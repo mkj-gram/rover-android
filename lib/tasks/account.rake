@@ -1,4 +1,4 @@
-unless Rails.env.development?
+if Rails.env.development?
     require 'colorize'
     require 'faker'
     namespace :account do
