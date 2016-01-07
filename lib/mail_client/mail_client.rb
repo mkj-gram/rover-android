@@ -18,8 +18,8 @@ module MailClient
     def self.connection_pool
         @@connection_pool ||= ConnectionPool.new(size: 5, timeout: 5) {
             config = Rails.configuration.mailgun
-            api_key = config["api-key"] || ""
-            domain = config["api-url"] || ""
+            api_key = config["api_key"] || ""
+            domain = config["api_url"] || ""
             set_default_domain(domain)
             Mailgun::Client.new(api_key)
         }

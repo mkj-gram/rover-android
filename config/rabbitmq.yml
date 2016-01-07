@@ -6,10 +6,10 @@ development:
     heartbeat: 10
 
 
-staging:
-    user: rover
-    password: 06IaQQ65CCdSs0I2n894I304dEx5QA3f
-    host: aws-us-east-1-portal.10.dblayer.com:10093/rover-rabbitmq-staging
-    vhost: '/'
+production:
+    user: <%=ENV['RABBITMQ_USER']%>
+    password: <%=ENV['RABBITMQ_PASSWORD']%>
+    host: <%=ENV['RABBITMQ_HOST']%>
+    vhost: <%=ENV['RABBITMQ_VHOST']%>
     heartbeat: 10
 
