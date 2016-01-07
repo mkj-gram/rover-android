@@ -1,7 +1,22 @@
-development:
-  adapter: postgresql
-  encoding: unicode
-  database: replicationexample
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
   pool: 5
-  username: myapp
-  password: password1
+  timeout: 5000
+
+development:
+    adapter: postgresql
+    encoding: unicode
+    database: rover-local
+    pool: 5
+    username: myapp
+    password: password1
+
+staging:
+    adapter: postgresql
+    encoding: unicode
+    database: rover
+    pool: 5
+    username: admin
+    password: BXHREZJTBHOXZVYX
+    host: aws-us-east-1-portal.9.dblayer.com:10428

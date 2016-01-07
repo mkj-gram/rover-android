@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class LocationTest < ActiveSupport::TestCase
+class AccountInviteTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

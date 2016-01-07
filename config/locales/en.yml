@@ -20,4 +20,11 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  validations:
+    commons:
+        email_wrong_format: "Invalid email address"
+        email_missing: "Please provide an email address"
+  unauthorized:
+    protected: "You do not have permission to access this resource"
+    invalid_token: "Invalid token"
+    malformed_token: "Malformed token"

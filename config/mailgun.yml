@@ -1,0 +1,4 @@
+development:
+    name: "sandbox"
+    api-key: "key-ef6a48e781d32c3abd524afb5c91838e"
+    api-url: "sandboxbb6b6014e8464f18ad8a7cd4af4cdfcf.mailgun.org"

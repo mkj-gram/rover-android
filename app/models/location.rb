@@ -1,5 +1,8 @@
 class Location < ActiveRecord::Base
-	# adds callbacks to replicate
-	include ModelBroadcaster::Document
+
+    belongs_to :account, counter_cache: true
+
+    has_many :beacon_configurations
+
 
 end

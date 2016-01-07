@@ -1,0 +1,15 @@
+development:
+    user: guest
+    password: guest
+    host: aws-us-east-1-portal.10.dblayer.com:10093/rover-rabbitmq-staging
+    vhost: '/'
+    heartbeat: 10
+
+
+staging:
+    user: rover
+    password: 06IaQQ65CCdSs0I2n894I304dEx5QA3f
+    host: aws-us-east-1-portal.10.dblayer.com:10093/rover-rabbitmq-staging
+    vhost: '/'
+    heartbeat: 10
+
