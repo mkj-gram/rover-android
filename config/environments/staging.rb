@@ -8,7 +8,7 @@ Rails.application.configure do
     # your application in memory, allowing both threaded web servers
     # and those relying on copy on write to perform better.
     # Rake tasks automatically ignore this option for performance.
-    config.eager_load = true
+    config.eager_load = false
 
     # Full error reports are disabled and caching is turned on.
     config.consider_all_requests_local       = false
@@ -52,7 +52,7 @@ Rails.application.configure do
     # config.log_tags = [ :subdomain, :uuid ]
 
     # Use a different logger for distributed setups.
-    # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+    config.logger = Logger.new(STDOUT)
 
     # Use a different cache store in production.
     # config.cache_store = :mem_cache_store
