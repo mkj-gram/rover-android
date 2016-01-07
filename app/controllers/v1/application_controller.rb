@@ -94,7 +94,7 @@ class V1::ApplicationController < ActionController::API
         if account
             @current_account = account
         else
-            render_unauthorized("")
+            render_unauthorized("Validation Error", "API Token doesn't exist")
         end
     end
 
