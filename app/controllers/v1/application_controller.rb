@@ -31,7 +31,7 @@ class V1::ApplicationController < ActionController::API
         elsif authentication_method.user?
             authenticate_user
         else
-            render_unauthorized("The credentials provided are invalid")
+            render_unauthorized("Validation Failed", "The credentials provided are invalid")
         end
     end
 
@@ -80,7 +80,6 @@ class V1::ApplicationController < ActionController::API
             end
 
             return ActiveSupport::StringInquirer.new(method)
-
         }.call
     end
 
