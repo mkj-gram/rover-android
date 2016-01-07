@@ -19,4 +19,5 @@ staging:
     pool: 5
     username: admin
     password: BXHREZJTBHOXZVYX
-    host: aws-us-east-1-portal.9.dblayer.com:10428
+    host: aws-us-east-1-portal.9.dblayer.com
+    port: 10428
