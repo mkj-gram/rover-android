@@ -17,6 +17,7 @@ class PasswordReset < ActiveRecord::Base
 
     validate :user_exists
 
+
     def reset_password(password, password_confirmation)
         transaction do
             user.update!({
@@ -29,11 +30,13 @@ class PasswordReset < ActiveRecord::Base
         return false
     end
 
+
     protected
 
     def has_record_collision
         !existing_record.nil?
     end
+
     def existing_record
         @existing_record ||= PasswordReset.find_by_email(self.email)
     end
@@ -42,7 +45,7 @@ class PasswordReset < ActiveRecord::Base
 
     def user_exists
         if !User.exists?(email: self.email)
-            errors.add(:email, "user with email not found")
+            errors.add(:email, "email not found")
         end
     end
 
@@ -58,6 +61,6 @@ class PasswordReset < ActiveRecord::Base
     end
 
     def send_email
-        SendEmailWorker.perform_async("no-reply@rover.io", user.email, "Rover Password Reset", "/*insert_passowrd_reset_link*/")
+        SendEmailWorker.perform_async("Rover <no-reply@rover.io>", user.email, "Rover Password Reset", "/*insert_passowrd_reset_link*/")
     end
 end

@@ -1,36 +1,26 @@
 class V1::PasswordResetController < V1::ApplicationController
 
-    # before_action :validate_json_schema,    only: [:create]
+    before_action :validate_json_schema,    only: [:create]
 
     #
     # This will destroy the old model and create a new one
     #
     # @return [type] [description]
     def create
-        # @password_reset = PasswordReset.new(password_reset_params)
-        # if @password_reset.save
-        #     render json: @password_reset, status: :created
-        # else
-        #     render json: @password_reset.errors, status: :unprocessable_entity
-        # end
-    end
-
-    def update
-        # token = params[:password_reset][:token]
-        # @password_reset = PasswordReset.find_by_token(token)
-        # if @password_reset.expires_at <= DateTime.now
-        #     password = params[:password_reset][:password]
-        #     password_confirmation = params[:password_reset][:password_confirmation]
-        #     @password_reset.reset_password!(password, password_confirmation)
-        # else
-        #     render json: {errors: ["Password reset link has expired"]}
-        # end
+        json = flatten_request({single_record: true})
+        @password_reset = PasswordReset.new(password_reset_params(json[:data]))
+        if @password_reset.save
+            render json: @password_reset, serializer: V1::PasswordResetSerializer, status: :created
+        else
+            render json: @password_reset.errors, status: :unprocessable_entity
+        end
     end
 
     private
 
-    def password_reset_params
-        # params.require(:password_reset).permit(:email)
+    def password_reset_params(local_params)
+        local_params.require(:password_reset).require(:email)
+        local_params.require(:password_reset).permit(:email)
     end
 end
 

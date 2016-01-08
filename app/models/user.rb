@@ -71,6 +71,16 @@ class User < ActiveRecord::Base
         end
     end
 
+
+    #
+    # Generates a formatted email. Email can be in the form of
+    # name <email> or email
+    #
+    # @return [String] [Formatted email]
+    def formatted_email
+        return user.name.nil? ? user.email : "#{user.name} <#{user.email}>"
+    end
+
     private
 
     def has_access_to_account

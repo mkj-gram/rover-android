@@ -9,7 +9,7 @@ Rails.application.routes.draw do
     # scope module: :v1, constraints: ApiConstraint.new(version: 1) do
     #     resources :apps, except: [:new, :edit]
     # end
-    api_version(:module => "V1", :path => {:value => "v1"}, :parameter => {:name => "version", :value => "1"}, default: true) do
+    api_version(:module => "V1", :path => {:value => "v1"}, :parameter => {:name => "version", :value => "1"}, default: true, :defaults => { :format => 'json' }) do
         # resources :accounts do
         #     scope module: "account_context" do
         #         resources :users
@@ -17,8 +17,11 @@ Rails.application.routes.draw do
         #     end
         # end
         resources :users do
+
             # resources :password_reset, only: [:create]
         end
+
+        post "password_reset", to: "password_reset#create"
 
 
         resources :locations do
