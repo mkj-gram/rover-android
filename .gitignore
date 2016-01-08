@@ -24,3 +24,4 @@ pickle-email-*.html
 
 # these should all be checked in to normalize the environment:
 # Gemfile.lock, .ruby-version, .ruby-gemset.env
+.env

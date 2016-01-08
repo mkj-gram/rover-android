@@ -29,6 +29,8 @@ gem 'classy_hash', '~> 0.1.5'
 
 gem 'will_paginate', '~> 3.0', '>= 3.0.7'
 
+gem 'rack-cors', '~> 0.4.0', :require => 'rack/cors'
+
 group :development do
     gem 'faker', '~> 1.6', '>= 1.6.1'
 
