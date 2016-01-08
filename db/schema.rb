@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 20160107180658) do
     t.text     "title"
     t.integer  "primary_user_id"
     t.text     "token",                                                null: false
+    t.text     "share_key",                                            null: false
     t.integer  "users_count",                              default: 0
     t.integer  "locations_count",                          default: 0
     t.integer  "ibeacon_configurations_count",             default: 0

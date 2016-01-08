@@ -4,6 +4,7 @@ class CreateAccounts < ActiveRecord::Migration
             t.text :title
             t.integer :primary_user_id
             t.text :token, null: false
+            t.text :share_key, null: false
 
             # cache counters
             t.integer :users_count, default: 0

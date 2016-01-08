@@ -16,6 +16,9 @@ Rails.application.routes.draw do
         #         # resources :locations, :controller => ""
         #     end
         # end
+
+        get 'account', to: 'account#show'
+
         resources :users, except:[:create] do
 
             # resources :password_reset, only: [:create]
