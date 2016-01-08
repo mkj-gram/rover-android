@@ -20,7 +20,7 @@ class Session < ActiveRecord::Base
     end
 
     def expires_at
-        @expires_at ||= JWTToken.read(self.token, :exp)
+        @expires_at ||= Time.at(JWTToken.read(self.token, :exp)).to_datetime
     end
 
 
