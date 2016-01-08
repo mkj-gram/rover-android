@@ -6,7 +6,9 @@ class Session < ActiveRecord::Base
     before_create :generate_jwt_token
 
     def self.build_session(user)
-        Session.new(account_id: user.account_id, user_id: user.id)
+        session = Session.new(account_id: user.account_id, user_id: user.id)
+        session.user = user
+        return session
     end
 
     def expired?

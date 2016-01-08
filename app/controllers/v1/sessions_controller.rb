@@ -9,7 +9,22 @@ class V1::SessionsController < V1::ApplicationController
         if @user && @user.authenticate(login_params[:password])
             @session = Session.build_session(@user)
             if @session.save
-                render json: @session, serializer: V1::SessionSerializer
+                json = {
+                    "data"=> {
+                        "id"=> @session.id,
+                        "type"=> "sessions",
+                        "attributes"=> {
+                            "token"=> @session.token,
+                            "expires_at"=> @session.expires_at
+                        },
+                        "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true}).merge!(V1::AccountSerializer.s(@session.user.account, {relationships: true}))
+                    },
+                    "included"=> [
+                        V1::UserSerializer.s(@session.user),
+                        V1::AccountSerializer.s(@session.user.account)
+                    ]
+                }
+                render json: json, location: v1_user_url(@session.user.id)
             else
                 render_errors(@session.errors)
             end
@@ -28,8 +43,8 @@ class V1::SessionsController < V1::ApplicationController
     private
 
     def session_params(local_params)
-        local_params.require(:session).require(:email)
-        local_params.require(:session).require(:password)
-        local_params.require(:session).permit(:email, :password)
+        local_params.require(:sessions).require(:email)
+        local_params.require(:sessions).require(:password)
+        local_params.require(:sessions).permit(:email, :password)
     end
 end

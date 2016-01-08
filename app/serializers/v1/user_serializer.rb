@@ -1,4 +1,4 @@
-module V1::AccountSerializer
+module V1::UserSerializer
     class << self
 
         def s(object, options = {})
@@ -15,20 +15,22 @@ module V1::AccountSerializer
         def serialize(object)
             {
                 "id"=> object.id,
-                "type"=> "accounts",
+                "type"=> "users",
                 "attributes"=> {
-                    "title"=> object.title,
-                    "token"=> object.token
+                    "name"=> object.name,
+                    "email"=> object.email,
+                    "created_at"=> object.created_at,
+                    "updated_at"=> object.updated_at
                 }
             }
         end
 
         def serialize_relationship(object)
             {
-                "account"=> {
+                "user"=> {
                     "data"=> {
                         "id"=> object.id,
-                        "type"=> "accounts"
+                        "type"=> "users"
                     }
                 }
             }
