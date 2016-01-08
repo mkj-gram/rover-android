@@ -36,18 +36,7 @@ class V1::UsersController < V1::ApplicationController
 
     end
 
-    # POST /users
-    # non batch request
-    def create
-        json = flatten_request({single_record: true})
-        @user = User.new(user_params(json[:data]))
-        # when a user is first created generate a session for them?
-        if @user.save
-            render json: @user, serializer: V1::UserSerializers::CreateSerializer, include: ["session"], location: v1_user_url(1)
-        else
-            render_errors(@user.errors, status: :unprocessable_entity)
-        end
-    end
+
 
     # PATCH/PUT /users/1
     # Non batch request

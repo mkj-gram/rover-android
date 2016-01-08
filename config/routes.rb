@@ -16,12 +16,14 @@ Rails.application.routes.draw do
         #         # resources :locations, :controller => ""
         #     end
         # end
-        resources :users do
+        resources :users, except:[:create] do
 
             # resources :password_reset, only: [:create]
         end
 
-        post "password_reset", to: "password_reset#create"
+        post 'registrations', to: "registrations#create"
+
+        post 'password_reset', to: "password_reset#create"
 
 
         resources :locations do
