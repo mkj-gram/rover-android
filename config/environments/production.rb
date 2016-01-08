@@ -52,10 +52,8 @@ Rails.application.configure do
     # config.log_tags = [ :subdomain, :uuid ]
 
     # Use a different logger for distributed setups.
-    if ENV['LOG_STDOUT'] == true
-        Rails.logger = Logger.new(STDOUT)
-    end
-    # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+    config.logger = Logger.new(STDOUT)
+    # config.logger = ActiveSupport::TaggedLogging.new(STDOUT)
 
     # Use a different cache store in production.
     # config.cache_store = :mem_cache_store
