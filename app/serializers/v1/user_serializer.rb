@@ -18,9 +18,7 @@ module V1::UserSerializer
                 "type"=> "users",
                 "attributes"=> {
                     "name"=> object.name,
-                    "email"=> object.email,
-                    "created-at"=> object.created_at,
-                    "updated-at"=> object.updated_at
+                    "email"=> object.email
                 }
             }
         end

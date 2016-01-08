@@ -14,13 +14,16 @@ class V1::SessionsController < V1::ApplicationController
                         "id"=> @session.id.to_s,
                         "type"=> "sessions",
                         "attributes"=> {
-                            "token"=> @session.token,
-                            "expires-at"=> @session.expires_at
+                            "token"=> @session.token
                         },
-                        "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true}).merge!(V1::AccountSerializer.s(@session.user.account, {relationships: true}))
+                        "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true})
                     },
                     "included"=> [
-                        V1::UserSerializer.s(@session.user),
+                        V1::UserSerializer.s(@session.user).merge!(
+                            {
+                                "relationships" => V1::AccountSerializer.s(@session.user.account, {relationships: true})
+                            }
+                        ),
                         V1::AccountSerializer.s(@session.user.account)
                     ]
                 }
