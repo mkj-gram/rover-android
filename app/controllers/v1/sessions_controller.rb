@@ -11,7 +11,7 @@ class V1::SessionsController < V1::ApplicationController
             if @session.save
                 json = {
                     "data"=> {
-                        "id"=> @session.id,
+                        "id"=> @session.id.to_s,
                         "type"=> "sessions",
                         "attributes"=> {
                             "token"=> @session.token,
