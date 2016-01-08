@@ -54,6 +54,10 @@ class V1::RegistrationsController < V1::ApplicationController
 
 
     def user_params(local_params)
+        local_params.require(:registrations).require(:email)
+        local_params.require(:registrations).require(:password)
+        local_params.require(:registrations).require(:password_confirmation)
+
         local_params.require(:registrations).permit(:name, :email, :password, :password_confirmation, :account_title, :account_invite_token)
     end
 end

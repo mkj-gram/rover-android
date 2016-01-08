@@ -15,7 +15,7 @@ class V1::SessionsController < V1::ApplicationController
                         "type"=> "sessions",
                         "attributes"=> {
                             "token"=> @session.token,
-                            "expires_at"=> @session.expires_at
+                            "expires-at"=> @session.expires_at
                         },
                         "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true}).merge!(V1::AccountSerializer.s(@session.user.account, {relationships: true}))
                     },

@@ -20,6 +20,10 @@ class V1::ApplicationController < ActionController::API
         return "X-Rover-REST-API-Key"
     end
 
+    rescue_from(ActionController::ParameterMissing) do |parameter_missing_exception|
+        error = {title: "Missing Parameter", description: "#{parameter_missing_exception.param} parameter is required" , status: "400"}
+        render_errors(error, status: :bad_request)
+    end
 
     #
     # Authenticates a request as either an application or user.
@@ -103,7 +107,7 @@ class V1::ApplicationController < ActionController::API
         token = params[:token] || request.headers["Authorization"].split(' ').last
         session = Session.find_by_token(token)
         if session.nil?
-            render_unauthorized("Validation Error", "could not find log in token")
+            render_unauthorized("Validation Error", "could not find the current session")
         elsif session.expired?
             render_unauthorized("Validation Error", "session has expired")
         else

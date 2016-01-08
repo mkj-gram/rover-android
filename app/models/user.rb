@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
 
     has_secure_password
 
-    attr_accessor :old_password
+    attr_accessor :old_password, :account_title, :account_invite_token
 
     # has_one :acl, class_name: "UserAcl" -> refer to custom function acl
 
@@ -19,11 +19,15 @@ class User < ActiveRecord::Base
         end
     end
 
+    before_validation :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
+
 
     before_create :create_account, if: -> { account_id.nil? }
     after_create :update_account_user_id
     after_create :create_acl
     after_create :generate_session
+
+    after_create :destroy_account_invite
 
     before_destroy :can_destroy
 
@@ -85,13 +89,13 @@ class User < ActiveRecord::Base
 
     def has_access_to_account
         if self.account_owner == false && changes.has_key?("account_id")
-            invite = AccountInvite.find_by_invited_email(self.email)
-            if invite && invite.account_id == self.account_id
-                if invite.token != self.account_invite_token
+            @invite ||= AccountInvite.find_by_invited_email(self.email)
+            if @invite && @invite.account_id == self.account_id
+                if @invite.token != self.account_invite_token
                     errors.add(:account, "invite expired ask the account owner to send a new invite")
                 end
             else
-                errors.add(:account, "you do not have permission #{invite.account_id}")
+                errors.add(:account, "you do not have permission to sign up")
             end
         end
     end
@@ -117,6 +121,13 @@ class User < ActiveRecord::Base
         # end
     end
 
+    def attach_to_account
+        @invite = AccountInvite.find_by_invited_email(self.email)
+        if @invite
+            self.account_id = @invite.account_id
+        end
+    end
+
     def create_account
         # create an account with the primary email as the first user to sign up
         account = Account.create(primary_user_id: self.id, title: account_title)
@@ -131,6 +142,13 @@ class User < ActiveRecord::Base
             UserAcl.create!(user_id: self.id)
         end
 
+    end
+
+    def destroy_account_invite
+        @invite ||= AccountInvite.find_by_invited_email(self.email)
+        if @invite
+            @invite.destroy!
+        end
     end
 
     def generate_session

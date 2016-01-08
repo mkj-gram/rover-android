@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20160107180658) do
     t.integer  "eddystone_namespace_configurations_count", default: 0
     t.integer  "eddystone_url_configurations_count",       default: 0
     t.integer  "beacon_configurations_count",              default: 0
+    t.integer  "account_invites_count",                    default: 0
     t.datetime "created_at",                                           null: false
     t.datetime "updated_at",                                           null: false
   end
