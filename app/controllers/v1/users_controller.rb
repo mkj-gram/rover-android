@@ -73,6 +73,6 @@ class V1::UsersController < V1::ApplicationController
 
 
     def user_params(local_params)
-        local_params.require(:users).permit(:name, :email, :password, :password_confirmation, :current_password)
+        local_params.require(:users).permit(:name, :email, :password, :password_confirmation, :old_password)
     end
 end

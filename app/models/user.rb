@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
 
     has_secure_password
 
-    attr_accessor :account_invite_token, :password_reset_token, :old_password, :account_title
+    attr_accessor :old_password
 
     # has_one :acl, class_name: "UserAcl" -> refer to custom function acl
 
@@ -97,6 +97,9 @@ class User < ActiveRecord::Base
     end
 
     def can_change_password
+        if old_password && !self.authenticate(old_password)
+            errors.add(:password, "incorrect password")
+        end
         # if password_reset_token
         #     reset = PasswordReset.find_by_token(password_reset_token)
         #     if reset && reset.email
