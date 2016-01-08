@@ -14,7 +14,7 @@ module V1::SessionSerializer
 
         def serialize(object)
             {
-                "id"=> object.id,
+                "id"=> object.id.to_s,
                 "type"=> "sessions",
                 "attributes"=> {
                     "token"=> object.token,
@@ -27,7 +27,7 @@ module V1::SessionSerializer
             {
                 "user"=> {
                     "data"=> {
-                        "id"=> object.id,
+                        "id"=> object.id.to_s,
                         "type"=> "sessions"
                     }
                 }

@@ -14,7 +14,7 @@ module V1::UserSerializer
 
         def serialize(object)
             {
-                "id"=> object.id,
+                "id"=> object.id.to_s,
                 "type"=> "users",
                 "attributes"=> {
                     "name"=> object.name,
@@ -29,7 +29,7 @@ module V1::UserSerializer
             {
                 "user"=> {
                     "data"=> {
-                        "id"=> object.id,
+                        "id"=> object.id.to_s,
                         "type"=> "users"
                     }
                 }

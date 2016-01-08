@@ -14,7 +14,7 @@ module V1::AccountSerializer
 
         def serialize(object)
             {
-                "id"=> object.id,
+                "id"=> object.id.to_s,
                 "type"=> "accounts",
                 "attributes"=> {
                     "title"=> object.title,
@@ -27,7 +27,7 @@ module V1::AccountSerializer
             {
                 "account"=> {
                     "data"=> {
-                        "id"=> object.id,
+                        "id"=> object.id.to_s,
                         "type"=> "accounts"
                     }
                 }

@@ -10,7 +10,17 @@ class V1::PasswordResetController < V1::ApplicationController
         json = flatten_request({single_record: true})
         @password_reset = PasswordReset.new(password_reset_params(json[:data]))
         if @password_reset.save
-            render json: @password_reset, serializer: V1::PasswordResetSerializer, status: :created
+            json = {
+                "data" => {
+                    "id" => @password_reset.id.to_s,
+                    "type" => "password_resets",
+                    "attributes" => {
+                        "email" => @password_reset.email,
+                        "expires_at" => @password_reset.expires_at
+                    }
+                }
+            }
+            render json: json, status: :created
         else
             render json: @password_reset.errors, status: :unprocessable_entity
         end
@@ -19,8 +29,8 @@ class V1::PasswordResetController < V1::ApplicationController
     private
 
     def password_reset_params(local_params)
-        local_params.require(:password_reset).require(:email)
-        local_params.require(:password_reset).permit(:email)
+        local_params.require(:password_resets).require(:email)
+        local_params.require(:password_resets).permit(:email)
     end
 end
 

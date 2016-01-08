@@ -29,7 +29,10 @@ class V1::UsersController < V1::ApplicationController
     def show
         @user = current_resource
         if @user
-            render json: @user, serializer: V1::UserSerializers::IndividualSerializer
+            json = {
+                "data" => V1::UserSerializer.s(@user)
+            }
+            render json: json
         else
             head :not_found
         end
@@ -70,6 +73,6 @@ class V1::UsersController < V1::ApplicationController
 
 
     def user_params(local_params)
-        local_params.require(:user).permit(:name, :email, :password, :password_confirmation, :account_title, :account_invite_token)
+        local_params.require(:user).permit(:name, :email, :password, :password_confirmation)
     end
 end
