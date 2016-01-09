@@ -12,7 +12,7 @@ class Session < ActiveRecord::Base
     end
 
     def expired?
-        @expired ||= DateTime.now.to_i > expires_at
+        @expired ||= DateTime.now > expires_at
     end
 
     def duration
