@@ -9,18 +9,23 @@ class V1::AccountInvitesController < V1::ApplicationController
         @account_invites = @account_invites.first(page_size)
         json = {
             "data" => @account_invites.map do |account_invite|
-                V1::AccountInviteSerializer.s(account_invite).merge!(
-                    {
-                        "relationships"=> {
-                            "issuer" => {
-                                "data" => {
-                                    "type" => "user",
-                                    "id" => account_invite.issuer_id.to_s
-                                }
+                {
+                    "id"=> account_invite.id.to_s,
+                    "type"=> "account_invites",
+                    "attributes"=> {
+                        "invited-email" => account_invite.invited_email,
+                        "issuer-id" => account_invite.issuer_id.to_s,
+                        "created-at"=> account_invite.created_at,
+                    },
+                    "relationships"=> {
+                        "issuer" => {
+                            "data" => {
+                                "type" => "users",
+                                "id" => account_invite.issuer_id.to_s
                             }
                         }
                     }
-                )
+                }
             end,
             "meta" => {
                 "total_records"=> current_account.account_invites_count
@@ -42,9 +47,9 @@ class V1::AccountInvitesController < V1::ApplicationController
                     "id" => @account_invite.id.to_s,
                     "type" => "account_invites",
                     "attributes" => {
-                        "invite_email" => @account_invite.invited_email,
-                        "issuer_id" => @account_invite.issuer_id.to_s,
-                        "created_at" => @account_invite.created_at
+                        "invited-email" => @account_invite.invited_email,
+                        "issuer-id" => @account_invite.issuer_id.to_s,
+                        "created-at" => @account_invite.created_at
                     },
                     "relationships" => {
                         "issuer" => {
@@ -61,11 +66,23 @@ class V1::AccountInvitesController < V1::ApplicationController
                         }
                     }
                 },
-                included: [
-                    V1::UserSerializer.s(@account_invite.issuer),
-                    V1::AccountSerializer.s(@account_invite.account)
+                "included"=> [
+                    {
+                        "id" => @account_invite.issuer.id.to_s,
+                        "type" => "users",
+                        "attributes" => {
+                            "name" => @account_invite.issuer.name,
+                            "email" => @account_invite.issuer.email
+                        }
+                    },
+                    {
+                        "id" => @account_invite.account.id.to_s,
+                        "type" => "accounts",
+                        "attributes" => {
+                            "title" => @account_invite.account.title.to_s,
+                        }
+                    }
                 ]
-
             }
             render json: json
         else
