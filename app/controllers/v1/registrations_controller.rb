@@ -8,38 +8,59 @@ class V1::RegistrationsController < V1::ApplicationController
     def create
         json = flatten_request({single_record: true})
         @user = User.new(user_params(json[:data]))
-        # when a user is first created generate a session for them?
         if @user.save
             json = {
                 "data"=> {
-                    "id"=> @user.id,
+                    "id"=> @user.id.to_s,
                     "type"=> "registrations",
-                    "attributes"=> {},
+                    "attributes"=> {
+                        "name" => @user.name,
+                        "email" => @user.email,
+                        "password" => "",
+                        "organization" => @user.account.title
+                    },
                     "relationships"=> {
-                        "user" => {
-                            "data" => {
-                                "id" => @user.id,
-                                "type" => "users"
-                            }
-                        },
-                        "account" => {
-                            "data" => {
-                                "id" => @user.account_id,
-                                "type" => "accounts"
-                            }
-                        },
                         "session" => {
                             "data" => {
-                                "id" => @user.session.id,
+                                "id" => @user.session.id.to_s,
                                 "type" => "sessions"
                             }
                         }
                     }
                 },
                 "included"=> [
-                    V1::UserSerializer.s(@user),
-                    V1::AccountSerializer.s(@user.account),
-                    V1::SessionSerializer.s(@user.session)
+                    {
+                        "type"=> "sessions",
+                        "id"=> @user.session.id.to_s,
+                        "attributes"=> {
+                            "token"=> @user.session.token
+                        },
+                        "relationships"=> {
+                            "user"=> {
+                                "data"=> {
+                                    "type"=> "users",
+                                    "id"=> @user.id.to_s
+                                }
+                            }
+                        }
+                    },
+
+                    {
+                        "type"=> "users",
+                        "id"=> @user.id.to_s,
+                        "attributes"=> {
+                            "name"=> @user.name,
+                            "email"=> @user.email,
+                        },
+                        "relationships"=> {
+                            "account"=> {
+                                "data"=> {
+                                    "type"=> "accounts",
+                                    "id"=> @user.account_id.to_s
+                                }
+                            }
+                        }
+                    }
                 ]
             }
             render json: json, location: v1_user_url(@user.id)
@@ -54,10 +75,17 @@ class V1::RegistrationsController < V1::ApplicationController
 
 
     def user_params(local_params)
+        local_params.require(:registrations).require(:name)
         local_params.require(:registrations).require(:email)
         local_params.require(:registrations).require(:password)
-        local_params.require(:registrations).require(:password_confirmation)
+
+        # format the clients request to server variables
+        registration_params = local_params[:registrations]
+        registration_params[:password_confirmation] = registration_params[:password]
+        registration_params[:account_title] = registration_params[:organization].nil? ? registration_params[:name] : registration_params[:organization]
+        registration_params[:account_invite_token] = registration_params[:token].nil? ? nil : registration_params[:token]
 
         local_params.require(:registrations).permit(:name, :email, :password, :password_confirmation, :account_title, :account_invite_token)
+
     end
 end
