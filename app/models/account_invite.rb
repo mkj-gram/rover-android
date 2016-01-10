@@ -27,8 +27,8 @@ class AccountInvite < ActiveRecord::Base
         SendEmailWorker.perform_async(
             "Rover <no-reply@rover.io>",
             self.invited_email,
-            "Invitition from #{user.name} on Rover",
-            "#{user.name || user.email} has invited you to collaborate on #{account.title}"
+            "Invitition from #{issuer.name} on Rover",
+            "#{issuer.name || issuer.email} has invited you to collaborate on #{account.title}"
         )
     end
 end
