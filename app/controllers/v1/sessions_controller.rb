@@ -23,8 +23,7 @@ class V1::SessionsController < V1::ApplicationController
                             {
                                 "relationships" => V1::AccountSerializer.s(@session.user.account, {relationships: true})
                             }
-                        ),
-                        V1::AccountSerializer.s(@session.user.account)
+                        )
                     ]
                 }
                 render json: json, location: v1_user_url(@session.user.id)
