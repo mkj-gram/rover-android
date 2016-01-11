@@ -19,6 +19,8 @@ class User < ActiveRecord::Base
         end
     end
 
+    before_validation { self.email = self.email.downcase if self.email? }
+
     before_create :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
     before_create :create_account, if: -> { account_id.nil? }
     after_create :update_account_user_id

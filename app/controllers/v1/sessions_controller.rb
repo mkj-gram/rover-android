@@ -6,7 +6,7 @@ class V1::SessionsController < V1::ApplicationController
         # takes in a email and password and returns a signed jwt token
         json = flatten_request({single_record: true})
         login_params = session_params(json[:data])
-        @user = User.find_by_email(login_params[:email])
+        @user = User.find_by_email(login_params[:email].downcase)
         if @user && @user.authenticate(login_params[:password])
             @session = Session.build_session(@user)
             if @session.save
