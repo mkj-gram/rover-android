@@ -39,6 +39,8 @@ class User < ActiveRecord::Base
         allow_blank: false,
         if: :email_changed?
 
+    validates :password, presence: true, length: { :minimum => 6, :allow_nil => false }
+    validates :password_confirmation, presence: true
     validate :has_access_to_account
     validate :can_change_password
 
