@@ -36,6 +36,18 @@ describe "/v1/sessions", :type => :request do
                 expect(json[:data]).to have_key(:attributes)
                 expect(json[:data][:attributes]).to have_key(:token)
             end
+
+            it 'returns 200 ok with an upcased email' do
+                user = create(:user)
+                post "/v1/sessions",
+                data: {
+                    type: "sessions",
+                    attributes: {
+                        email: user.email.upcase,
+                        password: user.password
+                    }
+                }
+            end
         end
     end
 

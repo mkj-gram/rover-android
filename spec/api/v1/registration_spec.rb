@@ -103,6 +103,32 @@ describe "/v1/registrations", :type => :request do
                 expect(attributes[:organization]).to eq(name)
 
             end
+
+            it 'creates a new user and account with the email downcased' do
+                name = "Test"
+                email = "test@rover.io"
+                password = "123456"
+
+                post '/v1/registrations',
+                data: {
+                    type: "registrations",
+                    attributes: {
+                        name: name,
+                        email: email.upcase, # upcase the email when sending it in
+                        password: password
+                    }
+                }
+
+                expect(response).to have_http_status(200)
+                expect(json).to have_key(:data)
+                expect(json[:data]).to have_key(:attributes)
+                attributes = json[:data][:attributes]
+
+                expect(attributes[:email]).to eq(email)
+                expect(attributes[:name]).to eq(name)
+                expect(attributes[:password]).to eq("")
+                expect(attributes[:organization]).to eq(name)
+            end
         end
 
         context "account invite" do
