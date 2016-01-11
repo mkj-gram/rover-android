@@ -19,9 +19,7 @@ class User < ActiveRecord::Base
         end
     end
 
-    before_validation :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
-
-
+    before_create :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
     before_create :create_account, if: -> { account_id.nil? }
     after_create :update_account_user_id
     after_create :create_acl
@@ -41,7 +39,7 @@ class User < ActiveRecord::Base
 
     validates :password, presence: true, length: { :minimum => 6, :allow_nil => false }
     validates :password_confirmation, presence: true
-    validate :has_access_to_account
+    validate :valid_account_invite_token
     validate :can_change_password
 
     # when changing the password we either have to validate the reset token or
@@ -62,7 +60,6 @@ class User < ActiveRecord::Base
             UserAcl.find_by_user_id(self.id)
         end
     end
-
 
     #
     # Returns the most recent created session
@@ -89,15 +86,22 @@ class User < ActiveRecord::Base
 
     private
 
-    def has_access_to_account
-        if self.account_owner == false && changes.has_key?("account_id")
-            @invite ||= AccountInvite.find_by_invited_email(self.email)
-            if @invite && @invite.account_id == self.account_id
-                if @invite.token != self.account_invite_token
-                    errors.add(:account, "invite expired ask the account owner to send a new invite")
-                end
+    def invite
+        @invite ||= -> {
+            if self.account_invite_token
+                AccountInvite.find_by_token(self.account_invite_token)
             else
-                errors.add(:account, "you do not have permission to sign up")
+                AccountInvite.find_by_invited_email(self.email)
+            end
+        }.call
+    end
+
+    def valid_account_invite_token
+        if self.account_invite_token
+            if invite.nil?
+                errors.add(:account, "the invite doesn't exist")
+            elsif invite.invited_email != self.email
+                errors.add(:account, "the email address specified doesn't match the invite")
             end
         end
     end
@@ -124,9 +128,8 @@ class User < ActiveRecord::Base
     end
 
     def attach_to_account
-        @invite = AccountInvite.find_by_invited_email(self.email)
-        if @invite
-            self.account_id = @invite.account_id
+        if invite
+            self.account_id = invite.account_id
         end
     end
 
