@@ -38,4 +38,40 @@ describe "/v1/sessions", :type => :request do
             end
         end
     end
+
+    context "DELETE" do
+        context "when deleting a session which does not belong to you" do
+            it 'returns 401 unauthorized' do
+
+                session = create(:session)
+
+                different_account = create(:different_account)
+
+                delete "/v1/sessions/1", nil, {'X-Rover-REST-API-Key' => different_account.token}
+
+                expect(response).to have_http_status(401)
+
+            end
+        end
+
+        context "when deleting a session from the owner account" do
+            it 'returns 204 no content' do
+                session = create(:session)
+
+                delete "/v1/sessions/1", nil, {'X-Rover-REST-API-Key' => session.account.token}
+
+                expect(response).to have_http_status(204)
+            end
+        end
+
+        context "when deleting a session from the user" do
+            it 'returns 204 no content' do
+                session = create(:session)
+
+                delete "/v1/sessions/1", nil, {'Authorization' => "Bearer #{session.token}"}
+
+                expect(response).to have_http_status(204)
+            end
+        end
+    end
 end

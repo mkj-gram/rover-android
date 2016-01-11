@@ -48,7 +48,7 @@ Rails.application.routes.draw do
             # end
         end
 
-        resources :sessions, only: [:create]
+        resources :sessions, only: [:create, :destroy]
         # resources :password_reset
     end
     # The priority is based upon order of creation: first created -> highest priority.

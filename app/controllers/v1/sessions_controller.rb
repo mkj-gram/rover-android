@@ -1,6 +1,6 @@
 class V1::SessionsController < V1::ApplicationController
     before_action :validate_json_schema,    only: [:create]
-
+    before_action :authenticate, only: [:destroy]
     def create
         # takes in a email and password and returns a signed jwt token
         json = flatten_request({single_record: true})
@@ -37,9 +37,22 @@ class V1::SessionsController < V1::ApplicationController
     end
 
     def destroy
-        # add in later for the admin console
-        # stateless? discussion
-        # if we keep state we can expire keys
+        @session = Session.find_by_id(params[:id])
+        if @session
+            if current_user && @session.user_id != current_user.id
+                render_unauthorized("Access", "you do not have access to delete this session")
+            elsif current_account && @session.account_id != current_account.id
+                render_unauthorized("Access", "you do not have access to delete this session")
+            else
+                if @session.destroy
+                    head :no_content
+                else
+                    render_errors(@session.errors, stautus: :conflict)
+                end
+            end
+        else
+            head :not_found
+        end
     end
 
     private
