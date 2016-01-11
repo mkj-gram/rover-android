@@ -19,5 +19,6 @@ class CreateAccounts < ActiveRecord::Migration
         end
 
         add_index :accounts, :token, unique: true
+        add_index :accounts, :share_key, unique: true
     end
 end

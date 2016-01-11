@@ -37,10 +37,14 @@ group :development do
 
     gem 'colorize', '~> 0.7.7'
 
-    gem 'rspec-rails', '~> 3.0'
-
 end
 
 group :test do
     gem 'sqlite3', '~> 1.3', '>= 1.3.11'
+end
+
+group :development, :test do
+    gem 'factory_girl_rails', '~> 4.5'
+
+    gem 'rspec-rails', '~> 3.0'
 end
