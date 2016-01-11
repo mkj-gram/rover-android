@@ -1,6 +1,7 @@
 class V1::SessionsController < V1::ApplicationController
     before_action :validate_json_schema,    only: [:create]
-    before_action :authenticate, only: [:destroy]
+    before_action :authenticate, only: [:show, :destroy]
+
     def create
         # takes in a email and password and returns a signed jwt token
         json = flatten_request({single_record: true})
@@ -34,6 +35,36 @@ class V1::SessionsController < V1::ApplicationController
             render_unauthorized("Validation Error", "Incorrect email or password")
         end
 
+    end
+
+    def show
+        @session = Session.find_by_id(params[:id])
+        if @session
+            if current_user && @session.user_id != current_user.id
+                render_unauthorized("Validation Error", "unable to view a session which isn't yours")
+            else
+                json = {
+                    "data"=> {
+                        "id"=> @session.id.to_s,
+                        "type"=> "sessions",
+                        "attributes"=> {
+                            "token"=> @session.token
+                        },
+                        "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true})
+                    },
+                    "included"=> [
+                        V1::UserSerializer.s(@session.user).merge!(
+                            {
+                                "relationships" => V1::AccountSerializer.s(@session.user.account, {relationships: true})
+                            }
+                        )
+                    ]
+                }
+                render json: json, location: v1_user_url(@session.user.id)
+            end
+        else
+            head :not_found
+        end
     end
 
     def destroy
