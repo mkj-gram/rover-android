@@ -108,6 +108,8 @@ class V1::ApplicationController < ActionController::API
         session = Session.find_by_token(token)
         if session.nil?
             render_unauthorized("Validation Error", "could not find the current session")
+        elsif session.verified? || session.errors.any?
+            render_unauthorized("Validation Error", "the session is invalid")
         elsif session.expired?
             render_unauthorized("Validation Error", "session has expired")
         else

@@ -15,16 +15,25 @@ class Session < ActiveRecord::Base
         @expired ||= DateTime.now > expires_at
     end
 
+    def verified?
+        @verified ||= jwt_token.verified?
+    end
+
+
     def duration
         24.hours
     end
 
     def expires_at
-        @expires_at ||= Time.at(JWTToken.read(self.token, :exp)).to_datetime
+        @expires_at ||= Time.at(jwt_token.read(:exp).to_i).to_datetime
     end
 
 
     private
+
+    def jwt_token
+        @jwt_token ||= JWTToken.new(self.token)
+    end
 
     def generate_jwt_token
         self.token = JWTToken.build_token(self)
