@@ -12,7 +12,7 @@ module RailsApi
         # Setup configuration per enviroment
         config.rabbitmq = Rails.application.config_for(:rabbitmq)
         config.mailgun = Rails.application.config_for(:mailgun)
-
+        config.password_reset = Rails.application.config_for(:password_reset)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
         # config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations', 'ibeacon_configuration')

@@ -38,6 +38,9 @@
     },
     "MAILGUN_API_URL": {
         "required": true
+    },
+    "PASSWORD_RESET_URL": {
+      "required": true
     }
   },
   "addons": []

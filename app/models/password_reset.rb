@@ -2,7 +2,6 @@ class PasswordReset < ActiveRecord::Base
     include Tokenable
     include UniqueRecord
 
-    self.primary_key = :user_id
     belongs_to :user
 
     before_create :attach_user
@@ -11,25 +10,26 @@ class PasswordReset < ActiveRecord::Base
     after_create :send_email
 
     validates :email,
-        presence: { message: I18n.t(:"validations.commons.email_missing") },
-        email: true,
-        allow_blank: false
+        presence: true,
+        email: { allow_blank: true },
+        allow_blank: false,
+        if: -> { new_record? || email_changed? }
 
     validate :user_exists
 
+    self.token_size = 32
 
-    def reset_password(password, password_confirmation)
-        transaction do
-            user.update!({
-                             password: password,
-                             password_confirmation: password_confirmation,
-            })
-            self.destroy!
-            return true
-        end
-        return false
+    def reset_password(password)
+        Rails.logger.info("updating password to: #{password}")
+        user.password = password
+        user.password_confirmation = password
+        return user.save
+
     end
 
+    def expired?
+        DateTime.now > self.expires_at
+    end
 
     protected
 
@@ -41,11 +41,13 @@ class PasswordReset < ActiveRecord::Base
         @existing_record ||= PasswordReset.find_by_email(self.email)
     end
 
+
+
     private
 
     def user_exists
         if !User.exists?(email: self.email)
-            errors.add(:email, "email not found")
+            errors.add(:email, "not found")
         end
     end
 
@@ -61,6 +63,7 @@ class PasswordReset < ActiveRecord::Base
     end
 
     def send_email
-        SendEmailWorker.perform_async("Rover <no-reply@rover.io>", user.email, "Rover Password Reset", "/*insert_passowrd_reset_link*/")
+        url = Rails.configuration.password_reset["uri"] + "?" + {token: self.token}.to_query
+        SendEmailWorker.perform_async("Rover <no-reply@rover.io>", user.email, "Rover Password Reset", "Please vist this #{url}")
     end
 end

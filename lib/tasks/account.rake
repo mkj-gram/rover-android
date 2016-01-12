@@ -33,7 +33,7 @@ if Rails.env.development?
                 puts "\nCreating primary user with email #{primary_account_email}"
                 ActiveRecord::Base.transaction do
                     show_percentage(0)
-                    user = User.create!(name: "Rover Test", email: primary_account_email, password: "1", password_confirmation: "1", account_title: "Rover")
+                    user = User.create!(name: "Rover Test", email: primary_account_email, password: "password", password_confirmation: "password", account_title: "Rover")
                     @account = user.account
                     show_finished
 
@@ -49,8 +49,8 @@ if Rails.env.development?
                         User.create!(
                             name: Faker::Name.name,
                             email: user_email,
-                            password: "123",
-                            password_confirmation: "123",
+                            password: "password",
+                            password_confirmation: "password",
                             account_id: @account.id,
                             account_invite_token: invite.token
                         )

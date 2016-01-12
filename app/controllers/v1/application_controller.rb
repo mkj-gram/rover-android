@@ -104,7 +104,7 @@ class V1::ApplicationController < ActionController::API
 
     def authenticate_user
         # this is jwt authentication method
-        token = params[:token] || request.headers["Authorization"].split(' ').last
+        token = request.headers["Authorization"].split(' ').last
         session = Session.find_by_token(token)
         if session.nil?
             render_unauthorized("Validation Error", "could not find the current session")
