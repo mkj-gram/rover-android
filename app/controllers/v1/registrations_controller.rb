@@ -48,11 +48,10 @@ class V1::RegistrationsController < V1::ApplicationController
             }
             render json: json, location: v1_user_url(@user.id)
         else
-            render_errors(@user.errors, status: :unprocessable_entity)
+            json = {errors: V1::RegistrationErrorSerializer.serialize(@user.errors)}
+            render json: json , status: :unprocessable_entity
         end
     end
-
-
 
     private
 
