@@ -16,39 +16,13 @@ class V1::RegistrationsController < V1::ApplicationController
                     "attributes"=> {
                         "name" => @user.name,
                         "email" => @user.email,
-                        "password" => "",
                         "organization" => @user.account.title
-                    },
-                    "relationships"=> {
-                        "session" => {
-                            "data" => {
-                                "id" => @user.session.id.to_s,
-                                "type" => "sessions"
-                            }
-                        }
                     }
-                },
-                "included"=> [
-                    {
-                        "type"=> "sessions",
-                        "id"=> @user.session.id.to_s,
-                        "attributes"=> {
-                            "token"=> @user.session.token
-                        },
-                        "relationships"=> {
-                            "user"=> {
-                                "data"=> {
-                                    "type"=> "users",
-                                    "id"=> @user.id.to_s
-                                }
-                            }
-                        }
-                    }
-                ]
+                }
             }
             render json: json, location: v1_user_url(@user.id)
         else
-            json = {errors: V1::RegistrationErrorSerializer.serialize(@user.errors)}
+            json = { errors: V1::RegistrationErrorSerializer.serialize(@user.errors) }
             render json: json , status: :unprocessable_entity
         end
     end
