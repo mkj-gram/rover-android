@@ -11,7 +11,7 @@ module ModelError
                 local_errors = errors[@attribute]
                 local_errors.each do |error|
                     serialized_errors.push({
-                                             detail: key.to_s.concat(" ").concat(error),
+                                             detail: error,
                                              source: {
                                                  pointer: "data/attributes/#{key}"
                                              }
