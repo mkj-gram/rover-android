@@ -1,7 +1,6 @@
 module MailClient
 
     class << self
-        attr_accessor :domain
 
         def send(msg)
             connection_pool.with do |conn|
@@ -13,8 +12,8 @@ module MailClient
 
         def connection_pool
             @connection_pool ||= ConnectionPool.new(size: 10, timeout: 5) {
-                api_key = config["api_key"]
-                @domain = config["api_url"]
+                api_key = Rails.configuration.mailgun["api_key"]
+                @domain = Rails.configuration.mailgun["api_url"]
                 Mailgun::Client.new(api_key)
             }
         end
