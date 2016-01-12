@@ -18,14 +18,7 @@ class V1::SessionsController < V1::ApplicationController
                             "token"=> @session.token
                         },
                         "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true})
-                    },
-                    "included"=> [
-                        V1::UserSerializer.s(@session.user).merge!(
-                            {
-                                "relationships" => V1::AccountSerializer.s(@session.user.account, {relationships: true})
-                            }
-                        )
-                    ]
+                    }
                 }
                 render json: json, location: v1_user_url(@session.user.id)
             else
@@ -51,14 +44,7 @@ class V1::SessionsController < V1::ApplicationController
                             "token"=> @session.token
                         },
                         "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true})
-                    },
-                    "included"=> [
-                        V1::UserSerializer.s(@session.user).merge!(
-                            {
-                                "relationships" => V1::AccountSerializer.s(@session.user.account, {relationships: true})
-                            }
-                        )
-                    ]
+                    }
                 }
                 render json: json, location: v1_user_url(@session.user.id)
             end

@@ -43,23 +43,6 @@ class V1::RegistrationsController < V1::ApplicationController
                                 }
                             }
                         }
-                    },
-
-                    {
-                        "type"=> "users",
-                        "id"=> @user.id.to_s,
-                        "attributes"=> {
-                            "name"=> @user.name,
-                            "email"=> @user.email,
-                        },
-                        "relationships"=> {
-                            "account"=> {
-                                "data"=> {
-                                    "type"=> "accounts",
-                                    "id"=> @user.account_id.to_s
-                                }
-                            }
-                        }
                     }
                 ]
             }
