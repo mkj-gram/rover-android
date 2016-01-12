@@ -34,17 +34,13 @@ class User < ActiveRecord::Base
     validates :name, presence: true
 
     validates :email,
-        presence: { message: I18n.t(:"validations.commons.email_missing") },
-        email: true,
+        presence: true,
+        email: {allow_blank: true},
         uniqueness: true,
         allow_blank: false,
         if: -> { new_record? || email_changed? }
 
-    # validates :password, presence: true, length: { :minimum => 6, :allow_nil => false }
-    # validates :password_confirmation, presence: true
-
     validates :password,
-        presence: true,
         length: { :minimum => 6 },
         if: -> { new_record? || !password.nil? }
 
