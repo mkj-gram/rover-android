@@ -64,6 +64,6 @@ class PasswordReset < ActiveRecord::Base
 
     def send_email
         url = Rails.configuration.password_reset["uri"] + "?" + {token: self.token}.to_query
-        SendEmailWorker.perform_async("Rover <no-reply@rover.io>", user.email, "Rover Password Reset", "Please vist this #{url}")
+        SendEmailWorker.perform_async("Rover <no-reply@rover.io>", user.formatted_email, "Rover Password Reset", "Please vist this #{url}")
     end
 end
