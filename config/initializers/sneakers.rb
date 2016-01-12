@@ -16,7 +16,7 @@ Sneakers.configure (
         :daemonize => false,          # Send to background
         :start_worker_delay => 0.2,  # When workers do frenzy-die, randomize to avoid resource starvation
         :workers => ENV['WEB_CONCURRENCY'] || 4,               # Number of per-cpu processes to run
-        :log  => 'log/sneakers.log',     # Log file
+        # :log  => 'log/sneakers.log',     # Log file
         :pid_path => 'pid/sneakers.pid', # Pid file
 
         :timeout_job_after => 5,      # Maximal seconds to wait for job
