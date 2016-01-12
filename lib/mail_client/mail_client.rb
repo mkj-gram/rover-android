@@ -12,7 +12,7 @@ module MailClient
         private
 
         def connection_pool
-            @connection_pool ||= ConnectionPool.new(size: 1, timeout: 5) {
+            @connection_pool ||= ConnectionPool.new(size: 10, timeout: 5) {
                 api_key = config["api_key"]
                 @domain = config["api_url"]
                 Mailgun::Client.new(api_key)
