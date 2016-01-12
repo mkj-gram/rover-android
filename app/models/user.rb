@@ -31,6 +31,7 @@ class User < ActiveRecord::Base
 
     before_destroy :can_destroy
 
+    validates :name, presence: true
 
     validates :email,
         presence: { message: I18n.t(:"validations.commons.email_missing") },
@@ -39,8 +40,18 @@ class User < ActiveRecord::Base
         allow_blank: false,
         if: :email_changed?
 
-    validates :password, presence: true, length: { :minimum => 6, :allow_nil => false }
-    validates :password_confirmation, presence: true
+    # validates :password, presence: true, length: { :minimum => 6, :allow_nil => false }
+    # validates :password_confirmation, presence: true
+
+    validates :password,
+        presence: true,
+        length: { :minimum => 6 },
+        if: lambda{ new_record? || !password.nil? }
+
+    validates :password_confirmation,
+        presence: true,
+        if: lambda{ new_record? || !password.nil? }
+
     validate :valid_account_invite_token
     validate :can_change_password
 
@@ -101,16 +112,16 @@ class User < ActiveRecord::Base
     def valid_account_invite_token
         if self.account_invite_token
             if invite.nil?
-                errors.add(:account, "the invite doesn't exist")
+                errors.add(:account_invite_token, "the invite doesn't exist")
             elsif invite.invited_email != self.email
-                errors.add(:account, "the email address specified doesn't match the invite")
+                errors.add(:account_invite_token, "the email address specified doesn't match the invite")
             end
         end
     end
 
     def can_change_password
         if old_password && !self.authenticate(old_password)
-            errors.add(:password, "incorrect password")
+            errors.add(:old_password, "incorrect password")
         end
         # if password_reset_token
         #     reset = PasswordReset.find_by_token(password_reset_token)

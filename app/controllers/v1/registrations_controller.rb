@@ -58,9 +58,7 @@ class V1::RegistrationsController < V1::ApplicationController
 
 
     def user_params(local_params)
-        local_params.require(:registrations).require(:name)
-        local_params.require(:registrations).require(:email)
-        local_params.require(:registrations).require(:password)
+        local_params.require(:registrations)
 
         # format the clients request to server variables
         registration_params = local_params[:registrations]

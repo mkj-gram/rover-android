@@ -185,15 +185,11 @@ describe "/v1/registrations", :type => :request do
 
                 expect(response).to have_http_status(200)
                 expect(json).to have_key(:included)
-                expect(json[:included].size).to eq(2)
+                expect(json[:included].size).to eq(1)
                 included_user = json[:included].last
                 expect(included_user).to have_key(:attributes)
 
                 expect(included_user).to have_key(:relationships)
-                expect(included_user[:relationships]).to have_key(:account)
-                expect(included_user[:relationships][:account]).to have_key(:data)
-                expect(included_user[:relationships][:account][:data]).to have_key(:id)
-                expect(included_user[:relationships][:account][:data][:id]).to eq(account.id.to_s)
             end
         end
     end

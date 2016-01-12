@@ -2,7 +2,7 @@ module RenderHelper
 
 
     def render_unauthorized(title, description)
-        render_errors([{title: title, description: description, status: "401"}], {status: :unauthorized})
+        render_errors([{title: title, detail: description, status: "401"}], {status: :unauthorized})
     end
 
     def render_errors(errors, opts = {})
@@ -26,7 +26,15 @@ module RenderHelper
     def render_active_model_errors(error, opts = {})
         status = option(opts, :status, :unprocessable_entity)
         messages = error.messages
-        errors = messages.map{|title, error| {title: title.to_s, description: error.first} }
+        errors = messages.map{ |title, error|
+            {
+                title: title.to_s,
+                detail: error.first,
+                source: {
+                    pointer: "data/attributes/#{title}"
+                }
+            }
+        }
         render json: {errors: errors}, status: status
     end
 
