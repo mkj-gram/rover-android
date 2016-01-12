@@ -1,15 +1,16 @@
 development:
-    user: guest
-    password: guest
-    host: aws-us-east-1-portal.10.dblayer.com:10093/rover-rabbitmq-staging
-    vhost: '/'
+    amqp: amqp://guest:guest@localhost
+    vhost: /
     heartbeat: 10
+    pool: 5
+    ssl: false
 
 
 production:
-    user: <%=ENV['RABBITMQ_USER']%>
-    password: <%=ENV['RABBITMQ_PASSWORD']%>
-    host: <%=ENV['RABBITMQ_HOST']%>
-    vhost: <%=ENV['RABBITMQ_VHOST']%>
+    amqp: <%=ENV['RABBITMQ_AMQP']%>
     heartbeat: 10
+    pool: <%=ENV['WEB_CONCURRENCY']%>
+    ssl: true
+    public_key: <%= Rails.root.join("config", "certs", "rabbit_mq_public_key.pem").to_s %>
+
 

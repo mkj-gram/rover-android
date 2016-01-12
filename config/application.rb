@@ -19,6 +19,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib', 'mail_client')
         config.autoload_paths << Rails.root.join('lib', 'model_broadcaster')
         config.autoload_paths << Rails.root.join('app', 'workers')
+        config.autoload_paths << Rails.root.join('lib', 'rabbit_mq_publisher')
 
 
 

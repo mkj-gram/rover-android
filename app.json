@@ -30,16 +30,7 @@
     "POSTGRESQL_DB_PORT": {
       "required": true
     },
-    "RABBITMQ_USER": {
-      "required": true
-    },
-    "RABBITMQ_PASSWORD": {
-      "required": true
-    },
-    "RABBITMQ_HOST": {
-      "required": true
-    },
-    "RABBITMQ_VHOST": {
+    "RABBITMQ_AMQP": {
       "required": true
     },
     "MAILGUN_API_KEY": {
