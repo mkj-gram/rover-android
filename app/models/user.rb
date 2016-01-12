@@ -25,7 +25,7 @@ class User < ActiveRecord::Base
     before_create :create_account, if: -> { account_id.nil? }
     after_create :update_account_user_id
     after_create :create_acl
-    after_create :generate_session
+    # after_create :generate_session
 
     after_create :destroy_account_invite
 
