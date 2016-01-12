@@ -60,7 +60,7 @@ class V1::PasswordResetController < V1::ApplicationController
                     render json: { errors: [{ detail: "can't be blank", source: {pointer: "data/attributes/password"}}]}, status: :unprocessable_entity
                 else
                     if @password_reset.reset_password(new_password)
-                        head :ok
+                        head :no_content
                     else
                         render json: { errors: V1::PasswordResetErrorSerializer.serialize(@password_reset.user.errors) }, status: :unprocessable_entity
                     end
