@@ -17,6 +17,7 @@ class SendEmailWorker
         logger.info("Recieved msg: " + msg)
         message_params = JSON.parse(msg)
         MailClient.send(message_params)
+        logger.info("Message sent")
         ack!
     end
 end
