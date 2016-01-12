@@ -38,7 +38,7 @@ class User < ActiveRecord::Base
         email: true,
         uniqueness: true,
         allow_blank: false,
-        if: :email_changed?
+        if: -> { new_record? || email_changed? }
 
     # validates :password, presence: true, length: { :minimum => 6, :allow_nil => false }
     # validates :password_confirmation, presence: true
@@ -46,11 +46,11 @@ class User < ActiveRecord::Base
     validates :password,
         presence: true,
         length: { :minimum => 6 },
-        if: lambda{ new_record? || !password.nil? }
+        if: -> { new_record? || !password.nil? }
 
     validates :password_confirmation,
         presence: true,
-        if: lambda{ new_record? || !password.nil? }
+        if: -> { new_record? || !password.nil? }
 
     validate :valid_account_invite_token
     validate :can_change_password
