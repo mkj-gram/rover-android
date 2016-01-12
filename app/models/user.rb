@@ -90,7 +90,7 @@ class User < ActiveRecord::Base
     #
     # @return [String] [Formatted email]
     def formatted_email
-        return user.name.nil? ? user.email : "#{user.name} <#{user.email}>"
+        return self.name.nil? ? self.email : "#{self.name} <#{self.email}>"
     end
 
     private
