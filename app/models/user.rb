@@ -35,7 +35,7 @@ class User < ActiveRecord::Base
 
     validates :email,
         presence: true,
-        email: {allow_blank: true},
+        email: { allow_blank: true },
         uniqueness: true,
         allow_blank: false,
         if: -> { new_record? || email_changed? }
