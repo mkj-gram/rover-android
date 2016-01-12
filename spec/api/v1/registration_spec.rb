@@ -25,12 +25,10 @@ describe "/v1/registrations", :type => :request do
                     attributes: {
                         name: "Test",
                         email: "test@rover.io",
-                        password: ""
                     }
                 }
 
-                # this is a 400 because ruby removes keys with empty values
-                expect(response).to have_http_status(400)
+                expect(response).to have_http_status(422)
             end
 
             it 'fails due to too short of a password' do
@@ -61,6 +59,21 @@ describe "/v1/registrations", :type => :request do
                 expect(response).to have_http_status(422)
             end
 
+
+            it 'fails to blank email' do
+
+                post '/v1/registrations',
+                data: {
+                    type: "registrations",
+                    attributes: {
+                        name: "Test",
+                        password: "123456"
+                    }
+                }
+
+                expect(response).to have_http_status(422)
+            end
+
             it 'fails due to no name' do
                 post '/v1/registrations',
                 data: {
@@ -71,8 +84,7 @@ describe "/v1/registrations", :type => :request do
                     }
                 }
 
-                # missing param
-                expect(response).to have_http_status(400)
+                expect(response).to have_http_status(422)
             end
         end
 
@@ -99,7 +111,7 @@ describe "/v1/registrations", :type => :request do
 
                 expect(attributes[:email]).to eq(email)
                 expect(attributes[:name]).to eq(name)
-                expect(attributes[:password]).to eq("")
+                expect(attributes[:password]).to eq(nil)
                 expect(attributes[:organization]).to eq(name)
 
             end
@@ -126,7 +138,7 @@ describe "/v1/registrations", :type => :request do
 
                 expect(attributes[:email]).to eq(email)
                 expect(attributes[:name]).to eq(name)
-                expect(attributes[:password]).to eq("")
+                expect(attributes[:password]).to eq(nil)
                 expect(attributes[:organization]).to eq(name)
             end
         end
@@ -184,12 +196,6 @@ describe "/v1/registrations", :type => :request do
                 }
 
                 expect(response).to have_http_status(200)
-                expect(json).to have_key(:included)
-                expect(json[:included].size).to eq(1)
-                included_user = json[:included].last
-                expect(included_user).to have_key(:attributes)
-
-                expect(included_user).to have_key(:relationships)
             end
         end
     end
