@@ -8,8 +8,8 @@ class SendEmailWorker
     from_queue 'send_email'
 
 
-    def self.perform_async(from, to, subject, text)
-        msg = {from: from, to: to, subject: subject, text: text}.to_json
+    def self.perform_async(from, to, subject, html)
+        msg = {from: from, to: to, subject: subject, html: html}.to_json
         RabbitMQPublisher.publish(msg, {to_queue: 'send_email'})
     end
 
