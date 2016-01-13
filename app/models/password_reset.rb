@@ -36,14 +36,16 @@ class PasswordReset < ActiveRecord::Base
     def expired?
         DateTime.now > self.expires_at
     end
-
+    def render
+        render_password_reset
+    end
     def self.get_template
         @template ||= %{
             <p>Dear <%= @user.name %>,</p>
 
             <p>You recently requested a password reset for your Rover account. To complete the process, click the link below.</p>
 
-            <a href="...">Reset now ></a>
+            <a href="<%= @url %>">Reset now</a>
 
             <p>If you didn't make this request, it's likely that another user has entered your email address by mistake and your account is still secure. If you believe an unauthorized person has accessed your account, you should change your password as soon as possible from your Rover account page at <a href="https://rover-front-end-builds-staging.herokuapp.com">https://rover-front-end-builds-staging.herokuapp.com</a>.
 
@@ -90,7 +92,7 @@ class PasswordReset < ActiveRecord::Base
     def render_password_reset
         @user = user
         @url = Rails.configuration.password_reset["host"] + "/reset-password" + "?" + {token: self.token}.to_query
-        ERB.new(PasswordReset.get_template, 3, '>').result(binding)
+        ERB.new(PasswordReset.get_template, nil , '-').result(binding).html_safe.to_str
     end
 
 end
