@@ -1,3 +1,4 @@
+
 module RabbitMQPublisher
     class ConnectionPool
 

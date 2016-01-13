@@ -1,4 +1,4 @@
-class V1::PasswordResetController < V1::ApplicationController
+class V1::PasswordResetsController < V1::ApplicationController
 
     before_action :validate_json_schema,    only: [:create, :update]
 

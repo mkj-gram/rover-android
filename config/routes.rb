@@ -27,7 +27,7 @@ Rails.application.routes.draw do
 
         post 'registrations', to: "registrations#create"
 
-        resources "password-resets", only: [:index, :create, :update], controller: "password_reset", :as => 'password_reset'
+        resources "password-resets", only: [:index, :create, :update], controller: "password_resets", :as => 'password_reset'
 
         resources :account_invites, only: [:index, :create, :destroy]
         get '/account_invites/:token', to: "account_invites#show"
