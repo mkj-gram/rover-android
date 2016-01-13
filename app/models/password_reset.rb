@@ -2,6 +2,7 @@ class PasswordReset < ActiveRecord::Base
     include Tokenable
     include UniqueRecord
 
+
     belongs_to :user
 
     before_create :attach_user
@@ -20,15 +21,34 @@ class PasswordReset < ActiveRecord::Base
     self.token_size = 32
 
     def reset_password(password)
-        Rails.logger.info("updating password to: #{password}")
-        user.password = password
-        user.password_confirmation = password
-        return user.save
-
+        PasswordReset.transaction do
+            user.password = password
+            user.password_confirmation = password
+            user.save!
+            self.destroy!
+            return true
+        end
+        return false
+    rescue ActiveRecord::RecordInvalid => e
+        return false
     end
 
     def expired?
         DateTime.now > self.expires_at
+    end
+
+    def self.get_template
+        @template ||= %{
+            <p>Dear <%= @user.name %>,</p>
+
+            <p>You recently requested a password reset for your Rover account. To complete the process, click the link below.</p>
+
+            <a href="...">Reset now ></a>
+
+            <p>If you didn't make this request, it's likely that another user has entered your email address by mistake and your account is still secure. If you believe an unauthorized person has accessed your account, you should change your password as soon as possible from your Rover account page at <a href="https://rover-front-end-builds-staging.herokuapp.com">https://rover-front-end-builds-staging.herokuapp.com</a>.
+
+            <p>Rover Support</p>
+        }
     end
 
     protected
@@ -63,7 +83,14 @@ class PasswordReset < ActiveRecord::Base
     end
 
     def send_email
-        url =  Rails.configuration.password_reset["host"] + "/reset-password" + "?" + {token: self.token}.to_query
-        SendEmailWorker.perform_async("Rover <no-reply@rover.io>", user.formatted_email, "Rover Password Reset", "Please vist this #{url}")
+        message = render_password_reset
+        SendEmailWorker.perform_async("Rover <support@rover.io>", user.formatted_email, "How to reset your Rover password", message)
     end
+
+    def render_password_reset
+        @user = user
+        @url = Rails.configuration.password_reset["host"] + "/reset-password" + "?" + {token: self.token}.to_query
+        ERB.new(PasswordReset.get_template, 3, '>').result(binding)
+    end
+
 end
