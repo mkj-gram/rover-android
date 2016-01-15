@@ -7,18 +7,17 @@ class SendEmailWorker
 
     from_queue 'send_email'
 
-    @@publisher = Sneakers::Publisher.new
 
-
-    def self.perform_async(from, to, subject, text)
-        msg = {from: from, to: to, subject: subject, text: text}.to_json
-        @@publisher.publish(msg, {to_queue: "send_email"})
+    def self.perform_async(from, to, subject, html)
+        msg = {from: from, to: to, subject: subject, html: html}.to_json
+        RabbitMQPublisher.publish(msg, {to_queue: 'send_email'})
     end
 
     def work(msg)
         logger.info("Recieved msg: " + msg)
         message_params = JSON.parse(msg)
         MailClient.send(message_params)
+        logger.info("Message sent")
         ack!
     end
 end

@@ -13,7 +13,7 @@ rerun.txt
 pickle-email-*.html
 .DS_Store
 /lib/.DS_Store
-
+/test
 # TODO Comment out these rules if you are OK with secrets being uploaded to the repo
 # config/initializers/secret_token.rb
 # config/secrets.yml
@@ -23,4 +23,5 @@ pickle-email-*.html
 /vendor/bundle
 
 # these should all be checked in to normalize the environment:
-# Gemfile.lock, .ruby-version, .ruby-gemset
+# Gemfile.lock, .ruby-version, .ruby-gemset.env
+.env

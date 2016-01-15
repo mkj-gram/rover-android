@@ -9,17 +9,28 @@ Rails.application.routes.draw do
     # scope module: :v1, constraints: ApiConstraint.new(version: 1) do
     #     resources :apps, except: [:new, :edit]
     # end
-    api_version(:module => "V1", :path => {:value => "v1"}, :parameter => {:name => "version", :value => "1"}, default: true) do
+    api_version(:module => "V1", :path => {:value => "v1"}, :parameter => {:name => "version", :value => "1"}, default: true, :defaults => { :format => 'json' }) do
         # resources :accounts do
         #     scope module: "account_context" do
         #         resources :users
         #         # resources :locations, :controller => ""
         #     end
         # end
-        resources :users do
+
+        get 'account', to: 'account#show'
+        patch 'account', to: 'account#update'
+
+        resources :users, except:[:create] do
+
             # resources :password_reset, only: [:create]
         end
 
+        post 'registrations', to: "registrations#create"
+
+        resources "password-resets", only: [:index, :create, :update], controller: "password_resets", :as => 'password_reset'
+
+        resources :account_invites, only: [:index, :create, :destroy]
+        get '/account_invites/:token', to: "account_invites#show"
 
         resources :locations do
             # collection do
@@ -37,7 +48,7 @@ Rails.application.routes.draw do
             # end
         end
 
-        resources :sessions, only: [:create]
+        resources :sessions, only: [:create, :show, :destroy]
         # resources :password_reset
     end
     # The priority is based upon order of creation: first created -> highest priority.

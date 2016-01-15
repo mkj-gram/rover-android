@@ -8,8 +8,20 @@ class V1::UsersController < V1::ApplicationController
     # GET /users
     # Returns paged user's who belong to an account
     def index
-        @users = current_account.users.order(whitelist_order(["id", "created_at"], "id")).paginate(page: current_page, per_page: page_size, total_entries: current_account.users_count)
-        render json: @users, each_serializer: V1::UserSerializers::IndividualSerializer
+        @users = current_account.users.order("id").where("id >= ?", current_cursor).limit(page_size + 1)
+        next_cursor = get_next_cursor(@users, "id")
+        # trim it since we included 1 extra record
+        @users = @users.first(page_size)
+        json = {
+            "data" => @users.map{|user| V1::UserSerializer.s(user)},
+            "meta" => {
+                "total_records"=> current_account.users_count
+            },
+            "links" => {
+                "next" => next_cursor.nil? ? nil : v1_users_url({"page[cursor]" => next_cursor})
+            }
+        }
+        render json: json
     end
 
     # GET /users/1
@@ -17,25 +29,17 @@ class V1::UsersController < V1::ApplicationController
     def show
         @user = current_resource
         if @user
-            render json: @user, serializer: V1::UserSerializers::IndividualSerializer
+            json = {
+                "data" => V1::UserSerializer.s(@user)
+            }
+            render json: json
         else
             head :not_found
         end
 
     end
 
-    # POST /users
-    # non batch request
-    def create
-        json = flatten_request({single_record: true})
-        @user = User.new(user_params(json[:data]))
-        # when a user is first created generate a session for them?
-        if @user.save
-            render json: @user, serializer: V1::UserSerializers::CreateSerializer, include: ["session"], location: v1_user_url(1)
-        else
-            render_errors(@user.errors, status: :unprocessable_entity)
-        end
-    end
+
 
     # PATCH/PUT /users/1
     # Non batch request
@@ -69,6 +73,6 @@ class V1::UsersController < V1::ApplicationController
 
 
     def user_params(local_params)
-        local_params.require(:user).permit(:name, :email, :password, :password_confirmation, :account_title, :account_invite_token)
+        local_params.require(:users).permit(:name, :email, :password, :password_confirmation, :old_password)
     end
 end

@@ -29,15 +29,20 @@ gem 'classy_hash', '~> 0.1.5'
 
 gem 'will_paginate', '~> 3.0', '>= 3.0.7'
 
+gem 'rack-cors', '~> 0.4.0', :require => 'rack/cors'
+
+
 group :development do
     gem 'faker', '~> 1.6', '>= 1.6.1'
 
     gem 'colorize', '~> 0.7.7'
 
-    gem 'rspec-rails', '~> 3.0'
-
 end
 
 group :test do
     gem 'sqlite3', '~> 1.3', '>= 1.3.11'
+
+    gem 'factory_girl_rails', '~> 4.5'
+
+    gem 'rspec-rails', '~> 3.0'
 end

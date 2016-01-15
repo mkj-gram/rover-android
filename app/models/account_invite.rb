@@ -9,8 +9,8 @@ class AccountInvite < ActiveRecord::Base
     include Tokenable
     include UniqueRecord
 
-    belongs_to :account
-    belongs_to :user, foreign_key: "issuer_id"
+    belongs_to :account, counter_cache: true
+    belongs_to :issuer, foreign_key: "issuer_id", class_name: "User"
 
     after_create :send_email
 
@@ -25,10 +25,10 @@ class AccountInvite < ActiveRecord::Base
     def send_email
         # This needs to change I'm really bad with messaging
         SendEmailWorker.perform_async(
-            "no-reply@rover.io",
+            "Rover <no-reply@rover.io>",
             self.invited_email,
-            "Invitition from #{user.name} on Rover",
-            "#{user.name || user.email} has invited you to collaborate on #{account.title}"
+            "Invitition from #{issuer.name} on Rover",
+            "#{issuer.name || issuer.email} has invited you to collaborate on #{account.title}"
         )
     end
 end

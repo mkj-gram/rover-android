@@ -17,9 +17,31 @@
     },
     "SECRET_KEY_BASE": {
       "required": true
+    },
+    "POSTGRESQL_DB_USERNAME": {
+      "required": true
+    },
+    "POSTGRESQL_DB_PASSWORD": {
+      "required": true
+    },
+    "POSTGRESQL_DB_HOST": {
+      "required": true
+    },
+    "POSTGRESQL_DB_PORT": {
+      "required": true
+    },
+    "RABBITMQ_AMQP": {
+      "required": true
+    },
+    "MAILGUN_API_KEY": {
+        "required": true
+    },
+    "MAILGUN_API_URL": {
+        "required": true
+    },
+    "PASSWORD_RESET_URL": {
+      "required": true
     }
   },
-  "addons": [
-    "heroku-postgresql"
-  ]
+  "addons": []
 }

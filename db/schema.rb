@@ -32,16 +32,19 @@ ActiveRecord::Schema.define(version: 20160107180658) do
     t.text     "title"
     t.integer  "primary_user_id"
     t.text     "token",                                                null: false
+    t.text     "share_key",                                            null: false
     t.integer  "users_count",                              default: 0
     t.integer  "locations_count",                          default: 0
     t.integer  "ibeacon_configurations_count",             default: 0
     t.integer  "eddystone_namespace_configurations_count", default: 0
     t.integer  "eddystone_url_configurations_count",       default: 0
     t.integer  "beacon_configurations_count",              default: 0
+    t.integer  "account_invites_count",                    default: 0
     t.datetime "created_at",                                           null: false
     t.datetime "updated_at",                                           null: false
   end
 
+  add_index "accounts", ["share_key"], name: "index_accounts_on_share_key", unique: true, using: :btree
   add_index "accounts", ["token"], name: "index_accounts_on_token", unique: true, using: :btree
 
   create_table "beacon_configurations", force: :cascade do |t|
@@ -105,15 +108,16 @@ ActiveRecord::Schema.define(version: 20160107180658) do
 
   add_index "locations", ["account_id"], name: "index_locations_on_account_id", using: :btree
 
-  create_table "password_resets", id: false, force: :cascade do |t|
+  create_table "password_resets", force: :cascade do |t|
     t.integer  "user_id",    null: false
     t.text     "email",      null: false
     t.text     "token",      null: false
     t.datetime "expires_at", null: false
   end
 
-  add_index "password_resets", ["email"], name: "index_password_resets_on_email", unique: true, using: :btree
+  add_index "password_resets", ["email"], name: "index_password_resets_on_email", using: :btree
   add_index "password_resets", ["token"], name: "index_password_resets_on_token", unique: true, using: :btree
+  add_index "password_resets", ["user_id"], name: "index_password_resets_on_user_id", using: :btree
 
   create_table "sessions", force: :cascade do |t|
     t.integer "account_id"

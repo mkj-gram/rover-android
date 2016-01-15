@@ -12,12 +12,12 @@ development:
     username: myapp
     password: password1
 
-staging:
+production:
     adapter: postgresql
     encoding: unicode
     database: rover
     pool: 5
-    username: admin
-    password: BXHREZJTBHOXZVYX
-    host: aws-us-east-1-portal.9.dblayer.com
-    port: 10428
+    username: <%=ENV['POSTGRESQL_DB_USERNAME']%>
+    password: <%=ENV['POSTGRESQL_DB_PASSWORD']%>
+    host: <%=ENV['POSTGRESQL_DB_HOST']%>
+    port: <%=ENV['POSTGRESQL_DB_PORT']%>

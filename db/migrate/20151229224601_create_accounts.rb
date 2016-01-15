@@ -4,6 +4,7 @@ class CreateAccounts < ActiveRecord::Migration
             t.text :title
             t.integer :primary_user_id
             t.text :token, null: false
+            t.text :share_key, null: false
 
             # cache counters
             t.integer :users_count, default: 0
@@ -12,10 +13,12 @@ class CreateAccounts < ActiveRecord::Migration
             t.integer :eddystone_namespace_configurations_count, default: 0
             t.integer :eddystone_url_configurations_count, default: 0
             t.integer :beacon_configurations_count, default: 0
+            t.integer :account_invites_count, default: 0
 
             t.timestamps null: false
         end
 
         add_index :accounts, :token, unique: true
+        add_index :accounts, :share_key, unique: true
     end
 end
