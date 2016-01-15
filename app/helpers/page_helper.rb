@@ -1,14 +1,15 @@
 module PageHelper
 
     def current_page
-        @current_page ||= params.has_key?(:page) && params[:page].has_key?(:number) ? params[:page][:number].to_i : 1
+        @current_page ||= params.has_key?(:page) && params[:page].has_key?(:number) ? params[:page][:number].to_i : 0
     end
 
-    def current_cursor
-        @current_cursor ||= params.has_key?(:page) && params[:page].has_key?(:cursor) ? params[:page][:cursor].to_i : 0
+    def current_cursor(default)
+        @current_cursor ||= params.has_key?(:page) && params[:page].has_key?(:cursor) ? params[:page][:cursor] : default
     end
+
     def page_size
-        @page_size ||= params.has_key?(:page) && params[:page].has_key?(:size) ? params[:page][:size].to_i : 15
+        @page_size ||= params.has_key?(:page) && params[:page].has_key?(:size) ? params[:page][:size].to_i : 50
     end
 
     def get_next_cursor(objects, cursor_sort_column)
@@ -19,4 +20,32 @@ module PageHelper
         end
     end
 
+    def pagination_links(resource_url, results)
+        links = {
+            first: resource_url + "?" + pagination_query(0, page_size),
+            last: resource_url + "?" + pagination_query(results.total_pages, page_size)
+        }
+        if results.next_page != current_page
+            links.merge!(
+                {
+                    next: resource_url + "?" + pagination_query(results.next_page, page_size)
+                }
+            )
+        end
+        if current_page > 0
+            links.merge!(
+                {
+                    prev: resource_url + "?" + pagination_query(current_page - 1, page_size)
+                }
+            )
+        end
+        return links
+    end
+
+
+    private
+
+    def pagination_query(number, size)
+        {page: {number: number, size: size}}.to_query
+    end
 end

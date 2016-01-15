@@ -23,7 +23,8 @@ if Rails.env.development?
         task :generate => :environment do
             begin
                 primary_account_email = ENV['EMAIL'] || "test@rover.io"
-                num_users = ENV['NUM_USERS'] || 50
+                num_users = ENV['NUM_USERS'] || 0
+                num_configurations = 500
                 num_locations = ENV['NUM_LOCATIONS'] || 500
 
                 share_account_id = ENV['SHARE_ACCOUNT_ID']
@@ -31,99 +32,120 @@ if Rails.env.development?
                 puts "\n\nGenerating Account\n".colorize(:color =>  :black, :background => :white).underline
 
                 puts "\nCreating primary user with email #{primary_account_email}"
-                ActiveRecord::Base.transaction do
-                    show_percentage(0)
-                    user = User.create!(name: "Rover Test", email: primary_account_email, password: "password", password_confirmation: "password", account_title: "Rover")
-                    @account = user.account
-                    show_finished
+                # ActiveRecord::Base.transaction do
+                show_percentage(0)
+                user = User.create!(name: "Rover Test", email: primary_account_email, password: "password", password_confirmation: "password", account_title: "Rover")
+                @account = user.account
+                show_finished
 
-                    # Add users
-                    puts "Adding #{num_users} users to account #{@account.id}"
-                    current_record = 1
-                    num_users.times.each do
-                        user_email = Faker::Internet.email
-                        invite = @account.account_invites.create!(
-                            issuer_id: user.id,
-                            invited_email: user_email
-                        )
-                        User.create!(
-                            name: Faker::Name.name,
-                            email: user_email,
-                            password: "password",
-                            password_confirmation: "password",
-                            account_id: @account.id,
-                            account_invite_token: invite.token
-                        )
-                        show_percentage((current_record/num_users.to_f) * 100)
-                        current_record += 1
-                    end
-                    show_finished
-
-                    # Add locations
-                    puts "Adding #{num_locations} locations to account #{@account.id}"
-                    current_record = 1
-                    locations = []
-                    num_locations.times.each do
-                        locations << Location.create!(
-                            account_id: @account.id,
-                            name: Faker::Address.street_name,
-                            address: Faker::Address.street_address,
-                            city: Faker::Address.city,
-                            province_state: Faker::Address.state,
-                            postal_zip: Faker::Address.zip_code,
-                            country: Faker::Address.country,
-                            latitude: Faker::Address.latitude,
-                            longitude: Faker::Address.longitude,
-                            radius: Random.rand(500) + 50,
-                            tags: Faker::Hipster.words(Random.rand(5), true, true)
-                        )
-                        show_percentage((current_record/num_locations.to_f) * 100)
-                        current_record += 1
-                    end
-                    show_finished
-
-                    # Add Beacons
-                    # puts "Adding #{num_beacons} beacons to account #{account.id}"
-                    # current_record = 1
-                    # beacons_attached_to_location = 0
-                    # beacons = []
-                    # num_beacons.times.each do
-                    #     beacon = Beacon.new(
-                    #         account_id: account.id,
-                    #         name: Faker::App.name,
-                    #         manufacturer: Beacon.manufacturers[:estimote],
-                    #         manufacturer_id: SecureRandom.uuid,
-                    #         enabled: true,
-                    #         tags: Faker::Hipster.words(Random.rand(5), true, true).join(" "),
-                    #         color: Faker::Color.hex_color
-                    #     )
-                    #     if Random.rand(5) == 2
-                    #         beacon.location_id = locations.sample.id
-                    #         beacons_attached_to_location += 1
-                    #     end
-                    #     beacons << beacon.save!
-                    #     show_percentage((current_record/num_beacons.to_f) * 100)
-                    #     current_record += 1
-                    # end
-                    # show_finished
-                    # puts "#{beacons_attached_to_location} beacons attached to random locations"
-
-                    # if share_account_id
-                    #     locations_to_share_count = num_locations / 4
-                    #     beacons_to_share_count = num_beacons / 4
-                    #     puts "\nDetected SHARE_ACCOUNT_ID present! sharing #{locations_to_share_count} locations & #{beacons_to_share_count} beacons with account #{share_account_id}".colorize(:light_blue).underline
-                    # end
-
-                    puts "Generating user session for #{user.name}"
-                    show_percentage(0)
-                    @session = Session.build_session(user)
-                    @session.save!
-                    show_finished
-
-                    puts "\nFinished below are your api-keys".colorize(:green)
-                    puts "X-Rover-REST-API-Key: #{@account.token}".colorize(:green)
-                    puts "JWT Token: #{@session.token}".colorize(:green)
+                # Add users
+                puts "Adding #{num_users} users to account #{@account.id}"
+                current_record = 1
+                num_users.times.each do
+                    user_email = Faker::Internet.email
+                    invite = @account.account_invites.create!(
+                        issuer_id: user.id,
+                        invited_email: user_email
+                    )
+                    User.create!(
+                        name: Faker::Name.name,
+                        email: user_email,
+                        password: "password",
+                        password_confirmation: "password",
+                        account_id: @account.id,
+                        account_invite_token: invite.token
+                    )
+                    show_percentage((current_record/num_users.to_f) * 100)
+                    current_record += 1
                 end
+                show_finished
+
+                # Add locations
+                # puts "Adding #{num_locations} locations to account #{@account.id}"
+                # current_record = 1
+                # locations = []
+                # num_locations.times.each do
+                #     locations << Location.create!(
+                #         account_id: @account.id,
+                #         name: Faker::Address.street_name,
+                #         address: Faker::Address.street_address,
+                #         city: Faker::Address.city,
+                #         province_state: Faker::Address.state,
+                #         postal_zip: Faker::Address.zip_code,
+                #         country: Faker::Address.country,
+                #         latitude: Faker::Address.latitude,
+                #         longitude: Faker::Address.longitude,
+                #         radius: Random.rand(500) + 50,
+                #         tags: Faker::Hipster.words(Random.rand(5), true, true)
+                #     )
+                #     show_percentage((current_record/num_locations.to_f) * 100)
+                #     current_record += 1
+                # end
+                # show_finished
+
+                # Add BeaconConfigurations
+                puts "Adding #{num_configurations} beacon configurations #{@account.id}"
+                current_record = 1
+                configurations = []
+                num_configurations.times.each do
+                    # configurations <<
+                    config = IBeaconConfiguration.new(
+                        account_id: @account.id,
+                        uuid: SecureRandom.uuid.upcase,
+                        major: Random.rand(5000),
+                        minor: Random.rand(5000),
+                        title: Faker::Commerce.product_name,
+                        tags: Faker::Hipster.words(Random.rand(5), true, true)
+                    )
+                    configurations << config.save(validate: false)
+                    show_percentage((current_record/num_configurations.to_f) * 100)
+                    current_record += 1
+                end
+                show_finished
+
+
+                # Add Beacons
+                # puts "Adding #{num_beacons} beacons to account #{account.id}"
+                # current_record = 1
+                # beacons_attached_to_location = 0
+                # beacons = []
+                # num_beacons.times.each do
+                #     beacon = Beacon.new(
+                #         account_id: account.id,
+                #         name: Faker::App.name,
+                #         manufacturer: Beacon.manufacturers[:estimote],
+                #         manufacturer_id: SecureRandom.uuid,
+                #         enabled: true,
+                #         tags: Faker::Hipster.words(Random.rand(5), true, true).join(" "),
+                #         color: Faker::Color.hex_color
+                #     )
+                #     if Random.rand(5) == 2
+                #         beacon.location_id = locations.sample.id
+                #         beacons_attached_to_location += 1
+                #     end
+                #     beacons << beacon.save!
+                #     show_percentage((current_record/num_beacons.to_f) * 100)
+                #     current_record += 1
+                # end
+                # show_finished
+                # puts "#{beacons_attached_to_location} beacons attached to random locations"
+
+                # if share_account_id
+                #     locations_to_share_count = num_locations / 4
+                #     beacons_to_share_count = num_beacons / 4
+                #     puts "\nDetected SHARE_ACCOUNT_ID present! sharing #{locations_to_share_count} locations & #{beacons_to_share_count} beacons with account #{share_account_id}".colorize(:light_blue).underline
+                # end
+
+                puts "Generating user session for #{user.name}"
+                show_percentage(0)
+                @session = Session.build_session(user)
+                @session.save!
+                show_finished
+
+                puts "\nFinished below are your api-keys".colorize(:green)
+                puts "X-Rover-REST-API-Key: #{@account.token}".colorize(:green)
+                puts "JWT Token: #{@session.token}".colorize(:green)
+                # end
             rescue Exception => e
                 show_error(e.message)
                 show_error("Rolling back")

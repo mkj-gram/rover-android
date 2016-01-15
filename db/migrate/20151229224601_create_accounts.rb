@@ -11,7 +11,7 @@ class CreateAccounts < ActiveRecord::Migration
             t.integer :locations_count, default: 0
             t.integer :ibeacon_configurations_count, default: 0
             t.integer :eddystone_namespace_configurations_count, default: 0
-            t.integer :eddystone_url_configurations_count, default: 0
+            t.integer :url_configurations_count, default: 0
             t.integer :beacon_configurations_count, default: 0
             t.integer :account_invites_count, default: 0
 

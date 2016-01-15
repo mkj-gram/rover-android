@@ -31,6 +31,11 @@ gem 'will_paginate', '~> 3.0', '>= 3.0.7'
 
 gem 'rack-cors', '~> 0.4.0', :require => 'rack/cors'
 
+gem 'elasticsearch-rails', '~> 0.1.8'
+
+gem 'elasticsearch-model', '~> 0.1.8'
+
+# gem 'textacular', '~> 3.2', '>= 3.2.2'
 
 group :development do
     gem 'faker', '~> 1.6', '>= 1.6.1'

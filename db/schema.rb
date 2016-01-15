@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160107180658) do
+ActiveRecord::Schema.define(version: 20160115015155) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,7 +37,7 @@ ActiveRecord::Schema.define(version: 20160107180658) do
     t.integer  "locations_count",                          default: 0
     t.integer  "ibeacon_configurations_count",             default: 0
     t.integer  "eddystone_namespace_configurations_count", default: 0
-    t.integer  "eddystone_url_configurations_count",       default: 0
+    t.integer  "url_configurations_count",                 default: 0
     t.integer  "beacon_configurations_count",              default: 0
     t.integer  "account_invites_count",                    default: 0
     t.datetime "created_at",                                           null: false
@@ -48,45 +48,33 @@ ActiveRecord::Schema.define(version: 20160107180658) do
   add_index "accounts", ["token"], name: "index_accounts_on_token", unique: true, using: :btree
 
   create_table "beacon_configurations", force: :cascade do |t|
-    t.integer "account_id",                     null: false
-    t.integer "location_id"
-    t.string  "configurable_type"
-    t.integer "configurable_id"
-    t.string  "title"
-    t.text    "tags",              default: [],              array: true
-    t.integer "devices_count",     default: 0
+    t.integer  "account_id",                  null: false
+    t.integer  "location_id"
+    t.string   "type",                        null: false
+    t.text     "title"
+    t.string   "tags",        default: [],                 array: true
+    t.boolean  "enabled",     default: true
+    t.boolean  "shared",      default: false
+    t.string   "uuid"
+    t.integer  "major"
+    t.integer  "minor"
+    t.string   "namespace"
+    t.integer  "instance_id"
+    t.text     "url"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
-  add_index "beacon_configurations", ["account_id", "configurable_type"], name: "beacon_configurations_account_configurable_type", using: :btree
-  add_index "beacon_configurations", ["configurable_id", "configurable_type"], name: "beacon_configurations_account_configurable_index", using: :btree
-
-  create_table "eddystone_namespace_configurations", force: :cascade do |t|
-    t.integer "account_id",   null: false
-    t.string  "namespace"
-    t.integer "namespace_id"
-  end
-
-  add_index "eddystone_namespace_configurations", ["account_id"], name: "index_eddystone_namespace_configurations_on_account_id", using: :btree
-  add_index "eddystone_namespace_configurations", ["namespace", "namespace_id"], name: "eddystone_namespace_uuid", unique: true, using: :btree
-  add_index "eddystone_namespace_configurations", ["namespace"], name: "index_eddystone_namespace_configurations_on_namespace", using: :btree
-
-  create_table "eddystone_url_configurations", force: :cascade do |t|
-    t.integer "account_id", null: false
-    t.text    "url"
-  end
-
-  add_index "eddystone_url_configurations", ["account_id"], name: "index_eddystone_url_configurations_on_account_id", using: :btree
-  add_index "eddystone_url_configurations", ["url"], name: "index_eddystone_url_configurations_on_url", using: :btree
-
-  create_table "ibeacon_configurations", force: :cascade do |t|
-    t.integer "account_id", null: false
-    t.string  "uuid"
-    t.integer "major"
-    t.integer "minor"
-  end
-
-  add_index "ibeacon_configurations", ["account_id"], name: "index_ibeacon_configurations_on_account_id", using: :btree
-  add_index "ibeacon_configurations", ["uuid", "major", "minor"], name: "index_ibeacon_configurations_on_uuid_and_major_and_minor", unique: true, using: :btree
+  add_index "beacon_configurations", ["account_id", "namespace", "instance_id"], name: "account_eddystone_namespace_index", using: :btree
+  add_index "beacon_configurations", ["account_id", "type", "created_at"], name: "beacon_configurations_type_created_at_index", using: :btree
+  add_index "beacon_configurations", ["account_id", "type"], name: "index_beacon_configurations_on_account_id_and_type", using: :btree
+  add_index "beacon_configurations", ["account_id", "uuid", "major", "minor"], name: "account_ibeacon_index", using: :btree
+  add_index "beacon_configurations", ["account_id"], name: "index_beacon_configurations_on_account_id", using: :btree
+  add_index "beacon_configurations", ["location_id"], name: "index_beacon_configurations_on_location_id", using: :btree
+  add_index "beacon_configurations", ["namespace", "instance_id"], name: "eddystone_namespace_unique_index", unique: true, using: :btree
+  add_index "beacon_configurations", ["url"], name: "index_beacon_configurations_on_url", unique: true, using: :btree
+  add_index "beacon_configurations", ["uuid", "major", "minor"], name: "ibeacon_unique_index", unique: true, using: :btree
+  add_index "beacon_configurations", ["uuid"], name: "index_beacon_configurations_on_uuid", using: :btree
 
   create_table "locations", force: :cascade do |t|
     t.integer  "account_id",                               null: false
@@ -127,6 +115,15 @@ ActiveRecord::Schema.define(version: 20160107180658) do
 
   add_index "sessions", ["account_id"], name: "index_sessions_on_account_id", using: :btree
   add_index "sessions", ["token"], name: "index_sessions_on_token", using: :btree
+
+  create_table "shared_beacon_configurations", force: :cascade do |t|
+    t.integer "owner_account_id"
+    t.integer "shared_account_id"
+    t.integer "beacon_configuration_id"
+  end
+
+  add_index "shared_beacon_configurations", ["owner_account_id"], name: "index_shared_beacon_configurations_on_owner_account_id", using: :btree
+  add_index "shared_beacon_configurations", ["shared_account_id"], name: "index_shared_beacon_configurations_on_shared_account_id", using: :btree
 
   create_table "user_acls", id: false, force: :cascade do |t|
     t.integer "user_id",                           null: false

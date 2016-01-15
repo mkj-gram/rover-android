@@ -49,7 +49,8 @@ Rails.application.routes.draw do
         end
 
         resources :sessions, only: [:create, :show, :destroy]
-        # resources :password_reset
+
+        resources "configurations", controller: "beacon_configurations", as: "beacon_configuration"
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".
