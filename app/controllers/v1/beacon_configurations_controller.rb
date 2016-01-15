@@ -2,7 +2,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     before_action :authenticate
 
     def index
-
         filter = {
             bool: {
                 should: [
@@ -22,7 +21,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }
 
         if !query_protocol.nil?
-            if query_protocol == "ibeacon"
+            if query_protocol == "iBeacon"
                 filter[:bool][:must].push(
                     {
                         type: {
@@ -30,7 +29,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         }
                     }
                 )
-            elsif query_protocol == "eddystonenamespace"
+            elsif query_protocol == "Eddystone-UUID"
                 filter[:bool][:must].push(
                     {
                         type: {
@@ -38,7 +37,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         }
                     }
                 )
-            elsif query_protocol == "url"
+            elsif query_protocol == "Url"
                 filter[:bool][:must].push(
                     {
                         type: {
@@ -46,6 +45,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         }
                     }
                 )
+            else
+                # they are specifying a protocol which doesn't exist
+                render_empty_data
+                return
             end
         end
 
@@ -131,6 +134,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         filter_params.fetch(:protocol, nil)
     end
 
+
     def serialize_ibeacon(config)
         source = config._source
         {
@@ -143,6 +147,16 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "major-number" => source.major,
                 "minor-number" => source.minor,
                 "tags" => source.tags
+            }
+        }
+    end
+
+    def render_empty_data
+        render json: {
+            data: [],
+            meta: {
+                totalPages: 0,
+                totalRecords: 0
             }
         }
     end
