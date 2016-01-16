@@ -68,9 +68,14 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         if !query_keyword.nil?
             query = {
-                multi_match: {
-                    query: query_keyword,
-                    fields: ["title"]
+                bool: {
+                    should: [
+                        {
+                            match_phrase: {
+                                title: query_keyword
+                            }
+                        }
+                    ]
                 }
             }
         else
