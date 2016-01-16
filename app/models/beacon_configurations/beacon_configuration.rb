@@ -37,11 +37,6 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
-
-    def destroy
-        Rails.logger.warn("Do not use the parent class please load a child class to remove")
-    end
-
     protected
 
     def indexed_location

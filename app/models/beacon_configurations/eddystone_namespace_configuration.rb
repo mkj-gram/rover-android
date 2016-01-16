@@ -1,4 +1,6 @@
 class EddystoneNamespaceConfiguration < BeaconConfiguration
+    include Elasticsearch::Model
+    include Elasticsearch::Model::Callbacks
 
     index_name BeaconConfiguration.index_name
     document_type "eddystone_namespace_configuration"
@@ -8,6 +10,8 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
             indexes :account_id, type: 'long', index: 'not_analyzed'
             indexes :title, type: 'string', analyzer: 'english'
             indexes :tags, type: 'string'
+            indexes :namespace, type: 'string', index: 'not_analyzed'
+            indexes :instance_id, type: 'string', index: 'not_analyzed'
             indexes :created_at, type: 'date'
         end
     end
@@ -26,9 +30,8 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
             account_id: self.account_id,
             title: self.title,
             tags: self.tags,
-            uuid: self.uuid,
-            major: self.major,
-            minor: self.minor,
+            namespace: self.namespace,
+            instance_id: self.instance_id.to_s,
             enabled: self.enabled,
             created_at: self.created_at,
             shared_account_ids: self.shared_account_ids,

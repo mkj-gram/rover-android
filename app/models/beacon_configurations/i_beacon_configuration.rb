@@ -1,6 +1,6 @@
 class IBeaconConfiguration < BeaconConfiguration
-    # include Elasticsearch::Model
-    # include Elasticsearch::Model::Callbacks
+    include Elasticsearch::Model
+    include Elasticsearch::Model::Callbacks
 
     index_name BeaconConfiguration.index_name
     document_type "ibeacon_configuration"
@@ -12,6 +12,8 @@ class IBeaconConfiguration < BeaconConfiguration
             indexes :tags, type: 'string'
             indexes :shared_account_ids, type: 'long'
             indexes :uuid, type: 'string'
+            indexes :major, type: 'string', type: 'not_analyzed'
+            indexes :minor, type: 'string', type: 'not_analyzed'
             indexes :created_at, type: 'date'
         end
     end
@@ -39,8 +41,8 @@ class IBeaconConfiguration < BeaconConfiguration
             title: self.title,
             tags: self.tags,
             uuid: self.uuid,
-            major: self.major,
-            minor: self.minor,
+            major: self.major.to_s,
+            minor: self.minor.to_s,
             enabled: self.enabled,
             created_at: self.created_at,
             shared_account_ids: self.shared_account_ids,

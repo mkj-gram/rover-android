@@ -94,6 +94,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             "data" => results.map do |config|
                 if config._type == IBeaconConfiguration.document_type
                     serialize_ibeacon(config)
+                elsif config._type == EddystoneNamespaceConfiguration.document_type
+                    serialize_eddystone_namespace(config)
+                elsif config._type == UrlConfiguration.document_type
+                    serialize_url(config)
                 end
             end,
             "meta" => {
@@ -162,6 +166,20 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "tags" => source.tags,
                 "namespace" => source.namespace,
                 "instance-id" => source.instance_id
+            }
+        }
+    end
+
+    def serialize_url(config)
+        source = config._source
+        {
+            "type" => "configurations",
+            "id" => config._id,
+            "attributes" => {
+                "protocol" => EddystoneNamespaceConfiguration.protocol,
+                "name" => source.title,
+                "tags" => source.tags,
+                "url" => source.url
             }
         }
     end
