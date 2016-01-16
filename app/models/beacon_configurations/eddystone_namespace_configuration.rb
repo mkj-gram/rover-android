@@ -43,7 +43,7 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
 
 
     def self.protocol
-        @protocol ||= "eddystone"
+        @protocol ||= "Eddystone"
     end
 
     def as_indexed_json(options = {})
