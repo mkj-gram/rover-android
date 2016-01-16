@@ -5,23 +5,32 @@ class BeaconConfiguration < ActiveRecord::Base
     # use to search through all document types
     document_type ""
 
-    settings index: { number_of_shards: 1 } do
-        mapping dynamic: false do
-            indexes :account_id, type: 'long', index: 'not_analyzed'
-            indexes :title, type: 'string', analyzer: 'english'
-            indexes :tags, type: 'string'
-            indexes :shared_account_ids, type: 'long'
-            indexes :uuid, type: 'string'
-            indexes :created_at, type: 'date'
-        end
-    end
-
-
     belongs_to :account
     belongs_to :location
     has_many :shared_beacon_configurations
 
 
+    def self.autocomplete_analysis
+        {
+            filter: {
+                autocomplete_filter: {
+                    type: "edge_ngram",
+                    min_gram: 1,
+                    max_gram: 15
+                }
+            },
+            analyzer: {
+                autocomplete: {
+                    type: "custom",
+                    tokenizer: "standard",
+                    filter: [
+                        "lowercase",
+                        "autocomplete_filter"
+                    ]
+                }
+            }
+        }
+    end
 
     def as_indexed_json
         # include everything by default

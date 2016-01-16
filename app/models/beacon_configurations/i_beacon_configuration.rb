@@ -5,15 +5,19 @@ class IBeaconConfiguration < BeaconConfiguration
     index_name BeaconConfiguration.index_name
     document_type "ibeacon_configuration"
 
-    settings index: { number_of_shards: 1 } do
-        mapping dynamic: false do
+    settings index: {
+        number_of_shards: 1,
+        analysis: BeaconConfiguration.autocomplete_analysis
+    } do
+
+        mapping do
             indexes :account_id, type: 'long', index: 'not_analyzed'
-            indexes :title, type: 'string', analyzer: 'english'
+            indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
             indexes :tags, type: 'string'
             indexes :shared_account_ids, type: 'long'
             indexes :uuid, type: 'string'
-            indexes :major, type: 'string', type: 'not_analyzed'
-            indexes :minor, type: 'string', type: 'not_analyzed'
+            indexes :major, type: 'string', index: 'not_analyzed'
+            indexes :minor, type: 'string', index: 'not_analyzed'
             indexes :created_at, type: 'date'
         end
     end

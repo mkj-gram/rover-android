@@ -5,10 +5,13 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     index_name BeaconConfiguration.index_name
     document_type "eddystone_namespace_configuration"
 
-    settings index: { number_of_shards: 1 } do
-        mapping dynamic: false do
+    settings index: {
+        number_of_shards: 1,
+        analysis: BeaconConfiguration.autocomplete_analysis
+    } do
+        mapping do
             indexes :account_id, type: 'long', index: 'not_analyzed'
-            indexes :title, type: 'string', analyzer: 'english'
+            indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
             indexes :tags, type: 'string'
             indexes :namespace, type: 'string', index: 'not_analyzed'
             indexes :instance_id, type: 'string', index: 'not_analyzed'
