@@ -66,17 +66,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             )
         end
 
-
-
-        querybuilder = {
-            query: {
-                filtered: {
-                    query: query
-                    filter: filter
-                }
-            }
-        }
-
         if !query_keyword.nil?
             query = {
                 multi_match: {
@@ -88,6 +77,14 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             query = {match_all:{}}
         end
 
+        querybuilder = {
+            query: {
+                filtered: {
+                    query: query,
+                    filter: filter
+                }
+            }
+        }
 
         if query_keyword.nil? && query_tags.nil?
             querybuilder.merge!(
