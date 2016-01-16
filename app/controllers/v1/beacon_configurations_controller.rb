@@ -52,16 +52,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             end
         end
 
-        querybuilder = {
-            query: {
-                filtered: {
-                    query: {
-                        match_all: {}
-                    },
-                    filter: filter
-                }
-            }
-        }
+
 
 
         if !query_tags.nil?
@@ -74,6 +65,29 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 }
             )
         end
+
+
+
+        querybuilder = {
+            query: {
+                filtered: {
+                    query: query
+                    filter: filter
+                }
+            }
+        }
+
+        if !query_keyword.nil?
+            query = {
+                multi_match: {
+                    query: query_keyword,
+                    fields: ["title"]
+                }
+            }
+        else
+            query = {match_all:{}}
+        end
+
 
         if query_keyword.nil? && query_tags.nil?
             querybuilder.merge!(
@@ -88,6 +102,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 }
             )
         end
+
         configurations = BeaconConfiguration.__elasticsearch__.search(querybuilder)
         results = configurations.per_page(page_size).page(current_page).results
         json  = {
@@ -176,7 +191,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             "type" => "configurations",
             "id" => config._id,
             "attributes" => {
-                "protocol" => EddystoneNamespaceConfiguration.protocol,
+                "protocol" => UrlConfiguration.protocol,
                 "name" => source.title,
                 "tags" => source.tags,
                 "url" => source.url
