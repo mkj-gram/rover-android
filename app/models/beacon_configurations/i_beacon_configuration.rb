@@ -15,7 +15,7 @@ class IBeaconConfiguration < BeaconConfiguration
             indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
             indexes :tags, type: 'string'
             indexes :shared_account_ids, type: 'long'
-            indexes :uuid, type: 'string'
+            indexes :uuid, type: 'string', index: 'not_analyzed'
             indexes :major, type: 'string', index: 'not_analyzed'
             indexes :minor, type: 'string', index: 'not_analyzed'
             indexes :created_at, type: 'date'

@@ -20,6 +20,9 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             }
         }
 
+        # all fields unless a protocol is speicifed
+        query_multi_match_fields = ["uuid", "major", "minor", "namespace", "namespace_id", "url"]
+
         if !query_protocol.nil?
             if query_protocol == IBeaconConfiguration.protocol
                 filter[:bool][:must].push(
@@ -29,6 +32,9 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         }
                     }
                 )
+
+                query_multi_match_fields = ["uuid", "major", "minor"]
+
             elsif query_protocol == EddystoneNamespaceConfiguration.protocol
                 filter[:bool][:must].push(
                     {
@@ -37,6 +43,9 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         }
                     }
                 )
+
+                query_multi_match_fields = ["namespace", "namespace_id"]
+
             elsif query_protocol == UrlConfiguration.protocol
                 filter[:bool][:must].push(
                     {
@@ -45,6 +54,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         }
                     }
                 )
+
+                query_multi_match_fields = ["url"]
             else
                 # they are specifying a protocol which doesn't exist
                 render_empty_data
@@ -67,12 +78,19 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         end
 
         if !query_keyword.nil?
+
             query = {
                 bool: {
                     should: [
                         {
                             match_phrase: {
                                 title: query_keyword
+                            }
+                        },
+                        {
+                            multi_match: {
+                                query: query_keyword,
+                                fields: query_multi_match_fields
                             }
                         }
                     ]
