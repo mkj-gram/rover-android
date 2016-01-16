@@ -37,10 +37,12 @@ gem 'elasticsearch-model', '~> 0.1.8'
 
 # gem 'textacular', '~> 3.2', '>= 3.2.2'
 
-group :development do
-    gem 'faker', '~> 1.6', '>= 1.6.1'
+gem 'faker', '~> 1.6', '>= 1.6.1'
 
-    gem 'colorize', '~> 0.7.7'
+gem 'colorize', '~> 0.7.7'
+
+group :development do
+
 
 end
 

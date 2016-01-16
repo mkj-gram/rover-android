@@ -1,15 +1,21 @@
 class BeaconConfiguration < ActiveRecord::Base
     include Elasticsearch::Model
+    include Elasticsearch::Model::Callbacks
 
-    # include Elasticsearch::Model::Callbacks
     # use to search through all document types
     document_type ""
 
-    # settings index: { number_of_shards: 1} do
-    #     mapping dynamic: false do
-    #         indexes :title, type: 'string', analyzer: 'english'
-    #     end
-    # end
+    settings index: { number_of_shards: 1 } do
+        mapping dynamic: false do
+            indexes :account_id, type: 'long', index: 'not_analyzed'
+            indexes :title, type: 'string', analyzer: 'english'
+            indexes :tags, type: 'string'
+            indexes :shared_account_ids, type: 'long'
+            indexes :uuid, type: 'string'
+            indexes :created_at, type: 'date'
+        end
+    end
+
 
     belongs_to :account
     belongs_to :location

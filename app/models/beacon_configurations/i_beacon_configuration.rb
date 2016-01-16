@@ -1,6 +1,6 @@
 class IBeaconConfiguration < BeaconConfiguration
-    include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
+    # include Elasticsearch::Model
+    # include Elasticsearch::Model::Callbacks
 
     index_name BeaconConfiguration.index_name
     document_type "ibeacon_configuration"
@@ -30,7 +30,7 @@ class IBeaconConfiguration < BeaconConfiguration
     validate :unique_ibeacon
 
     def self.protocol
-        @protocol ||= "ibeacon"
+        @protocol ||= "iBeacon"
     end
 
     def as_indexed_json(options = {})

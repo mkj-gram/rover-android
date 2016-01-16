@@ -1,38 +1,42 @@
-if Rails.env.development?
-    require 'colorize'
-    require 'faker'
-    namespace :account do
-        def show_percentage(percent, color = :blue)
-            if percent >= 100
-                color = :green
-            end
-            print "\r#{percent.round(2)}%".colorize(color)
+# if Rails.env.development?
+require 'colorize'
+require 'faker'
+namespace :account do
+    def show_percentage(percent, color = :blue)
+        if percent >= 100
+            color = :green
         end
-        def show_finished(message = "created!", color = :green)
-            show_percentage(100)
-            print "\r#{message}".colorize(color) + "\n"
-        end
+        print "\r#{percent.round(2)}%".colorize(color)
+    end
+    def show_finished(message = "created!", color = :green)
+        show_percentage(100)
+        print "\r#{message}".colorize(color) + "\n"
+    end
 
-        def show_error(err_message = "", color = :red)
-            print "\nAn error occured see message below".colorize(color) + "\n"
-            puts err_message.colorize(color)
-        end
+    def show_error(err_message = "", color = :red)
+        print "\nAn error occured see message below".colorize(color) + "\n"
+        puts err_message.colorize(color)
+    end
 
+    def generate_eddystone_namespace
+        uuid = SecureRandom.uuid
+        return uuid[0..7] + uuid[24..uuid.length]
+    end
 
-        desc "Create an account"
-        task :generate => :environment do
-            begin
-                primary_account_email = ENV['EMAIL'] || "test@rover.io"
-                num_users = ENV['NUM_USERS'] || 0
-                num_configurations = 500
-                num_locations = ENV['NUM_LOCATIONS'] || 500
+    desc "Create an account"
+    task :generate => :environment do
+        begin
+            primary_account_email = ENV['EMAIL'] || "test@rover.io"
+            num_users = ENV['NUM_USERS'] || 0
+            num_configurations = 500
+            num_locations = ENV['NUM_LOCATIONS'] || 500
 
-                share_account_id = ENV['SHARE_ACCOUNT_ID']
+            share_account_id = ENV['SHARE_ACCOUNT_ID']
 
-                puts "\n\nGenerating Account\n".colorize(:color =>  :black, :background => :white).underline
+            puts "\n\nGenerating Account\n".colorize(:color =>  :black, :background => :white).underline
 
-                puts "\nCreating primary user with email #{primary_account_email}"
-                # ActiveRecord::Base.transaction do
+            puts "\nCreating primary user with email #{primary_account_email}"
+            ActiveRecord::Base.transaction do
                 show_percentage(0)
                 user = User.create!(name: "Rover Test", email: primary_account_email, password: "password", password_confirmation: "password", account_title: "Rover")
                 @account = user.account
@@ -84,9 +88,9 @@ if Rails.env.development?
                 # show_finished
 
                 # Add BeaconConfigurations
-                puts "Adding #{num_configurations} beacon configurations #{@account.id}"
+                puts "Adding #{num_configurations} ibeacon configurations #{@account.id}"
                 current_record = 1
-                configurations = []
+                ibeacon_configurations = []
                 num_configurations.times.each do
                     # configurations <<
                     config = IBeaconConfiguration.new(
@@ -97,7 +101,42 @@ if Rails.env.development?
                         title: Faker::Commerce.product_name,
                         tags: Faker::Hipster.words(Random.rand(5), true, true)
                     )
-                    configurations << config.save(validate: false)
+                    ibeacon_configurations << config.save(validate: false)
+                    show_percentage((current_record/num_configurations.to_f) * 100)
+                    current_record += 1
+                end
+                show_finished
+
+                puts "Adding #{num_configurations} eddystone configurations #{@account.id}"
+                current_record = 1
+                eddystone_configurations = []
+                num_configurations.times.each do
+                    # configurations <<
+                    config = EddystoneNamespaceConfiguration.new(
+                        account_id: @account.id,
+                        namespace: generate_eddystone_namespace,
+                        instance_id: Random.rand(6000),
+                        title: Faker::Commerce.product_name,
+                        tags: Faker::Hipster.words(Random.rand(5), true, true)
+                    )
+                    eddystone_configurations << config.save(validate: false)
+                    show_percentage((current_record/num_configurations.to_f) * 100)
+                    current_record += 1
+                end
+                show_finished
+
+                puts "Adding #{num_configurations} url configurations #{@account.id}"
+                current_record = 1
+                url_configurations = []
+                num_configurations.times.each do
+                    # configurations <<
+                    config = UrlConfiguration.new(
+                        account_id: @account.id,
+                        url: (0...10).map { ('a'..'z').to_a[rand(26)] }.join,
+                        title: Faker::Commerce.product_name,
+                        tags: Faker::Hipster.words(Random.rand(5), true, true)
+                    )
+                    url_configurations << config.save(validate: false)
                     show_percentage((current_record/num_configurations.to_f) * 100)
                     current_record += 1
                 end
@@ -145,14 +184,14 @@ if Rails.env.development?
                 puts "\nFinished below are your api-keys".colorize(:green)
                 puts "X-Rover-REST-API-Key: #{@account.token}".colorize(:green)
                 puts "JWT Token: #{@session.token}".colorize(:green)
-                # end
-            rescue Exception => e
-                show_error(e.message)
-                show_error("Rolling back")
             end
-
-
+        rescue Exception => e
+            show_error(e.message)
+            show_error("Rolling back")
         end
-    end
 
+
+    end
 end
+
+# end

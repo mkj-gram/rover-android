@@ -21,7 +21,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }
 
         if !query_protocol.nil?
-            if query_protocol == "iBeacon"
+            if query_protocol == IBeaconConfiguration.protocol
                 filter[:bool][:must].push(
                     {
                         type: {
@@ -29,7 +29,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         }
                     }
                 )
-            elsif query_protocol == "Eddystone-UUID"
+            elsif query_protocol == EddystoneNamespaceConfiguration.protocol
                 filter[:bool][:must].push(
                     {
                         type: {
@@ -37,7 +37,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         }
                     }
                 )
-            elsif query_protocol == "Url"
+            elsif query_protocol == UrlConfiguration.protocol
                 filter[:bool][:must].push(
                     {
                         type: {
@@ -141,12 +141,27 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             "type" => "configurations",
             "id" => config._id,
             "attributes" => {
-                "protocol" => "ibeacon",
+                "protocol" => IBeaconConfiguration.protocol,
                 "name" => source.title,
                 "uuid" => source.uuid,
                 "major-number" => source.major,
                 "minor-number" => source.minor,
                 "tags" => source.tags
+            }
+        }
+    end
+
+    def serialize_eddystone_namespace(config)
+        source = config._source
+        {
+            "type" => "configurations",
+            "id" => config._id,
+            "attributes" => {
+                "protocol" => EddystoneNamespaceConfiguration.protocol,
+                "name" => source.title,
+                "tags" => source.tags,
+                "namespace" => source.namespace,
+                "instance-id" => source.instance_id
             }
         }
     end
