@@ -11,7 +11,8 @@ class V1::AccountController < V1::ApplicationController
                 "attributes" => {
                     "title" => current_account.title,
                     "token" => current_account.token,
-                    "share-key" => current_account.share_key
+                    "share-key" => current_account.share_key,
+                    "configuration-tags" => current_account.beacon_configuration_active_tags_index.tags
                 },
                 "relationships" => {
                     "users" => {

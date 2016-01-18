@@ -7,6 +7,7 @@ class Account < ActiveRecord::Base
     include Tokenable
 
     before_create :generate_share_key
+    before_create :create_beacon_configuration_active_tags
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
@@ -30,6 +31,8 @@ class Account < ActiveRecord::Base
     has_many :shared_beacon_configurations, through: :active_shared_beacon_configurations, source: :beacon_configuration
     has_many :shared_with_me_beacon_configurations, through: :passive_shared_beacon_configurations, source: :beacon_configuration
 
+    has_one :beacon_configuration_active_tags_index
+
     # we can go innerjoin the beacon_configuration table with the ibeacons table
     # has_many :ibeacon_configurations, through: :beacon_configurations, source: :configurable, source_type: "IbeaconConfiguration"
     # or just directly look up from the ibeacons_table
@@ -40,10 +43,15 @@ class Account < ActiveRecord::Base
 
 
     private
+
     def generate_share_key
         self.share_key = loop do
             random_token = SecureRandom.hex(16)
             break random_token unless Account.exists?(share_key: random_token)
         end
+    end
+
+    def create_beacon_configuration_active_tags
+        BeaconConfigurationActiveTagsIndex.create(account_id: self.account_id)
     end
 end
