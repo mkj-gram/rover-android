@@ -36,9 +36,7 @@ class PasswordReset < ActiveRecord::Base
     def expired?
         DateTime.now > self.expires_at
     end
-    def render
-        render_password_reset
-    end
+
     def self.get_template
         @template ||= %{
             <p>Dear <%= @user.name %>,</p>
