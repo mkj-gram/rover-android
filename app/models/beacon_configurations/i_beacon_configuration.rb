@@ -5,22 +5,29 @@ class IBeaconConfiguration < BeaconConfiguration
     index_name BeaconConfiguration.index_name
     document_type "ibeacon_configuration"
 
-    settings index: {
-        number_of_shards: 1,
-        analysis: BeaconConfiguration.autocomplete_analysis
-    } do
 
-        mapping do
-            indexes :account_id, type: 'long', index: 'not_analyzed'
-            indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
-            indexes :tags, type: 'string'
-            indexes :shared_account_ids, type: 'long'
-            indexes :uuid, type: 'string', index: 'not_analyzed'
-            indexes :major, type: 'string', index: 'not_analyzed'
-            indexes :minor, type: 'string', index: 'not_analyzed'
-            indexes :created_at, type: 'date'
-        end
+    mapping do
+        indexes :account_id, type: 'long', index: 'not_analyzed'
+        indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
+        indexes :tags, type: 'string'
+        indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
+        indexes :uuid, type: 'string', index: 'not_analyzed'
+        indexes :major, type: 'string', index: 'not_analyzed'
+        indexes :minor, type: 'string', index: 'not_analyzed'
+        indexes :created_at, type: 'date'
+        # didn't get to work but we should learn this for future
+        indexes :suggest_tags, type: 'completion', analyzer: 'simple', search_analyzer: 'simple', payloads: false, context: {
+            account_id: {
+                type: "category",
+                path: "account_id"
+            },
+            shared_account_ids: {
+                type: "category",
+                path: "shared_account_ids"
+            }
+        }
     end
+
 
     after_create :incremement_counter_cache
     after_destroy :decrement_counter_cache
@@ -53,7 +60,22 @@ class IBeaconConfiguration < BeaconConfiguration
             location: self.indexed_location
         }
 
-        MultiJson.dump(json)
+        if self.tags.any?
+            json.merge!(
+                {
+                    suggest_tags: {
+                        input: self.tags,
+                        context: {
+                            account_id: self.account_id,
+                            shared_account_ids: self.account_id
+                        }
+                    }
+                }
+            )
+        end
+
+        return json
+        # MultiJson.dump(json)
     end
 
     private
@@ -63,15 +85,19 @@ class IBeaconConfiguration < BeaconConfiguration
     end
 
     def uuid_account_owner
-        existing_uuid_config = BeaconConfiguration.find_by_uuid(self.uuid)
-        if !existing_uuid_config.nil? && existing_uuid_config.account_id != self.account_id
-            errors.add(:uuid, "has already been taken")
+        if self.uuid_changed?
+            existing_uuid_config = BeaconConfiguration.find_by_uuid(self.uuid)
+            if !existing_uuid_config.nil? && existing_uuid_config.account_id != self.account_id
+                errors.add(:uuid, "has already been taken")
+            end
         end
     end
 
     def unique_ibeacon
-        if IBeaconConfiguration.exists?(uuid: self.uuid, major: self.major, minor: self.minor)
-            errors.add(:ibeacon, "already exists")
+        if self.uuid_changed? || self.major_changed? || self.minor_changed?
+            if IBeaconConfiguration.exists?(uuid: self.uuid, major: self.major, minor: self.minor)
+                errors.add(:ibeacon, "already exists")
+            end
         end
     end
 

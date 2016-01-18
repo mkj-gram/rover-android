@@ -5,13 +5,9 @@ class BeaconConfiguration < ActiveRecord::Base
     # use to search through all document types
     document_type ""
 
-    belongs_to :account
-    belongs_to :location
-    has_many :shared_beacon_configurations
-
-
-    def self.autocomplete_analysis
-        {
+    settings index: {
+        number_of_shards: 1,
+        analysis:  {
             filter: {
                 autocomplete_filter: {
                     type: "edge_ngram",
@@ -30,7 +26,16 @@ class BeaconConfiguration < ActiveRecord::Base
                 }
             }
         }
-    end
+    }
+
+    before_update :update_active_tags
+
+
+    belongs_to :account
+    belongs_to :location
+    has_one :beacon_configuration_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
+    has_many :shared_beacon_configurations
+
 
     def as_indexed_json
         # include everything by default
@@ -44,6 +49,23 @@ class BeaconConfiguration < ActiveRecord::Base
         when eddystone_namespace_type
             "eddystone-namespace-configurations"
         end
+    end
+
+    def update_active_tags
+
+        # new_tags = self.changes[:tags].second - self.changes[:tags].first
+        # old_tags = self.changes[:tags].first - self.changes[:tags].second
+        # old_tags_to_delete.select do |tag|
+        #     !BeaconConfiguration.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
+        # end
+        new_tags = self.tags
+        old_tags_to_delete = []
+        # lock this row since we are updating and deleting the tags in the application level
+        # beacon_configuration_active_tags.lock!
+        beacon_configuration_active_tags_index.tags += new_tags
+        beacon_configuration_active_tags_index.tags -= old_tags_to_delete
+        beacon_configuration_active_tags_index.save
+
     end
 
     protected
@@ -61,6 +83,9 @@ class BeaconConfiguration < ActiveRecord::Base
     def shared_account_ids
         shared_beacon_configurations.map(&:shared_account_id)
     end
+
+
+
 
     private
 
