@@ -38,9 +38,9 @@ class V1::AccountsController < V1::ApplicationController
 
     private
     def has_access_to_account
-        # if current_account.id != params[:id]
-        #     head :unauthorized
-        # end
+        if current_account.id.to_s != params[:id].to_s
+            head :unauthorized
+        end
     end
     def account_params(local_params)
         local_params.require(:accounts).permit(:title)
