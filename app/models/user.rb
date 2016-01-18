@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
 
     has_secure_password
 
-    attr_accessor :old_password, :account_title, :account_invite_token
+    attr_accessor :current_password, :account_title, :account_invite_token, :force_update_for_protected_attributes
 
     # has_one :acl, class_name: "UserAcl" -> refer to custom function acl
 
@@ -31,6 +31,12 @@ class User < ActiveRecord::Base
 
     before_destroy :can_destroy
 
+
+
+    #############################################
+    #               Validations                 #
+    #############################################
+
     validates :name, presence: true
 
     validates :email,
@@ -49,7 +55,9 @@ class User < ActiveRecord::Base
         if: -> { new_record? || !password.nil? }
 
     validate :valid_account_invite_token
-    validate :can_change_password
+    validate :can_change_protected_attributes, if: -> {
+        !self.new_record? && self.password_digest_changed? && !self.force_update_for_protected_attributes
+    }
 
     # when changing the password we either have to validate the reset token or
     # we have to validate the existing password
@@ -93,6 +101,9 @@ class User < ActiveRecord::Base
         return self.name.nil? ? self.email : "#{self.name} <#{self.email}>"
     end
 
+    def force_update_for_protected_attributes
+        @force_update_for_protected_attributes || false
+    end
     private
 
     def invite
@@ -115,25 +126,15 @@ class User < ActiveRecord::Base
         end
     end
 
-    def can_change_password
-        if old_password && !self.authenticate(old_password)
-            errors.add(:old_password, "incorrect password")
+    def can_change_protected_attributes
+        if self.current_password.nil?
+            errors.add(:current_password, "can't be blank")
+        else
+            if !self.authenticate(current_password)
+                # what error is this?
+                errors.add(:unauthorized, "incorrect password")
+            end
         end
-        # if password_reset_token
-        #     reset = PasswordReset.find_by_token(password_reset_token)
-        #     if reset && reset.email
-
-        #     else
-        #         errors.add(:password, "password reset doesn't exist")
-        #         return false
-        #     end
-        # elsif old_password
-
-        # elsif password_digest.nil?
-        #     return true
-        # else
-        #     errors.add(:password, "authentication failed")
-        # end
     end
 
     def attach_to_account

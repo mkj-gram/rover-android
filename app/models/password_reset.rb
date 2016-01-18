@@ -24,6 +24,7 @@ class PasswordReset < ActiveRecord::Base
         PasswordReset.transaction do
             user.password = password
             user.password_confirmation = password
+            user.force_update_for_protected_attributes = true
             user.save!
             self.destroy!
             return true

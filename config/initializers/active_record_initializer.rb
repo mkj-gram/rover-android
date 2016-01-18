@@ -1,1 +1,1 @@
-Rails.application.config.active_record.schema_format = :sql
+# Rails.application.config.active_record.schema_format = :sql
