@@ -1,8 +1,8 @@
 class V1::AccountController < V1::ApplicationController
 
     before_action :authenticate
-
-    # GET /account/
+    before_action :has_access_to_account
+    # GET /accounts/:id
     def show
         json = {
             "data" => {
@@ -37,7 +37,11 @@ class V1::AccountController < V1::ApplicationController
     end
 
     private
-
+    def has_access_to_account
+        if current_account.id != params[:id]
+            head :unauthorized
+        end
+    end
     def account_params(local_params)
         local_params.require(:accounts).permit(:title)
     end

@@ -17,8 +17,7 @@ Rails.application.routes.draw do
         #     end
         # end
 
-        get 'account', to: 'account#show'
-        patch 'account', to: 'account#update'
+        resources :accounts, only: [:show]
 
         resources :users, except:[:create] do
 
