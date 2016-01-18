@@ -1,4 +1,4 @@
-class V1::AccountController < V1::ApplicationController
+class V1::AccountsController < V1::ApplicationController
 
     before_action :authenticate
     before_action :has_access_to_account
