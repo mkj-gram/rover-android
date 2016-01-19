@@ -37,6 +37,34 @@ class BeaconConfiguration < ActiveRecord::Base
     has_one :beacon_configuration_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
     has_many :shared_beacon_configurations
 
+    def as_indexed_json(options = {})
+        json = {
+            account_id: self.account_id,
+            title: self.title,
+            tags: self.tags,
+            enabled: self.enabled,
+            shared: self.shared,
+            created_at: self.created_at,
+            shared_account_ids: self.shared_account_ids,
+            location: self.indexed_location
+        }
+
+        if self.tags.any?
+            json.merge!(
+                {
+                    suggest_tags: {
+                        input: self.tags,
+                        context: {
+                            account_id: self.account_id,
+                            shared_account_ids: self.account_id
+                        }
+                    }
+                }
+            )
+        end
+
+        return json
+    end
 
     def formatted_type
         case type

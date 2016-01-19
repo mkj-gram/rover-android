@@ -5,7 +5,7 @@ class IBeaconConfiguration < BeaconConfiguration
     index_name BeaconConfiguration.index_name
     document_type "ibeacon_configuration"
 
-
+    # this needs to be in the parent class
     mapping do
         indexes :account_id, type: 'long', index: 'not_analyzed'
         indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
@@ -43,33 +43,15 @@ class IBeaconConfiguration < BeaconConfiguration
     end
 
     def as_indexed_json(options = {})
-        json = {
-            account_id: self.account_id,
-            title: self.title,
-            tags: self.tags,
-            uuid: self.uuid,
-            major: self.major.to_s,
-            minor: self.minor.to_s,
-            enabled: self.enabled,
-            created_at: self.created_at,
-            shared_account_ids: self.shared_account_ids,
-            location: self.indexed_location
-        }
+        json = super(options)
+        json.merge!(
+            {
+                uuid: self.uuid,
+                major: self.major.to_s,
+                minor: self.minor.to_s,
+            }
 
-        if self.tags.any?
-            json.merge!(
-                {
-                    suggest_tags: {
-                        input: self.tags,
-                        context: {
-                            account_id: self.account_id,
-                            shared_account_ids: self.account_id
-                        }
-                    }
-                }
-            )
-        end
-
+        )
         return json
     end
 

@@ -34,32 +34,13 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
 
 
     def as_indexed_json(options = {})
-        json = {
-            account_id: self.account_id,
-            title: self.title,
-            tags: self.tags,
-            namespace: self.namespace,
-            instance_id: self.instance_id.to_s,
-            enabled: self.enabled,
-            created_at: self.created_at,
-            shared_account_ids: self.shared_account_ids,
-            location: self.indexed_location
-        }
-
-        if self.tags.any?
-            json.merge!(
-                {
-                    suggest_tags: {
-                        input: self.tags,
-                        context: {
-                            account_id: self.account_id,
-                            shared_account_ids: self.account_id
-                        }
-                    }
-                }
-            )
-        end
-
+        json = super(options)
+        json.merge!(
+            {
+                namespace: self.namespace,
+                instance_id: self.instance_id.to_s,
+            }
+        )
         return json
     end
 

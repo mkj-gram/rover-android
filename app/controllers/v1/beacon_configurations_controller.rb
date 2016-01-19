@@ -174,49 +174,56 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
 
-    def serialize_ibeacon(config)
+    def serialize_beacon(config, extra_attributes = {})
         source = config._source
         {
             "type" => "configurations",
             "id" => config._id,
             "attributes" => {
-                "protocol" => IBeaconConfiguration.protocol,
                 "name" => source.title,
+                "tags" => source.tags,
+                "shared" => source.shared,
+                "enabled" => source.enabled
+            }.merge(extra_attributes)
+        }
+    end
+
+    def serialize_ibeacon(config)
+        source = config._source
+        serialize_beacon(
+            config,
+            {
+                "protocol" => IBeaconConfiguration.protocol,
                 "uuid" => source.uuid,
                 "major-number" => source.major,
                 "minor-number" => source.minor,
-                "tags" => source.tags
             }
-        }
+        )
     end
 
     def serialize_eddystone_namespace(config)
         source = config._source
-        {
-            "type" => "configurations",
-            "id" => config._id,
-            "attributes" => {
+        serialize_beacon(
+            config,
+            {
+
                 "protocol" => EddystoneNamespaceConfiguration.protocol,
-                "name" => source.title,
-                "tags" => source.tags,
                 "namespace" => source.namespace,
                 "instance-id" => source.instance_id
+
             }
-        }
+        )
     end
 
     def serialize_url(config)
         source = config._source
-        {
-            "type" => "configurations",
-            "id" => config._id,
-            "attributes" => {
+        serialize_beacon(
+            config,
+            {
                 "protocol" => UrlConfiguration.protocol,
-                "name" => source.title,
-                "tags" => source.tags,
                 "url" => source.url
             }
-        }
+        )
     end
 
     def render_empty_data
