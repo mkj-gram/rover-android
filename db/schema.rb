@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160118184921) do
+ActiveRecord::Schema.define(version: 20160118182842) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,17 +31,14 @@ ActiveRecord::Schema.define(version: 20160118184921) do
   create_table "accounts", force: :cascade do |t|
     t.text     "title"
     t.integer  "primary_user_id"
-    t.text     "token",                                                null: false
-    t.text     "share_key",                                            null: false
-    t.integer  "users_count",                              default: 0
-    t.integer  "locations_count",                          default: 0
-    t.integer  "ibeacon_configurations_count",             default: 0
-    t.integer  "eddystone_namespace_configurations_count", default: 0
-    t.integer  "url_configurations_count",                 default: 0
-    t.integer  "beacon_configurations_count",              default: 0
-    t.integer  "account_invites_count",                    default: 0
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
+    t.text     "token",                                              null: false
+    t.text     "share_key",                                          null: false
+    t.integer  "users_count",                            default: 0
+    t.integer  "locations_count",                        default: 0
+    t.integer  "searchable_beacon_configurations_count", default: 0
+    t.integer  "account_invites_count",                  default: 0
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
   end
 
   add_index "accounts", ["share_key"], name: "index_accounts_on_share_key", unique: true, using: :btree
