@@ -18,6 +18,9 @@
     "SECRET_KEY_BASE": {
       "required": true
     },
+    "SECRET_ENCRYPTION_KEY": {
+      "required": true
+    },
     "POSTGRESQL_DB_USERNAME": {
       "required": true
     },

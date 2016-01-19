@@ -42,6 +42,8 @@ gem 'faker', '~> 1.6', '>= 1.6.1'
 
 gem 'colorize', '~> 0.7.7'
 
+gem 'attr_encrypted', '~> 1.3', '>= 1.3.5'
+
 group :development do
 
 

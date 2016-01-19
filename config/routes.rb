@@ -50,6 +50,10 @@ Rails.application.routes.draw do
         resources :sessions, only: [:create, :show, :destroy]
 
         resources "configurations", controller: "beacon_configurations", as: "beacon_configuration"
+
+        resources :integrations, only: [:index]
+
+        resources "estimote-integrations", controller: "estimote_integrations", as: "estimote_integrations", only: [:show, :create, :update, :destroy]
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

@@ -17,6 +17,8 @@ module RailsApi
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
+        config.autoload_paths << Rails.root.join('app', 'models', 'third_party_integrations')
+
         # config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations', 'ibeacon_configuration')
         config.autoload_paths << Rails.root.join('lib', 'mail_client')
         config.autoload_paths << Rails.root.join('lib', 'model_broadcaster')

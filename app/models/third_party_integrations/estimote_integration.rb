@@ -1,0 +1,2 @@
+class EstimoteIntegration < ThirdPartyIntegration
+end

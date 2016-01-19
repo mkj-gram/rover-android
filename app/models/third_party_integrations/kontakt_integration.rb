@@ -1,0 +1,2 @@
+class Kontakt < ThirdPartyIntegration
+end

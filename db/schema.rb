@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160118182842) do
+ActiveRecord::Schema.define(version: 20160119151429) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -129,6 +129,23 @@ ActiveRecord::Schema.define(version: 20160118182842) do
 
   add_index "shared_beacon_configurations", ["owner_account_id"], name: "index_shared_beacon_configurations_on_owner_account_id", using: :btree
   add_index "shared_beacon_configurations", ["shared_account_id"], name: "index_shared_beacon_configurations_on_shared_account_id", using: :btree
+
+  create_table "third_party_integrations", force: :cascade do |t|
+    t.integer  "account_id",                                 null: false
+    t.string   "type",                                       null: false
+    t.boolean  "syncing",                    default: false
+    t.boolean  "enabled",                    default: true
+    t.string   "encrypted_credentials"
+    t.string   "encrypted_credentials_salt"
+    t.string   "encrypted_credentials_iv"
+    t.datetime "last_synced_at"
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+  end
+
+  add_index "third_party_integrations", ["account_id", "enabled"], name: "index_third_party_integrations_on_account_id_and_enabled", using: :btree
+  add_index "third_party_integrations", ["account_id", "type"], name: "index_third_party_integrations_on_account_id_and_type", using: :btree
+  add_index "third_party_integrations", ["account_id"], name: "index_third_party_integrations_on_account_id", using: :btree
 
   create_table "user_acls", id: false, force: :cascade do |t|
     t.integer "user_id",                           null: false
