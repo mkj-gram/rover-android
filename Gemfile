@@ -44,6 +44,8 @@ gem 'colorize', '~> 0.7.7'
 
 gem 'attr_encrypted', '~> 1.3', '>= 1.3.5'
 
+gem 'httparty', '~> 0.13.7'
+
 group :development do
 
 

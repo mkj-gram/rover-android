@@ -4,13 +4,17 @@ class CreateThirdPartyIntegrations < ActiveRecord::Migration
             t.integer :account_id, null: false
             t.string :type, null: false
             t.boolean :syncing, default: false
+            t.boolean :enabled, default: true
             t.string :encrypted_credentials
             t.string :encrypted_credentials_salt
             t.string :encrypted_credentials_iv
+
+            t.datetime :last_synced_at
             t.timestamps null: false
         end
 
         add_index :third_party_integrations, :account_id
+        add_index :third_party_integrations, [:account_id, :enabled]
         add_index :third_party_integrations, [:account_id, :type]
     end
 end
