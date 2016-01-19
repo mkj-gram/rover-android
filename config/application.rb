@@ -6,6 +6,7 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+require 'elasticsearch/rails/instrumentation'
 module RailsApi
     class Application < Rails::Application
 
@@ -13,6 +14,7 @@ module RailsApi
         config.rabbitmq = Rails.application.config_for(:rabbitmq)
         config.mailgun = Rails.application.config_for(:mailgun)
         config.password_reset = Rails.application.config_for(:password_reset)
+        config.elasticsearch = Rails.application.config_for(:elasticsearch)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
         # config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations', 'ibeacon_configuration')

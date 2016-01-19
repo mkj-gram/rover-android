@@ -12,8 +12,13 @@ module RequestHelpers
     end
 
     module HeaderHelper
-        def sign_request!(account)
-            request.headers["X-Rover-REST-API-Key"] = account.token
+        def sign_request!(account_or_session)
+            if account_or_session.is_a?(Account)
+                request.headers["X-Rover-REST-API-Key"] = account_or_session.token
+            else
+                request.headers["Authorization"] = "Bearer: #{account_or_session.token}"
+            end
+
         end
     end
 end

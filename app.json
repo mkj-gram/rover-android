@@ -41,6 +41,9 @@
     },
     "PASSWORD_RESET_URL": {
       "required": true
+    },
+    "ELASTICSEARCH_URLS": {
+      "required": true
     }
   },
   "addons": []

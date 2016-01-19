@@ -1,0 +1,6 @@
+test:
+    urls: "127.0.0.1:9200"
+development:
+    urls: "127.0.0.1:9200"
+production:
+    urls: <%= ENV['ELASTICSEARCH_URLS'] %>

@@ -9,10 +9,7 @@ class CreateAccounts < ActiveRecord::Migration
             # cache counters
             t.integer :users_count, default: 0
             t.integer :locations_count, default: 0
-            t.integer :ibeacon_configurations_count, default: 0
-            t.integer :eddystone_namespace_configurations_count, default: 0
-            t.integer :eddystone_url_configurations_count, default: 0
-            t.integer :beacon_configurations_count, default: 0
+            t.integer :searchable_beacon_configurations_count, default: 0
             t.integer :account_invites_count, default: 0
 
             t.timestamps null: false

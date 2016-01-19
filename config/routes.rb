@@ -17,8 +17,7 @@ Rails.application.routes.draw do
         #     end
         # end
 
-        get 'account', to: 'account#show'
-        patch 'account', to: 'account#update'
+        resources :accounts, only: [:show]
 
         resources :users, except:[:create] do
 
@@ -49,7 +48,8 @@ Rails.application.routes.draw do
         end
 
         resources :sessions, only: [:create, :show, :destroy]
-        # resources :password_reset
+
+        resources "configurations", controller: "beacon_configurations", as: "beacon_configuration"
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

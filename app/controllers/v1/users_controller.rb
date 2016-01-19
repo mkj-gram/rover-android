@@ -30,7 +30,19 @@ class V1::UsersController < V1::ApplicationController
         @user = current_resource
         if @user
             json = {
-                "data" => V1::UserSerializer.s(@user)
+                "data" => {
+                    "type" => "users",
+                    "id" => @user.id.to_s,
+                    "attributes" => {
+                        "name" => @user.name,
+                        "email" => @user.email
+                    },
+                    "relationships" => {
+                        "account" => {
+                            "data" => { "type" => "account", "id" => @user.account.id.to_s }
+                        }
+                    }
+                }
             }
             render json: json
         else
@@ -40,17 +52,23 @@ class V1::UsersController < V1::ApplicationController
     end
 
 
-
     # PATCH/PUT /users/1
     # Non batch request
     def update
+        # when updating we need to validate the user?
         json = flatten_request({single_record: true})
+        local_params = user_params(json[:data])
         @user = current_resource
+        # if @user.authenticate(local_params.fetch(:current_password, ""))
         if @user.update(user_params(json[:data]))
             head :no_content
         else
-            render_errors(@user.errors, status: :unprocessable_entity)
+            render json: {errors: V1::UserUpdateErrorSerializer.serialize(@user.errors)}, status: :unprocessable_entity
+            # render_errors(@user.errors, status: :unprocessable_entity)
         end
+        # else
+        #     head :unauthorized
+        # end
     end
 
     # DELETE /users/1
@@ -73,6 +91,10 @@ class V1::UsersController < V1::ApplicationController
 
 
     def user_params(local_params)
-        local_params.require(:users).permit(:name, :email, :password, :password_confirmation, :old_password)
+        local_params.require(:users)
+        local_params[:users][:current_password] = local_params[:users][:"current-password"] if local_params.has_key?(:users) && local_params[:users].has_key?(:"current-password")
+        Rails.logger.info(local_params)
+        local_params.require(:users).permit(:name, :email, :password, :password_confirmation, :current_password)
+
     end
 end

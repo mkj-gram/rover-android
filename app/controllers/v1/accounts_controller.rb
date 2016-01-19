@@ -1,8 +1,8 @@
-class V1::AccountController < V1::ApplicationController
+class V1::AccountsController < V1::ApplicationController
 
     before_action :authenticate
-
-    # GET /account/
+    before_action :has_access_to_account
+    # GET /accounts/:id
     def show
         json = {
             "data" => {
@@ -11,7 +11,8 @@ class V1::AccountController < V1::ApplicationController
                 "attributes" => {
                     "title" => current_account.title,
                     "token" => current_account.token,
-                    "share-key" => current_account.share_key
+                    "share-key" => current_account.share_key,
+                    "configuration-tags" => current_account.beacon_configuration_active_tags_index.tags
                 },
                 "relationships" => {
                     "users" => {
@@ -36,7 +37,11 @@ class V1::AccountController < V1::ApplicationController
     end
 
     private
-
+    def has_access_to_account
+        if current_account.id.to_s != params[:id].to_s
+            head :unauthorized
+        end
+    end
     def account_params(local_params)
         local_params.require(:accounts).permit(:title)
     end

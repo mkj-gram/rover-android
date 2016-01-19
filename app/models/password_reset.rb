@@ -24,6 +24,7 @@ class PasswordReset < ActiveRecord::Base
         PasswordReset.transaction do
             user.password = password
             user.password_confirmation = password
+            user.force_update_for_protected_attributes = true
             user.save!
             self.destroy!
             return true
@@ -36,9 +37,7 @@ class PasswordReset < ActiveRecord::Base
     def expired?
         DateTime.now > self.expires_at
     end
-    def render
-        render_password_reset
-    end
+
     def self.get_template
         @template ||= %{
             <p>Dear <%= @user.name %>,</p>
