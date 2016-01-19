@@ -29,18 +29,14 @@ class BeaconConfiguration < ActiveRecord::Base
     }
 
     before_update :update_active_tags
-
+    after_create :increment_searchable_beacon_configurations_count
+    after_destroy :decrement_searchable_beacon_configurations_count
 
     belongs_to :account
     belongs_to :location
     has_one :beacon_configuration_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
     has_many :shared_beacon_configurations
 
-
-    def as_indexed_json
-        # include everything by default
-
-    end
 
     def formatted_type
         case type
@@ -53,13 +49,12 @@ class BeaconConfiguration < ActiveRecord::Base
 
     def update_active_tags
 
-        # new_tags = self.changes[:tags].second - self.changes[:tags].first
-        # old_tags = self.changes[:tags].first - self.changes[:tags].second
-        # old_tags_to_delete.select do |tag|
-        #     !BeaconConfiguration.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
-        # end
+        new_tags = self.changes[:tags].second - self.changes[:tags].first
+        old_tags = self.changes[:tags].first - self.changes[:tags].second
+        old_tags_to_delete.select do |tag|
+            !BeaconConfiguration.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
+        end
         new_tags = self.tags
-        old_tags_to_delete = []
         # lock this row since we are updating and deleting the tags in the application level
         # beacon_configuration_active_tags.lock!
         beacon_configuration_active_tags_index.tags += new_tags
@@ -84,19 +79,14 @@ class BeaconConfiguration < ActiveRecord::Base
         shared_beacon_configurations.map(&:shared_account_id)
     end
 
-
-
-
     private
 
-
-
-    def incremement_counter_cache(child_column)
-        Account.update_counters(self.account_id, :beacon_configurations_count => 1, child_column => 1)
+    def increment_searchable_beacon_configurations_count
+        Account.updating_counters(self.account_id, :searchable_beacon_configurations_count => 1)
     end
 
-    def decrement_counter_cache(child_column)
-        Account.update_counters(self.account_id, :beacon_configurations_count => -1, child_column => -1)
+    def decrement_searchable_beacon_configurations_count
+        Account.updating_counters(self.account_id, :searchable_beacon_configurations_count => -1)
     end
 
     def ibeacon_type

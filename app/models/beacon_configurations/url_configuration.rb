@@ -26,11 +26,6 @@ class UrlConfiguration < BeaconConfiguration
         }
     end
 
-
-
-    after_create :incremement_counter_cache
-    after_destroy :decrement_counter_cache
-
     before_validation :clear_unused_attributes
     validates :url, presence: true
 
@@ -70,14 +65,6 @@ class UrlConfiguration < BeaconConfiguration
 
 
     private
-
-    def incremement_counter_cache
-        super(:ibeacon_configurations_count)
-    end
-
-    def decrement_counter_cache
-        super(:ibeacon_configurations_count)
-    end
 
     def clear_unused_attributes
         blacklist_attributes = [:namespace, :instance_id, :uuid, :major, :minor]

@@ -5,9 +5,6 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     index_name BeaconConfiguration.index_name
     document_type "eddystone_namespace_configuration"
 
-
-
-
     mapping do
         indexes :account_id, type: 'long', index: 'not_analyzed'
         indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
@@ -29,9 +26,6 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         }
     end
 
-
-    after_create :incremement_counter_cache
-    after_destroy :decrement_counter_cache
 
     before_validation :clear_unused_attributes
 
@@ -75,14 +69,6 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     end
 
     private
-
-    def incremement_counter_cache
-        super(:eddystone_namespace_configurations_count)
-    end
-
-    def decrement_counter_cache
-        super(:eddystone_namespace_configurations_count)
-    end
 
     def clear_unused_attributes
         blacklist_attributes = [:uuid, :major, :minor, :url]

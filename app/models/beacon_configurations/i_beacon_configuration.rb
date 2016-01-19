@@ -28,10 +28,6 @@ class IBeaconConfiguration < BeaconConfiguration
         }
     end
 
-
-    after_create :incremement_counter_cache
-    after_destroy :decrement_counter_cache
-
     before_validation :clear_unused_attributes
     before_validation :upcase_uuid
 
@@ -75,7 +71,6 @@ class IBeaconConfiguration < BeaconConfiguration
         end
 
         return json
-        # MultiJson.dump(json)
     end
 
     private
@@ -99,14 +94,6 @@ class IBeaconConfiguration < BeaconConfiguration
                 errors.add(:ibeacon, "already exists")
             end
         end
-    end
-
-    def incremement_counter_cache
-        super(:ibeacon_configurations_count)
-    end
-
-    def decrement_counter_cache
-        super(:ibeacon_configurations_count)
     end
 
     def clear_unused_attributes
