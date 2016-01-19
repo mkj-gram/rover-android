@@ -28,6 +28,7 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
 
 
     before_validation :clear_unused_attributes
+    before_validation :upcase_namespace
 
     validates :namespace, presence: true
     validates :instance_id, presence: true
@@ -50,6 +51,10 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     end
 
     private
+
+    def upcase_namespace
+        self.namespace.upcase
+    end
 
     def clear_unused_attributes
         blacklist_attributes = [:uuid, :major, :minor, :url]
