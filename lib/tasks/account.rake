@@ -26,7 +26,7 @@ namespace :account do
     desc "Create an account"
     task :generate => :environment do
         begin
-            primary_account_email = ENV['EMAIL'] || "test@rover.io"
+            primary_account_email = ENV['EMAIL'] || "sean@rover.io"
             num_users = ENV['NUM_USERS'] || 0
             num_configurations = 500
             num_locations = ENV['NUM_LOCATIONS'] || 500

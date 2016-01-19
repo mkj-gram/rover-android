@@ -20,11 +20,11 @@ class SharedBeaconConfiguration < ActiveRecord::Base
 
     # when we share a beacon we need to update the counter to reflect the total amount of beacons we can search for
     def increment_searchable_beacon_configurations_count
-        Account.updating_counters(self.shared_account_id, :searchable_beacon_configurations_count => 1)
+        Account.update_counters(self.shared_account_id, :searchable_beacon_configurations_count => 1)
     end
 
     def decrement_searchable_beacon_configurations_count
-        Account.updating_counters(self.shared_account_id, :searchable_beacon_configurations_count => -1)
+        Account.update_counters(self.shared_account_id, :searchable_beacon_configurations_count => -1)
     end
 
 end

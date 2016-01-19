@@ -28,7 +28,7 @@ class BeaconConfiguration < ActiveRecord::Base
         }
     }
 
-    before_update :update_active_tags
+    before_save :update_active_tags
     after_create :increment_searchable_beacon_configurations_count
     after_destroy :decrement_searchable_beacon_configurations_count
 
@@ -48,19 +48,20 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     def update_active_tags
-
-        new_tags = self.changes[:tags].second - self.changes[:tags].first
-        old_tags = self.changes[:tags].first - self.changes[:tags].second
-        old_tags_to_delete.select do |tag|
-            !BeaconConfiguration.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
+        Rails.logger.info("searching for tags: #{tags} with changes #{self.changes}")
+        if self.changes.include?(:tags)
+            new_tags = self.changes[:tags].second - self.changes[:tags].first
+            old_tags = self.changes[:tags].first - self.changes[:tags].second
+            old_tags_to_delete = old_tags.select do |tag|
+                !BeaconConfiguration.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
+            end
+            new_tags = self.tags
+            # lock this row since we are updating and deleting the tags in the application level
+            # beacon_configuration_active_tags.lock!
+            beacon_configuration_active_tags_index.tags += new_tags
+            beacon_configuration_active_tags_index.tags -= old_tags_to_delete
+            beacon_configuration_active_tags_index.save
         end
-        new_tags = self.tags
-        # lock this row since we are updating and deleting the tags in the application level
-        # beacon_configuration_active_tags.lock!
-        beacon_configuration_active_tags_index.tags += new_tags
-        beacon_configuration_active_tags_index.tags -= old_tags_to_delete
-        beacon_configuration_active_tags_index.save
-
     end
 
     protected
@@ -82,11 +83,11 @@ class BeaconConfiguration < ActiveRecord::Base
     private
 
     def increment_searchable_beacon_configurations_count
-        Account.updating_counters(self.account_id, :searchable_beacon_configurations_count => 1)
+        Account.update_counters(self.account_id, :searchable_beacon_configurations_count => 1)
     end
 
     def decrement_searchable_beacon_configurations_count
-        Account.updating_counters(self.account_id, :searchable_beacon_configurations_count => -1)
+        Account.update_counters(self.account_id, :searchable_beacon_configurations_count => -1)
     end
 
     def ibeacon_type
