@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160119151429) do
+ActiveRecord::Schema.define(version: 20160120003440) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -129,6 +129,18 @@ ActiveRecord::Schema.define(version: 20160119151429) do
 
   add_index "shared_beacon_configurations", ["owner_account_id"], name: "index_shared_beacon_configurations_on_owner_account_id", using: :btree
   add_index "shared_beacon_configurations", ["shared_account_id"], name: "index_shared_beacon_configurations_on_shared_account_id", using: :btree
+
+  create_table "third_party_integration_sync_jobs", force: :cascade do |t|
+    t.integer  "third_party_integration_id",             null: false
+    t.integer  "status",                     default: 0
+    t.datetime "started_at"
+    t.datetime "finished_at"
+    t.text     "error_message"
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+  end
+
+  add_index "third_party_integration_sync_jobs", ["third_party_integration_id"], name: "integration_sync_job_integration_id_index", using: :btree
 
   create_table "third_party_integrations", force: :cascade do |t|
     t.integer  "account_id",                                 null: false
