@@ -130,23 +130,22 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         configurations = Elasticsearch::Model.search(query, types)
         results = configurations.per_page(page_size).page(current_page).results
-        json = results.to_a
-        # json  = {
-        #     "data" => results.map do |config|
-        #         if config._type == IBeaconConfiguration.document_type
-        #             serialize_ibeacon(config)
-        #         elsif config._type == EddystoneNamespaceConfiguration.document_type
-        #             serialize_eddystone_namespace(config)
-        #         elsif config._type == UrlConfiguration.document_type
-        #             serialize_url(config)
-        #         end
-        #     end,
-        #     "meta" => {
-        #         "totalRecords" => results.total,
-        #         "totalPages" => results.total_pages
-        #     },
-        #     "links" => pagination_links(v1_beacon_configuration_index_url, results)
-        # }
+        json  = {
+            "data" => results.map do |config|
+                if config._type == IBeaconConfiguration.document_type
+                    serialize_ibeacon(config)
+                elsif config._type == EddystoneNamespaceConfiguration.document_type
+                    serialize_eddystone_namespace(config)
+                elsif config._type == UrlConfiguration.document_type
+                    serialize_url(config)
+                end
+            end,
+            "meta" => {
+                "totalRecords" => results.total,
+                "totalPages" => results.total_pages
+            },
+            "links" => pagination_links(v1_beacon_configuration_index_url, results)
+        }
 
         render json: json
     end
