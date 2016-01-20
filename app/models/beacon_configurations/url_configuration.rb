@@ -40,7 +40,7 @@ class UrlConfiguration < BeaconConfiguration
     end
 
     def self.protocol
-        @protocol ||= "url"
+        @protocol ||= "URL"
     end
 
 

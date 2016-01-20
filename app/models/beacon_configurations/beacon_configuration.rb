@@ -23,6 +23,13 @@ class BeaconConfiguration < ActiveRecord::Base
                         "lowercase",
                         "autocomplete_filter"
                     ]
+                },
+                lowercase_keyword: {
+                    type: "custom",
+                    tokenizer: "keyword",
+                    filter: [
+                        "lowercase"
+                    ]
                 }
             }
         }
