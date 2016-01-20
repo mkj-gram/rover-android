@@ -9,7 +9,7 @@ class UrlConfiguration < BeaconConfiguration
     mapping do
         indexes :account_id, type: 'long', index: 'not_analyzed'
         indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
-        indexes :tags, type: 'string'
+        indexes :tags, type: 'string', index: 'not_analyzed'
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
         indexes :url, type: 'string', index: 'not_analyzed'
         indexes :created_at, type: 'date'

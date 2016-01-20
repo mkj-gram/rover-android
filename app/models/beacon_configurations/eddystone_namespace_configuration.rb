@@ -8,7 +8,7 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     mapping do
         indexes :account_id, type: 'long', index: 'not_analyzed'
         indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
-        indexes :tags, type: 'string'
+        indexes :tags, type: 'string', index: 'not_analyzed'
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
         indexes :namespace, type: 'string', index: 'not_analyzed'
         indexes :instance_id, type: 'string', index: 'not_analyzed'
