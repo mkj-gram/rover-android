@@ -142,7 +142,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             end,
             "meta" => {
                 "totalRecords" => results.total,
-                "totalPages" => results.total_pages
+                "totalPages" => results.total_pages,
+                "totalSearchableRecords" => current_account.searchable_beacon_configurations_count
             },
             "links" => pagination_links(v1_beacon_configuration_index_url, results)
         }
