@@ -19,6 +19,19 @@ class EstimoteEddystoneNamespaceDevice < EstimoteDevice
         return EstimoteEddystoneNamespaceDevice.new(self.attributes_for_beacon(beacon))
     end
 
+    def configuration
+        EddystoneNamespaceConfiguration.where(namespace: self.namespace, instance_id: self.instance_id).first
+    end
+
+    def create_configuration(account_id)
+        configuration = IBeaconConfiguration.where(namespace: self.namespace, instance_id: self.instance_id).limit(1)[0]
+        if configuration.nil?
+            configuration = IBeaconConfiguration.new(account_id: account_id, namespace: self.namespace, instance_id: self.instance_id, title: self.name)
+            configuration.save
+        end
+        return configuration
+    end
+
     private
 
     def namespace_changed?

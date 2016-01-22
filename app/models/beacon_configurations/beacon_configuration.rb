@@ -1,6 +1,6 @@
 class BeaconConfiguration < ActiveRecord::Base
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
+    # include Elasticsearch::Model::Callbacks
 
     # use to search through all document types
     document_type ""
@@ -46,6 +46,7 @@ class BeaconConfiguration < ActiveRecord::Base
     has_many :shared_beacon_configurations
 
     def as_indexed_json(options = {})
+        Rails.logger.info("options #{options}")
         json = {
             account_id: self.account_id,
             title: self.title,
@@ -73,6 +74,10 @@ class BeaconConfiguration < ActiveRecord::Base
         end
 
         return json
+    end
+
+    def reindex_devices_meta
+        self.__elasticsearch__.update_document_attributes({devices_meta: self.devices_meta})
     end
 
     def formatted_type

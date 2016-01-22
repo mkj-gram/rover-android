@@ -46,7 +46,7 @@ class IBeaconConfiguration < BeaconConfiguration
     end
 
     def beacon_devices
-        @beacon_devices ||= BeaconDevice.where(uuid: self.uuid, major: self.major, minor: self.minor)
+        BeaconDevice.where(uuid: self.uuid, major: self.major, minor: self.minor)
     end
 
     def as_indexed_json(options = {})
@@ -59,6 +59,7 @@ class IBeaconConfiguration < BeaconConfiguration
             }
 
         )
+        Rails.logger.info("indexing with #{json}")
         return json
     end
 

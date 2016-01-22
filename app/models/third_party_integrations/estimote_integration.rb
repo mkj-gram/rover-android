@@ -53,23 +53,19 @@ class EstimoteIntegration < ThirdPartyIntegration
             removed_devices_count: 0
         }
 
-        # this method syncs the integration with the account
-        beacons = client.beacons
-
-        current_devices = self.beacon_devices.all.index_by(&:manufacturer_id)
-        # array of estimote devices pulled in from the api and coverted
+        estimote_beacons = [client.beacons[0]]
+        p estimote_beacons
         estimote_manufacturer_ids = Set.new
-        # we need to look in the users account
-        beacons.each do |beacon|
-            p "looking at beacon #{beacon.mac}"
+        configurations_modified = Set.new
+        current_devices = self.beacon_devices.all.index_by(&:manufacturer_id)
+        estimote_devices = {}
+        estimote_beacons.each do |beacon|
+            # map this to a device on our end
             if beacon.ibeacon?
-                save_ibeacon_configuration(beacon)
                 device = EstimoteIBeaconDevice.build_from_beacon(beacon)
             elsif beacon.eddystone_namespace?
-                save_eddystone_namespace_configuration(beacon)
                 device = EstimoteEddystoneNamespaceDevice.build_from_beacon(beacon)
             elsif beacon.url?
-                save_url_configuration(beacon)
                 device = EstimoteUrlDevice.build_from_beacon(beacon)
             else
                 Rails.logger.warn("Unknown beacon type #{beacon.protocol}")
@@ -78,37 +74,52 @@ class EstimoteIntegration < ThirdPartyIntegration
 
             next if device.nil?
 
-
             estimote_manufacturer_ids.add(device.manufacturer_id)
             device.third_party_integration_id = self.id
             device.skip_cache_update = true
-
-            if current_devices[device.manufacturer_id].nil?
-                # this is a new device
-                if device.save
-                    stats[:added_devices_count] += 1
-                end
-            else
-                # this device exists already lets see if we need to update it
-                existing_device = current_devices[device.manufacturer_id]
-                if existing_device.needs_update?(device)
-                    existing_device.overwrite_attributes_with_device(device)
-                    if existing_device.save
-                        stats[:modified_devices_count] += 1
-                    end
-
-                end
-            end
-
+            estimote_devices[device.manufacturer_id] = device
         end
 
-        # check to see if any beacons don't exist
-        deleted_devices = current_devices.select{|manufacturer_id, device| !estimote_manufacturer_ids.include?(manufacturer_id)}.values
-        deleted_devices.each do |device|
+
+        # we have 2 arrays
+        # 1 is all of our devices
+        # 2 is all of estimotes devices
+        # which ones are new?
+        new_devices = estimote_devices.select{|manufacturer_id, device| current_devices[manufacturer_id].nil? }
+
+        existing_devices_need_update = current_devices.select{ |manufacturer_id, device| estimote_devices.include?(manufacturer_id) && device.needs_update?(estimote_devices[manufacturer_id]) }
+
+        deleted_devices = current_devices.select{|manufacturer_id, device| !estimote_manufacturer_ids.include?(manufacturer_id)}
+
+        # with new devices we can just create their configs and if they exist oh well
+        new_devices.each do |manufacturer_id, device|
+            if device.save && new_config = device.create_configuration(self.account_id)
+                stats[:added_devices_count] += 1
+                configurations_modified.add(new_config) if new_config != nil
+            end
+        end
+
+        # existing devices need to update their previous config and update their newone
+        existing_devices_need_update.each do |manufacturer_id, device|
+            existing_configuration = device.configuration
+            configurations_modified.add(existing_configuration) if existing_configuration != nil
+            device.overwrite_attributes_with_device(estimote_devices[manufacturer_id])
+
+            if device.save && new_config = device.create_configuration(self.account_id)
+                stats[:modified_devices_count] += 1
+                configurations_modified.add(new_config) if new_config != nil
+            end
+        end
+
+        deleted_devices.each do |manufacturer_id, device|
             device.skip_cache_update = true
             if device.destroy
                 stats[:removed_devices_count] += 1
+                configurations_modified.add(device.configuration)
             end
+        end
+        configurations_modified.each do |configuration|
+            configuration.touch(:beacon_devices_updated_at)
         end
 
         return stats

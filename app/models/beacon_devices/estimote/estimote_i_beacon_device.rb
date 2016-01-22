@@ -32,6 +32,19 @@ class EstimoteIBeaconDevice < EstimoteDevice
         super(other)
     end
 
+    def configuration
+        IBeaconConfiguration.where(uuid: self.uuid, major: self.major, minor: self.minor).first
+    end
+
+    def create_configuration(account_id)
+        configuration = IBeaconConfiguration.where(uuid: self.uuid, major: self.major, minor: self.minor).limit(1)[0]
+        if configuration.nil?
+            configuration = IBeaconConfiguration.new(account_id: account_id, uuid: self.uuid, major: self.major, minor: self.minor, title: self.name)
+            configuration.save
+        end
+        return configuration
+    end
+
     private
 
     def uuid_changed?
