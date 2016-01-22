@@ -201,7 +201,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "name" => source.title,
                 "tags" => source.tags,
                 "shared" => source.shared,
-                "enabled" => source.enabled
+                "enabled" => source.enabled,
+                "devices_meta" => source.devices_meta
             }.merge(extra_attributes)
         }
     end
