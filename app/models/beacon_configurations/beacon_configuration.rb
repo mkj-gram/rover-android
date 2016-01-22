@@ -41,6 +41,7 @@ class BeaconConfiguration < ActiveRecord::Base
 
     belongs_to :account
     belongs_to :location
+
     has_one :beacon_configuration_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
     has_many :shared_beacon_configurations
 
@@ -53,7 +54,8 @@ class BeaconConfiguration < ActiveRecord::Base
             shared: self.shared,
             created_at: self.created_at,
             shared_account_ids: self.shared_account_ids,
-            location: self.indexed_location
+            location: self.indexed_location,
+            devices_meta: self.devices_meta
         }
 
         if self.tags.any?
@@ -83,8 +85,8 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     def update_active_tags
-        Rails.logger.info("searching for tags: #{tags} with changes #{self.changes}")
         if self.changes.include?(:tags)
+            Rails.logger.info("searching for tags: #{tags} with changes #{self.changes}")
             new_tags = self.changes[:tags].second - self.changes[:tags].first
             old_tags = self.changes[:tags].first - self.changes[:tags].second
             old_tags_to_delete = old_tags.select do |tag|
@@ -99,6 +101,8 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
+
+
     protected
 
     def indexed_location
@@ -109,6 +113,30 @@ class BeaconConfiguration < ActiveRecord::Base
         else
             return {}
         end
+    end
+
+    def devices_meta
+        # we use to_a here to remove the active record relation
+        devices = beacon_devices.all.to_a
+        count = devices.size
+        # there isn't any devices so return right away
+        return {} if count == 0
+        # check to see if they are all the same type
+        first_device_manufacturer = devices.first.manufacturer
+
+        if devices.all? {|device| device.manufacturer == first_device_manufacturer}
+            # they are all the same manufacturer
+            # select the first device
+            type = devices.first.manufacturer_model
+        else
+            # we have multiple types
+            type = "multi"
+        end
+
+        return {
+            type: type,
+            count: count
+        }
     end
 
     def shared_account_ids

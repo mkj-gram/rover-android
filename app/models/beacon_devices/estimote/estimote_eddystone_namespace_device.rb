@@ -1,4 +1,5 @@
 class EstimoteEddystoneNamespaceDevice < EstimoteDevice
+    include EddystoneNamespaceAttributes
 
     validates :namespace, presence: true
     validates :instance_id, presence: true

@@ -1,4 +1,5 @@
 class EstimoteUrlDevice < EstimoteDevice
+    include UrlAttributes
 
     validates :url, presence: true
 

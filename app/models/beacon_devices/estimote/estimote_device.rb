@@ -51,6 +51,14 @@ class EstimoteDevice < BeaconDevice
         self.battery_life_expectancy_in_days = other.battery_life_expectancy_in_days
     end
 
+    def manufacturer
+        return "estimote"
+    end
+
+    def manufacturer_model
+        return "estimote-#{self.color}"
+    end
+
     private
 
     def skip_cache_update

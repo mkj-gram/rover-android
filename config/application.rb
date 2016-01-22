@@ -10,7 +10,7 @@ require 'elasticsearch/rails/instrumentation'
 module RailsApi
     class Application < Rails::Application
 
-        # config.active_record.schema_format = :sql
+        config.active_record.schema_format = :sql
 
         # Setup configuration per enviroment
         config.rabbitmq = Rails.application.config_for(:rabbitmq)

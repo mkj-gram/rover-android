@@ -1,4 +1,5 @@
 class EstimoteIBeaconDevice < EstimoteDevice
+    include IBeaconAttributes
 
     validates :uuid, presence: true
     validates :major, presence: true
