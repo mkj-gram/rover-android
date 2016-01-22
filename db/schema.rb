@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160120003440) do
+ActiveRecord::Schema.define(version: 20160121135943) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,19 +53,20 @@ ActiveRecord::Schema.define(version: 20160120003440) do
   add_index "beacon_configuration_active_tags_indices", ["tags"], name: "index_beacon_configuration_active_tags_indices_on_tags", using: :gin
 
   create_table "beacon_configurations", force: :cascade do |t|
-    t.integer  "account_id",                  null: false
+    t.integer  "account_id",                                null: false
     t.integer  "location_id"
-    t.string   "type",                        null: false
+    t.string   "type",                                      null: false
     t.text     "title"
-    t.string   "tags",        default: [],                 array: true
-    t.boolean  "enabled",     default: true
-    t.boolean  "shared",      default: false
+    t.string   "tags",                      default: [],                 array: true
+    t.boolean  "enabled",                   default: true
+    t.boolean  "shared",                    default: false
     t.string   "uuid"
     t.integer  "major"
     t.integer  "minor"
     t.string   "namespace"
-    t.integer  "instance_id"
+    t.string   "instance_id"
     t.text     "url"
+    t.datetime "beacon_devices_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -80,6 +81,25 @@ ActiveRecord::Schema.define(version: 20160120003440) do
   add_index "beacon_configurations", ["url"], name: "index_beacon_configurations_on_url", unique: true, using: :btree
   add_index "beacon_configurations", ["uuid", "major", "minor"], name: "ibeacon_unique_index", unique: true, using: :btree
   add_index "beacon_configurations", ["uuid"], name: "index_beacon_configurations_on_uuid", using: :btree
+
+  create_table "beacon_devices", force: :cascade do |t|
+    t.integer "third_party_integration_id",              null: false
+    t.string  "manufacturer_id",                         null: false
+    t.string  "type",                                    null: false
+    t.string  "uuid"
+    t.integer "major"
+    t.integer "minor"
+    t.string  "namespace"
+    t.string  "instance_id"
+    t.text    "url"
+    t.jsonb   "device_data",                default: {}
+  end
+
+  add_index "beacon_devices", ["manufacturer_id"], name: "index_beacon_devices_on_manufacturer_id", unique: true, using: :btree
+  add_index "beacon_devices", ["namespace", "instance_id"], name: "index_beacon_devices_on_namespace_and_instance_id", using: :btree
+  add_index "beacon_devices", ["third_party_integration_id"], name: "index_beacon_devices_on_third_party_integration_id", using: :btree
+  add_index "beacon_devices", ["url"], name: "index_beacon_devices_on_url", using: :btree
+  add_index "beacon_devices", ["uuid", "major", "minor"], name: "index_beacon_devices_on_uuid_and_major_and_minor", using: :btree
 
   create_table "locations", force: :cascade do |t|
     t.integer  "account_id",                               null: false
@@ -136,6 +156,9 @@ ActiveRecord::Schema.define(version: 20160120003440) do
     t.datetime "started_at"
     t.datetime "finished_at"
     t.text     "error_message"
+    t.integer  "added_devices_count",        default: 0
+    t.integer  "modified_devices_count",     default: 0
+    t.integer  "removed_devices_count",      default: 0
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
   end
@@ -150,6 +173,7 @@ ActiveRecord::Schema.define(version: 20160120003440) do
     t.string   "encrypted_credentials"
     t.string   "encrypted_credentials_salt"
     t.string   "encrypted_credentials_iv"
+    t.integer  "average_sync_time_in_ms",    default: 0
     t.datetime "last_synced_at"
     t.datetime "created_at",                                 null: false
     t.datetime "updated_at",                                 null: false

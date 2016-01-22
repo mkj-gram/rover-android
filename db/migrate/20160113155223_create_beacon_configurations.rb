@@ -21,13 +21,13 @@ class CreateBeaconConfigurations < ActiveRecord::Migration
             #
             # 10 byte string id 8b0ca750095477cb3e77
             t.string :namespace
-            # 6 byte integer id 12312
-            t.integer :instance_id
+            # 6 byte string id 12312
+            t.string :instance_id
 
             # eddystone-url
             t.text :url
 
-
+            t.datetime :beacon_devices_updated_at
             t.timestamps
         end
 

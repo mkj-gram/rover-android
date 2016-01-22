@@ -9,6 +9,7 @@ class CreateThirdPartyIntegrations < ActiveRecord::Migration
             t.string :encrypted_credentials_salt
             t.string :encrypted_credentials_iv
 
+            t.integer :average_sync_time_in_ms, default: 0
             t.datetime :last_synced_at
             t.timestamps null: false
         end

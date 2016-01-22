@@ -1,14 +1,15 @@
-
 class Beacon
-    attr_reader :id, :uuid, :major, :minor, :mac, :color, :name
+    attr_reader :id, :uuid, :major, :minor, :mac, :mac_address, :color, :name, :battery_life_expectancy_in_days
     def initialize(config)
         @id = config["id"]
         @uuid = config["uuid"]
         @major = config["major"]
         @minor = config["minor"]
         @mac = config["mac"]
+        @mac_address = @mac.scan(/.{1,2}/).map(&:upcase).join(":")
         @color = config["color"]
         @name = config["name"]
+        @battery_life_expectancy_in_days = config["battery_life_expectancy_in_days"]
         @settings = Settings.new(config["settings"])
     end
 
@@ -40,6 +41,26 @@ class Beacon
         settings.broadcasting_scheme
     end
 
+    def battery
+        settings.battery
+    end
+
+    def interval
+        settings.interval
+    end
+
+    def firmware
+        settings.firmware
+    end
+
+    def range
+        settings.range
+    end
+
+    def power
+        settings.power
+    end
+
 
     private
 
@@ -47,7 +68,9 @@ class Beacon
         @settings
     end
 
+
     class Settings
+        attr_reader :battery, :interval, :firmware, :range, :power, :battery_life_expectancy_in_days
         attr_reader :broadcasting_scheme, :eddystone_namespace_id, :eddystone_instance_id, :url
 
         def initialize(config)
@@ -55,6 +78,13 @@ class Beacon
             @eddystone_instance_id = config["eddystone_instance_id"]
             @eddystone_namespace_id = config["eddystone_namespace_id"]
             @url = config["eddystone_url"]
+
+
+            @battery = config["battery"]
+            @interval = config["interval"]
+            @firmware = config["firmware"]
+            @range = config["range"]
+            @power = config["power"]
         end
 
         def ibeacon_broadcasting_scheme?

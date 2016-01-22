@@ -10,10 +10,23 @@ class ThirdPartyIntegrationSyncJob < ActiveRecord::Base
         self.update({status: :started, started_at: DateTime.now })
     end
 
+    def sync!
+        if third_party_integration
+            stats = third_party_integration.sync!
+            self.added_devices_count = stats[:added_devices_count]
+            self.modified_devices_count = stats[:modified_devices_count]
+            self.removed_devices_count = stats[:removed_devices_count]
+            self.save
+        end
+    end
+
     def finish!
         transaction do
-            self.update({status: :finished, finished_at: DateTime.now })
-            third_party_integration.update({syncing: false})
+            finished_at = DateTime.now
+            elapsed_milliseconds = ((finished_at - started_at.to_datetime) * 24 * 60 * 60 * 1000).to_f
+            p elapsed_milliseconds
+            self.update({status: :finished, finished_at: finished_at})
+            third_party_integration.finish_syncing(finished_at, elapsed_milliseconds)
         end
     end
 

@@ -10,6 +10,8 @@ require 'elasticsearch/rails/instrumentation'
 module RailsApi
     class Application < Rails::Application
 
+        # config.active_record.schema_format = :sql
+
         # Setup configuration per enviroment
         config.rabbitmq = Rails.application.config_for(:rabbitmq)
         config.mailgun = Rails.application.config_for(:mailgun)
@@ -18,6 +20,10 @@ module RailsApi
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
         config.autoload_paths << Rails.root.join('app', 'models', 'third_party_integrations')
+        config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices')
+        config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'estimote')
+        # Generic Classes
+        config.autoload_paths << Rails.root.join('app', 'classes')
 
         # config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations', 'ibeacon_configuration')
         config.autoload_paths << Rails.root.join('lib', 'mail_client')
@@ -25,6 +31,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib', 'rabbit_mq_publisher')
         config.autoload_paths << Rails.root.join('lib', 'model_error')
         config.autoload_paths << Rails.root.join('lib', 'estimote_api')
+        config.autoload_paths << Rails.root.join('lib', 'kontakt_api')
         config.autoload_paths << Rails.root.join('app', 'workers')
         config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
 

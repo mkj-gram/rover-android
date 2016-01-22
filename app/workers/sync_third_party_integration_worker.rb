@@ -15,16 +15,20 @@ class SyncThirdPartyIntegrationWorker
         sync_job = ThirdPartyIntegrationSyncJob.find_by_id(sync_job_id)
 
         # start the job
-        sync_job.start!
 
-        integration = sync_job.third_party_integration
 
-        if integration
-            integration.sync!
+        begin
+            sync_job.start!
+            sync_job.sync!
+        rescue Exception => e
+            # some error occured
+        ensure
+            sync_job.finish!
         end
 
+
         # finish the job
-        sync_job.finish!
+
 
         # ack even if the integration doesn't exist
         ack!
