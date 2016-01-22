@@ -202,7 +202,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "tags" => source.tags,
                 "shared" => source.shared,
                 "enabled" => source.enabled,
-                "devices_meta" => source.devices_meta
+                "device-type" => source.devices_meta[:type],
+                "device-count" => source.devices_meta[:count]
             }.merge(extra_attributes)
         }
     end
