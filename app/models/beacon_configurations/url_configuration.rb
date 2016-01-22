@@ -48,4 +48,8 @@ class UrlConfiguration < BeaconConfiguration
         @protocol ||= "URL"
     end
 
+    def beacon_devices
+        @beacon_devices ||= []
+    end
+
 end
