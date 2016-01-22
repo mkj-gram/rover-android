@@ -59,7 +59,6 @@ class IBeaconConfiguration < BeaconConfiguration
             }
 
         )
-        Rails.logger.info("indexing with #{json}")
         return json
     end
 

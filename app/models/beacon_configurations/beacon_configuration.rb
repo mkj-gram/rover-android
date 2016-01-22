@@ -46,7 +46,6 @@ class BeaconConfiguration < ActiveRecord::Base
     has_many :shared_beacon_configurations
 
     def as_indexed_json(options = {})
-        Rails.logger.info("options #{options}")
         json = {
             account_id: self.account_id,
             title: self.title,

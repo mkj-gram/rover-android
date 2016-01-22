@@ -53,7 +53,7 @@ class EstimoteIntegration < ThirdPartyIntegration
             removed_devices_count: 0
         }
 
-        estimote_beacons = [client.beacons[0]]
+        estimote_beacons = client.beacons
         p estimote_beacons
         estimote_manufacturer_ids = Set.new
         configurations_modified = Set.new
