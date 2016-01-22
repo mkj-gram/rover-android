@@ -6,7 +6,7 @@ class V1::EstimoteIntegrationsController < V1::ApplicationController
     def show
         json = {
             "data" => {
-                "type" => EstimoteIntegration.model_type,
+                "type" => EstimoteIntegration.model_type(pluralize: true),
                 "id" => @integration.id.to_s,
                 "attributes" => {
                     "enabled" => @integration.enabled,
@@ -33,7 +33,7 @@ class V1::EstimoteIntegrationsController < V1::ApplicationController
         if @integration.save
             json = {
                 "data" => {
-                    "type" => EstimoteIntegration.model_type,
+                    "type" => EstimoteIntegration.model_type(pluralize: true),
                     "id" => @integration.id.to_s,
                     "attributes" => {
                         "enabled" => @integration.enabled,
