@@ -64,7 +64,9 @@ class V1::UsersController < V1::ApplicationController
                     "id" => @user.id.to_s,
                     "attributes" => {
                         "name" => @user.name,
-                        "email" => @user.email
+                        "email" => @user.email,
+                        "current-password" => "",
+                        "password" => ""
                     },
                     "relationships" => {
                         "account" => {
