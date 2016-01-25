@@ -16,7 +16,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
 
             json = {
                 "data" => @jobs.map{|job| serialize_sync_job(@integration, job)},
-                "links" => pagination_links(v1_integration_sync_jobs_url, @jobs)
+                "links" => pagination_links(get_resource_url, @jobs)
             }
             render json: json
 
@@ -32,7 +32,6 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
             json = {
                 "data" => serialize_sync_job(@integration, @job)
             }
-
             render json: json
         else
             head :not_found
@@ -46,21 +45,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
             if @integration.create_sync_job!
                 @job = @integration.job
                 json = {
-                    "data" => {
-                        "type" => "integrations-sync-jobs",
-                        "id" => @job.id.to_s,
-                        "attributes" => {
-                            "status" => @job.status,
-                            "started-at" => @job.started_at,
-                            "finished-at" => @job.finished_at,
-                            "error-message" => @job.error_message,
-                        },
-                        "relationships" => {
-                            "integration" => {
-                                "data" => {type: @integration.model_type, "id" => @integration.id.to_s}
-                            }
-                        }
-                    }
+                    "data" => serialize_sync_job(@integration, @job)
                 }
                 render json: json, status: :created
             else
@@ -96,6 +81,14 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
     # kontakt_integration_id
     def get_integration_id
         @integration_id ||= params[:integration_id] || params[:estimote_integration_id]
+    end
+
+    def get_resource_url
+        if params[:estimote_integration_id]
+            v1_estimote_integration_sync_jobs_url
+        else
+            v1_integration_sync_jobs_url
+        end
     end
 
     def set_resource
