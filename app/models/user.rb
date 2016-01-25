@@ -133,7 +133,7 @@ class User < ActiveRecord::Base
             errors.add(:current_password, "can't be blank")
         else
             if BCrypt::Password.new(password_digest_was) != current_password
-                errors.add(:current_password, "incorrect password")
+                errors.add(:current_password, "is incorrect")
             end
         end
     end
