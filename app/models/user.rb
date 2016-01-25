@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
         end
     end
 
-    before_validation { self.email = self.email.downcase if self.email? }
+
 
     before_create :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
     before_create :create_account, if: -> { account_id.nil? }
@@ -36,7 +36,8 @@ class User < ActiveRecord::Base
     #############################################
     #               Validations                 #
     #############################################
-
+    before_validation { self.password_confirmation = self.password if !self.password.nil? }
+    before_validation { self.email = self.email.downcase if self.email? }
     validates :name, presence: true
 
     validates :email,
