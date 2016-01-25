@@ -27,7 +27,6 @@ class V1::UsersController < V1::ApplicationController
     # GET /users/1
     #
     def show
-        @user = current_resource
         if @user
             json = {
                 "data" => {
@@ -57,9 +56,7 @@ class V1::UsersController < V1::ApplicationController
     def update
         # when updating we need to validate the user?
         json = flatten_request({single_record: true})
-        Rails.logger.info(json)
         local_params = user_params(json[:data])
-        @user = current_resource
         if @user.update(user_params(json[:data]))
             json = {
                 "data" => {
@@ -85,7 +82,7 @@ class V1::UsersController < V1::ApplicationController
     # DELETE /users/1
     # DELETE /users/1.json
     def destroy
-        @user = current_resource
+        @user
         if @user.destroy
             head :no_content
         else
@@ -97,7 +94,8 @@ class V1::UsersController < V1::ApplicationController
 
     def set_resource
         user = User.find_by_id(params[:id])
-        set_current_resources(user)
+        @user = user
+        # set_current_resources(user)
     end
 
 
