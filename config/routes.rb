@@ -53,13 +53,13 @@ Rails.application.routes.draw do
 
         resources :integrations, only: [:index, :show] do
             scope module: "integrations" do
-                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
             end
         end
 
         resources "estimote-integrations", controller: "estimote_integrations", as: "estimote_integrations", only: [:show, :create, :update, :destroy] do
             scope module: "integrations" do
-                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
             end
         end
 

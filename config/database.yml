@@ -1,15 +1,17 @@
 test:
-  adapter: sqlite3
-  database: db/test.sqlite3
-  pool: 5
-  timeout: 5000
+    adapter: postgresql
+    encoding: unicode
+    database: rover-test
+    pool: 5
+    username: rover_test
+    password: password1
 
 development:
     adapter: postgresql
     encoding: unicode
     database: rover-local
     pool: 5
-    username: myapp
+    username: rover_development
     password: password1
 
 production:

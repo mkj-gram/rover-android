@@ -413,7 +413,8 @@ CREATE TABLE third_party_integrations (
     average_sync_time_in_ms integer DEFAULT 0,
     last_synced_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    third_party_integration_sync_jobs_count integer DEFAULT 0
 );
 
 
@@ -918,10 +919,31 @@ CREATE INDEX index_users_on_email ON users USING btree (email);
 
 
 --
+-- Name: integration_sync_job_integration_created_at_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX integration_sync_job_integration_created_at_index ON third_party_integration_sync_jobs USING btree (created_at DESC NULLS LAST);
+
+
+--
+-- Name: integration_sync_job_integration_finished_at_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX integration_sync_job_integration_finished_at_index ON third_party_integration_sync_jobs USING btree (finished_at DESC NULLS LAST);
+
+
+--
 -- Name: integration_sync_job_integration_id_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX integration_sync_job_integration_id_index ON third_party_integration_sync_jobs USING btree (third_party_integration_id);
+
+
+--
+-- Name: integration_sync_job_integration_started_at_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX integration_sync_job_integration_started_at_index ON third_party_integration_sync_jobs USING btree (started_at DESC NULLS LAST);
 
 
 --
@@ -966,4 +988,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160119151429');
 INSERT INTO schema_migrations (version) VALUES ('20160120003440');
 
 INSERT INTO schema_migrations (version) VALUES ('20160121135943');
+
+INSERT INTO schema_migrations (version) VALUES ('20160125152740');
+
+INSERT INTO schema_migrations (version) VALUES ('20160125174600');
 

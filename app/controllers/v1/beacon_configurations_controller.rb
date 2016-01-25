@@ -129,7 +129,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         end
 
         configurations = Elasticsearch::Model.search(query, types)
-        results = configurations.per_page(page_size).page(current_page).results
+        results = configurations.per_page(page_size).page(current_page(start_at: 0)).results
         json  = {
             "data" => results.map do |config|
                 if config._type == IBeaconConfiguration.document_type
@@ -145,7 +145,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "totalPages" => results.total_pages,
                 "totalSearchableRecords" => current_account.searchable_beacon_configurations_count
             },
-            "links" => pagination_links(v1_beacon_configuration_index_url, results)
+            "links" => pagination_links(v1_beacon_configuration_index_url, results, {start_at: 0})
         }
 
         render json: json

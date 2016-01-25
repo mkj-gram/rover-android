@@ -4,7 +4,7 @@ class ThirdPartyIntegrationSyncJob < ActiveRecord::Base
 
     after_create :perform_async
 
-    belongs_to :third_party_integration
+    belongs_to :third_party_integration, counter_cache: true
 
     def start!
         self.update({status: :started, started_at: DateTime.now })

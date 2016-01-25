@@ -1,6 +1,5 @@
 class EstimoteIntegration < ThirdPartyIntegration
 
-
     validates :app_id, presence: true
     validates :app_token, presence: true
 

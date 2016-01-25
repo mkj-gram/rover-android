@@ -6,17 +6,20 @@ module OrderHelper
     # @param list [Array] [array of values that are allowed to be ordered]
     #
     # @return [String] [SQL Query]
-    def whitelist_order(list, default = nil)
+    def whitelist_order(list, default = nil, opts = {})
+        forced_order = opts.fetch(:order, nil)
+
         data = params.has_key?(:order) ? params[:order] : []
         if data.is_a?(String)
             data = data.split(",")
         end
         orders = data.map{|d| Order.new(d)}
         orders.delete_if{|order| !list.include?(order.key)}
+        orders.delete_if{|order| order.order != forced_order } if !forced_order.nil?
         if orders.empty? && !default.nil?
             return default
         else
-            return orders.map{|order| order.statement}.join(",")
+            return orders.map{|order| order.statement}
         end
     end
 
