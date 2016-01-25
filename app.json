@@ -42,7 +42,7 @@
     "MAILGUN_API_URL": {
         "required": true
     },
-    "PASSWORD_RESET_URL": {
+    "PASSWORD_RESET_HOST": {
       "required": true
     },
     "ELASTICSEARCH_URLS": {
