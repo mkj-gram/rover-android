@@ -8,7 +8,7 @@ describe "/v1/estimote-integrations", :type => :request do
                 estimote = create(:estimote_integration)
                 account = estimote.account
 
-                get "/v1/estimote-integrations/#{estimote.id}", nil, {'X-Rover-REST-API-Key' => account.token}
+                get "/v1/estimote-integrations/#{estimote.id}", nil, signed_request_header(account)
 
                 expect(response).to have_http_status(200)
 
@@ -24,7 +24,7 @@ describe "/v1/estimote-integrations", :type => :request do
                 estimote = create(:estimote_integration)
                 account = estimote.account
 
-                get "/v1/estimote-integrations/#{estimote.id + 1}", nil, {'X-Rover-REST-API-Key' => account.token}
+                get "/v1/estimote-integrations/#{estimote.id + 1}", nil, signed_request_header(account)
 
                 expect(response).to have_http_status(404)
             end
@@ -46,15 +46,12 @@ describe "/v1/estimote-integrations", :type => :request do
                             enabled: true
                         }
                     }
-                },
-                {
-                    'X-Rover-REST-API-Key' => account.token
-                }
+                }, signed_request_header(account)
 
                 expect(response).to have_http_status(201)
 
                 id = json[:data][:id]
-                get "/v1/estimote-integrations/#{id}", nil, {'X-Rover-REST-API-Key' => account.token}
+                get "/v1/estimote-integrations/#{id}", nil, signed_request_header(account)
 
                 expect(response).to have_http_status(200)
             end
@@ -73,14 +70,11 @@ describe "/v1/estimote-integrations", :type => :request do
                             enabled: true
                         }
                     }
-                },
-                {
-                    'X-Rover-REST-API-Key' => account.token
-                }
+                }, signed_request_header(account)
 
                 expect(response).to have_http_status(422)
                 expect(json).to have_key(:errors)
-                expect(json[:errors].size).to be(2)
+                expect(json[:errors].size).to eq(1)
             end
         end
     end

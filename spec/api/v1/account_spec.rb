@@ -6,7 +6,7 @@ describe "/v1/account", :type => :request do
             account = create(:account)
 
 
-            get "/v1/accounts/#{account.id}", nil, {'X-Rover-REST-API-Key' => account.token}
+            get "/v1/accounts/#{account.id}", nil, signed_request_header(account)
 
             expect(response).to have_http_status(200)
             expect(json).to have_key(:data)

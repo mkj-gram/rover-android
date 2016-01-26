@@ -57,9 +57,9 @@ class V1::SessionsController < V1::ApplicationController
         @session = Session.find_by_id(params[:id])
         if @session
             if current_user && @session.user_id != current_user.id
-                render_unauthorized("Access", "you do not have access to delete this session")
+                render_unauthorized("access", "you do not have access to delete this session")
             elsif current_account && @session.account_id != current_account.id
-                render_unauthorized("Access", "you do not have access to delete this session")
+                render_unauthorized("access", "you do not have access to delete this session")
             else
                 if @session.destroy
                     head :no_content

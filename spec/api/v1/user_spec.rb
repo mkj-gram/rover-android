@@ -34,7 +34,7 @@ describe "/v1/users", :type => :request do
                         type: "users",
                         id: "#{user.id}",
                         attributes: {
-                            :"current-password" => "123456",
+                            :"current-password" => "THIS_IS_NOT_THE_ORIGINAL_PASSWORD:)",
                             password: "123456"
                         }
                     }
