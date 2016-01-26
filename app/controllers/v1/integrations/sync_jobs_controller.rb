@@ -39,7 +39,6 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
     def create
         @integration = ThirdPartyIntegration.find_by_id(get_integration_id)
         if @integration
-            p "creating job"
             if @integration.create_sync_job!
                 @job = @integration.job
                 json = {
@@ -59,7 +58,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
 
     def serialize_sync_job(integration, job)
         {
-            "type" => "integrations-sync-jobs",
+            "type" => "sync-jobs",
             "id" => job.id.to_s,
             "attributes" => {
                 "status" => job.status,

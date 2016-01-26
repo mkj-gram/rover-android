@@ -67,7 +67,7 @@ class V1::IntegrationsController < V1::ApplicationController
                 json = {
                     "data" => serialize_integration(integration)
                 }
-                render json: json
+                render json: json, status: :created
             else
                 render json: {errors: V1::ThirdPartyIntegrationsModelError.serialize(integration.errors)}, status: :unprocessable_entity
             end
@@ -130,7 +130,7 @@ class V1::IntegrationsController < V1::ApplicationController
 
     def serialize_sync_job(integration, job)
         {
-            "type" => "integrations-sync-jobs",
+            "type" => "sync-jobs",
             "id" => job.id.to_s,
             "attributes" => {
                 "status" => job.status,
@@ -166,7 +166,7 @@ class V1::IntegrationsController < V1::ApplicationController
                 {
                     "relationships" => {
                         "latestSync" => {
-                            "type" => "integrations-sync-jobs",
+                            "type" => "sync-jobs",
                             "id" => integration.latest_sync_job.id.to_s
                         }
                     }
