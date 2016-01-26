@@ -68,6 +68,10 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
                 "started-at" => job.started_at,
                 "finished-at" => job.finished_at,
                 "error-message" => job.error_message,
+                "added-devices-count" => job.added_devices_count,
+                "modified-devices-count" => job.modified_devices_count,
+                "removed-devices-count" => job.removed_devices_count,
+                "created-at" => job.created_at
             },
             "relationships" => {
                 "integration" => {
