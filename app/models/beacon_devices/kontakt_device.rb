@@ -1,2 +1,0 @@
-class KontaktDevice < BeaconDevice
-end

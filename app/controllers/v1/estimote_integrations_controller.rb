@@ -3,6 +3,17 @@ class V1::EstimoteIntegrationsController < V1::ApplicationController
     before_action :validate_json_schema,    only: [:create, :update]
     before_action :set_resource,            only: [:show, :update, :destroy]
 
+    def index
+        integrations = EstimoteIntegration.where(account_id: current_account.id).all
+        json = {
+            "data" => integrations.map do |integration|
+                serialize_integration(integration)
+            end
+        }
+
+        render json: json
+    end
+
     def show
         json = {
             "data" => {
@@ -68,6 +79,18 @@ class V1::EstimoteIntegrationsController < V1::ApplicationController
     end
 
     private
+
+    def serialize_integration(integration)
+        {
+            "type" => integration.model_type,
+            "id" => integration.id.to_s,
+            "attributes" => {
+                "enabled" => integration.enabled,
+                "syncing" => integration.syncing,
+                "last-synced-at" => integration.last_synced_at
+            }
+        }
+    end
 
     def set_resource
         @integration = EstimoteIntegration.find_by_id(params[:id])

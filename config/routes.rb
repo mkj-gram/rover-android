@@ -57,7 +57,7 @@ Rails.application.routes.draw do
             end
         end
 
-        resources "estimote-integrations", controller: "estimote_integrations", as: "estimote_integrations", only: [:show, :create, :update, :destroy] do
+        resources "estimote-integrations", controller: "estimote_integrations", as: "estimote_integrations", only: [:index, :show, :create, :update, :destroy] do
             scope module: "integrations" do
                 resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
             end
@@ -67,6 +67,9 @@ Rails.application.routes.draw do
         scope module: "integrations" do
             get "/integrations/sync-jobs/:id", to: "sync_jobs#show", as: "sync_jobs"
         end
+
+        get "/regions", to: 'regions#index', as: "regions"
+
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

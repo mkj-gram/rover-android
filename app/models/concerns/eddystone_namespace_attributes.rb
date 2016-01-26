@@ -5,25 +5,19 @@ module EddystoneNamespaceAttributes
         before_validation :clear_unused_attributes
         before_validation :upcase_namespace
 
+        validates :namespace, presence: true
+        validates :instance_id, presence: true
     end
 
-    def uuid=(v)
-        v
+    def namespace_changed?
+        changes.include?(:namespace)
     end
 
-    def major=(v)
-        v
+    def instance_id_changed?
+        changes.include?(:instance_id)
     end
 
-    def minor=(v)
-        v
-    end
-
-    def url=(v)
-        v
-    end
-
-    protected
+    private
 
     def clear_unused_attributes
         blacklist_attributes = [:uuid, :major, :minor, :url]
@@ -31,7 +25,6 @@ module EddystoneNamespaceAttributes
     end
 
     def upcase_namespace
-        self.namespace.upcase
+        self.namespace.upcase if !self.namespace.nil?
     end
-
 end

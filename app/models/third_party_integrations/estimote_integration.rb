@@ -65,7 +65,9 @@ class EstimoteIntegration < ThirdPartyIntegration
             elsif beacon.eddystone_namespace?
                 device = EstimoteEddystoneNamespaceDevice.build_from_beacon(beacon)
             elsif beacon.url?
-                device = EstimoteUrlDevice.build_from_beacon(beacon)
+                # for now we don't want to track their url devices
+                device = nil
+                # device = EstimoteUrlDevice.build_from_beacon(beacon)
             else
                 Rails.logger.warn("Unknown beacon type #{beacon.protocol}")
                 device = nil

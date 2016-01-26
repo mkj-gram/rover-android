@@ -1,2 +1,0 @@
-class RadiusNetworks < BeaconDevice
-end

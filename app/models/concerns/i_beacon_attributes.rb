@@ -4,6 +4,10 @@ module IBeaconAttributes
     included do
         before_validation :clear_unused_attributes
         before_validation :upcase_uuid
+
+        validates :uuid, presence: true
+        validates :major, presence: true
+        validates :minor, presence: true
     end
 
     def namespace=(v)
@@ -18,14 +22,24 @@ module IBeaconAttributes
         v
     end
 
-    protected
+    def uuid_changed?
+        changes.include?(:uuid)
+    end
 
-    def upcase_uuid
-        self.uuid.upcase
+    def major_changed?
+        changes.include?(:major)
+    end
+
+    def minor_changed?
+        changes.include?(:minor)
     end
 
 
+    private
 
+    def upcase_uuid
+        self.uuid.upcase if !self.uuid.nil?
+    end
 
     def clear_unused_attributes
         blacklist_attributes = [:namespace, :instance_id, :url]
