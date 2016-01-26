@@ -6,7 +6,7 @@ describe "/v1/users", :type => :request do
             it 'returns 422 when not providing a current password ' do
                 session = create(:session)
                 user = session.user
-                patch '/v1/users/1',
+                patch "/v1/users/#{user.id}",
                 {
                     data: {
 
@@ -27,7 +27,7 @@ describe "/v1/users", :type => :request do
             it 'returns 422 when the current password is provided but incorrect' do
                 session = create(:session)
                 user = session.user
-                patch '/v1/users/1',
+                patch "/v1/users/#{user.id}",
                 {
                     data: {
 
@@ -49,7 +49,7 @@ describe "/v1/users", :type => :request do
             it 'returns 422 when the current password is provided but the password is too short' do
                 session = create(:session)
                 user = session.user
-                patch '/v1/users/1',
+                patch "/v1/users/#{user.id}",
                 {
                     data: {
 
@@ -71,7 +71,7 @@ describe "/v1/users", :type => :request do
             it 'returns 200ok when the current password is provided and new password is valid' do
                 session = create(:session)
                 user = session.user
-                patch '/v1/users/1',
+                patch "/v1/users/#{user.id}",
                 {
                     data: {
 
