@@ -1,6 +1,6 @@
 class ThirdPartyIntegrationSyncJob < ActiveRecord::Base
 
-    enum status: [ :queued, :started, :finished ]
+    enum status: [ :queued, :started, :finished, :error ]
 
     after_create :perform_async
 
@@ -24,8 +24,12 @@ class ThirdPartyIntegrationSyncJob < ActiveRecord::Base
         transaction do
             finished_at = DateTime.now
             elapsed_milliseconds = ((finished_at - started_at.to_datetime) * 24 * 60 * 60 * 1000).to_f
-            p elapsed_milliseconds
-            self.update({status: :finished, finished_at: finished_at})
+            if error_message.nil?
+                new_status = :finished
+            else
+                new_status = :error
+            end
+            self.update({status: new_status, finished_at: finished_at})
             third_party_integration.finish_syncing(finished_at, elapsed_milliseconds)
         end
     end
