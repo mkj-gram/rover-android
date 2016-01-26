@@ -1,6 +1,8 @@
 class V1::Integrations::SyncJobsController < V1::ApplicationController
+
     before_action :authenticate
     before_action :set_resource, only: [:show]
+    before_action :validate_json_schema,    only: [:create]
 
     def index
         integration = ThirdPartyIntegration.find_by_id(get_integration_id)
@@ -81,7 +83,17 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
     # integration_id
     # kontakt_integration_id
     def get_integration_id
-        @integration_id ||= params[:integration_id] || params[:estimote_integration_id]
+        @integration_id ||= -> {
+            id = params[:integration_id] || params[:estimote_integration_id]
+            if id.nil?
+                # this request might have the integrations id in the payload
+                json = flatten_request({single_record: true})
+                if json.has_key?(:data) && json[:data].has_key?(:"sync-jobs") && json[:data][:"sync-jobs"].has_key?(:relationships) && json[:data][:"sync-jobs"][:relationships].has_key?(:integration) && json[:data][:"sync-jobs"][:relationships][:integration].has_key?(:data) && json[:data][:"sync-jobs"][:relationships][:integration][:data].has_key?(:id)
+                    id = json[:data][:"sync-jobs"][:relationships][:integration][:data][:id]
+                end
+            end
+            return id
+        }.call
     end
 
     def get_resource_url

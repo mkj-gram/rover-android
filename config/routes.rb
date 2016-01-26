@@ -63,9 +63,9 @@ Rails.application.routes.draw do
             end
         end
 
-        #
+
         scope module: "integrations" do
-            get "/sync-jobs/:id", to: "sync_jobs#show", as: "sync_jobs"
+            resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create]
         end
 
         get "/regions", to: 'regions#index', as: "regions"

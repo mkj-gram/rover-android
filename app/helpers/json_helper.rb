@@ -46,7 +46,7 @@ module JsonHelper
 
         validate_json_schema
 
-        data.map!{|sub_data| {sub_data[:type] => {id: sub_data[:id]}.merge!(sub_data[:attributes])}}
+        data.map!{|sub_data| {sub_data[:type] => {id: sub_data[:id]}.merge!(sub_data[:attributes]).merge!({relationships: sub_data[:relationships]})}}
         if single_record
             return params.merge!({:data => data.first})
         else
