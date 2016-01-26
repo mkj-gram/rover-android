@@ -23,11 +23,11 @@ class V1::IntegrationsController < V1::ApplicationController
         }
 
         if includes_sync
-            included = [
-                integrations.map do |integration|
-                    serialize_sync_job(integration, integration.latest_sync_job)
-                end
-            ]
+            included = integrations.map do |integration|
+                serialize_sync_job(integration, integration.latest_sync_job)
+            end
+
+
             json["included"] = included
         end
 
