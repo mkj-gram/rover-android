@@ -165,7 +165,7 @@ class V1::IntegrationsController < V1::ApplicationController
             json.merge!(
                 {
                     "relationships" => {
-                        "latestSync" => {
+                        "latest-sync" => {
                             "type" => "sync-jobs",
                             "id" => integration.latest_sync_job.id.to_s
                         }
