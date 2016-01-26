@@ -23,6 +23,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'concerns')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'estimote')
+        config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'kontakt')
         # Generic Classes
         config.autoload_paths << Rails.root.join('app', 'classes')
 

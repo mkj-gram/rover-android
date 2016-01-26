@@ -1,3 +1,3 @@
 class KontaktIBeaconDevice < KontaktDevice
-    include IBeaconDeviceAttributes
+    include IBeaconDevice
 end

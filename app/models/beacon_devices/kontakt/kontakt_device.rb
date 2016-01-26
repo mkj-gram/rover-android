@@ -1,4 +1,4 @@
-class KontanktDevice < BeaconDevice
+class KontaktDevice < BeaconDevice
 
     attr_accessor :skip_cache_update
 
@@ -28,7 +28,7 @@ class KontanktDevice < BeaconDevice
             self.battery     == other.battery &&
             self.interval    == other.interval &&
             self.firmware    == other.firmware &&
-            self.power       == other.power &&
+            self.power       == other.power
         )
     end
 
