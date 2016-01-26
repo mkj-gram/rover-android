@@ -51,13 +51,13 @@ Rails.application.routes.draw do
 
         resources "configurations", controller: "beacon_configurations", as: "beacon_configuration"
 
-        resources :integrations, only: [:index, :show] do
+        resources :integrations, only: [:index, :show, :create, :update, :destroy] do
             scope module: "integrations" do
                 resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
             end
         end
 
-        resources "estimote-integrations", controller: "estimote_integrations", as: "estimote_integrations", only: [:index, :show, :create, :update, :destroy] do
+        resources "estimote-integrations", controller: "integrations", as: "estimote_integrations", only: [:index, :show, :create, :update, :destroy], integration_type: "estimote-integrations" do
             scope module: "integrations" do
                 resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
             end
@@ -65,7 +65,7 @@ Rails.application.routes.draw do
 
         #
         scope module: "integrations" do
-            get "/integrations/sync-jobs/:id", to: "sync_jobs#show", as: "sync_jobs"
+            get "/sync-jobs/:id", to: "sync_jobs#show", as: "sync_jobs"
         end
 
         get "/regions", to: 'regions#index', as: "regions"

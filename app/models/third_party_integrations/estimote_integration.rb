@@ -18,10 +18,7 @@ class EstimoteIntegration < ThirdPartyIntegration
     end
 
     def set_credentials(app_id, app_token)
-        if !app_id.nil? && !app_token.nil?
-            self.credentials = {app_id: app_id, app_token: app_token}
-        end
-        return
+        self.credentials = {app_id: app_id, app_token: app_token}
     end
 
     def app_id
@@ -38,6 +35,13 @@ class EstimoteIntegration < ThirdPartyIntegration
         else
             nil
         end
+    end
+
+    def credentials_json
+        {
+            "app-id" => self.app_id,
+            "app-token" => self.app_token
+        }
     end
 
     def client

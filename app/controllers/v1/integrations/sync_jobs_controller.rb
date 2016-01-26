@@ -3,8 +3,8 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
     before_action :set_resource, only: [:show]
 
     def index
-        @integration = ThirdPartyIntegration.find_by_id(get_integration_id)
-        if @integration
+        integration = ThirdPartyIntegration.find_by_id(get_integration_id)
+        if integration
             orders = whitelist_order(["created_at", "started_at", "finished_at"], [], {order: "DESC"})
             if orders.empty?
                 orders = ["id DESC"]
@@ -12,15 +12,13 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
                 orders.map!{|order| order.concat(" ").concat(" NULLS LAST")}
             end
 
-            @jobs = @integration.sync_jobs.paginate(per_page: page_size, page: current_page, total_entries: @integration.third_party_integration_sync_jobs_count).order(orders.join(","))
+            jobs = integration.sync_jobs.paginate(per_page: page_size, page: current_page, total_entries: @integration.third_party_integration_sync_jobs_count).order(orders.join(","))
 
             json = {
-                "data" => @jobs.map{|job| serialize_sync_job(@integration, job)},
-                "links" => pagination_links(get_resource_url, @jobs)
+                "data" => @jobs.map{|job| serialize_sync_job(integration, job)},
+                "links" => pagination_links(get_resource_url, jobs)
             }
             render json: json
-
-
         else
             head :not_found
         end
