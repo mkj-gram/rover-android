@@ -41,7 +41,7 @@ class V1::IntegrationsController < V1::ApplicationController
 
         if integration
             json = {
-                "data" => serialize_integration(integration, true)
+                "data" => serialize_integration(integration)
             }
             if includes_sync
                 included = [
@@ -65,7 +65,7 @@ class V1::IntegrationsController < V1::ApplicationController
         if integration
             if integration.save
                 json = {
-                    "data" => serialize_integration(integration, true)
+                    "data" => serialize_integration(integration)
                 }
                 render json: json
             else
@@ -150,7 +150,7 @@ class V1::IntegrationsController < V1::ApplicationController
         }
     end
 
-    def serialize_integration(integration, show_credentials = false)
+    def serialize_integration(integration)
         json = {
             "type" => integration.model_type,
             "id" => integration.id.to_s,
@@ -158,7 +158,7 @@ class V1::IntegrationsController < V1::ApplicationController
                 "enabled" => integration.enabled,
                 "syncing" => integration.syncing,
                 "last-synced-at" => integration.last_synced_at
-            }
+            }.merge(integration.credentials_json)
         }
 
         if integration.latest_sync_job
@@ -172,10 +172,6 @@ class V1::IntegrationsController < V1::ApplicationController
                     }
                 }
             )
-        end
-
-        if show_credentials
-            json["attributes"].merge!(integration.credentials_json)
         end
 
         return json
