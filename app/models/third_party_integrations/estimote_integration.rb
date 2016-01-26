@@ -130,29 +130,4 @@ class EstimoteIntegration < ThirdPartyIntegration
         return stats
     end
 
-    private
-
-
-    def save_ibeacon_configuration(beacon)
-        configuration = IBeaconConfiguration.where(uuid: beacon.uuid, major: beacon.major, minor: beacon.minor).first
-        if configuration.nil?
-            configuration = IBeaconConfiguration.new(account_id: account_id, uuid: beacon.uuid, major: beacon.major, minor: beacon.minor, title: beacon.name)
-            configuration.save
-        end
-        return configuration
-    end
-
-    def save_eddystone_namespace_configuration(beacon)
-        configuration = EddystoneNamespaceConfiguration.where(namespace: beacon.eddystone_namespace, instance_id: beacon.eddystone_instance_id).first
-        if configuration.nil?
-            configuration = EddystoneNamespaceConfiguration.new(account_id: account_id, namespace: beacon.eddystone_namespace, instance_id: beacon.eddystone_instance_id, title: beacon.title)
-            configuration.save
-        end
-        return configuration
-    end
-
-    def save_url_configuration(beacon)
-        # we don't autosave for now
-    end
-
 end

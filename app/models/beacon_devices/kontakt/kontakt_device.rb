@@ -4,7 +4,7 @@ class KontaktDevice < BeaconDevice
 
     store_accessor :device_data, :specification, :name, :battery, :interval, :firmware, :power, :uniqueId
 
-    validates :mac, presence: true
+    validates :uniqueId, presence: true
 
     before_create :set_manufacturer_id
 
@@ -12,6 +12,7 @@ class KontaktDevice < BeaconDevice
     def self.attributes_for_beacon(device)
         {
             manufacturer_id: device.uniqueId,
+            uniqueId: device.uniqueId,
             specification: device.specification,
             name: device.name,
             battery: device.battery,

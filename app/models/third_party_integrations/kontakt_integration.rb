@@ -17,10 +17,7 @@ class KontaktIntegration < ThirdPartyIntegration
     end
 
     def set_credentials(api_key)
-        if !api_key.nil?
-            self.credentials = {api_key: api_key}
-        end
-        return
+        self.credentials = {api_key: api_key}
     end
 
     def api_key
@@ -31,33 +28,89 @@ class KontaktIntegration < ThirdPartyIntegration
         end
     end
 
+    def credentials_json
+        {
+            "api-key" => self.api_key
+        }
+    end
+
     def client
         @client ||= KontaktApi.new(api_key)
     end
 
     def sync!
-        # this one could page maybe the api just grabs all of it?
-        client.devices
-    end
+        stats = {
+            added_devices_count: 0,
+            modified_devices_count: 0,
+            removed_devices_count: 0
+        }
 
+        kontakt_server_devices = client.devices
+        kontakt_server_manufacturer_ids = Set.new
+        configurations_modified = Set.new
+        current_devices = self.beacon_devices.all.index_by(&:manufacturer_id)
+        # represents all devices seen on kontakts servers
+        kontakt_server_converted_devices_index = {}
+        kontakt_server_devices.each do |kontakt_server_device|
+            # map this to a device on our end
+            if kontakt_server_device.ibeacon?
+                device = KontaktIBeaconDevice.build_from_beacon(kontakt_server_device)
+            elsif kontakt_server_device.eddystone_namespace?
+                device = KontaktEddystoneNamespaceDevice.build_from_beacon(kontakt_server_device)
+            elsif kontakt_server_device.url?
+                # for now we don't want to track their url devices
+                device = nil
+                # device = EstimoteUrlDevice.build_from_beacon(beacon)
+            else
+                Rails.logger.warn("Unknown beacon type #{kontakt_server_device.device_type}")
+                device = nil
+            end
 
-    private
+            next if device.nil?
 
-    def save_ibeacon_configuration(beacon)
-        configuration = IBeaconConfiguration.where(uuid: beacon.uuid, major: beacon.major, minor: beacon.minor).first
-        if configuration.nil?
-            configuration = IBeaconConfiguration.new(account_id: account_id, uuid: beacon.uuid, major: beacon.major, minor: beacon.minor, title: beacon.name)
-            configuration.save
+            device.third_party_integration_id = self.id
+            device.skip_cache_update = true
+            kontakt_server_converted_devices_index[device.manufacturer_id] = device
         end
-        return configuration
-    end
 
-    def save_eddystone_namespace_configuration(beacon)
-        configuration = EddystoneNamespaceConfiguration.where(namespace: beacon.eddystone_namespace, instance_id: beacon.eddystone_instance_id).first
-        if configuration.nil?
-            configuration = EddystoneNamespaceConfiguration.new(account_id: account_id, namespace: beacon.eddystone_namespace, instance_id: beacon.eddystone_instance_id, title: beacon.title)
-            configuration.save
+
+        new_devices = kontakt_server_converted_devices_index.select{|manufacturer_id, device| current_devices[manufacturer_id].nil? }
+
+        existing_devices_need_update = current_devices.select{ |manufacturer_id, device| kontakt_server_converted_devices_index.include?(manufacturer_id) && device.needs_update?(kontakt_server_converted_devices_index[manufacturer_id]) }
+
+        deleted_devices = current_devices.select{|manufacturer_id, device| !kontakt_server_converted_devices_index.include?(manufacturer_id)}
+
+        # with new devices we can just create their configs and if they exist oh well
+        new_devices.each do |manufacturer_id, device|
+            if device.save && new_config = device.create_configuration(k.account_id)
+                stats[:added_devices_count] += 1
+                configurations_modified.add(new_config) if new_config != nil
+            end
         end
-        return configuration
+
+        # existing devices need to update their previous config and update their newone
+        existing_devices_need_update.each do |manufacturer_id, device|
+            existing_configuration = device.configuration
+            configurations_modified.add(existing_configuration) if existing_configuration != nil
+            device.overwrite_attributes_with_device(kontakt_server_converted_devices_index[manufacturer_id])
+
+            if device.save && new_config = device.create_configuration(self.account_id)
+                stats[:modified_devices_count] += 1
+                configurations_modified.add(new_config) if new_config != nil
+            end
+        end
+
+        deleted_devices.each do |manufacturer_id, device|
+            device.skip_cache_update = true
+            if device.destroy
+                stats[:removed_devices_count] += 1
+                configurations_modified.add(device.configuration)
+            end
+        end
+        configurations_modified.each do |configuration|
+            configuration.touch(:beacon_devices_updated_at)
+        end
+
+        return stats
     end
 end
