@@ -12,7 +12,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
                 orders.map!{|order| order.concat(" ").concat(" NULLS LAST")}
             end
 
-            jobs = integration.sync_jobs.paginate(per_page: page_size, page: current_page, total_entries: @integration.third_party_integration_sync_jobs_count).order(orders.join(","))
+            jobs = integration.sync_jobs.paginate(per_page: page_size, page: current_page, total_entries: integration.third_party_integration_sync_jobs_count).order(orders.join(","))
 
             json = {
                 "data" => @jobs.map{|job| serialize_sync_job(integration, job)},
