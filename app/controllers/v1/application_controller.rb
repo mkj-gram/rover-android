@@ -17,7 +17,7 @@ class V1::ApplicationController < ActionController::API
 
 
     def application_api_key_header
-        return "X-Rover-REST-API-Key"
+        return "X-Rover-Api-Key"
     end
 
     rescue_from(ActionController::ParameterMissing) do |parameter_missing_exception|
