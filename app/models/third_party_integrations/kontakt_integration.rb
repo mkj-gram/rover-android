@@ -83,7 +83,7 @@ class KontaktIntegration < ThirdPartyIntegration
 
         # with new devices we can just create their configs and if they exist oh well
         new_devices.each do |manufacturer_id, device|
-            if device.save && new_config = device.create_configuration(k.account_id)
+            if device.save && new_config = device.create_configuration(self.account_id)
                 stats[:added_devices_count] += 1
                 configurations_modified.add(new_config) if new_config != nil
             end
