@@ -24,6 +24,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'concerns')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'estimote')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'kontakt')
+
         # Generic Classes
         config.autoload_paths << Rails.root.join('app', 'classes')
 
@@ -38,6 +39,8 @@ module RailsApi
         config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
 
 
+        # Core Extensions
+        config.autoload_paths << Rails.root.join('lib', "core_ext")
 
         # Do not swallow errors in after_commit/after_rollback callbacks.
         config.active_record.raise_in_transactional_callbacks = true
@@ -52,3 +55,5 @@ module RailsApi
 
     end
 end
+
+require 'core_ext/hash'

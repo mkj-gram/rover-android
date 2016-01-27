@@ -89,9 +89,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
             if id.nil?
                 # this request might have the integrations id in the payload
                 json = flatten_request({single_record: true})
-                if json.has_key?(:data) && json[:data].has_key?(:"sync-jobs") && json[:data][:"sync-jobs"].has_key?(:relationships) && json[:data][:"sync-jobs"][:relationships].has_key?(:integration) && json[:data][:"sync-jobs"][:relationships][:integration].has_key?(:data) && json[:data][:"sync-jobs"][:relationships][:integration][:data].has_key?(:id)
-                    id = json[:data][:"sync-jobs"][:relationships][:integration][:data][:id]
-                end
+                id = json.dig(:data, :"sync-jobs", :relationships, :integration, :data, :id)
             end
             return id
         }.call
