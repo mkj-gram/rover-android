@@ -22,10 +22,9 @@ class ThirdPartyIntegration < ActiveRecord::Base
     end
 
     def create_sync_job!
-        # check to see if a sync is already running
         if self.syncing == false
             previous_job = ThirdPartyIntegrationSyncJob.where(third_party_integration_id: self.id).last
-            if  previous_job.nil? || (!previous_job.nil? && previous_job.finished?)
+            if  previous_job.nil? || (!previous_job.nil? && (previous_job.finished? || previous_job.error? ))
                 @job = self.sync_jobs.build
                 @job.save
             else
