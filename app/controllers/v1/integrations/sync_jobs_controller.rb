@@ -70,6 +70,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
                 "added-devices-count" => job.added_devices_count,
                 "modified-devices-count" => job.modified_devices_count,
                 "removed-devices-count" => job.removed_devices_count,
+                "devices-changed-configuration-count" => job.devices_changed_configuration_count,
                 "created-at" => job.created_at
             },
             "relationships" => {
