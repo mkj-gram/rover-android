@@ -42,7 +42,8 @@ class KontaktIntegration < ThirdPartyIntegration
         stats = {
             added_devices_count: 0,
             modified_devices_count: 0,
-            removed_devices_count: 0
+            removed_devices_count: 0,
+            devices_changed_configuration_count: 0
         }
 
         kontakt_server_devices = client.devices
@@ -96,6 +97,9 @@ class KontaktIntegration < ThirdPartyIntegration
 
             if device.save && new_config = device.create_configuration(self.account_id)
                 stats[:modified_devices_count] += 1
+                if existing_configuration.id == new_config.id
+                    stats[:devices_changed_configuration_count] += 1
+                end
                 configurations_modified.add(new_config) if new_config != nil
             end
         end

@@ -16,16 +16,17 @@ class SyncThirdPartyIntegrationWorker
 
         # start the job
 
-
-        begin
-            sync_job.start!
-            sync_job.sync!
-        rescue Exception => e
-            # some error occured
-        ensure
-            sync_job.finish!
+        if sync_job
+            begin
+                sync_job.start!
+                sync_job.sync!
+            rescue Exception => e
+                # some error occured
+                # sync_job.error_message = "123123123"
+            ensure
+                sync_job.finish!
+            end
         end
-
 
         # finish the job
 
