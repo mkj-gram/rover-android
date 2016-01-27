@@ -2,7 +2,7 @@ class ThirdPartyIntegrationSyncJob < ActiveRecord::Base
 
     enum status: [ :queued, :started, :finished, :error ]
 
-    before_create :perform_async
+    after_create :perform_async
 
     belongs_to :third_party_integration, counter_cache: true
 
