@@ -5,7 +5,7 @@ class ThirdPartyIntegrationRemoveDevicesWorker
 
     def self.perform_async(integration_id)
         msg = {id: integration_id}.to_json
-        RabbitMQPublisher.publish(msg, {to_queue: 'third_party_integrations_sync_devices'})
+        RabbitMQPublisher.publish(msg, {to_queue: 'third_party_integrations_remove_devices'})
     end
 
     def work(msg)

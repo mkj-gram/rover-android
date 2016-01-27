@@ -63,6 +63,12 @@ Rails.application.routes.draw do
             end
         end
 
+        resources "kontakt-integrations", controller: "integrations", as: "kontakt_integrations", only: [:index, :show, :create, :update, :destroy], integration_type: "kontakt-integrations" do
+            scope module: "integrations" do
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            end
+        end
+
 
         scope module: "integrations" do
             resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
