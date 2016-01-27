@@ -21,6 +21,19 @@ module EddystoneNamespaceDevice
         end
     end
 
+    #
+    # Object Methods
+    #
+    def overwrite_attributes_with_device(other)
+        self.namespace   = other.namespace
+        self.instance_id  = other.instance_id
+        super(other)
+    end
+
+    def needs_update?(other)
+        !(self.namespace == other.namespace && self.instance_id == other.instance_id) || super(other)
+    end
+
     def configuration
         EddystoneNamespaceConfiguration.where(namespace: self.namespace, instance_id: self.instance_id).first
     end
