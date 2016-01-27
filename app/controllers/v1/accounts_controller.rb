@@ -44,7 +44,7 @@ class V1::AccountsController < V1::ApplicationController
                 {
                     "kontakt-integration" => {
                         "data" => {
-                            "type" => "estimote-integrations",
+                            "type" => "kontakt-integrations",
                             "id" => kontakt_integration.id.to_s
                         }
                     }
