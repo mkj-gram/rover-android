@@ -8,6 +8,7 @@ class ThirdPartyIntegrationSyncJob < ActiveRecord::Base
 
     def start!
         self.update({status: :started, started_at: DateTime.now })
+        third_party_integration.start_syncing
     end
 
     def sync!

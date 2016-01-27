@@ -17,9 +17,11 @@ class ThirdPartyIntegration < ActiveRecord::Base
         # end
         @latest_sync_job ||= self.sync_jobs.last
     end
-
+    def start_syncing
+        self.update({syncing: true})
+    end
     def finish_syncing(finished_at, elapsed_milliseconds)
-        self.update({last_synced_at: finished_at})
+        self.update({last_synced_at: finished_at, syncing: false})
     end
 
     def create_sync_job!
