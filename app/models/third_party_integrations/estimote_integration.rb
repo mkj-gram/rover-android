@@ -58,7 +58,6 @@ class EstimoteIntegration < ThirdPartyIntegration
         }
 
         estimote_beacons = client.beacons
-        p estimote_beacons
         estimote_manufacturer_ids = Set.new
         configurations_modified = Set.new
         current_devices = self.beacon_devices.all.index_by(&:manufacturer_id)
