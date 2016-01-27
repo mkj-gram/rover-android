@@ -50,7 +50,9 @@ class KontaktDevice < BeaconDevice
         return "kontakt-#{self.specification}"
     end
 
-
+    def skip_cache_update
+        @skip_cache_update.nil? ? false : @skip_cache_update
+    end
 
     private
 
