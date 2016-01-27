@@ -97,7 +97,7 @@ class KontaktIntegration < ThirdPartyIntegration
 
             if device.save && new_config = device.create_configuration(self.account_id)
                 stats[:modified_devices_count] += 1
-                if existing_configuration.id == new_config.id
+                if (existing_configuration && new_config) && (existing_configuration.id != new_config.id)
                     stats[:devices_changed_configuration_count] += 1
                 end
                 configurations_modified.add(new_config) if new_config != nil
