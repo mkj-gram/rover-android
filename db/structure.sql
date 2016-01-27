@@ -374,7 +374,8 @@ CREATE TABLE third_party_integration_sync_jobs (
     modified_devices_count integer DEFAULT 0,
     removed_devices_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    devices_changed_configuration_count integer DEFAULT 0
 );
 
 
@@ -992,4 +993,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160121135943');
 INSERT INTO schema_migrations (version) VALUES ('20160125152740');
 
 INSERT INTO schema_migrations (version) VALUES ('20160125174600');
+
+INSERT INTO schema_migrations (version) VALUES ('20160127133932');
 

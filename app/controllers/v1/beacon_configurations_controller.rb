@@ -129,7 +129,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         end
 
         configurations = Elasticsearch::Model.search(query, types)
-        results = configurations.per_page(page_size).page(current_page(start_at: 0)).results
+        results = configurations.per_page(page_size).page(current_page).results
         json  = {
             "data" => results.map do |config|
                 if config._type == IBeaconConfiguration.document_type
@@ -156,12 +156,25 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def update
+        # this
+        # name
+        # enabled
+        # tags
+        # json = flatten_request({single_record: true})
+        # local_params = user_params(json[:data])
+        # if user.update(user_params(json[:data]))
+        # end
     end
 
     def destroy
+
     end
 
     private
+
+    def configuration_params(local_params)
+
+    end
 
     def filter_params
         params.fetch(:filter, {}).permit(:query, :protocol, {:protocols => []}, {:tags => []})

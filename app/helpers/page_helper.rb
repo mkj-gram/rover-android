@@ -1,8 +1,7 @@
 module PageHelper
 
-    def current_page(opts = {})
-        start_at = opts.fetch(:start_at, 1)
-        @current_page ||= params.has_key?(:page) && params[:page].has_key?(:number) ? params[:page][:number].to_i : start_at
+    def current_page
+        @current_page ||= params.has_key?(:page) && params[:page].has_key?(:number) ? params[:page][:number].to_i + 1 : 1
     end
 
     def current_cursor(default)
