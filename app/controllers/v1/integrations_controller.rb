@@ -23,8 +23,8 @@ class V1::IntegrationsController < V1::ApplicationController
         }
 
         if includes_sync
-            included = integrations.select{|integration| !integration.sync_jobs.last.nil? }.map do |integration|
-                serialize_sync_job(integration, integration.sync_jobs.last)
+            included = integrations.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
+                serialize_sync_job(integration, integration.latest_sync_job)
             end
 
 
@@ -45,7 +45,7 @@ class V1::IntegrationsController < V1::ApplicationController
             }
             if includes_sync
                 included = [
-                    serialize_sync_job(integration, integration.sync_jobs.last)
+                    serialize_sync_job(integration, integration.latest_sync_job)
                 ]
                 json["included"] = included
             end
@@ -162,13 +162,13 @@ class V1::IntegrationsController < V1::ApplicationController
             }.merge(integration.credentials_json)
         }
 
-        if integration.sync_jobs.last
+        if integration.latest_sync_job
             json.merge!(
                 {
                     "relationships" => {
                         "latest-sync" => {
                             "type" => "sync-jobs",
-                            "id" => integration.sync_jobs.last.id.to_s
+                            "id" => integration.latest_sync_job.id.to_s
                         }
                     }
                 }

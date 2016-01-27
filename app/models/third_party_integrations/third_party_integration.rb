@@ -12,9 +12,10 @@ class ThirdPartyIntegration < ActiveRecord::Base
     has_many :beacon_devices, foreign_key: "third_party_integration_id"
 
     def latest_sync_job
-        @latest_sync_job ||= Rails.cache.fetch(latest_sync_job_cache_key) do
-            self.sync_jobs.last
-        end
+        # @latest_sync_job ||= Rails.cache.fetch(latest_sync_job_cache_key) do
+        #     self.sync_jobs.last
+        # end
+        @latest_sync_job ||= self.sync_jobs.last
     end
 
     def finish_syncing(finished_at, elapsed_milliseconds)
