@@ -1,11 +1,11 @@
 class SyncThirdPartyIntegrationWorker
     include Sneakers::Worker
 
-    from_queue 'sync_third_party_integrations'
+    from_queue 'third_party_integrations_sync_devices'
 
     def self.perform_async(sync_job_id)
         msg = {id: sync_job_id}.to_json
-        RabbitMQPublisher.publish(msg, {to_queue: 'sync_third_party_integrations'})
+        RabbitMQPublisher.publish(msg, {to_queue: 'third_party_integrations_sync_devices'})
     end
 
     def work(msg)
@@ -35,5 +35,3 @@ class SyncThirdPartyIntegrationWorker
         # ack even if the integration doesn't exist
         ack!
     end
-
-end

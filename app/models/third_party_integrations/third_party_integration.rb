@@ -3,6 +3,7 @@ class ThirdPartyIntegration < ActiveRecord::Base
     attr_reader :job
 
     after_create :create_sync_job!
+    after_destroy :remove_all_devices
 
     belongs_to :account
     has_many :sync_jobs, class_name: "ThirdPartyIntegrationSyncJob", foreign_key:  "third_party_integration_id" do
@@ -43,6 +44,10 @@ class ThirdPartyIntegration < ActiveRecord::Base
     end
 
     private
+
+    def remove_all_devices
+        ThirdPartyIntegrationRemoveDevicesWorker.perform_async(self.id)
+    end
 
     def self.encryption_key
         @encryption_key ||= Rails.application.secrets.secret_encryption_key
