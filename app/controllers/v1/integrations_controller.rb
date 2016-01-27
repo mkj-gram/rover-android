@@ -67,6 +67,9 @@ class V1::IntegrationsController < V1::ApplicationController
                 json = {
                     "data" => serialize_integration(integration)
                 }
+
+                json["included"] = serialize_sync_job(integration, integration.latest_sync_job)
+
                 render json: json, status: :created
             else
                 render json: {errors: V1::ThirdPartyIntegrationsModelError.serialize(integration.errors)}, status: :unprocessable_entity
