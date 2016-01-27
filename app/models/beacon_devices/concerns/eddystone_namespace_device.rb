@@ -38,9 +38,9 @@ module EddystoneNamespaceDevice
     private
 
     def update_beacon_configuration
-        if skip_cache_update == false && (namespace_changed? || instance_id_changed?)
+        if self.skip_cache_update == false && (namespace_changed? || instance_id_changed?)
             configuration = EddystoneNamespaceConfiguration.where(namespace: self.namespace, instance_id: self.instance_id).first
-            configuration.update({beacon_devices_updated_at: DateTime.now})
+            configuration.update({beacon_devices_updated_at: DateTime.now}) if configuration
         end
     end
 end

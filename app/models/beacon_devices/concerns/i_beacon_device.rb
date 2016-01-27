@@ -51,9 +51,9 @@ module IBeaconDevice
     private
 
     def update_beacon_configuration
-        if skip_cache_update == false && (uuid_changed? || major_changed? || minor_changed?)
+        if self.skip_cache_update == false && (uuid_changed? || major_changed? || minor_changed?)
             configuration = IBeaconConfiguration.where(uuid: self.uuid, major: self.major, minor: self.minor).first
-            configuration.update({beacon_devices_updated_at: DateTime.now})
+            configuration.update({beacon_devices_updated_at: DateTime.now}) if configuration
         end
     end
 
