@@ -28,7 +28,7 @@ module EddystoneNamespaceDevice
     def create_configuration(account_id)
         configuration = EddystoneNamespaceConfiguration.where(namespace: self.namespace, instance_id: self.instance_id).limit(1)[0]
         if configuration.nil?
-            configuration = EddystoneNamespaceConfiguration.new(account_id: account_id, namespace: self.namespace, instance_id: self.instance_id, title: self.name)
+            configuration = EddystoneNamespaceConfiguration.new(account_id: account_id, namespace: self.namespace, instance_id: self.instance_id, title: self.configuration_name)
             configuration.save
         end
         return configuration

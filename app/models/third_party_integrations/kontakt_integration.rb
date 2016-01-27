@@ -92,6 +92,9 @@ class KontaktIntegration < ThirdPartyIntegration
         # existing devices need to update their previous config and update their newone
         existing_devices_need_update.each do |manufacturer_id, device|
             existing_configuration = device.configuration
+            if existing_configuration.nil?
+                existing_configuration = device.create_configuration(self.account_id)
+            end
             configurations_modified.add(existing_configuration) if existing_configuration != nil
             device.overwrite_attributes_with_device(kontakt_server_converted_devices_index[manufacturer_id])
 

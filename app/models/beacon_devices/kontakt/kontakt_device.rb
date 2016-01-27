@@ -2,7 +2,7 @@ class KontaktDevice < BeaconDevice
 
     attr_accessor :skip_cache_update
 
-    store_accessor :device_data, :specification, :name, :battery, :interval, :firmware, :power, :uniqueId
+    store_accessor :device_data, :specification, :name, :alias, :battery, :interval, :firmware, :power, :uniqueId
 
     validates :uniqueId, presence: true
 
@@ -18,7 +18,8 @@ class KontaktDevice < BeaconDevice
             battery: device.battery,
             interval: device.interval,
             firmware: device.firmware,
-            power: device.power
+            power: device.power,
+            alias: device.alias,
         }
     end
 
@@ -29,7 +30,8 @@ class KontaktDevice < BeaconDevice
             self.battery     == other.battery &&
             self.interval    == other.interval &&
             self.firmware    == other.firmware &&
-            self.power       == other.power
+            self.power       == other.power &&
+            self.alias       == other.alias
         )
     end
 
@@ -40,6 +42,11 @@ class KontaktDevice < BeaconDevice
         self.interval   = other.interval
         self.firmware   = other.firmware
         self.power      = other.power
+        self.alias      = other.alias
+    end
+
+    def configuration_name
+        self.alias.nil? ? self.uniqueId : self.alias
     end
 
     def manufacturer

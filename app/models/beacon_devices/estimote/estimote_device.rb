@@ -59,6 +59,10 @@ class EstimoteDevice < BeaconDevice
         return "estimote-#{self.color}"
     end
 
+    def configuration_name
+        self.name
+    end
+
     def skip_cache_update
         @skip_cache_update.nil? ? false : @skip_cache_update
     end

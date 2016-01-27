@@ -42,7 +42,7 @@ module IBeaconDevice
     def create_configuration(account_id)
         configuration = IBeaconConfiguration.where(uuid: self.uuid, major: self.major, minor: self.minor).limit(1)[0]
         if configuration.nil?
-            configuration = IBeaconConfiguration.new(account_id: account_id, uuid: self.uuid, major: self.major, minor: self.minor, title: self.name)
+            configuration = IBeaconConfiguration.new(account_id: account_id, uuid: self.uuid, major: self.major, minor: self.minor, title: self.configuration_name)
             configuration.save
         end
         return configuration

@@ -1,5 +1,5 @@
 class Device
-    attr_reader :id, :uniqueId, :device_type, :specification, :uuid, :major, :minor, :namespace, :instance_id, :name, :interval, :firmware, :power, :battery
+    attr_reader :id, :uniqueId, :device_type, :specification, :uuid, :major, :minor, :namespace, :instance_id, :name, :alias, :interval, :firmware, :power, :battery
 
     def initialize(config)
         @id = config["id"]
@@ -10,6 +10,7 @@ class Device
         @major = config["major"]
         @minor = config["minor"]
         @name = config["name"]
+        @alias = config["alias"]
         @namespace = config["namespace"]
         @instance_id = config["instanceId"]
         @profile = ActiveSupport::StringInquirer.new(config["profiles"].first.downcase)
