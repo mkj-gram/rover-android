@@ -48,7 +48,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
                 }
                 render json: json, status: :created
             else
-                render json: {errors: [{title: "conflict", detail: "A job is already running", source: {pointer: "data"}}]}, status: :conflict
+                render json: {errors: [{title: "conflict", detail: "A job is already running", source: {pointer: "data"}}]}, status: :unprocessable_entity
             end
         else
             head :not_found

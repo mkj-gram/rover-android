@@ -65,7 +65,7 @@ Rails.application.routes.draw do
 
 
         scope module: "integrations" do
-            resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create]
+            resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
         end
 
         get "/regions", to: 'regions#index', as: "regions"
