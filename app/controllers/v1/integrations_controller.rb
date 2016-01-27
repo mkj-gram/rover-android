@@ -95,6 +95,8 @@ class V1::IntegrationsController < V1::ApplicationController
         case type
         when "estimote-integrations"
             build_estimote_integration(json)
+        when "kontakt-integrations"
+            build_kontat_integration(json)
         else
             nil
         end
@@ -117,7 +119,19 @@ class V1::IntegrationsController < V1::ApplicationController
         return local_params[:"estimote-integrations"].permit(:enabled, :app_id, :app_token)
     end
 
+    def build_kontat_integration(json)
+        options = kontakt_integration_params(json[:data])
+        api_key = options.delete(:api_key)
+        integration = KontaktIntegration.new(options)
+        integration.set_credentials(api_key)
+        integration.account_id = current_account.id
+        return integration
+    end
 
+    def kontakt_integration_params(local_params)
+        convert_param_if_exists(local_params[:"kontakt-integrations"], :"api-key", :api_key)
+        return local_params[:"kontakt-integrations"].permit(:enabled, :api_key)
+    end
 
     def get_integrations
         case params[:integration_type]
