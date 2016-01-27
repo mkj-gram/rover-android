@@ -99,9 +99,10 @@ class KontaktIntegration < ThirdPartyIntegration
             device.overwrite_attributes_with_device(kontakt_server_converted_devices_index[manufacturer_id])
 
             if device.save && new_config = device.create_configuration(self.account_id)
-                stats[:modified_devices_count] += 1
                 if (existing_configuration && new_config) && (existing_configuration.id != new_config.id)
                     stats[:devices_changed_configuration_count] += 1
+                else
+                    stats[:modified_devices_count] += 1
                 end
                 configurations_modified.add(new_config) if new_config != nil
             end
