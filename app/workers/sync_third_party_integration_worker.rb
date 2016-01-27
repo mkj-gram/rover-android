@@ -35,3 +35,4 @@ class SyncThirdPartyIntegrationWorker
         # ack even if the integration doesn't exist
         ack!
     end
+end
