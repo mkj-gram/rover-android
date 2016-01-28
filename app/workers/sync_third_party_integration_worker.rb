@@ -23,6 +23,7 @@ class SyncThirdPartyIntegrationWorker
             rescue Exception => e
                 # some error occured
                 # sync_job.error_message = "123123123"
+                Rails.logger.warn(e)
                 sync_job.error_message = e.message
             ensure
                 sync_job.finish!
