@@ -696,20 +696,6 @@ CREATE INDEX beacon_configurations_type_created_at_index ON beacon_configuration
 
 
 --
--- Name: eddystone_namespace_unique_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX eddystone_namespace_unique_index ON beacon_configurations USING btree (namespace, instance_id);
-
-
---
--- Name: ibeacon_unique_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX ibeacon_unique_index ON beacon_configurations USING btree (uuid, major, minor);
-
-
---
 -- Name: index_account_invites_on_invited_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -995,4 +981,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160125152740');
 INSERT INTO schema_migrations (version) VALUES ('20160125174600');
 
 INSERT INTO schema_migrations (version) VALUES ('20160127133932');
+
+INSERT INTO schema_migrations (version) VALUES ('20160128135020');
 

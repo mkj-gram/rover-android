@@ -32,7 +32,7 @@ class UrlConfiguration < BeaconConfiguration
         }
     end
 
-    validates :url, presence: true
+    validates :url, presence: true, unique: true
 
     def as_indexed_json(options = {})
         json = super(options)

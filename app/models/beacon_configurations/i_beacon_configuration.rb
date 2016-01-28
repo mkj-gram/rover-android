@@ -37,8 +37,9 @@ class IBeaconConfiguration < BeaconConfiguration
     validates :uuid, presence: true, :format => {:with => /[A-Za-z\d]([-\w]{,498}[A-Za-z\d])?/i}
     validates :major, presence: true
     validates :minor, presence: true
-    validate :uuid_account_owner
-    validate :unique_ibeacon
+    # don't enforce an account owner
+    # validate :uuid_account_owner
+    # validate :unique_ibeacon
 
 
     def self.protocol
@@ -58,6 +59,19 @@ class IBeaconConfiguration < BeaconConfiguration
                 minor: self.minor.to_s,
             }
 
+        )
+        return json
+    end
+
+    def attributes_json
+        json = super
+        json.merge!(
+            {
+                protocol: self.protocol,
+                uuid: self.uuid,
+                major: self.major,
+                minor: self.minor
+            }
         )
         return json
     end
