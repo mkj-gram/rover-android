@@ -40,13 +40,9 @@ class CreateBeaconConfigurations < ActiveRecord::Migration
         # or grab all configs with the same uuid
         add_index :beacon_configurations, :uuid
 
-        # no one can have the same beacon configuration
-        add_index :beacon_configurations, [:uuid, :major, :minor], unique: true, name: "ibeacon_unique_index"
-        add_index :beacon_configurations, [:account_id, :uuid, :major, :minor], name: "account_ibeacon_index"
+        add_index :beacon_configurations, [:account_id, :uuid, :major, :minor], unique: true, name: "account_ibeacon_index"
 
-        # no one can have the same eddystone config
-        add_index :beacon_configurations, [:namespace, :instance_id], unique: true, name: "eddystone_namespace_unique_index"
-        add_index :beacon_configurations, [:account_id, :namespace, :instance_id], name: "account_eddystone_namespace_index"
+        add_index :beacon_configurations, [:account_id, :namespace, :instance_id], unique: true, name: "account_eddystone_namespace_index"
 
         add_index :beacon_configurations, :url, unique: true
 

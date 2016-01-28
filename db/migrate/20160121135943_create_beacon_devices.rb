@@ -30,8 +30,8 @@ class CreateBeaconDevices < ActiveRecord::Migration
         add_index :beacon_devices, [:account_id, :manufacturer_id], unique: true
         add_index :beacon_devices, :third_party_integration_id
 
-        add_index :beacon_devices, [:account_id, :uuid, :major, :minor]
-        add_index :beacon_devices, [:account_id, :namespace, :instance_id]
+        add_index :beacon_devices, [:account_id, :uuid, :major, :minor], name: "index_account_ibeacon_devices"
+        add_index :beacon_devices, [:account_id, :namespace, :instance_id], name: "index_account_eddystone_devices"
         add_index :beacon_devices, [:account_id, :url]
     end
 end
