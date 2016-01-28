@@ -10,7 +10,7 @@ class V1::RegionsController < V1::ApplicationController
         if types.include?("ibeacon")
             ibeacon_regions = IBeaconConfiguration.select("DISTINCT on(uuid) *").where(account_id: current_account.id).limit(page_size)
         else
-            ibeacon_region = []
+            ibeacon_regions = []
         end
 
         if types.include?("geofence")
