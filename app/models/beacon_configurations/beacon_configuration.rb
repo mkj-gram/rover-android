@@ -6,8 +6,8 @@ class BeaconConfiguration < ActiveRecord::Base
     document_type ""
 
     settings index: {
-        number_of_shards: 3,
-        number_of_replicas: 1,
+        number_of_shards: 1,
+        number_of_replicas: 2,
         analysis:  {
             filter: {
                 autocomplete_filter: {
