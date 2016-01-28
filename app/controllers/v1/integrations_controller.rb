@@ -162,7 +162,7 @@ class V1::IntegrationsController < V1::ApplicationController
             },
             "relationships" => {
                 "integration" => {
-                    "data" => {type: integration.model_type, "id" => integration.id.to_s}
+                    "data" => {"type" => integration.model_type, "id" => integration.id.to_s}
                 }
             }
         }
@@ -184,8 +184,11 @@ class V1::IntegrationsController < V1::ApplicationController
                 {
                     "relationships" => {
                         "latest-sync" => {
-                            "type" => "sync-jobs",
-                            "id" => integration.latest_sync_job.id.to_s
+                            "data" => {
+                                "type" => "sync-jobs",
+                                "id" => integration.latest_sync_job.id.to_s
+                            }
+
                         }
                     }
                 }

@@ -75,7 +75,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
             },
             "relationships" => {
                 "integration" => {
-                    "data" => {type: integration.model_type, "id" => integration.id.to_s}
+                    "data" => {"type" => integration.model_type, "id" => integration.id.to_s}
                 }
             }
         }

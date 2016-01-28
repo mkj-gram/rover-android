@@ -55,6 +55,38 @@ describe "/v1/estimote-integrations", :type => :request do
 
                 expect(response).to have_http_status(200)
             end
+
+            it 'returns 201 Created and passes syncing' do
+                account = create(:account)
+                post "/v1/estimote-integrations",
+                {
+                    data: {
+                        type: :"estimote-integrations",
+                        attributes: {
+                            :"app-id" => "rover-content-api-7jp",
+                            :"app-token" => "3b5fd956d27d2f760c142d7ef0ffaed2",
+                            enabled: true
+                        }
+                    }
+                }, signed_request_header(account)
+
+                expect(response).to have_http_status(201)
+
+                id = json[:data][:id]
+                get "/v1/estimote-integrations/#{id}", nil, signed_request_header(account)
+
+                # since workers are performed inline we know the sync has already occured
+                expect(response).to have_http_status(200)
+                expect(json[:data][:attributes][:syncing]).to eq(false)
+                expect(json[:data][:relationships]).to have_key(:"latest-sync")
+
+                latest_sync_id = json.dig(:data, :relationships, :"latest-sync", :data, :id)
+
+                get "/v1/estimote-integrations/#{id}/sync-jobs/#{latest_sync_id}", nil, signed_request_header(account)
+
+                expect(response).to have_http_status(200)
+                expect(json[:data][:attributes][:status]).to eq("finished")
+            end
         end
 
         context "when input is invalid" do
