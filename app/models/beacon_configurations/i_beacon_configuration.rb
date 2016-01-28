@@ -47,7 +47,7 @@ class IBeaconConfiguration < BeaconConfiguration
     end
 
     def beacon_devices
-        BeaconDevice.where(uuid: self.uuid, major: self.major, minor: self.minor)
+        BeaconDevice.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor)
     end
 
     def as_indexed_json(options = {})

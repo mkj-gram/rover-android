@@ -54,7 +54,7 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     end
 
     def beacon_devices
-        BeaconDevice.where(namespace: self.namespace, instance_id: self.instance_id)
+        BeaconDevice.where(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id)
     end
 
 
