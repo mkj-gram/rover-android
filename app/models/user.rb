@@ -19,7 +19,7 @@ class User < ActiveRecord::Base
         end
     end
 
-    before_validation { self.email = self.email.downcase if self.email? }
+
 
     before_create :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
     before_create :create_account, if: -> { account_id.nil? }
@@ -36,6 +36,8 @@ class User < ActiveRecord::Base
     #############################################
     #               Validations                 #
     #############################################
+    before_validation { self.password_confirmation = self.password if !self.password.nil? }
+    before_validation { self.email = self.email.downcase if self.email? }
 
     validates :name, presence: true
 
@@ -55,7 +57,7 @@ class User < ActiveRecord::Base
         if: -> { new_record? || !password.nil? }
 
     validate :valid_account_invite_token
-    validate :can_change_protected_attributes, if: -> {
+    validate :can_change_password, if: -> {
         !self.new_record? && self.password_digest_changed? && !self.force_update_for_protected_attributes
     }
 
@@ -126,13 +128,12 @@ class User < ActiveRecord::Base
         end
     end
 
-    def can_change_protected_attributes
+    def can_change_password
         if self.current_password.nil?
             errors.add(:current_password, "can't be blank")
         else
-            if !self.authenticate(current_password)
-                # what error is this?
-                errors.add(:unauthorized, "incorrect password")
+            if BCrypt::Password.new(password_digest_was) != current_password
+                errors.add(:current_password, "is incorrect")
             end
         end
     end

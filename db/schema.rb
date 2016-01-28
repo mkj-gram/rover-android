@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160118182842) do
+ActiveRecord::Schema.define(version: 20160127133932) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,33 +53,52 @@ ActiveRecord::Schema.define(version: 20160118182842) do
   add_index "beacon_configuration_active_tags_indices", ["tags"], name: "index_beacon_configuration_active_tags_indices_on_tags", using: :gin
 
   create_table "beacon_configurations", force: :cascade do |t|
-    t.integer  "account_id",                  null: false
+    t.integer  "account_id",                                null: false
     t.integer  "location_id"
-    t.string   "type",                        null: false
+    t.string   "type",                                      null: false
     t.text     "title"
-    t.string   "tags",        default: [],                 array: true
-    t.boolean  "enabled",     default: true
-    t.boolean  "shared",      default: false
+    t.string   "tags",                      default: [],                 array: true
+    t.boolean  "enabled",                   default: true
+    t.boolean  "shared",                    default: false
     t.string   "uuid"
     t.integer  "major"
     t.integer  "minor"
     t.string   "namespace"
-    t.integer  "instance_id"
+    t.string   "instance_id"
     t.text     "url"
+    t.datetime "beacon_devices_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "beacon_configurations", ["account_id", "namespace", "instance_id"], name: "account_eddystone_namespace_index", using: :btree
+  add_index "beacon_configurations", ["account_id", "namespace", "instance_id"], name: "account_eddystone_namespace_index", unique: true, using: :btree
   add_index "beacon_configurations", ["account_id", "type", "created_at"], name: "beacon_configurations_type_created_at_index", using: :btree
   add_index "beacon_configurations", ["account_id", "type"], name: "index_beacon_configurations_on_account_id_and_type", using: :btree
-  add_index "beacon_configurations", ["account_id", "uuid", "major", "minor"], name: "account_ibeacon_index", using: :btree
+  add_index "beacon_configurations", ["account_id", "uuid", "major", "minor"], name: "account_ibeacon_index", unique: true, using: :btree
   add_index "beacon_configurations", ["account_id"], name: "index_beacon_configurations_on_account_id", using: :btree
   add_index "beacon_configurations", ["location_id"], name: "index_beacon_configurations_on_location_id", using: :btree
-  add_index "beacon_configurations", ["namespace", "instance_id"], name: "eddystone_namespace_unique_index", unique: true, using: :btree
   add_index "beacon_configurations", ["url"], name: "index_beacon_configurations_on_url", unique: true, using: :btree
-  add_index "beacon_configurations", ["uuid", "major", "minor"], name: "ibeacon_unique_index", unique: true, using: :btree
   add_index "beacon_configurations", ["uuid"], name: "index_beacon_configurations_on_uuid", using: :btree
+
+  create_table "beacon_devices", force: :cascade do |t|
+    t.integer "account_id",                              null: false
+    t.integer "third_party_integration_id",              null: false
+    t.string  "manufacturer_id",                         null: false
+    t.string  "type",                                    null: false
+    t.string  "uuid"
+    t.integer "major"
+    t.integer "minor"
+    t.string  "namespace"
+    t.string  "instance_id"
+    t.text    "url"
+    t.jsonb   "device_data",                default: {}
+  end
+
+  add_index "beacon_devices", ["account_id", "manufacturer_id"], name: "index_beacon_devices_on_account_id_and_manufacturer_id", unique: true, using: :btree
+  add_index "beacon_devices", ["account_id", "namespace", "instance_id"], name: "index_account_eddystone_devices", using: :btree
+  add_index "beacon_devices", ["account_id", "url"], name: "index_beacon_devices_on_account_id_and_url", using: :btree
+  add_index "beacon_devices", ["account_id", "uuid", "major", "minor"], name: "index_account_ibeacon_devices", using: :btree
+  add_index "beacon_devices", ["third_party_integration_id"], name: "index_beacon_devices_on_third_party_integration_id", using: :btree
 
   create_table "locations", force: :cascade do |t|
     t.integer  "account_id",                               null: false
@@ -129,6 +148,44 @@ ActiveRecord::Schema.define(version: 20160118182842) do
 
   add_index "shared_beacon_configurations", ["owner_account_id"], name: "index_shared_beacon_configurations_on_owner_account_id", using: :btree
   add_index "shared_beacon_configurations", ["shared_account_id"], name: "index_shared_beacon_configurations_on_shared_account_id", using: :btree
+
+  create_table "third_party_integration_sync_jobs", force: :cascade do |t|
+    t.integer  "third_party_integration_id",                      null: false
+    t.integer  "status",                              default: 0
+    t.datetime "started_at"
+    t.datetime "finished_at"
+    t.text     "error_message"
+    t.integer  "added_devices_count",                 default: 0
+    t.integer  "modified_devices_count",              default: 0
+    t.integer  "removed_devices_count",               default: 0
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.integer  "devices_changed_configuration_count", default: 0
+  end
+
+  add_index "third_party_integration_sync_jobs", ["created_at"], name: "integration_sync_job_integration_created_at_index", order: {"created_at"=>:desc}, using: :btree
+  add_index "third_party_integration_sync_jobs", ["finished_at"], name: "integration_sync_job_integration_finished_at_index", order: {"finished_at"=>:desc}, using: :btree
+  add_index "third_party_integration_sync_jobs", ["started_at"], name: "integration_sync_job_integration_started_at_index", order: {"started_at"=>:desc}, using: :btree
+  add_index "third_party_integration_sync_jobs", ["third_party_integration_id"], name: "integration_sync_job_integration_id_index", using: :btree
+
+  create_table "third_party_integrations", force: :cascade do |t|
+    t.integer  "account_id",                                              null: false
+    t.string   "type",                                                    null: false
+    t.boolean  "syncing",                                 default: false
+    t.boolean  "enabled",                                 default: true
+    t.string   "encrypted_credentials"
+    t.string   "encrypted_credentials_salt"
+    t.string   "encrypted_credentials_iv"
+    t.integer  "average_sync_time_in_ms",                 default: 0
+    t.datetime "last_synced_at"
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
+    t.integer  "third_party_integration_sync_jobs_count", default: 0
+  end
+
+  add_index "third_party_integrations", ["account_id", "enabled"], name: "index_third_party_integrations_on_account_id_and_enabled", using: :btree
+  add_index "third_party_integrations", ["account_id", "type"], name: "index_third_party_integrations_on_account_id_and_type", using: :btree
+  add_index "third_party_integrations", ["account_id"], name: "index_third_party_integrations_on_account_id", using: :btree
 
   create_table "user_acls", id: false, force: :cascade do |t|
     t.integer "user_id",                           null: false

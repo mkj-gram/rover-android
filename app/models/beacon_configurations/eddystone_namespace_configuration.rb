@@ -1,6 +1,7 @@
 class EddystoneNamespaceConfiguration < BeaconConfiguration
     include Elasticsearch::Model
     include Elasticsearch::Model::Callbacks
+    include EddystoneNamespaceAttributes
 
     index_name BeaconConfiguration.index_name
     document_type "eddystone_namespace_configuration"
@@ -8,11 +9,15 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     mapping do
         indexes :account_id, type: 'long', index: 'not_analyzed'
         indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
-        indexes :tags, type: 'string'
+        indexes :tags, type: 'string', index: 'not_analyzed'
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
-        indexes :namespace, type: 'string', index: 'not_analyzed'
+        indexes :namespace, type: 'string', analyzer: "lowercase_keyword", search_analyzer: "lowercase_keyword"
         indexes :instance_id, type: 'string', index: 'not_analyzed'
         indexes :created_at, type: 'date'
+        indexes :devices_meta, type: 'object' do
+            indexes :type, type: 'string', index: "no"
+            indexes :count, type: 'integer', index: "no"
+        end
         # didn't get to work but we should learn this for future
         indexes :suggest_tags, type: 'completion', analyzer: 'simple', search_analyzer: 'simple', payloads: false, context: {
             account_id: {
@@ -27,8 +32,6 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     end
 
 
-    before_validation :clear_unused_attributes
-    before_validation :upcase_namespace
 
     validates :namespace, presence: true
     validates :instance_id, presence: true
@@ -50,14 +53,9 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         @protocol ||= "Eddystone"
     end
 
-    private
-
-    def upcase_namespace
-        self.namespace.upcase
+    def beacon_devices
+        BeaconDevice.where(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id)
     end
 
-    def clear_unused_attributes
-        blacklist_attributes = [:uuid, :major, :minor, :url]
-        blacklist_attributes.each {|attr| self[attr] = nil }
-    end
+
 end

@@ -17,7 +17,7 @@ class V1::ApplicationController < ActionController::API
 
 
     def application_api_key_header
-        return "X-Rover-REST-API-Key"
+        return "X-Rover-Api-Key"
     end
 
     rescue_from(ActionController::ParameterMissing) do |parameter_missing_exception|
@@ -56,6 +56,12 @@ class V1::ApplicationController < ActionController::API
     end
 
 
+    def convert_param_if_exists(local_params, from_key, to_key)
+        if local_params.include?(from_key)
+            local_params[to_key] = local_params[from_key]
+            local_params.delete(from_key)
+        end
+    end
 
     private
 

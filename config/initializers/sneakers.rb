@@ -25,7 +25,7 @@ Sneakers.configure (
         :log  => log,     # Log file
         :pid_path => 'pid/sneakers.pid', # Pid file
 
-        :timeout_job_after => 5,      # Maximal seconds to wait for job
+        :timeout_job_after => 1800,      # Maximal seconds to wait for job
         :prefetch => 10,              # Grab 10 jobs together. Better speed.
         :threads => 10,               # Threadpool size (good to match prefetch)
         :env => ENV['RACK_ENV'],      # Environment

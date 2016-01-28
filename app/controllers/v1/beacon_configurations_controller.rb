@@ -2,74 +2,74 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     before_action :authenticate
 
     def index
-        filter = {
-            bool: {
-                should: [
-                    {
-                        term: {
-                            account_id: current_account.id
-                        }
-                    },
-                    {
-                        term: {
-                            shared_account_ids: current_account.id
-                        }
-                    }
-                ],
-                must: []
+
+
+        # protocols can be an array
+        # we want ones which have been shared
+        # we should match our account_id all the time?
+        # no if I was looking for just beacons shared with me then i wouldn't want my term to match
+
+
+
+        types = []
+        should_query = []
+        should_filter = []
+        must_filer = []
+
+        # we are grabbing all of our beacons
+        should_filter.push(
+            {
+                term: {
+                    account_id: current_account.id
+                }
             }
-        }
+        )
 
-        # all fields unless a protocol is speicifed
-        query_multi_match_fields = ["uuid", "major", "minor", "namespace", "namespace_id", "url"]
+        if query_protocols.empty?
+            protocols = [IBeaconConfiguration.protocol, EddystoneNamespaceConfiguration.protocol, UrlConfiguration.protocol]
+        else
+            protocols = query_protocols
+        end
 
-        if !query_protocol.nil?
-            if query_protocol == IBeaconConfiguration.protocol
-                filter[:bool][:must].push(
-                    {
-                        type: {
-                            value: "ibeacon_configuration"
+        if protocols.include?(IBeaconConfiguration.protocol)
+            types.push(IBeaconConfiguration)
+            if query_keyword
+                [:uuid, :major, :minor].each do |field|
+                    should_query.push(
+                        {
+                            match: {
+                                field => query_keyword
+                            }
                         }
-                    }
-                )
-
-                query_multi_match_fields = ["uuid", "major", "minor"]
-
-            elsif query_protocol == EddystoneNamespaceConfiguration.protocol
-                filter[:bool][:must].push(
-                    {
-                        type: {
-                            value: "eddystone_namespace_configuration"
-                        }
-                    }
-                )
-
-                query_multi_match_fields = ["namespace", "namespace_id"]
-
-            elsif query_protocol == UrlConfiguration.protocol
-                filter[:bool][:must].push(
-                    {
-                        type: {
-                            value: "url_configuration"
-                        }
-                    }
-                )
-
-                query_multi_match_fields = ["url"]
-            else
-                # they are specifying a protocol which doesn't exist
-                render_empty_data
-                return
+                    )
+                end
             end
         end
 
+        if protocols.include?(EddystoneNamespaceConfiguration.protocol)
+            types.push(EddystoneNamespaceConfiguration)
+            if query_keyword
+                [:namespace, :namespace_id].each do |field|
+                    should_query.push(
+                        {
+                            match: {
+                                field => query_keyword
+                            }
+                        }
+                    )
+                end
+            end
+        end
 
+        if protocols.include?(UrlConfiguration.protocol)
+            types.push(UrlConfiguration)
+        end
 
-
-        if !query_tags.nil?
-            filter[:bool][:must].push(
+        # if tags are provided they must all match
+        if query_tags.any?
+            must_filer.push(
                 {
-                    terms: {
+                    terms:  {
                         tags: query_tags,
                         execution: "and"
                     }
@@ -77,53 +77,58 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             )
         end
 
-        if !query_keyword.nil?
-
-            query = {
-                bool: {
-                    should: [
-                        {
-                            match_phrase: {
-                                title: query_keyword
-                            }
-                        },
-                        {
-                            multi_match: {
-                                query: query_keyword,
-                                fields: query_multi_match_fields
-                            }
-                        }
-                    ]
-                }
-            }
-        else
-            query = {match_all:{}}
-        end
-
-        querybuilder = {
-            query: {
-                filtered: {
-                    query: query,
-                    filter: filter
-                }
-            }
-        }
-
-        if query_keyword.nil? && query_tags.nil?
-            querybuilder.merge!(
+        if query_keyword
+            should_query.push(
                 {
-                    sort: [
-                        {
-                            created_at: {
-                                order: "desc"
-                            }
-                        }
-                    ]
+                    match_phrase: {
+                        title: query_keyword
+                    }
                 }
             )
         end
 
-        configurations = BeaconConfiguration.__elasticsearch__.search(querybuilder)
+        if query_keyword.nil? && query_tags.empty?
+            query = {
+                query: {
+                    filtered: {
+                        query: {match_all: {}},
+                        filter: {
+                            bool: {
+                                should: should_filter,
+                                must: must_filer
+                            }
+                        }
+                    }
+                },
+                sort: [
+                    {
+                        created_at: {
+                            order: "desc"
+                        }
+                    }
+                ]
+            }
+        else
+            query = {
+                query: {
+                    filtered: {
+                        query: {
+                            bool: {
+                                should: should_query
+                            }
+                        },
+                        filter: {
+                            bool: {
+                                should: should_filter,
+                                must: must_filer
+                            }
+                        }
+                    }
+                }
+            }
+        end
+
+        configurations = Elasticsearch::Model.search(query, types)
         results = configurations.per_page(page_size).page(current_page).results
         json  = {
             "data" => results.map do |config|
@@ -137,9 +142,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             end,
             "meta" => {
                 "totalRecords" => results.total,
-                "totalPages" => results.total_pages
+                "totalPages" => results.total_pages,
+                "totalSearchableRecords" => current_account.searchable_beacon_configurations_count
             },
-            "links" => pagination_links(v1_beacon_configuration_index_url, results)
+            "links" => pagination_links(v1_beacon_configuration_index_url, results, {start_at: 0})
         }
 
         render json: json
@@ -153,12 +159,17 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def destroy
+
     end
 
     private
 
+    def configuration_params(local_params)
+
+    end
+
     def filter_params
-        params.fetch(:filter, {}).permit(:protocol, {:tags => []}, :query)
+        params.fetch(:filter, {}).permit(:query, :protocol, {:protocols => []}, {:tags => []})
     end
 
     def query_keyword
@@ -166,11 +177,23 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def query_tags
-        filter_params.fetch(:tags, nil)
+        @query_tags ||= filter_params.fetch(:tags, [])
     end
 
+    # depreciated
     def query_protocol
-        filter_params.fetch(:protocol, nil)
+        @query_protocol ||= filter_params.fetch(:protocol, nil)
+    end
+
+    def query_protocols
+        @query_protocols ||= -> {
+            protocols = filter_params.fetch(:protocols, [])
+            protocol = filter_params.fetch(:protocol, nil)
+            if protocols.empty? && !protocol.nil?
+                protocols = [protocol]
+            end
+            return protocols
+        }.call
     end
 
 
@@ -183,7 +206,9 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "name" => source.title,
                 "tags" => source.tags,
                 "shared" => source.shared,
-                "enabled" => source.enabled
+                "enabled" => source.enabled,
+                "device-type" => source.devices_meta[:type],
+                "device-count" => source.devices_meta[:count] || 0
             }.merge(extra_attributes)
         }
     end

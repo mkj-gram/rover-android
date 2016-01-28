@@ -24,7 +24,7 @@ gem 'puma', '~> 2.15', '>= 2.15.3'
 
 gem 'connection_pool', '~> 2.2'
 
-gem 'active_model_serializers', :git => "https://github.com/rails-api/active_model_serializers.git"
+gem 'active_model_serializers', :git => "https://github.com/rails-api/active_model_serializers.git", :ref => "58ff7535b7d619028d542f49831d43504b5d89be"
 
 gem 'classy_hash', '~> 0.1.5'
 
@@ -42,6 +42,10 @@ gem 'faker', '~> 1.6', '>= 1.6.1'
 
 gem 'colorize', '~> 0.7.7'
 
+gem 'attr_encrypted', '~> 1.3', '>= 1.3.5'
+
+gem 'httparty', '~> 0.13.7'
+
 group :development do
 
 
@@ -53,4 +57,6 @@ group :test do
     gem 'factory_girl_rails', '~> 4.5'
 
     gem 'rspec-rails', '~> 3.0'
+
+    gem 'database_cleaner', '~> 1.5', '>= 1.5.1'
 end

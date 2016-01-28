@@ -50,6 +50,32 @@ Rails.application.routes.draw do
         resources :sessions, only: [:create, :show, :destroy]
 
         resources "configurations", controller: "beacon_configurations", as: "beacon_configuration"
+
+        resources :integrations, only: [:index, :show, :create, :update, :destroy] do
+            scope module: "integrations" do
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            end
+        end
+
+        resources "estimote-integrations", controller: "integrations", as: "estimote_integrations", only: [:index, :show, :create, :update, :destroy], integration_type: "estimote-integrations" do
+            scope module: "integrations" do
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            end
+        end
+
+        resources "kontakt-integrations", controller: "integrations", as: "kontakt_integrations", only: [:index, :show, :create, :update, :destroy], integration_type: "kontakt-integrations" do
+            scope module: "integrations" do
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            end
+        end
+
+
+        scope module: "integrations" do
+            resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+        end
+
+        get "/regions", to: 'regions#index', as: "regions"
+
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

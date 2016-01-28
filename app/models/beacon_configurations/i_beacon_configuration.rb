@@ -1,6 +1,7 @@
 class IBeaconConfiguration < BeaconConfiguration
     include Elasticsearch::Model
     include Elasticsearch::Model::Callbacks
+    include IBeaconAttributes
 
     index_name BeaconConfiguration.index_name
     document_type "ibeacon_configuration"
@@ -9,12 +10,16 @@ class IBeaconConfiguration < BeaconConfiguration
     mapping do
         indexes :account_id, type: 'long', index: 'not_analyzed'
         indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
-        indexes :tags, type: 'string'
+        indexes :tags, type: 'string', index: 'not_analyzed'
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
-        indexes :uuid, type: 'string', index: 'not_analyzed'
+        indexes :uuid, type: 'string', analyzer: "lowercase_keyword", search_analyzer: "lowercase_keyword"
         indexes :major, type: 'string', index: 'not_analyzed'
         indexes :minor, type: 'string', index: 'not_analyzed'
         indexes :created_at, type: 'date'
+        indexes :devices_meta, type: 'object' do
+            indexes :type, type: 'string', index: "no"
+            indexes :count, type: 'integer', index: "no"
+        end
         # didn't get to work but we should learn this for future
         indexes :suggest_tags, type: 'completion', analyzer: 'simple', search_analyzer: 'simple', payloads: false, context: {
             account_id: {
@@ -28,18 +33,21 @@ class IBeaconConfiguration < BeaconConfiguration
         }
     end
 
-    before_validation :clear_unused_attributes
-    before_validation :upcase_uuid
-
     validates :account_id, presence: true
     validates :uuid, presence: true, :format => {:with => /[A-Za-z\d]([-\w]{,498}[A-Za-z\d])?/i}
     validates :major, presence: true
     validates :minor, presence: true
-    validate :uuid_account_owner
-    validate :unique_ibeacon
+    # don't enforce an account owner
+    # validate :uuid_account_owner
+    # validate :unique_ibeacon
+
 
     def self.protocol
         @protocol ||= "iBeacon"
+    end
+
+    def beacon_devices
+        BeaconDevice.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor)
     end
 
     def as_indexed_json(options = {})
@@ -55,11 +63,21 @@ class IBeaconConfiguration < BeaconConfiguration
         return json
     end
 
+    def attributes_json
+        json = super
+        json.merge!(
+            {
+                protocol: self.protocol,
+                uuid: self.uuid,
+                major: self.major,
+                minor: self.minor
+            }
+        )
+        return json
+    end
+
     private
 
-    def upcase_uuid
-        self.uuid.upcase
-    end
 
     def uuid_account_owner
         if self.uuid_changed?
@@ -78,8 +96,4 @@ class IBeaconConfiguration < BeaconConfiguration
         end
     end
 
-    def clear_unused_attributes
-        blacklist_attributes = [:namespace, :instance_id, :url]
-        blacklist_attributes.each {|attr| self[attr] = nil }
-    end
 end

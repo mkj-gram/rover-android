@@ -18,6 +18,9 @@
     "SECRET_KEY_BASE": {
       "required": true
     },
+    "SECRET_ENCRYPTION_KEY": {
+      "required": true
+    },
     "POSTGRESQL_DB_USERNAME": {
       "required": true
     },
@@ -39,7 +42,7 @@
     "MAILGUN_API_URL": {
         "required": true
     },
-    "PASSWORD_RESET_URL": {
+    "PASSWORD_RESET_HOST": {
       "required": true
     },
     "ELASTICSEARCH_URLS": {

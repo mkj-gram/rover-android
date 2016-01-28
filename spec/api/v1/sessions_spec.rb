@@ -59,7 +59,7 @@ describe "/v1/sessions", :type => :request do
 
                 different_account = create(:different_account)
 
-                delete "/v1/sessions/1", nil, {'X-Rover-REST-API-Key' => different_account.token}
+                delete "/v1/sessions/#{session.id}", nil, signed_request_header(different_account)
 
                 expect(response).to have_http_status(401)
 
@@ -70,7 +70,7 @@ describe "/v1/sessions", :type => :request do
             it 'returns 204 no content' do
                 session = create(:session)
 
-                delete "/v1/sessions/1", nil, {'X-Rover-REST-API-Key' => session.account.token}
+                delete "/v1/sessions/#{session.id}", nil, signed_request_header(session.account)
 
                 expect(response).to have_http_status(204)
             end
@@ -80,7 +80,7 @@ describe "/v1/sessions", :type => :request do
             it 'returns 204 no content' do
                 session = create(:session)
 
-                delete "/v1/sessions/1", nil, {'Authorization' => "Bearer #{session.token}"}
+                delete "/v1/sessions/#{session.id}", nil, {'Authorization' => "Bearer #{session.token}"}
 
                 expect(response).to have_http_status(204)
             end

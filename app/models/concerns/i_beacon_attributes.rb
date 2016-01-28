@@ -1,0 +1,48 @@
+module IBeaconAttributes
+    extend ActiveSupport::Concern
+
+    included do
+        before_validation :clear_unused_attributes
+        before_validation :upcase_uuid
+
+        validates :uuid, presence: true
+        validates :major, presence: true
+        validates :minor, presence: true
+    end
+
+    def namespace=(v)
+        v
+    end
+
+    def instance_id=(v)
+        v
+    end
+
+    def url=(v)
+        v
+    end
+
+    def uuid_changed?
+        changes.include?(:uuid)
+    end
+
+    def major_changed?
+        changes.include?(:major)
+    end
+
+    def minor_changed?
+        changes.include?(:minor)
+    end
+
+
+    private
+
+    def upcase_uuid
+        self.uuid.upcase if !self.uuid.nil?
+    end
+
+    def clear_unused_attributes
+        blacklist_attributes = [:namespace, :instance_id, :url]
+        blacklist_attributes.each {|attr| self[attr] = nil }
+    end
+end
