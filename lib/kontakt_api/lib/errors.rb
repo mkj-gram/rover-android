@@ -1,5 +1,5 @@
 require_relative 'errors/unauthorized'
-module EstimoteApi
+module KontaktApi
     module Errors
     end
 end

@@ -12,12 +12,11 @@ module EstimoteApi
 
         def beacons(options = {})
             response = self.class.get('/beacons', options)
-            p response.response.code
             if response.response.code == "200"
                 parsed_beacons = response.parsed_response
                 estimote_beacons = parsed_beacons.map!{|config| Beacon.new(config)}
                 return parsed_beacons
-            elsif response.response.code == "403"
+            elsif response.response.code == "403" || response.response.code == "401"
                 raise EstimoteApi::Errors::Unauthorized, "invalid credentials"
             else
                 []

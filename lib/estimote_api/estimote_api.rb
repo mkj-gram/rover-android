@@ -1,7 +1,6 @@
-require 'httparty'
-require 'lib/client'
-require 'lib/beacon'
-require 'lib/errors'
+require_relative 'lib/client'
+require_relative 'lib/beacon'
+require_relative 'lib/errors'
 
 module EstimoteApi
     class << self

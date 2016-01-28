@@ -1,26 +1,13 @@
-require 'httparty'
-require 'lib/device'
+require_relative 'lib/client'
+require_relative 'lib/device'
+require_relative 'lib/errors'
 
-class KontaktApi
-    include HTTParty
-    base_uri "https://api.kontakt.io"
-    format :json
-    headers 'Accept' => 'application/vnd.com.kontakt+json; version=7'
+module KontaktApi
+    class << self
 
-    def initialize(api_key)
-        self.class.headers({'Api-key' => api_key})
-    end
-
-
-    def devices(options = {})
-        options.merge!({query: {deviceType: "BEACON"}})
-        response = self.class.get('/device', options)
-        if response.response.code == "200"
-            parsed_response = response.parsed_response["devices"]
-            kontakt_beacons = parsed_response.map!{|config| Device.new(config)}
-            return kontakt_beacons
-        else
-            return []
+        def new(api_key)
+            KontaktApi::Client.new(api_key)
         end
+
     end
 end
