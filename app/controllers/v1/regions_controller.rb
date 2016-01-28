@@ -56,7 +56,7 @@ class V1::RegionsController < V1::ApplicationController
             geofence_regions = []
         end
 
-        data = ibeacon_regions.map{|ibeacon_region| serialize_ibeacon_region(ibeacon_region)} + geofence_regions
+        data = (ibeacon_regions.map{|ibeacon_region| serialize_ibeacon_region(ibeacon_region)} + geofence_regions).first(page_size)
         json = {
             "data" => data
         }
