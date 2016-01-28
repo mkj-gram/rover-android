@@ -23,7 +23,7 @@ class EstimoteDevice < BeaconDevice
             range: beacon.range,
             power: beacon.power,
             mac: beacon.mac,
-            battery_life_expectancy_in_days: beacon.battery_life_expectancy_in_days
+            battery_life_expectancy_in_days: beacon.battery_life_expectancy_in_days,
         }
     end
 
