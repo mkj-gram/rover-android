@@ -3,14 +3,14 @@ require 'bunny'
 require 'mail_client'
 
 class SendEmailWorker
-    include Sneakers::Worker
+    include BackgroundWorker::Worker
 
     from_queue 'send_email'
 
 
     def self.perform_async(from, to, subject, html)
         msg = {from: from, to: to, subject: subject, html: html}.to_json
-        RabbitMQPublisher.publish(msg, {to_queue: 'send_email'})
+        enqueue_message(msg, {to_queue: 'send_email'})
     end
 
     def work(msg)

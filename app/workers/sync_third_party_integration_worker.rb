@@ -1,11 +1,11 @@
 class SyncThirdPartyIntegrationWorker
-    include Sneakers::Worker
+    include BackgroundWorker::Worker
 
     from_queue 'third_party_integrations_sync_devices'
 
     def self.perform_async(sync_job_id)
         msg = {id: sync_job_id}.to_json
-        RabbitMQPublisher.publish(msg, {to_queue: 'third_party_integrations_sync_devices'})
+        enqueue_message(msg, {to_queue: 'third_party_integrations_sync_devices'})
     end
 
     def work(msg)

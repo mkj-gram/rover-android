@@ -24,7 +24,7 @@ gem 'puma', '~> 2.15', '>= 2.15.3'
 
 gem 'connection_pool', '~> 2.2'
 
-gem 'active_model_serializers', :git => "https://github.com/rails-api/active_model_serializers.git"
+gem 'active_model_serializers', :git => "https://github.com/rails-api/active_model_serializers.git", :ref => "58ff7535b7d619028d542f49831d43504b5d89be"
 
 gem 'classy_hash', '~> 0.1.5'
 
