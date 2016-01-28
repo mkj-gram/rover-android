@@ -78,8 +78,12 @@ class IBeaconConfiguration < BeaconConfiguration
         return json
     end
 
-    def beacon_devices
-        @beacon_devices ||= BeaconDevice.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor)
+    def region_id(opts = {})
+        id = "#{self.uuid}"
+        id.concat(":#{self.major}") if opts[:include_major]
+        id.concat(":-")             if !opts[:include_major] && opts[:include_minor]
+        id.concat(":#{self.minor}") if opts[:include_minor]
+        return id
     end
 
     private
