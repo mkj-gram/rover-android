@@ -156,14 +156,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def update
-        # this
-        # name
-        # enabled
-        # tags
-        # json = flatten_request({single_record: true})
-        # local_params = user_params(json[:data])
-        # if user.update(user_params(json[:data]))
-        # end
     end
 
     def destroy
