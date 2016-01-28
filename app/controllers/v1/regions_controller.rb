@@ -17,7 +17,7 @@ class V1::RegionsController < V1::ApplicationController
             geofence_regions = [
                 {
                     "type" => "geofence-regions",
-                    "id" => "43.7680567999999965:-79.4219654999999989",
+                    "id" => "1",
                     "attributes" => {
                         "radius": 50,
                         "longitude": -79.4219654999999989,
@@ -26,7 +26,7 @@ class V1::RegionsController < V1::ApplicationController
                 },
                 {
                     "type" => "geofence-regions",
-                    "id" => "43.7686240183319342:-79.4141962923431493",
+                    "id" => "2",
                     "attributes" => {
                         "radius": 89,
                         "longitude": -79.4141962923431493,
@@ -35,7 +35,7 @@ class V1::RegionsController < V1::ApplicationController
                 },
                 {
                     "type" => "geofence-regions",
-                    "id" => "43.7680567999999965:-79.4219654999999989",
+                    "id" => "3",
                     "attributes" => {
                         "radius": 50,
                         "longitude": -79.4219654999999989,
@@ -44,7 +44,7 @@ class V1::RegionsController < V1::ApplicationController
                 },
                 {
                     "type" => "geofence-regions",
-                    "id" => "43.7686240183319342:-79.4141962923431493",
+                    "id" => "4",
                     "attributes" => {
                         "radius": 89,
                         "longitude": -79.4141962923431493,
