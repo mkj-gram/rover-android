@@ -1,6 +1,7 @@
 class CreateBeaconDevices < ActiveRecord::Migration
     def change
         create_table :beacon_devices do |t|
+            t.integer :account_id, null: false
             t.integer :third_party_integration_id, null: false
             t.string :manufacturer_id, null: false
             t.string :type, null: false
@@ -26,12 +27,12 @@ class CreateBeaconDevices < ActiveRecord::Migration
             t.jsonb :device_data, default: {}
         end
 
-        add_index :beacon_devices, :manufacturer_id, unique: true
+        add_index :beacon_devices, [:account_id, :manufacturer_id], unique: true
         add_index :beacon_devices, :third_party_integration_id
 
-        add_index :beacon_devices, [:uuid, :major, :minor]
-        add_index :beacon_devices, [:namespace, :instance_id]
-        add_index :beacon_devices, :url
+        add_index :beacon_devices, [:account_id, :uuid, :major, :minor]
+        add_index :beacon_devices, [:account_id, :namespace, :instance_id]
+        add_index :beacon_devices, [:account_id, :url]
     end
 end
 

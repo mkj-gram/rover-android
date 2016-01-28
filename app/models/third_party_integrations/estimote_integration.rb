@@ -80,6 +80,7 @@ class EstimoteIntegration < ThirdPartyIntegration
             next if device.nil?
 
             estimote_manufacturer_ids.add(device.manufacturer_id)
+            device.account_id = self.account_id
             device.third_party_integration_id = self.id
             device.skip_cache_update = true
             estimote_devices[device.manufacturer_id] = device
@@ -98,7 +99,7 @@ class EstimoteIntegration < ThirdPartyIntegration
 
         # with new devices we can just create their configs and if they exist oh well
         new_devices.each do |manufacturer_id, device|
-            if device.save && new_config = device.create_configuration(self.account_id)
+            if device.save && new_config = device.create_configuration
                 stats[:added_devices_count] += 1
                 configurations_modified.add(new_config) if new_config != nil
             end
@@ -108,12 +109,12 @@ class EstimoteIntegration < ThirdPartyIntegration
         existing_devices_need_update.each do |manufacturer_id, device|
             existing_configuration = device.configuration
             if existing_configuration.nil?
-                existing_configuration = device.create_configuration(self.account_id)
+                existing_configuration = device.create_configuration
             end
             configurations_modified.add(existing_configuration) if existing_configuration != nil
             device.overwrite_attributes_with_device(estimote_devices[manufacturer_id])
 
-            if device.save && new_config = device.create_configuration(self.account_id)
+            if device.save && new_config = device.create_configuration
                 if (existing_configuration && new_config) && (existing_configuration.id != new_config.id)
                     stats[:devices_changed_configuration_count] += 1
                 else

@@ -35,13 +35,13 @@ module EddystoneNamespaceDevice
     end
 
     def configuration
-        EddystoneNamespaceConfiguration.where(namespace: self.namespace, instance_id: self.instance_id).first
+        EddystoneNamespaceConfiguration.where(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id).first
     end
 
     def create_configuration(account_id)
-        configuration = EddystoneNamespaceConfiguration.where(namespace: self.namespace, instance_id: self.instance_id).limit(1)[0]
+        configuration = EddystoneNamespaceConfiguration.where(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id).limit(1)[0]
         if configuration.nil?
-            configuration = EddystoneNamespaceConfiguration.new(account_id: account_id, namespace: self.namespace, instance_id: self.instance_id, title: self.configuration_name)
+            configuration = EddystoneNamespaceConfiguration.new(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id, title: self.configuration_name)
             configuration.save
         end
         return configuration
@@ -52,7 +52,7 @@ module EddystoneNamespaceDevice
 
     def update_beacon_configuration
         if self.skip_cache_update == false && (namespace_changed? || instance_id_changed?)
-            configuration = EddystoneNamespaceConfiguration.where(namespace: self.namespace, instance_id: self.instance_id).first
+            configuration = EddystoneNamespaceConfiguration.where(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id).first
             configuration.update({beacon_devices_updated_at: DateTime.now}) if configuration
         end
     end

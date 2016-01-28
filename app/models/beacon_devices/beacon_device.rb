@@ -14,6 +14,7 @@ class BeaconDevice < ActiveRecord::Base
 
     belongs_to :third_party_integration
     belongs_to :beacon_configuration
+    belongs_to :account
 
     # validate :belongs_to_a_beacon_configuration
 
