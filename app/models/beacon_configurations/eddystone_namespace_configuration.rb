@@ -31,12 +31,6 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         }
     end
 
-
-
-    validates :namespace, presence: true
-    validates :instance_id, presence: true
-
-
     def as_indexed_json(options = {})
         json = super(options)
         json.merge!(

@@ -167,7 +167,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         if !protocol.nil?
             if @@protocol_types.include?(protocol)
                 @beacon_configuration = build_beacon_configuration(json[:data], protocol)
-                # p @beacon_configuration and return
                 if @beacon_configuration.save
                     render_beacon_configuration(@beacon_configuration)
                 else

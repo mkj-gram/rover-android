@@ -5,7 +5,7 @@ module IBeaconAttributes
         before_validation :clear_unused_attributes
         before_validation :upcase_uuid
 
-        validates :uuid, presence: true
+        validates :uuid, presence: true, :format => {:with => /[A-Za-z\d]([-\w]{,498}[A-Za-z\d])?/i}
         validates :major, presence: true
         validates :minor, presence: true
     end

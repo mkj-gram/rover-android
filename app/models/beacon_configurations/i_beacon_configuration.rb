@@ -34,9 +34,6 @@ class IBeaconConfiguration < BeaconConfiguration
     end
 
     validates :account_id, presence: true
-    validates :uuid, presence: true, :format => {:with => /[A-Za-z\d]([-\w]{,498}[A-Za-z\d])?/i}
-    validates :major, presence: true
-    validates :minor, presence: true
     # don't enforce an account owner
     # validate :uuid_account_owner
     # validate :unique_ibeacon
