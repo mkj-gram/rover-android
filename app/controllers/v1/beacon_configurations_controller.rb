@@ -156,7 +156,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
         if @beacon_configuration
             json = serialize_beacon(@beacon_configuration)
-            devices = @beacon_configuration.beacon_devices.all
+            devices = @beacon_configuration.beacon_devices.all.to_a
             if devices.any?
                 grouped_devices = devices.group_by { |beacon| beacon.manufacturer }
                 # add relationship of estimote device
