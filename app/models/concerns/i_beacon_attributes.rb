@@ -37,8 +37,8 @@ module IBeaconAttributes
     def configuration_attributes
         {
             uuid: self.uuid,
-            :"major-number": self.major,
-            :"minor-number": self.minor
+            :"major-number" => self.major,
+            :"minor-number" => self.minor
         }
     end
 
