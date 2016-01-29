@@ -2,6 +2,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema,    only: [:create, :update]
 
+    @@protocol_types = Set.new([IBeaconConfiguration.protocol, EddystoneNamespaceConfiguration.protocol, UrlConfiguration.protocol])
+
     def index
 
 
@@ -160,6 +162,23 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def create
         # this we need a protocol?
+        json = flatten_request({single_record: true})
+        protocol = json.dig(:data, :configurations, :protocol)
+        if !protocol.nil?
+            if @@protocol_types.include?(protocol)
+                @beacon_configuration = build_beacon_configuration(json[:data], protocol)
+                # p @beacon_configuration and return
+                if @beacon_configuration.save
+                    render_beacon_configuration(@beacon_configuration)
+                else
+                    render json: { errors: V1::BeaconConfigurationCreateErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                end
+            else
+                render json: {errors: [{detail: "has to be of type (#{@@protocol_types.map(&:to_s).join(", ")})", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
+            end
+        else
+            render json: {errors: [{detail: "can't be blank", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
+        end
     end
 
     def update
@@ -221,9 +240,47 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }.call
     end
 
+    def beacon_configuration_params(local_params)
+        local_params.fetch(:configurations, {}).permit(:name, :enabled, {tags: []})
+    end
+
+    def ibeacon_configuration_params(local_params)
+        local_params.fetch(:configurations, {}).permit(:uuid, :major, :minor)
+    end
+
+    def eddystone_namespace_configuration_params(local_params)
+        convert_param_if_exists(local_params[:configurations], :"instance-id", :instance_id)
+        local_params.fetch(:configurations, {}).permit(:namespace, :instance_id)
+    end
+
+    def url_configuration_params(local_params)
+        local_params.fetch(:configurations, {}).permit(:url)
+    end
+
+    def build_beacon_configuration(local_params, protocol)
+        beacon_opts = beacon_configuration_params(local_params)
+        case protocol
+        when IBeaconConfiguration.protocol
+            opts = beacon_opts.merge(ibeacon_configuration_params(local_params)).merge(account_id: current_account.id)
+            beacon_configuration = IBeaconConfiguration.new(opts)
+
+        when EddystoneNamespaceConfiguration.protocol
+            opts = beacon_opts.merge(eddystone_namespace_configuration_params(local_params)).merge(account_id: current_account.id)
+            beacon_configuration = EddystoneNamespaceConfiguration.new(opts)
+
+        when UrlConfiguration.protocol
+            opts = beacon_opts.merge(url_configuration_params(local_params)).merge(account_id: current_account.id)
+            beacon_configuration = UrlConfiguration.new(opts)
+        else
+            nil
+        end
+    end
+
     def render_beacon_configuration(beacon_configuration)
         if beacon_configuration
-            json = serialize_beacon(beacon_configuration, {protocol: beacon_configuration.protocol})
+            json = {
+                "data" => serialize_beacon(beacon_configuration, {protocol: beacon_configuration.protocol})
+            }
             devices = beacon_configuration.beacon_devices.all.to_a
             if devices.any?
                 grouped_devices = devices.group_by { |beacon| beacon.manufacturer }
