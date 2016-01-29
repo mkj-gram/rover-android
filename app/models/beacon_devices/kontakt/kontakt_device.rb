@@ -62,6 +62,10 @@ class KontaktDevice < BeaconDevice
         self.alias.nil? ? self.uniqueId : self.alias
     end
 
+    def model_type
+        return "kontakt-devices"
+    end
+
     def manufacturer
         return "kontakt"
     end

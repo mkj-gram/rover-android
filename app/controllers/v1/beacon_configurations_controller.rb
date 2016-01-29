@@ -282,17 +282,19 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             }
             devices = beacon_configuration.beacon_devices.all.to_a
             if devices.any?
-                grouped_devices = devices.group_by { |beacon| beacon.manufacturer }
-                # add relationship of estimote device
-                # add relationship for kontakt device
-                # add them in the include
-                json["relationships"] = {}
-                json["relationships"].merge!(serialize_estimote_relationships(grouped_devices["estimote"])) if grouped_devices.include?("estimote")
-                json["relationships"].merge!(serialize_kontakt_relationships(grouped_devices["kontakt"])) if grouped_devices.include?("kontakt")
+                json["data"].merge!(
+                    {
+                        "relationships" => {
+                            "devices" => {
+                                "data" => devices.map do |device|
+                                    {"type" => device.model_type, "id" => device.id.to_s}
+                                end
+                            }
+                        }
+                    }
+                )
 
-                included = []
-                included += grouped_devices["estimote"].map{|device| serialize_device(device, "estimote-devices")} if grouped_devices.include?("estimote")
-                included += grouped_devices["kontakt"].map{|device| serialize_device(device, "kontakt-devices")} if grouped_devices.include?("kontakt")
+                included = devices.map{|device| serialize_device(device)}
                 json["included"] = included
             end
 
@@ -370,21 +372,17 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }
     end
 
-    def serialize_device(device, type)
+    def serialize_device(device)
         {
-            "type" => type,
+            "type" => device.model_type,
             "id" => device.id.to_s,
             "attributes" => device.device_attributes.merge(device.configuration_attributes)
         }
     end
 
-    def serialize_estimote_relationships(estimote_devices)
-        {
-            "estimote-devices" => {
-                "data" => estimote_devices.map{|device| {type: "estimote-devices", id: device.id.to_s}}
-            }
-        }
-    end
+    # def serialize_estimote_relationships(estimote_devices)
+    #     "data" => estimote_devices.map{|device| {type: "estimote-devices", id: device.id.to_s}}
+    # end
 
     def serialize_kontakt_relationships(kontakt_devices)
         {

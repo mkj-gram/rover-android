@@ -12,6 +12,7 @@ class EstimoteDevice < BeaconDevice
 
     before_create :set_manufacturer_id
 
+
     def self.attributes_for_beacon(beacon)
         {
             manufacturer_id: beacon.mac.downcase,
@@ -63,6 +64,10 @@ class EstimoteDevice < BeaconDevice
             mac: self.mac.scan(/.{1,2}/).map(&:upcase).join(":"),
             :"battery-life-expectancy-in-days" => self.battery_life_expectancy_in_days,
         }
+    end
+
+    def model_type
+        return "estimote-devices"
     end
 
     def manufacturer
