@@ -42,12 +42,9 @@ class IBeaconConfiguration < BeaconConfiguration
     # validate :unique_ibeacon
 
 
+
     def self.protocol
         @protocol ||= "iBeacon"
-    end
-
-    def beacon_devices
-        BeaconDevice.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor)
     end
 
     def as_indexed_json(options = {})
@@ -74,6 +71,10 @@ class IBeaconConfiguration < BeaconConfiguration
             }
         )
         return json
+    end
+
+    def beacon_devices
+        @beacon_devices ||= BeaconDevice.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor)
     end
 
     private

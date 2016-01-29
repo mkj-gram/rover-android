@@ -45,6 +45,19 @@ class KontaktDevice < BeaconDevice
         self.alias      = other.alias
     end
 
+    def device_attributes
+        {
+            uniqueId: self.uniqueId,
+            specification: self.specification,
+            name: self.name,
+            battery: self.battery,
+            interval: self.interval,
+            firmware: self.firmware,
+            power: self.power,
+            alias: self.alias,
+        }
+    end
+
     def configuration_name
         self.alias.nil? ? self.uniqueId : self.alias
     end

@@ -133,11 +133,11 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         json  = {
             "data" => results.map do |config|
                 if config._type == IBeaconConfiguration.document_type
-                    serialize_ibeacon(config)
+                    elasticsearch_serialize_ibeacon(config)
                 elsif config._type == EddystoneNamespaceConfiguration.document_type
-                    serialize_eddystone_namespace(config)
+                    elasticsearch_serialize_eddystone_namespace(config)
                 elsif config._type == UrlConfiguration.document_type
-                    serialize_url(config)
+                    elasticsearch_serialize_url(config)
                 end
             end,
             "meta" => {
@@ -151,11 +151,39 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         render json: json
     end
 
+    def show
+        # show a detail view of the beacon
+        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
+        if @beacon_configuration
+            json = serialize_beacon(@beacon_configuration)
+            devices = @beacon_configuration.beacon_devices.all
+            if devices.any?
+                grouped_devices = devices.group_by { |beacon| beacon.manufacturer }
+                # add relationship of estimote device
+                # add relationship for kontakt device
+                # add them in the include
+                json["relationships"] = {}
+                json["relationships"].merge!(serialize_estimote_relationships(grouped_devices["estimote"])) if grouped_devices.include?("estimote")
+                json["relationships"].merge!(serialize_kontakt_relationships(grouped_devices["kontakt"])) if grouped_devices.include?("kontakt")
+
+                included = []
+                included += grouped_devices["estimote"].map{|device| serialize_device(device, "estimote-devices")} if grouped_devices.include?("estimote")
+                included += grouped_devices["kontakt"].map{|device| serialize_device(device, "kontakt-devices")} if grouped_devices.include?("kontakt")
+                json["included"] = included
+            end
+
+            render json: json
+        else
+            head :not_found
+        end
+    end
+
     def create
 
     end
 
     def update
+
     end
 
     def destroy
@@ -197,7 +225,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
 
-    def serialize_beacon(config, extra_attributes = {})
+    def elasticsearch_serialize_beacon(config, extra_attributes = {})
         source = config._source
         {
             "type" => "configurations",
@@ -213,9 +241,9 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }
     end
 
-    def serialize_ibeacon(config)
+    def elasticsearch_serialize_ibeacon(config)
         source = config._source
-        serialize_beacon(
+        elasticsearch_serialize_beacon(
             config,
             {
                 "protocol" => IBeaconConfiguration.protocol,
@@ -226,9 +254,9 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         )
     end
 
-    def serialize_eddystone_namespace(config)
+    def elasticsearch_serialize_eddystone_namespace(config)
         source = config._source
-        serialize_beacon(
+        elasticsearch_serialize_beacon(
             config,
             {
 
@@ -240,15 +268,54 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         )
     end
 
-    def serialize_url(config)
+    def elasticsearch_serialize_url(config)
         source = config._source
-        serialize_beacon(
+        elasticsearch_serialize_beacon(
             config,
             {
                 "protocol" => UrlConfiguration.protocol,
                 "url" => source.url
             }
         )
+    end
+
+
+    def serialize_beacon(beacon, extra_attributes = {})
+        # include the relationships
+        {
+            "type" => "configurations",
+            "id" => beacon.id.to_s,
+            "attributes" => {
+                "name" => beacon.title,
+                "tags" => beacon.tags,
+                "shared" => beacon.shared,
+                "enabled" => beacon.enabled
+            }.merge(extra_attributes)
+        }
+    end
+
+    def serialize_device(device, type)
+        {
+            "type" => type,
+            "id" => device.id.to_s,
+            "attributes" => device.device_attributes.merge(device.configuration_attributes)
+        }
+    end
+
+    def serialize_estimote_relationships(estimote_devices)
+        {
+            "estimote-devices" => {
+                "data" => estimote_devices.map{|device| {type: "estimote-devices", id: device.id.to_s}}
+            }
+        }
+    end
+
+    def serialize_kontakt_relationships(kontakt_devices)
+        {
+            "kontakt-devices" => {
+                "data" => kontakt_devices.map{|device| {type: "kontakt-devices", id: device.id.to_s}}
+            }
+        }
     end
 
     def render_empty_data
