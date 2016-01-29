@@ -74,6 +74,14 @@ class IBeaconConfiguration < BeaconConfiguration
         return json
     end
 
+    def configuration_attributes
+        {
+            uuid: self.uuid,
+            major: self.major,
+            minor: self.minor
+        }
+    end
+
     def beacon_devices
         @beacon_devices ||= BeaconDevice.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor)
     end

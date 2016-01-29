@@ -278,7 +278,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     def render_beacon_configuration(beacon_configuration)
         if beacon_configuration
             json = {
-                "data" => serialize_beacon(beacon_configuration, {protocol: beacon_configuration.protocol})
+                "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
             }
             devices = beacon_configuration.beacon_devices.all.to_a
             if devices.any?
@@ -357,17 +357,16 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
 
-    def serialize_beacon(beacon, extra_attributes = {})
-        # include the relationships
+    def serialize_beacon_configuration(beacon_configuration, extra_attributes = {})
         {
             "type" => "configurations",
-            "id" => beacon.id.to_s,
+            "id" => beacon_configuration.id.to_s,
             "attributes" => {
-                "name" => beacon.title,
-                "tags" => beacon.tags,
-                "shared" => beacon.shared,
-                "enabled" => beacon.enabled
-            }.merge(extra_attributes)
+                "name" => beacon_configuration.title,
+                "tags" => beacon_configuration.tags,
+                "shared" => beacon_configuration.shared,
+                "enabled" => beacon_configuration.enabled
+            }.merge(extra_attributes).merge(beacon_configuration.configuration_attributes)
         }
     end
 
