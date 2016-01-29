@@ -39,14 +39,6 @@ module IBeaconDevice
         !(self.uuid == other.uuid && self.major == other.major && self.minor == other.minor) || super(other)
     end
 
-    def configuration_attributes
-        {
-            uuid: self.uuid,
-            major: self.major,
-            minor: self.minor
-        }
-    end
-
     def create_configuration
         configuration = IBeaconConfiguration.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor).limit(1)[0]
         if configuration.nil?

@@ -34,6 +34,13 @@ module IBeaconAttributes
         changes.include?(:minor)
     end
 
+    def configuration_attributes
+        {
+            uuid: self.uuid,
+            major: self.major,
+            minor: self.minor
+        }
+    end
 
     private
 

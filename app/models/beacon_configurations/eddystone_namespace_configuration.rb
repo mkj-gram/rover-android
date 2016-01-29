@@ -42,14 +42,6 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         return json
     end
 
-    def configuration_attributes
-        {
-            namespace: self.namespace,
-            :"instance-id" => self.instance_id
-        }
-    end
-
-
     def self.protocol
         @protocol ||= "Eddystone"
     end
