@@ -47,6 +47,10 @@ class IBeaconConfiguration < BeaconConfiguration
         @protocol ||= "iBeacon"
     end
 
+    def protocol
+        IBeaconConfiguration.protocol
+    end
+
     def as_indexed_json(options = {})
         json = super(options)
         json.merge!(

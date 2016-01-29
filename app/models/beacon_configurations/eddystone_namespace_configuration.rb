@@ -53,6 +53,10 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         @protocol ||= "Eddystone"
     end
 
+    def protocol
+        EddystoneNamespaceConfiguration.protocol
+    end
+
     def beacon_devices
         BeaconDevice.where(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id)
     end

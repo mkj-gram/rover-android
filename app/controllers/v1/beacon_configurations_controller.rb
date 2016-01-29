@@ -1,5 +1,6 @@
 class V1::BeaconConfigurationsController < V1::ApplicationController
     before_action :authenticate
+    before_action :validate_json_schema,    only: [:create, :update]
 
     def index
 
@@ -154,46 +155,42 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     def show
         # show a detail view of the beacon
         @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
+        render_beacon_configuration(@beacon_configuration)
+    end
+
+    def create
+        # this we need a protocol?
+    end
+
+    def update
+        # we can update name, tags, enabled
+        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
         if @beacon_configuration
-            json = serialize_beacon(@beacon_configuration)
-            devices = @beacon_configuration.beacon_devices.all.to_a
-            if devices.any?
-                grouped_devices = devices.group_by { |beacon| beacon.manufacturer }
-                # add relationship of estimote device
-                # add relationship for kontakt device
-                # add them in the include
-                json["relationships"] = {}
-                json["relationships"].merge!(serialize_estimote_relationships(grouped_devices["estimote"])) if grouped_devices.include?("estimote")
-                json["relationships"].merge!(serialize_kontakt_relationships(grouped_devices["kontakt"])) if grouped_devices.include?("kontakt")
-
-                included = []
-                included += grouped_devices["estimote"].map{|device| serialize_device(device, "estimote-devices")} if grouped_devices.include?("estimote")
-                included += grouped_devices["kontakt"].map{|device| serialize_device(device, "kontakt-devices")} if grouped_devices.include?("kontakt")
-                json["included"] = included
+            json = flatten_request({single_record: true})
+            if @beacon_configuration.update_attributes(configuration_params(json[:data]))
+                render_beacon_configuration(@beacon_configuration)
+            else
+                render json: { errors: V1::BeaconConfigurationUpdateErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
             end
-
-            render json: json
         else
             head :not_found
         end
     end
 
-    def create
-
-    end
-
-    def update
-
-    end
-
     def destroy
-
+        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
+        if @beacon_configuration
+            @beacon_configuration.destroy
+            head :no_content
+        else
+            head :not_found
+        end
     end
 
     private
 
     def configuration_params(local_params)
-
+        local_params.fetch(:configurations, {}).permit(:name, {tags: []}, :enabled)
     end
 
     def filter_params
@@ -224,6 +221,30 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }.call
     end
 
+    def render_beacon_configuration(beacon_configuration)
+        if beacon_configuration
+            json = serialize_beacon(beacon_configuration, {protocol: beacon_configuration.protocol})
+            devices = beacon_configuration.beacon_devices.all.to_a
+            if devices.any?
+                grouped_devices = devices.group_by { |beacon| beacon.manufacturer }
+                # add relationship of estimote device
+                # add relationship for kontakt device
+                # add them in the include
+                json["relationships"] = {}
+                json["relationships"].merge!(serialize_estimote_relationships(grouped_devices["estimote"])) if grouped_devices.include?("estimote")
+                json["relationships"].merge!(serialize_kontakt_relationships(grouped_devices["kontakt"])) if grouped_devices.include?("kontakt")
+
+                included = []
+                included += grouped_devices["estimote"].map{|device| serialize_device(device, "estimote-devices")} if grouped_devices.include?("estimote")
+                included += grouped_devices["kontakt"].map{|device| serialize_device(device, "kontakt-devices")} if grouped_devices.include?("kontakt")
+                json["included"] = included
+            end
+
+            render json: json
+        else
+            head :not_found
+        end
+    end
 
     def elasticsearch_serialize_beacon(config, extra_attributes = {})
         source = config._source
