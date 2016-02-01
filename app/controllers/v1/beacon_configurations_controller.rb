@@ -245,6 +245,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def ibeacon_configuration_params(local_params)
+        convert_param_if_exists(local_params[:configurations], :"major-number", :major)
+        convert_param_if_exists(local_params[:configurations], :"minor-number", :minor)
         local_params.fetch(:configurations, {}).permit(:uuid, :major, :minor)
     end
 
