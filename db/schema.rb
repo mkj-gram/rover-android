@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20160127133932) do
     t.integer  "users_count",                            default: 0
     t.integer  "locations_count",                        default: 0
     t.integer  "searchable_beacon_configurations_count", default: 0
+    t.integer  "searchable_locations_count",             default: 0
     t.integer  "account_invites_count",                  default: 0
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
@@ -102,16 +103,14 @@ ActiveRecord::Schema.define(version: 20160127133932) do
 
   create_table "locations", force: :cascade do |t|
     t.integer  "account_id",                               null: false
-    t.text     "name"
+    t.string   "title"
     t.text     "address"
     t.text     "city"
-    t.text     "province_state"
-    t.text     "postal_zip"
-    t.text     "country"
-    t.decimal  "latitude"
-    t.decimal  "longitude"
-    t.integer  "radius"
-    t.text     "google_place_id"
+    t.text     "province"
+    t.string   "country"
+    t.float    "latitude"
+    t.float    "longitude"
+    t.integer  "radius",                      default: 50
     t.text     "tags",                        default: [],              array: true
     t.integer  "beacon_configurations_count", default: 0
     t.datetime "created_at",                               null: false
