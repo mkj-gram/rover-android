@@ -208,7 +208,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     private
 
     def configuration_params(local_params)
-        local_params.fetch(:configurations, {}).permit(:name, {tags: []}, :enabled)
+        convert_param_if_exists(local_params[:configurations], :name, :title)
+        local_params.fetch(:configurations, {}).permit(:title, {tags: []}, :enabled)
     end
 
     def filter_params
