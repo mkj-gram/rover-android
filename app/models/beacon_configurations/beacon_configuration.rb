@@ -37,6 +37,7 @@ class BeaconConfiguration < ActiveRecord::Base
     }
 
     before_save :update_active_tags
+    before_save :remove_duplicate_tags
     after_create :increment_searchable_beacon_configurations_count
     after_destroy :decrement_searchable_beacon_configurations_count
 
@@ -150,6 +151,9 @@ class BeaconConfiguration < ActiveRecord::Base
 
     private
 
+    def remove_duplicate_tags
+        self.tags.uniq! if self.tags
+    end
     def increment_searchable_beacon_configurations_count
         Account.update_counters(self.account_id, :searchable_beacon_configurations_count => 1)
     end

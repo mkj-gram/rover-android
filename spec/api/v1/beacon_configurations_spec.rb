@@ -249,6 +249,31 @@ describe "/v1/configurations", :type => :request do
 
                 expect(json.dig(:data, :attributes, :tags)).to eq(new_tags)
             end
+
+            # it 'returns 200 ok when removing ALL tags' do
+
+            #     config = create(:ibeacon_configuration)
+            #     account = config.account
+
+            #     patch "/v1/configurations/#{config.id}",
+            #     {
+            #         data: {
+            #             type: "configurations",
+            #             id: config.id.to_s,
+            #             attributes: {
+            #                 tags: [],
+            #             }
+            #         }
+            #     }, signed_request_header(account)
+
+
+            #     expect(response).to have_http_status(200)
+
+
+            #     expect(json.dig(:data, :attributes, :tags)).to eq([])
+            # end
+
+
         end
     end
 

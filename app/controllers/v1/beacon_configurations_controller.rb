@@ -209,6 +209,11 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def configuration_params(local_params)
         convert_param_if_exists(local_params[:configurations], :name, :title)
+
+        # if local_params[:configurations].has_key?(:tags) && local_params[:configurations][:tags].nil?
+        #     local_params[:configurations][:tags] = []
+        # end
+
         local_params.fetch(:configurations, {}).permit(:title, {tags: []}, :enabled)
     end
 
