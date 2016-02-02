@@ -10,7 +10,8 @@ class Location < ActiveRecord::Base
                 autocomplete_filter: {
                     type: "edge_ngram",
                     min_gram: 1,
-                    max_gram: 15
+                    max_gram: 15,
+                    token_chars: ["letter", "digit"]
                 }
             },
             analyzer: {
@@ -35,7 +36,7 @@ class Location < ActiveRecord::Base
 
         mapping do
             indexes :account_id, type: 'long', index: 'not_analyzed'
-            indexes :formatted_address, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
+            indexes :formatted_address, type: 'string', analyzer: "autocomplete", search_analyzer: "standard"
             indexes :address, type: 'string', index: 'no'
             indexes :city, type: 'string', index: 'no'
             indexes :province, type: 'string', index: 'no'
