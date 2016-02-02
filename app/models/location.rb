@@ -60,13 +60,18 @@ class Location < ActiveRecord::Base
             enabled: self.enabled,
             shared: self.shared,
             created_at: self.created_at,
-            # shared_account_ids: self.shared_account_ids,
+            shared_account_ids: self.shared_account_ids,
             beacon_configurations_count: self.beacon_configurations_count
         }
     end
 
+    def shared_account_ids
+        []
+    end
 
     private
+
+
 
     def update_beacon_configurations_elasticsearch_document
         # only if the name has changed do we need to update the elasticsearch documents of the beacons
