@@ -25,6 +25,12 @@ module UrlAttributes
         v
     end
 
+    def configuration_attributes
+        {
+            url: self.url
+        }
+    end
+
     protected
 
     def clear_unused_attributes

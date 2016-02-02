@@ -34,20 +34,18 @@ class IBeaconConfiguration < BeaconConfiguration
     end
 
     validates :account_id, presence: true
-    validates :uuid, presence: true, :format => {:with => /[A-Za-z\d]([-\w]{,498}[A-Za-z\d])?/i}
-    validates :major, presence: true
-    validates :minor, presence: true
     # don't enforce an account owner
     # validate :uuid_account_owner
     # validate :unique_ibeacon
+
 
 
     def self.protocol
         @protocol ||= "iBeacon"
     end
 
-    def beacon_devices
-        BeaconDevice.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor)
+    def protocol
+        IBeaconConfiguration.protocol
     end
 
     def as_indexed_json(options = {})
@@ -74,6 +72,10 @@ class IBeaconConfiguration < BeaconConfiguration
             }
         )
         return json
+    end
+
+    def beacon_devices
+        @beacon_devices ||= BeaconDevice.where(account_id: self.account_id, uuid: self.uuid, major: self.major, minor: self.minor)
     end
 
     private

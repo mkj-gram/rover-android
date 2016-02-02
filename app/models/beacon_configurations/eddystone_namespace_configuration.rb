@@ -31,12 +31,6 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         }
     end
 
-
-
-    validates :namespace, presence: true
-    validates :instance_id, presence: true
-
-
     def as_indexed_json(options = {})
         json = super(options)
         json.merge!(
@@ -48,9 +42,12 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         return json
     end
 
-
     def self.protocol
         @protocol ||= "Eddystone"
+    end
+
+    def protocol
+        EddystoneNamespaceConfiguration.protocol
     end
 
     def beacon_devices

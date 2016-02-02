@@ -7,6 +7,12 @@ module JsonHelper
             if data.is_a?(Hash)
                 data = [data]
             end
+
+            data.each do |d|
+                # fix rails...
+                d[:attributes] = {} if !d.has_key?(:attributes)
+            end
+
             ClassyHash.validate_strict({data: data}, request_schema)
             @valid_json = true
         rescue RuntimeError => e
@@ -63,7 +69,7 @@ module JsonHelper
         each_schema = {
             type: String,
             id: [:optional, String, Integer],
-            attributes: Hash
+            attributes: [:optional, Hash]
         }
 
         {

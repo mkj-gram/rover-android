@@ -1,5 +1,8 @@
 class V1::BeaconConfigurationsController < V1::ApplicationController
     before_action :authenticate
+    before_action :validate_json_schema,    only: [:create, :update]
+
+    @@protocol_types = Set.new([IBeaconConfiguration.protocol, EddystoneNamespaceConfiguration.protocol, UrlConfiguration.protocol])
 
     def index
 
@@ -133,11 +136,11 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         json  = {
             "data" => results.map do |config|
                 if config._type == IBeaconConfiguration.document_type
-                    serialize_ibeacon(config)
+                    elasticsearch_serialize_ibeacon(config)
                 elsif config._type == EddystoneNamespaceConfiguration.document_type
-                    serialize_eddystone_namespace(config)
+                    elasticsearch_serialize_eddystone_namespace(config)
                 elsif config._type == UrlConfiguration.document_type
-                    serialize_url(config)
+                    elasticsearch_serialize_url(config)
                 end
             end,
             "meta" => {
@@ -151,21 +154,67 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         render json: json
     end
 
-    def create
+    def show
+        # show a detail view of the beacon
+        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
+        render_beacon_configuration(@beacon_configuration)
+    end
 
+    def create
+        # this we need a protocol?
+        json = flatten_request({single_record: true})
+        protocol = json.dig(:data, :configurations, :protocol)
+        if !protocol.nil?
+            if @@protocol_types.include?(protocol)
+                @beacon_configuration = build_beacon_configuration(json[:data], protocol)
+                if @beacon_configuration.save
+                    render_beacon_configuration(@beacon_configuration)
+                else
+                    render json: { errors: V1::BeaconConfigurationCreateErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                end
+            else
+                render json: {errors: [{detail: "has to be of type (#{@@protocol_types.map(&:to_s).join(", ")})", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
+            end
+        else
+            render json: {errors: [{detail: "can't be blank", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
+        end
     end
 
     def update
+        # we can update name, tags, enabled
+        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
+        if @beacon_configuration
+            json = flatten_request({single_record: true})
+            if @beacon_configuration.update_attributes(configuration_params(json[:data]))
+                render_beacon_configuration(@beacon_configuration)
+            else
+                render json: { errors: V1::BeaconConfigurationUpdateErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+            end
+        else
+            head :not_found
+        end
     end
 
     def destroy
-
+        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
+        if @beacon_configuration
+            @beacon_configuration.destroy
+            head :no_content
+        else
+            head :not_found
+        end
     end
 
     private
 
     def configuration_params(local_params)
+        convert_param_if_exists(local_params[:configurations], :name, :title)
 
+        # if local_params[:configurations].has_key?(:tags) && local_params[:configurations][:tags].nil?
+        #     local_params[:configurations][:tags] = []
+        # end
+
+        local_params.fetch(:configurations, {}).permit(:title, {tags: []}, :enabled)
     end
 
     def filter_params
@@ -196,8 +245,74 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }.call
     end
 
+    def beacon_configuration_params(local_params)
+        local_params.fetch(:configurations, {}).permit(:name, :enabled, {tags: []})
+    end
 
-    def serialize_beacon(config, extra_attributes = {})
+    def ibeacon_configuration_params(local_params)
+        convert_param_if_exists(local_params[:configurations], :"major-number", :major)
+        convert_param_if_exists(local_params[:configurations], :"minor-number", :minor)
+        local_params.fetch(:configurations, {}).permit(:uuid, :major, :minor)
+    end
+
+    def eddystone_namespace_configuration_params(local_params)
+        convert_param_if_exists(local_params[:configurations], :"instance-id", :instance_id)
+        local_params.fetch(:configurations, {}).permit(:namespace, :instance_id)
+    end
+
+    def url_configuration_params(local_params)
+        local_params.fetch(:configurations, {}).permit(:url)
+    end
+
+    def build_beacon_configuration(local_params, protocol)
+        beacon_opts = beacon_configuration_params(local_params)
+        case protocol
+        when IBeaconConfiguration.protocol
+            opts = beacon_opts.merge(ibeacon_configuration_params(local_params)).merge(account_id: current_account.id)
+            beacon_configuration = IBeaconConfiguration.new(opts)
+
+        when EddystoneNamespaceConfiguration.protocol
+            opts = beacon_opts.merge(eddystone_namespace_configuration_params(local_params)).merge(account_id: current_account.id)
+            beacon_configuration = EddystoneNamespaceConfiguration.new(opts)
+
+        when UrlConfiguration.protocol
+            opts = beacon_opts.merge(url_configuration_params(local_params)).merge(account_id: current_account.id)
+            beacon_configuration = UrlConfiguration.new(opts)
+        else
+            nil
+        end
+    end
+
+    def render_beacon_configuration(beacon_configuration)
+        if beacon_configuration
+            json = {
+                "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
+            }
+            devices = beacon_configuration.beacon_devices.all.to_a
+            if devices.any?
+                json["data"].merge!(
+                    {
+                        "relationships" => {
+                            "devices" => {
+                                "data" => devices.map do |device|
+                                    {"type" => device.model_type, "id" => device.id.to_s}
+                                end
+                            }
+                        }
+                    }
+                )
+
+                included = devices.map{|device| serialize_device(device)}
+                json["included"] = included
+            end
+
+            render json: json
+        else
+            head :not_found
+        end
+    end
+
+    def elasticsearch_serialize_beacon(config, extra_attributes = {})
         source = config._source
         {
             "type" => "configurations",
@@ -213,9 +328,9 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }
     end
 
-    def serialize_ibeacon(config)
+    def elasticsearch_serialize_ibeacon(config)
         source = config._source
-        serialize_beacon(
+        elasticsearch_serialize_beacon(
             config,
             {
                 "protocol" => IBeaconConfiguration.protocol,
@@ -226,9 +341,9 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         )
     end
 
-    def serialize_eddystone_namespace(config)
+    def elasticsearch_serialize_eddystone_namespace(config)
         source = config._source
-        serialize_beacon(
+        elasticsearch_serialize_beacon(
             config,
             {
 
@@ -240,15 +355,49 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         )
     end
 
-    def serialize_url(config)
+    def elasticsearch_serialize_url(config)
         source = config._source
-        serialize_beacon(
+        elasticsearch_serialize_beacon(
             config,
             {
                 "protocol" => UrlConfiguration.protocol,
                 "url" => source.url
             }
         )
+    end
+
+
+    def serialize_beacon_configuration(beacon_configuration, extra_attributes = {})
+        {
+            "type" => "configurations",
+            "id" => beacon_configuration.id.to_s,
+            "attributes" => {
+                "name" => beacon_configuration.title,
+                "tags" => beacon_configuration.tags,
+                "shared" => beacon_configuration.shared,
+                "enabled" => beacon_configuration.enabled
+            }.merge(extra_attributes).merge(beacon_configuration.configuration_attributes)
+        }
+    end
+
+    def serialize_device(device)
+        {
+            "type" => device.model_type,
+            "id" => device.id.to_s,
+            "attributes" => device.device_attributes.merge(device.configuration_attributes)
+        }
+    end
+
+    # def serialize_estimote_relationships(estimote_devices)
+    #     "data" => estimote_devices.map{|device| {type: "estimote-devices", id: device.id.to_s}}
+    # end
+
+    def serialize_kontakt_relationships(kontakt_devices)
+        {
+            "kontakt-devices" => {
+                "data" => kontakt_devices.map{|device| {type: "kontakt-devices", id: device.id.to_s}}
+            }
+        }
     end
 
     def render_empty_data

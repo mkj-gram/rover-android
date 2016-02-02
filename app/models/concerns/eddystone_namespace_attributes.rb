@@ -17,6 +17,13 @@ module EddystoneNamespaceAttributes
         changes.include?(:instance_id)
     end
 
+    def configuration_attributes
+        {
+            namespace: self.namespace,
+            :"instance-id" => self.instance_id
+        }
+    end
+
     private
 
     def clear_unused_attributes

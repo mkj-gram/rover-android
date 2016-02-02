@@ -5,9 +5,9 @@ module IBeaconAttributes
         before_validation :clear_unused_attributes
         before_validation :upcase_uuid
 
-        validates :uuid, presence: true
-        validates :major, presence: true
-        validates :minor, presence: true
+        validates :uuid, presence: true, :format => {:with => /[A-Za-z\d]([-\w]{,498}[A-Za-z\d])?/i}
+        validates :major, presence: true, inclusion: { in: 0..65535, message: "must be between 0 and 65535" }
+        validates :minor, presence: true, inclusion: { in: 0..65535, message: "must be between 0 and 65535" }
     end
 
     def namespace=(v)
@@ -34,6 +34,13 @@ module IBeaconAttributes
         changes.include?(:minor)
     end
 
+    def configuration_attributes
+        {
+            uuid: self.uuid,
+            :"major-number" => self.major,
+            :"minor-number" => self.minor
+        }
+    end
 
     private
 
