@@ -1,7 +1,7 @@
 class V1::LocationsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema,    only: [:create, :update]
-
+    before_action :set_location, only: [:show, :update, :destroy]
 
     def index
         should_query = []
@@ -113,7 +113,12 @@ class V1::LocationsController < V1::ApplicationController
     end
 
     def update
-
+        # do we accept a google place id?
+        json = flatten_request({single_record: true})
+        if @location.update_attributes(location_params(json[:data]))
+        else
+            render json: { errors: V1::LocationErrorSerializer.serialize(@location.errors)}, status: :unprocessable_entity
+        end
     end
 
     def create
@@ -127,6 +132,10 @@ class V1::LocationsController < V1::ApplicationController
 
     private
 
+    def set_location
+        @location = Location.find_by_id(params[:id])
+        head :not_found if @location.nil?
+    end
     # bounding box location query
     # or point
 
@@ -147,6 +156,11 @@ class V1::LocationsController < V1::ApplicationController
 
     def query_tags
         @query_tags ||= filter_params.fetch(:tags, [])
+    end
+
+    def location_params(local_params)
+        convert_param_if_exists(local_params[:configurations], :name, :title)
+        local_params.fetch(:locations, {}).permit(:enabled, :title, :address, :city, :province, :country, :latitude, :longitude, :radius)
     end
 
     def serialize_elasticsearch_location(document)
