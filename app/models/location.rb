@@ -52,7 +52,7 @@ class Location < ActiveRecord::Base
 
     after_save :update_beacon_configurations_elasticsearch_document
 
-    def as_indexed_json(opts = {})
+    def as_indexed_json(options = {})
         {
             account_id: self.account_id,
             title: self.title,
@@ -60,7 +60,7 @@ class Location < ActiveRecord::Base
             enabled: self.enabled,
             shared: self.shared,
             created_at: self.created_at,
-            shared_account_ids: self.shared_account_ids,
+            # shared_account_ids: self.shared_account_ids,
             beacon_configurations_count: self.beacon_configurations_count
         }
     end

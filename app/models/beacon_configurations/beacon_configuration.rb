@@ -112,9 +112,9 @@ class BeaconConfiguration < ActiveRecord::Base
     protected
 
     def indexed_location
-        if !self.location_id.nil?
+        if !self.location_id.nil? && self.location
             return {
-                name: location.name,
+                name: location.title,
                 id: location.id
             }
         else
