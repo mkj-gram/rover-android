@@ -4,15 +4,15 @@ module GeoFilterHelper
         def self.can_build?(location_params)
             !(
                 location_params.dig(:"geo-bounding-box", :"top-left", :lat).nil? ||
-                location_params.dig(:"geo-bounding-box", :"top-left", :lon).nil? ||
+                location_params.dig(:"geo-bounding-box", :"top-left", :lng).nil? ||
                 location_params.dig(:"geo-bounding-box", :"bottom-right", :lat).nil? ||
-                location_params.dig(:"geo-bounding-box", :"bottom-right", :lon).nil?
+                location_params.dig(:"geo-bounding-box", :"bottom-right", :lng).nil?
             )
         end
 
         def self.build(location_params)
-            top_left = [location_params.dig(:"geo-bounding-box", :"top-left", :lat), location_params.dig(:"geo-bounding-box", :"top-left", :lon)]
-            bottom_right = [location_params.dig(:"geo-bounding-box", :"bottom-right", :lat), location_params.dig(:"geo-bounding-box", :"bottom-right", :lon)]
+            top_left = [location_params.dig(:"geo-bounding-box", :"top-left", :lat), location_params.dig(:"geo-bounding-box", :"top-left", :lng)]
+            bottom_right = [location_params.dig(:"geo-bounding-box", :"bottom-right", :lat), location_params.dig(:"geo-bounding-box", :"bottom-right", :lng)]
             self.new(top_left, bottom_right)
         end
 
