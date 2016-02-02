@@ -165,7 +165,8 @@ class V1::LocationsController < V1::ApplicationController
                 "radius" => source.radius,
                 "tags" => source.tags,
                 "enabled" => source.enabled,
-                "shared" => source.shared
+                "shared" => source.shared,
+                "configurations-count" => source.beacon_configurations_count || 0
             }
         }
     end

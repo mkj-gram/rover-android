@@ -46,6 +46,7 @@ class Location < ActiveRecord::Base
             indexes :location, type: "geo_point", lat_lon: true
             indexes :radius, type: 'integer', index: 'no'
             indexes :enabled, type: 'boolean', index: 'not_analyzed'
+            indexes :beacon_configurations_count, type: 'integer', index: 'no'
             indexes :created_at, type: 'date'
         end
 
