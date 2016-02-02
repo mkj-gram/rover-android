@@ -12,6 +12,9 @@ class CreateLocations < ActiveRecord::Migration
             t.integer :radius, default: 50
             t.text :tags, array: true, default: []
 
+            t.boolean :enabled, default: true
+            t.boolean :shared, default: false
+
             # counter_cache
             t.integer :beacon_configurations_count, default: 0
             t.timestamps null: false

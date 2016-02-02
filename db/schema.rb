@@ -102,7 +102,7 @@ ActiveRecord::Schema.define(version: 20160127133932) do
   add_index "beacon_devices", ["third_party_integration_id"], name: "index_beacon_devices_on_third_party_integration_id", using: :btree
 
   create_table "locations", force: :cascade do |t|
-    t.integer  "account_id",                               null: false
+    t.integer  "account_id",                                  null: false
     t.string   "title"
     t.text     "address"
     t.text     "city"
@@ -111,10 +111,12 @@ ActiveRecord::Schema.define(version: 20160127133932) do
     t.float    "latitude"
     t.float    "longitude"
     t.integer  "radius",                      default: 50
-    t.text     "tags",                        default: [],              array: true
+    t.text     "tags",                        default: [],                 array: true
+    t.boolean  "enabled",                     default: true
+    t.boolean  "shared",                      default: false
     t.integer  "beacon_configurations_count", default: 0
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
   end
 
   add_index "locations", ["account_id"], name: "index_locations_on_account_id", using: :btree

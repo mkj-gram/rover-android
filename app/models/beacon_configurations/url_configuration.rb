@@ -12,6 +12,10 @@ class UrlConfiguration < BeaconConfiguration
         indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
         indexes :tags, type: 'string', index: 'not_analyzed'
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
+        indexes :location, type: 'object' do
+            indexes :name, type: 'string', index: 'not_analyzed'
+            indexes :id, type: 'integer', index: 'not_analyzed'
+        end
         indexes :url, type: 'string', index: 'not_analyzed'
         indexes :created_at, type: 'date'
         indexes :devices_meta, type: 'object' do
