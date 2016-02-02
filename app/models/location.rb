@@ -59,9 +59,9 @@ class Location < ActiveRecord::Base
 
 
     belongs_to :account, counter_cache: :searchable_locations_count
-
     has_many :beacon_configurations
 
+    before_save :update_active_tags
     after_save :update_beacon_configurations_elasticsearch_document
 
     def as_indexed_json(options = {})
@@ -94,7 +94,22 @@ class Location < ActiveRecord::Base
 
     private
 
-
+    def update_active_tags
+        if self.changes.include?(:tags)
+            Rails.logger.info("searching for tags: #{tags} with changes #{self.changes}")
+            new_tags = self.changes[:tags].second - self.changes[:tags].first
+            old_tags = self.changes[:tags].first - self.changes[:tags].second
+            old_tags_to_delete = old_tags.select do |tag|
+                !Location.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
+            end
+            new_tags = self.tags
+            # lock this row since we are updating and deleting the tags in the application level
+            # beacon_configuration_active_tags.lock!
+            location_active_tags_index.tags += new_tags
+            location_active_tags_index.tags -= old_tags_to_delete
+            location_active_tags_index.save
+        end
+    end
 
     def update_beacon_configurations_elasticsearch_document
         # only if the name has changed do we need to update the elasticsearch documents of the beacons

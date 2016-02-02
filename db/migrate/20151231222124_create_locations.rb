@@ -21,5 +21,6 @@ class CreateLocations < ActiveRecord::Migration
         end
 
         add_index :locations, :account_id
+        add_index :locations, :tags, using: :gin
     end
 end

@@ -1,0 +1,2 @@
+class LocationActiveTagsIndex < ActiveTagsIndex
+end

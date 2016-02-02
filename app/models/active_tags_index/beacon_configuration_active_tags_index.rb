@@ -1,0 +1,2 @@
+class BeaconConfigurationActiveTagsIndex < ActiveTagIndex
+end

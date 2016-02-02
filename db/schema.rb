@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160127133932) do
+ActiveRecord::Schema.define(version: 20160202201635) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,13 +45,13 @@ ActiveRecord::Schema.define(version: 20160127133932) do
   add_index "accounts", ["share_key"], name: "index_accounts_on_share_key", unique: true, using: :btree
   add_index "accounts", ["token"], name: "index_accounts_on_token", unique: true, using: :btree
 
-  create_table "beacon_configuration_active_tags_indices", force: :cascade do |t|
+  create_table "active_tags_indicies", force: :cascade do |t|
     t.integer "account_id",              null: false
+    t.string  "type",                    null: false
     t.string  "tags",       default: [],              array: true
   end
 
-  add_index "beacon_configuration_active_tags_indices", ["account_id"], name: "index_beacon_configuration_active_tags_indices_on_account_id", unique: true, using: :btree
-  add_index "beacon_configuration_active_tags_indices", ["tags"], name: "index_beacon_configuration_active_tags_indices_on_tags", using: :gin
+  add_index "active_tags_indicies", ["account_id", "type"], name: "index_active_tags_indicies_on_account_id_and_type", unique: true, using: :btree
 
   create_table "beacon_configurations", force: :cascade do |t|
     t.integer  "account_id",                                null: false
@@ -120,6 +120,7 @@ ActiveRecord::Schema.define(version: 20160127133932) do
   end
 
   add_index "locations", ["account_id"], name: "index_locations_on_account_id", using: :btree
+  add_index "locations", ["tags"], name: "index_locations_on_tags", using: :gin
 
   create_table "password_resets", force: :cascade do |t|
     t.integer  "user_id",    null: false
