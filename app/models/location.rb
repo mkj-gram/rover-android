@@ -36,10 +36,15 @@ class Location < ActiveRecord::Base
         mapping do
             indexes :account_id, type: 'long', index: 'not_analyzed'
             indexes :formatted_address, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
+            indexes :address, type: 'string', index: 'no'
+            indexes :city, type: 'string', index: 'no'
+            indexes :province, type: 'string', index: 'no'
+            indexes :country, type: 'string', index: 'no'
             indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
             indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
-            indexes :location, type: "geo_point"
+            indexes :location, type: "geo_point", lat_lon: true
+            indexes :radius, type: 'integer', index: 'no'
             indexes :enabled, type: 'boolean', index: 'not_analyzed'
             indexes :created_at, type: 'date'
         end
@@ -60,6 +65,9 @@ class Location < ActiveRecord::Base
             enabled: self.enabled,
             shared: self.shared,
             created_at: self.created_at,
+            location: {lat: self.latitude, lon: self.longitude},
+            radius: self.radius,
+            formatted_address: self.formatted_address,
             shared_account_ids: self.shared_account_ids,
             beacon_configurations_count: self.beacon_configurations_count
         }
@@ -67,6 +75,10 @@ class Location < ActiveRecord::Base
 
     def shared_account_ids
         []
+    end
+
+    def formatted_address
+        "#{self.address} #{self.city} #{self.province} #{self.country}"
     end
 
     private
