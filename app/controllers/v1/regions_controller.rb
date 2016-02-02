@@ -13,45 +13,77 @@ class V1::RegionsController < V1::ApplicationController
             ibeacon_regions = []
         end
 
+
         if types.include?("geofence")
-            geofence_regions = [
-                {
-                    "type" => "geofence-regions",
-                    "id" => "1",
-                    "attributes" => {
-                        "radius": 50,
-                        "longitude": -79.4219654999999989,
-                        "latitude": 43.7680567999999965
-                    }
-                },
-                {
-                    "type" => "geofence-regions",
-                    "id" => "2",
-                    "attributes" => {
-                        "radius": 89,
-                        "longitude": -79.4141962923431493,
-                        "latitude": 43.7686240183319342
-                    }
-                },
-                {
-                    "type" => "geofence-regions",
-                    "id" => "3",
-                    "attributes" => {
-                        "radius": 50,
-                        "longitude": -79.4219654999999989,
-                        "latitude": 43.7680567999999965
-                    }
-                },
-                {
-                    "type" => "geofence-regions",
-                    "id" => "4",
-                    "attributes" => {
-                        "radius": 89,
-                        "longitude": -79.4141962923431493,
-                        "latitude": 43.7686240183319342
-                    }
-                }
-            ]
+            geofence_regions = [{"type"=>"geofence-regions",
+                                 "id"=>"43.7680568:-79.4219655",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.4219655, "latitude"=>43.7680568}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.768624018331934:-79.41419629234315",
+                                 "attributes"=>
+                                 {"radius"=>89,
+                                "longitude"=>-79.41419629234315,
+                                "latitude"=>43.768624018331934}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.8390151:-79.39192430000003",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.39192430000003, "latitude"=>43.8390151}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.6618185:-79.38591350000002",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.38591350000002, "latitude"=>43.6618185}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.6412461:-79.41467949999998",
+                                 "attributes"=>
+                                 {"radius"=>150, "longitude"=>-79.41467949999998, "latitude"=>43.6412461}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.644629:-79.392933",
+                                 "attributes"=>
+                                 {"radius"=>100, "longitude"=>-79.392933, "latitude"=>43.644629}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.6262598:-79.51474840000003",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.51474840000003, "latitude"=>43.6262598}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.35387645646609:-79.75814637354125",
+                                 "attributes"=>
+                                 {"radius"=>60,
+                                "longitude"=>-79.75814637354125,
+                                "latitude"=>43.35387645646609}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.352926792566436:-79.77674197738497",
+                                 "attributes"=>
+                                 {"radius"=>60,
+                                "longitude"=>-79.77674197738497,
+                                "latitude"=>43.352926792566436}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.643305:-79.426916",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.426916, "latitude"=>43.643305}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.5937038:-79.63109250000002",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.63109250000002, "latitude"=>43.5937038}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.65109:-79.389905",
+                                 "attributes"=>{"radius"=>50, "longitude"=>-79.389905, "latitude"=>43.65109}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.771565:-79.512088",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.512088, "latitude"=>43.771565}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.8109084:-79.35064210000002",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.35064210000002, "latitude"=>43.8109084}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.644629:-79.392933",
+                                 "attributes"=>
+                                 {"radius"=>50, "longitude"=>-79.392933, "latitude"=>43.644629}},
+                                {"type"=>"geofence-regions",
+                                 "id"=>"43.650854:-79.376008",
+                                 "attributes"=>
+                                 {"radius"=>100, "longitude"=>-79.376008, "latitude"=>43.650854}}]
         else
             geofence_regions = []
         end
