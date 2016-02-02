@@ -3,16 +3,16 @@ module GeoFilterHelper
     class GeoBoundingBoxFilter
         def self.can_build?(location_params)
             !(
-                location_params.dig(:"geo-bounding-box", :"top-left", :lat).nil? ||
-                location_params.dig(:"geo-bounding-box", :"top-left", :lng).nil? ||
-                location_params.dig(:"geo-bounding-box", :"bottom-right", :lat).nil? ||
-                location_params.dig(:"geo-bounding-box", :"bottom-right", :lng).nil?
+                location_params.dig(:"bbox", :"top-left", :lat).nil? ||
+                location_params.dig(:"bbox", :"top-left", :lng).nil? ||
+                location_params.dig(:"bbox", :"bottom-right", :lat).nil? ||
+                location_params.dig(:"bbox", :"bottom-right", :lng).nil?
             )
         end
 
         def self.build(location_params)
-            top_left = [location_params.dig(:"geo-bounding-box", :"top-left", :lat), location_params.dig(:"geo-bounding-box", :"top-left", :lng)]
-            bottom_right = [location_params.dig(:"geo-bounding-box", :"bottom-right", :lat), location_params.dig(:"geo-bounding-box", :"bottom-right", :lng)]
+            top_left = [location_params.dig(:"bbox", :"top-left", :lat), location_params.dig(:"bbox", :"top-left", :lng)]
+            bottom_right = [location_params.dig(:"bbox", :"bottom-right", :lat), location_params.dig(:"bbox", :"bottom-right", :lng)]
             self.new(top_left, bottom_right)
         end
 
