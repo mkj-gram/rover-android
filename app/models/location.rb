@@ -53,7 +53,7 @@ class Location < ActiveRecord::Base
 
     end
 
-
+    validates :title, presence: true
     validates :latitude, presence: true, inclusion: { in: -90..90, message: "must be between -90 and 90" }, unless: :google_place_id?
     validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }, unless: :google_place_id?
 
