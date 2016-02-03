@@ -100,7 +100,8 @@ class V1::LocationsController < V1::ApplicationController
             "meta" => {
                 "totalRecords" => results.total,
                 "totalPages" => results.total_pages,
-                "totalSearchableRecords" => current_account.searchable_locations_count
+                "totalSearchableRecords" => current_account.searchable_locations_count,
+                "suggestedViewBounds" => current_account.location_bounding_box_suggestion
             }
         }
 
