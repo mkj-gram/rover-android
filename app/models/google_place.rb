@@ -17,7 +17,7 @@ class GooglePlace
             types = component["types"]
             if types.include?("street_number") || types.include?("premise") || types.include?("route")
                 @address.push(component["long_name"])
-            elsif types.include?("locality") || types.include?("sublocality_level_1")
+            elsif types.include?("locality")
                 @city.push(component["long_name"])
             elsif types.include?("administrative_area_level_1")
                 @province.push(component["long_name"])
