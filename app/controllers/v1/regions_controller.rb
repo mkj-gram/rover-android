@@ -108,12 +108,12 @@ class V1::RegionsController < V1::ApplicationController
             "id" => ibeacon_region.region_id(include_major: include_major, include_minor: include_minor),
             "attributes" => {
                 "uuid" => ibeacon_region.uuid,
-                "major" => nil,
-                "minor" => nil
+                "major-number" => nil,
+                "minor-number" => nil
             }
         }
-        json["attributes"].merge!({"major" => ibeacon_region.major}) if include_major
-        json["attributes"].merge!({"minor" => ibeacon_region.minor}) if include_minor
+        json["attributes"].merge!({"major-number" => ibeacon_region.major}) if include_major
+        json["attributes"].merge!({"minor-number" => ibeacon_region.minor}) if include_minor
         return json
     end
 
