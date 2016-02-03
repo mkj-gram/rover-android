@@ -38,6 +38,7 @@ class BeaconConfiguration < ActiveRecord::Base
 
     before_save :update_active_tags
     before_save :remove_duplicate_tags
+    after_save :update_location
     after_create :increment_searchable_beacon_configurations_count
     after_destroy :decrement_searchable_beacon_configurations_count
 
@@ -110,6 +111,24 @@ class BeaconConfiguration < ActiveRecord::Base
 
 
     protected
+
+    def update_location
+        if self.changes.include?(:location_id) && location_id_was != location_id
+            old_location = location_id_was.nil? ? nil : Location.find_by_id(location_id_was)
+
+            if old_location
+                Location.decrement_counter(:beacon_configurations_count, old_location.id)
+                old_location.__elasticsearch__.update_document
+            end
+
+            new_location = location_id.nil? ? nil : Location.find_by_id(location_id)
+            if new_location
+                Location.increment_counter(:beacon_configurations_count, 1)
+                new_location.__elasticsearch__.update_document
+            end
+
+        end
+    end
 
     def indexed_location
         if !self.location_id.nil? && self.location
