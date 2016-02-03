@@ -54,14 +54,15 @@ class Location < ActiveRecord::Base
     end
 
 
-    validates :latitude, presence: true, inclusion: { in: -90..90, message: "must be between -90 and 90" }
-    validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }
+    validates :latitude, presence: true, inclusion: { in: -90..90, message: "must be between -90 and 90" }, unless: :google_place_id?
+    validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }, unless: :google_place_id?
 
 
     belongs_to :account, counter_cache: :searchable_locations_count
     has_many :beacon_configurations
     has_one :location_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
 
+    before_save :update_address_from_google_place
     before_save :update_active_tags
     after_save :update_beacon_configurations_elasticsearch_document
 
@@ -94,6 +95,23 @@ class Location < ActiveRecord::Base
     end
 
     private
+
+    def update_address_from_google_place
+        if self.changes.include?(:google_place_id) && google_place_id_was != google_place_id
+            begin
+                place = GooglePlace.new(google_place_id)
+                self.address = place.address
+                self.city = place.city
+                self.province = place.province
+                self.country = place.country
+                self.latitude = place.latitude
+                self.longitude = place.longitude
+            rescue Exception => e
+                errors.add(:google_place_id, "invalid id")
+                return false
+            end
+        end
+    end
 
     def update_active_tags
         if self.changes.include?(:tags)

@@ -1,6 +1,6 @@
 class V1::LocationsController < V1::ApplicationController
     before_action :authenticate
-    before_action :validate_json_schema,    only: [:create, :update]
+    before_action :validate_json_schema, only: [:create, :update]
     before_action :set_location, only: [:show, :update, :destroy]
 
     def index
@@ -124,11 +124,25 @@ class V1::LocationsController < V1::ApplicationController
     end
 
     def create
-
+        json = flatten_request({single_record: true})
+        @location = current_account.locations.build(location_params(json[:data]))
+        if @location.save
+            json = {
+                "data" => serialize_location(@location)
+            }
+            render json: json
+        else
+            p @location.errors.full_messages
+            render json: { errors: V1::LocationErrorSerializer.serialize(@location.errors)}, status: :unprocessable_entity
+        end
     end
 
     def destroy
-
+        if @location.destroy
+            head :no_content
+        else
+            render json: {errors: V1::LocationErrorSerializer.serialize(@location.errors)}, status: :internal_server_error
+        end
     end
 
 
@@ -161,8 +175,30 @@ class V1::LocationsController < V1::ApplicationController
     end
 
     def location_params(local_params)
-        convert_param_if_exists(local_params[:configurations], :name, :title)
-        local_params.fetch(:locations, {}).permit(:enabled, :title, :address, :city, :province, :country, :latitude, :longitude, :radius)
+        convert_param_if_exists(local_params[:locations], :name, :title)
+        convert_param_if_exists(local_params[:locations], :"google-place-id", :google_place_id)
+        local_params.fetch(:locations, {}).permit(:enabled, :title, :address, :city, :province, :country, :latitude, :longitude, :radius, :google_place_id, {:tags => []})
+    end
+
+    def serialize_location(location)
+        {
+            "type" => "locations",
+            "id" => location.id.to_s,
+            "attributes" => {
+                "name" => location.title,
+                "address" => location.address,
+                "city" => location.city,
+                "province" => location.province,
+                "country" => location.country,
+                "latitude" => location.latitude,
+                "longitude" => location.longitude,
+                "radius" => location.radius,
+                "tags" => location.tags,
+                "enabled" => location.enabled,
+                "shared" => location.shared,
+                "configurations-count" => location.beacon_configurations_count
+            }
+        }
     end
 
     def serialize_elasticsearch_location(document)

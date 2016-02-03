@@ -11,6 +11,7 @@ class CreateLocations < ActiveRecord::Migration
             t.float :longitude, {:precision=>10, :scale=>6}
             t.integer :radius, default: 50
             t.text :tags, array: true, default: []
+            t.text :google_place_id
 
             t.boolean :enabled, default: true
             t.boolean :shared, default: false

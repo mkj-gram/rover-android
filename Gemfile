@@ -46,6 +46,8 @@ gem 'attr_encrypted', '~> 1.3', '>= 1.3.5'
 
 gem 'httparty', '~> 0.13.7'
 
+gem 'google_places', '~> 0.32.0'
+
 group :development do
 
 

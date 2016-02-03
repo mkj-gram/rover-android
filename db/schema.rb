@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 20160202201635) do
     t.float    "longitude"
     t.integer  "radius",                      default: 50
     t.text     "tags",                        default: [],                 array: true
+    t.text     "google_place_id"
     t.boolean  "enabled",                     default: true
     t.boolean  "shared",                      default: false
     t.integer  "beacon_configurations_count", default: 0
