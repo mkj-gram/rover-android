@@ -109,6 +109,36 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
 
+    def devices_meta
+        # we use to_a here to remove the active record relation
+        @devices_meta ||= Rails.cache.fetch(devices_meta_cache_key) do
+            devices = beacon_devices.all.to_a
+            count = devices.size
+            # there isn't any devices so return right away
+            if count == 0
+                {}
+            else
+                # check to see if they are all the same type
+                first_device_manufacturer = devices.first.manufacturer
+
+                if devices.all? {|device| device.manufacturer == first_device_manufacturer}
+                    # they are all the same manufacturer
+                    # select the first device
+                    type = devices.first.manufacturer_model
+                else
+                    # we have multiple types
+                    type = "multi"
+                end
+
+                {
+                    type: type,
+                    count: count
+                }
+            end
+        end
+
+        return @devices_meta
+    end
 
     protected
 
@@ -141,28 +171,8 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
-    def devices_meta
-        # we use to_a here to remove the active record relation
-        devices = beacon_devices.all.to_a
-        count = devices.size
-        # there isn't any devices so return right away
-        return {} if count == 0
-        # check to see if they are all the same type
-        first_device_manufacturer = devices.first.manufacturer
-
-        if devices.all? {|device| device.manufacturer == first_device_manufacturer}
-            # they are all the same manufacturer
-            # select the first device
-            type = devices.first.manufacturer_model
-        else
-            # we have multiple types
-            type = "multi"
-        end
-
-        return {
-            type: type,
-            count: count
-        }
+    def devices_meta_cache_key
+        "beacon_configurations/#{self.id}/devices_meta/#{self.beacon_devices_updated_at.to_i}"
     end
 
     def shared_account_ids
