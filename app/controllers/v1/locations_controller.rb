@@ -101,9 +101,10 @@ class V1::LocationsController < V1::ApplicationController
                 "totalRecords" => results.total,
                 "totalPages" => results.total_pages,
                 "totalSearchableRecords" => current_account.searchable_locations_count,
-                "suggestedViewBounds" => current_account.location_bounding_box_suggestion
             }
         }
+
+        json["meta"].merge!({"suggestedViewBounds" => current_account.location_bounding_box_suggestion}) if query_location.nil? && current_page == 1
 
         render json: json
     end
