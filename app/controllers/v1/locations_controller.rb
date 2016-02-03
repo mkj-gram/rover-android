@@ -254,7 +254,9 @@ class V1::LocationsController < V1::ApplicationController
                 "tags" => beacon_configuration.tags,
                 "shared" => beacon_configuration.shared,
                 "enabled" => beacon_configuration.enabled,
-                "protocol" => beacon_configuration.protocol
+                "device-type" => beacon_configuration.devices_meta[:type],
+                "device-count" => beacon_configuration.devices_meta[:count] || 0,
+                "protocol" => beacon_configuration.protocol,
             }.merge(beacon_configuration.configuration_attributes)
         }
     end
