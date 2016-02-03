@@ -60,6 +60,7 @@ class Location < ActiveRecord::Base
 
     belongs_to :account, counter_cache: :searchable_locations_count
     has_many :beacon_configurations
+    has_one :location_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
 
     before_save :update_active_tags
     after_save :update_beacon_configurations_elasticsearch_document
