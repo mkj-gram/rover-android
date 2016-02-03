@@ -293,8 +293,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             json = {
                 "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
             }
-            devices = beacon_configuration.beacon_devices.all.to_a
-            if devices.any?
+            should_include = whitelist_include(["location", "devices"])
+
+            if should_include.include?("devices")
+                devices = beacon_configuration.beacon_devices.all.to_a
                 json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
                 json["data"]["relationships"].merge!(
                     {
@@ -309,7 +311,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 json["included"] += devices.map{|device| serialize_device(device)}
             end
 
-            if beacon_configuration.location
+            if should_include.include?("location") && beacon_configuration.location
                 json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
                 json["data"]["relationships"].merge!(
                     {
