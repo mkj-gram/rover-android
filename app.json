@@ -49,5 +49,7 @@
       "required": true
     }
   },
-  "addons": []
+  "addons": [
+    "searchbox"
+  ]
 }
