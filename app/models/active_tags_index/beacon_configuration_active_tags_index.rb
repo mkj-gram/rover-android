@@ -1,2 +1,2 @@
-class BeaconConfigurationActiveTagsIndex < ActiveTagIndex
+class BeaconConfigurationActiveTagsIndex < ActiveTagsIndex
 end

@@ -45,13 +45,13 @@ ActiveRecord::Schema.define(version: 20160202201635) do
   add_index "accounts", ["share_key"], name: "index_accounts_on_share_key", unique: true, using: :btree
   add_index "accounts", ["token"], name: "index_accounts_on_token", unique: true, using: :btree
 
-  create_table "active_tags_indicies", force: :cascade do |t|
+  create_table "active_tags_indices", force: :cascade do |t|
     t.integer "account_id",              null: false
     t.string  "type",                    null: false
     t.string  "tags",       default: [],              array: true
   end
 
-  add_index "active_tags_indicies", ["account_id", "type"], name: "index_active_tags_indicies_on_account_id_and_type", unique: true, using: :btree
+  add_index "active_tags_indices", ["account_id", "type"], name: "index_active_tags_indices_on_account_id_and_type", unique: true, using: :btree
 
   create_table "beacon_configurations", force: :cascade do |t|
     t.integer  "account_id",                                null: false
