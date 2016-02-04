@@ -1,12 +1,13 @@
 class GooglePlace
     @@client = GooglePlaces::Client.new("AIzaSyDMy0oeUHIoagdwLVfRgsV5fprxvpSknzM")
 
-    attr_reader :address, :city, :province, :country, :longitude, :latitude
+    attr_reader :name, :address, :city, :province, :country, :longitude, :latitude
 
     def initialize(google_place_id)
         response = @@client.spot(google_place_id)
         components = response.address_components
         # formatted_address_index = Set.new(response.formatted_address.gsub(",", "").split(" "))
+        @name = response.name || ""
         @longitude = response.lng
         @latitude = response.lat
         @address = []

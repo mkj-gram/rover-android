@@ -3,7 +3,7 @@ class V1::LocationErrorSerializer < ModelError::Serializer
     attribute :title, error_key: :name
     attribute :address
     attribute :city
-    attribute :provice
+    attribute :province
     attribute :country
     attribute :radius
     attribute :longitude

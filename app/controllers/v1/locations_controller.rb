@@ -140,6 +140,10 @@ class V1::LocationsController < V1::ApplicationController
         # do we accept a google place id?
         json = flatten_request({single_record: true})
         if @location.update_attributes(location_params(json[:data]))
+            json = {
+                "data" => serialize_location(@location)
+            }
+            render json: json
         else
             render json: { errors: V1::LocationErrorSerializer.serialize(@location.errors)}, status: :unprocessable_entity
         end
@@ -154,7 +158,6 @@ class V1::LocationsController < V1::ApplicationController
             }
             render json: json
         else
-            p @location.errors.full_messages
             render json: { errors: V1::LocationErrorSerializer.serialize(@location.errors)}, status: :unprocessable_entity
         end
     end
