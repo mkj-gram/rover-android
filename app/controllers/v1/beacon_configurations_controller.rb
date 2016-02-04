@@ -151,6 +151,11 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             "links" => pagination_links(v1_beacon_configuration_index_url, results, {start_at: 0})
         }
 
+        included = results.select{|config| !config._source.location.empty? }.map{|config| serialize_partial_location(config._source.location) }
+        if included.any?
+            json["included"] = included
+        end
+
         render json: json
     end
 
@@ -288,22 +293,37 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             json = {
                 "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
             }
-            devices = beacon_configuration.beacon_devices.all.to_a
-            if devices.any?
-                json["data"].merge!(
+            should_include = whitelist_include(["location", "devices"])
+
+            if should_include.include?("devices")
+                devices = beacon_configuration.beacon_devices.all.to_a
+                json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
+                json["data"]["relationships"].merge!(
                     {
-                        "relationships" => {
-                            "devices" => {
-                                "data" => devices.map do |device|
-                                    {"type" => device.model_type, "id" => device.id.to_s}
-                                end
-                            }
+                        "devices" => {
+                            "data" => devices.map do |device|
+                                {"type" => device.model_type, "id" => device.id.to_s}
+                            end
                         }
                     }
                 )
+                json["included"] = [] if json["included"].nil?
+                json["included"] += devices.map{|device| serialize_device(device)}
+            end
 
-                included = devices.map{|device| serialize_device(device)}
-                json["included"] = included
+            if should_include.include?("location") && beacon_configuration.location
+                json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
+                json["data"]["relationships"].merge!(
+                    {
+                        "location" => {
+                            "data" => {"type" => "locations", "id" => beacon_configuration.location.id.to_s}
+                        }
+                    }
+                )
+                included = serialize_location(beacon_configuration.location)
+
+                json["included"] = [] if json["included"].nil?
+                json["included"] += [included]
             end
 
             render json: json
@@ -312,9 +332,39 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         end
     end
 
+    def serialize_location(location)
+        {
+            "type" => "locations",
+            "id" => location.id,
+            "attributes" => {
+                "name" => location.title,
+                "address" => location.address,
+                "city" => location.city,
+                "province" => location.province,
+                "country" => location.country,
+                "latitude" => location.latitude,
+                "longitude" => location.longitude,
+                "radius" => location.radius,
+                "tags" => location.tags,
+                "enabled" => location.enabled,
+                "shared" => location.shared
+            }
+        }
+    end
+
+    def serialize_partial_location(location)
+        {
+            "type" => "locations",
+            "id" => location.id,
+            "attributes" => {
+                "name" => location.name
+            }
+        }
+    end
+
     def elasticsearch_serialize_beacon(config, extra_attributes = {})
         source = config._source
-        {
+        json = {
             "type" => "configurations",
             "id" => config._id,
             "attributes" => {
@@ -326,6 +376,14 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "device-count" => source.devices_meta[:count] || 0
             }.merge(extra_attributes)
         }
+        if !source.location.empty?
+            json["relationships"] = {
+                "location" => {
+                    "data" => { "type" =>  "locations", "id" => source.location.id }
+                }
+            }
+        end
+        return json
     end
 
     def elasticsearch_serialize_ibeacon(config)

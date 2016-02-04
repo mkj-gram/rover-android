@@ -38,6 +38,7 @@ class BeaconConfiguration < ActiveRecord::Base
 
     before_save :update_active_tags
     before_save :remove_duplicate_tags
+    after_save :update_location
     after_create :increment_searchable_beacon_configurations_count
     after_destroy :decrement_searchable_beacon_configurations_count
 
@@ -108,41 +109,70 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
 
+    def devices_meta
+        # we use to_a here to remove the active record relation
+        @devices_meta ||= Rails.cache.fetch(devices_meta_cache_key) do
+            devices = beacon_devices.all.to_a
+            count = devices.size
+            # there isn't any devices so return right away
+            if count == 0
+                {}
+            else
+                # check to see if they are all the same type
+                first_device_manufacturer = devices.first.manufacturer
+
+                if devices.all? {|device| device.manufacturer == first_device_manufacturer}
+                    # they are all the same manufacturer
+                    # select the first device
+                    type = devices.first.manufacturer_model
+                else
+                    # we have multiple types
+                    type = "multi"
+                end
+
+                {
+                    type: type,
+                    count: count
+                }
+            end
+        end
+
+        return @devices_meta
+    end
 
     protected
 
+    def update_location
+        if self.changes.include?(:location_id) && location_id_was != location_id
+            old_location = location_id_was.nil? ? nil : Location.find_by_id(location_id_was)
+
+            if old_location
+                Location.decrement_counter(:beacon_configurations_count, old_location.id)
+                old_location.__elasticsearch__.update_document
+            end
+
+            new_location = location_id.nil? ? nil : Location.find_by_id(location_id)
+            if new_location
+                Location.increment_counter(:beacon_configurations_count, 1)
+                new_location.__elasticsearch__.update_document
+            end
+
+        end
+    end
+
     def indexed_location
-        if !self.location_id.nil?
+        if !self.location_id.nil? && self.location
             return {
-                name: location.name
+                name: location.title,
+                id: location.id
             }
         else
             return {}
         end
     end
 
-    def devices_meta
-        # we use to_a here to remove the active record relation
-        devices = beacon_devices.all.to_a
-        count = devices.size
-        # there isn't any devices so return right away
-        return {} if count == 0
-        # check to see if they are all the same type
-        first_device_manufacturer = devices.first.manufacturer
-
-        if devices.all? {|device| device.manufacturer == first_device_manufacturer}
-            # they are all the same manufacturer
-            # select the first device
-            type = devices.first.manufacturer_model
-        else
-            # we have multiple types
-            type = "multi"
-        end
-
-        return {
-            type: type,
-            count: count
-        }
+    def devices_meta_cache_key
+        "beacon_configurations/#{self.id}/devices_meta/#{self.beacon_devices_updated_at.to_i}"
     end
 
     def shared_account_ids

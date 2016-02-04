@@ -7,7 +7,7 @@ class Account < ActiveRecord::Base
     include Tokenable
 
     before_create :generate_share_key
-    after_create :create_beacon_configuration_active_tags
+    after_create :create_active_tags_indexes
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
@@ -32,6 +32,7 @@ class Account < ActiveRecord::Base
     has_many :shared_with_me_beacon_configurations, through: :passive_shared_beacon_configurations, source: :beacon_configuration
 
     has_one :beacon_configuration_active_tags_index
+    has_one :location_active_tags_index
 
     has_many :third_party_integrations do
         def enabled
@@ -50,6 +51,57 @@ class Account < ActiveRecord::Base
     # has_many :eddystone_url_configurations, dependent: :destroy
     has_many :account_invites, dependent: :destroy
 
+    def location_bounding_box_suggestion
+        query = {
+            size: 0,
+            query: {
+                filtered: {
+                    filter: {
+                        bool: {
+                            should: [
+                                {
+                                    term: { account_id: 1 }
+                                },
+                                {
+                                    term: { shared_account_ids: 1}
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            aggs: {
+                geo_hash: {
+                    geohash_grid: {
+                        size: 1,
+                        precision: 2,
+                        field: "location"
+                    },
+                    aggs: {
+                        cell: {
+                            geo_bounds: {
+                                field: "location"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        response = Elasticsearch::Model.search(query, [Location]).response
+        return nil if response.aggregations.geo_hash.buckets.empty?
+        bounds = response.aggregations.geo_hash.buckets.first.cell.bounds
+        {
+            "top-left" => {
+                "lat" => bounds.top_left.lat,
+                "lng" => bounds.top_left.lon
+            },
+            "bottom-right" => {
+                "lat" => bounds.bottom_right.lat,
+                "lng" => bounds.bottom_right.lon
+            }
+        }
+    end
 
     private
 
@@ -60,7 +112,8 @@ class Account < ActiveRecord::Base
         end
     end
 
-    def create_beacon_configuration_active_tags
+    def create_active_tags_indexes
         BeaconConfigurationActiveTagsIndex.create(account_id: self.id)
+        LocationActiveTagsIndex.create(account_id: self.id)
     end
 end

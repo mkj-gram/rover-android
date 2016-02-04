@@ -10,6 +10,7 @@ class CreateAccounts < ActiveRecord::Migration
             t.integer :users_count, default: 0
             t.integer :locations_count, default: 0
             t.integer :searchable_beacon_configurations_count, default: 0
+            t.integer :searchable_locations_count, default: 0
             t.integer :account_invites_count, default: 0
 
             t.timestamps null: false

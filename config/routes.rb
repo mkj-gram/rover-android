@@ -31,21 +31,23 @@ Rails.application.routes.draw do
         resources :account_invites, only: [:index, :create, :destroy]
         get '/account_invites/:token', to: "account_invites#show"
 
-        resources :locations do
-            # collection do
-            # scope module: "locations" do
-            #     collection do
-            #         delete  '', to: "bulk#destroy",   as: "bulk_delete"
-            #         patch   '', to: "bulk#update",    as: "bulk_update"
-            #         post    '', to: "bulk#create",    as: "bulk_create"
-            #     end
-            # end
+        # resources :locations do
+        #     # collection do
+        #     # scope module: "locations" do
+        #     #     collection do
+        #     #         delete  '', to: "bulk#destroy",   as: "bulk_delete"
+        #     #         patch   '', to: "bulk#update",    as: "bulk_update"
+        #     #         post    '', to: "bulk#create",    as: "bulk_create"
+        #     #     end
+        #     # end
 
-            # end
-            # namespace :relationships, module: "locations" do
-            #     resources :beacons
-            # end
-        end
+        #     # end
+        #     # namespace :relationships, module: "locations" do
+        #     #     resources :beacons
+        #     # end
+        # end
+
+        resources :locations
 
         resources :sessions, only: [:create, :show, :destroy]
 

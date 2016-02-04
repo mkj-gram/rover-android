@@ -1,5 +1,4 @@
-class BeaconConfigurationActiveTagsIndex < ActiveRecord::Base
-
+class ActiveTagsIndex < ActiveRecord::Base
     before_update :unique_tags, if: -> { self.tags_changed? }
 
     private

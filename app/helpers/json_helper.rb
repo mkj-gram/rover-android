@@ -8,12 +8,12 @@ module JsonHelper
                 data = [data]
             end
 
+            ClassyHash.validate_strict({data: data}, request_schema)
+
             data.each do |d|
                 # fix rails...
                 d[:attributes] = {} if !d.has_key?(:attributes)
             end
-
-            ClassyHash.validate_strict({data: data}, request_schema)
             @valid_json = true
         rescue RuntimeError => e
             @valid_json = false

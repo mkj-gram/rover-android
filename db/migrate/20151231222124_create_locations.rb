@@ -2,17 +2,19 @@ class CreateLocations < ActiveRecord::Migration
     def change
         create_table :locations do |t|
             t.integer :account_id, null: false
-            t.text :name
+            t.string :title
             t.text :address
             t.text :city
-            t.text :province_state
-            t.text :postal_zip
-            t.text :country
-            t.decimal :latitude
-            t.decimal :longitude
-            t.integer :radius
-            t.text :google_place_id
+            t.text :province
+            t.string :country
+            t.float :latitude, {:precision=>10, :scale=>6}
+            t.float :longitude, {:precision=>10, :scale=>6}
+            t.integer :radius, default: 50
             t.text :tags, array: true, default: []
+            t.text :google_place_id
+
+            t.boolean :enabled, default: true
+            t.boolean :shared, default: false
 
             # counter_cache
             t.integer :beacon_configurations_count, default: 0
@@ -20,5 +22,6 @@ class CreateLocations < ActiveRecord::Migration
         end
 
         add_index :locations, :account_id
+        add_index :locations, :tags, using: :gin
     end
 end

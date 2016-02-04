@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160127133932) do
+ActiveRecord::Schema.define(version: 20160202201635) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20160127133932) do
     t.integer  "users_count",                            default: 0
     t.integer  "locations_count",                        default: 0
     t.integer  "searchable_beacon_configurations_count", default: 0
+    t.integer  "searchable_locations_count",             default: 0
     t.integer  "account_invites_count",                  default: 0
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
@@ -44,13 +45,13 @@ ActiveRecord::Schema.define(version: 20160127133932) do
   add_index "accounts", ["share_key"], name: "index_accounts_on_share_key", unique: true, using: :btree
   add_index "accounts", ["token"], name: "index_accounts_on_token", unique: true, using: :btree
 
-  create_table "beacon_configuration_active_tags_indices", force: :cascade do |t|
+  create_table "active_tags_indices", force: :cascade do |t|
     t.integer "account_id",              null: false
+    t.string  "type",                    null: false
     t.string  "tags",       default: [],              array: true
   end
 
-  add_index "beacon_configuration_active_tags_indices", ["account_id"], name: "index_beacon_configuration_active_tags_indices_on_account_id", unique: true, using: :btree
-  add_index "beacon_configuration_active_tags_indices", ["tags"], name: "index_beacon_configuration_active_tags_indices_on_tags", using: :gin
+  add_index "active_tags_indices", ["account_id", "type"], name: "index_active_tags_indices_on_account_id_and_type", unique: true, using: :btree
 
   create_table "beacon_configurations", force: :cascade do |t|
     t.integer  "account_id",                                null: false
@@ -101,24 +102,26 @@ ActiveRecord::Schema.define(version: 20160127133932) do
   add_index "beacon_devices", ["third_party_integration_id"], name: "index_beacon_devices_on_third_party_integration_id", using: :btree
 
   create_table "locations", force: :cascade do |t|
-    t.integer  "account_id",                               null: false
-    t.text     "name"
+    t.integer  "account_id",                                  null: false
+    t.string   "title"
     t.text     "address"
     t.text     "city"
-    t.text     "province_state"
-    t.text     "postal_zip"
-    t.text     "country"
-    t.decimal  "latitude"
-    t.decimal  "longitude"
-    t.integer  "radius"
+    t.text     "province"
+    t.string   "country"
+    t.float    "latitude"
+    t.float    "longitude"
+    t.integer  "radius",                      default: 50
+    t.text     "tags",                        default: [],                 array: true
     t.text     "google_place_id"
-    t.text     "tags",                        default: [],              array: true
+    t.boolean  "enabled",                     default: true
+    t.boolean  "shared",                      default: false
     t.integer  "beacon_configurations_count", default: 0
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
   end
 
   add_index "locations", ["account_id"], name: "index_locations_on_account_id", using: :btree
+  add_index "locations", ["tags"], name: "index_locations_on_tags", using: :gin
 
   create_table "password_resets", force: :cascade do |t|
     t.integer  "user_id",    null: false
