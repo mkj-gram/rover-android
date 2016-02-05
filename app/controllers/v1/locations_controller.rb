@@ -17,9 +17,15 @@ class V1::LocationsController < V1::ApplicationController
             }
         )
 
-        if query_location
-            must_filter.push(query_location.to_elasticsearch_filter("location"))
+        begin
+            bounds_filter = query_bounds
+        rescue GeoFilter::GeoBoundingBox::InvalidBoundsFormat => e
+            render json: { errors: [{detail: e.message, status: "400"}]}, status: 400
+            return
         end
+
+        must_filter.push(query_bounds.to_elasticsearch_filter("location")) if bounds_filter
+
 
         # if tags are provided they must all match
         if query_tags.any?
@@ -104,7 +110,7 @@ class V1::LocationsController < V1::ApplicationController
             }
         }
 
-        json["meta"].merge!({"suggestedViewBounds" => current_account.location_bounding_box_suggestion}) if query_location.nil? && current_page == 1
+        json["meta"].merge!({"suggestedViewBounds" => current_account.location_bounding_box_suggestion}) if query_bounds.nil? && current_page == 1
 
         render json: json
     end
@@ -181,17 +187,17 @@ class V1::LocationsController < V1::ApplicationController
     # or point
 
     def filter_params
-        params.fetch(:filter, {}).permit(:query, {:tags => []})
+        params.fetch(:filter, {}).permit(:query, :bounds, {:bounds => []}, {:tags => []})
     end
 
     def query_keyword
         filter_params.fetch(:query, nil)
     end
 
-    def query_location
-        @query_location ||= -> {
-            return nil if params.dig(:filter, :location).nil?
-            return get_geo_filter(params[:filter])
+    def query_bounds
+        @query_bounds ||= -> {
+            return nil if !filter_params.has_key?(:bounds)
+            return GeoFilter::GeoBoundingBox.new(filter_params.fetch(:bounds, []))
         }.call
     end
 

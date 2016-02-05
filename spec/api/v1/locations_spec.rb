@@ -10,6 +10,28 @@ end
 describe "/v1/locations", :type => :request do
 
     context "GET" do
+        it 'returns 400 when bounds is specified but invalid' do
+            account = create(:account)
+            get '/v1/locations', {filter: {bounds: [999,999,999,999]}}, signed_request_header(account)
+
+            expect(response).to have_http_status(400)
+            expect(json[:errors].size).to be >=1
+        end
+
+        it 'returns 200 with no filters' do
+            account = create(:account)
+            get '/v1/locations', nil, signed_request_header(account)
+
+            expect(response).to have_http_status(200)
+        end
+
+        it 'returns 200 with bounds filters' do
+            account = create(:account)
+            get '/v1/locations', {filter: {bounds: [0,0,0,0]}}, signed_request_header(account)
+
+            expect(response).to have_http_status(200)
+        end
+
         it 'returns 200ok when a location exists' do
             location = create(:location)
             account = location.account
@@ -23,8 +45,8 @@ describe "/v1/locations", :type => :request do
             expect(attributes).not_to eq(nil)
             expect(attributes.dig(:name)).to eq(location.title)
             expect(attributes.dig(:address)).to eq(location.address)
-            expect(attributes.dig(:latitude)).to eq(location.latitude.round(13))
-            expect(attributes.dig(:longitude)).to eq(location.longitude.round(13))
+            expect(attributes.dig(:latitude).round(10)).to eq(location.latitude.round(10))
+            expect(attributes.dig(:longitude).round(10)).to eq(location.longitude.round(10))
         end
 
 

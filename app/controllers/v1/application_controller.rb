@@ -7,7 +7,6 @@ class V1::ApplicationController < ActionController::API
     include AccessHelper
     include JsonHelper
     include RenderHelper
-    include GeoFilterHelper
 
     # set the scope to the view context so we can use Rails url_helper like v1_users_path(@user)
     serialization_scope :view_context
