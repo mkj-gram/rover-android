@@ -105,7 +105,7 @@ class Location < ActiveRecord::Base
         if self.changes.include?(:google_place_id) && google_place_id_was != google_place_id
             begin
                 place = GooglePlace.new(google_place_id)
-                self.title = place.name
+                self.title ||= place.name
                 self.address = place.address
                 self.city = place.city
                 self.province = place.province
