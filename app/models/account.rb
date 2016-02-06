@@ -91,16 +91,7 @@ class Account < ActiveRecord::Base
         response = Elasticsearch::Model.search(query, [Location]).response
         return nil if response.aggregations.geo_hash.buckets.empty?
         bounds = response.aggregations.geo_hash.buckets.first.cell.bounds
-        {
-            "top-left" => {
-                "lat" => bounds.top_left.lat,
-                "lng" => bounds.top_left.lon
-            },
-            "bottom-right" => {
-                "lat" => bounds.bottom_right.lat,
-                "lng" => bounds.bottom_right.lon
-            }
-        }
+        return [bounds.top_left.lat, bounds.bottom_right.lon, bounds.bottom_right.lat, bounds.top_left.lon]
     end
 
     private
