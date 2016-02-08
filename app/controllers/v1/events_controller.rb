@@ -30,28 +30,30 @@ class V1::EventsController < V1::ApplicationController
         event.save
 
         json = {
-            "data" => []
+            "data" => {}
         }
-        render json: Customer.all
+
+        render json: json
     end
 
 
     private
 
-    # if the alias has changed then we need to update before inserting into the db
     def get_device(event_attributes)
-        device = CustomerDevice.find_by_udid(event_attributes.dig(:device, :udid))
+        device_attributes = event_attributes.fetch(:device, {})
+        device = device_attributes[:udid].nil? ? nil : CustomerDevice.find_by_udid(device_attributes[:udid])
         if device.nil?
             device = build_device(event_attributes)
             device.account_id = current_account.id
             device.save
         end
-
+        device.update_attributes_async(device_params(device_attributes))
+        # check to see if the device_attributes need updating
         return device
     end
 
     def build_device(event_attributes)
-        device = CustomerDevice.new(device_params(event_attributes))
+        device = CustomerDevice.new(device_params(event_attributes.fetch(:device, {})))
         user_alias = event_attributes.dig(:user, :alias)
         if !user_alias.nil?
             # they are creating a device with an alias, rare but could happen
@@ -78,13 +80,22 @@ class V1::EventsController < V1::ApplicationController
             current_customer = new_customer
         end
 
-        current_customer.update_attributes_async(user_attributes)
+        current_customer.update_attributes_async(customer_params(user_attributes))
+
+        return current_customer
     end
 
     def create_customer(user_attributes)
-        customer = Customer.new(customer_params(user_attributes))
-        customer.account_id = current_account.id
-        customer.save
+        begin
+            customer = Customer.new(customer_params(user_attributes))
+            customer.account_id = current_account.id
+            customer.save
+        rescue ActiveRecord::RecordNotUnique => e
+            # this happens when 2 request come at the exact same time
+            # User with 2 devices update their attributes at the exact same time
+            # Super rare but we don't want to 500 internal
+            customer = Customer.find_by(account_id: current_account.id, alias: new_customer_alias)
+        end
         return customer
     end
 
@@ -109,9 +120,10 @@ class V1::EventsController < V1::ApplicationController
         allowed_params = user_attributes.permit(:alias, :name, :email, :phone_number, {:tags => []})
         # we have to manually allow traits since strong params doesn't allow unknown hashes
         allowed_params[:traits] = user_attributes.dig(:traits) || {}
+        return allowed_params
     end
 
     def device_params(local_params)
-        local_params.fetch(:device, {}).permit(:udid, :token, :locale_lang, :locale_region, :time_zone, :sdk_version, :platform, :os_name, :os_version, :model, :manufacturer, :carrier, :idfa, :aaid)
+        local_params.permit(:udid, :token, :locale_lang, :locale_region, :time_zone, :sdk_version, :platform, :os_name, :os_version, :model, :manufacturer, :carrier, :idfa, :aaid)
     end
 end

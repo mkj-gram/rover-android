@@ -78,6 +78,8 @@ Rails.application.routes.draw do
 
         get "/regions", to: 'regions#index', as: "regions"
 
+        post "/events", to: 'events#create'
+
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

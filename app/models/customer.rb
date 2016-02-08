@@ -13,18 +13,18 @@ class Customer < ActiveRecord::Base
         end
     end
 
-    def local_merge_attributes(new_attributes)
-        new_traits = new_attributes.dig(:traits)
-        new_tags = new_attributes.dig(:tags)
-        {
-            id: self.id,
-            name: new_attributes.dig(:name) || self.name,
-            email: new_attributes.dig(:email) || self.email,
-            phone_number: new_attributes.dig(:"phone-number") || self.phone_number,
-            tags: new_tags.nil? ? self.tags : (self.tags + new_tags).uniq,
-            alias: new_attributes.dig(:alias) || self.alias,
-            traits: new_traits.nil? ? self.traits : self.traits.merge(new_traits)
-        }
+    def merge_and_update_attributes(new_attributes)
+        new_traits = new_attributes.delete(:traits)
+        new_tags = new_attributes.delete(:tags)
+
+        new_attributes[:traits] = self.traits.merge!(new_traits) if new_traits && new_traits.any?
+        new_attributes[:tags] = (self.tags + new_tags).uniq if new_tags && new_tags.any?
+
+
+
+        if new_attributes.any?
+            self.update_attributes(new_attributes)
+        end
     end
 
     private
