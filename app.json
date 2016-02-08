@@ -50,6 +50,7 @@
     }
   },
   "addons": [
-    "searchbox"
+    "searchbox",
+    "cloudamqp"
   ]
 }
