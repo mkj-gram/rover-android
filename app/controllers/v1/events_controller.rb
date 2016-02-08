@@ -1,4 +1,3 @@
-require 'signature_helper'
 class V1::EventsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema

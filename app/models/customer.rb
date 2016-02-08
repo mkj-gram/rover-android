@@ -1,4 +1,3 @@
-require 'signature_helper'
 class Customer < ActiveRecord::Base
 
     has_many :devices, class_name: "CustomerDevice"
