@@ -10,7 +10,7 @@ production:
     amqp: <%= ENV['CLOUDAMQP_URL'] || ENV['RABBITMQ_AMQP']%>
     heartbeat: 10
     pool: <%=ENV['WEB_CONCURRENCY'] || 5 %>
-    ssl: <%= ENV['CLOUDAMQP_URL'].nil? ? false : true %>
+    ssl: <%= ENV['RABBITMQ_AMQP'].nil? ? false : true %>
     public_key: <%= Rails.root.join("config", "certs", "rabbit_mq_public_key.pem").to_s %>
 
 
