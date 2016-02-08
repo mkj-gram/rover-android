@@ -4,8 +4,7 @@ class V1::RegionsController < V1::ApplicationController
 
 
     def index
-        types = filter_types.dig(:types)
-
+        types = query_types[:types]
 
         if types.include?("ibeacon")
             ibeacon_regions = IBeaconConfiguration.select("DISTINCT on(uuid) *").where(account_id: current_account.id).limit(page_size)
@@ -15,7 +14,59 @@ class V1::RegionsController < V1::ApplicationController
 
 
         if types.include?("geofence")
+            if query_lat && query_lng
+                sort = [
+                    {
+                        :"_geo_distance" => {
+                            location: {
+                                lat: query_lat,
+                                lon: query_lng
+                            },
+                            order: "asc",
+                            unit: "km",
+                            :"distance_type" => "plane"
+                        }
+                    }
+                ]
 
+            else
+                sort = [
+                    {
+                        created_at: {
+                            order: "desc"
+                        }
+                    }
+                ]
+            end
+
+            query = {
+                query: {
+                    filtered: {
+                        filter: {
+                            bool: {
+                                should: [
+                                    {
+                                        term: { account_id: current_account.id }
+                                    },
+                                    {
+                                        term: { shared_account_ids: current_account.id }
+                                    }
+                                ],
+                                must: [
+                                    {
+                                        term: { enabled: true }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                sort: sort
+            }
+
+            locations = Elasticsearch::Model.search(query, [Location])
+            results = locations.per_page(page_size - ibeacon_regions.length).page(current_page).results
+            geofence_regions = results.map{|result| serialize_elasticsearch_geofence_region(result)}
         else
             geofence_regions = []
         end
@@ -49,13 +100,31 @@ class V1::RegionsController < V1::ApplicationController
         return json
     end
 
-    def serialize_geofence_region(geofence_region)
-
+    def serialize_elasticsearch_geofence_region(geofence_region)
+        source = geofence_region._source
+        {
+            "type" => "geofence-regions",
+            "id" => "#{source.location.lat}#{source.location.lon}",
+            "attributes" => {
+                "latitude" => source.location.lat,
+                "longitude" => source.location.lon
+            }
+        }
     end
 
-
-    def filter_types
-        # {filter: types: [ibeacon,geofence]}
-        params.fetch(:filter, {types: ["ibeacon", "geofence"]}).permit({:types => []})
+    def query_lat
+        lat = params.dig(:filter, :lat)
+        return lat.nil? ? nil : lat.to_f
     end
+
+    def query_lng
+        lng = params.dig(:filter, :lng)
+        return lng.nil? ? nil : lng.to_f
+    end
+
+    def query_types
+        params[:filter][:types] = ["ibeacon", "geofence"] if !(params.has_key?(:filter) && params[:filter].has_key?(:types))
+        params.fetch(:filter, {}).permit({:types => []})
+    end
+
 end
