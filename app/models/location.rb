@@ -41,6 +41,7 @@ class Location < ActiveRecord::Base
             indexes :city, type: 'string', index: 'no'
             indexes :province, type: 'string', index: 'no'
             indexes :country, type: 'string', index: 'no'
+            indexes :postal_code, type: 'string', index: 'no'
             indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
             indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
@@ -54,11 +55,7 @@ class Location < ActiveRecord::Base
     end
 
     validates :title, presence: true, unless: :google_place_id?
-    validates :address, presence: true, unless: :google_place_id?
-    validates :city, presence: true, unless: :google_place_id?
-    validates :province, presence: true, unless: :google_place_id?
-    validates :country, presence: true, unless: :google_place_id?
-    validates :radius, presence: true, inclusion: { in: 50..500, message: "must be between 50 and 500" }
+    validates :radius, inclusion: { in: 50..500, message: "must be between 50 and 500" }
     validates :latitude, presence: true, inclusion: { in: -90..90, message: "must be between -90 and 90" }, unless: :google_place_id?
     validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }, unless: :google_place_id?
 
@@ -83,6 +80,7 @@ class Location < ActiveRecord::Base
             city: self.city,
             province: self.province,
             country: self.country,
+            postal_code: self.postal_code,
             location: {lat: self.latitude, lon: self.longitude},
             radius: self.radius,
             formatted_address: self.formatted_address,
@@ -96,7 +94,7 @@ class Location < ActiveRecord::Base
     end
 
     def formatted_address
-        "#{self.address} #{self.city} #{self.province} #{self.country}"
+        "#{self.address} #{self.city} #{self.province} #{self.postal_code} #{self.country}"
     end
 
     private
@@ -107,9 +105,10 @@ class Location < ActiveRecord::Base
                 place = GooglePlace.new(google_place_id)
                 self.title ||= place.name
                 self.address = place.address
-                self.city = place.city
-                self.province = place.province
-                self.country = place.country
+                self.city ||= place.city
+                self.province ||= place.province
+                self.country ||= place.country
+                self.postal_code ||= place.postal_code
                 self.latitude = place.latitude
                 self.longitude = place.longitude
             rescue Exception => e

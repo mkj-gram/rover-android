@@ -208,7 +208,8 @@ class V1::LocationsController < V1::ApplicationController
     def location_params(local_params)
         convert_param_if_exists(local_params[:locations], :name, :title)
         convert_param_if_exists(local_params[:locations], :"google-place-id", :google_place_id)
-        local_params.fetch(:locations, {}).permit(:enabled, :title, :address, :city, :province, :country, :latitude, :longitude, :radius, :google_place_id, {:tags => []})
+        convert_param_if_exists(local_params[:locations], :"postal-code", :postal_code)
+        local_params.fetch(:locations, {}).permit(:enabled, :title, :address, :city, :province, :country, :postal_code,  :latitude, :longitude, :radius, :google_place_id, {:tags => []})
     end
 
     def serialize_location(location)
@@ -221,6 +222,7 @@ class V1::LocationsController < V1::ApplicationController
                 "city" => location.city,
                 "province" => location.province,
                 "country" => location.country,
+                "postal-code" => location.postal_code,
                 "latitude" => location.latitude,
                 "longitude" => location.longitude,
                 "radius" => location.radius,
@@ -243,6 +245,7 @@ class V1::LocationsController < V1::ApplicationController
                 "city" => source.city,
                 "province" => source.province,
                 "country" => source.country,
+                "postal_code" => source.postal_code,
                 "latitude" => source.location.lat,
                 "longitude" => source.location.lon,
                 "radius" => source.radius,

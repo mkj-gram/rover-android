@@ -86,10 +86,10 @@ describe "/v1/locations", :type => :request do
                 expect(json[:errors].size).to be >=1
             end
 
-            it 'returns 422 when address is not included' do
+            it 'returns 422 when name is not included' do
                 account = create(:account)
                 attributes = location_attributes
-                attributes[:address] = nil
+                attributes[:name] = nil
                 post '/v1/locations',
                 {
                     data: {
@@ -102,69 +102,6 @@ describe "/v1/locations", :type => :request do
                 expect(json[:errors].size).to be >=1
             end
 
-            it 'returns 422 when city is not included' do
-                account = create(:account)
-                attributes = location_attributes
-                attributes[:city] = nil
-                post '/v1/locations',
-                {
-                    data: {
-                        type: "locations",
-                        attributes: attributes
-                    }
-                }, signed_request_header(account)
-
-                expect(response).to have_http_status(422)
-                expect(json[:errors].size).to be >=1
-            end
-
-            it 'returns 422 when province is not included' do
-                account = create(:account)
-                attributes = location_attributes
-                attributes[:province] = nil
-                post '/v1/locations',
-                {
-                    data: {
-                        type: "locations",
-                        attributes: attributes
-                    }
-                }, signed_request_header(account)
-
-                expect(response).to have_http_status(422)
-                expect(json[:errors].size).to be >=1
-            end
-
-            it 'returns 422 when country is not included' do
-                account = create(:account)
-                attributes = location_attributes
-                attributes[:country] = nil
-                post '/v1/locations',
-                {
-                    data: {
-                        type: "locations",
-                        attributes: attributes
-                    }
-                }, signed_request_header(account)
-
-                expect(response).to have_http_status(422)
-                expect(json[:errors].size).to be >=1
-            end
-
-            it 'returns 422 when radius is not in the specified bounds' do
-                account = create(:account)
-                attributes = location_attributes
-                attributes[:radius] = 50000
-                post '/v1/locations',
-                {
-                    data: {
-                        type: "locations",
-                        attributes: attributes
-                    }
-                }, signed_request_header(account)
-
-                expect(response).to have_http_status(422)
-                expect(json[:errors].size).to be >=1
-            end
 
             it 'returns 422 when passed an invalid google-place-id' do
                 account = create(:account)
@@ -303,26 +240,6 @@ describe "/v1/locations", :type => :request do
 
                 expect(response).to have_http_status(200)
                 expect(json.dig(:data, :attributes, :address)).to eq("new address")
-            end
-
-            it 'returns 200 when providing just the google-place-id' do
-                location = create(:location)
-                account = location.account
-                place_id = "ChIJWb7ra-AY1YkRCbp8uCzA3_c"
-                place = GooglePlace.new(place_id)
-                patch "/v1/locations/#{location.id}",
-                {
-                    data: {
-                        type: "locations",
-                        attributes: {
-                            :"google-place-id" => place_id
-                        }
-                    }
-                }, signed_request_header(account)
-
-                expect(response).to have_http_status(200)
-                expect(json.dig(:data, :attributes, :address)).to eq(place.address)
-                expect(json.dig(:data, :attributes, :city)).to eq(place.city)
             end
         end
     end

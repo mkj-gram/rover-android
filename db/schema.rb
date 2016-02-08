@@ -108,6 +108,7 @@ ActiveRecord::Schema.define(version: 20160202201635) do
     t.text     "city"
     t.text     "province"
     t.string   "country"
+    t.string   "postal_code"
     t.float    "latitude"
     t.float    "longitude"
     t.integer  "radius",                      default: 50

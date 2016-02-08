@@ -1,7 +1,7 @@
 class GooglePlace
     @@client = GooglePlaces::Client.new("AIzaSyDMy0oeUHIoagdwLVfRgsV5fprxvpSknzM")
 
-    attr_reader :name, :address, :city, :province, :country, :longitude, :latitude
+    attr_reader :name, :address, :city, :province, :country, :postal_code, :longitude, :latitude
 
     def initialize(google_place_id)
         response = @@client.spot(google_place_id)
@@ -14,6 +14,7 @@ class GooglePlace
         @city = []
         @province = []
         @country = []
+        @postal_code = response.postal_code
         components.each do |component|
             types = component["types"]
             if types.include?("street_number") || types.include?("premise") || types.include?("route")
