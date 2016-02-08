@@ -107,7 +107,8 @@ class V1::RegionsController < V1::ApplicationController
             "id" => "#{source.location.lat}#{source.location.lon}",
             "attributes" => {
                 "latitude" => source.location.lat,
-                "longitude" => source.location.lon
+                "longitude" => source.location.lon,
+                "radius" => source.radius
             }
         }
     end
