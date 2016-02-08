@@ -55,7 +55,7 @@ class Location < ActiveRecord::Base
     end
 
     validates :title, presence: true, unless: :google_place_id?
-    validates :radius, inclusion: { in: 50..500, message: "must be between 50 and 500" }
+    validates :radius, inclusion: { in: 50..5000, message: "must be between 50 and 5000" }
     validates :latitude, presence: true, inclusion: { in: -90..90, message: "must be between -90 and 90" }, unless: :google_place_id?
     validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }, unless: :google_place_id?
 
