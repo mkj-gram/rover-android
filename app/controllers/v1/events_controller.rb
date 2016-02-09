@@ -123,6 +123,10 @@ class V1::EventsController < V1::ApplicationController
     end
 
     def device_params(local_params)
-        local_params.permit(:udid, :token, :locale_lang, :locale_region, :time_zone, :sdk_version, :platform, :os_name, :os_version, :model, :manufacturer, :carrier, :idfa, :aaid)
+        convert_param_if_exists(local_params, :"local-notifications-enabled", :local_notifications_enabled)
+        convert_param_if_exists(local_params, :"remote-notifications-enabled", :remote_notifications_enabled)
+        convert_param_if_exists(local_params, :"bluetooth-enabled", :bluetooth_enabled)
+
+        local_params.permit(:udid, :token, :locale_lang, :locale_region, :time_zone, :sdk_version, :platform, :os_name, :os_version, :model, :manufacturer, :carrier, :idfa, :aaid, :local_notifications_enabled, :remote_notifications_enabled, :bluetooth_enabled)
     end
 end
