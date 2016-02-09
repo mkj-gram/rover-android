@@ -14,8 +14,5 @@ class CreateCustomers < ActiveRecord::Migration
 
         add_index :customers, :account_id
         add_index :customers, [:account_id, :alias], unique: true
-        add_index :customers, [:account_id, :traits], using: :gin
-        add_index :customers, [:account_id, :tags], using: :gin
-        add_index :customers, [:account_id, :tags, :traits], using: :gin
     end
 end

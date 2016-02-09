@@ -23,5 +23,7 @@ class CreateCustomerDevices < ActiveRecord::Migration
             t.boolean :remote_notifications_enabled, default: false
             t.boolean :bluetooth_enabled, default: false
         end
+
+        add_index :customer_devices, :udid, unique: true
     end
 end
