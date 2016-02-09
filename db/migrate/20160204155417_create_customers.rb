@@ -1,5 +1,6 @@
 class CreateCustomers < ActiveRecord::Migration
     def change
+        enable_extension "btree_gin"
         create_table :customers do |t|
             t.integer :account_id, null: false
             t.string :alias
@@ -13,5 +14,8 @@ class CreateCustomers < ActiveRecord::Migration
 
         add_index :customers, :account_id
         add_index :customers, [:account_id, :alias], unique: true
+        add_index :customers, [:account_id, :traits], using: :gin
+        add_index :customers, [:account_id, :tags], using: :gin
+        add_index :customers, [:account_id, :tags, :traits], using: :gin
     end
 end
