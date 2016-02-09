@@ -16,11 +16,11 @@ class CreateCustomerDevices < ActiveRecord::Migration
             t.string :model
             t.string :manufacturer
             t.string :carrier
-            t.string :idfa
-            t.string :aaid
+            t.string :aid
 
             t.boolean :local_notifications_enabled, default: false
             t.boolean :remote_notifications_enabled, default: false
+            t.boolean :location_monitoring_enabled, default: false
             t.boolean :bluetooth_enabled, default: false
         end
 

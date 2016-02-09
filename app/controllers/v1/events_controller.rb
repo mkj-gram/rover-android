@@ -132,7 +132,8 @@ class V1::EventsController < V1::ApplicationController
         convert_param_if_exists(local_params, :"local-notifications-enabled", :local_notifications_enabled)
         convert_param_if_exists(local_params, :"remote-notifications-enabled", :remote_notifications_enabled)
         convert_param_if_exists(local_params, :"bluetooth-enabled", :bluetooth_enabled)
+        convert_param_if_exists(local_params, :"location-monitoring-enabled", :location_monitoring_enabled)
 
-        local_params.permit(:udid, :token, :locale_lang, :locale_region, :time_zone, :sdk_version, :platform, :os_name, :os_version, :model, :manufacturer, :carrier, :idfa, :aaid, :local_notifications_enabled, :remote_notifications_enabled, :bluetooth_enabled)
+        local_params.permit(:udid, :token, :locale_lang, :locale_region, :time_zone, :sdk_version, :platform, :os_name, :os_version, :model, :manufacturer, :carrier, :aid , :local_notifications_enabled, :remote_notifications_enabled, :bluetooth_enabled, :location_monitoring_enabled)
     end
 end
