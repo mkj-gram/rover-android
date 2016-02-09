@@ -8,6 +8,7 @@ class Customer < ActiveRecord::Base
         mapping do
             indexes :account_id, type: 'long', index: 'not_analyzed'
             indexes :alias, type: 'string', index: 'not_analyzed'
+            indexes :name, type: 'string', index: 'not_analyzed'
             indexes :email, type: 'string', index: 'not_analyzed'
             indexes :phone_number, type: 'string', index: 'not_analyzed'
             indexes :tags, type: 'string', index: 'not_analyzed'
@@ -37,6 +38,7 @@ class Customer < ActiveRecord::Base
         {
             account_id: self.account_id,
             alias: self.alias,
+            name: self.name,
             email: self.email,
             phone_number: self.phone_number,
             tags: self.tags,
