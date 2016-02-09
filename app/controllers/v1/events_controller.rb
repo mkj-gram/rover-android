@@ -123,6 +123,12 @@ class V1::EventsController < V1::ApplicationController
     end
 
     def device_params(local_params)
+        convert_param_if_exists(local_params, :"locale-lang", :locale_lang)
+        convert_param_if_exists(local_params, :"locale_region", :locale_region)
+        convert_param_if_exists(local_params, :"time-zone", :time_zone)
+        convert_param_if_exists(local_params, :"sdk-version", :sdk_version)
+        convert_param_if_exists(local_params, :"os-name", :os_name)
+        convert_param_if_exists(local_params, :"os-version", :os_version)
         convert_param_if_exists(local_params, :"local-notifications-enabled", :local_notifications_enabled)
         convert_param_if_exists(local_params, :"remote-notifications-enabled", :remote_notifications_enabled)
         convert_param_if_exists(local_params, :"bluetooth-enabled", :bluetooth_enabled)
