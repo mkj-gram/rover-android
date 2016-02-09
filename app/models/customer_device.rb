@@ -10,6 +10,7 @@ class CustomerDevice < ActiveRecord::Base
 
     def as_indexed_json(options = {})
         {
+            token: self.token,
             locale_lang: self.locale_lang,
             locale_region: self.locale_region,
             time_zone: self.time_zone,
@@ -22,6 +23,7 @@ class CustomerDevice < ActiveRecord::Base
             carrier: self.carrier,
             local_notifications_enabled: self.local_notifications_enabled,
             remote_notifications_enabled: self.remote_notifications_enabled,
+            location_monitoring_enabled: self.location_monitoring_enabled,
             bluetooth_enabled: self.bluetooth_enabled
         }
     end

@@ -14,6 +14,7 @@ class Customer < ActiveRecord::Base
             indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :traits, type: 'object'
             indexes :devices, type: 'nested' do
+                indexes :token, type: 'string', index: 'no'
                 indexes :locale_lang, type: 'string', index: 'not_analyzed'
                 indexes :locale_region, type: 'string', index: 'not_analyzed'
                 indexes :time_zone, type: 'string', index: 'not_analyzed'
@@ -26,6 +27,7 @@ class Customer < ActiveRecord::Base
                 indexes :carrier, type: 'string', index: 'not_analyzed'
                 indexes :local_notifications_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :remote_notifications_enabled, type: 'boolean', index: 'not_analyzed'
+                indexes :location_monitoring_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :bluetooth_enabled, type: 'boolean', index: 'not_analyzed'
             end
         end
