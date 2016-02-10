@@ -115,7 +115,6 @@ class V1::EventsController < V1::ApplicationController
     end
 
     def customer_params(user_attributes)
-        convert_param_if_exists(user_attributes, :"phone-number", :phone_number)
         allowed_params = user_attributes.permit(:alias, :name, :email, :phone_number, {:tags => []})
         # we have to manually allow traits since strong params doesn't allow unknown hashes
         allowed_params[:traits] = user_attributes.dig(:traits) || {}
@@ -123,17 +122,6 @@ class V1::EventsController < V1::ApplicationController
     end
 
     def device_params(local_params)
-        convert_param_if_exists(local_params, :"locale-lang", :locale_lang)
-        convert_param_if_exists(local_params, :"locale-region", :locale_region)
-        convert_param_if_exists(local_params, :"time-zone", :time_zone)
-        convert_param_if_exists(local_params, :"sdk-version", :sdk_version)
-        convert_param_if_exists(local_params, :"os-name", :os_name)
-        convert_param_if_exists(local_params, :"os-version", :os_version)
-        convert_param_if_exists(local_params, :"local-notifications-enabled", :local_notifications_enabled)
-        convert_param_if_exists(local_params, :"remote-notifications-enabled", :remote_notifications_enabled)
-        convert_param_if_exists(local_params, :"bluetooth-enabled", :bluetooth_enabled)
-        convert_param_if_exists(local_params, :"location-monitoring-enabled", :location_monitoring_enabled)
-
         local_params.permit(:udid, :token, :locale_lang, :locale_region, :time_zone, :sdk_version, :platform, :os_name, :os_version, :model, :manufacturer, :carrier, :aid , :local_notifications_enabled, :remote_notifications_enabled, :bluetooth_enabled, :location_monitoring_enabled)
     end
 end
