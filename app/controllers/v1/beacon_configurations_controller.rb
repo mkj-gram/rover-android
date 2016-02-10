@@ -255,13 +255,12 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def ibeacon_configuration_params(local_params)
-        convert_param_if_exists(local_params[:configurations], :"major-number", :major)
-        convert_param_if_exists(local_params[:configurations], :"minor-number", :minor)
+        convert_param_if_exists(local_params[:configurations], :major_number, :major)
+        convert_param_if_exists(local_params[:configurations], :minor_number, :minor)
         local_params.fetch(:configurations, {}).permit(:uuid, :major, :minor)
     end
 
     def eddystone_namespace_configuration_params(local_params)
-        convert_param_if_exists(local_params[:configurations], :"instance-id", :instance_id)
         local_params.fetch(:configurations, {}).permit(:namespace, :instance_id)
     end
 

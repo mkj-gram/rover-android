@@ -102,8 +102,6 @@ class V1::UsersController < V1::ApplicationController
 
 
     def user_params(local_params)
-        local_params.require(:users)
-        convert_param_if_exists(local_params[:users], :"current-password", :current_password)
         local_params.require(:users).permit(:name, :email, :password, :password_confirmation, :current_password)
 
     end

@@ -117,9 +117,7 @@ class V1::IntegrationsController < V1::ApplicationController
     end
 
     def estimote_integration_params(local_params)
-        convert_param_if_exists(local_params[:"estimote-integrations"], :"app-id", :app_id)
-        convert_param_if_exists(local_params[:"estimote-integrations"], :"app-token", :app_token)
-        return local_params[:"estimote-integrations"].permit(:enabled, :app_id, :app_token)
+        return local_params[:estimote_integrations].permit(:enabled, :app_id, :app_token)
     end
 
     def build_kontat_integration(json)
@@ -132,13 +130,12 @@ class V1::IntegrationsController < V1::ApplicationController
     end
 
     def kontakt_integration_params(local_params)
-        convert_param_if_exists(local_params[:"kontakt-integrations"], :"api-key", :api_key)
-        return local_params[:"kontakt-integrations"].permit(:enabled, :api_key)
+        return local_params[:kontakt_integrations].permit(:enabled, :api_key)
     end
 
     def get_integrations
         case params[:integration_type]
-        when "estimote-integrations"
+        when :estimote_integrations
             EstimoteIntegration.where(account_id: current_account.id).all
         else
             current_account.third_party_integrations
