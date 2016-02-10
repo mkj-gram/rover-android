@@ -257,7 +257,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def beacon_configuration_params(local_params)
-        local_params.fetch(:configurations, {}).permit(:name, :enabled, {tags: []}, :location_id)
+        convert_param_if_exists(local_params[:configurations], :name, :title)
+        local_params.fetch(:configurations, {}).permit(:title, :enabled, {tags: []}, :location_id)
     end
 
     def ibeacon_configuration_params(local_params)

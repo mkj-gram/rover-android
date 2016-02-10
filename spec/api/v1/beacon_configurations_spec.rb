@@ -29,6 +29,27 @@ describe "/v1/configurations", :type => :request do
     context "POST" do
         context "input is invalid" do
             context "ibeacon protocol" do
+                it 'returns 422 when name is missing' do
+                    account = create(:account)
+                    post "/v1/configurations",
+                    {
+                        data: {
+                            type: "configurations",
+                            attributes: {
+                                protocol: "iBeacon",
+                                uuid: SecureRandom.uuid,
+                                :"major-number" => 1,
+                                :"minor-number" => 1
+                            }
+                        }
+                    }, signed_request_header(account)
+
+                    expect(response).to have_http_status(422)
+                    expect(json.dig(:errors).size).to be >= 1
+                    error = json[:errors].first
+                    expect(error.dig(:source, :pointer)).to eq("data/attributes/name")
+
+                end
                 it 'returns 422 when uuid is missing' do
                     account = create(:account)
                     post "/v1/configurations",
@@ -37,7 +58,7 @@ describe "/v1/configurations", :type => :request do
                             type: "configurations",
                             attributes: {
                                 protocol: "iBeacon",
-                                title: "Hello",
+                                name: "Hello",
                                 :"major-number" => 1,
                                 :"minor-number" => 1
                             }
@@ -59,7 +80,7 @@ describe "/v1/configurations", :type => :request do
                             type: "configurations",
                             attributes: {
                                 protocol: "iBeacon",
-                                title: "Hello",
+                                name: "Hello",
                                 uuid: SecureRandom.uuid,
                                 :"minor-number" => 1
                             }
@@ -81,7 +102,7 @@ describe "/v1/configurations", :type => :request do
                             type: "configurations",
                             attributes: {
                                 protocol: "iBeacon",
-                                title: "Hello",
+                                name: "Hello",
                                 uuid: SecureRandom.uuid,
                                 :"major-number" => 1,
                             }
@@ -104,7 +125,7 @@ describe "/v1/configurations", :type => :request do
                             type: "configurations",
                             attributes: {
                                 protocol: "iBeacon",
-                                title: "Hello",
+                                name: "Hello",
                                 uuid: SecureRandom.uuid,
                                 :"major-number" => -1,
                                 :"minor-number" => 1
@@ -128,7 +149,7 @@ describe "/v1/configurations", :type => :request do
                             type: "configurations",
                             attributes: {
                                 protocol: "iBeacon",
-                                title: "Hello",
+                                name: "Hello",
                                 uuid: SecureRandom.uuid,
                                 :"major-number" => 1,
                                 :"minor-number" => -1
@@ -153,7 +174,7 @@ describe "/v1/configurations", :type => :request do
                             type: "configurations",
                             attributes: {
                                 protocol: "iBeacon",
-                                title: "Hello",
+                                name: "Hello",
                                 uuid: uuid,
                                 :"major-number" => 1,
                                 :"minor-number" => 1
@@ -181,7 +202,7 @@ describe "/v1/configurations", :type => :request do
                             type: "configurations",
                             attributes: {
                                 protocol: "iBeacon",
-                                title: "Hello",
+                                name: "Hello",
                                 uuid: uuid,
                                 :"major-number" => 1,
                                 :"minor-number" => 1
@@ -206,7 +227,7 @@ describe "/v1/configurations", :type => :request do
                             type: "configurations",
                             attributes: {
                                 protocol: "iBeacon",
-                                title: "Hello",
+                                name: "Hello",
                                 uuid: uuid,
                                 :"major-number" => 1,
                                 :"minor-number" => 1
