@@ -77,13 +77,13 @@ class V1::PasswordResetsController < V1::ApplicationController
     private
 
     def password_reset_create_params(local_params)
-        local_params.require(:"password-resets")
-        local_params.require(:"password-resets").permit(:email)
+        local_params.require(:password_resets)
+        local_params.require(:password_resets).permit(:email)
     end
 
     def password_reset_update_params(local_params)
-        local_params.require(:"password-resets")
-        local_params.require(:"password-resets").permit(:token, :password)
+        local_params.require(:password_resets)
+        local_params.require(:password_resets).permit(:token, :password)
     end
 end
 

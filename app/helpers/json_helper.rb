@@ -52,7 +52,7 @@ module JsonHelper
 
         validate_json_schema
 
-        data.map!{|sub_data| {sub_data[:type] => {id: sub_data[:id]}.merge!(sub_data[:attributes]).merge!({relationships: sub_data[:relationships]})}}
+        data.map!{|sub_data| {sub_data[:type].underscore => {id: sub_data[:id]}.merge!(underscore_attributes(sub_data[:attributes])).merge!(get_relationship_data(sub_data[:relationships]))}}
         if single_record
             return params.merge!({:data => data.first})
         else
@@ -60,7 +60,23 @@ module JsonHelper
         end
     end
 
+    private
 
+    def underscore_attributes(attributes)
+        return attributes.inject({}) {|hash, (k,v)| hash.merge({k.underscore => v})}
+    end
+
+    def get_relationship_data(relationships)
+        return {} if relationships.nil?
+        relationships.inject({}) do |hash, (relationship_name, value)|
+            relationship_name = relationship_name.singularize
+            if value[:data].is_a?(Array)
+                hash.merge({"#{relationship_name}_ids" => value[:data].map{|data| data[:id]}})
+            else
+                hash.merge({"#{relationship_name}_id" => value[:data][:id]})
+            end
+        end
+    end
 
     def request_schema
         # we cache the schema for all requests
