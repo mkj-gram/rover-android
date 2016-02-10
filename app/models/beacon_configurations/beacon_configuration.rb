@@ -36,6 +36,22 @@ class BeaconConfiguration < ActiveRecord::Base
         }
     }
 
+    after_commit on: [:create] do
+        __elasticsearch__.index_document
+    end
+
+    after_commit on: [:update] do
+        if previous_changes.include?("location_id")
+            __elasticsearch__.index_document
+        else
+            __elasticsearch__.update_document
+        end
+    end
+
+    after_commit on: [:destroy] do
+        __elasticsearch__.delete_document
+    end
+
     before_save :update_active_tags
     before_save :remove_duplicate_tags
     after_save :update_location

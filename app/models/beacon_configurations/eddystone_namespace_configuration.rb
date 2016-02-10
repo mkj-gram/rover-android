@@ -2,14 +2,6 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
     include Elasticsearch::Model
     include EddystoneNamespaceAttributes
 
-    after_commit on: [:create, :update] do
-        __elasticsearch__.index_document
-    end
-
-    after_commit on: [:destroy] do
-        __elasticsearch__.delete_document
-    end
-
     index_name BeaconConfiguration.index_name
     document_type "eddystone_namespace_configuration"
 
