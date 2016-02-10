@@ -1,8 +1,13 @@
 class Customer < ActiveRecord::Base
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
 
-    # index_name "account_#{self.account_id}_customers"
+    after_commit on: [:create, :update] do
+        __elasticsearch__.index_document
+    end
+
+    after_commit on: [:destroy] do
+        __elasticsearch__.delete_document
+    end
 
     settings index: { number_of_shards: 1, number_of_replicas: 2 } do
         mapping do
