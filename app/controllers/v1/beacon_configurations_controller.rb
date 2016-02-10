@@ -175,7 +175,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 if @beacon_configuration.save
                     render_beacon_configuration(@beacon_configuration)
                 else
-                    render json: { errors: V1::BeaconConfigurationCreateErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                    render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
                 end
             else
                 render json: {errors: [{detail: "has to be of type (#{@@protocol_types.map(&:to_s).join(", ")})", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
@@ -193,7 +193,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             if @beacon_configuration.update_attributes(configuration_params(json[:data]))
                 render_beacon_configuration(@beacon_configuration)
             else
-                render json: { errors: V1::BeaconConfigurationUpdateErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
             end
         else
             head :not_found
@@ -251,7 +251,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def beacon_configuration_params(local_params)
-        local_params.fetch(:configurations, {}).permit(:name, :enabled, {tags: []})
+        local_params.fetch(:configurations, {}).permit(:name, :enabled, {tags: []}, :location_id)
     end
 
     def ibeacon_configuration_params(local_params)

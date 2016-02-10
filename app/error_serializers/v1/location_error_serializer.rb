@@ -9,4 +9,5 @@ class V1::LocationErrorSerializer < ModelError::Serializer
     attribute :longitude
     attribute :latitude
     attribute :google_place_id, error_key: :"google-place-id"
+
 end

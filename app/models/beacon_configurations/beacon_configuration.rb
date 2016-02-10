@@ -39,14 +39,14 @@ class BeaconConfiguration < ActiveRecord::Base
     before_save :update_active_tags
     before_save :remove_duplicate_tags
     after_save :update_location
-    after_create :increment_searchable_beacon_configurations_count
-    after_destroy :decrement_searchable_beacon_configurations_count
 
     belongs_to :account
-    belongs_to :location
+    belongs_to :location, counter_cache: :beacon_configurations_count
 
     has_one :beacon_configuration_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
     has_many :shared_beacon_configurations
+
+    validate :location_exists
 
     def as_indexed_json(options = {})
         json = {
@@ -141,22 +141,19 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     protected
+    def location_exists
+        if changes.include?(:location_id) && !location_id.nil? && !Location.exists?(location_id)
+            errors.add(:location_id, "location doesn't exist")
+        end
+    end
 
     def update_location
-        if self.changes.include?(:location_id) && location_id_was != location_id
+        if changes.include?(:location_id) && location_id_was != location_id
             old_location = location_id_was.nil? ? nil : Location.find_by_id(location_id_was)
+            old_location.__elasticsearch__.update_document  if old_location
 
-            if old_location
-                Location.decrement_counter(:beacon_configurations_count, old_location.id)
-                old_location.__elasticsearch__.update_document
-            end
-
-            new_location = location_id.nil? ? nil : Location.find_by_id(location_id)
-            if new_location
-                Location.increment_counter(:beacon_configurations_count, 1)
-                new_location.__elasticsearch__.update_document
-            end
-
+            new_location = location
+            new_location.__elasticsearch__.update_document if new_location
         end
     end
 

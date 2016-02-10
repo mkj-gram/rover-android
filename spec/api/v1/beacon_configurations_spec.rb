@@ -143,6 +143,31 @@ describe "/v1/configurations", :type => :request do
                     expect(error.dig(:source, :pointer)).to eq("data/attributes/minor-number")
 
                 end
+                it 'returns 422 when location doesnt exist' do
+                    account = create(:account)
+                    location = create(:location, account: account)
+                    uuid = SecureRandom.uuid
+                    post "/v1/configurations",
+                    {
+                        data: {
+                            type: "configurations",
+                            attributes: {
+                                protocol: "iBeacon",
+                                title: "Hello",
+                                uuid: uuid,
+                                :"major-number" => 1,
+                                :"minor-number" => 1
+                            },
+                            relationships: {
+                                location: {
+                                    data: {type: "locations", id: "-1"}
+                                }
+                            }
+                        }
+                    }, signed_request_header(account)
+
+                    expect(response).to have_http_status(422)
+                end
             end
         end
         context "input is valid" do
@@ -169,6 +194,37 @@ describe "/v1/configurations", :type => :request do
                     expect(json.dig(:data, :attributes, :uuid)).to eq(uuid)
                     expect(json.dig(:data, :attributes, :"major-number")).to eq(1)
                     expect(json.dig(:data, :attributes, :"minor-number")).to eq(1)
+                end
+
+                it 'returns 200 ok when uuid, major, minor is supplied with a location' do
+                    account = create(:account)
+                    location = create(:location, account: account)
+                    uuid = SecureRandom.uuid
+                    post "/v1/configurations",
+                    {
+                        data: {
+                            type: "configurations",
+                            attributes: {
+                                protocol: "iBeacon",
+                                title: "Hello",
+                                uuid: uuid,
+                                :"major-number" => 1,
+                                :"minor-number" => 1
+                            },
+                            relationships: {
+                                location: {
+                                    data: {type: "locations", id: location.id.to_s}
+                                }
+                            }
+                        }
+                    }, signed_request_header(account)
+
+                    expect(response).to have_http_status(200)
+
+                    expect(json.dig(:data, :attributes, :uuid)).to eq(uuid)
+                    expect(json.dig(:data, :attributes, :"major-number")).to eq(1)
+                    expect(json.dig(:data, :attributes, :"minor-number")).to eq(1)
+
                 end
             end
         end
