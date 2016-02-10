@@ -40,7 +40,7 @@ class BeaconConfiguration < ActiveRecord::Base
     before_save :remove_duplicate_tags
     after_save :update_location
 
-    belongs_to :account
+    belongs_to :account, counter_cache: :searchable_beacon_configurations_count
     belongs_to :location, counter_cache: :beacon_configurations_count
 
     has_one :beacon_configuration_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
@@ -57,25 +57,16 @@ class BeaconConfiguration < ActiveRecord::Base
             shared: self.shared,
             created_at: self.created_at,
             shared_account_ids: self.shared_account_ids,
-            location: self.indexed_location,
-            devices_meta: self.devices_meta
+            location: indexed_location,
+            devices_meta: devices_meta
         }
 
-        if self.tags.any?
-            json.merge!(
-                {
-                    suggest_tags: {
-                        input: self.tags,
-                        context: {
-                            account_id: self.account_id,
-                            shared_account_ids: self.account_id
-                        }
-                    }
-                }
-            )
-        end
-
+        puts "json #{json}"
         return json
+    end
+
+    def reindex_location
+        self.__elasticsearch__.update_document_attributes({location: indexed_location})
     end
 
     def reindex_devices_meta
@@ -141,6 +132,7 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     protected
+
     def location_exists
         if changes.include?(:location_id) && !location_id.nil? && !Location.exists?(location_id)
             errors.add(:location_id, "location doesn't exist")
@@ -157,16 +149,7 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
-    def indexed_location
-        if !self.location_id.nil? && self.location
-            return {
-                name: location.title,
-                id: location.id
-            }
-        else
-            return {}
-        end
-    end
+
 
     def devices_meta_cache_key
         "beacon_configurations/#{self.id}/devices_meta/#{self.beacon_devices_updated_at.to_i}"
@@ -177,6 +160,17 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     private
+
+    def indexed_location
+        if location
+            return {
+                name: location.title,
+                id: location.id
+            }
+        else
+            return {}
+        end
+    end
 
     def remove_duplicate_tags
         self.tags.uniq! if self.tags
