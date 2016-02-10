@@ -184,10 +184,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                     render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
                 end
             else
-                render json: {errors: [{detail: "has to be of type (#{@@protocol_types.map(&:to_s).join(", ")})", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
+                render json: {errors: [{detail: "has to be of type (#{@@protocol_types.map(&:to_s).join(", ")})", source: {pointer: "/data/attributes/protocol"}}]}, status: :unprocessable_entity
             end
         else
-            render json: {errors: [{detail: "can't be blank", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
+            render json: {errors: [{detail: "can't be blank", source: {pointer: "/data/attributes/protocol"}}]}, status: :unprocessable_entity
         end
     end
 
