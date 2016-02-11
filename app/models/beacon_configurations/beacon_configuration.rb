@@ -96,15 +96,6 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
-    def update_active_tags
-        if previous_changes.include?(:tags)
-            previous_tags = (previous_changes[:tags][0] || [])
-            tags = (tags || []).uniq
-            old_tags = previous_tags - tags
-            new_tags = tags - previous_tags
-            BeaconConfigurationActiveTag.update_tags(self.account_id, old_tags, new_tags)
-        end
-    end
 
 
     def devices_meta
@@ -167,6 +158,16 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     private
+
+    def update_active_tags
+        if self.changes.include?(:tags)
+            previous_tags = (tags_was || [])
+            uniq_tags = (tags || []).uniq
+            old_tags = previous_tags - uniq_tags
+            new_tags = uniq_tags - previous_tags
+            BeaconConfigurationActiveTag.update_tags(self.account_id, old_tags, new_tags)
+        end
+    end
 
     def indexed_location
         if location

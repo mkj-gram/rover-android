@@ -19,13 +19,13 @@ class UpdateActiveTagsWorker
         old_tags.each do |tag|
             if !lookup_class.where(account_id: account_id).where("tags @> ?", "{#{tag}}").exists?
                 # don't need to read the model just delete it
-                ActiveTags.where(account_id: account_id, type: tag_type, tag: tag).delete_all
+                ActiveTag.where(account_id: account_id, type: tag_type, tag: tag).delete_all
             end
         end
 
         new_tags.each do |tag|
             begin
-                ActiveTags.create(account_id: account_id, type: tag_type, tag: tag)
+                ActiveTag.create(account_id: account_id, type: tag_type, tag: tag)
             rescue ActiveRecord::RecordNotUnique => e
                 Rails.logger.warn("Tag already exists #{tag}")
                 Rails.logger.warn("Message: #{e.message}")
