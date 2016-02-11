@@ -12,7 +12,7 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
         indexes :location, type: 'object' do
             indexes :name, type: 'string', index: 'no'
-            indexes :id, type: 'integer', index: 'no'
+            indexes :id, type: 'integer', index: 'not_analyzed'
         end
         indexes :namespace, type: 'string', analyzer: "lowercase_keyword", search_analyzer: "lowercase_keyword"
         indexes :instance_id, type: 'string', index: 'not_analyzed'

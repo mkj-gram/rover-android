@@ -13,7 +13,7 @@ class UrlConfiguration < BeaconConfiguration
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
         indexes :location, type: 'object' do
             indexes :name, type: 'string', index: 'no'
-            indexes :id, type: 'integer', index: 'no'
+            indexes :id, type: 'integer', index: 'not_analyzed'
         end
         indexes :url, type: 'string', index: 'not_analyzed'
         indexes :created_at, type: 'date'

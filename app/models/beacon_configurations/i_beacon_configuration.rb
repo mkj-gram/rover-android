@@ -14,7 +14,7 @@ class IBeaconConfiguration < BeaconConfiguration
 
         indexes :location, type: 'object' do
             indexes :name, type: 'string', index: 'no'
-            indexes :id, type: 'integer', index: 'no'
+            indexes :id, type: 'integer', index: 'not_analyzed'
         end
 
         indexes :uuid, type: 'string', analyzer: "lowercase_keyword", search_analyzer: "lowercase_keyword"
