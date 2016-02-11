@@ -97,7 +97,7 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     def update_active_tags
-        if previous_changes.include?(:tag)
+        if previous_changes.include?(:tags)
             previous_tags = (previous_changes[:tags][0] || [])
             tags = (tags || []).uniq
             old_tags = previous_tags - tags
