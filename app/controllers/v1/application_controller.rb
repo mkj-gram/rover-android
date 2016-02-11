@@ -57,7 +57,7 @@ class V1::ApplicationController < ActionController::API
 
 
     def convert_param_if_exists(local_params, from_key, to_key)
-        if local_params.include?(from_key)
+        if !local_params.nil? && local_params.include?(from_key)
             local_params[to_key] = local_params[from_key]
             local_params.delete(from_key)
         end

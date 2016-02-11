@@ -248,6 +248,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def filter_params
+        convert_param_if_exists(params[:filter], :"location-id", :location_id)
         params.fetch(:filter, {}).permit(:query, :protocol, {:protocols => []}, {:tags => []}, :location_id)
     end
 
