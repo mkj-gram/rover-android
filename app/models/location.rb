@@ -1,6 +1,13 @@
 class Location < ActiveRecord::Base
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
+
+    after_commit on: [:create, :update] do
+        __elasticsearch__.index_document
+    end
+
+    after_commit on: [:destroy] do
+        __elasticsearch__.delete_document
+    end
 
     settings index: {
         number_of_shards: 1,
