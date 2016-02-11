@@ -130,7 +130,7 @@ class Location < ActiveRecord::Base
             tags = (tags || []).uniq
             old_tags = previous_tags - tags
             new_tags = tags - previous_tags
-            LocationActiveTags.update_tags(self.account_id, old_tags, new_tags)
+            LocationActiveTag.update_tags(self.account_id, old_tags, new_tags)
         end
     end
 
