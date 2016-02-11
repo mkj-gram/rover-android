@@ -178,10 +178,14 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         if !protocol.nil?
             if @@protocol_types.include?(protocol)
                 @beacon_configuration = build_beacon_configuration(json[:data], protocol)
-                if @beacon_configuration.save
-                    render_beacon_configuration(@beacon_configuration)
-                else
-                    render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                begin
+                    if @beacon_configuration.save
+                        render_beacon_configuration(@beacon_configuration)
+                    else
+                        render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                    end
+                rescue ActiveRecord::RecordNotUnique => e
+                    render json: {errors: [{detail: "configuration already exists", source: {pointer: "data"}}]}, status: :unprocessable_entity
                 end
             else
                 render json: {errors: [{detail: "has to be of type (#{@@protocol_types.map(&:to_s).join(", ")})", source: {pointer: "/data/attributes/protocol"}}]}, status: :unprocessable_entity

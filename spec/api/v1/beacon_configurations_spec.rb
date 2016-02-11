@@ -164,6 +164,30 @@ describe "/v1/configurations", :type => :request do
                     expect(error.dig(:source, :pointer)).to eq("data/attributes/minor-number")
 
                 end
+                it 'returns 422 when uuid major minor already exists' do
+                    account = create(:account)
+                    config = create(:ibeacon_configuration, account: account)
+                    post "/v1/configurations",
+                    {
+                        data: {
+                            type: "configurations",
+                            attributes: {
+                                protocol: "iBeacon",
+                                name: "Hello",
+                                uuid: config.uuid,
+                                :"major-number" => config.major,
+                                :"minor-number" => config.minor
+                            }
+                        }
+                    }, signed_request_header(account)
+
+
+                    expect(response).to have_http_status(422)
+                    expect(json.dig(:errors).size).to be >= 1
+                    error = json[:errors].first
+                    expect(error.dig(:source, :pointer)).to eq("data")
+
+                end
                 it 'returns 422 when location doesnt exist' do
                     account = create(:account)
                     location = create(:location, account: account)
