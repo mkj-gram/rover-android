@@ -1,4 +1,4 @@
-class BeaconConfigurationActiveTags < ActiveTags
+class BeaconConfigurationActiveTag < ActiveTag
     include TaggableAsync
 
     def self.lookup_class

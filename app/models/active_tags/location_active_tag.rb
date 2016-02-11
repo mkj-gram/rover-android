@@ -1,4 +1,4 @@
-class LocationActiveTags < ActiveTags
+class LocationActiveTag < ActiveTag
     include TaggableAsync
 
     def self.lookup_class

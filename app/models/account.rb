@@ -102,8 +102,4 @@ class Account < ActiveRecord::Base
         end
     end
 
-    def create_active_tags_indexes
-        BeaconConfigurationActiveTagsIndex.create(account_id: self.id)
-        LocationActiveTagsIndex.create(account_id: self.id)
-    end
 end
