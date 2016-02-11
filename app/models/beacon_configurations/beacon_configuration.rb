@@ -53,7 +53,7 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     before_save :remove_duplicate_tags
-    before_save :update_active_tags
+    after_save :update_active_tags
     after_save :update_location
 
     belongs_to :account, counter_cache: :searchable_beacon_configurations_count
@@ -97,8 +97,8 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     def update_active_tags
-        if self.changes.include?(:tags)
-            previous_tags = (tags_was || [])
+        if previous_changes.include?(:tag)
+            previous_tags = (previous_changes[:tags][0] || [])
             tags = (tags || []).uniq
             old_tags = previous_tags - tags
             new_tags = tags - previous_tags

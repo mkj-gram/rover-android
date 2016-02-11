@@ -71,7 +71,7 @@ class Location < ActiveRecord::Base
     has_many :beacon_configurations
 
     before_save :update_address_from_google_place
-    before_save :update_active_tags
+    after_save :update_active_tags
     after_save :update_beacon_configurations_elasticsearch_document
 
     def as_indexed_json(options = {})
@@ -125,8 +125,8 @@ class Location < ActiveRecord::Base
     end
 
     def update_active_tags
-        if self.changes.include?(:tags)
-            previous_tags = (tags_was || [])
+        if previous_changes.include?(:tag)
+            previous_tags = (previous_changes[:tags][0] || [])
             tags = (tags || []).uniq
             old_tags = previous_tags - tags
             new_tags = tags - previous_tags
