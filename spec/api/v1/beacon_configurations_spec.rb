@@ -219,7 +219,7 @@ describe "/v1/configurations", :type => :request do
             context "ibeacon protocol" do
                 it 'returns 200 ok when uuid, major, minor is supplied' do
                     account = create(:account)
-                    uuid = SecureRandom.uuid
+                    uuid = SecureRandom.uuid.upcase
                     post "/v1/configurations",
                     {
                         data: {
@@ -244,7 +244,7 @@ describe "/v1/configurations", :type => :request do
                 it 'returns 200 ok when uuid, major, minor is supplied with a location' do
                     account = create(:account)
                     location = create(:location, account: account)
-                    uuid = SecureRandom.uuid
+                    uuid = SecureRandom.uuid.upcase
                     post "/v1/configurations",
                     {
                         data: {
