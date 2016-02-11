@@ -17,7 +17,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         types = []
         should_query = []
         should_filter = []
-        must_filer = []
+        must_filter = []
 
         # we are grabbing all of our beacons
         should_filter.push(
@@ -70,11 +70,21 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         # if tags are provided they must all match
         if query_tags.any?
-            must_filer.push(
+            must_filter.push(
                 {
                     terms:  {
                         tags: query_tags,
                         execution: "and"
+                    }
+                }
+            )
+        end
+
+        if query_location_id
+            must_filter.push(
+                {
+                    term: {
+                        "location.id" => query_location_id.to_i
                     }
                 }
             )
@@ -98,7 +108,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         filter: {
                             bool: {
                                 should: should_filter,
-                                must: must_filer
+                                must: must_filter
                             }
                         }
                     }
@@ -123,7 +133,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         filter: {
                             bool: {
                                 should: should_filter,
-                                must: must_filer
+                                must: must_filter
                             }
                         }
                     }
@@ -146,11 +156,16 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             end,
             "meta" => {
                 "totalRecords" => results.total,
-                "totalPages" => results.total_pages,
-                "totalSearchableRecords" => current_account.searchable_beacon_configurations_count
+                "totalPages" => results.total_pages
             },
             "links" => pagination_links(v1_beacon_configuration_index_url, results, {start_at: 0})
         }
+
+        if query_location_id
+            json["meta"]["totalSearchableRecords"] = BeaconConfiguration.where(location_id: query_location_id).count
+        else
+            json["meta"]["totalSearchableRecords"] = current_account.searchable_beacon_configurations_count
+        end
 
         included = []
 
@@ -233,7 +248,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def filter_params
-        params.fetch(:filter, {}).permit(:query, :protocol, {:protocols => []}, {:tags => []})
+        params.fetch(:filter, {}).permit(:query, :protocol, {:protocols => []}, {:tags => []}, :location_id)
     end
 
     def query_keyword
@@ -242,6 +257,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def query_tags
         @query_tags ||= filter_params.fetch(:tags, [])
+    end
+
+    def query_location_id
+        @query_location_id ||= filter_params[:location_id]
     end
 
     # depreciated
