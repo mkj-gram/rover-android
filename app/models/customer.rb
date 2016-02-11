@@ -38,8 +38,12 @@ class Customer < ActiveRecord::Base
         end
     end
 
+    validates :account_id, presence: true
+
+    belongs_to :account, counter_cache: true
     has_many :devices, class_name: "CustomerDevice"
 
+    before_save :update_active_traits
 
     def as_indexed_json(options = {})
         {
@@ -79,6 +83,19 @@ class Customer < ActiveRecord::Base
     end
 
     private
+
+    def update_active_traits
+        if changes.include?(:traits)
+            # old {gold_member => false}
+            # new {gold_member => true}
+            previous_trait_keys = traits_was.map{|k,v| k.to_s }
+            trait_keys = traits.map{|k,v| k.to_s}
+
+            old_trait_keys = previous_trait_keys - trait_keys
+            new_trait_keys = trait_keys - previous_trait_keys
+            CustomerActiveTraits.update_traits(self.account_id, old_trait_keys, new_trait_keys)
+        end
+    end
 
     def devices_as_indexed_json(options)
         self.devices.map{|device| device.as_indexed_json(options)}
