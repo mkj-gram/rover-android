@@ -7,7 +7,6 @@ class Account < ActiveRecord::Base
     include Tokenable
 
     before_create :generate_share_key
-    after_create :create_active_tags_indexes
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
@@ -31,8 +30,8 @@ class Account < ActiveRecord::Base
     has_many :shared_beacon_configurations, through: :active_shared_beacon_configurations, source: :beacon_configuration
     has_many :shared_with_me_beacon_configurations, through: :passive_shared_beacon_configurations, source: :beacon_configuration
 
-    has_one :beacon_configuration_active_tags_index
-    has_one :location_active_tags_index
+    has_many :beacon_configuration_active_tags
+    has_many :location_active_tags
 
     has_many :third_party_integrations do
         def enabled

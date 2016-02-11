@@ -32,7 +32,7 @@ describe "/v1/locations", :type => :request do
             expect(response).to have_http_status(200)
         end
 
-        it 'returns 200ok when a location exists' do
+        it 'returns 200 when a location exists' do
             location = create(:location)
             account = location.account
             get "/v1/locations/#{location.id}", nil, signed_request_header(account)

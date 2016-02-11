@@ -52,14 +52,13 @@ class BeaconConfiguration < ActiveRecord::Base
         __elasticsearch__.delete_document
     end
 
-    before_save :update_active_tags
     before_save :remove_duplicate_tags
+    before_save :update_active_tags
     after_save :update_location
 
     belongs_to :account, counter_cache: :searchable_beacon_configurations_count
     belongs_to :location, counter_cache: :beacon_configurations_count
 
-    has_one :beacon_configuration_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
     has_many :shared_beacon_configurations
 
     validate :location_exists
@@ -77,8 +76,6 @@ class BeaconConfiguration < ActiveRecord::Base
             location: indexed_location,
             devices_meta: devices_meta
         }
-
-        puts "json #{json}"
         return json
     end
 
@@ -101,18 +98,11 @@ class BeaconConfiguration < ActiveRecord::Base
 
     def update_active_tags
         if self.changes.include?(:tags)
-            Rails.logger.info("searching for tags: #{tags} with changes #{self.changes}")
-            new_tags = self.changes[:tags].second - self.changes[:tags].first
-            old_tags = self.changes[:tags].first - self.changes[:tags].second
-            old_tags_to_delete = old_tags.select do |tag|
-                !BeaconConfiguration.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
-            end
-            new_tags = self.tags
-            # lock this row since we are updating and deleting the tags in the application level
-            # beacon_configuration_active_tags.lock!
-            beacon_configuration_active_tags_index.tags += new_tags
-            beacon_configuration_active_tags_index.tags -= old_tags_to_delete
-            beacon_configuration_active_tags_index.save
+            previous_tags = (tags_was || [])
+            tags = (tags || []).uniq
+            old_tags = previous_tags - tags
+            new_tags = tags - previous_tags
+            BeaconConfigurationActiveTags.update_tags(self.account_id, old_tags, new_tags)
         end
     end
 

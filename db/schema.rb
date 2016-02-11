@@ -11,10 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160202201635) do
+ActiveRecord::Schema.define(version: 20160211151337) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "btree_gin"
 
   create_table "account_invites", force: :cascade do |t|
     t.integer  "account_id",    null: false
@@ -45,6 +46,16 @@ ActiveRecord::Schema.define(version: 20160202201635) do
   add_index "accounts", ["share_key"], name: "index_accounts_on_share_key", unique: true, using: :btree
   add_index "accounts", ["token"], name: "index_accounts_on_token", unique: true, using: :btree
 
+  create_table "active_tags", force: :cascade do |t|
+    t.integer "account_id"
+    t.string  "type"
+    t.string  "tag"
+  end
+
+  add_index "active_tags", ["account_id", "type", "tag"], name: "index_active_tags_on_account_id_and_type_and_tag", unique: true, using: :btree
+  add_index "active_tags", ["account_id", "type"], name: "index_active_tags_on_account_id_and_type", using: :btree
+  add_index "active_tags", ["account_id"], name: "index_active_tags_on_account_id", using: :btree
+
   create_table "active_tags_indices", force: :cascade do |t|
     t.integer "account_id",              null: false
     t.string  "type",                    null: false
@@ -73,6 +84,7 @@ ActiveRecord::Schema.define(version: 20160202201635) do
   end
 
   add_index "beacon_configurations", ["account_id", "namespace", "instance_id"], name: "account_eddystone_namespace_index", unique: true, using: :btree
+  add_index "beacon_configurations", ["account_id", "tags"], name: "index_beacon_configurations_on_account_id_and_tags", using: :gin
   add_index "beacon_configurations", ["account_id", "type", "created_at"], name: "beacon_configurations_type_created_at_index", using: :btree
   add_index "beacon_configurations", ["account_id", "type"], name: "index_beacon_configurations_on_account_id_and_type", using: :btree
   add_index "beacon_configurations", ["account_id", "uuid", "major", "minor"], name: "account_ibeacon_index", unique: true, using: :btree
@@ -121,8 +133,8 @@ ActiveRecord::Schema.define(version: 20160202201635) do
     t.datetime "updated_at",                                  null: false
   end
 
+  add_index "locations", ["account_id", "tags"], name: "index_locations_on_account_id_and_tags", using: :gin
   add_index "locations", ["account_id"], name: "index_locations_on_account_id", using: :btree
-  add_index "locations", ["tags"], name: "index_locations_on_tags", using: :gin
 
   create_table "password_resets", force: :cascade do |t|
     t.integer  "user_id",    null: false

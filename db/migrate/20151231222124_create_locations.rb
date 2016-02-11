@@ -1,5 +1,6 @@
 class CreateLocations < ActiveRecord::Migration
     def change
+        enable_extension "btree_gin"
         create_table :locations do |t|
             t.integer :account_id, null: false
             t.string :title
@@ -23,6 +24,6 @@ class CreateLocations < ActiveRecord::Migration
         end
 
         add_index :locations, :account_id
-        add_index :locations, :tags, using: :gin
+        add_index :locations, [:account_id, :tags], using: :gin
     end
 end
