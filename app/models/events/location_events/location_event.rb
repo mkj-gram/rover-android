@@ -76,7 +76,12 @@ class LocationEvent < Event
         }
 
         locations = Elasticsearch::Model.search(query, [Location])
-        locations.per_page(limit).page(0).results
+        locations.per_page(limit).page(0).results.map do |document|
+            latitude = document._source.location.lat
+            longitude = document._source.location.lon
+            radius = document._source.radius
+            GeofenceRegion.new(latitude: latitude, longitude: longitude, radius: radius)
+        end
     end
 
 end

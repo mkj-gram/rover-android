@@ -35,6 +35,7 @@ class V1::EventsController < V1::ApplicationController
             device.save
         end
         device.update_attributes_async(device_params(device_attributes))
+        device.merge(device_params(device_attributes))
         # check to see if the device_attributes need updating
         return device
     end

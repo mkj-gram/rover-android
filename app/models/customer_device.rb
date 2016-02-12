@@ -35,6 +35,11 @@ class CustomerDevice < ActiveRecord::Base
         end
     end
 
+    def merge(new_attributes)
+        new_attributes.each do |attribute, value|
+            self[attribute] = value
+        end
+    end
 
     private
 
