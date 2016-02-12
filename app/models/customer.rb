@@ -61,16 +61,21 @@ class Customer < ActiveRecord::Base
         end
     end
 
-    def merge_and_update_attributes(new_attributes)
+    def merge(new_attributes)
         new_traits = new_attributes.delete(:traits)
         new_tags = new_attributes.delete(:tags)
 
         new_attributes[:traits] = self.traits.merge!(new_traits) if new_traits && new_traits.any?
         new_attributes[:tags] = (self.tags + new_tags).uniq if new_tags && new_tags.any?
 
+        new_attributes.each do |attribute, value|
+            self[attribute] = value
+        end
+    end
 
-
+    def merge_and_update_attributes(new_attributes)
         if new_attributes.any?
+            merge(new_attributes)
             self.update_attributes(new_attributes)
         end
     end

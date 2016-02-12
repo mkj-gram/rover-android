@@ -1,0 +1,2 @@
+class LocationEvent < Event
+end

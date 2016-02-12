@@ -2,35 +2,23 @@ class V1::EventsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema
 
-    # {
-    #     "data": {
-    #         "type": "events",
-    #         "attributes": {
-    #             "object": "app",
-    #             "action": "opened",
-    #             "user": {
-    #                 "alias": "bob@gmail.com",
-    #                 "traits": {"gold_plus": true, "interests": ["basketball", "painting"]}
-    #             }
-    #         }
-    #     }
-    # }
 
     def create
-        # create the event and the device or the user
-
         json = flatten_request({single_record: true})
+
         event_attributes = json.dig(:data, :events)
 
-        device = get_device(event_attributes)
-        user_attributes = get_customer(device, event_attributes.fetch(:user, {}))
+        device_attributes = event_attributes.delete(:device) || {}
+        user_attributes = event_attributes.delete(:user) || {}
 
-        event = Event.new()
+        device = get_device(device_attributes, user_attributes)
+        customer = get_customer(device, user_attributes)
+
+        attributes = event_attributes.merge({device: device, customer: customer})
+        event = Event.new(attributes)
         event.save
 
-        json = {
-            "data" => {}
-        }
+        json = event.json_response
 
         render json: json
     end
@@ -38,11 +26,10 @@ class V1::EventsController < V1::ApplicationController
 
     private
 
-    def get_device(event_attributes)
-        device_attributes = event_attributes.fetch(:device, {})
+    def get_device(device_attributes, user_attributes)
         device = device_attributes[:udid].nil? ? nil : CustomerDevice.find_by_udid(device_attributes[:udid])
         if device.nil?
-            device = build_device(event_attributes)
+            device = build_device(device_attributes, user_attributes)
             device.account_id = current_account.id
             device.save
         end
@@ -51,9 +38,9 @@ class V1::EventsController < V1::ApplicationController
         return device
     end
 
-    def build_device(event_attributes)
-        device = CustomerDevice.new(device_params(event_attributes.fetch(:device, {})))
-        user_alias = event_attributes.dig(:user, :alias)
+    def build_device(device_attributes, user_attributes)
+        device = CustomerDevice.new(device_params(device_attributes))
+        user_alias = user_attributes[:alias]
         if !user_alias.nil?
             # they are creating a device with an alias, rare but could happen
             customer = Customer.find_by(account_id: current_account.id, alias: user_alias)
@@ -80,7 +67,7 @@ class V1::EventsController < V1::ApplicationController
         end
 
         current_customer.update_attributes_async(customer_params(user_attributes))
-
+        current_customer.merge(customer_params(user_attributes))
         return current_customer
     end
 

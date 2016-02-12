@@ -1,0 +1,2 @@
+class BeaconRegionEvent < Event
+end

@@ -4,7 +4,7 @@ opts = Rails.configuration.rabbitmq
 if opts["ssl"] == true
     bunny = Bunny.new(opts["amqp"], { tls_ca_certificates: [opts["public_key"]], verify_peer: true })
 else
-    bunny = Bunny.new(opts["amqp"])
+    bunny = Bunny.new(opts["amqp"], vhost: "/")
 end
 
 if Rails.env.test?

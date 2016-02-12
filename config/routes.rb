@@ -76,7 +76,6 @@ Rails.application.routes.draw do
             resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
         end
 
-        get "/regions", to: 'regions#index', as: "regions"
 
         post "/events", to: 'events#create'
 
