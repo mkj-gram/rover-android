@@ -3,7 +3,7 @@ class CustomerDevice < ActiveRecord::Base
     belongs_to :customer
     validates :account_id, presence: true
 
-    after_create :create_customer, if: -> { customer_id.nil? }
+    before_create :create_customer, if: -> { customer_id.nil? }
     after_update :reindex_customer
 
 
@@ -45,7 +45,8 @@ class CustomerDevice < ActiveRecord::Base
 
     def create_customer
         Rails.logger.info("Creating customer")
-        self.customer = Customer.create(account_id: self.account_id)
+        customer = Customer.create(account_id: self.account_id)
+        self.customer_id = customer.id if customer
     end
 
     def reindex_customer
