@@ -45,7 +45,9 @@ class CustomerDevice < ActiveRecord::Base
     end
 
     def reindex_customer
-        self.customer.__elasticsearch__.index_document if self.customer
+        if self.customer
+            self.customer.reindex_devices
+        end
     end
 
     def needs_update?(new_attributes)

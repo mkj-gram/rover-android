@@ -1,13 +1,6 @@
 class Customer < ActiveRecord::Base
     include Elasticsearch::Model
-
-    after_commit on: [:create, :update] do
-        __elasticsearch__.index_document
-    end
-
-    after_commit on: [:destroy] do
-        __elasticsearch__.delete_document
-    end
+    include Elasticsearch::Model::Callbacks
 
     settings index: { number_of_shards: 1, number_of_replicas: 2 } do
         mapping do
@@ -82,6 +75,10 @@ class Customer < ActiveRecord::Base
         end
     end
 
+    def reindex_devices
+        self.__elasticsearch__.update_document_attributes({ devices: devices_as_indexed_json })
+    end
+
     private
 
     def update_active_traits
@@ -97,7 +94,7 @@ class Customer < ActiveRecord::Base
         end
     end
 
-    def devices_as_indexed_json(options)
+    def devices_as_indexed_json(options = {})
         self.devices.map{|device| device.as_indexed_json(options)}
     end
 
