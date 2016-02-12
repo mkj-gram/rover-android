@@ -38,12 +38,7 @@ class IBeaconConfiguration < BeaconConfiguration
         # }
     end
 
-    validates :account_id, presence: true
-    # don't enforce an account owner
-    # validate :uuid_account_owner
-    # validate :unique_ibeacon
-
-
+    after_save :update_active_uuids
 
     def self.protocol
         @protocol ||= "iBeacon"
@@ -85,22 +80,11 @@ class IBeaconConfiguration < BeaconConfiguration
 
     private
 
-
-    def uuid_account_owner
-        if self.uuid_changed?
-            existing_uuid_config = BeaconConfiguration.find_by_uuid(self.uuid)
-            if !existing_uuid_config.nil? && existing_uuid_config.account_id != self.account_id
-                errors.add(:uuid, "has already been taken")
-            end
+    def update_active_uuids
+        if self.changes.include?(:uuid)
+            ActiveIBeaconConfigurationUuid.update_uuids(self.account_id, [uuid_was], [uuid])
         end
-    end
 
-    def unique_ibeacon
-        if self.uuid_changed? || self.major_changed? || self.minor_changed?
-            if IBeaconConfiguration.exists?(uuid: self.uuid, major: self.major, minor: self.minor)
-                errors.add(:ibeacon, "already exists")
-            end
-        end
     end
 
 end

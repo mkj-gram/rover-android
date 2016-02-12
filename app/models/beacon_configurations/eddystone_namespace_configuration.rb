@@ -34,6 +34,8 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         # }
     end
 
+    after_save :update_active_uuids
+
     def as_indexed_json(options = {})
         json = super(options)
         json.merge!(
@@ -57,5 +59,11 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         BeaconDevice.where(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id)
     end
 
+    private
 
+    def update_active_uuids
+        if self.changes.include?(:namespace)
+            ActiveEddystoneConfigurationUuid.update_uuids(self.account_id, [namespace_was], [namespace])
+        end
+    end
 end

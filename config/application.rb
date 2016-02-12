@@ -10,7 +10,7 @@ require 'elasticsearch/rails/instrumentation'
 module RailsApi
     class Application < Rails::Application
 
-        # config.active_record.schema_format = :sql
+        config.active_record.schema_format = :sql
 
         # Setup configuration per enviroment
         config.rabbitmq = Rails.application.config_for(:rabbitmq)
@@ -25,6 +25,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'estimote')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices', 'kontakt')
         config.autoload_paths << Rails.root.join('app', 'models', 'active_tags')
+        config.autoload_paths << Rails.root.join('app', 'models', 'active_configuration_uuids')
         # Generic Classes
         config.autoload_paths << Rails.root.join('app', 'classes')
 

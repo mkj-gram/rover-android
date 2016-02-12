@@ -3,11 +3,10 @@ class CreateActiveTags < ActiveRecord::Migration
         create_table :active_tags do |t|
             t.integer :account_id
             t.string :type
-            t.string :tag
+            t.string :tags, array: true, default: []
         end
 
         add_index :active_tags, :account_id
         add_index :active_tags, [:account_id, :type]
-        add_index :active_tags, [:account_id, :type, :tag], unique: true
     end
 end

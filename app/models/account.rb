@@ -7,6 +7,8 @@ class Account < ActiveRecord::Base
     include Tokenable
 
     before_create :generate_share_key
+    after_create :create_active_tags_index
+    after_create :create_active_configuration_uuids_index
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
@@ -32,6 +34,9 @@ class Account < ActiveRecord::Base
 
     has_many :beacon_configuration_active_tags
     has_many :location_active_tags
+
+    has_many :ibeacon_configuration_uuids
+    has_many :eddystone_namespace_configuration_uuids, class_name: "ActiveEddystoneConfigurationUuid"
 
     has_many :third_party_integrations do
         def enabled
@@ -94,6 +99,16 @@ class Account < ActiveRecord::Base
     end
 
     private
+
+    def create_active_tags_index
+        BeaconConfigurationActiveTag.create(account_id: self.id)
+        LocationActiveTag.create(account_id: self.id)
+    end
+
+    def create_active_configuration_uuids_index
+        ActiveEddystoneConfigurationUuid.create(account_id: self.id)
+        ActiveIBeaconConfigurationUuid.create(account_id: self.id)
+    end
 
     def generate_share_key
         self.share_key = loop do

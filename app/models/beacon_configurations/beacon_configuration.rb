@@ -63,6 +63,7 @@ class BeaconConfiguration < ActiveRecord::Base
 
     validate :location_exists
     validates :title, presence: true
+    validates :account_id, presence: true
 
     def as_indexed_json(options = {})
         json = {
