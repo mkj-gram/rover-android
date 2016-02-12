@@ -15,7 +15,7 @@ class V1::EventsController < V1::ApplicationController
         customer = get_customer(device, user_attributes)
 
         attributes = event_attributes.merge({device: device, customer: customer})
-        event = Event.new(attributes)
+        event = Event.create_event(attributes)
         event.save
 
         json = event.json_response
