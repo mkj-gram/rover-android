@@ -15,7 +15,7 @@ class V1::EventsController < V1::ApplicationController
         device = get_device(device_attributes, user_attributes)
         customer = get_customer(device, user_attributes)
 
-        attributes = event_attributes.merge({device: device, customer: customer})
+        attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
         event = Event.create_event(attributes)
         event.save
 

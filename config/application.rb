@@ -19,6 +19,7 @@ module RailsApi
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('app', 'models', 'events')
+        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'location_events')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
         config.autoload_paths << Rails.root.join('app', 'models', 'third_party_integrations')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices')
@@ -59,3 +60,6 @@ module RailsApi
 end
 
 require 'core_ext/hash'
+# first require the event then require everything else
+require Rails.root.join("app", "models", "events", "event.rb").to_s
+# Dir[Rails.root.join("app", "models", "events", "*").to_s].each{|file| puts file; require file}
