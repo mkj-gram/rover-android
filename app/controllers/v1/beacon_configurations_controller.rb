@@ -143,7 +143,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         configurations = Elasticsearch::Model.search(query, types)
         results = configurations.per_page(page_size).page(current_page).results
-        include_location = whitelist_include(["location"]).first == "location"
+        include_location = true #whitelist_include(["location"]).first == "location"
         json  = {
             "data" => results.map do |config|
                 if config._type == IBeaconConfiguration.document_type
