@@ -10,8 +10,9 @@ if !client.indices.exists?(index: BeaconConfiguration.index_name)
         client.indices.put_mapping(index: BeaconConfiguration.index_name, type: IBeaconConfiguration.document_type, body: IBeaconConfiguration.mappings.to_hash)
         client.indices.put_mapping(index: BeaconConfiguration.index_name, type: EddystoneNamespaceConfiguration.document_type, body: EddystoneNamespaceConfiguration.mappings.to_hash)
         client.indices.put_mapping(index: BeaconConfiguration.index_name, type: UrlConfiguration.document_type, body: UrlConfiguration.mappings.to_hash)
-    rescue Elasticsearch::Transport::Transport::Errors::InternalServerError => e
+    rescue  Exception => e
         Rails.logger.warn("Tried creating BeaconConfiguration elasticsearch index")
         Rails.logger.warn("Message: #{e}")
     end
+
 end
