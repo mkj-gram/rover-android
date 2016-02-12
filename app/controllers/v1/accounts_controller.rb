@@ -14,7 +14,7 @@ class V1::AccountsController < V1::ApplicationController
                     "share-key" => current_account.share_key,
                     "configuration-tags" => current_account.beacon_configuration_active_tag.tags,
                     "location-tags" => current_account.location_active_tag.tags,
-                    "iBeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
+                    "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids
                 },
                 "relationships" => {
