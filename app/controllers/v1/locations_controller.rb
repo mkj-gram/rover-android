@@ -124,16 +124,17 @@ class V1::LocationsController < V1::ApplicationController
         }
         included = []
         # if should_include.include?("configurations")
-        json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
-        p @location.beacon_configurations.size
-        json["data"]["relationships"].merge!(
-            "configurations" => {
-                "data" => @location.beacon_configurations.map{|config| { "type" => "configurations", "id" => config.id.to_s }}
-            }
-        )
+        if @location.beacon_configurations_count > 0
+            json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
 
-        included += @location.beacon_configurations.map{|config| serialize_beacon_configuration(config)}
-        # end
+            json["data"]["relationships"].merge!(
+                "configurations" => {
+                    "data" => @location.beacon_configurations.map{|config| { "type" => "configurations", "id" => config.id.to_s }}
+                }
+            )
+
+            included += @location.beacon_configurations.map{|config| serialize_beacon_configuration(config)}
+        end
 
         if included.any?
             json["included"] = included
