@@ -32,11 +32,11 @@ class Account < ActiveRecord::Base
     has_many :shared_beacon_configurations, through: :active_shared_beacon_configurations, source: :beacon_configuration
     has_many :shared_with_me_beacon_configurations, through: :passive_shared_beacon_configurations, source: :beacon_configuration
 
-    has_many :beacon_configuration_active_tags
-    has_many :location_active_tags
+    has_one :beacon_configuration_active_tag
+    has_one :location_active_tag
 
-    has_many :ibeacon_configuration_uuids
-    has_many :eddystone_namespace_configuration_uuids, class_name: "ActiveEddystoneConfigurationUuid"
+    has_one :ibeacon_configuration_uuids, class_name: "ActiveIBeaconConfigurationUuid"
+    has_one :eddystone_namespace_configuration_uuids, class_name: "ActiveEddystoneConfigurationUuid"
 
     has_many :third_party_integrations do
         def enabled
