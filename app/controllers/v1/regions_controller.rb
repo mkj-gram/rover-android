@@ -124,8 +124,7 @@ class V1::RegionsController < V1::ApplicationController
     end
 
     def query_types
-        params[:filter][:types] = ["ibeacon", "geofence"] if !(params.has_key?(:filter) && params[:filter].has_key?(:types))
-        params.fetch(:filter, {}).permit({:types => []})
+        params.fetch(:filter, {types: ["ibeacon", "geofence"]}).permit({:types => []})
     end
 
 end
