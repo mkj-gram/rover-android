@@ -56,7 +56,7 @@ class Customer < ActiveRecord::Base
     end
 
     def update_attributes_async(new_attributes)
-        if needs_update?(new_attributes)
+        if needs_update?
             UpdateCustomerAttributesWorker.perform_async(self.id, new_attributes)
         end
     end
@@ -103,8 +103,8 @@ class Customer < ActiveRecord::Base
         self.devices.map{|device| device.as_indexed_json(options)}
     end
 
-    def needs_update?(new_attributes)
-        true
+    def needs_update?
+        changes.any?
     end
 
 end

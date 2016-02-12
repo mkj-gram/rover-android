@@ -63,7 +63,13 @@ module JsonHelper
     private
 
     def underscore_attributes(attributes)
-        return attributes.inject({}) {|hash, (k,v)| hash.merge({k.underscore => v})}
+        attributes.inject({}) do |hash, (k,v)|
+            if v.is_a?(Hash)
+                hash.merge({k.underscore => underscore_attributes(v)})
+            else
+                hash.merge({k.underscore => v})
+            end
+        end
     end
 
     def get_relationship_data(relationships)

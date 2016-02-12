@@ -11,6 +11,7 @@ class V1::EventsController < V1::ApplicationController
         device_attributes = event_attributes.delete(:device) || {}
         user_attributes = event_attributes.delete(:user) || {}
 
+
         device = get_device(device_attributes, user_attributes)
         customer = get_customer(device, user_attributes)
 
