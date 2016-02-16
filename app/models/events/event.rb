@@ -30,7 +30,7 @@ class Event
     end
 
     def save
-        puts @attributes
+
     end
 
     # want a way to say add this to the saved model

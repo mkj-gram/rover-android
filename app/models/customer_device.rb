@@ -31,7 +31,7 @@ class CustomerDevice < ActiveRecord::Base
 
 
     def device_type
-        @device_type ||= os_name == "iOS" ? IOS_DEVICE : ANDROID_DEVICE
+        @device_type ||= platform == "iOS" ? IOS_DEVICE : ANDROID_DEVICE
     end
 
     def ios?
