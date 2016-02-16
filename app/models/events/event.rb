@@ -43,8 +43,8 @@ class Event
         end
     end
 
+    # used for adding extra attributes to be saved along with the event
     def add_to_event_attributes(object)
-        @attributes.merge!(object)
     end
 
     def to_json
@@ -52,7 +52,10 @@ class Event
             data: {
                 type: "events",
                 id: rand(99999),
-                attributes: @attributes
+                attributes: {
+                    object: object,
+                    action: action
+                }
             }
         }
         if @included.any?

@@ -4,6 +4,8 @@ class BeaconRegionEvent < Event
         case action
         when "enter"
             return BeaconRegionEnterEvent.new(event_attributes)
+        when "exit"
+            return BeaconRegionExitEvent.new(event_attributes)
         else
             return Event.new(event_attributes)
         end
@@ -41,12 +43,27 @@ class BeaconRegionEvent < Event
                         id: beacon_configuration.id.to_s,
                         name: beacon_configuration.title,
                         tags: beacon_configuration.tags,
-                        shared: beacon_configuration.shared
+                        shared: beacon_configuration.shared,
+                        enabled: beacon_configuration.enabled
                     }.merge(beacon_configuration.configuration_attributes)
                 }
             )
         end
         super
+    end
+
+    def to_json
+        json = super
+        if beacon_configuration && beacon_configuration.enabled
+            json[:data][:attributes][:configuration] = {
+                name: beacon_configuration.title,
+                tags: beacon_configuration.tags,
+                shared: beacon_configuration.shared
+            }.merge(beacon_configuration.configuration_attributes)
+        else
+            json[:data][:attributes][:configuration] = {}
+        end
+        return json
     end
 
     def beacon_configuration
@@ -74,6 +91,5 @@ class BeaconRegionEvent < Event
             "shared" => beacon_configuration.shared,
             "enabled" => beacon_configuration.enabled
         }.merge(beacon_configuration.configuration_attributes)
-
     end
 end
