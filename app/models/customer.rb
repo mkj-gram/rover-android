@@ -56,6 +56,7 @@ class Customer < ActiveRecord::Base
     end
 
     def update_attributes_async(new_attributes)
+        merge(new_attributes)
         if needs_update?
             UpdateCustomerAttributesWorker.perform_async(self.id, new_attributes)
         end
@@ -104,9 +105,7 @@ class Customer < ActiveRecord::Base
     end
 
     def needs_update?
-        true
-        Rails.logger.info("Changes for customer: #{changes}")
-        # changes.any?
+        changes.any?
     end
 
 end

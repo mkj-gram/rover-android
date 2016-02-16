@@ -30,7 +30,8 @@ class CustomerDevice < ActiveRecord::Base
 
 
     def update_attributes_async(new_attributes)
-        if needs_update?(new_attributes)
+        merge(new_attributes)
+        if needs_update?
             UpdateCustomerDeviceAttributesWorker.perform_async(self.id, new_attributes)
         end
     end
@@ -55,10 +56,8 @@ class CustomerDevice < ActiveRecord::Base
         end
     end
 
-    def needs_update?(new_attributes)
-        new_attributes.any? do |attribute_name, value|
-            modifiable_attributes.include?(attribute_name) && self.attributes[attribute_name] != value
-        end
+    def needs_update?
+        changes.any?
     end
 
 

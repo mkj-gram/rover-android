@@ -23,19 +23,42 @@ class Event
         @action = event_attributes[:action]
         @customer = event_attributes[:customer]
         @device = event_attributes[:device]
+        @included = []
+        @attributes = {object: @object, action: @action}
     end
 
     def save
-
+        puts @attributes
     end
 
-    def json
-        @json ||= {}
+    # want a way to say add this to the saved model
+    # then dump everything in mongo
+    #
+
+    def add_to_included(object)
+        if object.is_a?(Hash)
+            @included.push(object)
+        elsif object.is_a?(Array)
+            @included += object
+        end
     end
 
-    def add_to_json_included(hash)
-        @json[:included] = [] if @json[:included].nil?
-        @json[:included].push(hash)
+    def add_to_event_attributes(object)
+        @attributes.merge!(object)
+    end
+
+    def to_json
+        json = {
+            data: {
+                type: "events",
+                id: rand(99999),
+                attributes: @attributes
+            }
+        }
+        if @included.any?
+            json[:included] = @included
+        end
+        return json
     end
 
     def closest_geofence_regions(limit = 20)
@@ -76,6 +99,7 @@ class Event
             ]
         }
 
+
         locations = Elasticsearch::Model.search(query, [Location])
         locations.per_page(limit).page(0).results.map do |document|
             latitude = document._source.location.lat
@@ -83,22 +107,11 @@ class Event
             radius = document._source.radius
             GeofenceRegion.new(latitude: latitude, longitude: longitude, radius: radius)
         end
+
     end
 
     def ibeacon_wildcard_regions
         @ibeacon_wildcard_regions ||= account.ibeacon_configuration_uuids.configuration_uuids.map{|uuid| IBeaconRegion.new(uuid: uuid)}
     end
 
-    def json_response
-        @json = {
-            data: {
-                type: "events",
-                id: rand(99999),
-                attributes: {
-                    object: object,
-                    action: action
-                }
-            }
-        }
-    end
 end

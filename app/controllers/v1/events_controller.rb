@@ -22,7 +22,7 @@ class V1::EventsController < V1::ApplicationController
             event = Event.build_event(attributes)
             event.save
 
-            json = event.json_response
+            json = event.to_json
 
             render json: json
         end
@@ -74,7 +74,7 @@ class V1::EventsController < V1::ApplicationController
         end
 
         current_customer.update_attributes_async(customer_params(user_attributes))
-        current_customer.merge(customer_params(user_attributes))
+
         return current_customer
     end
 
@@ -90,18 +90,6 @@ class V1::EventsController < V1::ApplicationController
             customer = Customer.find_by(account_id: current_account.id, alias: new_customer_alias)
         end
         return customer
-    end
-
-    def update_customer_attributes_async(device, attributes)
-        # first check to see if we really need an update
-        customer_id = device.customer_id
-        customer_alias = device.customer_alias
-        traits = attributes.dig(:traits)
-        new_attributes_hash_code = {id: customer_id, alias: customer_alias, traits: traits}.hash
-        if device.customer_attributes_hashcode != new_attributes_hash_code
-            Rails.logger.info("The customer #{customer_id} needs updated")
-            UpdateCustomerAttributesWorker.perform_async(customer_id, {traits: traits})
-        end
     end
 
     def event_params(local_params)

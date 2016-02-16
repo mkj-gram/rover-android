@@ -33,14 +33,30 @@ class BeaconRegionEvent < Event
 
     end
 
+    def save
+        if beacon_configuration
+            add_to_event_attributes(
+                {
+                    configuration: {
+                        id: beacon_configuration.id.to_s,
+                        name: beacon_configuration.title,
+                        tags: beacon_configuration.tags,
+                        shared: beacon_configuration.shared
+                    }.merge(beacon_configuration.configuration_attributes)
+                }
+            )
+        end
+        super
+    end
+
     def beacon_configuration
         @beacon_configuration ||= case @protocol
         when BeaconConfiguration::IBEACON_PROTOCOL
-            IBeaconConfiguration.where(uuid: @uuid, major: @major, minor: @minor).first
+            IBeaconConfiguration.find_by(uuid: @uuid, major: @major, minor: @minor)
         when BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
-            EddystoneNamespaceConfiguration.where(namespace: @namespace, instance_id: @instance_id).first
+            EddystoneNamespaceConfiguration.find_by(namespace: @namespace, instance_id: @instance_id)
         when BeaconConfiguration::URL_PROTOCOL
-            UrlConfiguration.where(url: @url).first
+            UrlConfiguration.find_by(url: @url)
         else
             nil
         end

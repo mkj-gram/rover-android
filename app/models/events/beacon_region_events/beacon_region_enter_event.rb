@@ -8,12 +8,7 @@ class BeaconRegionEnterEvent < BeaconRegionEvent
         # update the customer elasticsearch document
         # when creating a visit check to see if there is any dwell messages
         # if so queue to perform in dwell time
+        super
     end
 
-    def json_response
-        super
-        json[:data][:attributes][:configuration] = {}
-        json[:data][:attributes][:configuration] = serialize_beacon_configuration(beacon_configuration) if beacon_configuration
-        return json
-    end
 end

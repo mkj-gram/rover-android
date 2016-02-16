@@ -29,11 +29,9 @@ class LocationEvent < Event
         @region_limit = device.os_name == "iOS" ? 20 : 100
     end
 
-
-    def json_response
+    def save
+        # add_to_event_attributes()
         super
-        json[:data][:attributes].merge!({latitude: latitude, longitude: longitude, radius: radius})
-        return json
     end
 
     private
