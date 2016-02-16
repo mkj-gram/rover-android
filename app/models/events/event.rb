@@ -29,6 +29,57 @@ class Event
 
     end
 
+    def closest_geofence_regions(limit = 20)
+        query = {
+            query: {
+                filtered: {
+                    filter: {
+                        bool: {
+                            should: [
+                                {
+                                    term: { account_id: account.id }
+                                },
+                                {
+                                    term: { shared_account_ids: account.id }
+                                }
+                            ],
+                            must: [
+                                {
+                                    term: { enabled: true }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            sort:  [
+                {
+                    :"_geo_distance" => {
+                        location: {
+                            lat: latitude,
+                            lon: longitude
+                        },
+                        order: "asc",
+                        unit: "km",
+                        :"distance_type" => "plane"
+                    }
+                }
+            ]
+        }
+
+        locations = Elasticsearch::Model.search(query, [Location])
+        locations.per_page(limit).page(0).results.map do |document|
+            latitude = document._source.location.lat
+            longitude = document._source.location.lon
+            radius = document._source.radius
+            GeofenceRegion.new(latitude: latitude, longitude: longitude, radius: radius)
+        end
+    end
+
+    def ibeacon_wildcard_regions
+        @ibeacon_wildcard_regions ||= account.ibeacon_configuration_uuids.configuration_uuids.map{|uuid| IBeaconRegion.new(uuid: uuid)}
+    end
+
     def json_response
         {
             data: {
