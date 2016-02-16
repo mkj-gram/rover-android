@@ -8,7 +8,8 @@ class LocationUpdateEvent < LocationEvent
         json = super
         # check to see if there is any beacons in the location
         # grab the closests locations
-        json[:included] = closest_geofence_regions(region_limit).map(&:serialize)
+        json[:included] = ibeacon_wildcard_regions.map(&:serialize)
+        json[:included] += closest_geofence_regions(region_limit - ibeacon_wildcard_regions.size).map(&:serialize)
         return json
     end
 
