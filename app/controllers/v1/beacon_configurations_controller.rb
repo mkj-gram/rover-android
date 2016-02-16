@@ -323,7 +323,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             json = {
                 "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
             }
-            should_include = whitelist_include(["location", "devices"])
+            should_include = ["location", "devices"] #whitelist_include(["location", "devices"])
 
             if should_include.include?("devices")
                 devices = beacon_configuration.beacon_devices.all.to_a
