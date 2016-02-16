@@ -47,7 +47,7 @@ class KontaktDevice < BeaconDevice
 
     def device_attributes
         {
-            uniqueId: self.uniqueId,
+            :"unique-id" => self.uniqueId,
             specification: self.specification,
             name: self.name,
             battery: self.battery,
