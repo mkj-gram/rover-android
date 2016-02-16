@@ -61,7 +61,7 @@ class EstimoteDevice < BeaconDevice
             firmware: self.firmware,
             range: self.range,
             power: self.power,
-            mac: self.mac.scan(/.{1,2}/).map(&:upcase).join(":"),
+            mac: self.mac,
             :"battery-life-expectancy-in-days" => self.battery_life_expectancy_in_days,
         }
     end
