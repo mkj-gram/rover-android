@@ -104,7 +104,9 @@ class Customer < ActiveRecord::Base
     end
 
     def needs_update?
-        changes.any?
+        true
+        Rails.logger.info("Changes for customer: #{changes}")
+        # changes.any?
     end
 
 end
