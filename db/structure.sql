@@ -117,7 +117,8 @@ CREATE TABLE accounts (
     searchable_locations_count integer DEFAULT 0,
     account_invites_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    customers_count integer DEFAULT 0
 );
 
 
@@ -283,6 +284,120 @@ CREATE SEQUENCE beacon_devices_id_seq
 --
 
 ALTER SEQUENCE beacon_devices_id_seq OWNED BY beacon_devices.id;
+
+
+--
+-- Name: customer_active_traits; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE customer_active_traits (
+    id integer NOT NULL,
+    account_id integer,
+    trait_key character varying
+);
+
+
+--
+-- Name: customer_active_traits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE customer_active_traits_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: customer_active_traits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE customer_active_traits_id_seq OWNED BY customer_active_traits.id;
+
+
+--
+-- Name: customer_devices; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE customer_devices (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    customer_id integer NOT NULL,
+    udid uuid NOT NULL,
+    token character varying,
+    locale_lang character varying,
+    locale_region character varying,
+    time_zone character varying,
+    sdk_version character varying,
+    platform character varying,
+    os_name character varying,
+    os_version character varying,
+    model character varying,
+    manufacturer character varying,
+    carrier character varying,
+    aid character varying,
+    local_notifications_enabled boolean DEFAULT false,
+    remote_notifications_enabled boolean DEFAULT false,
+    location_monitoring_enabled boolean DEFAULT false,
+    bluetooth_enabled boolean DEFAULT false
+);
+
+
+--
+-- Name: customer_devices_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE customer_devices_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: customer_devices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE customer_devices_id_seq OWNED BY customer_devices.id;
+
+
+--
+-- Name: customers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE customers (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    alias character varying,
+    name character varying,
+    email character varying,
+    phone_number character varying,
+    tags character varying[] DEFAULT '{}'::character varying[],
+    traits jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE customers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE customers_id_seq OWNED BY customers.id;
 
 
 --
@@ -614,6 +729,27 @@ ALTER TABLE ONLY beacon_devices ALTER COLUMN id SET DEFAULT nextval('beacon_devi
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY customer_active_traits ALTER COLUMN id SET DEFAULT nextval('customer_active_traits_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY customer_devices ALTER COLUMN id SET DEFAULT nextval('customer_devices_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY customers ALTER COLUMN id SET DEFAULT nextval('customers_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq'::regclass);
 
 
@@ -705,6 +841,30 @@ ALTER TABLE ONLY beacon_configurations
 
 ALTER TABLE ONLY beacon_devices
     ADD CONSTRAINT beacon_devices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: customer_active_traits_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY customer_active_traits
+    ADD CONSTRAINT customer_active_traits_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: customer_devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY customer_devices
+    ADD CONSTRAINT customer_devices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY customers
+    ADD CONSTRAINT customers_pkey PRIMARY KEY (id);
 
 
 --
@@ -918,6 +1078,48 @@ CREATE INDEX index_beacon_devices_on_third_party_integration_id ON beacon_device
 
 
 --
+-- Name: index_customer_active_traits_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_customer_active_traits_on_account_id ON customer_active_traits USING btree (account_id);
+
+
+--
+-- Name: index_customer_active_traits_on_account_id_and_trait_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_customer_active_traits_on_account_id_and_trait_key ON customer_active_traits USING btree (account_id, trait_key);
+
+
+--
+-- Name: index_customer_devices_on_udid; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_customer_devices_on_udid ON customer_devices USING btree (udid);
+
+
+--
+-- Name: index_customers_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_customers_on_account_id ON customers USING btree (account_id);
+
+
+--
+-- Name: index_customers_on_account_id_and_alias; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_customers_on_account_id_and_alias ON customers USING btree (account_id, alias);
+
+
+--
+-- Name: index_customers_on_account_id_and_traits; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_customers_on_account_id_and_traits ON customers USING gin (account_id, traits);
+
+
+--
 -- Name: index_locations_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1096,6 +1298,14 @@ INSERT INTO schema_migrations (version) VALUES ('20160125152740');
 INSERT INTO schema_migrations (version) VALUES ('20160125174600');
 
 INSERT INTO schema_migrations (version) VALUES ('20160127133932');
+
+INSERT INTO schema_migrations (version) VALUES ('20160204155417');
+
+INSERT INTO schema_migrations (version) VALUES ('20160204155855');
+
+INSERT INTO schema_migrations (version) VALUES ('20160211141152');
+
+INSERT INTO schema_migrations (version) VALUES ('20160211142442');
 
 INSERT INTO schema_migrations (version) VALUES ('20160211151337');
 

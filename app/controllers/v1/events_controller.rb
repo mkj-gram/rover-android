@@ -13,22 +13,27 @@ class V1::EventsController < V1::ApplicationController
 
 
         device = get_device(device_attributes, user_attributes)
-        customer = get_customer(device, user_attributes)
+        if device.nil?
+            render json: {errors: [{detail: "can't be blank", source: {pointer: "data/attributes/device/udid"}}]}, status: :unprocessable_entity
+        else
+            customer = get_customer(device, user_attributes)
 
-        attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
-        event = Event.build_event(attributes)
-        event.save
+            attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
+            event = Event.build_event(attributes)
+            event.save
 
-        json = event.json_response
+            json = event.json_response
 
-        render json: json
+            render json: json
+        end
     end
 
 
     private
 
     def get_device(device_attributes, user_attributes)
-        device = device_attributes[:udid].nil? ? nil : CustomerDevice.find_by_udid(device_attributes[:udid])
+        return nil if device_attributes[:udid].nil?
+        device = CustomerDevice.find_by_udid(device_attributes[:udid])
         if device.nil?
             device = build_device(device_attributes, user_attributes)
             device.account_id = current_account.id
