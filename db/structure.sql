@@ -1127,6 +1127,13 @@ CREATE INDEX index_locations_on_account_id ON locations USING btree (account_id)
 
 
 --
+-- Name: index_locations_on_account_id_and_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_locations_on_account_id_and_latitude_and_longitude ON locations USING btree (account_id, latitude, longitude);
+
+
+--
 -- Name: index_locations_on_account_id_and_tags; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 

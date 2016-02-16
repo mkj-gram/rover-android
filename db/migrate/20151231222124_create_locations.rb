@@ -25,5 +25,6 @@ class CreateLocations < ActiveRecord::Migration
 
         add_index :locations, :account_id
         add_index :locations, [:account_id, :tags], using: :gin
+        add_index :locations, [:account_id, :latitude, :longitude], unique: true
     end
 end
