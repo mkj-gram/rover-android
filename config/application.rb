@@ -22,6 +22,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('app', 'models', 'events', 'location_events')
         config.autoload_paths << Rails.root.join('app', 'models', 'events', 'beacon_region_events')
         config.autoload_paths << Rails.root.join('app', 'models', 'events', 'geofence_region_events')
+        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'app_events')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
         config.autoload_paths << Rails.root.join('app', 'models', 'third_party_integrations')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices')

@@ -1,0 +1,2 @@
+class AppClosedEvent < AppEvent
+end

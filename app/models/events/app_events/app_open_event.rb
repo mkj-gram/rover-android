@@ -1,0 +1,2 @@
+class AppOpenEvent < AppEvent
+end
