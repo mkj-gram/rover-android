@@ -106,7 +106,7 @@ class V1::LocationsController < V1::ApplicationController
             "meta" => {
                 "totalRecords" => results.total,
                 "totalPages" => results.total_pages,
-                "totalSearchableRecords" => current_account.searchable_locations_count,
+                "totalSearchableRecords" => current_account.searchable_locations_count
             }
         }
 
@@ -123,9 +123,10 @@ class V1::LocationsController < V1::ApplicationController
             "data" => serialize_location(@location)
         }
         included = []
-        if should_include.include?("configurations")
+        # if should_include.include?("configurations")
+        if @location.beacon_configurations_count > 0
             json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
-            p @location.beacon_configurations.size
+
             json["data"]["relationships"].merge!(
                 "configurations" => {
                     "data" => @location.beacon_configurations.map{|config| { "type" => "configurations", "id" => config.id.to_s }}

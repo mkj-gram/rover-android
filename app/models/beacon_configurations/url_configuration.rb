@@ -1,6 +1,5 @@
 class UrlConfiguration < BeaconConfiguration
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
     include UrlAttributes
 
     index_name BeaconConfiguration.index_name
@@ -14,7 +13,7 @@ class UrlConfiguration < BeaconConfiguration
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
         indexes :location, type: 'object' do
             indexes :name, type: 'string', index: 'no'
-            indexes :id, type: 'integer', index: 'no'
+            indexes :id, type: 'integer', index: 'not_analyzed'
         end
         indexes :url, type: 'string', index: 'not_analyzed'
         indexes :created_at, type: 'date'
@@ -24,16 +23,16 @@ class UrlConfiguration < BeaconConfiguration
         end
         # indexes :devices_meta, type: 'nested', index: 'no'
         # didn't get to work but we should learn this for future
-        indexes :suggest_tags, type: 'completion', analyzer: 'simple', search_analyzer: 'simple', payloads: false, context: {
-            account_id: {
-                type: "category",
-                path: "account_id"
-            },
-            shared_account_ids: {
-                type: "category",
-                path: "shared_account_ids"
-            }
-        }
+        # indexes :suggest_tags, type: 'completion', analyzer: 'simple', search_analyzer: 'simple', payloads: false, context: {
+        #     account_id: {
+        #         type: "category",
+        #         path: "account_id"
+        #     },
+        #     shared_account_ids: {
+        #         type: "category",
+        #         path: "shared_account_ids"
+        #     }
+        # }
     end
 
     validates :url, presence: true, uniqueness: true

@@ -17,7 +17,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         types = []
         should_query = []
         should_filter = []
-        must_filer = []
+        must_filter = []
 
         # we are grabbing all of our beacons
         should_filter.push(
@@ -70,11 +70,21 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         # if tags are provided they must all match
         if query_tags.any?
-            must_filer.push(
+            must_filter.push(
                 {
                     terms:  {
                         tags: query_tags,
                         execution: "and"
+                    }
+                }
+            )
+        end
+
+        if query_location_id
+            must_filter.push(
+                {
+                    term: {
+                        "location.id" => query_location_id.to_i
                     }
                 }
             )
@@ -98,7 +108,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         filter: {
                             bool: {
                                 should: should_filter,
-                                must: must_filer
+                                must: must_filter
                             }
                         }
                     }
@@ -123,7 +133,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                         filter: {
                             bool: {
                                 should: should_filter,
-                                must: must_filer
+                                must: must_filter
                             }
                         }
                     }
@@ -133,25 +143,36 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         configurations = Elasticsearch::Model.search(query, types)
         results = configurations.per_page(page_size).page(current_page).results
+        include_location = true #whitelist_include(["location"]).first == "location"
         json  = {
             "data" => results.map do |config|
                 if config._type == IBeaconConfiguration.document_type
-                    elasticsearch_serialize_ibeacon(config)
+                    elasticsearch_serialize_ibeacon(config, include_location)
                 elsif config._type == EddystoneNamespaceConfiguration.document_type
-                    elasticsearch_serialize_eddystone_namespace(config)
+                    elasticsearch_serialize_eddystone_namespace(config, include_location)
                 elsif config._type == UrlConfiguration.document_type
-                    elasticsearch_serialize_url(config)
+                    elasticsearch_serialize_url(config, include_location)
                 end
             end,
             "meta" => {
                 "totalRecords" => results.total,
-                "totalPages" => results.total_pages,
-                "totalSearchableRecords" => current_account.searchable_beacon_configurations_count
+                "totalPages" => results.total_pages
             },
             "links" => pagination_links(v1_beacon_configuration_index_url, results, {start_at: 0})
         }
 
-        included = results.select{|config| !config._source.location.empty? }.map{|config| serialize_partial_location(config._source.location) }
+        if query_location_id
+            json["meta"]["totalSearchableRecords"] = BeaconConfiguration.where(location_id: query_location_id).count
+        else
+            json["meta"]["totalSearchableRecords"] = current_account.searchable_beacon_configurations_count
+        end
+
+        included = []
+
+        if whitelist_include(["location"])
+            included += results.select{|config| !config._source.location.empty? }.map{|config| serialize_partial_location(config._source.location) }
+        end
+
         if included.any?
             json["included"] = included
         end
@@ -172,16 +193,20 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         if !protocol.nil?
             if @@protocol_types.include?(protocol)
                 @beacon_configuration = build_beacon_configuration(json[:data], protocol)
-                if @beacon_configuration.save
-                    render_beacon_configuration(@beacon_configuration)
-                else
-                    render json: { errors: V1::BeaconConfigurationCreateErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                begin
+                    if @beacon_configuration.save
+                        render_beacon_configuration(@beacon_configuration)
+                    else
+                        render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                    end
+                rescue ActiveRecord::RecordNotUnique => e
+                    render json: {errors: [{detail: "configuration already exists", source: {pointer: "data"}}]}, status: :unprocessable_entity
                 end
             else
-                render json: {errors: [{detail: "has to be of type (#{@@protocol_types.map(&:to_s).join(", ")})", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
+                render json: {errors: [{detail: "has to be of type (#{@@protocol_types.map(&:to_s).join(", ")})", source: {pointer: "/data/attributes/protocol"}}]}, status: :unprocessable_entity
             end
         else
-            render json: {errors: [{detail: "can't be blank", source: "/data/attributes/protocol"}]}, status: :unprocessable_entity
+            render json: {errors: [{detail: "can't be blank", source: {pointer: "/data/attributes/protocol"}}]}, status: :unprocessable_entity
         end
     end
 
@@ -193,7 +218,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             if @beacon_configuration.update_attributes(configuration_params(json[:data]))
                 render_beacon_configuration(@beacon_configuration)
             else
-                render json: { errors: V1::BeaconConfigurationUpdateErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
+                render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
             end
         else
             head :not_found
@@ -219,11 +244,12 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         #     local_params[:configurations][:tags] = []
         # end
 
-        local_params.fetch(:configurations, {}).permit(:title, {tags: []}, :enabled)
+        local_params.fetch(:configurations, {}).permit(:title, {tags: []}, :enabled, :location_id)
     end
 
     def filter_params
-        params.fetch(:filter, {}).permit(:query, :protocol, {:protocols => []}, {:tags => []})
+        convert_param_if_exists(params[:filter], :"location-id", :location_id)
+        params.fetch(:filter, {}).permit(:query, :protocol, {:protocols => []}, {:tags => []}, :location_id)
     end
 
     def query_keyword
@@ -232,6 +258,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def query_tags
         @query_tags ||= filter_params.fetch(:tags, [])
+    end
+
+    def query_location_id
+        @query_location_id ||= filter_params[:location_id]
     end
 
     # depreciated
@@ -251,7 +281,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     def beacon_configuration_params(local_params)
-        local_params.fetch(:configurations, {}).permit(:name, :enabled, {tags: []})
+        convert_param_if_exists(local_params[:configurations], :name, :title)
+        local_params.fetch(:configurations, {}).permit(:title, :enabled, {tags: []}, :location_id)
     end
 
     def ibeacon_configuration_params(local_params)
@@ -292,7 +323,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             json = {
                 "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
             }
-            should_include = whitelist_include(["location", "devices"])
+            should_include = ["location", "devices"] #whitelist_include(["location", "devices"])
 
             if should_include.include?("devices")
                 devices = beacon_configuration.beacon_devices.all.to_a
@@ -361,7 +392,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }
     end
 
-    def elasticsearch_serialize_beacon(config, extra_attributes = {})
+    def elasticsearch_serialize_beacon(config, include_location = false, extra_attributes = {})
         source = config._source
         json = {
             "type" => "configurations",
@@ -375,7 +406,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "device-count" => source.devices_meta[:count] || 0
             }.merge(extra_attributes)
         }
-        if !source.location.empty?
+        if include_location && !source.location.empty?
             json["relationships"] = {
                 "location" => {
                     "data" => { "type" =>  "locations", "id" => source.location.id }
@@ -385,10 +416,11 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         return json
     end
 
-    def elasticsearch_serialize_ibeacon(config)
+    def elasticsearch_serialize_ibeacon(config, include_location = false)
         source = config._source
         elasticsearch_serialize_beacon(
             config,
+            include_location,
             {
                 "protocol" => IBeaconConfiguration.protocol,
                 "uuid" => source.uuid,
@@ -398,10 +430,11 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         )
     end
 
-    def elasticsearch_serialize_eddystone_namespace(config)
+    def elasticsearch_serialize_eddystone_namespace(config, include_location = false)
         source = config._source
         elasticsearch_serialize_beacon(
             config,
+            include_location,
             {
 
                 "protocol" => EddystoneNamespaceConfiguration.protocol,
@@ -412,10 +445,11 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         )
     end
 
-    def elasticsearch_serialize_url(config)
+    def elasticsearch_serialize_url(config, include_location = false)
         source = config._source
         elasticsearch_serialize_beacon(
             config,
+            include_location,
             {
                 "protocol" => UrlConfiguration.protocol,
                 "url" => source.url

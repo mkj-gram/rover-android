@@ -1,6 +1,13 @@
 class Location < ActiveRecord::Base
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
+
+    after_commit on: [:create, :update] do
+        __elasticsearch__.index_document
+    end
+
+    after_commit on: [:destroy] do
+        __elasticsearch__.delete_document
+    end
 
     settings index: {
         number_of_shards: 1,
@@ -62,10 +69,9 @@ class Location < ActiveRecord::Base
 
     belongs_to :account, counter_cache: :searchable_locations_count
     has_many :beacon_configurations
-    has_one :location_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
 
     before_save :update_address_from_google_place
-    before_save :update_active_tags
+    after_save :update_active_tags
     after_save :update_beacon_configurations_elasticsearch_document
 
     def as_indexed_json(options = {})
@@ -120,18 +126,11 @@ class Location < ActiveRecord::Base
 
     def update_active_tags
         if self.changes.include?(:tags)
-            Rails.logger.info("searching for tags: #{tags} with changes #{self.changes}")
-            new_tags = self.changes[:tags].second - self.changes[:tags].first
-            old_tags = self.changes[:tags].first - self.changes[:tags].second
-            old_tags_to_delete = old_tags.select do |tag|
-                !Location.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
-            end
-            new_tags = self.tags
-            # lock this row since we are updating and deleting the tags in the application level
-            # beacon_configuration_active_tags.lock!
-            location_active_tags_index.tags += new_tags
-            location_active_tags_index.tags -= old_tags_to_delete
-            location_active_tags_index.save
+            previous_tags = (tags_was || [])
+            uniq_tags = (tags || []).uniq
+            old_tags = previous_tags - uniq_tags
+            new_tags = uniq_tags - previous_tags
+            LocationActiveTag.update_tags(self.account_id, old_tags, new_tags)
         end
     end
 

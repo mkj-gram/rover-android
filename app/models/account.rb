@@ -7,7 +7,8 @@ class Account < ActiveRecord::Base
     include Tokenable
 
     before_create :generate_share_key
-    after_create :create_active_tags_indexes
+    after_create :create_active_tags_index
+    after_create :create_active_configuration_uuids_index
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
@@ -31,8 +32,11 @@ class Account < ActiveRecord::Base
     has_many :shared_beacon_configurations, through: :active_shared_beacon_configurations, source: :beacon_configuration
     has_many :shared_with_me_beacon_configurations, through: :passive_shared_beacon_configurations, source: :beacon_configuration
 
-    has_one :beacon_configuration_active_tags_index
-    has_one :location_active_tags_index
+    has_one :beacon_configuration_active_tag
+    has_one :location_active_tag
+
+    has_one :ibeacon_configuration_uuids, class_name: "ActiveIBeaconConfigurationUuid"
+    has_one :eddystone_namespace_configuration_uuids, class_name: "ActiveEddystoneConfigurationUuid"
 
     has_many :third_party_integrations do
         def enabled
@@ -96,6 +100,16 @@ class Account < ActiveRecord::Base
 
     private
 
+    def create_active_tags_index
+        BeaconConfigurationActiveTag.create(account_id: self.id)
+        LocationActiveTag.create(account_id: self.id)
+    end
+
+    def create_active_configuration_uuids_index
+        ActiveEddystoneConfigurationUuid.create(account_id: self.id)
+        ActiveIBeaconConfigurationUuid.create(account_id: self.id)
+    end
+
     def generate_share_key
         self.share_key = loop do
             random_token = SecureRandom.hex(16)
@@ -103,8 +117,4 @@ class Account < ActiveRecord::Base
         end
     end
 
-    def create_active_tags_indexes
-        BeaconConfigurationActiveTagsIndex.create(account_id: self.id)
-        LocationActiveTagsIndex.create(account_id: self.id)
-    end
 end

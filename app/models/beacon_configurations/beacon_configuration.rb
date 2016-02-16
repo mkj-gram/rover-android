@@ -36,17 +36,34 @@ class BeaconConfiguration < ActiveRecord::Base
         }
     }
 
-    before_save :update_active_tags
+    after_commit on: [:create] do
+        __elasticsearch__.index_document
+    end
+
+    after_commit on: [:update] do
+        if previous_changes.include?("location_id")
+            __elasticsearch__.index_document
+        else
+            __elasticsearch__.update_document
+        end
+    end
+
+    after_commit on: [:destroy] do
+        __elasticsearch__.delete_document
+    end
+
     before_save :remove_duplicate_tags
+    after_save :update_active_tags
     after_save :update_location
-    after_create :increment_searchable_beacon_configurations_count
-    after_destroy :decrement_searchable_beacon_configurations_count
 
-    belongs_to :account
-    belongs_to :location
+    belongs_to :account, counter_cache: :searchable_beacon_configurations_count
+    belongs_to :location, counter_cache: :beacon_configurations_count
 
-    has_one :beacon_configuration_active_tags_index, foreign_key: "account_id", primary_key: "account_id"
     has_many :shared_beacon_configurations
+
+    validate :location_exists
+    validates :title, presence: true
+    validates :account_id, presence: true
 
     def as_indexed_json(options = {})
         json = {
@@ -57,25 +74,14 @@ class BeaconConfiguration < ActiveRecord::Base
             shared: self.shared,
             created_at: self.created_at,
             shared_account_ids: self.shared_account_ids,
-            location: self.indexed_location,
-            devices_meta: self.devices_meta
+            location: indexed_location,
+            devices_meta: devices_meta
         }
-
-        if self.tags.any?
-            json.merge!(
-                {
-                    suggest_tags: {
-                        input: self.tags,
-                        context: {
-                            account_id: self.account_id,
-                            shared_account_ids: self.account_id
-                        }
-                    }
-                }
-            )
-        end
-
         return json
+    end
+
+    def reindex_location
+        self.__elasticsearch__.update_document_attributes({location: indexed_location})
     end
 
     def reindex_devices_meta
@@ -91,22 +97,6 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
-    def update_active_tags
-        if self.changes.include?(:tags)
-            Rails.logger.info("searching for tags: #{tags} with changes #{self.changes}")
-            new_tags = self.changes[:tags].second - self.changes[:tags].first
-            old_tags = self.changes[:tags].first - self.changes[:tags].second
-            old_tags_to_delete = old_tags.select do |tag|
-                !BeaconConfiguration.where('tags @> ?', "{#{tag}}").where(account_id: self.account_id).exists?
-            end
-            new_tags = self.tags
-            # lock this row since we are updating and deleting the tags in the application level
-            # beacon_configuration_active_tags.lock!
-            beacon_configuration_active_tags_index.tags += new_tags
-            beacon_configuration_active_tags_index.tags -= old_tags_to_delete
-            beacon_configuration_active_tags_index.save
-        end
-    end
 
 
     def devices_meta
@@ -142,34 +132,23 @@ class BeaconConfiguration < ActiveRecord::Base
 
     protected
 
+    def location_exists
+        if changes.include?(:location_id) && !location_id.nil? && !Location.exists?(location_id)
+            errors.add(:location_id, "location doesn't exist")
+        end
+    end
+
     def update_location
-        if self.changes.include?(:location_id) && location_id_was != location_id
+        if changes.include?(:location_id) && location_id_was != location_id
             old_location = location_id_was.nil? ? nil : Location.find_by_id(location_id_was)
+            old_location.__elasticsearch__.update_document  if old_location
 
-            if old_location
-                Location.decrement_counter(:beacon_configurations_count, old_location.id)
-                old_location.__elasticsearch__.update_document
-            end
-
-            new_location = location_id.nil? ? nil : Location.find_by_id(location_id)
-            if new_location
-                Location.increment_counter(:beacon_configurations_count, 1)
-                new_location.__elasticsearch__.update_document
-            end
-
+            new_location = location
+            new_location.__elasticsearch__.update_document if new_location
         end
     end
 
-    def indexed_location
-        if !self.location_id.nil? && self.location
-            return {
-                name: location.title,
-                id: location.id
-            }
-        else
-            return {}
-        end
-    end
+
 
     def devices_meta_cache_key
         "beacon_configurations/#{self.id}/devices_meta/#{self.beacon_devices_updated_at.to_i}"
@@ -180,6 +159,27 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     private
+
+    def update_active_tags
+        if self.changes.include?(:tags)
+            previous_tags = (tags_was || [])
+            uniq_tags = (tags || []).uniq
+            old_tags = previous_tags - uniq_tags
+            new_tags = uniq_tags - previous_tags
+            BeaconConfigurationActiveTag.update_tags(self.account_id, old_tags, new_tags)
+        end
+    end
+
+    def indexed_location
+        if location
+            return {
+                name: location.title,
+                id: location.id
+            }
+        else
+            return {}
+        end
+    end
 
     def remove_duplicate_tags
         self.tags.uniq! if self.tags

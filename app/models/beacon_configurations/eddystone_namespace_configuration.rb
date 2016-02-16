@@ -1,6 +1,5 @@
 class EddystoneNamespaceConfiguration < BeaconConfiguration
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
     include EddystoneNamespaceAttributes
 
     index_name BeaconConfiguration.index_name
@@ -13,7 +12,7 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
         indexes :location, type: 'object' do
             indexes :name, type: 'string', index: 'no'
-            indexes :id, type: 'integer', index: 'no'
+            indexes :id, type: 'integer', index: 'not_analyzed'
         end
         indexes :namespace, type: 'string', analyzer: "lowercase_keyword", search_analyzer: "lowercase_keyword"
         indexes :instance_id, type: 'string', index: 'not_analyzed'
@@ -23,17 +22,19 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
             indexes :count, type: 'integer', index: "no"
         end
         # didn't get to work but we should learn this for future
-        indexes :suggest_tags, type: 'completion', analyzer: 'simple', search_analyzer: 'simple', payloads: false, context: {
-            account_id: {
-                type: "category",
-                path: "account_id"
-            },
-            shared_account_ids: {
-                type: "category",
-                path: "shared_account_ids"
-            }
-        }
+        # indexes :suggest_tags, type: 'completion', analyzer: 'simple', search_analyzer: 'simple', payloads: false, context: {
+        #     account_id: {
+        #         type: "category",
+        #         path: "account_id"
+        #     },
+        #     shared_account_ids: {
+        #         type: "category",
+        #         path: "shared_account_ids"
+        #     }
+        # }
     end
+
+    after_save :update_active_uuids
 
     def as_indexed_json(options = {})
         json = super(options)
@@ -58,5 +59,11 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         BeaconDevice.where(account_id: self.account_id, namespace: self.namespace, instance_id: self.instance_id)
     end
 
+    private
 
+    def update_active_uuids
+        if self.changes.include?(:namespace)
+            ActiveEddystoneConfigurationUuid.update_uuids(self.account_id, [namespace_was], [namespace])
+        end
+    end
 end

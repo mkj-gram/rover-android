@@ -1,6 +1,6 @@
 class CreateBeaconConfigurations < ActiveRecord::Migration
     def change
-
+        enable_extension "btree_gin"
         create_table :beacon_configurations do |t|
             t.integer :account_id, null: false
             t.integer :location_id
@@ -47,7 +47,7 @@ class CreateBeaconConfigurations < ActiveRecord::Migration
         add_index :beacon_configurations, :url, unique: true
 
         # we will use elasticsearch
-        # add_index :beacon_configurations, :tags, using: :gin
+        add_index :beacon_configurations, [:account_id, :tags], using: :gin
 
 
     end
