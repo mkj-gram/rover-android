@@ -12,7 +12,8 @@ class BeaconRegionEnterEvent < BeaconRegionEvent
 
     def json_response
         super
-        add_to_json_included(serialize_beacon_configuration(beacon_configuration)) if beacon_configuration
+        json[:data][:attributes][:configuration] = {}
+        json[:data][:attributes][:configuration] = serialize_beacon_configuration(beacon_configuration) if beacon_configuration
         return json
     end
 end
