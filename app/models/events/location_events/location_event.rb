@@ -26,7 +26,7 @@ class LocationEvent < Event
         @longitude = event_attributes[:longitude]
         @latitude = event_attributes[:latitude]
         @radius = event_attributes[:radius]
-        @region_limit = device.os_name == "iOS" ? 20 : 100
+        @region_limit = device.ios? ? 20 : 100
     end
 
     def save
