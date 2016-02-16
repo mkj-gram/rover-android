@@ -3,7 +3,9 @@ class BeaconRegionEvent < Event
     def self.build_event(object, action, event_attributes)
         case action
         when "enter"
-            BeaconRegionEnterEvent.new(event_attributes)
+            return BeaconRegionEnterEvent.new(event_attributes)
+        else
+            return Event.new(event_attributes)
         end
     end
 

@@ -1,7 +1,12 @@
 class LocationEvent < Event
 
     def self.build_event(object, action, event_attributes)
-        LocationUpdateEvent.new(event_attributes)
+        case action
+        when "update"
+            LocationUpdateEvent.new(event_attributes)
+        else
+            return Event.new(event_attributes)
+        end
     end
     # type is location
     # action update
