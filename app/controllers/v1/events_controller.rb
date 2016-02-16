@@ -8,8 +8,8 @@ class V1::EventsController < V1::ApplicationController
 
         event_attributes = json.dig(:data, :events)
 
-        device_attributes = event_attributes.delete(:device) || {}
-        user_attributes = event_attributes.delete(:user) || {}
+        device_attributes = ActionController::Parameters.new(event_attributes.delete(:device) || {})
+        user_attributes = ActionController::Parameters.new(event_attributes.delete(:user) || {})
 
 
         device = get_device(device_attributes, user_attributes)
