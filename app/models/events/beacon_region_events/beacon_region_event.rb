@@ -9,6 +9,7 @@ class BeaconRegionEvent < Event
 
 
     def initialize(event_attributes)
+        super
         @uuid = event_attributes[:uuid]
         @major = event_attributes[:major_number]
         @minor = event_attributes[:minor_number]
@@ -45,5 +46,18 @@ class BeaconRegionEvent < Event
 
     def location
         @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
+    end
+
+    def serialize_beacon_configuration(beacon_configuration)
+        {
+            "type" => "configurations",
+            "id" => beacon_configuration.id.to_s,
+            "attributes" => {
+                "name" => beacon_configuration.title,
+                "tags" => beacon_configuration.tags,
+                "shared" => beacon_configuration.shared,
+                "enabled" => beacon_configuration.enabled
+            }.merge(beacon_configuration.configuration_attributes)
+        }
     end
 end

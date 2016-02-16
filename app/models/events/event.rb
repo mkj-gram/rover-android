@@ -29,6 +29,15 @@ class Event
 
     end
 
+    def json
+        @json ||= {}
+    end
+
+    def add_to_json_included(hash)
+        @json[:included] = [] if @json[:included].nil?
+        @json[:included].push(hash)
+    end
+
     def closest_geofence_regions(limit = 20)
         query = {
             query: {
@@ -81,7 +90,7 @@ class Event
     end
 
     def json_response
-        {
+        @json = {
             data: {
                 type: "events",
                 id: rand(99999),

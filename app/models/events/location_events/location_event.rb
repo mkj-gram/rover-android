@@ -26,7 +26,7 @@ class LocationEvent < Event
 
 
     def json_response
-        json = super
+        super
         json[:data][:attributes].merge!({latitude: latitude, longitude: longitude, radius: radius})
         return json
     end
