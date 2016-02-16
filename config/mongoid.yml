@@ -1,7 +1,6 @@
 production:
     clients:
         default:
-            database: rover
             uri: <%= ENV["MONGODB_URI"] %>
 development:
   # Configure available database clients. (required)
