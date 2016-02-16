@@ -52,14 +52,12 @@ class BeaconRegionEvent < Event
 
     def serialize_beacon_configuration(beacon_configuration)
         {
-            "type" => "configurations",
             "id" => beacon_configuration.id.to_s,
-            "attributes" => {
-                "name" => beacon_configuration.title,
-                "tags" => beacon_configuration.tags,
-                "shared" => beacon_configuration.shared,
-                "enabled" => beacon_configuration.enabled
-            }.merge(beacon_configuration.configuration_attributes)
-        }
+            "name" => beacon_configuration.title,
+            "tags" => beacon_configuration.tags,
+            "shared" => beacon_configuration.shared,
+            "enabled" => beacon_configuration.enabled
+        }.merge(beacon_configuration.configuration_attributes)
+
     end
 end
