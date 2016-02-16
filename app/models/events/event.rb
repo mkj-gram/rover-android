@@ -8,6 +8,8 @@ class Event
             return LocationEvent.build_event(object, action, event_attributes)
         when "beacon-region"
             return BeaconRegionEvent.build_event(object, action, event_attributes)
+        when "geofence-region"
+            return GeofenceRegionEvent.build_event(object, action, event_attributes)
         else
             return Event.new(event_attributes)
         end
