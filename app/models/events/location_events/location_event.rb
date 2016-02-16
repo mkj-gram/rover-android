@@ -1,6 +1,6 @@
 class LocationEvent < Event
 
-    def self.create_event(event_attributes)
+    def self.build_event(object, action, event_attributes)
         LocationUpdateEvent.new(event_attributes)
     end
     # type is location

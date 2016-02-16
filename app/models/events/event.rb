@@ -1,10 +1,13 @@
 class Event
 
-    def self.create_event(event_attributes)
+    def self.build_event(event_attributes)
         object = event_attributes[:object]
+        action = event_attributes[:action]
         case object
         when "location"
-            return LocationEvent.create_event(event_attributes)
+            return LocationEvent.build_event(object, action, event_attributes)
+        when "beacon-region"
+            return BeaconRegionEvent.build_event(object, action, event_attributes)
         else
             return Event.new(event_attributes)
         end

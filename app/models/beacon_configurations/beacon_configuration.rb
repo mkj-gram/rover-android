@@ -1,6 +1,11 @@
 class BeaconConfiguration < ActiveRecord::Base
     include Elasticsearch::Model
-    # include Elasticsearch::Model::Callbacks
+
+    # Constants
+    IBEACON_PROTOCOL                = 1
+    EDDYSTONE_NAMESPACE_PROTOCOL    = 2
+    URL_PROTOCOL                    = 3
+    NO_PROTOCOL                     = 4
 
     # use to search through all document types
     document_type ""

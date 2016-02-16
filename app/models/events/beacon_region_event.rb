@@ -1,2 +1,0 @@
-class BeaconRegionEvent < Event
-end
