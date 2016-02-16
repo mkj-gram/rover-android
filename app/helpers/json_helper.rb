@@ -71,7 +71,7 @@ module JsonHelper
         relationships.inject({}) do |hash, (relationship_name, value)|
             relationship_name = relationship_name.singularize
             if value[:data].nil?
-                hash.merge({"#{relationship_id}" => nil})
+                hash.merge({"#{relationship_name}_id" => nil})
             elsif value[:data].is_a?(Array)
                 hash.merge({"#{relationship_name}_ids" => value[:data].map{|data| data[:id]}})
             else
