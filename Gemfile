@@ -49,6 +49,8 @@ gem 'httparty', '~> 0.13.7'
 gem 'google_places', '~> 0.32.0'
 
 gem 'virtus', '~> 1.0', '>= 1.0.5'
+
+gem 'mongoid', '~> 5.1'
 group :development do
 
 
