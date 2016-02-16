@@ -69,11 +69,11 @@ class BeaconRegionEvent < Event
     def beacon_configuration
         @beacon_configuration ||= case @protocol
         when BeaconConfiguration::IBEACON_PROTOCOL
-            IBeaconConfiguration.find_by(uuid: @uuid, major: @major, minor: @minor)
+            IBeaconConfiguration.find_by(account_id: account.id, uuid: @uuid, major: @major, minor: @minor)
         when BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
-            EddystoneNamespaceConfiguration.find_by(namespace: @namespace, instance_id: @instance_id)
+            EddystoneNamespaceConfiguration.find_by(account_id: account.id, namespace: @namespace, instance_id: @instance_id)
         when BeaconConfiguration::URL_PROTOCOL
-            UrlConfiguration.find_by(url: @url)
+            UrlConfiguration.find_by(account_id: account.id, url: @url)
         else
             nil
         end
