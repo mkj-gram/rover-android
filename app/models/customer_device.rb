@@ -6,7 +6,8 @@ class CustomerDevice < ActiveRecord::Base
     before_create :create_customer, if: -> { customer_id.nil? }
     after_update :reindex_customer
 
-
+    IOS_DEVICE = 1
+    ANDROID_DEVICE = 2
 
     def as_indexed_json(options = {})
         {
@@ -28,6 +29,18 @@ class CustomerDevice < ActiveRecord::Base
         }
     end
 
+
+    def device_type
+        @device_type ||= os_name == "iOS" ? IOS_DEVICE : ANDROID_DEVICE
+    end
+
+    def ios?
+        device_type == IOS_DEVICE
+    end
+
+    def android?
+        device_type == ANDROID_DEVICE
+    end
 
     def update_attributes_async(new_attributes)
         merge(new_attributes)

@@ -116,7 +116,13 @@ class Event
     end
 
     def ibeacon_wildcard_regions
-        @ibeacon_wildcard_regions ||= account.ibeacon_configuration_uuids.configuration_uuids.map{|uuid| IBeaconRegion.new(uuid: uuid)}
+        @ibeacon_wildcard_regions ||= -> {
+            if device.ios?
+                account.ibeacon_configuration_uuids.configuration_uuids.map{|uuid| IBeaconRegion.new(uuid: uuid)}
+            else
+                []
+            end
+        }.call
     end
 
 end
