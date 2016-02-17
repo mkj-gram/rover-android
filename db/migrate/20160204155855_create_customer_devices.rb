@@ -18,6 +18,7 @@ class CreateCustomerDevices < ActiveRecord::Migration
             t.string :carrier
             t.string :aid
 
+            t.boolean :background_enabled, default: false
             t.boolean :local_notifications_enabled, default: false
             t.boolean :remote_notifications_enabled, default: false
             t.boolean :location_monitoring_enabled, default: false

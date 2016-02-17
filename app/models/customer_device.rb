@@ -23,6 +23,7 @@ class CustomerDevice < ActiveRecord::Base
             model: self.model,
             manufacturer: self.manufacturer,
             carrier: self.carrier,
+            background_enabled: self.background_enabled,
             local_notifications_enabled: self.local_notifications_enabled,
             remote_notifications_enabled: self.remote_notifications_enabled,
             location_monitoring_enabled: self.location_monitoring_enabled,

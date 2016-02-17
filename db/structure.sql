@@ -337,6 +337,7 @@ CREATE TABLE customer_devices (
     manufacturer character varying,
     carrier character varying,
     aid character varying,
+    background_enabled boolean DEFAULT false,
     local_notifications_enabled boolean DEFAULT false,
     remote_notifications_enabled boolean DEFAULT false,
     location_monitoring_enabled boolean DEFAULT false,

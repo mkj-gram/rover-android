@@ -25,6 +25,7 @@ class Customer < ActiveRecord::Base
                 indexes :model, type: 'string', index: 'not_analyzed'
                 indexes :manufacturer, type: 'string', index: 'not_analyzed'
                 indexes :carrier, type: 'string', index: 'not_analyzed'
+                indexes :background_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :local_notifications_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :remote_notifications_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :location_monitoring_enabled, type: 'boolean', index: 'not_analyzed'
