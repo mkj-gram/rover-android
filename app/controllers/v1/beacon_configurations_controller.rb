@@ -323,14 +323,14 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             json = {
                 "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
             }
-            should_include = ["location", "devices"] #whitelist_include(["location", "devices"])
+            should_include = ["location", "beacons"] #whitelist_include(["location", "beacons"])
 
-            if should_include.include?("devices")
+            if should_include.include?("beacons")
                 devices = beacon_configuration.beacon_devices.all.to_a
                 json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
                 json["data"]["relationships"].merge!(
                     {
-                        "devices" => {
+                        "beacons" => {
                             "data" => devices.map do |device|
                                 {"type" => device.model_type, "id" => device.id.to_s}
                             end
@@ -402,8 +402,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "tags" => source.tags,
                 "shared" => source.shared,
                 "enabled" => source.enabled,
-                "device-type" => source.devices_meta[:type],
-                "device-count" => source.devices_meta[:count] || 0
+                "beacon-type" => source.devices_meta[:type],
+                "beacon-count" => source.devices_meta[:count] || 0
             }.merge(extra_attributes)
         }
         if include_location && !source.location.empty?
@@ -479,17 +479,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }
     end
 
-    # def serialize_estimote_relationships(estimote_devices)
-    #     "data" => estimote_devices.map{|device| {type: "estimote-devices", id: device.id.to_s}}
-    # end
-
-    def serialize_kontakt_relationships(kontakt_devices)
-        {
-            "kontakt-devices" => {
-                "data" => kontakt_devices.map{|device| {type: "kontakt-devices", id: device.id.to_s}}
-            }
-        }
-    end
 
     def render_empty_data
         render json: {
