@@ -337,11 +337,11 @@ CREATE TABLE customer_devices (
     manufacturer character varying,
     carrier character varying,
     aid character varying,
-    background_enabled boolean DEFAULT false,
-    local_notifications_enabled boolean DEFAULT false,
-    remote_notifications_enabled boolean DEFAULT false,
-    location_monitoring_enabled boolean DEFAULT false,
-    bluetooth_enabled boolean DEFAULT false
+    background_enabled boolean,
+    local_notifications_enabled boolean,
+    remote_notifications_enabled boolean,
+    location_monitoring_enabled boolean,
+    bluetooth_enabled boolean
 );
 
 
