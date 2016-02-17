@@ -11,7 +11,7 @@ module RailsApi
     class Application < Rails::Application
 
         config.active_record.schema_format = :sql
-
+        config.mongoid.logger = Logger.new($stdout, :warn)
         # Setup configuration per enviroment
         config.rabbitmq = Rails.application.config_for(:rabbitmq)
         config.mailgun = Rails.application.config_for(:mailgun)
