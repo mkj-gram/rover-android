@@ -13,6 +13,7 @@ class Customer < ActiveRecord::Base
             indexes :created_at, type: 'date', index: 'not_analyzed'
             indexes :traits, type: 'object'
             indexes :devices, type: 'nested' do
+                indexes :id, type: 'integer', index: 'no'
                 indexes :token, type: 'string', index: 'no'
                 indexes :locale_lang, type: 'string', index: 'not_analyzed'
                 indexes :locale_region, type: 'string', index: 'not_analyzed'

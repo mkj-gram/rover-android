@@ -11,6 +11,7 @@ class CustomerDevice < ActiveRecord::Base
 
     def as_indexed_json(options = {})
         {
+            id: self.id,
             token: self.token,
             locale_lang: self.locale_lang,
             locale_region: self.locale_region,
