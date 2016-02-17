@@ -79,6 +79,8 @@ Rails.application.routes.draw do
 
         post "/events", to: 'events#create'
 
+        get "/customers", to: 'customers#index'
+
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

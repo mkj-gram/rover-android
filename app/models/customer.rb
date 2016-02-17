@@ -10,6 +10,7 @@ class Customer < ActiveRecord::Base
             indexes :email, type: 'string', index: 'not_analyzed'
             indexes :phone_number, type: 'string', index: 'not_analyzed'
             indexes :tags, type: 'string', index: 'not_analyzed'
+            indexes :created_at, type: 'date', index: 'not_analyzed'
             indexes :traits, type: 'object'
             indexes :devices, type: 'nested' do
                 indexes :token, type: 'string', index: 'no'
