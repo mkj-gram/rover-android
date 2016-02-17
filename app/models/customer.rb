@@ -42,7 +42,7 @@ class Customer < ActiveRecord::Base
     def as_indexed_json(options = {})
         {
             account_id: self.account_id,
-            alias: self.alias,
+            identifier: self.identifier,
             name: self.name,
             email: self.email,
             phone_number: self.phone_number,
@@ -50,10 +50,6 @@ class Customer < ActiveRecord::Base
             traits: self.traits,
             devices: devices_as_indexed_json(options)
         }
-    end
-
-    def attributes_signature
-        SignatureHelper.createsig({ id: self.id, alias: self.alias, traits: self.traits })
     end
 
     def update_attributes_async(new_attributes)
