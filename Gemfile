@@ -51,6 +51,11 @@ gem 'google_places', '~> 0.32.0'
 gem 'virtus', '~> 1.0', '>= 1.0.5'
 
 gem 'mongoid', '~> 5.1'
+
+gem 'multi_json', '~> 1.11', '>= 1.11.2'
+
+gem 'oj', '~> 2.14', '>= 2.14.4'
+
 group :development do
 
 

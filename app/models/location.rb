@@ -95,6 +95,14 @@ class Location < ActiveRecord::Base
         }
     end
 
+    def latitude
+        read_attribute(:latitude).to_f
+    end
+
+    def longitude
+        read_attribute(:longitude).to_f
+    end
+
     def shared_account_ids
         []
     end

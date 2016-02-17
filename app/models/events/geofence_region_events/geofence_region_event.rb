@@ -31,8 +31,8 @@ class GeofenceRegionEvent < Event
         if location && location.enabled
             json[:data][:attributes][:location] = {
                 name: location.title,
-                latitude: location.latitude.to_f,
-                longitude: location.longitude.to_f,
+                latitude: location.latitude,
+                longitude: location.longitude,
                 radius: location.radius,
                 tags: location.tags,
                 shared: location.shared
