@@ -3,4 +3,4 @@ test:
 development:
     urls: "127.0.0.1:9200"
 production:
-    urls: <%= ENV['SEARCHBOX_SSL_URL'] || ENV['ELASTICSEARCH_URLS'] %>
+    urls: <%= ENV['BONSAI_URL'] %>
