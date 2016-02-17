@@ -1,4 +1,4 @@
-class GeofenceRegion < ActiveModelSerializers::Model
+class GeofenceRegion
     include Virtus.model
 
     attribute :id, String
@@ -6,10 +6,24 @@ class GeofenceRegion < ActiveModelSerializers::Model
     attribute :latitude, Float
     attribute :radius, Integer
 
+
+    def initialize(attributes = {})
+        if attributes.is_a?(String)
+            latitude, longitude = attributes.split(":")
+            super(latitude: latitude, longitude: longitude)
+        else
+            super
+        end
+    end
+
+    def id
+        "#{latitude}:#{longitude}"
+    end
+
     def serialize
         {
             type: "geofence-regions",
-            id: "#{latitude}:#{longitude}",
+            id: id,
             attributes: {
                 latitude: latitude,
                 longitude: longitude,
