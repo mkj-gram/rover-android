@@ -11,17 +11,17 @@ class GeofenceRegionEvent < Event
         end
     end
 
-    attr_reader :longitude, :latitude, :radius
+    attr_reader :identifier_latitude, :identifier_longitude, :longitude, :latitude, :radius
 
     def initialize(event_attributes)
         super
+        @identifier_latitude, @identifier_longitude = event_attributes[:identifier].split(":")
         @latitude = event_attributes[:latitude]
         @longitude = event_attributes[:longitude]
         @radius = event_attributes[:radius]
     end
 
     def save
-
         super
     end
 
@@ -47,7 +47,13 @@ class GeofenceRegionEvent < Event
     private
 
     def location
-        @location ||= Location.find_by(latitude: latitude, longitude: longitude)
+        @location ||= -> {
+            if identifier_latitude && identifier_longitude
+                Location.find_by(latitude: identifier_latitude, longitude: identifier_longitude)
+            else
+                Location.find_by(latitude: latitude, longitude: longitude)
+            end
+        }.call
     end
 
 end
