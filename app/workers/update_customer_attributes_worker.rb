@@ -5,7 +5,7 @@ class UpdateCustomerAttributesWorker
 
     def self.perform_async(customer_id, new_attributes)
         # do a permit here
-        updated_attributes = ActionController::Parameters.new(new_attributes).permit(:alias, :name, :email, :phone_number, {:tags => []})
+        updated_attributes = ActionController::Parameters.new(new_attributes).permit(:identifier, :name, :email, :phone_number, {:tags => []})
         updated_attributes[:traits] = new_attributes.fetch(:traits, {})
         msg = {id: customer_id, attributes: updated_attributes}.to_json
         enqueue_message(msg, {to_queue: 'update_customer_attributes'})

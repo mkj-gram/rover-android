@@ -370,7 +370,7 @@ ALTER SEQUENCE customer_devices_id_seq OWNED BY customer_devices.id;
 CREATE TABLE customers (
     id integer NOT NULL,
     account_id integer NOT NULL,
-    alias character varying,
+    identifier character varying,
     name character varying,
     email character varying,
     phone_number character varying,
@@ -1106,10 +1106,10 @@ CREATE INDEX index_customers_on_account_id ON customers USING btree (account_id)
 
 
 --
--- Name: index_customers_on_account_id_and_alias; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customers_on_account_id_and_identifier; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_customers_on_account_id_and_alias ON customers USING btree (account_id, alias);
+CREATE UNIQUE INDEX index_customers_on_account_id_and_identifier ON customers USING btree (account_id, identifier);
 
 
 --

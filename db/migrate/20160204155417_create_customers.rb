@@ -3,7 +3,7 @@ class CreateCustomers < ActiveRecord::Migration
         enable_extension "btree_gin"
         create_table :customers do |t|
             t.integer :account_id, null: false
-            t.string :alias
+            t.string :identifier
             t.string :name
             t.string :email
             t.string :phone_number
@@ -13,7 +13,7 @@ class CreateCustomers < ActiveRecord::Migration
         end
 
         add_index :customers, :account_id
-        add_index :customers, [:account_id, :alias], unique: true
+        add_index :customers, [:account_id, :identifier], unique: true
         add_index :customers, [:account_id, :traits], using: :gin
     end
 end

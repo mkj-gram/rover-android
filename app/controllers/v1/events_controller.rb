@@ -47,10 +47,10 @@ class V1::EventsController < V1::ApplicationController
 
     def build_device(device_attributes, user_attributes)
         device = CustomerDevice.new(device_params(device_attributes))
-        user_alias = user_attributes[:alias]
-        if !user_alias.nil?
-            # they are creating a device with an alias, rare but could happen
-            customer = Customer.find_by(account_id: current_account.id, alias: user_alias)
+        user_identifier = user_attributes[:identifier]
+        if !user_identifier.nil?
+            # they are creating a device with an identifier, rare but could happen
+            customer = Customer.find_by(account_id: current_account.id, identifier: user_identifier)
             device.customer = customer if customer
         end
         return device
@@ -59,13 +59,13 @@ class V1::EventsController < V1::ApplicationController
 
     def get_customer(device, user_attributes)
         current_customer = device.customer
-        new_customer_alias = user_attributes.dig(:alias)
+        new_customer_identifier = user_attributes.dig(:identifier)
 
-        if current_customer.alias.nil? && !new_customer_alias.nil? && !(existing_customer = Customer.find_by(account_id: current_account.id, alias: new_customer_alias)).nil?
+        if current_customer.identifier.nil? && !new_customer_identifier.nil? && !(existing_customer = Customer.find_by(account_id: current_account.id, identifier: new_customer_identifier)).nil?
             device.customer = existing_customer
             device.save
             current_customer = existing_customer
-        elsif !current_customer.alias.nil? && new_customer_alias.nil?
+        elsif !current_customer.identifier.nil? && new_customer_identifier.nil?
             # the customer has logged out create a new anonymous customer
             new_customer = create_customer(user_attributes)
             device.customer = new_customer
@@ -87,7 +87,7 @@ class V1::EventsController < V1::ApplicationController
             # this happens when 2 request come at the exact same time
             # User with 2 devices update their attributes at the exact same time
             # Super rare but we don't want to 500 internal
-            customer = Customer.find_by(account_id: current_account.id, alias: new_customer_alias)
+            customer = Customer.find_by(account_id: current_account.id, identifier: new_customer_identifier)
         end
         return customer
     end
@@ -97,7 +97,7 @@ class V1::EventsController < V1::ApplicationController
     end
 
     def customer_params(user_attributes)
-        allowed_params = user_attributes.permit(:alias, :name, :email, :phone_number, {:tags => []})
+        allowed_params = user_attributes.permit(:identifier, :name, :email, :phone_number, {:tags => []})
         # we have to manually allow traits since strong params doesn't allow unknown hashes
         allowed_params[:traits] = user_attributes.dig(:traits) || {}
         return allowed_params

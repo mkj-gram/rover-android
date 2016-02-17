@@ -5,7 +5,7 @@ class Customer < ActiveRecord::Base
     settings index: { number_of_shards: 1, number_of_replicas: 2 } do
         mapping do
             indexes :account_id, type: 'long', index: 'not_analyzed'
-            indexes :alias, type: 'string', index: 'not_analyzed'
+            indexes :identifier, type: 'string', index: 'not_analyzed'
             indexes :name, type: 'string', index: 'not_analyzed'
             indexes :email, type: 'string', index: 'not_analyzed'
             indexes :phone_number, type: 'string', index: 'not_analyzed'
