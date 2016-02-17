@@ -49,7 +49,7 @@ class GeofenceRegionEvent < Event
     def location
         @location ||= -> {
             if geofence_region && geofence_region.latitude && geofence_region.latitude
-                return Location.find_by(latitude: geofence_region.latitude , longitude: geofence_region.latitude)
+                return Location.find_by(latitude: geofence_region.latitude , longitude: geofence_region.longitude)
             else
                 return Location.find_by(latitude: latitude, longitude: longitude)
             end
