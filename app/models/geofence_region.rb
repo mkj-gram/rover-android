@@ -10,7 +10,7 @@ class GeofenceRegion
     def initialize(attributes = {})
         if attributes.is_a?(String)
             latitude, longitude = attributes.split(":")
-            super(latitude: latitude, longitude: longitude)
+            super(latitude: latitude.to_f, longitude: longitude.to_f)
         else
             super
         end
