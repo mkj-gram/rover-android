@@ -1,6 +1,7 @@
 class V1::CustomersController < V1::ApplicationController
 
     before_action :authenticate
+    before_action :set_customer, only: [:show]
 
     def index
 
@@ -38,12 +39,44 @@ class V1::CustomersController < V1::ApplicationController
                 "totalSearchableRecords" => current_account.customers_count
             }
         }
-        json["included"] = results.map{|customer| customer.devices.map{|device| serialize_elasticsearch_device(device)}}.flatten
+        json["included"] = results.map{|customer| customer.devices.map{|device| serialize_device(device)}}.flatten
         render json: json
     end
 
+    def show
+        json = {
+            data: serialize_customer(@customer),
+            included: @customer.devices.map{|device| serialize_device(device)}
+        }
+        render json: json
+    end
 
     private
+
+    def set_customer
+        @customer = Customer.find_by_id(params[:id])
+        head :not_found if @customer.nil?
+    end
+
+    def serialize_customer(customer)
+        {
+            type: "customers",
+            id: customer.id.to_s,
+            attributes: {
+                identifier: customer.identifier,
+                name: customer.name,
+                email: customer.email,
+                :"phone-number" => customer.phone_number,
+                tags: customer.tags,
+                traits: customer.traits
+            },
+            relationships: {
+                devices: {
+                    data: customer.devices.map{|device| {type: "devices", id: device.id }}
+                }
+            }
+        }
+    end
 
     def serialize_elasticsearch_customer(customer)
         source = customer._source
@@ -66,7 +99,7 @@ class V1::CustomersController < V1::ApplicationController
         }
     end
 
-    def serialize_elasticsearch_device(device)
+    def serialize_device(device)
         {
             type: "devices",
             id: device.id.to_s,

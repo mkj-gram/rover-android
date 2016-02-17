@@ -18,11 +18,11 @@ class CreateCustomerDevices < ActiveRecord::Migration
             t.string :carrier
             t.string :aid
 
-            t.boolean :background_enabled, default: false
-            t.boolean :local_notifications_enabled, default: false
-            t.boolean :remote_notifications_enabled, default: false
-            t.boolean :location_monitoring_enabled, default: false
-            t.boolean :bluetooth_enabled, default: false
+            t.boolean :background_enabled
+            t.boolean :local_notifications_enabled
+            t.boolean :remote_notifications_enabled
+            t.boolean :location_monitoring_enabled
+            t.boolean :bluetooth_enabled
         end
 
         add_index :customer_devices, :udid, unique: true

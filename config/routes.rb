@@ -79,7 +79,7 @@ Rails.application.routes.draw do
 
         post "/events", to: 'events#create'
 
-        get "/customers", to: 'customers#index'
+        resources :customers, only: [:index, :show]
 
     end
     # The priority is based upon order of creation: first created -> highest priority.
