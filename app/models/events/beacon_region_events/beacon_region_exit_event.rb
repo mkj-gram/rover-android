@@ -1,6 +1,11 @@
 class BeaconRegionExitEvent < BeaconRegionEvent
 
 
+    def self.event_id
+        Event::BEACON_REGION_EXIT_EVENT_ID
+    end
+
+
     def save
         # only writing is the event
         # create a visit in the background

@@ -1,5 +1,9 @@
 class GeofenceRegionEvent < Event
 
+    def self.event_id
+        Event::GEOFENCE_REGION_EVENT_ID
+    end
+
     def self.build_event(object, action, event_attributes)
         case action
         when "enter"

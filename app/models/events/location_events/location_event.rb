@@ -1,5 +1,9 @@
 class LocationEvent < Event
 
+    def self.event_id
+        Event::LOCATION_EVENT_ID
+    end
+
     def self.build_event(object, action, event_attributes)
         case action
         when "update"

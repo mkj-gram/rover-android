@@ -1,5 +1,9 @@
 class BeaconRegionEvent < Event
 
+    # def self.event_id
+    #     Event::BEACON_REGION_EVENT_ID
+    # end
+
     def self.build_event(object, action, event_attributes)
         case action
         when "enter"
@@ -60,28 +64,42 @@ class BeaconRegionEvent < Event
                 tags: beacon_configuration.tags,
                 shared: beacon_configuration.shared
             }.merge(beacon_configuration.configuration_attributes)
+            # only include the message if the configuration exists
+            if messages.any?
+                json[:included] += messages.map{|message| message.serialize(customer: customer, device: device) }
+            end
         else
             json[:data][:attributes][:configuration] = {}
         end
+
+
+
         return json
     end
 
+    def messages
+        @messages ||= ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id)
+    end
+
     def beacon_configuration
-        @beacon_configuration ||= case @protocol
+        @beacon_configuration ||=
+        case @protocol
         when BeaconConfiguration::IBEACON_PROTOCOL
-            IBeaconConfiguration.find_by(account_id: account.id, uuid: @uuid, major: @major, minor: @minor)
+            [IBeaconConfiguration.find_by(account_id: account.id, uuid: @uuid, major: @major, minor: @minor)]
         when BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
-            EddystoneNamespaceConfiguration.find_by(account_id: account.id, namespace: @namespace, instance_id: @instance_id)
+            [EddystoneNamespaceConfiguration.find_by(account_id: account.id, namespace: @namespace, instance_id: @instance_id)]
         when BeaconConfiguration::URL_PROTOCOL
-            UrlConfiguration.find_by(account_id: account.id, url: @url)
+            [UrlConfiguration.find_by(account_id: account.id, url: @url)]
         else
-            nil
+            [nil]
         end
+        return @beacon_configuration.first
     end
 
     def location
         @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
     end
+
 
     def serialize_beacon_configuration(beacon_configuration)
         {
@@ -92,4 +110,5 @@ class BeaconRegionEvent < Event
             "enabled" => beacon_configuration.enabled
         }.merge(beacon_configuration.configuration_attributes)
     end
+
 end

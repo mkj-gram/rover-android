@@ -1,5 +1,28 @@
 class Event
 
+    UNKNOWN_EVENT_ID = 0
+
+    # each get a block of 20
+    # Geofence Region Event 1-20
+    GEOFENCE_REGION_EVENT_ID = 1
+    GEOFENCE_REGION_ENTER_EVENT_ID = 2
+    GEOFENCE_REGION_EXIT_EVENT_ID = 3
+
+    # Beacon Region Event 21-40
+    BEACON_REGION_EVENT_ID = 21
+    BEACON_REGION_ENTER_EVENT_ID = 22
+    BEACON_REGION_EXIT_EVENT_ID = 23
+
+    # App Events 41-60
+    APP_EVENT_ID = 41
+    APP_OPEN_EVENT_ID = 42
+    APP_CLOSED_EVENT_ID = 43
+
+    # Location Events 61-80
+    LOCATION_EVENT_ID = 61
+    LOCATION_UPDATE_EVENT_ID = 62
+
+
     def self.build_event(event_attributes)
         object = event_attributes[:object]
         action = event_attributes[:action]
@@ -60,11 +83,9 @@ class Event
                     object: object,
                     action: action
                 }
-            }
+            },
+            included: []
         }
-        if @included.any?
-            json[:included] = @included
-        end
         return json
     end
 

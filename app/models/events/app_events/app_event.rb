@@ -1,5 +1,9 @@
 class AppEvent < Event
 
+    def self.event_id
+        Event::APP_EVENT_ID
+    end
+
     def self.build_event(object, action, event_attributes)
         case action
         when "open"
