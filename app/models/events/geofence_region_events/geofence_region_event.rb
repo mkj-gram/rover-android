@@ -1,9 +1,5 @@
 class GeofenceRegionEvent < Event
 
-    def self.event_id
-        Event::GEOFENCE_REGION_EVENT_ID
-    end
-
     def self.build_event(object, action, event_attributes)
         case action
         when "enter"
@@ -41,6 +37,9 @@ class GeofenceRegionEvent < Event
                 tags: location.tags,
                 shared: location.shared
             }
+            if messages.any?
+                json[:included] += messages.map{|message| serialize_message(message,{customer: customer, device: device}) }
+            end
         else
             json[:data][:attributes][:location] = {}
         end
@@ -49,6 +48,28 @@ class GeofenceRegionEvent < Event
     end
 
     private
+
+    def messages
+        @messages ||= ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id)
+    end
+
+    def serialize_message(message, opts = {})
+        customer = opts.delete(:customer)
+        if customer
+            opts.merge!(customer.attributes.inject({}){|hash, (k,v)| hash.merge("customer_#{k}" => v)})
+        end
+        device = opts.delete(:device)
+        if device
+            opts.merge!(device.attributes.inject({}){|hash, (k,v)| hash.merge("device_#{k}" => v)})
+        end
+        {
+            type: "messages",
+            id: message.id.to_s,
+            attributes: {
+                text: message.formatted_message(opts)
+            }
+        }
+    end
 
     def location
         @location ||= -> {

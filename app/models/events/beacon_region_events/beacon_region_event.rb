@@ -77,9 +77,13 @@ class BeaconRegionEvent < Event
         return json
     end
 
+
+    private
+
     def messages
         @messages ||= ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id)
     end
+
 
     def beacon_configuration
         @beacon_configuration ||=
