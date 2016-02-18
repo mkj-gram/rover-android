@@ -19,14 +19,25 @@ Sneakers.configure(
         workers: num_workers,
         pid_path: "pid/sneakers.pid",
         timeout_job_after: 1800,
-        prefetch: 10,
-        threads: 10,
+        prefetch: 5,
+        threads: 5,
         env: ENV['RACK_ENV'],
         durable: true,
         ack: true,
         heartbeat: 60,
         exchange: 'background_jobs',
-        hooks: {}
+        hooks: {
+            before_fork: -> {
+                Rails.logger.info('Worker: Disconnect from the database')
+                ActiveRecord::Base.connection_pool.disconnect!
+            },
+            after_fork: -> {
+                config = Rails.application.config.database_configuration[Rails.env]
+                config['reaping_frequency'] = 10 # seconds
+                ActiveRecord::Base.establish_connection(config)
+                Rails.logger.info('Worker: Reconnect to the database')
+            }
+        }
     }
 )
 
