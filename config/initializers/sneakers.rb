@@ -27,16 +27,6 @@ Sneakers.configure(
         heartbeat: 60,
         exchange: 'background_jobs',
         hooks: {
-            before_fork: -> {
-                Rails.logger.info('Worker: Disconnect from the database')
-                ActiveRecord::Base.connection_pool.disconnect!
-            },
-            after_fork: -> {
-                config = Rails.application.config.database_configuration[Rails.env]
-                config['reaping_frequency'] = 10 # seconds
-                ActiveRecord::Base.establish_connection(config)
-                Rails.logger.info('Worker: Reconnect to the database')
-            }
         }
     }
 )
