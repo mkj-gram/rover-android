@@ -66,7 +66,7 @@ class BeaconRegionEvent < Event
             }.merge(beacon_configuration.configuration_attributes)
             # only include the message if the configuration exists
             if messages.any?
-                json[:included] += messages.map{|message| message.serialize(customer: customer, device: device) }
+                json[:included] += messages.map{|message| serialize_message(message,{customer: customer, device: device}) }
             end
         else
             json[:data][:attributes][:configuration] = {}
@@ -100,6 +100,23 @@ class BeaconRegionEvent < Event
         @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
     end
 
+    def serialize_message(message, opts = {})
+        customer = opts.delete(:customer)
+        if customer
+            opts.merge!(customer.attributes.inject({}){|hash, (k,v)| hash.merge("customer_#{k}" => v)})
+        end
+        device = opts.delete(:device)
+        if device
+            opts.merge!(device.attributes.inject({}){|hash, (k,v)| hash.merge("device_#{k}" => v)})
+        end
+        {
+            type: "messages",
+            id: message.id.to_s,
+            attributes: {
+                text: message.formatted_message(opts)
+            }
+        }
+    end
 
     def serialize_beacon_configuration(beacon_configuration)
         {
