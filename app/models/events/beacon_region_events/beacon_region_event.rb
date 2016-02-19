@@ -65,6 +65,7 @@ class BeaconRegionEvent < Event
                 shared: beacon_configuration.shared
             }.merge(beacon_configuration.configuration_attributes)
             # only include the message if the configuration exists
+            messages = get_message_for_beacon_configuration(beacon_configuration)
             if messages.any?
                 json[:included] += messages.map{|message| serialize_message(message,{customer: customer, device: device}) }
             end
@@ -80,10 +81,32 @@ class BeaconRegionEvent < Event
 
     private
 
-    def messages
-        @messages ||= ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id).all.to_a
+    def get_message_for_beacon_configuration(beacon_configuration)
+        # has to perform all filtering in memory
+        # first find all messages where the trigger_event_id is the type of event which occured
+        messages = ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id).all.to_a
+        # apply all filters
+        current_time = DateTime.now
+        messages.select do |message|
+            # check time
+            if message.within_schedule(current_time)
+                # we are within schedule
+                # check to see if our config fits the message
+                if message.apply_configuration_filters(beacon_configuration)
+                    # we also have customer filtering ontop
+                    if message.apply_customer_filters(customer, device)
+                        true
+                    else
+                        false
+                    end
+                else
+                    false
+                end
+            else
+                false
+            end
+        end
     end
-
 
     def beacon_configuration
         @beacon_configuration ||=
