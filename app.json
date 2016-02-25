@@ -48,12 +48,13 @@
     "ELASTICSEARCH_URLS": {
       "required": true
     },
-    "MONGODB_URI": {
+    "MONGOHQ_URL": {
       "required": true
     }
   },
   "addons": [
     "bonsai",
-    "cloudamqp"
+    "cloudamqp",
+    "mongohq"
   ]
 }
