@@ -10,36 +10,36 @@ class BeaconConfiguration < ActiveRecord::Base
     # use to search through all document types
     document_type ""
 
-    settings index: {
-        number_of_shards: 1,
-        number_of_replicas: 2,
-        analysis:  {
-            filter: {
-                autocomplete_filter: {
-                    type: "edge_ngram",
-                    min_gram: 1,
-                    max_gram: 15
-                }
-            },
-            analyzer: {
-                autocomplete: {
-                    type: "custom",
-                    tokenizer: "standard",
-                    filter: [
-                        "lowercase",
-                        "autocomplete_filter"
-                    ]
+    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2}).merge(
+        {
+            analysis:  {
+                filter: {
+                    autocomplete_filter: {
+                        type: "edge_ngram",
+                        min_gram: 1,
+                        max_gram: 15
+                    }
                 },
-                lowercase_keyword: {
-                    type: "custom",
-                    tokenizer: "keyword",
-                    filter: [
-                        "lowercase"
-                    ]
+                analyzer: {
+                    autocomplete: {
+                        type: "custom",
+                        tokenizer: "standard",
+                        filter: [
+                            "lowercase",
+                            "autocomplete_filter"
+                        ]
+                    },
+                    lowercase_keyword: {
+                        type: "custom",
+                        tokenizer: "keyword",
+                        filter: [
+                            "lowercase"
+                        ]
+                    }
                 }
             }
         }
-    }
+    )
 
     after_commit on: [:create] do
         __elasticsearch__.index_document
