@@ -4,6 +4,9 @@ class IBeaconConfiguration < BeaconConfiguration
     include BeaconConfigurationElasticsearchMappings
 
     document_type "ibeacon_configuration"
+    # workaround since including BeaconConfigurationElasticsearchMappings before document_type
+    # assumes the mapping type is of i_beacon_configuration so we have to reset it
+    mappings.type = document_type
 
     mapping do
         indexes :uuid, type: 'string', analyzer: "lowercase_keyword", search_analyzer: "lowercase_keyword"
