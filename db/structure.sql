@@ -116,6 +116,8 @@ CREATE TABLE accounts (
     searchable_beacon_configurations_count integer DEFAULT 0,
     searchable_locations_count integer DEFAULT 0,
     account_invites_count integer DEFAULT 0,
+    messages_count integer DEFAULT 0,
+    archived_messages_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customers_count integer DEFAULT 0
@@ -447,6 +449,50 @@ ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
 
 
 --
+-- Name: messages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE messages (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    type character varying NOT NULL,
+    title character varying,
+    notification_text text,
+    published boolean DEFAULT false,
+    archived boolean DEFAULT false,
+    schedule daterange,
+    approximate_customers_count integer,
+    trigger_event_id integer,
+    dwell_time_in_seconds integer,
+    filter_beacon_configuration_tags character varying[],
+    filter_beacon_configuration_ids integer[],
+    filter_location_configuration_tags character varying[],
+    filter_location_configuration_ids integer[],
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE messages_id_seq OWNED BY messages.id;
+
+
+--
 -- Name: password_resets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -476,46 +522,6 @@ CREATE SEQUENCE password_resets_id_seq
 --
 
 ALTER SEQUENCE password_resets_id_seq OWNED BY password_resets.id;
-
-
---
--- Name: proximity_messages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE proximity_messages (
-    id integer NOT NULL,
-    account_id integer NOT NULL,
-    title character varying,
-    message text,
-    schedule daterange,
-    approximate_customers_count integer,
-    trigger_event_id integer NOT NULL,
-    filter_beacon_configuration_tags character varying[],
-    filter_beacon_configuration_ids integer[],
-    filter_location_configuration_tags character varying[],
-    filter_location_configuration_ids integer[],
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: proximity_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE proximity_messages_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: proximity_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE proximity_messages_id_seq OWNED BY proximity_messages.id;
 
 
 --
@@ -798,14 +804,14 @@ ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY password_resets ALTER COLUMN id SET DEFAULT nextval('password_resets_id_seq'::regclass);
+ALTER TABLE ONLY messages ALTER COLUMN id SET DEFAULT nextval('messages_id_seq'::regclass);
 
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY proximity_messages ALTER COLUMN id SET DEFAULT nextval('proximity_messages_id_seq'::regclass);
+ALTER TABLE ONLY password_resets ALTER COLUMN id SET DEFAULT nextval('password_resets_id_seq'::regclass);
 
 
 --
@@ -924,19 +930,19 @@ ALTER TABLE ONLY locations
 
 
 --
+-- Name: messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY messages
+    ADD CONSTRAINT messages_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: password_resets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY password_resets
     ADD CONSTRAINT password_resets_pkey PRIMARY KEY (id);
-
-
---
--- Name: proximity_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY proximity_messages
-    ADD CONSTRAINT proximity_messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -1197,6 +1203,13 @@ CREATE INDEX index_locations_on_account_id_and_tags ON locations USING gin (acco
 
 
 --
+-- Name: index_messages_on_account_id_and_type_and_trigger_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_messages_on_account_id_and_type_and_trigger_event_id ON messages USING btree (account_id, type, trigger_event_id) WHERE ((type)::text = 'ProximityMessage'::text);
+
+
+--
 -- Name: index_password_resets_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1215,13 +1228,6 @@ CREATE UNIQUE INDEX index_password_resets_on_token ON password_resets USING btre
 --
 
 CREATE INDEX index_password_resets_on_user_id ON password_resets USING btree (user_id);
-
-
---
--- Name: index_proximity_messages_on_account_id_and_trigger_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_proximity_messages_on_account_id_and_trigger_event_id ON proximity_messages USING btree (account_id, trigger_event_id);
 
 
 --
@@ -1385,5 +1391,5 @@ INSERT INTO schema_migrations (version) VALUES ('20160211200011');
 
 INSERT INTO schema_migrations (version) VALUES ('20160211202819');
 
-INSERT INTO schema_migrations (version) VALUES ('20160217210026');
+INSERT INTO schema_migrations (version) VALUES ('20160225140703');
 

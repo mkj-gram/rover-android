@@ -18,6 +18,8 @@ module RailsApi
         config.password_reset = Rails.application.config_for(:password_reset)
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
         # Autoload our libraries
+        config.autoload_paths << Rails.root.join('app', 'models', 'messages')
+        config.autoload_paths << Rails.root.join('app', 'models', 'configuration_visits')
         config.autoload_paths << Rails.root.join('app', 'models', 'events')
         config.autoload_paths << Rails.root.join('app', 'models', 'events', 'location_events')
         config.autoload_paths << Rails.root.join('app', 'models', 'events', 'beacon_region_events')

@@ -1,0 +1,2 @@
+class ProximityMessage < Message
+end

@@ -12,7 +12,8 @@ class CreateAccounts < ActiveRecord::Migration
             t.integer :searchable_beacon_configurations_count, default: 0
             t.integer :searchable_locations_count, default: 0
             t.integer :account_invites_count, default: 0
-
+            t.integer :messages_count, default: 0
+            t.integer :archived_messages_count, default: 0
             t.timestamps null: false
         end
 

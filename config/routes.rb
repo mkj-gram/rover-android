@@ -81,6 +81,9 @@ Rails.application.routes.draw do
 
         resources :customers, only: [:index, :show]
 
+        resources :"proximity-messages", controller: "proximity_messages", as: "proximity_messages"
+        resources :"scheduled-messages", controller: "scheduled_messages", as: "scheduled_messages"
+
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

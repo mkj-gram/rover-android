@@ -1,0 +1,2 @@
+class ScheduledMessage < Message
+end
