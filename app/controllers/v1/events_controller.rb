@@ -11,85 +11,104 @@ class V1::EventsController < V1::ApplicationController
         device_attributes = ActionController::Parameters.new(event_attributes.delete(:device) || {})
         user_attributes = ActionController::Parameters.new(event_attributes.delete(:user) || {})
 
+        customer, device = get_customer_and_device(user_attributes, device_attributes)
 
-        device = get_device(device_attributes, user_attributes)
-        if device.nil?
-            render json: {errors: [{detail: "can't be blank", source: {pointer: "data/attributes/device/udid"}}]}, status: :unprocessable_entity
-        else
-            customer = get_customer(device, user_attributes)
 
-            attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
-            event = Event.build_event(attributes)
-            event.save
+        attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
 
-            json = event.to_json
+        event = Event.build_event(attributes)
+        event.save
 
-            render json: json
-        end
+        json = event.to_json
+
+        render json: json
     end
 
 
     private
 
-    def get_device(device_attributes, user_attributes)
-        return nil if device_attributes[:udid].nil?
-        device = CustomerDevice.find_by_udid(device_attributes[:udid])
-        if device.nil?
-            device = build_device(device_attributes, user_attributes)
-            device.account_id = current_account.id
-            device.save
+    def get_customer_and_device(user_attributes, device_attributes)
+        # first check to see if a customer has the device
+        device_udid = device_attributes[:udid]
+
+        customer = Customer.find_by("devices._id" => device_udid)
+        if customer.nil?
+            # there is no customer with this device
+            # lets create a customer with this device
+            customer = create_customer_with_device(user_attributes, device_attributes)
+            # next line uses an in memory find
+            device = customer.devices.where("_id" => device_udid).first
+        elsif !user_attributes[:identifier].nil? && customer.identifier.nil?
+            # an anonymous user has logged in
+            existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
+            if existing_customer.nil?
+                # no customer with the identifier exists so lets just update the current one
+                customer.update_attributes({identifier: user_attributes[:identifier]})
+            else
+                # this is the case where an anonymous user logged in and their profile already exists on our system
+                # we want to transfer the device from the current customer to the existing one
+                device = customer.devices.where("_id" => device_udid).first
+                # this uses $pull to remove from the array
+                device.delete
+                transfer_device = existing_customer.devices.new(device.attributes)
+                # this $pushes onto the array
+                transfer_device.save
+                device = transfer_device
+            end
+
+        elsif user_attributes.has_key?(:identifier) && user_attributes[:identifier].nil? && !customer.identifier.nil?
+            # the developer has logged the user out
+            # the identifier has specifically been set to null by the device
+            # i.e stopped tracking the customer_params
+            device = customer.devices.where("_id" => device_udid).first
+            # delete the device
+            device.delete
+            # create a new customer with this device
+            customer = create_anonymous_customer(user_attributes, device_attributes)
+            device = customer.devices.where("_id" => device_udid).first
         end
-        device.update_attributes_async(device_params(device_attributes))
-        device.merge(device_params(device_attributes))
-        # check to see if the device_attributes need updating
-        return device
+
+
+
+        # check to see if the customer or device needs updating
+        # if the identifier changed we want to switch it here and not in the background
+        # customer.update_attributes_async(user_attributes, device_attributes)
+        return [customer, device]
     end
 
-    def build_device(device_attributes, user_attributes)
-        device = CustomerDevice.new(device_params(device_attributes))
-        user_identifier = user_attributes[:identifier]
-        if !user_identifier.nil?
-            # they are creating a device with an identifier, rare but could happen
-            customer = Customer.find_by(account_id: current_account.id, identifier: user_identifier)
-            device.customer = customer if customer
-        end
-        return device
-    end
-
-
-    def get_customer(device, user_attributes)
-        current_customer = device.customer
-        new_customer_identifier = user_attributes.dig(:identifier)
-
-        if current_customer.identifier.nil? && !new_customer_identifier.nil? && !(existing_customer = Customer.find_by(account_id: current_account.id, identifier: new_customer_identifier)).nil?
-            device.customer = existing_customer
-            device.save
-            current_customer = existing_customer
-        elsif !current_customer.identifier.nil? && new_customer_identifier.nil?
-            # the customer has logged out create a new anonymous customer
-            new_customer = create_customer(user_attributes)
-            device.customer = new_customer
-            device.save
-            current_customer = new_customer
-        end
-
-        current_customer.update_attributes_async(customer_params(user_attributes))
-
-        return current_customer
-    end
-
-    def create_customer(user_attributes)
-        begin
-            customer = Customer.new(customer_params(user_attributes))
-            customer.account_id = current_account.id
-            customer.save
-        rescue ActiveRecord::RecordNotUnique => e
-            # this happens when 2 request come at the exact same time
-            # User with 2 devices update their attributes at the exact same time
-            # Super rare but we don't want to 500 internal
-            customer = Customer.find_by(account_id: current_account.id, identifier: new_customer_identifier)
+    def create_customer_with_device(user_attributes, device_attributes)
+        # its possible here that the devices is created with an indentifier
+        if user_attributes[:identifier]
+            # a customer
+            existing_customer = Customer.find_by(account_id: current_account.id, indentifier: user_attributes[:identifier])
+            if existing_customer
+                # this calls $push on the devices array for the existing customer
+                device = existing_customer.devices.new(device_params(device_attributes))
+                device.update
+                customer = existing_customer
+            else
+                customer = Customer.new(customer_params(user_attributes))
+                device = customer.devices.build(device_params(device_attributes))
+                customer.save
+            end
+        else
+            customer = create_anonymous_customer(user_attributes, device_attributes)
         end
         return customer
+    end
+
+
+    def create_anonymous_customer(user_attributes, device_attributes)
+        # this is the case where we create a customer without an identifier
+        # make sure incase if someone calls this function they aren't setting the identifier
+        user_attributes.delete(:identifier)
+        customer = Customer.new(customer_params(user_attributes))
+        device = customer.devices.build(device_params(device_attributes))
+        if customer.save
+            return customer
+        else
+            nil
+        end
     end
 
     def event_params(local_params)
@@ -100,6 +119,7 @@ class V1::EventsController < V1::ApplicationController
         allowed_params = user_attributes.permit(:identifier, :name, :email, :phone_number, {:tags => []})
         # we have to manually allow traits since strong params doesn't allow unknown hashes
         allowed_params[:traits] = user_attributes.dig(:traits) || {}
+        allowed_params[:account_id] = current_account.id
         return allowed_params
     end
 
