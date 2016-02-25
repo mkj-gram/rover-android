@@ -4,4 +4,4 @@ development:
     urls: "127.0.0.1:9200"
 production:
     urls: <%= ENV['BONSAI_URL'] %>
-    max_shards_per_index: <%= ENV['ELASTICSEARCH_MAX_SHARDS_PER_INDEX']
+    max_shards_per_index: <%= ENV['ELASTICSEARCH_MAX_SHARDS_PER_INDEX'] %>
