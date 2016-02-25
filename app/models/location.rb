@@ -9,57 +9,57 @@ class Location < ActiveRecord::Base
         __elasticsearch__.delete_document
     end
 
-    settings index: {
-        number_of_shards: 1,
-        number_of_replicas: 2,
-        analysis:  {
-            filter: {
-                autocomplete_filter: {
-                    type: "edge_ngram",
-                    min_gram: 1,
-                    max_gram: 15,
-                    token_chars: ["letter", "digit"]
-                }
-            },
-            analyzer: {
-                autocomplete: {
-                    type: "custom",
-                    tokenizer: "standard",
-                    filter: [
-                        "lowercase",
-                        "autocomplete_filter"
-                    ]
+    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2}).merge(
+        {
+            analysis:  {
+                filter: {
+                    autocomplete_filter: {
+                        type: "edge_ngram",
+                        min_gram: 1,
+                        max_gram: 15,
+                        token_chars: ["letter", "digit"]
+                    }
                 },
-                lowercase_keyword: {
-                    type: "custom",
-                    tokenizer: "keyword",
-                    filter: [
-                        "lowercase"
-                    ]
+                analyzer: {
+                    autocomplete: {
+                        type: "custom",
+                        tokenizer: "standard",
+                        filter: [
+                            "lowercase",
+                            "autocomplete_filter"
+                        ]
+                    },
+                    lowercase_keyword: {
+                        type: "custom",
+                        tokenizer: "keyword",
+                        filter: [
+                            "lowercase"
+                        ]
+                    }
                 }
             }
         }
-    } do
+    )
 
-        mapping do
-            indexes :account_id, type: 'long', index: 'not_analyzed'
-            indexes :formatted_address, type: 'string', analyzer: "autocomplete", search_analyzer: "standard"
-            indexes :address, type: 'string', index: 'no'
-            indexes :city, type: 'string', index: 'no'
-            indexes :province, type: 'string', index: 'no'
-            indexes :country, type: 'string', index: 'no'
-            indexes :postal_code, type: 'string', index: 'no'
-            indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
-            indexes :tags, type: 'string', index: 'not_analyzed'
-            indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
-            indexes :location, type: "geo_point", lat_lon: true
-            indexes :radius, type: 'integer', index: 'no'
-            indexes :enabled, type: 'boolean', index: 'not_analyzed'
-            indexes :beacon_configurations_count, type: 'integer', index: 'no'
-            indexes :created_at, type: 'date'
-        end
-
+    mapping do
+        indexes :account_id, type: 'long', index: 'not_analyzed'
+        indexes :formatted_address, type: 'string', analyzer: "autocomplete", search_analyzer: "standard"
+        indexes :address, type: 'string', index: 'no'
+        indexes :city, type: 'string', index: 'no'
+        indexes :province, type: 'string', index: 'no'
+        indexes :country, type: 'string', index: 'no'
+        indexes :postal_code, type: 'string', index: 'no'
+        indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
+        indexes :tags, type: 'string', index: 'not_analyzed'
+        indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
+        indexes :location, type: "geo_point", lat_lon: true
+        indexes :radius, type: 'integer', index: 'no'
+        indexes :enabled, type: 'boolean', index: 'not_analyzed'
+        indexes :beacon_configurations_count, type: 'integer', index: 'no'
+        indexes :created_at, type: 'date'
     end
+
+
 
     validates :title, presence: true, unless: :google_place_id?
     validates :radius, inclusion: { in: 50..5000, message: "must be between 50 and 5000" }

@@ -1,7 +1,6 @@
 class Customer
     include Mongoid::Document
     include Elasticsearch::Model
-    # include Elasticsearch::Model::Callbacks
 
     field :account_id, type: Integer
     field :identifier, type: String
@@ -16,7 +15,7 @@ class Customer
 
     embeds_many :devices, class_name: "CustomerDevice"
 
-    settings index: { number_of_shards: 1, number_of_replicas: 2 } do
+    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2 }) do
         mapping do
             indexes :account_id, type: 'long', index: 'not_analyzed'
             indexes :identifier, type: 'string', index: 'not_analyzed'
@@ -50,10 +49,10 @@ class Customer
 
     validates :account_id, presence: true
 
+    # where should we store counter cache? how do we?
     # # belongs_to :account, counter_cache: true
-    # # has_many :devices, class_name: "CustomerDevice"
 
-    # before_save :update_active_traits
+    before_save :update_active_traits
 
     def as_indexed_json(options = {})
         {
@@ -110,18 +109,21 @@ class Customer
 
     # private
 
-    # def update_active_traits
-    #     if changes.include?(:traits)
-    #         # old {gold_member => false}
-    #         # new {gold_member => true}
-    #         previous_trait_keys = traits_was.nil? ? [] : traits_was.map{|k,v| k.to_s }
-    #         trait_keys = traits.nil? ? [] : traits.map{|k,v| k.to_s}
+    def update_active_traits
+        if changes.include?(:traits)
+            # old {gold_member => false}
+            # new {gold_member => true}
+            # we want {gold_member => true}
+            # to map to {key: gold_member, type: Boolean }
+            previous_trait_keys = traits_was.nil? ? [] : traits_was.map{|k,v| k.to_s }
+            trait_keys = traits.nil? ? [] : traits.map{|k,v| k.to_s}
 
-    #         old_trait_keys = previous_trait_keys - trait_keys
-    #         new_trait_keys = trait_keys - previous_trait_keys
-    #         CustomerActiveTraits.update_traits(self.account_id, old_trait_keys, new_trait_keys)
-    #     end
-    # end
+            old_trait_keys = previous_trait_keys - trait_keys
+            new_trait_keys = trait_keys - previous_trait_keys
+
+            CustomerActiveTraits.update_traits(self.account_id, old_trait_keys, new_trait_keys)
+        end
+    end
 
     def devices_as_indexed_json(options = {})
         self.devices.map{|device| device.as_indexed_json(options)}
