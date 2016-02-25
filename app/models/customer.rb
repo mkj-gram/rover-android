@@ -1,6 +1,7 @@
 class Customer
     include Mongoid::Document
     include Elasticsearch::Model
+    include Elasticsearch::Model::Callbacks
 
     field :account_id, type: Integer
     field :identifier, type: String
