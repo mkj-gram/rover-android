@@ -24,8 +24,8 @@ class CustomerDevice
     embedded_in :customer
 
 
-    # IOS_DEVICE = 1
-    # ANDROID_DEVICE = 2
+    IOS_DEVICE = 1
+    ANDROID_DEVICE = 2
 
     def as_indexed_json(options = {})
         {
@@ -50,17 +50,17 @@ class CustomerDevice
     end
 
 
-    # def device_type
-    #     @device_type ||= platform == "iOS" ? IOS_DEVICE : ANDROID_DEVICE
-    # end
+    def device_type
+        @device_type ||= platform == "iOS" ? IOS_DEVICE : ANDROID_DEVICE
+    end
 
-    # def ios?
-    #     device_type == IOS_DEVICE
-    # end
+    def ios?
+        device_type == IOS_DEVICE
+    end
 
-    # def android?
-    #     device_type == ANDROID_DEVICE
-    # end
+    def android?
+        device_type == ANDROID_DEVICE
+    end
 
     # def update_attributes_async(new_attributes)
     #     merge(new_attributes)
