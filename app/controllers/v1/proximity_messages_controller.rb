@@ -108,6 +108,11 @@ class V1::ProximityMessagesController < V1::ApplicationController
     end
 
     def destroy
+        if @proximity_message.destroy
+            head :no_content
+        else
+            render json: { errors: V1::ProximityMessageErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
+        end
     end
 
     private
