@@ -43,7 +43,7 @@ class V1::EventsController < V1::ApplicationController
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
             if existing_customer.nil?
                 # no customer with the identifier exists so lets just update the current one
-                customer.update_attributes({identifier: user_attributes[:identifier]})
+                customer.update_attributes(customer_params(user_attributes))
             else
                 # this is the case where an anonymous user logged in and their profile already exists on our system
                 # we want to transfer the device from the current customer to the existing one
@@ -70,9 +70,10 @@ class V1::EventsController < V1::ApplicationController
             device = customer.devices.where("_id" => device_udid).first
         end
 
-        # check to see if the customer or device needs updating
-        # if the identifier changed we want to switch it here and not in the background
-        # customer.update_attributes_async(user_attributes, device_attributes)
+        # update any fields that need updating if nothing has changed
+        # update_attributes performs a no-op
+        customer.update_attributes(customer_params(user_attributes))
+        device.update_attributes(device_params(device_attributes))
         return [customer, device]
     end
 
