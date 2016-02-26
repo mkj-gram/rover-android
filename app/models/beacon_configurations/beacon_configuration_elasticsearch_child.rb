@@ -1,4 +1,4 @@
-module BeaconConfigurationElasticsearchMappings
+module BeaconConfigurationElasticsearchChild
     extend ActiveSupport::Concern
 
     included do

@@ -1,7 +1,7 @@
 class IBeaconConfiguration < BeaconConfiguration
     include Elasticsearch::Model
     include IBeaconAttributes
-    include BeaconConfigurationElasticsearchMappings
+    include BeaconConfigurationElasticsearchChild
 
     document_type "ibeacon_configuration"
     # workaround since including BeaconConfigurationElasticsearchMappings before document_type

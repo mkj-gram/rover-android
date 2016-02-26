@@ -1,7 +1,7 @@
 class EddystoneNamespaceConfiguration < BeaconConfiguration
     include Elasticsearch::Model
     include EddystoneNamespaceAttributes
-    include BeaconConfigurationElasticsearchMappings
+    include BeaconConfigurationElasticsearchChild
 
 
     document_type "eddystone_namespace_configuration"

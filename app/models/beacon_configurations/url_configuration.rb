@@ -1,7 +1,7 @@
 class UrlConfiguration < BeaconConfiguration
     include Elasticsearch::Model
     include UrlAttributes
-    include BeaconConfigurationElasticsearchMappings
+    include BeaconConfigurationElasticsearchChild
 
     document_type "url_configuration"
 
