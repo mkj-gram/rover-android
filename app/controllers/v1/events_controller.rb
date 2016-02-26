@@ -31,7 +31,7 @@ class V1::EventsController < V1::ApplicationController
         device_udid = device_attributes[:udid]
 
         customer = Customer.find_by("devices._id" => device_udid)
-        device = customer.devices.where("_id" => device_udid).first
+
         if customer.nil?
             # there is no customer with this device
             # lets create a customer with this device
@@ -65,6 +65,8 @@ class V1::EventsController < V1::ApplicationController
             device.delete
             # create a new customer with this device
             customer = create_anonymous_customer(user_attributes, device_attributes)
+            device = customer.devices.where("_id" => device_udid).first
+        else
             device = customer.devices.where("_id" => device_udid).first
         end
 
