@@ -13,7 +13,6 @@ class V1::EventsController < V1::ApplicationController
 
         customer, device = get_customer_and_device(user_attributes, device_attributes)
 
-
         attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
 
         event = Event.build_event(attributes)
@@ -32,6 +31,7 @@ class V1::EventsController < V1::ApplicationController
         device_udid = device_attributes[:udid]
 
         customer = Customer.find_by("devices._id" => device_udid)
+        device = customer.devices.where("_id" => device_udid).first
         if customer.nil?
             # there is no customer with this device
             # lets create a customer with this device
@@ -67,8 +67,6 @@ class V1::EventsController < V1::ApplicationController
             customer = create_anonymous_customer(user_attributes, device_attributes)
             device = customer.devices.where("_id" => device_udid).first
         end
-
-
 
         # check to see if the customer or device needs updating
         # if the identifier changed we want to switch it here and not in the background
