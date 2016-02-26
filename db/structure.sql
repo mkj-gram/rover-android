@@ -116,8 +116,8 @@ CREATE TABLE accounts (
     searchable_beacon_configurations_count integer DEFAULT 0,
     searchable_locations_count integer DEFAULT 0,
     account_invites_count integer DEFAULT 0,
-    messages_count integer DEFAULT 0,
-    archived_messages_count integer DEFAULT 0,
+    proximity_messages_count integer DEFAULT 0,
+    archived_proximity_messages_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customers_count integer DEFAULT 0
@@ -460,14 +460,15 @@ CREATE TABLE messages (
     notification_text text,
     published boolean DEFAULT false,
     archived boolean DEFAULT false,
-    schedule daterange,
+    start_date date,
+    end_date date,
     approximate_customers_count integer,
     trigger_event_id integer,
     dwell_time_in_seconds integer,
     filter_beacon_configuration_tags character varying[],
     filter_beacon_configuration_ids integer[],
-    filter_location_configuration_tags character varying[],
-    filter_location_configuration_ids integer[],
+    filter_location_tags character varying[],
+    filter_location_ids integer[],
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1203,10 +1204,10 @@ CREATE INDEX index_locations_on_account_id_and_tags ON locations USING gin (acco
 
 
 --
--- Name: index_messages_on_account_id_and_type_and_trigger_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_messages_on_account_id_type_published_trigger_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_messages_on_account_id_and_type_and_trigger_event_id ON messages USING btree (account_id, type, trigger_event_id) WHERE ((type)::text = 'ProximityMessage'::text);
+CREATE INDEX index_messages_on_account_id_type_published_trigger_event_id ON messages USING btree (account_id, type, published, trigger_event_id) WHERE ((published = true) AND ((type)::text = 'ProximityMessage'::text));
 
 
 --

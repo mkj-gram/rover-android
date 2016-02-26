@@ -9,7 +9,9 @@ class CreateMessages < ActiveRecord::Migration
             t.boolean :published, default: false
             t.boolean :archived, default: false
 
-            t.daterange :schedule
+            t.date :start_date
+            t.date :end_date
+
             t.integer :approximate_customers_count
 
             t.integer :trigger_event_id
@@ -18,17 +20,13 @@ class CreateMessages < ActiveRecord::Migration
             # filters
             t.string    :filter_beacon_configuration_tags, array: true
             t.integer   :filter_beacon_configuration_ids, array: true
-            t.string    :filter_location_configuration_tags, array: true
-            t.integer   :filter_location_configuration_ids, array: true
+            t.string    :filter_location_tags, array: true
+            t.integer   :filter_location_ids, array: true
 
             t.timestamps null: false
         end
 
-        # only want to search messages by trigger_event_id where type is ProximityMessage
-        add_index :messages, [:account_id, :type, :trigger_event_id], where: "type = 'ProximityMessage'"
-        # add a partial index since we are only searching for
-        # messages which have not been archived
-        # archived messages will be searched within elasticsearch
-        # add_index :messages, [:account_id, :type, :archived], where: "archived = false"
+        # Create a partial index to quickly search up published proximity messages with specific trigger_event_id
+        add_index :messages, [:account_id, :type, :published, :trigger_event_id], where: "published = true AND type = 'ProximityMessage'", name: "index_messages_on_account_id_type_published_trigger_event_id"
     end
 end

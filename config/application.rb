@@ -65,6 +65,7 @@ module RailsApi
 end
 
 require 'core_ext/hash'
+require 'core_ext/string'
 # first require the event then require everything else
 require Rails.root.join("app", "models", "events", "event.rb").to_s
 # Dir[Rails.root.join("app", "models", "events", "*").to_s].each{|file| puts file; require file}
