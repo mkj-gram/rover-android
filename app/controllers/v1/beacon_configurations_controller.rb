@@ -215,7 +215,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
         if @beacon_configuration
             json = flatten_request({single_record: true})
-            if @beacon_configuration.update_attributes(configuration_params(json[:data]))
+            if @beacon_configuration.update_attributes(beacon_configuration_params(json[:data]))
                 render_beacon_configuration(@beacon_configuration)
             else
                 render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
@@ -236,16 +236,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     private
-
-    def configuration_params(local_params)
-        convert_param_if_exists(local_params[:configurations], :name, :title)
-
-        # if local_params[:configurations].has_key?(:tags) && local_params[:configurations][:tags].nil?
-        #     local_params[:configurations][:tags] = []
-        # end
-
-        local_params.fetch(:configurations, {}).permit(:title, {tags: []}, :enabled, :location_id)
-    end
 
     def filter_params
         convert_param_if_exists(params[:filter], :"location-id", :location_id)
@@ -282,7 +272,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def beacon_configuration_params(local_params)
         convert_param_if_exists(local_params[:configurations], :name, :title)
-        local_params.fetch(:configurations, {}).permit(:title, :enabled, {tags: []}, :location_id)
+        # local_params[:configurations][:tags] ||= [] if local_params[:configurations].has_key?(:tags)
+        local_params.fetch(:configurations, {}).permit(:title, :enabled, :tags, {tags: []}, :location_id)
     end
 
     def ibeacon_configuration_params(local_params)

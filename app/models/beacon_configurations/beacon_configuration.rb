@@ -1,5 +1,6 @@
 class BeaconConfiguration < ActiveRecord::Base
     include Elasticsearch::Model
+    include DefaultEmptyArray
 
     # Constants
     IBEACON_PROTOCOL                = 1
@@ -40,6 +41,8 @@ class BeaconConfiguration < ActiveRecord::Base
             }
         }
     )
+
+    default_empty_array_attribute :tags
 
     after_commit on: [:create] do
         __elasticsearch__.index_document
@@ -102,7 +105,13 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
-
+    def tags=(value)
+        if value.nil?
+            self[:tags] = []
+        else
+            self[:tags] = value
+        end
+    end
 
     def devices_meta
         # we use to_a here to remove the active record relation

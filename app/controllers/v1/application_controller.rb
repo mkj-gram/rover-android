@@ -55,6 +55,9 @@ class V1::ApplicationController < ActionController::API
         }.call
     end
 
+    def param_should_be_array(local_params, key)
+        local_params[key] ||= [] if local_params.has_key?(key)
+    end
 
     def convert_param_if_exists(local_params, from_key, to_key)
         if !local_params.nil? && local_params.include?(from_key)

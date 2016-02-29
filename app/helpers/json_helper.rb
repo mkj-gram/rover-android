@@ -75,13 +75,18 @@ module JsonHelper
     def get_relationship_data(relationships)
         return {} if relationships.nil?
         relationships.inject({}) do |hash, (relationship_name, value)|
-            relationship_name = relationship_name.singularize
+            singular_relationship_name = relationship_name.singularize
+            should_be_array = singular_relationship_name != relationship_name
             if value[:data].nil?
-                hash.merge({"#{relationship_name}_id" => nil})
+                if should_be_array
+                    hash.merge({"#{singular_relationship_name}_ids" => []})
+                else
+                    hash.merge({"#{singular_relationship_name}_id" => nil})
+                end
             elsif value[:data].is_a?(Array)
-                hash.merge({"#{relationship_name}_ids" => value[:data].map{|data| data[:id]}})
+                hash.merge({"#{singular_relationship_name}_ids" => value[:data].map{|data| data[:id]}})
             else
-                hash.merge({"#{relationship_name}_id" => value[:data][:id]})
+                hash.merge({"#{singular_relationship_name}_id" => value[:data][:id]})
             end
         end
     end
