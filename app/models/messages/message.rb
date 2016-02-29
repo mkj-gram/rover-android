@@ -46,8 +46,7 @@ class Message < ActiveRecord::Base
     end
 
     def apply_configuration_filters(configuration)
-        # needs to check to see if the filters pass
-        true
+        filter_location(configuration) && filter_beacon_configuration(configuration)
     end
 
     def apply_customer_filters(customer, device)
@@ -57,6 +56,30 @@ class Message < ActiveRecord::Base
         true
     end
 
+    private
 
+    def filter_beacon_configuration(configuration)
+        if configuration.is_a?(BeaconConfiguration)
+            if filter_beacon_configuration_tags.any?
+                configuration.tags == filter_beacon_configuration_tags
+            elsif filter_beacon_configuration_ids.any?
+                filter_beacon_configuration_ids.include?(configuration.id)
+            else
+                true
+            end
+        else
+            # if we are only filtering locations
+            true
+        end
+    end
 
-end
+    def filter_location(configuration)
+        location = configuration.is_a?(BeaconConfiguration) ? configuration.location : configuration
+        if filter_location_tags.any?
+            location.tags == filter_location_tags
+        elsif filter_location_ids.any?
+            filter_location_ids.include?(location.id)
+        else
+            true
+        end
+    end
