@@ -1,8 +1,8 @@
 class CustomerTrait
 
-    attr_reader :trait_key,
+    attr_reader :trait_key
 
-    def initialize(opts = {})
+    def initialize(opts)
         @trait_key = opts.delete(:trait_key)
         if opts.has_key?(:trait_type)
             @trait_type = opts.delete(:trait_type)
