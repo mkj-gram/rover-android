@@ -48,7 +48,7 @@
     "ELASTICSEARCH_URLS": {
       "required": true
     },
-    "MONGOHQ_URL": {
+    "MONGODB_URI": {
       "required": true
     }
   },
