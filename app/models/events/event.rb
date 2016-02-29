@@ -1,4 +1,8 @@
 class Event
+    extend ActiveModel::Callbacks
+    include ActiveModel::Validations
+
+    define_model_callbacks :save, only: [:after, :before]
 
     UNKNOWN_EVENT_ID = 0
 
@@ -22,6 +26,49 @@ class Event
     LOCATION_EVENT_ID = 61
     LOCATION_UPDATE_EVENT_ID = 62
 
+    VALID_EVENT_IDS = Set.new([GEOFENCE_REGION_ENTER_EVENT_ID, GEOFENCE_REGION_EXIT_EVENT_ID, BEACON_REGION_ENTER_EVENT_ID, BEACON_REGION_EXIT_EVENT_ID, APP_OPEN_EVENT_ID, APP_CLOSED_EVENT_ID])
+
+    def self.valid_event_id(event_id)
+        VALID_EVENT_IDS.include?(event_id)
+    end
+
+    def self.event_string_to_event_id(event_string)
+        case event_string
+        when "geofence-region-enter"
+            GEOFENCE_REGION_ENTER_EVENT_ID
+        when "geofence-region-exit"
+            GEOFENCE_REGION_EXIT_EVENT_ID
+        when "beacon-region-enter"
+            BEACON_REGION_ENTER_EVENT_ID
+        when "beacon-region-exit"
+            BEACON_REGION_EXIT_EVENT_ID
+        when "app-open"
+            APP_OPEN_EVENT_ID
+        when "app-close"
+            APP_CLOSED_EVENT_ID
+        else
+            UNKNOWN_EVENT_ID
+        end
+    end
+
+    def self.event_id_to_event_string(event_id)
+        case event_id
+        when GEOFENCE_REGION_ENTER_EVENT_ID
+            "geofence-region-enter"
+        when GEOFENCE_REGION_EXIT_EVENT_ID
+            "geofence-region-exit"
+        when BEACON_REGION_ENTER_EVENT_ID
+            "beacon-region-enter"
+        when BEACON_REGION_EXIT_EVENT_ID
+            "beacon-region-exit"
+        when APP_OPEN_EVENT_ID
+            "app-open"
+        when APP_CLOSED_EVENT_ID
+            "app-close"
+        else
+            nil
+        end
+    end
 
     def self.build_event(event_attributes)
         object = event_attributes[:object]
@@ -43,8 +90,10 @@ class Event
 
 
     attr_reader :account, :customer, :device, :object, :action
+    attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
 
     def initialize(event_attributes)
+        @id = SecureRandom.uuid
         @account = event_attributes[:account]
         @object = event_attributes[:object]
         @action = event_attributes[:action]
@@ -52,10 +101,33 @@ class Event
         @device = event_attributes[:device]
         @included = []
         @attributes = {object: @object, action: @action}
+        @inbox_messages = []
+        @local_messages = []
     end
 
-    def save
+    def attributes
+        {"id" => @id, "object" => object, "action" => action}
+    end
 
+
+    def save
+        # save works the opposite way than to_json
+        # it bubbles up from the children appending their attributes
+    end
+
+    def message_opts
+        @message_opts ||= -> {
+            opts = {}
+            if customer
+                opts.merge!(customer.attributes.inject({}){ |hash, (k,v)| hash.merge("customer.#{k}" => v)})
+            end
+
+            if device
+                opts.merge!(device.attributes.inject({}){|hash, (k,v)| hash.merge("device.#{k}" => v)})
+            end
+
+            return opts
+        }.call
     end
 
     # want a way to say add this to the saved model
@@ -87,6 +159,10 @@ class Event
             included: []
         }
         return json
+    end
+
+    def get_customers_inbox
+        @customer_inbox ||= CustomerInbox.find(customer.id)
     end
 
     def closest_geofence_regions(limit = 20)

@@ -294,8 +294,9 @@ ALTER SEQUENCE beacon_devices_id_seq OWNED BY beacon_devices.id;
 
 CREATE TABLE customer_active_traits (
     id integer NOT NULL,
-    account_id integer,
-    trait_key character varying
+    account_id integer NOT NULL,
+    trait_key character varying,
+    trait_type character varying
 );
 
 
@@ -460,6 +461,7 @@ CREATE TABLE messages (
     notification_text text,
     published boolean DEFAULT false,
     archived boolean DEFAULT false,
+    save_to_inbox boolean DEFAULT true,
     start_date date,
     end_date date,
     approximate_customers_count integer,

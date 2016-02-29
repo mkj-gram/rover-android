@@ -123,6 +123,15 @@ class V1::ProximityMessagesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :configuration_ids, :filter_beacon_configuration_ids)
         convert_param_if_exists(local_params[:proximity_messages], :location_tags, :filter_location_tags)
         convert_param_if_exists(local_params[:proximity_messages], :location_ids, :filter_location_ids)
+
+        param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
+        param_should_be_array(local_params[:proximity_messages], :filter_location_tags)
+
+        if local_params[:proximity_messages].has_key?(:trigger_event)
+            local_params[:proximity_messages][:trigger_event] = Event.event_string_to_event_id(local_params[:proximity_messages][:trigger_event])
+        end
+
+        puts "Here is my local params #{local_params}"
         local_params.fetch(:proximity_messages, {}).permit(:title, :notification_text, :published, :archived, {:filter_beacon_configuration_tags => []}, {:filter_beacon_configuration_ids => []},{:filter_location_tags => []}, {:filter_location_ids => []})
     end
 

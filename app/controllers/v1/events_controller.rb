@@ -42,20 +42,23 @@ class V1::EventsController < V1::ApplicationController
             # an anonymous user has logged in
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
             if existing_customer.nil?
-                # no customer with the identifier exists so lets just update the current one
-                customer.update_attributes(customer_params(user_attributes))
-            else
-                # this is the case where an anonymous user logged in and their profile already exists on our system
-                # we want to transfer the device from the current customer to the existing one
-                device = customer.devices.where("_id" => device_udid).first
-                # this uses $pull to remove from the array
+                # we want a new customer object here because we don't
+                # want to merge the analytics
+                # the next block takes care of tranfering the device over
+                existing_customer = Customer.create(customer_params(user_attributes))
+            end
+            # this is the case where an anonymous user logged in and their profile already exists on our system
+            # we want to transfer the device from the current customer to the existing one
+            device = customer.devices.where("_id" => device_udid).first
+            # this uses $pull to remove from the array
+            if device
                 device.delete
                 transfer_device = existing_customer.devices.new(device.attributes)
                 # this $pushes onto the array
                 transfer_device.save
                 device = transfer_device
             end
-
+            customer = existing_customer
         elsif user_attributes.has_key?(:identifier) && user_attributes[:identifier].nil? && !customer.identifier.nil?
             # the developer has logged the user out
             # the identifier has specifically been set to null by the device

@@ -1,5 +1,7 @@
 class BeaconRegionEvent < Event
 
+    after_save :save_messages_to_inbox
+
     # def self.event_id
     #     Event::BEACON_REGION_EVENT_ID
     # end
@@ -39,21 +41,29 @@ class BeaconRegionEvent < Event
 
     end
 
-    def save
+    def attributes
+        parent_attributes = super
         if beacon_configuration
-            add_to_event_attributes(
+            parent_attributes.merge(
                 {
                     configuration: {
-                        id: beacon_configuration.id.to_s,
-                        name: beacon_configuration.title,
+                        id: beacon_configuration.id,
+                        title: beacon_configuration.tile,
                         tags: beacon_configuration.tags,
                         shared: beacon_configuration.shared,
                         enabled: beacon_configuration.enabled
-                    }.merge(beacon_configuration.configuration_attributes)
+                    }
                 }
             )
+        else
+            parent_attributes
         end
-        super
+    end
+
+
+    def save
+        @proximity_messages = get_messages_for_beacon_configuration(beacon_configuration) || []
+        run_callbacks :save
     end
 
     def to_json
@@ -65,9 +75,13 @@ class BeaconRegionEvent < Event
                 shared: beacon_configuration.shared
             }.merge(beacon_configuration.configuration_attributes)
             # only include the message if the configuration exists
-            messages = get_message_for_beacon_configuration(beacon_configuration)
-            if messages.any?
-                json[:included] += messages.map{|message| serialize_message(message,{customer: customer, device: device}) }
+
+            if inbox_messages.any?
+                json[:included] += inbox_messages.map{|message| serialize_inbox_message(message)}
+            end
+
+            if local_messages.any?
+                json[:included] += local_messages.map{|message| serialize_local_message(message)}
             end
         else
             json[:data][:attributes][:configuration] = {}
@@ -81,30 +95,24 @@ class BeaconRegionEvent < Event
 
     private
 
-    def get_message_for_beacon_configuration(beacon_configuration)
+    def save_messages_to_inbox
+        puts "after save"
+        if @proximity_messages.any?
+            @inbox_messages = @proximity_messages.select{|message| message.save_to_inbox}.map{|message| message.to_inbox_message(message_opts)}
+            @local_messages = @proximity_messages.select{|message| message.save_to_inbox == false}
+            CustomerInbox.add_messages(customer.id, @inbox_messages)
+        end
+    end
+
+    def get_messages_for_beacon_configuration(beacon_configuration)
+        return nil if beacon_configuration.nil?
         # has to perform all filtering in memory
         # first find all messages where the trigger_event_id is the type of event which occured
-        messages = ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id).all.to_a
+        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).all.to_a
         # apply all filters
         current_time = DateTime.now
         messages.select do |message|
-            # check time
-            if message.within_schedule(current_time)
-                # we are within schedule
-                # check to see if our config fits the message
-                if message.apply_configuration_filters(beacon_configuration)
-                    # we also have customer filtering ontop
-                    if message.apply_customer_filters(customer, device)
-                        true
-                    else
-                        false
-                    end
-                else
-                    false
-                end
-            else
-                false
-            end
+            message.within_schedule(current_time) && message.apply_configuration_filters(beacon_configuration) && message.apply_configuration_filters(customer, device)
         end
     end
 
@@ -127,22 +135,41 @@ class BeaconRegionEvent < Event
         @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
     end
 
-    def serialize_message(message, opts = {})
-        customer = opts.delete(:customer)
-        if customer
-            opts.merge!(customer.attributes.inject({}){|hash, (k,v)| hash.merge("customer_#{k}" => v)})
-        end
-        device = opts.delete(:device)
-        if device
-            opts.merge!(device.attributes.inject({}){|hash, (k,v)| hash.merge("device_#{k}" => v)})
-        end
+    def serialize_local_message(message)
         {
             type: "messages",
             id: message.id.to_s,
             attributes: {
-                text: message.formatted_message(opts)
+                :"notification-text" => message.formatted_message(message_opts),
+                read: true,
+                :"save-to-inbox" => false
             }
         }
+    end
+
+    def serialize_inbox_message(message)
+        {
+            type: "messages",
+            id: message.id.to_s,
+            attributes: {
+                :"notification-text" => message.notification_text,
+                read: message.read,
+                :"save-to-inbox" => true
+            }
+        }
+    end
+
+    def serialize_message(message)
+
+        # inbox_message = message.to_inbox_message
+        # {
+        #     type: "messages",
+        #     id: inbox_message.id,
+        #     attributes: {
+        #         :"notification-text" => inbox_message.notification_text,
+        #         read: inbox_message.read
+        #     }
+        # }
     end
 
     def serialize_beacon_configuration(beacon_configuration)

@@ -8,6 +8,7 @@ class CreateMessages < ActiveRecord::Migration
             t.text :notification_text
             t.boolean :published, default: false
             t.boolean :archived, default: false
+            t.boolean :save_to_inbox, default: true
 
             t.date :start_date
             t.date :end_date

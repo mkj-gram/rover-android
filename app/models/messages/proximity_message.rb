@@ -1,5 +1,6 @@
 class ProximityMessage < Message
     include MessagesElasticsearchChild
+    include DefaultEmptyArray
 
     belongs_to :account, counter_cache: :proximity_messages_count
     before_save :update_archived_messages_count
@@ -14,6 +15,22 @@ class ProximityMessage < Message
         indexes :filter_location_ids, type: 'string', index: 'no'
     end
 
+    default_empty_array_attribute :filter_beacon_configuration_tags
+    default_empty_array_attribute :filter_beacon_configuration_ids
+    default_empty_array_attribute :filter_location_tags
+    default_empty_array_attribute :filter_location_ids
+
+    # validates :legal_trigger_event_id
+
+    def to_inbox_message(opts)
+        @inbox_message ||= InboxMessage.new(
+            {
+                notification_text: formatted_message(opts),
+                read: true
+            }
+        )
+    end
+
     def filter_beacon_configurations
         @filter_beacon_configurations ||= filter_beacon_configuration_ids.any? ? BeaconConfiguration.where(id: filter_beacon_configuration_ids) : []
     end
@@ -23,6 +40,13 @@ class ProximityMessage < Message
     end
 
     private
+
+    def legal_trigger_event_id
+        # if published then the trigger_event_id must also be valid
+        # if published && !Event.valid_event_id(trigger_event_id)
+        #     errors.add(:trigger_event_id, "invalid")
+        # end
+    end
 
     def update_archived_messages_count
         if archived == true && archived_was == false
