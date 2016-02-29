@@ -146,6 +146,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
                     :"notification-text" => message.notification_text,
                     published: message.published,
                     archived: message.archived,
+                    :"trigger-event" => Event.event_id_to_event_string(message.trigger_event_id),
                     :"approximate-customers-count" => message.approximate_customers_count,
                     :"configuration-tags" => message.filter_beacon_configuration_tags,
                     :"location-tags" => message.filter_location_tags,
