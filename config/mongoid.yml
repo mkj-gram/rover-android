@@ -1,7 +1,7 @@
 production:
     clients:
         default:
-            uri: <%= ENV["MONGOHQ_URL"] %>
+            uri: <%= ENV["MONGODB_URI"] %>
             options:
                 ssl: true
                 ssl_ca_cert: <%= Rails.root.join("config", "certs", "mongodb_public_key.cert") %>
