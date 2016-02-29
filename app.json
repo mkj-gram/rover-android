@@ -54,7 +54,6 @@
   },
   "addons": [
     "bonsai",
-    "cloudamqp",
-    "mongohq"
+    "cloudamqp"
   ]
 }
