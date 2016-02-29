@@ -1,7 +1,6 @@
 class Customer
     include Mongoid::Document
     include Elasticsearch::Model
-    include Elasticsearch::Model::Callbacks
 
     field :account_id, type: Integer
     field :identifier, type: String
@@ -13,6 +12,7 @@ class Customer
 
     index({"devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
     index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
+    index({"account_id": 1, "traits": 1}, {partial_filter_expression: {"traits" => {"$exists" => true}}})
 
     embeds_many :devices, class_name: "CustomerDevice"
 
@@ -48,14 +48,29 @@ class Customer
         end
     end
 
+    has_one :inbox, class_name: "CustomerInbox"
     validates :account_id, presence: true
 
     # where should we store counter cache? how do we?
     # # belongs_to :account, counter_cache: true
 
+    after_destroy do
+        begin
+            __elasticsearch__.delete_document
+        rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
+            Rails.logger.warn(e)
+        end
+    end
+
     before_save :update_active_traits
 
+    after_create :increment_customers_count, if: -> { indexable_customer? }
+    after_destroy :decrement_customers_count
+
+    after_save :index_customer
+
     def as_indexed_json(options = {})
+        puts "indexing document"
         {
             account_id: self.account_id,
             identifier: self.identifier,
@@ -78,6 +93,11 @@ class Customer
                                 mappings: mappings.to_hash
         })
     end
+
+    def indexable_customer?
+        (!self.identifier.nil?) || (self.identifier.nil? && devices.any?)
+    end
+
     # def update_attributes_async(new_attributes)
     #     merge(new_attributes)
     #     if needs_update?
@@ -116,13 +136,14 @@ class Customer
             # new {gold_member => true}
             # we want {gold_member => true}
             # to map to {key: gold_member, type: Boolean }
-            previous_trait_keys = traits_was.nil? ? [] : traits_was.map{|k,v| k.to_s }
-            trait_keys = traits.nil? ? [] : traits.map{|k,v| k.to_s}
+            previous_trait_keys = traits_was.nil? ? [] : traits_was.keys
+            trait_keys = traits.nil? ? [] : traits.keys
 
             old_trait_keys = previous_trait_keys - trait_keys
             new_trait_keys = trait_keys - previous_trait_keys
 
-            CustomerActiveTraits.update_traits(self.account_id, old_trait_keys, new_trait_keys)
+            new_traits = new_trait_keys.map{|key| CustomerTrait.new(trait_key: key, value: traits[key])}
+            CustomerActiveTraits.update_traits(self.account_id, old_trait_keys, new_traits)
         end
     end
 
@@ -130,6 +151,36 @@ class Customer
         self.devices.map{|device| device.as_indexed_json(options)}
     end
 
+    def increment_customers_count
+        Account.update_counters(account_id, customers_count: 1)
+    end
+
+    def decrement_customers_count
+        Account.update_counters(account_id, customers_count: -1)
+    end
+
+    def index_customer
+        # we only want to show customers which are identified or have a device
+
+        # going from no identifier to named
+        if identifier.nil? && changes.include?(:devices) && devices_was.any? && devices.empty?
+            puts "this anonymous user doesn't have a device anymore"
+            decrement_customers_count
+            begin
+                self.__elasticsearch__.delete_document
+            rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
+                Rails.logger.wanr(e)
+            end
+        elsif identifier.nil? && devices.any?
+            __elasticsearch__.index_document
+        elsif !identifier.nil?
+            __elasticsearch__.index_document
+        end
+
+
+
+
+    end
     # def needs_update?
     #     changes.any?
     # end

@@ -93,7 +93,7 @@ class V1::CustomersController < V1::ApplicationController
             },
             relationships: {
                 devices: {
-                    data: source.devices.map{|device| {type: "devices", id: device.id }}
+                    data: source.devices.map{|device| {type: "devices", id: device.udid }}
                 }
             }
         }
@@ -102,7 +102,7 @@ class V1::CustomersController < V1::ApplicationController
     def serialize_device(device)
         {
             type: "devices",
-            id: device.id.to_s,
+            id: device.udid.to_s,
             attributes: {
                 :"locale-lang" => device.locale_lang,
                 :"locale-region" => device.locale_region,
