@@ -76,9 +76,9 @@ class Message < ActiveRecord::Base
     def filter_location(configuration)
         location = configuration.is_a?(BeaconConfiguration) ? configuration.location : configuration
         if filter_location_tags.any?
-            location.tags == filter_location_tags
+            !location.nil? && location.tags == filter_location_tags
         elsif filter_location_ids.any?
-            filter_location_ids.include?(location.id)
+            !location.nil? && filter_location_ids.include?(location.id)
         else
             true
         end
