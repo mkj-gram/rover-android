@@ -64,29 +64,11 @@ class GeofenceRegionEvent < Event
     end
 
     def get_message_for_location(location_configuration)
-        # has to perform all filtering in memory
-        # first find all messages where the trigger_event_id is the type of event which occured
-        messages = ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id).all.to_a
+        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).all.to_a
         # apply all filters
         current_time = DateTime.now
         messages.select do |message|
-            # check time
-            if message.within_schedule(current_time)
-                # we are within schedule
-                # check to see if our config fits the message
-                if message.apply_configuration_filters(location_configuration)
-                    # we also have customer filtering ontop
-                    if message.apply_customer_filters(customer, device)
-                        true
-                    else
-                        false
-                    end
-                else
-                    false
-                end
-            else
-                false
-            end
+            message.within_schedule(current_time) && message.apply_configuration_filters(location_configuration) && message.apply_customer_filters(customer, device)
         end
     end
 
