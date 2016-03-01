@@ -43,13 +43,13 @@ class Location < ActiveRecord::Base
 
     mapping do
         indexes :account_id, type: 'long', index: 'not_analyzed'
-        indexes :formatted_address, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
+        indexes :formatted_address, type: 'string', index_analyzer: "autocomplete", search_analyzer: "simple"
         indexes :address, type: 'string', index: 'no'
         indexes :city, type: 'string', index: 'no'
         indexes :province, type: 'string', index: 'no'
         indexes :country, type: 'string', index: 'no'
         indexes :postal_code, type: 'string', index: 'no'
-        indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
+        indexes :title, type: 'string', index_analyzer: "autocomplete", search_analyzer: "simple"
         indexes :tags, type: 'string', index: 'not_analyzed'
         indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
         indexes :location, type: "geo_point", lat_lon: true

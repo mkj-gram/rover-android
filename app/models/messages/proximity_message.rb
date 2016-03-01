@@ -8,12 +8,12 @@ class ProximityMessage < Message
     after_save :update_approximate_customers_count
 
     mappings do
-        # indexes :trigger_event_id, type: 'integer', index: 'no'
-        # indexes :dwell_time_in_seconds, type: 'integer', index: 'no'
-        # indexes :filter_beacon_configuration_tags, type: 'string', index: 'no'
-        # indexes :filter_beacon_configuration_ids, type: 'string', index: 'no'
-        # indexes :filter_location_tags, type: 'string', index: 'no'
-        # indexes :filter_location_ids, type: 'string', index: 'no'
+        indexes :trigger_event_id, type: 'integer', index: 'no'
+        indexes :dwell_time_in_seconds, type: 'integer', index: 'no'
+        indexes :filter_beacon_configuration_tags, type: 'string', index: 'no'
+        indexes :filter_beacon_configuration_ids, type: 'string', index: 'no'
+        indexes :filter_location_tags, type: 'string', index: 'no'
+        indexes :filter_location_ids, type: 'string', index: 'no'
     end
 
     default_empty_array_attribute :filter_beacon_configuration_tags
