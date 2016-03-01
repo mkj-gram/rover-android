@@ -115,16 +115,33 @@ class BeaconRegionEvent < Event
     end
 
     def beacon_configuration
+        # we use empty arrays so that we know the value has been initialized
+        # if we returned nil the function would rerun and not keep the cached result
         @beacon_configuration ||=
         case @protocol
         when BeaconConfiguration::IBEACON_PROTOCOL
-            [IBeaconConfiguration.find_by(account_id: account.id, uuid: @uuid, major: @major, minor: @minor)]
+            configuration = IBeaconConfiguration.find_by(account_id: account.id, uuid: @uuid, major: @major, minor: @minor)
+            if configuration.enabled
+                [configuration]
+            else
+                []
+            end
         when BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
-            [EddystoneNamespaceConfiguration.find_by(account_id: account.id, namespace: @namespace, instance_id: @instance_id)]
+            configuration = EddystoneNamespaceConfiguration.find_by(account_id: account.id, namespace: @namespace, instance_id: @instance_id)
+            if configuration.enabled
+                [configuration]
+            else
+                []
+            end
         when BeaconConfiguration::URL_PROTOCOL
-            [UrlConfiguration.find_by(account_id: account.id, url: @url)]
+            configuration = UrlConfiguration.find_by(account_id: account.id, url: @url)
+            if configuration.enabled
+                [configuration]
+            else
+                []
+            end
         else
-            [nil]
+            []
         end
         return @beacon_configuration.first
     end
