@@ -40,7 +40,7 @@ class GeofenceRegionEvent < Event
                 tags: location.tags,
                 shared: location.shared
             }
-            messages = get_message_for_location_configuration(location)
+
             if new_messages.any?
                 json[:included] += new_messages.map{|message| serialize_inbox_message(message)}
             end
