@@ -122,7 +122,7 @@ class Message < ActiveRecord::Base
     def filter_beacon_configuration(configuration)
         if configuration.is_a?(BeaconConfiguration)
             if filter_beacon_configuration_tags && filter_beacon_configuration_tags.any?
-                configuration.tags == filter_beacon_configuration_tags
+                (filter_beacon_configuration_tags - configuration.tags).empty?
             elsif filter_beacon_configuration_ids && filter_beacon_configuration_ids.any?
                 filter_beacon_configuration_ids.include?(configuration.id)
             else
@@ -137,7 +137,7 @@ class Message < ActiveRecord::Base
     def filter_location(configuration)
         location = configuration.is_a?(BeaconConfiguration) ? configuration.location : configuration
         if filter_location_tags && filter_location_tags.any?
-            !location.nil? && location.tags == filter_location_tags
+            !location.nil? && (filter_location_tags - location.tags)
         elsif filter_location_ids && filter_location_ids.any?
             !location.nil? && filter_location_ids.include?(location.id)
         else
