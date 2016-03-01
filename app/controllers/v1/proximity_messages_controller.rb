@@ -132,7 +132,21 @@ class V1::ProximityMessagesController < V1::ApplicationController
         end
 
         puts "Here is my local params #{local_params}"
-        local_params.fetch(:proximity_messages, {}).permit(:title, :notification_text, :published, :archived, :trigger_event_id, {:filter_beacon_configuration_tags => []}, {:filter_beacon_configuration_ids => []},{:filter_location_tags => []}, {:filter_location_ids => []})
+        local_params.fetch(:proximity_messages, {}).permit(
+            :title,
+            :notification_text,
+            :published,
+            :archived,
+            :trigger_event_id,
+            {:filter_beacon_configuration_tags => []},
+            {:filter_beacon_configuration_ids => []},
+            {:filter_location_tags => []},
+            {:filter_location_ids => []},
+            :limit_per_day,
+            :limit_per_week,
+            :limit_per_month,
+            :limit_per_year
+        )
     end
 
     def render_proximity_message(message)
@@ -150,6 +164,10 @@ class V1::ProximityMessagesController < V1::ApplicationController
                     :"approximate-customers-count" => message.approximate_customers_count,
                     :"configuration-tags" => message.filter_beacon_configuration_tags,
                     :"location-tags" => message.filter_location_tags,
+                    :"limit-per-day" => message.limit_per_day,
+                    :"limit-per-week" => message.limit_per_week,
+                    :"limit-per-month" => message.limit_per_month,
+                    :"limit-per-year" => message.limit_per_year
                 }
             }
         }
@@ -217,8 +235,6 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 published: source.published,
                 archived: source.archived,
                 approximate_customers_count: source.approximate_customers_count,
-                beacon_configuration_tags: source.filter_beacon_configuration_tags,
-                location_configuration_tags: source.filter_location_tags,
             }
         }
     end
