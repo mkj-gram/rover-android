@@ -58,7 +58,6 @@ class GeofenceRegionEvent < Event
         puts "after save"
         if @proximity_messages && @proximity_messages.any?
             messages_to_deliver = @proximity_messages.map{|message| message.to_inbox_message(message_opts)}
-
             @new_messages = customer.inbox.add_messages(messages_to_deliver, account) if messages_to_deliver.any?
         end
     end

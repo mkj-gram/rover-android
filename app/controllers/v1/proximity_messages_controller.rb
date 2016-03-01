@@ -234,7 +234,14 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"notification-text" => source.notification_text,
                 published: source.published,
                 archived: source.archived,
+                :"trigger-event" => Event.event_id_to_event_string(source.trigger_event_id),
                 approximate_customers_count: source.approximate_customers_count,
+                :"configuration-tags" => source.filter_beacon_configuration_tags,
+                :"location-tags" => source.filter_location_tags,
+                :"limit-per-day" => source.limit_per_day,
+                :"limit-per-week" => source.limit_per_week,
+                :"limit-per-month" => source.limit_per_month,
+                :"limit-per-year" => source.limit_per_year
             }
         }
     end

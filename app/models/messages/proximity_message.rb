@@ -14,6 +14,11 @@ class ProximityMessage < Message
         indexes :filter_beacon_configuration_ids, type: 'string', index: 'no'
         indexes :filter_location_tags, type: 'string', index: 'no'
         indexes :filter_location_ids, type: 'string', index: 'no'
+
+        indexes :limit_per_day, type: 'integer', index: 'no'
+        indexes :limit_per_week, type: 'integer', index: 'no'
+        indexes :limit_per_month, type: 'integer', index: 'no'
+        indexes :limit_per_year, type: 'integer', index: 'no'
     end
 
     default_empty_array_attribute :filter_beacon_configuration_tags
