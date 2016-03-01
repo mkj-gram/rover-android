@@ -15,7 +15,11 @@ class V1::AccountsController < V1::ApplicationController
                     "configuration-tags" => current_account.beacon_configuration_active_tag.tags,
                     "location-tags" => current_account.location_active_tag.tags,
                     "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
-                    "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids
+                    "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
+                    "global-message-limit-per-day" => current_account.global_message_limit_per_day,
+                    "global-message-limit-per-week" => current_account.global_message_limit_per_week,
+                    "global-message-limit-per-month" => current_account.global_message_limit_per_month,
+                    "global-message-limit-per-year" => current_account.global_message_limit_per_year,
                 },
                 "relationships" => {
                     "users" => {
@@ -85,7 +89,7 @@ class V1::AccountsController < V1::ApplicationController
         end
     end
     def account_params(local_params)
-        local_params.require(:accounts).permit(:title)
+        local_params.require(:accounts).permit(:title, :global_message_limit_per_day, :global_message_limit_per_week, :global_message_limit_per_month, :global_message_limit_per_year)
     end
 
 
