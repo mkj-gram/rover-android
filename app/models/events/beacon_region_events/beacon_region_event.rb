@@ -76,12 +76,8 @@ class BeaconRegionEvent < Event
             }.merge(beacon_configuration.configuration_attributes)
             # only include the message if the configuration exists
 
-            if inbox_messages.any?
-                json[:included] += inbox_messages.map{|message| serialize_inbox_message(message)}
-            end
-
-            if local_messages.any?
-                json[:included] += local_messages.map{|message| serialize_local_message(message)}
+            if new_messages.any?
+                json[:included] += new_messages.map{|message| serialize_inbox_message(message)}
             end
         else
             json[:data][:attributes][:configuration] = {}
@@ -97,10 +93,12 @@ class BeaconRegionEvent < Event
 
     def save_messages_to_inbox
         puts "after save"
-        if @proximity_messages.any?
-            @inbox_messages = @proximity_messages.select{|message| message.save_to_inbox}.map{|message| message.to_inbox_message(message_opts)}
-            @local_messages = @proximity_messages.select{|message| message.save_to_inbox == false}
-            CustomerInbox.add_messages(customer.id, @inbox_messages)
+        if @proximity_messages && @proximity_messages.any?
+            # @inbox_messages = @proximity_messages.select{|message| message.save_to_inbox}.map{|message| message.to_inbox_message(message_opts)}
+            # @local_messages = @proximity_messages.select{|message| message.save_to_inbox == false}
+            messages_to_deliver = @proximity_messages.map{|message| message.to_inbox_message(message_opts)}
+
+            @new_messages = customer.inbox.add_messages(messages_to_deliver) if messages_to_deliver.any?
         end
     end
 
@@ -135,17 +133,17 @@ class BeaconRegionEvent < Event
         @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
     end
 
-    def serialize_local_message(message)
-        {
-            type: "messages",
-            id: message.id.to_s,
-            attributes: {
-                :"notification-text" => message.formatted_message(message_opts),
-                read: true,
-                :"save-to-inbox" => false
-            }
-        }
-    end
+    # def serialize_local_message(message)
+    #     {
+    #         type: "messages",
+    #         id: message.id.to_s,
+    #         attributes: {
+    #             :"notification-text" => message.formatted_message(message_opts),
+    #             read: true,
+    #             :"save-to-inbox" => false
+    #         }
+    #     }
+    # end
 
     def serialize_inbox_message(message)
         {

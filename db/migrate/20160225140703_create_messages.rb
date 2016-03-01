@@ -18,6 +18,12 @@ class CreateMessages < ActiveRecord::Migration
             t.integer :trigger_event_id
             t.integer :dwell_time_in_seconds
 
+            # limits
+            t.integer :limit_per_day
+            t.integer :limit_per_week
+            t.integer :limit_per_month
+            t.integer :limit_per_year
+
             # filters
             t.string    :filter_beacon_configuration_tags, array: true
             t.integer   :filter_beacon_configuration_ids, array: true

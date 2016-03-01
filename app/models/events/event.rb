@@ -90,7 +90,8 @@ class Event
 
 
     attr_reader :account, :customer, :device, :object, :action
-    attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
+    attr_reader :new_messages
+    # attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
 
     def initialize(event_attributes)
         @id = SecureRandom.uuid
@@ -101,8 +102,7 @@ class Event
         @device = event_attributes[:device]
         @included = []
         @attributes = {object: @object, action: @action}
-        @inbox_messages = []
-        @local_messages = []
+        @new_messages = []
     end
 
     def attributes

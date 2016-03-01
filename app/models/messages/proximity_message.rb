@@ -5,6 +5,7 @@ class ProximityMessage < Message
     belongs_to :account, counter_cache: :proximity_messages_count
     before_save :update_archived_messages_count
 
+    after_save :update_approximate_customers_count
 
     mappings do
         indexes :trigger_event_id, type: 'integer', index: 'no'
@@ -23,12 +24,18 @@ class ProximityMessage < Message
     # validates :legal_trigger_event_id
 
     def to_inbox_message(opts)
-        @inbox_message ||= InboxMessage.new(
-            {
-                notification_text: formatted_message(opts),
-                read: true
-            }
-        )
+        @inbox_message ||= -> {
+            inbox_message = InboxMessage.new(
+                {
+                    message_id: self.id,
+                    notification_text: formatted_message(opts),
+                    read: true,
+                    saved_to_inbox: self.save_to_inbox
+                }
+            )
+            inbox_message.message = self
+            return inbox_message
+        }.call
     end
 
     def filter_beacon_configurations
@@ -46,6 +53,12 @@ class ProximityMessage < Message
         # if published && !Event.valid_event_id(trigger_event_id)
         #     errors.add(:trigger_event_id, "invalid")
         # end
+    end
+
+    def update_approximate_customers_count
+        # we need to update here
+        # if we changed the filters we need to update
+        #
     end
 
     def update_archived_messages_count

@@ -56,13 +56,74 @@ class Message < ActiveRecord::Base
         true
     end
 
+    def within_message_limits(message_rate_index)
+        # message_rate_index
+        # {"1" => {message_per_day: 1, message_per_week: 1}}
+        # describes how many of these messages the user has received
+        if !message_rate_index.has_key?(self.id)
+            message_rate_index[self.id] = {
+                messages_per_day: 0,
+                messages_per_week: 0,
+                messages_per_month: 0,
+                messages_per_year: 0
+            }
+        end
+        (
+            within_message_limit_per_day(message_rate_index[self.id][:messages_per_day]) &&
+            within_message_limit_per_week(message_rate_index[self.id][:messages_per_week]) &&
+            within_message_limit_per_month(message_rate_index[self.id][:messages_per_month]) &&
+            within_message_limit_per_year(message_rate_index[self.id][:messages_per_year])
+        )
+    end
+
+    def has_message_limits
+        !(
+            self.limit_per_day.nil? ||
+            self.limit_per_week.nil? ||
+            self.limit_per_month.nil? ||
+            self.limit_per_year.nil?
+        )
+    end
+
     private
+
+    def within_message_limit_per_day(current_message_rate_per_day)
+        if self.limit_per_day
+            current_message_rate_per_day < self.limit_per_day
+        else
+            true
+        end
+    end
+
+    def within_message_limit_per_week(current_message_rate_per_week)
+        if self.limit_per_week
+            current_message_rate_per_week < self.limit_per_week
+        else
+            true
+        end
+    end
+
+    def within_message_limit_per_month(current_message_rate_per_month)
+        if self.limit_per_month
+            current_message_rate_per_month < self.limit_per_month
+        else
+            true
+        end
+    end
+
+    def within_message_limit_per_year(current_message_rate_per_year)
+        if self.limit_per_year
+            current_message_rate_per_year < self.limit_per_year
+        else
+            true
+        end
+    end
 
     def filter_beacon_configuration(configuration)
         if configuration.is_a?(BeaconConfiguration)
-            if filter_beacon_configuration_tags.any?
+            if filter_beacon_configuration_tags && filter_beacon_configuration_tags.any?
                 configuration.tags == filter_beacon_configuration_tags
-            elsif filter_beacon_configuration_ids.any?
+            elsif filter_beacon_configuration_ids && filter_beacon_configuration_ids.any?
                 filter_beacon_configuration_ids.include?(configuration.id)
             else
                 true
@@ -75,9 +136,9 @@ class Message < ActiveRecord::Base
 
     def filter_location(configuration)
         location = configuration.is_a?(BeaconConfiguration) ? configuration.location : configuration
-        if filter_location_tags.any?
+        if filter_location_tags && filter_location_tags.any?
             !location.nil? && location.tags == filter_location_tags
-        elsif filter_location_ids.any?
+        elsif filter_location_ids && filter_location_ids.any?
             !location.nil? && filter_location_ids.include?(location.id)
         else
             true

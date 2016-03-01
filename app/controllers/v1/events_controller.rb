@@ -81,10 +81,10 @@ class V1::EventsController < V1::ApplicationController
     end
 
     def create_customer_with_device(user_attributes, device_attributes)
-        # its possible here that the devices is created with an indentifier
+        # its possible here that the devices is created with an identifier
         if user_attributes[:identifier]
             # a customer
-            existing_customer = Customer.find_by(account_id: current_account.id, indentifier: user_attributes[:identifier])
+            existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
             if existing_customer
                 # this calls $push on the devices array for the existing customer
                 device = existing_customer.devices.new(device_params(device_attributes))

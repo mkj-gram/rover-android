@@ -48,7 +48,7 @@ class Customer
         end
     end
 
-    has_one :inbox, class_name: "CustomerInbox"
+    # has_one :inbox, class_name: "CustomerInbox"
     validates :account_id, presence: true
 
     # where should we store counter cache? how do we?
@@ -63,7 +63,7 @@ class Customer
     end
 
     before_save :update_active_traits
-
+    after_create :create_inbox
     after_create :increment_customers_count, if: -> { indexable_customer? }
     after_destroy :decrement_customers_count
 
@@ -98,6 +98,12 @@ class Customer
         (!self.identifier.nil?) || (self.identifier.nil? && devices.any?)
     end
 
+    def inbox
+        @inbox ||= CustomerInbox.find(self.id)
+        @inbox = CustomerInbox.create(customer_id: self.id) if @inbox.nil?
+        return @inbox
+    end
+
     # def update_attributes_async(new_attributes)
     #     merge(new_attributes)
     #     if needs_update?
@@ -128,7 +134,11 @@ class Customer
     #     self.__elasticsearch__.update_document_attributes({ devices: devices_as_indexed_json })
     # end
 
-    # private
+    private
+
+    def create_inbox
+        CustomerInbox.create(customer_id: self.id)
+    end
 
     def update_active_traits
         if changes.include?(:traits)
@@ -176,13 +186,7 @@ class Customer
         elsif !identifier.nil?
             __elasticsearch__.index_document
         end
-
-
-
-
     end
-    # def needs_update?
-    #     changes.any?
-    # end
+
 
 end
