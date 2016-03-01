@@ -93,6 +93,16 @@ class CustomerInbox
             end
 
             if within_limit
+                if !message_rate.has_key?(inbox_message.message_id)
+                    # if this message doesn't exist in the inbox
+                    message_rate[inbox_message.message_id] = {
+                        messages_per_day: 0,
+                        messages_per_week: 0,
+                        messages_per_month: 0,
+                        messages_per_year: 0
+                    }
+
+                end
                 [:messages_per_day, :messages_per_week, :messages_per_month, :messages_per_year].each do |key|
                     message_rate[inbox_message.message_id][key] += 1
                 end
