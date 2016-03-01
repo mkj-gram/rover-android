@@ -1,5 +1,7 @@
 class GeofenceRegionEvent < Event
 
+    after_save :save_messages_to_inbox
+
     def self.build_event(object, action, event_attributes)
         case action
         when "enter"
@@ -22,7 +24,8 @@ class GeofenceRegionEvent < Event
     end
 
     def save
-        super
+        @proximity_messages = get_message_for_location(location) || []
+        run_callbacks :save
     end
 
     def to_json
@@ -38,8 +41,8 @@ class GeofenceRegionEvent < Event
                 shared: location.shared
             }
             messages = get_message_for_location_configuration(location)
-            if messages.any?
-                json[:included] += messages.map{|message| serialize_message(message,{customer: customer, device: device}) }
+            if new_messages.any?
+                json[:included] += new_messages.map{|message| serialize_inbox_message(message)}
             end
         else
             json[:data][:attributes][:location] = {}
@@ -50,7 +53,17 @@ class GeofenceRegionEvent < Event
 
     private
 
-    def get_message_for_location_configuration(location_configuration)
+    def save_messages_to_inbox
+        # TODO Refractor both beacon_region_event and location_event use the same structure
+        puts "after save"
+        if @proximity_messages && @proximity_messages.any?
+            messages_to_deliver = @proximity_messages.map{|message| message.to_inbox_message(message_opts)}
+
+            @new_messages = customer.inbox.add_messages(messages_to_deliver, account) if messages_to_deliver.any?
+        end
+    end
+
+    def get_message_for_location(location_configuration)
         # has to perform all filtering in memory
         # first find all messages where the trigger_event_id is the type of event which occured
         messages = ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id).all.to_a
@@ -77,23 +90,35 @@ class GeofenceRegionEvent < Event
         end
     end
 
-    def serialize_message(message, opts = {})
-        customer = opts.delete(:customer)
-        if customer
-            opts.merge!(customer.attributes.inject({}){|hash, (k,v)| hash.merge("customer_#{k}" => v)})
-        end
-        device = opts.delete(:device)
-        if device
-            opts.merge!(device.attributes.inject({}){|hash, (k,v)| hash.merge("device_#{k}" => v)})
-        end
+    def serialize_inbox_message(message)
         {
             type: "messages",
             id: message.id.to_s,
             attributes: {
-                text: message.formatted_message(opts)
+                :"notification-text" => message.notification_text,
+                read: message.read,
+                :"save-to-inbox" => true
             }
         }
     end
+
+    # def serialize_message(message, opts = {})
+    #     customer = opts.delete(:customer)
+    #     if customer
+    #         opts.merge!(customer.attributes.inject({}){|hash, (k,v)| hash.merge("customer_#{k}" => v)})
+    #     end
+    #     device = opts.delete(:device)
+    #     if device
+    #         opts.merge!(device.attributes.inject({}){|hash, (k,v)| hash.merge("device_#{k}" => v)})
+    #     end
+    #     {
+    #         type: "messages",
+    #         id: message.id.to_s,
+    #         attributes: {
+    #             text: message.formatted_message(opts)
+    #         }
+    #     }
+    # end
 
     def location
         @location ||= -> {

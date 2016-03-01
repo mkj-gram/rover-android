@@ -120,7 +120,11 @@ CREATE TABLE accounts (
     archived_proximity_messages_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    customers_count integer DEFAULT 0
+    customers_count integer DEFAULT 0,
+    global_message_limit_per_day integer,
+    global_message_limit_per_week integer,
+    global_message_limit_per_month integer,
+    global_message_limit_per_year integer
 );
 
 
@@ -1399,4 +1403,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160211200011');
 INSERT INTO schema_migrations (version) VALUES ('20160211202819');
 
 INSERT INTO schema_migrations (version) VALUES ('20160225140703');
+
+INSERT INTO schema_migrations (version) VALUES ('20160301142503');
 
