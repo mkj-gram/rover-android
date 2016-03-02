@@ -37,6 +37,20 @@ CREATE EXTENSION IF NOT EXISTS btree_gin WITH SCHEMA public;
 COMMENT ON EXTENSION btree_gin IS 'support for indexing common datatypes in GIN';
 
 
+--
+-- Name: hstore; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION hstore; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION hstore IS 'data type for storing sets of (key, value) pairs';
+
+
 SET search_path = public, pg_catalog;
 
 --
@@ -121,10 +135,7 @@ CREATE TABLE accounts (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customers_count integer DEFAULT 0,
-    global_message_limit_per_day integer,
-    global_message_limit_per_week integer,
-    global_message_limit_per_month integer,
-    global_message_limit_per_year integer
+    message_limits hstore[] DEFAULT '{}'::hstore[]
 );
 
 
@@ -466,15 +477,11 @@ CREATE TABLE messages (
     published boolean DEFAULT false,
     archived boolean DEFAULT false,
     save_to_inbox boolean DEFAULT true,
-    start_date date,
-    end_date date,
+    schedule int4range DEFAULT '(,)'::int4range,
     approximate_customers_count integer,
     trigger_event_id integer,
     dwell_time_in_seconds integer,
-    limit_per_day integer,
-    limit_per_week integer,
-    limit_per_month integer,
-    limit_per_year integer,
+    limits hstore[] DEFAULT '{}'::hstore[],
     filter_beacon_configuration_tags character varying[],
     filter_beacon_configuration_ids integer[],
     filter_location_tags character varying[],

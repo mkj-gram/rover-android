@@ -22,7 +22,7 @@ class CreateMessages < ActiveRecord::Migration
             t.integer :dwell_time_in_seconds
 
             # limits
-            t.hstore :limits, array: true
+            t.hstore :limits, array: true, default: []
 
             # filters
             t.string    :filter_beacon_configuration_tags, array: true
