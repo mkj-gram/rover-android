@@ -52,8 +52,9 @@ class V1::ProximityMessagesController < V1::ApplicationController
             ]
         }
 
-        messages = Elasticsearch::Model.search(query, [ProximityMessage])
-        results = messages.per_page(page_size).page(current_page).results
+        elasticsearch_query = ProximityMessage.search(query)
+
+        messages = elasticsearch_query.per_page(page_size).page(current_page).records
 
         if query_archived == true
             total_searchable_records = current_account.archived_proximity_messages_count
@@ -64,10 +65,10 @@ class V1::ProximityMessagesController < V1::ApplicationController
         end
 
         json = {
-            "data" => results.map{|message| serialize_elasticsearch_message(message)},
+            "data" => messages.to_a.map{|message| serialize_message(message)},
             "meta" => {
-                "totalRecords" => results.total,
-                "totalPages" => results.total_pages,
+                "totalRecords" => messages.total,
+                "totalPages" => messages.total_pages,
                 "totalSearchableRecords" => total_searchable_records
             }
         }
@@ -131,7 +132,6 @@ class V1::ProximityMessagesController < V1::ApplicationController
             local_params[:proximity_messages][:trigger_event_id] = Event.event_string_to_event_id(local_params[:proximity_messages][:trigger_event])
         end
 
-        puts "Here is my local params #{local_params}"
         local_params.fetch(:proximity_messages, {}).permit(
             :title,
             :notification_text,
@@ -142,34 +142,17 @@ class V1::ProximityMessagesController < V1::ApplicationController
             {:filter_beacon_configuration_ids => []},
             {:filter_location_tags => []},
             {:filter_location_ids => []},
-            :limit_per_day,
-            :limit_per_week,
-            :limit_per_month,
-            :limit_per_year
+            :schedule_start_date,
+            :schedule_end_date,
+            :schedule_start_time,
+            :schedule_end_time,
         )
     end
 
     def render_proximity_message(message)
         should_include = ["beacons", "locations"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
         json = {
-            data: {
-                type: "proximity-messages",
-                id: message.id.to_s,
-                attributes: {
-                    name: message.title,
-                    :"notification-text" => message.notification_text,
-                    published: message.published,
-                    archived: message.archived,
-                    :"trigger-event" => Event.event_id_to_event_string(message.trigger_event_id),
-                    :"approximate-customers-count" => message.approximate_customers_count,
-                    :"configuration-tags" => message.filter_beacon_configuration_tags,
-                    :"location-tags" => message.filter_location_tags,
-                    :"limit-per-day" => message.limit_per_day,
-                    :"limit-per-week" => message.limit_per_week,
-                    :"limit-per-month" => message.limit_per_month,
-                    :"limit-per-year" => message.limit_per_year
-                }
-            }
+            data: serialize_message(message)
         }
         included = []
         if should_include.include?("beacons")
@@ -223,26 +206,26 @@ class V1::ProximityMessagesController < V1::ApplicationController
         params.permit(:archived)[:archived].to_s.to_bool
     end
 
-
-    def serialize_elasticsearch_message(message)
-        source = message._source
+    def serialize_message(message)
         {
             type: "proximity-messages",
-            id: message.id,
+            id: message.id.to_s,
             attributes: {
-                name: source.title,
-                :"notification-text" => source.notification_text,
-                published: source.published,
-                archived: source.archived,
-                :"trigger-event" => Event.event_id_to_event_string(source.trigger_event_id),
-                approximate_customers_count: source.approximate_customers_count,
-                :"configuration-tags" => source.filter_beacon_configuration_tags,
-                :"location-tags" => source.filter_location_tags,
-                :"limit-per-day" => source.limit_per_day,
-                :"limit-per-week" => source.limit_per_week,
-                :"limit-per-month" => source.limit_per_month,
-                :"limit-per-year" => source.limit_per_year
+                name: message.title,
+                :"notification-text" => message.notification_text,
+                published: message.published,
+                archived: message.archived,
+                :"trigger-event" => Event.event_id_to_event_string(message.trigger_event_id),
+                :"approximate-customers-count" => message.approximate_customers_count,
+                :"configuration-tags" => message.filter_beacon_configuration_tags,
+                :"schedule-start-date" => message.schedule_start_date,
+                :"schedule-end-date" => message.schedule_end_date,
+                :"schedule-start-time" => message.schedule_start_time,
+                :"schedule-end-time" => message.schedule_end_time,
+                :"location-tags" => message.filter_location_tags
             }
         }
+
     end
+
 end

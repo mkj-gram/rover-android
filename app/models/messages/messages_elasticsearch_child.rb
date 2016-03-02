@@ -4,15 +4,12 @@ module MessagesElasticsearchChild
     included do
         index_name Message.index_name
 
-        mapping do
+        mappings dynamic: 'false' do
             indexes :account_id, type: 'long', index: 'not_analyzed'
             indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
-            indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :notification_text, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
             indexes :published, type: 'boolean', index: 'not_analyzed'
             indexes :archived, type: 'boolean', index: 'not_analyzed'
-            indexes :approximate_customers_count, type: 'integer', index: 'no'
-            indexes :action, type: 'string', index: 'no'
             indexes :created_at, type: 'date', index: 'not_analyzed', store: 'no'
         end
     end

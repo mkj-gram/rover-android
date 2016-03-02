@@ -37,6 +37,135 @@ class Message < ActiveRecord::Base
             }
         }
     )
+    def as_indexed_json(opts = {})
+        {
+            account_id: self.account_id,
+            title: self.title,
+            notification_text: self.notification_text,
+            published: self.published,
+            archived: self.archived,
+            created_at: self.created_at,
+        }
+    end
+
+    def archived=(val)
+        if val == true
+            self.published = false
+        end
+        self[:archived] = val
+    end
+
+    def schedule_start_date
+        @schedule_start_date ||= if schedule_start_parsed_time
+            Date.parse(schedule_start_parsed_time.to_s).to_s
+        else
+            nil
+        end
+    end
+
+    def schedule_end_date
+        @schedule_end_date ||= if schedule_end_parsed_time
+            Date.parse(schedule_end_parsed_time.to_s).to_s
+        else
+            nil
+        end
+    end
+
+    def schedule_start_time
+        @schedule_start_time ||= if schedule_start_parsed_time
+            schedule_start_parsed_time.strftime("%H:%M:%S")
+        else
+            nil
+        end
+    end
+
+    def schedule_end_time
+        @schedule_end_time ||= if schedule_end_parsed_time
+            schedule_end_parsed_time.strftime("%H:%M:%S")
+        else
+            nil
+        end
+    end
+
+    def schedule_start_date=(val)
+        val = val.is_a?(DateTime) ?  val.to_date : val
+        val = val.is_a?(Date) ? val.to_s : val
+        @schedule_start_date = val
+        set_schedule! if valid_date(val)
+    end
+
+    def schedule_end_date=(val)
+        val = val.is_a?(DateTime) ?  val.to_date : val
+        val = val.is_a?(Date) ? val.to_s : val
+        @schedule_end_date = val
+        set_schedule! if valid_date(val)
+    end
+
+    def schedule_start_time=(val)
+        val = val.is_a?(DateTime) ? val.to_time : val
+        val = val.is_a?(Time) ? val.strftime("%H:%M:%S") : val
+        @schedule_start_time = val
+        set_schedule! if valid_time(val)
+    end
+
+    def schedule_end_time=(val)
+        val = val.is_a?(DateTime) ? val.to_time : val
+        val = val.is_a?(Time) ? val.strftime("%H:%M:%S") : val
+        @schedule_end_time = val
+        set_schedule! if valid_time(val)
+    end
+
+
+    def valid_date(date)
+        return true if date == Float::INFINITY
+        return !!(date =~ /^\d{4}\-\d{2}\-\d{2}$/)
+    end
+
+    def valid_time(time)
+        return true if time == Float::INFINITY
+        return !!(time =~ /^\d{2}\:\d{2}\:\d{2}$/)
+    end
+
+    def schedule_start_parsed_time
+        if self.schedule && self.schedule.first != -Float::INFINITY
+            Time.at(self.schedule.first)
+        else
+            nil
+        end
+    end
+
+    def schedule_end_parsed_time
+        if self.schedule && self.schedule.last != Float::INFINITY
+            Time.at(self.schedule.last)
+        else
+            nil
+        end
+    end
+
+    def set_schedule!
+        # build the start_date
+        if schedule_start_date
+            if schedule_start_time
+                start_time = Time.parse("#{schedule_start_date} #{schedule_start_time}").to_i
+            else
+                start_time = Time.parse("#{schedule_start_date} 00:00:00").to_i
+            end
+        else
+            start_time = BigDecimal.new("-1.0")/ BigDecimal.new("0.0")
+        end
+
+        if schedule_end_date
+            if schedule_end_time
+                end_time = Time.parse("#{schedule_end_date} #{schedule_end_time}").to_i
+            else
+                end_time = Time.parse("#{schedule_end_date} 24:00:00").to_i
+            end
+        else
+            end_time = BigDecimal.new("1.0")/ BigDecimal.new("0.0")
+        end
+        puts "start_time #{start_time} end_time #{end_time}"
+        self.schedule = Range.new(start_time, end_time)
+    end
 
     def within_schedule(current_time)
         # needs to check the start_time end_time

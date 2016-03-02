@@ -106,7 +106,7 @@ class BeaconRegionEvent < Event
         return nil if beacon_configuration.nil?
         # has to perform all filtering in memory
         # first find all messages where the trigger_event_id is the type of event which occured
-        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).all.to_a
+        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where("? <@ schedule", Time.now.to_i).all.to_a
         # apply all filters
         current_time = DateTime.now
         messages.select do |message|
@@ -121,21 +121,21 @@ class BeaconRegionEvent < Event
         case @protocol
         when BeaconConfiguration::IBEACON_PROTOCOL
             configuration = IBeaconConfiguration.find_by(account_id: account.id, uuid: @uuid, major: @major, minor: @minor)
-            if configuration.enabled
+            if configuration && configuration.enabled
                 [configuration]
             else
                 []
             end
         when BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
             configuration = EddystoneNamespaceConfiguration.find_by(account_id: account.id, namespace: @namespace, instance_id: @instance_id)
-            if configuration.enabled
+            if configuration && configuration.enabled
                 [configuration]
             else
                 []
             end
         when BeaconConfiguration::URL_PROTOCOL
             configuration = UrlConfiguration.find_by(account_id: account.id, url: @url)
-            if configuration.enabled
+            if configuration && configuration.enabled
                 [configuration]
             else
                 []

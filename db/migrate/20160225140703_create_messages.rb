@@ -1,5 +1,6 @@
 class CreateMessages < ActiveRecord::Migration
     def change
+        # enable_extension "btree_gist"
         create_table :messages do |t|
             t.integer :account_id, null: false
             t.string :type, null: false
@@ -10,8 +11,10 @@ class CreateMessages < ActiveRecord::Migration
             t.boolean :archived, default: false
             t.boolean :save_to_inbox, default: true
 
-            t.date :start_date
-            t.date :end_date
+            # schedule holds the days and times of when to push
+            # bug with rails 4
+            # t.tsrange :schedule, default: Float::INFINITY..Float::INFINITY
+            t.int4range :schedule, default: Float::INFINITY..Float::INFINITY
 
             t.integer :approximate_customers_count
 
@@ -19,10 +22,7 @@ class CreateMessages < ActiveRecord::Migration
             t.integer :dwell_time_in_seconds
 
             # limits
-            t.integer :limit_per_day
-            t.integer :limit_per_week
-            t.integer :limit_per_month
-            t.integer :limit_per_year
+            t.jsonb :limits, array: true
 
             # filters
             t.string    :filter_beacon_configuration_tags, array: true
