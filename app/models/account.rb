@@ -5,6 +5,9 @@
 #
 class Account < ActiveRecord::Base
     include Tokenable
+    include MessageLimit::Attribute
+
+    message_limit_attribute :message_limits
 
     before_create :generate_share_key
     after_create :create_active_tags_index

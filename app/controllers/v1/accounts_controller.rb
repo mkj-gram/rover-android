@@ -16,10 +16,7 @@ class V1::AccountsController < V1::ApplicationController
                     "location-tags" => current_account.location_active_tag.tags,
                     "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
-                    "global-message-limit-per-day" => current_account.global_message_limit_per_day,
-                    "global-message-limit-per-week" => current_account.global_message_limit_per_week,
-                    "global-message-limit-per-month" => current_account.global_message_limit_per_month,
-                    "global-message-limit-per-year" => current_account.global_message_limit_per_year,
+                    "message-limits" => current_account.message_limits.map{|limit| serialize_limit(limit)}
                 },
                 "relationships" => {
                     "users" => {
@@ -83,13 +80,16 @@ class V1::AccountsController < V1::ApplicationController
     end
 
     private
+
     def has_access_to_account
         if current_account.id.to_s != params[:id].to_s
             head :unauthorized
         end
     end
+
     def account_params(local_params)
-        local_params.require(:accounts).permit(:title, :global_message_limit_per_day, :global_message_limit_per_week, :global_message_limit_per_month, :global_message_limit_per_year)
+        param_should_be_array(local_params[:accounts], :message_limits)
+        local_params.require(:accounts).permit(:title, :message_limits)
     end
 
 
@@ -113,6 +113,12 @@ class V1::AccountsController < V1::ApplicationController
                     "data" => {type: integration.model_type, "id" => integration.id.to_s}
                 }
             }
+        }
+    end
+    def serialize_limit(limit)
+        {
+            "message-limit" => limit.message_limit,
+            "number-of-days" => limit.number_of_days
         }
     end
 
