@@ -66,6 +66,8 @@ module JsonHelper
         attributes.inject({}) do |hash, (k,v)|
             if v.is_a?(Hash)
                 hash.merge({k.underscore => underscore_attributes(v)})
+            elsif v.is_a?(Array)
+                hash.merge({k.underscore => v.map{|value| underscore_attributes(value)}})
             else
                 hash.merge({k.underscore => v})
             end
