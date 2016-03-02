@@ -127,6 +127,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
 
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
         param_should_be_array(local_params[:proximity_messages], :filter_location_tags)
+        param_should_be_array(local_params[:proximity_messages], :limits)
 
         if local_params[:proximity_messages].has_key?(:trigger_event)
             local_params[:proximity_messages][:trigger_event_id] = Event.event_string_to_event_id(local_params[:proximity_messages][:trigger_event])
@@ -223,10 +224,17 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"schedule-end-date" => message.schedule_end_date,
                 :"schedule-start-time" => message.schedule_start_time,
                 :"schedule-end-time" => message.schedule_end_time,
-                :"location-tags" => message.filter_location_tags
+                :"location-tags" => message.filter_location_tags,
+                :"limits" => message.limits.map{|limit| serialize_limit(limit)}
             }
         }
+    end
 
+    def serialize_limit(limit)
+        {
+            :"message-limit" => limit.message_limit,
+            :"number-of-days" => limit.number_of_days
+        }
     end
 
 end
