@@ -37,6 +37,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('app', 'classes')
 
         # config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations', 'ibeacon_configuration')
+        config.autoload_paths << Rails.root.join('lib', 'message_limit')
         config.autoload_paths << Rails.root.join('lib', 'mail_client')
         config.autoload_paths << Rails.root.join('lib', 'model_broadcaster')
         config.autoload_paths << Rails.root.join('lib', 'rabbit_mq_publisher')

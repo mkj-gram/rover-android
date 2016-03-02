@@ -14,36 +14,16 @@ class CustomerInbox
 
     def message_rate_index
         current_time = Time.now
-        one_year_limit = current_time - 1.year
-        one_month_limit = current_time - 1.month
-        one_week_limit = current_time - 1.week
-        one_day_limit = current_time - 1.day
-        @message_rate_index ||= messages.inject({global_messages_per_year: 0, global_messages_per_month: 0, global_messages_per_week: 0, global_messages_per_day: 0}) do |hash, message|
+        @message_rate_index ||= messages.inject({global_count: Hash.new(0), messages: {}}) do |hash, message|
             key = message.message_id || message.id
-            if !hash.has_key?(key)
-                hash[key] = {
-                    messages_per_day: 0,
-                    messages_per_week: 0,
-                    messages_per_month: 0,
-                    messages_per_year: 0
-                }
+            if !hash[:messages].has_key?(key)
+                hash[:messages][key] = Hash.new(0)
             end
             saved_at = message.id.generation_time
-            if saved_at > one_year_limit
-                hash[key][:messages_per_year] += 1
-                hash[:global_messages_per_year] += 1
-            end
-            if saved_at > one_month_limit
-                hash[key][:messages_per_month] += 1
-                hash[:global_messages_per_month] += 1
-            end
-            if saved_at > one_week_limit
-                hash[key][:messages_per_week] += 1
-                hash[:global_messages_per_week] += 1
-            end
-            if saved_at > one_day_limit
-                hash[key][:messages_per_day] += 1
-                hash[:global_messages_per_day] += 1
+            number_of_days = (current_time - saved_at).to_i / (24 * 60 * 60)
+            number_of_days.times.each do |i|
+                hash[:messages][key][i + 1] += 1
+                hash[:global_count][i + 1] += 1
             end
             hash
         end
@@ -62,26 +42,27 @@ class CustomerInbox
         message_rate = message_rate_index
 
         # loop through pre-adding to the message_rate and then see if we are still within the limit
-        messages_to_add = inbox_messages.select do |inbox_message|
-            # now filter
-            # TODO kinda ugly
-            within_limit = (
-                (account.global_message_limit_per_day.nil?      || message_rate[:global_messages_per_day]    < account.global_message_limit_per_day)     &&
-                (account.global_message_limit_per_week.nil?     || message_rate[:global_messages_per_week]   < account.global_message_limit_per_week)   &&
-                (account.global_message_limit_per_month.nil?    || message_rate[:global_messages_per_month]  < account.global_message_limit_per_month) &&
-                (account.global_message_limit_per_year.nil?     || message_rate[:global_messages_per_year]   < account.global_message_limit_per_year)
-            )
+        # TODO needs fixed for new dynamic limits
+        # messages_to_add = inbox_messages.select do |inbox_message|
+        #     # now filter
+        #     # TODO kinda ugly
+        #     within_limit = (
+        #         (account.global_message_limit_per_day.nil?      || message_rate[:global_messages_per_day]    < account.global_message_limit_per_day)     &&
+        #         (account.global_message_limit_per_week.nil?     || message_rate[:global_messages_per_week]   < account.global_message_limit_per_week)   &&
+        #         (account.global_message_limit_per_month.nil?    || message_rate[:global_messages_per_month]  < account.global_message_limit_per_month) &&
+        #         (account.global_message_limit_per_year.nil?     || message_rate[:global_messages_per_year]   < account.global_message_limit_per_year)
+        #     )
 
-            if within_limit
-                # we increase the global limit counters after selecting a message which passes
-                [:global_messages_per_day, :global_messages_per_week, :global_messages_per_month, :global_messages_per_year].each do |key|
-                    message_rate[key] += 1
-                end
-            else
-                Rails.logger.warn("Message with message_id #{inbox_message.message_id} not within global_limit")
-            end
-            within_limit
-        end
+        #     if within_limit
+        #         # we increase the global limit counters after selecting a message which passes
+        #         [:global_messages_per_day, :global_messages_per_week, :global_messages_per_month, :global_messages_per_year].each do |key|
+        #             message_rate[key] += 1
+        #         end
+        #     else
+        #         Rails.logger.warn("Message with message_id #{inbox_message.message_id} not within global_limit")
+        #     end
+        #     within_limit
+        # end
 
 
         messages_to_add = messages_to_add.select do |inbox_message|

@@ -2,6 +2,9 @@ class Message < ActiveRecord::Base
     include Elasticsearch::Model
     include Elasticsearch::Model::Callbacks
     include FormattableMessage
+    include MessageLimit::Attribute
+
+    message_limit_attribute :limits
     # belongs_to :account
 
 
@@ -37,6 +40,7 @@ class Message < ActiveRecord::Base
             }
         }
     )
+
     def as_indexed_json(opts = {})
         {
             account_id: self.account_id,
@@ -186,17 +190,11 @@ class Message < ActiveRecord::Base
     end
 
     def within_message_limits(message_rate_index)
-        # message_rate_index
-        # {"1" => {message_per_day: 1, message_per_week: 1}}
-        # describes how many of these messages the user has received
-        if !message_rate_index.has_key?(self.id)
-            message_rate_index[self.id] = {
-                messages_per_day: 0,
-                messages_per_week: 0,
-                messages_per_month: 0,
-                messages_per_year: 0
-            }
-        end
+        #  message_rate_index
+        #  {"1" => {1: 4, 2: 1, 3: 1}}
+        #  within 1 day we have 4 messages within 2 days we have 1 message etc..
+        #  describes how many of these messages the user has received
+        # loop through all limits
         (
             within_message_limit_per_day(message_rate_index[self.id][:messages_per_day]) &&
             within_message_limit_per_week(message_rate_index[self.id][:messages_per_week]) &&

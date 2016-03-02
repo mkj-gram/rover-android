@@ -1,6 +1,6 @@
 class CreateMessages < ActiveRecord::Migration
     def change
-        # enable_extension "btree_gist"
+        enable_extension "hstore"
         create_table :messages do |t|
             t.integer :account_id, null: false
             t.string :type, null: false
@@ -22,7 +22,7 @@ class CreateMessages < ActiveRecord::Migration
             t.integer :dwell_time_in_seconds
 
             # limits
-            t.jsonb :limits, array: true
+            t.hstore :limits, array: true
 
             # filters
             t.string    :filter_beacon_configuration_tags, array: true
