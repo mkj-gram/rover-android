@@ -28,6 +28,8 @@ class Event
 
     VALID_EVENT_IDS = Set.new([GEOFENCE_REGION_ENTER_EVENT_ID, GEOFENCE_REGION_EXIT_EVENT_ID, BEACON_REGION_ENTER_EVENT_ID, BEACON_REGION_EXIT_EVENT_ID, APP_OPEN_EVENT_ID, APP_CLOSED_EVENT_ID])
 
+    TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
+
     def self.valid_event_id(event_id)
         VALID_EVENT_IDS.include?(event_id)
     end
@@ -100,8 +102,8 @@ class Event
         @action = event_attributes[:action]
         @customer = event_attributes[:customer]
         @device = event_attributes[:device]
-        # this needs to be the customers time
-        @generation_time = Time.now
+        @generation_time = get_time(event_attributes[:time])
+        Rails.logger.debug("Customers time is #{@generation_time}")
         @included = []
         @attributes = {object: @object, action: @action}
         @new_messages = []
@@ -156,7 +158,7 @@ class Event
         json = {
             data: {
                 type: "events",
-                id: rand(99999),
+                id: @id,
                 attributes: {
                     object: object,
                     action: action
@@ -230,4 +232,21 @@ class Event
         }.call
     end
 
+    private
+
+    def get_time(time)
+        if time.nil?
+            Time.now
+        elsif time.is_a?(Integer)
+            Time.at(time)
+        else
+            # remove the timezone
+            matches = TIME_REGEX.match(time)
+            if matches.size == 1
+                Time.parse(matches[0])
+            else
+                Time.now
+            end
+        end
+    end
 end
