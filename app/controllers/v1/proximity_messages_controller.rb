@@ -205,7 +205,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
     end
 
     def query_archived
-        params.permit(:archived)[:archived].to_s.to_bool
+        params.fetch(:filter, {}).fetch(:archived, "false").to_bool
     end
 
     def serialize_message(message)
