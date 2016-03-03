@@ -488,7 +488,7 @@ CREATE TABLE messages (
     approximate_customers_count integer,
     trigger_event_id integer,
     dwell_time_in_seconds integer,
-    limits hstore[] DEFAULT '{}'::hstore[],
+    limits hstore[] DEFAULT '{"\"message_limit\"=>\"1\", \"number_of_days\"=>\"1\""}'::hstore[],
     filter_beacon_configuration_tags character varying[],
     filter_beacon_configuration_ids integer[],
     filter_location_tags character varying[],
