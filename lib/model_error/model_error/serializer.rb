@@ -1,5 +1,5 @@
 puts "i am required"
-require_relative 'serializer/attributes'
+require 'model_error/serializer/attributes'
 module ModelError
     class Serializer
         include Attributes

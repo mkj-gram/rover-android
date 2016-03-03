@@ -1,4 +1,4 @@
-require_relative 'attribute'
+require 'model_error/serializer/attribute'
 module ModelError
     class Serializer
         module Attributes

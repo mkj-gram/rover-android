@@ -1,6 +1,6 @@
-require_relative 'lib/limit'
-require_relative 'lib/attribute'
-require_relative 'lib/serializer'
+require 'message_limit/limit'
+require 'message_limit/attribute'
+require 'message_limit/serializer'
 
 module MessageLimit
 end
