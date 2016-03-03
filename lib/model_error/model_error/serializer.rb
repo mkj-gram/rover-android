@@ -1,4 +1,3 @@
-puts "i am required"
 require 'model_error/serializer/attributes'
 module ModelError
     class Serializer
