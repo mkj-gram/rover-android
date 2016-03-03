@@ -12,19 +12,33 @@ class CustomerInbox
         300
     end
 
-    def message_rate_index
+    def message_rate_index(global_limits, message_limits)
         current_time = Time.now
-        @message_rate_index ||= messages.inject({global_count: Hash.new(0), messages: {}}) do |hash, message|
-            key = message.message_id || message.id
+        tmp_messages.inject({global_count: Hash.new(0), messages: {}}) do |hash, message|
+            key = message.message_id
+            next if key.nil?
+
             if !hash[:messages].has_key?(key)
                 hash[:messages][key] = Hash.new(0)
             end
+
             saved_at = message.id.generation_time
-            number_of_days = (current_time - saved_at).to_i / (24 * 60 * 60)
-            number_of_days.times.each do |i|
-                hash[:messages][key][i + 1] += 1
-                hash[:global_count][i + 1] += 1
+            number_of_days = ((current_time - saved_at).to_i / (24 * 60 * 60) + 1)
+            # we are going to loop through the global limits and update the index
+            # based on what they are interested in
+
+            global_limits.each do |limiter|
+                if number_of_days <= limiter.number_of_days
+                    hash[:global_count][limiter.number_of_days] += 1
+                end
             end
+
+            message_limits.each do |limiter|
+                if number_of_days <= limiter.number_of_days
+                    hash[:messages][key][limiter.number_of_days] += 1
+                end
+            end
+
             hash
         end
     end
@@ -37,60 +51,33 @@ class CustomerInbox
         end
     end
 
+    # TODO
+    # clean this up a lot maybe put everyting into a helper class
     def add_messages(inbox_messages, account)
+        message_limits = inbox_messages.map{|inbox_message| inbox_message.message.limits }.flatten
+        message_rate = message_rate_index(account.message_limits, message_limits)
 
-        message_rate = message_rate_index
-
-        # loop through pre-adding to the message_rate and then see if we are still within the limit
-        # TODO needs fixed for new dynamic limits
-        # messages_to_add = inbox_messages.select do |inbox_message|
-        #     # now filter
-        #     # TODO kinda ugly
-        #     within_limit = (
-        #         (account.global_message_limit_per_day.nil?      || message_rate[:global_messages_per_day]    < account.global_message_limit_per_day)     &&
-        #         (account.global_message_limit_per_week.nil?     || message_rate[:global_messages_per_week]   < account.global_message_limit_per_week)   &&
-        #         (account.global_message_limit_per_month.nil?    || message_rate[:global_messages_per_month]  < account.global_message_limit_per_month) &&
-        #         (account.global_message_limit_per_year.nil?     || message_rate[:global_messages_per_year]   < account.global_message_limit_per_year)
-        #     )
-
-        #     if within_limit
-        #         # we increase the global limit counters after selecting a message which passes
-        #         [:global_messages_per_day, :global_messages_per_week, :global_messages_per_month, :global_messages_per_year].each do |key|
-        #             message_rate[key] += 1
-        #         end
-        #     else
-        #         Rails.logger.warn("Message with message_id #{inbox_message.message_id} not within global_limit")
-        #     end
-        #     within_limit
-        # end
-
+        messages_to_add = inbox_messages.select do |inbox_message|
+            if account.within_message_limits(message_rate[:global_count])
+                message_rate[:global_count][1] += 1
+                true
+            else
+                false
+            end
+        end
 
         messages_to_add = messages_to_add.select do |inbox_message|
-            # grab the schedule message or proximity message
             message = inbox_message.message
+            key = message.id
             within_limit = true
             if message.has_message_limits
-                within_limit = message.within_message_limits(message_rate)
+                within_limit = message.within_message_limits(message_rate[:messages][key])
             end
 
             if within_limit
-                if !message_rate.has_key?(inbox_message.message_id)
-                    # if this message doesn't exist in the inbox
-                    message_rate[inbox_message.message_id] = {
-                        messages_per_day: 0,
-                        messages_per_week: 0,
-                        messages_per_month: 0,
-                        messages_per_year: 0
-                    }
-
-                end
-                [:messages_per_day, :messages_per_week, :messages_per_month, :messages_per_year].each do |key|
-                    message_rate[inbox_message.message_id][key] += 1
-                end
-            else
-                Rails.logger.warn("Message with message_id #{inbox_message.message_id} not within local_limit")
+                tmp_messages << inbox_message
+                message_rate = message_rate_index(account.message_limits, message_limits)
             end
-            within_limit
         end
 
         # not a bug but build into mongoid and you can't turn it off
@@ -104,6 +91,7 @@ class CustomerInbox
             []
         end
     end
+
 
     def self.add_messages(customer_id, inbox_messages)
 
@@ -127,4 +115,11 @@ class CustomerInbox
             }
         )
     end
+
+    private
+
+    def tmp_messages
+        @tmp_messages ||= messages.dup
+    end
+
 end

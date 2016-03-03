@@ -190,26 +190,19 @@ class Message < ActiveRecord::Base
     end
 
     def within_message_limits(message_rate_index)
+        return true if message_rate_index.nil?
         #  message_rate_index
         #  {"1" => {1: 4, 2: 1, 3: 1}}
         #  within 1 day we have 4 messages within 2 days we have 1 message etc..
         #  describes how many of these messages the user has received
         # loop through all limits
-        (
-            within_message_limit_per_day(message_rate_index[self.id][:messages_per_day]) &&
-            within_message_limit_per_week(message_rate_index[self.id][:messages_per_week]) &&
-            within_message_limit_per_month(message_rate_index[self.id][:messages_per_month]) &&
-            within_message_limit_per_year(message_rate_index[self.id][:messages_per_year])
-        )
+        limits.all? do |limiter|
+            message_rate_index[limiter.number_of_days] < limiter.message_limit
+        end
     end
 
     def has_message_limits
-        !(
-            self.limit_per_day.nil? ||
-            self.limit_per_week.nil? ||
-            self.limit_per_month.nil? ||
-            self.limit_per_year.nil?
-        )
+        limits.any?
     end
 
     private
