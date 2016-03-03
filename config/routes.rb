@@ -17,7 +17,7 @@ Rails.application.routes.draw do
         #     end
         # end
 
-        resources :accounts, only: [:show]
+        resources :accounts, only: [:show, :update]
 
         resources :users, except:[:create] do
 
