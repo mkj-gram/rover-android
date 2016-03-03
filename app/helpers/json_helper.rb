@@ -52,7 +52,7 @@ module JsonHelper
 
         validate_json_schema
 
-        data.map!{|sub_data| {sub_data[:type].underscore => {id: sub_data[:id]}.merge!(underscore_attributes(sub_data[:attributes])).merge!(get_relationship_data(sub_data[:relationships]))}}
+        data.map!{|sub_data| {sub_data[:type].underscore => {id: sub_data[:id]}.merge!(underscore_attribute(sub_data[:attributes])).merge!(get_relationship_data(sub_data[:relationships]))}}
         if single_record
             return params.merge!({:data => data.first})
         else
@@ -62,15 +62,19 @@ module JsonHelper
 
     private
 
-    def underscore_attributes(attributes)
-        attributes.inject({}) do |hash, (k,v)|
-            if v.is_a?(Hash)
-                hash.merge({k.underscore => underscore_attributes(v)})
-            elsif v.is_a?(Array)
-                hash.merge({k.underscore => v.map{|value| underscore_attributes(value)}})
-            else
-                hash.merge({k.underscore => v})
+    def underscore_attribute(attribute)
+        if attribute.is_a?(Hash)
+            attribute.inject({}) do |hash, (k,v)|
+                if v.is_a?(Hash)
+                    hash.merge({k.underscore => underscore_attribute(v)})
+                elsif v.is_a?(Array)
+                    hash.merge({k.underscore => v.map{|value| underscore_attribute(value)}})
+                else
+                    hash.merge({k.underscore => v})
+                end
             end
+        else
+            attribute
         end
     end
 
