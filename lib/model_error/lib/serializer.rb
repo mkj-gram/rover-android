@@ -1,4 +1,5 @@
-require 'lib/serializer/attributes'
+puts "i am required"
+require_relative 'serializer/attributes'
 module ModelError
     class Serializer
         include Attributes
