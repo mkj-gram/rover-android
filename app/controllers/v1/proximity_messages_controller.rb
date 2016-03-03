@@ -224,8 +224,15 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"schedule-end-date" => message.schedule_end_date,
                 :"schedule-start-time" => message.schedule_start_time,
                 :"schedule-end-time" => message.schedule_end_time,
+                :"schedule-monday" => message.schedule_monday,
+                :"schedule-tuesday" => message.schedule_tuesday,
+                :"schedule-wednesday" => message.schedule_wednesday,
+                :"schedule-thursday" => message.schedule_thursday,
+                :"schedule-friday" => message.schedule_friday,
+                :"schedule-saturday" => message.schedule_saturday,
+                :"schedule-sunday" => message.schedule_sunday,
                 :"location-tags" => message.filter_location_tags,
-                :"limits" => message.limits.map{|limit| serialize_limit(limit)}
+                :"limits" => message.limits.map{|limit| serialize_limit(limit)},
             }
         }
     end

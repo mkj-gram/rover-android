@@ -16,6 +16,14 @@ class CreateMessages < ActiveRecord::Migration
             # t.tsrange :schedule, default: Float::INFINITY..Float::INFINITY
             t.int4range :schedule, default: Float::INFINITY..Float::INFINITY
 
+            t.boolean :schedule_monday, default: true
+            t.boolean :schedule_tuesday, default: true
+            t.boolean :schedule_wednesday, default: true
+            t.boolean :schedule_thursday, default: true
+            t.boolean :schedule_friday, default: true
+            t.boolean :schedule_saturday, default: true
+            t.boolean :schedule_sunday, default: true
+
             t.integer :approximate_customers_count
 
             t.integer :trigger_event_id

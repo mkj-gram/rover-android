@@ -89,7 +89,7 @@ class Event
     end
 
 
-    attr_reader :account, :customer, :device, :object, :action
+    attr_reader :account, :customer, :device, :object, :action, :generation_time
     attr_reader :new_messages
     # attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
 
@@ -100,6 +100,8 @@ class Event
         @action = event_attributes[:action]
         @customer = event_attributes[:customer]
         @device = event_attributes[:device]
+        # this needs to be the customers time
+        @generation_time = Time.now
         @included = []
         @attributes = {object: @object, action: @action}
         @new_messages = []
@@ -113,6 +115,10 @@ class Event
     def save
         # save works the opposite way than to_json
         # it bubbles up from the children appending their attributes
+    end
+
+    def today_schedule_column
+        "schedule_#{Date::DAYNAMES[generation_time.wday].downcase}"
     end
 
     def message_opts

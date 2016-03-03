@@ -106,7 +106,7 @@ class BeaconRegionEvent < Event
         return nil if beacon_configuration.nil?
         # has to perform all filtering in memory
         # first find all messages where the trigger_event_id is the type of event which occured
-        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where("? <@ schedule", Time.now.to_i).all.to_a
+        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ schedule", self.generation_time.to_i).all.to_a
         # apply all filters
         current_time = DateTime.now
         messages.select do |message|
