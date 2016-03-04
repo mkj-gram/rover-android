@@ -48,7 +48,8 @@ module CustomerSegment
                 end
             end
 
-            def within_segment(device)
+            def within_segment(opts = {})
+                device = opts[:device]
                 if device.is_a?(::CustomerDevice)
                     value = get_value_for(device)
                     comparer.check(value)

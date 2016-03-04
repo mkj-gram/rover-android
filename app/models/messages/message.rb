@@ -188,10 +188,7 @@ class Message < ActiveRecord::Base
     end
 
     def apply_customer_filters(customer, device)
-        # this can be a module since it will be used in push messages
-        # and experiences
-        # need a common way to store these filters
-        true
+        self.customer_segments.all?{|customer_segment| customer_segment.within_segment(customer: customer, device: device)}
     end
 
     def within_message_limits(message_rate_index)

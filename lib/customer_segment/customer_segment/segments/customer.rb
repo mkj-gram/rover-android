@@ -40,7 +40,8 @@ module CustomerSegment
                 end
             end
 
-            def within_segment(customer)
+            def within_segment(opts = {})
+                customer = opts[:customer]
                 if customer.is_a?(::Customer)
                     value = get_value_for(customer)
                     comparer.check(value)
