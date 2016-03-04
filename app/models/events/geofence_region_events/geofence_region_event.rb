@@ -63,7 +63,7 @@ class GeofenceRegionEvent < Event
     end
 
     def get_message_for_location(location_configuration)
-        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ schedule", self.generation_time.to_i).all.to_a
+        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", self.generation_time.to_i).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
         # apply all filters
         current_time = DateTime.now
         messages.select do |message|

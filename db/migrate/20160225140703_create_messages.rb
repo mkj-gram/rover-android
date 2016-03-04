@@ -14,7 +14,9 @@ class CreateMessages < ActiveRecord::Migration
             # schedule holds the days and times of when to push
             # bug with rails 4
             # t.tsrange :schedule, default: Float::INFINITY..Float::INFINITY
-            t.int4range :schedule, default: Float::INFINITY..Float::INFINITY
+            t.int4range :date_schedule, default: Float::INFINITY..Float::INFINITY
+            # defaults to the whole day ie between 0 minutes and 1440 mins end of day
+            t.int4range :time_schedule, default: 0..1440
 
             t.boolean :schedule_monday, default: true
             t.boolean :schedule_tuesday, default: true

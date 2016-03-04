@@ -43,11 +43,14 @@ class Message < ActiveRecord::Base
         }
     )
 
+    after_initialize :set_proper_time_schedule_range
     after_initialize :set_defaults, unless: :persisted?
     before_save :set_approximate_customers_count
 
-    # bad name...
-    validate :proper_schedule
+    validate :valid_date_schedule
+
+    validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
+    validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
 
     def as_indexed_json(opts = {})
         {
@@ -84,47 +87,37 @@ class Message < ActiveRecord::Base
     end
 
     def schedule_start_time
-        @schedule_start_time ||= if schedule_start_parsed_time
-            schedule_start_parsed_time.strftime("%H:%M:%S")
-        else
-            nil
-        end
+        return self.time_schedule.first
     end
 
     def schedule_end_time
-        @schedule_end_time ||= if schedule_end_parsed_time
-            schedule_end_parsed_time.strftime("%H:%M:%S")
-        else
-            nil
-        end
+        return self.time_schedule.last
     end
 
     def schedule_start_date=(val)
         val = val.is_a?(DateTime) ?  val.to_date : val
         val = val.is_a?(Date) ? val.to_s : val
         @schedule_start_date = val
-        set_schedule! if valid_date(val)
+        set_date_schedule! if valid_date(val)
     end
 
     def schedule_end_date=(val)
         val = val.is_a?(DateTime) ?  val.to_date : val
         val = val.is_a?(Date) ? val.to_s : val
         @schedule_end_date = val
-        set_schedule! if valid_date(val)
+        set_date_schedule! if valid_date(val)
     end
 
     def schedule_start_time=(val)
-        val = val.is_a?(DateTime) ? val.to_time : val
-        val = val.is_a?(Time) ? val.strftime("%H:%M:%S") : val
+        # integer of minutes
         @schedule_start_time = val
-        set_schedule! if valid_time(val)
+        self.time_schedule = Range.new(@schedule_start_time, schedule_end_time)
     end
 
     def schedule_end_time=(val)
-        val = val.is_a?(DateTime) ? val.to_time : val
-        val = val.is_a?(Time) ? val.strftime("%H:%M:%S") : val
+        val = 1440 if val.nil?
         @schedule_end_time = val
-        set_schedule! if valid_time(val)
+        self.time_schedule = Range.new(schedule_start_time, @schedule_end_time)
     end
 
 
@@ -133,50 +126,38 @@ class Message < ActiveRecord::Base
         return !!(date =~ /^\d{4}\-\d{2}\-\d{2}$/)
     end
 
-    def valid_time(time)
-        return true if time == Float::INFINITY
-        return !!(time =~ /^\d{2}\:\d{2}$/)
-    end
-
     def schedule_start_parsed_time
-        if self.schedule && self.schedule.first != -Float::INFINITY
-            Time.at(self.schedule.first)
+        if self.date_schedule && self.date_schedule.first != -Float::INFINITY
+            Time.at(self.date_schedule.first)
         else
             nil
         end
     end
 
     def schedule_end_parsed_time
-        if self.schedule && self.schedule.last != Float::INFINITY
-            Time.at(self.schedule.last)
+        if self.date_schedule && self.date_schedule.last != Float::INFINITY
+            Time.at(self.date_schedule.last)
         else
             nil
         end
     end
 
-    def set_schedule!
+    def set_date_schedule!
         # build the start_date
         if schedule_start_date
-            if schedule_start_time
-                start_time = Time.parse("#{schedule_start_date} #{schedule_start_time}").to_i
-            else
-                start_time = Time.parse("#{schedule_start_date} 00:00:00").to_i
-            end
+            start_date = Time.parse("#{schedule_start_date} 00:00:00").to_i
         else
-            start_time = BigDecimal.new("-1.0")/ BigDecimal.new("0.0")
+            start_date = -Float::INFINITY
         end
 
         if schedule_end_date
-            if schedule_end_time
-                end_time = Time.parse("#{schedule_end_date} #{schedule_end_time}").to_i
-            else
-                end_time = Time.parse("#{schedule_end_date} 24:00:00").to_i
-            end
+            end_date = Time.parse("#{schedule_end_date} 00:00:00").to_i
         else
-            end_time = BigDecimal.new("1.0")/ BigDecimal.new("0.0")
+            end_date = Float::INFINITY
         end
-        puts "start_time #{start_time} end_time #{end_time}"
-        self.schedule = Range.new(start_time, end_time)
+
+        puts "start_date #{start_date} end_date #{end_date}"
+        self.date_schedule = Range.new(start_date, end_date)
     end
 
     def within_schedule(current_time)
@@ -214,24 +195,21 @@ class Message < ActiveRecord::Base
 
     def set_defaults
         self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]
+        self.time_schedule = Range.new(0,1440)
     end
 
-    def proper_schedule
+    def set_proper_time_schedule_range
+        self.time_schedule = Range.new(schedule_start_time, schedule_end_time - 1)
+    end
 
+
+    def valid_date_schedule
         if @schedule_start_date && !valid_date(@schedule_start_date)
-            errors.add(:schedule_start_date, "invalid")
+            errors.add(:schedule_start_date, "invalid format expecting yyyy-mm-dd")
         end
 
         if @schedule_end_date && !valid_date(@schedule_end_date)
-            errors.add(:schedule_end_date, "invalid")
-        end
-
-        if @schedule_start_time && !valid_time(@schedule_start_time)
-            errors.add(:schedule_start_time, "invalid")
-        end
-
-        if @schedule_end_time && !valid_time(@schedule_end_time)
-            errors.add(:schedule_end_time, "invalid")
+            errors.add(:schedule_end_date, "invalid format expecting yyyy-mm-dd")
         end
     end
 
