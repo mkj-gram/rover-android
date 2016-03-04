@@ -2,7 +2,6 @@ module MessageLimit
     class Limit
         attr_reader :message_limit, :number_of_minutes
         def initialize(opts)
-            puts "wtf #{opts}"
             opts = opts.with_indifferent_access
             @message_limit = opts["message_limit"].to_i if opts.has_key?("message_limit")
 
