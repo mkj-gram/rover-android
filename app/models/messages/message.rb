@@ -202,7 +202,7 @@ class Message < ActiveRecord::Base
         #  describes how many of these messages the user has received
         # loop through all limits
         limits.all? do |limiter|
-            message_rate_index[limiter.number_of_days] < limiter.message_limit
+            message_rate_index[limiter.number_of_minutes] < limiter.message_limit
         end
     end
 

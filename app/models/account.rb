@@ -106,7 +106,7 @@ class Account < ActiveRecord::Base
         # {1 => 2, 2 => 2, 3 => 1}
         # 2 messages within 1 day, 2 messages within 2 days, 1 message within 3 days
         message_limits.all? do |limiter|
-            inbox_global_message_rate[limiter.number_of_days] < limiter.message_limit
+            inbox_global_message_rate[limiter.number_of_minutes] < limiter.message_limit
         end
     end
 

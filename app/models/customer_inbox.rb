@@ -23,19 +23,20 @@ class CustomerInbox
             end
 
             saved_at = message.id.generation_time
-            number_of_days = ((current_time - saved_at).to_i / (24 * 60 * 60) + 1)
+            number_of_minutes = ((current_time - saved_at).to_i / 60) + 1
+            puts "number of minutes #{number_of_minutes}"
             # we are going to loop through the global limits and update the index
             # based on what they are interested in
 
             global_limits.each do |limiter|
-                if number_of_days <= limiter.number_of_days
-                    hash[:global_count][limiter.number_of_days] += 1
+                if number_of_minutes <= limiter.number_of_minutes
+                    hash[:global_count][limiter.number_of_minutes] += 1
                 end
             end
 
             message_limits.each do |limiter|
-                if number_of_days <= limiter.number_of_days
-                    hash[:messages][key][limiter.number_of_days] += 1
+                if number_of_minutes <= limiter.number_of_minutes
+                    hash[:messages][key][limiter.number_of_minutes] += 1
                 end
             end
 
