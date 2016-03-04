@@ -24,7 +24,6 @@ class CustomerInbox
 
             saved_at = message.id.generation_time
             number_of_minutes = ((current_time - saved_at).to_i / 60) + 1
-            puts "number of minutes #{number_of_minutes}"
             # we are going to loop through the global limits and update the index
             # based on what they are interested in
 
