@@ -47,6 +47,7 @@ class Message < ActiveRecord::Base
     after_initialize :set_defaults, unless: :persisted?
     before_save :set_approximate_customers_count
 
+    validates :title, presence: true
     validate :valid_date_schedule
 
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
