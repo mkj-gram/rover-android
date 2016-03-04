@@ -46,6 +46,9 @@ class Message < ActiveRecord::Base
     after_initialize :set_defaults, unless: :persisted?
     before_save :set_approximate_customers_count
 
+    # bad name...
+    validate :proper_schedule
+
     def as_indexed_json(opts = {})
         {
             account_id: self.account_id,
@@ -132,7 +135,7 @@ class Message < ActiveRecord::Base
 
     def valid_time(time)
         return true if time == Float::INFINITY
-        return !!(time =~ /^\d{2}\:\d{2}\:\d{2}$/)
+        return !!(time =~ /^\d{2}\:\d{2}$/)
     end
 
     def schedule_start_parsed_time
@@ -211,6 +214,25 @@ class Message < ActiveRecord::Base
 
     def set_defaults
         self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]
+    end
+
+    def proper_schedule
+
+        if @schedule_start_date && !valid_date(@schedule_start_date)
+            errors.add(:schedule_start_date, "invalid")
+        end
+
+        if @schedule_end_date && !valid_date(@schedule_end_date)
+            errors.add(:schedule_end_date, "invalid")
+        end
+
+        if @schedule_start_time && !valid_time(@schedule_start_time)
+            errors.add(:schedule_start_time, "invalid")
+        end
+
+        if @schedule_end_time && !valid_time(@schedule_end_time)
+            errors.add(:schedule_end_time, "invalid")
+        end
     end
 
     def set_approximate_customers_count

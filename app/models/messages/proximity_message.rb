@@ -14,7 +14,7 @@ class ProximityMessage < Message
     default_empty_array_attribute :filter_location_tags
     default_empty_array_attribute :filter_location_ids
 
-    # validates :legal_trigger_event_id
+    validate :legal_trigger_event_id
 
 
     def to_inbox_message(opts)
@@ -43,6 +43,9 @@ class ProximityMessage < Message
     private
 
     def legal_trigger_event_id
+        if published && !Event.valid_event_id(self.trigger_event_id)
+            errors.add(:trigger_event_id, "invalid")
+        end
         # if published then the trigger_event_id must also be valid
         # if published && !Event.valid_event_id(trigger_event_id)
         #     errors.add(:trigger_event_id, "invalid")
