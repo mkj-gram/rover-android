@@ -89,7 +89,7 @@ class V1::AccountsController < V1::ApplicationController
 
     def account_params(local_params)
         param_should_be_array(local_params[:accounts], :message_limits)
-        local_params.require(:accounts).permit(:title, {:message_limits => [:message_limit, :number_of_minutes, :number_of_days]})
+        local_params.require(:accounts).permit(:title, {:message_limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]})
     end
 
 

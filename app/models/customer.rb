@@ -179,7 +179,7 @@ class Customer
             begin
                 self.__elasticsearch__.delete_document
             rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
-                Rails.logger.wanr(e)
+                Rails.logger.warn(e)
             end
         elsif identifier.nil? && devices.any?
             __elasticsearch__.index_document

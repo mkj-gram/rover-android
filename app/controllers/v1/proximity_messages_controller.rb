@@ -147,7 +147,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
             :schedule_end_date,
             :schedule_start_time,
             :schedule_end_time,
-            :limits => [:message_limit, :number_of_minutes, :number_of_days]
+            :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]
         )
     end
 
