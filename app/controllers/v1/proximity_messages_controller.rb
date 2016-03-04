@@ -147,7 +147,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
             :schedule_end_date,
             :schedule_start_time,
             :schedule_end_time,
-            :limits => [:message_limit, :number_of_days]
+            :limits => [:message_limit, :number_of_minutes]
         )
     end
 
@@ -240,7 +240,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
     def serialize_limit(limit)
         {
             :"message-limit" => limit.message_limit,
-            :"number-of-days" => limit.number_of_days
+            :"number-of-days" => limit.number_of_minutes
         }
     end
 
