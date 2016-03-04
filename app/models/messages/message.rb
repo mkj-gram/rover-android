@@ -43,6 +43,9 @@ class Message < ActiveRecord::Base
         }
     )
 
+    after_initialize :set_defaults, unless: :persisted?
+    before_save :set_approximate_customers_count
+
     def as_indexed_json(opts = {})
         {
             account_id: self.account_id,
@@ -209,35 +212,14 @@ class Message < ActiveRecord::Base
 
     private
 
-    def within_message_limit_per_day(current_message_rate_per_day)
-        if self.limit_per_day
-            current_message_rate_per_day < self.limit_per_day
-        else
-            true
-        end
+    def set_defaults
+        self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_minutes: 1440)]
     end
 
-    def within_message_limit_per_week(current_message_rate_per_week)
-        if self.limit_per_week
-            current_message_rate_per_week < self.limit_per_week
+    def set_approximate_customers_count
+        if self.new_record?
+            self.approximate_customers_count ||= self.account.customers_count
         else
-            true
-        end
-    end
-
-    def within_message_limit_per_month(current_message_rate_per_month)
-        if self.limit_per_month
-            current_message_rate_per_month < self.limit_per_month
-        else
-            true
-        end
-    end
-
-    def within_message_limit_per_year(current_message_rate_per_year)
-        if self.limit_per_year
-            current_message_rate_per_year < self.limit_per_year
-        else
-            true
         end
     end
 
