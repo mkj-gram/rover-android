@@ -239,6 +239,8 @@ class Event
             Time.now
         elsif time.is_a?(Integer)
             Time.at(time)
+        elsif time.is_a?(Float)
+            Time.at(time)
         else
             # remove the timezone
             matches = TIME_REGEX.match(time)
