@@ -54,7 +54,7 @@ class V1::CustomersController < V1::ApplicationController
     private
 
     def set_customer
-        @customer = Customer.find_by_id(params[:id])
+        @customer = Customer.find(params[:id])
         head :not_found if @customer.nil?
     end
 
