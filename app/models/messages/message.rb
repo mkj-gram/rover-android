@@ -210,7 +210,7 @@ class Message < ActiveRecord::Base
     private
 
     def set_defaults
-        self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_minutes: 1440)]
+        self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]
     end
 
     def set_approximate_customers_count

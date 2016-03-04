@@ -232,7 +232,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"schedule-saturday" => message.schedule_saturday,
                 :"schedule-sunday" => message.schedule_sunday,
                 :"location-tags" => message.filter_location_tags,
-                :"limits" => message.limits.map{|limit| serialize_limit(limit)},
+                :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
             }
         }
     end

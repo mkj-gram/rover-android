@@ -16,7 +16,7 @@ class V1::AccountsController < V1::ApplicationController
                     "location-tags" => current_account.location_active_tag.tags,
                     "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
-                    "message-limits" => current_account.message_limits.map{|limit| serialize_limit(limit)}
+                    "message-limits" => current_account.message_limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)}
                 },
                 "relationships" => {
                     "users" => {
@@ -115,12 +115,7 @@ class V1::AccountsController < V1::ApplicationController
             }
         }
     end
-    def serialize_limit(limit)
-        {
-            "message-limit" => limit.message_limit,
-            "number-of-minutes" => limit.number_of_minutes
-        }
-    end
+
 
     def serialize_integration(integration)
         json = {

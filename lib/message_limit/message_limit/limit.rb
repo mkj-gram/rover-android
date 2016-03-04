@@ -1,12 +1,16 @@
 module MessageLimit
     class Limit
-        attr_reader :message_limit, :number_of_minutes, :number_of_hours, :number_of_days
+        attr_reader :message_limit, :number_of_minutes, :number_of_hours, :number_of_days, :number_of_months
         def initialize(opts)
             opts = opts.with_indifferent_access
             @message_limit = opts["message_limit"].to_i if opts.has_key?("message_limit")
+            @number_of_months = opts["number_of_months"].to_i if opts.has_key?("number_of_months")
             @number_of_days = opts["number_of_days"].to_i if opts.has_key?("number_of_days")
             @number_of_hours = opts["number_of_hours"].to_i if opts.has_key?("number_of_hours")
-            if @number_of_days
+
+            if @number_of_months
+                @number_of_minutes = @number_of_months * 30 * 24 * 60
+            elsif @number_of_days
                 @number_of_minutes = @number_of_days * 24 * 60
             elsif @number_of_hours
                 @number_of_minutes = @number_of_hours * 60
