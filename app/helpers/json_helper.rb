@@ -52,7 +52,8 @@ module JsonHelper
 
         validate_json_schema
 
-        data.map!{|sub_data| {sub_data[:type].underscore => {id: sub_data[:id]}.merge!(underscore_attribute(sub_data[:attributes])).merge!(get_relationship_data(sub_data[:relationships]))}}
+        except_path = opts.delete(:except).freeze
+        data.map!{|sub_data| {sub_data[:type].underscore => {id: sub_data[:id]}.merge!(underscore_attribute(sub_data[:attributes], except_path, "attributes")).merge!(get_relationship_data(sub_data[:relationships]))}}
         if single_record
             return params.merge!({:data => data.first})
         else
@@ -62,15 +63,20 @@ module JsonHelper
 
     private
 
-    def underscore_attribute(attribute)
+    def underscore_attribute(attribute, except_path, current_path)
         if attribute.is_a?(Hash)
             attribute.inject({}) do |hash, (k,v)|
-                if v.is_a?(Hash)
-                    hash.merge({k.underscore => underscore_attribute(v)})
-                elsif v.is_a?(Array)
-                    hash.merge({k.underscore => v.map{|value| underscore_attribute(value)}})
+                next_path = current_path + ".#{k}"
+                if next_path != except_path
+                    if v.is_a?(Hash)
+                        hash.merge({k.underscore => underscore_attribute(v, except_path, next_path)})
+                    elsif v.is_a?(Array)
+                        hash.merge({k.underscore => v.map{|value| underscore_attribute(value, except_path, next_path)}})
+                    else
+                        hash.merge({k.underscore => v})
+                    end
                 else
-                    hash.merge({k.underscore => v})
+                    hash.merge({k => v})
                 end
             end
         else

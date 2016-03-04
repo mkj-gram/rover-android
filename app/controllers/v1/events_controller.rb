@@ -4,7 +4,7 @@ class V1::EventsController < V1::ApplicationController
 
 
     def create
-        json = flatten_request({single_record: true})
+        json = flatten_request({single_record: true, except: "attributes.user.traits"})
 
         event_attributes = json.dig(:data, :events)
 
