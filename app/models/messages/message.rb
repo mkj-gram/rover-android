@@ -3,7 +3,9 @@ class Message < ActiveRecord::Base
     include Elasticsearch::Model::Callbacks
     include FormattableMessage
     include MessageLimit::Attribute
+    include CustomerSegment::Attribute
 
+    segment_attribute :customer_segments
     message_limit_attribute :limits
     # belongs_to :account
 
