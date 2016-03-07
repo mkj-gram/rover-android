@@ -98,6 +98,7 @@ class Message < ActiveRecord::Base
     def schedule_start_date=(val)
         val = val.is_a?(DateTime) ?  val.to_date : val
         val = val.is_a?(Date) ? val.to_s : val
+        val = val.nil? ? -Float::INFINITY : val
         @schedule_start_date = val
         set_date_schedule! if valid_date(val)
     end
@@ -105,6 +106,7 @@ class Message < ActiveRecord::Base
     def schedule_end_date=(val)
         val = val.is_a?(DateTime) ?  val.to_date : val
         val = val.is_a?(Date) ? val.to_s : val
+        val = val.nil? ? Float::INFINITY : val
         @schedule_end_date = val
         set_date_schedule! if valid_date(val)
     end
@@ -123,7 +125,7 @@ class Message < ActiveRecord::Base
 
 
     def valid_date(date)
-        return true if date == Float::INFINITY
+        return true if date == Float::INFINITY || date == -Float::INFINITY
         return !!(date =~ /^\d{4}\-\d{2}\-\d{2}$/)
     end
 
@@ -145,13 +147,13 @@ class Message < ActiveRecord::Base
 
     def set_date_schedule!
         # build the start_date
-        if schedule_start_date
+        if schedule_start_date && schedule_start_date != -Float::INFINITY
             start_date = Time.parse("#{schedule_start_date} 00:00:00").to_i
         else
             start_date = -Float::INFINITY
         end
 
-        if schedule_end_date
+        if schedule_end_date && schedule_end_date != Float::INFINITY
             end_date = Time.parse("#{schedule_end_date} 00:00:00").to_i
         else
             end_date = Float::INFINITY
