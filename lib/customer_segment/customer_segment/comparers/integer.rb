@@ -2,6 +2,17 @@ module CustomerSegment
     module Comparers
         class Integer < Comparer
 
+            attr_reader :range
+            def initialize(opts)
+                super
+                lower_bound, upper_bound = @value.split(",")
+                if lower_bound && upper_bound
+                    @range = Range.new(lower_bound, upper_bound)
+                else
+                    Rails.logger.warn("Tried creating an integer comparer with a illegal range")
+                end
+            end
+
             def check(v)
                 case @method
                 when Comparers::Methods::EQUAL
@@ -20,6 +31,8 @@ module CustomerSegment
                     v > @value
                 when Comparers::Methods::GREATER_THAN_OR_EQUAL
                     v >= @value
+                when Comparers::Methods::RANGE
+                    range.include?(v)
                 else
                     false
                 end
@@ -153,6 +166,28 @@ module CustomerSegment
                             }
                         }
                     }
+                when Comparers::Methods::RANGE
+                    if range
+                        {
+                            filter: {
+                                bool: {
+                                    must: [
+                                        {
+                                            range: {
+                                                attribute_name => {
+                                                    from: range.first,
+                                                    to: range.last
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    else
+                        {}
+                    end
+
                 else
                     {}
                 end
