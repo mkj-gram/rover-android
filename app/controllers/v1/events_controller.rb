@@ -120,7 +120,7 @@ class V1::EventsController < V1::ApplicationController
     end
 
     def customer_params(user_attributes)
-        allowed_params = user_attributes.permit(:identifier, :name, :email, :phone_number, {:tags => []})
+        allowed_params = user_attributes.permit(:identifier, :name, :email, :phone_number, {:tags => []}, :age, :gender)
         # we have to manually allow traits since strong params doesn't allow unknown hashes
         allowed_params[:traits] = user_attributes.dig(:traits) || {}
         allowed_params[:account_id] = current_account.id

@@ -6,6 +6,8 @@ class Customer
     field :identifier, type: String
     field :name, type: String
     field :email, type: String
+    field :age, type: Integer
+    field :gender, type: String
     field :phone_number, type: String
     field :tags, type: Array
     field :traits, type: Hash
@@ -16,13 +18,68 @@ class Customer
 
     embeds_many :devices, class_name: "CustomerDevice"
 
-    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2 }) do
+    def self.search_string_mapping
+        {
+            type: "string",
+            index: "not_analyzed",
+            fields: {
+                reversed: {
+                    type: "string",
+                    analyzer: "reversed",
+                    search_analyzer: "reversed",
+                    store: "no"
+                },
+                trigrams: {
+                    type: "string",
+                    analyzer: "trigrams",
+                    search_analyzer: "simple",
+                    store: "no"
+                }
+            }
+        }
+    end
+
+    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2 }).merge(
+        {
+            analysis:  {
+                filter: {
+                    trigram_filter: {
+                        type: "ngram",
+                        min_gram: 3,
+                        max_gram: 3,
+                        token_chars: ["letter", "digit"]
+                    }
+                },
+                analyzer: {
+                    trigrams: {
+                        type: "custom",
+                        tokenizer: "keyword",
+                        filter: [
+                            "lowercase",
+                            "trigram_filter"
+                        ]
+                    },
+                    reversed: {
+                        type: "custom",
+                        tokenizer: "keyword",
+                        filter: [
+                            "lowercase",
+                            "reverse"
+                        ]
+                    }
+                }
+            }
+        }
+
+    ) do
         mapping do
-            indexes :account_id, type: 'long', index: 'not_analyzed'
+            indexes :account_id, type: 'integer', index: 'not_analyzed'
             indexes :identifier, type: 'string', index: 'not_analyzed'
-            indexes :name, type: 'string', index: 'not_analyzed'
-            indexes :email, type: 'string', index: 'not_analyzed'
-            indexes :phone_number, type: 'string', index: 'not_analyzed'
+            indexes :name, Customer.search_string_mapping
+            indexes :email, Customer.search_string_mapping
+            indexes :phone_number, Customer.search_string_mapping
+            indexes :age, type: 'integer'
+            indexes :gender, type: 'string', index: 'not_analyzed'
             indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :created_at, type: 'date', index: 'not_analyzed'
             indexes :traits, type: 'object'
@@ -79,14 +136,32 @@ class Customer
             phone_number: self.phone_number,
             tags: self.tags,
             traits: self.traits,
+            age: self.age,
+            gender: self.gender,
             devices: devices_as_indexed_json(options)
         }
+    end
+
+
+
+    def self.get_index_name(account)
+        return "account_#{account.id}_customers"
     end
 
     def self.create_index!(opts = {})
         client = Customer.__elasticsearch__.client
         settings = Customer.settings.to_hash.merge(BeaconConfigurationVisit.settings.to_hash)
         mappings = Customer.mappings.to_hash.merge(BeaconConfigurationVisit.mappings.to_hash)
+        dynamic_templates = [
+            {
+                strings: {
+                    match_mapping_type: "string",
+                    mapping: Customer.search_string_mapping
+                }
+            }
+        ]
+
+        mappings[:customer][:dynamic_templates] = dynamic_templates
 
         client.indices.create(index: Customer.index_name, body: {
                                 settings: settings.to_hash,
@@ -102,6 +177,15 @@ class Customer
         @inbox ||= CustomerInbox.find(self.id)
         @inbox = CustomerInbox.create(customer_id: self.id) if @inbox.nil?
         return @inbox
+    end
+
+    def gender=(val)
+        # make sure gender is always in the form of male or female
+        if val == "male" || val == "female"
+            self[:gender] = val
+        else
+            self.gender = nil
+        end
     end
 
     # def update_attributes_async(new_attributes)
