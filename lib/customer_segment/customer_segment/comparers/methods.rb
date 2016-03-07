@@ -1,8 +1,8 @@
 module CustomerSegment
     module Comparers
         module Methods
-            EQUAL = "is".freeze
-            NOT_EQUAL = "is_not".freeze
+            EQUAL = "equal".freeze
+            NOT_EQUAL = "not_equal".freeze
             STARTS_WITH = "start_with".freeze
             ENDS_WITH = "ends_with".freeze
             CONTAINS = "contains".freeze
@@ -13,6 +13,7 @@ module CustomerSegment
             GREATER_THAN = "greater_than".freeze
             LESS_THAN_OR_EQUAL = "less_than_or_equal".freeze
             GREATER_THAN_OR_EQUAL = "greater_than_or_equal".freeze
+            RANGE = "range".freeze
         end
     end
 end

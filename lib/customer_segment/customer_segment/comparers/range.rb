@@ -1,6 +1,6 @@
 module CustomerSegment
     module Comparers
-        class Integer < Comparer
+        class Range < Comparer
 
             def check(v)
                 case @method

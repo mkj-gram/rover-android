@@ -12,7 +12,8 @@ module CustomerSegment
                 "email" => :string,
                 "phone_number" => :string,
                 "tags" => :array,
-                "traits" => :hash
+                "traits" => :hash,
+                "something" => :integer
             }
 
             # "name" => CustomerSegment::AttributeType.new(type: :string),
@@ -37,6 +38,31 @@ module CustomerSegment
                 super
                 if opts.has_key?("comparer")
                     @comparer = CustomerSegment::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
+                end
+            end
+
+            def compute_segment_count(account)
+                # use the comparer to build an elasticsearch query
+                # find the count
+                if @comparer
+                    query = {
+                        filter: {
+                            bool: {
+                                must: [
+                                    {
+                                        term: {
+                                            account_id: account.id
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                    query.deep_merge!(@comparer.get_elasticsearch_query(attribute_name)) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
+                    @segment_count = Elasticsearch::Model.search(query, [::Customer]).count
+                    return @segment_count
+                else
+                    0
                 end
             end
 

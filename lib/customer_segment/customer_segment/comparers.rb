@@ -1,8 +1,13 @@
+require 'customer_segment/comparers/methods'
+require 'customer_segment/comparers/comparer'
 require 'customer_segment/comparers/string'
-# require 'customer_segment/comparers/date'
-# require 'customer_segment/comparers/boolean'
-# require 'customer_segment/comparers/integer'
-# require 'customer_segment/comparers/array'
+require 'customer_segment/comparers/date'
+require 'customer_segment/comparers/boolean'
+require 'customer_segment/comparers/integer'
+require 'customer_segment/comparers/float'
+require 'customer_segment/comparers/array'
+require 'customer_segment/comparers/hash'
+
 module CustomerSegment
     module Comparers
         class << self
@@ -20,6 +25,12 @@ module CustomerSegment
                     hash(opts)
                 when :array
                     array(opts)
+                when :date
+                    date(opts)
+                when :integer
+                    integer(opts)
+                when :float
+                    float(opts)
                 end
             end
 
@@ -35,6 +46,10 @@ module CustomerSegment
                     :hash
                 when ::DateTime, ::Time
                     :date
+                when ::Fixnum
+                    :integer
+                when ::Float
+                    :float
                 end
             end
 
@@ -44,6 +59,14 @@ module CustomerSegment
 
             def boolean(opts)
                 CustomerSegment::Comparers::Boolean.new(opts)
+            end
+
+            def integer(opts)
+                CustomerSegment::Comparers::Integer.new(opts)
+            end
+
+            def float(opts)
+                CustomerSegment::Comparers::Float.new(opts)
             end
 
             def hash(opts)
