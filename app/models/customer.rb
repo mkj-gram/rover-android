@@ -12,7 +12,7 @@ class Customer
     field :tags, type: Array
     field :traits, type: Hash
 
-    index({"devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
+    index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
     index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
     index({"account_id": 1, "traits": 1}, {partial_filter_expression: {"traits" => {"$exists" => true}}})
 

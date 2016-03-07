@@ -42,7 +42,7 @@ class GeofenceRegionEvent < Event
             }
 
             if new_messages.any?
-                json[:included] += new_messages.map{|message| serialize_inbox_message(message)}
+                json[:included] += new_messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
             end
         else
             json[:data][:attributes][:location] = {}
@@ -70,36 +70,6 @@ class GeofenceRegionEvent < Event
             message.within_schedule(current_time) && message.apply_configuration_filters(location_configuration) && message.apply_customer_filters(customer, device)
         end
     end
-
-    def serialize_inbox_message(message)
-        {
-            type: "messages",
-            id: message.id.to_s,
-            attributes: {
-                :"notification-text" => message.notification_text,
-                read: message.read,
-                :"save-to-inbox" => true
-            }
-        }
-    end
-
-    # def serialize_message(message, opts = {})
-    #     customer = opts.delete(:customer)
-    #     if customer
-    #         opts.merge!(customer.attributes.inject({}){|hash, (k,v)| hash.merge("customer_#{k}" => v)})
-    #     end
-    #     device = opts.delete(:device)
-    #     if device
-    #         opts.merge!(device.attributes.inject({}){|hash, (k,v)| hash.merge("device_#{k}" => v)})
-    #     end
-    #     {
-    #         type: "messages",
-    #         id: message.id.to_s,
-    #         attributes: {
-    #             text: message.formatted_message(opts)
-    #         }
-    #     }
-    # end
 
     def location
         @location ||= -> {

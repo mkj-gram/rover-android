@@ -77,7 +77,7 @@ class BeaconRegionEvent < Event
             # only include the message if the configuration exists
 
             if new_messages.any?
-                json[:included] += new_messages.map{|message| serialize_inbox_message(message)}
+                json[:included] += new_messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
             end
         else
             json[:data][:attributes][:configuration] = {}
@@ -148,43 +148,6 @@ class BeaconRegionEvent < Event
 
     def location
         @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
-    end
-
-    # def serialize_local_message(message)
-    #     {
-    #         type: "messages",
-    #         id: message.id.to_s,
-    #         attributes: {
-    #             :"notification-text" => message.formatted_message(message_opts),
-    #             read: true,
-    #             :"save-to-inbox" => false
-    #         }
-    #     }
-    # end
-
-    def serialize_inbox_message(message)
-        {
-            type: "messages",
-            id: message.id.to_s,
-            attributes: {
-                :"notification-text" => message.notification_text,
-                read: message.read,
-                :"save-to-inbox" => true
-            }
-        }
-    end
-
-    def serialize_message(message)
-
-        # inbox_message = message.to_inbox_message
-        # {
-        #     type: "messages",
-        #     id: inbox_message.id,
-        #     attributes: {
-        #         :"notification-text" => inbox_message.notification_text,
-        #         read: inbox_message.read
-        #     }
-        # }
     end
 
     def serialize_beacon_configuration(beacon_configuration)
