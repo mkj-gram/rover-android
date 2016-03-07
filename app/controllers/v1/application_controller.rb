@@ -15,10 +15,9 @@ class V1::ApplicationController < ActionController::API
 
     attr_reader :current_user, :current_account
 
+    APPLICATION_API_KEY_HEADER = "X-Rover-Api-Key".freeze
+    APPLICATION_DEVICE_ID_HEADER = "X-Rover-Device-Id".freeze
 
-    def application_api_key_header
-        return "X-Rover-Api-Key"
-    end
 
     rescue_from(ActionController::ParameterMissing) do |parameter_missing_exception|
         error = {title: "Missing Parameter", description: "#{parameter_missing_exception.param} parameter is required" , status: "400"}
@@ -39,10 +38,33 @@ class V1::ApplicationController < ActionController::API
         end
     end
 
+    def current_device_udid
+        device_id
+    end
+
+    def current_device
+        if current_customer
+            return current_customer.where("devices._id" => device_id).first
+        else
+            return nil
+        end
+    end
+
+    def current_customer
+        @current_customer ||= -> {
+            if device_id
+                return Customer.find_by("account_id" => current_account.id, "devices._id" => device_id)
+            else
+                return nil
+            end
+        }.call
+    end
 
 
 
 
+    # TODO FIX THIS BUG
+    # why are you finding by id?
     def current_account
         @current_account ||= -> {
             if params.has_key?(:account_id)
@@ -68,6 +90,13 @@ class V1::ApplicationController < ActionController::API
 
     private
 
+    def device_id
+        if request.headers.include?(APPLICATION_DEVICE_ID_HEADER)
+            return request.headers[APPLICATION_DEVICE_ID_HEADER]
+        else
+            return nil
+        end
+    end
 
 
     def acl_path
@@ -84,7 +113,7 @@ class V1::ApplicationController < ActionController::API
     # @return [ActiveSupport::StringInquirer]
     def authentication_method
         @authentication_method ||= -> {
-            if request.headers.include?(application_api_key_header)
+            if request.headers.include?(APPLICATION_API_KEY_HEADER)
                 method = "application"
             elsif params.has_key?(:token) || request.headers.include?("Authorization")
                 method = "user"
@@ -103,7 +132,7 @@ class V1::ApplicationController < ActionController::API
     #
     # @return [type] [description]
     def authenticate_application
-        account = Account.find_by_token(request.headers[application_api_key_header])
+        account = Account.find_by_token(request.headers[APPLICATION_API_KEY_HEADER])
         if account
             @current_account = account
         else

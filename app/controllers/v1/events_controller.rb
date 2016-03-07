@@ -28,16 +28,16 @@ class V1::EventsController < V1::ApplicationController
 
     def get_customer_and_device(user_attributes, device_attributes)
         # first check to see if a customer has the device
-        device_udid = device_attributes[:udid]
+        # device_udid = device_attributes[:udid]
 
-        customer = Customer.find_by("devices._id" => device_udid)
+        customer = current_customer
 
         if customer.nil?
             # there is no customer with this device
             # lets create a customer with this device
             customer = create_customer_with_device(user_attributes, device_attributes)
             # next line uses an in memory find
-            device = customer.devices.where("_id" => device_udid).first
+            device = customer.devices.where("_id" => current_device_udid).first
         elsif !user_attributes[:identifier].nil? && customer.identifier.nil?
             # an anonymous user has logged in
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
@@ -49,7 +49,7 @@ class V1::EventsController < V1::ApplicationController
             end
             # this is the case where an anonymous user logged in and their profile already exists on our system
             # we want to transfer the device from the current customer to the existing one
-            device = customer.devices.where("_id" => device_udid).first
+            device = customer.devices.where("_id" => current_device_udid).first
             # this uses $pull to remove from the array
             if device
                 device.delete
@@ -63,14 +63,14 @@ class V1::EventsController < V1::ApplicationController
             # the developer has logged the user out
             # the identifier has specifically been set to null by the device
             # i.e stopped tracking the customer_params
-            device = customer.devices.where("_id" => device_udid).first
+            device = customer.devices.where("_id" => current_device_udid).first
             # delete the device
             device.delete
             # create a new customer with this device
             customer = create_anonymous_customer(user_attributes, device_attributes)
-            device = customer.devices.where("_id" => device_udid).first
+            device = customer.devices.where("_id" => current_device_udid).first
         else
-            device = customer.devices.where("_id" => device_udid).first
+            device = customer.devices.where("_id" => current_device_udid).first
         end
 
         # update any fields that need updating if nothing has changed
