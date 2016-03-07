@@ -2,15 +2,11 @@ module CustomerSegment
     module Comparers
         class Integer < Comparer
 
-            attr_reader :range
+            attr_reader :lower_bound, :upper_bound
             def initialize(opts)
                 super
-                lower_bound, upper_bound = @value.split(",")
-                if lower_bound && upper_bound
-                    @range = Range.new(lower_bound, upper_bound)
-                else
-                    Rails.logger.warn("Tried creating an integer comparer with a illegal range")
-                end
+                @lower_bound = opts["from"]
+                @upper_bound = opts["to"]
             end
 
             def check(v)
@@ -39,6 +35,9 @@ module CustomerSegment
 
             end
 
+            def extra_opts
+                {"from" => lower_bound, "to" => upper_bound}
+            end
 
             def get_elasticsearch_query(attribute_name)
                 case @method
@@ -167,27 +166,22 @@ module CustomerSegment
                         }
                     }
                 when Comparers::Methods::RANGE
-                    if range
-                        {
-                            filter: {
-                                bool: {
-                                    must: [
-                                        {
-                                            range: {
-                                                attribute_name => {
-                                                    from: range.first,
-                                                    to: range.last
-                                                }
+                    {
+                        filter: {
+                            bool: {
+                                must: [
+                                    {
+                                        range: {
+                                            attribute_name => {
+                                                from: lower_bound,
+                                                to: upper_bound
                                             }
                                         }
-                                    ]
-                                }
+                                    }
+                                ]
                             }
                         }
-                    else
-                        {}
-                    end
-
+                    }
                 else
                     {}
                 end
