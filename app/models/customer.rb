@@ -29,9 +29,9 @@ class Customer
                     search_analyzer: "reversed",
                     store: "no"
                 },
-                trigrams: {
+                ngrams: {
                     type: "string",
-                    analyzer: "trigrams",
+                    analyzer: "substring",
                     search_analyzer: "simple",
                     store: "no"
                 }
@@ -43,20 +43,20 @@ class Customer
         {
             analysis:  {
                 filter: {
-                    trigram_filter: {
+                    substring_filter: {
                         type: "ngram",
-                        min_gram: 3,
-                        max_gram: 3,
+                        min_gram: 1,
+                        max_gram: 10,
                         token_chars: ["letter", "digit"]
                     }
                 },
                 analyzer: {
-                    trigrams: {
+                    substring: {
                         type: "custom",
-                        tokenizer: "keyword",
+                        tokenizer: "whitespace",
                         filter: [
                             "lowercase",
-                            "trigram_filter"
+                            "substring_filter"
                         ]
                     },
                     reversed: {

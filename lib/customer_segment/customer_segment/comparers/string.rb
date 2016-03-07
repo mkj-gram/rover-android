@@ -89,7 +89,7 @@ module CustomerSegment
                     {
                         query: {
                             match_phrase_prefix: {
-                                attribute_name => @value
+                                "#{attribute_name}.ngrams" => @value
                             }
                         }
                     }
@@ -99,7 +99,7 @@ module CustomerSegment
                             bool: {
                                 must_not: [
                                     match_phrase_prefix: {
-                                        attribute_name => @value
+                                        "#{attribute_name}.ngrams" => @value
                                     }
                                 ]
                             }
