@@ -105,7 +105,6 @@ class Event
         @generation_time = get_time(event_attributes[:time])
         Rails.logger.debug("Customers time is #{@generation_time}")
         @included = []
-        @attributes = {object: @object, action: @action}
         @new_messages = []
     end
 
@@ -117,6 +116,11 @@ class Event
     def save
         # save works the opposite way than to_json
         # it bubbles up from the children appending their attributes
+        run_callbacks :save do
+            # TODO save this to somewhere
+            puts "here are the attributes i'm going to save -> #{attributes}"
+        end
+
     end
 
     def today_schedule_column

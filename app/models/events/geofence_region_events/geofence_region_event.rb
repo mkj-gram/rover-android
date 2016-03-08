@@ -23,11 +23,6 @@ class GeofenceRegionEvent < Event
         @radius = event_attributes[:radius]
     end
 
-    def save
-        @proximity_messages = get_message_for_location(location) || []
-        run_callbacks :save
-    end
-
     def to_json
         json = super
         # should have a location tied to it
@@ -56,6 +51,7 @@ class GeofenceRegionEvent < Event
     def save_messages_to_inbox
         # TODO Refractor both beacon_region_event and location_event use the same structure
         puts "after save"
+        @proximity_messages = get_message_for_location(location) || []
         if @proximity_messages && @proximity_messages.any?
             messages_to_deliver = @proximity_messages.map{|message| message.to_inbox_message(message_opts)}
             @new_messages = customer.inbox.add_messages(messages_to_deliver, account) if messages_to_deliver.any?

@@ -48,7 +48,7 @@ class BeaconRegionEvent < Event
                 {
                     configuration: {
                         id: beacon_configuration.id,
-                        title: beacon_configuration.tile,
+                        title: beacon_configuration.title,
                         tags: beacon_configuration.tags,
                         shared: beacon_configuration.shared,
                         enabled: beacon_configuration.enabled
@@ -56,14 +56,8 @@ class BeaconRegionEvent < Event
                 }
             )
         else
-            parent_attributes
+            return parent_attributes
         end
-    end
-
-
-    def save
-        @proximity_messages = get_messages_for_beacon_configuration(beacon_configuration) || []
-        run_callbacks :save
     end
 
     def to_json
@@ -82,9 +76,6 @@ class BeaconRegionEvent < Event
         else
             json[:data][:attributes][:configuration] = {}
         end
-
-
-
         return json
     end
 
@@ -93,6 +84,7 @@ class BeaconRegionEvent < Event
 
     def save_messages_to_inbox
         puts "after save"
+        @proximity_messages = get_messages_for_beacon_configuration(beacon_configuration) || []
         if @proximity_messages && @proximity_messages.any?
             # @inbox_messages = @proximity_messages.select{|message| message.save_to_inbox}.map{|message| message.to_inbox_message(message_opts)}
             # @local_messages = @proximity_messages.select{|message| message.save_to_inbox == false}
