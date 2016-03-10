@@ -92,7 +92,7 @@ class V1::ApplicationController < ActionController::API
 
     def device_id
         if request.headers.include?(APPLICATION_DEVICE_ID_HEADER)
-            return request.headers[APPLICATION_DEVICE_ID_HEADER]
+            return request.headers[APPLICATION_DEVICE_ID_HEADER].downcase
         else
             return nil
         end
