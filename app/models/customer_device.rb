@@ -49,6 +49,9 @@ class CustomerDevice
         }
     end
 
+    def udid=(val)
+        self[:udid] = val.downcase
+    end
 
     def device_type
         @device_type ||= platform == "iOS" ? IOS_DEVICE : ANDROID_DEVICE
