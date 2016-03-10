@@ -3,7 +3,7 @@ class V1::CustomerInboxController < V1::ApplicationController
 
     def show
         inbox = current_customer.inbox
-        messages = inbox.messages.reverse!
+        messages = inbox.messages.select{|message| message.saved_to_inbox == true}.reverse!
         json = {
             data: messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
         }

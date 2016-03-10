@@ -21,10 +21,12 @@ class ProximityMessage < Message
         @inbox_message ||= -> {
             inbox_message = InboxMessage.new(
                 {
+                    title: self.title,
                     message_id: self.id,
                     notification_text: formatted_message(opts),
                     read: true,
-                    saved_to_inbox: self.save_to_inbox
+                    saved_to_inbox: self.save_to_inbox,
+                    timestamp: DateTime.now
                 }
             )
             inbox_message.message = self

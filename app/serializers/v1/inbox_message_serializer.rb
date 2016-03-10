@@ -5,10 +5,11 @@ module V1::InboxMessageSerializer
                 type: "messages",
                 id: message.id.to_s,
                 attributes: {
+                    title: message.title,
                     :"notification-text" => message.notification_text,
                     read: message.read,
-                    :"saved-to-inbox" => message.saved_to_inbox,
-                    # :"saved-at" =>
+                    # :"saved-to-inbox" => message.saved_to_inbox,
+                    timestamp: message.timestamp
                 }
             }
         end
