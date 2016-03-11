@@ -38,8 +38,8 @@ class V1::EventsController < V1::ApplicationController
             customer = create_customer_with_device(user_attributes, device_attributes)
             # next line uses an in memory find
             device = customer.devices.where("_id" => current_device_udid).first
-        elsif !user_attributes[:identifier].nil? && customer.identifier.nil?
-            # an anonymous user has logged in
+        elsif (!user_attributes[:identifier].nil? && (customer.identifier.nil? || customer.identifier != user_attributes[:identifier]))
+            # the identifier has changed
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
             if existing_customer.nil?
                 # we want a new customer object here because we don't
@@ -59,16 +59,6 @@ class V1::EventsController < V1::ApplicationController
                 device = transfer_device
             end
             customer = existing_customer
-        elsif user_attributes.has_key?(:identifier) && user_attributes[:identifier].nil? && !customer.identifier.nil?
-            # the developer has logged the user out
-            # the identifier has specifically been set to null by the device
-            # i.e stopped tracking the customer_params
-            device = customer.devices.where("_id" => current_device_udid).first
-            # delete the device
-            device.delete
-            # create a new customer with this device
-            customer = create_anonymous_customer(user_attributes, device_attributes)
-            device = customer.devices.where("_id" => current_device_udid).first
         else
             device = customer.devices.where("_id" => current_device_udid).first
         end
