@@ -15,7 +15,8 @@ class V1::AccountsController < V1::ApplicationController
                     "configuration-tags" => current_account.beacon_configuration_active_tag.tags,
                     "location-tags" => current_account.location_active_tag.tags,
                     "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
-                    "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids
+                    "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
+                    "message-limits" => current_account.message_limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)}
                 },
                 "relationships" => {
                     "users" => {
@@ -79,13 +80,16 @@ class V1::AccountsController < V1::ApplicationController
     end
 
     private
+
     def has_access_to_account
         if current_account.id.to_s != params[:id].to_s
             head :unauthorized
         end
     end
+
     def account_params(local_params)
-        local_params.require(:accounts).permit(:title)
+        param_should_be_array(local_params[:accounts], :message_limits)
+        local_params.require(:accounts).permit(:title, {:message_limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]})
     end
 
 
@@ -98,10 +102,10 @@ class V1::AccountsController < V1::ApplicationController
                 "started-at" => job.started_at,
                 "finished-at" => job.finished_at,
                 "error-message" => job.error_message,
-                "added-devices-count" => job.added_devices_count,
-                "modified-devices-count" => job.modified_devices_count,
-                "removed-devices-count" => job.removed_devices_count,
-                "devices-changed-configuration-count" => job.devices_changed_configuration_count,
+                "added-beacons-count" => job.added_devices_count,
+                "modified-beacons-count" => job.modified_devices_count,
+                "removed-beacons-count" => job.removed_devices_count,
+                "beacons-changed-configuration-count" => job.devices_changed_configuration_count,
                 "created-at" => job.created_at
             },
             "relationships" => {
@@ -111,6 +115,7 @@ class V1::AccountsController < V1::ApplicationController
             }
         }
     end
+
 
     def serialize_integration(integration)
         json = {

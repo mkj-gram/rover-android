@@ -6,6 +6,11 @@ module RequestHelpers
             end).call
         end
 
+        def post_json(url, json, headers)
+            headers.merge!({ 'Content-Type' => 'application/json', 'Accept' => 'application/json' })
+            post(url, json.to_json, headers)
+        end
+
         def json_request_headers
             { 'Content-Type' => 'application/json', 'Accept' => 'application/json' }
         end

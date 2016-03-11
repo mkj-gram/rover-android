@@ -52,7 +52,8 @@ module JsonHelper
 
         validate_json_schema
 
-        data.map!{|sub_data| {sub_data[:type].underscore => {id: sub_data[:id]}.merge!(underscore_attributes(sub_data[:attributes])).merge!(get_relationship_data(sub_data[:relationships]))}}
+        except_path = opts.delete(:except).freeze
+        data.map!{|sub_data| {sub_data[:type].underscore => {id: sub_data[:id]}.merge!(underscore_attribute(sub_data[:attributes], except_path, "attributes")).merge!(get_relationship_data(sub_data[:relationships]))}}
         if single_record
             return params.merge!({:data => data.first})
         else
@@ -62,20 +63,42 @@ module JsonHelper
 
     private
 
-    def underscore_attributes(attributes)
-        return attributes.inject({}) {|hash, (k,v)| hash.merge({k.underscore => v})}
+    def underscore_attribute(attribute, except_path, current_path)
+        if attribute.is_a?(Hash)
+            attribute.inject({}) do |hash, (k,v)|
+                next_path = current_path + ".#{k}"
+                if next_path != except_path
+                    if v.is_a?(Hash)
+                        hash.merge({k.underscore => underscore_attribute(v, except_path, next_path)})
+                    elsif v.is_a?(Array)
+                        hash.merge({k.underscore => v.map{|value| underscore_attribute(value, except_path, next_path)}})
+                    else
+                        hash.merge({k.underscore => v})
+                    end
+                else
+                    hash.merge({k => v})
+                end
+            end
+        else
+            attribute
+        end
     end
 
     def get_relationship_data(relationships)
         return {} if relationships.nil?
         relationships.inject({}) do |hash, (relationship_name, value)|
-            relationship_name = relationship_name.singularize
+            singular_relationship_name = relationship_name.singularize
+            should_be_array = singular_relationship_name != relationship_name
             if value[:data].nil?
-                hash.merge({"#{relationship_name}_id" => nil})
+                if should_be_array
+                    hash.merge({"#{singular_relationship_name}_ids" => []})
+                else
+                    hash.merge({"#{singular_relationship_name}_id" => nil})
+                end
             elsif value[:data].is_a?(Array)
-                hash.merge({"#{relationship_name}_ids" => value[:data].map{|data| data[:id]}})
+                hash.merge({"#{singular_relationship_name}_ids" => value[:data].map{|data| data[:id]}})
             else
-                hash.merge({"#{relationship_name}_id" => value[:data][:id]})
+                hash.merge({"#{singular_relationship_name}_id" => value[:data][:id]})
             end
         end
     end

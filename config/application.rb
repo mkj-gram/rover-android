@@ -11,13 +11,20 @@ module RailsApi
     class Application < Rails::Application
 
         config.active_record.schema_format = :sql
-
+        config.mongoid.logger = Logger.new($stdout, :warn)
         # Setup configuration per enviroment
         config.rabbitmq = Rails.application.config_for(:rabbitmq)
         config.mailgun = Rails.application.config_for(:mailgun)
         config.password_reset = Rails.application.config_for(:password_reset)
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
         # Autoload our libraries
+        config.autoload_paths << Rails.root.join('app', 'models', 'messages')
+        config.autoload_paths << Rails.root.join('app', 'models', 'configuration_visits')
+        config.autoload_paths << Rails.root.join('app', 'models', 'events')
+        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'location_events')
+        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'beacon_region_events')
+        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'geofence_region_events')
+        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'app_events')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
         config.autoload_paths << Rails.root.join('app', 'models', 'third_party_integrations')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices')
@@ -31,11 +38,14 @@ module RailsApi
 
         # config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations', 'ibeacon_configuration')
         config.autoload_paths << Rails.root.join('lib', 'mail_client')
+        config.autoload_paths << Rails.root.join('lib', 'customer_segment')
+        config.autoload_paths << Rails.root.join('lib', 'message_limit')
         config.autoload_paths << Rails.root.join('lib', 'model_broadcaster')
         config.autoload_paths << Rails.root.join('lib', 'rabbit_mq_publisher')
         config.autoload_paths << Rails.root.join('lib', 'model_error')
         config.autoload_paths << Rails.root.join('lib', 'estimote_api')
         config.autoload_paths << Rails.root.join('lib', 'kontakt_api')
+
         config.autoload_paths << Rails.root.join('app', 'workers')
         config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
 
@@ -58,3 +68,7 @@ module RailsApi
 end
 
 require 'core_ext/hash'
+require 'core_ext/string'
+# first require the event then require everything else
+require Rails.root.join("app", "models", "events", "event.rb").to_s
+# Dir[Rails.root.join("app", "models", "events", "*").to_s].each{|file| puts file; require file}

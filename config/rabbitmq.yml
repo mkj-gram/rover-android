@@ -1,6 +1,5 @@
 development:
-    amqp: amqp://guest:guest@localhost
-    vhost: /
+    amqp: amqp://guest:guest@127.0.0.1:5672/
     heartbeat: 10
     pool: 5
     ssl: false

@@ -67,7 +67,7 @@ class EstimoteDevice < BeaconDevice
     end
 
     def model_type
-        return "estimote-devices"
+        return "estimote-beacons"
     end
 
     def manufacturer

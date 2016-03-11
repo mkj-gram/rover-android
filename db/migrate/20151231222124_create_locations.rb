@@ -9,8 +9,8 @@ class CreateLocations < ActiveRecord::Migration
             t.text :province
             t.string :country
             t.string :postal_code
-            t.float :latitude, {:precision=>10, :scale=>6}
-            t.float :longitude, {:precision=>10, :scale=>6}
+            t.decimal :latitude, precision: 10, scale: 6
+            t.decimal :longitude, precision: 10, scale: 6
             t.integer :radius, default: 50
             t.text :tags, array: true, default: []
             t.text :google_place_id
@@ -25,5 +25,6 @@ class CreateLocations < ActiveRecord::Migration
 
         add_index :locations, :account_id
         add_index :locations, [:account_id, :tags], using: :gin
+        add_index :locations, [:account_id, :latitude, :longitude], unique: true
     end
 end

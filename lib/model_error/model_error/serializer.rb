@@ -1,4 +1,4 @@
-require 'lib/serializer/attributes'
+require 'model_error/serializer/attributes'
 module ModelError
     class Serializer
         include Attributes

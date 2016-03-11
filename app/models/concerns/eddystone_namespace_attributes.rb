@@ -39,6 +39,7 @@ module EddystoneNamespaceAttributes
 
     def configuration_attributes
         {
+            protocol: "Eddystone",
             namespace: self.namespace,
             :"instance-id" => self.instance_id
         }

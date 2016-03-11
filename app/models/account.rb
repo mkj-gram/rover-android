@@ -5,6 +5,9 @@
 #
 class Account < ActiveRecord::Base
     include Tokenable
+    include MessageLimit::Attribute
+
+    message_limit_attribute :message_limits
 
     before_create :generate_share_key
     after_create :create_active_tags_index
@@ -96,6 +99,15 @@ class Account < ActiveRecord::Base
         return nil if response.aggregations.geo_hash.buckets.empty?
         bounds = response.aggregations.geo_hash.buckets.first.cell.bounds
         return [bounds.top_left.lat, bounds.bottom_right.lon, bounds.bottom_right.lat, bounds.top_left.lon]
+    end
+
+    def within_message_limits(inbox_global_message_rate)
+        # looks like this
+        # {1 => 2, 2 => 2, 3 => 1}
+        # 2 messages within 1 day, 2 messages within 2 days, 1 message within 3 days
+        message_limits.all? do |limiter|
+            inbox_global_message_rate[limiter.number_of_minutes] < limiter.message_limit
+        end
     end
 
     private

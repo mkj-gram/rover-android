@@ -17,7 +17,7 @@ Rails.application.routes.draw do
         #     end
         # end
 
-        resources :accounts, only: [:show]
+        resources :accounts, only: [:show, :update]
 
         resources :users, except:[:create] do
 
@@ -76,7 +76,21 @@ Rails.application.routes.draw do
             resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
         end
 
-        get "/regions", to: 'regions#index', as: "regions"
+
+        post "/events", to: 'events#create'
+
+        resources :customers, only: [:index, :show]
+
+        resources :"proximity-messages", controller: "proximity_messages", as: "proximity_messages"
+        resources :"scheduled-messages", controller: "scheduled_messages", as: "scheduled_messages"
+
+        get "/inbox", to: 'customer_inbox#show'
+
+        get "/inbox/messages/:id", to: 'customer_inbox_messages#show'
+        patch "/inbox/messages/:id", to: 'customer_inbox_messages#update'
+        delete "/inbox/messages/:id", to: 'customer_inbox_messages#destroy'
+
+
 
     end
     # The priority is based upon order of creation: first created -> highest priority.

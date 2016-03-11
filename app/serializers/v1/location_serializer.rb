@@ -1,16 +1,25 @@
-class V1::LocationSerializer < ActiveModel::Serializer
-    # t.integer :account_id, null: false
-    # t.text :name
-    # t.text :address
-    # t.text :city
-    # t.text :province_state
-    # t.text :postal_zip
-    # t.text :country
-    # t.decimal :latitude
-    # t.decimal :longitude
-    # t.integer :radius
-    # t.text :google_place_id
-    # t.text :tags
-    attributes :id, :name, :address, :city, :province_state, :postal_zip, :country, :latitude, :longitude, :radius, :google_place_id, :tags
-
+module V1::LocationSerializer
+    class << self
+        def serialize(location_configuration, extra_attributes = {})
+            {
+                "type" => "locations",
+                "id" => location_configuration.id.to_s,
+                "attributes" => {
+                    "name" => location_configuration.title,
+                    "address" => location_configuration.address,
+                    "city" => location_configuration.city,
+                    "province" => location_configuration.province,
+                    "country" => location_configuration.country,
+                    "postal-code" => location_configuration.postal_code,
+                    "latitude" => location_configuration.latitude,
+                    "longitude" => location_configuration.longitude,
+                    "radius" => location_configuration.radius,
+                    "tags" => location_configuration.tags,
+                    "enabled" => location_configuration.enabled,
+                    "shared" => location_configuration.shared,
+                    "configurations-count" => location_configuration.beacon_configurations_count
+                }
+            }
+        end
+    end
 end

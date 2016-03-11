@@ -63,7 +63,7 @@ class KontaktDevice < BeaconDevice
     end
 
     def model_type
-        return "kontakt-devices"
+        return "kontakt-beacons"
     end
 
     def manufacturer

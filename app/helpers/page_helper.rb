@@ -9,7 +9,7 @@ module PageHelper
     end
 
     def page_size
-        @page_size ||= params.has_key?(:page) && params[:page].has_key?(:size) ? params[:page][:size].to_i : 50
+        @page_size ||= params.has_key?(:page) && params[:page].has_key?(:size) ? params[:page][:size].to_i : 500
     end
 
     def get_next_cursor(objects, cursor_sort_column)

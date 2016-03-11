@@ -1,40 +1,48 @@
 class BeaconConfiguration < ActiveRecord::Base
     include Elasticsearch::Model
-    # include Elasticsearch::Model::Callbacks
+    include DefaultEmptyArray
+
+    # Constants
+    IBEACON_PROTOCOL                = 1
+    EDDYSTONE_NAMESPACE_PROTOCOL    = 2
+    URL_PROTOCOL                    = 3
+    NO_PROTOCOL                     = 4
 
     # use to search through all document types
     document_type ""
 
-    settings index: {
-        number_of_shards: 1,
-        number_of_replicas: 2,
-        analysis:  {
-            filter: {
-                autocomplete_filter: {
-                    type: "edge_ngram",
-                    min_gram: 1,
-                    max_gram: 15
-                }
-            },
-            analyzer: {
-                autocomplete: {
-                    type: "custom",
-                    tokenizer: "standard",
-                    filter: [
-                        "lowercase",
-                        "autocomplete_filter"
-                    ]
+    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2}).merge(
+        {
+            analysis:  {
+                filter: {
+                    autocomplete_filter: {
+                        type: "edge_ngram",
+                        min_gram: 1,
+                        max_gram: 15
+                    }
                 },
-                lowercase_keyword: {
-                    type: "custom",
-                    tokenizer: "keyword",
-                    filter: [
-                        "lowercase"
-                    ]
+                analyzer: {
+                    autocomplete: {
+                        type: "custom",
+                        tokenizer: "standard",
+                        filter: [
+                            "lowercase",
+                            "autocomplete_filter"
+                        ]
+                    },
+                    lowercase_keyword: {
+                        type: "custom",
+                        tokenizer: "keyword",
+                        filter: [
+                            "lowercase"
+                        ]
+                    }
                 }
             }
         }
-    }
+    )
+
+    default_empty_array_attribute :tags
 
     after_commit on: [:create] do
         __elasticsearch__.index_document
@@ -97,7 +105,13 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
-
+    def tags=(value)
+        if value.nil?
+            self[:tags] = []
+        else
+            self[:tags] = value
+        end
+    end
 
     def devices_meta
         # we use to_a here to remove the active record relation

@@ -215,7 +215,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
         if @beacon_configuration
             json = flatten_request({single_record: true})
-            if @beacon_configuration.update_attributes(configuration_params(json[:data]))
+            if @beacon_configuration.update_attributes(beacon_configuration_params(json[:data]))
                 render_beacon_configuration(@beacon_configuration)
             else
                 render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
@@ -236,16 +236,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     end
 
     private
-
-    def configuration_params(local_params)
-        convert_param_if_exists(local_params[:configurations], :name, :title)
-
-        # if local_params[:configurations].has_key?(:tags) && local_params[:configurations][:tags].nil?
-        #     local_params[:configurations][:tags] = []
-        # end
-
-        local_params.fetch(:configurations, {}).permit(:title, {tags: []}, :enabled, :location_id)
-    end
 
     def filter_params
         convert_param_if_exists(params[:filter], :"location-id", :location_id)
@@ -282,7 +272,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def beacon_configuration_params(local_params)
         convert_param_if_exists(local_params[:configurations], :name, :title)
-        local_params.fetch(:configurations, {}).permit(:title, :enabled, {tags: []}, :location_id)
+        # local_params[:configurations][:tags] ||= [] if local_params[:configurations].has_key?(:tags)
+        local_params.fetch(:configurations, {}).permit(:title, :enabled, :tags, {tags: []}, :location_id)
     end
 
     def ibeacon_configuration_params(local_params)
@@ -323,14 +314,14 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             json = {
                 "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
             }
-            should_include = ["location", "devices"] #whitelist_include(["location", "devices"])
+            should_include = ["location", "beacons"] #whitelist_include(["location", "beacons"])
 
-            if should_include.include?("devices")
+            if should_include.include?("beacons")
                 devices = beacon_configuration.beacon_devices.all.to_a
                 json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
                 json["data"]["relationships"].merge!(
                     {
-                        "devices" => {
+                        "beacons" => {
                             "data" => devices.map do |device|
                                 {"type" => device.model_type, "id" => device.id.to_s}
                             end
@@ -402,8 +393,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 "tags" => source.tags,
                 "shared" => source.shared,
                 "enabled" => source.enabled,
-                "device-type" => source.devices_meta[:type],
-                "device-count" => source.devices_meta[:count] || 0
+                "beacon-type" => source.devices_meta[:type],
+                "beacon-count" => source.devices_meta[:count] || 0
             }.merge(extra_attributes)
         }
         if include_location && !source.location.empty?
@@ -479,17 +470,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         }
     end
 
-    # def serialize_estimote_relationships(estimote_devices)
-    #     "data" => estimote_devices.map{|device| {type: "estimote-devices", id: device.id.to_s}}
-    # end
-
-    def serialize_kontakt_relationships(kontakt_devices)
-        {
-            "kontakt-devices" => {
-                "data" => kontakt_devices.map{|device| {type: "kontakt-devices", id: device.id.to_s}}
-            }
-        }
-    end
 
     def render_empty_data
         render json: {
