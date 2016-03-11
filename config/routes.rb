@@ -86,6 +86,12 @@ Rails.application.routes.draw do
 
         get "/inbox", to: 'customer_inbox#show'
 
+        get "/inbox/messages/:id", to: 'customer_inbox_messages#show'
+        patch "/inbox/messages/:id", to: 'customer_inbox_messages#update'
+        delete "/inbox/messages/:id", to: 'customer_inbox_messages#destroy'
+
+
+
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".
