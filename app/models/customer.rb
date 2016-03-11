@@ -255,7 +255,7 @@ class Customer
 
     def index_customer
         # we only want to show customers which are identified or have a device
-
+        return if changes.empty?
         # going from no identifier to named
         if identifier.nil? && changes.include?(:devices) && devices_was.any? && devices.empty?
             puts "this anonymous user doesn't have a device anymore"
