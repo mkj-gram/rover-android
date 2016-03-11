@@ -9,7 +9,7 @@ module V1::InboxMessageSerializer
                     :"notification-text" => message.notification_text,
                     read: message.read,
                     # :"saved-to-inbox" => message.saved_to_inbox,
-                    timestamp: message.timestamp.to_time.utc.iso8601
+                    timestamp: message.timestamp
                 }
             }
         end

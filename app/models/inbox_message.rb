@@ -7,7 +7,7 @@ class InboxMessage
     field :notification_text, type: String
     field :read, type: Boolean, default: false
     field :saved_to_inbox, type: Boolean, default: true
-    field :timestamp, type: DateTime
+    field :timestamp, type: Time
 
     embedded_in :customer_inbox
 

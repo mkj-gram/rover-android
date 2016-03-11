@@ -26,7 +26,7 @@ class ProximityMessage < Message
                     notification_text: formatted_message(opts),
                     read: true,
                     saved_to_inbox: self.save_to_inbox,
-                    timestamp: DateTime.now
+                    timestamp: Time.now
                 }
             )
             inbox_message.message = self
