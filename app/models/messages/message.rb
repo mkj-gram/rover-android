@@ -268,4 +268,9 @@ class Message < ActiveRecord::Base
             true
         end
     end
+
+
+    def valid_action
+        # some set of actions
+    end
 end
