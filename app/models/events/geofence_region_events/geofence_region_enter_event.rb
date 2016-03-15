@@ -4,16 +4,4 @@ class GeofenceRegionEnterEvent < GeofenceRegionEvent
         Event::GEOFENCE_REGION_ENTER_EVENT_ID
     end
 
-    def save
-
-        super
-    end
-
-    def to_json
-        json = super
-
-        return json
-    end
-
-
 end
