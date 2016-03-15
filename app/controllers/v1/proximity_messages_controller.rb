@@ -154,9 +154,9 @@ class V1::ProximityMessagesController < V1::ApplicationController
             :schedule_friday,
             :schedule_saturday,
             :schedule_sunday,
-            :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days],
             :action,
-            :action_url
+            :action_url,
+            :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days],
         )
     end
 
