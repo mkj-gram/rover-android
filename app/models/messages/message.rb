@@ -55,6 +55,8 @@ class Message < ActiveRecord::Base
 
     validate :valid_action
 
+    VALID_ACTIONS = Set.new(["link", "landing-page", "experience"])
+
     def as_indexed_json(opts = {})
         {
             account_id: self.account_id,
@@ -271,6 +273,8 @@ class Message < ActiveRecord::Base
 
 
     def valid_action
-        # some set of actions
+        if !VALID_ACTIONS.include?(self.action)
+            errors.add(:action, "invalid, must be of type (#{VALID_ACTIONS.to_a.join(', ')})")
+        end
     end
 end
