@@ -53,6 +53,8 @@ class Message < ActiveRecord::Base
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
 
+    validate :valid_action
+
     def as_indexed_json(opts = {})
         {
             account_id: self.account_id,
