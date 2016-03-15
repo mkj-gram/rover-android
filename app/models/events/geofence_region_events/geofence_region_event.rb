@@ -37,6 +37,7 @@ class GeofenceRegionEvent < Event
             }
 
             if new_messages.any?
+                Rails.logger.info("Detected #{new_messages.size} to be rendered out")
                 json[:included] += new_messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
             end
         else
