@@ -127,6 +127,10 @@ class Event
         "schedule_#{Date::DAYNAMES[generation_time.wday].downcase}"
     end
 
+    def generation_time_date
+        @generation_time_date ||= self.generation_time.beginning_of_day.to_i
+    end
+
     def generation_time_minutes_since_midnight
         @generation_time_minutes_since_midnight ||= (self.generation_time.seconds_since_midnight.to_i / 60)
     end
