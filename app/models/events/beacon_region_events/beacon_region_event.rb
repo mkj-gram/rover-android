@@ -20,7 +20,7 @@ class BeaconRegionEvent < Event
 
     def initialize(event_attributes)
         super
-        @uuid = event_attributes[:uuid]
+        @uuid = event_attributes[:uuid].upcase
         @major = event_attributes[:major_number]
         @minor = event_attributes[:minor_number]
 
