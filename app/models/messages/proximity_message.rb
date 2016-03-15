@@ -17,23 +17,6 @@ class ProximityMessage < Message
     validate :legal_trigger_event_id
 
 
-    def to_inbox_message(opts)
-        @inbox_message ||= -> {
-            inbox_message = InboxMessage.new(
-                {
-                    title: self.title,
-                    message_id: self.id,
-                    notification_text: formatted_message(opts),
-                    read: false,
-                    saved_to_inbox: self.save_to_inbox,
-                    timestamp: Time.now
-                }
-            )
-            inbox_message.message = self
-            return inbox_message
-        }.call
-    end
-
     def filter_beacon_configurations
         @filter_beacon_configurations ||= filter_beacon_configuration_ids.any? ? BeaconConfiguration.where(id: filter_beacon_configuration_ids) : []
     end

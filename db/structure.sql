@@ -473,6 +473,7 @@ CREATE TABLE messages (
     account_id integer NOT NULL,
     type character varying NOT NULL,
     title character varying,
+    tags character varying[] DEFAULT '{}'::character varying[],
     notification_text text,
     published boolean DEFAULT false,
     archived boolean DEFAULT false,
@@ -495,6 +496,10 @@ CREATE TABLE messages (
     filter_beacon_configuration_ids integer[],
     filter_location_tags character varying[],
     filter_location_ids integer[],
+    action character varying,
+    action_url character varying,
+    action_landing_page_id integer,
+    action_experience_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

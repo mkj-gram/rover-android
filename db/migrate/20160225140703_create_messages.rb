@@ -6,6 +6,7 @@ class CreateMessages < ActiveRecord::Migration
             t.string :type, null: false
 
             t.string :title
+            t.string :tags, array: true, default: []
             t.text :notification_text
             t.boolean :published, default: false
             t.boolean :archived, default: false
@@ -40,6 +41,14 @@ class CreateMessages < ActiveRecord::Migration
             t.integer   :filter_beacon_configuration_ids, array: true
             t.string    :filter_location_tags, array: true
             t.integer   :filter_location_ids, array: true
+
+
+            # Actions
+            #
+            t.string :action # "open-url"
+            t.string :action_url # "https://google.ca"
+            t.integer :action_landing_page_id
+            t.integer :action_experience_id
 
             t.timestamps null: false
         end
