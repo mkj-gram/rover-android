@@ -242,6 +242,8 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"schedule-sunday" => message.schedule_sunday,
                 :"location-tags" => message.filter_location_tags,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
+                :"action" => message.action,
+                :"action-url" => message.action_url
             }
         }
     end
