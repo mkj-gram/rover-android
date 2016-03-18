@@ -273,7 +273,7 @@ class Message < ActiveRecord::Base
 
 
     def valid_action
-        if !VALID_ACTIONS.include?(self.action)
+        if published && self.action && !VALID_ACTIONS.include?(self.action)
             errors.add(:action, "invalid, must be of type (#{VALID_ACTIONS.to_a.join(', ')})")
         end
     end
