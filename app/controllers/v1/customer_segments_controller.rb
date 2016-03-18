@@ -27,7 +27,7 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         customer_segment.account_id = current_account.id
         if customer_segment.save
             json = {
-                data: V1::CustomerSegmentSerializer.serialize(@customer_segment, {:"total-customers-count" => current_account.customers_count})
+                data: V1::CustomerSegmentSerializer.serialize(customer_segment, {:"total-customers-count" => current_account.customers_count})
             }
             render json: json
         else
