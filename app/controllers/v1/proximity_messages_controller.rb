@@ -54,7 +54,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
 
         elasticsearch_query = ProximityMessage.search(query)
 
-        messages = elasticsearch_query.per_page(page_size).page(current_page).records
+        messages = elasticsearch_query.per_page(page_size).page(current_page).records.includes(:customer_segment)
 
         if query_archived == true
             total_searchable_records = current_account.archived_proximity_messages_count
@@ -154,15 +154,18 @@ class V1::ProximityMessagesController < V1::ApplicationController
             :schedule_friday,
             :schedule_saturday,
             :schedule_sunday,
+            :customer_segment_id,
             :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]
         )
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "locations"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
+        should_include = ["beacons", "locations", "customer-segments"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
+
         json = {
             data: serialize_message(message)
         }
+
         included = []
         if should_include.include?("beacons")
             json[:data][:relationships] = {} if json[:data][:relationships].nil?
@@ -199,6 +202,23 @@ class V1::ProximityMessagesController < V1::ApplicationController
             end
         end
 
+        if should_include.included?("customer-segments")
+            json[:data][:relationships] = {} if json[:data][:relationships].nil?
+            if message.customer_segment
+                json[:data][:relationships].merge!(
+                    {
+                        :"customer-segment" => {
+                            data: { type: "customer-segments", id: message.customer_segment.id.to_s }
+                        }
+
+                    }
+                )
+                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
+            else
+                json[:data][:relationships].merge!({:"customer-segments" => {data: []}})
+            end
+        end
+
         if included.any?
             json[:included] = included
         end
@@ -225,7 +245,6 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 published: message.published,
                 archived: message.archived,
                 :"trigger-event" => Event.event_id_to_event_string(message.trigger_event_id),
-                :"approximate-customers-count" => message.approximate_customers_count,
                 :"configuration-tags" => message.filter_beacon_configuration_tags,
                 :"schedule-start-date" => message.schedule_start_date,
                 :"schedule-end-date" => message.schedule_end_date,
@@ -240,6 +259,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"schedule-sunday" => message.schedule_sunday,
                 :"location-tags" => message.filter_location_tags,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
+                :"approximate-customers-count" => message.customer_segment ? message.customer_segment.approximate_customers_count : current_account.customers_count
             }
         }
     end

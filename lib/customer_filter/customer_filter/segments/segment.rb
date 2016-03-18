@@ -1,20 +1,20 @@
 module CustomerFilter
     module Filters
         class Filter
-            attr_accessor :attribute_name, :comparer, :segment_count
+            attr_accessor :attribute_name, :comparer, :filter_count
 
 
             def initialize(opts)
                 @attribute_name = opts["attribute"]
                 @path = opts["path"]
-                @segment_count = opts["segment_count"]
+                @filter_count = opts["filter_count"]
             end
 
             def dump
                 {
                     "model" => self.model_name,
                     "attribute" => attribute_name,
-                    "segment_count" => segment_count,
+                    "filter_count" => filter_count,
                     "comparer" => comparer.dump
                 }
             end

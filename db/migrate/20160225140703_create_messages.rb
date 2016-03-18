@@ -26,15 +26,15 @@ class CreateMessages < ActiveRecord::Migration
             t.boolean :schedule_saturday, default: true
             t.boolean :schedule_sunday, default: true
 
-            t.integer :approximate_customers_count
+
 
             t.integer :trigger_event_id
             t.integer :dwell_time_in_seconds
-
+            # segment
+            t.integer :customer_segment_id
             # limits
             t.hstore :limits, array: true
-            # segments
-            t.jsonb :customer_segments, array: true, default: []
+
             # filters
             t.string    :filter_beacon_configuration_tags, array: true
             t.integer   :filter_beacon_configuration_ids, array: true

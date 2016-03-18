@@ -48,7 +48,15 @@ module CustomerFilter
                 end
             end
 
-            def within_segment(opts = {})
+            def elasticsearch_query
+                if @comparer
+                    return @comparer.get_elasticsearch_query(attribute_name)
+                else
+                    {}
+                end
+            end
+
+            def within_filter(opts = {})
                 device = opts[:device]
                 if device.is_a?(::CustomerDevice)
                     value = get_value_for(device)

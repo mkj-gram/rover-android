@@ -1,7 +1,35 @@
 require 'customer_filter/comparers'
-require 'customer_filter/segments'
+require 'customer_filter/filters'
 require 'customer_filter/attribute_type'
 module CustomerFilter
+
+    class << self
+
+        def compute_filter_count(account, filters)
+            # merge all filters comparer queries
+            query = {
+                filter: {
+                    bool: {
+                        must: [
+                            {
+                                term: {
+                                    account_id: account.id
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+
+            filters.each do |filter|
+                query.deep_merge!(filter.elasticsearch_query) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
+            end
+
+            return Elasticsearch::Model.search(query, [::Customer]).count
+        end
+
+    end
+
     # we can have types
     # types
     # :string

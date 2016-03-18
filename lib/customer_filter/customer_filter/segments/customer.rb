@@ -41,7 +41,7 @@ module CustomerFilter
                 end
             end
 
-            def compute_segment_count(account)
+            def compute_filter_count(account)
                 # use the comparer to build an elasticsearch query
                 # find the count
                 if @comparer
@@ -66,7 +66,15 @@ module CustomerFilter
                 end
             end
 
-            def within_segment(opts = {})
+            def elasticsearch_query
+                if @comparer
+                    return @comparer.get_elasticsearch_query(attribute_name)
+                else
+                    {}
+                end
+            end
+
+            def within_filter(opts = {})
                 customer = opts[:customer]
                 if customer.is_a?(::Customer)
                     value = get_value_for(customer)

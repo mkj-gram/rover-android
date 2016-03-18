@@ -383,6 +383,38 @@ ALTER SEQUENCE customer_devices_id_seq OWNED BY customer_devices.id;
 
 
 --
+-- Name: customer_segments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE customer_segments (
+    id integer NOT NULL,
+    account_id integer,
+    title character varying,
+    filters jsonb,
+    approximate_customers_count integer
+);
+
+
+--
+-- Name: customer_segments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE customer_segments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: customer_segments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE customer_segments_id_seq OWNED BY customer_segments.id;
+
+
+--
 -- Name: customers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -486,11 +518,10 @@ CREATE TABLE messages (
     schedule_friday boolean DEFAULT true,
     schedule_saturday boolean DEFAULT true,
     schedule_sunday boolean DEFAULT true,
-    approximate_customers_count integer,
     trigger_event_id integer,
     dwell_time_in_seconds integer,
+    customer_segment_id integer,
     limits hstore[],
-    customer_segments jsonb[] DEFAULT '{}'::jsonb[],
     filter_beacon_configuration_tags character varying[],
     filter_beacon_configuration_ids integer[],
     filter_location_tags character varying[],
@@ -817,6 +848,13 @@ ALTER TABLE ONLY customer_devices ALTER COLUMN id SET DEFAULT nextval('customer_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY customer_segments ALTER COLUMN id SET DEFAULT nextval('customer_segments_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY customers ALTER COLUMN id SET DEFAULT nextval('customers_id_seq'::regclass);
 
 
@@ -938,6 +976,14 @@ ALTER TABLE ONLY customer_active_traits
 
 ALTER TABLE ONLY customer_devices
     ADD CONSTRAINT customer_devices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: customer_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY customer_segments
+    ADD CONSTRAINT customer_segments_pkey PRIMARY KEY (id);
 
 
 --
@@ -1188,6 +1234,13 @@ CREATE UNIQUE INDEX index_customer_devices_on_udid ON customer_devices USING btr
 
 
 --
+-- Name: index_customer_segments_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_customer_segments_on_account_id ON customer_segments USING btree (account_id);
+
+
+--
 -- Name: index_customers_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1421,4 +1474,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160211202819');
 INSERT INTO schema_migrations (version) VALUES ('20160225140703');
 
 INSERT INTO schema_migrations (version) VALUES ('20160301142503');
+
+INSERT INTO schema_migrations (version) VALUES ('20160318144534');
 
