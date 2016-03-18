@@ -7,7 +7,7 @@ module ModelError
         # attribute :account_invite_token, key: :token
         # end
         def self.serialize(errors)
-            Rails.logger.warn("Model Errors: #{errors}")
+            Rails.logger.warn("Model Errors: #{errors.full_messages}")
             serialized_errors = []
             _attributes_data.each do |key, attribute|
                 messages = attribute.serialize(key, errors)
