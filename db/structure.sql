@@ -388,10 +388,12 @@ ALTER SEQUENCE customer_devices_id_seq OWNED BY customer_devices.id;
 
 CREATE TABLE customer_segments (
     id integer NOT NULL,
-    account_id integer,
+    account_id integer NOT NULL,
     title character varying,
     filters jsonb,
-    approximate_customers_count integer
+    approximate_customers_count integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
