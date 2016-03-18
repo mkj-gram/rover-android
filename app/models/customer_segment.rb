@@ -9,12 +9,12 @@ class CustomerSegment < ActiveRecord::Base
     has_one :account
 
 
-    def within_segment(customer, device)
-        self.apply_customer_filters.all?{|filter| filter.within_filter(customer: customer, device: device)}
+    def self.update_all_customer_counts_async
+        UpdateCustomerSegmentsCountWorker.preform_async
     end
 
-    def update_all_customer_counts_async
-        UpdateCustomerSegmentsCountWorker.preform_async
+    def within_segment(customer, device)
+        self.apply_customer_filters.all?{|filter| filter.within_filter(customer: customer, device: device)}
     end
 
     def update_customers_count!
