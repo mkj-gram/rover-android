@@ -202,7 +202,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
             end
         end
 
-        if should_include.included?("segment")
+        if should_include.include?("segment")
             json[:data][:relationships] = {} if json[:data][:relationships].nil?
             if message.customer_segment
                 json[:data][:relationships].merge!(
