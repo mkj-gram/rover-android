@@ -44,7 +44,6 @@ class Message < ActiveRecord::Base
 
     after_initialize :set_proper_time_schedule_range
     after_initialize :set_defaults, unless: :persisted?
-    before_save :set_approximate_customers_count
 
     validates :title, presence: true
     validate :valid_date_schedule
@@ -218,13 +217,6 @@ class Message < ActiveRecord::Base
 
         if @schedule_end_date && !valid_date(@schedule_end_date)
             errors.add(:schedule_end_date, "invalid format expecting yyyy-mm-dd")
-        end
-    end
-
-    def set_approximate_customers_count
-        if self.new_record?
-            self.approximate_customers_count ||= self.account.customers_count
-        else
         end
     end
 
