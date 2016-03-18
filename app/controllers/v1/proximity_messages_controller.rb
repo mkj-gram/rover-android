@@ -154,13 +154,13 @@ class V1::ProximityMessagesController < V1::ApplicationController
             :schedule_friday,
             :schedule_saturday,
             :schedule_sunday,
-            :customer_segment_id,
+            :segment_id,
             :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]
         )
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "locations", "customer-segments"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
+        should_include = ["beacons", "locations", "segment"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
 
         json = {
             data: serialize_message(message)
@@ -202,18 +202,18 @@ class V1::ProximityMessagesController < V1::ApplicationController
             end
         end
 
-        if should_include.included?("customer-segments")
+        if should_include.included?("segment")
             json[:data][:relationships] = {} if json[:data][:relationships].nil?
             if message.customer_segment
                 json[:data][:relationships].merge!(
                     {
-                        :"customer-segment" => {
-                            data: { type: "customer-segments", id: message.customer_segment.id.to_s }
+                        :"segment" => {
+                            data: { type: "segments", id: message.customer_segment.id.to_s }
                         }
 
                     }
                 )
-                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
+                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment, {:"total-customers-count" => current_account.customers_count})]
             else
                 json[:data][:relationships].merge!({:"customer-segments" => {data: []}})
             end
