@@ -64,9 +64,8 @@ class V1::ProximityMessagesController < V1::ApplicationController
             total_searchable_records = current_account.proximity_messages_count
         end
 
-        messages.includes(:customer_segment)
         json = {
-            "data" => messages.to_a.map{|message| serialize_message(message)},
+            "data" => messages.includes(:customer_segment).to_a.map{|message| serialize_message(message)},
             "meta" => {
                 "totalRecords" => messages.total,
                 "totalPages" => messages.total_pages,
