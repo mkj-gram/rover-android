@@ -23,6 +23,7 @@ class V1::CustomerSegmentsController < V1::ApplicationController
     def create
         json = flatten_request({single_record: true})
         customer_segment = CustomerSegment.new(customer_segment_params(json[:data]))
+        customer_segment.account = current_account
         customer_segment.account_id = current_account.id
         if customer_segment.save
             json = {

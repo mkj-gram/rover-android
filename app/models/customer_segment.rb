@@ -6,7 +6,7 @@ class CustomerSegment < ActiveRecord::Base
     before_create :calculate_customers_count
 
     before_save :calculate_customers_count
-    has_one :account
+    belongs_to :account
 
 
     def self.update_all_customer_counts_async
