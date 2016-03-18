@@ -13,6 +13,20 @@ class CustomerSegment < ActiveRecord::Base
         self.apply_customer_filters.all?{|filter| filter.within_filter(customer: customer, device: device)}
     end
 
+    def update_all_customer_counts_async
+        UpdateCustomerSegmentsCountWorker.preform_async
+    end
+
+    def update_customers_count!
+        previous_count = self.approximate_customers_count
+        calculate_customers_count
+        new_count = self.approximate_customers_count
+        if new_count != previous_count
+            self.save
+            Rails.logger.info("Customer Segment: #{self.id}, previous segment size: #{previous_count}, new segment size: #{new_count}")
+        end
+    end
+
     private
 
     def calculate_customers_count
