@@ -1,6 +1,6 @@
-module CustomerSegment
-    module Segments
-        class Segment
+module CustomerFilter
+    module Filters
+        class Filter
             attr_accessor :attribute_name, :comparer, :segment_count
 
 

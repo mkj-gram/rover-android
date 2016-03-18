@@ -1,4 +1,4 @@
-module CustomerSegment
+module CustomerFilter
     module Comparers
         module Methods
             EQUAL = "equal".freeze

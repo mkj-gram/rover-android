@@ -1,14 +1,14 @@
-require 'customer_segment/comparers/methods'
-require 'customer_segment/comparers/comparer'
-require 'customer_segment/comparers/string'
-require 'customer_segment/comparers/date'
-require 'customer_segment/comparers/boolean'
-require 'customer_segment/comparers/integer'
-require 'customer_segment/comparers/float'
-require 'customer_segment/comparers/array'
-require 'customer_segment/comparers/hash'
+require 'customer_filter/comparers/methods'
+require 'customer_filter/comparers/comparer'
+require 'customer_filter/comparers/string'
+require 'customer_filter/comparers/date'
+require 'customer_filter/comparers/boolean'
+require 'customer_filter/comparers/integer'
+require 'customer_filter/comparers/float'
+require 'customer_filter/comparers/array'
+require 'customer_filter/comparers/hash'
 
-module CustomerSegment
+module CustomerFilter
     module Comparers
         class << self
 
@@ -54,31 +54,31 @@ module CustomerSegment
             end
 
             def string(opts)
-                CustomerSegment::Comparers::String.new(opts)
+                CustomerFilter::Comparers::String.new(opts)
             end
 
             def boolean(opts)
-                CustomerSegment::Comparers::Boolean.new(opts)
+                CustomerFilter::Comparers::Boolean.new(opts)
             end
 
             def integer(opts)
-                CustomerSegment::Comparers::Integer.new(opts)
+                CustomerFilter::Comparers::Integer.new(opts)
             end
 
             def float(opts)
-                CustomerSegment::Comparers::Float.new(opts)
+                CustomerFilter::Comparers::Float.new(opts)
             end
 
             def hash(opts)
-                CustomerSegment::Comparers::Hash.new(opts)
+                CustomerFilter::Comparers::Hash.new(opts)
             end
 
             def array(opts)
-                CustomerSegment::Comparers::Array.new(opts)
+                CustomerFilter::Comparers::Array.new(opts)
             end
 
             def date(opts)
-                CustomerSegment::Comparers::Date.new(opts)
+                CustomerFilter::Comparers::Date.new(opts)
             end
 
         end

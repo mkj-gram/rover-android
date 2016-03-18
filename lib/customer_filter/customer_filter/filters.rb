@@ -1,15 +1,15 @@
-require 'customer_segment/segments/segment'
-require 'customer_segment/segments/customer'
-require 'customer_segment/segments/device'
-module CustomerSegment
-    module Segments
+require 'customer_filter/segments/segment'
+require 'customer_filter/segments/customer'
+require 'customer_filter/segments/device'
+module CustomerFilter
+    module Filters
 
         class << self
 
             # holds a map from string to initialization class
             @@models = {
-                "device" => CustomerSegment::Segments::Device,
-                "customer" => CustomerSegment::Segments::Customer
+                "device" => CustomerFilter::Filters::Device,
+                "customer" => CustomerFilter::Filters::Customer
             }
 
             def build(opts)

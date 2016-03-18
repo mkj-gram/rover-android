@@ -1,4 +1,4 @@
-module CustomerSegment
+module CustomerFilter
     module Comparers
         class Hash < Comparer
 
@@ -25,7 +25,7 @@ module CustomerSegment
                     # this value could be any value
                     # want to map which ever value to a comparer
                     # and check
-                    tmp_comparer = CustomerSegment::Comparers.build_with_type(self.dump, CustomerSegment::Comparers.get_type(v))
+                    tmp_comparer = CustomerFilter::Comparers.build_with_type(self.dump, CustomerFilter::Comparers.get_type(v))
                     if tmp_comparer
                         tmp_comparer.check(v)
                     else

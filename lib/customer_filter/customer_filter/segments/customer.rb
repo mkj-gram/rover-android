@@ -1,6 +1,6 @@
-module CustomerSegment
-    module Segments
-        class Customer < Segment
+module CustomerFilter
+    module Filters
+        class Customer < Filter
             # field :name, type: String
             # field :email, type: String
             # field :phone_number, type: String
@@ -16,7 +16,7 @@ module CustomerSegment
                 "something" => :integer
             }
 
-            # "name" => CustomerSegment::AttributeType.new(type: :string),
+            # "name" => CustomerFilter::AttributeType.new(type: :string),
             # "email" => AttributeType.new(type: :string),
             # "phone_number" => AttributeType.new(type: :string),
             # "tags" => AttributeType.new(type: :string, array: true),
@@ -37,7 +37,7 @@ module CustomerSegment
             def initialize(opts)
                 super
                 if opts.has_key?("comparer")
-                    @comparer = CustomerSegment::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
+                    @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
                 end
             end
 

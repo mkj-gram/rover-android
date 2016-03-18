@@ -1,4 +1,4 @@
-module CustomerSegment
+module CustomerFilter
     module Comparers
         class Boolean < Comparer
 

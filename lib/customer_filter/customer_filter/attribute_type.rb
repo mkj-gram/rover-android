@@ -1,4 +1,4 @@
-module CustomerSegment
+module CustomerFilter
     class AttributeType
         include Virtus.model
 

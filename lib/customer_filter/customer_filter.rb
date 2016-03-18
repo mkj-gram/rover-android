@@ -1,7 +1,7 @@
-require 'customer_segment/comparers'
-require 'customer_segment/segments'
-require 'customer_segment/attribute_type'
-module CustomerSegment
+require 'customer_filter/comparers'
+require 'customer_filter/segments'
+require 'customer_filter/attribute_type'
+module CustomerFilter
     # we can have types
     # types
     # :string

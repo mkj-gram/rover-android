@@ -1,6 +1,6 @@
-module CustomerSegment
-    module Segments
-        class Device < Segment
+module CustomerFilter
+    module Filters
+        class Device < Filter
 
             # field :locale_lang, type: String
             # field :locale_region, type: String
@@ -44,7 +44,7 @@ module CustomerSegment
             def initialize(opts)
                 super
                 if opts.has_key?("comparer")
-                    @comparer = CustomerSegment::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
+                    @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
                 end
             end
 
