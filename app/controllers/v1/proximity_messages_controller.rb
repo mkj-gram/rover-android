@@ -54,8 +54,8 @@ class V1::ProximityMessagesController < V1::ApplicationController
 
         elasticsearch_query = ProximityMessage.search(query)
 
-        messages = elasticsearch_query.per_page(page_size).page(current_page).records.includes(:customer_segment)
-
+        messages = elasticsearch_query.per_page(page_size).page(current_page)
+        records = messages.records.includes(:customer_segment)
         if query_archived == true
             total_searchable_records = current_account.archived_proximity_messages_count
         elsif query_archived == false
@@ -65,7 +65,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
         end
 
         json = {
-            "data" => messages.to_a.map{|message| serialize_message(message)},
+            "data" => records.to_a.map{|message| serialize_message(message)},
             "meta" => {
                 "totalRecords" => messages.total,
                 "totalPages" => messages.total_pages,
