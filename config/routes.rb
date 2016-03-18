@@ -90,7 +90,7 @@ Rails.application.routes.draw do
         patch "/inbox/messages/:id", to: 'customer_inbox_messages#update'
         delete "/inbox/messages/:id", to: 'customer_inbox_messages#destroy'
 
-        resources :"customer-segments", controller: "customer_segments", as: "customer_segments"
+        resources :"segments", controller: "customer_segments", as: "customer_segments"
 
     end
     # The priority is based upon order of creation: first created -> highest priority.
