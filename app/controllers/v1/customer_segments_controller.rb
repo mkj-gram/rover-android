@@ -64,10 +64,10 @@ class V1::CustomerSegmentsController < V1::ApplicationController
 
     def customer_segment_params(local_params)
 
-        convert_param_if_exists(local_params[:customer_segments], :name, :title)
-        param_should_be_array(local_params[:customer_segments], :filters)
+        convert_param_if_exists(local_params[:segments], :name, :title)
+        param_should_be_array(local_params[:segments], :filters)
 
-        local_params.fetch(:customer_segments, {}).permit(:title, :filters => [])
+        local_params.fetch(:segments, {}).permit(:title, :filters => [])
     end
 
 end
