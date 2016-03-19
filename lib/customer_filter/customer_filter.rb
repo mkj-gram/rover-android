@@ -6,6 +6,8 @@ module CustomerFilter
     class << self
 
         def compute_filter_count(account, filters)
+            return account.customers_count if filters.nil? || filters.empty?
+
             # merge all filters comparer queries
             query = {
                 filter: {

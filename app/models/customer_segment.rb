@@ -27,13 +27,21 @@ class CustomerSegment < ActiveRecord::Base
         end
     end
 
+    def customers_count
+        if filters.nil? || filters.empty?
+            return account.customers_count
+        else
+            return self.approximate_customers_count
+        end
+    end
+
     private
 
     def calculate_customers_count
         if filters.nil? || filters.empty?
             self.approximate_customers_count ||= account.customers_count
         elsif changes.include?(:filters)
-            self.approximate_customers_count = CustomerFilter.compute_filter_count(self.filters)
+            self.approximate_customers_count = CustomerFilter.compute_filter_count(self.account, self.filters)
         end
     end
 
