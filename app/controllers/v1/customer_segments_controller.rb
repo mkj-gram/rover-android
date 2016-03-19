@@ -5,7 +5,7 @@ class V1::CustomerSegmentsController < V1::ApplicationController
 
     def index
         # show all segments
-        segments = Account.customer_segments
+        segments = current_account.customer_segments
         json = {
             data: segments.map{|segment| V1::CustomerSegmentSerializer.serialize(segment, {:"total-customers-count" => current_account.customers_count})}
         }
