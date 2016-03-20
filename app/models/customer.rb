@@ -11,6 +11,7 @@ class Customer
     field :phone_number, type: String
     field :tags, type: Array
     field :traits, type: Hash
+    field :last_known_location, type: GeoPoint
 
     index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
     index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
@@ -83,6 +84,7 @@ class Customer
             indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :created_at, type: 'date', index: 'not_analyzed'
             indexes :traits, type: 'object'
+            indexes :last_known_location, type: "geo_point", lat_lon: true
             indexes :devices, type: 'nested' do
                 indexes :udid, type: 'string', index: 'no'
                 indexes :token, type: 'string', index: 'no'
@@ -127,8 +129,8 @@ class Customer
     after_save :index_customer
 
     def as_indexed_json(options = {})
-        puts "indexing document"
-        {
+
+        json = {
             account_id: self.account_id,
             identifier: self.identifier,
             name: self.name,
@@ -138,8 +140,11 @@ class Customer
             traits: self.traits,
             age: self.age,
             gender: self.gender,
+            last_known_location: last_known_location_as_indexed_json,
             devices: devices_as_indexed_json(options)
         }
+        puts "indexing document #{json}"
+        return json
     end
 
 
@@ -185,6 +190,14 @@ class Customer
             self[:gender] = val
         else
             self.gender = nil
+        end
+    end
+
+    def last_known_location_as_indexed_json
+        if self.last_known_location
+            {lat: self.last_known_location.lat, lon: self.last_known_location.lng}
+        else
+            nil
         end
     end
 

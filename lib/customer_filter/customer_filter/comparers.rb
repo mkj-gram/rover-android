@@ -31,6 +31,8 @@ module CustomerFilter
                     integer(opts)
                 when :float
                     float(opts)
+                when :geo_pont
+                    geo_pont(opts)
                 else
                     return nil
                 end
@@ -81,6 +83,10 @@ module CustomerFilter
 
             def date(opts)
                 CustomerFilter::Comparers::Date.new(opts)
+            end
+
+            def geo_point(opts)
+                CustomerFilter::Comparers::GeoPoint.new(opts)
             end
 
         end

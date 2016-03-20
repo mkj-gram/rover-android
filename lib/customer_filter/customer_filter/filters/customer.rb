@@ -14,7 +14,8 @@ module CustomerFilter
                 "tags" => :array,
                 "traits" => :hash,
                 "gender" => :string,
-                "age" => :integer
+                "age" => :integer,
+                "last-known-location" => :geo_point
             }
 
             # "name" => CustomerFilter::AttributeType.new(type: :string),
