@@ -17,14 +17,14 @@ module CustomerFilter
             end
 
             def range?
-                lower_bound && upper_bound
+                lower_bound || upper_bound
             end
 
             def dump
                 opts = super
                 if range?
                     opts.delete("value")
-                    opts.merge(
+                    opts.merge!(
                         {
                             "from" => lower_bound,
                             "to" => upper_bound
