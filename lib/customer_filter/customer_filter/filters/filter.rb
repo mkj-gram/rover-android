@@ -7,6 +7,7 @@ module CustomerFilter
             def initialize(opts)
                 @attribute_name = opts["attribute"]
                 @path = opts["path"]
+                @id = opts["id"] || SecureRandom.uuid
             end
 
             def model
