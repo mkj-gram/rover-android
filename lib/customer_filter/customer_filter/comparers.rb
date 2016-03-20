@@ -31,8 +31,8 @@ module CustomerFilter
                     integer(opts)
                 when :float
                     float(opts)
-                when :geo_pont
-                    geo_pont(opts)
+                when :geo_point
+                    geo_point(opts)
                 else
                     return nil
                 end
@@ -54,6 +54,8 @@ module CustomerFilter
                     :integer
                 when ::Float
                     :float
+                when ::GeoPoint
+                    :geo_point
                 end
             end
 

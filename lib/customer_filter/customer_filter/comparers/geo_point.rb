@@ -11,12 +11,19 @@ module CustomerFilter
                 @radius = opts["radius"] || 100
             end
 
-            def extra_opts
-                if longitude && latitude && radius
-                    {"longitude" => longitude, "latitude" => latitude, "radius" => radius}
-                else
-                    {}
-                end
+            def dump
+                opts = super
+
+                opts.delete("value")
+                opts.merge!(
+                    {
+                        "longitude" => longitude,
+                        "latitude" => latitude,
+                        "radius" => radius
+                    }
+                )
+
+                return opts
             end
 
             def check(v)
@@ -48,9 +55,9 @@ module CustomerFilter
                             bool: {
                                 must: [
                                     {
-                                        geo_distance: => {
+                                        geo_distance: {
                                             distance: radius,
-                                            distance_unit: "m"
+                                            distance_unit: "m",
                                             attribute_name => {
                                                 lat: latitude,
                                                 lon: longitude
