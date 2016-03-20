@@ -13,7 +13,8 @@ module CustomerFilter
                 "phone_number" => :string,
                 "tags" => :array,
                 "traits" => :hash,
-                "gender" => :string
+                "gender" => :string,
+                "age" => :integer
             }
 
             # "name" => CustomerFilter::AttributeType.new(type: :string),

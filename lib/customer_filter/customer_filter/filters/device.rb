@@ -18,19 +18,19 @@ module CustomerFilter
             # field :bluetooth_enabled, type: Boolean
             # field :location_monitoring_enabled, type: Boolean
             @@attribute_index = {
-                "locale_lang" => :string,
-                "locale_region" => :string,
-                "time_zone" => :string,
-                "sdk_version" => :string,
-                "os_name" => :string,
-                "os_version" => :string,
+                "locale-lang" => :string,
+                "locale-region" => :string,
+                "time-zone" => :string,
+                "sdk-version" => :string,
+                "os-name" => :string,
+                "os-version" => :string,
                 "model" => :string,
                 "manufacturer" => :string,
-                "background_enabled" => :boolean,
-                "local_notifications_enabled" => :boolean,
-                "remote_notifications_enabled" => :boolean,
-                "bluetooth_enabled" => :boolean,
-                "location_monitoring_enabled" => :boolean
+                "background-enabled" => :boolean,
+                "local_notifications-enabled" => :boolean,
+                "remote_notifications-enabled" => :boolean,
+                "bluetooth-enabled" => :boolean,
+                "location-monitoring-enabled" => :boolean
             }
 
             def model_name
