@@ -18,6 +18,7 @@ class UpdateCustomerSegmentsCountWorker
         CustomerSegment.find_each(batch_size: 50) do |customer_segment|
             customer_segment.update_customers_count!
         end
+        ack!
     end
 
 end
