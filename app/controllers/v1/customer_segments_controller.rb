@@ -68,7 +68,12 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         convert_param_if_exists(local_params[:segments], :name, :title)
         param_should_be_array(local_params[:segments], :filters)
 
-        local_params.fetch(:segments, {}).permit(:title, :filters => [])
+        filtered_params = local_params.fetch(:segments, {}).permit(:title)
+        if local_params.dig(:segments, :filters)
+            filtered_params[:filters] = local_params[:segments][:filters]
+        end
+        puts filtered_params
+        return filtered_params
     end
 
 end

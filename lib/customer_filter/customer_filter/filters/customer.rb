@@ -13,7 +13,7 @@ module CustomerFilter
                 "phone_number" => :string,
                 "tags" => :array,
                 "traits" => :hash,
-                "something" => :integer
+                "gender" => :string
             }
 
             # "name" => CustomerFilter::AttributeType.new(type: :string),
@@ -39,6 +39,7 @@ module CustomerFilter
                 if opts.has_key?("comparer")
                     @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
                 end
+                return nil if @comparer.nil?
             end
 
             def compute_filter_count(account)

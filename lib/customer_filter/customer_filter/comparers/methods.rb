@@ -14,6 +14,7 @@ module CustomerFilter
             LESS_THAN_OR_EQUAL = "less_than_or_equal".freeze
             GREATER_THAN_OR_EQUAL = "greater_than_or_equal".freeze
             RANGE = "range".freeze
+            IN = "in".freeze
         end
     end
 end
