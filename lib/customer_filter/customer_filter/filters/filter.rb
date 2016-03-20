@@ -7,14 +7,12 @@ module CustomerFilter
             def initialize(opts)
                 @attribute_name = opts["attribute"]
                 @path = opts["path"]
-                @filter_count = opts["filter_count"]
             end
 
             def dump
                 {
                     "model" => self.model_name,
                     "attribute" => attribute_name,
-                    "filter_count" => filter_count,
                     "comparer" => comparer.dump
                 }
             end
@@ -30,6 +28,13 @@ module CustomerFilter
                 else
                     model[attribute_name]
                 end
+            end
+
+            def valid?
+                !(
+                    attribute_name.nil? ||
+                    comparer.nil?
+                )
             end
 
         end

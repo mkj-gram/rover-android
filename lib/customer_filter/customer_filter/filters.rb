@@ -15,7 +15,9 @@ module CustomerFilter
             def build(opts)
                 model_name = opts["model"]
                 if model_name && @@models.has_key?(model_name)
-                    @@models[model_name].new(opts)
+                    filter = @@models[model_name].new(opts)
+                    return nil if !filter.valid?
+                    return filter
                 else
                     nil
                 end

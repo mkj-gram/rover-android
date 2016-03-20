@@ -31,6 +31,8 @@ module CustomerFilter
                     integer(opts)
                 when :float
                     float(opts)
+                else
+                    return nil
                 end
             end
 

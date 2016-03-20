@@ -46,7 +46,6 @@ module CustomerFilter
                 if opts.has_key?("comparer")
                     @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
                 end
-                return nil if @comparer.nil?
             end
 
             def elasticsearch_query
