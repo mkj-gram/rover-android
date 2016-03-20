@@ -51,7 +51,19 @@ module CustomerFilter
 
             def elasticsearch_query
                 if @comparer
-                    return @comparer.get_elasticsearch_query(formatted_attribute_name)
+                    nested_attribute_name = "devices.#{formatted_attribute_name}"
+                    query = @comparer.get_elasticsearch_query(nested_attribute_name)
+                    {
+                        filter: {
+                            bool: {
+                                must: [
+                                    nested: {
+                                        path: "devices"
+                                    }.merge(query)
+                                ]
+                            }
+                        }
+                    }
                 else
                     {}
                 end

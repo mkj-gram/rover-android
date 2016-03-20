@@ -15,7 +15,7 @@ module CustomerFilter
                         must: [
                             {
                                 term: {
-                                    account_id: account.id
+                                    "account_id" => account.id
                                 }
                             }
                         ]
@@ -27,7 +27,7 @@ module CustomerFilter
                 query.deep_merge!(filter.elasticsearch_query) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
             end
 
-            return Elasticsearch::Model.search(query, [::Customer]).count
+            return Elasticsearch::Model.search(query, [::Customer], {search_type: "count"}).response.hits.total
         end
 
     end
