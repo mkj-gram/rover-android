@@ -6,7 +6,7 @@ module V1::CustomerSegmentSerializer
                 "id" => customer_segment.id.to_s,
                 "attributes" => {
                     "name" => customer_segment.title,
-                    "filters" => customer_segment.filters,
+                    "filters" => customer_segment.filters.map{|filter| filter.dump},
                     "approximate-customers-count" => customer_segment.customers_count,
                 }.merge(extra_attributes)
             }
