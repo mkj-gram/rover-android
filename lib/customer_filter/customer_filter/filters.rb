@@ -1,6 +1,6 @@
-require 'customer_filter/segments/segment'
-require 'customer_filter/segments/customer'
-require 'customer_filter/segments/device'
+require 'customer_filter/filters/filter'
+require 'customer_filter/filters/customer'
+require 'customer_filter/filters/device'
 module CustomerFilter
     module Filters
 
