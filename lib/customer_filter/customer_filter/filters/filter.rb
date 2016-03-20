@@ -1,12 +1,16 @@
 module CustomerFilter
     module Filters
         class Filter
-            attr_accessor :attribute_name, :comparer, :filter_count
+            attr_accessor :model, :attribute_name, :comparer, :filter_count
 
 
             def initialize(opts)
                 @attribute_name = opts["attribute"]
                 @path = opts["path"]
+            end
+
+            def model
+                self.model_name
             end
 
             def dump
@@ -20,6 +24,10 @@ module CustomerFilter
             def elasticsearch_query
                 # builds an elasticsearch query using the comparer and field
                 #
+            end
+
+            def formatted_attribute_name
+                attribute_name.underscore
             end
 
             def get_value_for(model)

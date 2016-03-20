@@ -134,7 +134,8 @@ module CustomerFilter
                             bool: {
                                 must: [
                                     terms: {
-                                        attribute_name => @value
+                                        attribute_name => @value,
+                                        method: "and"
                                     }
                                 ]
                             }

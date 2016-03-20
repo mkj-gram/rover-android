@@ -18,19 +18,19 @@ module CustomerFilter
             # field :bluetooth_enabled, type: Boolean
             # field :location_monitoring_enabled, type: Boolean
             @@attribute_index = {
-                "locale-lang" => :string,
-                "locale-region" => :string,
-                "time-zone" => :string,
-                "sdk-version" => :string,
-                "os-name" => :string,
-                "os-version" => :string,
+                "locale_lang" => :string,
+                "locale_region" => :string,
+                "time_zone" => :string,
+                "sdk_version" => :string,
+                "os_name" => :string,
+                "os_version" => :string,
                 "model" => :string,
                 "manufacturer" => :string,
-                "background-enabled" => :boolean,
-                "local_notifications-enabled" => :boolean,
-                "remote_notifications-enabled" => :boolean,
-                "bluetooth-enabled" => :boolean,
-                "location-monitoring-enabled" => :boolean
+                "background_enabled" => :boolean,
+                "local_notifications_enabled" => :boolean,
+                "remote_notifications_enabled" => :boolean,
+                "bluetooth_enabled" => :boolean,
+                "location_monitoring_enabled" => :boolean
             }
 
             def model_name
@@ -43,14 +43,15 @@ module CustomerFilter
 
             def initialize(opts)
                 super
+                @model = self.model_name
                 if opts.has_key?("comparer")
-                    @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
+                    @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[formatted_attribute_name])
                 end
             end
 
             def elasticsearch_query
                 if @comparer
-                    return @comparer.get_elasticsearch_query(attribute_name)
+                    return @comparer.get_elasticsearch_query(formatted_attribute_name)
                 else
                     {}
                 end

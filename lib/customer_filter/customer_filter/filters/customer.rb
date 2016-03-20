@@ -37,8 +37,9 @@ module CustomerFilter
 
             def initialize(opts)
                 super
+                @model = self.model_name
                 if opts.has_key?("comparer")
-                    @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
+                    @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[formatted_attribute_name])
                 end
                 return nil if @comparer.nil?
             end
@@ -60,7 +61,7 @@ module CustomerFilter
                             }
                         }
                     }
-                    query.deep_merge!(@comparer.get_elasticsearch_query(attribute_name)) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
+                    query.deep_merge!(@comparer.get_elasticsearch_query(formatted_attribute_name)) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
                     @segment_count = Elasticsearch::Model.search(query, [::Customer]).count
                     return @segment_count
                 else
@@ -70,7 +71,7 @@ module CustomerFilter
 
             def elasticsearch_query
                 if @comparer
-                    return @comparer.get_elasticsearch_query(attribute_name)
+                    return @comparer.get_elasticsearch_query(formatted_attribute_name)
                 else
                     {}
                 end
