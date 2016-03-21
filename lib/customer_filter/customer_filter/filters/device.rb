@@ -1,6 +1,6 @@
-module CustomerSegment
-    module Segments
-        class Device < Segment
+module CustomerFilter
+    module Filters
+        class Device < Filter
 
             # field :locale_lang, type: String
             # field :locale_region, type: String
@@ -43,12 +43,33 @@ module CustomerSegment
 
             def initialize(opts)
                 super
+                @model = self.model_name
                 if opts.has_key?("comparer")
-                    @comparer = CustomerSegment::Comparers.build_with_type(opts["comparer"], attribute_index[attribute_name])
+                    @comparer = CustomerFilter::Comparers.build_with_type(opts["comparer"], attribute_index[formatted_attribute_name])
                 end
             end
 
-            def within_segment(opts = {})
+            def elasticsearch_query
+                if @comparer
+                    nested_attribute_name = "devices.#{formatted_attribute_name}"
+                    query = @comparer.get_elasticsearch_query(nested_attribute_name)
+                    {
+                        filter: {
+                            bool: {
+                                must: [
+                                    nested: {
+                                        path: "devices"
+                                    }.merge(query)
+                                ]
+                            }
+                        }
+                    }
+                else
+                    {}
+                end
+            end
+
+            def within_filter(opts = {})
                 device = opts[:device]
                 if device.is_a?(::CustomerDevice)
                     value = get_value_for(device)

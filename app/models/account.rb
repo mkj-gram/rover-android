@@ -50,6 +50,7 @@ class Account < ActiveRecord::Base
     has_many :estimote_integrations
     has_many :kontakt_integrations
 
+    has_many :customer_segments
     # we can go innerjoin the beacon_configuration table with the ibeacons table
     # has_many :ibeacon_configurations, through: :beacon_configurations, source: :configurable, source_type: "IbeaconConfiguration"
     # or just directly look up from the ibeacons_table

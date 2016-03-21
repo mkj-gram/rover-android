@@ -102,7 +102,7 @@ class BeaconRegionEvent < Event
         # apply all filters
         current_time = DateTime.now
         messages.select do |message|
-            message.within_schedule(current_time) && message.apply_configuration_filters(beacon_configuration) && message.apply_customer_filters(customer, device)
+            message.within_schedule(current_time) && message.apply_configuration_filters(beacon_configuration) && message.within_customer_segment(customer, device)
         end
     end
 

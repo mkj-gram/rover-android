@@ -3,12 +3,11 @@ class Message < ActiveRecord::Base
     include Elasticsearch::Model::Callbacks
     include FormattableMessage
     include MessageLimit::Attribute
-    include CustomerSegment::Attribute
 
-    segment_attribute :customer_segments
     message_limit_attribute :limits
     # belongs_to :account
-
+    # doesn't make sense but thats how rails structures relationships
+    belongs_to :customer_segment
 
     message_attribute :notification_text
 
@@ -45,13 +44,14 @@ class Message < ActiveRecord::Base
 
     after_initialize :set_proper_time_schedule_range
     after_initialize :set_defaults, unless: :persisted?
-    before_save :set_approximate_customers_count
 
     validates :title, presence: true
     validate :valid_date_schedule
 
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
+
+
 
     def as_indexed_json(opts = {})
         {
@@ -174,8 +174,12 @@ class Message < ActiveRecord::Base
         filter_location(configuration) && filter_beacon_configuration(configuration)
     end
 
-    def apply_customer_filters(customer, device)
-        self.customer_segments.all?{|customer_segment| customer_segment.within_segment(customer: customer, device: device)}
+    def within_customer_segment(customer, device)
+        if self.customer_segment_id
+            self.customer_segment.within_segment(customer, device)
+        else
+            true
+        end
     end
 
     def within_message_limits(message_rate_index)
@@ -213,13 +217,6 @@ class Message < ActiveRecord::Base
 
         if @schedule_end_date && !valid_date(@schedule_end_date)
             errors.add(:schedule_end_date, "invalid format expecting yyyy-mm-dd")
-        end
-    end
-
-    def set_approximate_customers_count
-        if self.new_record?
-            self.approximate_customers_count ||= self.account.customers_count
-        else
         end
     end
 

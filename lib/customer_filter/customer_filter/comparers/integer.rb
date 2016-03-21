@@ -1,13 +1,39 @@
-module CustomerSegment
+module CustomerFilter
     module Comparers
         class Integer < Comparer
 
-            attr_reader :lower_bound, :upper_bound
             def initialize(opts)
                 super
-                @lower_bound = opts["from"]
-                @upper_bound = opts["to"]
+                @from = opts["from"]
+                @to = opts["to"]
             end
+
+            def lower_bound
+                @from
+            end
+
+            def upper_bound
+                @to
+            end
+
+            def range?
+                lower_bound || upper_bound
+            end
+
+            def dump
+                opts = super
+                if range?
+                    opts.delete("value")
+                    opts.merge!(
+                        {
+                            "from" => lower_bound,
+                            "to" => upper_bound
+                        }
+                    )
+                end
+                return opts
+            end
+
 
             def check(v)
                 case @method
@@ -36,7 +62,11 @@ module CustomerSegment
             end
 
             def extra_opts
-                {"from" => lower_bound, "to" => upper_bound}
+                if lower_bound && upper_bound
+                    {"from" => lower_bound, "to" => upper_bound}
+                else
+                    {}
+                end
             end
 
             def get_elasticsearch_query(attribute_name)

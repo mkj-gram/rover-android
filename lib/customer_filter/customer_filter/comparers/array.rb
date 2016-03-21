@@ -1,6 +1,6 @@
-module CustomerSegment
+module CustomerFilter
     module Comparers
-        class Float < Comparer
+        class Array < Comparer
 
             def check(v)
                 case @method
@@ -8,24 +8,19 @@ module CustomerSegment
                     v == @value
                 when Comparers::Methods::NOT_EQUAL
                     v != @value
+                when Comparers::Methods::CONTAINS
+                    v.include?(@value)
+                when Comparers::Methods::DOES_NOT_CONTAIN
+                    !v.include?(@value)
                 when Comparers::Methods::ANY_VALUE
                     true
                 when Comparers::Methods::UNKNOWN_VALUE
                     v.nil?
-                when Comparers::Methods::LESS_THAN
-                    v < @value
-                when Comparers::Methods::LESS_THAN_OR_EQUAL
-                    v <= @value
-                when Comparers::Methods::GREATER_THAN
-                    v > @value
-                when Comparers::Methods::GREATER_THAN_OR_EQUAL
-                    v >= @value
                 else
                     false
                 end
 
             end
-
         end
     end
 end

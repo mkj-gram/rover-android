@@ -1,4 +1,4 @@
-module CustomerSegment
+module CustomerFilter
     module Comparers
         class String < Comparer
 
@@ -18,6 +18,8 @@ module CustomerSegment
                     !v.include?(@value)
                 when Comparers::Methods::ANY_VALUE
                     true
+                when Comparers::Methods::IN
+                    v.include?(@value)
                 when Comparers::Methods::UNKNOWN_VALUE
                     v.nil?
                 else
@@ -126,6 +128,19 @@ module CustomerSegment
 
                         }
                     }
+                when Comparers::Methods::IN
+                    {
+                        filter: {
+                            bool: {
+                                must: [
+                                    terms: {
+                                        attribute_name => @value,
+                                    }
+                                ]
+                            }
+                        }
+                    }
+
                 else
                     {}
                 end

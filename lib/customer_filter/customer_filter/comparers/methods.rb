@@ -1,4 +1,4 @@
-module CustomerSegment
+module CustomerFilter
     module Comparers
         module Methods
             EQUAL = "equal".freeze
@@ -14,6 +14,8 @@ module CustomerSegment
             LESS_THAN_OR_EQUAL = "less_than_or_equal".freeze
             GREATER_THAN_OR_EQUAL = "greater_than_or_equal".freeze
             RANGE = "range".freeze
+            IN = "in".freeze
+            GEOFENCE = "geofence".freeze
         end
     end
 end

@@ -1,4 +1,4 @@
-module CustomerSegment
+module CustomerFilter
     module Serializer
         class << self
             def load(value)
@@ -12,9 +12,9 @@ module CustomerSegment
             end
 
             def dump(value)
-                if value.is_a?(Array) && value.first.is_a?(CustomerSegment::Segments::Segment)
+                if value.is_a?(Array) && value.first.is_a?(CustomerFilter::Filters::Filter)
                     value.map{|v| serialize(v)}
-                elsif value.is_a?(CustomerSegment::Segments::Segment)
+                elsif value.is_a?(CustomerFilter::Filters::Filter)
                     serialize(value)
                 else
                     value
@@ -29,7 +29,7 @@ module CustomerSegment
 
             def deserialize(value)
                 return nil if !value.is_a?(Hash)
-                CustomerSegment::Segments.build(value)
+                CustomerFilter::Filters.build(value)
             end
         end
     end
