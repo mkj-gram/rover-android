@@ -14,7 +14,7 @@ class CustomerSegment < ActiveRecord::Base
     end
 
     def within_segment(customer, device)
-        self.apply_customer_filters.all?{|filter| filter.within_filter(customer: customer, device: device)}
+        self.filters.all?{|filter| filter.within_filter(customer: customer, device: device)}
     end
 
     def update_customers_count!
