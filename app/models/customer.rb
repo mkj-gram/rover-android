@@ -143,7 +143,7 @@ class Customer
             location: location_as_indexed_json,
             devices: devices_as_indexed_json(options)
         }
-        puts "indexing document #{json}"
+        Rails.logger.debug("indexing document #{json}")
         return json
     end
 
