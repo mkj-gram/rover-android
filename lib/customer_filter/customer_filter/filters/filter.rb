@@ -31,6 +31,10 @@ module CustomerFilter
                 attribute_name.underscore
             end
 
+            # Given a model it performs an attribute lookup using the formatted attribute name
+            # eg. model = Filters::Device
+            # attribute_name = "os-name" formatted_attribute_name = "os_name"
+            # lookup model[formatted_attribute_name] -> "iOS"
             def get_value_for(model)
                 if @path && model[formatted_attribute_name].is_a?(Hash)
                     model[formatted_attribute_name].dig(*@path.split("."))
