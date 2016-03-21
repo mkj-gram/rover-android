@@ -27,7 +27,7 @@ namespace :account do
     task :generate => :environment do
         begin
             # Turn off mongo output
-            Rails.logger.level = ::Logger::INFO
+            Rails.logger.level = ::Logger::FATAL
             Mongo::Logger.logger.level = ::Logger::INFO
             primary_account_email = ENV['EMAIL'] || "sean@rover.io"
             num_configurations = ENV['NUM_CONFIGURATIONS'] || 1000
