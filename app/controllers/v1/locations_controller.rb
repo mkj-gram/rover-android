@@ -117,7 +117,7 @@ class V1::LocationsController < V1::ApplicationController
 
     def show
         # include configurations
-        should_include = whitelist_include(["configurations"])
+        should_include = ["configurations"] # auto include for now whitelist_include(["configurations"])
 
         json = {
             "data" => serialize_location(@location)
