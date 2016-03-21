@@ -32,10 +32,10 @@ module CustomerFilter
             end
 
             def get_value_for(model)
-                if @path && model[attribute_name].is_a?(Hash)
-                    model[attribute_name].dig(*@path.split("."))
+                if @path && model[formatted_attribute_name].is_a?(Hash)
+                    model[formatted_attribute_name].dig(*@path.split("."))
                 else
-                    model[attribute_name]
+                    model[formatted_attribute_name]
                 end
             end
 
