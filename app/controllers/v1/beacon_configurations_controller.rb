@@ -70,14 +70,15 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         # if tags are provided they must all match
         if query_tags.any?
-            must_filter.push(
-                {
-                    terms:  {
-                        tags: query_tags,
-                        execution: "and"
+            query_tags.each do |tag|
+                must_filter.push(
+                    {
+                        term:  {
+                            tags: tag,
+                        }
                     }
-                }
-            )
+                )
+            end
         end
 
         if query_location_id

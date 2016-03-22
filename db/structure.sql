@@ -127,6 +127,7 @@ CREATE TABLE accounts (
     share_key text NOT NULL,
     users_count integer DEFAULT 0,
     locations_count integer DEFAULT 0,
+    beacon_configurations_count integer DEFAULT 0,
     searchable_beacon_configurations_count integer DEFAULT 0,
     searchable_locations_count integer DEFAULT 0,
     account_invites_count integer DEFAULT 0,

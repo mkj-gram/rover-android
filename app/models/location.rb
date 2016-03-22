@@ -67,12 +67,15 @@ class Location < ActiveRecord::Base
     validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }, unless: :google_place_id?
 
 
-    belongs_to :account, counter_cache: :searchable_locations_count
+    belongs_to :account
     has_many :beacon_configurations
 
     before_save :update_address_from_google_place
     after_save :update_active_tags
     after_save :update_beacon_configurations_elasticsearch_document
+
+    after_create :increment_account_locations_count
+    after_destroy :decrement_account_locations_count
 
     def as_indexed_json(options = {})
         {
@@ -113,6 +116,14 @@ class Location < ActiveRecord::Base
 
     private
 
+    def increment_account_locations_count
+        Account.update_counters(self.account_id, :locations_count => 1, :searchable_locations_count => 1)
+    end
+
+    def decrement_account_locations_count
+        Account.update_counters(self.account_id, :locations_count => 1, :searchable_locations_count => 1)
+    end
+
     def update_address_from_google_place
         if self.changes.include?(:google_place_id) && google_place_id_was != google_place_id
             begin
@@ -145,9 +156,10 @@ class Location < ActiveRecord::Base
     def update_beacon_configurations_elasticsearch_document
         # only if the name has changed do we need to update the elasticsearch documents of the beacons
         # who are attached to this
-        if changes.include?(:title)
+        if changes.include?(:title) || changes.include?(:tags)
+            Rails.logger.debug("Reindexing #{beacon_configurations.size} beacon configurations")
             beacon_configurations.each do |config|
-                config.__elasticsearch__.update_document_attributes({location: {name: self.title, id: self.id}})
+                config.__elasticsearch__.update_document_attributes({location: {name: self.title, id: self.id, tags: self.tags}})
             end
         end
     end

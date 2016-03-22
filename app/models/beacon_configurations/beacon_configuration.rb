@@ -64,7 +64,10 @@ class BeaconConfiguration < ActiveRecord::Base
     after_save :update_active_tags
     after_save :update_location
 
-    belongs_to :account, counter_cache: :searchable_beacon_configurations_count
+    after_create :increment_account_beacons_count
+    after_destroy :decrement_account_beacons_count
+
+    belongs_to :account
     belongs_to :location, counter_cache: :beacon_configurations_count
 
     has_many :shared_beacon_configurations
@@ -188,7 +191,8 @@ class BeaconConfiguration < ActiveRecord::Base
         if location
             return {
                 name: location.title,
-                id: location.id
+                id: location.id,
+                tags: location.tags
             }
         else
             return {}
@@ -198,12 +202,13 @@ class BeaconConfiguration < ActiveRecord::Base
     def remove_duplicate_tags
         self.tags.uniq! if self.tags
     end
-    def increment_searchable_beacon_configurations_count
-        Account.update_counters(self.account_id, :searchable_beacon_configurations_count => 1)
+
+    def increment_account_beacons_count
+        Account.update_counters(self.account_id, :searchable_beacon_configurations_count => 1, :beacon_configurations_count => 1)
     end
 
-    def decrement_searchable_beacon_configurations_count
-        Account.update_counters(self.account_id, :searchable_beacon_configurations_count => -1)
+    def decrement_account_beacons_count
+        Account.update_counters(self.account_id, :searchable_beacon_configurations_count => -1, :beacon_configurations_count => -1)
     end
 
     def ibeacon_type
