@@ -69,7 +69,8 @@ class V1::ProximityMessagesController < V1::ApplicationController
             "meta" => {
                 "totalRecords" => messages.total,
                 "totalPages" => messages.total_pages,
-                "totalSearchableRecords" => total_searchable_records
+                "totalSearchableRecords" => total_searchable_records,
+                "totalConfigurationsCount" => current_account.searchable_beacon_configurations_count # use searchable since we could be targeting shared beacons
             }
         }
 
@@ -163,7 +164,10 @@ class V1::ProximityMessagesController < V1::ApplicationController
         should_include = ["beacons", "locations", "segment"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
 
         json = {
-            data: serialize_message(message)
+            data: serialize_message(message, {:"targeted-configurations-count" => message.targeted_beacon_configurations_count}),
+            meta: {
+                totalConfigurationsCount: current_account.searchable_beacon_configurations_count # use searchable since we could be targeting shared beacons
+            }
         }
 
         included = []
@@ -235,7 +239,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
         params.fetch(:filter, {}).fetch(:archived, "false").to_bool
     end
 
-    def serialize_message(message)
+    def serialize_message(message, extra_attributes = {})
         {
             type: "proximity-messages",
             id: message.id.to_s,
@@ -260,7 +264,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"location-tags" => message.filter_location_tags,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
                 :"approximate-customers-count" => message.customer_segment ? message.customer_segment.customers_count : current_account.customers_count
-            }
+            }.merge(extra_attributes)
         }
     end
 

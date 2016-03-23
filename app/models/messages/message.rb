@@ -198,6 +198,101 @@ class Message < ActiveRecord::Base
         limits.any?
     end
 
+    def has_configuration_filters
+        (
+            filter_beacon_configuration_tags && filter_beacon_configuration_tags.any?  ||
+            filter_beacon_configuration_ids && filter_beacon_configuration_ids.any? ||
+            filter_location_tags && filter_location_tags.any? ||
+            filter_location_ids && filter_location_ids.any?
+        )
+    end
+
+    def targeted_beacon_configurations_count
+        if has_configuration_filters
+            return @cached_targeted_beacon_configurations_count if @cached_targeted_beacon_configurations_count
+            must_filters = [
+                {
+                    term: {
+                        account_id: self.account_id
+                    }
+                }
+            ]
+            should_filters = [
+                {
+                    term: {
+                        account_id: self.account_id
+                    }
+                },
+                {
+                    term: {
+                        shared_account_ids: self.account_id
+                    }
+                }
+            ]
+
+            if filter_beacon_configuration_ids && filter_beacon_configuration_ids.any?
+                must_filters.push(
+                    {
+                        ids: {
+                            values: filter_beacon_configuration_ids
+                        }
+                    }
+                )
+            end
+
+            if filter_location_ids && filter_location_ids.any?
+                must_filters.push(
+                    {
+                        terms: {
+                            "location.id" => filter_location_ids
+                        }
+                    }
+                )
+            end
+
+            if filter_beacon_configuration_tags && filter_beacon_configuration_tags.any?
+                filter_beacon_configuration_tags.each do |tag|
+                    must_filters.push(
+                        {
+                            term: {
+                                tags: tag
+                            }
+
+                        }
+                    )
+                end
+            end
+
+            if filter_location_tags && filter_location_tags.any?
+                filter_location_tags.each do |tag|
+                    must_filters.push(
+                        {
+                            term: {
+                                "location.tags" => tag
+                            }
+                        }
+                    )
+                end
+            end
+
+
+
+            query = {
+                filter: {
+                    bool: {
+                        must: must_filters,
+                        should: should_filters,
+                        minimum_should_match: 1
+                    }
+                }
+            }
+            @cached_targeted_beacon_configurations_count = Elasticsearch::Model.search(query, [::BeaconConfiguration], {search_type: "count"}).response.hits.total
+            return @cached_targeted_beacon_configurations_count
+        else
+            account.beacon_configurations_count
+        end
+    end
+
     private
 
     def set_defaults
