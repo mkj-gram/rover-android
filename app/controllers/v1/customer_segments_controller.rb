@@ -7,14 +7,20 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         # show all segments
         segments = current_account.customer_segments
         json = {
-            data: segments.map{|segment| V1::CustomerSegmentSerializer.serialize(segment, {:"total-customers-count" => current_account.customers_count})}
+            data: segments.map{|segment| V1::CustomerSegmentSerializer.serialize(segment)},
+            meta: {
+                totalCustomersCount: current_account.customers_count
+            }
         }
         render json: json
     end
 
     def show
         json = {
-            data: V1::CustomerSegmentSerializer.serialize(@customer_segment, {:"total-customers-count" => current_account.customers_count})
+            data: V1::CustomerSegmentSerializer.serialize(@customer_segment),
+            meta: {
+                totalCustomersCount: current_account.customers_count
+            }
         }
 
         render json: json
@@ -27,7 +33,10 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         customer_segment.account_id = current_account.id
         if customer_segment.save
             json = {
-                data: V1::CustomerSegmentSerializer.serialize(customer_segment, {:"total-customers-count" => current_account.customers_count})
+                data: V1::CustomerSegmentSerializer.serialize(customer_segment),
+                meta: {
+                    totalCustomersCount: current_account.customers_count
+                }
             }
             render json: json
         else
@@ -39,7 +48,10 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         json = flatten_request({single_record: true})
         if @customer_segment.update_attributes(customer_segment_params(json[:data]))
             json = {
-                data: V1::CustomerSegmentSerializer.serialize(@customer_segment, {:"total-customers-count" => current_account.customers_count})
+                data: V1::CustomerSegmentSerializer.serialize(@customer_segment),
+                meta: {
+                    totalCustomersCount: current_account.customers_count
+                }
             }
             render json: json
         else
