@@ -56,6 +56,8 @@ gem 'multi_json', '~> 1.11', '>= 1.11.2'
 
 gem 'oj', '~> 2.14', '>= 2.14.4'
 
+gem 'google-api-client', '~> 0.9.4'
+
 group :development do
 
 
