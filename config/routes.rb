@@ -91,6 +91,9 @@ Rails.application.routes.draw do
         delete "/inbox/messages/:id", to: 'customer_inbox_messages#destroy'
 
         resources :"segments", controller: "customer_segments", as: "customer_segments"
+        scope :segments do
+            post "/calculate", to: "customer_segment_calculate#create", as: "customer_segment_calculate"
+        end
 
     end
     # The priority is based upon order of creation: first created -> highest priority.
