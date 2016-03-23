@@ -50,6 +50,14 @@ module CustomerFilter
                 )
             end
 
+            def ==(other)
+                self.model_name == other.model_name && self.attribute_name == other.attribute_name && self.comparer == other.comparer
+            end
+
+            def eql?(other)
+                self == other
+            end
+
         end
     end
 end

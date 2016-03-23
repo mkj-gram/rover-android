@@ -20,6 +20,14 @@ module CustomerFilter
             def extra_opts
                 {}
             end
+
+            def ==(other)
+                self.dump == other.dump
+            end
+
+            def eql(other)
+                self == other
+            end
         end
     end
 end
