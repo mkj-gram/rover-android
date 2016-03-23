@@ -281,8 +281,7 @@ class Message < ActiveRecord::Base
                 filter: {
                     bool: {
                         must: must_filters,
-                        should: should_filters,
-                        minimum_should_match: 1
+                        should: should_filters
                     }
                 }
             }
