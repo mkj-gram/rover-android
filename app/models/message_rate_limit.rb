@@ -27,8 +27,8 @@ class MessageRateLimit
         # drop all keys from the largets limit
         if limits.any?
             largest_limit = limits.sort_by(&:number_of_seconds).last
-            drop_interval = time - largest_limit.number_of_minutes
-            client.zremrangebyscore(key, "#{drop_interval}", "+inf")
+            drop_interval = time - largest_limit.number_of_seconds
+            client.zremrangebyscore(key, "-inf", "#{drop_interval}")
             # drop all events which are older than our time interval
             # each limit count how events exist
             count_intervals = {}
@@ -52,8 +52,6 @@ class MessageRateLimit
             end
         else
             return true
-            # just add and return
-            # expire should be our highest 90 days
         end
     end
 

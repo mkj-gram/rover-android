@@ -8,7 +8,7 @@ class CustomerInbox
     validates :_id, presence: true
     embeds_many :messages, class_name: "InboxMessage"
 
-    belongs_to :customer
+    belongs_to :customer, foreign_key: "_id"
 
     def self.inbox_limit
         300
@@ -56,8 +56,8 @@ class CustomerInbox
     def add_messages(inbox_messages, account)
 
         # use the new redis client
-        messages_to_add = inbox_messages.select do |message|
-            limits = message.limits + account.message_limits
+        messages_to_add = inbox_messages.select do |inbox_message|
+            message = inbox_message.message
             MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)
         end
         # not a bug but build into mongoid and you can't turn it off
