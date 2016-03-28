@@ -58,6 +58,6 @@ class MessageRateLimit
     end
 
     def self.client
-
+        return $redis
     end
 end

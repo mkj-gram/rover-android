@@ -8,6 +8,8 @@ class CustomerInbox
     validates :_id, presence: true
     embeds_many :messages, class_name: "InboxMessage"
 
+    belongs_to :customer
+
     def self.inbox_limit
         300
     end
@@ -51,35 +53,13 @@ class CustomerInbox
         end
     end
 
-    # TODO
-    # clean this up a lot maybe put everyting into a helper class
     def add_messages(inbox_messages, account)
-        message_limits = inbox_messages.map{|inbox_message| inbox_message.message.limits }.flatten
-        message_rate = message_rate_index(account.message_limits, message_limits)
 
-        messages_to_add = inbox_messages.select do |inbox_message|
-            if account.within_message_limits(message_rate[:global_count])
-                message_rate[:global_count][1] += 1
-                true
-            else
-                false
-            end
+        # use the new redis client
+        messages_to_add = inbox_messages.select do |message|
+            limits = message.limits + account.message_limits
+            MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)
         end
-
-        messages_to_add = messages_to_add.select do |inbox_message|
-            message = inbox_message.message
-            key = message.id
-            within_limit = true
-            if message.has_message_limits
-                within_limit = message.within_message_limits(message_rate[:messages][key])
-            end
-
-            if within_limit
-                tmp_messages << inbox_message
-                message_rate = message_rate_index(account.message_limits, message_limits)
-            end
-        end
-
         # not a bug but build into mongoid and you can't turn it off
         # self.messages += messages_to_add
         # auto updates the document for some reason
