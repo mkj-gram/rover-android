@@ -58,6 +58,8 @@ gem 'oj', '~> 2.14', '>= 2.14.4'
 
 gem 'google-api-client', '~> 0.9.4'
 
+gem 'fluentd', '~> 0.12.22'
+
 group :development do
 
 

@@ -50,6 +50,15 @@
     },
     "MONGODB_URI": {
       "required": true
+    },
+    "ANALYTICS_SHARED_KEY": {
+      "required": true
+    },
+    "ANALYTICS_USERNAME": {
+        "required": true
+    },
+    "ANALYTICS_PASSWORD": {
+        "required": true
     }
   },
   "addons": [
