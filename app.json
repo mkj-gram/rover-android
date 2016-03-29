@@ -54,12 +54,6 @@
     "ANALYTICS_SHARED_KEY": {
       "required": true
     },
-    "ANALYTICS_USERNAME": {
-        "required": true
-    },
-    "ANALYTICS_PASSWORD": {
-        "required": true
-    },
     "REDISCLOUD_URL": {
       "required": true
     }

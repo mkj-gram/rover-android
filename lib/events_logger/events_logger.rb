@@ -8,7 +8,7 @@ module EventsLogger
         end
 
         def client
-            @client ||= Fluent::Logger::FluentLogger.new(nil, host: Rails.configuration.event_logger["host"], port: Rails.configuration.event_logger["port"])
+            @client ||= Fluent::Logger::FluentLogger.new(nil, host: "localhost", port: 24284)
         end
     end
 end

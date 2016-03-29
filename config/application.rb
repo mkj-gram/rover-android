@@ -17,7 +17,6 @@ module RailsApi
         config.mailgun = Rails.application.config_for(:mailgun)
         config.password_reset = Rails.application.config_for(:password_reset)
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
-        config.event_logger = Rails.application.config_for(:event_logger)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('app', 'models', 'messages')
         config.autoload_paths << Rails.root.join('app', 'models', 'configuration_visits')
