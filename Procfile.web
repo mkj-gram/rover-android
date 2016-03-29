@@ -1,0 +1,2 @@
+puma: bundle exec puma -C config/puma.rb
+fluentd: bundle exec fluentd -c config/td-agent.conf --use-v1-config
