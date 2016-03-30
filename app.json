@@ -59,10 +59,14 @@
     },
     "ANALYTICS_PASSWORD": {
         "required": true
+    },
+    "REDISCLOUD_URL": {
+      "required": true
     }
   },
   "addons": [
     "bonsai",
-    "cloudamqp"
+    "cloudamqp",
+    "rediscloud"
   ]
 }

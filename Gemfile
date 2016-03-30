@@ -62,6 +62,9 @@ gem 'fluentd', '~> 0.12.22'
 
 gem 'fluent-plugin-secure-forward', '~> 0.4.0'
 
+gem 'redis', '~> 3.2', '>= 3.2.2'
+
+
 group :development do
 
 

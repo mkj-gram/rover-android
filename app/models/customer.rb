@@ -181,6 +181,7 @@ class Customer
     def inbox
         @inbox ||= CustomerInbox.find(self.id)
         @inbox = CustomerInbox.create(customer_id: self.id) if @inbox.nil?
+        @inbox.customer = self
         return @inbox
     end
 

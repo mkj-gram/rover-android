@@ -33,6 +33,10 @@ module MessageLimit
             end
         end
 
+        def number_of_seconds
+            @number_of_minutes * 60
+        end
+
         def valid?
             !(message_limit.nil? && number_of_minutes.nil?)
         end
