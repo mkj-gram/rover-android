@@ -37,7 +37,7 @@ class LocationEvent < Event
 
     def update_customer_location
         if customer
-            customer.update_attributes({last_known_location: GeoPoint.new(latitude, longitude)})
+            customer.update_attributes({location: GeoPoint.new(latitude, longitude)})
         end
     end
 
