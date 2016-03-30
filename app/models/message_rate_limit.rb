@@ -1,6 +1,8 @@
 class MessageRateLimit
 
-
+    def self.prefix
+        "msgrl_"
+    end
     # takes a message
     # each message has a rolling window
     # there is an aggregate for global limits per user as well
@@ -15,11 +17,11 @@ class MessageRateLimit
     private
 
     def self.get_global_rate_limit_key(customer)
-        "#{customer.id.to_s}"
+        prefix + "#{customer.id.to_s}"
     end
 
     def self.get_message_rate_limit_key(customer, message)
-        "#{customer.id.to_s}:#{message.id.to_s}"
+        prefix + "#{customer.id.to_s}:#{message.id.to_s}"
     end
 
     def self.add_to_limit(key, limits = [])
