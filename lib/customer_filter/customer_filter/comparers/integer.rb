@@ -4,8 +4,8 @@ module CustomerFilter
 
             def initialize(opts)
                 super
-                @from = opts["from"]
-                @to = opts["to"]
+                @from = opts["from"].to_i
+                @to = opts["to"].to_i
             end
 
             def lower_bound
@@ -54,7 +54,7 @@ module CustomerFilter
                 when Comparers::Methods::GREATER_THAN_OR_EQUAL
                     v >= @value
                 when Comparers::Methods::RANGE
-                    range.include?(v)
+                    Range.new(lower_bound, upper_bound).include?(v)
                 else
                     false
                 end
