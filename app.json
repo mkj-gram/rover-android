@@ -56,6 +56,9 @@
     },
     "REDISCLOUD_URL": {
       "required": true
+    },
+    "TD_AGENT_CONF_PATH": {
+      "required": true
     }
   },
   "addons": [
