@@ -38,6 +38,8 @@ module CustomerFilter
             def get_value_for(model)
                 if @path && model[formatted_attribute_name].is_a?(Hash)
                     model[formatted_attribute_name].dig(*@path.split("."))
+                elsif model.respond_to?(formatted_attribute_name)
+                    model.send(formatted_attribute_name)
                 else
                     model[formatted_attribute_name]
                 end

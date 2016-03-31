@@ -26,8 +26,23 @@ module CustomerFilter
                 return opts
             end
 
+            def geo_point
+                @geo_point ||= ::GeoPoint.new(latitude, longitude)
+            end
+
             def check(v)
-                false
+                case @method
+                when Comparers::Methods::ANY_VALUE
+                    true
+                when Comparers::Methods::UNKNOWN_VALUE
+                    v.nil?
+                when Comparers::Methods::GEOFENCE
+                    # v is the customers current geo_point
+                    distance = ::GeoPoint.distance_between(v, geo_point)
+                    distance < radius
+                else
+                    false
+                end
             end
 
             def get_elasticsearch_query(attribute_name)
