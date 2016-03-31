@@ -109,7 +109,20 @@ class Event
     end
 
     def attributes
-        {"id" => @id, "object" => object, "action" => action}
+        {
+            # id: @id,
+            object: object,
+            action: action,
+            event_id: self.class.event_id,
+            timestamp: generation_time.to_i,
+            customer: {
+                id: customer.id.to_s,
+                name: customer.name,
+                gender: customer.gender,
+                age: customer.age,
+                tags: customer.tags
+            }
+        }
     end
 
 
@@ -119,6 +132,7 @@ class Event
         run_callbacks :save do
             # TODO save this to somewhere
             puts "here are the attributes i'm going to save -> #{attributes}"
+            EventsLogger.log(account.id, generation_time, attributes)
         end
 
     end

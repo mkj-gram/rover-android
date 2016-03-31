@@ -41,6 +41,16 @@ class LocationEvent < Event
         end
     end
 
+    # def attributes
+    #     super.merge(
+    #         {
+    #             longitude: longitude,
+    #             latitude: latitude
+    #         }
+    #     )
+    # end
+
+
     private
 
     def location
