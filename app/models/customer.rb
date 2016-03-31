@@ -190,7 +190,7 @@ class Customer
         if val == "male" || val == "female"
             self[:gender] = val
         else
-            self.gender = nil
+            self[:gender] = nil
         end
     end
 
