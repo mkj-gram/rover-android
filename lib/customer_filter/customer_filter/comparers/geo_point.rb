@@ -39,7 +39,7 @@ module CustomerFilter
                 when Comparers::Methods::GEOFENCE
                     # v is the customers current geo_point
                     distance = ::GeoPoint.distance_between(v, geo_point)
-                    distance < radius
+                    distance <= radius
                 else
                     false
                 end
