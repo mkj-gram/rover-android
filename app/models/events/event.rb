@@ -109,7 +109,7 @@ class Event
     end
 
     def attributes
-        {
+        json = {
             # id: @id,
             object: object,
             action: action,
@@ -127,6 +127,23 @@ class Event
                 }
             }
         }
+
+        if @new_messages && @new_messages.any?
+            messages = @new_messages.map{|inbox_message| inbox_message.message }
+            json.merge!(
+                {
+                    messages: messages.map{ |message|
+                        {
+                            id: message.message_id,
+                            tags: message.tags,
+                            save_to_inbox: message.save_to_inbox
+                        }
+                    }
+                }
+            )
+        end
+
+        return json
     end
 
 

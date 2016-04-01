@@ -48,10 +48,16 @@ class BeaconRegionEvent < Event
                 {
                     configuration: {
                         id: beacon_configuration.id,
-                        title: beacon_configuration.title,
+                        protocol: beacon_configuration.protocol,
                         tags: beacon_configuration.tags,
                         shared: beacon_configuration.shared,
-                        enabled: beacon_configuration.enabled
+                        enabled: beacon_configuration.enabled,
+                        configuration_uuid: beacon_configuration.uuid,
+                        configuration_major: beacon_configuration.major,
+                        configuration_minor: beacon_configuration.minor,
+                        configuration_namespace: beacon_configuration.namespace,
+                        configuration_instance_id: beacon_configuration.instance_id,
+                        configuration_url: beacon_configuration.url
                     }
                 }
             )
