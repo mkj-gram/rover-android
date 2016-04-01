@@ -1,6 +1,6 @@
 class GeofenceRegionEvent < Event
 
-    after_save :save_messages_to_inbox
+    before_save :save_messages_to_inbox
 
     def self.build_event(object, action, event_attributes)
         case action

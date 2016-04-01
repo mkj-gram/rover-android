@@ -1,6 +1,6 @@
 class BeaconRegionEvent < Event
 
-    after_save :save_messages_to_inbox
+    before_save :save_messages_to_inbox
 
     # def self.event_id
     #     Event::BEACON_REGION_EVENT_ID
