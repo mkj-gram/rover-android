@@ -1,6 +1,11 @@
 class GeoPoint
 
+
+
     attr_reader :lat, :lng
+
+    alias_method :latitude, :lat
+    alias_method :longitude, :lng
 
     def initialize(lat, lng)
         @lat, @lng = lat, lng
