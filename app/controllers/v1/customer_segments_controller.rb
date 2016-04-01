@@ -7,10 +7,7 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         # show all segments
         segments = current_account.customer_segments
         json = {
-            data: segments.map{|segment| V1::CustomerSegmentSerializer.serialize(segment)},
-            meta: {
-                totalCustomersCount: current_account.customers_count
-            }
+            data: segments.map{|segment| V1::CustomerSegmentSerializer.serialize(segment)}
         }
         render json: json
     end
@@ -34,9 +31,6 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         if customer_segment.save
             json = {
                 data: V1::CustomerSegmentSerializer.serialize(customer_segment),
-                meta: {
-                    totalCustomersCount: current_account.customers_count
-                }
             }
             render json: json
         else
@@ -71,7 +65,7 @@ class V1::CustomerSegmentsController < V1::ApplicationController
     private
 
     def set_customer_segment
-        @customer_segment = CustomerSegment.find_by_id(params[:id])
+        @customer_segment = current_account.customer_segments.find_by_id(params[:id])# CustomerSegment.find_by_id(params[:id])
         head :not_found if @customer_segment.nil?
     end
 

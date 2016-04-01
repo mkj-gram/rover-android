@@ -1,6 +1,6 @@
 module V1::CustomerSegmentSerializer
     class << self
-        def serialize(customer_segment, extra_attributes = {})
+        def serialize(customer_segment)
             {
                 "type" => "segments",
                 "id" => customer_segment.id.to_s,
@@ -8,7 +8,8 @@ module V1::CustomerSegmentSerializer
                     "name" => customer_segment.title,
                     "filters" => customer_segment.filters.map{|filter| filter.dump},
                     "approximate-customers-count" => customer_segment.customers_count,
-                }.merge(extra_attributes)
+                    "total-customers-count" => customer_segment.account.customers_count
+                }
             }
         end
     end
