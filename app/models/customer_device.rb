@@ -23,9 +23,19 @@ class CustomerDevice
 
     embedded_in :customer
 
+    validate :valid_locale_lang
+    validate :valid_locale_region
+    validate :valid_platform
+    validate :valid_os_name
+    validate :valid_time_zone
+    validates :os_version, version: true
+    validates :sdk_version, version: true
+
 
     IOS_DEVICE = 1
     ANDROID_DEVICE = 2
+    PLATFORMS = Set.new(["iOS", "Android"]).freeze
+    OS_NAMES = Set.new(["iOS", "Android"]).freeze
 
     def as_indexed_json(options = {})
         {
@@ -63,6 +73,38 @@ class CustomerDevice
 
     def android?
         device_type == ANDROID_DEVICE
+    end
+
+    private
+
+    def valid_time_zone
+        if self.time_zone && !ActiveSupport::TimeZone[self.time_zone].present?
+            errors.add(:time_zone, "invalid")
+        end
+    end
+
+    def valid_locale_lang
+        if self.locale_lang && !Iso639.exists?(self.locale_lang)
+            errors.add(:locale_lang, "invalid ISO639 code")
+        end
+    end
+
+    def valid_locale_region
+        if self.locale_region && !Iso3166.exists?(self.locale_region)
+            errors.add(:locale_region, "invalid ISO3166 code")
+        end
+    end
+
+    def valid_platform
+        if self.platform && !PLATFORMS.include?(self.platform)
+            errors.add(:platform, "invalid")
+        end
+    end
+
+    def valid_os_name
+        if self.os_name && !OS_NAMES.include?(self.os_name)
+            errors.add(:os_name, "invalid")
+        end
     end
 
     # def update_attributes_async(new_attributes)

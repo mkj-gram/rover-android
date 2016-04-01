@@ -109,7 +109,7 @@ class Customer
 
     # has_one :inbox, class_name: "CustomerInbox"
     validates :account_id, presence: true
-    validate :format_gender
+    validates :email, email: { allow_blank: false }
     # where should we store counter cache? how do we?
     # # belongs_to :account, counter_cache: true
 
@@ -265,9 +265,6 @@ class Customer
 
     def decrement_customers_count
         Account.update_counters(account_id, customers_count: -1)
-    end
-
-    def format_gender
     end
 
     def index_customer

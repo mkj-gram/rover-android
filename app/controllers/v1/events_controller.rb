@@ -12,15 +12,22 @@ class V1::EventsController < V1::ApplicationController
         user_attributes = ActionController::Parameters.new(event_attributes.delete(:user) || {})
 
         customer, device = get_customer_and_device(user_attributes, device_attributes)
+        puts "ERRORS?????\n\n\n\n\nn"
+        puts "#{customer.errors.full_messages}"
+        puts "#{device.errors.full_messages}"
 
-        attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
+        if !device.valid?
+        elsif !customer.valid?
+        else
+            attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
 
-        event = Event.build_event(attributes)
-        event.save
+            event = Event.build_event(attributes)
+            event.save
 
-        json = event.to_json
+            json = event.to_json
 
-        render json: json
+            render json: json
+        end
     end
 
 
