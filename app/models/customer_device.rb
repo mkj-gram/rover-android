@@ -23,6 +23,9 @@ class CustomerDevice
 
     embedded_in :customer
 
+    before_validation { self.locale_lang = self.locale_lang.downcase if self.locale_lang? }
+    before_validation { self.locale_region = self.locale_region.downcase if self.locale_region? }
+
     validate :valid_locale_lang
     validate :valid_locale_region
     validate :valid_platform
