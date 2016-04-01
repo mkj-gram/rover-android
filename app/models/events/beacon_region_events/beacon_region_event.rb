@@ -44,7 +44,7 @@ class BeaconRegionEvent < Event
     def attributes
         parent_attributes = super
         if beacon_configuration
-            parent_attributes.merge(
+            parent_attributes.merge!(
                 {
                     configuration: {
                         id: beacon_configuration.id,
@@ -55,9 +55,25 @@ class BeaconRegionEvent < Event
                     }
                 }
             )
-        else
-            return parent_attributes
         end
+
+        if location
+            parent_attributes.merge!(
+                {
+                    location: {
+                        id: location.id,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        tags: location.tags,
+                        shared: location.shared,
+                        enabled: location.enabled,
+                        beacon_configurations_count: location.beacon_configurations_count
+                    }
+                }
+            )
+        end
+
+        return parent_attributes
     end
 
     def to_json

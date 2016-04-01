@@ -23,6 +23,29 @@ class GeofenceRegionEvent < Event
         @radius = event_attributes[:radius]
     end
 
+
+    def attributes
+        parent_attributes = super
+
+        if location
+            parent_attributes.merge!(
+                {
+                    location: {
+                        id: location.id,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        tags: location.tags,
+                        shared: location.shared,
+                        enabled: location.enabled,
+                        beacon_configurations_count: location.beacon_configurations_count
+                    }
+                }
+            )
+        end
+
+        return parent_attributes
+    end
+
     def to_json
         json = super
         # should have a location tied to it
