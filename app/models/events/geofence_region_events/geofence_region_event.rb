@@ -49,7 +49,7 @@ class GeofenceRegionEvent < Event
                 {
                     messages: messages.map{ |message|
                         {
-                            id: message.message_id,
+                            id: message.id,
                             tags: message.tags,
                             save_to_inbox: message.save_to_inbox
                         }
