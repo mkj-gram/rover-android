@@ -217,7 +217,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
 
                     }
                 )
-                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment, {:"total-customers-count" => current_account.customers_count})]
+                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
             else
                 json[:data][:relationships].merge!({:"segment" => {data: nil}})
             end
