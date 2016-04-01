@@ -10,7 +10,7 @@ class CreateMessages < ActiveRecord::Migration
             t.boolean :published, default: false
             t.boolean :archived, default: false
             t.boolean :save_to_inbox, default: true
-
+            t.string :tags, array: true
             # schedule holds the days and times of when to push
             # bug with rails 4
             # t.tsrange :schedule, default: Float::INFINITY..Float::INFINITY

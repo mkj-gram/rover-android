@@ -512,6 +512,7 @@ CREATE TABLE messages (
     published boolean DEFAULT false,
     archived boolean DEFAULT false,
     save_to_inbox boolean DEFAULT true,
+    tags character varying[],
     date_schedule int4range DEFAULT '(,)'::int4range,
     time_schedule int4range DEFAULT '[0,1441)'::int4range,
     schedule_monday boolean DEFAULT true,
