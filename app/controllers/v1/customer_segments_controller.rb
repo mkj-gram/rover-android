@@ -14,10 +14,7 @@ class V1::CustomerSegmentsController < V1::ApplicationController
 
     def show
         json = {
-            data: V1::CustomerSegmentSerializer.serialize(@customer_segment),
-            meta: {
-                totalCustomersCount: current_account.customers_count
-            }
+            data: V1::CustomerSegmentSerializer.serialize(@customer_segment)
         }
 
         render json: json
