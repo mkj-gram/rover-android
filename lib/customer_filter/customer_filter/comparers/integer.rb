@@ -46,7 +46,7 @@ module CustomerFilter
                     v >= @value
                 when Comparers::Methods::RANGE
                     lower_bound = @from.nil? ? 0 : @from.to_i
-                    upper_bound = @to.nil? ? Float::INFINITY
+                    upper_bound = @to.nil? ? Float::INFINITY : @to.to_i
                     Range.new(lower_bound, upper_bound).include?(v)
                 end
 
