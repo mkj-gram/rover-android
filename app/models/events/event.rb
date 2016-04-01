@@ -120,7 +120,11 @@ class Event
                 name: customer.name,
                 gender: customer.gender,
                 age: customer.age,
-                tags: customer.tags
+                tags: customer.tags,
+                location: {
+                    latitude: customer.location ? customer.location.latitude : nil,
+                    longitude: customer.location ? customer.location.longitude : nil
+                }
             }
         }
     end
