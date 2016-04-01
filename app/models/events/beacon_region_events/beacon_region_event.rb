@@ -79,6 +79,21 @@ class BeaconRegionEvent < Event
             )
         end
 
+        if @new_messages && @new_messages.any?
+            messages = @new_messages.map{|inbox_message| inbox_message.message }
+            parent_attributes.merge!(
+                {
+                    messages: messages.map{ |message|
+                        {
+                            id: message.message_id,
+                            tags: message.tags,
+                            save_to_inbox: message.save_to_inbox
+                        }
+                    }
+                }
+            )
+        end
+
         return parent_attributes
     end
 
