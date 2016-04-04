@@ -31,7 +31,7 @@ module EstimoteApi
         end
 
         def namespace
-            settings.eddystone_namespace
+            settings.eddystone_namespace_id
         end
 
         def eddystone_instance_id
