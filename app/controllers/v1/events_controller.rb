@@ -12,12 +12,11 @@ class V1::EventsController < V1::ApplicationController
         user_attributes = ActionController::Parameters.new(event_attributes.delete(:user) || {})
 
         customer, device = get_customer_and_device(user_attributes, device_attributes)
-        puts "ERRORS?????\n\n\n\n\nn"
-        puts "#{customer.errors.full_messages}"
-        puts "#{device.errors.full_messages}"
 
         if !device.valid?
+            render json: { errors: V1::CustomerDeviceErrorSerializer.serialize(device.errors)}, status: :unprocessable_entity
         elsif !customer.valid?
+            render json: { errors: V1::CustomerErrorSerializer.serialize(customer.errors)}, status: :unprocessable_entity
         else
             attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
 
