@@ -12,6 +12,7 @@ class Account < ActiveRecord::Base
     before_create :generate_share_key
     after_create :create_active_tags_index
     after_create :create_active_configuration_uuids_index
+    after_create :create_customer_elasticsearch_alias
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
@@ -112,6 +113,10 @@ class Account < ActiveRecord::Base
     end
 
     private
+
+    def create_customer_elasticsearch_alias
+        Customer.create_alias!(self)
+    end
 
     def create_active_tags_index
         BeaconConfigurationActiveTag.create(account_id: self.id)

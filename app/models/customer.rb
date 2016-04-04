@@ -40,7 +40,7 @@ class Customer
         }
     end
 
-    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2 }).merge(
+    settings index: ElasticsearchShardCountHelper.get_settings({number_of_shards: 3, number_of_replicas: 1}).merge(
         {
             analysis:  {
                 filter: {
@@ -149,8 +149,9 @@ class Customer
 
 
 
-    def self.get_index_name(account)
-        return "account_#{account.id}_customers"
+    def self.get_index_name(model)
+        account_id = model.is_a?(Customer) ? model.account_id : model.id
+        return "customers_account_#{account_id}"
     end
 
     def self.create_index!(opts = {})
@@ -172,6 +173,22 @@ class Customer
                                 settings: settings.to_hash,
                                 mappings: mappings.to_hash
         })
+
+    end
+
+    def self.create_alias!(account)
+        client = Customer.__elasticsearch__.client
+        client.indices.put_alias(
+            index: Customer.index_name,
+            name: Customer.get_index_name(account),
+            body: {
+                filter: {
+                    term: {
+                        account_id: account.id
+                    }
+                }
+            }
+        )
     end
 
     def indexable_customer?
@@ -232,7 +249,7 @@ class Customer
     #     self.__elasticsearch__.update_document_attributes({ devices: devices_as_indexed_json })
     # end
 
-    private
+    # private
 
     def create_inbox
         CustomerInbox.create(customer_id: self.id)
@@ -278,16 +295,46 @@ class Customer
             puts "this anonymous user doesn't have a device anymore"
             decrement_customers_count
             begin
-                self.__elasticsearch__.delete_document
+                self.delete_document
             rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
                 Rails.logger.warn(e)
             end
         elsif identifier.nil? && devices.any?
-            __elasticsearch__.index_document
+            self.index_document
         elsif !identifier.nil?
-            __elasticsearch__.index_document
+            self.index_document
         end
     end
 
+    def index_document(opts = {})
+        client = __elasticsearch__.client
+        document = self.as_indexed_json
+
+        client.index(
+            {
+                index: Customer.get_index_name(self),
+                type:  Customer.document_type,
+                id:    self.id.to_s,
+                body:  document
+            }.merge(opts)
+        )
+    end
+
+    def update_document(opts = {})
+        self.index_document(opts)
+        Rails.logger.warn("Not implemented")
+    end
+
+    def delete_document
+        client = __elasticsearch__.client
+        client.delete(
+            {
+                index: Customer.get_index_name(self),
+                type: Customer.document_type,
+                id: self.id.to_s
+            }
+        )
+
+    end
 
 end
