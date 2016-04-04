@@ -125,6 +125,22 @@ class Event
                     latitude: customer.location ? customer.location.latitude : nil,
                     longitude: customer.location ? customer.location.longitude : nil
                 }
+            },
+            device: {
+                sdk_version: device.sdk_version,
+                locale_lang: device.locale_lang,
+                locale_region: device.locale_region,
+                time_zone: device.time_zone,
+                platform: device.platform,
+                os_name: device.os_name,
+                os_version: device.os_version,
+                model: device.model,
+                manufacturer: device.manufacturer,
+                background_enabled: device.background_enabled,
+                local_notifications_enabled: device.local_notifications_enabled,
+                remote_notifications_enabled: device.remote_notifications_enabled,
+                bluetooth_enabled: device.bluetooth_enabled,
+                location_monitoring_enabled: device.location_monitoring_enabled
             }
         }
     end
