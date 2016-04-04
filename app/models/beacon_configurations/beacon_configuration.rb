@@ -11,7 +11,7 @@ class BeaconConfiguration < ActiveRecord::Base
     # use to search through all document types
     document_type ""
 
-    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2}).merge(
+    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 1}).merge(
         {
             analysis:  {
                 filter: {
