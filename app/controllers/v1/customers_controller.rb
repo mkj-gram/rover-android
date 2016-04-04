@@ -7,18 +7,6 @@ class V1::CustomersController < V1::ApplicationController
 
 
         query = {
-            query: {
-                filtered: {
-                    query: {match_all: {}},
-                    filter: {
-                        bool: {
-                            must: [
-                                {term: {account_id: current_account.id}}
-                            ]
-                        }
-                    }
-                }
-            },
             sort: [
                 {
                     created_at: {
@@ -29,7 +17,7 @@ class V1::CustomersController < V1::ApplicationController
         }
 
 
-        customers = Elasticsearch::Model.search(query, [Customer])
+        customers = Elasticsearch::Model.search(query, [Customer], {index: Customer.get_index_name(current_account)})
         results = customers.per_page(page_size).page(current_page).results
         json = {
             "data" => results.map{|customer| serialize_elasticsearch_customer(customer)},
