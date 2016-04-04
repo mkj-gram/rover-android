@@ -292,18 +292,18 @@ class Customer
             puts "this anonymous user doesn't have a device anymore"
             decrement_customers_count
             begin
-                self.delete_document
+                self.delete_elasticsearch_document
             rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
                 Rails.logger.warn(e)
             end
         elsif identifier.nil? && devices.any?
-            self.index_document
+            self.index_elasticsearch_document
         elsif !identifier.nil?
-            self.index_document
+            self.index_elasticsearch_document
         end
     end
 
-    def index_document(opts = {})
+    def index_elasticsearch_document(opts = {})
         client = __elasticsearch__.client
         document = self.as_indexed_json
 
@@ -317,12 +317,12 @@ class Customer
         )
     end
 
-    def update_document(opts = {})
+    def update_elasticsearch_document(opts = {})
         self.index_document(opts)
         Rails.logger.warn("Not implemented")
     end
 
-    def delete_document
+    def delete_elasticsearch_document
         client = __elasticsearch__.client
         client.delete(
             {
