@@ -30,8 +30,16 @@ module EstimoteApi
             settings.eddystone_namespace_id
         end
 
+        def namespace
+            settings.eddystone_namespace
+        end
+
         def eddystone_instance_id
             settings.eddystone_instance_id
+        end
+
+        def instance_id
+            setting.eddystone_instance_id
         end
 
         def url
