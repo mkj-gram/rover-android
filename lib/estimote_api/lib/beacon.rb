@@ -39,7 +39,7 @@ module EstimoteApi
         end
 
         def instance_id
-            setting.eddystone_instance_id
+            settings.eddystone_instance_id
         end
 
         def url
