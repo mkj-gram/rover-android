@@ -117,7 +117,7 @@ class Event
             timestamp: generation_time.to_i,
             customer: {
                 id: customer.id.to_s,
-                name: customer.name,
+                identifier: customer.identifier,
                 gender: customer.gender,
                 age: customer.age,
                 tags: customer.tags,
