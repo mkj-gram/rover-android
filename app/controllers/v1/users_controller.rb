@@ -92,6 +92,10 @@ class V1::UsersController < V1::ApplicationController
         end
     end
 
+    def resource
+        User
+    end
+
     private
 
     def set_resource
@@ -100,6 +104,13 @@ class V1::UsersController < V1::ApplicationController
         # set_current_resources(user)
     end
 
+    def check_access
+        if action_name != "index" && current_user.id == @user.id
+            return true
+        else
+            super
+        end
+    end
 
     def user_params(local_params)
         local_params.require(:users).permit(:name, :email, :password, :password_confirmation, :current_password)

@@ -6,7 +6,8 @@ class CreateUsers < ActiveRecord::Migration
             t.string :password_digest, null: false
             t.integer :account_id, null: false
             t.boolean :account_owner, default: false
-            t.datetime :acl_updated_at
+            t.integer :user_role_id, null: false
+            t.datetime :user_role_updated_at
             t.timestamps null: false
         end
 
