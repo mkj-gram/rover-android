@@ -88,6 +88,13 @@ class V1::ApplicationController < ActionController::API
         end
     end
 
+
+    def device_id_header_present
+        if !request.headers.include?(APPLICATION_DEVICE_ID_HEADER)
+            render_errors([{title: "Missing Header", detail: "#{APPLICATION_DEVICE_ID_HEADER} is missing", status: "400"}], {status: :bad_request})
+        end
+    end
+
     private
 
     def device_id
