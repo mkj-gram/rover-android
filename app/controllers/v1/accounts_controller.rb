@@ -2,6 +2,8 @@ class V1::AccountsController < V1::ApplicationController
 
     before_action :authenticate
     before_action :has_access_to_account
+    before_action :check_access, only: [:show, :update]
+
     # GET /accounts/:id
     def show
         json = {
@@ -79,11 +81,15 @@ class V1::AccountsController < V1::ApplicationController
         end
     end
 
+    def resource
+        Account
+    end
+
     private
 
     def has_access_to_account
         if current_account.id.to_s != params[:id].to_s
-            head :unauthorized
+            head :forbidden
         end
     end
 

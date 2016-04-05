@@ -5,6 +5,11 @@ class CreateUserRoles < ActiveRecord::Migration
             t.string :title
             t.text :description
 
+            t.boolean :account_show,    default: true
+            t.boolean :account_create,  default: true
+            t.boolean :account_update,  default: true
+            t.boolean :account_destroy, default: true
+
             t.boolean :user_show,    default: true
             t.boolean :user_create,  default: true
             t.boolean :user_update,  default: true
@@ -44,6 +49,16 @@ class CreateUserRoles < ActiveRecord::Migration
             t.boolean :automated_message_create,  default: true
             t.boolean :automated_message_update,  default: true
             t.boolean :automated_message_destroy, default: true
+
+            t.boolean :third_party_integration_show,    default: true
+            t.boolean :third_party_integration_create,  default: true
+            t.boolean :third_party_integration_update,  default: true
+            t.boolean :third_party_integration_destroy, default: true
+
+            t.boolean :account_invite_show,    default: true
+            t.boolean :account_invite_create,  default: true
+            t.boolean :account_invite_update,  default: true
+            t.boolean :account_invite_destroy, default: true
 
             t.boolean :user_acl_show,    default: true
             t.boolean :user_acl_create,  default: true

@@ -1,6 +1,7 @@
 class V1::CustomersController < V1::ApplicationController
 
     before_action :authenticate
+    before_action :check_access, only: [:index, :show, :create, :update, :destroy]
     before_action :set_customer, only: [:show]
 
     def index
@@ -37,6 +38,10 @@ class V1::CustomersController < V1::ApplicationController
             included: @customer.devices.map{|device| serialize_device(device)}
         }
         render json: json
+    end
+
+    def resource
+        Customer
     end
 
     private

@@ -8,6 +8,12 @@ class UserRole < ActiveRecord::Base
         UserRole.new(
             title: "Admin",
             description: "Admin Access",
+
+            account_show: true,
+            account_create: true,
+            account_update: true,
+            account_destroy: true,
+
             user_show: true,
             user_create: true,
             user_update: true,
@@ -47,6 +53,17 @@ class UserRole < ActiveRecord::Base
             automated_message_create: true,
             automated_message_update: true,
             automated_message_destroy: true,
+
+            third_party_integration_show: true,
+            third_party_integration_create: true,
+            third_party_integration_update: true,
+            third_party_integration_destroy: true,
+
+            account_invite_show: true,
+            account_invite_create: true,
+            account_invite_update: true,
+            account_invite_destroy: true,
+
 
             user_acl_show: true,
             user_acl_create: true,

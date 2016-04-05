@@ -1,7 +1,11 @@
 class V1::ProximityMessagesController < V1::ApplicationController
+
     before_action :authenticate
-    before_action :validate_json_schema, only: [:create, :update]
-    before_action :set_proximity_message, only: [:show, :update, :destroy]
+    before_action :validate_json_schema,    only: [:create, :update]
+    before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
+    before_action :set_proximity_message,   only: [:show, :update, :destroy]
+
+
     def index
         # list all proximity messages
         # queryby status?
@@ -115,6 +119,10 @@ class V1::ProximityMessagesController < V1::ApplicationController
         else
             render json: { errors: V1::ProximityMessageErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
         end
+    end
+
+    def resource
+        ProximityMessage
     end
 
     private

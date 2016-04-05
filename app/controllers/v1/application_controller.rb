@@ -60,12 +60,10 @@ class V1::ApplicationController < ActionController::API
     end
 
     def check_access
-        Rails.logger.info("Checking access #{controller_name} for method #{action_name}")
         # account token is automatically given full access
         return true if current_user.nil? && !current_account.nil?
         controller_resource = self.resource
         if controller_resource.nil?
-            Rails.logger.warn("Called check_access without defining the method resource in controller #{controller_name}")
             return false
         else
             role = current_user.user_role
