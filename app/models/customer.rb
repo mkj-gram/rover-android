@@ -109,7 +109,7 @@ class Customer
 
     # has_one :inbox, class_name: "CustomerInbox"
     validates :account_id, presence: true
-    validates :email, email: { allow_blank: false }
+    validates :email, email: { allow_blank: true }
     # where should we store counter cache? how do we?
     # # belongs_to :account, counter_cache: true
 
