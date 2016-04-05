@@ -15,17 +15,24 @@ module Iso3166
         end
 
         def exists?(code)
-            alpha2_exists(code) || alpha3_exists(code)
+            alpha2_exists?(code) || alpha3_exists?(code)
+        end
+
+        def convert_alpha3_to_aplha2(code)
+            return code if code.length == 2 && ALPHA2_CODES.include?(code)
+            if ALPHA3_CODES.include?(code)
+                return ALPHA3_REVERSE_INDEX[code]
+            else
+                nil
+            end
         end
 
         def convert_alpha2_to_alpha3(code)
-            def convert_alpha3_to_aplha2(code)
-                return code if code.length == 2 && ALPHA2_CODES.include?(code)
-                if ALPHA3_CODES.include?(code)
-                    return ALPHA3_REVERSE_INDEX[code]
-                else
-                    nil
-                end
+            return code if code.length == 3 && ALPHA3_CODES.include?(code)
+            if ALPHA2_CODES.include?(code)
+                return ALPHA2_REVERSE_INDEX[code]
+            else
+                nil
             end
         end
     end
