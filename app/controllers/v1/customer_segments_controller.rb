@@ -1,6 +1,7 @@
 class V1::CustomerSegmentsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:create, :update]
+    before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
     before_action :set_customer_segment, only: [:show, :update, :destroy]
 
     def index
@@ -58,6 +59,9 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         end
     end
 
+    def resource
+        CustomerSegment
+    end
 
     private
 

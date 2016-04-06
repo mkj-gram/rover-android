@@ -1,5 +1,8 @@
 class V1::AccountInvitesController < V1::ApplicationController
+
     before_action :authenticate
+    before_action :check_access, only: [:index, :show, :create, :update, :destroy]
+    before_action :set_account_invite, only: [:show, :update, :destroy]
 
     # GET /account_invites
     def index
@@ -40,54 +43,51 @@ class V1::AccountInvitesController < V1::ApplicationController
     # GET /account_invites/:token
 
     def show
-        @account_invite = AccountInvite.find_by_token(params[:token])
-        if @account_invite
-            json = {
-                "data" => {
-                    "id" => @account_invite.id.to_s,
-                    "type" => "account_invites",
-                    "attributes" => {
-                        "invited-email" => @account_invite.invited_email,
-                        "issuer-id" => @account_invite.issuer_id.to_s,
-                        "created-at" => @account_invite.created_at
-                    },
-                    "relationships" => {
-                        "issuer" => {
-                            "data" => {
-                                "type" => "users",
-                                "id" => @account_invite.issuer_id.to_s
-                            }
-                        },
-                        "account" => {
-                            "data" => {
-                                "type" => "accounts",
-                                "id" => @account_invite.account_id.to_s
-                            }
+
+        json = {
+            "data" => {
+                "id" => @account_invite.id.to_s,
+                "type" => "account_invites",
+                "attributes" => {
+                    "invited-email" => @account_invite.invited_email,
+                    "issuer-id" => @account_invite.issuer_id.to_s,
+                    "created-at" => @account_invite.created_at
+                },
+                "relationships" => {
+                    "issuer" => {
+                        "data" => {
+                            "type" => "users",
+                            "id" => @account_invite.issuer_id.to_s
                         }
+                    },
+                    "account" => {
+                        "data" => {
+                            "type" => "accounts",
+                            "id" => @account_invite.account_id.to_s
+                        }
+                    }
+                }
+            },
+            "included"=> [
+                {
+                    "id" => @account_invite.issuer.id.to_s,
+                    "type" => "users",
+                    "attributes" => {
+                        "name" => @account_invite.issuer.name,
+                        "email" => @account_invite.issuer.email
                     }
                 },
-                "included"=> [
-                    {
-                        "id" => @account_invite.issuer.id.to_s,
-                        "type" => "users",
-                        "attributes" => {
-                            "name" => @account_invite.issuer.name,
-                            "email" => @account_invite.issuer.email
-                        }
-                    },
-                    {
-                        "id" => @account_invite.account.id.to_s,
-                        "type" => "accounts",
-                        "attributes" => {
-                            "title" => @account_invite.account.title.to_s,
-                        }
+                {
+                    "id" => @account_invite.account.id.to_s,
+                    "type" => "accounts",
+                    "attributes" => {
+                        "title" => @account_invite.account.title.to_s,
                     }
-                ]
-            }
-            render json: json
-        else
-            head :not_found
-        end
+                }
+            ]
+        }
+        render json: json
+
     end
 
     # POST /account_invites
@@ -106,7 +106,6 @@ class V1::AccountInvitesController < V1::ApplicationController
     # PATCH/PUT /account_invites/1
     # PATCH/PUT /account_invites/1.json
     def update
-        @account_invite = AccountInvite.find(params[:id])
 
         if @account_invite.update(account_invite_params)
             head :no_content

@@ -1,6 +1,7 @@
 class V1::LocationsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:create, :update]
+    before_action :check_access, only: [:index, :show, :create, :update, :destroy]
     before_action :set_location, only: [:show, :update, :destroy]
 
     def index
@@ -178,11 +179,14 @@ class V1::LocationsController < V1::ApplicationController
         end
     end
 
+    def resource
+        Location
+    end
 
     private
 
     def set_location
-        @location = Location.find_by_id(params[:id])
+        @location = current_account.locations.find_by_id(params[:id])
         head :not_found if @location.nil?
     end
     # bounding box location query

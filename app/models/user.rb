@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
     # has_one :acl, class_name: "UserAcl" -> refer to custom function acl
 
     belongs_to :account, counter_cache: true
+    belongs_to :user_role, counter_cache: true
+
     has_many :sessions do
         def recent
             last
@@ -24,7 +26,6 @@ class User < ActiveRecord::Base
     before_create :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
     before_create :create_account, if: -> { account_id.nil? }
     after_create :update_account_user_id
-    after_create :create_acl
     # after_create :generate_session
 
     after_create :destroy_account_invite
@@ -74,11 +75,11 @@ class User < ActiveRecord::Base
     # end
 
     # since we want to cache the association we need our own function
-    def acl
-        @acl ||= Rails.cache.fetch("user/#{self.id}/acl/#{acl_updated_at.to_i}") do
-            UserAcl.find_by_user_id(self.id)
-        end
-    end
+    # def acl
+    #     @acl ||= Rails.cache.fetch("user/#{self.id}/acl/#{acl_updated_at.to_i}") do
+    #         UserAcl.find_by_user_id(self.id)
+    #     end
+    # end
 
     #
     # Returns the most recent created session
@@ -106,6 +107,7 @@ class User < ActiveRecord::Base
     def force_update_for_protected_attributes
         @force_update_for_protected_attributes || false
     end
+
     private
 
     def invite
@@ -141,6 +143,7 @@ class User < ActiveRecord::Base
     def attach_to_account
         if invite
             self.account_id = invite.account_id
+            self.user_role_id = self.account.default_user_role_id
         end
     end
 
@@ -149,15 +152,7 @@ class User < ActiveRecord::Base
         account = Account.create(primary_user_id: self.id, title: account_title)
         self.account_owner = true
         self.account_id = account.id
-    end
-
-    def create_acl
-        if self.account_owner == true
-            UserAcl.create!(user_id: self.id, admin: true)
-        else
-            UserAcl.create!(user_id: self.id)
-        end
-
+        self.user_role_id = account.default_user_role_id
     end
 
     def destroy_account_invite

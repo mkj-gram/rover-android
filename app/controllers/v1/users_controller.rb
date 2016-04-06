@@ -92,14 +92,29 @@ class V1::UsersController < V1::ApplicationController
         end
     end
 
+    def resource
+        User
+    end
+
     private
 
     def set_resource
-        user = User.find_by_id(params[:id])
-        @user = user
-        # set_current_resources(user)
+        if params[:id].to_i == current_user.id
+            @user = current_user
+        else
+            user = User.find_by_id(params[:id])
+            head :not_found if user.account_id != current_account.id
+            @user = user
+        end
     end
 
+    def check_access
+        if action_name != "index" && current_user.id == @user.id
+            return true
+        else
+            super
+        end
+    end
 
     def user_params(local_params)
         local_params.require(:users).permit(:name, :email, :password, :password_confirmation, :current_password)

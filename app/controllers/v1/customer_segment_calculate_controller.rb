@@ -1,6 +1,7 @@
 class V1::CustomerSegmentCalculateController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:create]
+    before_action :check_access, only: [:create]
 
 
 
@@ -19,6 +20,10 @@ class V1::CustomerSegmentCalculateController < V1::ApplicationController
         else
             render json: { errors: V1::CustomerSegmentErrorSerializer.serialize(customer_segment.errors)}, status: :unprocessable_entity
         end
+    end
+
+    def resource
+        CustomerSegment
     end
 
     private
