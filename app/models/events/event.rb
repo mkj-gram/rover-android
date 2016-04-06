@@ -26,7 +26,12 @@ class Event
     LOCATION_EVENT_ID = 61
     LOCATION_UPDATE_EVENT_ID = 62
 
-    VALID_EVENT_IDS = Set.new([GEOFENCE_REGION_ENTER_EVENT_ID, GEOFENCE_REGION_EXIT_EVENT_ID, BEACON_REGION_ENTER_EVENT_ID, BEACON_REGION_EXIT_EVENT_ID, APP_OPEN_EVENT_ID, APP_CLOSED_EVENT_ID])
+    # Gimbal Events 81-100
+    GIMBAL_PLACE_EVENT_ID = 81
+    GIMBAL_PLACE_ENTER_EVENT_ID = 82
+    GIMBAL_PLACE_EXIT_EVENT_ID = 83
+
+    VALID_EVENT_IDS = Set.new([GEOFENCE_REGION_ENTER_EVENT_ID, GEOFENCE_REGION_EXIT_EVENT_ID, BEACON_REGION_ENTER_EVENT_ID, BEACON_REGION_EXIT_EVENT_ID, APP_OPEN_EVENT_ID, APP_CLOSED_EVENT_ID, GIMBAL_PLACE_ENTER_EVENT_ID, GIMBAL_PLACE_EXIT_EVENT_ID]).freeze
 
     TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
@@ -48,6 +53,10 @@ class Event
             APP_OPEN_EVENT_ID
         when "app-close"
             APP_CLOSED_EVENT_ID
+        when "gimbal-place-enter"
+            GIMBAL_PLACE_ENTER_EVENT_ID
+        when "gimbal-place-exit"
+            GIMBAL_PLACE_EXIT_EVENT_ID
         else
             UNKNOWN_EVENT_ID
         end
@@ -67,6 +76,10 @@ class Event
             "app-open"
         when APP_CLOSED_EVENT_ID
             "app-close"
+        when GIMBAL_PLACE_ENTER_EVENT_ID
+            "gimbal-place-enter"
+        when GIMBAL_PLACE_EXIT_EVENT_ID
+            "gimbal-place-exit"
         else
             nil
         end
@@ -84,6 +97,8 @@ class Event
             return GeofenceRegionEvent.build_event(object, action, event_attributes)
         when "app"
             return AppEvent.build_event(object, action, event_attributes)
+        when "gimbal-place"
+            return GimbalPlaceEvent.build_event(object, action, event_attributes)
         else
             return Event.new(event_attributes)
         end
