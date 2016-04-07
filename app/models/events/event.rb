@@ -117,7 +117,7 @@ module Events
                 device: device,
                 customer: customer
             }
-            event = Event.build_event(attributes)
+            event = Events::Pipeline.build("message", "delivered", attributes)
             event.save
         end
 

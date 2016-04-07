@@ -22,7 +22,7 @@ module Events
                 # puts @@events
             end
 
-            def build_event(object, action, event_attributes)
+            def build(object, action, event_attributes)
                 model = @@events.dig(object, action)
                 return Event.new(event_attributes) if model.nil?
                 return model.new(event_attributes)

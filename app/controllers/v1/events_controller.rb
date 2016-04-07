@@ -23,7 +23,7 @@ class V1::EventsController < V1::ApplicationController
             object = event_attributes[:object]
             action = event_attributes[:action]
 
-            event = EventPipeline.build_event(object, action, attributes)
+            event = Events::Pipeline.build(object, action, attributes)
             event.save
 
             json = event.to_json
