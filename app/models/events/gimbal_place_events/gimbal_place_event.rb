@@ -25,6 +25,15 @@ class GimbalPlaceEvent < Event
 
     def attributes
         parent_attributes = super
+        if gimbal_place
+            parent_attributes.merge!(
+                {
+                    gimbal_place: {
+                        id: gimbal_place.id
+                    }
+                }
+            )
+        end
 
         if @new_messages && @new_messages.any?
             messages = @new_messages.map{|inbox_message| inbox_message.message }
