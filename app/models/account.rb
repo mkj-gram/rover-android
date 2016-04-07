@@ -55,6 +55,8 @@ class Account < ActiveRecord::Base
 
 
 
+    has_many :gimbal_places
+
     def location_bounding_box_suggestion
         query = {
             size: 0,

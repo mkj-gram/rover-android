@@ -105,6 +105,8 @@ class V1::IntegrationsController < V1::ApplicationController
             build_estimote_integration(json)
         when "kontakt-integrations"
             build_kontat_integration(json)
+        when "gimbal-integrations"
+            build_gimbal_integration(json)
         else
             nil
         end
@@ -136,6 +138,19 @@ class V1::IntegrationsController < V1::ApplicationController
 
     def kontakt_integration_params(local_params)
         return local_params[:kontakt_integrations].permit(:enabled, :api_key)
+    end
+
+    def build_gimbal_integration(json)
+        options = gimbal_integration_params(json[:data])
+        api_key = options.delete(:api_key)
+        integration = GimbalIntegration.new(options)
+        integration.set_credentials(api_key)
+        integration.account_id = current_account.id
+        return integration
+    end
+
+    def gimbal_integration_params(local_params)
+        return local_params[:gimbal_integrations].permit(:enabled, :api_key)
     end
 
     def get_integrations

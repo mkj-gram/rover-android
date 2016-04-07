@@ -134,6 +134,7 @@ CREATE TABLE accounts (
     account_invites_count integer DEFAULT 0,
     proximity_messages_count integer DEFAULT 0,
     archived_proximity_messages_count integer DEFAULT 0,
+    gimbal_places_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customers_count integer DEFAULT 0,
@@ -456,6 +457,19 @@ ALTER SEQUENCE customers_id_seq OWNED BY customers.id;
 
 
 --
+-- Name: gimbal_places; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE gimbal_places (
+    account_id integer NOT NULL,
+    id character varying NOT NULL,
+    name character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
 -- Name: locations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -531,6 +545,7 @@ CREATE TABLE messages (
     filter_beacon_configuration_ids integer[],
     filter_location_tags character varying[],
     filter_location_ids integer[],
+    filter_gimbal_place_id character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -1343,6 +1358,20 @@ CREATE INDEX index_customers_on_account_id_and_traits ON customers USING gin (ac
 
 
 --
+-- Name: index_gimbal_places_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_gimbal_places_on_account_id ON gimbal_places USING btree (account_id);
+
+
+--
+-- Name: index_gimbal_places_on_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_gimbal_places_on_id ON gimbal_places USING btree (id);
+
+
+--
 -- Name: index_locations_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1553,4 +1582,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160301142503');
 INSERT INTO schema_migrations (version) VALUES ('20160318144534');
 
 INSERT INTO schema_migrations (version) VALUES ('20160405134656');
+
+INSERT INTO schema_migrations (version) VALUES ('20160406145542');
 

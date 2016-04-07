@@ -85,7 +85,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
     # kontakt_integration_id
     def get_integration_id
         @integration_id ||= -> {
-            id = params[:integration_id] || params[:estimote_integration_id]
+            id = params[:integration_id] || params[:estimote_integration_id] || params[:kontakt_integration_id] || params[:gimbal_integration_id]
             if id.nil?
                 # this request might have the integrations id in the payload
                 json = flatten_request({single_record: true})

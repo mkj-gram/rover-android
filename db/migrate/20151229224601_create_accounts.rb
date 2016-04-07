@@ -16,6 +16,7 @@ class CreateAccounts < ActiveRecord::Migration
             t.integer :account_invites_count, default: 0
             t.integer :proximity_messages_count, default: 0
             t.integer :archived_proximity_messages_count, default: 0
+            t.integer :gimbal_places_count, default: 0
 
             t.timestamps null: false
         end

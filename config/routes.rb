@@ -53,6 +53,9 @@ Rails.application.routes.draw do
 
         resources "configurations", controller: "beacon_configurations", as: "beacon_configuration"
 
+        resources "gimbal-places", controller: "gimbal_places", as: "gimbal_place", only: [:index, :show]
+
+
         resources :integrations, only: [:index, :show, :create, :update, :destroy] do
             scope module: "integrations" do
                 resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
@@ -71,6 +74,11 @@ Rails.application.routes.draw do
             end
         end
 
+        resources "gimbal-integrations", controller: "integrations", as: "gimbal_integrations", only: [:index, :show, :create, :update, :destroy], integration_type: "gimbal-integrations" do
+            scope module: "integrations" do
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            end
+        end
 
         scope module: "integrations" do
             resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]

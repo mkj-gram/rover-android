@@ -40,6 +40,7 @@ class CreateMessages < ActiveRecord::Migration
             t.integer   :filter_beacon_configuration_ids, array: true
             t.string    :filter_location_tags, array: true
             t.integer   :filter_location_ids, array: true
+            t.string    :filter_gimbal_place_id
 
             t.timestamps null: false
         end

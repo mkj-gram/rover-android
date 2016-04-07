@@ -134,6 +134,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :location_tags, :filter_location_tags)
         convert_param_if_exists(local_params[:proximity_messages], :location_ids, :filter_location_ids)
         convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
+        convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_id, :filter_gimbal_place_id)
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
         param_should_be_array(local_params[:proximity_messages], :filter_location_tags)
         param_should_be_array(local_params[:proximity_messages], :limits)
@@ -152,6 +153,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
             {:filter_beacon_configuration_ids => []},
             {:filter_location_tags => []},
             {:filter_location_ids => []},
+            :filter_gimbal_place_id,
             :schedule_start_date,
             :schedule_end_date,
             :schedule_start_time,
@@ -270,6 +272,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"schedule-saturday" => message.schedule_saturday,
                 :"schedule-sunday" => message.schedule_sunday,
                 :"location-tags" => message.filter_location_tags,
+                :"gimbal-place-id" => message.filter_gimbal_place_id,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
                 :"approximate-customers-count" => message.customer_segment ? message.customer_segment.customers_count : current_account.customers_count
             }.merge(extra_attributes)
