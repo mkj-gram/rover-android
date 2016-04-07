@@ -16,7 +16,7 @@ module Events
                     @@event_string_to_event_id_index[event_string] = model.event_id
                     @@event_id_to_event_string_index[model.event_id] = event_string
                     if opts[:targetable] == true
-                        @@targetable_events.add(event_string)
+                        @@targetable_events.add(model.event_id)
                     end
                 }
                 # puts @@events
@@ -34,7 +34,7 @@ module Events
 
             def event_string_to_event_id(event_string)
                 id = @@event_string_to_event_id_index[event_string]
-                return id.nil? ? EVENT::UNKNOWN_EVENT_ID : id
+                return id.nil? ? Events::Constants::UNKNOWN_EVENT_ID : id
             end
 
             def event_id_to_event_string(event_id)

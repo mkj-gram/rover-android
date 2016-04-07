@@ -45,7 +45,7 @@ class ProximityMessage < Message
     private
 
     def legal_trigger_event_id
-        if published && !Event.valid_event_id(self.trigger_event_id)
+        if published && !Events::Pipeline.targetable_event?(self.trigger_event_id)
             errors.add(:trigger_event_id, "invalid")
         end
         # if published then the trigger_event_id must also be valid
