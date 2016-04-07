@@ -20,7 +20,10 @@ class V1::EventsController < V1::ApplicationController
         else
             attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
 
-            event = Event.build_event(attributes)
+            object = event_attributes[:object]
+            action = event_attributes[:action]
+
+            event = EventPipeline.build_event(object, action, attributes)
             event.save
 
             json = event.to_json
