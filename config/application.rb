@@ -21,11 +21,11 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib')
         config.autoload_paths << Rails.root.join('app', 'models', 'messages')
         config.autoload_paths << Rails.root.join('app', 'models', 'configuration_visits')
-        config.autoload_paths << Rails.root.join('app', 'models', 'events')
-        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'location_events')
-        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'beacon_region_events')
-        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'geofence_region_events')
-        config.autoload_paths << Rails.root.join('app', 'models', 'events', 'app_events')
+        # config.autoload_paths << Rails.root.join('app', 'models', 'events')
+        # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'location_events')
+        # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'beacon_region_events')
+        # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'geofence_region_events')
+        # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'app_events')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
         config.autoload_paths << Rails.root.join('app', 'models', 'third_party_integrations')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices')
@@ -74,6 +74,18 @@ require 'core_ext/hash'
 require 'core_ext/string'
 require 'iso_639'
 require 'iso_3166'
+
 # first require the event then require everything else
+require Rails.root.join("app", "models", "events", "events.rb").to_s
+require Rails.root.join("app", "models", "events", "constants.rb").to_s
 require Rails.root.join("app", "models", "events", "event.rb").to_s
-# Dir[Rails.root.join("app", "models", "events", "*").to_s].each{|file| puts file; require file}
+require Rails.root.join("app", "models", "events", "pipeline.rb").to_s
+
+Dir[Rails.root.join("app", "models", "events", "*")].each do |event_subdir|
+    next if !File.directory?(event_subdir)
+    parent_file_name = File.join(event_subdir, File.basename(event_subdir).singularize + ".rb")
+    require parent_file_name
+    children = Dir[File.join(event_subdir, "*")].each do |child_filename|
+        require child_filename
+    end
+end
