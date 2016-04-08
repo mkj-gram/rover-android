@@ -1,2 +1,2 @@
 web: bin/runsvdir-dyno
-worker: rake sneakers:run
+worker: bin/runsvdir-dyno
