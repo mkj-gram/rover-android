@@ -5,6 +5,10 @@ module RenderHelper
         render_errors([{title: title, detail: description, status: "401"}], {status: :unauthorized})
     end
 
+    def render_forbidden(title, description)
+        render_errors([{title: title, detail: description, status: "403"}], {status: :forbidden})
+    end
+
     def render_errors(errors, opts = {})
         if errors.is_a?(ActiveModel::Errors)
             render_active_model_errors(errors, opts)

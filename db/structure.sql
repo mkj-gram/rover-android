@@ -125,13 +125,16 @@ CREATE TABLE accounts (
     primary_user_id integer,
     token text NOT NULL,
     share_key text NOT NULL,
+    default_user_role_id integer,
     users_count integer DEFAULT 0,
     locations_count integer DEFAULT 0,
+    beacon_configurations_count integer DEFAULT 0,
     searchable_beacon_configurations_count integer DEFAULT 0,
     searchable_locations_count integer DEFAULT 0,
     account_invites_count integer DEFAULT 0,
     proximity_messages_count integer DEFAULT 0,
     archived_proximity_messages_count integer DEFAULT 0,
+    gimbal_places_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customers_count integer DEFAULT 0,
@@ -383,6 +386,40 @@ ALTER SEQUENCE customer_devices_id_seq OWNED BY customer_devices.id;
 
 
 --
+-- Name: customer_segments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE customer_segments (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    title character varying,
+    filters jsonb[] DEFAULT '{}'::jsonb[],
+    approximate_customers_count integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: customer_segments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE customer_segments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: customer_segments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE customer_segments_id_seq OWNED BY customer_segments.id;
+
+
+--
 -- Name: customers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -417,6 +454,19 @@ CREATE SEQUENCE customers_id_seq
 --
 
 ALTER SEQUENCE customers_id_seq OWNED BY customers.id;
+
+
+--
+-- Name: gimbal_places; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE gimbal_places (
+    account_id integer NOT NULL,
+    id character varying NOT NULL,
+    name character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
 
 
 --
@@ -473,7 +523,7 @@ CREATE TABLE messages (
     account_id integer NOT NULL,
     type character varying NOT NULL,
     title character varying,
-    tags character varying[] DEFAULT '{}'::character varying[],
+    tags character varying[],
     notification_text text,
     published boolean DEFAULT false,
     archived boolean DEFAULT false,
@@ -487,15 +537,15 @@ CREATE TABLE messages (
     schedule_friday boolean DEFAULT true,
     schedule_saturday boolean DEFAULT true,
     schedule_sunday boolean DEFAULT true,
-    approximate_customers_count integer,
     trigger_event_id integer,
     dwell_time_in_seconds integer,
+    customer_segment_id integer,
     limits hstore[],
-    customer_segments jsonb[] DEFAULT '{}'::jsonb[],
     filter_beacon_configuration_tags character varying[],
     filter_beacon_configuration_ids integer[],
     filter_location_tags character varying[],
     filter_location_ids integer[],
+    filter_gimbal_place_id character varying,
     action character varying,
     action_url character varying,
     action_landing_page_id integer,
@@ -707,23 +757,83 @@ ALTER SEQUENCE third_party_integrations_id_seq OWNED BY third_party_integrations
 
 
 --
--- Name: user_acls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_roles; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE user_acls (
-    user_id integer NOT NULL,
-    admin boolean DEFAULT false,
-    users_index boolean DEFAULT true,
-    users_show boolean DEFAULT true,
-    users_create boolean DEFAULT true,
-    users_update boolean DEFAULT false,
-    users_destroy boolean DEFAULT false,
-    locations_index boolean DEFAULT true,
-    locations_show boolean DEFAULT true,
-    locations_create boolean DEFAULT true,
-    locations_update boolean DEFAULT true,
-    locations_destroy boolean DEFAULT false
+CREATE TABLE user_roles (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    title character varying,
+    description text,
+    account_show boolean DEFAULT true,
+    account_create boolean DEFAULT true,
+    account_update boolean DEFAULT true,
+    account_destroy boolean DEFAULT true,
+    user_show boolean DEFAULT true,
+    user_create boolean DEFAULT true,
+    user_update boolean DEFAULT true,
+    user_destroy boolean DEFAULT true,
+    beacon_configuration_show boolean DEFAULT true,
+    beacon_configuration_create boolean DEFAULT true,
+    beacon_configuration_update boolean DEFAULT true,
+    beacon_configuration_destroy boolean DEFAULT true,
+    location_show boolean DEFAULT true,
+    location_create boolean DEFAULT true,
+    location_update boolean DEFAULT true,
+    location_destroy boolean DEFAULT true,
+    customer_show boolean DEFAULT true,
+    customer_create boolean DEFAULT true,
+    customer_update boolean DEFAULT true,
+    customer_destroy boolean DEFAULT true,
+    customer_segment_show boolean DEFAULT true,
+    customer_segment_create boolean DEFAULT true,
+    customer_segment_update boolean DEFAULT true,
+    customer_segment_destroy boolean DEFAULT true,
+    proximity_message_show boolean DEFAULT true,
+    proximity_message_create boolean DEFAULT true,
+    proximity_message_update boolean DEFAULT true,
+    proximity_message_destroy boolean DEFAULT true,
+    scheduled_message_show boolean DEFAULT true,
+    scheduled_message_create boolean DEFAULT true,
+    scheduled_message_update boolean DEFAULT true,
+    scheduled_message_destroy boolean DEFAULT true,
+    automated_message_show boolean DEFAULT true,
+    automated_message_create boolean DEFAULT true,
+    automated_message_update boolean DEFAULT true,
+    automated_message_destroy boolean DEFAULT true,
+    third_party_integration_show boolean DEFAULT true,
+    third_party_integration_create boolean DEFAULT true,
+    third_party_integration_update boolean DEFAULT true,
+    third_party_integration_destroy boolean DEFAULT true,
+    account_invite_show boolean DEFAULT true,
+    account_invite_create boolean DEFAULT true,
+    account_invite_update boolean DEFAULT true,
+    account_invite_destroy boolean DEFAULT true,
+    user_acl_show boolean DEFAULT true,
+    user_acl_create boolean DEFAULT true,
+    user_acl_update boolean DEFAULT true,
+    user_acl_destroy boolean DEFAULT true,
+    users_count integer DEFAULT 0
 );
+
+
+--
+-- Name: user_roles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE user_roles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE user_roles_id_seq OWNED BY user_roles.id;
 
 
 --
@@ -737,7 +847,8 @@ CREATE TABLE users (
     password_digest character varying NOT NULL,
     account_id integer NOT NULL,
     account_owner boolean DEFAULT false,
-    acl_updated_at timestamp without time zone,
+    user_role_id integer NOT NULL,
+    user_role_updated_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -822,6 +933,13 @@ ALTER TABLE ONLY customer_devices ALTER COLUMN id SET DEFAULT nextval('customer_
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY customer_segments ALTER COLUMN id SET DEFAULT nextval('customer_segments_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY customers ALTER COLUMN id SET DEFAULT nextval('customers_id_seq'::regclass);
 
 
@@ -872,6 +990,13 @@ ALTER TABLE ONLY third_party_integration_sync_jobs ALTER COLUMN id SET DEFAULT n
 --
 
 ALTER TABLE ONLY third_party_integrations ALTER COLUMN id SET DEFAULT nextval('third_party_integrations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY user_roles ALTER COLUMN id SET DEFAULT nextval('user_roles_id_seq'::regclass);
 
 
 --
@@ -946,6 +1071,14 @@ ALTER TABLE ONLY customer_devices
 
 
 --
+-- Name: customer_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY customer_segments
+    ADD CONSTRAINT customer_segments_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1007,6 +1140,14 @@ ALTER TABLE ONLY third_party_integration_sync_jobs
 
 ALTER TABLE ONLY third_party_integrations
     ADD CONSTRAINT third_party_integrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY user_roles
+    ADD CONSTRAINT user_roles_pkey PRIMARY KEY (id);
 
 
 --
@@ -1193,6 +1334,13 @@ CREATE UNIQUE INDEX index_customer_devices_on_udid ON customer_devices USING btr
 
 
 --
+-- Name: index_customer_segments_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_customer_segments_on_account_id ON customer_segments USING btree (account_id);
+
+
+--
 -- Name: index_customers_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1211,6 +1359,20 @@ CREATE UNIQUE INDEX index_customers_on_account_id_and_identifier ON customers US
 --
 
 CREATE INDEX index_customers_on_account_id_and_traits ON customers USING gin (account_id, traits);
+
+
+--
+-- Name: index_gimbal_places_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_gimbal_places_on_account_id ON gimbal_places USING btree (account_id);
+
+
+--
+-- Name: index_gimbal_places_on_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_gimbal_places_on_id ON gimbal_places USING btree (id);
 
 
 --
@@ -1312,10 +1474,10 @@ CREATE INDEX index_third_party_integrations_on_account_id_and_type ON third_part
 
 
 --
--- Name: index_user_acls_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_roles_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_user_acls_on_user_id ON user_acls USING btree (user_id);
+CREATE INDEX index_user_roles_on_account_id ON user_roles USING btree (account_id);
 
 
 --
@@ -1383,12 +1545,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151230194352');
 
 INSERT INTO schema_migrations (version) VALUES ('20151231222124');
 
-INSERT INTO schema_migrations (version) VALUES ('20160102004249');
-
-INSERT INTO schema_migrations (version) VALUES ('20160102004639');
-
-INSERT INTO schema_migrations (version) VALUES ('20160102124353');
-
 INSERT INTO schema_migrations (version) VALUES ('20160107180658');
 
 INSERT INTO schema_migrations (version) VALUES ('20160113155223');
@@ -1426,4 +1582,10 @@ INSERT INTO schema_migrations (version) VALUES ('20160211202819');
 INSERT INTO schema_migrations (version) VALUES ('20160225140703');
 
 INSERT INTO schema_migrations (version) VALUES ('20160301142503');
+
+INSERT INTO schema_migrations (version) VALUES ('20160318144534');
+
+INSERT INTO schema_migrations (version) VALUES ('20160405134656');
+
+INSERT INTO schema_migrations (version) VALUES ('20160406145542');
 

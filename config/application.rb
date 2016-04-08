@@ -18,6 +18,7 @@ module RailsApi
         config.password_reset = Rails.application.config_for(:password_reset)
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
         # Autoload our libraries
+        config.autoload_paths << Rails.root.join('lib')
         config.autoload_paths << Rails.root.join('app', 'models', 'messages')
         config.autoload_paths << Rails.root.join('app', 'models', 'configuration_visits')
         config.autoload_paths << Rails.root.join('app', 'models', 'events')
@@ -38,13 +39,15 @@ module RailsApi
 
         # config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations', 'ibeacon_configuration')
         config.autoload_paths << Rails.root.join('lib', 'mail_client')
-        config.autoload_paths << Rails.root.join('lib', 'customer_segment')
+        config.autoload_paths << Rails.root.join('lib', 'customer_filter')
         config.autoload_paths << Rails.root.join('lib', 'message_limit')
         config.autoload_paths << Rails.root.join('lib', 'model_broadcaster')
         config.autoload_paths << Rails.root.join('lib', 'rabbit_mq_publisher')
         config.autoload_paths << Rails.root.join('lib', 'model_error')
         config.autoload_paths << Rails.root.join('lib', 'estimote_api')
         config.autoload_paths << Rails.root.join('lib', 'kontakt_api')
+        config.autoload_paths << Rails.root.join('lib', 'events_logger')
+        config.autoload_paths << Rails.root.join('lib', 'gimbal_api')
 
         config.autoload_paths << Rails.root.join('app', 'workers')
         config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
@@ -69,6 +72,8 @@ end
 
 require 'core_ext/hash'
 require 'core_ext/string'
+require 'iso_639'
+require 'iso_3166'
 # first require the event then require everything else
 require Rails.root.join("app", "models", "events", "event.rb").to_s
 # Dir[Rails.root.join("app", "models", "events", "*").to_s].each{|file| puts file; require file}

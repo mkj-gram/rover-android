@@ -1,7 +1,11 @@
 class V1::ProximityMessagesController < V1::ApplicationController
+
     before_action :authenticate
-    before_action :validate_json_schema, only: [:create, :update]
-    before_action :set_proximity_message, only: [:show, :update, :destroy]
+    before_action :validate_json_schema,    only: [:create, :update]
+    before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
+    before_action :set_proximity_message,   only: [:show, :update, :destroy]
+
+
     def index
         # list all proximity messages
         # queryby status?
@@ -65,11 +69,12 @@ class V1::ProximityMessagesController < V1::ApplicationController
         end
 
         json = {
-            "data" => messages.to_a.map{|message| serialize_message(message)},
+            "data" => messages.includes(:customer_segment).to_a.map{|message| serialize_message(message)},
             "meta" => {
                 "totalRecords" => messages.total,
                 "totalPages" => messages.total_pages,
-                "totalSearchableRecords" => total_searchable_records
+                "totalSearchableRecords" => total_searchable_records,
+                "totalConfigurationsCount" => current_account.searchable_beacon_configurations_count # use searchable since we could be targeting shared beacons
             }
         }
 
@@ -116,6 +121,10 @@ class V1::ProximityMessagesController < V1::ApplicationController
         end
     end
 
+    def resource
+        ProximityMessage
+    end
+
     private
 
     def proximity_message_params(local_params)
@@ -124,7 +133,8 @@ class V1::ProximityMessagesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :configuration_ids, :filter_beacon_configuration_ids)
         convert_param_if_exists(local_params[:proximity_messages], :location_tags, :filter_location_tags)
         convert_param_if_exists(local_params[:proximity_messages], :location_ids, :filter_location_ids)
-
+        convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
+        convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_id, :filter_gimbal_place_id)
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
         param_should_be_array(local_params[:proximity_messages], :filter_location_tags)
         param_should_be_array(local_params[:proximity_messages], :limits)
@@ -143,6 +153,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
             {:filter_beacon_configuration_ids => []},
             {:filter_location_tags => []},
             {:filter_location_ids => []},
+            :filter_gimbal_place_id,
             :schedule_start_date,
             :schedule_end_date,
             :schedule_start_time,
@@ -157,14 +168,21 @@ class V1::ProximityMessagesController < V1::ApplicationController
             :action,
             :action_url,
             :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days],
+            :customer_segment_id,
+            :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]
         )
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "locations"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
+        should_include = ["beacons", "locations", "segment"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
+
         json = {
-            data: serialize_message(message)
+            data: serialize_message(message, {:"targeted-configurations-count" => message.targeted_beacon_configurations_count}),
+            meta: {
+                totalConfigurationsCount: current_account.searchable_beacon_configurations_count # use searchable since we could be targeting shared beacons
+            }
         }
+
         included = []
         if should_include.include?("beacons")
             json[:data][:relationships] = {} if json[:data][:relationships].nil?
@@ -201,6 +219,23 @@ class V1::ProximityMessagesController < V1::ApplicationController
             end
         end
 
+        if should_include.include?("segment")
+            json[:data][:relationships] = {} if json[:data][:relationships].nil?
+            if message.customer_segment
+                json[:data][:relationships].merge!(
+                    {
+                        :"segment" => {
+                            data: { type: "segments", id: message.customer_segment.id.to_s }
+                        }
+
+                    }
+                )
+                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
+            else
+                json[:data][:relationships].merge!({:"segment" => {data: nil}})
+            end
+        end
+
         if included.any?
             json[:included] = included
         end
@@ -217,7 +252,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
         params.fetch(:filter, {}).fetch(:archived, "false").to_bool
     end
 
-    def serialize_message(message)
+    def serialize_message(message, extra_attributes = {})
         {
             type: "proximity-messages",
             id: message.id.to_s,
@@ -227,7 +262,6 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 published: message.published,
                 archived: message.archived,
                 :"trigger-event" => Event.event_id_to_event_string(message.trigger_event_id),
-                :"approximate-customers-count" => message.approximate_customers_count,
                 :"configuration-tags" => message.filter_beacon_configuration_tags,
                 :"schedule-start-date" => message.schedule_start_date,
                 :"schedule-end-date" => message.schedule_end_date,
@@ -241,10 +275,12 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"schedule-saturday" => message.schedule_saturday,
                 :"schedule-sunday" => message.schedule_sunday,
                 :"location-tags" => message.filter_location_tags,
+                :"gimbal-place-id" => message.filter_gimbal_place_id,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
                 :"action" => message.action,
-                :"action-url" => message.action_url
-            }
+                :"action-url" => message.action_url,
+                :"approximate-customers-count" => message.customer_segment ? message.customer_segment.customers_count : current_account.customers_count
+            }.merge(extra_attributes)
         }
     end
 

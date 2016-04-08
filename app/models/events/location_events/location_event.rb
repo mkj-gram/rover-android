@@ -1,5 +1,7 @@
 class LocationEvent < Event
 
+    after_save :update_customer_location
+
     def self.event_id
         Event::LOCATION_EVENT_ID
     end
@@ -33,10 +35,21 @@ class LocationEvent < Event
         @region_limit = device.ios? ? 20 : 100
     end
 
-    def save
-        # add_to_event_attributes()
-        super
+    def update_customer_location
+        if customer
+            customer.update_attributes({location: GeoPoint.new(latitude, longitude)})
+        end
     end
+
+    # def attributes
+    #     super.merge(
+    #         {
+    #             longitude: longitude,
+    #             latitude: latitude
+    #         }
+    #     )
+    # end
+
 
     private
 

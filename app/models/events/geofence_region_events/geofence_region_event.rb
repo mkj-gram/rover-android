@@ -1,6 +1,6 @@
 class GeofenceRegionEvent < Event
 
-    after_save :save_messages_to_inbox
+    before_save :save_messages_to_inbox
 
     def self.build_event(object, action, event_attributes)
         case action
@@ -21,6 +21,44 @@ class GeofenceRegionEvent < Event
         @latitude = event_attributes[:latitude]
         @longitude = event_attributes[:longitude]
         @radius = event_attributes[:radius]
+    end
+
+
+    def attributes
+        parent_attributes = super
+
+        if location
+            parent_attributes.merge!(
+                {
+                    location: {
+                        id: location.id,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        tags: location.tags,
+                        shared: location.shared,
+                        enabled: location.enabled,
+                        beacon_configurations_count: location.beacon_configurations_count
+                    }
+                }
+            )
+        end
+
+        if @new_messages && @new_messages.any?
+            messages = @new_messages.map{|inbox_message| inbox_message.message }
+            parent_attributes.merge!(
+                {
+                    messages: messages.map{ |message|
+                        {
+                            id: message.id,
+                            tags: message.tags,
+                            save_to_inbox: message.save_to_inbox
+                        }
+                    }
+                }
+            )
+        end
+
+        return parent_attributes
     end
 
     def to_json
@@ -65,7 +103,7 @@ class GeofenceRegionEvent < Event
         # apply all filters
         current_time = DateTime.now
         messages.select do |message|
-            message.within_schedule(current_time) && message.apply_configuration_filters(location_configuration) && message.apply_customer_filters(customer, device)
+            message.within_schedule(current_time) && message.apply_configuration_filters(location_configuration) && message.within_customer_segment(customer, device)
         end
     end
 

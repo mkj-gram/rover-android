@@ -7,6 +7,7 @@
 class V1::IntegrationsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema,    only: [:create, :update]
+    before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
 
     def index
 
@@ -89,6 +90,10 @@ class V1::IntegrationsController < V1::ApplicationController
         end
     end
 
+    def reosurce
+        ThirdPartyIntegration
+    end
+
     private
 
     def build_integration(json)
@@ -100,6 +105,8 @@ class V1::IntegrationsController < V1::ApplicationController
             build_estimote_integration(json)
         when "kontakt-integrations"
             build_kontat_integration(json)
+        when "gimbal-integrations"
+            build_gimbal_integration(json)
         else
             nil
         end
@@ -131,6 +138,19 @@ class V1::IntegrationsController < V1::ApplicationController
 
     def kontakt_integration_params(local_params)
         return local_params[:kontakt_integrations].permit(:enabled, :api_key)
+    end
+
+    def build_gimbal_integration(json)
+        options = gimbal_integration_params(json[:data])
+        api_key = options.delete(:api_key)
+        integration = GimbalIntegration.new(options)
+        integration.set_credentials(api_key)
+        integration.account_id = current_account.id
+        return integration
+    end
+
+    def gimbal_integration_params(local_params)
+        return local_params[:gimbal_integrations].permit(:enabled, :api_key)
     end
 
     def get_integrations

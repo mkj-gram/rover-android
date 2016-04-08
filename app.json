@@ -50,10 +50,20 @@
     },
     "MONGODB_URI": {
       "required": true
+    },
+    "ANALYTICS_SHARED_KEY": {
+      "required": true
+    },
+    "REDISCLOUD_URL": {
+      "required": true
+    },
+    "TD_AGENT_CONF_PATH": {
+      "required": true
     }
   },
   "addons": [
     "bonsai",
-    "cloudamqp"
+    "cloudamqp",
+    "rediscloud"
   ]
 }

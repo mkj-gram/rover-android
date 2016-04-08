@@ -1,2 +1,2 @@
-web: bundle exec puma -C config/puma.rb
-worker: rake sneakers:run
+web: bin/runsvdir-dyno
+worker: bin/runsvdir-dyno

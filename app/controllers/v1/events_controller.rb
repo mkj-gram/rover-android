@@ -1,7 +1,7 @@
 class V1::EventsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema
-
+    before_action :device_id_header_present
 
     def create
         json = flatten_request({single_record: true, except: "attributes.user.traits"})
@@ -13,14 +13,20 @@ class V1::EventsController < V1::ApplicationController
 
         customer, device = get_customer_and_device(user_attributes, device_attributes)
 
-        attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
+        if !device.valid?
+            render json: { errors: V1::CustomerDeviceErrorSerializer.serialize(device.errors)}, status: :unprocessable_entity
+        elsif !customer.valid?
+            render json: { errors: V1::CustomerErrorSerializer.serialize(customer.errors)}, status: :unprocessable_entity
+        else
+            attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
 
-        event = Event.build_event(attributes)
-        event.save
+            event = Event.build_event(attributes)
+            event.save
 
-        json = event.to_json
+            json = event.to_json
 
-        render json: json
+            render json: json
+        end
     end
 
 

@@ -12,6 +12,8 @@ class Account < ActiveRecord::Base
     before_create :generate_share_key
     after_create :create_active_tags_index
     after_create :create_active_configuration_uuids_index
+    after_create :create_customer_elasticsearch_alias
+    after_create :create_admin_role
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
@@ -29,15 +31,19 @@ class Account < ActiveRecord::Base
             where(type: "UrlConfiguration")
         end
     end
+
     has_many :active_shared_beacon_configurations, class_name: "SharedBeaconConfiguration", foreign_key: "owner_account_id"
     has_many :passive_shared_beacon_configurations, class_name: "SharedBeaconConfiguration", foreign_key: "shared_account_id"
-
     has_many :shared_beacon_configurations, through: :active_shared_beacon_configurations, source: :beacon_configuration
     has_many :shared_with_me_beacon_configurations, through: :passive_shared_beacon_configurations, source: :beacon_configuration
+    has_many :estimote_integrations
+    has_many :kontakt_integrations
+    has_many :customer_segments
+    has_many :account_invites, dependent: :destroy
+    has_many :user_roles
 
     has_one :beacon_configuration_active_tag
     has_one :location_active_tag
-
     has_one :ibeacon_configuration_uuids, class_name: "ActiveIBeaconConfigurationUuid"
     has_one :eddystone_namespace_configuration_uuids, class_name: "ActiveEddystoneConfigurationUuid"
 
@@ -47,16 +53,9 @@ class Account < ActiveRecord::Base
         end
     end
 
-    has_many :estimote_integrations
-    has_many :kontakt_integrations
 
-    # we can go innerjoin the beacon_configuration table with the ibeacons table
-    # has_many :ibeacon_configurations, through: :beacon_configurations, source: :configurable, source_type: "IbeaconConfiguration"
-    # or just directly look up from the ibeacons_table
-    # has_many :ibeacon_configurations, dependent: :destroy, class_name: "IBeaconConfiguration"
-    # has_many :eddystone_namespace_configurations, dependent: :destroy
-    # has_many :eddystone_url_configurations, dependent: :destroy
-    has_many :account_invites, dependent: :destroy
+
+    has_many :gimbal_places
 
     def location_bounding_box_suggestion
         query = {
@@ -112,6 +111,10 @@ class Account < ActiveRecord::Base
 
     private
 
+    def create_customer_elasticsearch_alias
+        Customer.create_alias!(self)
+    end
+
     def create_active_tags_index
         BeaconConfigurationActiveTag.create(account_id: self.id)
         LocationActiveTag.create(account_id: self.id)
@@ -127,6 +130,13 @@ class Account < ActiveRecord::Base
             random_token = SecureRandom.hex(16)
             break random_token unless Account.exists?(share_key: random_token)
         end
+    end
+
+    def create_admin_role
+        admin_role = UserRole.admin_role
+        admin_role.account_id = self.id
+        admin_role.save
+        self.update_attributes({default_user_role_id: admin_role.id})
     end
 
 end

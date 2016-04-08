@@ -4,7 +4,6 @@ class V1::ApplicationController < ActionController::API
     include PageHelper
     include OrderHelper
     include IncludeHelper
-    include AccessHelper
     include JsonHelper
     include RenderHelper
 
@@ -60,16 +59,29 @@ class V1::ApplicationController < ActionController::API
         }.call
     end
 
+    def check_access
+        # account token is automatically given full access
+        return true if current_user.nil? && !current_account.nil?
+        controller_resource = self.resource
+        if controller_resource.nil?
+            return false
+        else
+            role = current_user.user_role
+            method = action_name
+            method = "show" if action_name == "index"
+            if !role.has_access(controller_resource, method)
+                render_forbidden("Access Denied", "")
+            end
+        end
+    end
 
+    def resource
+        nil
+    end
 
-
-    # TODO FIX THIS BUG
-    # why are you finding by id?
     def current_account
         @current_account ||= -> {
-            if params.has_key?(:account_id)
-                return Account.find_by_id(params[:account_id])
-            elsif current_user
+            if current_user
                 return current_user.account
             else
                 return nil
@@ -88,6 +100,13 @@ class V1::ApplicationController < ActionController::API
         end
     end
 
+
+    def device_id_header_present
+        if !request.headers.include?(APPLICATION_DEVICE_ID_HEADER)
+            render_errors([{title: "Missing Header", detail: "#{APPLICATION_DEVICE_ID_HEADER} is missing", status: "400"}], {status: :bad_request})
+        end
+    end
+
     private
 
     def device_id
@@ -96,11 +115,6 @@ class V1::ApplicationController < ActionController::API
         else
             return nil
         end
-    end
-
-
-    def acl_path
-        return "#{controller_name}_#{action_name}"
     end
 
     def set_locale

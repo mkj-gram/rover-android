@@ -3,12 +3,11 @@ class Message < ActiveRecord::Base
     include Elasticsearch::Model::Callbacks
     include FormattableMessage
     include MessageLimit::Attribute
-    include CustomerSegment::Attribute
 
-    segment_attribute :customer_segments
     message_limit_attribute :limits
     # belongs_to :account
-
+    # doesn't make sense but thats how rails structures relationships
+    belongs_to :customer_segment
 
     message_attribute :notification_text
 
@@ -45,7 +44,6 @@ class Message < ActiveRecord::Base
 
     after_initialize :set_proper_time_schedule_range
     after_initialize :set_defaults, unless: :persisted?
-    before_save :set_approximate_customers_count
 
     validates :title, presence: true
     validate :valid_date_schedule
@@ -196,8 +194,12 @@ class Message < ActiveRecord::Base
         filter_location(configuration) && filter_beacon_configuration(configuration)
     end
 
-    def apply_customer_filters(customer, device)
-        self.customer_segments.all?{|customer_segment| customer_segment.within_segment(customer: customer, device: device)}
+    def within_customer_segment(customer, device)
+        if self.customer_segment_id
+            self.customer_segment.within_segment(customer, device)
+        else
+            true
+        end
     end
 
     def within_message_limits(message_rate_index)
@@ -214,6 +216,100 @@ class Message < ActiveRecord::Base
 
     def has_message_limits
         limits.any?
+    end
+
+    def has_configuration_filters
+        (
+            filter_beacon_configuration_tags && filter_beacon_configuration_tags.any?  ||
+            filter_beacon_configuration_ids && filter_beacon_configuration_ids.any? ||
+            filter_location_tags && filter_location_tags.any? ||
+            filter_location_ids && filter_location_ids.any?
+        )
+    end
+
+    def targeted_beacon_configurations_count
+        if has_configuration_filters
+            return @cached_targeted_beacon_configurations_count if @cached_targeted_beacon_configurations_count
+            must_filters = [
+                {
+                    term: {
+                        account_id: self.account_id
+                    }
+                }
+            ]
+            should_filters = [
+                {
+                    term: {
+                        account_id: self.account_id
+                    }
+                },
+                {
+                    term: {
+                        shared_account_ids: self.account_id
+                    }
+                }
+            ]
+
+            if filter_beacon_configuration_ids && filter_beacon_configuration_ids.any?
+                must_filters.push(
+                    {
+                        ids: {
+                            values: filter_beacon_configuration_ids
+                        }
+                    }
+                )
+            end
+
+            if filter_location_ids && filter_location_ids.any?
+                must_filters.push(
+                    {
+                        terms: {
+                            "location.id" => filter_location_ids
+                        }
+                    }
+                )
+            end
+
+            if filter_beacon_configuration_tags && filter_beacon_configuration_tags.any?
+                filter_beacon_configuration_tags.each do |tag|
+                    must_filters.push(
+                        {
+                            term: {
+                                tags: tag
+                            }
+
+                        }
+                    )
+                end
+            end
+
+            if filter_location_tags && filter_location_tags.any?
+                filter_location_tags.each do |tag|
+                    must_filters.push(
+                        {
+                            term: {
+                                "location.tags" => tag
+                            }
+                        }
+                    )
+                end
+            end
+
+
+
+            query = {
+                filter: {
+                    bool: {
+                        must: must_filters,
+                        should: should_filters
+                    }
+                }
+            }
+            @cached_targeted_beacon_configurations_count = Elasticsearch::Model.search(query, [::BeaconConfiguration], {search_type: "count"}).response.hits.total
+            return @cached_targeted_beacon_configurations_count
+        else
+            account.beacon_configurations_count
+        end
     end
 
     private
@@ -235,13 +331,6 @@ class Message < ActiveRecord::Base
 
         if @schedule_end_date && !valid_date(@schedule_end_date)
             errors.add(:schedule_end_date, "invalid format expecting yyyy-mm-dd")
-        end
-    end
-
-    def set_approximate_customers_count
-        if self.new_record?
-            self.approximate_customers_count ||= self.account.customers_count
-        else
         end
     end
 

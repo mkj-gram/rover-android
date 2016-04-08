@@ -33,9 +33,20 @@ module MessageLimit
             end
         end
 
+        def number_of_seconds
+            @number_of_minutes * 60
+        end
+
         def valid?
             !(message_limit.nil? && number_of_minutes.nil?)
         end
 
+        def ==(other)
+            self.message_limit == other.message_limit && self.number_of_minutes == other.number_of_minutes
+        end
+
+        def eql?(other)
+            return self == other
+        end
     end
 end

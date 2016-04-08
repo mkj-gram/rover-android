@@ -12,6 +12,7 @@ module BeaconConfigurationElasticsearchChild
             indexes :location, type: 'object' do
                 indexes :name, type: 'string', index: 'no'
                 indexes :id, type: 'integer', index: 'not_analyzed'
+                indexes :tags, type: 'string', index: 'not_analyzed'
             end
 
             indexes :created_at, type: 'date'

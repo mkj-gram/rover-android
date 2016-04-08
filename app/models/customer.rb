@@ -11,6 +11,7 @@ class Customer
     field :phone_number, type: String
     field :tags, type: Array
     field :traits, type: Hash
+    field :location, type: GeoPoint
 
     index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
     index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
@@ -39,7 +40,7 @@ class Customer
         }
     end
 
-    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 2 }).merge(
+    settings index: ElasticsearchShardCountHelper.get_settings({number_of_shards: 3, number_of_replicas: 1}).merge(
         {
             analysis:  {
                 filter: {
@@ -83,6 +84,7 @@ class Customer
             indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :created_at, type: 'date', index: 'not_analyzed'
             indexes :traits, type: 'object'
+            indexes :location, type: "geo_point", lat_lon: true
             indexes :devices, type: 'nested' do
                 indexes :udid, type: 'string', index: 'no'
                 indexes :token, type: 'string', index: 'no'
@@ -107,7 +109,7 @@ class Customer
 
     # has_one :inbox, class_name: "CustomerInbox"
     validates :account_id, presence: true
-
+    validates :email, email: { allow_blank: true }
     # where should we store counter cache? how do we?
     # # belongs_to :account, counter_cache: true
 
@@ -127,8 +129,8 @@ class Customer
     after_save :index_customer
 
     def as_indexed_json(options = {})
-        puts "indexing document"
-        {
+
+        json = {
             account_id: self.account_id,
             identifier: self.identifier,
             name: self.name,
@@ -138,14 +140,18 @@ class Customer
             traits: self.traits,
             age: self.age,
             gender: self.gender,
+            location: location_as_indexed_json,
             devices: devices_as_indexed_json(options)
         }
+        Rails.logger.debug("indexing document #{json}")
+        return json
     end
 
 
 
-    def self.get_index_name(account)
-        return "account_#{account.id}_customers"
+    def self.get_index_name(model)
+        account_id = model.is_a?(Customer) ? model.account_id : model.id
+        return "customers_account_#{account_id}"
     end
 
     def self.create_index!(opts = {})
@@ -167,6 +173,22 @@ class Customer
                                 settings: settings.to_hash,
                                 mappings: mappings.to_hash
         })
+
+    end
+
+    def self.create_alias!(account)
+        client = Customer.__elasticsearch__.client
+        client.indices.put_alias(
+            index: Customer.index_name,
+            name: Customer.get_index_name(account),
+            body: {
+                filter: {
+                    term: {
+                        account_id: account.id
+                    }
+                }
+            }
+        )
     end
 
     def indexable_customer?
@@ -176,6 +198,7 @@ class Customer
     def inbox
         @inbox ||= CustomerInbox.find(self.id)
         @inbox = CustomerInbox.create(customer_id: self.id) if @inbox.nil?
+        @inbox.customer = self
         return @inbox
     end
 
@@ -184,7 +207,15 @@ class Customer
         if val == "male" || val == "female"
             self[:gender] = val
         else
-            self.gender = nil
+            self[:gender] = nil
+        end
+    end
+
+    def location_as_indexed_json
+        if self.location
+            {lat: self.location.lat, lon: self.location.lng}
+        else
+            nil
         end
     end
 
@@ -218,7 +249,7 @@ class Customer
     #     self.__elasticsearch__.update_document_attributes({ devices: devices_as_indexed_json })
     # end
 
-    private
+    # private
 
     def create_inbox
         CustomerInbox.create(customer_id: self.id)
@@ -261,16 +292,46 @@ class Customer
             puts "this anonymous user doesn't have a device anymore"
             decrement_customers_count
             begin
-                self.__elasticsearch__.delete_document
+                self.delete_elasticsearch_document
             rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
                 Rails.logger.warn(e)
             end
         elsif identifier.nil? && devices.any?
-            __elasticsearch__.index_document
+            self.index_elasticsearch_document
         elsif !identifier.nil?
-            __elasticsearch__.index_document
+            self.index_elasticsearch_document
         end
     end
 
+    def index_elasticsearch_document(opts = {})
+        client = __elasticsearch__.client
+        document = self.as_indexed_json
+
+        client.index(
+            {
+                index: Customer.get_index_name(self),
+                type:  Customer.document_type,
+                id:    self.id.to_s,
+                body:  document
+            }.merge(opts)
+        )
+    end
+
+    def update_elasticsearch_document(opts = {})
+        self.index_document(opts)
+        Rails.logger.warn("Not implemented")
+    end
+
+    def delete_elasticsearch_document
+        client = __elasticsearch__.client
+        client.delete(
+            {
+                index: Customer.get_index_name(self),
+                type: Customer.document_type,
+                id: self.id.to_s
+            }
+        )
+
+    end
 
 end

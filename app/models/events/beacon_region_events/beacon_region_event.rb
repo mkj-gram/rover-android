@@ -1,6 +1,6 @@
 class BeaconRegionEvent < Event
 
-    after_save :save_messages_to_inbox
+    before_save :save_messages_to_inbox
 
     # def self.event_id
     #     Event::BEACON_REGION_EVENT_ID
@@ -44,20 +44,57 @@ class BeaconRegionEvent < Event
     def attributes
         parent_attributes = super
         if beacon_configuration
-            parent_attributes.merge(
+            parent_attributes.merge!(
                 {
                     configuration: {
                         id: beacon_configuration.id,
-                        title: beacon_configuration.title,
+                        protocol: beacon_configuration.protocol,
                         tags: beacon_configuration.tags,
                         shared: beacon_configuration.shared,
-                        enabled: beacon_configuration.enabled
+                        enabled: beacon_configuration.enabled,
+                        configuration_uuid: beacon_configuration.uuid,
+                        configuration_major: beacon_configuration.major,
+                        configuration_minor: beacon_configuration.minor,
+                        configuration_namespace: beacon_configuration.namespace,
+                        configuration_instance_id: beacon_configuration.instance_id,
+                        configuration_url: beacon_configuration.url
                     }
                 }
             )
-        else
-            return parent_attributes
         end
+
+        if location
+            parent_attributes.merge!(
+                {
+                    location: {
+                        id: location.id,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        tags: location.tags,
+                        shared: location.shared,
+                        enabled: location.enabled,
+                        beacon_configurations_count: location.beacon_configurations_count
+                    }
+                }
+            )
+        end
+
+        if @new_messages && @new_messages.any?
+            messages = @new_messages.map{|inbox_message| inbox_message.message }
+            parent_attributes.merge!(
+                {
+                    messages: messages.map{ |message|
+                        {
+                            id: message.id,
+                            tags: message.tags,
+                            save_to_inbox: message.save_to_inbox
+                        }
+                    }
+                }
+            )
+        end
+
+        return parent_attributes
     end
 
     def to_json
@@ -103,7 +140,7 @@ class BeaconRegionEvent < Event
         # apply all filters
         current_time = DateTime.now
         messages.select do |message|
-            message.within_schedule(current_time) && message.apply_configuration_filters(beacon_configuration) && message.apply_customer_filters(customer, device)
+            message.within_schedule(current_time) && message.apply_configuration_filters(beacon_configuration) && message.within_customer_segment(customer, device)
         end
     end
 

@@ -11,7 +11,7 @@ class CreateMessages < ActiveRecord::Migration
             t.boolean :published, default: false
             t.boolean :archived, default: false
             t.boolean :save_to_inbox, default: true
-
+            t.string :tags, array: true
             # schedule holds the days and times of when to push
             # bug with rails 4
             # t.tsrange :schedule, default: Float::INFINITY..Float::INFINITY
@@ -27,20 +27,21 @@ class CreateMessages < ActiveRecord::Migration
             t.boolean :schedule_saturday, default: true
             t.boolean :schedule_sunday, default: true
 
-            t.integer :approximate_customers_count
+
 
             t.integer :trigger_event_id
             t.integer :dwell_time_in_seconds
-
+            # segment
+            t.integer :customer_segment_id
             # limits
             t.hstore :limits, array: true
-            # segments
-            t.jsonb :customer_segments, array: true, default: []
+
             # filters
             t.string    :filter_beacon_configuration_tags, array: true
             t.integer   :filter_beacon_configuration_ids, array: true
             t.string    :filter_location_tags, array: true
             t.integer   :filter_location_ids, array: true
+            t.string    :filter_gimbal_place_id
 
 
             # Actions

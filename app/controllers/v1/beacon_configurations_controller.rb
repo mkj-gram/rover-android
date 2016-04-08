@@ -1,6 +1,9 @@
 class V1::BeaconConfigurationsController < V1::ApplicationController
+
     before_action :authenticate
     before_action :validate_json_schema,    only: [:create, :update]
+    before_action :set_resource,            only: [:show, :update, :destroy]
+    before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
 
     @@protocol_types = Set.new([IBeaconConfiguration.protocol, EddystoneNamespaceConfiguration.protocol, UrlConfiguration.protocol])
 
@@ -70,14 +73,15 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         # if tags are provided they must all match
         if query_tags.any?
-            must_filter.push(
-                {
-                    terms:  {
-                        tags: query_tags,
-                        execution: "and"
+            query_tags.each do |tag|
+                must_filter.push(
+                    {
+                        term:  {
+                            tags: tag,
+                        }
                     }
-                }
-            )
+                )
+            end
         end
 
         if query_location_id
@@ -182,7 +186,6 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def show
         # show a detail view of the beacon
-        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
         render_beacon_configuration(@beacon_configuration)
     end
 
@@ -212,30 +215,30 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def update
         # we can update name, tags, enabled
-        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
-        if @beacon_configuration
-            json = flatten_request({single_record: true})
-            if @beacon_configuration.update_attributes(beacon_configuration_params(json[:data]))
-                render_beacon_configuration(@beacon_configuration)
-            else
-                render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
-            end
+        json = flatten_request({single_record: true})
+        if @beacon_configuration.update_attributes(beacon_configuration_params(json[:data]))
+            render_beacon_configuration(@beacon_configuration)
         else
-            head :not_found
+            render json: { errors: V1::BeaconConfigurationErrorSerializer.serialize(@beacon_configuration.errors)}, status: :unprocessable_entity
         end
+
     end
 
     def destroy
-        @beacon_configuration = BeaconConfiguration.find_by_id(params[:id])
-        if @beacon_configuration
-            @beacon_configuration.destroy
-            head :no_content
-        else
-            head :not_found
-        end
+        @beacon_configuration.destroy
+        head :no_content
+    end
+
+    def resource
+        BeaconConfiguration
     end
 
     private
+
+    def set_resource
+        @beacon_configuration = current_account.beacon_configurations.find_by_id(params[:id])
+        head :not_found if @beacon_configuration.nil?
+    end
 
     def filter_params
         convert_param_if_exists(params[:filter], :"location-id", :location_id)

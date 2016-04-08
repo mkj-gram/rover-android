@@ -1,6 +1,7 @@
 class V1::LocationsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:create, :update]
+    before_action :check_access, only: [:index, :show, :create, :update, :destroy]
     before_action :set_location, only: [:show, :update, :destroy]
 
     def index
@@ -29,14 +30,15 @@ class V1::LocationsController < V1::ApplicationController
 
         # if tags are provided they must all match
         if query_tags.any?
-            must_filter.push(
-                {
-                    terms:  {
-                        tags: query_tags,
-                        execution: "and"
+            query_tags.each do |tag|
+                must_filter.push(
+                    {
+                        term:  {
+                            tags: tag,
+                        }
                     }
-                }
-            )
+                )
+            end
         end
 
         if query_keyword
@@ -117,7 +119,7 @@ class V1::LocationsController < V1::ApplicationController
 
     def show
         # include configurations
-        should_include = whitelist_include(["configurations"])
+        should_include = ["configurations"] # auto include for now whitelist_include(["configurations"])
 
         json = {
             "data" => serialize_location(@location)
@@ -177,11 +179,14 @@ class V1::LocationsController < V1::ApplicationController
         end
     end
 
+    def resource
+        Location
+    end
 
     private
 
     def set_location
-        @location = Location.find_by_id(params[:id])
+        @location = current_account.locations.find_by_id(params[:id])
         head :not_found if @location.nil?
     end
     # bounding box location query

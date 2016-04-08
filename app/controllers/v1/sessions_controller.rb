@@ -1,6 +1,7 @@
 class V1::SessionsController < V1::ApplicationController
+
     before_action :validate_json_schema,    only: [:create]
-    before_action :authenticate, only: [:show, :destroy]
+    before_action :authenticate,            only: [:show, :destroy]
 
     def create
         # takes in a email and password and returns a signed jwt token
