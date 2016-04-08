@@ -261,7 +261,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"notification-text" => message.notification_text,
                 published: message.published,
                 archived: message.archived,
-                :"trigger-event" => Event.event_id_to_event_string(message.trigger_event_id),
+                :"trigger-event" => Events::Pipeline.event_id_to_event_string(message.trigger_event_id),
                 :"configuration-tags" => message.filter_beacon_configuration_tags,
                 :"schedule-start-date" => message.schedule_start_date,
                 :"schedule-end-date" => message.schedule_end_date,
