@@ -23,7 +23,7 @@ module Events
                     parent_attributes.merge!(
                         {
                             message: {
-                                id: message.id
+                                id: message.id,
                                 type: message.type,
                                 save_to_inbox: message.save_to_inbox,
                                 tags: message.tags
