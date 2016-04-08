@@ -523,11 +523,11 @@ CREATE TABLE messages (
     account_id integer NOT NULL,
     type character varying NOT NULL,
     title character varying,
+    tags character varying[],
     notification_text text,
     published boolean DEFAULT false,
     archived boolean DEFAULT false,
     save_to_inbox boolean DEFAULT true,
-    tags character varying[],
     date_schedule int4range DEFAULT '(,)'::int4range,
     time_schedule int4range DEFAULT '[0,1441)'::int4range,
     schedule_monday boolean DEFAULT true,
@@ -546,6 +546,10 @@ CREATE TABLE messages (
     filter_location_tags character varying[],
     filter_location_ids integer[],
     filter_gimbal_place_id character varying,
+    action character varying,
+    action_url character varying,
+    action_landing_page_id integer,
+    action_experience_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

@@ -6,6 +6,7 @@ class CreateMessages < ActiveRecord::Migration
             t.string :type, null: false
 
             t.string :title
+            t.string :tags, array: true, default: []
             t.text :notification_text
             t.boolean :published, default: false
             t.boolean :archived, default: false
@@ -41,6 +42,12 @@ class CreateMessages < ActiveRecord::Migration
             t.string    :filter_location_tags, array: true
             t.integer   :filter_location_ids, array: true
             t.string    :filter_gimbal_place_id
+
+
+            # Actions
+            #
+            t.string :action # "open-url"
+            t.string :action_url # "https://google.ca"
 
             t.timestamps null: false
         end

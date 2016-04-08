@@ -51,7 +51,9 @@ class Message < ActiveRecord::Base
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
 
+    validate :valid_action
 
+    VALID_ACTIONS = Set.new(["link", "landing-page", "experience"])
 
     def as_indexed_json(opts = {})
         {
@@ -62,6 +64,24 @@ class Message < ActiveRecord::Base
             archived: self.archived,
             created_at: self.created_at,
         }
+    end
+    def to_inbox_message(opts)
+        @inbox_message ||= -> {
+            inbox_message = InboxMessage.new(
+                {
+                    title: self.title,
+                    message_id: self.id,
+                    notification_text: formatted_message(opts),
+                    read: false,
+                    saved_to_inbox: self.save_to_inbox,
+                    action: self.action,
+                    action_url: self.action_url,
+                    timestamp: Time.now
+                }
+            )
+            inbox_message.message = self
+            return inbox_message
+        }.call
     end
 
     def archived=(val)
@@ -337,6 +357,13 @@ class Message < ActiveRecord::Base
             !location.nil? && filter_location_ids.include?(location.id)
         else
             true
+        end
+    end
+
+
+    def valid_action
+        if published && self.action && !VALID_ACTIONS.include?(self.action)
+            errors.add(:action, "invalid, must be of type (#{VALID_ACTIONS.to_a.join(', ')})")
         end
     end
 end

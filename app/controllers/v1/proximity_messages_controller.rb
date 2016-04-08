@@ -165,6 +165,9 @@ class V1::ProximityMessagesController < V1::ApplicationController
             :schedule_friday,
             :schedule_saturday,
             :schedule_sunday,
+            :action,
+            :action_url,
+            :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days],
             :customer_segment_id,
             :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]
         )
@@ -274,6 +277,8 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"location-tags" => message.filter_location_tags,
                 :"gimbal-place-id" => message.filter_gimbal_place_id,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
+                :"action" => message.action,
+                :"action-url" => message.action_url,
                 :"approximate-customers-count" => message.customer_segment ? message.customer_segment.customers_count : current_account.customers_count
             }.merge(extra_attributes)
         }
