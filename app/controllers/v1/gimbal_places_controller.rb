@@ -89,7 +89,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
             data: serialize_gimbal_place(@gimbal_place)
         }
 
-        render json: json @gimbal_place
+        render json: json: @gimbal_place
     end
 
     private
