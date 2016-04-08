@@ -1,193 +1,167 @@
-class BeaconRegionEvent < Event
+module Events
+    module BeaconRegionEvents
+        class BeaconRegionEvent < Event
 
-    before_save :save_messages_to_inbox
-
-    # def self.event_id
-    #     Event::BEACON_REGION_EVENT_ID
-    # end
-
-    def self.build_event(object, action, event_attributes)
-        case action
-        when "enter"
-            return BeaconRegionEnterEvent.new(event_attributes)
-        when "exit"
-            return BeaconRegionExitEvent.new(event_attributes)
-        else
-            return Event.new(event_attributes)
-        end
-    end
+            before_save :save_messages_to_inbox
 
 
-    def initialize(event_attributes)
-        super
-        @uuid = event_attributes[:uuid].upcase
-        @major = event_attributes[:major_number]
-        @minor = event_attributes[:minor_number]
+            def initialize(event_attributes)
+                super
+                @uuid = event_attributes[:uuid]
+                @major = event_attributes[:major_number]
+                @minor = event_attributes[:minor_number]
 
-        @eddystone_namespace = event_attributes[:namespace]
-        @eddystone_instance_id = event_attributes[:instance_id]
+                @eddystone_namespace = event_attributes[:namespace]
+                @eddystone_instance_id = event_attributes[:instance_id]
 
-        @url = event_attributes[:url]
+                @url = event_attributes[:url]
 
-        @protocol = if @uuid && @major && @minor
-            BeaconConfiguration::IBEACON_PROTOCOL
-        elsif @eddystone_namespace && @eddystone_instance_id
-            BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
-        elsif @url
-            BeaconConfiguration::URL_PROTOCOL
-        else
-            BeaconConfiguration::NO_PROTOCOL
-        end
+                @protocol = if @uuid && @major && @minor
+                    BeaconConfiguration::IBEACON_PROTOCOL
+                elsif @eddystone_namespace && @eddystone_instance_id
+                    BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
+                elsif @url
+                    BeaconConfiguration::URL_PROTOCOL
+                else
+                    BeaconConfiguration::NO_PROTOCOL
+                end
 
-    end
+            end
 
-    def attributes
-        parent_attributes = super
-        if beacon_configuration
-            parent_attributes.merge!(
-                {
-                    configuration: {
-                        id: beacon_configuration.id,
-                        protocol: beacon_configuration.protocol,
-                        tags: beacon_configuration.tags,
-                        shared: beacon_configuration.shared,
-                        enabled: beacon_configuration.enabled,
-                        configuration_uuid: beacon_configuration.uuid,
-                        configuration_major: beacon_configuration.major,
-                        configuration_minor: beacon_configuration.minor,
-                        configuration_namespace: beacon_configuration.namespace,
-                        configuration_instance_id: beacon_configuration.instance_id,
-                        configuration_url: beacon_configuration.url
-                    }
-                }
-            )
-        end
-
-        if location
-            parent_attributes.merge!(
-                {
-                    location: {
-                        id: location.id,
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                        tags: location.tags,
-                        shared: location.shared,
-                        enabled: location.enabled,
-                        beacon_configurations_count: location.beacon_configurations_count
-                    }
-                }
-            )
-        end
-
-        if @new_messages && @new_messages.any?
-            messages = @new_messages.map{|inbox_message| inbox_message.message }
-            parent_attributes.merge!(
-                {
-                    messages: messages.map{ |message|
+            def attributes
+                parent_attributes = super
+                if beacon_configuration
+                    parent_attributes.merge!(
                         {
-                            id: message.id,
-                            tags: message.tags,
-                            save_to_inbox: message.save_to_inbox
+                            configuration: {
+                                id: beacon_configuration.id,
+                                protocol: beacon_configuration.protocol,
+                                tags: beacon_configuration.tags,
+                                shared: beacon_configuration.shared,
+                                uuid: beacon_configuration.uuid,
+                                major: beacon_configuration.major,
+                                minor: beacon_configuration.minor,
+                                namespace: beacon_configuration.namespace,
+                                instance_id: beacon_configuration.instance_id,
+                                url: beacon_configuration.url
+                            }
                         }
-                    }
-                }
-            )
-        end
+                    )
+                end
 
-        return parent_attributes
-    end
+                if location
+                    parent_attributes.merge!(
+                        {
+                            location: {
+                                id: location.id,
+                                address: location.address,
+                                postal_code: location.postal_code,
+                                city: location.city,
+                                province: location.province,
+                                country: location.country,
+                                latitude: location.latitude,
+                                longitude: location.longitude,
+                                tags: location.tags,
+                                shared: location.shared
+                            }
+                        }
+                    )
+                end
 
-    def to_json
-        json = super
-        if beacon_configuration && beacon_configuration.enabled
-            json[:data][:attributes][:configuration] = {
-                name: beacon_configuration.title,
-                tags: beacon_configuration.tags,
-                shared: beacon_configuration.shared
-            }.merge(beacon_configuration.configuration_attributes)
-            # only include the message if the configuration exists
-
-            if new_messages.any?
-                Rails.logger.info("Detected #{new_messages.size} to be rendered out")
-                json[:included] += new_messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
+                return parent_attributes
             end
-        else
-            json[:data][:attributes][:configuration] = {}
-        end
-        return json
-    end
 
+            def to_json
+                json = super
+                if beacon_configuration && beacon_configuration.enabled
+                    json[:data][:attributes][:configuration] = {
+                        name: beacon_configuration.title,
+                        tags: beacon_configuration.tags,
+                        shared: beacon_configuration.shared
+                    }.merge(beacon_configuration.configuration_attributes)
+                    # only include the message if the configuration exists
 
-    private
-
-    def save_messages_to_inbox
-        puts "after save"
-        @proximity_messages = get_messages_for_beacon_configuration(beacon_configuration) || []
-        if @proximity_messages && @proximity_messages.any?
-            # @inbox_messages = @proximity_messages.select{|message| message.save_to_inbox}.map{|message| message.to_inbox_message(message_opts)}
-            # @local_messages = @proximity_messages.select{|message| message.save_to_inbox == false}
-            messages_to_deliver = @proximity_messages.map{|message| message.to_inbox_message(message_opts)}
-
-            @new_messages = customer.inbox.add_messages(messages_to_deliver, account) if messages_to_deliver.any?
-        end
-    end
-
-    def get_messages_for_beacon_configuration(beacon_configuration)
-        return nil if beacon_configuration.nil? || !beacon_configuration.enabled
-        # has to perform all filtering in memory
-        # first find all messages where the trigger_event_id is the type of event which occured
-        messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
-        # apply all filters
-        current_time = DateTime.now
-        messages.select do |message|
-            message.within_schedule(current_time) && message.apply_configuration_filters(beacon_configuration) && message.within_customer_segment(customer, device)
-        end
-    end
-
-    def beacon_configuration
-        # we use empty arrays so that we know the value has been initialized
-        # if we returned nil the function would rerun and not keep the cached result
-        @beacon_configuration ||=
-        case @protocol
-        when BeaconConfiguration::IBEACON_PROTOCOL
-            configuration = IBeaconConfiguration.find_by(account_id: account.id, uuid: @uuid, major: @major, minor: @minor)
-            if configuration && configuration.enabled
-                [configuration]
-            else
-                []
+                    if new_messages.any?
+                        json[:included] += new_messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
+                    end
+                else
+                    json[:data][:attributes][:configuration] = {}
+                end
+                return json
             end
-        when BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
-            configuration = EddystoneNamespaceConfiguration.find_by(account_id: account.id, namespace: @namespace, instance_id: @instance_id)
-            if configuration && configuration.enabled
-                [configuration]
-            else
-                []
+
+
+            private
+
+            def save_messages_to_inbox
+                puts "after save"
+                @proximity_messages = get_messages_for_beacon_configuration(beacon_configuration) || []
+                if @proximity_messages && @proximity_messages.any?
+                    # @inbox_messages = @proximity_messages.select{|message| message.save_to_inbox}.map{|message| message.to_inbox_message(message_opts)}
+                    # @local_messages = @proximity_messages.select{|message| message.save_to_inbox == false}
+                    messages_to_deliver = @proximity_messages.map{|message| message.to_inbox_message(message_opts)}
+
+                    track_delivered_messages(customer.inbox.add_messages(messages_to_deliver, account)) if messages_to_deliver.any?
+                end
             end
-        when BeaconConfiguration::URL_PROTOCOL
-            configuration = UrlConfiguration.find_by(account_id: account.id, url: @url)
-            if configuration && configuration.enabled
-                [configuration]
-            else
-                []
+
+            def get_messages_for_beacon_configuration(beacon_configuration)
+                return nil if beacon_configuration.nil?
+                # has to perform all filtering in memory
+                # first find all messages where the trigger_event_id is the type of event which occured
+                messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
+                # apply all filters
+                current_time = DateTime.now
+                messages.select do |message|
+                    message.within_schedule(current_time) && message.apply_configuration_filters(beacon_configuration) && message.within_customer_segment(customer, device)
+                end
             end
-        else
-            []
+
+            def beacon_configuration
+                # we use empty arrays so that we know the value has been initialized
+                # if we returned nil the function would rerun and not keep the cached result
+                @beacon_configuration ||=
+                case @protocol
+                when BeaconConfiguration::IBEACON_PROTOCOL
+                    configuration = IBeaconConfiguration.find_by(account_id: account.id, uuid: @uuid, major: @major, minor: @minor)
+                    if configuration && configuration.enabled
+                        [configuration]
+                    else
+                        []
+                    end
+                when BeaconConfiguration::EDDYSTONE_NAMESPACE_PROTOCOL
+                    configuration = EddystoneNamespaceConfiguration.find_by(account_id: account.id, namespace: @namespace, instance_id: @instance_id)
+                    if configuration && configuration.enabled
+                        [configuration]
+                    else
+                        []
+                    end
+                when BeaconConfiguration::URL_PROTOCOL
+                    configuration = UrlConfiguration.find_by(account_id: account.id, url: @url)
+                    if configuration && configuration.enabled
+                        [configuration]
+                    else
+                        []
+                    end
+                else
+                    []
+                end
+                return @beacon_configuration.first
+            end
+
+            def location
+                @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
+            end
+
+            def serialize_beacon_configuration(beacon_configuration)
+                {
+                    "id" => beacon_configuration.id.to_s,
+                    "name" => beacon_configuration.title,
+                    "tags" => beacon_configuration.tags,
+                    "shared" => beacon_configuration.shared,
+                    "enabled" => beacon_configuration.enabled
+                }.merge(beacon_configuration.configuration_attributes)
+            end
         end
-        return @beacon_configuration.first
     end
-
-    def location
-        @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
-    end
-
-    def serialize_beacon_configuration(beacon_configuration)
-        {
-            "id" => beacon_configuration.id.to_s,
-            "name" => beacon_configuration.title,
-            "tags" => beacon_configuration.tags,
-            "shared" => beacon_configuration.shared,
-            "enabled" => beacon_configuration.enabled
-        }.merge(beacon_configuration.configuration_attributes)
-    end
-
 end

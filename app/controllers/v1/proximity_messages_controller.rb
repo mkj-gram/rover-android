@@ -140,7 +140,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
         param_should_be_array(local_params[:proximity_messages], :limits)
 
         if local_params[:proximity_messages].has_key?(:trigger_event)
-            local_params[:proximity_messages][:trigger_event_id] = Event.event_string_to_event_id(local_params[:proximity_messages][:trigger_event])
+            local_params[:proximity_messages][:trigger_event_id] = Events::Pipeline.event_string_to_event_id(local_params[:proximity_messages][:trigger_event])
         end
 
         local_params.fetch(:proximity_messages, {}).permit(
