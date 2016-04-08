@@ -548,8 +548,6 @@ CREATE TABLE messages (
     filter_gimbal_place_id character varying,
     action character varying,
     action_url character varying,
-    action_landing_page_id integer,
-    action_experience_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
