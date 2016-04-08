@@ -48,8 +48,6 @@ class CreateMessages < ActiveRecord::Migration
             #
             t.string :action # "open-url"
             t.string :action_url # "https://google.ca"
-            t.integer :action_landing_page_id
-            t.integer :action_experience_id
 
             t.timestamps null: false
         end
