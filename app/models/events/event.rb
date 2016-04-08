@@ -116,7 +116,8 @@ module Events
                 account: account,
                 device: device,
                 customer: customer
-            }
+            }.with_indifferent_access
+
             event = Events::Pipeline.build("message", "delivered", attributes)
             event.save
         end
