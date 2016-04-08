@@ -167,9 +167,8 @@ class V1::ProximityMessagesController < V1::ApplicationController
             :schedule_sunday,
             :action,
             :action_url,
-            :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days],
             :customer_segment_id,
-            :limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]
+            {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
         )
     end
 
