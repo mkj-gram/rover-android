@@ -10,7 +10,6 @@ class V1::CustomerSegmentCalculateController < V1::ApplicationController
         customer_segment = CustomerSegment.new(customer_segment_params(json[:data]))
         customer_segment.account = current_account
         customer_segment.account_id = current_account.id
-        customer_segment.calculate_customers_count
         if customer_segment.valid?
             customer_segment.calculate_customers_count
             json = {

@@ -15,7 +15,7 @@ module CustomerFilter
                 query.deep_merge!(filter.elasticsearch_query) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
             end
 
-            return Elasticsearch::Model.client.count(index: ::Customer.get_index_name(account), body: query)
+            return Elasticsearch::Model.client.count(index: ::Customer.get_index_name(account), body: query)["count"]
         end
 
     end
