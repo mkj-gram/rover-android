@@ -12,6 +12,7 @@ class V1::CustomerSegmentCalculateController < V1::ApplicationController
         customer_segment.account_id = current_account.id
         customer_segment.calculate_customers_count
         if customer_segment.valid?
+            customer_segment.calculate_customers_count
             json = {
                 :"approximate-customers-count" => customer_segment.approximate_customers_count,
                 :"total-customers-count" => current_account.customers_count
