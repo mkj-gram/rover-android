@@ -51,6 +51,9 @@
     "MONGODB_URI": {
       "required": true
     },
+    "MONGODB_SSL_CERT": {
+      "required": true
+    },
     "ANALYTICS_SHARED_KEY": {
       "required": true
     },

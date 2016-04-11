@@ -4,7 +4,7 @@ production:
             uri: <%= ENV["MONGODB_URI"] %>
             options:
                 ssl: true
-                ssl_ca_cert: <%= Rails.root.join("config", "certs", "mongodb_public_key.cert") %>
+                ssl_ca_cert: <%= ENV["MONGODB_SSL_CERT"] %>
     options:
         raise_not_found_error: false
 development:
