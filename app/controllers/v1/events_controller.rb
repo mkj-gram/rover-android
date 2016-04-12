@@ -87,11 +87,13 @@ class V1::EventsController < V1::ApplicationController
             if existing_customer
                 # this calls $push on the devices array for the existing customer
                 device = existing_customer.devices.new(device_params(device_attributes))
+                device.udid = current_device_udid
                 device.update
                 customer = existing_customer
             else
                 customer = Customer.new(customer_params(user_attributes))
                 device = customer.devices.build(device_params(device_attributes))
+                device.udid = current_device_udid
                 customer.save
             end
         else
@@ -107,6 +109,7 @@ class V1::EventsController < V1::ApplicationController
         user_attributes.delete(:identifier)
         customer = Customer.new(customer_params(user_attributes))
         device = customer.devices.build(device_params(device_attributes))
+        device.udid = current_device_udid
         if customer.save
             return customer
         else
