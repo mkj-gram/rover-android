@@ -109,6 +109,7 @@ module Events
         end
 
         def track_delivered_message(message)
+            message = message.is_a?(InboxMessage) ? message.message : message
             attributes = {
                 object: "message",
                 action: "delivered",
