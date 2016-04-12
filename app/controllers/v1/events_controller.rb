@@ -13,6 +13,9 @@ class V1::EventsController < V1::ApplicationController
 
         customer, device = get_customer_and_device(user_attributes, device_attributes)
 
+        puts customer
+        puts device
+
         if !device.valid?
             render json: { errors: V1::CustomerDeviceErrorSerializer.serialize(device.errors)}, status: :unprocessable_entity
         elsif !customer.valid?
@@ -44,9 +47,8 @@ class V1::EventsController < V1::ApplicationController
         if customer.nil?
             # there is no customer with this device
             # lets create a customer with this device
-            customer = create_customer_with_device(user_attributes, device_attributes)
-            # next line uses an in memory find
-            device = customer.devices.where("_id" => current_device_udid).first
+            customer, device = create_customer_with_device(user_attributes, device_attributes)
+            puts "customer was nil"
         elsif (!user_attributes[:identifier].nil? && (customer.identifier.nil? || customer.identifier != user_attributes[:identifier]))
             # the identifier has changed
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
@@ -54,7 +56,10 @@ class V1::EventsController < V1::ApplicationController
                 # we want a new customer object here because we don't
                 # want to merge the analytics
                 # the next block takes care of tranfering the device over
-                existing_customer = Customer.create(customer_params(user_attributes))
+                existing_customer = Customer.new(customer_params(user_attributes))
+                if !existing_customer.save
+                    return [existing_customer, nil]
+                end
             end
             # this is the case where an anonymous user logged in and their profile already exists on our system
             # we want to transfer the device from the current customer to the existing one
@@ -74,8 +79,8 @@ class V1::EventsController < V1::ApplicationController
 
         # update any fields that need updating if nothing has changed
         # update_attributes performs a no-op
-        customer.update_attributes(customer_params(user_attributes))
-        device.update_attributes(device_params(device_attributes))
+        customer.update_attributes(customer_params(user_attributes)) if customer
+        device.update_attributes(device_params(device_attributes)) if device
         return [customer, device]
     end
 
@@ -96,10 +101,11 @@ class V1::EventsController < V1::ApplicationController
                 device.udid = current_device_udid
                 customer.save
             end
+            return [customer, device]
         else
-            customer = create_anonymous_customer(user_attributes, device_attributes)
+            return create_anonymous_customer(user_attributes, device_attributes)
         end
-        return customer
+
     end
 
 
@@ -110,11 +116,7 @@ class V1::EventsController < V1::ApplicationController
         customer = Customer.new(customer_params(user_attributes))
         device = customer.devices.build(device_params(device_attributes))
         device.udid = current_device_udid
-        if customer.save
-            return customer
-        else
-            nil
-        end
+        return [customer, device]
     end
 
     def event_params(local_params)
