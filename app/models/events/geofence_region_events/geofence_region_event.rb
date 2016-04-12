@@ -52,10 +52,6 @@ module Events
                         tags: location.tags,
                         shared: location.shared
                     }
-
-                    if new_messages.any?
-                        json[:included] += new_messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
-                    end
                 else
                     json[:data][:attributes][:location] = {}
                 end
@@ -70,8 +66,7 @@ module Events
                 puts "after save"
                 @proximity_messages = get_message_for_location(location) || []
                 if @proximity_messages && @proximity_messages.any?
-                    messages_to_deliver = @proximity_messages.map{|message| message.to_inbox_message(message_opts)}
-                    track_delivered_messages(customer.inbox.add_messages(messages_to_deliver, account)) if messages_to_deliver.any?
+                    deliver_messages(@proximity_messages)
                 end
             end
 

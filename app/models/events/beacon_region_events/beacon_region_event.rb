@@ -79,14 +79,10 @@ module Events
                         tags: beacon_configuration.tags,
                         shared: beacon_configuration.shared
                     }.merge(beacon_configuration.configuration_attributes)
-                    # only include the message if the configuration exists
-
-                    if new_messages.any?
-                        json[:included] += new_messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
-                    end
                 else
                     json[:data][:attributes][:configuration] = {}
                 end
+
                 return json
             end
 
@@ -97,11 +93,7 @@ module Events
                 puts "after save"
                 @proximity_messages = get_messages_for_beacon_configuration(beacon_configuration) || []
                 if @proximity_messages && @proximity_messages.any?
-                    # @inbox_messages = @proximity_messages.select{|message| message.save_to_inbox}.map{|message| message.to_inbox_message(message_opts)}
-                    # @local_messages = @proximity_messages.select{|message| message.save_to_inbox == false}
-                    messages_to_deliver = @proximity_messages.map{|message| message.to_inbox_message(message_opts)}
-
-                    track_delivered_messages(customer.inbox.add_messages(messages_to_deliver, account)) if messages_to_deliver.any?
+                    deliver_messages(@proximity_messages)
                 end
             end
 

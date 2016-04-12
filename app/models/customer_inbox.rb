@@ -56,17 +56,17 @@ class CustomerInbox
     def add_messages(inbox_messages, account)
 
         # use the new redis client
-        messages_to_add = inbox_messages.select do |inbox_message|
-            message = inbox_message.message
-            MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)
-        end
+        # messages_to_add = inbox_messages.select do |inbox_message|
+        #     message = inbox_message.message
+        #     MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)
+        # end
         # not a bug but build into mongoid and you can't turn it off
         # self.messages += messages_to_add
         # auto updates the document for some reason
-        if messages_to_add.any?
-            Rails.logger.info("Adding #{messages_to_add.size} message(s) to customer inbox")
-            CustomerInbox.add_messages(self.id, messages_to_add)
-            return messages_to_add
+        if inbox_messages.any?
+            Rails.logger.info("Adding #{inbox_messages.size} message(s) to customer inbox")
+            CustomerInbox.add_messages(self.id, inbox_messages)
+            return inbox_messages
         else
             []
         end

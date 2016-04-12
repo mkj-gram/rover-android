@@ -9,7 +9,7 @@ module Events
         TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
         attr_reader :account, :customer, :device, :object, :action, :generation_time
-        attr_reader :new_messages
+        attr_reader :messages
         # attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
 
         def initialize(event_attributes)
@@ -22,7 +22,7 @@ module Events
             @generation_time = get_time(event_attributes[:time])
             Rails.logger.debug("Customers time is #{@generation_time}")
             @included = []
-            @new_messages = []
+            @messages = []
         end
 
         def attributes
@@ -104,6 +104,26 @@ module Events
             }.call
         end
 
+        def deliver_messages(messages)
+            inbox_messages, local_messages = messages.partition(&:save_to_inbox)
+
+            # first filter them
+            inbox_messages_to_deliver = inbox_messages.select{|message| MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)}
+            local_messages_to_deliver = local_messages.select{|message| MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)}
+
+            # map them to inbox messages
+            inbox_messages_to_deliver = inbox_messages_to_deliver.map{|message| message.to_inbox_message(message_opts)}
+            local_messages_to_deliver = local_messages_to_deliver.map{|message| message.to_inbox_message(message_opts)}
+
+            # add them to the included array for json output
+            @included += inbox_messages_to_deliver.map{|message| V1::InboxMessageSerializer.serialize(message)}
+            @included += local_messages_to_deliver.map{|message| V1::InboxMessageSerializer.serialize(message)}
+            # track them in the analytics
+            track_delivered_messages(inbox_messages_to_deliver)
+            track_delivered_messages(local_messages_to_deliver)
+
+        end
+
         def track_delivered_messages(messages)
             messages.each{ |message| track_delivered_message(message) }
         end
@@ -149,7 +169,7 @@ module Events
                         action: action
                     }
                 },
-                included: []
+                included: @included
             }
             return json
         end
