@@ -1,9 +1,5 @@
 class UserRole < ActiveRecord::Base
 
-    has_many :users
-
-    after_save :update_users
-
     def self.admin_role
         UserRole.new(
             title: "Admin",
@@ -72,22 +68,14 @@ class UserRole < ActiveRecord::Base
         )
     end
 
-    def has_access(resource, method)
-        Rails.logger.info("has_access to #{resource} with method #{method}")
-        # resource some model
-        # method the method the user wants to perform ie :show, :create, :update, :destroy
-        column = resource.is_a?(Class) ? resource.name.underscore : resource.class.name.underscore
-        column = column.concat("_#{method}")
-        Rails.logger.info("column to read #{column}")
-        access = self.read_attribute(column)
-        access = false if access.nil?
-        Rails.logger.info("Access? #{access}")
-        return access
+    def attach_user(user)
+        self.user_ids.push(user.id)
+        self.user_ids.uniq!
+        self.save
     end
 
-    private
-
-    def update_users
-        users.update_all(user_role_updated_at: Time.now)
+    def users
+        @users ||= User.where(id: self.user_ids).all
     end
+
 end

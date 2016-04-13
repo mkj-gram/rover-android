@@ -41,7 +41,7 @@ class Account < ActiveRecord::Base
     has_many :customer_segments
     has_many :account_invites, dependent: :destroy
     has_many :user_roles
-
+    has_one :default_user_role, class_name: "UserRole", primary_key: "default_user_role_id", foreign_key: "id"
     has_one :beacon_configuration_active_tag
     has_one :location_active_tag
     has_one :ibeacon_configuration_uuids, class_name: "ActiveIBeaconConfigurationUuid"
