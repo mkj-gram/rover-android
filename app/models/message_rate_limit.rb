@@ -22,7 +22,7 @@ class MessageRateLimit
     private
 
     def self.get_global_rate_limit_key(customer)
-        id = customer.is_a?(Customer) : customer.id.to_s : customer
+        id = customer.is_a?(Customer) ? customer.id.to_s : customer
         prefix + id
     end
 
