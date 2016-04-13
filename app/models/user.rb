@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
     # has_one :acl, class_name: "UserAcl" -> refer to custom function acl
 
     belongs_to :account, counter_cache: true
-    belongs_to :user_role, counter_cache: true
+    has_one :user_acl
 
     has_many :sessions do
         def recent
@@ -25,6 +25,7 @@ class User < ActiveRecord::Base
 
     before_create :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
     before_create :create_account, if: -> { account_id.nil? }
+    after_create :create_user_acl
     after_create :update_account_user_id
     # after_create :generate_session
 
@@ -94,6 +95,9 @@ class User < ActiveRecord::Base
         end
     end
 
+    def attach_role(user_role)
+        self.user_acl.attach_role(user_role)
+    end
 
     #
     # Generates a formatted email. Email can be in the form of
@@ -109,6 +113,11 @@ class User < ActiveRecord::Base
     end
 
     private
+
+    def create_user_acl
+        user_acl = UserAcl.create(user_id: self.id)
+        user_acl.attach_role(self.account.default_user_role)
+    end
 
     def invite
         @invite ||= -> {
@@ -143,7 +152,6 @@ class User < ActiveRecord::Base
     def attach_to_account
         if invite
             self.account_id = invite.account_id
-            self.user_role_id = self.account.default_user_role_id
         end
     end
 
@@ -152,7 +160,6 @@ class User < ActiveRecord::Base
         account = Account.create(primary_user_id: self.id, title: account_title)
         self.account_owner = true
         self.account_id = account.id
-        self.user_role_id = account.default_user_role_id
     end
 
     def destroy_account_invite

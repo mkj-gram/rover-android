@@ -66,10 +66,10 @@ class V1::ApplicationController < ActionController::API
         if controller_resource.nil?
             return false
         else
-            role = current_user.user_role
+            acl = current_user.user_acl
             method = action_name
             method = "show" if action_name == "index"
-            if !role.has_access(controller_resource, method)
+            if !acl.has_access(controller_resource, method)
                 render_forbidden("Access Denied", "")
             end
         end
