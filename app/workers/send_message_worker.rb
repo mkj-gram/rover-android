@@ -44,7 +44,7 @@ class SendMessageWorker
                 response = client.search(index: ::Customer.get_index_name(account_id), scroll: '5m', body: segment_query.merge(size: SendMessageWorker.batch_size, from: offset))
             end
         else
-            response = client.search(index: ::Customer.get_index_name(account_id), scroll: '5m', body: segment_query.merge(size: SendMessageWorker.batch_size)})
+            response = client.search(index: ::Customer.get_index_name(account_id), scroll: '5m', body: segment_query.merge(size: SendMessageWorker.batch_size))
         end
 
 
