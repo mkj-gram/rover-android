@@ -605,6 +605,42 @@ ALTER SEQUENCE password_resets_id_seq OWNED BY password_resets.id;
 
 
 --
+-- Name: platforms; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE platforms (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    type character varying NOT NULL,
+    app_identifier character varying,
+    encrypted_credentials character varying,
+    encrypted_credentials_salt character varying,
+    encrypted_credentials_iv character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: platforms_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE platforms_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE platforms_id_seq OWNED BY platforms.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -891,7 +927,11 @@ CREATE TABLE user_roles (
     user_acl_create boolean DEFAULT true,
     user_acl_update boolean DEFAULT true,
     user_acl_destroy boolean DEFAULT true,
-    user_ids integer[] DEFAULT '{}'::integer[]
+    user_ids integer[] DEFAULT '{}'::integer[],
+    platform_show boolean DEFAULT true,
+    platform_create boolean DEFAULT true,
+    platform_update boolean DEFAULT true,
+    platform_destroy boolean DEFAULT true
 );
 
 
@@ -1046,6 +1086,13 @@ ALTER TABLE ONLY password_resets ALTER COLUMN id SET DEFAULT nextval('password_r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY platforms ALTER COLUMN id SET DEFAULT nextval('platforms_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY sessions ALTER COLUMN id SET DEFAULT nextval('sessions_id_seq'::regclass);
 
 
@@ -1193,6 +1240,14 @@ ALTER TABLE ONLY messages
 
 ALTER TABLE ONLY password_resets
     ADD CONSTRAINT password_resets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY platforms
+    ADD CONSTRAINT platforms_pkey PRIMARY KEY (id);
 
 
 --
@@ -1518,6 +1573,13 @@ CREATE INDEX index_password_resets_on_user_id ON password_resets USING btree (us
 
 
 --
+-- Name: index_platforms_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_platforms_on_account_id_and_type ON platforms USING btree (account_id, type);
+
+
+--
 -- Name: index_sessions_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1688,6 +1750,10 @@ INSERT INTO schema_migrations (version) VALUES ('20160318144534');
 INSERT INTO schema_migrations (version) VALUES ('20160405134656');
 
 INSERT INTO schema_migrations (version) VALUES ('20160406145542');
+
+INSERT INTO schema_migrations (version) VALUES ('20160411163050');
+
+INSERT INTO schema_migrations (version) VALUES ('20160413132810');
 
 INSERT INTO schema_migrations (version) VALUES ('20160413141311');
 

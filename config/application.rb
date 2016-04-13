@@ -21,6 +21,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib')
         config.autoload_paths << Rails.root.join('app', 'models', 'messages')
         config.autoload_paths << Rails.root.join('app', 'models', 'configuration_visits')
+        config.autoload_paths << Rails.root.join('app', 'models', 'platforms')
         # config.autoload_paths << Rails.root.join('app', 'models', 'events')
         # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'location_events')
         # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'beacon_region_events')

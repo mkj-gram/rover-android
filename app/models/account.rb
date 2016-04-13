@@ -57,6 +57,10 @@ class Account < ActiveRecord::Base
 
     has_many :gimbal_places
 
+    has_many :platforms
+    has_one :android_platform
+    has_one :ios_platform
+
     def location_bounding_box_suggestion
         query = {
             size: 0,

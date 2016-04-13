@@ -53,7 +53,12 @@ class GeoPoint
         def mongoize(object)
             case object
             when GeoPoint then object.mongoize
-            when Hash then GeoPoint.new(object[:lat], object[:lng]).mongoize
+            when Hash then
+                if object.has_key?("lat") && object.has_key?("lon")
+                    GeoPoint.new(object["lat"], object["lon"]).mongoize
+                else
+                    GeoPoint.new(object[:lat], object[:lng]).mongoize
+                end
             else object
             end
         end
