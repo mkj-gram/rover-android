@@ -103,6 +103,7 @@ class Customer
                 indexes :remote_notifications_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :location_monitoring_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :bluetooth_enabled, type: 'boolean', index: 'not_analyzed'
+                indexes :development, type: 'boolean', index: 'not_analyzed'
             end
         end
     end
@@ -149,8 +150,8 @@ class Customer
 
 
 
-    def self.get_index_name(model)
-        account_id = model.is_a?(Customer) ? model.account_id : model.id
+    def self.get_index_name(arg)
+        account_id = arg.is_a?(Fixnum) ? arg : (arg.is_a?(Customer) ? arg.account_id : arg.id)
         return "customers_account_#{account_id}"
     end
 

@@ -2,40 +2,17 @@ module ApnsHelper
 
     class << self
 
-        # def send(devices, notification, opts = {})
-        #     return [] if devices.nil? || devices.empty?
-        #     # split devices by test_device
-        #     development_devices, production_devices = devices.partition(&:test_device)
-
-        #     development_notifications = development_devices.map do |device|
-        #         notification = Houston::Notification.new(device: device.token)
-        #         notification
-        #     end
-
-        #     production_notifications = production_notifications.map do |device|
-        #         notification = Houston::Notification.new(device: device.token)
-        #         notification
-        #     end
-
-        #     development_client.push(development_notifications)
-        #     production_client.push(production_notifications)
-
-        #     client.push(client_notifcations)
-        #     failed_notifications = client_notifcations.select{|notification| notification.error }
-        #     unsent_notifcations = client_notifcations.select{|notification| notification.error.nil? && !notification.sent? }
-        #     return (failed_notifications + send(unsent_notifcations, notification_text, opts)).flatten
-        # end
-        def send(apns_app, notification, devices)
+        def send(apns_app, inbox_messages_by_token, devices)
             return [] if devices.nil? || devices.empty?
 
             development_devices, production_devices = devices.partition(&:development_device?)
 
             development_notifications = development_devices.map do |device|
-                Lowdown::Notification.new(:token => device.token, :payload => { :alert => "Hello World!" })
+                Lowdown::Notification.new(:token => device.token, :payload => payload_from_inbox_message(inbox_messages_by_token[device.token]))
             end
 
             production_notifications = production_devices.map do |device|
-                Lowdown::Notification.new(:token => device.token, :payload => { :alert => "Hello World!" })
+                Lowdown::Notification.new(:token => device.token, :payload => payload_from_inbox_message(inbox_messages_by_token[device.token]))
             end
 
             certificate = Lowdown::Certificate.from_pem_data(apns_app.certificate, apns_app.passphrase)
@@ -64,6 +41,22 @@ module ApnsHelper
                 end
             end
             return expired_tokens
+        end
+
+        def payload_from_inbox_message(inbox_message)
+            {
+                data: {
+                    title: inbox_message.title,
+                    :"notification-text" => inbox_message.notification_text,
+                    tags: inbox_message.tags,
+                    read: inbox_message.read,
+                    saved_to_inbox: inbox_message.saved_to_inbox,
+                    action: inbox_message.action,
+                    action_url: inbox_message.action_url,
+                    timestamp: inbox_message.timestamp
+                    # scheduled_at: what do we determine as scheduled at?
+                }
+            }
         end
 
     end

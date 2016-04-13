@@ -61,7 +61,7 @@ class CustomerDevice
             remote_notifications_enabled: self.remote_notifications_enabled,
             location_monitoring_enabled: self.location_monitoring_enabled,
             bluetooth_enabled: self.bluetooth_enabled,
-            test_device: self.test_device
+            development: self.development
         }
     end
 

@@ -18,6 +18,16 @@ module CustomerFilter
             return Elasticsearch::Model.client.count(index: ::Customer.get_index_name(account), body: query)["count"]
         end
 
+        def to_elasticsearch_query(filters)
+            query = {}
+
+            filters.each do |filter|
+                query.deep_merge!(filter.elasticsearch_query) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
+            end
+
+            return query
+        end
+
     end
 
     # we can have types
