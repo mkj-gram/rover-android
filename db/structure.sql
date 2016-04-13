@@ -613,9 +613,9 @@ CREATE TABLE platforms (
     account_id integer NOT NULL,
     type character varying NOT NULL,
     app_identifier character varying,
-    encrypted_credentials character varying,
-    encrypted_credentials_salt character varying,
-    encrypted_credentials_iv character varying,
+    encrypted_credentials text,
+    encrypted_credentials_salt text,
+    encrypted_credentials_iv text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -931,11 +931,11 @@ CREATE TABLE user_roles (
     user_acl_create boolean DEFAULT true,
     user_acl_update boolean DEFAULT true,
     user_acl_destroy boolean DEFAULT true,
-    user_ids integer[] DEFAULT '{}'::integer[],
     platform_show boolean DEFAULT true,
     platform_create boolean DEFAULT true,
     platform_update boolean DEFAULT true,
-    platform_destroy boolean DEFAULT true
+    platform_destroy boolean DEFAULT true,
+    user_ids integer[] DEFAULT '{}'::integer[]
 );
 
 
