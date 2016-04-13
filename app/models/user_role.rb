@@ -65,6 +65,11 @@ class UserRole < ActiveRecord::Base
             user_acl_create: true,
             user_acl_update: true,
             user_acl_destroy: true,
+
+            platform_show: true,
+            platform_create: true,
+            platform_update: true,
+            platform_destroy: true
         )
     end
 

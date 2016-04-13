@@ -847,7 +847,11 @@ CREATE TABLE user_acls (
     user_acl_update boolean DEFAULT true,
     user_acl_destroy boolean DEFAULT true,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    platform_show boolean DEFAULT true,
+    platform_create boolean DEFAULT true,
+    platform_update boolean DEFAULT true,
+    platform_destroy boolean DEFAULT true
 );
 
 
@@ -1760,4 +1764,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160413141311');
 INSERT INTO schema_migrations (version) VALUES ('20160413142302');
 
 INSERT INTO schema_migrations (version) VALUES ('20160413142757');
+
+INSERT INTO schema_migrations (version) VALUES ('20160413154453');
 
