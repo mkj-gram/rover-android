@@ -4,14 +4,13 @@ class SyncThirdPartyIntegrationWorker
     from_queue 'third_party_integrations_sync_devices'
 
     def self.perform_async(sync_job_id)
-        msg = {id: sync_job_id}.to_json
+        msg = {id: sync_job_id}
         enqueue_message(msg, {to_queue: 'third_party_integrations_sync_devices'})
     end
 
-    def work(msg)
+    def perform(args)
         # grab the integration and sync it
-        payload = JSON.parse(msg)
-        sync_job_id = payload["id"]
+        sync_job_id = args["id"]
         sync_job = ThirdPartyIntegrationSyncJob.find_by_id(sync_job_id)
 
         # start the job

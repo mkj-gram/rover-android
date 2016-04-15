@@ -170,6 +170,11 @@ class Customer
 
         mappings[:customer][:dynamic_templates] = dynamic_templates
 
+        force = opts.delete(:force)
+        if force && client.indices.exists?(index: Customer.index_name)
+            client.indices.delete(index: Customer.index_name)
+        end
+
         client.indices.create(index: Customer.index_name, body: {
                                 settings: settings.to_hash,
                                 mappings: mappings.to_hash

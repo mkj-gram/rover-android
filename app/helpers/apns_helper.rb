@@ -45,17 +45,8 @@ module ApnsHelper
 
         def payload_from_inbox_message(inbox_message)
             {
-                data: {
-                    title: inbox_message.title,
-                    :"notification-text" => inbox_message.notification_text,
-                    tags: inbox_message.tags,
-                    read: inbox_message.read,
-                    saved_to_inbox: inbox_message.saved_to_inbox,
-                    action: inbox_message.action,
-                    action_url: inbox_message.action_url,
-                    timestamp: inbox_message.timestamp
-                    # scheduled_at: what do we determine as scheduled at?
-                }
+                data: V1::InboxMessageSerializer.serialize(inbox_message),
+                "content-available" => 1
             }
         end
 

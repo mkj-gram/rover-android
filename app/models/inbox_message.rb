@@ -16,6 +16,10 @@ class InboxMessage
 
     embedded_in :customer_inbox
 
+    def scheduled_at
+        message.scheduled_at
+    end
+
     def message
         @message ||= Message.find_by_id(message_id)
     end

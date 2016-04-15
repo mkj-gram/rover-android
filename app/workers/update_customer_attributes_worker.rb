@@ -7,14 +7,13 @@ class UpdateCustomerAttributesWorker
         # do a permit here
         updated_attributes = ActionController::Parameters.new(new_attributes).permit(:identifier, :name, :email, :phone_number, {:tags => []})
         updated_attributes[:traits] = new_attributes.fetch(:traits, {})
-        msg = {id: customer_id, attributes: updated_attributes}.to_json
+        msg = {id: customer_id, attributes: updated_attributes}
         enqueue_message(msg, {to_queue: 'update_customer_attributes'})
     end
 
-    def work(msg)
-        payload = JSON.parse(msg)
-        customer_id = payload["id"]
-        attributes = payload["attributes"].with_indifferent_access
+    def perform(args)
+        customer_id = args["id"]
+        attributes = args["attributes"].with_indifferent_access
         customer = Customer.lock.find_by_id(customer_id)
         if customer
             new_attributes = customer.merge_and_update_attributes(attributes)

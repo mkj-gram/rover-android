@@ -9,6 +9,8 @@ class Message < ActiveRecord::Base
     # doesn't make sense but thats how rails structures relationships
     belongs_to :customer_segment
 
+    belongs_to :account
+
     message_attribute :notification_text
 
     settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 2}).merge(
@@ -194,6 +196,10 @@ class Message < ActiveRecord::Base
         filter_location(configuration) && filter_beacon_configuration(configuration)
     end
 
+    def approximate_customers_count
+        return self.customer_segment ? self.customer_segment.customers_count : self.account.customers_count
+    end
+
     def within_customer_segment(customer, device)
         if self.customer_segment_id
             self.customer_segment.within_segment(customer, device)
@@ -305,7 +311,7 @@ class Message < ActiveRecord::Base
                     }
                 }
             }
-            @cached_targeted_beacon_configurations_count = Elasticsearch::Model.search(query, [::BeaconConfiguration], {search_type: "count"}).response.hits.total
+            @cached_targeted_beacon_configurations_count = Elasticsearch::Model.client.count(index: BeaconConfiguration.index_name, body: query)["count"]
             return @cached_targeted_beacon_configurations_count
         else
             account.beacon_configurations_count

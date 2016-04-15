@@ -13,7 +13,7 @@ module RabbitMQPublisher
             end
             to_queue = options.delete(:to_queue)
             options[:routing_key] ||= to_queue
-            Sneakers.logger.info {"publishing <#{msg}> to [#{options[:routing_key]}]"}
+            Sneakers.logger.info {"publishing <#{msg}> to [#{options[:routing_key]}] with headers [#{options[:headers]}]"}
             @exchange.publish(msg, options)
         end
 

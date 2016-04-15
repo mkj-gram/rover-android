@@ -549,7 +549,10 @@ CREATE TABLE messages (
     action character varying,
     action_url character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    scheduled_at timestamp without time zone,
+    scheduled_local_time boolean DEFAULT false,
+    scheduled_token character varying
 );
 
 
@@ -1766,4 +1769,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160413142302');
 INSERT INTO schema_migrations (version) VALUES ('20160413142757');
 
 INSERT INTO schema_migrations (version) VALUES ('20160413154453');
+
+INSERT INTO schema_migrations (version) VALUES ('20160414122442');
 

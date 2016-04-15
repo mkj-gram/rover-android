@@ -4,15 +4,14 @@ class UpdateCustomerActiveTraitsWorker
     from_queue 'update_customer_active_traits'
 
     def self.perform_async(account_id, old_trait_keys, new_traits)
-        msg = {account_id: account_id, old_trait_keys: old_trait_keys, new_traits: new_traits}.to_json
+        msg = {account_id: account_id, old_trait_keys: old_trait_keys, new_traits: new_traits}
         enqueue_message(msg, {to_queue: 'update_customer_active_traits'})
     end
 
-    def work(msg)
-        payload = JSON.parse(msg)
-        account_id = payload["account_id"]
-        old_trait_keys = payload["old_trait_keys"]
-        new_traits = payload["new_traits"].map{|opts| CustomerTrait.new(opts)}
+    def perform(args)
+        account_id = args["account_id"]
+        old_trait_keys = args["old_trait_keys"]
+        new_traits = args["new_traits"].map{|opts| CustomerTrait.new(opts)}
         # before removing we need to check if a customer with that trait key exists
         old_trait_keys.each do |trait_key|
             if !Customer.where(account_id: account_id).where({"traits.#{trait_key}": {"$exists": true }}).exists?

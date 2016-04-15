@@ -256,7 +256,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
                 :"action" => message.action,
                 :"action-url" => message.action_url,
-                :"approximate-customers-count" => message.customer_segment ? message.customer_segment.customers_count : current_account.customers_count
+                :"approximate-customers-count" => message.approximate_customers_count
             }.merge(extra_attributes)
         }
         json[:relationships] = {}

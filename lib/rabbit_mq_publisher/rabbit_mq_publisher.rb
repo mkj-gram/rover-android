@@ -14,6 +14,10 @@ module RabbitMQPublisher
             @@publisher.publish(msg, options)
         end
 
+        def new(options = {})
+            RabbitMQPublisher::ConnectionPool.new(options)
+        end
+
         def pub
             return @@publisher
         end

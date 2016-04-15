@@ -12,6 +12,10 @@ module Events
         attr_reader :messages
         # attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
 
+        def self.event_id
+            Events::Constants::UNKNOWN_EVENT_ID
+        end
+
         def initialize(event_attributes)
             @id = SecureRandom.uuid
             @account = event_attributes[:account]
@@ -66,6 +70,10 @@ module Events
 
 
         def save
+            if self.class.event_id == Events::Constants::UNKNOWN_EVENT_ID
+                Rails.logger.info("An event #{object}, #{action} was not recorded")
+                return true
+            end
             # save works the opposite way than to_json
             # it bubbles up from the children appending their attributes
             run_callbacks :save do
@@ -241,19 +249,13 @@ module Events
 
         def get_time(time)
             if time.nil?
-                Time.now
+                Time.zone.now
             elsif time.is_a?(Integer)
-                Time.at(time)
+                Time.zone.at(time)
             elsif time.is_a?(Float)
-                Time.at(time)
+                Time.zone.at(time)
             else
-                # remove the timezone
-                matches = TIME_REGEX.match(time)
-                if matches.size == 1
-                    Time.parse(matches[0])
-                else
-                    Time.now
-                end
+                Time.zone.parse(time)
             end
         end
     end

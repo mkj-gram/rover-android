@@ -49,7 +49,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib', 'kontakt_api')
         config.autoload_paths << Rails.root.join('lib', 'events_logger')
         config.autoload_paths << Rails.root.join('lib', 'gimbal_api')
-
+        config.autoload_paths << Rails.root.join('lib', 'time_zone_offset')
         config.autoload_paths << Rails.root.join('app', 'workers')
         config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
 

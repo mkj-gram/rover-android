@@ -5,21 +5,29 @@ require 'gcm_helper'
 class SendMessageWorker
     include BackgroundWorker::Worker
 
-    from_queue 'send_message'
+    from_queue 'send_message',
+        :prefetch => 1,
+        :ack => true
 
+    def self.perform_async(message_id, segment_query = nil, test_customer_ids = [], scroll_id = nil, offset = 0)
 
-    def self.perform_async(account, message, scroll_id = nil, offset = nil, test_message = false, test_customer_ids = nil)
-        account_id = account.is_a?(Account) ? account.id : account
-        message_id = message.is_a?(Message) ? message.id : message
+        if segment_query.nil?
+            message = Message.find(message_id)
+            if message.customer_segment
+                segment_query = message.customer_segment.to_elasticsearch_query
+            else
+                segment_query = {}
+            end
+        end
+
         msg = {
-            account_id: account_id,
             message_id: message_id,
-            scroll_id: nil,
-            offset: 0,
-            test_message: test_message,
-            test_device_ids: test_device_ids
-        }.to_json
-        # using scroll api
+            segment_query: segment_query,
+            test_customer_ids: test_customer_ids,
+            scroll_id: scroll_id,
+            offset: offset
+        }
+
         enqueue_message(msg, {to_queue: 'send_message'})
     end
 
@@ -27,46 +35,65 @@ class SendMessageWorker
         500
     end
 
-    def work(msg)
-        msg = JSON.parse(msg)
 
-        account = Account.find(msg["account_id"])
-        message = Message.find(msg["message_id"])
+    def work(args)
+        args = JSON.load(args).with_indifferent_access
+        puts args
+        message_id = args[:message_id]
+        segment_query = args[:segment_query]
+        test_customer_ids = args[:test_customer_ids]
+        scroll_id = args[:scroll_id]
+        offset = args[:offset]
+        test_message = !test_customer_ids.nil? && test_customer_ids.any?
 
-        scroll_id = msg["scroll_id"]
-        offset = msg["offset"]
-        test_message = msg["test_message"]
-        test_customer_ids = msg["test_customer_ids"]
+        message = Message.find(message_id)
+        account = message.account
 
-        # if test_customers are passed in then we only want to select them
-        if test_customer_ids
+        ##################################################################
+        #                                                                #
+        #           Grab all customers who fit the criteria              #
+        #                                                                #
+        ##################################################################
+
+        if test_customer_ids.any?
             customers = Customer.find(test_customer_ids).all
         else
             if scroll_id
+                Sneakers.logger.info("Found scroll_id #{scroll_id}")
                 begin
                     response = client.scroll(scroll: '5m', scroll_id: scroll_id)
                 rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
                     Rails.logger.warn(e)
-                    response = client.search(index: ::Customer.get_index_name(account), scroll: '5m', body: message.customer_segment.to_elasticsearch_query.merge(size: SendMessageWorker.batch_size, from: offset))
+                    response = client.search(index: ::Customer.get_index_name(account), scroll: '5m', body: segment_query.merge(size: SendMessageWorker.batch_size, from: offset))
                 end
             else
-                response = client.search(index: ::Customer.get_index_name(account), scroll: '5m', body: message.customer_segment.to_elasticsearch_query.merge(size: SendMessageWorker.batch_size))
+                Sneakers.logger.info("Performing search with #{segment_query}")
+                response = client.search(index: ::Customer.get_index_name(account), scroll: '5m', body: segment_query.merge(size: SendMessageWorker.batch_size))
             end
 
 
             if response && response["hits"]["hits"].any?
+                Sneakers.logger.info("Got response of #{response['hits']['hits'].size}")
                 # perform the next scroll we
-                perform_next_scroll(account, message, response["_scroll_id"], offset + response["hits"]["hits"].size, test_message)
+                # perform_next_scroll(message_id, segment_query, test_customer_ids, response["_scroll_id"], offset + response["hits"]["hits"].size)
 
                 customers = response["hits"]["hits"].map do |document|
                     source = document["_source"]
                     customer = Customer.new(source)
                 end
             else
+                Sneakers.logger.info("No customers found")
                 customers = []
+                ack!
             end
         end
 
+
+        ##################################################################
+        #                                                                #
+        #           Add rate limits and add to inbox if needed           #
+        #                                                                #
+        ##################################################################
 
         if test_message == false && account.message_limits.any?
             customers = customers.select{|customer| MessageRateLimit.add_global_message(customer, account.message_limits)}
@@ -81,14 +108,25 @@ class SendMessageWorker
             end
         end
 
-        # log message delivered
+
+        ##################################################################
+        #                                                                #
+        #         Record message delivered event for all customers       #
+        #                                                                #
+        ##################################################################
+
         customers.each do |customer|
             event = Events::Pipeline.build("message", "delivered", {account: account, customer: customer, device: customer.devices.first, message: message})
             event.save
         end
-        # need to loop through and create inbox messages for each device
-        # {token => inbox_message}
-        # map to pushable devices
+
+
+        ##################################################################
+        #                                                                #
+        #     Generate the notification based on customer and device     #
+        #                                                                #
+        ##################################################################
+
         inbox_messages_by_token = {}
         devices = []
         customers.each do |customer|
@@ -106,13 +144,10 @@ class SendMessageWorker
         ack!
     end
 
-
-
-
     private
 
-    def perform_next_scroll(account, message, scroll_id, offset, test_message = false)
-        SendMessageWorker.perform_async(account, message, scroll_id, offset, test_message)
+    def perform_next_scroll(message_id, segment_query = nil, test_customer_ids = [], scroll_id = nil, offset = 0)
+        SendMessageWorker.perform_async(message_id, segment_query, test_customer_ids, scroll_id, offset)
     end
 
     def client
@@ -121,6 +156,7 @@ class SendMessageWorker
 
 
     def send_push_notification(account, inbox_messages_by_token, devices)
+        Sneakers.logger.info("Sending #{devices.size} notifications")
         apns_app = account.ios_platform
         gcm_app = account.android_platform
 
@@ -142,19 +178,20 @@ class SendMessageWorker
 
     end
 
-    def send_apns_notification(apns_app, message, devices)
+    def send_apns_notification(apns_app, inbox_messages_by_token, devices)
         # split devices by 1000
         expired_tokens = []
         devices.each_slice(1000) do |devices|
-            expired_tokens += ApnsHelper.send(apns_app, message, devices)
+            Sneakers.logger.info("Sending #{devices.size} ios devices")
+            expired_tokens += ApnsHelper.send(apns_app, inbox_messages_by_token, devices)
         end
         return expired_tokens
     end
 
-    def send_gcm_notification(gcm_app, message, devices)
+    def send_gcm_notification(gcm_app, inbox_messages_by_token, devices)
         expired_tokens = []
         devices.each_slice(1000) do |devices|
-            expired_token += GcmHelper.send(gcm_app, message, devices)
+            expired_token += GcmHelper.send(gcm_app, inbox_messages_by_token, devices)
         end
         return expired_tokens
     end

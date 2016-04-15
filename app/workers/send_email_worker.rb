@@ -9,15 +9,15 @@ class SendEmailWorker
 
 
     def self.perform_async(from, to, subject, html)
-        msg = {from: from, to: to, subject: subject, html: html}.to_json
+        msg = {from: from, to: to, subject: subject, html: html}
         enqueue_message(msg, {to_queue: 'send_email'})
     end
 
-    def work(msg)
+    def perform(args)
         logger.info("Recieved msg: " + msg)
-        message_params = JSON.parse(msg)
-        MailClient.send(message_params)
+        MailClient.send(args)
         logger.info("Message sent")
         ack!
     end
+
 end
