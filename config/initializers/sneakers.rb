@@ -7,7 +7,7 @@ else
     bunny = Bunny.new(opts["amqp"], vhost: "/")
 end
 
-num_workers = ENV['WEB_CONCURRENCY'].nil? ? 1 : ENV['WEB_CONCURRENCY'].to_i
+num_workers = ENV['WEB_CONCURRENCY'].nil? ? 4 : ENV['WEB_CONCURRENCY'].to_i
 
 Sneakers.configure(
     {
@@ -15,12 +15,13 @@ Sneakers.configure(
         exchange_type: :direct,
         daemonize: false,
         log: $stdout,
-        start_worker_delay: 0.2,
+        start_worker_delay: 1,
         workers: num_workers,
         pid_path: "pid/sneakers.pid",
         timeout_job_after: 1800,
         prefetch: 5,
         threads: 5,
+        share_threads: true,
         env: ENV['RACK_ENV'],
         durable: true,
         ack: true,

@@ -68,7 +68,7 @@ gem 'fluent-logger', '~> 0.5.1'
 
 gem 'gcm', '~> 0.1.1'
 
-gem 'lowdown', '~> 0.3.1'
+gem 'apns_kit', '~> 0.1.0'
 
 group :development do
 

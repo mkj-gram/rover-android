@@ -46,11 +46,10 @@ module BackgroundWorker
                 decoded_message = JSON.parse(msg).with_indifferent_access
                 begin
                     perform(decoded_message)
-                    Sneakers.logger.info("\n\n\n\n\nOKAY WE ARE GOOD!!!!!\n\n\n\n\n\n")
                     return :ack
                 rescue Exception => e
-                    Sneakers.logger.info("\n\n\n\n\nOKAY WE ARE BADDDDDD!!!!!\n\n\n\n\n\n")
                     Rails.logger.info("FAILED: #{self.class.name} failed to perform #{msg}")
+                    raise e
                 end
             end
         end

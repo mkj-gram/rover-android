@@ -4,50 +4,25 @@ module ApnsHelper
 
         def send(apns_app, inbox_messages_by_token, devices)
             return [] if devices.nil? || devices.empty?
+            certificate = ApnsKit::Certificate.new(apns_app.certificate, apns_app.passphrase)
+            client = ApnsKit::Client.production(certificate, pool_size: 1, heartbeat_interval: 0)
 
-            development_devices, production_devices = devices.partition(&:development_device?)
-
-            development_notifications = development_devices.map do |device|
-                Lowdown::Notification.new(:token => device.token, :payload => payload_from_inbox_message(inbox_messages_by_token[device.token]))
+            notifications = devices.map do |device|
+                ApnsKit::Notification.new(token: device.token, content_available: true, data: payload_from_inbox_message(inbox_messages_by_token[device.token]))
             end
 
-            production_notifications = production_devices.map do |device|
-                Lowdown::Notification.new(:token => device.token, :payload => payload_from_inbox_message(inbox_messages_by_token[device.token]))
-            end
+            responses = client.send(notifications)
+            expired_tokens = responses.select{ |response| response.invalid_token? }.map{ |response| response.notification.token }
 
-            certificate = Lowdown::Certificate.from_pem_data(apns_app.certificate, apns_app.passphrase)
-            development_client = Lowdown::Client.production(false, certificate: certificate, keep_alive: false)
-            production_client = Lowdown::Client.production(true, certificate: certificate, keep_alive: false)
+            client.shutdown
 
-            expired_token = []
-            expired_tokens += send_with_client(development_client, development_notifications)
-            expired_tokens += send_with_client(production_client, production_notifications)
             return expired_tokens
         end
 
         private
 
-        def send_with_client(client, notifications)
-            return [] if notifications.empty?
-            expired_tokens = []
-            client.connect do |group|
-                notifications.each do |notification|
-                    group.send_notification(notification) do |response|
-                        puts response
-                        if response.invalid_token? || response.inactive_token?
-                            expired_tokens.push(notification.token)
-                        end
-                    end
-                end
-            end
-            return expired_tokens
-        end
-
         def payload_from_inbox_message(inbox_message)
-            {
-                data: V1::InboxMessageSerializer.serialize(inbox_message),
-                "content-available" => 1
-            }
+            V1::InboxMessageSerializer.serialize(inbox_message)
         end
 
     end

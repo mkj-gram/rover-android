@@ -78,7 +78,7 @@ class Message < ActiveRecord::Base
                     saved_to_inbox: self.save_to_inbox,
                     action: self.action,
                     action_url: self.action_url,
-                    timestamp: Time.now
+                    timestamp: Time.zone.now
                 }
             )
             inbox_message.message = self

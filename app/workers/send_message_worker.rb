@@ -182,7 +182,6 @@ class SendMessageWorker
         # split devices by 1000
         expired_tokens = []
         devices.each_slice(1000) do |devices|
-            Sneakers.logger.info("Sending #{devices.size} ios devices")
             expired_tokens += ApnsHelper.send(apns_app, inbox_messages_by_token, devices)
         end
         return expired_tokens
