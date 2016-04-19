@@ -2,27 +2,33 @@ module GcmHelper
 
     class << self
         INVALID_REGISTRATION = "InvalidRegistration".freeze
+        NOT_REGISTERED = "NotRegistered".freeze
 
-        def send(gcm_app, notification, devices)
+        def send(gcm_app, inbox_messages_by_token, devices)
+
             client = GCM.new(gcm_app.api_key)
-            registration_ids = devices.map(&:token)
-            options = {data: {score: "123", collapase_key: "updated_score"}}
-            response = client.send(registration_ids, options)
-            if response[:status_code] != 200
-                expired_tokens = []
-                results = JSON.parse(response[:body])["results"]
+            expired_tokens = []
 
-                results.each_with_index do |result, position|
-                    if result.has_key?("error") && result["error"] == INVALID_REGISTRATION
-                        expired_tokens.push(registration_ids[position])
+            devices.each do |device|
+                response = client.send([device.token], { data: payload_from_inbox_message(inbox_messages_by_token[device.token]) })
+                body = JSON.parse(response[:body])
+                if body.has_key?("failure") && body["failure"] > 0
+                    body["results"].each do |result|
+                        if result.has_key?("error") && (result["error"] == INVALID_REGISTRATION || result["error"] == NOT_REGISTERED)
+                            expired_tokens.push(device.token)
+                        end
                     end
                 end
-
-                return expired_tokens
-            else
-                return []
             end
+
+            return expired_tokens
         end
+
+
+        def payload_from_inbox_message(inbox_message)
+            V1::InboxMessageSerializer.serialize(inbox_message)
+        end
+
     end
 
 end

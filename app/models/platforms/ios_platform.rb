@@ -25,20 +25,10 @@ class IosPlatform < Platform
         end
     end
 
-    def credentials_json
-        {
-            "certificate" => self.certificate,
-            "passphrase" => self.passphrase,
-        }
-    end
-
-
     private
 
-
-
     def apns_certificate
-        @apns_certificate ||= ApnsCertificate.new(certificate, passphrase)
+        @apns_certificate ||= ApnsKit::Certificate.new(certificate, passphrase)
     end
 
     def valid_certificate

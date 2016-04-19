@@ -12,6 +12,8 @@ class ScheduledMessageJob
         :exchange_arguments => {'x-delayed-type' => 'direct'},
         :heartbeat => 5
 
+    TIME_ZONE_OFFSETS = [-12.0, -11.0, -10.0, -9.5, -9.0, -8.0, -7.0, -6.0, -5.0, -4.5, -4.0, -3.0, -2.5, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 4.5, 5.0, 5.5, 5.75, 6.0, 6.5, 7.0, 8.0, 8.5, 8.75, 9.0, 9.5, 10.0, 10.5, 11.0, 12.0, 13, 14].freeze
+
     def self.perform_async(message)
         # here we check what we need to queue
 
@@ -19,14 +21,10 @@ class ScheduledMessageJob
 
         if message.scheduled_local_time == true
             # here we are finding the timezone offsets
-            delay = (message.scheduled_at.utc - current_time).to_i
-            # we need to enqueue from +12 to -12
-            # +12 need to be scheduled 12 hours ahead of delay
-            # and -12 needs to be scheduled 12 hours after delay
-            #
-            # These timezones are ahead so we need to schedule before
-            for hour in -12..12
-                local_delay = delay + (hour * 60 * 60)
+            delay = (message.scheduled_at.utc - current_time).to_i * 1000
+
+            for hour in TIME_ZONE_OFFSETS
+                local_delay = delay + (hour * 60 * 60 * 1000)
                 msg = {
                     message_id: message.id,
                     scheduled_token: message.scheduled_token,
@@ -37,7 +35,8 @@ class ScheduledMessageJob
 
         else
             # we want to send at that specific time so we don't need the 24 delayed jobs
-            delay = (message.scheduled_at.utc - current_time).to_i
+            # delay is measured in milliseconds
+            delay = (message.scheduled_at.utc - current_time).to_i * 1000
             msg = {
                 message_id: message.id,
                 scheduled_token: message.scheduled_token
@@ -61,7 +60,10 @@ class ScheduledMessageJob
                 end
 
                 time_zones = TimeZoneOffset.get_time_zones_for_offset(args["time_zone_offset"])
-
+                if time_zones.empty?
+                    puts "EMPTY? #{args['time_zone_offset']}"
+                    return ack!
+                end
                 time_zone_query = {
                     filter: {
                         bool: {
@@ -81,14 +83,13 @@ class ScheduledMessageJob
                     }
                 }
 
-
+                segment_query = merge_queries(base_query, time_zone_query)
             else
                 if message.customer_segment
                     segment_query = message.customer_segment.to_elasticsearch_query
                 else
                     segment_query = {}
                 end
-
             end
 
             SendMessageWorker.perform_async(message.id, segment_query)
@@ -97,13 +98,9 @@ class ScheduledMessageJob
         end
     end
 
-
-
     private
 
-    def merge_query(query1, query2)
-        return query1.deep_merge(query2) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
+    def merge_queries(queryOne, queryTwo)
+        return queryOne.deep_merge(queryTwo) {|k, a, b| a.is_a?(Array) && b.is_a?(Array) ? a + b : b}
     end
-
-
 end

@@ -3,7 +3,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema,    only: [:create, :update]
     before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
-    before_action :set_proximity_message,   only: [:show, :update, :destroy]
+    before_action :set_proximity_message,   only: [:show, :update, :destroy, :test_message]
 
 
     def index
@@ -125,6 +125,20 @@ class V1::ProximityMessagesController < V1::ApplicationController
             render json: { errors: V1::ProximityMessageErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
         end
     end
+
+    def test_message
+        # this will just be simple ids
+        # customer_ids = []
+        param_should_be_array(params, :customer_ids)
+        customer_ids = params[:customer_ids]
+        if customer_ids.any?
+            SendMessageWorker.perform_async(@proximity_message.id, {} , customer_ids)
+            head :ok
+        else
+            head :bad_request
+        end
+    end
+
 
     def resource
         ProximityMessage

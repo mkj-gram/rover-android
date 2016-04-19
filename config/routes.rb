@@ -90,6 +90,8 @@ Rails.application.routes.draw do
         resources :customers, only: [:index, :show]
 
         resources :"proximity-messages", controller: "proximity_messages", as: "proximity_messages"
+        post "/proximity-messages/:id/test-message", to: 'proximity_messages#test_message'
+
         resources :"scheduled-messages", controller: "scheduled_messages", as: "scheduled_messages"
 
         get "/inbox", to: 'customer_inbox#show'
@@ -102,6 +104,9 @@ Rails.application.routes.draw do
         scope :segments do
             post "/calculate", to: "customer_segment_calculate#create", as: "customer_segment_calculate"
         end
+
+        resources "ios-platforms", controller: "ios_platforms", as: "ios_platforms", except: [:index]
+        resources "android-platforms", controller: "android_platforms", as: "android_platforms", except: [:index]
 
     end
     # The priority is based upon order of creation: first created -> highest priority.

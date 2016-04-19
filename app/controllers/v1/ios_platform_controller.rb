@@ -36,7 +36,7 @@ class V1::IosPlatformController < V1::ApplicationController
     end
 
     def serialize_ios_platform(ios_platform)
-        IosPlatformSerializer.serialize(ios_platform)
+        V1::IosPlatformSerializer.serialize(ios_platform)
     end
 
     def ios_platform_params(local_params)

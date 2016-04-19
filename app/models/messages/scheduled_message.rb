@@ -3,7 +3,7 @@ class ScheduledMessage < Message
 
     TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
-    validate :can_publish_message
+    validate :can_publish_message, if: -> { self.published == true }
 
     before_save :publish_message
 
@@ -22,6 +22,7 @@ class ScheduledMessage < Message
         else
             Time.zone.parse(time)
         end
+        self.scheduled_token = SecureRandom.hex if parsed_time != scheduled_at
         self["scheduled_at"] = parsed_time
     end
 
@@ -30,13 +31,19 @@ class ScheduledMessage < Message
     private
 
     def can_publish_message
-        true
+        if scheduled_local_time == true && (scheduled_at - Time.zone.now) < 24.hours
+            errors.add(:scheduled_at, "needs a 24 hour window")
+        end
+
+        if scheduled_at < Time.zone.now
+            errors.add(:scheduled_at, "cannot schedule a message in the past")
+        end
     end
 
     def publish_message
-        if self.changes.include?(:published) && published_was == false && published == true
+        if self.changes.include?(:scheduled_token)
             Rails.logger.info("Scheduling Message #{self.id} #{self.title}")
-            self.scheduled_token = SecureRandom.hex
+            # self.update_attribute(:scheduled_token, SecureRandom.hex)
             ScheduledMessageJob.perform_async(self)
         end
     end

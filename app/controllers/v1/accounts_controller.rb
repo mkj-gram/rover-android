@@ -58,6 +58,34 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
+        ios_platform = current_account.ios_platform
+        if ios_platform
+            json["data"]["relationships"].merge!(
+                {
+                    "ios-platform" => {
+                        "data" => {
+                            "type" => "ios-platforms",
+                            "id" => ios_platform.id.to_s
+                        }
+                    }
+                }
+            )
+        end
+
+        android_platform = current_account.android_platform
+        if android_platform
+            json["data"]["relationships"].merge!(
+                {
+                    "android-platform" => {
+                        "data" => {
+                            "type" => "android-platforms",
+                            "id" => android_platform.id.to_s
+                        }
+                    }
+                }
+            )
+        end
+
         included = [estimote_integration, kontakt_integration].compact.map do |integration|
             serialize_integration(integration)
         end
@@ -65,6 +93,9 @@ class V1::AccountsController < V1::ApplicationController
         included += [estimote_integration, kontakt_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
             serialize_sync_job(integration, integration.latest_sync_job)
         end
+
+        # included += [V1::AndroidPlatformSerializer.serialize(android_platform)] if android_platform
+        # included += [V1::IosPlatformSerializer.serialize(ios_platform)] if ios_platform
 
         json["included"] = included
 

@@ -42,18 +42,6 @@ class ApnsCertificate
         @errors
     end
 
-    def test_connection!
-        if production? || universal?
-            uri = URI(APPLE_PRODUCTION_GATEWAY_URI)
-        else
-            uri = URI(APPLE_DEVELOPMENT_GATEWAY_URI)
-        end
-        # socket = TCPSocket.new(uri.host, uri.port)
-        # ssl = OpenSSL::SSL::SSLSocket.new(socket, ssl_context)
-        # ssl.sync = true
-        # ssl.connect
-    end
-
     def ssl_context
         @ssl_context ||= OpenSSL::SSL::SSLContext.new.tap do |context|
             context.key = @key

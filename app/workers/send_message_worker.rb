@@ -56,7 +56,7 @@ class SendMessageWorker
         ##################################################################
 
         if test_customer_ids.any?
-            customers = Customer.find(test_customer_ids).all
+            customers = Customer.find(test_customer_ids)
         else
             if scroll_id
                 Sneakers.logger.info("Found scroll_id #{scroll_id}")
@@ -190,7 +190,7 @@ class SendMessageWorker
     def send_gcm_notification(gcm_app, inbox_messages_by_token, devices)
         expired_tokens = []
         devices.each_slice(1000) do |devices|
-            expired_token += GcmHelper.send(gcm_app, inbox_messages_by_token, devices)
+            expired_tokens += GcmHelper.send(gcm_app, inbox_messages_by_token, devices)
         end
         return expired_tokens
     end

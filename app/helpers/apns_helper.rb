@@ -1,7 +1,7 @@
 module ApnsHelper
 
     class << self
-
+        ApnsKit.logger = Sneakers.logger
         def send(apns_app, inbox_messages_by_token, devices)
             return [] if devices.nil? || devices.empty?
             certificate = ApnsKit::Certificate.new(apns_app.certificate, apns_app.passphrase)
