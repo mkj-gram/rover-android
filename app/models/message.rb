@@ -7,6 +7,8 @@ class Message
     field :notification_text, type: String
     field :ios_title, type: String, default: ""
     field :android_title, type: String, default: ""
+    field :ios_sound_file, type: String
+    field :android_sound_file, type: String
     field :tags, type: Array, default: []
     field :read, type: Boolean, default: false
     field :viewed, type: Boolean, default: false
