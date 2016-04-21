@@ -24,7 +24,7 @@ class V1::IosPlatformController < V1::ApplicationController
     end
 
     def resource
-        Platform
+        :platform
     end
 
     private

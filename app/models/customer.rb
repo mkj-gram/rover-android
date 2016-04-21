@@ -12,6 +12,7 @@ class Customer
     field :tags, type: Array
     field :traits, type: Hash
     field :location, type: GeoPoint
+    field :inbox_updated_at, type: Time, default: -> { Time.zone.now }
 
     index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
     index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
@@ -108,7 +109,6 @@ class Customer
         end
     end
 
-    # has_one :inbox, class_name: "CustomerInbox"
     validates :account_id, presence: true
     validates :email, email: { allow_blank: true }
     # where should we store counter cache? how do we?
@@ -123,7 +123,6 @@ class Customer
     end
 
     before_save :update_active_traits
-    after_create :create_inbox
     after_create :increment_customers_count, if: -> { indexable_customer? }
     after_destroy :decrement_customers_count
 
@@ -202,10 +201,7 @@ class Customer
     end
 
     def inbox
-        @inbox ||= CustomerInbox.find(self.id)
-        @inbox = CustomerInbox.create(customer_id: self.id) if @inbox.nil?
-        @inbox.customer = self
-        return @inbox
+        @inbox ||= CustomerInbox.new(self)
     end
 
     def gender=(val)

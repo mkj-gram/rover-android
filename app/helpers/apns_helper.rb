@@ -1,14 +1,15 @@
 module ApnsHelper
 
     class << self
-        ApnsKit.logger = Sneakers.logger
-        def send(apns_app, inbox_messages_by_token, devices)
+
+        def send(apns_app, message_instance_by_token, devices)
             return [] if devices.nil? || devices.empty?
             certificate = ApnsKit::Certificate.new(apns_app.certificate, apns_app.passphrase)
             client = ApnsKit::Client.production(certificate, pool_size: 1, heartbeat_interval: 0)
 
             notifications = devices.map do |device|
-                ApnsKit::Notification.new(token: device.token, content_available: true, data: payload_from_inbox_message(inbox_messages_by_token[device.token]))
+                puts payload_from_inbox_message(message_instance_by_token[device.token])
+                ApnsKit::Notification.new(token: device.token, content_available: true, data: payload_from_inbox_message(message_instance_by_token[device.token]))
             end
 
             responses = client.send(notifications)
@@ -22,7 +23,7 @@ module ApnsHelper
         private
 
         def payload_from_inbox_message(inbox_message)
-            V1::InboxMessageSerializer.serialize(inbox_message)
+            V1::MessageSerializer.serialize(inbox_message)
         end
 
     end

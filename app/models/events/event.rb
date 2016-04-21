@@ -24,7 +24,6 @@ module Events
             @customer = event_attributes[:customer]
             @device = event_attributes[:device]
             @generation_time = get_time(event_attributes[:time])
-            Rails.logger.debug("Customers time is #{@generation_time}")
             @included = []
             @messages = []
         end
@@ -112,25 +111,33 @@ module Events
             }.call
         end
 
-        def deliver_messages(messages)
-            inbox_messages, local_messages = messages.partition(&:save_to_inbox)
+        def deliver_messages(message_templates)
+            # messages is of type ::Messages
+            # see if all pass rate limit
+            # convert all to message instances
+            # create each one
+            # add them to the included array
+            # track messages
+            message_templates.each {|template| template.account = account }
+            inbox_messages, local_messages = message_templates.partition(&:save_to_inbox)
+
 
             # first filter them
             inbox_messages_to_deliver = inbox_messages.select{|message| MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)}
             local_messages_to_deliver = local_messages.select{|message| MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)}
 
             # map them to inbox messages
-            inbox_messages_to_deliver = inbox_messages_to_deliver.map{|message| message.to_inbox_message(message_opts)}
-            local_messages_to_deliver = local_messages_to_deliver.map{|message| message.to_inbox_message(message_opts)}
+            inbox_messages_to_deliver = inbox_messages_to_deliver.map{|message_template| message_template.render_message(customer, message_opts)}
+            local_messages_to_deliver = local_messages_to_deliver.map{|message_template| message_template.render_message(customer, message_opts)}
 
             # add them to the included array for json output
-            @included += inbox_messages_to_deliver.map{|message| V1::InboxMessageSerializer.serialize(message)}
-            @included += local_messages_to_deliver.map{|message| V1::InboxMessageSerializer.serialize(message)}
-            # track them in the analytics
-            track_delivered_messages(inbox_messages_to_deliver)
-            track_delivered_messages(local_messages_to_deliver)
+            @included += inbox_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
+            @included += local_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
+
 
         end
+
+        # TODO Fix this!
 
         def track_delivered_messages(messages)
             messages.each{ |message| track_delivered_message(message) }

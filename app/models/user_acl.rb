@@ -14,8 +14,8 @@ class UserAcl < ActiveRecord::Base
         log("Checking if user #{self.user_id} has access to #{resource}")
         # resource some model
         # method the method the user wants to perform ie :show, :create, :update, :destroy
-        column = resource.is_a?(Class) ? resource.name.underscore : resource.class.name.underscore
-        column = column.concat("_#{method}")
+        column = resource.is_a?(Class) ? resource.name.underscore : resource
+        column = column.to_s.concat("_#{method}")
         access = self.read_attribute(column)
         access = false if access.nil?
         if access

@@ -3,16 +3,15 @@ class V1::CustomerInboxController < V1::ApplicationController
     before_action :set_inbox
 
     def show
-        if @inbox.nil?
-            messages = []
-        else
-            messages = @inbox.messages.select{|message| message.saved_to_inbox == true}.reverse!
-        end
+
+        message = current_customer.inbox.messages
+
         json = {
-            data: messages.map{|message| V1::InboxMessageSerializer.serialize(message)}
+            data: messages.map{|message| V1::MessageInstanceSerializer.serialize(message)}
         }
 
         render json: json
+
     end
 
 
@@ -25,4 +24,5 @@ class V1::CustomerInboxController < V1::ApplicationController
             head :not_found
         end
     end
+
 end

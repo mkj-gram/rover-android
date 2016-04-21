@@ -1,4 +1,4 @@
-class Message < ActiveRecord::Base
+class MessageTemplate < ActiveRecord::Base
     include Elasticsearch::Model
     include Elasticsearch::Model::Callbacks
     include FormattableMessage
@@ -67,23 +67,23 @@ class Message < ActiveRecord::Base
             created_at: self.created_at,
         }
     end
-    def to_inbox_message(opts)
-        @inbox_message ||= -> {
-            inbox_message = InboxMessage.new(
-                {
-                    title: self.title,
-                    message_id: self.id,
-                    notification_text: formatted_message(opts),
-                    read: false,
-                    saved_to_inbox: self.save_to_inbox,
-                    action: self.action,
-                    action_url: self.action_url,
-                    timestamp: Time.zone.now
-                }
-            )
-            inbox_message.message = self
-            return inbox_message
-        }.call
+
+    def render_message(customer, opts = {})
+        opts = opts.merge(customer: customer)
+        Message.new(
+            {
+                message_template: self,
+                customer: customer,
+                notification_text: self.notification_text,
+                read: false,
+                saved_to_inbox: self.save_to_inbox,
+                action: self.action,
+                action_url: self.action_url,
+                timestamp: Time.zone.now,
+                ios_title: get_ios_title.to_s,
+                android_title: get_android_title.to_s
+            }
+        )
     end
 
     def archived=(val)
@@ -181,7 +181,6 @@ class Message < ActiveRecord::Base
             end_date = Float::INFINITY
         end
 
-        puts "start_date #{start_date} end_date #{end_date}"
         self.date_schedule = Range.new(start_date, end_date)
     end
 
@@ -316,6 +315,14 @@ class Message < ActiveRecord::Base
         else
             account.beacon_configurations_count
         end
+    end
+
+    def get_ios_title
+        self.ios_title ? self.ios_title : self.account.ios_platform_name
+    end
+
+    def get_android_title
+        self.android_title ? self.android_title : self.account.android_platform_name
     end
 
     private

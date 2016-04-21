@@ -1,4 +1,4 @@
-class V1::ProximityMessagesController < V1::ApplicationController
+class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
     before_action :authenticate
     before_action :validate_json_schema,    only: [:create, :update]
@@ -33,23 +33,18 @@ class V1::ProximityMessagesController < V1::ApplicationController
             )
         end
 
-        if !query_published.nil?
-            must_filter.push(
-                {
-                    term: {
-                        published: query_published
-                    }
-                }
-            )
-        end
-
 
 
         query = {
-            filter: {
-                bool: {
-                    should: should_filter,
-                    must: must_filter
+            query: {
+                filtered: {
+                    query: {match_all: {}},
+                    filter: {
+                        bool: {
+                            should: should_filter,
+                            must: must_filter
+                        }
+                    }
                 }
             },
             sort: [
@@ -61,25 +56,18 @@ class V1::ProximityMessagesController < V1::ApplicationController
             ]
         }
 
-        elasticsearch_query = ProximityMessage.search(query)
+        elasticsearch_query = ProximityMessageTemplate.search(query)
 
-        messages = elasticsearch_query.per_page(page_size).page(current_page).records
-
-        if query_archived == true
-            total_searchable_records = current_account.archived_proximity_messages_count
-        elsif query_archived == false
-            total_searchable_records = current_account.proximity_messages_count - current_account.archived_proximity_messages_count
-        else
-            total_searchable_records = current_account.proximity_messages_count
-        end
+        message_templates = elasticsearch_query.per_page(page_size).page(current_page).records
 
         json = {
-            "data" => messages.includes(:customer_segment).to_a.map { |message| serialize_message(message) },
+            "data" => message_templates.includes(:customer_segment).to_a.map{|message| serialize_message(message)},
             "meta" => {
-                "totalRecords" => messages.total,
-                "totalPages" => messages.total_pages,
-                "totalSearchableRecords" => total_searchable_records,
-                "totalConfigurationsCount" => current_account.searchable_beacon_configurations_count # use searchable since we could be targeting shared beacons
+                "totalRecords" => message_templates.total,
+                "totalPages" => message_templates.total_pages,
+                "totalDrafts" => current_account.proximity_message_templates_draft_count,
+                "totalPublished" => current_account.proximity_message_templates_published_count,
+                "totalArchived" => current_account.proximity_message_templates_archived_count
             }
         }
 
@@ -98,13 +86,13 @@ class V1::ProximityMessagesController < V1::ApplicationController
     # create accepts everything the same as update
     def create
         json = flatten_request({single_record: true})
-        @proximity_message = ProximityMessage.new(proximity_message_params(json[:data]))
+        @proximity_message = ProximityMessageTemplate.new(proximity_message_params(json[:data]))
         @proximity_message.account_id = current_account.id
         if @proximity_message.save
             json = render_proximity_message(@proximity_message)
             render json: json
         else
-            render json: { errors: V1::ProximityMessageErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
+            render json: { errors: V1::ProximityMessageTemplateErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
         end
     end
 
@@ -114,7 +102,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
             json = render_proximity_message(@proximity_message)
             render json: json
         else
-            render json: { errors: V1::ProximityMessageErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
+            render json: { errors: V1::ProximityMessageTemplateErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
         end
     end
 
@@ -122,7 +110,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
         if @proximity_message.destroy
             head :no_content
         else
-            render json: { errors: V1::ProximityMessageErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
+            render json: { errors: V1::ProximityMessageTemplateErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
         end
     end
 
@@ -141,7 +129,7 @@ class V1::ProximityMessagesController < V1::ApplicationController
 
 
     def resource
-        ProximityMessage
+        ProximityMessageTemplate
     end
 
     private
@@ -203,21 +191,55 @@ class V1::ProximityMessagesController < V1::ApplicationController
 
         included = []
         if should_include.include?("beacons")
+            json[:data][:relationships] = {} if json[:data][:relationships].nil?
             if message.filter_beacon_configuration_ids
+                json[:data][:relationships].merge!(
+                    {
+                        configurations: {
+                            data: message.filter_beacon_configuration_ids.map{|beacon_id| {type: "configurations", id: beacon_id}}
+                        }
+                    }
+                )
                 beacon_configurations = message.filter_beacon_configurations
                 included += beacon_configurations.map{|configuration| V1::BeaconConfigurationSerializer.serialize(configuration)}
+            else
+                json[:data][:relationships].merge({beacons: {data: []}})
             end
         end
 
         if should_include.include?("locations")
+            json[:data][:relationships] = {} if json[:data][:relationships].nil?
             if message.filter_location_ids
+
+                json[:data][:relationships].merge!(
+                    {
+                        locations: {
+                            data: message.filter_location_ids.map{|location_id| {type: "locations", id: location_id}}
+                        }
+                    }
+                )
                 locations = message.filter_locations
                 included += locations.map{|location| V1::LocationSerializer.serialize(location)}
+            else
+                json[:data][:relationships].merge!({locations: {data: []}})
             end
         end
 
-        if should_include.include?("segment") && message.customer_segment
-            included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
+        if should_include.include?("segment")
+            json[:data][:relationships] = {} if json[:data][:relationships].nil?
+            if message.customer_segment
+                json[:data][:relationships].merge!(
+                    {
+                        :"segment" => {
+                            data: { type: "segments", id: message.customer_segment.id.to_s }
+                        }
+
+                    }
+                )
+                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
+            else
+                json[:data][:relationships].merge!({:"segment" => {data: nil}})
+            end
         end
 
         if included.any?
@@ -228,23 +250,16 @@ class V1::ProximityMessagesController < V1::ApplicationController
     end
 
     def set_proximity_message
-        @proximity_message = ProximityMessage.find_by_id(params[:id])
+        @proximity_message = ProximityMessageTemplate.find_by_id(params[:id])
         head :not_found if @proximity_message.nil?
     end
 
     def query_archived
-        query = params.dig(:filter, :archived)
-        return query.nil? ? nil : query.to_s.to_bool
+        params.fetch(:filter, {}).fetch(:archived, "false").to_bool
     end
-
-    def query_published
-        query = params.dig(:filter, :published)
-        return query.nil? ? nil : query.to_s.to_bool
-    end
-
 
     def serialize_message(message, extra_attributes = {})
-        json = {
+        {
             type: "proximity-messages",
             id: message.id.to_s,
             attributes: {
@@ -273,37 +288,6 @@ class V1::ProximityMessagesController < V1::ApplicationController
                 :"approximate-customers-count" => message.approximate_customers_count
             }.merge(extra_attributes)
         }
-        json[:relationships] = {}
-
-        json[:relationships].merge!(
-            {
-                locations: {
-                    data: message.filter_location_ids.map{|location_id| {type: "locations", id: location_id}}
-                }
-            }
-        )
-
-
-        json[:relationships].merge!(
-            {
-                configurations: {
-                    data: message.filter_beacon_configuration_ids.map{|beacon_id| {type: "configurations", id: beacon_id}}
-                }
-            }
-        )
-
-        if message.customer_segment
-            json[:relationships].merge!(
-                {
-                    :"segment" => {
-                        data: { type: "segments", id: message.customer_segment.id.to_s }
-                    }
-
-                }
-            )
-        end
-
-        return json
     end
 
     def serialize_limit(limit)

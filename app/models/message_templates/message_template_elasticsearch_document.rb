@@ -1,8 +1,8 @@
-module MessagesElasticsearchChild
+module MessageTemplateElasticsearchDocument
     extend ActiveSupport::Concern
 
     included do
-        index_name Message.index_name
+        index_name MessageTemplate.index_name
 
         mappings dynamic: 'false' do
             indexes :account_id, type: 'long', index: 'not_analyzed'
@@ -17,11 +17,11 @@ module MessagesElasticsearchChild
     class_methods do
         def create_index!(opts = {})
             client = self.__elasticsearch__.client
-            if !client.indices.exists?(index: Message.index_name)
-                client.indices.create(index: Message.index_name, body: Message.settings.to_hash)
+            if !client.indices.exists?(index: MessageTemplate.index_name)
+                client.indices.create(index: MessageTemplate.index_name, body: MessageTemplate.settings.to_hash)
             end
-            if client.indices.get_mapping(index: Message.index_name, type: self.document_type).empty?
-                client.indices.put_mapping(index: Message.index_name, type: self.document_type, body: self.mappings.to_hash)
+            if client.indices.get_mapping(index: MessageTemplate.index_name, type: self.document_type).empty?
+                client.indices.put_mapping(index: MessageTemplate.index_name, type: self.document_type, body: self.mappings.to_hash)
             else
                 Rails.logger.warn("Index with mapping already exists")
             end

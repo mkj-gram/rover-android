@@ -1,3 +1,3 @@
-class V1::InboxMessageErrorSerializer < ModelError::Serializer
+class V1::MessageInstanceErrorSerializer < ModelError::Serializer
     attribute :read
 end

@@ -132,13 +132,16 @@ CREATE TABLE accounts (
     searchable_beacon_configurations_count integer DEFAULT 0,
     searchable_locations_count integer DEFAULT 0,
     account_invites_count integer DEFAULT 0,
-    proximity_messages_count integer DEFAULT 0,
-    archived_proximity_messages_count integer DEFAULT 0,
     gimbal_places_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customers_count integer DEFAULT 0,
-    message_limits hstore[] DEFAULT '{}'::hstore[]
+    message_limits hstore[] DEFAULT '{}'::hstore[],
+    proximity_message_templates_draft_count integer DEFAULT 0,
+    proximity_message_templates_published_count integer DEFAULT 0,
+    proximity_message_templates_archived_count integer DEFAULT 0,
+    ios_platform_name character varying,
+    android_platform_name character varying
 );
 
 
@@ -221,6 +224,42 @@ CREATE SEQUENCE active_tags_id_seq
 --
 
 ALTER SEQUENCE active_tags_id_seq OWNED BY active_tags.id;
+
+
+--
+-- Name: android_platforms; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE android_platforms (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    title character varying,
+    package_name character varying,
+    encrypted_credentials text,
+    encrypted_credentials_salt text,
+    encrypted_credentials_iv text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: android_platforms_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE android_platforms_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: android_platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE android_platforms_id_seq OWNED BY android_platforms.id;
 
 
 --
@@ -470,6 +509,42 @@ CREATE TABLE gimbal_places (
 
 
 --
+-- Name: ios_platforms; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE ios_platforms (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    title character varying,
+    bundle_id character varying,
+    encrypted_credentials text,
+    encrypted_credentials_salt text,
+    encrypted_credentials_iv text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: ios_platforms_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE ios_platforms_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ios_platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE ios_platforms_id_seq OWNED BY ios_platforms.id;
+
+
+--
 -- Name: locations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -515,10 +590,10 @@ ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
 
 
 --
--- Name: messages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: message_templates; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE messages (
+CREATE TABLE message_templates (
     id integer NOT NULL,
     account_id integer NOT NULL,
     type character varying NOT NULL,
@@ -552,15 +627,21 @@ CREATE TABLE messages (
     updated_at timestamp without time zone NOT NULL,
     scheduled_at timestamp without time zone,
     scheduled_local_time boolean DEFAULT false,
-    scheduled_token character varying
+    scheduled_token character varying,
+    ios_title character varying,
+    android_title character varying,
+    android_collapse_key character varying,
+    ios_sound_file character varying,
+    android_sound_file character varying,
+    time_to_live integer
 );
 
 
 --
--- Name: messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: message_templates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE messages_id_seq
+CREATE SEQUENCE message_templates_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -569,10 +650,10 @@ CREATE SEQUENCE messages_id_seq
 
 
 --
--- Name: messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: message_templates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE messages_id_seq OWNED BY messages.id;
+ALTER SEQUENCE message_templates_id_seq OWNED BY message_templates.id;
 
 
 --
@@ -605,42 +686,6 @@ CREATE SEQUENCE password_resets_id_seq
 --
 
 ALTER SEQUENCE password_resets_id_seq OWNED BY password_resets.id;
-
-
---
--- Name: platforms; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE platforms (
-    id integer NOT NULL,
-    account_id integer NOT NULL,
-    type character varying NOT NULL,
-    app_identifier character varying,
-    encrypted_credentials text,
-    encrypted_credentials_salt text,
-    encrypted_credentials_iv text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: platforms_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE platforms_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE platforms_id_seq OWNED BY platforms.id;
 
 
 --
@@ -825,18 +870,18 @@ CREATE TABLE user_acls (
     customer_segment_create boolean DEFAULT true,
     customer_segment_update boolean DEFAULT true,
     customer_segment_destroy boolean DEFAULT true,
-    proximity_message_show boolean DEFAULT true,
-    proximity_message_create boolean DEFAULT true,
-    proximity_message_update boolean DEFAULT true,
-    proximity_message_destroy boolean DEFAULT true,
-    scheduled_message_show boolean DEFAULT true,
-    scheduled_message_create boolean DEFAULT true,
-    scheduled_message_update boolean DEFAULT true,
-    scheduled_message_destroy boolean DEFAULT true,
-    automated_message_show boolean DEFAULT true,
-    automated_message_create boolean DEFAULT true,
-    automated_message_update boolean DEFAULT true,
-    automated_message_destroy boolean DEFAULT true,
+    proximity_message_template_show boolean DEFAULT true,
+    proximity_message_template_create boolean DEFAULT true,
+    proximity_message_template_update boolean DEFAULT true,
+    proximity_message_template_destroy boolean DEFAULT true,
+    scheduled_message_template_show boolean DEFAULT true,
+    scheduled_message_template_create boolean DEFAULT true,
+    scheduled_message_template_update boolean DEFAULT true,
+    scheduled_message_template_destroy boolean DEFAULT true,
+    automated_message_template_show boolean DEFAULT true,
+    automated_message_template_create boolean DEFAULT true,
+    automated_message_template_update boolean DEFAULT true,
+    automated_message_template_destroy boolean DEFAULT true,
     third_party_integration_show boolean DEFAULT true,
     third_party_integration_create boolean DEFAULT true,
     third_party_integration_update boolean DEFAULT true,
@@ -910,18 +955,18 @@ CREATE TABLE user_roles (
     customer_segment_create boolean DEFAULT true,
     customer_segment_update boolean DEFAULT true,
     customer_segment_destroy boolean DEFAULT true,
-    proximity_message_show boolean DEFAULT true,
-    proximity_message_create boolean DEFAULT true,
-    proximity_message_update boolean DEFAULT true,
-    proximity_message_destroy boolean DEFAULT true,
-    scheduled_message_show boolean DEFAULT true,
-    scheduled_message_create boolean DEFAULT true,
-    scheduled_message_update boolean DEFAULT true,
-    scheduled_message_destroy boolean DEFAULT true,
-    automated_message_show boolean DEFAULT true,
-    automated_message_create boolean DEFAULT true,
-    automated_message_update boolean DEFAULT true,
-    automated_message_destroy boolean DEFAULT true,
+    proximity_message_template_show boolean DEFAULT true,
+    proximity_message_template_create boolean DEFAULT true,
+    proximity_message_template_update boolean DEFAULT true,
+    proximity_message_template_destroy boolean DEFAULT true,
+    scheduled_message_template_show boolean DEFAULT true,
+    scheduled_message_template_create boolean DEFAULT true,
+    scheduled_message_template_update boolean DEFAULT true,
+    scheduled_message_template_destroy boolean DEFAULT true,
+    automated_message_template_show boolean DEFAULT true,
+    automated_message_template_create boolean DEFAULT true,
+    automated_message_template_update boolean DEFAULT true,
+    automated_message_template_destroy boolean DEFAULT true,
     third_party_integration_show boolean DEFAULT true,
     third_party_integration_create boolean DEFAULT true,
     third_party_integration_update boolean DEFAULT true,
@@ -934,11 +979,11 @@ CREATE TABLE user_roles (
     user_acl_create boolean DEFAULT true,
     user_acl_update boolean DEFAULT true,
     user_acl_destroy boolean DEFAULT true,
+    user_ids integer[] DEFAULT '{}'::integer[],
     platform_show boolean DEFAULT true,
     platform_create boolean DEFAULT true,
     platform_update boolean DEFAULT true,
-    platform_destroy boolean DEFAULT true,
-    user_ids integer[] DEFAULT '{}'::integer[]
+    platform_destroy boolean DEFAULT true
 );
 
 
@@ -1030,6 +1075,13 @@ ALTER TABLE ONLY active_tags ALTER COLUMN id SET DEFAULT nextval('active_tags_id
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY android_platforms ALTER COLUMN id SET DEFAULT nextval('android_platforms_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY beacon_configurations ALTER COLUMN id SET DEFAULT nextval('beacon_configurations_id_seq'::regclass);
 
 
@@ -1072,6 +1124,13 @@ ALTER TABLE ONLY customers ALTER COLUMN id SET DEFAULT nextval('customers_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY ios_platforms ALTER COLUMN id SET DEFAULT nextval('ios_platforms_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq'::regclass);
 
 
@@ -1079,7 +1138,7 @@ ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY messages ALTER COLUMN id SET DEFAULT nextval('messages_id_seq'::regclass);
+ALTER TABLE ONLY message_templates ALTER COLUMN id SET DEFAULT nextval('message_templates_id_seq'::regclass);
 
 
 --
@@ -1087,13 +1146,6 @@ ALTER TABLE ONLY messages ALTER COLUMN id SET DEFAULT nextval('messages_id_seq':
 --
 
 ALTER TABLE ONLY password_resets ALTER COLUMN id SET DEFAULT nextval('password_resets_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY platforms ALTER COLUMN id SET DEFAULT nextval('platforms_id_seq'::regclass);
 
 
 --
@@ -1178,6 +1230,14 @@ ALTER TABLE ONLY active_tags
 
 
 --
+-- Name: android_platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY android_platforms
+    ADD CONSTRAINT android_platforms_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: beacon_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1226,6 +1286,14 @@ ALTER TABLE ONLY customers
 
 
 --
+-- Name: ios_platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY ios_platforms
+    ADD CONSTRAINT ios_platforms_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1234,11 +1302,11 @@ ALTER TABLE ONLY locations
 
 
 --
--- Name: messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: message_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY messages
-    ADD CONSTRAINT messages_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY message_templates
+    ADD CONSTRAINT message_templates_pkey PRIMARY KEY (id);
 
 
 --
@@ -1247,14 +1315,6 @@ ALTER TABLE ONLY messages
 
 ALTER TABLE ONLY password_resets
     ADD CONSTRAINT password_resets_pkey PRIMARY KEY (id);
-
-
---
--- Name: platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY platforms
-    ADD CONSTRAINT platforms_pkey PRIMARY KEY (id);
 
 
 --
@@ -1405,6 +1465,13 @@ CREATE INDEX index_active_tags_on_account_id_and_type ON active_tags USING btree
 
 
 --
+-- Name: index_android_platforms_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_android_platforms_on_account_id ON android_platforms USING btree (account_id);
+
+
+--
 -- Name: index_beacon_configurations_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1531,6 +1598,13 @@ CREATE UNIQUE INDEX index_gimbal_places_on_id ON gimbal_places USING btree (id);
 
 
 --
+-- Name: index_ios_platforms_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_ios_platforms_on_account_id ON ios_platforms USING btree (account_id);
+
+
+--
 -- Name: index_locations_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1555,7 +1629,7 @@ CREATE INDEX index_locations_on_account_id_and_tags ON locations USING gin (acco
 -- Name: index_messages_on_account_id_type_published_trigger_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_messages_on_account_id_type_published_trigger_event_id ON messages USING btree (account_id, type, published, trigger_event_id) WHERE ((published = true) AND ((type)::text = 'ProximityMessage'::text));
+CREATE INDEX index_messages_on_account_id_type_published_trigger_event_id ON message_templates USING btree (account_id, type, published, trigger_event_id) WHERE ((published = true) AND ((type)::text = 'ProximityMessage'::text));
 
 
 --
@@ -1577,13 +1651,6 @@ CREATE UNIQUE INDEX index_password_resets_on_token ON password_resets USING btre
 --
 
 CREATE INDEX index_password_resets_on_user_id ON password_resets USING btree (user_id);
-
-
---
--- Name: index_platforms_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_platforms_on_account_id_and_type ON platforms USING btree (account_id, type);
 
 
 --
@@ -1758,17 +1825,27 @@ INSERT INTO schema_migrations (version) VALUES ('20160405134656');
 
 INSERT INTO schema_migrations (version) VALUES ('20160406145542');
 
-INSERT INTO schema_migrations (version) VALUES ('20160411163050');
-
-INSERT INTO schema_migrations (version) VALUES ('20160413132810');
-
 INSERT INTO schema_migrations (version) VALUES ('20160413141311');
 
 INSERT INTO schema_migrations (version) VALUES ('20160413142302');
 
 INSERT INTO schema_migrations (version) VALUES ('20160413142757');
 
-INSERT INTO schema_migrations (version) VALUES ('20160413154453');
-
 INSERT INTO schema_migrations (version) VALUES ('20160414122442');
+
+INSERT INTO schema_migrations (version) VALUES ('20160420150128');
+
+INSERT INTO schema_migrations (version) VALUES ('20160420194109');
+
+INSERT INTO schema_migrations (version) VALUES ('20160420194351');
+
+INSERT INTO schema_migrations (version) VALUES ('20160420194403');
+
+INSERT INTO schema_migrations (version) VALUES ('20160421130901');
+
+INSERT INTO schema_migrations (version) VALUES ('20160421134707');
+
+INSERT INTO schema_migrations (version) VALUES ('20160421140310');
+
+INSERT INTO schema_migrations (version) VALUES ('20160421173623');
 

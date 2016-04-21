@@ -75,13 +75,25 @@ module Events
                 json = super
                 if beacon_configuration && beacon_configuration.enabled
                     json[:data][:attributes][:configuration] = {
+                        id: beacon_configuration.id,
                         name: beacon_configuration.title,
                         tags: beacon_configuration.tags,
                         shared: beacon_configuration.shared
                     }.merge(beacon_configuration.configuration_attributes)
-                else
-                    json[:data][:attributes][:configuration] = {}
                 end
+
+                if location && location.enabled
+                    json[:data][:attributes][:location] = {
+                        id: location.id,
+                        name: location.title,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        radius: location.radius,
+                        tags: location.tags,
+                        shared: location.shared
+                    }
+                end
+
 
                 return json
             end
@@ -101,11 +113,11 @@ module Events
                 return nil if beacon_configuration.nil?
                 # has to perform all filtering in memory
                 # first find all messages where the trigger_event_id is the type of event which occured
-                messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
+                message_templates = ProximityMessageTemplate.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
                 # apply all filters
                 current_time = DateTime.now
-                messages.select do |message|
-                    message.within_schedule(current_time) && message.apply_configuration_filters(beacon_configuration) && message.within_customer_segment(customer, device)
+                message_templates.select do |message_template|
+                    message_template.within_schedule(current_time) && message_template.apply_configuration_filters(beacon_configuration) && message_template.within_customer_segment(customer, device)
                 end
             end
 

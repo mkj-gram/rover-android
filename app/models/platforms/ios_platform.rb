@@ -1,12 +1,16 @@
-class IosPlatform < Platform
+class IosPlatform < ActiveRecord::Base
+    include Platformable
 
     validate :valid_certificate
 
     before_create :set_app_identifier
 
+    before_save :update_name_cache
+
+    belongs_to :account
+
     def set_credentials(certificate, passphrase)
-        self.credentials = {} if self.credentials.nil?
-        self.credentials.merge!({certificate: certificate, passphrase: passphrase})
+        self.credentials = {certificate: certificate, passphrase: passphrase}
     end
 
     def certificate
@@ -28,7 +32,7 @@ class IosPlatform < Platform
     private
 
     def apns_certificate
-        @apns_certificate ||= ApnsKit::Certificate.new(certificate, passphrase)
+        @apns_certificate ||= ApnsCertificate.new(certificate, passphrase)
     end
 
     def valid_certificate
@@ -44,7 +48,13 @@ class IosPlatform < Platform
     end
 
     def set_app_identifier
-        self.app_identifier = apns_certificate.app_bundle_id
+        self.bundle_id = apns_certificate.app_bundle_id
+    end
+
+    def update_name_cache
+        if self.changes.include?(:title)
+            account.update_attributes(ios_platform_name: self.title)
+        end
     end
 
 end

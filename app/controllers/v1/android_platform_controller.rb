@@ -34,7 +34,7 @@ class V1::AndroidPlatformController < V1::ApplicationController
     end
 
     def resource
-        Platform
+        :platform
     end
 
     private

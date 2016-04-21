@@ -89,10 +89,10 @@ Rails.application.routes.draw do
 
         resources :customers, only: [:index, :show]
 
-        resources :"proximity-messages", controller: "proximity_messages", as: "proximity_messages"
-        post "/proximity-messages/:id/test-message", to: 'proximity_messages#test_message'
+        resources :"proximity-messages", controller: "proximity_message_templates", as: "proximity_message_templates"
+        post "/proximity-messages/:id/test-message", to: 'proximity_message_templates#test_message'
 
-        resources :"scheduled-messages", controller: "scheduled_messages", as: "scheduled_messages"
+        resources :"scheduled-messages", controller: "scheduled_message_templates", as: "scheduled_message_templates"
 
         get "/inbox", to: 'customer_inbox#show'
 

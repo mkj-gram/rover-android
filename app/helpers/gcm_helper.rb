@@ -26,7 +26,7 @@ module GcmHelper
 
 
         def payload_from_inbox_message(inbox_message)
-            V1::InboxMessageSerializer.serialize(inbox_message)
+            V1::MessageSerializer.serialize(inbox_message)
         end
 
     end

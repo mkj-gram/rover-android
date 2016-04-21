@@ -14,7 +14,7 @@ Sneakers.configure(
         connection: bunny,
         exchange_type: :direct,
         daemonize: false,
-        log: $stdout,
+        log: STDOUT,
         start_worker_delay: 1,
         workers: num_workers,
         pid_path: "pid/sneakers.pid",
@@ -27,9 +27,7 @@ Sneakers.configure(
         ack: true,
         heartbeat: 60,
         exchange: 'background_jobs',
-        hooks: {
-        }
+        hooks: {}
     }
 )
-
 Sneakers.logger.level = Logger::INFO

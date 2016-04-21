@@ -5,16 +5,22 @@ module Events
 
             attr_reader :message
 
+            # This handles both message templates and messages
+            # A ::Message is a rendered ::MessageTemplate for 1 user
+            # Analytics track ::MessageTemplates
+            #
             def initialize(event_attributes)
                 super
-                if event_attributes["message"]
-                    @message = event_attributes["message"]
+                if event_attributes["message_template"]
+                    @message_template = event_attributes["message_template"]
                 elsif event_attributes["message_id"]
-                    @message = ::Message.find_by_id(event_attributes["message_id"])
+                    @message = ::Message.find(event_attributes["message_id"])
                 end
 
             end
 
+
+            # TODO Change this to message_template
 
             def attributes
                 parent_attributes = super
