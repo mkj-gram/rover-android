@@ -1,9 +1,9 @@
 class IosPlatform < ActiveRecord::Base
     include Platformable
 
-    validate :valid_certificate
+    # validate :valid_certificate
 
-    before_create :set_app_identifier
+    before_save :set_app_identifier
 
     before_save :update_name_cache
 
@@ -32,6 +32,7 @@ class IosPlatform < ActiveRecord::Base
     private
 
     def apns_certificate
+        return nil if certificate.nil?
         @apns_certificate ||= ApnsCertificate.new(certificate, passphrase)
     end
 
@@ -48,7 +49,9 @@ class IosPlatform < ActiveRecord::Base
     end
 
     def set_app_identifier
-        self.bundle_id = apns_certificate.app_bundle_id
+        if apns_certificate
+            self.bundle_id = apns_certificate.app_bundle_id
+        end
     end
 
     def update_name_cache
