@@ -177,7 +177,7 @@ class SendMessageWorker
         apns_app = account.ios_platform
         gcm_app = account.android_platform
 
-        if apns_app
+        if apns_app && !apns_app.credentials.nil?
             apns_devices = devices.select(&:apns_device?)
             apns_devices_by_token = apns_devices.index_by(&:token)
             expired_tokens = send_apns_notification(apns_app, message_instance_by_token, apns_devices)
@@ -185,7 +185,7 @@ class SendMessageWorker
             ExpiredTokenHelper.expire_devices(expired_devices)
         end
 
-        if gcm_app
+        if gcm_app && !gcm_app.credentials.nil?
             gcm_devices = devices.select(&:gcm_device?)
             gcm_devices_by_token = gcm_devices.index_by(&:token)
             expired_tokens = send_gcm_notification(gcm_app, message_instance_by_token, gcm_devices)

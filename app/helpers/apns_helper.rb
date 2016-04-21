@@ -9,7 +9,7 @@ module ApnsHelper
 
             notifications = devices.map do |device|
                 puts payload_from_inbox_message(message_instance_by_token[device.token])
-                ApnsKit::Notification.new(token: device.token, content_available: true, data: payload_from_inbox_message(message_instance_by_token[device.token]))
+                ApnsKit::Notification.new(token: device.token, data: payload_from_inbox_message(message_instance_by_token[device.token]))
             end
 
             responses = client.send(notifications)
