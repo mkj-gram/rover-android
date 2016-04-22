@@ -94,6 +94,10 @@ class MessageTemplate < ActiveRecord::Base
         self[:archived] = val
     end
 
+    def stats
+        @stats ||= MessageTemplateStats.find(self.id)
+    end
+
     def schedule_start_date
         @schedule_start_date ||= if schedule_start_parsed_time
             Date.parse(schedule_start_parsed_time.to_s).to_s

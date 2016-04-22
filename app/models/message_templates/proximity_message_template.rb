@@ -33,7 +33,6 @@ class ProximityMessageTemplate < MessageTemplate
         published_was == false && archived_was == false
     end
 
-
     private
 
     def legal_trigger_event_id

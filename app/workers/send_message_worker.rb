@@ -136,7 +136,9 @@ class SendMessageWorker
             event.save
         end
 
-        MessageTemplateStats.update_counters(message_template.id, total_delivered: customers.size)
+        if !test_message
+            MessageTemplateStats.update_counters(message_template.id, total_delivered: customers.size)
+        end
 
 
         ##################################################################
