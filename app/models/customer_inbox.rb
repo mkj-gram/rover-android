@@ -37,13 +37,13 @@ class CustomerInbox
 
     def messages
         @messages ||= -> {
-            message_instance_ids = CustomerInbox.redis_client.lrange(inbox_key, 0, -1)
-            if message_instance_ids.empty?
+            message_ids = CustomerInbox.redis_client.lrange(inbox_key, 0, -1)
+            if message_ids.empty?
                 []
             else
-                MessageInstance.find(message_instance_ids)
+                Message.find(message_ids)
             end
-        }
+        }.call
     end
 
     def add_message(message_instance)
