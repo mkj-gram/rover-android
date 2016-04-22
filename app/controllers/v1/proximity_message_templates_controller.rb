@@ -182,8 +182,25 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     def render_proximity_message(message)
         should_include = ["beacons", "locations", "segment"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
 
+
+
+        extra_attributes = {:"targeted-configurations-count" => message.targeted_beacon_configurations_count}
+
+        message_template_stats = message.stats
+
+        if message_template_stats
+            extra_attributes.merge!(
+                {
+                    :"total-delivered" => message_template_stats.total_delivered,
+                    :"total-views" => message_template_stats.total_views,
+                    :"total-swipes" => message_template_stats.total_swipes,
+                    :"unique-views" => message_template_stats.unique_views
+                }
+            )
+        end
+
         json = {
-            data: serialize_message(message, {:"targeted-configurations-count" => message.targeted_beacon_configurations_count}),
+            data: serialize_message(message, extra_attributes),
             meta: {
                 totalConfigurationsCount: current_account.searchable_beacon_configurations_count # use searchable since we could be targeting shared beacons
             }
