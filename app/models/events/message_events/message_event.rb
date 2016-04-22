@@ -16,8 +16,10 @@ module Events
                 elsif event_attributes["message_id"]
                     @message = ::Message.find(event_attributes["message_id"])
                     @message_template_id = @message.message_template_id if @message
+                elsif event_attributes["message"]
+                    @message = event_attributes["message"]
+                    @message_template_id = @message.message_template_id if @message
                 end
-
             end
 
 
