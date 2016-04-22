@@ -136,6 +136,8 @@ module Events
             inbox_messages_to_deliver.each(&:save)
             local_messages_to_deliver.each(&:save)
 
+            inbox_messages_to_deliver.each{|message| track_delivered_message(message)}
+            local_messages_to_deliver.each{|message| track_delivered_message(message)}
             # add them to the included array for json output
             @included += inbox_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
             @included += local_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
@@ -150,7 +152,6 @@ module Events
         end
 
         def track_delivered_message(message)
-            message = message.is_a?(InboxMessage) ? message.message : message
             attributes = {
                 object: "message",
                 action: "delivered",
