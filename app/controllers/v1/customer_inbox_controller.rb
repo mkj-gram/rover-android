@@ -4,7 +4,7 @@ class V1::CustomerInboxController < V1::ApplicationController
 
     def show
 
-        messages = current_customer.inbox.messages
+        messages = current_customer.inbox.messages.reverse!
 
         json = {
             data: messages.map{|message| V1::MessageSerializer.serialize(message)}
