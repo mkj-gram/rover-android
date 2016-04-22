@@ -46,6 +46,7 @@ class MessageTemplate < ActiveRecord::Base
 
     after_initialize :set_proper_time_schedule_range
     after_initialize :set_defaults, unless: :persisted?
+    after_create :create_message_template_stats
 
     validates :title, presence: true
     validate :valid_date_schedule
@@ -379,4 +380,9 @@ class MessageTemplate < ActiveRecord::Base
             errors.add(:action, "invalid, must be of type (#{VALID_ACTIONS.to_a.join(', ')})")
         end
     end
+
+    def create_message_template_stats
+        MessageTemplateStats.create(message_template_id: self.id)
+    end
+
 end

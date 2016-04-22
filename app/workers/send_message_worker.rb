@@ -132,9 +132,11 @@ class SendMessageWorker
         ##################################################################
 
         customers.each do |customer|
-            event = Events::Pipeline.build("message", "delivered", {account: account, customer: customer, device: customer.devices.first, message_template: message_template})
+            event = Events::Pipeline.build("message", "delivered", {account: account, customer: customer, device: customer.devices.first, message_template: message_template, skip_message_stats: true})
             event.save
         end
+
+        MessageTemplateStats.update_counters(message_template.id, total_delivered: customers.size)
 
 
         ##################################################################

@@ -3,7 +3,7 @@ module Events
 
         class MessageEvent < Event
 
-            attr_reader :message
+            attr_reader :message, :message_template, :message_template_id
 
             # This handles both message templates and messages
             # A ::Message is a rendered ::MessageTemplate for 1 user
@@ -15,6 +15,7 @@ module Events
                     @message_template = event_attributes["message_template"]
                 elsif event_attributes["message_id"]
                     @message = ::Message.find(event_attributes["message_id"])
+                    @message_template_id = @message.message_template_id if @message
                 end
 
             end
