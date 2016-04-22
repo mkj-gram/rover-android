@@ -197,6 +197,15 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                     :"unique-views" => message_template_stats.unique_views
                 }
             )
+        else
+            extra_attributes.merge!(
+                {
+                    :"total-delivered" => 0,
+                    :"total-views" => 0,
+                    :"total-swipes" => 0,
+                    :"unique-views" => 0
+                }
+            )
         end
 
         json = {
