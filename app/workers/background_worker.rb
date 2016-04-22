@@ -18,11 +18,20 @@ module BackgroundWorker
 
     module Worker
         module ClassMethods
+
+            private
+
+            def worker_publisher
+                @worker_publisher ||= RabbitMQPublisher.new(queue_opts)
+            end
+
             def enqueue_message(message, options)
+                options.merge!(:content_type => 'application/json')
+                message = message.to_json
                 if BackgroundWorker.run_inline?
                     get_base_instance.work(message)
                 else
-                    RabbitMQPublisher.publish(message, options)
+                    worker_publisher.publish(message, options)
                 end
             end
 
@@ -31,9 +40,26 @@ module BackgroundWorker
             end
         end
 
+        module InstanceMethods
+
+            def work(msg)
+                decoded_message = JSON.parse(msg).with_indifferent_access
+                begin
+                    perform(decoded_message)
+                    return :ack
+                rescue Exception => e
+                    Rails.logger.info("FAILED: #{self.class.name} failed to perform #{msg}")
+                    raise e
+                end
+            end
+        end
+
         def self.included(receiver)
+            receiver.send :include, InstanceMethods
             receiver.extend         ClassMethods
             receiver.send :include, Sneakers::Worker
+
+
         end
     end
 

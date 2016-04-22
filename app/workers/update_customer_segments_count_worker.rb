@@ -10,11 +10,11 @@ class UpdateCustomerSegmentsCountWorker
     #     :timeout_job_after => 600
 
     def self.preform_async
-        msg = {}.to_json
+        msg = {}
         enqueue_message(msg, {to_queue: 'update_customer_segments_count'})
     end
 
-    def work(msg)
+    def perform(args)
         CustomerSegment.find_each(batch_size: 50) do |customer_segment|
             customer_segment.update_customers_count!
         end

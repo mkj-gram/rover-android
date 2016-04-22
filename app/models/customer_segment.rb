@@ -45,6 +45,8 @@ class CustomerSegment < ActiveRecord::Base
     end
 
 
-
+    def to_elasticsearch_query
+        CustomerFilter.to_elasticsearch_query(self.filters)
+    end
 
 end

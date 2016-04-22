@@ -14,6 +14,7 @@ class Account < ActiveRecord::Base
     after_create :create_active_configuration_uuids_index
     after_create :create_customer_elasticsearch_alias
     after_create :create_admin_role
+    after_create :create_platforms
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
@@ -56,6 +57,10 @@ class Account < ActiveRecord::Base
 
 
     has_many :gimbal_places
+
+    has_many :platforms
+    has_one :android_platform
+    has_one :ios_platform
 
     def location_bounding_box_suggestion
         query = {
@@ -138,5 +143,11 @@ class Account < ActiveRecord::Base
         admin_role.save
         self.update_attributes({default_user_role_id: admin_role.id})
     end
+
+    def create_platforms
+        IosPlatform.create(account_id: self.id, title: self.title)
+        AndroidPlatform.create(account_id: self.id, title: self.title)
+    end
+
 
 end

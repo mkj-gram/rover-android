@@ -12,11 +12,12 @@ class Customer
     field :tags, type: Array
     field :traits, type: Hash
     field :location, type: GeoPoint
+    field :inbox_updated_at, type: Time, default: -> { Time.zone.now }
 
     index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
     index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
     index({"account_id": 1, "traits": 1}, {partial_filter_expression: {"traits" => {"$exists" => true}}})
-
+    index({"devices.token": 1}, {unique: true, partial_filter_expression: {"devices.token" => {"$exists" => true}}})
     embeds_many :devices, class_name: "CustomerDevice"
 
     def self.search_string_mapping
@@ -103,11 +104,11 @@ class Customer
                 indexes :remote_notifications_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :location_monitoring_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :bluetooth_enabled, type: 'boolean', index: 'not_analyzed'
+                indexes :development, type: 'boolean', index: 'not_analyzed'
             end
         end
     end
 
-    # has_one :inbox, class_name: "CustomerInbox"
     validates :account_id, presence: true
     validates :email, email: { allow_blank: true }
     # where should we store counter cache? how do we?
@@ -122,7 +123,6 @@ class Customer
     end
 
     before_save :update_active_traits
-    after_create :create_inbox
     after_create :increment_customers_count, if: -> { indexable_customer? }
     after_destroy :decrement_customers_count
 
@@ -149,8 +149,8 @@ class Customer
 
 
 
-    def self.get_index_name(model)
-        account_id = model.is_a?(Customer) ? model.account_id : model.id
+    def self.get_index_name(arg)
+        account_id = arg.is_a?(Fixnum) ? arg : (arg.is_a?(Customer) ? arg.account_id : arg.id)
         return "customers_account_#{account_id}"
     end
 
@@ -168,6 +168,11 @@ class Customer
         ]
 
         mappings[:customer][:dynamic_templates] = dynamic_templates
+
+        force = opts.delete(:force)
+        if force && client.indices.exists?(index: Customer.index_name)
+            client.indices.delete(index: Customer.index_name)
+        end
 
         client.indices.create(index: Customer.index_name, body: {
                                 settings: settings.to_hash,
@@ -196,10 +201,7 @@ class Customer
     end
 
     def inbox
-        @inbox ||= CustomerInbox.find(self.id)
-        @inbox = CustomerInbox.create(customer_id: self.id) if @inbox.nil?
-        @inbox.customer = self
-        return @inbox
+        @inbox ||= CustomerInbox.new(self)
     end
 
     def gender=(val)

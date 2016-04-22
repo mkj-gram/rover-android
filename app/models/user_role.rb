@@ -35,20 +35,20 @@ class UserRole < ActiveRecord::Base
             customer_segment_update: true,
             customer_segment_destroy: true,
 
-            proximity_message_show: true,
-            proximity_message_create: true,
-            proximity_message_update: true,
-            proximity_message_destroy: true,
+            proximity_message_template_show: true,
+            proximity_message_template_create: true,
+            proximity_message_template_update: true,
+            proximity_message_template_destroy: true,
 
-            scheduled_message_show: true,
-            scheduled_message_create: true,
-            scheduled_message_update: true,
-            scheduled_message_destroy: true,
+            scheduled_message_template_show: true,
+            scheduled_message_template_create: true,
+            scheduled_message_template_update: true,
+            scheduled_message_template_destroy: true,
 
-            automated_message_show: true,
-            automated_message_create: true,
-            automated_message_update: true,
-            automated_message_destroy: true,
+            automated_message_template_show: true,
+            automated_message_template_create: true,
+            automated_message_template_update: true,
+            automated_message_template_destroy: true,
 
             third_party_integration_show: true,
             third_party_integration_create: true,
@@ -65,6 +65,11 @@ class UserRole < ActiveRecord::Base
             user_acl_create: true,
             user_acl_update: true,
             user_acl_destroy: true,
+
+            platform_show: true,
+            platform_create: true,
+            platform_update: true,
+            platform_destroy: true
         )
     end
 

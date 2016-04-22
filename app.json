@@ -1,72 +1,73 @@
 {
-  "name": "content-api",
-  "scripts": {
-  },
-  "env": {
-    "LANG": {
-      "required": true
+    "name": "content-api",
+    "scripts": {
+        "postdeploy": "bundle exec rake db:migrate"
     },
-    "RACK_ENV": {
-      "required": true
+    "env": {
+        "LANG": {
+            "required": true
+        },
+        "RACK_ENV": {
+            "required": true
+        },
+        "RAILS_ENV": {
+            "required": true
+        },
+        "RAILS_SERVE_STATIC_FILES": {
+            "required": true
+        },
+        "SECRET_KEY_BASE": {
+            "required": true
+        },
+        "SECRET_ENCRYPTION_KEY": {
+            "required": true
+        },
+        "POSTGRESQL_DB_USERNAME": {
+            "required": true
+        },
+        "POSTGRESQL_DB_PASSWORD": {
+            "required": true
+        },
+        "POSTGRESQL_DB_HOST": {
+            "required": true
+        },
+        "POSTGRESQL_DB_PORT": {
+            "required": true
+        },
+        "RABBITMQ_AMQP": {
+            "required": true
+        },
+        "MAILGUN_API_KEY": {
+            "required": true
+        },
+        "MAILGUN_API_URL": {
+            "required": true
+        },
+        "PASSWORD_RESET_HOST": {
+            "required": true
+        },
+        "ELASTICSEARCH_URLS": {
+            "required": true
+        },
+        "MONGODB_URI": {
+            "required": true
+        },
+        "MONGODB_SSL_CERT": {
+            "required": true
+        },
+        "ANALYTICS_SHARED_KEY": {
+            "required": true
+        },
+        "REDISCLOUD_URL": {
+            "required": true
+        },
+        "TD_AGENT_CONF_PATH": {
+            "required": true
+        }
     },
-    "RAILS_ENV": {
-      "required": true
-    },
-    "RAILS_SERVE_STATIC_FILES": {
-      "required": true
-    },
-    "SECRET_KEY_BASE": {
-      "required": true
-    },
-    "SECRET_ENCRYPTION_KEY": {
-      "required": true
-    },
-    "POSTGRESQL_DB_USERNAME": {
-      "required": true
-    },
-    "POSTGRESQL_DB_PASSWORD": {
-      "required": true
-    },
-    "POSTGRESQL_DB_HOST": {
-      "required": true
-    },
-    "POSTGRESQL_DB_PORT": {
-      "required": true
-    },
-    "RABBITMQ_AMQP": {
-      "required": true
-    },
-    "MAILGUN_API_KEY": {
-        "required": true
-    },
-    "MAILGUN_API_URL": {
-        "required": true
-    },
-    "PASSWORD_RESET_HOST": {
-      "required": true
-    },
-    "ELASTICSEARCH_URLS": {
-      "required": true
-    },
-    "MONGODB_URI": {
-      "required": true
-    },
-    "MONGODB_SSL_CERT": {
-      "required": true
-    },
-    "ANALYTICS_SHARED_KEY": {
-      "required": true
-    },
-    "REDISCLOUD_URL": {
-      "required": true
-    },
-    "TD_AGENT_CONF_PATH": {
-      "required": true
-    }
-  },
-  "addons": [
-    "bonsai",
-    "cloudamqp",
-    "rediscloud"
-  ]
+    "addons": [
+        "bonsai",
+        "cloudamqp",
+        "rediscloud"
+    ]
 }

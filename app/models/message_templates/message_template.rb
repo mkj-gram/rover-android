@@ -1,4 +1,4 @@
-class Message < ActiveRecord::Base
+class MessageTemplate < ActiveRecord::Base
     include Elasticsearch::Model
     include Elasticsearch::Model::Callbacks
     include FormattableMessage
@@ -8,6 +8,8 @@ class Message < ActiveRecord::Base
     # belongs_to :account
     # doesn't make sense but thats how rails structures relationships
     belongs_to :customer_segment
+
+    belongs_to :account
 
     message_attribute :notification_text
 
@@ -44,16 +46,13 @@ class Message < ActiveRecord::Base
 
     after_initialize :set_proper_time_schedule_range
     after_initialize :set_defaults, unless: :persisted?
+    after_create :create_message_template_stats
 
     validates :title, presence: true
     validate :valid_date_schedule
 
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
-
-    validate :valid_action
-
-    VALID_ACTIONS = Set.new(["link", "landing-page", "experience"])
 
     def as_indexed_json(opts = {})
         {
@@ -65,23 +64,23 @@ class Message < ActiveRecord::Base
             created_at: self.created_at,
         }
     end
-    def to_inbox_message(opts)
-        @inbox_message ||= -> {
-            inbox_message = InboxMessage.new(
-                {
-                    title: self.title,
-                    message_id: self.id,
-                    notification_text: formatted_message(opts),
-                    read: false,
-                    saved_to_inbox: self.save_to_inbox,
-                    action: self.action,
-                    action_url: self.action_url,
-                    timestamp: Time.now
-                }
-            )
-            inbox_message.message = self
-            return inbox_message
-        }.call
+
+    def render_message(customer, opts = {})
+        opts = opts.merge(customer: customer)
+        Message.new(
+            {
+                message_template: self,
+                customer: customer,
+                notification_text: self.notification_text,
+                read: false,
+                saved_to_inbox: self.save_to_inbox,
+                content_type: self.content_type,
+                website_url: self.website_url,
+                timestamp: Time.zone.now,
+                ios_title: get_ios_title.to_s,
+                android_title: get_android_title.to_s
+            }
+        )
     end
 
     def archived=(val)
@@ -89,6 +88,10 @@ class Message < ActiveRecord::Base
             self.published = false
         end
         self[:archived] = val
+    end
+
+    def stats
+        @stats ||= MessageTemplateStats.find(self.id)
     end
 
     def schedule_start_date
@@ -179,7 +182,6 @@ class Message < ActiveRecord::Base
             end_date = Float::INFINITY
         end
 
-        puts "start_date #{start_date} end_date #{end_date}"
         self.date_schedule = Range.new(start_date, end_date)
     end
 
@@ -192,6 +194,10 @@ class Message < ActiveRecord::Base
 
     def apply_configuration_filters(configuration)
         filter_location(configuration) && filter_beacon_configuration(configuration)
+    end
+
+    def approximate_customers_count
+        return self.customer_segment ? self.customer_segment.customers_count : self.account.customers_count
     end
 
     def within_customer_segment(customer, device)
@@ -305,11 +311,19 @@ class Message < ActiveRecord::Base
                     }
                 }
             }
-            @cached_targeted_beacon_configurations_count = Elasticsearch::Model.search(query, [::BeaconConfiguration], {search_type: "count"}).response.hits.total
+            @cached_targeted_beacon_configurations_count = Elasticsearch::Model.client.count(index: BeaconConfiguration.index_name, body: query)["count"]
             return @cached_targeted_beacon_configurations_count
         else
             account.beacon_configurations_count
         end
+    end
+
+    def get_ios_title
+        self.ios_title ? self.ios_title : self.account.ios_platform_name
+    end
+
+    def get_android_title
+        self.android_title ? self.android_title : self.account.android_platform_name
     end
 
     private
@@ -360,10 +374,8 @@ class Message < ActiveRecord::Base
         end
     end
 
-
-    def valid_action
-        if published && self.action && !VALID_ACTIONS.include?(self.action)
-            errors.add(:action, "invalid, must be of type (#{VALID_ACTIONS.to_a.join(', ')})")
-        end
+    def create_message_template_stats
+        MessageTemplateStats.create(message_template_id: self.id)
     end
+
 end

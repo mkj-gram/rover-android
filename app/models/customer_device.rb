@@ -19,6 +19,7 @@ class CustomerDevice
     field :remote_notifications_enabled, type: Boolean
     field :bluetooth_enabled, type: Boolean
     field :location_monitoring_enabled, type: Boolean
+    field :development, type: Boolean, default: false
     field :aid, type: String
 
     embedded_in :customer
@@ -59,7 +60,8 @@ class CustomerDevice
             local_notifications_enabled: self.local_notifications_enabled,
             remote_notifications_enabled: self.remote_notifications_enabled,
             location_monitoring_enabled: self.location_monitoring_enabled,
-            bluetooth_enabled: self.bluetooth_enabled
+            bluetooth_enabled: self.bluetooth_enabled,
+            development: self.development
         }
     end
 
@@ -75,8 +77,20 @@ class CustomerDevice
         device_type == IOS_DEVICE
     end
 
+    def apns_device?
+        ios?
+    end
+
     def android?
         device_type == ANDROID_DEVICE
+    end
+
+    def gcm_device?
+        android?
+    end
+
+    def development_device?
+        self.development
     end
 
     private

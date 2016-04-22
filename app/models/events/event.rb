@@ -12,6 +12,10 @@ module Events
         attr_reader :messages
         # attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
 
+        def self.event_id
+            Events::Constants::UNKNOWN_EVENT_ID
+        end
+
         def initialize(event_attributes)
             @id = SecureRandom.uuid
             @account = event_attributes[:account]
@@ -20,7 +24,6 @@ module Events
             @customer = event_attributes[:customer]
             @device = event_attributes[:device]
             @generation_time = get_time(event_attributes[:time])
-            Rails.logger.debug("Customers time is #{@generation_time}")
             @included = []
             @messages = []
         end
@@ -66,6 +69,10 @@ module Events
 
 
         def save
+            if self.class.event_id == Events::Constants::UNKNOWN_EVENT_ID
+                Rails.logger.info("An event #{object}, #{action} was not recorded")
+                return true
+            end
             # save works the opposite way than to_json
             # it bubbles up from the children appending their attributes
             run_callbacks :save do
@@ -104,32 +111,47 @@ module Events
             }.call
         end
 
-        def deliver_messages(messages)
-            inbox_messages, local_messages = messages.partition(&:save_to_inbox)
+        def deliver_messages(message_templates)
+            # messages is of type ::Messages
+            # see if all pass rate limit
+            # convert all to message instances
+            # create each one
+            # add them to the included array
+            # track messages
+            message_templates.each {|template| template.account = account }
+            inbox_messages, local_messages = message_templates.partition(&:save_to_inbox)
+
 
             # first filter them
             inbox_messages_to_deliver = inbox_messages.select{|message| MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)}
             local_messages_to_deliver = local_messages.select{|message| MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)}
 
-            # map them to inbox messages
-            inbox_messages_to_deliver = inbox_messages_to_deliver.map{|message| message.to_inbox_message(message_opts)}
-            local_messages_to_deliver = local_messages_to_deliver.map{|message| message.to_inbox_message(message_opts)}
 
+            # map them to inbox messages
+            inbox_messages_to_deliver = inbox_messages_to_deliver.map{|message_template| message_template.render_message(customer, message_opts)}
+            local_messages_to_deliver = local_messages_to_deliver.map{|message_template| message_template.render_message(customer, message_opts)}
+
+
+            # save all the messages
+            inbox_messages_to_deliver.each(&:save)
+            local_messages_to_deliver.each(&:save)
+
+            inbox_messages_to_deliver.each{|message| track_delivered_message(message)}
+            local_messages_to_deliver.each{|message| track_delivered_message(message)}
             # add them to the included array for json output
-            @included += inbox_messages_to_deliver.map{|message| V1::InboxMessageSerializer.serialize(message)}
-            @included += local_messages_to_deliver.map{|message| V1::InboxMessageSerializer.serialize(message)}
-            # track them in the analytics
-            track_delivered_messages(inbox_messages_to_deliver)
-            track_delivered_messages(local_messages_to_deliver)
+            @included += inbox_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
+            @included += local_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
+
 
         end
+
+        # TODO Fix this!
 
         def track_delivered_messages(messages)
             messages.each{ |message| track_delivered_message(message) }
         end
 
         def track_delivered_message(message)
-            message = message.is_a?(InboxMessage) ? message.message : message
             attributes = {
                 object: "message",
                 action: "delivered",
@@ -241,19 +263,13 @@ module Events
 
         def get_time(time)
             if time.nil?
-                Time.now
+                Time.zone.now
             elsif time.is_a?(Integer)
-                Time.at(time)
+                Time.zone.at(time)
             elsif time.is_a?(Float)
-                Time.at(time)
+                Time.zone.at(time)
             else
-                # remove the timezone
-                matches = TIME_REGEX.match(time)
-                if matches.size == 1
-                    Time.parse(matches[0])
-                else
-                    Time.now
-                end
+                Time.zone.parse(time)
             end
         end
     end

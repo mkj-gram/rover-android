@@ -19,8 +19,9 @@ module RailsApi
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('lib')
-        config.autoload_paths << Rails.root.join('app', 'models', 'messages')
+        config.autoload_paths << Rails.root.join('app', 'models', 'message_templates')
         config.autoload_paths << Rails.root.join('app', 'models', 'configuration_visits')
+        config.autoload_paths << Rails.root.join('app', 'models', 'platforms')
         # config.autoload_paths << Rails.root.join('app', 'models', 'events')
         # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'location_events')
         # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'beacon_region_events')
@@ -48,10 +49,12 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib', 'kontakt_api')
         config.autoload_paths << Rails.root.join('lib', 'events_logger')
         config.autoload_paths << Rails.root.join('lib', 'gimbal_api')
-
+        config.autoload_paths << Rails.root.join('lib', 'time_zone_offset')
         config.autoload_paths << Rails.root.join('app', 'workers')
-        config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
 
+
+        config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
+        config.eager_load_paths << Rails.root.join('app', 'models', 'events')
 
         # Core Extensions
         config.autoload_paths << Rails.root.join('lib', "core_ext")
@@ -78,16 +81,4 @@ require 'iso_639'
 require 'iso_3166'
 
 # first require the event then require everything else
-require Rails.root.join("app", "models", "events", "events.rb").to_s
-require Rails.root.join("app", "models", "events", "constants.rb").to_s
-require Rails.root.join("app", "models", "events", "event.rb").to_s
-require Rails.root.join("app", "models", "events", "pipeline.rb").to_s
-
-Dir[Rails.root.join("app", "models", "events", "*")].each do |event_subdir|
-    next if !File.directory?(event_subdir)
-    parent_file_name = File.join(event_subdir, File.basename(event_subdir).singularize + ".rb")
-    require parent_file_name
-    children = Dir[File.join(event_subdir, "*")].each do |child_filename|
-        require child_filename
-    end
-end
+# require Rails.root.join("app", "models", "events", "events.rb").to_s
