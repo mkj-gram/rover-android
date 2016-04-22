@@ -13,8 +13,8 @@ class Message
     field :read, type: Boolean, default: false
     field :viewed, type: Boolean, default: false
     field :saved_to_inbox, type: Boolean, default: true
-    field :action, type: String
-    field :action_url, type: String
+    field :content_type, type: String
+    field :website_url, type: String
     field :timestamp, type: Time , default: -> { Time.zone.now }
     field :expire_at, type: Time
 

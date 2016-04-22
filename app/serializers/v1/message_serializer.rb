@@ -11,8 +11,8 @@ module V1::MessageSerializer
                     :"tags" => message.tags,
                     :"read" => message.read,
                     :"saved-to-inbox" => message.saved_to_inbox,
-                    :"action" => message.action,
-                    :"action-url" => message.action_url,
+                    :"content-type" => message.content_type,
+                    :"website-url" => message.website_url,
                     :"timestamp" => message.timestamp.iso8601(3)
                 }
             }

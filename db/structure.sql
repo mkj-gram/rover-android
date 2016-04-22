@@ -621,8 +621,8 @@ CREATE TABLE message_templates (
     filter_location_tags character varying[],
     filter_location_ids integer[],
     filter_gimbal_place_id character varying,
-    action character varying,
-    action_url character varying,
+    content_type character varying,
+    website_url character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     scheduled_at timestamp without time zone,
@@ -1848,4 +1848,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160421134707');
 INSERT INTO schema_migrations (version) VALUES ('20160421140310');
 
 INSERT INTO schema_migrations (version) VALUES ('20160421173623');
+
+INSERT INTO schema_migrations (version) VALUES ('20160422184350');
 

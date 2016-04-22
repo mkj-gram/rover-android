@@ -24,7 +24,7 @@ module Events
 
             def update_delivered_stats
                 if !skip_message_stats && message_template_id
-                    MessageTemplateStats.update_counters(message_template_id, delivered_count: 1)
+                    MessageTemplateStats.update_counters(message_template_id, total_delivered: 1)
                 end
             end
 

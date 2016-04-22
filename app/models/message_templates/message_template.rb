@@ -54,10 +54,6 @@ class MessageTemplate < ActiveRecord::Base
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
 
-    validate :valid_action
-
-    VALID_ACTIONS = Set.new(["link", "landing-page", "experience"])
-
     def as_indexed_json(opts = {})
         {
             account_id: self.account_id,
@@ -78,8 +74,8 @@ class MessageTemplate < ActiveRecord::Base
                 notification_text: self.notification_text,
                 read: false,
                 saved_to_inbox: self.save_to_inbox,
-                action: self.action,
-                action_url: self.action_url,
+                content_type: self.content_type,
+                website_url: self.website_url,
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s
@@ -375,13 +371,6 @@ class MessageTemplate < ActiveRecord::Base
             !location.nil? && filter_location_ids.include?(location.id)
         else
             true
-        end
-    end
-
-
-    def valid_action
-        if published && self.action && !VALID_ACTIONS.include?(self.action)
-            errors.add(:action, "invalid, must be of type (#{VALID_ACTIONS.to_a.join(', ')})")
         end
     end
 
