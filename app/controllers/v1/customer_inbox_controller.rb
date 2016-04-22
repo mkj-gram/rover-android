@@ -4,7 +4,7 @@ class V1::CustomerInboxController < V1::ApplicationController
 
     def show
 
-        message = current_customer.inbox.messages
+        messages = current_customer.inbox.messages
 
         json = {
             data: messages.map{|message| V1::MessageInstanceSerializer.serialize(message)}
