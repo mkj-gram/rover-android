@@ -126,9 +126,15 @@ module Events
             inbox_messages_to_deliver = inbox_messages.select{|message| MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)}
             local_messages_to_deliver = local_messages.select{|message| MessageRateLimit.add_message(message, customer, message.limits, account.message_limits)}
 
+
             # map them to inbox messages
             inbox_messages_to_deliver = inbox_messages_to_deliver.map{|message_template| message_template.render_message(customer, message_opts)}
             local_messages_to_deliver = local_messages_to_deliver.map{|message_template| message_template.render_message(customer, message_opts)}
+
+
+            # save all the messages
+            inbox_messages_to_deliver.each(&:save)
+            local_messages_to_deliver.each(&:save)
 
             # add them to the included array for json output
             @included += inbox_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
