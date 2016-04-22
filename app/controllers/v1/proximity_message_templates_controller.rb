@@ -301,6 +301,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def serialize_message(message, extra_attributes = {})
+        message.account = current_account
         {
             type: "proximity-messages",
             id: message.id.to_s,
