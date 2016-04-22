@@ -33,6 +33,16 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             )
         end
 
+        if !query_published.nil?
+            must_filter.push(
+                {
+                    term: {
+                        published: query_published
+                    }
+                }
+            )
+        end
+
 
 
         query = {
@@ -281,7 +291,13 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def query_archived
-        params.fetch(:filter, {}).fetch(:archived, "false").to_bool
+        query = params.dig(:filter, :archived)
+        return query.nil? ? nil : query.to_s.to_bool
+    end
+
+    def query_published
+        query = params.dig(:filter, :published)
+        return query.nil? ? nil : query.to_s.to_bool
     end
 
     def serialize_message(message, extra_attributes = {})
