@@ -28,18 +28,18 @@ module Events
             def attributes
                 parent_attributes = super
 
-                if message
-                    parent_attributes.merge!(
-                        {
-                            message: {
-                                id: message.id,
-                                type: message.type,
-                                save_to_inbox: message.save_to_inbox,
-                                tags: message.tags
-                            }
-                        }
-                    )
-                end
+                # if message
+                #     parent_attributes.merge!(
+                #         {
+                #             message: {
+                #                 id: message.id,
+                #                 type: message.type,
+                #                 save_to_inbox: message.save_to_inbox,
+                #                 tags: message.tags
+                #             }
+                #         }
+                #     )
+                # end
 
                 return parent_attributes
             end
