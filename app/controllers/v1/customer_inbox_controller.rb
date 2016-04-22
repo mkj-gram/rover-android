@@ -7,7 +7,7 @@ class V1::CustomerInboxController < V1::ApplicationController
         messages = current_customer.inbox.messages
 
         json = {
-            data: messages.map{|message| V1::MessageInstanceSerializer.serialize(message)}
+            data: messages.map{|message| V1::MessageSerializer.serialize(message)}
         }
 
         render json: json
