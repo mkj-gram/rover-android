@@ -340,10 +340,10 @@ namespace :account do
                     tags: configuration_tags.sample(rand(4))
                 )
 
-                message = ProximityMessage.new(
+                message = ProximityMessageTemplate.new(
                     {
                         "account_id"=> @account.id,
-                        "type"=>"ProximityMessage",
+                        "type"=>"ProximityMessageTemplate",
                         "title"=>"Recipes for the BBQ Season",
                         "notification_text"=>"Get Great recipes of this bbq seaon",
                         "published"=>true,
@@ -370,10 +370,10 @@ namespace :account do
                 )
                 message.save
 
-                message = ProximityMessage.new(
+                message = ProximityMessageTemplate.new(
                     {
                         "account_id"=>@account.id,
-                        "type"=>"ProximityMessage",
+                        "type"=>"ProximityMessageTemplate",
                         "title"=>"In-Store Samples",
                         "notification_text"=>"Don't miss this afternoon's in-store samples for VH Sweet and Sour Chicken and Vitamin Water",
                         "published"=>true,
@@ -408,10 +408,10 @@ namespace :account do
                     }
                 )
 
-                message = ProximityMessage.new(
+                message = ProximityMessageTemplate.new(
                     {
                         "account_id"=>@account.id,
-                        "type"=>"ProximityMessage",
+                        "type"=>"ProximityMessageTemplate",
                         "title"=>"Superbowl Weekend",
                         "notification_text"=>"It's Superbowl Weekend! Stock up on all the essential snacking and dining supplies for you party",
                         "published"=>true,
@@ -445,11 +445,11 @@ namespace :account do
                         "filters"=>[{"model"=>"customer", "attribute"=>"gender", "comparer"=>{"method"=>"equal", "value"=>"female"}}],
                     }
                 )
-                message = ProximityMessage.new(
+                message = ProximityMessageTemplate.new(
 
                     {
                         "account_id"=>@account.id,
-                        "type"=>"ProximityMessage",
+                        "type"=>"ProximityMessageTemplate",
                         "title"=>"Bakery Deals",
                         "notification_text"=>"Save on Dempster's Gluten-Free Ancient Grain products",
                         "published"=>true,
@@ -477,10 +477,10 @@ namespace :account do
                 )
                 message.save
 
-                message = ProximityMessage.new(
+                message = ProximityMessageTemplate.new(
                     {
                         "account_id"=>@account.id,
-                        "type"=>"ProximityMessage",
+                        "type"=>"ProximityMessageTemplate",
                         "title"=>"Thanks for visiting",
                         "notification_text"=>"Thanks for visiting! Gas up on the way home with $5 off coupon at Teaxo",
                         "published"=>true,

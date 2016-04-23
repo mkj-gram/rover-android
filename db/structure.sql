@@ -1626,13 +1626,6 @@ CREATE INDEX index_locations_on_account_id_and_tags ON locations USING gin (acco
 
 
 --
--- Name: index_messages_on_account_id_type_published_trigger_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_messages_on_account_id_type_published_trigger_event_id ON message_templates USING btree (account_id, type, published, trigger_event_id) WHERE ((published = true) AND ((type)::text = 'ProximityMessage'::text));
-
-
---
 -- Name: index_password_resets_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1651,6 +1644,13 @@ CREATE UNIQUE INDEX index_password_resets_on_token ON password_resets USING btre
 --
 
 CREATE INDEX index_password_resets_on_user_id ON password_resets USING btree (user_id);
+
+
+--
+-- Name: index_published_proximity_messages_by_trigger_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_published_proximity_messages_by_trigger_event_id ON message_templates USING btree (account_id, type, published, trigger_event_id) WHERE ((published = true) AND ((type)::text = 'ProximityMessageTemplate'::text));
 
 
 --
@@ -1850,4 +1850,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160421140310');
 INSERT INTO schema_migrations (version) VALUES ('20160421173623');
 
 INSERT INTO schema_migrations (version) VALUES ('20160422184350');
+
+INSERT INTO schema_migrations (version) VALUES ('20160423104812');
 

@@ -71,7 +71,7 @@ module Events
             end
 
             def get_message_for_location(location_configuration)
-                messages = ProximityMessage.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
+                messages = ProximityMessageTemplate.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
                 # apply all filters
                 current_time = DateTime.now
                 messages.select do |message|

@@ -10,7 +10,7 @@ module Events
             private
 
             def messages
-                @messages ||= ProximityMessage.where(account_id: account.id, trigger_event_id: self.class.event_id)
+                @messages ||= ProximityMessageTemplate.where(account_id: account.id, trigger_event_id: self.class.event_id)
             end
         end
 
