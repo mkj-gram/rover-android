@@ -93,6 +93,25 @@ class CustomerDevice
         self.development
     end
 
+    def message_attributes
+        {
+            "locale-lang" => locale_lang,
+            "locale-region" => locale_region,
+            "time-zone" => time_zone,
+            "sdk-version" => sdk_version,
+            "platform" => platform,
+            "os-name" => os_name,
+            "os-version" => os_version,
+            "model" => model,
+            "manufacturer" => manufacturer,
+            "carrier" => carrier,
+            "background-enabled" => background_enabled,
+            "remote-notifications-enabled" => remote_notifications_enabled,
+            "bluetooth-enabled" => bluetooth_enabled,
+            "location-monitoring-enabled" => location_monitoring_enabled
+        }
+    end
+
     private
 
     def valid_time_zone

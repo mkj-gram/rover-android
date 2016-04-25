@@ -147,6 +147,22 @@ class BeaconConfiguration < ActiveRecord::Base
         return @devices_meta
     end
 
+    def message_attributes
+        {
+            "name" => title,
+            "tags" => tags,
+            "enabled" => enabled,
+            "shared" => shared,
+            "uuid" => uuid,
+            "major-number" => major,
+            "minor-number" => minor,
+            "namespace" => namespace,
+            "instance-id" => instance_id,
+            "url" => url
+        }
+    end
+
+
     protected
 
     def location_exists

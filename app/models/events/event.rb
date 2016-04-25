@@ -97,19 +97,16 @@ module Events
 
 
         def message_opts
-            @message_opts ||= -> {
-                opts = {}
-                if customer
-                    opts.merge!(customer.attributes.inject({}){ |hash, (k,v)| hash.merge("customer.#{k}" => v)})
-                end
+            return @message_opts if @message_opts
+            opts = {}
 
-                if device
-                    opts.merge!(device.attributes.inject({}){|hash, (k,v)| hash.merge("device.#{k}" => v)})
-                end
+            if device
+                opts.merge!(device.message_attributes.inject({}){|hash, (k,v)| hash.merge("device.#{k}" => v)})
+            end
 
-                return opts
-            }.call
+            @message_opts = opts
         end
+
 
         def deliver_messages(message_templates)
             # messages is of type ::Messages

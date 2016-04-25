@@ -66,12 +66,12 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def render_message(customer, opts = {})
-        opts = opts.merge(customer: customer)
+        opts = opts.merge(customer: customer.attributes)
         Message.new(
             {
                 message_template: self,
                 customer: customer,
-                notification_text: self.notification_text,
+                notification_text: formatted_message(opts),
                 read: false,
                 saved_to_inbox: self.save_to_inbox,
                 content_type: self.content_type,

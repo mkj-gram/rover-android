@@ -59,6 +59,17 @@ module Events
                 return json
             end
 
+            def message_opts
+                @message_opts if @message_opts
+                opts = super
+
+                if location
+                    opts.merge!(location.message_attributes.inject({}){|hash, (k,v)| hash.merge("location.#{k}" => v)})
+                end
+
+                @message_opts = opts
+            end
+
             private
 
             def save_messages_to_inbox

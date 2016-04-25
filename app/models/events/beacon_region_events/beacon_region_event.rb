@@ -25,7 +25,7 @@ module Events
                 else
                     BeaconConfiguration::NO_PROTOCOL
                 end
-
+                puts @uuid, @major, @minor
             end
 
             def attributes
@@ -99,6 +99,20 @@ module Events
                 return json
             end
 
+            def message_opts
+                @message_opts if @message_opts
+                opts = super
+
+                if beacon_configuration
+                    opts.merge!(beacon_configuration.message_attributes.inject({}){|hash, (k,v)| hash.merge("configuration.#{k}" => v)})
+                end
+
+                if location
+                    opts.merge!(location.message_attributes.inject({}){|hash, (k,v)| hash.merge("location.#{k}" => v)})
+                end
+
+                @message_opts = opts
+            end
 
             private
 
@@ -167,6 +181,7 @@ module Events
                     "enabled" => beacon_configuration.enabled
                 }.merge(beacon_configuration.configuration_attributes)
             end
+
         end
     end
 end

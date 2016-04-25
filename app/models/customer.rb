@@ -196,6 +196,17 @@ class Customer
         )
     end
 
+    def message_attributes
+        {
+            "name" => name,
+            "email" => email,
+            "phone-number" => phone_number,
+            "age" => age,
+            "gender" => gender,
+            "traits" => traits
+        }
+    end
+
     def indexable_customer?
         (!self.identifier.nil?) || (self.identifier.nil? && devices.any?)
     end

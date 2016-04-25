@@ -114,6 +114,20 @@ class Location < ActiveRecord::Base
         "#{self.address} #{self.city} #{self.province} #{self.postal_code} #{self.country}"
     end
 
+    def message_attributes
+        {
+            "name" => title,
+            "tags" => tags,
+            "shared" => shared,
+            "address" => address,
+            "city" => city,
+            "province" => province,
+            "country" => country,
+            "postal-code" => postal_code,
+            "formatted-address" => formatted_address
+        }
+    end
+
     private
 
     def increment_account_locations_count
