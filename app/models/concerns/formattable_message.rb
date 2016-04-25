@@ -4,7 +4,7 @@ module FormattableMessage
     # needs the column to work with
     # example "hello @{customer_name, airmiles user} welcome to the acc"
 
-    MESSAGE_FORMAT_REGEX = /\{[a-zA-Z\_\.\,0-9]*\}/
+    MESSAGE_FORMAT_REGEX = /\{[a-zA-Z\_0-9\.\,\s\-]*\}/
 
     included do
         class_attribute :_formattable_message_attribute

@@ -198,6 +198,7 @@ class Customer
 
     def message_attributes
         {
+            "identifier" => identifier,
             "name" => name,
             "email" => email,
             "phone-number" => phone_number,
