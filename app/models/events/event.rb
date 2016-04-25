@@ -100,6 +100,10 @@ module Events
             return @message_opts if @message_opts
             opts = {}
 
+            if customer
+                opts.merge!(customer.message_attributes.inject({}){|hash, (k,v)| hash.merge("customer.#{k}" => v)})
+            end
+
             if device
                 opts.merge!(device.message_attributes.inject({}){|hash, (k,v)| hash.merge("device.#{k}" => v)})
             end

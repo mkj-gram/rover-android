@@ -66,7 +66,6 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def render_message(customer, opts = {})
-        opts = opts.merge(customer: customer.attributes)
         Message.new(
             {
                 message_template: self,
