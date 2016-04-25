@@ -38,7 +38,7 @@ class V1::EventsController < V1::ApplicationController
     def get_customer_and_device(user_attributes, device_attributes)
         # first check to see if a customer has the device
         # device_udid = device_attributes[:udid]
-
+        user_attributes[:identifier] = nil if !user_attributes[:identifier].nil? && user_attributes[:identifier].empty?
         customer = current_customer
 
         if customer.nil?

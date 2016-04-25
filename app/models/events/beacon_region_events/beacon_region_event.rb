@@ -35,6 +35,7 @@ module Events
                         {
                             configuration: {
                                 id: beacon_configuration.id,
+                                title: beacon_configuration.title,
                                 protocol: beacon_configuration.protocol,
                                 tags: beacon_configuration.tags,
                                 shared: beacon_configuration.shared,
