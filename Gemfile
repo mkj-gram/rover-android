@@ -70,6 +70,8 @@ gem 'gcm', '~> 0.1.1'
 
 gem 'apns_kit', '~> 0.1.1'
 
+gem 'librato-rails', '~> 1.3'
+
 group :development do
 
 

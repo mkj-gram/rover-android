@@ -1,0 +1,7 @@
+production:
+  user: <%= ENV['LIBRATO_USER'] %>
+  token: <%= ENV['LIBRATO_TOKEN'] %>
+
+development:
+  user: <%= ENV['LIBRATO_USER'] || 'sean@rover.io' %>
+  token: <%= ENV['LIBRATO_TOKEN'] || '73134454266df4e7c77fa9ec85010834794729c2109918a7ab65dcb2895c96b7' %>
