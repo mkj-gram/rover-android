@@ -3,6 +3,8 @@ class V1::EventsController < V1::ApplicationController
     before_action :validate_json_schema
     before_action :device_id_header_present
 
+    instrument_action :create
+
     def create
         json = flatten_request({single_record: true, except: "attributes.user.traits"})
 
