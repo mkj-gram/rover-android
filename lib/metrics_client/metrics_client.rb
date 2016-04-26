@@ -30,9 +30,8 @@ module MetricsClient
                 config = ::Librato::Rails::Configuration.new
                 Librato::Metrics.authenticate(config.user, config.token)
                 flush_interval = config.flush_interval || 60
-                puts ::Librato::Metrics.client
-                @queue = ::Librato::Metrics::Queue.new(autosubmit_interval: flush_interval, prefix: config.prefix)
-                @aggregator = ::Librato::Metrics::Aggregator.new(autosubmit_interval: flush_interval, prefix: config.prefix)
+                @queue = ::Librato::Metrics::Queue.new(autosubmit_interval: flush_interval, prefix: config.prefix, source: config.source)
+                @aggregator = ::Librato::Metrics::Aggregator.new(autosubmit_interval: flush_interval, prefix: config.prefix, source: config.source)
             }
         end
 
