@@ -81,6 +81,9 @@ module Events
                 EventsLogger.log(account.id, generation_time, attributes)
             end
 
+            MetricsClient.queue.add("events.#{object}.#{action}" => { type: :counter, value: 1 })
+            MetricsClient.queue.add("events.#{object}.#{action}" => { type: :counter, value: 1, source: "account_#{account.id}" })
+
         end
 
         def today_schedule_column
@@ -119,6 +122,12 @@ module Events
             # create each one
             # add them to the included array
             # track messages
+            #
+            message_templates.each do |template|
+                MetricsClient.queue.add("#{template.metric_type}.delivered" => { type: :counter, value: 1 })
+                MetricsClient.queue.add("#{template.metric_type}.delivered" => { type: :counter, value: 1, source: "account_#{account.id}" })
+            end
+
             message_templates.each {|template| template.account = account }
             inbox_messages, local_messages = message_templates.partition(&:save_to_inbox)
 

@@ -52,7 +52,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib', 'time_zone_offset')
         config.autoload_paths << Rails.root.join('app', 'workers')
 
-
+        config.eager_load_paths << Rails.root.join('lib', 'metrics_client')
         config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
         config.eager_load_paths << Rails.root.join('app', 'models', 'events')
 

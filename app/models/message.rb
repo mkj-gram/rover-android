@@ -44,6 +44,10 @@ class Message
         @message_template ||= MessageTemplate.find_by_id(message_template_id)
     end
 
+    def metric_type
+        "message_template.root"
+    end
+
     private
 
     # We expire messages which aren't saved to the inbox

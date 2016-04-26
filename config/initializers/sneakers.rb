@@ -7,7 +7,7 @@ else
     bunny = Bunny.new(opts["amqp"], vhost: "/")
 end
 
-num_workers = ENV['WEB_CONCURRENCY'].nil? ? 4 : ENV['WEB_CONCURRENCY'].to_i
+num_workers = ENV['WEB_CONCURRENCY'].nil? ? 2 : ENV['WEB_CONCURRENCY'].to_i
 
 Sneakers.configure(
     {
@@ -27,7 +27,8 @@ Sneakers.configure(
         ack: true,
         heartbeat: 60,
         exchange: 'background_jobs',
-        hooks: {}
+        hooks: {
+        }
     }
 )
 Sneakers.logger.level = Logger::INFO

@@ -16,7 +16,8 @@ gem 'jwt', '~> 1.5', '>= 1.5.2'
 
 gem 'versionist', '~> 1.4', '>= 1.4.1'
 
-gem 'sneakers', '~> 2.3', '>= 2.3.5'
+# gem 'sneakers', '~> 2.3', '>= 2.3.5'
+gem 'sneakers', '~> 2.3', path: "~/Documents/workspace/sneakers"
 
 gem 'mailgun-ruby', '~>1.0.3', require: 'mailgun'
 

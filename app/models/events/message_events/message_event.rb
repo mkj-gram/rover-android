@@ -5,6 +5,8 @@ module Events
 
             attr_reader :message, :message_template, :message_template_id
 
+            after_save :track_message_event_type
+
             # This handles both message templates and messages
             # A ::Message is a rendered ::MessageTemplate for 1 user
             # Analytics track ::MessageTemplates
