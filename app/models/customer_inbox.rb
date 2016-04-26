@@ -24,7 +24,7 @@ class CustomerInbox
         expired_message_ids = expired_message_futures.map(&:value).flatten.uniq
 
         if expired_message_ids.any?
-            MessageInstance.delete_all(id: {"$in" => expired_message_ids})
+            Message.delete_all(id: {"$in" => expired_message_ids})
         end
 
         return inserts.keys.size
