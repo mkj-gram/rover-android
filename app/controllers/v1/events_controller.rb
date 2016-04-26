@@ -17,11 +17,15 @@ class V1::EventsController < V1::ApplicationController
 
         customer, device = get_customer_and_device(user_attributes, device_attributes)
 
+
+
         if !device.valid?
             render json: { errors: V1::CustomerDeviceErrorSerializer.serialize(device.errors)}, status: :unprocessable_entity
         elsif !customer.valid?
             render json: { errors: V1::CustomerErrorSerializer.serialize(customer.errors)}, status: :unprocessable_entity
         else
+            Raven.user_context(account_id: current_account.id, customer_id: customer.id, customer_identifier: customer.identifier, customer_name: customer.name)
+
             attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
 
             object = event_attributes[:object]

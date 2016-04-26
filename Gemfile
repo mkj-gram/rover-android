@@ -16,8 +16,8 @@ gem 'jwt', '~> 1.5', '>= 1.5.2'
 
 gem 'versionist', '~> 1.4', '>= 1.4.1'
 
-# gem 'sneakers', '~> 2.3', '>= 2.3.5'
-gem 'sneakers', '~> 2.3', path: "~/Documents/workspace/sneakers"
+gem 'sneakers', '~> 2.3', '>= 2.3.5'
+# gem 'sneakers', '~> 2.3', path: "~/Documents/workspace/sneakers"
 
 gem 'mailgun-ruby', '~>1.0.3', require: 'mailgun'
 
@@ -72,6 +72,8 @@ gem 'gcm', '~> 0.1.1'
 gem 'apns_kit', '~> 0.1.1'
 
 gem 'librato-rails', '~> 1.3'
+
+gem 'sentry-raven', '~> 0.15.6'
 
 group :development do
 
