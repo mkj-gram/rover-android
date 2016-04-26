@@ -3,6 +3,14 @@
     "scripts": {
         "postdeploy": "bundle exec rake db:migrate"
     },
+    "buildpacks": [
+        {
+            "url": "https://github.com/codeship/heroku-buildpack-runit.git"
+        },
+        {
+            "url": "heroku/ruby"
+        }
+    ],
     "env": {
         "LANG": {
             "required": true
@@ -66,8 +74,6 @@
         }
     },
     "addons": [
-        "bonsai",
-        "cloudamqp",
         "rediscloud"
     ]
 }
