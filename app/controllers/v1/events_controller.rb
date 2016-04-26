@@ -6,6 +6,8 @@ class V1::EventsController < V1::ApplicationController
     instrument_action :create
 
     def create
+        head :internal_error
+        return
         json = flatten_request({single_record: true, except: "attributes.user.traits"})
 
         event_attributes = json.dig(:data, :events)
