@@ -46,7 +46,6 @@ class MessageTemplate < ActiveRecord::Base
 
     after_initialize :set_proper_time_schedule_range
     after_initialize :set_defaults, unless: :persisted?
-    after_create :create_message_template_stats
 
     validates :title, presence: true
     validate :valid_date_schedule
@@ -90,7 +89,7 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def stats
-        @stats ||= MessageTemplateStats.find(self.id)
+        @stats ||= MessageTemplateStats.find(self.id) || MessageTemplateStats.new(message_template_id: self.id)
     end
 
     def schedule_start_date
@@ -371,10 +370,6 @@ class MessageTemplate < ActiveRecord::Base
         else
             true
         end
-    end
-
-    def create_message_template_stats
-        MessageTemplateStats.create(message_template_id: self.id)
     end
 
 end

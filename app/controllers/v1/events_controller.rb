@@ -6,9 +6,6 @@ class V1::EventsController < V1::ApplicationController
     instrument_action :create
 
     def create
-        sleep(30)
-        head :internal_error
-        return
         json = flatten_request({single_record: true, except: "attributes.user.traits"})
 
         event_attributes = json.dig(:data, :events)
@@ -53,10 +50,12 @@ class V1::EventsController < V1::ApplicationController
         if customer.nil?
             # there is no customer with this device
             # lets create a customer with this device
+            Rails.logger.info("get_customer_and_device: customer was nil".red.bold)
             customer, device = create_customer_with_device(user_attributes, device_attributes)
-            puts "customer was nil"
+
         elsif (!user_attributes[:identifier].nil? && (customer.identifier.nil? || customer.identifier != user_attributes[:identifier]))
             # the identifier has changed
+            Rails.logger.info("get_customer_and_device: the identifier has changed".red.bold)
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
             if existing_customer.nil?
                 # we want a new customer object here because we don't
@@ -69,24 +68,27 @@ class V1::EventsController < V1::ApplicationController
             end
             # this is the case where an anonymous user logged in and their profile already exists on our system
             # we want to transfer the device from the current customer to the existing one
-            device = customer.devices.where("_id" => current_device_udid).first
+            device = customer.devices.find{ |device| device._id == current_device_udid }
             # this uses $pull to remove from the array
             if device
-                device.delete
-                transfer_device = existing_customer.devices.new(device.attributes)
-                # this $pushes onto the array
-                transfer_device.save
-                device = transfer_device
+                current_customer.remove_device(device)
+                existing_customer.add_device(device)
             end
             customer = existing_customer
+        elsif user_attributes[:identifier].nil? && !customer.identifier.nil?
+            # user has logged out
+            Rails.logger.info("get_customer_and_device: customer has logged out".red.bold)
+            device = customer.devices.find{ |device| device._id == current_device_udid }
+            customer.remove_device(device)
+            customer, device = create_anonymous_customer(user_attributes, device_attributes)
         else
-            device = customer.devices.where("_id" => current_device_udid).first
+            device = customer.devices.find{ |device| device._id == current_device_udid }
         end
 
         # update any fields that need updating if nothing has changed
         # update_attributes performs a no-op
-        customer.update_attributes(customer_params(user_attributes)) if customer
-        device.update_attributes(device_params(device_attributes)) if device
+        # customer.update_attributes(customer_params(user_attributes)) if customer
+        # device.update_attributes(device_params(device_attributes)) if device
         return [customer, device]
     end
 
@@ -96,15 +98,15 @@ class V1::EventsController < V1::ApplicationController
             # a customer
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
             if existing_customer
-                # this calls $push on the devices array for the existing customer
-                device = existing_customer.devices.new(device_params(device_attributes))
+                device = existing_customer.build_device(device_params(device_attributes))
                 device.udid = current_device_udid
-                device.update
+                existing_customer.add_device(device)
                 customer = existing_customer
             else
                 customer = Customer.new(customer_params(user_attributes))
-                device = customer.devices.build(device_params(device_attributes))
+                device = customer.build_device(device_params(device_attributes))
                 device.udid = current_device_udid
+                customer.devices = [device]
                 customer.save
             end
             return [customer, device]
@@ -120,8 +122,10 @@ class V1::EventsController < V1::ApplicationController
         # make sure incase if someone calls this function they aren't setting the identifier
         user_attributes.delete(:identifier)
         customer = Customer.new(customer_params(user_attributes))
-        device = customer.devices.build(device_params(device_attributes))
+        device = customer.build_device(device_params(device_attributes))
         device.udid = current_device_udid
+        customer.devices = [device]
+        customer.save
         return [customer, device]
     end
 
@@ -130,7 +134,7 @@ class V1::EventsController < V1::ApplicationController
     end
 
     def customer_params(user_attributes)
-        allowed_params = user_attributes.permit(:identifier, :name, :email, :phone_number, {:tags => []}, :age, :gender)
+        allowed_params = user_attributes.permit(:identifier, :first_name, :last_name, :email, :phone_number, {:tags => []}, :age, :gender)
         # we have to manually allow traits since strong params doesn't allow unknown hashes
         allowed_params[:traits] = user_attributes.dig(:traits) || {}
         allowed_params[:account_id] = current_account.id

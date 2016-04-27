@@ -24,7 +24,7 @@ module Events
 
             def build(object, action, event_attributes)
                 model = @@events.dig(object, action)
-                return Event.new(event_attributes) if model.nil?
+                return Events::Event.new(event_attributes) if model.nil?
                 return model.new(event_attributes)
             end
 

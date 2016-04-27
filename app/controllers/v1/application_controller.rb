@@ -44,6 +44,7 @@ class V1::ApplicationController < ActionController::API
 
     def current_device
         if current_customer
+
             return current_customer.where("devices._id" => device_id).first
         else
             return nil
@@ -112,7 +113,7 @@ class V1::ApplicationController < ActionController::API
 
     def device_id
         if request.headers.include?(APPLICATION_DEVICE_ID_HEADER)
-            return request.headers[APPLICATION_DEVICE_ID_HEADER].downcase
+            return request.headers[APPLICATION_DEVICE_ID_HEADER].upcase
         else
             return nil
         end

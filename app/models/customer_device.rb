@@ -1,32 +1,37 @@
 class CustomerDevice
-    include Mongoid::Document
+    include Virtus.model(:nullify_blank => true)
+    include ActiveModel::Validations
+    include ActiveModel::Validations::Callbacks
+    extend ActiveModel::Naming
+    extend ActiveModel::Callbacks
 
-    field :_id, as: :udid, type: String
+    attribute :_id, String
+    attribute :token, String
+    attribute :locale_lang, String
+    attribute :locale_region, String
+    attribute :time_zone, String
+    attribute :sdk_version, String
+    attribute :platform, String
+    attribute :os_name, String
+    attribute :os_version, String
+    attribute :model, String
+    attribute :manufacturer, String
+    attribute :carrier, String
+    attribute :background_enabled, Boolean
+    attribute :local_notifications_enabled, Boolean
+    attribute :remote_notifications_enabled, Boolean
+    attribute :bluetooth_enabled, Boolean
+    attribute :location_monitoring_enabled, Boolean
+    attribute :development, Boolean, default: false
+    attribute :aid, String
 
-    field :token, type: String
-    field :locale_lang, type: String
-    field :locale_region, type: String
-    field :time_zone, type: String
-    field :sdk_version, type: String
-    field :platform, type: String
-    field :os_name, type: String
-    field :os_version, type: String
-    field :model, type: String
-    field :manufacturer, type: String
-    field :carrier, type: String
-    field :background_enabled, type: Boolean
-    field :local_notifications_enabled, type: Boolean
-    field :remote_notifications_enabled, type: Boolean
-    field :bluetooth_enabled, type: Boolean
-    field :location_monitoring_enabled, type: Boolean
-    field :development, type: Boolean, default: false
-    field :aid, type: String
+    alias_method :udid, :_id
 
-    embedded_in :customer
+    define_model_callbacks :save, :create, :update, :destroy
 
-    before_validation { self.locale_lang = self.locale_lang.downcase if self.locale_lang? }
-    before_validation { self.locale_region = self.locale_region.downcase if self.locale_region? }
-    before_validation { self.locale_region = Iso3166.convert_alpha3_to_alpha2(self.locale_region) if self.locale_region? && self.locale_region.length == 3}
+    before_validation { self.locale_lang = self.locale_lang.downcase if self.locale_lang }
+    before_validation { self.locale_region = self.locale_region.downcase if self.locale_region }
+    before_validation { self.locale_region = Iso3166.convert_alpha3_to_alpha2(self.locale_region) if self.locale_region && self.locale_region.length == 3}
 
     validate :valid_locale_lang
     validate :valid_locale_region
@@ -41,6 +46,11 @@ class CustomerDevice
     ANDROID_DEVICE = 2
     PLATFORMS = Set.new(["iOS", "Android"]).freeze
     OS_NAMES = Set.new(["iOS", "Android"]).freeze
+
+    def self.find(id)
+        Customer.mongo_client[Customer.collection_name]
+    end
+
 
     def as_indexed_json(options = {})
         {
@@ -65,8 +75,20 @@ class CustomerDevice
         }
     end
 
-    def udid=(val)
-        self[:udid] = val.downcase
+    def to_doc
+        return attributes
+    end
+
+    def customer=(customer)
+        @customer = customer
+    end
+
+    def customer
+        @customer
+    end
+
+    def udid=(new_udid)
+        self[:_id] = new_udid.upcase
     end
 
     def device_type
