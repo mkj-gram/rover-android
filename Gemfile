@@ -17,6 +17,7 @@ gem 'jwt', '~> 1.5', '>= 1.5.2'
 gem 'versionist', '~> 1.4', '>= 1.4.1'
 
 gem 'sneakers', '~> 2.3', '>= 2.3.5'
+# gem 'sneakers', '~> 2.3', path: "~/Documents/workspace/sneakers"
 
 gem 'mailgun-ruby', '~>1.0.3', require: 'mailgun'
 
@@ -50,7 +51,7 @@ gem 'google_places', '~> 0.32.0'
 
 gem 'virtus', '~> 1.0', '>= 1.0.5'
 
-gem 'mongoid', '~> 5.1'
+gem 'mongo', '~> 2.2', '>= 2.2.4'
 
 gem 'multi_json', '~> 1.11', '>= 1.11.2'
 
@@ -69,6 +70,12 @@ gem 'fluent-logger', '~> 0.5.1'
 gem 'gcm', '~> 0.1.1'
 
 gem 'apns_kit', '~> 0.1.1'
+
+gem 'librato-rails', '~> 1.3'
+
+gem 'sentry-raven', '~> 0.15.6'
+
+gem 'concurrent-ruby', '~> 1.0', '>= 1.0.1'
 
 group :development do
 

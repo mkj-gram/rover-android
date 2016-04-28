@@ -11,12 +11,12 @@ module RailsApi
     class Application < Rails::Application
 
         config.active_record.schema_format = :sql
-        config.mongoid.logger = Logger.new($stdout, :warn)
         # Setup configuration per enviroment
         config.rabbitmq = Rails.application.config_for(:rabbitmq)
         config.mailgun = Rails.application.config_for(:mailgun)
         config.password_reset = Rails.application.config_for(:password_reset)
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
+        config.mongo = Rails.application.config_for(:mongo)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('lib')
         config.autoload_paths << Rails.root.join('app', 'models', 'message_templates')
@@ -52,7 +52,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib', 'time_zone_offset')
         config.autoload_paths << Rails.root.join('app', 'workers')
 
-
+        config.eager_load_paths << Rails.root.join('lib', 'metrics_client')
         config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')
         config.eager_load_paths << Rails.root.join('app', 'models', 'events')
 

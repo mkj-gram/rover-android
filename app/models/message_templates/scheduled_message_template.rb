@@ -26,7 +26,9 @@ class ScheduledMessageTemplate < MessageTemplate
         self["scheduled_at"] = parsed_time
     end
 
-
+    def metric_type
+        "message_template.scheduled"
+    end
 
     private
 

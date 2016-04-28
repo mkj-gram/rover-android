@@ -3,6 +3,7 @@ class ProximityMessageTemplate < MessageTemplate
     include DefaultEmptyArray
 
     belongs_to :account
+
     before_save :update_archived_messages_count
 
     after_save :update_approximate_customers_count
@@ -33,6 +34,10 @@ class ProximityMessageTemplate < MessageTemplate
         published_was == false && archived_was == false
     end
 
+    def metric_type
+        "message_template.proximity"
+    end
+
     private
 
     def legal_trigger_event_id
@@ -52,7 +57,7 @@ class ProximityMessageTemplate < MessageTemplate
     end
 
     def update_archived_messages_count
-        if self.changes.include?(:archived) || self.changes.include?(:published) || self.new_record?
+        if self.changes.include?(:archived) || self.changes.include?(:published) && !new_record?
 
             if archived == true && archived_was == false
                 Account.update_counters(self.account_id, proximity_message_templates_archived_count: 1)
@@ -70,21 +75,23 @@ class ProximityMessageTemplate < MessageTemplate
                 Account.update_counters(self.account_id, proximity_message_templates_published_count: -1)
             end
 
-
-
-            # edge case when we are a new record we were previously drafted and are drafted now
-            if self.new_record?
+            if drafted == true && drafted_was == false
                 Account.update_counters(self.account_id, proximity_message_templates_draft_count: 1)
-            else
-                if drafted == true && drafted_was == false
-                    Account.update_counters(self.account_id, proximity_message_templates_draft_count: 1)
-                end
-
-                if drafted_was == true && drafted == false
-                    Account.update_counters(self.account_id, proximity_message_templates_draft_count: -1)
-                end
             end
 
+            if drafted_was == true && drafted == false
+                Account.update_counters(self.account_id, proximity_message_templates_draft_count: -1)
+            end
+        elsif self.new_record?
+            if archived
+                Account.update_counters(self.account_id, proximity_message_templates_archived_count: 1)
+            elsif published
+                Account.update_counters(self.account_id, proximity_message_templates_published_count: 1)
+            else
+                Account.update_counters(self.account_id, proximity_message_templates_draft_count: 1)
+            end
         end
+
+
     end
 end

@@ -11,6 +11,7 @@ class V1::ApplicationController < ActionController::API
     serialization_scope :view_context
 
     before_action :set_locale
+    before_action :set_raven_context
 
     attr_reader :current_user, :current_account
 
@@ -43,6 +44,7 @@ class V1::ApplicationController < ActionController::API
 
     def current_device
         if current_customer
+
             return current_customer.where("devices._id" => device_id).first
         else
             return nil
@@ -111,7 +113,7 @@ class V1::ApplicationController < ActionController::API
 
     def device_id
         if request.headers.include?(APPLICATION_DEVICE_ID_HEADER)
-            return request.headers[APPLICATION_DEVICE_ID_HEADER].downcase
+            return request.headers[APPLICATION_DEVICE_ID_HEADER].upcase
         else
             return nil
         end
@@ -119,6 +121,10 @@ class V1::ApplicationController < ActionController::API
 
     def set_locale
         I18n.locale = params[:locale] || I18n.default_locale
+    end
+
+    def set_raven_context
+        Raven.extra_context(params: params.to_hash, url: request.url)
     end
 
     #
@@ -149,6 +155,7 @@ class V1::ApplicationController < ActionController::API
         account = Account.find_by_token(request.headers[APPLICATION_API_KEY_HEADER])
         if account
             @current_account = account
+            Raven.user_context(account_id: @current_account.id)
         else
             render_unauthorized("Validation Error", "API Token doesn't exist")
         end
@@ -166,6 +173,7 @@ class V1::ApplicationController < ActionController::API
             render_unauthorized("Validation Error", "session has expired")
         else
             @current_user = session.user
+            Raven.user_context(account_id: @current_user.account_id, user_id: @current_user.id, email: @current_user.email)
         end
     end
 

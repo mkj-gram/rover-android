@@ -1,24 +1,35 @@
 class Customer
-    include Mongoid::Document
     include Elasticsearch::Model
+    include ActiveModel::Validations
+    include Virtus.model(:nullify_blank => true)
+    include VirtusDirtyAttributes
+    extend ActiveModel::Naming
+    extend ActiveModel::Callbacks
 
-    field :account_id, type: Integer
-    field :identifier, type: String
-    field :name, type: String
-    field :email, type: String
-    field :age, type: Integer
-    field :gender, type: String
-    field :phone_number, type: String
-    field :tags, type: Array
-    field :traits, type: Hash
-    field :location, type: GeoPoint
-    field :inbox_updated_at, type: Time, default: -> { Time.zone.now }
+    attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
+    attribute :account_id, Integer
+    attribute :identifier, String
+    attribute :first_name, String
+    attribute :last_name, String
+    attribute :email, String
+    attribute :age, Integer
+    attribute :gender, String
+    attribute :phone_number, String
+    attribute :tags, Array
+    attribute :traits, Hash
+    attribute :location, GeoPoint
+    attribute :inbox_updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
+    attribute :devices, Array[CustomerDevice], default: []
 
-    index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
-    index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
-    index({"account_id": 1, "traits": 1}, {partial_filter_expression: {"traits" => {"$exists" => true}}})
-    index({"devices.token": 1}, {unique: true, partial_filter_expression: {"devices.token" => {"$exists" => true}}})
-    embeds_many :devices, class_name: "CustomerDevice"
+    define_model_callbacks :save, :create, :update, :destroy
+
+    alias_method :id, :_id
+    # track_dirty_attributes :a
+    # index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
+    # index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
+    # index({"account_id": 1, "traits": 1}, {partial_filter_expression: {"traits" => {"$exists" => true}}})
+    # index({"devices.token": 1}, {unique: true, partial_filter_expression: {"devices.token" => {"$exists" => true}}})
+    # embeds_many :devices, class_name: "CustomerDevice"
 
     def self.search_string_mapping
         {
@@ -77,7 +88,8 @@ class Customer
         mapping do
             indexes :account_id, type: 'integer', index: 'not_analyzed'
             indexes :identifier, type: 'string', index: 'not_analyzed'
-            indexes :name, Customer.search_string_mapping
+            indexes :first_name, Customer.search_string_mapping
+            indexes :last_name, Customer.search_string_mapping
             indexes :email, Customer.search_string_mapping
             indexes :phone_number, Customer.search_string_mapping
             indexes :age, type: 'integer'
@@ -109,6 +121,7 @@ class Customer
         end
     end
 
+    validates :_id, presence: true
     validates :account_id, presence: true
     validates :email, email: { allow_blank: true }
     # where should we store counter cache? how do we?
@@ -133,7 +146,8 @@ class Customer
         json = {
             account_id: self.account_id,
             identifier: self.identifier,
-            name: self.name,
+            first_name: self.first_name,
+            last_name: self.last_name,
             email: self.email,
             phone_number: self.phone_number,
             tags: self.tags,
@@ -196,6 +210,137 @@ class Customer
         )
     end
 
+    def to_doc
+        current_attributes = attributes
+        # work around since virtus doesn't do nested attributes
+        current_attributes[:devices] = current_attributes[:devices].map(&:to_doc) if current_attributes[:devices]
+        return current_attributes
+    end
+
+    def self.collection_name
+        'customers'.freeze
+    end
+
+    def collection_name
+        Customer.collection_name
+    end
+
+    def self.mongo_client
+        $mongo
+    end
+
+    def mongo_client
+        Customer.mongo_client
+    end
+
+    def inspect
+        "#<Customer:#{object_id} _id=#{@_id} first_name=#{format_variable(@first_name)} last_name=#{format_variable(@last_name)} email=#{format_variable(@email)} phone_number=#{format_variable(@phone_number)} age=#{format_variable(@age)} devices=#{format_variable(@devices)}>"
+    end
+
+    def valid?
+        if devices.any?
+            super && devices.all?(&:valid?)
+        else
+            super
+        end
+    end
+
+    def self.from_document(doc)
+        customer = Customer.new(doc.merge(new_record: false))
+        customer.devices.each { |device| device.customer = customer } if customer.devices.any?
+        return customer
+    end
+
+    def self.find(id)
+        doc = mongo_client[collection_name].find("_id" => BSON::ObjectId(id)).limit(1).first
+        return nil if doc.nil?
+        return Customer.from_document(doc)
+    end
+
+    def self.first
+        doc = mongo_client[collection_name].find().limit(1).first
+        return nil if doc.nil?
+        return Customer.from_document(doc)
+    end
+
+    def self.find_all(ids)
+        ids = ids.map{|id| BSON::ObjectId(id)}
+        docs = mongo_client[collection_name].find("_id" => {"$in" => ids }).map{|document| Customer.from_document(document) }
+        return docs
+    end
+
+    def self.find_by(query)
+        doc = mongo_client[collection_name].find(query).first
+        return nil if doc.nil?
+        return Customer.from_document(doc)
+    end
+
+    def self.delete_all
+        mongo_client[collection_name].find().delete_many
+    end
+
+    def build_device(attributes)
+        CustomerDevice.new(attributes.merge(customer: self))
+    end
+
+    def create
+        return false if !valid?
+        run_callbacks :create do
+            run_callbacks :save do
+                mongo_client[collection_name].insert_one(to_doc)
+            end
+        end
+        changes_applied
+    end
+
+    def save
+        return false if !valid?
+        if new_record?
+            create
+        else
+            run_callbacks :save do
+                # grab the changes
+                if changes.any?
+                    mongo_client[collection_name].find("_id" => self._id).update_one(
+                        changes.map do |k,v|
+                            new_value = v.last
+                            if new_value.is_a?(Array) && new_value.first.respond_to?(:to_doc)
+                                new_value = new_value.map(&:to_doc)
+                            end
+                            {"$set" => { k => new_value } }
+                        end
+                    )
+                end
+            end
+            changes_applied
+        end
+    end
+
+    def remove_device(device)
+        devices.delete_if{|stored_device| stored_device._id == device._id}
+        run_callbacks :save do
+            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$pull" => {"devices" => {"_id" => device._id}}})
+        end
+        changes_applied
+        return true
+    end
+
+    def add_device(device)
+        return false if !device.valid?
+        return true if devices.one?{ |stored_device| stored_device._id == device._id }
+        devices << device
+        run_callbacks :save do
+            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$push" => {"devices" => device.to_doc}})
+        end
+        changes_applied
+        return true
+    end
+
+    def destroy
+        return if new_record?
+        mongo_client[collection_name].delete_one("_id" => self._id)
+    end
+
     def message_attributes
         {
             "identifier" => identifier,
@@ -216,13 +361,16 @@ class Customer
         @inbox ||= CustomerInbox.new(self)
     end
 
-    def gender=(val)
-        # make sure gender is always in the form of male or female
-        if val == "male" || val == "female"
-            self[:gender] = val
-        else
-            self[:gender] = nil
+    def gender=(new_gender)
+        custom_gender = nil
+        if new_gender == "male" || new_gender == "female"
+            custom_gender = new_gender
         end
+        super custom_gender
+    end
+
+    def name
+        format("%s %s", first_name, last_name)
     end
 
     def location_as_indexed_json
@@ -265,8 +413,12 @@ class Customer
 
     # private
 
-    def create_inbox
-        CustomerInbox.create(customer_id: self.id)
+    def format_variable(value)
+        value.nil? ? "nil" : value
+    end
+
+    def persist
+        # mongo_client[collection_name].
     end
 
     def update_active_traits
@@ -302,8 +454,8 @@ class Customer
         # we only want to show customers which are identified or have a device
         return if changes.empty?
         # going from no identifier to named
-        if identifier.nil? && changes.include?(:devices) && devices_was.any? && devices.empty?
-            puts "this anonymous user doesn't have a device anymore"
+        if identifier.nil? && changes.include?(:devices) && changes[:devices].first.any? && changes[:devices].last.empty?
+            Rails.logger.info("#{self._id}: this anonymous user doesn't have a device anymore")
             decrement_customers_count
             begin
                 self.delete_elasticsearch_document
@@ -318,6 +470,7 @@ class Customer
     end
 
     def index_elasticsearch_document(opts = {})
+        Rails.logger.info("Indexing #{self._id} from Elasticsearch".green.bold)
         client = __elasticsearch__.client
         document = self.as_indexed_json
 
@@ -337,6 +490,7 @@ class Customer
     end
 
     def delete_elasticsearch_document
+        Rails.logger.info("Deleting #{self._id} from Elasticsearch".green.bold)
         client = __elasticsearch__.client
         client.delete(
             {

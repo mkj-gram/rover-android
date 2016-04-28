@@ -81,6 +81,7 @@ module Events
                 EventsLogger.log(account.id, generation_time, attributes)
             end
 
+            MetricsClient.aggregate("events.#{object}.#{action}" => { value: 1, source: "account_#{account.id}" })
         end
 
         def today_schedule_column
@@ -119,6 +120,11 @@ module Events
             # create each one
             # add them to the included array
             # track messages
+            #
+            message_templates.each do |template|
+                MetricsClient.aggregate("#{template.metric_type}.delivered" => { value: 1, source: "account_#{account.id}" })
+            end
+
             message_templates.each {|template| template.account = account }
             inbox_messages, local_messages = message_templates.partition(&:save_to_inbox)
 
