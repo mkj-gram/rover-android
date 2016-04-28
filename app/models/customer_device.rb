@@ -26,7 +26,7 @@ class CustomerDevice
     attribute :aid, String
 
     alias_method :udid, :_id
-
+    alias_method :id, :_id
     define_model_callbacks :save, :create, :update, :destroy
 
     before_validation { self.locale_lang = self.locale_lang.downcase if self.locale_lang }
