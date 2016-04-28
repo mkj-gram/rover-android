@@ -1,9 +1,12 @@
 # To be used by the backend workers since they don't have access to librato-rails
+require 'colorize'
+require 'concurrent'
 module MetricsClient
 
     class << self
 
         @@mutex = Mutex.new
+        @@submitter_lock = Mutex.new
 
         def queue
             return @queue if @queue
@@ -17,9 +20,22 @@ module MetricsClient
             return @aggregator
         end
 
+        def aggregate(opts)
+            @@submitter_lock.synchronize do
+                aggregator.add(opts)
+            end
+        end
+
         def flush!
-            queue.submit
-            aggregator.submit
+            @@submitter_lock.synchronize do
+                queue.submit if !queue.empty?
+                Rails.logger.debug(aggregator.queued)
+                aggregator.submit if !aggregator.empty?
+            end
+        end
+
+        def submitter
+            @@submitter
         end
 
         private
@@ -30,9 +46,20 @@ module MetricsClient
                 config = ::Librato::Rails::Configuration.new
                 Librato::Metrics.authenticate(config.user, config.token)
                 flush_interval = config.flush_interval || 60
-                @queue = ::Librato::Metrics::Queue.new(autosubmit_interval: flush_interval, prefix: config.prefix, source: config.source)
-                @aggregator = ::Librato::Metrics::Aggregator.new(autosubmit_interval: flush_interval, prefix: config.prefix, source: config.source)
+                @@submitter = Concurrent::TimerTask.new(execution_interval: flush_interval, timeout_interval: 30) do
+                    Rails.logger.info("[ MetricsClient ] Submitting Metrics!".blue.bold)
+                    begin
+                        MetricsClient.flush!
+                    rescue => e
+                        Rails.logger.info("[ MetricsClient ] Error submitting metrics #{e.message}".blue.bold)
+                    end
+                    Rails.logger.info("[ MetricsClient ] Done!".blue.bold)
+                end
+
+                @queue = ::Librato::Metrics::Queue.new(prefix: config.prefix, source: config.source)
+                @aggregator = ::Librato::Metrics::Aggregator.new(prefix: config.prefix, source: config.source)
             }
+            @@submitter.execute
         end
 
     end

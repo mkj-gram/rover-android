@@ -75,6 +75,8 @@ gem 'librato-rails', '~> 1.3'
 
 gem 'sentry-raven', '~> 0.15.6'
 
+gem 'concurrent-ruby', '~> 1.0', '>= 1.0.1'
+
 group :development do
 
 
