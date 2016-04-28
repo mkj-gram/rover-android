@@ -27,7 +27,7 @@ module CustomerFilter
             end
 
             def geo_point
-                @geo_point ||= ::GeoPoint.new(latitude, longitude)
+                @geo_point ||= ::GeoPoint.new(latitude: latitude, longitude: longitude)
             end
 
             def check(v)

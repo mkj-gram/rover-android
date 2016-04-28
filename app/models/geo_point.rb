@@ -1,23 +1,31 @@
 class GeoPoint
+    include Virtus.model
 
+    attribute :latitude,  Float
+    attribute :longitude, Float
 
-
-    attr_reader :lat, :lng
-
-    alias_method :latitude, :lat
-    alias_method :longitude, :lng
-
-    def initialize(lat, lng)
-        @lat, @lng = lat, lng
-    end
-
-    def mongoize
-        [ lat, lng ]
-    end
-
+    # def initialize(lat, lng)
+    #     @lat, @lng = lat, lng
+    # end
 
     def distance(geo_point)
         GeoPoint.distance_between(self, geo_point)
+    end
+
+    def to_doc
+        [self.latitude, self.longitude]
+    end
+
+    def eq?(other)
+        self == other
+    end
+
+    def equal?(other)
+        self == other
+    end
+
+    def ==(other)
+        self.latitude == other.latitude && self.longitude == other.longitude
     end
 
     class << self
@@ -45,30 +53,8 @@ class GeoPoint
             return 6371000 * c
         end
 
-        def demongoize(object)
-            return nil if object.nil?
-            GeoPoint.new(object[0], object[1])
-        end
-
-        def mongoize(object)
-            case object
-            when GeoPoint then object.mongoize
-            when Hash then
-                if object.has_key?("lat") && object.has_key?("lon")
-                    GeoPoint.new(object["lat"], object["lon"]).mongoize
-                else
-                    GeoPoint.new(object[:lat], object[:lng]).mongoize
-                end
-            else object
-            end
-        end
-
-        def evolve(object)
-            case object
-            when GeoPoint then object.mongoize
-            else object
-            end
+        def from_document(doc)
+            GeoPoint.new(latitude: doc.first, longitude: doc.last)
         end
     end
-
 end

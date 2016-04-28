@@ -39,7 +39,8 @@ module Events
 
             def update_customer_location
                 if customer
-                    customer.update_attributes({location: GeoPoint.new(latitude, longitude)})
+                    customer.location = GeoPoint.new(latitude: latitude, longitude: longitude)
+                    customer.save
                 end
             end
 

@@ -214,6 +214,7 @@ class Customer
         current_attributes = attributes
         # work around since virtus doesn't do nested attributes
         current_attributes[:devices] = current_attributes[:devices].map(&:to_doc) if current_attributes[:devices]
+        current_attributes[:location] = current_attributes[:location].to_doc if current_attributes[:location]
         return current_attributes
     end
 
@@ -246,8 +247,10 @@ class Customer
     end
 
     def self.from_document(doc)
+        location = doc.delete(:location)
         customer = Customer.new(doc.merge(new_record: false))
         customer.devices.each { |device| device.customer = customer } if customer.devices.any?
+        customer.location = GeoPoint.new(latitude: location.first, longitude: location.last) if location
         return customer
     end
 
@@ -304,6 +307,7 @@ class Customer
                     mongo_client[collection_name].find("_id" => self._id).update_one(
                         changes.map do |k,v|
                             new_value = v.last
+                            new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
                             if new_value.is_a?(Array) && new_value.first.respond_to?(:to_doc)
                                 new_value = new_value.map(&:to_doc)
                             end
