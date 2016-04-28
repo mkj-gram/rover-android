@@ -251,6 +251,7 @@ class Customer
         customer = Customer.new(doc.merge(new_record: false))
         customer.devices.each { |device| device.customer = customer } if customer.devices.any?
         customer.location = GeoPoint.new(latitude: location.first, longitude: location.last) if location
+        customer.changes_applied # force an update for what attributes are
         return customer
     end
 
