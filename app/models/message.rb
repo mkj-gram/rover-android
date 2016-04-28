@@ -7,7 +7,7 @@ class Message
     extend ActiveModel::Naming
     extend ActiveModel::Callbacks
 
-    attribute :_id, Integer, default: lambda { |model, attribute| BSON::ObjectId.new }
+    attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
     attribute :customer_id, BSON::ObjectId
     attribute :message_template_id, Integer
     attribute :notification_text, String
@@ -117,6 +117,18 @@ class Message
 
     def metric_type
         "message_template.root"
+    end
+
+    class << self
+        def from_document(doc)
+            Message.new(doc)
+        end
+
+        def find_all(ids)
+            ids = ids.map{|id| BSON::ObjectId(id)}
+            docs = mongo_client[collection_name].find("_id" => {"$in" => ids }).map{|document| Message.from_document(document) }
+            return docs
+        end
     end
 
     private

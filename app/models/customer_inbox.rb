@@ -42,7 +42,7 @@ class CustomerInbox
             if message_ids.empty?
                 []
             else
-                Message.find(message_ids)
+                Message.find_all(message_ids)
             end
         }.call
     end
