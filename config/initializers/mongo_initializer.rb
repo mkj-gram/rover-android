@@ -12,7 +12,7 @@ defaults = {
     ssl_ca_cert: nil
 }
 
-mongo_config = (config.merge(defaults)).symbolize_keys
+mongo_config = (defaults.merge(config)).symbolize_keys
 uri = mongo_config.delete(:uri)
 
 $mongo = Mongo::Client.new(uri, mongo_config)
