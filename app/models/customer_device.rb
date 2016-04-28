@@ -75,6 +75,10 @@ class CustomerDevice
         }
     end
 
+    def <=>(other)
+        self.id <=> other.id
+    end
+
     def to_doc
         return attributes
     end
