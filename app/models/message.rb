@@ -94,6 +94,15 @@ class Message
         changes_applied
     end
 
+    def customers=(new_customer)
+        @customer = new_customer
+        self[:customer_id] = @customer.id
+    end
+
+    def customer
+        @customer
+    end
+
     def message_template=(template)
         @message_template = template
         self[:_id] = template.id
@@ -118,7 +127,7 @@ class Message
 
     def add_to_inbox
         if saved_to_inbox == true
-            customer.inbox.add_message(self)
+            customer.inbox.add_message(self) if customer
         end
     end
 
