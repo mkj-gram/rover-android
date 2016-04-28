@@ -7,7 +7,7 @@ class Message
     extend ActiveModel::Naming
     extend ActiveModel::Callbacks
 
-    attribute :_id, Integer
+    attribute :_id, Integer, default: lambda { |model, attribute| BSON::ObjectId.new }
     attribute :customer_id, BSON::ObjectId
     attribute :notification_text, String
     attribute :ios_title, String, default: ""
@@ -59,6 +59,9 @@ class Message
         Message.collection_name
     end
 
+    def to_doc
+        attributes
+    end
 
     def create
         return false if !valid?
