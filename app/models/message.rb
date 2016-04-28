@@ -9,6 +9,7 @@ class Message
 
     attribute :_id, Integer, default: lambda { |model, attribute| BSON::ObjectId.new }
     attribute :customer_id, BSON::ObjectId
+    attribute :message_template_id, Integer
     attribute :notification_text, String
     attribute :ios_title, String, default: ""
     attribute :android_title, String, default: ""
@@ -23,7 +24,6 @@ class Message
     attribute :timestamp, Time , default: lambda { |model, attribute|  Time.zone.now }
     attribute :expire_at, Time
 
-    alias_method :message_template_id, :_id
 
     define_model_callbacks :save, :create, :update, :destroy
     # index({ expire_at: 1 }, { sparse: true,  expire_after_seconds: 0 })
@@ -31,9 +31,11 @@ class Message
     # belongs_to :customer
     # belongs_to: message nope
 
-    # validates :message_id, presence: true
-    # validates :customer_id, presence: true
-    # validates :timestamp, presence: true
+    validates :_id, presence: true
+    validates :message_template_id, presence: true
+    validates :customer_id, presence: true
+    validates :notification_text, presence: true
+    validates :timestamp, presence: true
 
     before_create :set_expire
     after_create :add_to_inbox
@@ -105,7 +107,7 @@ class Message
 
     def message_template=(template)
         @message_template = template
-        self[:_id] = template.id
+        self[:message_template_id] = template.id
     end
 
     def message_template
