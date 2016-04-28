@@ -16,7 +16,7 @@ module VirtusDirtyAttributes
         def changes
             changed = attributes.inject({}) do |hash, (k,v)|
                 if v.is_a?(Array)
-                    hash.merge!(k => [@_original_attributes[k], v]) if @_original_attributes[k].uniq.sort != v.uniq.sort
+                    hash.merge!(k => [@_original_attributes[k], v]) if @_original_attributes[k].uniq != v.uniq
                 else
                     hash.merge!(k => [@_original_attributes[k], v]) if @_original_attributes[k] != v
                 end

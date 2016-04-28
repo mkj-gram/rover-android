@@ -304,16 +304,16 @@ class Customer
             run_callbacks :save do
                 # grab the changes
                 if changes.any?
-                    mongo_client[collection_name].find("_id" => self._id).update_one(
-                        changes.map do |k,v|
-                            new_value = v.last
-                            new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
-                            if new_value.is_a?(Array) && new_value.first.respond_to?(:to_doc)
-                                new_value = new_value.map(&:to_doc)
-                            end
-                            {"$set" => { k => new_value } }
+                    setters = changes.inject({}) do |hash, (k,v)|
+                        new_value = v.last
+                        new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
+                        if new_value.is_a?(Array) && new_value.first.respond_to?(:to_doc)
+                            new_value = new_value.map(&:to_doc)
                         end
-                    )
+                        hash.merge!({ k.to_s => new_value })
+                        hash
+                    end
+                    mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => setters})
                 end
             end
             changes_applied
@@ -379,7 +379,7 @@ class Customer
 
     def location_as_indexed_json
         if self.location
-            {lat: self.location.lat, lon: self.location.lng}
+            {lat: self.location.latitude, lon: self.location.longitude}
         else
             nil
         end
