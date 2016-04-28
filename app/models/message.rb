@@ -124,6 +124,13 @@ class Message
             Message.new(doc)
         end
 
+        def self.find(id)
+            doc = mongo_client[collection_name].find("_id" => BSON::ObjectId(id)).limit(1).first
+            return nil if doc.nil?
+            return Message.from_document(doc)
+        end
+
+
         def find_all(ids)
             ids = ids.map{|id| BSON::ObjectId(id)}
             docs = mongo_client[collection_name].find("_id" => {"$in" => ids }).map{|document| Message.from_document(document) }
