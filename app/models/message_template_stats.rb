@@ -32,7 +32,7 @@ class MessageTemplateStats
     def self.find(id)
         doc = mongo_client[collection_name].find("_id" => id).limit(1).first
         return nil if doc.nil?
-        return Customer.from_document(doc)
+        return MessageTemplateStats.from_document(doc)
     end
 
     def self.update_counters(id, counters)

@@ -24,6 +24,7 @@ class Message
     attribute :timestamp, Time , default: lambda { |model, attribute|  Time.zone.now }
     attribute :expire_at, Time
 
+    alias_method :id, :_id
 
     define_model_callbacks :save, :create, :update, :destroy
     # index({ expire_at: 1 }, { sparse: true,  expire_after_seconds: 0 })
