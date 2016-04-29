@@ -326,6 +326,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"location-tags" => message.filter_location_tags,
                 :"gimbal-place-id" => message.filter_gimbal_place_id,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
+                :"save-to-inbox" => message.save_to_inbox,
                 :"content-type" => message.content_type,
                 :"website-url" => message.website_url,
                 :"approximate-customers-count" => message.approximate_customers_count
