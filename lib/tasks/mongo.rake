@@ -3,9 +3,9 @@ namespace :mongo do
     task :create_indexes => :environment do
         $mongo[Customer.collection_name].indexes.create_many(
             [
-                { :key => { :account_id =>  1, :"devices._id" => 1}, :unique => true, :partial_filter_expression => { :"devices._id" => { :"$exists" => true } } },
-                { :key => { :account_id =>  1, :identifier => 1 }, :unique => true, :partial_filter_expression => { :"identifier" => { :"$exists" => true } } },
-                { :key => { :"devices.token" => 1 }, :unique => true, :partial_filter_expression => { :"devices.token" => { :"$exists" => true } } }
+                { :key => { :account_id =>  1, :"devices._id" => 1}, :unique => true, sparse: true }, #:partial_filter_expression => { :"devices._id" => { :$exists => true } }
+                { :key => { :account_id =>  1, :identifier => 1 }, :unique => true, sparse: true }, #:partial_filter_expression => { :"identifier" => { :"$exists" => true } }
+                { :key => { :"devices.token" => 1 }, :unique => true, sparse: true } #:partial_filter_expression => { :"devices.token" => { :"$exists" => true } }
             ]
         )
 
