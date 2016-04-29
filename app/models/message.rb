@@ -97,7 +97,7 @@ class Message
         changes_applied
     end
 
-    def customers=(new_customer)
+    def customer=(new_customer)
         @customer = new_customer
         self[:customer_id] = @customer.id
     end
