@@ -7,7 +7,7 @@ module Events
                 Events::Constants::MESSAGE_OPENED_EVENT_ID
             end
 
-            Events::Pipeline.register("message", "opened", self, { targetable: false })
+            Events::Pipeline.register("message", "open", self, { targetable: false })
 
             NOTIFICATION_SOURCE = "notification".freeze
             INBOX_SOURCE = "inbox".freeze
