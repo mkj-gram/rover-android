@@ -165,6 +165,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :notification_text,
             :published,
             :archived,
+            :save_to_inbox,
             :trigger_event_id,
             {:filter_beacon_configuration_tags => []},
             {:filter_beacon_configuration_ids => []},
