@@ -37,9 +37,7 @@ module Events
                                 viewed: message.viewed,
                                 saved_to_inbox: message.saved_to_inbox,
                                 timestamp: message.timestamp.to_i
-                            }
-                        },
-                        {
+                            },
                             message_template: {
                                 id: template.id,
                                 type: template.type,
