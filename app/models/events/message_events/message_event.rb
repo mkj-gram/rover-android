@@ -31,6 +31,7 @@ module Events
                         {
                             message: {
                                 id: message.id,
+                                message_template_id: message.message_template_id,
                                 notification_text: message.notification_text,
                                 tags: message.tags,
                                 read: message.read,
@@ -42,7 +43,7 @@ module Events
                                 id: template.id,
                                 type: template.type,
                                 title: template.title,
-                                tags: template.tags,
+                                tags: template.tags || [],
                                 notification_text: template.notification_text,
                                 published: template.published,
                                 archived: template.archived,
