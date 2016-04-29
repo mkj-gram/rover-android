@@ -20,6 +20,8 @@ class Customer
     attribute :location, GeoPoint
     attribute :inbox_updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
     attribute :devices, Array[CustomerDevice], default: []
+    attribute :created_at, Time
+    attribute :updated_at, Time
 
     define_model_callbacks :save, :create, :update, :destroy
 
@@ -291,7 +293,7 @@ class Customer
         return false if !valid?
         run_callbacks :create do
             run_callbacks :save do
-                mongo_client[collection_name].insert_one(to_doc)
+                mongo_client[collection_name].insert_one(to_doc.merge("created_at" => Time.zone.now))
             end
         end
         changes_applied
@@ -314,7 +316,7 @@ class Customer
                         hash.merge!({ k.to_s => new_value })
                         hash
                     end
-                    mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => setters})
+                    mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => setters.merge("updated_at" => Time.zone.now)})
                 end
             end
             changes_applied
@@ -324,7 +326,7 @@ class Customer
     def remove_device(device)
         devices.delete_if{|stored_device| stored_device._id == device._id}
         run_callbacks :save do
-            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$pull" => {"devices" => {"_id" => device._id}}})
+            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => { "updated_at" => Time.zone.now }, "$pull" => {"devices" => {"_id" => device._id}}})
         end
         changes_applied
         return true
@@ -335,7 +337,7 @@ class Customer
         return true if devices.one?{ |stored_device| stored_device._id == device._id }
         devices << device
         run_callbacks :save do
-            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$push" => {"devices" => device.to_doc}})
+            mongo_client[collection_name].find({"_id" => self._id}).update_one({ "$set" => { "updated_at" => Time.zone.now }, "$push" => {"devices" => device.to_doc}})
         end
         changes_applied
         return true

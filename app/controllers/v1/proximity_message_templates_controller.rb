@@ -202,19 +202,19 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             extra_attributes.merge!(
                 {
                     :"total-delivered" => message_template_stats.total_delivered,
-                    :"total-views" => message_template_stats.total_views,
-                    :"total-swipes" => message_template_stats.total_swipes,
-                    :"unique-views" => message_template_stats.unique_views
+                    :"total-notification-opens" => message_template_stats.total_notification_opens,
+                    :"total-inbox-opens" => message_template_stats.total_inbox_opens,
+                    :"total-opens" => message_template_stats.total_opens,
+                    :"unique-opens" => message_template_stats.unique_opens
                 }
             )
         else
             extra_attributes.merge!(
-                {
-                    :"total-delivered" => 0,
-                    :"total-views" => 0,
-                    :"total-swipes" => 0,
-                    :"unique-views" => 0
-                }
+                :"total-delivered" => 0,
+                :"total-notification-opens" => 0,
+                :"total-inbox-opens" => 0,
+                :"total-opens" => 0,
+                :"unique-opens" => 0
             )
         end
 

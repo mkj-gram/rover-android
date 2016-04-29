@@ -6,6 +6,8 @@ class V1::CustomersController < V1::ApplicationController
 
     def index
 
+        # possible to pass in a customer_segment_id
+
 
         query = {
             sort: [
@@ -16,6 +18,13 @@ class V1::CustomersController < V1::ApplicationController
                 }
             ]
         }
+
+        if customer_segment_id_query
+            customer_segment = CustomerSegment.find(customer_segment_id_query)
+            if customer_segment
+                query.merge!(customer_segment.to_elasticsearch_query)
+            end
+        end
 
 
         customers = Elasticsearch::Model.search(query, [Customer], {index: Customer.get_index_name(current_account)})
@@ -49,6 +58,10 @@ class V1::CustomersController < V1::ApplicationController
     def set_customer
         @customer = Customer.find(params[:id])
         head :not_found if @customer.nil?
+    end
+
+    def customer_segment_id_query
+        params.has_key?(:customer_segment_id) ? params[:customer_segment_id] : nil
     end
 
     def serialize_customer(customer)
