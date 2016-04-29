@@ -136,7 +136,7 @@ class Message
             Message.new(doc)
         end
 
-        def self.find(id)
+        def find(id)
             doc = mongo_client[collection_name].find("_id" => BSON::ObjectId(id)).limit(1).first
             return nil if doc.nil?
             return Message.from_document(doc)
