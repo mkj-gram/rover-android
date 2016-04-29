@@ -5,7 +5,7 @@ module VirtusDirtyAttributes
 
         def initialize(atr = {})
             super atr
-            @_original_attributes = attributes.deep_dup
+            @_original_attributes = attributes
             @_new_record = atr[:new_record].nil? ? true : atr[:new_record]
         end
 
@@ -26,7 +26,7 @@ module VirtusDirtyAttributes
         end
 
         def changes_applied
-            @_original_attributes = attributes.deep_dup
+            @_original_attributes = attributes
         end
 
         def new_record?

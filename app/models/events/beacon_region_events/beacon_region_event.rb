@@ -55,6 +55,7 @@ module Events
                         {
                             location: {
                                 id: location.id,
+                                title: location.title,
                                 address: location.address,
                                 postal_code: location.postal_code,
                                 city: location.city,

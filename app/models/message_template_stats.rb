@@ -3,9 +3,10 @@ class MessageTemplateStats
 
     attribute :_id, Integer
     attribute :total_delivered, Integer, default: 0
-    attribute :total_views, Integer, default: 0
-    attribute :total_swipes, Integer, default: 0
-    attribute :unique_views, Integer, default: 0
+    attribute :total_notification_opens, Integer, default: 0
+    attribute :total_inbox_opens, Integer, default: 0
+    attribute :total_opens, Integer, default: 0
+    attribute :unique_opens, Integer, default: 0
 
     alias_method :message_template_id, :_id
 

@@ -31,9 +31,8 @@ module Events
         # Message Events 101-120
         MESSAGE_EVENT_ID = 101
         MESSAGE_DELIVERED_EVENT_ID = 102
-        MESSAGE_SWIPED_EVENT_ID = 103
-        MESSAGE_VIEWED_EVENT_ID = 104
-        MESSAGE_DELETED_EVENT_ID = 105
+        MESSAGE_OPENED_EVENT_ID = 103
+        MESSAGE_DELETED_EVENT_ID = 104
 
     end
 end

@@ -22,24 +22,41 @@ module Events
                 end
             end
 
-
-            # TODO Change this to message_template
-
             def attributes
                 parent_attributes = super
+                if message
+                    template = message.message_template
 
-                # if message
-                #     parent_attributes.merge!(
-                #         {
-                #             message: {
-                #                 id: message.id,
-                #                 type: message.type,
-                #                 save_to_inbox: message.save_to_inbox,
-                #                 tags: message.tags
-                #             }
-                #         }
-                #     )
-                # end
+                    parent_attributes.merge!(
+                        {
+                            message: {
+                                id: message.id,
+                                notification_text: message.notification_text,
+                                tags: message.tags,
+                                read: message.read,
+                                viewed: message.viewed,
+                                saved_to_inbox: message.saved_to_inbox,
+                                timestamp: message.timestamp.to_i
+                            }
+                        },
+                        {
+                            message_template: {
+                                id: template.id,
+                                type: template.type,
+                                title: template.title,
+                                tags: template.tags,
+                                notification_text: template.notification_text,
+                                published: template.published,
+                                archived: template.archived,
+                                save_to_inbox: template.save_to_inbox,
+                                trigger_event_id: template.trigger_event_id,
+                                customer_segment_id: template.customer_segment_id,
+                                content_type: template.content_type,
+                                website_url: template.website_url
+                            }
+                        }
+                    )
+                end
 
                 return parent_attributes
             end
