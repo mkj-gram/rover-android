@@ -25,7 +25,9 @@ class Customer
 
     define_model_callbacks :save, :create, :update, :destroy
 
-    alias_method :id, :_id
+    def id
+        _id.to_s
+    end
     # track_dirty_attributes :a
     # index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
     # index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
@@ -217,6 +219,7 @@ class Customer
         # work around since virtus doesn't do nested attributes
         current_attributes[:devices] = current_attributes[:devices].map(&:to_doc) if current_attributes[:devices]
         current_attributes[:location] = current_attributes[:location].to_doc if current_attributes[:location]
+        current_attributes.delete_if{|k,v| v.nil? }
         return current_attributes
     end
 
