@@ -1,5 +1,4 @@
 class V1::ApplicationController < ActionController::API
-    include ::ActionController::Serialization
     include Rails.application.routes.url_helpers
     include PageHelper
     include OrderHelper
@@ -7,8 +6,6 @@ class V1::ApplicationController < ActionController::API
     include JsonHelper
     include RenderHelper
 
-    # set the scope to the view context so we can use Rails url_helper like v1_users_path(@user)
-    serialization_scope :view_context
 
     before_action :set_locale
     before_action :set_raven_context

@@ -1,4 +1,4 @@
-class IBeaconRegion < ActiveModelSerializers::Model
+class IBeaconRegion
     include Virtus.model
 
     attribute :id, String
