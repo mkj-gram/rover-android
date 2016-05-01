@@ -202,7 +202,7 @@ GEM
     os (0.9.6)
     pg (0.18.4)
     proxifier (1.0.3)
-    puma (2.16.0)
+    puma (3.4.0)
     rack (1.6.4)
     rack-cors (0.4.0)
     rack-test (0.6.3)
@@ -342,7 +342,7 @@ DEPENDENCIES
   multi_json (~> 1.11, >= 1.11.2)
   oj (~> 2.14, >= 2.14.4)
   pg (~> 0.18.4)
-  puma (~> 2.15, >= 2.15.3)
+  puma (~> 3.4)
   rack-cors (~> 0.4.0)
   rails (= 4.2.5)
   rails-api

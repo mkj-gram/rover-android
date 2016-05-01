@@ -21,7 +21,7 @@ gem 'sneakers', '~> 2.3', '>= 2.3.5'
 
 gem 'mailgun-ruby', '~>1.0.3', require: 'mailgun'
 
-gem 'puma', '~> 2.15', '>= 2.15.3'
+gem 'puma', '~> 3.4'
 
 gem 'connection_pool', '~> 2.2'
 
