@@ -148,6 +148,11 @@ class Message
             docs = mongo_client[collection_name].find("_id" => {"$in" => ids }).map{|document| Message.from_document(document) }
             return docs
         end
+
+        def delete_all(ids)
+            ids = ids.map{|id| id.is_a?(BSON::ObjectId) ? id : BSON::ObjectId(id) }
+            docs = mongo_client[collection_name].find("_id" => {"$in" => ids}).delete_many
+        end
     end
 
     private

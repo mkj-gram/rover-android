@@ -14,17 +14,24 @@ class CustomerInbox
 
         expired_message_futures = []
 
-        redis_client.pipelined do
-            inserts.each do |inbox, message|
-                expired_message_futures.push(redis_client.lrange(inbox.inbox_key, INBOX_LIMIT, -1))
-                redis_client.ltrim(inbox.inbox_key, 0, INBOX_LIMIT - 1)
-                redis_client.lpush(inbox.inbox_key, message.id.to_s)
+        # if we can't insert the item into redis just move on
+        begin
+            redis_client.pipelined do
+                inserts.each do |inbox, message|
+                    expired_message_futures.push(redis_client.lrange(inbox.inbox_key, INBOX_LIMIT, -1))
+                    redis_client.ltrim(inbox.inbox_key, 0, INBOX_LIMIT - 1)
+                    redis_client.lpush(inbox.inbox_key, message.id.to_s)
+                end
             end
+            expired_message_ids = expired_message_futures.map(&:value).flatten.uniq
+        rescue Redis::TimeoutError => e
+            Rails.logger.warn(e.message)
+            expired_message_ids = []
         end
-        expired_message_ids = expired_message_futures.map(&:value).flatten.uniq
+
 
         if expired_message_ids.any?
-            Message.delete_all(id: {"$in" => expired_message_ids})
+            Message.delete_all(expired_message_ids)
         end
 
         return inserts.keys.size
