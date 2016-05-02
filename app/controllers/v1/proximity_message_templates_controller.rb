@@ -70,8 +70,13 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         message_templates = elasticsearch_query.per_page(page_size).page(current_page).records
 
+        records = message_templates.includes(:customer_segment).to_a
+        # next grab all stats
+        stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
+        records.each{|template| template.stats = stats[template.id] }
+
         json = {
-            "data" => message_templates.includes(:customer_segment).to_a.map{|message| serialize_message(message)},
+            "data" => records.map{|message| serialize_message(message)},
             "meta" => {
                 "totalRecords" => message_templates.total,
                 "totalPages" => message_templates.total_pages,
@@ -197,27 +202,6 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         extra_attributes = {:"targeted-configurations-count" => message.targeted_beacon_configurations_count}
 
-        message_template_stats = message.stats
-
-        if message_template_stats
-            extra_attributes.merge!(
-                {
-                    :"total-delivered" => message_template_stats.total_delivered,
-                    :"total-notification-opens" => message_template_stats.total_notification_opens,
-                    :"total-inbox-opens" => message_template_stats.total_inbox_opens,
-                    :"total-opens" => message_template_stats.total_opens,
-                    :"unique-opens" => message_template_stats.unique_opens
-                }
-            )
-        else
-            extra_attributes.merge!(
-                :"total-delivered" => 0,
-                :"total-notification-opens" => 0,
-                :"total-inbox-opens" => 0,
-                :"total-opens" => 0,
-                :"unique-opens" => 0
-            )
-        end
 
         json = {
             data: serialize_message(message, extra_attributes),
@@ -302,6 +286,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def serialize_message(message, extra_attributes = {})
+
         message.account = current_account
         {
             type: "proximity-messages",
@@ -330,7 +315,12 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"save-to-inbox" => message.save_to_inbox,
                 :"content-type" => message.content_type,
                 :"website-url" => message.website_url,
-                :"approximate-customers-count" => message.approximate_customers_count
+                :"approximate-customers-count" => message.approximate_customers_count,
+                :"total-delivered" => message.stats.total_delivered,
+                :"total-notification-opens" => message.stats.total_notification_opens,
+                :"total-inbox-opens" => message.stats.total_inbox_opens,
+                :"total-opens" => message.stats.total_opens,
+                :"unique-opens" => message.stats.unique_opens
             }.merge(extra_attributes)
         }
     end

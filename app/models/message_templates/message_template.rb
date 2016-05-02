@@ -92,6 +92,10 @@ class MessageTemplate < ActiveRecord::Base
         @stats ||= MessageTemplateStats.find(self.id) || MessageTemplateStats.new(message_template_id: self.id)
     end
 
+    def stats=(new_stats)
+        @stats = new_stats.nil? ? MessageTemplateStats.new(message_template_id: self.id) : new_stats
+    end
+
     def schedule_start_date
         @schedule_start_date ||= if schedule_start_parsed_time
             Date.parse(schedule_start_parsed_time.to_s).to_s
