@@ -11,7 +11,8 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
         indexes :instance_id, type: 'string', index: 'not_analyzed'
     end
 
-    after_save :update_active_uuids
+    after_create :add_uuid_to_active_uuids
+    after_destroy :remove_uuid_from_active_uuids
 
     def as_indexed_json(options = {})
         json = super(options)
@@ -38,9 +39,14 @@ class EddystoneNamespaceConfiguration < BeaconConfiguration
 
     private
 
-    def update_active_uuids
-        if self.changes.include?(:namespace)
-            ActiveEddystoneConfigurationUuid.update_uuids(self.account_id, [namespace_was], [namespace])
+    def add_uuid_to_active_uuids
+        ActiveEddystoneConfigurationUuid.update_uuids(self.account_id, [], [namespace])
+    end
+
+    def remove_uuid_from_active_uuids
+        if !EddystoneNamespaceConfiguration.where(account_id: self.account_id, namespace: self.namespace).exists?
+            ActiveEddystoneConfigurationUuid.update_uuids(self.account_id, [namespace], [])
         end
     end
+
 end

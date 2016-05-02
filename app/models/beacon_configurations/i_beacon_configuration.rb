@@ -14,7 +14,8 @@ class IBeaconConfiguration < BeaconConfiguration
         indexes :minor, type: 'string', index: 'not_analyzed'
     end
 
-    after_save :update_active_uuids
+    after_create :add_uuid_to_active_uuids
+    after_destroy :remove_uuid_from_active_uuids
 
     def self.protocol
         @protocol ||= "iBeacon"
@@ -65,11 +66,20 @@ class IBeaconConfiguration < BeaconConfiguration
 
     private
 
-    def update_active_uuids
-        if self.changes.include?(:uuid)
-            ActiveIBeaconConfigurationUuid.update_uuids(self.account_id, [uuid_was], [uuid])
-        end
-
+    def add_uuid_to_active_uuids
+        ActiveIBeaconConfigurationUuid.update_uuids(self.account_id, [], [uuid])
     end
+
+    def remove_uuid_from_active_uuids
+        if !IBeaconConfiguration.where(account_id: self.account_id, uuid: self.uuid).exists?
+            ActiveIBeaconConfigurationUuid.update_uuids(self.account_id, [uuid], [])
+        end
+    end
+
+    # def update_active_uuids
+    #     if self.changes.include?(:uuid)
+    #         ActiveIBeaconConfigurationUuid.update_uuids(self.account_id, [uuid_was], [uuid])
+    #     end
+    # end
 
 end
