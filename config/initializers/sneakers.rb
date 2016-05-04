@@ -7,7 +7,7 @@ else
     bunny = Bunny.new(opts["amqp"], vhost: "/")
 end
 
-num_workers = ENV['WEB_CONCURRENCY'].nil? ? 2 : ENV['WEB_CONCURRENCY'].to_i
+num_workers = Integer(ENV['BACKGROUND_CONCURRENCY'] || 2)
 
 Sneakers.configure(
     {
