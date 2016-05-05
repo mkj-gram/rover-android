@@ -13,7 +13,7 @@ class MessageTemplate < ActiveRecord::Base
 
     serialize :landing_page_template, LandingPageTemplate
 
-    alias_attribute :landing_page_screen, :landing_page_template
+    alias_attribute :landing_page, :landing_page_template
 
     message_attribute :notification_text
 

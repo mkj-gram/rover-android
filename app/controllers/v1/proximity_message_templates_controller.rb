@@ -193,7 +193,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :content_type,
             :website_url,
             :customer_segment_id,
-            {:landing_page_screen => [:title, {:rows => [:autoHeight, :height, {:blocks => [:autoHeight, :autoWidth, :backgroundRed, :backgroundGreen, :backgroundBlue, :backgroundAlpha, :backgroundImagePath, :backgroundContentMode, :borderRed, :borderGreen, :borderBlue, :borderAlpha, :borderWidth, :height, :horizontalAlignment, :layout, :marginBottom, :marginLeft, :marginRight, :marginTop, :verticalAlignment, :width, :type] }]}]},
+            {:landing_page => [:title, {:rows => [:autoHeight, :height, {:blocks => [:autoHeight, :autoWidth, :backgroundRed, :backgroundGreen, :backgroundBlue, :backgroundAlpha, :backgroundImagePath, :backgroundContentMode, :borderRed, :borderGreen, :borderBlue, :borderAlpha, :borderWidth, :height, :horizontalAlignment, :layout, :marginBottom, :marginLeft, :marginRight, :marginTop, :verticalAlignment, :width, :type] }]}]},
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
         )
     end
@@ -289,7 +289,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def serialize_message(message, extra_attributes = {})
-        # extra_attributes.merge!(:landing_page_screen_template => message.landing_page_screen_template.to_json) if message.landing_page_screen_template
+        # extra_attributes.merge!(:landing_page_template => message.landing_page_template.to_json) if message.landing_page_template
         message.account = current_account
         {
             type: "proximity-messages",
@@ -324,7 +324,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
                 :"total-opens" => message.stats.total_opens,
                 :"unique-opens" => message.stats.unique_opens,
-                :"landing-page-screen" => message.landing_page_screen
+                :"landing-page-screen" => message.landing_page
             }.merge(extra_attributes)
         }
     end
