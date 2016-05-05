@@ -324,7 +324,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
                 :"total-opens" => message.stats.total_opens,
                 :"unique-opens" => message.stats.unique_opens,
-                :"landing-page-screen" => message.landing_page
+                :"landing-page" => message.landing_page
             }.merge(extra_attributes)
         }
     end
