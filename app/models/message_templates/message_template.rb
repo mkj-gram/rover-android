@@ -82,7 +82,8 @@ class MessageTemplate < ActiveRecord::Base
                 website_url: self.website_url,
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
-                android_title: get_android_title.to_s
+                android_title: get_android_title.to_s,
+                landing_page: landing_page_template.render(opts)
             }
         )
     end

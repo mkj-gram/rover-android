@@ -28,6 +28,7 @@ class LandingPageTemplate
     end
 
     def render(opts = {})
+        LandingPage.new(JSON.parse(self.to_json))
     end
 
 end

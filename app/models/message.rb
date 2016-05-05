@@ -23,6 +23,7 @@ class Message
     attribute :website_url, String
     attribute :timestamp, Time , default: lambda { |model, attribute|  Time.zone.now }
     attribute :expire_at, Time
+    attribute :landing_page, LandingPage
 
 
 
@@ -71,7 +72,11 @@ class Message
     end
 
     def to_doc
-        attributes
+        doc = attributes
+        landing_page = doc.delete(:landing_page)
+        doc.merge!(landing_page: landing_page.to_doc) if landing_page
+        doc.compact!
+        doc
     end
 
     def create
@@ -152,6 +157,12 @@ class Message
         def delete_all(ids)
             ids = ids.map{|id| id.is_a?(BSON::ObjectId) ? id : BSON::ObjectId(id) }
             docs = mongo_client[collection_name].find("_id" => {"$in" => ids}).delete_many
+        end
+
+        def first
+            doc = mongo_client[collection_name].find().limit(1).first
+            return nil if doc.nil?
+            return Message.from_document(doc)
         end
     end
 
