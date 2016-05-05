@@ -101,14 +101,16 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     # create accepts everything the same as update
     def create
         json = flatten_request({single_record: true})
-        @proximity_message = ProximityMessageTemplate.new(proximity_message_params(json[:data]))
-        @proximity_message.account_id = current_account.id
+
+        @proximity_message = current_account.proximity_message_templates.build(proximity_message_params(json[:data]))
+
         if @proximity_message.save
             json = render_proximity_message(@proximity_message)
             render json: json
         else
             render json: { errors: V1::ProximityMessageTemplateErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
         end
+
     end
 
     def update
@@ -191,6 +193,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :content_type,
             :website_url,
             :customer_segment_id,
+            {:landing_page_screen => [:title, {:rows => [:autoHeight, :height, {:blocks => [:autoHeight, :autoWidth, :backgroundRed, :backgroundGreen, :backgroundBlue, :backgroundAlpha, :backgroundImagePath, :backgroundContentMode, :borderRed, :borderGreen, :borderBlue, :borderAlpha, :borderWidth, :height, :horizontalAlignment, :layout, :marginBottom, :marginLeft, :marginRight, :marginTop, :verticalAlignment, :width, :type] }]}]},
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
         )
     end
@@ -286,7 +289,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def serialize_message(message, extra_attributes = {})
-
+        # extra_attributes.merge!(:landing_page_screen_template => message.landing_page_screen_template.to_json) if message.landing_page_screen_template
         message.account = current_account
         {
             type: "proximity-messages",
@@ -320,7 +323,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"total-notification-opens" => message.stats.total_notification_opens,
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
                 :"total-opens" => message.stats.total_opens,
-                :"unique-opens" => message.stats.unique_opens
+                :"unique-opens" => message.stats.unique_opens,
+                :"landing-page-screen" => message.landing_page_screen
             }.merge(extra_attributes)
         }
     end
