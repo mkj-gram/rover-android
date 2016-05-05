@@ -5,30 +5,51 @@ class LandingPage
     class Block
         include Virtus.model
 
+        attribute :type, String
+
         attribute :autoHeight, Boolean, default: false
         attribute :autoWidth, Boolean, default: false
-        attribute :backgroundRed, Integer, default: 255
-        attribute :backgroundGreen, Integer, default: 255
-        attribute :backgroundBlue, Integer, default: 255
-        attribute :backgroundAlpha, Float, default: 1
+        attribute :width, Integer, default: 170
+        attribute :height, Integer, default: 280
+
+        # Layout
+        attribute :layout, String, default: "stacked"
+        attribute :horizontalAlignment, String, default: "left"
+        attribute :verticalAlignment, String, default: "top"
+
+        # offsets
+        attribute :offsetTop, Integer, default: 20
+        attribute :offsetBottom, Integer, default: 20
+        attribute :offsetLeft, Integer, default: 20
+        attribute :offsetRight, Integer, default: 20
+        attribute :centerOffset, Integer
+        attribute :middleOffset, Integer
+
+        # Background
+        attribute :backgroundRed, Integer, default: 216
+        attribute :backgroundGreen, Integer, default: 216
+        attribute :backgroundBlue, Integer, default: 216
+        attribute :backgroundAlpha, Float, default: 1.0
         attribute :backgroundImagePath, String
-        attribute :backgroundContentMode, String
-        attribute :borderRed, Integer, default: 255
-        attribute :borderGreen, Integer, default: 255
-        attribute :borderBlue, Integer, default: 255
-        attribute :borderAlpha, Float, default: 1
+        attribute :backgroundContentMode, String, default: "tile"
+
+        # border
+        attribute :borderRed, Integer, default: 151
+        attribute :borderGreen, Integer, default: 151
+        attribute :borderBlue, Integer, default: 151
+        attribute :borderAlpha, Float, default: 1.0
         attribute :borderWidth, Integer, default: 1
         attribute :borderRadius, Integer, default: 0
-        attribute :height, Integer
-        attribute :horizontalAlignment, String
-        attribute :layout, String
-        attribute :marginBottom, Integer
-        attribute :marginLeft, Integer
-        attribute :marginRight, Integer
-        attribute :marginTop, Integer
-        attribute :verticalAlignment, String
-        attribute :width, Integer
-        attribute :type, String
+
+        # Button Block
+        attribute :title, String
+        attribute :titleRed, Integer, default: 255
+        attribute :titleGreen, Integer, default: 255
+        attribute :titleBlue, Integer, default: 255
+        attribute :titleAlpha, Float, default: 1.0
+
+        # Text Block
+        attribute :text, String
     end
 
     class Row

@@ -28,7 +28,7 @@ class LandingPageTemplate
     end
 
     def render(opts = {})
-        LandingPage.new(JSON.parse(self.to_json))
+        LandingPage.new(title: TemplateHelper.render_string(title, opts), rows: rows.map{|row| row.render(opts)})
     end
 
 end
