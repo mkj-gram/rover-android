@@ -114,7 +114,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def update
-        json = flatten_request({single_record: true, except: "attributes.landing-page"})
+        json = flatten_request({single_record: true})
         if @proximity_message.update_attributes(proximity_message_params(json[:data]))
             json = render_proximity_message(@proximity_message)
             render json: json
@@ -159,7 +159,6 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :location_ids, :filter_location_ids)
         convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
         convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_id, :filter_gimbal_place_id)
-        convert_param_if_exists(local_params[:proximity_messages], :"landing-page", :landing_page)
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
         param_should_be_array(local_params[:proximity_messages], :filter_location_tags)
         param_should_be_array(local_params[:proximity_messages], :limits)
@@ -325,7 +324,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
                 :"total-opens" => message.stats.total_opens,
                 :"unique-opens" => message.stats.unique_opens,
-                :"landing-page" => message.landing_page
+                :"landing-page" => message.landing_page.as_json(dasherize: true)
             }.merge(extra_attributes)
         }
     end

@@ -17,14 +17,14 @@ module LandingPageTemplateBuilder
 
 
 
-        attribute :autoHeight, Boolean
+        attribute :auto_height, Boolean
         attribute :height, Float
         attribute :blocks, Array[LandingPageTemplateBuilder::Block]
 
 
         def to_json(opts ={})
             {
-                autoHeight: autoHeight,
+                auto_height: auto_height,
                 height: height,
                 blocks: blocks
             }
@@ -39,7 +39,7 @@ module LandingPageTemplateBuilder
         end
 
         def ==(other)
-            self.autoHeight == other.autoHeight && self.height == other.height && self.blocks == other.blocks
+            self.auto_height == other.auto_height && self.height == other.height && self.blocks == other.blocks
         end
 
     end
