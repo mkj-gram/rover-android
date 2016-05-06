@@ -193,7 +193,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :content_type,
             :website_url,
             :customer_segment_id,
-            {:landing_page => [:title, {:rows => [:autoHeight, :height, {:blocks => [:autoHeight, :autoWidth, :backgroundRed, :backgroundGreen, :backgroundBlue, :backgroundAlpha, :backgroundImagePath, :backgroundContentMode, :borderRed, :borderGreen, :borderBlue, :borderAlpha, :borderWidth, :height, :horizontalAlignment, :layout, :marginBottom, :marginLeft, :marginRight, :marginTop, :verticalAlignment, :width, :type] }]}]},
+            {:landing_page => [:title, {:rows => [:autoHeight, :height, {:blocks => [:type, :autoHeight, :autoWidth, :width, :height, :layout, :horizontalAlignment, :verticalAlignment,:offsetTop,:offsetBottom,:offsetLeft,:offsetRight,:centerOffset,:middleOffset,:backgroundRed,:backgroundGreen,:backgroundBlue,:backgroundAlpha,:backgroundImagePath,:backgroundContentMode,:borderRed,:borderGreen,:borderBlue,:borderAlpha,:borderWidth,:borderRadius,:title,:titleRed,:titleGreen,:titleBlue,:titleAlpha,:text] }]}]},
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
         )
     end
