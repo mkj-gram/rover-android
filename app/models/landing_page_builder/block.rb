@@ -45,8 +45,6 @@ module LandingPageBuilder
             return false if other.nil? || !other.is_a?(LandingPageTemplateBuilder::Block)
             (
                 self.type == other.type &&
-                self.auto_height == other.auto_height &&
-                self.auto_width == other.auto_width &&
                 self.width == other.width &&
                 self.height == other.height &&
                 self.layout == other.layout &&

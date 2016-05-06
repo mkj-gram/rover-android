@@ -8,7 +8,6 @@ module LandingPageBuilder
         def ==(other)
             return false if other.nil?
             (
-                self.auto_height == other.auto_height &&
                 self.height == other.height &&
                 self.blocks == other.blocks
             )
