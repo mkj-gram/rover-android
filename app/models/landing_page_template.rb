@@ -1,12 +1,16 @@
-class LandingPageTemplate
-    include Virtus.model
+class LandingPageTemplate < LandingPageBuilder::Screen
 
     class << self
 
         def load(obj)
             return nil if obj.nil?
             return obj if !obj.is_a?(Hash)
-            LandingPageTemplate.new(obj)
+            begin
+                LandingPageTemplate.new(obj)
+            rescue => e
+                Rails.logger.warn("Couldn't load object #{obj} into LandingPageTemplate")
+                return nil
+            end
         end
 
         def dump(obj)
@@ -19,16 +23,26 @@ class LandingPageTemplate
 
     end
 
-
-    attribute :title, String
-    attribute :rows, Array[LandingPageTemplateBuilder::Row]
-
     def valid?
         true
     end
 
     def render(opts = {})
-        LandingPage.new(title: TemplateHelper.render_string(title, opts), rows: rows.map{|row| row.render(opts)})
+        LandingPage.new(
+            {
+                title: TemplateHelper.render_string(title, opts),
+                rows:  rows.map do |row|
+                    {
+                        blocks: row.blocks.map do |block|
+                            block.title = TemplateHelper.render_string(block.title, opts) if block.title
+                            block.text = TemplateHelper.render_string(block.text, opts) if block.text
+                            block.as_json
+                        end
+                    }
+
+                end
+            }
+        )
     end
 
     def to_json(opts ={})
@@ -39,11 +53,6 @@ class LandingPageTemplate
         json = super
         json.dasherize! if opts[:dasherize]
         json
-    end
-
-    def ==(other)
-        return false if other.nil? || !other.is_a?(LandingPageTemplate)
-        self.title == other.title && self.rows == other.rows
     end
 
 end

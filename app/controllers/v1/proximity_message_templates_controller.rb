@@ -193,9 +193,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :content_type,
             :website_url,
             :customer_segment_id,
-            {:landing_page => [:title, {:rows => [:auto_height, :height, {:blocks => [:type, :auto_height, :auto_width, :width, :height, :layout, :horizontal_alignment, :vertical_alignment, :offset_top, :offset_bottom, :offset_left, :offset_right, :center_offset, :middle_offset, :background_red, :background_green, :background_blue, :background_alpha, :background_image_path, :background_content_mode, :border_red, :border_green, :border_blue, :border_alpha, :border_width, :border_radius, :title, :title_red, :title_green, :title_blue, :title_alpha, :title_font_weight, :text] }]}]},
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
-        )
+        ).merge(:landing_page => local_params.dig(:proximity_messages, :landing_page))
     end
 
     def render_proximity_message(message)

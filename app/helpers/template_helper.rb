@@ -4,6 +4,7 @@ module TemplateHelper
 
     class << self
         def render_string(string, opts = {})
+            puts "RENDER #{string}"
             return string if string.nil? || string.empty?
             string.gsub(TEMPLATE_ARGUMENT_REGEX) do |string_match|
                 attribute, fallback = string_match[1..string_match.length-2].split(",")
