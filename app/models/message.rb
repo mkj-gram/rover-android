@@ -71,6 +71,14 @@ class Message
         _id.to_s
     end
 
+    def new_record?
+        @_new_record.nil? ? true : @_new_record
+    end
+
+    def new_record=(val)
+        @_new_record = val
+    end
+
     def to_doc
         doc = attributes
         landing_page = doc.delete(:landing_page)
@@ -86,7 +94,6 @@ class Message
                 mongo_client[collection_name].insert_one(to_doc)
             end
         end
-        changes_applied
     end
 
     def save
@@ -106,7 +113,6 @@ class Message
         run_callbacks :destroy do
             mongo_client[collection_name].delete_one("_id" => self._id)
         end
-        changes_applied
     end
 
     def customer=(new_customer)
