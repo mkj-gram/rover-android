@@ -41,6 +41,7 @@ module LandingPageTemplateBuilder
 
         # Button Block
         attribute :title, String
+        attribute :titleFontWeight, Integer, default: 500
         attribute :titleRed, Integer, default: 255
         attribute :titleGreen, Integer, default: 255
         attribute :titleBlue, Integer, default: 255
@@ -90,12 +91,15 @@ module LandingPageTemplateBuilder
 
                 # Button Block
                 title: TemplateHelper.render_string(title, opts),
+                titleFontWeight: titleFontWeight,
                 titleRed: titleRed,
                 titleGreen: titleGreen,
                 titleBlue: titleBlue,
                 titleAlpha: titleAlpha,
 
-                text: TemplateHelper.render_string(text, opts)
+
+                text: TemplateHelper.render_string(text, opts),
+
 
             }
         end
@@ -134,6 +138,7 @@ module LandingPageTemplateBuilder
                 self.titleGreen == other.titleGreen &&
                 self.titleBlue == other.titleBlue &&
                 self.titleAlpha == other.titleAlpha &&
+                self.titleFontWeight == other.titleFontWeight &&
                 self.text == other.text
             )
         end
