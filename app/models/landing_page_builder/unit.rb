@@ -7,6 +7,7 @@ module LandingPageBuilder
 
 
         def ==(other)
+            return false if other.nil?
             self.value == other.value && self.type == other.type
         end
 
