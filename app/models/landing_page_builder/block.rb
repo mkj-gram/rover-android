@@ -42,7 +42,7 @@ module LandingPageBuilder
 
 
         def ==(other)
-            return false if other.nil? || !other.is_a?(LandingPageTemplateBuilder::Block)
+            return false if other.nil?
             (
                 self.type == other.type &&
                 self.width == other.width &&
