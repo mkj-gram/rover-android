@@ -3,7 +3,7 @@ class Message
     include Virtus.model(:nullify_blank => true)
     include ActiveModel::Validations
     include ActiveModel::Validations::Callbacks
-    include VirtusDirtyAttributes
+    # include VirtusDirtyAttributes
     extend ActiveModel::Naming
     extend ActiveModel::Callbacks
 
@@ -94,12 +94,7 @@ class Message
         if new_record?
             create
         else
-            run_callbacks :save do
-                if changes.any?
-                    mongo_client[collection_name].find("_id" => self._id).update_one(changes.map{|k,v|  {"$set" => { k => v.last } }})
-                end
-            end
-            changes_applied
+            mongo_client[collection_name].find("_id" => self.id).replace_one(self.to_doc)
         end
     end
 
