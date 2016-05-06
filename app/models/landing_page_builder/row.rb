@@ -2,8 +2,7 @@ module LandingPageBuilder
     class Row
         include Virtus.model
 
-        attribute :auto_height, Boolean
-        attribute :height, Float
+        attribute :height, LandingPageBuilder::Unit
         attribute :blocks, Array[LandingPageBuilder::Block]
 
         def ==(other)

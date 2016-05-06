@@ -4,8 +4,6 @@ module LandingPageBuilder
 
         attribute :type, String
 
-        attribute :auto_height, Boolean, default: false
-        attribute :auto_width, Boolean, default: false
         attribute :width, LandingPageBuilder::Unit, default: { value: 170, type: "points" }
         attribute :height, LandingPageBuilder::Unit, default: { value: 280, type: "points" }
 
