@@ -3,6 +3,8 @@ module LandingPageTemplateBuilder
         include Virtus.model
 
 
+        # TODO make this a mixin since landing_page and landing_page_template use the same attributes
+        # they just differ in how they are rendered
         attribute :type, String
 
         attribute :auto_height, Boolean, default: false
@@ -20,8 +22,8 @@ module LandingPageTemplateBuilder
         attribute :offset_bottom, Integer, default: 20
         attribute :offset_left, Integer, default: 20
         attribute :offset_right, Integer, default: 20
-        attribute :offset_center, Integer
-        attribute :offset_middle, Integer
+        attribute :offset_center, Integer, default: 0
+        attribute :offset_middle, Integer, default: 0
 
         # Background
         attribute :background_red, Integer, default: 216
