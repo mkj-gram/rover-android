@@ -38,5 +38,9 @@ module LandingPageTemplateBuilder
             }
         end
 
+        def ==(other)
+            self.autoHeight == other.autoHeight && self.height == other.height && self.blocks == other.blocks
+        end
+
     end
 end

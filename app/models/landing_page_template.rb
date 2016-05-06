@@ -31,4 +31,9 @@ class LandingPageTemplate
         LandingPage.new(title: TemplateHelper.render_string(title, opts), rows: rows.map{|row| row.render(opts)})
     end
 
+    def ==(other)
+        return false if other.nil? || !other.is_a?(LandingPageTemplate)
+        self.title == other.title && self.rows == other.rows
+    end
+
 end

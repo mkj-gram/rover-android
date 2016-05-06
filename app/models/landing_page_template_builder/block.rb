@@ -100,5 +100,43 @@ module LandingPageTemplateBuilder
             }
         end
 
+        def ==(other)
+            return false if other.nil? || !other.is_a?(LandingPageTemplateBuilder::Block)
+            (
+                self.type == other.type &&
+                self.autoHeight == other.autoHeight &&
+                self.autoWidth == other.autoWidth &&
+                self.width == other.width &&
+                self.height == other.height &&
+                self.layout == other.layout &&
+                self.horizontalAlignment == other.horizontalAlignment &&
+                self.verticalAlignment == other.verticalAlignment &&
+                self.offsetTop == other.offsetTop &&
+                self.offsetBottom == other.offsetBottom &&
+                self.offsetLeft == other.offsetLeft &&
+                self.offsetRight == other.offsetRight &&
+                self.centerOffset == other.centerOffset &&
+                self.middleOffset == other.middleOffset &&
+                self.backgroundRed == other.backgroundRed &&
+                self.backgroundGreen == other.backgroundGreen &&
+                self.backgroundBlue == other.backgroundBlue &&
+                self.backgroundAlpha == other.backgroundAlpha &&
+                self.backgroundImagePath == other.backgroundImagePath &&
+                self.backgroundContentMode == other.backgroundContentMode &&
+                self.borderRed == other.borderRed &&
+                self.borderGreen == other.borderGreen &&
+                self.borderBlue == other.borderBlue &&
+                self.borderAlpha == other.borderAlpha &&
+                self.borderWidth == other.borderWidth &&
+                self.borderRadius == other.borderRadius &&
+                self.title == other.title &&
+                self.titleRed == other.titleRed &&
+                self.titleGreen == other.titleGreen &&
+                self.titleBlue == other.titleBlue &&
+                self.titleAlpha == other.titleAlpha &&
+                self.text == other.text
+            )
+        end
+
     end
 end
