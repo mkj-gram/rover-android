@@ -32,7 +32,7 @@ module LandingPageTemplateBuilder
 
         def render(opts ={})
             {
-                autoHeight: autoHeight,
+                auto_height: auto_height,
                 height: height,
                 blocks: blocks.map{|block| block.render(opts)}
             }

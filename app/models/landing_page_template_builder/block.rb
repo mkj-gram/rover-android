@@ -55,8 +55,8 @@ module LandingPageTemplateBuilder
             {
                 type: type,
 
-                auto_height: autoHeight,
-                auto_width: autoWidth,
+                auto_height: auto_height,
+                auto_width: auto_width,
                 width: width,
                 height: height,
 
