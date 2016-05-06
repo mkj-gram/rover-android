@@ -20,8 +20,8 @@ module LandingPageTemplateBuilder
         attribute :offsetBottom, Integer, default: 20
         attribute :offsetLeft, Integer, default: 20
         attribute :offsetRight, Integer, default: 20
-        attribute :centerOffset, Integer
-        attribute :middleOffset, Integer
+        attribute :offsetCenter, Integer
+        attribute :offsetMiddle, Integer
 
         # Background
         attribute :backgroundRed, Integer, default: 216
@@ -70,8 +70,8 @@ module LandingPageTemplateBuilder
                 offsetBottom: offsetBottom,
                 offsetLeft: offsetLeft,
                 offsetRight: offsetRight,
-                centerOffset: centerOffset,
-                middleOffset: middleOffset,
+                offsetCenter: offsetCenter,
+                offsetMiddle: offsetMiddle,
 
                 # Background
                 backgroundRed: backgroundRed,
@@ -119,8 +119,8 @@ module LandingPageTemplateBuilder
                 self.offsetBottom == other.offsetBottom &&
                 self.offsetLeft == other.offsetLeft &&
                 self.offsetRight == other.offsetRight &&
-                self.centerOffset == other.centerOffset &&
-                self.middleOffset == other.middleOffset &&
+                self.offsetCenter == other.offsetCenter &&
+                self.offsetMiddle == other.offsetMiddle &&
                 self.backgroundRed == other.backgroundRed &&
                 self.backgroundGreen == other.backgroundGreen &&
                 self.backgroundBlue == other.backgroundBlue &&
