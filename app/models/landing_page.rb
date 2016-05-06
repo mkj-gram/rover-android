@@ -7,8 +7,8 @@ class LandingPage
 
         attribute :type, String
 
-        attribute :auto_Height, Boolean, default: false
-        attribute :auto_Width, Boolean, default: false
+        attribute :auto_height, Boolean, default: false
+        attribute :auto_width, Boolean, default: false
         attribute :width, Integer, default: 170
         attribute :height, Integer, default: 280
 
