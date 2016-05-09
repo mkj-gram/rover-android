@@ -31,15 +31,9 @@ module LandingPageBuilder
                     self.type == other.type &&
                     self.width == other.width &&
                     self.height == other.height &&
-                    self.layout == other.layout &&
-                    self.horizontal_alignment == other.horizontal_alignment &&
-                    self.vertical_alignment == other.vertical_alignment &&
-                    self.offset_top == other.offset_top &&
-                    self.offset_bottom == other.offset_bottom &&
-                    self.offset_left == other.offset_left &&
-                    self.offset_right == other.offset_right &&
-                    self.offset_center == other.offset_center &&
-                    self.offset_middle == other.offset_middle &&
+                    self.position == other.position &&
+                    self.alignment == other.alignment &&
+                    self.offset == other.offset &&
                     self.background_color == other.background_color &&
                     self.background_content_mode == other.background_content_mode &&
                     self.border_color == other.border_color &&
