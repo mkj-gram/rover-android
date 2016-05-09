@@ -34,8 +34,12 @@ class LandingPageTemplate < LandingPageBuilder::Screen
                 rows:  rows.map do |row|
                     {
                         blocks: row.blocks.map do |block|
-                            block.title = TemplateHelper.render_string(block.title, opts) if block.title
-                            block.text = TemplateHelper.render_string(block.text, opts) if block.text
+                            case block
+                            when LandingPageBuilder::Blocks::TextBlock
+                                block.text = TemplateHelper.render_string(block.text, opts) if block.text
+                            when LandingPageBuilder::Blocks::ButtonBlock
+                                block.title = TemplateHelper.render_string(block.title, opts) if block.title
+                            end
                             block.as_json
                         end
                     }
