@@ -5,7 +5,7 @@ module LandingPageBuilder
 
             attribute :title_text, String, default: 'Button'
             attribute :title_alignment, LandingPageBuilder::Alignment, default: { horizontal: 'center', vertical: 'middle' }
-            attribute :title_offset, LandingPageBuilder::Offset
+            attribute :title_offset, LandingPageBuilder::Offset, default: {}
             attribute :title_color, LandingPageBuilder::Color, default: { red: 255, green: 255, blue: 255, alpha: 1.0 }
             attribute :title_font_size, Integer, default: 16
             attribute :title_font_weight, Integer, default: 700
