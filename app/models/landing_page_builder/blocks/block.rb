@@ -9,17 +9,11 @@ module LandingPageBuilder
             attribute :height, LandingPageBuilder::Unit, default: { value: 280, type: "points" }
 
             # Layout
-            attribute :layout, String, default: "stacked"
-            attribute :horizontal_alignment, String, default: "left"
-            attribute :vertical_alignment, String, default: "top"
+            attribute :position, String, default: "stacked"
+            attribute :alignment, LandingPageBuilder::Alignment, default: { horizontal: "fill" }
 
             # offsets
-            attribute :offset_top, LandingPageBuilder::Unit, default: { value: 20, type: "points" }
-            attribute :offset_bottom, LandingPageBuilder::Unit, default: { value: 20, type: "points" }
-            attribute :offset_left, LandingPageBuilder::Unit, default: { value: 20, type: "points" }
-            attribute :offset_right, LandingPageBuilder::Unit, default: { value: 20, type: "points" }
-            attribute :offset_center, LandingPageBuilder::Unit, default: { value: 0, type: "points" }
-            attribute :offset_middle, LandingPageBuilder::Unit, default: { value: 0, type: "points" }
+            attribute :offset, LandingPageBuilder::Offset, default: { top: { value: 20 } , right: { value: 20 }, bottom: { value: 20 }, left: { value: 20 } }
 
             # Background
             attribute :background_color, LandingPageBuilder::Color, default: { red: 216, green: 216, blue: 216, alpha: 1.0 }
