@@ -316,6 +316,8 @@ class Customer
         run_callbacks :create do
             run_callbacks :save do
                 mongo_client[collection_name].insert_one(to_doc.merge("created_at" => Time.zone.now))
+                self.new_record = false
+
             end
         end
         self.new_record = false
@@ -341,12 +343,17 @@ class Customer
                         hash
                     end
                     mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => setters.merge("updated_at" => Time.zone.now)})
+                    self.new_record = false
                 end
             end
             self.new_record = false
             changes_applied
         end
         return self
+    end
+
+    def update_attribute(attribute)
+        mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => attribute})
     end
 
     def update(update_params)
