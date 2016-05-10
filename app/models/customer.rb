@@ -143,7 +143,6 @@ class Customer
         end
     end
 
-    before_save :update_active_traits
     after_create :increment_customers_count, if: -> { indexable_customer? }
     after_destroy :decrement_customers_count
 
@@ -317,7 +316,7 @@ class Customer
             run_callbacks :save do
                 mongo_client[collection_name].insert_one(to_doc.merge("created_at" => Time.zone.now))
                 self.new_record = false
-
+                true
             end
         end
         self.new_record = false
@@ -344,6 +343,7 @@ class Customer
                     end
                     mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => setters.merge("updated_at" => Time.zone.now)})
                     self.new_record = false
+                    true
                 end
             end
             self.new_record = false
