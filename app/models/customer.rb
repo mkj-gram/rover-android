@@ -19,6 +19,10 @@ class Customer
     attribute :traits, Hash
     attribute :location, GeoPoint
     attribute :inbox_updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
+    attribute :last_location_visit_id, Integer
+    attribute :total_location_visits, Integer, default: 0
+    attribute :last_location_visit_at, Time
+    attribute :first_visit_at, Time
     attribute :devices, Array[CustomerDevice], default: []
     attribute :created_at, Time
     attribute :updated_at, Time
@@ -243,59 +247,58 @@ class Customer
         "#<Customer:#{object_id} _id=#{@_id} first_name=#{format_variable(@first_name)} last_name=#{format_variable(@last_name)} email=#{format_variable(@email)} phone_number=#{format_variable(@phone_number)} age=#{format_variable(@age)} devices=#{format_variable(@devices)}>"
     end
 
+    class << self
+        def from_document(doc)
+            location = doc.delete(:location)
+            customer = Customer.new(doc.merge(new_record: false))
+            customer.devices.each { |device| device.customer = customer } if customer.devices.any?
+            customer.location = GeoPoint.new(latitude: location.first, longitude: location.last) if location
+            customer.changes_applied # force an update for what attributes are
+            return customer
+        end
+
+        def find(id)
+            doc = mongo_client[collection_name].find("_id" => BSON::ObjectId(id)).limit(1).first
+            return nil if doc.nil?
+            return Customer.from_document(doc)
+        end
+
+        def first
+            doc = mongo_client[collection_name].find().limit(1).first
+            return nil if doc.nil?
+            return Customer.from_document(doc)
+        end
+
+        def find_all(ids)
+            ids = ids.map{|id| BSON::ObjectId(id)}
+            docs = mongo_client[collection_name].find("_id" => {"$in" => ids }).map{|document| Customer.from_document(document) }
+            return docs
+        end
+
+        def find_by(query)
+            doc = mongo_client[collection_name].find(query).first
+            return nil if doc.nil?
+            return Customer.from_document(doc)
+        end
+
+        def count(query = {})
+            return mongo_client[collection_name].find(query).count
+        end
+
+        def delete_all
+            mongo_client[collection_name].find().delete_many
+        end
+    end
+
+
+
     def valid?
         if devices.any?
             super && devices.all?(&:valid?)
         else
             super
         end
-    end
 
-    def self.from_document(doc)
-        location = doc.delete(:location)
-        customer = Customer.new(doc.merge(new_record: false))
-        customer.devices.each { |device| device.customer = customer } if customer.devices.any?
-        customer.location = GeoPoint.new(latitude: location.first, longitude: location.last) if location
-        customer.changes_applied # force an update for what attributes are
-        return customer
-    end
-
-    def self.find(id)
-        doc = mongo_client[collection_name].find("_id" => BSON::ObjectId(id)).limit(1).first
-        return nil if doc.nil?
-        return Customer.from_document(doc)
-    end
-
-    def self.first
-        doc = mongo_client[collection_name].find().limit(1).first
-        return nil if doc.nil?
-        return Customer.from_document(doc)
-    end
-
-    def self.all
-        mongo_client[collection_name].find({}).each do |document|
-            yield Customer.from_document(document) if block_given?
-        end
-    end
-
-    def self.find_all(ids)
-        ids = ids.map{|id| BSON::ObjectId(id)}
-        docs = mongo_client[collection_name].find("_id" => {"$in" => ids }).map{|document| Customer.from_document(document) }
-        return docs
-    end
-
-    def self.find_by(query)
-        doc = mongo_client[collection_name].find(query).first
-        return nil if doc.nil?
-        return Customer.from_document(doc)
-    end
-
-    def self.count(query = {})
-        return mongo_client[collection_name].find(query).count
-    end
-
-    def self.delete_all
-        mongo_client[collection_name].find().delete_many
     end
 
     def build_device(attributes)
@@ -344,6 +347,10 @@ class Customer
             changes_applied
         end
         return self
+    end
+
+    def update(update_params)
+        mongo_client[collection_name].find("_id" => self._id).update_one(update_params)
     end
 
     def remove_device(device)
