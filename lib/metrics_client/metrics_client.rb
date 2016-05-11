@@ -8,12 +8,6 @@ module MetricsClient
         @@mutex = Mutex.new
         @@submitter_lock = Mutex.new
 
-        def queue
-            return @queue if @queue
-            authenticate!
-            return @queue
-        end
-
         def aggregator
             return @aggregator if @aggregator
             authenticate!
@@ -27,11 +21,14 @@ module MetricsClient
         end
 
         def flush!
+            return if aggregator.empty?
+            submitter_queue = ::Librato::Metrics::Queue.new(prefix: config.prefix, source: config.source)
             @@submitter_lock.synchronize do
-                queue.submit if !queue.empty?
-                Rails.logger.debug(aggregator.queued)
-                aggregator.submit if !aggregator.empty?
+                submitter_queue.merge!(aggregator)
+                aggregator.clear
             end
+            Rails.logger.debug(submitter_queue.queued)
+            submitter_queue.submit if !submitter_queue.empty?
         end
 
         def submitter
@@ -40,10 +37,13 @@ module MetricsClient
 
         private
 
+        def config
+            @@config ||= ::Librato::Rails::Configuration.new
+        end
+
         def authenticate!
             return if @authenticated
             @@mutex.synchronize {
-                config = ::Librato::Rails::Configuration.new
                 Librato::Metrics.authenticate(config.user, config.token)
                 flush_interval = config.flush_interval || 60
                 @@submitter = Concurrent::TimerTask.new(execution_interval: flush_interval, timeout_interval: 30) do
@@ -56,7 +56,6 @@ module MetricsClient
                     Rails.logger.info("[ MetricsClient ] Done!".blue.bold)
                 end
 
-                @queue = ::Librato::Metrics::Queue.new(prefix: config.prefix, source: config.source)
                 @aggregator = ::Librato::Metrics::Aggregator.new(prefix: config.prefix, source: config.source)
             }
             @@submitter.execute
