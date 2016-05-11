@@ -25,6 +25,8 @@ module LandingPageBuilder
             attribute :border_width, Float, default: 1.0
             attribute :border_radius, Float, default: 1.0
 
+            attribute :action, LandingPageBuilder::Actions::Action
+
             def ==(other)
                 return false if other.nil?
                 (
@@ -40,6 +42,10 @@ module LandingPageBuilder
                     self.border_width == other.border_width &&
                     self.border_radius == other.border_radius
                 )
+            end
+
+            def action=(new_action)
+                super LandingPageBuilder::Actions::ActionBuilder.new(new_action)
             end
 
         end
