@@ -40,11 +40,13 @@ module LandingPageBuilder
                     self.background_content_mode == other.background_content_mode &&
                     self.border_color == other.border_color &&
                     self.border_width == other.border_width &&
-                    self.border_radius == other.border_radius
+                    self.border_radius == other.border_radius &&
+                    self.action == other.action
                 )
             end
 
             def action=(new_action)
+                return if new_action.nil?
                 super LandingPageBuilder::Actions::ActionBuilder.new(new_action)
             end
 
