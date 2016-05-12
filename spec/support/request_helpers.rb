@@ -17,8 +17,10 @@ module RequestHelpers
     end
 
     module HeaderHelper
-        def signed_request_header(account)
-            return {'X-Rover-Api-Key' => account.token}
+        def signed_request_header(account, device_id = nil)
+            headers = {'X-Rover-Api-Key' => account.token}
+            headers.merge!('X-Rover-Device-Id' => device_id) if device_id
+            return headers
         end
 
         # def sign_request!(account_or_session)

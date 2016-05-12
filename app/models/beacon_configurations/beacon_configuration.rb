@@ -76,6 +76,29 @@ class BeaconConfiguration < ActiveRecord::Base
     validates :title, presence: true
     validates :account_id, presence: true
 
+    def self.create_index!(opts = {})
+        begin
+            self.__elasticsearch__.delete_index! if opts[:force]
+        rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
+        end
+        client = self.__elasticsearch__.client
+
+        if !client.indices.exists?(index: BeaconConfiguration.index_name)
+            begin
+                client.indices.create(index: BeaconConfiguration.index_name, body: BeaconConfiguration.settings.to_hash)
+                client.indices.put_mapping(index: BeaconConfiguration.index_name, type: IBeaconConfiguration.document_type, body: IBeaconConfiguration.mappings.to_hash)
+                client.indices.put_mapping(index: BeaconConfiguration.index_name, type: EddystoneNamespaceConfiguration.document_type, body: EddystoneNamespaceConfiguration.mappings.to_hash)
+                client.indices.put_mapping(index: BeaconConfiguration.index_name, type: UrlConfiguration.document_type, body: UrlConfiguration.mappings.to_hash)
+            rescue  Exception => e
+                Rails.logger.warn("Tried creating BeaconConfiguration elasticsearch index")
+                Rails.logger.warn("Message: #{e}")
+            end
+
+        end
+
+    end
+
+
     def as_indexed_json(options = {})
         json = {
             account_id: self.account_id,

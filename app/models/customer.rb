@@ -272,6 +272,12 @@ class Customer
         return Customer.from_document(doc)
     end
 
+    def self.all
+        mongo_client[collection_name].find({}).each do |document|
+            yield Customer.from_document(document) if block_given?
+        end
+    end
+
     def self.find_all(ids)
         ids = ids.map{|id| BSON::ObjectId(id)}
         docs = mongo_client[collection_name].find("_id" => {"$in" => ids }).map{|document| Customer.from_document(document) }
@@ -284,12 +290,22 @@ class Customer
         return Customer.from_document(doc)
     end
 
+    def self.count(query = {})
+        return mongo_client[collection_name].find(query).count
+    end
+
     def self.delete_all
         mongo_client[collection_name].find().delete_many
     end
 
     def build_device(attributes)
         CustomerDevice.new(attributes.merge(customer: self))
+    end
+
+    def merge_attributes!(new_attributes)
+        new_attributes.each do |k, v|
+            self[k] = v if self.respond_to?("#{k}=")
+        end
     end
 
     def create
@@ -299,7 +315,9 @@ class Customer
                 mongo_client[collection_name].insert_one(to_doc.merge("created_at" => Time.zone.now))
             end
         end
+        self.new_record = false
         changes_applied
+        return self
     end
 
     def save
@@ -322,8 +340,10 @@ class Customer
                     mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => setters.merge("updated_at" => Time.zone.now)})
                 end
             end
+            self.new_record = false
             changes_applied
         end
+        return self
     end
 
     def remove_device(device)

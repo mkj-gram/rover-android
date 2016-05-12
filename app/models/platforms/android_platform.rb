@@ -8,11 +8,12 @@ class AndroidPlatform < ActiveRecord::Base
     alias_attribute :package_name, :app_identifier
     alias_attribute :api_key, :credentials
 
-    belongs_to :account
-
     before_save :update_name_cache
 
 
+    def account
+        @account ||= Account.find(self.account_id)
+    end
 
     private
 

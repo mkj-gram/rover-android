@@ -3,11 +3,15 @@ class IosPlatform < ActiveRecord::Base
 
     # validate :valid_certificate
 
-    before_save :set_app_identifier
+    # before_save :set_app_identifier
 
-    before_save :update_name_cache
+    after_save :update_name_cache
 
-    belongs_to :account
+    # belongs_to :account
+
+    def account
+        @account ||= Account.find(self.account_id)
+    end
 
     def set_credentials(certificate, passphrase)
         self.credentials = {certificate: certificate, passphrase: passphrase}
@@ -56,7 +60,7 @@ class IosPlatform < ActiveRecord::Base
 
     def update_name_cache
         if self.changes.include?(:title)
-            account.update_attributes(ios_platform_name: self.title)
+            account.update_attribute(:ios_platform_name, title)
         end
     end
 

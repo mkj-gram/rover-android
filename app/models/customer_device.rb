@@ -51,7 +51,6 @@ class CustomerDevice
         Customer.mongo_client[Customer.collection_name]
     end
 
-
     def as_indexed_json(options = {})
         {
             udid: self.udid,
@@ -118,6 +117,13 @@ class CustomerDevice
     def development_device?
         self.development
     end
+
+    def merge_attributes!(new_attributes)
+        new_attributes.each do |k, v|
+            self[k] = v if self.respond_to?("#{k}=")
+        end
+    end
+
 
     def message_attributes
         {
