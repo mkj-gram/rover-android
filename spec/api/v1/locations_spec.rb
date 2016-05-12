@@ -102,26 +102,10 @@ describe "/v1/locations", :type => :request do
                 expect(json[:errors].size).to be >=1
             end
 
-
-            it 'returns 422 when passed an invalid google-place-id' do
-                account = create(:account)
-                post '/v1/locations',
-                {
-                    data: {
-                        type: "locations",
-                        attributes: {
-                            :"google-place-id" => "111"
-                        }
-                    }
-                }, signed_request_header(account)
-
-                expect(response).to have_http_status(422)
-                expect(json[:errors].size).to be >=1
-            end
         end
 
         context "valid input" do
-            it 'returns 200 when providing everything but the google-place-id' do
+            it 'returns 200 when input is valid' do
                 account = create(:account)
                 attributes = location_attributes
                 post '/v1/locations',
@@ -129,22 +113,6 @@ describe "/v1/locations", :type => :request do
                     data: {
                         type: "locations",
                         attributes: attributes
-                    }
-                }, signed_request_header(account)
-
-                expect(response).to have_http_status(200)
-            end
-
-            it 'returns 200 when providing just the google-place-id' do
-                account = create(:account)
-                attributes = location_attributes
-                post '/v1/locations',
-                {
-                    data: {
-                        type: "locations",
-                        attributes: {
-                            :"google-place-id" => "ChIJWb7ra-AY1YkRCbp8uCzA3_c"
-                        }
                     }
                 }, signed_request_header(account)
 
@@ -206,22 +174,6 @@ describe "/v1/locations", :type => :request do
                 expect(json[:errors].size).to be >=1
             end
 
-            it 'returns 422 when passed an invalid google-place-id' do
-                location = create(:location)
-                account = location.account
-                patch "/v1/locations/#{location.id}",
-                {
-                    data: {
-                        type: "locations",
-                        attributes: {
-                            :"google-place-id" => "123123123"
-                        }
-                    }
-                }, signed_request_header(account)
-
-                expect(response).to have_http_status(422)
-                expect(json[:errors].size).to be >=1
-            end
         end
 
         context "valid input" do

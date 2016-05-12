@@ -72,9 +72,11 @@ class V1::EventsController < V1::ApplicationController
             # this uses $pull to remove from the array
             if device
                 current_customer.remove_device(device)
+                device.merge_attributes!(device_params(device_attributes))
                 existing_customer.add_device(device)
             end
             customer = existing_customer
+            customer.merge_attributes!(customer_params(user_attributes))
         elsif user_attributes[:identifier].nil? && !customer.identifier.nil?
             # user has logged out
             Rails.logger.info("get_customer_and_device: customer has logged out".red.bold)
@@ -83,12 +85,12 @@ class V1::EventsController < V1::ApplicationController
             customer, device = create_anonymous_customer(user_attributes, device_attributes)
         else
             device = customer.devices.find{ |device| device._id == current_device_udid }
+            device.merge_attributes!(device_params(device_attributes))
+            customer.merge_attributes!(customer_params(user_attributes))
         end
 
         # update any fields that need updating if nothing has changed
-        # update_attributes performs a no-op
-        # customer.update_attributes(customer_params(user_attributes)) if customer
-        # device.update_attributes(device_params(device_attributes)) if device
+        customer.save
         return [customer, device]
     end
 

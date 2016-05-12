@@ -77,6 +77,10 @@ class Location < ActiveRecord::Base
     after_create :increment_account_locations_count
     after_destroy :decrement_account_locations_count
 
+    def self.create_index!(opts = {})
+        self.__elasticsearch__.create_index!(opts)
+    end
+
     def as_indexed_json(options = {})
         {
             account_id: self.account_id,

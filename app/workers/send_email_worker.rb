@@ -14,9 +14,7 @@ class SendEmailWorker
     end
 
     def perform(args)
-        logger.info("Recieved msg: " + msg)
         MailClient.send(args)
-        logger.info("Message sent")
         ack!
     end
 
