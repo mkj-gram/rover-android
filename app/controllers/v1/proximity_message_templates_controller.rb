@@ -194,7 +194,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :website_url,
             :customer_segment_id,
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
-        ).merge(:landing_page => local_params.dig(:proximity_messages, :landing_page))
+        ).merge({:landing_page => local_params.dig(:proximity_messages, :landing_page), :extras => local_params.dig(:proximity_messages, :extras)})
     end
 
     def render_proximity_message(message)

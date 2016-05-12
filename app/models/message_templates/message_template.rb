@@ -12,6 +12,7 @@ class MessageTemplate < ActiveRecord::Base
     belongs_to :account
 
     serialize :landing_page_template, LandingPageTemplate
+    serialize :extras, Hash
 
     alias_attribute :landing_page, :landing_page_template
 
@@ -83,7 +84,8 @@ class MessageTemplate < ActiveRecord::Base
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s,
-                landing_page: landing_page.nil? ? nil : landing_page_template.render(opts)
+                landing_page: landing_page.nil? ? nil : landing_page_template.render(opts),
+                extras: extras
             }
         )
     end
