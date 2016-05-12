@@ -13,7 +13,8 @@ module V1::MessageSerializer
                     :"saved-to-inbox" => message.saved_to_inbox,
                     :"content-type" => message.content_type,
                     :"website-url" => message.website_url,
-                    :"timestamp" => message.timestamp.iso8601(3)
+                    :"timestamp" => message.timestamp.iso8601(3),
+                    :"landing-page" => message.landing_page.nil? ? nil : message.landing_page.as_json(dasherize: true)
                 }
             }
         end

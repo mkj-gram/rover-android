@@ -100,15 +100,17 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
     # create accepts everything the same as update
     def create
-        json = flatten_request({single_record: true})
-        @proximity_message = ProximityMessageTemplate.new(proximity_message_params(json[:data]))
-        @proximity_message.account_id = current_account.id
+        json = flatten_request({single_record: true, except: "attributes.landing-page"})
+
+        @proximity_message = current_account.proximity_message_templates.build(proximity_message_params(json[:data]))
+
         if @proximity_message.save
             json = render_proximity_message(@proximity_message)
             render json: json
         else
             render json: { errors: V1::ProximityMessageTemplateErrorSerializer.serialize(@proximity_message.errors)}, status: :unprocessable_entity
         end
+
     end
 
     def update
@@ -192,7 +194,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :website_url,
             :customer_segment_id,
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
-        )
+        ).merge(:landing_page => local_params.dig(:proximity_messages, :landing_page))
     end
 
     def render_proximity_message(message)
@@ -286,7 +288,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def serialize_message(message, extra_attributes = {})
-
+        # extra_attributes.merge!(:landing_page_template => message.landing_page_template.to_json) if message.landing_page_template
         message.account = current_account
         {
             type: "proximity-messages",
@@ -320,7 +322,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"total-notification-opens" => message.stats.total_notification_opens,
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
                 :"total-opens" => message.stats.total_opens,
-                :"unique-opens" => message.stats.unique_opens
+                :"unique-opens" => message.stats.unique_opens,
+                :"landing-page" => message.landing_page.as_json(dasherize: true)
             }.merge(extra_attributes)
         }
     end

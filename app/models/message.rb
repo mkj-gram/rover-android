@@ -3,7 +3,7 @@ class Message
     include Virtus.model(:nullify_blank => true)
     include ActiveModel::Validations
     include ActiveModel::Validations::Callbacks
-    include VirtusDirtyAttributes
+    # include VirtusDirtyAttributes
     extend ActiveModel::Naming
     extend ActiveModel::Callbacks
 
@@ -23,6 +23,7 @@ class Message
     attribute :website_url, String
     attribute :timestamp, Time , default: lambda { |model, attribute|  Time.zone.now }
     attribute :expire_at, Time
+    attribute :landing_page, LandingPage
 
 
 
@@ -70,8 +71,20 @@ class Message
         _id.to_s
     end
 
+    def new_record?
+        @_new_record.nil? ? true : @_new_record
+    end
+
+    def new_record=(val)
+        @_new_record = val
+    end
+
     def to_doc
-        attributes
+        doc = attributes
+        landing_page = doc.delete(:landing_page)
+        doc.merge!(landing_page: landing_page.to_doc) if landing_page
+        doc.compact!
+        doc
     end
 
     def create
@@ -81,7 +94,6 @@ class Message
                 mongo_client[collection_name].insert_one(to_doc)
             end
         end
-        changes_applied
     end
 
     def save
@@ -89,12 +101,7 @@ class Message
         if new_record?
             create
         else
-            run_callbacks :save do
-                if changes.any?
-                    mongo_client[collection_name].find("_id" => self._id).update_one(changes.map{|k,v|  {"$set" => { k => v.last } }})
-                end
-            end
-            changes_applied
+            mongo_client[collection_name].find("_id" => self.id).replace_one(self.to_doc)
         end
     end
 
@@ -106,7 +113,6 @@ class Message
         run_callbacks :destroy do
             mongo_client[collection_name].delete_one("_id" => self._id)
         end
-        changes_applied
     end
 
     def customer=(new_customer)
@@ -152,6 +158,12 @@ class Message
         def delete_all(ids)
             ids = ids.map{|id| id.is_a?(BSON::ObjectId) ? id : BSON::ObjectId(id) }
             docs = mongo_client[collection_name].find("_id" => {"$in" => ids}).delete_many
+        end
+
+        def first
+            doc = mongo_client[collection_name].find().limit(1).first
+            return nil if doc.nil?
+            return Message.from_document(doc)
         end
     end
 

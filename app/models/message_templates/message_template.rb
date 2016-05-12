@@ -11,6 +11,10 @@ class MessageTemplate < ActiveRecord::Base
 
     belongs_to :account
 
+    serialize :landing_page_template, LandingPageTemplate
+
+    alias_attribute :landing_page, :landing_page_template
+
     message_attribute :notification_text
 
     settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 2}).merge(
@@ -53,6 +57,8 @@ class MessageTemplate < ActiveRecord::Base
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
 
+
+
     def as_indexed_json(opts = {})
         {
             account_id: self.account_id,
@@ -76,7 +82,8 @@ class MessageTemplate < ActiveRecord::Base
                 website_url: self.website_url,
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
-                android_title: get_android_title.to_s
+                android_title: get_android_title.to_s,
+                landing_page: landing_page.nil? ? nil : landing_page_template.render(opts)
             }
         )
     end

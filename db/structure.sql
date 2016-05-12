@@ -633,7 +633,8 @@ CREATE TABLE message_templates (
     android_collapse_key character varying,
     ios_sound_file character varying,
     android_sound_file character varying,
-    time_to_live integer
+    time_to_live integer,
+    landing_page_template jsonb
 );
 
 
@@ -1852,4 +1853,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160421173623');
 INSERT INTO schema_migrations (version) VALUES ('20160422184350');
 
 INSERT INTO schema_migrations (version) VALUES ('20160423104812');
+
+INSERT INTO schema_migrations (version) VALUES ('20160505164431');
 
