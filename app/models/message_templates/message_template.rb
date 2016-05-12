@@ -12,7 +12,7 @@ class MessageTemplate < ActiveRecord::Base
     belongs_to :account
 
     serialize :landing_page_template, LandingPageTemplate
-    serialize :extras, Hash
+    serialize :extras, JSONHash
 
     alias_attribute :landing_page, :landing_page_template
 
