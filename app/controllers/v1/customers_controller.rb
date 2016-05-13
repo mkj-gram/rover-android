@@ -86,7 +86,7 @@ class V1::CustomersController < V1::ApplicationController
     end
 
     def customer_segment_id_query
-        params.dig(:filter, :segment_id)
+        params.dig(:filter, :segmentId)
     end
 
     def render_customer(customer)
