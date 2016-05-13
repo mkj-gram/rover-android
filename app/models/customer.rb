@@ -269,6 +269,7 @@ class Customer
         end
 
         def find_all(ids)
+            return [] if ids.empty?
             ids = ids.map{|id| BSON::ObjectId(id)}
             docs = mongo_client[collection_name].find("_id" => {"$in" => ids }).map{|document| Customer.from_document(document) }
             return docs
