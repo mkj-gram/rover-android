@@ -6,10 +6,10 @@ class V1::CustomersController < V1::ApplicationController
 
     def index
 
-        # possible to pass in a customer_segment_id
-
+        should_include = ["devices", "last-location"]
 
         query = {
+            fields: ["_id"],
             sort: [
                 {
                     created_at: {
@@ -29,23 +29,48 @@ class V1::CustomersController < V1::ApplicationController
 
         customers = Elasticsearch::Model.search(query, [Customer], {index: Customer.get_index_name(current_account)})
         results = customers.per_page(page_size).page(current_page).results
+        customers = Customer.find_all(results.map{ |hit| hit["_id"] })
+
         json = {
-            "data" => results.map{|customer| serialize_elasticsearch_customer(customer)},
+            "data" => customers.map{|customer| serialize_customer(customer)},
             "meta" => {
                 "totalRecords" => results.total,
                 "totalPages" => results.total_pages,
                 "totalSearchableRecords" => current_account.customers_count
             }
         }
-        json["included"] = results.map{|customer| customer.devices.map{|device| serialize_device(device)}}.flatten
+        included = []
+
+        if should_include.include?("devices")
+            included += customers.map{|customer| customer.devices.map{|device| serialize_device(device)}}.flatten
+        end
+
+        if should_include.include?("last-location")
+            location_ids  = customers.map{|customer| customer.last_location_visit_id }.compact
+            if location_ids.any?
+                locations = Location.where(id: location_ids).all
+                included += locations.map{|location| V1::LocationSerializer.serialize(location)}
+            end
+        end
+
+        json["included"] = included if included.any?
         render json: json
     end
 
     def show
+
+        included = @customer.devices.map{|device| serialize_device(device)}
+
+        if !@customer.last_location_visit_id.nil?
+            location = Location.find(@customer.last_location_visit_id)
+            included.push(V1::LocationSerializer.serialize(location)) if location
+        end
+
         json = {
             data: serialize_customer(@customer),
-            included: @customer.devices.map{|device| serialize_device(device)}
+            included: included
         }
+
         render json: json
     end
 
@@ -64,46 +89,26 @@ class V1::CustomersController < V1::ApplicationController
         params.has_key?(:customer_segment_id) ? params[:customer_segment_id] : nil
     end
 
-    def serialize_customer(customer)
-        {
-            type: "customers",
-            id: customer.id.to_s,
-            attributes: {
-                identifier: customer.identifier,
-                name: customer.name,
-                email: customer.email,
-                :"phone-number" => customer.phone_number,
-                tags: customer.tags,
-                traits: customer.traits
-            },
-            relationships: {
-                devices: {
-                    data: customer.devices.map{|device| {type: "devices", id: device.id }}
-                }
-            }
-        }
+    def render_customer(customer)
     end
 
-    def serialize_elasticsearch_customer(customer)
-        source = customer._source
-        {
-            type: "customers",
-            id: customer.id,
-            attributes: {
-                identifier: source.identifier,
-                name: source.name,
-                email: source.email,
-                :"phone-number" => source.phone_number,
-                tags: source.tags,
-                traits: source.traits
-            },
-            relationships: {
-                devices: {
-                    data: source.devices.map{|device| {type: "devices", id: device.udid }}
-                }
-            }
-        }
+    def serialize_customer(customer, locations_cache = {})
+        should_include = ["devices", "last-location"]
+
+        relationships = {}
+
+        if should_include.include?("devices")
+            relationships[:devices] = { data: customer.devices.map { |device| { type: "devices", id: device.id }}}
+        end
+
+        if should_include.include?("last-location") && customer.last_location_visit_id
+            relationships[:"last-location"] = { data: { type: "locations", id: customer.last_location_visit_id }}
+        end
+
+
+        V1::CustomerSerializer.serialize(customer).merge(relationships: relationships)
     end
+
 
     def serialize_device(device)
         {

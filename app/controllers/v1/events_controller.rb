@@ -15,8 +15,6 @@ class V1::EventsController < V1::ApplicationController
 
         customer, device = get_customer_and_device(user_attributes, device_attributes)
 
-
-
         if !device.valid?
             render json: { errors: V1::CustomerDeviceErrorSerializer.serialize(device.errors)}, status: :unprocessable_entity
         elsif !customer.valid?
