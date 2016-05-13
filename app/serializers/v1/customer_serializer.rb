@@ -1,0 +1,21 @@
+module V1::CustomerSerializer
+    class << self
+        def serialize(customer, extra_attributes = {})
+            {
+                type: "customers",
+                id: customer.id,
+                attributes: {
+                    identifier: customer.identifier,
+                    name: customer.name,
+                    email: customer.email,
+                    :"phone-number" => customer.phone_number,
+                    tags: customer.tags,
+                    traits: customer.traits,
+                    :"total-visits" => customer.total_location_visits.to_i,
+                    :"last-visit" => customer.last_location_visit_at.nil? ? nil : customer.last_location_visit_at.iso8601(3),
+                    :"first-visit" => customer.first_visit_at.nil? ? nil : customer.first_visit_at.iso8601(3)
+                }
+            }
+        end
+    end
+end
