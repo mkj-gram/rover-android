@@ -26,6 +26,7 @@ class V1::ApplicationController < ActionController::API
     #
     # @return [nil]
     def authenticate
+        Rails.logger.info(request.headers[APPLICATION_API_KEY_HEADER])
         if authentication_method.application?
             authenticate_application
         elsif authentication_method.user?
