@@ -79,7 +79,7 @@ class CustomerDevice
     end
 
     def to_doc
-        return attributes
+        return attributes.compact
     end
 
     def customer=(customer)
