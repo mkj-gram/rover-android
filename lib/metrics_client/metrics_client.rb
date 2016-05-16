@@ -20,6 +20,15 @@ module MetricsClient
             end
         end
 
+        def time(name, options = {})
+            start = Time.now
+            yield.tap do
+                duration = (Time.now - start) * 1000.0 # milliseconds
+                metric = {name => options.merge({:value => duration})}
+                aggregate(metric)
+            end
+        end
+
         def flush!
             return if aggregator.empty?
             submitter_queue = ::Librato::Metrics::Queue.new(prefix: config.prefix, source: config.source)
