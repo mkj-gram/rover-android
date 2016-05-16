@@ -5,7 +5,7 @@ module VirtusDirtyAttributes
 
         def initialize(atr = {})
             super atr
-            @_original_attributes = as_json
+            @_original_attributes = to_doc
             @_new_record = atr[:new_record].nil? ? true : atr[:new_record]
         end
 
@@ -14,9 +14,9 @@ module VirtusDirtyAttributes
         end
 
         def changes
-            changed = as_json.inject({}) do |hash, (k,v)|
+            changed = to_doc.inject({}) do |hash, (k,v)|
                 if v.is_a?(Array)
-                    hash.merge!(k => [@_original_attributes[k], v]) if @_original_attributes[k].uniq != v.uniq
+                    hash.merge!(k => [@_original_attributes[k], v]) if @_original_attributes[k] != v
                 else
                     hash.merge!(k => [@_original_attributes[k], v]) if @_original_attributes[k] != v
                 end
@@ -26,7 +26,7 @@ module VirtusDirtyAttributes
         end
 
         def changes_applied
-            @_original_attributes = as_json
+            @_original_attributes = to_doc
         end
 
         def new_record?
