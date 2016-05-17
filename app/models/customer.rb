@@ -1,21 +1,21 @@
 class Customer
     include Elasticsearch::Model
     include ActiveModel::Validations
-    include Virtus.model(:nullify_blank => true)
     include VirtusDirtyAttributes
+    include Virtus.model(:nullify_blank => true)
     extend ActiveModel::Naming
     extend ActiveModel::Callbacks
 
     attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
     attribute :account_id, Integer
-    attribute :identifier, String
-    attribute :first_name, String
-    attribute :last_name, String
-    attribute :email, String
+    attribute :identifier, NullableString
+    attribute :first_name, NullableString
+    attribute :last_name, NullableString
+    attribute :email, NullableString
     attribute :age, Integer
-    attribute :gender, String
-    attribute :phone_number, String
-    attribute :tags, Array
+    attribute :gender, NullableString
+    attribute :phone_number, NullableString
+    attribute :tags, Array[NullableString]
     attribute :traits, Hash
     attribute :location, GeoPoint
     attribute :inbox_updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
@@ -242,9 +242,9 @@ class Customer
         Customer.mongo_client
     end
 
-    def inspect
-        "#<Customer:#{object_id} _id=#{@_id} first_name=#{format_variable(@first_name)} last_name=#{format_variable(@last_name)} email=#{format_variable(@email)} phone_number=#{format_variable(@phone_number)} age=#{format_variable(@age)} devices=#{format_variable(@devices)}>"
-    end
+    # def inspect
+    #     "#<Customer:#{object_id} _id=#{@_id} first_name=#{format_variable(@first_name)} last_name=#{format_variable(@last_name)} email=#{format_variable(@email)} phone_number=#{format_variable(@phone_number)} age=#{format_variable(@age)} devices=#{format_variable(@devices)}>"
+    # end
 
     class << self
         def from_document(doc)
@@ -289,7 +289,11 @@ class Customer
         end
     end
 
-
+    def tags=(new_tags)
+        new_tags.delete_if { |tag|  tag.nil? || tag.is_a?(String) && tag.empty? }
+        return if new_tags.empty?
+        super new_tags
+    end
 
     def valid?
         if devices.any?

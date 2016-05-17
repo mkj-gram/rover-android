@@ -6,24 +6,24 @@ class CustomerDevice
     extend ActiveModel::Callbacks
 
     attribute :_id, String
-    attribute :token, String
-    attribute :locale_lang, String
-    attribute :locale_region, String
-    attribute :time_zone, String
-    attribute :sdk_version, String
-    attribute :platform, String
-    attribute :os_name, String
-    attribute :os_version, String
-    attribute :model, String
-    attribute :manufacturer, String
-    attribute :carrier, String
+    attribute :token, NullableString
+    attribute :locale_lang, NullableString
+    attribute :locale_region, NullableString
+    attribute :time_zone, NullableString
+    attribute :sdk_version, NullableString
+    attribute :platform, NullableString
+    attribute :os_name, NullableString
+    attribute :os_version, NullableString
+    attribute :model, NullableString
+    attribute :manufacturer, NullableString
+    attribute :carrier, NullableString
     attribute :background_enabled, Boolean
     attribute :local_notifications_enabled, Boolean
     attribute :remote_notifications_enabled, Boolean
     attribute :bluetooth_enabled, Boolean
     attribute :location_monitoring_enabled, Boolean
     attribute :development, Boolean, default: false
-    attribute :aid, String
+    attribute :aid, NullableString
 
     alias_method :udid, :_id
     alias_method :id, :_id

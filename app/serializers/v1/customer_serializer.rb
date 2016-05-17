@@ -6,7 +6,8 @@ module V1::CustomerSerializer
                 id: customer.id,
                 attributes: {
                     identifier: customer.identifier,
-                    name: customer.name,
+                    :"first-name" => customer.first_name,
+                    :"last-name" => customer.last_name,
                     email: customer.email,
                     :"phone-number" => customer.phone_number,
                     tags: customer.tags,
