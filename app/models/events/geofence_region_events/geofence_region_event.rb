@@ -3,6 +3,7 @@ module Events
         class GeofenceRegionEvent < Event
 
             before_save :save_messages_to_inbox
+            after_save :track_customer_last_location_visit
 
             attr_reader :geofence_region, :identifier_longitude, :longitude, :latitude, :radius
 
@@ -72,6 +73,25 @@ module Events
             end
 
             private
+
+            def track_customer_last_location_visit
+                if location && customer.last_location_visit_id != location.id
+                    current_time = Time.zone.now
+                    update_params = {
+                        "$inc" => {
+                            "total_location_visits" => 1,
+                        },
+                        "$set" => {
+                            "last_location_visit_id" => location.id,
+                            "last_location_visit_at" => current_time
+                        }
+                    }
+                    if customer.first_visit_at.nil?
+                        update_params["$set"].merge!("first_visit_at" => current_time)
+                    end
+                    customer.update(update_params)
+                end
+            end
 
             def save_messages_to_inbox
                 # TODO Refractor both beacon_region_event and location_event use the same structure
