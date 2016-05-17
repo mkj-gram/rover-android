@@ -11,7 +11,7 @@ namespace :mongo do
 
         $mongo[Message.collection_name].indexes.create_many(
             [
-                { :key => { :expire => 1 }, :sparse => true, :expire_after_seconds => 0}
+                { :key => { :expire_at => 1 }, :sparse => true, :expire_after_seconds => 0}
             ]
         )
     end
