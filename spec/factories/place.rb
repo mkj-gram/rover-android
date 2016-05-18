@@ -1,5 +1,5 @@
 FactoryGirl.define do
-    factory :location do
+    factory :place do
         account
         title Faker::Company.name
         address Faker::Address.street_address

@@ -1,8 +1,8 @@
-class V1::LocationsController < V1::ApplicationController
+class V1::PlacesController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:create, :update]
     before_action :check_access, only: [:index, :show, :create, :update, :destroy]
-    before_action :set_location, only: [:show, :update, :destroy]
+    before_action :set_place, only: [:show, :update, :destroy]
 
     def index
         should_query = []
@@ -101,18 +101,18 @@ class V1::LocationsController < V1::ApplicationController
             }
         end
 
-        locations = Elasticsearch::Model.search(query, [Location])
-        results = locations.per_page(page_size).page(current_page).results
+        places = Elasticsearch::Model.search(query, [Place])
+        results = places.per_page(page_size).page(current_page).results
         json = {
-            "data" => results.map{|location| serialize_elasticsearch_location(location)},
+            "data" => results.map{|place| serialize_elasticsearch_place(place)},
             "meta" => {
                 "totalRecords" => results.total,
                 "totalPages" => results.total_pages,
-                "totalSearchableRecords" => current_account.searchable_locations_count
+                "totalSearchableRecords" => current_account.searchable_places_count
             }
         }
 
-        json["meta"].merge!({"suggestedViewBounds" => current_account.location_bounding_box_suggestion}) if query_bounds.nil? && current_page == 1
+        json["meta"].merge!({"suggestedViewBounds" => current_account.place_bounding_box_suggestion}) if query_bounds.nil? && current_page == 1
 
         render json: json
     end
@@ -122,20 +122,20 @@ class V1::LocationsController < V1::ApplicationController
         should_include = ["configurations"] # auto include for now whitelist_include(["configurations"])
 
         json = {
-            "data" => serialize_location(@location)
+            "data" => serialize_place(@place)
         }
         included = []
         # if should_include.include?("configurations")
-        if @location.beacon_configurations_count > 0
+        if @place.beacon_configurations_count > 0
             json["data"]["relationships"] = {} if json["data"]["relationships"].nil?
 
             json["data"]["relationships"].merge!(
                 "configurations" => {
-                    "data" => @location.beacon_configurations.map{|config| { "type" => "configurations", "id" => config.id.to_s }}
+                    "data" => @place.beacon_configurations.map{|config| { "type" => "configurations", "id" => config.id.to_s }}
                 }
             )
 
-            included += @location.beacon_configurations.map{|config| serialize_beacon_configuration(config)}
+            included += @place.beacon_configurations.map{|config| serialize_beacon_configuration(config)}
         end
 
         if included.any?
@@ -148,48 +148,48 @@ class V1::LocationsController < V1::ApplicationController
     def update
         # do we accept a google place id?
         json = flatten_request({single_record: true})
-        if @location.update_attributes(location_params(json[:data]))
+        if @place.update_attributes(place_params(json[:data]))
             json = {
-                "data" => serialize_location(@location)
+                "data" => serialize_place(@place)
             }
             render json: json
         else
-            render json: { errors: V1::LocationErrorSerializer.serialize(@location.errors)}, status: :unprocessable_entity
+            render json: { errors: V1::PlaceErrorSerializer.serialize(@place.errors)}, status: :unprocessable_entity
         end
     end
 
     def create
         json = flatten_request({single_record: true})
-        @location = current_account.locations.build(location_params(json[:data]))
-        if @location.save
+        @place = current_account.places.build(place_params(json[:data]))
+        if @place.save
             json = {
-                "data" => serialize_location(@location)
+                "data" => serialize_place(@place)
             }
             render json: json
         else
-            render json: { errors: V1::LocationErrorSerializer.serialize(@location.errors)}, status: :unprocessable_entity
+            render json: { errors: V1::PlaceErrorSerializer.serialize(@place.errors)}, status: :unprocessable_entity
         end
     end
 
     def destroy
-        if @location.destroy
+        if @place.destroy
             head :no_content
         else
-            render json: {errors: V1::LocationErrorSerializer.serialize(@location.errors)}, status: :internal_server_error
+            render json: {errors: V1::PlaceErrorSerializer.serialize(@place.errors)}, status: :internal_server_error
         end
     end
 
     def resource
-        Location
+        Place
     end
 
     private
 
-    def set_location
-        @location = current_account.locations.find_by_id(params[:id])
-        head :not_found if @location.nil?
+    def set_place
+        @place = current_account.places.find_by_id(params[:id])
+        head :not_found if @place.nil?
     end
-    # bounding box location query
+    # bounding box place query
     # or point
 
     def filter_params
@@ -211,37 +211,37 @@ class V1::LocationsController < V1::ApplicationController
         @query_tags ||= filter_params.fetch(:tags, [])
     end
 
-    def location_params(local_params)
-        convert_param_if_exists(local_params[:locations], :name, :title)
-        local_params.fetch(:locations, {}).permit(:enabled, :title, :address, :city, :province, :country, :postal_code,  :latitude, :longitude, :radius, :google_place_id, {:tags => []})
+    def place_params(local_params)
+        convert_param_if_exists(local_params[:places], :name, :title)
+        local_params.fetch(:places, {}).permit(:enabled, :title, :address, :city, :province, :country, :postal_code,  :latitude, :longitude, :radius, :google_place_id, {:tags => []})
     end
 
-    def serialize_location(location)
+    def serialize_place(place)
         {
-            "type" => "locations",
-            "id" => location.id.to_s,
+            "type" => "places",
+            "id" => place.id.to_s,
             "attributes" => {
-                "name" => location.title,
-                "address" => location.address,
-                "city" => location.city,
-                "province" => location.province,
-                "country" => location.country,
-                "postal-code" => location.postal_code,
-                "latitude" => location.latitude,
-                "longitude" => location.longitude,
-                "radius" => location.radius,
-                "tags" => location.tags,
-                "enabled" => location.enabled,
-                "shared" => location.shared,
-                "configurations-count" => location.beacon_configurations_count
+                "name" => place.title,
+                "address" => place.address,
+                "city" => place.city,
+                "province" => place.province,
+                "country" => place.country,
+                "postal-code" => place.postal_code,
+                "latitude" => place.latitude,
+                "longitude" => place.longitude,
+                "radius" => place.radius,
+                "tags" => place.tags,
+                "enabled" => place.enabled,
+                "shared" => place.shared,
+                "configurations-count" => place.beacon_configurations_count
             }
         }
     end
 
-    def serialize_elasticsearch_location(document)
+    def serialize_elasticsearch_place(document)
         source = document._source
         {
-            "type" => "locations",
+            "type" => "places",
             "id" => document.id,
             "attributes" => {
                 "name" => source.title,
@@ -250,8 +250,8 @@ class V1::LocationsController < V1::ApplicationController
                 "province" => source.province,
                 "country" => source.country,
                 "postal_code" => source.postal_code,
-                "latitude" => source.location.lat,
-                "longitude" => source.location.lon,
+                "latitude" => source.place.lat,
+                "longitude" => source.place.lon,
                 "radius" => source.radius,
                 "tags" => source.tags,
                 "enabled" => source.enabled,

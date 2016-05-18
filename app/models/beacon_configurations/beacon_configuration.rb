@@ -49,7 +49,7 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     after_commit on: [:update] do
-        if previous_changes.include?("location_id")
+        if previous_changes.include?("place_id")
             __elasticsearch__.index_document
         else
             __elasticsearch__.update_document
@@ -62,17 +62,17 @@ class BeaconConfiguration < ActiveRecord::Base
 
     before_save :remove_duplicate_tags
     after_save :update_active_tags
-    after_save :update_location
+    after_save :update_place
 
     after_create :increment_account_beacons_count
     after_destroy :decrement_account_beacons_count
 
     belongs_to :account
-    belongs_to :location, counter_cache: :beacon_configurations_count
+    belongs_to :place, counter_cache: :beacon_configurations_count
 
     has_many :shared_beacon_configurations
 
-    validate :location_exists
+    validate :place_exists
     validates :title, presence: true
     validates :account_id, presence: true
 
@@ -108,14 +108,14 @@ class BeaconConfiguration < ActiveRecord::Base
             shared: self.shared,
             created_at: self.created_at,
             shared_account_ids: self.shared_account_ids,
-            location: indexed_location,
+            place: indexed_place,
             devices_meta: devices_meta
         }
         return json
     end
 
-    def reindex_location
-        self.__elasticsearch__.update_document_attributes({location: indexed_location})
+    def reindex_place
+        self.__elasticsearch__.update_document_attributes({place: indexed_place})
     end
 
     def reindex_devices_meta
@@ -188,19 +188,19 @@ class BeaconConfiguration < ActiveRecord::Base
 
     protected
 
-    def location_exists
-        if changes.include?(:location_id) && !location_id.nil? && !Location.exists?(location_id)
-            errors.add(:location_id, "location doesn't exist")
+    def place_exists
+        if changes.include?(:place_id) && !place_id.nil? && !Place.exists?(place_id)
+            errors.add(:place_id, "place doesn't exist")
         end
     end
 
-    def update_location
-        if changes.include?(:location_id) && location_id_was != location_id
-            old_location = location_id_was.nil? ? nil : Location.find_by_id(location_id_was)
-            old_location.__elasticsearch__.update_document  if old_location
+    def update_place
+        if changes.include?(:place_id) && place_id_was != place_id
+            old_place = place_id_was.nil? ? nil : Place.find_by_id(place_id_was)
+            old_place.__elasticsearch__.update_document  if old_place
 
-            new_location = location
-            new_location.__elasticsearch__.update_document if new_location
+            new_place = place
+            new_place.__elasticsearch__.update_document if new_place
         end
     end
 
@@ -226,12 +226,12 @@ class BeaconConfiguration < ActiveRecord::Base
         end
     end
 
-    def indexed_location
-        if location
+    def indexed_place
+        if place
             return {
-                name: location.title,
-                id: location.id,
-                tags: location.tags
+                name: place.title,
+                id: place.id,
+                tags: place.tags
             }
         else
             return {}

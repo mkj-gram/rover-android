@@ -1,4 +1,4 @@
-class Location < ActiveRecord::Base
+class Place < ActiveRecord::Base
     include Elasticsearch::Model
 
     after_commit on: [:create, :update] do
@@ -74,8 +74,8 @@ class Location < ActiveRecord::Base
     after_save :update_active_tags
     after_save :update_beacon_configurations_elasticsearch_document
 
-    after_create :increment_account_locations_count
-    after_destroy :decrement_account_locations_count
+    after_create :increment_account_places_count
+    after_destroy :decrement_account_places_count
 
     def self.create_index!(opts = {})
         self.__elasticsearch__.create_index!(opts)
@@ -134,12 +134,12 @@ class Location < ActiveRecord::Base
 
     private
 
-    def increment_account_locations_count
-        Account.update_counters(self.account_id, :locations_count => 1, :searchable_locations_count => 1)
+    def increment_account_places_count
+        Account.update_counters(self.account_id, :places_count => 1, :searchable_places_count => 1)
     end
 
-    def decrement_account_locations_count
-        Account.update_counters(self.account_id, :locations_count => 1, :searchable_locations_count => 1)
+    def decrement_account_places_count
+        Account.update_counters(self.account_id, :places_count => 1, :searchable_places_count => 1)
     end
 
     def update_address_from_google_place
@@ -167,7 +167,7 @@ class Location < ActiveRecord::Base
             uniq_tags = (tags || []).uniq
             old_tags = previous_tags - uniq_tags
             new_tags = uniq_tags - previous_tags
-            LocationActiveTag.update_tags(self.account_id, old_tags, new_tags)
+            PlaceActiveTag.update_tags(self.account_id, old_tags, new_tags)
         end
     end
 

@@ -37,8 +37,8 @@ module Events
 
             private
 
-            def location
-                @location ||= Location.where(latitude: latitude, longitude: longitude).first
+            def place
+                @place ||= Place.where(latitude: latitude, longitude: longitude).first
             end
 
         end

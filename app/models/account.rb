@@ -18,7 +18,7 @@ class Account < ActiveRecord::Base
 
     has_one :primary_user, class_name: "User", primary_key: "primary_user_id", foreign_key: "id"
     has_many :users, dependent: :destroy
-    has_many :locations, dependent: :destroy
+    has_many :places, dependent: :destroy
     has_many :beacon_configurations, dependent: :destroy do
         def ibeacons
             where(type: "IBeaconConfiguration")
@@ -44,7 +44,7 @@ class Account < ActiveRecord::Base
     has_many :user_roles
     has_one :default_user_role, class_name: "UserRole", primary_key: "default_user_role_id", foreign_key: "id"
     has_one :beacon_configuration_active_tag
-    has_one :location_active_tag
+    has_one :place_active_tag
     has_one :ibeacon_configuration_uuids, class_name: "ActiveIBeaconConfigurationUuid"
     has_one :eddystone_namespace_configuration_uuids, class_name: "ActiveEddystoneConfigurationUuid"
 
@@ -63,7 +63,7 @@ class Account < ActiveRecord::Base
     has_one :android_platform
     has_one :ios_platform
 
-    def location_bounding_box_suggestion
+    def place_bounding_box_suggestion
         query = {
             size: 0,
             query: {
@@ -100,7 +100,7 @@ class Account < ActiveRecord::Base
             }
         }
 
-        response = Elasticsearch::Model.search(query, [Location]).response
+        response = Elasticsearch::Model.search(query, [Place]).response
         return nil if response.aggregations.geo_hash.buckets.empty?
         bounds = response.aggregations.geo_hash.buckets.first.cell.bounds
         return [bounds.top_left.lat, bounds.bottom_right.lon, bounds.bottom_right.lat, bounds.top_left.lon]
@@ -123,7 +123,7 @@ class Account < ActiveRecord::Base
 
     def create_active_tags_index
         BeaconConfigurationActiveTag.create(account_id: self.id)
-        LocationActiveTag.create(account_id: self.id)
+        PlaceActiveTag.create(account_id: self.id)
     end
 
     def create_active_configuration_uuids_index

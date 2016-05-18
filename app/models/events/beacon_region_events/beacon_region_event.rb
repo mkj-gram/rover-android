@@ -2,7 +2,7 @@ module Events
     module BeaconRegionEvents
         class BeaconRegionEvent < Event
 
-            after_save :track_customer_last_location_visit
+            after_save :track_customer_last_place_visit
             before_save :save_messages_to_inbox
 
 
@@ -51,21 +51,21 @@ module Events
                     )
                 end
 
-                if location
+                if place
                     parent_attributes.merge!(
                         {
-                            location: {
-                                id: location.id,
-                                title: location.title,
-                                address: location.address,
-                                postal_code: location.postal_code,
-                                city: location.city,
-                                province: location.province,
-                                country: location.country,
-                                latitude: location.latitude,
-                                longitude: location.longitude,
-                                tags: location.tags,
-                                shared: location.shared
+                            place: {
+                                id: place.id,
+                                title: place.title,
+                                address: place.address,
+                                postal_code: place.postal_code,
+                                city: place.city,
+                                province: place.province,
+                                country: place.country,
+                                latitude: place.latitude,
+                                longitude: place.longitude,
+                                tags: place.tags,
+                                shared: place.shared
                             }
                         }
                     )
@@ -85,15 +85,15 @@ module Events
                     }.merge(beacon_configuration.configuration_attributes)
                 end
 
-                if location && location.enabled
-                    json[:data][:attributes][:location] = {
-                        id: location.id,
-                        name: location.title,
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                        radius: location.radius,
-                        tags: location.tags,
-                        shared: location.shared
+                if place && place.enabled
+                    json[:data][:attributes][:place] = {
+                        id: place.id,
+                        name: place.title,
+                        latitude: place.latitude,
+                        longitude: place.longitude,
+                        radius: place.radius,
+                        tags: place.tags,
+                        shared: place.shared
                     }
                 end
 
@@ -109,8 +109,8 @@ module Events
                     opts.merge!(beacon_configuration.message_attributes.inject({}){|hash, (k,v)| hash.merge("configuration.#{k}" => v)})
                 end
 
-                if location
-                    opts.merge!(location.message_attributes.inject({}){|hash, (k,v)| hash.merge("location.#{k}" => v)})
+                if place
+                    opts.merge!(place.message_attributes.inject({}){|hash, (k,v)| hash.merge("place.#{k}" => v)})
                 end
 
                 @message_opts = opts
@@ -118,16 +118,16 @@ module Events
 
             private
 
-            def track_customer_last_location_visit
-                if location && customer.last_location_visit_id != location.id
+            def track_customer_last_place_visit
+                if place && customer.last_place_visit_id != place.id
                     current_time = Time.zone.now
                     update_params = {
                         "$inc" => {
-                            "total_location_visits" => 1,
+                            "total_place_visits" => 1,
                         },
                         "$set" => {
-                            "last_location_visit_id" => location.id,
-                            "last_location_visit_at" => current_time
+                            "last_place_visit_id" => place.id,
+                            "last_place_visit_at" => current_time
                         }
                     }
                     if customer.first_visit_at.nil?
@@ -189,8 +189,8 @@ module Events
                 return @beacon_configuration.first
             end
 
-            def location
-                @location ||= beacon_configuration.nil? ? nil : beacon_configuration.location
+            def place
+                @place ||= beacon_configuration.nil? ? nil : beacon_configuration.place
             end
 
             def serialize_beacon_configuration(beacon_configuration)

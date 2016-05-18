@@ -9,7 +9,7 @@ module BeaconConfigurationElasticsearchChild
             indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
             indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :shared_account_ids, type: 'long', index: 'not_analyzed'
-            indexes :location, type: 'object' do
+            indexes :place, type: 'object' do
                 indexes :name, type: 'string', index: 'no'
                 indexes :id, type: 'integer', index: 'not_analyzed'
                 indexes :tags, type: 'string', index: 'not_analyzed'

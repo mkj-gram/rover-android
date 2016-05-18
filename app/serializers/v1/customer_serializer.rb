@@ -12,8 +12,8 @@ module V1::CustomerSerializer
                     :"phone-number" => customer.phone_number,
                     tags: customer.tags,
                     traits: customer.traits,
-                    :"total-visits" => customer.total_location_visits.to_i,
-                    :"last-visit" => customer.last_location_visit_at.nil? ? nil : customer.last_location_visit_at.iso8601(3),
+                    :"total-visits" => customer.total_place_visits.to_i,
+                    :"last-visit" => customer.last_place_visit_at.nil? ? nil : customer.last_place_visit_at.iso8601(3),
                     :"first-visit" => customer.first_visit_at.nil? ? nil : customer.first_visit_at.iso8601(3)
                 }
             }

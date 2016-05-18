@@ -1,3 +1,3 @@
-class LocationActiveTag < ActiveTag
+class PlaceActiveTag < ActiveTag
     include UniqueTagsUpdatable
 end

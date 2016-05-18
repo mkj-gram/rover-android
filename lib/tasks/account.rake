@@ -31,12 +31,12 @@ namespace :account do
             Mongo::Logger.logger.level = ::Logger::INFO
             primary_account_email = ENV['EMAIL'] || "sean@rover.io"
             num_configurations = ENV['NUM_CONFIGURATIONS'] || 1000
-            num_locations = ENV['NUM_LOCATIONS'] || 300
-            precentage_of_configurations_attached_to_locations = ENV['CONFIGURATION_LOCATION_PERCENT'] || 0.9
+            num_places = ENV['NUM_LOCATIONS'] || 300
+            precentage_of_configurations_attached_to_places = ENV['CONFIGURATION_LOCATION_PERCENT'] || 0.9
             num_customers = ENV['NUM_CUSTOMERS'] || 1000
             configuration_names = ["Meaford Bakery","Meaford Produce","Meaford Butcher","Meaford Frozen","Meaford Cashier","Meaford Entrance","Meaford Bulk","Meaford International Foods","Liberty Bakery","Liberty Produce","Liberty Butcher","Liberty Frozen","Liberty Cashier","Liberty Entrance","Liberty Bulk","Liberty International Foods","Front Street Bakery","Front Street Produce","Front Street Butcher","Front Street Frozen","Front Street Cashier","Front Street Entrance","Front Street Bulk","Front Street International Foods","Centrepoint Bakery","Centrepoint Produce","Centrepoint Butcher","Centrepoint Frozen","Centrepoint Cashier","Centrepoint Entrance","Centrepoint Bulk","Centrepoint International Foods", "Innisville Bakery","Innisville Produce","Innisville Butcher","Innisville Frozen","Innisville Cashier","Innisville Entrance","Innisville Bulk","Innisville International Foods", "SquareOne Bakery","SquareOne Produce","SquareOne Butcher","SquareOne Frozen","SquareOne Cashier","SquareOne Entrance","SquareOne Bulk","SquareOne International Foods", "Shoppers World Bakery","Shoppers World Produce","Shoppers World Butcher","Shoppers World Frozen","Shoppers World Cashier","Shoppers World Entrance","Shoppers World Bulk","Shoppers World International Foods", "OC Centre Bakery","OC Centre Produce","OC Centre Butcher","OC Centre Frozen","OC Centre Cashier","OC Centre Entrance","OC Centre Bulk","OC Centre International Foods"].freeze
             configuration_tags = ["Layout A", "Layout B", "Layout C", "Fresh", "Low-Powered", "On-Shelf", "High-Powered", "Multi-Region", "Near Entrance", "Popular", "Sampler"].freeze
-            location_tags = ["Suburban", "Rural", "Urban", "Downtown", "Outside-Parking", "Underground Parking", "In-Mall", "Region A"," Region B", "Region C", "Distric 1", "District 2", "District 3"].freeze
+            place_tags = ["Suburban", "Rural", "Urban", "Downtown", "Outside-Parking", "Underground Parking", "In-Mall", "Region A"," Region B", "Region C", "Distric 1", "District 2", "District 3"].freeze
 
             puts "\n\nGenerating Account\n".colorize(:color =>  :black, :background => :white).underline
 
@@ -69,7 +69,7 @@ namespace :account do
                 # end
                 # show_finished
 
-                # Add locations
+                # Add places
                 # 32.549156, -117.102067
                 # 57.804427, -71.313488
                 rng = Random.new(Time.now.to_i)
@@ -77,13 +77,13 @@ namespace :account do
                 maxLat = 57.804427
                 minLng = -117.102067
                 maxLng = -71.313488
-                puts "Adding #{num_locations} locations to account #{@account.id}"
+                puts "Adding #{num_places} places to account #{@account.id}"
                 current_record = 1
-                locations = []
-                num_locations.times.each do
+                places = []
+                num_places.times.each do
                     lat = minLat + rng.rand * (maxLat - minLat)
                     lng = minLng + rng.rand * (maxLng - minLng)
-                    locations << Location.create!(
+                    places << Place.create!(
                         account_id: @account.id,
                         title: Faker::Address.street_name,
                         address: Faker::Address.street_address,
@@ -94,9 +94,9 @@ namespace :account do
                         latitude: lat,
                         longitude: lng,
                         radius: Random.rand(500) + 50,
-                        tags: location_tags.sample(rand(3))
+                        tags: place_tags.sample(rand(3))
                     )
-                    show_percentage((current_record/num_locations.to_f) * 100)
+                    show_percentage((current_record/num_places.to_f) * 100)
                     current_record += 1
                 end
                 show_finished
@@ -123,25 +123,25 @@ namespace :account do
                 end
                 show_finished
 
-                num_configurations_to_attach = ibeacon_configurations.size * precentage_of_configurations_attached_to_locations.to_f
+                num_configurations_to_attach = ibeacon_configurations.size * precentage_of_configurations_attached_to_places.to_f
                 configurations_to_attach = ibeacon_configurations.last(num_configurations_to_attach)
 
-                puts "Attaching #{num_configurations_to_attach.floor} configurations to random locations"
+                puts "Attaching #{num_configurations_to_attach.floor} configurations to random places"
                 current_record = 1
                 configurations_to_attach.each do |config|
-                    config.update_attributes({location_id: locations.sample.id})
+                    config.update_attributes({place_id: places.sample.id})
                     show_percentage((current_record/num_configurations_to_attach.to_f) * 100)
                     current_record += 1
                 end
                 show_finished
 
-                puts "Reindexing locations"
+                puts "Reindexing places"
                 show_percentage(0)
-                Location.where(account_id: @account.id).import
+                Place.where(account_id: @account.id).import
                 show_percentage(100)
                 show_finished
                 # Generate a list of customers
-                # All will have a random location
+                # All will have a random place
                 languages = ["en", "fr", "es", "ko"]
                 os_name = ["iOS", "Android"]
                 android_os_versions = ["4.0", "4.0.2", "4.1", "4.3.1", "4.4", "5.0", "5.1.1", "6.0", "6.0.1"]
@@ -159,8 +159,8 @@ namespace :account do
                     os = os_name.sample
                     version = os == "iOS" ? ios_os_versions.sample : android_os_versions.sample
                     model = os == "iOS" ? "iPhone" : "Google"
-                    c = Customer.new(account_id: @account.id, identifier: SecureRandom.uuid, name: Faker::Name.name, email: Faker::Internet.email, age: 15 + rand(40), gender: gender.sample, location: GeoPoint.new(latitude: lat, longitude: lng) )
-                    c.devices.build(udid: SecureRandom.uuid, locale_lang: languages.sample, locale_region: region.sample, time_zone: timezones.sample, sdk_version: "4.0.0", os_name: os, os_version: version, model: model, background_enabled: true_false.sample, local_notifications_enabled: true_false.sample, remote_notifications_enabled: true_false.sample, bluetooth_enabled: true_false.sample, location_monitoring_enabled: true_false.sample  )
+                    c = Customer.new(account_id: @account.id, identifier: SecureRandom.uuid, name: Faker::Name.name, email: Faker::Internet.email, age: 15 + rand(40), gender: gender.sample, place: GeoPoint.new(latitude: lat, longitude: lng) )
+                    c.devices.build(udid: SecureRandom.uuid, locale_lang: languages.sample, locale_region: region.sample, time_zone: timezones.sample, sdk_version: "4.0.0", os_name: os, os_version: version, model: model, background_enabled: true_false.sample, local_notifications_enabled: true_false.sample, remote_notifications_enabled: true_false.sample, bluetooth_enabled: true_false.sample, place_monitoring_enabled: true_false.sample  )
                     c.save
                     show_percentage((current_record/ num_customers.to_f) * 100)
                     current_record += 1
@@ -179,8 +179,8 @@ namespace :account do
                     os = os_name.sample
                     version = os == "iOS" ? ios_os_versions.sample : android_os_versions.sample
                     model = os == "iOS" ? "iPhone" : "Google"
-                    c = Customer.new(account_id: @account.id, identifier: SecureRandom.uuid, name: Faker::Name.name, email: Faker::Internet.email, age: 15 + rand(40), gender: gender.sample, location: GeoPoint.new(latitude: lat, longitude: lng) )
-                    c.devices.build(udid: SecureRandom.uuid, locale_lang: languages.sample, locale_region: region.sample, time_zone: timezones.sample, sdk_version: "4.0.0", os_name: os, os_version: version, model: model, background_enabled: true_false.sample, local_notifications_enabled: true_false.sample, remote_notifications_enabled: true_false.sample, bluetooth_enabled: true_false.sample, location_monitoring_enabled: true_false.sample  )
+                    c = Customer.new(account_id: @account.id, identifier: SecureRandom.uuid, name: Faker::Name.name, email: Faker::Internet.email, age: 15 + rand(40), gender: gender.sample, place: GeoPoint.new(latitude: lat, longitude: lng) )
+                    c.devices.build(udid: SecureRandom.uuid, locale_lang: languages.sample, locale_region: region.sample, time_zone: timezones.sample, sdk_version: "4.0.0", os_name: os, os_version: version, model: model, background_enabled: true_false.sample, local_notifications_enabled: true_false.sample, remote_notifications_enabled: true_false.sample, bluetooth_enabled: true_false.sample, place_monitoring_enabled: true_false.sample  )
                     c.save
                     show_percentage((current_record/ num_customers.to_f) * 100)
                     current_record += 1
@@ -252,7 +252,7 @@ namespace :account do
                         },
                         {
                             "model" => "customer",
-                            "attribute" => "location",
+                            "attribute" => "place",
                             "comparer" => {
                                 "method" => "geofence",
                                 "latitude" => 43.662469,
@@ -364,8 +364,8 @@ namespace :account do
                         "limits"=>[{"message_limit"=>1, "number_of_days"=>30}],
                         "filter_beacon_configuration_tags"=>[],
                         "filter_beacon_configuration_ids"=>[],
-                        "filter_location_tags"=>[],
-                    "filter_location_ids"=>[]},
+                        "filter_place_tags"=>[],
+                    "filter_place_ids"=>[]},
 
                 )
                 message.save
@@ -394,8 +394,8 @@ namespace :account do
                         "limits"=>[{"message_limit"=>1, "number_of_days"=>1}],
                         "filter_beacon_configuration_tags"=>[],
                         "filter_beacon_configuration_ids"=>[],
-                        "filter_location_tags"=>["Urban", "Region A"],
-                        "filter_location_ids"=>[]
+                        "filter_place_tags"=>["Urban", "Region A"],
+                        "filter_place_ids"=>[]
                     }
                 )
                 message.save
@@ -404,7 +404,7 @@ namespace :account do
                     {
                         "account_id"=>@account.id,
                         "title"=>"Sports Fans",
-                        "filters"=>[{"model"=>"customer", "attribute"=>"gender", "comparer"=>{"method"=>"equal", "value"=>"male"}}, {"model"=>"customer", "attribute"=>"age", "comparer"=>{"method"=>"range", "from"=>29, "to"=>nil}}, {"model"=>"device", "attribute"=>"locale-lang", "comparer"=>{"method"=>"in", "value"=>["en"]}}, {"model"=>"customer", "attribute"=>"location", "comparer"=>{"method"=>"geofence", "longitude"=>-79.38918419999999, "latitude"=>43.6756957, "radius"=>3500}}],
+                        "filters"=>[{"model"=>"customer", "attribute"=>"gender", "comparer"=>{"method"=>"equal", "value"=>"male"}}, {"model"=>"customer", "attribute"=>"age", "comparer"=>{"method"=>"range", "from"=>29, "to"=>nil}}, {"model"=>"device", "attribute"=>"locale-lang", "comparer"=>{"method"=>"in", "value"=>["en"]}}, {"model"=>"customer", "attribute"=>"place", "comparer"=>{"method"=>"geofence", "longitude"=>-79.38918419999999, "latitude"=>43.6756957, "radius"=>3500}}],
                     }
                 )
 
@@ -432,8 +432,8 @@ namespace :account do
                         "limits"=>[{"message_limit"=>1, "number_of_days"=>1}],
                         "filter_beacon_configuration_tags"=>["Popular"],
                         "filter_beacon_configuration_ids"=>[],
-                        "filter_location_tags"=>["Downtown"],
-                        "filter_location_ids"=>[]
+                        "filter_place_tags"=>["Downtown"],
+                        "filter_place_ids"=>[]
                     }
                 )
 
@@ -470,8 +470,8 @@ namespace :account do
                         "limits"=>[{"message_limit"=>1, "number_of_days"=>1}, {"message_limit"=>3, "number_of_days"=>14}],
                         "filter_beacon_configuration_tags"=>[],
                         "filter_beacon_configuration_ids"=>ibeacon_configurations.sample(3).map(&:id),
-                        "filter_location_tags"=>[],
-                        "filter_location_ids"=>[]
+                        "filter_place_tags"=>[],
+                        "filter_place_ids"=>[]
                     }
 
                 )
@@ -501,7 +501,7 @@ namespace :account do
                         "limits"=>[{"message_limit"=>2, "number_of_days"=>1}, {"message_limit"=>3, "number_of_days"=>7}],
                         "filter_beacon_configuration_tags"=>["At Cash"],
                         "filter_beacon_configuration_ids"=>[],
-                        "filter_location_tags"=>[], "filter_location_ids"=>[]
+                        "filter_place_tags"=>[], "filter_place_ids"=>[]
                     }
                 )
                 message.save

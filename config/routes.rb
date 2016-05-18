@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
     # resources :account_invites, except: [:new, :edit]
     # resources :shared_beacons, except: [:new, :edit]
-    # resources :shared_locations, except: [:new, :edit]
+    # resources :shared_places, except: [:new, :edit]
 
     # resources :users, except: [:new, :edit]
     # resources :accounts, except: [:new, :edit]
@@ -13,7 +13,7 @@ Rails.application.routes.draw do
         # resources :accounts do
         #     scope module: "account_context" do
         #         resources :users
-        #         # resources :locations, :controller => ""
+        #         # resources :places, :controller => ""
         #     end
         # end
 
@@ -31,9 +31,9 @@ Rails.application.routes.draw do
         resources :account_invites, only: [:index, :create, :destroy]
         get '/account_invites/:token', to: "account_invites#show"
 
-        # resources :locations do
+        # resources :places do
         #     # collection do
-        #     # scope module: "locations" do
+        #     # scope module: "places" do
         #     #     collection do
         #     #         delete  '', to: "bulk#destroy",   as: "bulk_delete"
         #     #         patch   '', to: "bulk#update",    as: "bulk_update"
@@ -42,12 +42,12 @@ Rails.application.routes.draw do
         #     # end
 
         #     # end
-        #     # namespace :relationships, module: "locations" do
+        #     # namespace :relationships, module: "places" do
         #     #     resources :beacons
         #     # end
         # end
 
-        resources :locations
+        resources :places
 
         resources :sessions, only: [:create, :show, :destroy]
 

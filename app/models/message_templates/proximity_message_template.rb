@@ -12,8 +12,8 @@ class ProximityMessageTemplate < MessageTemplate
 
     default_empty_array_attribute :filter_beacon_configuration_tags
     default_empty_array_attribute :filter_beacon_configuration_ids
-    default_empty_array_attribute :filter_location_tags
-    default_empty_array_attribute :filter_location_ids
+    default_empty_array_attribute :filter_place_tags
+    default_empty_array_attribute :filter_place_ids
 
     validate :legal_trigger_event_id
 
@@ -22,8 +22,8 @@ class ProximityMessageTemplate < MessageTemplate
         @filter_beacon_configurations ||= filter_beacon_configuration_ids.any? ? BeaconConfiguration.where(id: filter_beacon_configuration_ids) : []
     end
 
-    def filter_locations
-        @filter_locations ||= filter_location_ids.any? ? Location.where(id: filter_location_ids).all : []
+    def filter_places
+        @filter_places ||= filter_place_ids.any? ? Place.where(id: filter_place_ids).all : []
     end
 
     def drafted

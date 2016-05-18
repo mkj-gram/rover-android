@@ -246,8 +246,8 @@ module Events
             }
 
 
-            locations = Elasticsearch::Model.search(query, [Location])
-            locations.per_page(limit).page(0).results.map do |document|
+            places = Elasticsearch::Model.search(query, [Place])
+            places.per_page(limit).page(0).results.map do |document|
                 latitude = document._source.location.lat
                 longitude = document._source.location.lon
                 radius = document._source.radius

@@ -20,10 +20,10 @@ class UserRole < ActiveRecord::Base
             beacon_configuration_update: true,
             beacon_configuration_destroy: true,
 
-            location_show: true,
-            location_create: true,
-            location_update: true,
-            location_destroy: true,
+            place_show: true,
+            place_create: true,
+            place_update: true,
+            place_destroy: true,
 
             customer_show: true,
             customer_create: true,

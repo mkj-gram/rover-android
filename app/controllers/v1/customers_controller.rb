@@ -6,7 +6,7 @@ class V1::CustomersController < V1::ApplicationController
 
     def index
 
-        should_include = ["devices", "last-location"]
+        should_include = ["devices", "last-place"]
 
         query = {
             fields: ["_id"],
@@ -45,11 +45,11 @@ class V1::CustomersController < V1::ApplicationController
             included += customers.map{|customer| customer.devices.map{|device| serialize_device(device)}}.flatten
         end
 
-        if should_include.include?("last-location")
-            location_ids  = customers.map{|customer| customer.last_location_visit_id }.compact
-            if location_ids.any?
-                locations = Location.where(id: location_ids).all
-                included += locations.map{|location| V1::LocationSerializer.serialize(location)}
+        if should_include.include?("last-place")
+            place_ids  = customers.map{|customer| customer.last_place_visit_id }.compact
+            if place_ids.any?
+                places = Place.where(id: place_ids).all
+                included += places.map{|place| V1::PlaceSerializer.serialize(place)}
             end
         end
 
@@ -61,9 +61,9 @@ class V1::CustomersController < V1::ApplicationController
 
         included = @customer.devices.map{|device| serialize_device(device)}
 
-        if !@customer.last_location_visit_id.nil?
-            location = Location.find(@customer.last_location_visit_id)
-            included.push(V1::LocationSerializer.serialize(location)) if location
+        if !@customer.last_place_visit_id.nil?
+            place = Place.find(@customer.last_place_visit_id)
+            included.push(V1::PlaceSerializer.serialize(place)) if place
         end
 
         json = {
@@ -92,8 +92,8 @@ class V1::CustomersController < V1::ApplicationController
     def render_customer(customer)
     end
 
-    def serialize_customer(customer, locations_cache = {})
-        should_include = ["devices", "last-location"]
+    def serialize_customer(customer, places_cache = {})
+        should_include = ["devices", "last-place"]
 
         relationships = {}
 
@@ -101,8 +101,8 @@ class V1::CustomersController < V1::ApplicationController
             relationships[:devices] = { data: customer.devices.map { |device| { type: "devices", id: device.id }}}
         end
 
-        if should_include.include?("last-location") && customer.last_location_visit_id
-            relationships[:"last-location"] = { data: { type: "locations", id: customer.last_location_visit_id }}
+        if should_include.include?("last-place") && customer.last_place_visit_id
+            relationships[:"last-place"] = { data: { type: "places", id: customer.last_place_visit_id }}
         end
 
 
@@ -127,7 +127,7 @@ class V1::CustomersController < V1::ApplicationController
                 :"carrier" => device.manufacturer,
                 :"local-notifications-enabled" => device.local_notifications_enabled,
                 :"remote-notifications-enabled" => device.remote_notifications_enabled,
-                :"location-monitoring-enabled" => device.location_monitoring_enabled,
+                :"place-monitoring-enabled" => device.place_monitoring_enabled,
                 :"background-enabled" => device.background_enabled,
                 :"bluetooth-enabled" => device.bluetooth_enabled
             }

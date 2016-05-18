@@ -188,9 +188,9 @@ describe "/v1/configurations", :type => :request do
                     expect(error.dig(:source, :pointer)).to eq("data")
 
                 end
-                it 'returns 422 when location doesnt exist' do
+                it 'returns 422 when place doesnt exist' do
                     account = create(:account)
-                    location = create(:location, account: account)
+                    place = create(:place, account: account)
                     uuid = SecureRandom.uuid
                     post "/v1/configurations",
                     {
@@ -204,8 +204,8 @@ describe "/v1/configurations", :type => :request do
                                 :"minor-number" => 1
                             },
                             relationships: {
-                                location: {
-                                    data: {type: "locations", id: "-1"}
+                                place: {
+                                    data: {type: "places", id: "-1"}
                                 }
                             }
                         }
@@ -241,9 +241,9 @@ describe "/v1/configurations", :type => :request do
                     expect(json.dig(:data, :attributes, :"minor-number")).to eq(1)
                 end
 
-                it 'returns 200 ok when uuid, major, minor is supplied with a location' do
+                it 'returns 200 ok when uuid, major, minor is supplied with a place' do
                     account = create(:account)
-                    location = create(:location, account: account)
+                    place = create(:place, account: account)
                     uuid = SecureRandom.uuid.upcase
                     post "/v1/configurations",
                     {
@@ -257,8 +257,8 @@ describe "/v1/configurations", :type => :request do
                                 :"minor-number" => 1
                             },
                             relationships: {
-                                location: {
-                                    data: {type: "locations", id: location.id.to_s}
+                                place: {
+                                    data: {type: "places", id: place.id.to_s}
                                 }
                             }
                         }

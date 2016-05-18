@@ -15,7 +15,7 @@ module CustomerFilter
                 "traits" => :hash,
                 "gender" => :string,
                 "age" => :integer,
-                "location" => :geo_point
+                "place" => :geo_point
             }
 
             # "name" => CustomerFilter::AttributeType.new(type: :string),

@@ -91,7 +91,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
     def show
         # include beacons
-        # include location
+        # include place
 
         json = render_proximity_message(@proximity_message)
 
@@ -155,12 +155,12 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :name, :title)
         convert_param_if_exists(local_params[:proximity_messages], :configuration_tags, :filter_beacon_configuration_tags)
         convert_param_if_exists(local_params[:proximity_messages], :configuration_ids, :filter_beacon_configuration_ids)
-        convert_param_if_exists(local_params[:proximity_messages], :location_tags, :filter_location_tags)
-        convert_param_if_exists(local_params[:proximity_messages], :location_ids, :filter_location_ids)
+        convert_param_if_exists(local_params[:proximity_messages], :place_tags, :filter_place_tags)
+        convert_param_if_exists(local_params[:proximity_messages], :place_ids, :filter_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
         convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_id, :filter_gimbal_place_id)
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
-        param_should_be_array(local_params[:proximity_messages], :filter_location_tags)
+        param_should_be_array(local_params[:proximity_messages], :filter_place_tags)
         param_should_be_array(local_params[:proximity_messages], :limits)
 
         if local_params[:proximity_messages].has_key?(:trigger_event)
@@ -176,8 +176,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :trigger_event_id,
             {:filter_beacon_configuration_tags => []},
             {:filter_beacon_configuration_ids => []},
-            {:filter_location_tags => []},
-            {:filter_location_ids => []},
+            {:filter_place_tags => []},
+            {:filter_place_ids => []},
             :filter_gimbal_place_id,
             :schedule_start_date,
             :schedule_end_date,
@@ -198,7 +198,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "locations", "segment"] # when ember can implement include on get whitelist_include(["beacons", "locations"])
+        should_include = ["beacons", "places", "segment"] # when ember can implement include on get whitelist_include(["beacons", "places"])
 
 
 
@@ -230,21 +230,21 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             end
         end
 
-        if should_include.include?("locations")
+        if should_include.include?("places")
             json[:data][:relationships] = {} if json[:data][:relationships].nil?
-            if message.filter_location_ids
+            if message.filter_place_ids
 
                 json[:data][:relationships].merge!(
                     {
-                        locations: {
-                            data: message.filter_location_ids.map{|location_id| {type: "locations", id: location_id}}
+                        places: {
+                            data: message.filter_place_ids.map{|place_id| {type: "places", id: place_id}}
                         }
                     }
                 )
-                locations = message.filter_locations
-                included += locations.map{|location| V1::LocationSerializer.serialize(location)}
+                places = message.filter_places
+                included += places.map{|place| V1::PlaceSerializer.serialize(place)}
             else
-                json[:data][:relationships].merge!({locations: {data: []}})
+                json[:data][:relationships].merge!({places: {data: []}})
             end
         end
 
@@ -311,7 +311,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"schedule-friday" => message.schedule_friday,
                 :"schedule-saturday" => message.schedule_saturday,
                 :"schedule-sunday" => message.schedule_sunday,
-                :"location-tags" => message.filter_location_tags,
+                :"place-tags" => message.filter_place_tags,
                 :"gimbal-place-id" => message.filter_gimbal_place_id,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
                 :"save-to-inbox" => message.save_to_inbox,

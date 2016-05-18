@@ -202,7 +202,7 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def apply_configuration_filters(configuration)
-        filter_location(configuration) && filter_beacon_configuration(configuration)
+        filter_place(configuration) && filter_beacon_configuration(configuration)
     end
 
     def approximate_customers_count
@@ -237,8 +237,8 @@ class MessageTemplate < ActiveRecord::Base
         (
             filter_beacon_configuration_tags && filter_beacon_configuration_tags.any?  ||
             filter_beacon_configuration_ids && filter_beacon_configuration_ids.any? ||
-            filter_location_tags && filter_location_tags.any? ||
-            filter_location_ids && filter_location_ids.any?
+            filter_place_tags && filter_place_tags.any? ||
+            filter_place_ids && filter_place_ids.any?
         )
     end
 
@@ -275,11 +275,11 @@ class MessageTemplate < ActiveRecord::Base
                 )
             end
 
-            if filter_location_ids && filter_location_ids.any?
+            if filter_place_ids && filter_place_ids.any?
                 must_filters.push(
                     {
                         terms: {
-                            "location.id" => filter_location_ids
+                            "place.id" => filter_place_ids
                         }
                     }
                 )
@@ -298,12 +298,12 @@ class MessageTemplate < ActiveRecord::Base
                 end
             end
 
-            if filter_location_tags && filter_location_tags.any?
-                filter_location_tags.each do |tag|
+            if filter_place_tags && filter_place_tags.any?
+                filter_place_tags.each do |tag|
                     must_filters.push(
                         {
                             term: {
-                                "location.tags" => tag
+                                "place.tags" => tag
                             }
                         }
                     )
@@ -367,17 +367,17 @@ class MessageTemplate < ActiveRecord::Base
                 true
             end
         else
-            # if we are only filtering locations
+            # if we are only filtering places
             true
         end
     end
 
-    def filter_location(configuration)
-        location = configuration.is_a?(BeaconConfiguration) ? configuration.location : configuration
-        if filter_location_tags && filter_location_tags.any?
-            !location.nil? && (filter_location_tags - location.tags).empty?
-        elsif filter_location_ids && filter_location_ids.any?
-            !location.nil? && filter_location_ids.include?(location.id)
+    def filter_place(configuration)
+        place = configuration.is_a?(BeaconConfiguration) ? configuration.place : configuration
+        if filter_place_tags && filter_place_tags.any?
+            !place.nil? && (filter_place_tags - place.tags).empty?
+        elsif filter_place_ids && filter_place_ids.any?
+            !place.nil? && filter_place_ids.include?(place.id)
         else
             true
         end

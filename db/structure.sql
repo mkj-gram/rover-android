@@ -127,10 +127,10 @@ CREATE TABLE accounts (
     share_key text NOT NULL,
     default_user_role_id integer,
     users_count integer DEFAULT 0,
-    locations_count integer DEFAULT 0,
+    places_count integer DEFAULT 0,
     beacon_configurations_count integer DEFAULT 0,
     searchable_beacon_configurations_count integer DEFAULT 0,
-    searchable_locations_count integer DEFAULT 0,
+    searchable_places_count integer DEFAULT 0,
     account_invites_count integer DEFAULT 0,
     gimbal_places_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
@@ -269,7 +269,7 @@ ALTER SEQUENCE android_platforms_id_seq OWNED BY android_platforms.id;
 CREATE TABLE beacon_configurations (
     id integer NOT NULL,
     account_id integer NOT NULL,
-    location_id integer,
+    place_id integer,
     type character varying NOT NULL,
     title text,
     tags character varying[] DEFAULT '{}'::character varying[],
@@ -545,51 +545,6 @@ ALTER SEQUENCE ios_platforms_id_seq OWNED BY ios_platforms.id;
 
 
 --
--- Name: locations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE locations (
-    id integer NOT NULL,
-    account_id integer NOT NULL,
-    title character varying,
-    address text,
-    city text,
-    province text,
-    country character varying,
-    postal_code character varying,
-    latitude numeric(10,6),
-    longitude numeric(10,6),
-    radius integer DEFAULT 50,
-    tags text[] DEFAULT '{}'::text[],
-    google_place_id text,
-    enabled boolean DEFAULT true,
-    shared boolean DEFAULT false,
-    beacon_configurations_count integer DEFAULT 0,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE locations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
-
-
---
 -- Name: message_templates; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -618,8 +573,8 @@ CREATE TABLE message_templates (
     limits hstore[],
     filter_beacon_configuration_tags character varying[],
     filter_beacon_configuration_ids integer[],
-    filter_location_tags character varying[],
-    filter_location_ids integer[],
+    filter_place_tags character varying[],
+    filter_place_ids integer[],
     filter_gimbal_place_id character varying,
     content_type character varying,
     website_url character varying,
@@ -634,7 +589,8 @@ CREATE TABLE message_templates (
     ios_sound_file character varying,
     android_sound_file character varying,
     time_to_live integer,
-    landing_page_template jsonb
+    landing_page_template jsonb,
+    extras jsonb
 );
 
 
@@ -687,6 +643,51 @@ CREATE SEQUENCE password_resets_id_seq
 --
 
 ALTER SEQUENCE password_resets_id_seq OWNED BY password_resets.id;
+
+
+--
+-- Name: places; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE places (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    title character varying,
+    address text,
+    city text,
+    province text,
+    country character varying,
+    postal_code character varying,
+    latitude numeric(10,6),
+    longitude numeric(10,6),
+    radius integer DEFAULT 50,
+    tags text[] DEFAULT '{}'::text[],
+    google_place_id text,
+    enabled boolean DEFAULT true,
+    shared boolean DEFAULT false,
+    beacon_configurations_count integer DEFAULT 0,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: places_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE places_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: places_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE places_id_seq OWNED BY places.id;
 
 
 --
@@ -859,10 +860,10 @@ CREATE TABLE user_acls (
     beacon_configuration_create boolean DEFAULT true,
     beacon_configuration_update boolean DEFAULT true,
     beacon_configuration_destroy boolean DEFAULT true,
-    location_show boolean DEFAULT true,
-    location_create boolean DEFAULT true,
-    location_update boolean DEFAULT true,
-    location_destroy boolean DEFAULT true,
+    place_show boolean DEFAULT true,
+    place_create boolean DEFAULT true,
+    place_update boolean DEFAULT true,
+    place_destroy boolean DEFAULT true,
     customer_show boolean DEFAULT true,
     customer_create boolean DEFAULT true,
     customer_update boolean DEFAULT true,
@@ -944,10 +945,10 @@ CREATE TABLE user_roles (
     beacon_configuration_create boolean DEFAULT true,
     beacon_configuration_update boolean DEFAULT true,
     beacon_configuration_destroy boolean DEFAULT true,
-    location_show boolean DEFAULT true,
-    location_create boolean DEFAULT true,
-    location_update boolean DEFAULT true,
-    location_destroy boolean DEFAULT true,
+    place_show boolean DEFAULT true,
+    place_create boolean DEFAULT true,
+    place_update boolean DEFAULT true,
+    place_destroy boolean DEFAULT true,
     customer_show boolean DEFAULT true,
     customer_create boolean DEFAULT true,
     customer_update boolean DEFAULT true,
@@ -1132,13 +1133,6 @@ ALTER TABLE ONLY ios_platforms ALTER COLUMN id SET DEFAULT nextval('ios_platform
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY message_templates ALTER COLUMN id SET DEFAULT nextval('message_templates_id_seq'::regclass);
 
 
@@ -1147,6 +1141,13 @@ ALTER TABLE ONLY message_templates ALTER COLUMN id SET DEFAULT nextval('message_
 --
 
 ALTER TABLE ONLY password_resets ALTER COLUMN id SET DEFAULT nextval('password_resets_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY places ALTER COLUMN id SET DEFAULT nextval('places_id_seq'::regclass);
 
 
 --
@@ -1295,14 +1296,6 @@ ALTER TABLE ONLY ios_platforms
 
 
 --
--- Name: locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY locations
-    ADD CONSTRAINT locations_pkey PRIMARY KEY (id);
-
-
---
 -- Name: message_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1316,6 +1309,14 @@ ALTER TABLE ONLY message_templates
 
 ALTER TABLE ONLY password_resets
     ADD CONSTRAINT password_resets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: places_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY places
+    ADD CONSTRAINT places_pkey PRIMARY KEY (id);
 
 
 --
@@ -1494,10 +1495,10 @@ CREATE INDEX index_beacon_configurations_on_account_id_and_type ON beacon_config
 
 
 --
--- Name: index_beacon_configurations_on_location_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_configurations_on_place_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_beacon_configurations_on_location_id ON beacon_configurations USING btree (location_id);
+CREATE INDEX index_beacon_configurations_on_place_id ON beacon_configurations USING btree (place_id);
 
 
 --
@@ -1606,27 +1607,6 @@ CREATE UNIQUE INDEX index_ios_platforms_on_account_id ON ios_platforms USING btr
 
 
 --
--- Name: index_locations_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_locations_on_account_id ON locations USING btree (account_id);
-
-
---
--- Name: index_locations_on_account_id_and_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_locations_on_account_id_and_latitude_and_longitude ON locations USING btree (account_id, latitude, longitude);
-
-
---
--- Name: index_locations_on_account_id_and_tags; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_locations_on_account_id_and_tags ON locations USING gin (account_id, tags);
-
-
---
 -- Name: index_password_resets_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1645,6 +1625,27 @@ CREATE UNIQUE INDEX index_password_resets_on_token ON password_resets USING btre
 --
 
 CREATE INDEX index_password_resets_on_user_id ON password_resets USING btree (user_id);
+
+
+--
+-- Name: index_places_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_places_on_account_id ON places USING btree (account_id);
+
+
+--
+-- Name: index_places_on_account_id_and_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_places_on_account_id_and_latitude_and_longitude ON places USING btree (account_id, latitude, longitude);
+
+
+--
+-- Name: index_places_on_account_id_and_tags; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_places_on_account_id_and_tags ON places USING gin (account_id, tags);
 
 
 --
@@ -1855,4 +1856,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160422184350');
 INSERT INTO schema_migrations (version) VALUES ('20160423104812');
 
 INSERT INTO schema_migrations (version) VALUES ('20160505164431');
+
+INSERT INTO schema_migrations (version) VALUES ('20160512153039');
+
+INSERT INTO schema_migrations (version) VALUES ('20160517195421');
 

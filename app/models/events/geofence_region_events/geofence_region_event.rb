@@ -3,7 +3,7 @@ module Events
         class GeofenceRegionEvent < Event
 
             before_save :save_messages_to_inbox
-            after_save :track_customer_last_location_visit
+            after_save :track_customer_last_place_visit
 
             attr_reader :geofence_region, :identifier_longitude, :longitude, :latitude, :radius
 
@@ -19,21 +19,21 @@ module Events
             def attributes
                 parent_attributes = super
 
-                if location
+                if place
                     parent_attributes.merge!(
                         {
-                            location: {
-                                id: location.id,
-                                title: location.title,
-                                address: location.address,
-                                postal_code: location.postal_code,
-                                city: location.city,
-                                province: location.province,
-                                country: location.country,
-                                latitude: location.latitude,
-                                longitude: location.longitude,
-                                tags: location.tags,
-                                shared: location.shared
+                            place: {
+                                id: place.id,
+                                title: place.title,
+                                address: place.address,
+                                postal_code: place.postal_code,
+                                city: place.city,
+                                province: place.province,
+                                country: place.country,
+                                latitude: place.latitude,
+                                longitude: place.longitude,
+                                tags: place.tags,
+                                shared: place.shared
                             }
                         }
                     )
@@ -44,18 +44,18 @@ module Events
 
             def to_json
                 json = super
-                # should have a location tied to it
-                if location && location.enabled
-                    json[:data][:attributes][:location] = {
-                        name: location.title,
-                        latitude: location.latitude,
-                        longitude: location.longitude,
-                        radius: location.radius,
-                        tags: location.tags,
-                        shared: location.shared
+                # should have a place tied to it
+                if place && place.enabled
+                    json[:data][:attributes][:place] = {
+                        name: place.title,
+                        latitude: place.latitude,
+                        longitude: place.longitude,
+                        radius: place.radius,
+                        tags: place.tags,
+                        shared: place.shared
                     }
                 else
-                    json[:data][:attributes][:location] = {}
+                    json[:data][:attributes][:place] = {}
                 end
 
                 return json
@@ -65,8 +65,8 @@ module Events
                 @message_opts if @message_opts
                 opts = super
 
-                if location
-                    opts.merge!(location.message_attributes.inject({}){|hash, (k,v)| hash.merge("location.#{k}" => v)})
+                if place
+                    opts.merge!(place.message_attributes.inject({}){|hash, (k,v)| hash.merge("place.#{k}" => v)})
                 end
 
                 @message_opts = opts
@@ -74,16 +74,16 @@ module Events
 
             private
 
-            def track_customer_last_location_visit
-                if location && customer.last_location_visit_id != location.id
+            def track_customer_last_place_visit
+                if place && customer.last_place_visit_id != place.id
                     current_time = Time.zone.now
                     update_params = {
                         "$inc" => {
-                            "total_location_visits" => 1,
+                            "total_place_visits" => 1,
                         },
                         "$set" => {
-                            "last_location_visit_id" => location.id,
-                            "last_location_visit_at" => current_time
+                            "last_place_visit_id" => place.id,
+                            "last_place_visit_at" => current_time
                         }
                     }
                     if customer.first_visit_at.nil?
@@ -94,29 +94,29 @@ module Events
             end
 
             def save_messages_to_inbox
-                # TODO Refractor both beacon_region_event and location_event use the same structure
+                # TODO Refractor both beacon_region_event and place_event use the same structure
                 puts "after save"
-                @proximity_messages = get_message_for_location(location) || []
+                @proximity_messages = get_message_for_place(place) || []
                 if @proximity_messages && @proximity_messages.any?
                     deliver_messages(@proximity_messages)
                 end
             end
 
-            def get_message_for_location(location_configuration)
+            def get_message_for_place(place_configuration)
                 messages = ProximityMessageTemplate.where(account_id: account.id, published: true,  trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
                 # apply all filters
                 current_time = DateTime.now
                 messages.select do |message|
-                    message.within_schedule(current_time) && message.apply_configuration_filters(location_configuration) && message.within_customer_segment(customer, device)
+                    message.within_schedule(current_time) && message.apply_configuration_filters(place_configuration) && message.within_customer_segment(customer, device)
                 end
             end
 
-            def location
-                @location ||= -> {
+            def place
+                @place ||= -> {
                     if geofence_region && geofence_region.latitude && geofence_region.latitude
-                        return Location.find_by(latitude: geofence_region.latitude , longitude: geofence_region.longitude)
+                        return Place.find_by(latitude: geofence_region.latitude , longitude: geofence_region.longitude)
                     else
-                        return Location.find_by(latitude: latitude, longitude: longitude)
+                        return Place.find_by(latitude: latitude, longitude: longitude)
                     end
                 }.call
             end

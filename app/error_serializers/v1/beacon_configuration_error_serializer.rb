@@ -9,5 +9,5 @@ class V1::BeaconConfigurationErrorSerializer < ModelError::Serializer
 
     attribute :url
 
-    attribute :location_id, error_key: :location, relationship: true
+    attribute :place_id, error_key: :place, relationship: true
 end

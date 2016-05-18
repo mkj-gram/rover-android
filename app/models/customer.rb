@@ -19,9 +19,9 @@ class Customer
     attribute :traits, Hash
     attribute :location, GeoPoint
     attribute :inbox_updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
-    attribute :last_location_visit_id, Integer
-    attribute :total_location_visits, Integer, default: 0
-    attribute :last_location_visit_at, Time
+    attribute :last_place_visit_id, Integer
+    attribute :total_place_visits, Integer, default: 0
+    attribute :last_place_visit_at, Time
     attribute :first_visit_at, Time
     attribute :devices, Array[CustomerDevice], default: []
     attribute :created_at, Time

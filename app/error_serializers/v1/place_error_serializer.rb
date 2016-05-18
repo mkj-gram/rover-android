@@ -1,4 +1,4 @@
-class V1::LocationErrorSerializer < ModelError::Serializer
+class V1::PlaceErrorSerializer < ModelError::Serializer
 
     attribute :title, error_key: :name
     attribute :address
