@@ -61,16 +61,16 @@ class Place < ActiveRecord::Base
 
 
 
-    validates :title, presence: true, unless: :google_place_id?
+    validates :title, presence: true
     validates :radius, inclusion: { in: 50..5000, message: "must be between 50 and 5000" }
-    validates :latitude, presence: true, inclusion: { in: -90..90, message: "must be between -90 and 90" }, unless: :google_place_id?
-    validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }, unless: :google_place_id?
+    validates :latitude, presence: true, inclusion: { in: -90..90, message: "must be between -90 and 90" }
+    validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }
 
 
     belongs_to :account
     has_many :beacon_configurations
 
-    before_save :update_address_from_google_place
+    # before_save :update_address_from_google_place
     after_save :update_active_tags
     after_save :update_beacon_configurations_elasticsearch_document
 
