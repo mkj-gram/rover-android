@@ -12,7 +12,7 @@ class MessageTemplate < ActiveRecord::Base
     belongs_to :account
 
     serialize :landing_page_template, LandingPageTemplate
-    serialize :extras, JSONHash
+    serialize :properties, JSONHash
 
     alias_attribute :landing_page, :landing_page_template
 
@@ -85,7 +85,7 @@ class MessageTemplate < ActiveRecord::Base
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s,
                 landing_page: landing_page.nil? ? nil : landing_page_template.render(opts),
-                extras: extras
+                properties: properties
             }
         )
     end
