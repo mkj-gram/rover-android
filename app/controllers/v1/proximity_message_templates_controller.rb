@@ -325,7 +325,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
                 :"total-opens" => message.stats.total_opens,
                 :"unique-opens" => message.stats.unique_opens,
-                :"landing-page" => message.landing_page.as_json(dasherize: true)
+                :"landing-page" => message.landing_page.as_json(dasherize: true),
+                :"properties" => message.properties,
             }.merge(extra_attributes)
         }
     end
