@@ -192,7 +192,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :schedule_sunday,
             :content_type,
             :website_url,
-            :deeplink_url,
+            :deep_link_url,
             :customer_segment_id,
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
         ).merge({:landing_page => local_params.dig(:proximity_messages, :landing_page), :properties => local_params.dig(:proximity_messages, :properties)})
@@ -318,7 +318,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"save-to-inbox" => message.save_to_inbox,
                 :"content-type" => message.content_type,
                 :"website-url" => message.website_url,
-                :"deeplink-url" => message.deeplink_url,
+                :"deep-link-url" => message.deeplink_url,
                 :"approximate-customers-count" => message.approximate_customers_count,
                 :"total-delivered" => message.stats.total_delivered,
                 :"total-notification-opens" => message.stats.total_notification_opens,

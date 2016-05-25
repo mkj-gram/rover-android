@@ -15,7 +15,7 @@ class MessageTemplate < ActiveRecord::Base
     serialize :properties, JSONHash
 
     alias_attribute :landing_page, :landing_page_template
-
+    alias_attribute :deep_link_url, :deeplink_url
     message_attribute :notification_text
 
     settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 2}).merge(
