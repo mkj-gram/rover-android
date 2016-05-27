@@ -6,6 +6,8 @@ gem 'rails', '4.2.5'
 
 gem 'rails-api'
 
+gem 'dotenv-rails', :groups => [:development, :test]
+
 gem 'bcrypt', '~> 3.1', '>= 3.1.10'
 
 gem 'bunny', '~> 2.2', '>= 2.2.1'
@@ -74,6 +76,8 @@ gem 'librato-rails', '~> 1.3'
 gem 'sentry-raven', '~> 0.15.6'
 
 gem 'concurrent-ruby', '~> 1.0', '>= 1.0.1'
+
+gem 'aws-sdk', '~> 2.3', '>= 2.3.9'
 
 group :development do
 
