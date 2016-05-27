@@ -57,7 +57,7 @@ class MessageTemplate < ActiveRecord::Base
 
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
-
+    validate :valid_properties
 
 
     def as_indexed_json(opts = {})
@@ -338,6 +338,17 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     private
+
+    def valid_properties
+        return true if properties.nil?
+        if properties.is_a?(Hash)
+            return true
+        else
+            errors.add(:properties, "invalid data type")
+            return false
+        end
+    end
+
 
     def set_defaults
         self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]

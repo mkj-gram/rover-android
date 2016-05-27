@@ -9,7 +9,7 @@ module JSONHash
 
         def dump(obj)
             return nil if obj.nil?
-            return obj if !obj.is_a?(String)
+            return obj if !obj.is_a?(Hash)
             return JSON.dump(obj)
         end
     end

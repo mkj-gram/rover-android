@@ -24,7 +24,7 @@ class Message
     attribute :timestamp, Time , default: lambda { |model, attribute|  Time.zone.now }
     attribute :expire_at, Time
     attribute :landing_page, LandingPage
-    attribute :properties, Array[Hash]
+    attribute :properties, Hash
 
 
 
