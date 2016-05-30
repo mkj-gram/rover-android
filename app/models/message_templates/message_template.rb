@@ -12,9 +12,10 @@ class MessageTemplate < ActiveRecord::Base
     belongs_to :account
 
     serialize :landing_page_template, LandingPageTemplate
+    serialize :properties, JSONHash
 
     alias_attribute :landing_page, :landing_page_template
-
+    alias_attribute :deep_link_url, :deeplink_url
     message_attribute :notification_text
 
     settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 2}).merge(
@@ -56,7 +57,7 @@ class MessageTemplate < ActiveRecord::Base
 
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
-
+    validate :valid_properties
 
 
     def as_indexed_json(opts = {})
@@ -83,7 +84,8 @@ class MessageTemplate < ActiveRecord::Base
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s,
-                landing_page: landing_page.nil? ? nil : landing_page_template.render(opts)
+                landing_page: landing_page.nil? ? nil : landing_page_template.render(opts),
+                properties: properties
             }
         )
     end
@@ -336,6 +338,17 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     private
+
+    def valid_properties
+        return true if properties.nil?
+        if properties.is_a?(Hash)
+            return true
+        else
+            errors.add(:properties, "invalid data type")
+            return false
+        end
+    end
+
 
     def set_defaults
         self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]

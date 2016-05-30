@@ -30,12 +30,12 @@ class CustomerInbox
                 Rails.logger.warn(e.message)
                 expired_message_ids = []
             end
-
-
-            if expired_message_ids.any?
-                Message.delete_all(expired_message_ids)
-            end
         end
+
+        if expired_message_ids.any?
+            Message.delete_all(expired_message_ids)
+        end
+
 
         return inserts.keys.size
     end

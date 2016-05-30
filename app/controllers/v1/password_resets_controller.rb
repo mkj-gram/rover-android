@@ -5,7 +5,7 @@ class V1::PasswordResetsController < V1::ApplicationController
     def index
         # this has a query param as token
         token = params[:token]
-        @password_reset = PasswordReset.find_by_token(token)
+        @password_reset = PasswordReset.where(token: params[:token]).first
         if @password_reset && !@password_reset.expired?
             json = {
                 "data" => {
@@ -51,7 +51,7 @@ class V1::PasswordResetsController < V1::ApplicationController
     #
     def update
         json = flatten_request({single_record: true})
-        @password_reset = PasswordReset.find_by_id(params[:id])
+        @password_reset = PasswordReset.where(id: params[:id]).first
         if @password_reset && !@password_reset.expired?
             local_params = password_reset_update_params(json[:data])
             if @password_reset.token == local_params.fetch(:token, "")

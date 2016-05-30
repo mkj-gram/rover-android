@@ -590,7 +590,8 @@ CREATE TABLE message_templates (
     android_sound_file character varying,
     time_to_live integer,
     landing_page_template jsonb,
-    extras jsonb
+    properties jsonb,
+    deeplink_url character varying
 );
 
 
@@ -1860,4 +1861,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160505164431');
 INSERT INTO schema_migrations (version) VALUES ('20160512153039');
 
 INSERT INTO schema_migrations (version) VALUES ('20160517195421');
+
+INSERT INTO schema_migrations (version) VALUES ('20160524125136');
 

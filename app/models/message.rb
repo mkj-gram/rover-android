@@ -24,6 +24,7 @@ class Message
     attribute :timestamp, Time , default: lambda { |model, attribute|  Time.zone.now }
     attribute :expire_at, Time
     attribute :landing_page, LandingPage
+    attribute :properties, Hash
 
 
 
@@ -172,7 +173,7 @@ class Message
     # We expire messages which aren't saved to the inbox
     def set_expire
         if saved_to_inbox == false
-            self.expire_message_at = Time.zone.now + Message.temporary_message_expire_time
+            self.expire_at = Time.zone.now + Message.temporary_message_expire_time
         end
     end
 
