@@ -108,6 +108,8 @@ Rails.application.routes.draw do
         resources "ios-platforms", controller: "ios_platforms", as: "ios_platforms", except: [:index]
         resources "android-platforms", controller: "android_platforms", as: "android_platforms", except: [:index]
 
+        resources :images, only: [:create]
+
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".
