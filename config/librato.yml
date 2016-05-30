@@ -10,4 +10,4 @@ development:
   prefix: <%= ENV['LIBRATO_PREFIX'] || "development" %>
   source: "content-api"
   log_level: debug
-  flush_interval: 15
+  flush_interval: 100000

@@ -3,25 +3,23 @@ module LandingPageBuilder
         class ButtonBlock < Block
             include Virtus.model
 
-            attribute :title_text, String, default: 'Button'
-            attribute :title_alignment, LandingPageBuilder::Alignment, default: { horizontal: 'center', vertical: 'middle' }
-            attribute :title_offset, LandingPageBuilder::Offset, default: {}
-            attribute :title_color, LandingPageBuilder::Color, default: { red: 255, green: 255, blue: 255, alpha: 1.0 }
-            attribute :title_font_size, Integer, default: 16
-            attribute :title_font_weight, Integer, default: 700
 
+            attribute :states, LandingPageBuilder::ButtonStates::Hash, default: {}
+
+            attribute :action, LandingPageBuilder::Actions::Action
 
             def ==(other)
                 return false if other.nil?
                 (
                     super &&
-                    self.title_text == other.title_text &&
-                    self.title_alignment == other.title_alignment &&
-                    self.title_offset == other.title_offset &&
-                    self.title_color == other.title_color &&
-                    self.title_font_size == other.title_font_size &&
-                    self.title_font_weight == other.title_font_weight
+                    self.states == other.states &&
+                    self.action == other.action
                 )
+            end
+
+            def action=(new_action)
+                return if new_action.nil?
+                super LandingPageBuilder::Actions::ActionBuilder.new(new_action)
             end
 
         end
