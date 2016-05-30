@@ -100,7 +100,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
     # create accepts everything the same as update
     def create
-        json = flatten_request({single_record: true, except: "attributes.landing-page"})
+        json = flatten_request({single_record: true})
 
         @proximity_message = current_account.proximity_message_templates.build(proximity_message_params(json[:data]))
 

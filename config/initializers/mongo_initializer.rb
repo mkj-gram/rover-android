@@ -17,4 +17,4 @@ mongo_config = (defaults.merge(config)).symbolize_keys
 uri = mongo_config.delete(:uri)
 
 $mongo = Mongo::Client.new(uri, mongo_config)
-$mongo.subscribe(Mongo::Monitoring::COMMAND, MongoInstrumenter::Monitoring.new)
+$mongo.subscribe(Mongo::Monitoring::COMMAND, MongoInstrumenter::Monitoring.new) if Rails.env.production?

@@ -15,17 +15,7 @@ module LandingPageBuilder
             # offsets
             attribute :offset, LandingPageBuilder::Offset, default: { top: { value: 20 } , right: { value: 20 }, bottom: { value: 20 }, left: { value: 20 } }
 
-            # Background
-            attribute :background_color, LandingPageBuilder::Color, default: { red: 216, green: 216, blue: 216, alpha: 1.0 }
-            attribute :background_image_path, String
-            attribute :background_content_mode, String, default: "tile"
 
-            # border
-            attribute :border_color, LandingPageBuilder::Color, default: { red: 151, green: 151, blue: 151, alpha: 1.0 }
-            attribute :border_width, Float, default: 1.0
-            attribute :border_radius, Float, default: 1.0
-
-            attribute :action, LandingPageBuilder::Actions::Action
 
             def ==(other)
                 return false if other.nil?
@@ -35,19 +25,8 @@ module LandingPageBuilder
                     self.height == other.height &&
                     self.position == other.position &&
                     self.alignment == other.alignment &&
-                    self.offset == other.offset &&
-                    self.background_color == other.background_color &&
-                    self.background_content_mode == other.background_content_mode &&
-                    self.border_color == other.border_color &&
-                    self.border_width == other.border_width &&
-                    self.border_radius == other.border_radius &&
-                    self.action == other.action
+                    self.offset == other.offset
                 )
-            end
-
-            def action=(new_action)
-                return if new_action.nil?
-                super LandingPageBuilder::Actions::ActionBuilder.new(new_action)
             end
 
         end
