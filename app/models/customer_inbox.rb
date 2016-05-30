@@ -16,6 +16,7 @@ class CustomerInbox
 
         # if we can't insert the item into redis just move on
         MetricsClient.aggregate("inbox.inserts" => inserts.keys.size)
+        expired_message_ids = []
         MetricsClient.time("inbox.inserts.time") do
             begin
                 redis_client.pipelined do
