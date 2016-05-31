@@ -31,20 +31,20 @@ class LandingPageTemplate < LandingPageBuilder::Screen
         LandingPage.new(
             {
                 title: TemplateHelper.render_string(title, opts),
-                rows:  rows.map do |row|
-                    {
-                        blocks: row.blocks.map do |block|
-                            case block
-                            when LandingPageBuilder::Blocks::TextBlock
-                                block.text = TemplateHelper.render_string(block.text, opts) if block.text
-                            when LandingPageBuilder::Blocks::ButtonBlock
-                                block.title_text = TemplateHelper.render_string(block.title_text, opts) if block.title_text
-                            end
-                            block.as_json
-                        end
-                    }
+                rows:  rows.as_json #rows.map do |row|
+                #     {
+                #         blocks: row.blocks.map do |block|
+                #             case block
+                #             when LandingPageBuilder::Blocks::TextBlock
+                #                 block.text = TemplateHelper.render_string(block.text, opts) if block.text
+                #             when LandingPageBuilder::Blocks::ButtonBlock
+                #                 block.title_text = TemplateHelper.render_string(block.title_text, opts) if block.title_text
+                #             end
+                #             block.as_json
+                #         end
+                #     }
 
-                end
+                # end
             }
         )
     end
