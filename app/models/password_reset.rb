@@ -91,7 +91,7 @@ class PasswordReset < ActiveRecord::Base
     def render_password_reset
         @user = user
         @base_url =  Rails.configuration.password_reset["host"]
-        @password_reset_url = @base_url + "/reset-password" + "?" + {token: self.token}.to_query
+        @password_reset_url = @base_url + "/auth/reset-password" + "?" + {token: self.token}.to_query
 
         ERB.new(PasswordReset.get_template, nil , '-').result(binding).html_safe.to_str
     end
