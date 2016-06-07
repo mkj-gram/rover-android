@@ -20,6 +20,22 @@ module GoogleOauthSettings
         end
 
 
+        def get_credentials_from_code(opts = {})
+            code = opts.delete(:code)
+            scope = opts.delete(:scope) || default_scope
+            base_url = opts.delete(:base_url) || callback_base_url
+            credentials = Google::Auth::UserRefreshCredentials.new(
+                client_id: client_id.id,
+                client_secret: client_id.secret,
+                redirect_uri: URI.join(base_url, 'google-oauth-callback'),
+                scope: scope
+            )
+            credentials.code = code
+            credentials.fetch_access_token!({})
+            return credentials
+        end
+
+
     end
 
 end

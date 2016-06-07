@@ -111,6 +111,13 @@ Rails.application.routes.draw do
         resources :images, only: [:create]
 
         get '/google-oauth-url', to: "google_oauth#show"
+
+        resources :"google-integrations", controller: "google_integrations", as: "google_integrations", only: [:show, :create, :destroy] do
+            scope module: "integrations" do
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            end
+        end
+
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

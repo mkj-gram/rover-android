@@ -57,6 +57,20 @@ class V1::AccountsController < V1::ApplicationController
                 }
             )
         end
+        google_integration = current_account.google_integration
+        if google_integration
+            json["data"]["relationships"].merge!(
+                {
+                    "google-proximity-integration" => {
+                        "data" => {
+                            "type" => "google-proximity-integrations",
+                            "id" => google_integration.id.to_s
+                        }
+                    }
+                }
+            )
+        end
+
 
         ios_platform = current_account.ios_platform
         if ios_platform
@@ -86,11 +100,11 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
-        included = [estimote_integration, kontakt_integration].compact.map do |integration|
+        included = [estimote_integration, kontakt_integration, google_integration].compact.map do |integration|
             serialize_integration(integration)
         end
 
-        included += [estimote_integration, kontakt_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
+        included += [estimote_integration, kontakt_integration, google_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
             serialize_sync_job(integration, integration.latest_sync_job)
         end
 
