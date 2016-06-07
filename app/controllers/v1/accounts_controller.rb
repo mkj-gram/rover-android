@@ -61,7 +61,7 @@ class V1::AccountsController < V1::ApplicationController
         if google_integration
             json["data"]["relationships"].merge!(
                 {
-                    "google-proximity-integration" => {
+                    "google-integration" => {
                         "data" => {
                             "type" => "google-integrations",
                             "id" => google_integration.id.to_s
