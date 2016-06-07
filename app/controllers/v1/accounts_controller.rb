@@ -63,7 +63,7 @@ class V1::AccountsController < V1::ApplicationController
                 {
                     "google-proximity-integration" => {
                         "data" => {
-                            "type" => "google-proximity-integrations",
+                            "type" => "google-integrations",
                             "id" => google_integration.id.to_s
                         }
                     }

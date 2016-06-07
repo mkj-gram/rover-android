@@ -16,6 +16,10 @@ class GoogleIntegration < ThirdPartyIntegration
         should_pluralize ? GoogleIntegration.model_type_pluralized : GoogleIntegration.model_type
     end
 
+    def credentials_json
+        {}
+    end
+
     def sync!
         stats = {
             added_devices_count: 0,

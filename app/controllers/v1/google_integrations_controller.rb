@@ -30,7 +30,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                 }
                 if google_integration.save
                     json = serialize_google_integration(google_integration)
-                    json["included"] = [ serialize_sync_job(google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
+                    json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
                     render json: json
                 else
                     render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(google_integration)}, status: :unprocessable_entity
