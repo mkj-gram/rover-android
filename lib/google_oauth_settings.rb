@@ -16,7 +16,7 @@ module GoogleOauthSettings
         end
 
         def authorizer
-            @authorizer ||= Google::Auth::UserAuthorizer.new(client_id, default_scope, nil, 'google-oauth-callback')
+            @authorizer ||= Google::Auth::UserAuthorizer.new(client_id, default_scope, nil, 'google')
         end
 
 
@@ -27,7 +27,7 @@ module GoogleOauthSettings
             credentials = Google::Auth::UserRefreshCredentials.new(
                 client_id: client_id.id,
                 client_secret: client_id.secret,
-                redirect_uri: URI.join(base_url, 'google-oauth-callback'),
+                redirect_uri: URI.join(base_url, 'google'),
                 scope: scope
             )
             credentials.code = code
