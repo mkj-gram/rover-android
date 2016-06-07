@@ -1,13 +1,20 @@
+require 'google/apis/cloudresourcemanager_v1beta1'
 class V1::GoogleIntegrationsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema,    only: [:create, :update]
     # before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
-    before_action :set_google_integration, only: [:show, :destroy]
+    before_action :set_google_integration, only: [:show, :update, :destroy]
 
     def show
         # grab the integration
         json = serialize_google_integration(@google_integration)
         json["included"] = [ serialize_sync_job(@google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
+        client = Google::Apis::CloudresourcemanagerV1beta1::CloudResourceManagerService.new
+        client.authorization = @google_integration.access_token
+        response = client.list_projects
+        if response.projects.any?
+            json["meta"] = { "project-ids" => response.projects.map(&:project_id) }
+        end
         render json: json
     end
 
@@ -16,12 +23,12 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
             json = flatten_request({single_record: true})
             code = json.dig(:data,:google_integrations, :code)
             if code.nil?
-                puts json
                 render json: { errors: { source: { pointer: "data/attributes/code" }, title: "missing" } }
             else
-                google_integration = current_account.build_google_integration
+                google_integration = current_account.build_google_integration(google_integration_params(json[:data]))
                 credentials = GoogleOauthSettings.get_credentials_from_code(code: code)
                 google_integration.credentials = {
+                    project_id: google_integration.project_id,
                     client_id: credentials.client_id,
                     access_token: credentials.access_token,
                     refresh_token: credentials.refresh_token,
@@ -41,6 +48,17 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
         end
     end
 
+    def update
+        if @google_integration.update(google_integration_params(json["data"]))
+            json = serialize_google_integration(google_integration)
+            json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
+            render json: json
+        else
+            render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(@google_integration)}, status: :unprocessable_entity
+        end
+    end
+
+
     def destroy
         if @google_integration.destroy
             head :no_content
@@ -51,6 +69,10 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
 
 
     private
+
+    def google_integration_params(local_params)
+        local_params.fetch(:google_integrations, {}).permit(:project_id)
+    end
 
     def serialize_sync_job(integration, job)
         {

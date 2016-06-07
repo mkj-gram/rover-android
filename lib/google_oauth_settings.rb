@@ -8,7 +8,7 @@ module GoogleOauthSettings
         end
 
         def default_scope
-            @default_scope ||= Rails.configuration.google_oauth["default_scope"]
+            @default_scope ||= Rails.configuration.google_oauth["default_scope"].split(',')
         end
 
         def callback_base_url

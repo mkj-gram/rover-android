@@ -112,7 +112,7 @@ Rails.application.routes.draw do
 
         get '/google-oauth-url', to: "google_oauth#show"
 
-        resources :"google-integrations", controller: "google_integrations", as: "google_integrations", only: [:show, :create, :destroy] do
+        resources :"google-integrations", controller: "google_integrations", as: "google_integrations", only: [:show, :create, :update, :destroy] do
             scope module: "integrations" do
                 resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
             end
