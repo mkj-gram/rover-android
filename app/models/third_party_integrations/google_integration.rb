@@ -20,7 +20,7 @@ class GoogleIntegration < ThirdPartyIntegration
     end
 
     def project_id
-        self.credentials["project_id"]
+        self.credentials.nil? ? nil : self.credentials["project_id"]
     end
 
     def project_id=(id)
