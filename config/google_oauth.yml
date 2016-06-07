@@ -1,0 +1,10 @@
+production:
+    client_id: <%= ENV['GOOGLE_OAUTH_CLIENT_ID'] %>
+    client_secret: <%= ENV['GOOGLE_OAUTH_CLIENT_SECRET'] %>
+    default_scope: <%= ENV['GOOGLE_OAUTH_DEFAULT_SCOPE'] || 'https://www.googleapis.com/auth/userlocation.beacon.registry'%>
+    callback_base_url: <%= ENV['GOOGLE_OAUTH_CALLBACK_BASE_URL'] || 'https://app.rover.io/settings/' %>
+development:
+    client_id: <%= ENV['GOOGLE_OAUTH_CLIENT_ID'] || '193019288649-cktho6cj3uffppruj0tbgcg90jru9vt0.apps.googleusercontent.com' %>
+    client_secret: <%= ENV['GOOGLE_OAUTH_CLIENT_SECRET'] || 'EdhTgl-p3aXYj5tHHbznxgtB' %>
+    default_scope: <%= ENV['GOOGLE_OAUTH_DEFAULT_SCOPE'] || 'https://www.googleapis.com/auth/userlocation.beacon.registry'%>
+    callback_base_url: 'http://localhost:4200/settings/'
