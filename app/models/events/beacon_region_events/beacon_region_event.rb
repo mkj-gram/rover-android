@@ -8,6 +8,7 @@ module Events
 
             def initialize(event_attributes)
                 super
+                @configuration_id = event_attributes[:configuration_id]
                 @uuid = event_attributes[:uuid]
                 @major = event_attributes[:major_number]
                 @minor = event_attributes[:minor_number]
@@ -184,7 +185,16 @@ module Events
                         []
                     end
                 else
-                    []
+                    if @configuration_id
+                        configuration = BeaconConfiguration.find_by_id(@configuration_id)
+                        if configuration && configuration.enabled
+                            [configuration]
+                        else
+                            []
+                        end
+                    else
+                        []
+                    end
                 end
                 return @beacon_configuration.first
             end
