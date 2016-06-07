@@ -13,21 +13,28 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
 
     def create
         if current_account.google_integration.nil?
-            google_integration = current_account.build_google_integration
-            credentials = GoogleOauthSettings.get_credentials_from_code(code: params[:code])
-            google_integration.credentials = {
-                client_id: credentials.client_id,
-                access_token: credentials.access_token,
-                refresh_token: credentials.refresh_token,
-                scope: credentials.scope,
-                expiration_time_millis: (credentials.expires_at.to_i) * 1000
-            }
-            if google_integration.save
-                json = serialize_google_integration(google_integration)
-                json["included"] = [ serialize_sync_job(google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
-                render json: json
+            json = flatten_request({single_record: true})
+            code = json.dig(:data,:google_integrations, :code)
+            if code.nil?
+                puts json
+                render json: { errors: { source: { pointer: "data/attributes/code" }, title: "missing" } }
             else
-                render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(google_integration)}, status: :unprocessable_entity
+                google_integration = current_account.build_google_integration
+                credentials = GoogleOauthSettings.get_credentials_from_code(code: code)
+                google_integration.credentials = {
+                    client_id: credentials.client_id,
+                    access_token: credentials.access_token,
+                    refresh_token: credentials.refresh_token,
+                    scope: credentials.scope,
+                    expiration_time_millis: (credentials.expires_at.to_i) * 1000
+                }
+                if google_integration.save
+                    json = serialize_google_integration(google_integration)
+                    json["included"] = [ serialize_sync_job(google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
+                    render json: json
+                else
+                    render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(google_integration)}, status: :unprocessable_entity
+                end
             end
         else
             render json: { errors: [ { title: "Integration already exists" } ] }, status: :unprocessable_entity
@@ -76,7 +83,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                 "enabled" => integration.enabled,
                 "syncing" => integration.syncing,
                 "last-synced-at" => integration.last_synced_at
-            }.merge(integration.credentials_json)
+            }
         }
 
         if integration.latest_sync_job

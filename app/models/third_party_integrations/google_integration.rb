@@ -1,3 +1,4 @@
+require 'googleauth'
 class GoogleIntegration < ThirdPartyIntegration
 
     # validates :api_key, presence: true
@@ -29,12 +30,12 @@ class GoogleIntegration < ThirdPartyIntegration
     def access_token
         # grab the url
         token = Google::Auth::UserRefreshCredentials.new(
-            client_id: GoogleOauth.client_id,
-            client_secret: GoogleOauth.client_secret,
-            scope: credentials['scope'] || GoogleOauth.scope,
-            access_token: credentials['access_token'],
-            refresh_token: credentials['refresh_token'],
-            expires_at: credentials.fetch('expiration_time_millis', 0) / 1000
+            client_id: GoogleOauthSettings.client_id.id,
+            client_secret: GoogleOauthSettings.client_id.secret,
+            scope: credentials[:scope] || GoogleOauthSettings.default_scope,
+            access_token: credentials[:access_token],
+            refresh_token: credentials[:refresh_token],
+            expires_at: credentials.fetch(:expiration_time_millis, 0) / 1000
         )
 
         if Time.zone.now > token.expires_at
