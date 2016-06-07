@@ -9,12 +9,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
         # grab the integration
         json = serialize_google_integration(@google_integration)
         json["included"] = [ serialize_sync_job(@google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
-        client = Google::Apis::CloudresourcemanagerV1beta1::CloudResourceManagerService.new
-        client.authorization = @google_integration.access_token
-        response = client.list_projects
-        if response.projects.any?
-            json["meta"] = { "project-ids" => response.projects.map(&:project_id) }
-        end
+        json["meta"] = { "project-ids" => meta_project_ids(@google_integration) }
         render json: json
     end
 
@@ -38,6 +33,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                 if google_integration.save
                     json = serialize_google_integration(google_integration)
                     json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
+                    json["meta"] = { "project-ids" => meta_project_ids(google_integration) }
                     render json: json
                 else
                     render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(google_integration)}, status: :unprocessable_entity
@@ -131,6 +127,17 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
         @google_integration = GoogleIntegration.find_by_id(params[:id])
         if @google_integration.nil?
             head :not_found and return
+        end
+    end
+
+    def meta_project_ids(google_integration)
+        client = Google::Apis::CloudresourcemanagerV1beta1::CloudResourceManagerService.new
+        client.authorization = google_integration.access_token
+        response = client.list_projects
+        if response.projects.any?
+            response.projects.map(&:project_id)
+        else
+            []
         end
     end
 
