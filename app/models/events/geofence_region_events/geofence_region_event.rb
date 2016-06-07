@@ -114,11 +114,12 @@ module Events
             def place
                 @place ||= -> {
                     if geofence_region && geofence_region.latitude && geofence_region.latitude
-                        return Place.find_by(latitude: geofence_region.latitude , longitude: geofence_region.longitude)
+                        return [Place.find_by(latitude: geofence_region.latitude , longitude: geofence_region.longitude)]
                     else
-                        return Place.find_by(latitude: latitude, longitude: longitude)
+                        return [Place.find_by(latitude: latitude, longitude: longitude)]
                     end
                 }.call
+                return @place.first
             end
         end
     end
