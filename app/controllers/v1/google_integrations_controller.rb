@@ -7,9 +7,8 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
 
     def show
         # grab the integration
-        json = { "data" => serialize_google_integration(@google_integration) }
+        json = { "data" => serialize_google_integration(@google_integration, {"project-ids" => meta_project_ids(@google_integration)}) }
         json["included"] = [ serialize_sync_job(@google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
-        json["meta"] = { "project-ids" => meta_project_ids(@google_integration) }
         render json: json
     end
 
@@ -31,9 +30,8 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                     expiration_time_millis: (credentials.expires_at.to_i) * 1000
                 }
                 if google_integration.save
-                    json = { "data" => serialize_google_integration(google_integration) }
+                    json = { "data" => serialize_google_integration(google_integration, {"project-ids" => meta_project_ids(google_integration)}) }
                     json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
-                    json["meta"] = { "project-ids" => meta_project_ids(google_integration) }
                     render json: json
                 else
                     render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(google_integration)}, status: :unprocessable_entity
@@ -46,7 +44,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
 
     def update
         if @google_integration.update(google_integration_params(json["data"]))
-            json = { "data" => serialize_google_integration(google_integration) }
+            json = { "data" => serialize_google_integration(@google_integration, {"project-ids" => meta_project_ids(@google_integration)}) }
             json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
             render json: json
         else
@@ -93,7 +91,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
         }
     end
 
-    def serialize_google_integration(integration)
+    def serialize_google_integration(integration, extra_attributes = {})
         json = {
             "type" => integration.model_type,
             "id" => integration.id.to_s,
@@ -101,7 +99,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                 "enabled" => integration.enabled,
                 "syncing" => integration.syncing,
                 "last-synced-at" => integration.last_synced_at
-            }
+            }.merge(extra_attributes)
         }
 
         if integration.latest_sync_job
