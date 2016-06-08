@@ -1,4 +1,5 @@
 require 'googleauth'
+require 'google/apis/proximitybeacon_v1beta1'
 class GoogleIntegration < ThirdPartyIntegration
 
     skip_callback :create, :after, :create_sync_job
@@ -48,7 +49,7 @@ class GoogleIntegration < ThirdPartyIntegration
 
 
     def access_token
-        return nil if  !([:client_id, :client_secret, :scope, :access_token, :refresh_token, :expires_at].all? { |property| credentials.has_key?(property) })
+        return nil if  !([:client_id, :scope, :access_token, :refresh_token, :expires_at].all? { |property| credentials.has_key?(property) })
         # grab the url
         token = Google::Auth::UserRefreshCredentials.new(
             client_id: GoogleOauthSettings.client_id.id,

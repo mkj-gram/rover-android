@@ -131,6 +131,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
     end
 
     def meta_project_ids(google_integration)
+        return [] if google_integration.access_token.nil?
         client = Google::Apis::CloudresourcemanagerV1beta1::CloudResourceManagerService.new
         client.authorization = google_integration.access_token
         response = client.list_projects
