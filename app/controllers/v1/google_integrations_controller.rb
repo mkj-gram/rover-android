@@ -7,7 +7,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
 
     def show
         # grab the integration
-        json = serialize_google_integration(@google_integration)
+        json = { "data" => serialize_google_integration(@google_integration) }
         json["included"] = [ serialize_sync_job(@google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
         json["meta"] = { "project-ids" => meta_project_ids(@google_integration) }
         render json: json
@@ -31,7 +31,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                     expiration_time_millis: (credentials.expires_at.to_i) * 1000
                 }
                 if google_integration.save
-                    json = serialize_google_integration(google_integration)
+                    json = { "data" => serialize_google_integration(google_integration) }
                     json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
                     json["meta"] = { "project-ids" => meta_project_ids(google_integration) }
                     render json: json
@@ -46,7 +46,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
 
     def update
         if @google_integration.update(google_integration_params(json["data"]))
-            json = serialize_google_integration(google_integration)
+            json = { "data" => serialize_google_integration(google_integration) }
             json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
             render json: json
         else
