@@ -8,7 +8,7 @@ class GoogleSyncJob < ThirdPartyIntegrationSyncJob
 
 
     class << self
-        def type
+        def model_type
             "google-sync-jobs"
         end
     end

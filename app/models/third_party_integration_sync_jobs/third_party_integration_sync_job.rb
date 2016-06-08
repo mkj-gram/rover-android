@@ -11,6 +11,16 @@ class ThirdPartyIntegrationSyncJob < ActiveRecord::Base
         third_party_integration.start_syncing
     end
 
+    class << self
+        def model_type
+            "sync-jobs"
+        end
+    end
+
+    def model_type
+        self.class.model_type
+    end
+
     def sync!
         if third_party_integration
             self.stats = third_party_integration.sync!(self)

@@ -147,7 +147,7 @@ class V1::AccountsController < V1::ApplicationController
 
     def serialize_sync_job(integration, job)
         {
-            "type" => job.type,
+            "type" => job.model_type,
             "id" => job.id.to_s,
             "attributes" => {
                 "status" => job.status,
@@ -181,7 +181,7 @@ class V1::AccountsController < V1::ApplicationController
                 {
                     "relationships" => {
                         "latest-sync" => {
-                            "type" => integration.latest_sync_job.type,
+                            "type" => integration.latest_sync_job.model_type,
                             "id" => integration.latest_sync_job.id.to_s
                         }
                     }
