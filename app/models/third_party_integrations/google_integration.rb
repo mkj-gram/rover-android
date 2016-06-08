@@ -46,8 +46,9 @@ class GoogleIntegration < ThirdPartyIntegration
         {}
     end
 
+
     def sync!(calling_job)
-        
+
         raise ArgumentError, "Calling job is missing" if calling_job.nil?
 
         stats = {

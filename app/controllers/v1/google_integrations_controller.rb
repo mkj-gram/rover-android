@@ -78,12 +78,8 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                 "started-at" => job.started_at,
                 "finished-at" => job.finished_at,
                 "error-message" => job.error_message,
-                "added-beacons-count" => job.added_devices_count,
-                "modified-beacons-count" => job.modified_devices_count,
-                "removed-beacons-count" => job.removed_devices_count,
-                "beacons-changed-configuration-count" => job.devices_changed_configuration_count,
                 "created-at" => job.created_at
-            },
+            }.merge(job.stats_attributes || {}),
             "relationships" => {
                 "integration" => {
                     "data" => {"type" => integration.model_type, "id" => integration.id.to_s}

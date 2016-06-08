@@ -155,7 +155,7 @@ class V1::AccountsController < V1::ApplicationController
                 "finished-at" => job.finished_at,
                 "error-message" => job.error_message,
                 "created-at" => job.created_at
-            }.merge(job.stats || {}),
+            }.merge(job.stats_attributes || {}),
             "relationships" => {
                 "integration" => {
                     "data" => {type: integration.model_type, "id" => integration.id.to_s}
