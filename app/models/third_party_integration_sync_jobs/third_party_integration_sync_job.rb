@@ -13,11 +13,7 @@ class ThirdPartyIntegrationSyncJob < ActiveRecord::Base
 
     def sync!
         if third_party_integration
-            stats = third_party_integration.sync!
-            self.added_devices_count = stats[:added_devices_count]
-            self.modified_devices_count = stats[:modified_devices_count]
-            self.removed_devices_count = stats[:removed_devices_count]
-            self.devices_changed_configuration_count = stats[:devices_changed_configuration_count]
+            self.stats = third_party_integration.sync!(self)
             self.save
         end
     end

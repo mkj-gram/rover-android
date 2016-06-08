@@ -2,6 +2,11 @@ class KontaktIntegration < ThirdPartyIntegration
 
     validates :api_key, presence: true
 
+    has_many :sync_jobs, class_name: "DeviceSyncJob", foreign_key:  "third_party_integration_id" do
+        def latest
+            last
+        end
+    end
 
     def self.model_type
         @@model_type ||= "kontakt-integration"
@@ -38,7 +43,7 @@ class KontaktIntegration < ThirdPartyIntegration
         @client ||= KontaktApi.new(api_key)
     end
 
-    def sync!
+    def sync!(calling_job = nil)
         stats = {
             added_devices_count: 0,
             modified_devices_count: 0,

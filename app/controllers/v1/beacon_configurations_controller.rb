@@ -275,8 +275,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def beacon_configuration_params(local_params)
         convert_param_if_exists(local_params[:configurations], :name, :title)
-        # local_params[:configurations][:tags] ||= [] if local_params[:configurations].has_key?(:tags)
-        local_params.fetch(:configurations, {}).permit(:title, :enabled, :tags, {tags: []}, :place_id)
+        param_should_be_array(local_params[:configurations], :tags)
+        local_params.fetch(:configurations, {}).permit(:title, :enabled, :tags, {tags: []}, :place_id, :indoor_level)
     end
 
     def ibeacon_configuration_params(local_params)

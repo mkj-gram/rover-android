@@ -46,13 +46,241 @@ class GoogleIntegration < ThirdPartyIntegration
         {}
     end
 
-    def sync!
+    def sync!(calling_job)
+        
+        raise ArgumentError, "Calling job is missing" if calling_job.nil?
+
         stats = {
-            added_devices_count: 0,
-            modified_devices_count: 0,
-            removed_devices_count: 0,
-            devices_changed_configuration_count: 0
+            configurations_created_on_google: 0,
+            configurations_modified_on_google: 0,
+            configurations_created_on_rover: 0
         }
+
+        if access_token.nil?
+            raise StandardError, "Integration missing access token. Please contact support@rover.io"
+        end
+
+        if project_id.nil?
+            raise StandardError, "Cannot sync unless a project_id has been specified"
+        end
+
+        client = Google::Apis::ProximitybeaconV1beta1::ProximitybeaconService.new
+        client.authorization = access_token
+
+
+        response = client.list_namespaces
+        unformatted_namespace_name = response.namespaces.first.namespace_name
+        namespace_name = unformatted_namespace_name[11..unformatted_namespace_name.length]
+
+        #################################################################
+        #                                                               #
+        #   Find all configurations which need to be added to google    #
+        #                                                               #
+        #################################################################
+
+        BeaconConfiguration.where(account_id: self.account_id, registered_with_google: false).includes(:place).find_in_batches(batch_size: 100) do |configurations|
+
+            beacon_registrations = []
+
+            configurations.each do |configuration|
+                case configuration
+                when IBeaconConfiguration
+                    advertised_id = { id: [configuration.uuid.downcase.gsub("-", ""), configuration.major, configuration.minor].pack("H*SS"), type: "IBEACON" }
+                when EddystoneNamespaceConfiguration
+                    advertised_id = { id: [configuration.namespace.downcase, configuration.instance_id.downcase].pack("H*H*"), type: "EDDYSTONE" }
+                else
+                    advertised_id = nil
+                end
+
+                next if advertised_id.nil?
+
+                beacon = Google::Apis::ProximitybeaconV1beta1::Beacon.new(advertised_id: advertised_id, status: "active", description: configuration.title)
+
+                if configuration.place
+                    beacon.lat_lng = { latitude: configuration.place.latitude, longitude: configuration.place.longitude }
+                    beacon.place_id = configuration.place.place_id if configuration.place.place_id
+                end
+
+                if beacon.indoor_level
+                    beacon.indoor_level = configuration.indoor_level
+                end
+                beacon_registrations.push({ beacon: beacon, configuration: configuration })
+            end
+
+            attachment_registrations = []
+
+            client.batch do |service|
+                beacon_registrations.each do |beacon_registration|
+                    beacon = beacon_registration[:beacon]
+                    configuration = beacon_registration[:configuration]
+                    service.register_beacon(beacon, project_id: self.project_id) do |res, err|
+                        if res
+                            configuration.google_beacon_name = res.beacon_name
+                            configuration.save
+                            attachment_registrations.push({configuration: configuration })
+                        end
+                    end
+                end
+            end
+
+            synced_configurations = []
+
+            client.batch do |service|
+                attachment_registrations.each do |attachment_registration|
+                    configuration = attachment_registration[:configuration]
+                    beacon_name = configuration.google_beacon_name
+                    attachment = Google::Apis::ProximitybeaconV1beta1::BeaconAttachment.new(namespaced_type: "#{namespace_name}/rover-configuration-id", data: configuration.id.to_s)
+                    service.create_beacon_attachment(beacon_name, attachment) do |res, err|
+                        if res
+                            synced_configurations.push(configuration)
+                        end
+                    end
+                end
+            end
+
+            stats[:configurations_created_on_google] += BeaconConfiguration.where(id: synced_configurations.map(&:id)).update_all(registered_with_google: true)
+        end
+
+        #################################################################
+        #                                                               #
+        #  Find all configurations which need to push updates to google #
+        #                                                               #
+        #################################################################
+
+        BeaconConfiguration.where(account_id: self.account_id, registered_with_google: true, has_pending_google_update: true).includes(:place).find_in_batches(batch_size: 100) do |configurations|
+
+
+
+            beacons_info = []
+
+            client.batch do |service|
+                configurations.each do |configuration|
+                    service.get_beacon(configuration.beacon_name, project_id: self.project_id) do |res, err|
+                        if res
+                            beacons_info.push({ beacon: res, configuration: configuration })
+                        end
+                    end
+                end
+            end
+
+            updated_beacons = []
+
+            beacons_info.each do |beacon_info|
+                updates = false
+                beacon = beacon_info[:beacon]
+                configuration = beacon_info[:configuration]
+
+                if configuration.place
+                    if beacon.lat_lng != { latitude: configuration.place.latitude, longitude: configuration.place.longitude }
+                        updates = true
+                        beacon.lat_lng = { latitude: configuration.place.latitude, longitude: configuration.place.longitude }
+                    end
+
+                    if beacon.place_id != configuration.place.place_id
+                        updates = true
+                        beacon.place_id = configuration.place.place_id
+                    end
+                end
+
+                if beacon.indoor_level != configuration.indoor_level
+                    updates = true
+                    beacon.indoor_level = configuration.indoor_level
+                end
+
+                if updates
+                    updated_beacons.push({ beacon: beacon, configuration: configuration })
+                end
+            end
+
+
+            next if updated_beacons.empty?
+
+            configurations_updated = []
+
+            client.batch do |service|
+                updated_beacons.each do |beacon_info|
+                    beacon = beacon_info[:beacon]
+                    configuration = beacon_info[:configuration]
+                    service.update_beacon(beacon.beacon_name, beacon, project_id: self.project_id) do |res, err|
+                        if res
+                            configurations_updated.push(configuration)
+                        end
+                    end
+                end
+            end
+
+            stats[:configurations_modified_on_google] += BeaconConfiguration.where(id: configurations_updated.map(&:id)).update_all(has_pending_google_update: false)
+        end
+
+        #################################################################
+        #                                                               #
+        #   Find all configurations which need to be saved on rover     #
+        #                                                               #
+        #################################################################
+
+        if self.sync_jobs.count == 1
+            calling_job.started_at.to_i
+            # this is the first time we are syncing so grab everything
+            query = "status:active registration_time<#{calling_job.started_at.to_i}"
+        else
+            # need the previous job
+            previous_job = self.sync_jobs.previous
+            if previous_job.nil?
+                query = nil
+            else
+                query = "status:active registration_time>=#{previous_job.started_at.to_i}"
+            end
+        end
+
+        # needs fixed
+        # if !query.nil?
+        #     next_page_token = nil
+        #     while ((response = client.list_beacons(q: query, project_id: self.project_id, page_token: next_page_token, page_size: 100)) && response.beacons) do
+        #             next if response.beacons.nil?
+
+        #             response.beacons.each do |beacon|
+        #                 case beacon.advertised_id.type
+        #                 when "IBEACON"
+        #                     uuid, major, minor = beacon.advertised_id.unpack("H32SS")
+        #                     uuid = "#{uuid[0..7]}-#{uuid[8..11]}-#{uuid[12..15]}-#{uuid[16..19]}-#{uuid[20..31]}"
+        #                     begin
+        #                         IBeaconConfiguration.create(
+        #                             title: beacon.description || beacon.beacon_name,
+        #                             uuid: uuid.upcase,
+        #                             major: major,
+        #                             minor: minor,
+        #                             indoor_level: beacon.indoor_level,
+        #                             google_beacon_name: beacon.beacon_name
+        #                         )
+        #                         stats[:configurations_created_on_rover] += 1
+        #                     rescue ActiveRecord::RecordNotUnique => e
+
+        #                     end
+        #                 when "EDDYSTONE"
+        #                     namespace, instance_id = beacon.advertised_id.unpack("H20H12")
+        #                     begin
+        #                         EddystoneNamespaceConfiguration.create(
+        #                             title: beacon.description || beacon.beacon_name,
+        #                             namespace: namespace,
+        #                             instance_id: instance_id,
+        #                             indoor_level: beacon.indoor_level,
+        #                             google_beacon_name: beacon.beacon_name
+        #                         )
+        #                         stats[:configurations_created_on_rover] += 1
+        #                     rescue ActiveRecord::RecordNotUnique => e
+                                
+        #                     end
+                       
+                                
+        #                 end
+        #             end
+
+        #         end
+
+
+
+        end
+
         return stats
     end
 

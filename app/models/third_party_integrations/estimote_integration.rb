@@ -3,6 +3,14 @@ class EstimoteIntegration < ThirdPartyIntegration
     validates :app_id, presence: true
     validates :app_token, presence: true
 
+    after_create :create_sync_job!
+    after_destroy :remove_all_devices
+
+    has_many :sync_jobs, class_name: "DeviceSyncJob", foreign_key:  "third_party_integration_id" do
+        def latest
+            last
+        end
+    end
 
     def self.model_type
         @@model_type ||= "estimote-integration"
@@ -48,7 +56,7 @@ class EstimoteIntegration < ThirdPartyIntegration
         @client ||= EstimoteApi.new(app_id, app_token)
     end
 
-    def sync!
+    def sync!(calling_job = nil)
 
         stats = {
             added_devices_count: 0,

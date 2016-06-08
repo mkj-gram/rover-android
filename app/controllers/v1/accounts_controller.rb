@@ -44,6 +44,7 @@ class V1::AccountsController < V1::ApplicationController
             )
 
         end
+
         kontakt_integration = current_account.kontakt_integrations.first
         if kontakt_integration
             json["data"]["relationships"].merge!(
@@ -146,19 +147,15 @@ class V1::AccountsController < V1::ApplicationController
 
     def serialize_sync_job(integration, job)
         {
-            "type" => "sync-jobs",
+            "type" => job.type,
             "id" => job.id.to_s,
             "attributes" => {
                 "status" => job.status,
                 "started-at" => job.started_at,
                 "finished-at" => job.finished_at,
                 "error-message" => job.error_message,
-                "added-beacons-count" => job.added_devices_count,
-                "modified-beacons-count" => job.modified_devices_count,
-                "removed-beacons-count" => job.removed_devices_count,
-                "beacons-changed-configuration-count" => job.devices_changed_configuration_count,
                 "created-at" => job.created_at
-            },
+            }.merge(job.stats || {}),
             "relationships" => {
                 "integration" => {
                     "data" => {type: integration.model_type, "id" => integration.id.to_s}
@@ -184,7 +181,7 @@ class V1::AccountsController < V1::ApplicationController
                 {
                     "relationships" => {
                         "latest-sync" => {
-                            "type" => "sync-jobs",
+                            "type" => integration.latest_sync_job.type,
                             "id" => integration.latest_sync_job.id.to_s
                         }
                     }
