@@ -2,10 +2,19 @@ require 'googleauth'
 require 'google/apis/proximitybeacon_v1beta1'
 class GoogleIntegration < ThirdPartyIntegration
 
-    skip_callback :create, :after, :create_sync_job
-    skip_callback :destroy, :after, :remove_all_devices
-
     after_save :create_sync_job!, if: -> { project_id_changed && access_token }
+    after_destroy :revoke_access_token
+
+    has_many :sync_jobs, class_name: "GoogleSyncJob", foreign_key:  "third_party_integration_id" do
+
+        def latest
+            last
+        end
+
+        def previous
+            last(2).last
+        end
+    end
 
     def self.model_type
         @@model_type ||= "google-integration"
@@ -62,7 +71,7 @@ class GoogleIntegration < ThirdPartyIntegration
 
         if Time.zone.now > token.expires_at
             token.refresh!
-            self.credentials = {
+            new_credentials = {
                 project_id: self.project_id,
                 client_id: token.client_id,
                 access_token: token.access_token,
@@ -70,10 +79,18 @@ class GoogleIntegration < ThirdPartyIntegration
                 scope: token.scope,
                 expiration_time_millis: (token.expires_at.to_i) * 1000
             }
-            self.save
+            self.update(credentials: new_credentials)
         end
 
         return token
     end
+
+    private
+
+    def revoke_access_token
+        return if access_token.nil?
+        access_token.revoke!
+    end
+
 
 end
