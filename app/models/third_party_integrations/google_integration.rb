@@ -279,7 +279,7 @@ class GoogleIntegration < ThirdPartyIntegration
 
 
 
-        end
+        # end
 
         return stats
     end
