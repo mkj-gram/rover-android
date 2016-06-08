@@ -43,9 +43,10 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
     end
 
     def update
-        if @google_integration.update(google_integration_params(json["data"]))
+        json = flatten_request({single_record: true})
+        if @google_integration.update(google_integration_params(json[:data]))
             json = { "data" => serialize_google_integration(@google_integration, {"project-ids" => meta_project_ids(@google_integration)}) }
-            json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
+            json["included"] = [ serialize_sync_job(@google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
             render json: json
         else
             render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(@google_integration)}, status: :unprocessable_entity
@@ -98,7 +99,8 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
             "attributes" => {
                 "enabled" => integration.enabled,
                 "syncing" => integration.syncing,
-                "last-synced-at" => integration.last_synced_at
+                "last-synced-at" => integration.last_synced_at,
+                "project-id" => integration.project_id
             }.merge(extra_attributes)
         }
 
