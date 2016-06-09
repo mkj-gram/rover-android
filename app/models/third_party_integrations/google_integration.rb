@@ -2,7 +2,7 @@ require 'googleauth'
 require 'google/apis/proximitybeacon_v1beta1'
 class GoogleIntegration < ThirdPartyIntegration
 
-    # after_save :create_sync_job!, if: -> { project_id_changed && access_token }
+    after_save :create_sync_job!, if: -> { project_id_changed && access_token }
     after_destroy :revoke_access_token
 
     validate :did_not_switch_projects
