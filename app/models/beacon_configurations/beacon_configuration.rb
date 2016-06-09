@@ -60,6 +60,7 @@ class BeaconConfiguration < ActiveRecord::Base
         __elasticsearch__.delete_document
     end
 
+    before_save :track_google_pending_changes
     before_save :remove_duplicate_tags
     after_save :update_active_tags
     after_save :update_place
@@ -215,6 +216,12 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     private
+
+    def track_google_pending_changes
+        if registered_with_google && has_pending_google_update == false && ( place_id_changed? || indoor_level_changed? || title_changed?)
+            self.has_pending_google_update = true
+        end
+    end
 
     def update_active_tags
         if self.changes.include?(:tags)
