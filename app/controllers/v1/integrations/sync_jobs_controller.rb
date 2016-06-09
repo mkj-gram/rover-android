@@ -59,7 +59,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
 
     def serialize_sync_job(integration, job)
         {
-            "type" => "sync-jobs",
+            "type" => job.model_type,
             "id" => job.id.to_s,
             "attributes" => {
                 "status" => job.status,
