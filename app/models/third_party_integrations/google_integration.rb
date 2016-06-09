@@ -5,6 +5,8 @@ class GoogleIntegration < ThirdPartyIntegration
     after_save :create_sync_job!, if: -> { project_id_changed && access_token }
     after_destroy :revoke_access_token
 
+    validate :did_not_switch_projects
+
     has_many :sync_jobs, class_name: "GoogleSyncJob", foreign_key:  "third_party_integration_id" do
 
         def latest
@@ -34,6 +36,9 @@ class GoogleIntegration < ThirdPartyIntegration
     end
 
     def project_id=(id)
+        if !project_id.nil?
+            @switched_projects = true
+        end
         @project_id_changed = true if project_id != id
         self.credentials = (credentials || {}).merge("project_id" => id)
     end
@@ -315,6 +320,14 @@ class GoogleIntegration < ThirdPartyIntegration
     end
 
     private
+
+    # make sure the project_id hasn't gone from one project to another
+    def did_not_switch_projects
+        if @switched_projects == true
+            errors.add(:project_id, "cannot switch between projects")
+            return false
+        end
+    end
 
     def revoke_access_token
         return if access_token.nil?
