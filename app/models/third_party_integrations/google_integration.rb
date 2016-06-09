@@ -161,7 +161,7 @@ class GoogleIntegration < ThirdPartyIntegration
 
             client.batch do |service|
                 configurations.each do |configuration|
-                    service.get_beacon(configuration.beacon_name, project_id: self.project_id) do |res, err|
+                    service.get_beacon(configuration.google_beacon_name, project_id: self.project_id) do |res, err|
                         if res
                             beacons_info.push({ beacon: res, configuration: configuration })
                         end
@@ -224,6 +224,7 @@ class GoogleIntegration < ThirdPartyIntegration
         #                                                               #
         #################################################################
 
+        previous_successful_sync_job = self.sync_jobs.where(status: ThirdPartyIntegrationSyncJob.statuses["finished"]).last
         if self.sync_jobs.count == 1
             calling_job.started_at.to_i
             # this is the first time we are syncing so grab everything
