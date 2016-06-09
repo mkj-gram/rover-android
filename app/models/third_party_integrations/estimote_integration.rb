@@ -6,7 +6,7 @@ class EstimoteIntegration < ThirdPartyIntegration
     after_create :create_sync_job!
     after_destroy :remove_all_devices
 
-    has_many :sync_jobs, class_name: "DeviceSyncJob", foreign_key:  "third_party_integration_id" do
+    has_many :sync_jobs, class_name: "BeaconSyncJob", foreign_key:  "third_party_integration_id" do
         def latest
             last
         end

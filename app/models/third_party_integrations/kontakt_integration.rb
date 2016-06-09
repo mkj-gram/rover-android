@@ -2,7 +2,7 @@ class KontaktIntegration < ThirdPartyIntegration
 
     validates :api_key, presence: true
 
-    has_many :sync_jobs, class_name: "DeviceSyncJob", foreign_key:  "third_party_integration_id" do
+    has_many :sync_jobs, class_name: "BeaconSyncJob", foreign_key:  "third_party_integration_id" do
         def latest
             last
         end
