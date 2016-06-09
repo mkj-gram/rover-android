@@ -822,8 +822,7 @@ CREATE TABLE third_party_integrations (
     last_synced_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    third_party_integration_sync_jobs_count integer DEFAULT 0,
-    credentials jsonb DEFAULT '{}'::jsonb
+    third_party_integration_sync_jobs_count integer DEFAULT 0
 );
 
 
@@ -1899,6 +1898,4 @@ INSERT INTO schema_migrations (version) VALUES ('20160608143038');
 INSERT INTO schema_migrations (version) VALUES ('20160608200150');
 
 INSERT INTO schema_migrations (version) VALUES ('20160609142610');
-
-INSERT INTO schema_migrations (version) VALUES ('20160609182550');
 

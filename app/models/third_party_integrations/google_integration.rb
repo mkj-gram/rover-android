@@ -2,7 +2,7 @@ require 'googleauth'
 require 'google/apis/proximitybeacon_v1beta1'
 class GoogleIntegration < ThirdPartyIntegration
 
-    after_save :create_sync_job!, if: -> { project_id_changed && access_token }
+    # after_save :create_sync_job!, if: -> { project_id_changed && access_token }
     after_destroy :revoke_access_token
 
     validate :did_not_switch_projects
@@ -305,6 +305,7 @@ class GoogleIntegration < ThirdPartyIntegration
 
         if Time.zone.now > token.expires_at
             token.refresh!
+            
             new_credentials = {
                 project_id: self.project_id,
                 client_id: token.client_id,
@@ -313,7 +314,10 @@ class GoogleIntegration < ThirdPartyIntegration
                 scope: token.scope,
                 expiration_time_millis: (token.expires_at.to_i) * 1000
             }
-            self.update(credentials: new_credentials)
+            credentials = new_credentials
+            save!
+            # self.update(credentials: new_credentials)
+
         end
 
         return token
