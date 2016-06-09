@@ -1,5 +1,6 @@
 class ThirdPartyIntegration < ActiveRecord::Base
-    attr_encrypted :credentials, v2_gcm_iv: false, key: proc { ThirdPartyIntegration.encryption_key }, mode: :per_attribute_iv_and_salt, marshal: true 
+    attr_encrypted :old_credentials, key: proc { ThirdPartyIntegration.encryption_key }, mode: :per_attribute_iv_and_salt, marshal: true, attribute: "encrypted_credentials"
+    serialize :credentials, JSONHash
     attr_reader :job
 
     belongs_to :account

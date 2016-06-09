@@ -3,8 +3,9 @@ module JSONHash
 
         def load(obj)
             return {} if obj.nil?
-            return obj if !obj.is_a?(String)
-            return JSON.parse(obj)
+            return obj.with_indifferent_access if obj.is_a?(Hash)
+            return JSON.parse(obj).with_indifferent_access if obj.is_a?(String)
+            return {}
         end
 
         def dump(obj)
