@@ -83,6 +83,12 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
                 # this request might have the integrations id in the payload
                 json = flatten_request({single_record: true})
                 id = json.dig(:data, :sync_jobs, :integration_id)
+                if id.nil?
+                    id = json.dig(:data, :device_sync_jobs, :integration_id)
+                end
+                if id.nil?
+                    id = json.dig(:data, :google_sync_jobs, :integration_id)
+                end
             end
             return id
         }.call
