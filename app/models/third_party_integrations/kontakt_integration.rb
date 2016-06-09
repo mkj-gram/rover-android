@@ -45,10 +45,10 @@ class KontaktIntegration < ThirdPartyIntegration
 
     def sync!(calling_job = nil)
         stats = {
-            added_devices_count: 0,
-            modified_devices_count: 0,
-            removed_devices_count: 0,
-            devices_changed_configuration_count: 0
+            added_beacons_count: 0,
+            modified_beacons_count: 0,
+            removed_beacons_count: 0,
+            beacons_changed_configuration_count: 0
         }
 
         kontakt_server_devices = client.devices
@@ -90,7 +90,7 @@ class KontaktIntegration < ThirdPartyIntegration
         # with new devices we can just create their configs and if they exist oh well
         new_devices.each do |manufacturer_id, device|
             if device.save && new_config = device.create_configuration
-                stats[:added_devices_count] += 1
+                stats[:added_beacons_count] += 1
                 configurations_modified.add(new_config) if new_config != nil
             end
         end
@@ -106,9 +106,9 @@ class KontaktIntegration < ThirdPartyIntegration
 
             if device.save && new_config = device.create_configuration
                 if (existing_configuration && new_config) && (existing_configuration.id != new_config.id)
-                    stats[:devices_changed_configuration_count] += 1
+                    stats[:beacons_changed_configuration_count] += 1
                 else
-                    stats[:modified_devices_count] += 1
+                    stats[:modified_beacons_count] += 1
                 end
                 configurations_modified.add(new_config) if new_config != nil
             end
@@ -117,7 +117,7 @@ class KontaktIntegration < ThirdPartyIntegration
         deleted_devices.each do |manufacturer_id, device|
             device.skip_cache_update = true
             if device.destroy
-                stats[:removed_devices_count] += 1
+                stats[:removed_beacons_count] += 1
                 configurations_modified.add(device.configuration)
             end
         end

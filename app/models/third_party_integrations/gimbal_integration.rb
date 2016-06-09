@@ -41,10 +41,10 @@ class GimbalIntegration < ThirdPartyIntegration
     def sync!
 
         stats = {
-            added_devices_count: 0,
-            modified_devices_count: 0,
-            removed_devices_count: 0,
-            devices_changed_configuration_count: 0
+            added_beacons_count: 0,
+            modified_beacons_count: 0,
+            removed_beacons_count: 0,
+            beacons_changed_configuration_count: 0
         }
 
         # grab all the places
@@ -62,13 +62,13 @@ class GimbalIntegration < ThirdPartyIntegration
 
         new_gimbal_places.each do |gimbal_place|
             if gimbal_place.save
-                added_devices_count += 1
+                added_beacons_count += 1
             end
         end
 
         old_gimbal_places.each do |gimbal_place|
             if gimbal_place.destroy
-                removed_devices_count += 1
+                removed_beacons_count += 1
             end
         end
 
