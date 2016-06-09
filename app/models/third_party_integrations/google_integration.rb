@@ -182,9 +182,9 @@ class GoogleIntegration < ThirdPartyIntegration
                         beacon.lat_lng = { latitude: configuration.place.latitude, longitude: configuration.place.longitude }
                     end
 
-                    if beacon.place_id != configuration.place.place_id
+                    if beacon.place_id != configuration.place.google_place_id
                         updates = true
-                        beacon.place_id = configuration.place.place_id
+                        beacon.place_id = configuration.place.google_place_id
                     end
                 end
 
