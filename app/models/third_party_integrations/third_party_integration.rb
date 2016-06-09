@@ -23,7 +23,6 @@ class ThirdPartyIntegration < ActiveRecord::Base
     end
 
     def finish_syncing(finished_at, elapsed_milliseconds)
-        self.increment(:synced_count)
         self.update({last_synced_at: finished_at, syncing: false})
     end
 
