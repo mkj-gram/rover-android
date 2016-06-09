@@ -82,6 +82,7 @@ Rails.application.routes.draw do
 
         scope module: "integrations" do
             resources :"beacon-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+            resources :"google-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
         end
 
 
