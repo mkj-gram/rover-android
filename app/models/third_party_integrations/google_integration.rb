@@ -368,6 +368,7 @@ class GoogleIntegration < ThirdPartyIntegration
     private
 
     def add_rover_configuration_id_as_attachment(client, namespace_name, configurations)
+        return [] if configurations.nil? || configurations.empty?
         synced_configurations = []
         client.batch do |service|
             configurations.each do |configuration|
