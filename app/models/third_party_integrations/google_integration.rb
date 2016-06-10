@@ -157,25 +157,22 @@ class GoogleIntegration < ThirdPartyIntegration
                 configuration = beacon_info[:configuration]
 
                 if configuration.place
-                    if beacon.lat_lng != { latitude: configuration.place.latitude, longitude: configuration.place.longitude }
-                        updates = true
-                        beacon.lat_lng = { latitude: configuration.place.latitude, longitude: configuration.place.longitude }
-                    end
-
-                    if beacon.place_id != configuration.place.google_place_id
-                        updates = true
-                        beacon.place_id = configuration.place.google_place_id
-                    end
+                    new_place_id = configuration.place.id
+                    new_lat_lng = { latitude: configuration.place.latitude, longitude: configuration.place.longitude }
                 else
-                    if beacon.place_id != nil
-                        beacon.place_id = nil
-                        updates = true
-                    end
+                    new_place_id = nil
+                    new_lat_lng = nil
+                end
 
-                    if beacon.lat_lng != nil
-                        beacon.lat_lng = nil
-                        updates = true
-                    end
+
+                if beacon.place_id != new_place_id
+                    beacon.place_id = new_place_id
+                    updates = true
+                end
+
+                if beacon.lat_lng != new_lat_lng
+                    beacon.lat_lng = new_lat_lng
+                    updates = true
                 end
 
                 if beacon.indoor_level != configuration.indoor_level
