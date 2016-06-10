@@ -131,7 +131,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
         client = Google::Apis::CloudresourcemanagerV1beta1::CloudResourceManagerService.new
         client.authorization = google_integration.access_token
         response = client.list_projects
-        if response.projects.any?
+        if !response.projects.nil? && response.projects.any?
             response.projects.map(&:project_id)
         else
             []
