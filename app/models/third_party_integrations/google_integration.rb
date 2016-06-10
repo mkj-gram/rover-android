@@ -96,7 +96,7 @@ class GoogleIntegration < ThirdPartyIntegration
                 end
 
                 if beacon.indoor_level
-                    beacon.indoor_level = configuration.indoor_level
+                    beacon.indoor_level =  { name: configuration.indoor_level }
                 end
 
                 beacon_registrations.push({ beacon: beacon, configuration: configuration })
@@ -164,7 +164,6 @@ class GoogleIntegration < ThirdPartyIntegration
                     new_lat_lng = nil
                 end
 
-
                 if beacon.place_id != new_place_id
                     beacon.place_id = new_place_id
                     updates = true
@@ -175,9 +174,9 @@ class GoogleIntegration < ThirdPartyIntegration
                     updates = true
                 end
 
-                if beacon.indoor_level != configuration.indoor_level
+                if beacon.indoor_level != { name: configuration.indoor_level }
                     updates = true
-                    beacon.indoor_level = configuration.indoor_level
+                    beacon.indoor_level = { name: configuration.indoor_level }
                 end
 
                 if updates
