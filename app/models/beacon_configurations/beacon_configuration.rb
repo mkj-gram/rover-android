@@ -187,12 +187,12 @@ class BeaconConfiguration < ActiveRecord::Base
     end
 
     def google_integration_status
-        if registered_with_google
-            "registered"
+        if google_sync_error
+            "sync-error"
         elsif has_pending_google_update
             "pending-updates"
-        elsif google_sync_error
-            "sync-error"
+        elsif registered_with_google 
+            "registered"
         else
             "unknown"
         end
