@@ -22,7 +22,6 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                 google_integration = current_account.build_google_integration(google_integration_params(json[:data]))
                 credentials = GoogleOauthSettings.get_credentials_from_code(code: code)
                 google_integration.credentials = {
-                    project_id: google_integration.project_id,
                     client_id: credentials.client_id,
                     access_token: credentials.access_token,
                     refresh_token: credentials.refresh_token,
@@ -66,7 +65,8 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
     private
 
     def google_integration_params(local_params)
-        local_params.fetch(:google_integrations, {}).permit(:project_id)
+        convert_param_if_exists(local_params[:google_integrations], :project_id, :google_project_id)
+        local_params.fetch(:google_integrations, {}).permit(:google_project_id)
     end
 
     def serialize_sync_job(integration, job)
