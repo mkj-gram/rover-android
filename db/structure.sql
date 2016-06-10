@@ -822,7 +822,8 @@ CREATE TABLE third_party_integrations (
     last_synced_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    third_party_integration_sync_jobs_count integer DEFAULT 0
+    third_party_integration_sync_jobs_count integer DEFAULT 0,
+    google_project_id character varying
 );
 
 
@@ -1731,6 +1732,13 @@ CREATE INDEX index_third_party_integrations_on_account_id_and_type ON third_part
 
 
 --
+-- Name: index_third_party_integrations_on_google_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_third_party_integrations_on_google_project_id ON third_party_integrations USING btree (google_project_id);
+
+
+--
 -- Name: index_user_acls_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1898,4 +1906,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160608143038');
 INSERT INTO schema_migrations (version) VALUES ('20160608200150');
 
 INSERT INTO schema_migrations (version) VALUES ('20160609142610');
+
+INSERT INTO schema_migrations (version) VALUES ('20160610152917');
 

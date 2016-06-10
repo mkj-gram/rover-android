@@ -2,7 +2,7 @@ require 'googleauth'
 require 'google/apis/proximitybeacon_v1beta1'
 class GoogleIntegration < ThirdPartyIntegration
 
-    after_save :create_sync_job!, if: -> { project_id_changed && access_token }
+    after_save :create_sync_job!, if: -> { google_project_id_changed? && access_token }
     after_destroy :revoke_access_token
 
     validate :did_not_switch_projects
@@ -31,24 +31,12 @@ class GoogleIntegration < ThirdPartyIntegration
         should_pluralize ? GoogleIntegration.model_type_pluralized : GoogleIntegration.model_type
     end
 
-    def project_id
-        self.credentials.nil? ? nil : self.credentials["project_id"]
-    end
-
-    def project_id=(id)
-        if !project_id.nil?
-            @switched_projects = true
-        end
-        @project_id_changed = true if project_id != id
-        self.credentials = (credentials || {}).merge("project_id" => id)
-    end
-
-    def project_id_changed
-        @project_id_changed ||= false
-    end
-
     def credentials_json
         {}
+    end
+
+    def project_id
+        google_project_id
     end
 
 
