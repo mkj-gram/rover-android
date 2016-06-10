@@ -32,7 +32,9 @@ class GoogleIntegration < ThirdPartyIntegration
     end
 
     def credentials_json
-        {}
+        {
+            "project-id" => project_id
+        }
     end
 
     def project_id
