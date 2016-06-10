@@ -285,7 +285,7 @@ CREATE TABLE beacon_configurations (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     registered_with_google boolean DEFAULT false,
-    has_pending_google_update boolean DEFAULT false,
+    has_pending_google_updates boolean DEFAULT false,
     indoor_level character varying,
     google_beacon_name character varying,
     google_sync_error boolean DEFAULT false
@@ -1400,7 +1400,7 @@ CREATE UNIQUE INDEX account_ibeacon_index ON beacon_configurations USING btree (
 -- Name: beacon_configurations_pending_google_updates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX beacon_configurations_pending_google_updates ON beacon_configurations USING btree (account_id, has_pending_google_update);
+CREATE INDEX beacon_configurations_pending_google_updates ON beacon_configurations USING btree (account_id, has_pending_google_updates);
 
 
 --

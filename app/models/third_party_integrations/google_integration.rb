@@ -132,7 +132,7 @@ class GoogleIntegration < ThirdPartyIntegration
         #                                                               #
         #################################################################
 
-        BeaconConfiguration.where(account_id: self.account_id, registered_with_google: true, has_pending_google_update: true).includes(:place).find_in_batches(batch_size: 100) do |configurations|
+        BeaconConfiguration.where(account_id: self.account_id, registered_with_google: true, has_pending_google_updates: true).includes(:place).find_in_batches(batch_size: 100) do |configurations|
 
 
 
@@ -197,7 +197,7 @@ class GoogleIntegration < ThirdPartyIntegration
                 end
             end
 
-            stats[:configurations_modified_on_google] += BeaconConfiguration.where(id: configurations_updated.map(&:id)).update_all(has_pending_google_update: false, google_sync_error: false)
+            stats[:configurations_modified_on_google] += BeaconConfiguration.where(id: configurations_updated.map(&:id)).update_all(has_pending_google_updates: false, google_sync_error: false)
         end
 
         #################################################################
@@ -295,7 +295,7 @@ class GoogleIntegration < ThirdPartyIntegration
                             indoor_level: beacon.indoor_level ? beacon.indoor_level.name : nil,
                             google_beacon_name: beacon.beacon_name,
                             registered_with_google: true,
-                            has_pending_google_update: false,
+                            has_pending_google_updates: false,
                         )
                     )
                 when "EDDYSTONE"
@@ -309,7 +309,7 @@ class GoogleIntegration < ThirdPartyIntegration
                             indoor_level:  beacon.indoor_level ? beacon.indoor_level.name : nil,
                             google_beacon_name: beacon.beacon_name,
                             registered_with_google: true,
-                            has_pending_google_update: false,
+                            has_pending_google_updates: false,
                         )
                     )
                 end
