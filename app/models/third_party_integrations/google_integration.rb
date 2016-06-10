@@ -279,7 +279,8 @@ class GoogleIntegration < ThirdPartyIntegration
         
         next_page_token = nil
         while ((response = client.list_beacons(q: "status:active", project_id: self.project_id, page_token: next_page_token, page_size: 100)) && response.beacons) do
-            next if response.beacons.nil?
+            break if response.beacons.nil?
+            next_page_token = response.next_page_token
             beacons = response.beacons
             configurations_by_beacon_name = BeaconConfiguration.where(google_beacon_name: beacons.map(&:beacon_name)).all.index_by(&:google_beacon_name)
             new_beacons = beacons.select{ |beacon| !configurations_by_beacon_name.include?(beacon.beacon_name) }
@@ -288,28 +289,30 @@ class GoogleIntegration < ThirdPartyIntegration
             new_beacons.each do |beacon|
                 case beacon.advertised_id.type
                 when "IBEACON"
-                    uuid, major, minor = beacon.advertised_id.unpack("H32SS")
-                    uid = "#{uuid[0..7]}-#{uuid[8..11]}-#{uuid[12..15]}-#{uuid[16..19]}-#{uuid[20..31]}"
+                    uuid, major, minor = beacon.advertised_id.id.unpack("H32SS")
+                    uuid = "#{uuid[0..7]}-#{uuid[8..11]}-#{uuid[12..15]}-#{uuid[16..19]}-#{uuid[20..31]}"
                     new_configurations.push(
                         IBeaconConfiguration.new(
+                            account_id: self.account_id,
                             title: beacon.description || beacon.beacon_name || "",
                             uuid: uuid.upcase,
                             major: major,
                             minor: minor,
-                            indoor_level: beacon.indoor_level,
+                            indoor_level: beacon.indoor_level ? beacon.indoor_level.name : nil,
                             google_beacon_name: beacon.beacon_name,
                             registered_with_google: true,
                             has_pending_google_update: false,
                         )
                     )
                 when "EDDYSTONE"
-                    namespace, instance_id = beacon.advertised_id.unpack("H20H12")
+                    namespace, instance_id = beacon.advertised_id.id.unpack("H20H12")
                     new_configurations.push(
                         EddystoneNamespaceConfiguration.new(
+                            account_id: self.account_id,
                             title: beacon.description || beacon.beacon_name || "",
                             namespace: namespace, 
                             instance_id: instance_id,
-                            indoor_level: beacon.indoor_level,
+                            indoor_level:  beacon.indoor_level ? beacon.indoor_level.name : nil,
                             google_beacon_name: beacon.beacon_name,
                             registered_with_google: true,
                             has_pending_google_update: false,
