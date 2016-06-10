@@ -130,6 +130,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 query: {
                     filtered: {
                         query: {
+                            fields: ["_id"],
                             bool: {
                                 should: should_query
                             }
@@ -147,22 +148,24 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         configurations = Elasticsearch::Model.search(query, types)
         results = configurations.per_page(page_size).page(current_page).results
+        records = BeaconConfiguration.where(id: results.map(&:_id)).includes(:place)
         include_place = true #whitelist_include(["place"]).first == "place"
         json  = {
-            "data" => results.map do |config|
-                if config._type == IBeaconConfiguration.document_type
-                    elasticsearch_serialize_ibeacon(config, include_place)
-                elsif config._type == EddystoneNamespaceConfiguration.document_type
-                    elasticsearch_serialize_eddystone_namespace(config, include_place)
-                elsif config._type == UrlConfiguration.document_type
-                    elasticsearch_serialize_url(config, include_place)
+            "data" => records.map do |config|
+                json = V1::BeaconConfigurationSerializer.serialize(config)
+                if config.place
+                    json["relationships"] = {
+                        "place" => {
+                            "data" => { type: "places", id: config.place.id.to_s }
+                        }
+                    }
                 end
+                json
             end,
             "meta" => {
                 "totalRecords" => results.total,
                 "totalPages" => results.total_pages
-            },
-            "links" => pagination_links(v1_beacon_configuration_index_url, results, {start_at: 0})
+            }
         }
 
         if query_place_id
@@ -174,7 +177,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         included = []
 
         if whitelist_include(["place"])
-            included += results.select{|config| !config._source.place.empty? }.map{|config| serialize_partial_place(config._source.place) }
+            included += records.map(&:place).compact.uniq.map{ |place| V1::PlaceSerializer.serialize(place) }
         end
 
         if included.any?
@@ -315,7 +318,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     def render_beacon_configuration(beacon_configuration)
         if beacon_configuration
             json = {
-                "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
+                "data" => V1::BeaconConfigurationSerializer.serialize(beacon_configuration)
             }
             should_include = ["place", "beacons"] #whitelist_include(["place", "beacons"])
 
