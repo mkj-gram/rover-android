@@ -93,15 +93,10 @@ class GoogleIntegration < ThirdPartyIntegration
                 if configuration.place
                     beacon.lat_lng = { latitude: configuration.place.latitude, longitude: configuration.place.longitude }
                     beacon.place_id = configuration.place.google_place_id if configuration.place.google_place_id
-                else
-                    beacon.lat_lng = nil
-                    beacon.place_id = nil
                 end
 
                 if beacon.indoor_level
                     beacon.indoor_level = configuration.indoor_level
-                else
-                    beacon.indoor_level = nil
                 end
 
                 beacon_registrations.push({ beacon: beacon, configuration: configuration })
@@ -170,6 +165,16 @@ class GoogleIntegration < ThirdPartyIntegration
                     if beacon.place_id != configuration.place.google_place_id
                         updates = true
                         beacon.place_id = configuration.place.google_place_id
+                    end
+                else
+                    if beacon.place_id != nil
+                        beacon.place_id = nil
+                        updates = true
+                    end
+
+                    if beacon.lat_lng != nil
+                        beacon.lat_lng = nil
+                        updates = true
                     end
                 end
 
