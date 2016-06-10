@@ -157,7 +157,7 @@ class GoogleIntegration < ThirdPartyIntegration
                 configuration = beacon_info[:configuration]
 
                 if configuration.place && configuration.place.google_place_id
-                    new_place_id = { name: configuration.place.google_place_id }
+                    new_place_id = configuration.place.google_place_id
                     new_lat = configuration.place.latitude
                     new_lng = configuration.place.longitude
                 else
