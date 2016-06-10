@@ -333,7 +333,7 @@ class GoogleIntegration < ThirdPartyIntegration
 
 
     def access_token
-        return nil if  !([:client_id, :scope, :access_token, :refresh_token, :expiration_time_millis].all? { |property| credentials.has_key?(property) })
+        return nil if credentials.nil? || !([:client_id, :scope, :access_token, :refresh_token, :expiration_time_millis].all? { |property| credentials.has_key?(property) })
         # grab the url
         token = Google::Auth::UserRefreshCredentials.new(
             client_id: GoogleOauthSettings.client_id.id,
