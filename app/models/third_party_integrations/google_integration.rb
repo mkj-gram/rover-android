@@ -171,7 +171,7 @@ class GoogleIntegration < ThirdPartyIntegration
                     updates = true
                 end
 
-                if (beacon.lat_lng.nil? && !new_lat.nil? && !new_lng.nil?) || (beacon.lat_lng.latitude != new_lat || beacon.lat_lng.longitude != new_lng)
+                if (beacon.lat_lng.nil? && !new_lat.nil? && !new_lng.nil?) || ( !beacon.lat_lng.nil? && (beacon.lat_lng.latitude != new_lat || beacon.lat_lng.longitude != new_lng))
                     beacon.lat_lng = { longitude: new_lng, latitude: new_lat }
                     updates = true
                 end
