@@ -186,6 +186,17 @@ class BeaconConfiguration < ActiveRecord::Base
         }
     end
 
+    def google_integration_status
+        if registered_with_google
+            "registered"
+        elsif has_pending_google_update
+            "pending-updates"
+        elsif google_sync_error
+            "sync-error"
+        else
+            "unknown"
+        end
+    end
 
     protected
 

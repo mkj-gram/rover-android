@@ -9,8 +9,7 @@ module V1::BeaconConfigurationSerializer
                     "tags" => beacon_configuration.tags,
                     "shared" => beacon_configuration.shared,
                     "enabled" => beacon_configuration.enabled,
-                    "registered-with-google" => beacon_configuration.registered_with_google,
-                    "has-pending-google-updates" => beacon_configuration.has_pending_google_update,
+                    "google-integration-status" => beacon_configuration.google_integration_status,
                     "indoor-level" => beacon_configuration.indoor_level
                 }.merge(extra_attributes).merge(beacon_configuration.configuration_attributes)
             }

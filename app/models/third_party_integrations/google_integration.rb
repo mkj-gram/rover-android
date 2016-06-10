@@ -110,8 +110,12 @@ class GoogleIntegration < ThirdPartyIntegration
                     service.register_beacon(beacon, project_id: self.project_id) do |res, err|
                         if res
                             configuration.google_beacon_name = res.beacon_name
+                            configuration.google_sync_error = false
                             configuration.save
                             attachment_registrations.push(configuration)
+                        elsif err
+                            configuration.google_sync_error = true
+                            configuration.save
                         end
                     end
                 end
@@ -186,12 +190,14 @@ class GoogleIntegration < ThirdPartyIntegration
                     service.update_beacon(beacon.beacon_name, beacon, project_id: self.project_id) do |res, err|
                         if res
                             configurations_updated.push(configuration)
+                        elsif err
+                            configuration.update(google_sync_error: true)
                         end
                     end
                 end
             end
 
-            stats[:configurations_modified_on_google] += BeaconConfiguration.where(id: configurations_updated.map(&:id)).update_all(has_pending_google_update: false)
+            stats[:configurations_modified_on_google] += BeaconConfiguration.where(id: configurations_updated.map(&:id)).update_all(has_pending_google_update: false, google_sync_error: false)
         end
 
         #################################################################
