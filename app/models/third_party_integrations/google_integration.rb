@@ -182,7 +182,6 @@ class GoogleIntegration < ThirdPartyIntegration
 
             configurations_updated = []
 
-            add_rover_configuration_id_as_attachment(client, namespace_name)
             client.batch do |service|
                 updated_beacons.each do |beacon_info|
                     beacon = beacon_info[:beacon]
