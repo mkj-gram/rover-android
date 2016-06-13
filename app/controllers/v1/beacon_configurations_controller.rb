@@ -108,8 +108,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             query = {
                 query: {
                     filtered: {
-                        fields: ["_id", "devices_meta.type", "devices_meta.count"],
-                        query: {match_all: {}},
+                        query: {
+                            fields: ["_id", "devices_meta.type", "devices_meta.count"],
+                            match_all: {}
+                        },
                         filter: {
                             bool: {
                                 should: should_filter,
