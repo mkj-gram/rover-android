@@ -114,10 +114,12 @@ class GoogleIntegration < ThirdPartyIntegration
                         if res
                             configuration.google_beacon_name = res.beacon_name
                             configuration.google_sync_error = false
+                            configuration.google_sync_error_message = nil
                             configuration.save
                             attachment_registrations.push(configuration)
                         elsif err
                             configuration.google_sync_error = true
+                            configuration.google_sync_error_message = err.message
                             configuration.save
                         end
                     end
@@ -201,7 +203,7 @@ class GoogleIntegration < ThirdPartyIntegration
                         if res
                             configurations_updated.push(configuration)
                         elsif err
-                            configuration.update(google_sync_error: true)
+                            configuration.update(google_sync_error: true, google_sync_error_message: err.message)
                         end
                     end
                 end
@@ -376,8 +378,6 @@ class GoogleIntegration < ThirdPartyIntegration
 
     private
 
-    private
-
     def add_rover_configuration_id_as_attachment(client, namespace_name, configurations)
         return [] if configurations.nil? || configurations.empty?
         synced_configurations = []
@@ -388,6 +388,10 @@ class GoogleIntegration < ThirdPartyIntegration
                 service.create_beacon_attachment(beacon_name, attachment) do |res, err|
                     if res
                         synced_configurations.push(configuration)
+                    elsif err
+                        configuration.google_sync_error = true
+                        configuration.google_sync_error_message = err.message
+                        configuration.save
                     end
                 end
             end

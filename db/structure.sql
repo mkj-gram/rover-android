@@ -288,7 +288,8 @@ CREATE TABLE beacon_configurations (
     has_pending_google_updates boolean DEFAULT false,
     indoor_level character varying,
     google_beacon_name character varying,
-    google_sync_error boolean DEFAULT false
+    google_sync_error boolean DEFAULT false,
+    google_sync_error_message text
 );
 
 
