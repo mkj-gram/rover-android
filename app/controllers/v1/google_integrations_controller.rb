@@ -82,7 +82,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
             }.merge(job.stats_attributes.dasherize || {}),
             "relationships" => {
                 "integration" => {
-                    "data" => {"type" => integration.model_type, "id" => integration.id.to_s}
+                    "data" => {"type" => "integrations", "id" => integration.id.to_s}
                 }
             }
         }
