@@ -106,10 +106,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         if query_keyword.nil? && query_tags.empty?
             query = {
+                fields: ["_id", "devices_meta.type", "devices_meta.count"],
                 query: {
                     filtered: {
                         query: {
-                            fields: ["_id", "devices_meta.type", "devices_meta.count"],
                             match_all: {}
                         },
                         filter: {
@@ -130,10 +130,10 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             }
         else
             query = {
+                fields: ["_id", "devices_meta.type", "devices_meta.count"],
                 query: {
                     filtered: {
                         query: {
-                            fields: ["_id", "devices_meta.type", "devices_meta.count"],
                             bool: {
                                 should: should_query
                             }
