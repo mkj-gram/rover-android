@@ -8,7 +8,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
     def show
         # grab the integration
         json = { "data" => serialize_google_integration(@google_integration, {"project-ids" => meta_project_ids(@google_integration)}) }
-        json["included"] = [ serialize_sync_job(@google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
+        json["included"] = [ V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(@google_integration.latest_sync_job, @google_integration)] if @google_integration.latest_sync_job
         render json: json
     end
 
@@ -30,7 +30,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
                 }
                 if google_integration.save
                     json = { "data" => serialize_google_integration(google_integration, {"project-ids" => meta_project_ids(google_integration)}) }
-                    json["included"] = [ serialize_sync_job(google_integration, google_integration.latest_sync_job)] if google_integration.latest_sync_job
+                    json["included"] = [ V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(google_integration.latest_sync_job, google_integration) ] if google_integration.latest_sync_job
                     render json: json
                 else
                     render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(google_integration)}, status: :unprocessable_entity
@@ -45,7 +45,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
         json = flatten_request({single_record: true})
         if @google_integration.update(google_integration_params(json[:data]))
             json = { "data" => serialize_google_integration(@google_integration, {"project-ids" => meta_project_ids(@google_integration)}) }
-            json["included"] = [ serialize_sync_job(@google_integration, @google_integration.latest_sync_job)] if @google_integration.latest_sync_job
+            json["included"] = [ V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(@google_integration.latest_sync_job, @google_integration) ] if @google_integration.latest_sync_job
             render json: json
         else
             render json: { errors: V1::GoogleIntegrationErrorSerializer.serialize(@google_integration)}, status: :unprocessable_entity
@@ -67,25 +67,6 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
     def google_integration_params(local_params)
         convert_param_if_exists(local_params[:google_integrations], :project_id, :google_project_id)
         local_params.fetch(:google_integrations, {}).permit(:google_project_id)
-    end
-
-    def serialize_sync_job(integration, job)
-        {
-            "type" => job.model_type,
-            "id" => job.id.to_s,
-            "attributes" => {
-                "status" => job.status,
-                "started-at" => job.started_at,
-                "finished-at" => job.finished_at,
-                "error-message" => job.error_message,
-                "created-at" => job.created_at
-            }.merge(job.stats_attributes.dasherize || {}),
-            "relationships" => {
-                "integration" => {
-                    "data" => {"type" => "integrations", "id" => integration.id.to_s}
-                }
-            }
-        }
     end
 
     def serialize_google_integration(integration, extra_attributes = {})

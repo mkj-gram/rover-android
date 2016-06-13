@@ -17,7 +17,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
             jobs = integration.sync_jobs.paginate(per_page: page_size, page: current_page, total_entries: integration.third_party_integration_sync_jobs_count).order(orders.join(","))
 
             json = {
-                "data" => jobs.map{|job| serialize_sync_job(integration, job)}
+                "data" => jobs.map{|job| V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(job, integration) }
             }
             render json: json
         else
@@ -29,7 +29,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
     def show
         if @job
             json = {
-                "data" => serialize_sync_job(@integration, @job)
+                "data" => V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(@job, @integration)
             }
             render json: json
         else
@@ -43,7 +43,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
             if @integration.create_sync_job!
                 @job = @integration.job
                 json = {
-                    "data" => serialize_sync_job(@integration, @job)
+                    "data" => V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(@job, @integration)
                 }
                 render json: json, status: :created
             else
@@ -56,25 +56,6 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
 
 
     private
-
-    def serialize_sync_job(integration, job)
-        {
-            "type" => job.model_type,
-            "id" => job.id.to_s,
-            "attributes" => {
-                "status" => job.status,
-                "started-at" => job.started_at,
-                "finished-at" => job.finished_at,
-                "error-message" => job.error_message,
-                "created-at" => job.created_at
-            }.merge(job.stats_attributes.dasherize || {}),
-            "relationships" => {
-                "integration" => {
-                    "data" => {"type" => "integrations", "id" => integration.id.to_s}
-                }
-            }
-        }
-    end
 
     def get_integration_id
         @integration_id ||= -> {

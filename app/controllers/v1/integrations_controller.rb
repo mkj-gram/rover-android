@@ -25,9 +25,8 @@ class V1::IntegrationsController < V1::ApplicationController
 
         if includes_sync
             included = integrations.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
-                serialize_sync_job(integration, integration.latest_sync_job)
+                V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
             end
-
 
             json["included"] = included
         end
@@ -46,7 +45,7 @@ class V1::IntegrationsController < V1::ApplicationController
             }
             if includes_sync
                 included = [
-                    serialize_sync_job(integration, integration.latest_sync_job)
+                    V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
                 ]
                 json["included"] = included
             end
@@ -69,7 +68,7 @@ class V1::IntegrationsController < V1::ApplicationController
                     "data" => serialize_integration(integration)
                 }
 
-                json["included"] = [serialize_sync_job(integration, integration.latest_sync_job)] if integration.latest_sync_job
+                json["included"] = [V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)] if integration.latest_sync_job
 
                 render json: json, status: :created
             else
@@ -161,26 +160,7 @@ class V1::IntegrationsController < V1::ApplicationController
             current_account.third_party_integrations
         end
     end
-
-    def serialize_sync_job(integration, job)
-        {
-            "type" => job.model_type,
-            "id" => job.id.to_s,
-            "attributes" => {
-                "status" => job.status,
-                "started-at" => job.started_at,
-                "finished-at" => job.finished_at,
-                "error-message" => job.error_message,
-                "created-at" => job.created_at,
-            }.merge(job.stats || {}),
-            "relationships" => {
-                "integration" => {
-                    "data" => {"type" => "integrations", "id" => integration.id.to_s}
-                }
-            }
-        }
-    end
-
+    
     def serialize_integration(integration)
         json = {
             "type" => integration.model_type,

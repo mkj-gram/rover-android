@@ -106,7 +106,7 @@ class V1::AccountsController < V1::ApplicationController
         end
 
         included += [estimote_integration, kontakt_integration, google_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
-            serialize_sync_job(integration, integration.latest_sync_job)
+            V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
         end
 
         # included += [V1::AndroidPlatformSerializer.serialize(android_platform)] if android_platform
@@ -143,27 +143,6 @@ class V1::AccountsController < V1::ApplicationController
         param_should_be_array(local_params[:accounts], :message_limits)
         local_params.require(:accounts).permit(:title, {:message_limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]})
     end
-
-
-    def serialize_sync_job(integration, job)
-        {
-            "type" => job.model_type,
-            "id" => job.id.to_s,
-            "attributes" => {
-                "status" => job.status,
-                "started-at" => job.started_at,
-                "finished-at" => job.finished_at,
-                "error-message" => job.error_message,
-                "created-at" => job.created_at
-            }.merge(job.stats_attributes.dasherize || {}),
-            "relationships" => {
-                "integration" => {
-                    "data" => {type: "integrations", "id" => integration.id.to_s}
-                }
-            }
-        }
-    end
-
 
     def serialize_integration(integration)
         json = {
