@@ -175,7 +175,7 @@ class V1::IntegrationsController < V1::ApplicationController
             }.merge(job.stats || {}),
             "relationships" => {
                 "integration" => {
-                    "data" => {"type" => integration.model_type, "id" => integration.id.to_s}
+                    "data" => {"type" => "integrations", "id" => integration.id.to_s}
                 }
             }
         }
