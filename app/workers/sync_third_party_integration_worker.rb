@@ -17,7 +17,9 @@ class SyncThirdPartyIntegrationWorker
 
         if sync_job
             begin
+                Rails.logger.info("Starting sync job for #{sync_job.id}")
                 sync_job.start!
+                Rails.logger.info("Syncing #{sync_job.id}")
                 sync_job.sync!
             rescue Exception => e
                 # some error occured
