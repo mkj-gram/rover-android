@@ -8,7 +8,10 @@ module V1::BeaconConfigurationSerializer
                     "name" => beacon_configuration.title,
                     "tags" => beacon_configuration.tags,
                     "shared" => beacon_configuration.shared,
-                    "enabled" => beacon_configuration.enabled
+                    "enabled" => beacon_configuration.enabled,
+                    "google-integration-status" => beacon_configuration.google_integration_status,
+                    "indoor-level" => beacon_configuration.indoor_level,
+                    "google-integration-error-message" => beacon_configuration.google_sync_error_message
                 }.merge(extra_attributes).merge(beacon_configuration.configuration_attributes)
             }
         end

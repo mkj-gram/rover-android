@@ -64,13 +64,13 @@ Rails.application.routes.draw do
 
         resources "estimote-integrations", controller: "integrations", as: "estimote_integrations", only: [:index, :show, :create, :update, :destroy], integration_type: "estimote-integrations" do
             scope module: "integrations" do
-                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+                resources "estimote-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
             end
         end
 
         resources "kontakt-integrations", controller: "integrations", as: "kontakt_integrations", only: [:index, :show, :create, :update, :destroy], integration_type: "kontakt-integrations" do
             scope module: "integrations" do
-                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+                resources "kontakt-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
             end
         end
 
@@ -81,7 +81,10 @@ Rails.application.routes.draw do
         end
 
         scope module: "integrations" do
-            resources :"sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+            resources :"estimote-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+            resources :"kontakt-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+            resources :"beacon-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+            resources :"google-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
         end
 
 
@@ -109,6 +112,14 @@ Rails.application.routes.draw do
         resources "android-platforms", controller: "android_platforms", as: "android_platforms", except: [:index]
 
         resources :images, only: [:create]
+
+        get '/google-oauth-url', to: "google_oauth#show"
+
+        resources :"google-integrations", controller: "google_integrations", as: "google_integrations", only: [:show, :create, :update, :destroy] do
+            scope module: "integrations" do
+                resources "google-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            end
+        end
 
     end
     # The priority is based upon order of creation: first created -> highest priority.

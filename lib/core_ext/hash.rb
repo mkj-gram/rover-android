@@ -7,11 +7,11 @@ class Hash
     end
 
     def dasherize
-        self.deep_transform_keys { |key| key.dasherize }
+        self.deep_transform_keys { |key| key.to_s.dasherize }
     end
 
     def dasherize!
-        self.deep_transform_keys! { |key| key.dasherize }
+        self.deep_transform_keys! { |key| key.to_s.dasherize }
     end
 
 end

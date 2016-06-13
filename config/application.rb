@@ -17,6 +17,7 @@ module RailsApi
         config.password_reset = Rails.application.config_for(:password_reset)
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
         config.mongo = Rails.application.config_for(:mongo)
+        config.google_oauth = Rails.application.config_for(:google_oauth)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('lib')
         config.autoload_paths << Rails.root.join('app', 'models', 'message_templates')
@@ -27,6 +28,7 @@ module RailsApi
         # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'beacon_region_events')
         # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'geofence_region_events')
         # config.autoload_paths << Rails.root.join('app', 'models', 'events', 'app_events')
+        config.autoload_paths << Rails.root.join('app', 'models', 'third_party_integration_sync_jobs')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations')
         config.autoload_paths << Rails.root.join('app', 'models', 'third_party_integrations')
         config.autoload_paths << Rails.root.join('app', 'models', 'beacon_devices')

@@ -25,9 +25,8 @@ class V1::IntegrationsController < V1::ApplicationController
 
         if includes_sync
             included = integrations.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
-                serialize_sync_job(integration, integration.latest_sync_job)
+                V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
             end
-
 
             json["included"] = included
         end
@@ -46,7 +45,7 @@ class V1::IntegrationsController < V1::ApplicationController
             }
             if includes_sync
                 included = [
-                    serialize_sync_job(integration, integration.latest_sync_job)
+                    V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
                 ]
                 json["included"] = included
             end
@@ -69,7 +68,7 @@ class V1::IntegrationsController < V1::ApplicationController
                     "data" => serialize_integration(integration)
                 }
 
-                json["included"] = [serialize_sync_job(integration, integration.latest_sync_job)]
+                json["included"] = [V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)] if integration.latest_sync_job
 
                 render json: json, status: :created
             else
@@ -161,30 +160,7 @@ class V1::IntegrationsController < V1::ApplicationController
             current_account.third_party_integrations
         end
     end
-
-    def serialize_sync_job(integration, job)
-        {
-            "type" => "sync-jobs",
-            "id" => job.id.to_s,
-            "attributes" => {
-                "status" => job.status,
-                "started-at" => job.started_at,
-                "finished-at" => job.finished_at,
-                "error-message" => job.error_message,
-                "added-beacons-count" => job.added_devices_count,
-                "modified-beacons-count" => job.modified_devices_count,
-                "removed-beacons-count" => job.removed_devices_count,
-                "beacons-changed-configuration-count" => job.devices_changed_configuration_count,
-                "created-at" => job.created_at
-            },
-            "relationships" => {
-                "integration" => {
-                    "data" => {"type" => integration.model_type, "id" => integration.id.to_s}
-                }
-            }
-        }
-    end
-
+    
     def serialize_integration(integration)
         json = {
             "type" => integration.model_type,
@@ -202,7 +178,7 @@ class V1::IntegrationsController < V1::ApplicationController
                     "relationships" => {
                         "latest-sync" => {
                             "data" => {
-                                "type" => "sync-jobs",
+                                "type" => integration.latest_sync_job.model_type,
                                 "id" => integration.latest_sync_job.id.to_s
                             }
 

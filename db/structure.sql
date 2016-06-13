@@ -283,7 +283,13 @@ CREATE TABLE beacon_configurations (
     url text,
     beacon_devices_updated_at timestamp without time zone,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    registered_with_google boolean DEFAULT false,
+    has_pending_google_updates boolean DEFAULT false,
+    indoor_level character varying,
+    google_beacon_name character varying,
+    google_sync_error boolean DEFAULT false,
+    google_sync_error_message text
 );
 
 
@@ -775,12 +781,10 @@ CREATE TABLE third_party_integration_sync_jobs (
     started_at timestamp without time zone,
     finished_at timestamp without time zone,
     error_message text,
-    added_devices_count integer DEFAULT 0,
-    modified_devices_count integer DEFAULT 0,
-    removed_devices_count integer DEFAULT 0,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    devices_changed_configuration_count integer DEFAULT 0
+    type character varying,
+    stats jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -820,7 +824,8 @@ CREATE TABLE third_party_integrations (
     last_synced_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    third_party_integration_sync_jobs_count integer DEFAULT 0
+    third_party_integration_sync_jobs_count integer DEFAULT 0,
+    google_project_id character varying
 );
 
 
@@ -1393,6 +1398,20 @@ CREATE UNIQUE INDEX account_ibeacon_index ON beacon_configurations USING btree (
 
 
 --
+-- Name: beacon_configurations_pending_google_updates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX beacon_configurations_pending_google_updates ON beacon_configurations USING btree (account_id, has_pending_google_updates);
+
+
+--
+-- Name: beacon_configurations_registered_with_google; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX beacon_configurations_registered_with_google ON beacon_configurations USING btree (account_id, registered_with_google);
+
+
+--
 -- Name: beacon_configurations_type_created_at_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1495,6 +1514,13 @@ CREATE INDEX index_beacon_configurations_on_account_id_and_tags ON beacon_config
 --
 
 CREATE INDEX index_beacon_configurations_on_account_id_and_type ON beacon_configurations USING btree (account_id, type);
+
+
+--
+-- Name: index_beacon_configurations_on_google_beacon_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_beacon_configurations_on_google_beacon_name ON beacon_configurations USING btree (google_beacon_name);
 
 
 --
@@ -1708,6 +1734,13 @@ CREATE INDEX index_third_party_integrations_on_account_id_and_type ON third_part
 
 
 --
+-- Name: index_third_party_integrations_on_google_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_third_party_integrations_on_google_project_id ON third_party_integrations USING btree (google_project_id);
+
+
+--
 -- Name: index_user_acls_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1868,5 +1901,13 @@ INSERT INTO schema_migrations (version) VALUES ('20160524125136');
 
 INSERT INTO schema_migrations (version) VALUES ('20160603194911');
 
+INSERT INTO schema_migrations (version) VALUES ('20160607185656');
+
+INSERT INTO schema_migrations (version) VALUES ('20160608143038');
+
+INSERT INTO schema_migrations (version) VALUES ('20160608200150');
+
 INSERT INTO schema_migrations (version) VALUES ('20160609142610');
+
+INSERT INTO schema_migrations (version) VALUES ('20160610152917');
 

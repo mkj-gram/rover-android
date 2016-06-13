@@ -106,9 +106,12 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         if query_keyword.nil? && query_tags.empty?
             query = {
+                fields: ["_id", "devices_meta.type", "devices_meta.count"],
                 query: {
                     filtered: {
-                        query: {match_all: {}},
+                        query: {
+                            match_all: {}
+                        },
                         filter: {
                             bool: {
                                 should: should_filter,
@@ -127,6 +130,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
             }
         else
             query = {
+                fields: ["_id", "devices_meta.type", "devices_meta.count"],
                 query: {
                     filtered: {
                         query: {
@@ -147,22 +151,38 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
         configurations = Elasticsearch::Model.search(query, types)
         results = configurations.per_page(page_size).page(current_page).results
+        records = BeaconConfiguration.where(id: results.map(&:_id)).includes(:place)
+        device_meta_index = results.inject({}) do |hash, r|
+            if r.has_key?(:fields) && r.fields.has_key?("devices_meta.type")
+                hash.merge!(
+                    r._id.to_i => {
+                        "beacon-type": r.fields["devices_meta.type"].first,
+                        "beacon-count": r.fields.has_key?("devices_meta.count") ? r.fields["devices_meta.count"].first || 0 : 0
+                    }
+                )
+                hash
+            else
+                hash
+            end
+        end
         include_place = true #whitelist_include(["place"]).first == "place"
         json  = {
-            "data" => results.map do |config|
-                if config._type == IBeaconConfiguration.document_type
-                    elasticsearch_serialize_ibeacon(config, include_place)
-                elsif config._type == EddystoneNamespaceConfiguration.document_type
-                    elasticsearch_serialize_eddystone_namespace(config, include_place)
-                elsif config._type == UrlConfiguration.document_type
-                    elasticsearch_serialize_url(config, include_place)
+            "data" => records.map do |config|
+                device_meta = device_meta_index[config.id] || { "beacon-type": nil, "beacon-count" => nil }
+                json = V1::BeaconConfigurationSerializer.serialize(config, device_meta)
+                if config.place
+                    json["relationships"] = {
+                        "place" => {
+                            "data" => { type: "places", id: config.place.id.to_s }
+                        }
+                    }
                 end
+                json
             end,
             "meta" => {
                 "totalRecords" => results.total,
                 "totalPages" => results.total_pages
-            },
-            "links" => pagination_links(v1_beacon_configuration_index_url, results, {start_at: 0})
+            }
         }
 
         if query_place_id
@@ -174,7 +194,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         included = []
 
         if whitelist_include(["place"])
-            included += results.select{|config| !config._source.place.empty? }.map{|config| serialize_partial_place(config._source.place) }
+            included += records.map(&:place).compact.uniq.map{ |place| V1::PlaceSerializer.serialize(place) }
         end
 
         if included.any?
@@ -275,8 +295,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
 
     def beacon_configuration_params(local_params)
         convert_param_if_exists(local_params[:configurations], :name, :title)
-        # local_params[:configurations][:tags] ||= [] if local_params[:configurations].has_key?(:tags)
-        local_params.fetch(:configurations, {}).permit(:title, :enabled, :tags, {tags: []}, :place_id)
+        param_should_be_array(local_params[:configurations], :tags)
+        local_params.fetch(:configurations, {}).permit(:title, :enabled, :tags, {tags: []}, :place_id, :indoor_level)
     end
 
     def ibeacon_configuration_params(local_params)
@@ -315,7 +335,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     def render_beacon_configuration(beacon_configuration)
         if beacon_configuration
             json = {
-                "data" => serialize_beacon_configuration(beacon_configuration, {protocol: beacon_configuration.protocol})
+                "data" => V1::BeaconConfigurationSerializer.serialize(beacon_configuration)
             }
             should_include = ["place", "beacons"] #whitelist_include(["place", "beacons"])
 

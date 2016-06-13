@@ -3,6 +3,14 @@ class EstimoteIntegration < ThirdPartyIntegration
     validates :app_id, presence: true
     validates :app_token, presence: true
 
+    after_create :create_sync_job!
+    after_destroy :remove_all_devices
+
+    has_many :sync_jobs, class_name: "EstimoteSyncJob", foreign_key:  "third_party_integration_id" do
+        def latest
+            last
+        end
+    end
 
     def self.model_type
         @@model_type ||= "estimote-integration"
@@ -48,13 +56,13 @@ class EstimoteIntegration < ThirdPartyIntegration
         @client ||= EstimoteApi.new(app_id, app_token)
     end
 
-    def sync!
+    def sync!(calling_job = nil)
 
         stats = {
-            added_devices_count: 0,
-            modified_devices_count: 0,
-            removed_devices_count: 0,
-            devices_changed_configuration_count: 0
+            added_beacons_count: 0,
+            modified_beacons_count: 0,
+            removed_beacons_count: 0,
+            beacons_changed_configuration_count: 0
         }
 
         estimote_beacons = client.beacons
@@ -100,7 +108,7 @@ class EstimoteIntegration < ThirdPartyIntegration
         # with new devices we can just create their configs and if they exist oh well
         new_devices.each do |manufacturer_id, device|
             if device.save && new_config = device.create_configuration
-                stats[:added_devices_count] += 1
+                stats[:added_beacons_count] += 1
                 configurations_modified.add(new_config) if new_config != nil
             end
         end
@@ -116,9 +124,9 @@ class EstimoteIntegration < ThirdPartyIntegration
 
             if device.save && new_config = device.create_configuration
                 if (existing_configuration && new_config) && (existing_configuration.id != new_config.id)
-                    stats[:devices_changed_configuration_count] += 1
+                    stats[:beacons_changed_configuration_count] += 1
                 else
-                    stats[:modified_devices_count] += 1
+                    stats[:modified_beacons_count] += 1
                 end
                 configurations_modified.add(new_config) if new_config != nil
             end
@@ -127,7 +135,7 @@ class EstimoteIntegration < ThirdPartyIntegration
         deleted_devices.each do |manufacturer_id, device|
             device.skip_cache_update = true
             if device.destroy
-                stats[:removed_devices_count] += 1
+                stats[:removed_beacons_count] += 1
                 configurations_modified.add(device.configuration)
             end
         end

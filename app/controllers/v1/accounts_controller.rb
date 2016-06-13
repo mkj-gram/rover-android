@@ -44,6 +44,7 @@ class V1::AccountsController < V1::ApplicationController
             )
 
         end
+
         kontakt_integration = current_account.kontakt_integrations.first
         if kontakt_integration
             json["data"]["relationships"].merge!(
@@ -57,6 +58,20 @@ class V1::AccountsController < V1::ApplicationController
                 }
             )
         end
+        google_integration = current_account.google_integration
+        if google_integration
+            json["data"]["relationships"].merge!(
+                {
+                    "google-integration" => {
+                        "data" => {
+                            "type" => "google-integrations",
+                            "id" => google_integration.id.to_s
+                        }
+                    }
+                }
+            )
+        end
+
 
         ios_platform = current_account.ios_platform
         if ios_platform
@@ -86,12 +101,12 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
-        included = [estimote_integration, kontakt_integration].compact.map do |integration|
+        included = [estimote_integration, kontakt_integration, google_integration].compact.map do |integration|
             serialize_integration(integration)
         end
 
-        included += [estimote_integration, kontakt_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
-            serialize_sync_job(integration, integration.latest_sync_job)
+        included += [estimote_integration, kontakt_integration, google_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
+            V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
         end
 
         # included += [V1::AndroidPlatformSerializer.serialize(android_platform)] if android_platform
@@ -129,31 +144,6 @@ class V1::AccountsController < V1::ApplicationController
         local_params.require(:accounts).permit(:title, {:message_limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]})
     end
 
-
-    def serialize_sync_job(integration, job)
-        {
-            "type" => "sync-jobs",
-            "id" => job.id.to_s,
-            "attributes" => {
-                "status" => job.status,
-                "started-at" => job.started_at,
-                "finished-at" => job.finished_at,
-                "error-message" => job.error_message,
-                "added-beacons-count" => job.added_devices_count,
-                "modified-beacons-count" => job.modified_devices_count,
-                "removed-beacons-count" => job.removed_devices_count,
-                "beacons-changed-configuration-count" => job.devices_changed_configuration_count,
-                "created-at" => job.created_at
-            },
-            "relationships" => {
-                "integration" => {
-                    "data" => {type: integration.model_type, "id" => integration.id.to_s}
-                }
-            }
-        }
-    end
-
-
     def serialize_integration(integration)
         json = {
             "type" => integration.model_type,
@@ -170,7 +160,7 @@ class V1::AccountsController < V1::ApplicationController
                 {
                     "relationships" => {
                         "latest-sync" => {
-                            "type" => "sync-jobs",
+                            "type" => integration.latest_sync_job.model_type,
                             "id" => integration.latest_sync_job.id.to_s
                         }
                     }
