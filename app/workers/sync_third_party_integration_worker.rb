@@ -24,6 +24,7 @@ class SyncThirdPartyIntegrationWorker
                 # sync_job.error_message = "123123123"
                 Rails.logger.warn(e)
                 sync_job.error_message = e.message
+                Raven.capture_exception(e)
             ensure
                 sync_job.finish!
             end
