@@ -130,7 +130,7 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
                 query: {
                     filtered: {
                         query: {
-                            fields: ["_id"],
+                            fields: ["_id", "devices_meta.type", "devices_meta.count"],
                             bool: {
                                 should: should_query
                             }
@@ -149,10 +149,24 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         configurations = Elasticsearch::Model.search(query, types)
         results = configurations.per_page(page_size).page(current_page).results
         records = BeaconConfiguration.where(id: results.map(&:_id)).includes(:place)
+        device_meta_index = results.inject({}) do |hash, r|
+            if r.has_key?(:fields) && r.fields.has_key?("devices_meta.type")
+                hash.merge!(
+                    r._id.to_i => {
+                        "beacon-type": r.fields["devices_meta.type"].first,
+                        "beacon-count": r.fields.has_key?("devices_meta.count") ? r.fields["devices_meta.count"].first || 0 : 0
+                    }
+                )
+                hash
+            else
+                hash
+            end
+        end
         include_place = true #whitelist_include(["place"]).first == "place"
         json  = {
             "data" => records.map do |config|
-                json = V1::BeaconConfigurationSerializer.serialize(config)
+                device_meta = device_meta_index[config.id] || { "beacon-type": nil, "beacon-count" => nil }
+                json = V1::BeaconConfigurationSerializer.serialize(config, device_meta)
                 if config.place
                     json["relationships"] = {
                         "place" => {
