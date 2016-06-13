@@ -178,7 +178,7 @@ class GoogleIntegration < ThirdPartyIntegration
                     updates = true
                 end
 
-                if (beacon.indoor_level.nil? && !configuration.indoor_level.nil?) || ( beacon.indoor_level.name != configuration.indoor_level )
+                if (beacon.indoor_level.nil? && !configuration.indoor_level.nil?) || ( !beacon.indoor_level.nil? && beacon.indoor_level.name != configuration.indoor_level )
                     updates = true
                     beacon.indoor_level = { name: configuration.indoor_level }
                 end
