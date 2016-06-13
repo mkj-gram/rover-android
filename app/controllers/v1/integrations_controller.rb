@@ -69,7 +69,7 @@ class V1::IntegrationsController < V1::ApplicationController
                     "data" => serialize_integration(integration)
                 }
 
-                json["included"] = [serialize_sync_job(integration, integration.latest_sync_job)]
+                json["included"] = [serialize_sync_job(integration, integration.latest_sync_job)] if integration.latest_sync_job
 
                 render json: json, status: :created
             else
