@@ -8,7 +8,10 @@ class V1::CustomerInboxController < V1::ApplicationController
             messages = current_customer.inbox.messages.reverse!
 
             json = {
-                data: messages.map{|message| V1::MessageSerializer.serialize(message)}
+                data: messages.map{|message| V1::MessageSerializer.serialize(message)},
+                meta: {
+                    "badge-number" => messages.count { |message| message.read == false }
+                }
             }
 
             render json: json

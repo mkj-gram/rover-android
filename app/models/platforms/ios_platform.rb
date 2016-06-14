@@ -1,21 +1,13 @@
 class IosPlatform < ActiveRecord::Base
     include Platformable
 
-    # validate :valid_certificate
+    validate :valid_certificate
 
-    # before_save :set_app_identifier
-
+    before_save :set_app_identifier
+    before_save :set_certificate_expiry
     after_save :update_name_cache
 
-    # belongs_to :account
-
-    def account
-        @account ||= Account.find(self.account_id)
-    end
-
-    def set_credentials(certificate, passphrase)
-        self.credentials = {certificate: certificate, passphrase: passphrase}
-    end
+    belongs_to :account
 
     def certificate
         if self.credentials
@@ -25,6 +17,14 @@ class IosPlatform < ActiveRecord::Base
         end
     end
 
+    def certificate=(new_certificate)
+        if new_certificate.is_a?(ActionDispatch::Http::UploadedFile)
+            certificate_filename = new_certificate.original_filename
+            new_certificate = new_certificate.read
+        end
+        self.credentials = ( self.credentials || {}).merge(certificate: new_certificate)
+    end
+
     def passphrase
         if self.credentials
             self.credentials[:passphrase]
@@ -32,6 +32,11 @@ class IosPlatform < ActiveRecord::Base
             nil
         end
     end
+
+    def passphrase=(new_passphrase)
+        self.credentials = ( self.credentials || {}).merge(passphrase: new_passphrase)
+    end
+
 
     private
 
@@ -53,13 +58,19 @@ class IosPlatform < ActiveRecord::Base
     end
 
     def set_app_identifier
-        if apns_certificate
+        if credentials_changed? && apns_certificate
             self.bundle_id = apns_certificate.app_bundle_id
         end
     end
 
+    def set_certificate_expiry
+        if credentials_changed? && apns_certificate
+            self.certificate_expires_at = apns_certificate.expires_at
+        end
+    end
+
     def update_name_cache
-        if self.changes.include?(:title)
+        if title_changed?
             account.update_attribute(:ios_platform_name, title)
         end
     end

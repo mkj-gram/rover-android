@@ -4,7 +4,9 @@ module V1::IosPlatformSerializer
             {
                 id: ios_platform.id.to_s,
                 attributes: {
-
+                	:"name" => ios_platform.title,
+                	:"certificate-expires-at" => ios_platform.certificate_expires_at,
+                	:"certificate-filename" => ios_platform.certificate_filename,
                 }
             }
         end

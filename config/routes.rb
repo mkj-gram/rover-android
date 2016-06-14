@@ -108,7 +108,10 @@ Rails.application.routes.draw do
             post "/calculate", to: "customer_segment_calculate#create", as: "customer_segment_calculate"
         end
 
-        resources "ios-platforms", controller: "ios_platforms", as: "ios_platforms", except: [:index]
+        resources "ios-platforms", controller: "ios_platforms", as: "ios_platforms", only: [:show, :update] do
+            post "/certificate", to: 'ios_platform_certificate#update', as: 'ios_platform_certificate'
+        end
+
         resources "android-platforms", controller: "android_platforms", as: "android_platforms", except: [:index]
 
         resources :images, only: [:create]

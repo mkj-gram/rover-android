@@ -42,6 +42,10 @@ class ApnsCertificate
         @errors
     end
 
+    def expires_at
+        @certificate ? @certificate.not_after : nil
+    end
+
     def ssl_context
         @ssl_context ||= OpenSSL::SSL::SSLContext.new.tap do |context|
             context.key = @key
