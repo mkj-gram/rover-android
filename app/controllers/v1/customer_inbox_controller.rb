@@ -4,13 +4,15 @@ class V1::CustomerInboxController < V1::ApplicationController
 
     def show
 
-        messages = current_customer.inbox.messages.reverse!
+        if stale?(last_modified: current_customer.inbox.updated_at )
+            messages = current_customer.inbox.messages.reverse!
 
-        json = {
-            data: messages.map{|message| V1::MessageSerializer.serialize(message)}
-        }
+            json = {
+                data: messages.map{|message| V1::MessageSerializer.serialize(message)}
+            }
 
-        render json: json
+            render json: json
+        end
 
     end
 

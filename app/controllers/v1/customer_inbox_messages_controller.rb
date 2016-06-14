@@ -6,6 +6,7 @@ class V1::CustomerInboxMessagesController < V1::ApplicationController
     before_action :set_message
 
     def show
+
         json = {
             data: V1::MessageSerializer.serialize(@message)
         }
@@ -16,6 +17,7 @@ class V1::CustomerInboxMessagesController < V1::ApplicationController
     def update
         json = flatten_request({single_record: true})
         if @message.update_attributes(message_params(json[:data]))
+            current_customer.update_attributes(inbox_updated_at: Time.zone.now)
             json = {
                 data: V1::MessageSerializer.serialize(@message)
             }
@@ -27,6 +29,7 @@ class V1::CustomerInboxMessagesController < V1::ApplicationController
 
     def destroy
         if @message.destroy
+            current_customer.update_attributes(inbox_updated_at: Time.zone.now)
             head :no_content
         else
             render json: {errors: V1::MessageErrorSerializer.serialize(@message.errors)}, status: :internal_server_error
