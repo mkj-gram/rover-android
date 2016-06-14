@@ -3,6 +3,7 @@ module V1::IosPlatformSerializer
         def serialize(ios_platform)
             {
                 id: ios_platform.id.to_s,
+                type: "ios-platforms",
                 attributes: {
                 	:"name" => ios_platform.title,
                     :"bundle-id" => ios_platform.bundle_id,

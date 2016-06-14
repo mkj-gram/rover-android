@@ -109,8 +109,8 @@ class V1::AccountsController < V1::ApplicationController
             V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
         end
 
-        included += [V1::AndroidPlatformSerializer.serialize(android_platform)] if android_platform
-        included += [V1::IosPlatformSerializer.serialize(ios_platform)] if ios_platform
+        # included += [V1::AndroidPlatformSerializer.serialize(android_platform)] if android_platform
+        # included += [V1::IosPlatformSerializer.serialize(ios_platform)] if ios_platform
 
         json["included"] = included
 

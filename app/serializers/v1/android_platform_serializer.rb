@@ -3,6 +3,7 @@ module V1::AndroidPlatformSerializer
         def serialize(android_platform)
             {
                 id: android_platform.id.to_s,
+                type: "android-platforms",
                 attributes: {
                     :"api-key" => android_platform.api_key,
                     :"package-name" => android_platform.package_name
