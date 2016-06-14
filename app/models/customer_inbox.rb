@@ -37,7 +37,7 @@ class CustomerInbox
             Message.delete_all(expired_message_ids)
         end
 
-        inserts.each { |inbox| inbox.customer.update_attribute(inbox_updated_at: Time.zone.now ) }
+        inserts.keys.each { |inbox| inbox.customer.update_attribute(inbox_updated_at: Time.zone.now ) }
 
         return inserts.keys.size
     end
