@@ -64,7 +64,7 @@ class GoogleIntegration < ThirdPartyIntegration
         client.authorization = access_token
 
 
-        response = client.list_namespaces
+        response = client.list_namespaces(project_id: self.project_id)
         unformatted_namespace_name = response.namespaces.first.namespace_name
         namespace_name = unformatted_namespace_name[11..unformatted_namespace_name.length]
 
