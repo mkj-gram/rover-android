@@ -6,7 +6,6 @@ class AndroidPlatform < ActiveRecord::Base
 
     belongs_to :account
     
-    alias_attribute :package_name
     alias_attribute :api_key, :credentials
 
     before_save :update_name_cache
