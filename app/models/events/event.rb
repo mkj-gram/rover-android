@@ -153,7 +153,7 @@ module Events
             # TODO:
             # Remove this once google testing is done
             # move to state api
-            if device.ios_name == "iOS" && device.remote_notifications_enabled
+            if device.os_name == "iOS" && device.remote_notifications_enabled
                 message_ids = inbox_messages_to_deliver.map(&:id) + local_messages_to_deliver.map(&:id)
                 SendMessageNotificationWorker.perform_async(customer.id, message_ids, [ device.id ])
             end
