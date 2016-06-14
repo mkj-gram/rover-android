@@ -385,7 +385,7 @@ class GoogleIntegration < ThirdPartyIntegration
             configurations.each do |configuration|
                 beacon_name = configuration.google_beacon_name
                 attachment = Google::Apis::ProximitybeaconV1beta1::BeaconAttachment.new(namespaced_type: "#{namespace_name}/rover-configuration-id", data: configuration.id.to_s)
-                service.create_beacon_attachment(beacon_name, attachment) do |res, err|
+                service.create_beacon_attachment(beacon_name, attachment, project_id: self.project_id) do |res, err|
                     if res
                         synced_configurations.push(configuration)
                     elsif err
