@@ -2,7 +2,7 @@ class SendMessageNotificationWorker
     include BackgroundWorker::Worker
 
     from_queue 'send_message_notifications',
-        :prefetch => 1,
+        :prefetch => 15,
         :ack => true
 
 
