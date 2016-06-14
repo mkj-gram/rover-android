@@ -28,7 +28,6 @@ module ApnsHelper
         private
 
         def payload_from_message(inbox_message)
-            # V1::MessageSerializer.serialize(inbox_message)
             { "message-id" => inbox_message.id.to_s }
         end
 
