@@ -28,7 +28,7 @@ class SendMessageNotificationWorker
         ios_platform = IosPlatform.find(customer.account_id)
 
         if ios_platform
-            ios_devices = customer.devices.select { |device| device.os_name = "iOS" && device.remote_notifications_enabled }
+            ios_devices = customer.devices.select { |device| device.os_name == "iOS" && device.remote_notifications_enabled }
             ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
 
             message_ids_by_token = ios_devices.inject({}) { |hash, device| hash.merge!(device.token => messages); hash }
