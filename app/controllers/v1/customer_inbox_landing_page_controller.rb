@@ -1,5 +1,4 @@
-class V1::CustomerInboxMessagesController < V1::ApplicationController
-    
+class V1::CustomerInboxLandingPageController < V1::ApplicationController
     before_action :authenticate
     before_action :set_message
 
