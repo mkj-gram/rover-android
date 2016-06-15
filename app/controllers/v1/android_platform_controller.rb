@@ -1,8 +1,8 @@
 class V1::AndroidPlatformController < V1::ApplicationController
     before_action :authenticate
-    before_action :validate_json_schema, only: [:create]
-    before_action :check_access, only: [:index, :show, :create, :destroy]
-    before_action :set_android_platform, only: [:show, :destroy]
+    before_action :validate_json_schema, only: [:create, :update]
+    before_action :check_access, only: [:index, :show, :create, :update, :destroy]
+    before_action :set_android_platform, only: [:show, :update, :destroy]
 
     def show
         json = {
@@ -24,6 +24,19 @@ class V1::AndroidPlatformController < V1::ApplicationController
             render json: {errors: V1::AndroidPlatformErrorSerializer.serialize(android_platform.errors)}, status: :unprocessable_entity
         end
     end
+
+    def update
+        json = flatten_request({single_record: true})
+        if @android_platform.update_attributes(android_platform_params(json[:data]))
+            json = {
+                data: serialize_android_platform(@android_platform)
+            }
+            render json: json
+        else
+            render json: {errors: V1::AndroidPlatformErrorSerializer.serialize(@android_platform.errors)}, status: :unprocessable_entity
+        end
+    end
+
 
     def destroy
         if @android_platform.destroy
