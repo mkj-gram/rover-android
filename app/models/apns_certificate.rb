@@ -78,6 +78,7 @@ class ApnsCertificate
     UNIVERSAL_CERTIFICATE_EXTENSION = "1.2.840.113635.100.6.3.6".freeze
 
     def extension(oid)
+        return nil if @certificate.nil?
         @certificate.extensions.find { |ext| ext.oid == oid }
     end
 end
