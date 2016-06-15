@@ -145,7 +145,6 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     def scheduled_message_params(local_params)
         convert_param_if_exists(local_params[:scheduled_messages], :name, :title)
         convert_param_if_exists(local_params[:scheduled_messages], :segment_id, :customer_segment_id)
-        param_should_be_array(local_params[:scheduled_messages], :limits)
 
         local_params.fetch(:scheduled_messages, {}).permit(
             :title,
@@ -160,7 +159,6 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             :scheduled_at,
             :scheduled_local_time,
             :scheduled_at_time_zone,
-            {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
         ).merge({:landing_page => local_params.dig(:scheduled_messages, :landing_page), :properties => local_params.dig(:scheduled_messages, :properties)})
     end
 
@@ -228,7 +226,6 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 published: message.published,
                 archived: message.archived,
                 sent: message.sent,
-                :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
                 :"save-to-inbox" => message.save_to_inbox,
                 :"content-type" => message.content_type,
                 :"website-url" => message.website_url,
@@ -245,13 +242,6 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 :"scheduled-local-time" => message.scheduled_local_time,
                 :"scheduled-at-time-zone" => message.scheduled_at_time_zone
             }.merge(extra_attributes)
-        }
-    end
-
-    def serialize_limit(limit)
-        {
-            :"message-limit" => limit.message_limit,
-            :"number-of-minutes" => limit.number_of_minutes
         }
     end
 
