@@ -56,8 +56,12 @@ class IosPlatform < ActiveRecord::Base
     end
 
     def set_app_identifier
-        if credentials_changed? && apns_certificate
-            self.bundle_id = apns_certificate.app_bundle_id
+        if credentials_changed?
+            if apns_certificate
+                self.bundle_id = apns_certificate.app_bundle_id
+            else
+                self.bundle_id = nil
+            end
         end
     end
 
