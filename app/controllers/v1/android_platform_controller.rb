@@ -46,7 +46,7 @@ class V1::AndroidPlatformController < V1::ApplicationController
     end
 
     def serialize_android_platform(android_platform)
-        AndroidPlatformSerializer.serialize(android_platform)
+        V1::AndroidPlatformSerializer.serialize(android_platform)
     end
 
     def android_platform_params(local_params)
