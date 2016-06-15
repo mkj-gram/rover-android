@@ -42,7 +42,7 @@ class V1::AndroidPlatformController < V1::ApplicationController
     def set_android_platform
         @android_platform = current_account.android_platform
         head :not_found if @android_platform.nil?
-        head :not_found if @android_platform.id.to_s == params[:id].to_s
+        head :not_found if @android_platform.id.to_s != params[:id].to_s
     end
 
     def serialize_android_platform(android_platform)
