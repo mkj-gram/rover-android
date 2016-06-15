@@ -7,9 +7,9 @@ class ScheduledMessageTemplate < MessageTemplate
     # validate :can_modify_message
 
     before_save :update_scheduled_token
-
-    after_save :publish_message_to_queue
-    after_save :update_account_counters
+    before_save :update_account_counters
+    before_save :publish_message_to_queue
+    
 
 
     mapping do

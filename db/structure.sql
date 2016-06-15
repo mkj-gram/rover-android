@@ -604,7 +604,8 @@ CREATE TABLE message_templates (
     landing_page_template jsonb,
     properties jsonb,
     deeplink_url character varying,
-    scheduled_at_time_zone character varying
+    scheduled_at_time_zone character varying,
+    sent boolean DEFAULT false
 );
 
 
@@ -1923,4 +1924,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160614163426');
 INSERT INTO schema_migrations (version) VALUES ('20160615145618');
 
 INSERT INTO schema_migrations (version) VALUES ('20160615154052');
+
+INSERT INTO schema_migrations (version) VALUES ('20160615173908');
 
