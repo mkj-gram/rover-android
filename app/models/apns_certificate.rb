@@ -9,7 +9,7 @@ class ApnsCertificate
             @key = p12.key
             @certificate = p12.certificate
         rescue Exception => e
-            Rails.logger.warn(e)
+            Rails.logger.warn(e.message)
         end
     end
 
