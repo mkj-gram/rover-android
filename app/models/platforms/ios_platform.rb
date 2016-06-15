@@ -62,8 +62,13 @@ class IosPlatform < ActiveRecord::Base
     end
 
     def set_certificate_expiry
-        if credentials_changed? && apns_certificate
-            self.certificate_expires_at = apns_certificate.expires_at
+        if credentials_changed?
+            if apns_certificate
+                self.certificate_expires_at = apns_certificate.expires_at
+            else
+                self.certificate_expires_at = nil
+                self.certificate_filename = nil
+            end
         end
     end
 
