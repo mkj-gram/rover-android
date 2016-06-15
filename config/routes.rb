@@ -119,7 +119,7 @@ Rails.application.routes.draw do
             delete "/certificate", to: 'ios_platform_certificate#destroy', as: 'ios_platform_certificate_destroy'
         end
 
-        resources "android-platforms", controller: "android_platforms", as: "android_platforms", except: [:index]
+        resources "android-platforms", controller: "android_platform", as: "android_platforms", except: [:index]
 
         resources :images, only: [:create]
 
