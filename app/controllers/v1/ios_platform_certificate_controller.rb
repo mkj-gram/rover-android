@@ -1,6 +1,6 @@
 class V1::IosPlatformCertificateController < V1::ApplicationController
     before_action :authenticate
-    before_action :set_ios_platform, only: [:update]
+    before_action :set_ios_platform, only: [:update, :destroy]
 
 
     def update
