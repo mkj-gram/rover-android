@@ -4,13 +4,17 @@ class V1::IosPlatformCertificateController < V1::ApplicationController
 
 
     def update
-        if @ios_platform.update_attributes(ios_platform_certificate_params(params))
-            json = {
-                data: V1::IosPlatformSerializer.serialize(@ios_platform)
-            }
-            render json: json
+        if params.has_key?(:certificate) && params[:certificate].is_a?(ActionDispatch::Http::UploadedFile) && params[:certificate].content_type != "application/x-pem-file"
+            render json: { errors: [ { title: "Invalid format", detail: "the certificate must be a pem encoded certificate" }]}, status: :unprocessable_entity
         else
-            render json: { errors: V1::IosPlatformErrorSerializer.serialize(@ios_platform.errors)}, status: :unprocessable_entity
+            if @ios_platform.update_attributes(ios_platform_certificate_params(params))
+                json = {
+                    data: V1::IosPlatformSerializer.serialize(@ios_platform)
+                }
+                render json: json
+            else
+                render json: { errors: V1::IosPlatformErrorSerializer.serialize(@ios_platform.errors)}, status: :unprocessable_entity
+            end
         end
     end
 
