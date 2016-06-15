@@ -50,7 +50,7 @@ class MessageTemplate < ActiveRecord::Base
     )
 
     after_initialize :set_proper_time_schedule_range
-    after_initialize :set_defaults, unless: :persisted?
+   
 
     validates :title, presence: true
     validate :valid_date_schedule
@@ -347,12 +347,6 @@ class MessageTemplate < ActiveRecord::Base
             errors.add(:properties, "invalid data type")
             return false
         end
-    end
-
-
-    def set_defaults
-        self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]
-        self.time_schedule = Range.new(0,1440)
     end
 
     def set_proper_time_schedule_range

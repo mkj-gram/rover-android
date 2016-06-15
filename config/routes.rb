@@ -103,8 +103,12 @@ Rails.application.routes.draw do
         patch "/inbox/:id", to: 'customer_inbox_messages#update'
         delete "/inbox/:id", to: 'customer_inbox_messages#destroy'
 
+        get "/inbox/messages/:id", to: 'customer_inbox_messages#show'
+        patch "/inbox/messages/:id", to: 'customer_inbox_messages#update'
+        delete "/inbox/messages/:id", to: 'customer_inbox_messages#destroy'
+
         get "/inbox/:id/landing-page", to: 'customer_inbox_landing_page#show'
-        
+
         resources :"segments", controller: "customer_segments", as: "customer_segments"
         scope :segments do
             post "/calculate", to: "customer_segment_calculate#create", as: "customer_segment_calculate"
