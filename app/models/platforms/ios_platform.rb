@@ -19,7 +19,7 @@ class IosPlatform < ActiveRecord::Base
 
     def certificate=(new_certificate)
         if new_certificate.is_a?(ActionDispatch::Http::UploadedFile)
-            certificate_filename = new_certificate.original_filename
+            self.certificate_filename = new_certificate.original_filename
             new_certificate = new_certificate.read
         end
         self.credentials = ( self.credentials || {}).merge(certificate: new_certificate)
