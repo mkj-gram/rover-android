@@ -141,7 +141,11 @@ CREATE TABLE accounts (
     proximity_message_templates_published_count integer DEFAULT 0,
     proximity_message_templates_archived_count integer DEFAULT 0,
     ios_platform_name character varying,
-    android_platform_name character varying
+    android_platform_name character varying,
+    scheduled_message_templates_draft_count integer DEFAULT 0,
+    scheduled_message_templates_published_count integer DEFAULT 0,
+    scheduled_message_templates_sent_count integer DEFAULT 0,
+    scheduled_message_templates_archived_count integer DEFAULT 0
 );
 
 
@@ -599,7 +603,8 @@ CREATE TABLE message_templates (
     time_to_live integer,
     landing_page_template jsonb,
     properties jsonb,
-    deeplink_url character varying
+    deeplink_url character varying,
+    scheduled_at_time_zone character varying
 );
 
 
@@ -1914,4 +1919,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160609142610');
 INSERT INTO schema_migrations (version) VALUES ('20160610152917');
 
 INSERT INTO schema_migrations (version) VALUES ('20160614163426');
+
+INSERT INTO schema_migrations (version) VALUES ('20160615145618');
+
+INSERT INTO schema_migrations (version) VALUES ('20160615154052');
 

@@ -52,6 +52,9 @@ class ScheduledMessageJob
             Sneakers.logger.info("PUBLISH TOKEN missmatch message_template: #{message_template.scheduled_token} job: #{args['scheduled_token']}".red.bold)
             ack!
         else
+            
+            message_template.update_attribute(sent: true)
+
             if args.include?("time_zone_offset")
                 if message_template.customer_segment
                     base_query = message_template.customer_segment.to_elasticsearch_query
