@@ -1,7 +1,7 @@
 class IosPlatform < ActiveRecord::Base
     include Platformable
 
-    validate :valid_certificate
+    validate :valid_certificate, if: -> { !certificate.nil? }
 
     before_save :set_app_identifier
     before_save :set_certificate_expiry
