@@ -28,7 +28,10 @@ module ApnsHelper
         private
 
         def payload_from_message(inbox_message)
-            { "message-id" => inbox_message.id.to_s }
+            json = V1::MessageSerializer.serialize(inbox_message)
+            json.delete(:"landing-page")
+            json
+            # { "message-id" => inbox_message.id.to_s }
         end
 
     end
