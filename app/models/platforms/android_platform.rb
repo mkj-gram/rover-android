@@ -8,7 +8,7 @@ class AndroidPlatform < ActiveRecord::Base
     
     alias_attribute :api_key, :credentials
 
-    before_save :update_name_cache
+    # before_save :update_name_cache
 
 
     

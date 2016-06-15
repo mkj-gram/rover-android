@@ -5,7 +5,7 @@ class IosPlatform < ActiveRecord::Base
 
     before_save :set_app_identifier
     before_save :set_certificate_expiry
-    after_save :update_name_cache
+    # after_save :update_name_cache
 
     belongs_to :account
 
