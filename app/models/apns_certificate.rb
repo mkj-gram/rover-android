@@ -2,44 +2,19 @@ class ApnsCertificate
 
     attr_reader :certificate, :key
 
-    def initialize(certificate, passphrase = nil)
+    def initialize(p12_certificate, passphrase = nil)
         @errors = []
         begin
-            @key = OpenSSL::PKey::RSA.new(certificate, passphrase)
-            @certificate = OpenSSL::X509::Certificate.new(certificate)
-            @valid = true
-            @valid_passphrase = true
-            @valid_certificate = true
-        rescue OpenSSL::PKey::RSAError => e
-            @valid = false
-            if e.message == INVALID_CERT
-                @valid_certificate = false
-                @valid_passphrase = false
-            elsif e.message == INVALID_PASSPHRASE
-                @valid_certificate = true
-                @valid_passphrase = false
-            end
-            @errors.push(e.message)
+            p12 = OpenSSL::PKCS12.new(p12_certificate, passphrase)
+            @key = p12.key
+            @certificate = p12.certificate
         rescue Exception => e
-            @valid = false
-            @errors.push(e.message)
+            Rails.logger.warn(e)
         end
     end
 
     def valid?
-        !!@valid
-    end
-
-    def valid_passphrase?
-        !!@valid_passphrase
-    end
-
-    def valid_certificate?
-        !!@valid_certificate
-    end
-
-    def errors
-        @errors
+        @key && @certificate
     end
 
     def expires_at

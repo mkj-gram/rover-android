@@ -4,8 +4,8 @@ class V1::IosPlatformCertificateController < V1::ApplicationController
 
 
     def update
-        if params.has_key?(:certificate) && params[:certificate].is_a?(ActionDispatch::Http::UploadedFile) && params[:certificate].content_type != "application/x-pem-file"
-            render json: { errors: [ { title: "Invalid format", detail: "the certificate must be a pem encoded certificate" }]}, status: :unprocessable_entity
+        if params.has_key?(:certificate) && params[:certificate].is_a?(ActionDispatch::Http::UploadedFile) && params[:certificate].content_type != "application/x-pkcs12"
+            render json: { errors: [ { title: "Invalid format", detail: "the certificate must be a p12 encoded certificate" }]}, status: :unprocessable_entity
         else
             if @ios_platform.update_attributes(ios_platform_certificate_params(params))
                 json = {

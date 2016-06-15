@@ -47,15 +47,7 @@ class IosPlatform < ActiveRecord::Base
 
     def valid_certificate
         if !apns_certificate.valid?
-            errors.add(:certificate, apns_certificate.errors.join(","))
-        end
-
-        if !apns_certificate.valid_certificate?
-            errors.add(:certificate, "invalid")
-        end
-
-        if !apns_certificate.valid_passphrase?
-            errors.add(:passphrase, "incorrect")
+            errors.add(:certificate, "invalid file or passphrase")
         end
 
         if !apns_certificate.universal?

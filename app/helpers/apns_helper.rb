@@ -4,7 +4,7 @@ module ApnsHelper
 
         def send(apns_app, messages_by_token, devices)
             return [] if devices.nil? || devices.empty?
-            certificate = ApnsKit::Certificate.new(apns_app.certificate, apns_app.passphrase)
+            certificate = ApnsKit::Certificate.from_p12_file(apns_app.certificate, apns_app.passphrase)
             client = ApnsKit::Client.production(certificate, pool_size: 1, heartbeat_interval: 0)
 
             notifications = []
