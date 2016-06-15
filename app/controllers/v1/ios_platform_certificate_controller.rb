@@ -18,6 +18,16 @@ class V1::IosPlatformCertificateController < V1::ApplicationController
         end
     end
 
+    def destroy
+        @ios_platform.credentials = {}
+        if @ios_platform.save
+            head :no_content
+        else
+           render json: { errors: V1::IosPlatformErrorSerializer.serialize(@ios_platform.errors)}, status: :unprocessable_entity
+       end
+    end
+
+
 
     private
 

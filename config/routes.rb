@@ -112,6 +112,7 @@ Rails.application.routes.draw do
 
         resources "ios-platforms", controller: "ios_platforms", as: "ios_platforms", only: [:show, :update] do
             post "/certificate", to: 'ios_platform_certificate#update', as: 'ios_platform_certificate'
+            delete "/certificate", to: 'ios_platform_certificate#destroy', as: 'ios_platform_certificate_destroy'
         end
 
         resources "android-platforms", controller: "android_platforms", as: "android_platforms", except: [:index]
