@@ -1,11 +1,9 @@
 class V1::IosPlatformController < V1::ApplicationController
     before_action :authenticate
-    before_action :validate_json_schema, only: [:create]
-    before_action :check_access, only: [:index, :show, :create, :destroy]
-    before_action :set_ios_platform, only: [:show, :destroy]
-    def index
+    before_action :validate_json_schema, only: [:update]
+    before_action :check_access, only: [:show, :update]
+    before_action :set_ios_platform, only: [:show, :update]
 
-    end
 
     def show
         json = {
@@ -15,12 +13,15 @@ class V1::IosPlatformController < V1::ApplicationController
         render json: json
     end
 
-    def create
-
-    end
-
-    def destroy
-
+    def update
+        if @ios_platform.update(ios_platform_params(json[:data]))
+            json = {
+                data: serialize_ios_platform(@ios_platform)
+            }
+            render json: json
+        else
+            render json: { errors: V1::IosPlatformErrorSerializer.serialize(@ios_platform.errors)}, status: :unprocessable_entity
+        end
     end
 
     def resource
@@ -32,7 +33,7 @@ class V1::IosPlatformController < V1::ApplicationController
     def set_ios_platform
         @ios_platform = current_account.ios_platform
         head :not_found if @ios_platform.nil?
-        head :not_found if @ios_platform.id.to_s == params[:id].to_s
+        head :not_found if @ios_platform.id.to_s != params[:id].to_s
     end
 
     def serialize_ios_platform(ios_platform)
@@ -40,7 +41,7 @@ class V1::IosPlatformController < V1::ApplicationController
     end
 
     def ios_platform_params(local_params)
-        local_params.fetch(:ios_platforms, {}).permit(:certificate, :passphrase)
+        local_params.fetch(:ios_platforms, {}).permit(:name)
     end
 
 end

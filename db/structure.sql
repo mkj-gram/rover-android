@@ -527,7 +527,9 @@ CREATE TABLE ios_platforms (
     encrypted_credentials_salt text,
     encrypted_credentials_iv text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    certificate_expires_at timestamp without time zone,
+    certificate_filename character varying
 );
 
 
@@ -1910,4 +1912,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160608200150');
 INSERT INTO schema_migrations (version) VALUES ('20160609142610');
 
 INSERT INTO schema_migrations (version) VALUES ('20160610152917');
+
+INSERT INTO schema_migrations (version) VALUES ('20160614163426');
 
