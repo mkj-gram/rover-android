@@ -14,6 +14,7 @@ class CustomerInbox
 
         expired_message_futures = []
 
+        Rails.logger.info("Inserting messages into #{inserts.keys.size} inboxes ")
         # if we can't insert the item into redis just move on
         MetricsClient.aggregate("inbox.inserts" => inserts.keys.size)
         expired_message_ids = []

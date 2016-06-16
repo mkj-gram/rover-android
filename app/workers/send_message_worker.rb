@@ -115,7 +115,8 @@ class SendMessageWorker
        
 
         begin
-            bulk_write.execute
+            r = bulk_write.execute
+            Sneakers.logger.info("Successfully added #{r.inserted_ids.size} messages")
         rescue Mongo::Error::BulkWriteError => result
             # result[Mongo::Error::WRITE_ERRORS].first['index']
             # only raised when dupicates exist
