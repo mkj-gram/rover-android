@@ -4,7 +4,7 @@ class V1::CustomerInboxController < V1::ApplicationController
 
     def show
 
-        # if stale?(last_modified: current_customer.inbox_updated_at )
+        if stale?(last_modified: current_customer.inbox_updated_at )
             messages = current_customer.inbox.messages.reverse!
 
             json = {
@@ -15,7 +15,7 @@ class V1::CustomerInboxController < V1::ApplicationController
             }
 
             render json: json
-        # end
+        end
 
     end
 

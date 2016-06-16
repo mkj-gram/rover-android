@@ -112,7 +112,7 @@ class SendMessageWorker
             bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.to_doc}}, ordered: false )
         end
 
-        Sneakers.logger.info("Saving #{messages_by_inbox.values.size} messages to inboxes")
+       
 
         begin
             bulk_write.execute
@@ -123,6 +123,7 @@ class SendMessageWorker
         end
 
         if message_template.save_to_inbox
+            Sneakers.logger.info("Saving #{messages_by_inbox.values.size} messages to inboxes")
             CustomerInbox.bulk_insert(messages_by_inbox)
         end
 
