@@ -25,6 +25,7 @@ module ApnsHelper
                     notifications.push(ApnsKit::Notification.new(token: token, sound: message.ios_sound_file, alert: { title: message.ios_title, body: message.notification_text }, data: payload ))
                 end
             end
+            return notifications
         end
 
         def connection_from_ios_platform(ios_platform, opts = {})
