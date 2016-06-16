@@ -64,7 +64,7 @@ class ScheduledMessageTemplate < MessageTemplate
 
     def set_sent_status
         if changes.include?("published") && published == true
-            sent = true
+            self.sent = true
         end
     end
 
