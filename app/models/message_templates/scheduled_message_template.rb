@@ -7,8 +7,8 @@ class ScheduledMessageTemplate < MessageTemplate
     # validate :can_modify_message
 
     before_save :update_scheduled_token
-    before_save :update_account_counters
     before_save :set_sent_status
+    before_save :update_account_counters
     after_save :publish_message_to_queue
 
     after_commit on: [:create, :update] do
@@ -138,7 +138,7 @@ class ScheduledMessageTemplate < MessageTemplate
             :draft
         elsif published_was == false && sent_was == false && archived_was == true
             :archived
-        elsif published_was == false && archived_was == false && sent_was == true
+        elsif published_was == true && archived_was == false && sent_was == true
             :sent
         else
             :published
@@ -150,7 +150,7 @@ class ScheduledMessageTemplate < MessageTemplate
             :draft
         elsif published == false && sent == false && archived == true
             :archived
-        elsif published == false && archived == false && sent == true
+        elsif published == true && archived == false && sent == true
             :sent
         else
             :published
