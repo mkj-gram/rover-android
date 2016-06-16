@@ -9,31 +9,30 @@ class ScheduledMessageTemplate < MessageTemplate
     before_save :update_scheduled_token
     before_save :update_account_counters
     before_save :publish_message_to_queue
-    
+
 
 
     mapping do
         indexes :sent, type: 'boolean', index: 'not_analyzed'
     end
 
-    # def scheduled_at=(time)
-    #     # this needs to be stored in utc
-    #     parsed_time = if time.nil?
-    #         Time.zone.now
-    #     elsif time.is_a?(Integer)
-    #         Time.zone.at(time)
-    #     elsif time.is_a?(Float)
-    #         Time.zone.at(time)
-    #     elsif time.is_a?(Time)
-    #         time.utc
-    #     elsif time.is_a?(DateTime)
-    #         time.utc
-    #     else
-    #         Time.zone.parse(time)
-    #     end
-    #     self.scheduled_token = SecureRandom.hex if parsed_time != scheduled_at
-    #     super parsed_time
-    # end
+    def scheduled_at=(time)
+        # this needs to be stored in utc
+        parsed_time = if time.nil?
+            Time.zone.now
+        elsif time.is_a?(Integer)
+            Time.zone.at(time)
+        elsif time.is_a?(Float)
+            Time.zone.at(time)
+        elsif time.is_a?(Time)
+            time.utc
+        elsif time.is_a?(DateTime)
+            time.utc
+        else
+            Time.zone.parse(time)
+        end
+        super parsed_time
+    end
 
     def metric_type
         "message_template.scheduled"
@@ -55,9 +54,9 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     def as_indexed_json(opts = {})
-       json = super opts
-       json = (json || {}).merge(sent: sent)
-       json
+        json = super opts
+        json = (json || {}).merge(sent: sent)
+        json
     end
 
     private
@@ -75,7 +74,7 @@ class ScheduledMessageTemplate < MessageTemplate
     def publish_message_to_queue
         if changes.any? && published
             Rails.logger.info("Scheduling Message #{self.id} #{self.title}")
-            ScheduledMessageJob.perform_async(self)
+            ScheduledMessageJobMasterWorker.perform_async(self)
         end
     end
 
@@ -99,7 +98,7 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     # def can_modify_message
-    #     if sent_was == true && sent == true && 
+    #     if sent_was == true && sent == true &&
     #         changes.each do |k,v|
     #             errors.add(k, "unable to modify, message has already been sent")
     #         end

@@ -1,16 +1,38 @@
 module GcmHelper
 
     class << self
+        
         INVALID_REGISTRATION = "InvalidRegistration".freeze
         NOT_REGISTERED = "NotRegistered".freeze
 
-        def send(gcm_app, inbox_messages_by_token, devices)
+        def send(android_platform, messages_by_token)
+            return if messages_by_token.empty?
 
             client = GCM.new(gcm_app.api_key)
             expired_tokens = []
 
-            devices.each do |device|
-                response = client.send([device.token], { data: payload_from_inbox_message(inbox_messages_by_token[device.token]) })
+            notifications = messages_to_notifications(messages_by_token)
+
+            expired_tokens = send_with_connection(client, notifications)
+
+            return expired_tokens
+        end
+
+        def messages_to_notifications(messages_by_token)
+            notifications = []
+            messages_by_token.each do |token, messages|
+                messages.each do |message|
+                    payload = payload_from_message(message)
+                    { token: token, data: payload }
+                end
+            end
+            return notifications
+        end
+
+        def send_with_connection(connection, notifications)
+            expired_tokens = []
+            notifications.each do |notification|
+                response = client.send([notification[:token]], { data: notification[:data]})
                 body = JSON.parse(response[:body])
                 if body.has_key?("failure") && body["failure"] > 0
                     body["results"].each do |result|
@@ -20,13 +42,16 @@ module GcmHelper
                     end
                 end
             end
-
             return expired_tokens
         end
 
+        private
 
-        def payload_from_inbox_message(inbox_message)
-            V1::MessageSerializer.serialize(inbox_message)
+        def payload_from_message(inbox_message)
+            json = V1::MessageSerializer.serialize(inbox_message)
+            json[:attributes].delete(:"landing-page")
+            json
+            # { "message-id" => inbox_message.id.to_s }
         end
 
     end
