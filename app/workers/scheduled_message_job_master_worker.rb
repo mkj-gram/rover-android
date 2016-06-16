@@ -42,7 +42,7 @@ class ScheduledMessageJobMasterWorker
 
             current_time = Time.zone.now
 
-            if message_template.scheduled_local_time == true
+            if message_template.scheduled_local_time == true && !message_template.scheduled_at.nil?
                 # here we are finding the timezone offsets
                 delay = (message_template.scheduled_at.utc - current_time).to_i * 1000
 
@@ -55,7 +55,8 @@ class ScheduledMessageJobMasterWorker
                     enqueue_message(msg, {to_queue: 'scheduled_message_jobs_worker', headers: {'x-delay' => local_delay}})
                 end
 
-            else
+            elsif !message_template.scheduled_at.nil?
+
                 # we want to send at that specific time so we don't need the 24 delayed jobs
                 # delay is measured in milliseconds
                 delay = (message_template.scheduled_at.utc - current_time).to_i * 1000
@@ -63,6 +64,11 @@ class ScheduledMessageJobMasterWorker
                     message_template_id: message_template.id,
                 }
                 enqueue_message(msg, {:to_queue => 'scheduled_message_jobs_worker', headers: {'x-delay' => delay}})
+            else
+                msg = {
+                    message_template_id: message_template.id,
+                }
+                enqueue_message(msg, {:to_queue => 'scheduled_message_jobs_worker')
             end
         end
     end
