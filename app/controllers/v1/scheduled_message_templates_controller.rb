@@ -19,43 +19,12 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             }
         )
 
-        if query_archived
-            must_filter.push(
-                {
-                    term: {
-                        archived: query_archived
-                    }
-                }
-            )
-        end
-
-        if query_sent
-            must_filter.push(
-                {
-                    term: {
-                        sent: query_sent
-                    }
-
-                }
-            )
-        end
-
-        if query_published
-            must_filter.push(
-                {
-                    term: {
-                        published: query_published
-                    }
-                }
-            )
-        end
-
-
+        must_filter += query_collection_type if query_collection_type
 
         query = {
             query: {
                 filtered: {
-                    query: {match_all: {}},
+                    query: { match_all: {} },
                     filter: {
                         bool: {
                             should: should_filter,
@@ -194,20 +163,76 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         return json
     end
 
-    def query_archived
-        query = params.dig(:filter, :archived)
-        return query.nil? ? nil : query.to_s.to_bool
+    def query_collection_type
+        type = params.dig(:filters, :"collection-type")
+        case type
+        when "draft"
+            [
+                {
+                    term: {
+                        archived: false
+                    }
+                },
+                {
+                    term: {
+                        published: false
+                    }
+                },
+                {
+                    term: {
+                        sent: false
+                    }
+                }
+            ]
+        when "published"
+            [
+                {
+                    term: {
+                        archived: false
+                    }
+                },
+                {
+                    term: {
+                        published: true
+                    }
+                },
+                {
+                    term: {
+                        sent: false
+                    }
+                }
+            ]
+        when "sent"
+            [
+                {
+                    term: {
+                        archived: false
+                    }
+                },
+                {
+                    term: {
+                        published: true
+                    }
+                },
+                {
+                    term: {
+                        sent: true
+                    }
+                }
+            ]
+        when "archived"
+            [
+                {
+                    term: {
+                        archived: true
+                    }
+                }
+            ]
+        else
+            nil
+        end
     end
 
-    def query_sent
-        query = params.dig(:filter, :sent)
-        return query.nil? ? nil : query.to_s.to_bool
-    end
-
-    def query_published
-        query = params.dig(:filter, :published)
-        return query.nil? ? nil : query.to_s.to_bool
-    end
 
     def set_schedued_message
         @scheduled_message = ScheduledMessageTemplate.find_by_id(params[:id])

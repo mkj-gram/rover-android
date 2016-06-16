@@ -41,7 +41,7 @@ class ScheduledMessageTemplate < MessageTemplate
 
     def sent=(new_value)
         if new_value == true
-            published = false
+            published = true
             archived = false
         end
         super new_value
@@ -49,7 +49,6 @@ class ScheduledMessageTemplate < MessageTemplate
 
     def published=(new_value)
         if new_value  == true
-            sent = false
             archived = false
         end
         super new_value
