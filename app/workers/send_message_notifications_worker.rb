@@ -89,11 +89,12 @@ class SendMessageNotificationWorker
 
         notifications = ApnsHelper.messages_to_notifications(messages_by_token)
 
-
+        start_time = Time.now
         responses = ApnsHelper.send_with_connection(connection, notifications)
-        
-        MetricsClient.aggregate("apns_notification.sent" => { value: responses.size })
+        duration = (Time.now - start_time) * 1000.0
 
+        MetricsClient.aggregate("apns_notification.sent" => { value: responses.size })
+        MetricsClient.aggregate("apns_notification.sent.time" => { value: (duration/responses.size.to_f).round(1) })
         Rails.logger.info(responses)
 
         # ios_platform = IosPlatform.find(customer.account_id)
