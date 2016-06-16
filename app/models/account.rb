@@ -56,6 +56,7 @@ class Account < ActiveRecord::Base
     end
 
     has_many :proximity_message_templates
+    has_many :scheduled_message_templates
 
 
     has_many :gimbal_places
