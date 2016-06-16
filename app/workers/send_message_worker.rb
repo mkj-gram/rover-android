@@ -161,9 +161,9 @@ class SendMessageWorker
             devices = inbox.customer.devices.select { |device| !device.token.nil? }
             devices.each do |device|
                 if device.ios?
-                    messages_by_ios_token[device.token] = message
+                    messages_by_ios_token[device.token] = [message]
                 elsif device.android?
-                    messages_by_android_token[device.token] = message
+                    messages_by_android_token[device.token] = [message]
                 end
             end
         end
