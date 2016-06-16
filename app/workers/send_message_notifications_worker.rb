@@ -89,7 +89,10 @@ class SendMessageNotificationWorker
 
         notifications = ApnsHelper.messages_to_notifications(messages_by_token)
 
+
         responses = ApnsHelper.send_with_connection(connection, notifications)
+        
+        MetricsClient.aggregate("apns_notification.sent" => { value: responses.size })
 
         Rails.logger.info(responses)
 
