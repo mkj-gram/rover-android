@@ -166,7 +166,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     end
 
     def query_collection_type
-        type = params.dig(:filters, :collectionType)
+        type = params.dig(:filter, :collectionType)
         case type
         when "drafts"
             [
