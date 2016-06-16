@@ -236,7 +236,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     end
 
 
-    def set_schedued_message
+    def set_scheduled_message
         @scheduled_message = ScheduledMessageTemplate.find_by_id(params[:id])
         head :not_found if @scheduled_message.nil? || @scheduled_message.account_id != current_account.id
     end
