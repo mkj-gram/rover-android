@@ -54,6 +54,12 @@ class ScheduledMessageTemplate < MessageTemplate
         super new_value
     end
 
+    def as_indexed_json(opts = {})
+       json = super opts
+       json = (json || {}).merge(sent: sent)
+       json
+    end
+
     private
 
     def can_publish_message
