@@ -28,7 +28,7 @@ class ScheduledMessageJobMasterWorker
             scheduled_token: message_template.scheduled_token
         }
 
-        enqueue_message(msg, { to_queue: 'scheduled_message_jobs', headers: { 'x-delay' => delay }})
+        enqueue_message(msg, { to_queue: 'scheduled_message_jobs_master_worker', headers: { 'x-delay' => delay }})
     end
 
 
