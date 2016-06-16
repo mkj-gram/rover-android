@@ -140,7 +140,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         }
 
         included = []
-        
+
         if should_include.include?("segment")
             json[:data][:relationships] = {} if json[:data][:relationships].nil?
             if message.customer_segment
@@ -168,7 +168,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     def query_collection_type
         type = params.dig(:filters, :collectionType)
         case type
-        when "draft"
+        when "drafts"
             [
                 {
                     term: {
@@ -186,7 +186,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                     }
                 }
             ]
-        when "published"
+        when "scheduled"
             [
                 {
                     term: {
