@@ -68,7 +68,7 @@ class ScheduledMessageJobMasterWorker
                 msg = {
                     message_template_id: message_template.id,
                 }
-                enqueue_message(msg, {:to_queue => 'scheduled_message_jobs_worker')
+                enqueue_message(msg, {:to_queue => 'scheduled_message_jobs_worker'})
             end
         end
     end
