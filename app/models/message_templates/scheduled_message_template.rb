@@ -63,7 +63,7 @@ class ScheduledMessageTemplate < MessageTemplate
     private
 
     def set_sent_status
-        if changes.include?("published") && published == true
+        if changes.include?("published") && published == true && scheduled_at.nil?
             self.sent = true
         end
     end
