@@ -38,7 +38,7 @@ class ScheduledMessageJobMasterWorker
             Sneakers.logger.info("PUBLISH TOKEN missmatch message_template: #{message_template.scheduled_token} job: #{args['scheduled_token']}".red.bold)
             ack!
         else
-            message_template.update_attribute(sent: true)
+            message_template.update_attributes(sent: true)
 
             current_time = Time.zone.now
 
