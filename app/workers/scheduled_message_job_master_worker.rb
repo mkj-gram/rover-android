@@ -31,7 +31,6 @@ class ScheduledMessageJobMasterWorker
         enqueue_message(msg, { to_queue: 'scheduled_message_jobs_master_worker', headers: { 'x-delay' => delay }})
     end
 
-
     def perform(args)
         message_template = MessageTemplate.find(args["message_template_id"])
         if message_template.scheduled_token != args["scheduled_token"]
@@ -52,7 +51,7 @@ class ScheduledMessageJobMasterWorker
                         message_template_id: message_template.id,
                         time_zone_offset: hour
                     }
-                    enqueue_message(msg, {to_queue: 'scheduled_message_jobs_worker', headers: {'x-delay' => local_delay}})
+                    ScheduledMessageJobWorker.perform_async(msg, local_delay)
                 end
 
             elsif !message_template.scheduled_at.nil?
@@ -63,12 +62,12 @@ class ScheduledMessageJobMasterWorker
                 msg = {
                     message_template_id: message_template.id,
                 }
-                enqueue_message(msg, {:to_queue => 'scheduled_message_jobs_worker', headers: {'x-delay' => delay}})
+               ScheduledMessageJobWorker.perform_async(msg, delay)
             else
                 msg = {
                     message_template_id: message_template.id,
                 }
-                enqueue_message(msg, {:to_queue => 'scheduled_message_jobs_worker'})
+               ScheduledMessageJobWorker.perform_async(msg, 0)
             end
         end
     end

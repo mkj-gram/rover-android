@@ -12,6 +12,11 @@ class ScheduledMessageJobWorker
         :exchange_arguments => {'x-delayed-type' => 'direct'},
         :heartbeat => 5
 
+
+    def self.perform_async(msg, delay)
+        enqueue_message(msg, {to_queue: 'scheduled_message_jobs_worker', headers: {'x-delay' => delay}})
+    end
+
     # args => { message_template_id: 1} optional time_zone_offset
     def perform(args)
         message_template = MessageTemplate.find(args["message_template_id"])
