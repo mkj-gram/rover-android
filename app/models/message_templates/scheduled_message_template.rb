@@ -16,23 +16,23 @@ class ScheduledMessageTemplate < MessageTemplate
         indexes :sent, type: 'boolean', index: 'not_analyzed'
     end
 
-    def scheduled_at=(time)
-        # this needs to be stored in utc
-        parsed_time = if time.nil?
-            Time.zone.now
-        elsif time.is_a?(Integer)
-            Time.zone.at(time)
-        elsif time.is_a?(Float)
-            Time.zone.at(time)
-        elsif time.is_a?(Time)
-            time.utc
-        elsif time.is_a?(DateTime)
-            time.utc
-        else
-            Time.zone.parse(time)
-        end
-        super parsed_time
-    end
+    # def scheduled_at=(time)
+    #     # this needs to be stored in utc
+    #     parsed_time = if time.nil?
+    #         Time.zone.now
+    #     elsif time.is_a?(Integer)
+    #         Time.zone.at(time)
+    #     elsif time.is_a?(Float)
+    #         Time.zone.at(time)
+    #     elsif time.is_a?(Time)
+    #         time.utc
+    #     elsif time.is_a?(DateTime)
+    #         time.utc
+    #     else
+    #         Time.zone.parse(time)
+    #     end
+    #     super parsed_time
+    # end
 
     def metric_type
         "message_template.scheduled"
