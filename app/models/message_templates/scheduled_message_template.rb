@@ -8,7 +8,8 @@ class ScheduledMessageTemplate < MessageTemplate
 
     before_save :update_scheduled_token
     before_save :update_account_counters
-    before_save :publish_message_to_queue
+    before_save :set_sent_status
+    after_save :publish_message_to_queue
 
 
 
@@ -61,6 +62,12 @@ class ScheduledMessageTemplate < MessageTemplate
 
     private
 
+    def set_sent_status
+        if changes.include?("published") && published == true
+            sent = true
+        end
+    end
+
     def can_publish_message
         if !scheduled_at.nil?
             if scheduled_local_time == true && (scheduled_at - Time.zone.now) < 24.hours
@@ -74,7 +81,7 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     def publish_message_to_queue
-        if changes.any? && published
+        if previous_changes.any? && previous_changes.include?("published") && published == true
             Rails.logger.info("Scheduling Message #{self.id} #{self.title}")
             ScheduledMessageJobMasterWorker.perform_async(self)
         end
