@@ -89,7 +89,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     def update
         json = flatten_request({single_record: true})
         if @scheduled_message.update_attributes(scheduled_message_params(json[:data]))
-            json = render_proximity_message(@scheduled_message)
+            json = render_scheduled_message(@scheduled_message)
             render json: json
         else
             render json: { errors: V1::ScheduledMessageTemplateErrorSerializer.serialize(@scheduled_message.errors)}, status: :unprocessable_entity
