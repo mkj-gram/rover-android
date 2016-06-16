@@ -65,6 +65,7 @@ class SendMessageWorker
                 response = client.search(index: ::Customer.get_index_name(account), scroll: '5m', body: segment_query.merge(size: SendMessageWorker.batch_size))
             end
 
+            customers = []
 
             if response && response["hits"]["hits"].any?
                 Sneakers.logger.info("Got response of #{response['hits']['hits'].size}")
@@ -77,11 +78,12 @@ class SendMessageWorker
                 end
             else
                 Sneakers.logger.info("No customers found")
-                customers = []
-                ack!
             end
         end
 
+        if customers.empty?
+            return ack!
+        end
 
         ##################################################################
         #                                                                #
@@ -105,9 +107,9 @@ class SendMessageWorker
         if message_template.save_to_inbox == false
             current_time = Time.zone.now
             # we want the tmp messages to eventually expire
-            bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.attributes.merge("expire_at" => current_time + Message.temporary_message_expire_time)}}, ordered: false )
+            bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.to_doc.merge("expire_at" => current_time + Message.temporary_message_expire_time)}}, ordered: false )
         else
-            bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.attributes}}, ordered: false )
+            bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.to_doc}}, ordered: false )
         end
 
         Sneakers.logger.info("Saving #{messages_by_inbox.values.size} messages to inboxes")
