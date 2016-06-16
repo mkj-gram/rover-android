@@ -62,12 +62,14 @@ class ScheduledMessageTemplate < MessageTemplate
     private
 
     def can_publish_message
-        if scheduled_local_time == true && (scheduled_at - Time.zone.now) < 24.hours
-            errors.add(:scheduled_at, "needs a 24 hour window")
-        end
+        if !scheduled_at.nil?
+            if scheduled_local_time == true && (scheduled_at - Time.zone.now) < 24.hours
+                errors.add(:scheduled_at, "needs a 24 hour window")
+            end
 
-        if scheduled_at < Time.zone.now
-            errors.add(:scheduled_at, "cannot schedule a message in the past")
+            if scheduled_at < Time.zone.now
+                errors.add(:scheduled_at, "cannot schedule a message in the past")
+            end
         end
     end
 
