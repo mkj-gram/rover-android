@@ -11,7 +11,13 @@ class ScheduledMessageTemplate < MessageTemplate
     before_save :set_sent_status
     after_save :publish_message_to_queue
 
+    after_commit on: [:create, :update] do
+        __elasticsearch__.index_document
+    end
 
+    after_commit on: [:destroy] do
+        __elasticsearch__.delete_document
+    end
 
     mapping do
         indexes :sent, type: 'boolean', index: 'not_analyzed'

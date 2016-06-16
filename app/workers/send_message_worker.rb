@@ -157,7 +157,7 @@ class SendMessageWorker
         messages_by_ios_token = {}
         messages_by_android_token = {}
 
-        messages_by_inbox do |inbox, message|
+        messages_by_inbox.each do |inbox, message|
             devices = customer.devices.select { |device| !device.token.nil? }
             devices.each do |device|
                 if device.ios?
