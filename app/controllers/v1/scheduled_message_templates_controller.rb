@@ -139,6 +139,8 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             data: serialize_message(message)
         }
 
+        included = []
+        
         if should_include.include?("segment")
             json[:data][:relationships] = {} if json[:data][:relationships].nil?
             if message.customer_segment
