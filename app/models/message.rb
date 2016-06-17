@@ -21,6 +21,7 @@ class Message
     attribute :saved_to_inbox, Boolean, default: true
     attribute :content_type, String
     attribute :website_url, String
+    attribute :deeplink_url, String
     attribute :timestamp, Time , default: lambda { |model, attribute|  Time.zone.now }
     attribute :expire_at, Time
     attribute :landing_page, LandingPage

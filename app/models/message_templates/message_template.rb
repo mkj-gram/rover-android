@@ -81,6 +81,7 @@ class MessageTemplate < ActiveRecord::Base
                 saved_to_inbox: self.save_to_inbox,
                 content_type: self.content_type,
                 website_url: self.website_url,
+                deeplink_url: self.deeplink_url,
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s,

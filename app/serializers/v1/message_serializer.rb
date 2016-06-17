@@ -14,6 +14,7 @@ module V1::MessageSerializer
                     :"content-type" => message.content_type,
                     :"website-url" => message.website_url,
                     :"timestamp" => message.timestamp.iso8601(3),
+                    :"deep-link-url" => message.deeplink_url,
                     :"landing-page" => message.landing_page.nil? ? nil : message.landing_page.as_json(dasherize: true),
                     :"properties" => message.properties || {}
                 }
