@@ -61,12 +61,16 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     def scheduled_timestamp=(new_timestamp)
-        if scheduled_time_zone
-            Time.use_zone(scheduled_time_zone) do
+        if new_timestamp
+            if scheduled_time_zone
+                Time.use_zone(scheduled_time_zone) do
+                    self.scheduled_at = Time.zone.parse(new_timestamp)
+                end
+            else
                 self.scheduled_at = Time.zone.parse(new_timestamp)
             end
         else
-            self.scheduled_at = Time.zone.parse(new_timestamp)
+            self.scheduled_at = nil
         end
     end
 
@@ -83,7 +87,7 @@ class ScheduledMessageTemplate < MessageTemplate
 
 
     def set_sent_status
-        if changes.include?("published") && published == true && scheduled_at.nil? || scheduled_at.utc < Time.zone.now
+        if changes.include?("published") && published == true && scheduled_at.nil? || (!scheduled_at.nil? && scheduled_at.utc < Time.zone.now)
             Time.use_zone(self.scheduled_time_zone) do
                 self.scheduled_at = Time.now.utc
             end
