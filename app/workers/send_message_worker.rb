@@ -74,7 +74,8 @@ class SendMessageWorker
 
                 customers = response["hits"]["hits"].map do |document|
                     source = document["_source"]
-                    customer = Customer.new(source)
+                    customer = Customer.from_document(source.merge("_id" => document["_id"]))
+                    customer
                 end
             else
                 Sneakers.logger.info("No customers found")
