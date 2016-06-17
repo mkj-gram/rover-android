@@ -8,7 +8,7 @@ module GcmHelper
         def send(android_platform, messages_by_token)
             return if messages_by_token.empty?
 
-            client = GCM.new(gcm_app.api_key)
+            client = FCM.new(gcm_app.api_key)
             expired_tokens = []
 
             notifications = messages_to_notifications(messages_by_token)
