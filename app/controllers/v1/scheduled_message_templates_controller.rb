@@ -115,20 +115,6 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:scheduled_messages], :name, :title)
         convert_param_if_exists(local_params[:scheduled_messages], :segment_id, :customer_segment_id)
 
-        # if local_params.dig(:scheduled_messages, :scheduled_time_zone)
-        #     Time.use_zone(local_params[:scheduled_messages][:scheduled_time_zone]) do
-        #         if local_params.dig(:scheduled_messages, :scheduled_timestamp)
-        #             time = Time.parse(local_params.dig(:scheduled_messages, :scheduled_timestamp))
-        #         else
-        #             time = Time.now
-        #         end
-
-        #         local_params[:scheduled_messages][:scheduled_at] = time.utc
-        #     end
-        # end
-
-        puts "SCHEDULED_AT=#{local_params[:scheduled_messages][:scheduled_at]}"
-
         local_params.fetch(:scheduled_messages, {}).permit(
             :title,
             :notification_text,
@@ -141,7 +127,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             :customer_segment_id,
             :use_local_time_zone,
             :scheduled_time_zone,
-            :scheduled_at
+            :scheduled_timestamp
         ).merge({:landing_page => local_params.dig(:scheduled_messages, :landing_page), :properties => local_params.dig(:scheduled_messages, :properties)})
     end
 

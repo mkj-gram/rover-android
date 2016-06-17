@@ -70,7 +70,6 @@ class ScheduledMessageTemplate < MessageTemplate
         end
     end
 
-
     def use_local_time_zone=(new_value)
         self.scheduled_local_time = new_value
     end
@@ -84,7 +83,7 @@ class ScheduledMessageTemplate < MessageTemplate
 
 
     def set_sent_status
-        if changes.include?("published") && published == true && scheduled_at.nil?
+        if changes.include?("published") && published == true && scheduled_at.nil? || scheduled_at.utc < Time.zone.now
             Time.use_zone(self.scheduled_time_zone) do
                 self.scheduled_at = Time.now.utc
             end
