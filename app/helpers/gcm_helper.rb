@@ -45,7 +45,8 @@ module GcmHelper
                 if body.has_key?("failure") && body["failure"] > 0
                     body["results"].each do |result|
                         if result.has_key?("error") && (result["error"] == INVALID_REGISTRATION || result["error"] == NOT_REGISTERED)
-                            expired_tokens.push(device.token)
+                            Rails.logger.warn("Error while sending notification to android device #{results["error"]}")
+                            expired_tokens.push(notification[:token])
                         end
                     end
                 end
