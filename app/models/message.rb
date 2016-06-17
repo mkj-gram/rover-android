@@ -110,6 +110,10 @@ class Message
         mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => attribute})
     end
 
+    def update_attributes(update_params)
+        mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => update_params})
+    end
+
     def destroy
         run_callbacks :destroy do
             mongo_client[collection_name].delete_one("_id" => self._id)
