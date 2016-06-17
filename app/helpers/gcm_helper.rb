@@ -23,7 +23,7 @@ module GcmHelper
             messages_by_token.each do |token, messages|
                 messages.each do |message|
                     payload = payload_from_message(message)
-                    { 
+                    data = { 
                         token: token,
                         notification: {
                             title: message.android_title,
@@ -31,6 +31,7 @@ module GcmHelper
                         },
                         data: payload 
                     }
+                    notifications.push(data)
                 end
             end
             return notifications
