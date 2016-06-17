@@ -366,6 +366,10 @@ class Customer
         mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => attribute})
     end
 
+    def update_attributes(attributes)
+        mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => attribute})
+    end
+
     def update(update_params)
         mongo_client[collection_name].find("_id" => self._id).update_one(update_params)
     end
