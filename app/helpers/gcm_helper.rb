@@ -23,7 +23,14 @@ module GcmHelper
             messages_by_token.each do |token, messages|
                 messages.each do |message|
                     payload = payload_from_message(message)
-                    { token: token, data: payload }
+                    { 
+                        token: token,
+                        notification: {
+                            title: message.android_title,
+                            body: message.notification_text,
+                        },
+                        data: payload 
+                    }
                 end
             end
             return notifications
@@ -32,7 +39,7 @@ module GcmHelper
         def send_with_connection(connection, notifications)
             expired_tokens = []
             notifications.each do |notification|
-                response = client.send([notification[:token]], { data: notification[:data]})
+                response = client.send([notification[:token]], { notification: notification[:notification], data: notification[:data]})
                 body = JSON.parse(response[:body])
                 if body.has_key?("failure") && body["failure"] > 0
                     body["results"].each do |result|
