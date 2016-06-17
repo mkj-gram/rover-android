@@ -14,6 +14,7 @@ module LandingPageBuilder
                     border_equal?(other)
                 )
             end
+            
         end
     end
 end
