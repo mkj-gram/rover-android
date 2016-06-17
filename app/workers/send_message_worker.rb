@@ -173,7 +173,7 @@ class SendMessageWorker
 
         send_push_notification_for_ios_messages(account, messages_by_ios_token)
 
-        send_push_notification_for_android_messages(account, messages_by_ios_token)
+        send_push_notification_for_android_messages(account, messages_by_android_token)
 
         ack!
     end
