@@ -604,7 +604,7 @@ CREATE TABLE message_templates (
     landing_page_template jsonb,
     properties jsonb,
     deeplink_url character varying,
-    scheduled_at_time_zone character varying,
+    scheduled_time_zone character varying,
     sent boolean DEFAULT false
 );
 

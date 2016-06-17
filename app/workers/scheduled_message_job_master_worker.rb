@@ -17,12 +17,8 @@ class ScheduledMessageJobMasterWorker
     def self.perform_async(message_template)
         # here we check what we need to queue
 
-        if message_template.scheduled_at
-            delay = (message_template.scheduled_at.utc - Time.zone.now).to_i * 1000
-        else
-            delay = 0
-        end
-
+        delay = [(message_template.scheduled_at.utc - Time.zone.now).to_i * 1000, 0].max
+        
         msg = {
             message_template_id: message_template.id,
             scheduled_token: message_template.scheduled_token
@@ -62,12 +58,12 @@ class ScheduledMessageJobMasterWorker
                 msg = {
                     message_template_id: message_template.id,
                 }
-               ScheduledMessageJobWorker.perform_async(msg, delay)
+                ScheduledMessageJobWorker.perform_async(msg, delay)
             else
                 msg = {
                     message_template_id: message_template.id,
                 }
-               ScheduledMessageJobWorker.perform_async(msg, 0)
+                ScheduledMessageJobWorker.perform_async(msg, 0)
             end
         end
     end

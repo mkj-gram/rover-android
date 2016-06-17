@@ -4,9 +4,11 @@ class ScheduledMessageTemplate < MessageTemplate
     TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
     validate :can_publish_message, if: -> { self.published == true }
+    validates :scheduled_time_zone, presence: true
     # validate :can_modify_message
 
     before_save :update_scheduled_token
+    # before_save :set_scheduled_at_time
     before_save :set_sent_status
     before_save :update_account_counters
     after_commit :publish_message_to_queue, on: [:create, :update]
@@ -24,21 +26,9 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     # def scheduled_at=(time)
-    #     # this needs to be stored in utc
-    #     parsed_time = if time.nil?
-    #         Time.zone.now
-    #     elsif time.is_a?(Integer)
-    #         Time.zone.at(time)
-    #     elsif time.is_a?(Float)
-    #         Time.zone.at(time)
-    #     elsif time.is_a?(Time)
-    #         time.utc
-    #     elsif time.is_a?(DateTime)
-    #         time.utc
-    #     else
-    #         Time.zone.parse(time)
-    #     end
-    #     super parsed_time
+    #     parsed_time = Time.parse(time)
+    #     self.scheduled_at_time_zone = parsed_time.zone
+    #     super parsed_time.in_time_zone("UTC")
     # end
 
     def metric_type
@@ -66,23 +56,45 @@ class ScheduledMessageTemplate < MessageTemplate
         json
     end
 
+    def scheduled_timestamp
+        scheduled_at ? scheduled_at.in_time_zone(scheduled_time_zone).strftime("%Y-%m-%dT%H:%M:%S") : nil
+    end
+
+    def scheduled_timestamp=(new_timestamp)
+        if scheduled_time_zone
+            Time.use_zone(scheduled_time_zone) do
+                self.scheduled_at = Time.zone.parse(new_timestamp)
+            end
+        else
+            self.scheduled_at = Time.zone.parse(new_timestamp)
+        end
+    end
+
+
+    def use_local_time_zone=(new_value)
+        self.scheduled_local_time = new_value
+    end
+
+    def use_local_time_zone
+        self.scheduled_local_time
+    end
+
     private
+
+
 
     def set_sent_status
         if changes.include?("published") && published == true && scheduled_at.nil?
+            Time.use_zone(self.scheduled_time_zone) do
+                self.scheduled_at = Time.now.utc
+            end
             self.sent = true
         end
     end
 
     def can_publish_message
-        if !scheduled_at.nil?
-            if scheduled_local_time == true && (scheduled_at - Time.zone.now) < 24.hours
-                errors.add(:scheduled_at, "needs a 24 hour window")
-            end
-
-            if scheduled_at < Time.zone.now
-                errors.add(:scheduled_at, "cannot schedule a message in the past")
-            end
+        if scheduled_local_time == true && (scheduled_at - Time.zone.now) < 24.hours
+            errors.add(:scheduled_at, "needs a 24 hour window")
         end
     end
 
