@@ -176,24 +176,24 @@ class ScheduledMessageTemplate < MessageTemplate
             :nil
         elsif published_was == false && archived_was == false && sent_was == false
             :draft
-        elsif published_was == false && sent_was == false && archived_was == true
-            :archived
+        elsif published_was == true && sent_was == false && archived_was == false
+            :published
         elsif published_was == true && archived_was == false && sent_was == true
             :sent
         else
-            :published
+            :archived
         end
     end
 
     def current_status
         if published == false && archived == false && sent == false
             :draft
-        elsif published == false && sent == false && archived == true
-            :archived
+        elsif published == true && sent == false && archived == false
+            :published
         elsif published == true && archived == false && sent == true
             :sent
         else
-            :published
+            :archived
         end
     end
 
