@@ -4,7 +4,7 @@ class ScheduledMessageTemplate < MessageTemplate
     TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
     validate :can_publish_message, if: -> { self.published == true }
-    validates :scheduled_time_zone, presence: true
+    validates :scheduled_time_zone, presence: true, if: -> { self.use_local_time_zone == false }
     # validate :can_modify_message
 
     before_save :update_scheduled_token
@@ -87,17 +87,20 @@ class ScheduledMessageTemplate < MessageTemplate
 
 
     def set_sent_status
-        if changes.include?("published") && published == true && scheduled_at.nil? || (!scheduled_at.nil? && scheduled_at.utc < Time.zone.now)
-            Time.use_zone(self.scheduled_time_zone) do
-                self.scheduled_at = Time.now.utc
+        if changes.include?("published") && published == true
+            if scheduled_at.nil?
+                Time.use_zone(self.scheduled_time_zone) do
+                    self.scheduled_at = Time.now.utc
+                end
             end
             self.sent = true
         end
     end
 
     def can_publish_message
-        if scheduled_local_time == true && (scheduled_at - Time.zone.now) < 24.hours
-            errors.add(:scheduled_at, "needs a 24 hour window")
+        # puts "future #{Time.zone.now + 14.hours} when we send is #{scheduled_at ? scheduled_at.utc : nil}"
+        if scheduled_local_time == true && scheduled_at.utc < Time.zone.now + 14.hours
+            errors.add(:scheduled_at, "needs to be 24 hours in advance")
         end
     end
 
