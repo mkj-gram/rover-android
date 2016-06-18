@@ -127,7 +127,8 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     def publish_message_to_queue
-        if previous_changes.any? && previous_changes.include?("published") && published == true
+        was_previously_archived = previous_changes.any? && previous_changes.include?(:archived) ?  previous_changes[:archived].first : archived
+        if previous_changes.any? && previous_changes.include?("published") && published == true && was_previously_archived != true
             Rails.logger.info("Scheduling Message #{self.id} #{self.title}")
             ScheduledMessageJobMasterWorker.perform_async(self)
         end
