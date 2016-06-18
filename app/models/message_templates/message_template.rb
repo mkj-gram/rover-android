@@ -91,13 +91,6 @@ class MessageTemplate < ActiveRecord::Base
         )
     end
 
-    def archived=(val)
-        if val == true
-            self.published = false
-        end
-        self[:archived] = val
-    end
-
     def stats
         @stats ||= MessageTemplateStats.find(self.id) || MessageTemplateStats.new(message_template_id: self.id)
     end

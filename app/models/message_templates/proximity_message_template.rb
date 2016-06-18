@@ -18,6 +18,12 @@ class ProximityMessageTemplate < MessageTemplate
 
     validate :legal_trigger_event_id
 
+     def archived=(val)
+        if val == true
+            self.published = false
+        end
+        super val
+    end
 
     def filter_beacon_configurations
         @filter_beacon_configurations ||= filter_beacon_configuration_ids.any? ? BeaconConfiguration.where(id: filter_beacon_configuration_ids) : []

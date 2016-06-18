@@ -44,19 +44,19 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     def published=(new_value)
-        if new_value  == true
+        if sent == true
+            super true
+        elsif new_value == true
             self[:archived] = false
+            super new_value
+        else
+            super new_value
         end
-        super new_value
     end
 
     def archived=(new_value)
         if new_value == true && current_status == :published
             self[:published] = false
-        end
-
-        if new_value == false && sent == true
-            self[:published] = true
         end
 
         super new_value
