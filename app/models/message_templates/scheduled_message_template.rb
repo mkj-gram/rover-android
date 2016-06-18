@@ -57,12 +57,25 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     def scheduled_timestamp
-        scheduled_at ? scheduled_at.in_time_zone(scheduled_time_zone).strftime("%Y-%m-%dT%H:%M:%S") : nil
+        if scheduled_at
+            if use_local_time_zone
+                scheduled_at.utc.strftime("%Y-%m-%dT%H:%M:%S")
+            else
+                scheduled_at.in_time_zone(scheduled_time_zone).strftime("%Y-%m-%dT%H:%M:%S")
+            end
+        else
+            nil
+        end
     end
+
+    # def scheduled_at=(new_value)
+    #     puts "SCHEDULED_AT = #{new_value}"
+    #     super new_value
+    # end
 
     def scheduled_timestamp=(new_timestamp)
         if new_timestamp
-            if scheduled_time_zone
+            if scheduled_time_zone && use_local_time_zone != true
                 Time.use_zone(scheduled_time_zone) do
                     self.scheduled_at = Time.zone.parse(new_timestamp)
                 end
@@ -79,7 +92,7 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     def use_local_time_zone
-        self.scheduled_local_time
+        self.scheduled_local_time ? self.scheduled_local_time : false
     end
 
     private
