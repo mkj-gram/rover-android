@@ -37,23 +37,28 @@ class ScheduledMessageTemplate < MessageTemplate
 
     def sent=(new_value)
         if new_value == true
-            published = true
-            archived = false
+            self[:published] = true
+            self[:archived] = false
         end
         super new_value
     end
 
     def published=(new_value)
         if new_value  == true
-            archived = false
+            self[:archived] = false
         end
         super new_value
     end
 
     def archived=(new_value)
         if new_value == true && current_status == :published
-            published = false
+            self[:published] = false
         end
+
+        if new_value == false && sent == true
+            self[:published] = true
+        end
+
         super new_value
     end
 
@@ -128,6 +133,7 @@ class ScheduledMessageTemplate < MessageTemplate
 
     def publish_message_to_queue
         was_previously_archived = previous_changes.any? && previous_changes.include?(:archived) ?  previous_changes[:archived].first : archived
+        puts "Was was_previously_archived: #{was_previously_archived}"
         if previous_changes.any? && previous_changes.include?("published") && published == true && was_previously_archived != true
             Rails.logger.info("Scheduling Message #{self.id} #{self.title}")
             ScheduledMessageJobMasterWorker.perform_async(self)
