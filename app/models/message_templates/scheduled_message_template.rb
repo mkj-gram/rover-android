@@ -50,6 +50,13 @@ class ScheduledMessageTemplate < MessageTemplate
         super new_value
     end
 
+    def archived=(new_value)
+        if new_value == true && current_status == :published
+            published = false
+        end
+        super new_value
+    end
+
     def as_indexed_json(opts = {})
         json = super opts
         json = (json || {}).merge(sent: sent)
@@ -105,8 +112,10 @@ class ScheduledMessageTemplate < MessageTemplate
                 Time.use_zone(self.scheduled_time_zone) do
                     self.scheduled_at = Time.now.utc
                 end
+                self.sent = true
+            elsif scheduled_at.utc < Time.zone.now
+                self.sent = true
             end
-            self.sent = true
         end
     end
 
@@ -125,7 +134,7 @@ class ScheduledMessageTemplate < MessageTemplate
     end
 
     def update_scheduled_token
-        if published_changed?
+        if published_changed? || archived_changed?
             self.scheduled_token = SecureRandom.hex
         end
     end
