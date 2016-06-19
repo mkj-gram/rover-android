@@ -50,7 +50,7 @@ class SendMessageWorker
         ##################################################################
 
         if test_customer_ids.any?
-            customers = Customer.find(test_customer_ids)
+            customers = Customer.find_all(test_customer_ids)
         else
             if scroll_id
                 Sneakers.logger.info("Found scroll_id #{scroll_id}")
