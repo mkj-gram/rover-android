@@ -96,7 +96,8 @@ Rails.application.routes.draw do
         post "/proximity-messages/:id/test-message", to: 'proximity_message_templates#test_message'
 
         resources :"scheduled-messages", controller: "scheduled_message_templates", as: "scheduled_message_templates"
-
+        post "/scheduled-messages/:id/test-message", to: 'scheduled_message_templates#test_message'
+        
         get "/inbox", to: 'customer_inbox#show'
 
         get "/inbox/:id", to: 'customer_inbox_messages#show'

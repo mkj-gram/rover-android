@@ -72,7 +72,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         render json: json
     end
 
-     def create
+    def create
         json = flatten_request({single_record: true})
 
         @scheduled_message = current_account.scheduled_message_templates.build(scheduled_message_params(json[:data]))
@@ -101,6 +101,17 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             head :no_content
         else
             render json: { errors: V1::ScheduledMessageTemplateErrorSerializer.serialize(@scheduled_message.errors)}, status: :unprocessable_entity
+        end
+    end
+
+    def test_message
+        param_should_be_array(params, :customer_ids)
+        customer_ids = params[:customer_ids]
+        if customer_ids.any?
+            SendMessageWorker.perform_async(@scheduled_message.id, {} , customer_ids)
+            head :ok
+        else
+            head :bad_request
         end
     end
 
