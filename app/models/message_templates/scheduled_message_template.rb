@@ -3,7 +3,7 @@ class ScheduledMessageTemplate < MessageTemplate
 
     TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
-    validate :can_publish_message, if: -> { self.published == true }
+    # validate :can_publish_message, if: -> { self.published == true }
     validates :scheduled_time_zone, presence: true, if: -> { self.use_local_time_zone == false }
     # validate :can_modify_message
 

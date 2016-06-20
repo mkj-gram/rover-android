@@ -46,8 +46,11 @@ class ScheduledMessageJobMasterWorker
                 # here we are finding the timezone offsets
                 for hour in TIME_ZONE_OFFSETS
                     # if we are 4 hours behind utc then we are delayed + 4 hours
-                    
+
                     local_delay = [(((message_template.scheduled_at.utc - hour.hours)) - current_time).to_i * 1000, 0].max
+
+                    # do not send if time has already passed and we aren't sending to utc timezone
+                    next if local_delay == 0 && hour != 0.0
 
                     local_delay = delay + (hour * 60 * 60 * 1000)
                     msg = {
