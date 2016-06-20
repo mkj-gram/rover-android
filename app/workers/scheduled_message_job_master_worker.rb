@@ -17,8 +17,13 @@ class ScheduledMessageJobMasterWorker
     def self.perform_async(message_template)
         # here we check what we need to queue
 
-        delay = [(message_template.scheduled_at.utc - Time.zone.now).to_i * 1000, 0].max
-        
+        if message_template.scheduled_local_time
+            # if we are using local time make sure to start the job at the furthest timezone + 14
+            delay = [((message_template.utc - 14.hours) - Time.zone.now).to_i * 1000, 0].max
+        else
+            delay = [(message_template.scheduled_at.utc - Time.zone.now).to_i * 1000, 0].max
+        end
+
         msg = {
             message_template_id: message_template.id,
             scheduled_token: message_template.scheduled_token
@@ -39,9 +44,11 @@ class ScheduledMessageJobMasterWorker
 
             if message_template.scheduled_local_time == true && !message_template.scheduled_at.nil?
                 # here we are finding the timezone offsets
-                delay = (message_template.scheduled_at.utc - current_time).to_i * 1000
-
                 for hour in TIME_ZONE_OFFSETS
+                    # if we are 4 hours behind utc then we are delayed + 4 hours
+                    
+                    local_delay = [(((message_template.scheduled_at.utc - hour.hours)) - current_time).to_i * 1000, 0].max
+
                     local_delay = delay + (hour * 60 * 60 * 1000)
                     msg = {
                         message_template_id: message_template.id,
