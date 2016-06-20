@@ -10,7 +10,7 @@ class V1::CustomerInboxController < V1::ApplicationController
             json = {
                 data: messages.map{|message| V1::MessageSerializer.serialize(message)},
                 meta: {
-                    "badge-number" => messages.count { |message| message.read == false }
+                    "unread-messages-count" => messages.count { |message| message.read == false }
                 }
             }
 

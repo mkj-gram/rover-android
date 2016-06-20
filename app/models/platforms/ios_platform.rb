@@ -1,11 +1,11 @@
 class IosPlatform < ActiveRecord::Base
     include Platformable
 
-    validate :valid_certificate
+    validate :valid_certificate, if: -> { !certificate.nil? }
 
     before_save :set_app_identifier
     before_save :set_certificate_expiry
-    after_save :update_name_cache
+    # after_save :update_name_cache
 
     belongs_to :account
 
@@ -56,14 +56,23 @@ class IosPlatform < ActiveRecord::Base
     end
 
     def set_app_identifier
-        if credentials_changed? && apns_certificate
-            self.bundle_id = apns_certificate.app_bundle_id
+        if credentials_changed?
+            if apns_certificate
+                self.bundle_id = apns_certificate.app_bundle_id
+            else
+                self.bundle_id = nil
+            end
         end
     end
 
     def set_certificate_expiry
-        if credentials_changed? && apns_certificate
-            self.certificate_expires_at = apns_certificate.expires_at
+        if credentials_changed?
+            if apns_certificate
+                self.certificate_expires_at = apns_certificate.expires_at
+            else
+                self.certificate_expires_at = nil
+                self.certificate_filename = nil
+            end
         end
     end
 

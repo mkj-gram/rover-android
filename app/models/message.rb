@@ -21,6 +21,7 @@ class Message
     attribute :saved_to_inbox, Boolean, default: true
     attribute :content_type, String
     attribute :website_url, String
+    attribute :deeplink_url, String
     attribute :timestamp, Time , default: lambda { |model, attribute|  Time.zone.now }
     attribute :expire_at, Time
     attribute :landing_page, LandingPage
@@ -108,6 +109,10 @@ class Message
 
     def update_attribute(attribute)
         mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => attribute})
+    end
+
+    def update_attributes(update_params)
+        mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => update_params})
     end
 
     def destroy

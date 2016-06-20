@@ -281,6 +281,11 @@ class Customer
             return Customer.from_document(doc)
         end
 
+        def update_all(ids, update_params)
+            ids = ids.map{|id| BSON::ObjectId(id)}
+            mongo_client[collection_name].find("_id" => {"$in" => ids }).update_many("$set" => update_params)
+        end
+
         def count(query = {})
             return mongo_client[collection_name].find(query).count
         end
@@ -359,6 +364,10 @@ class Customer
 
     def update_attribute(attribute)
         mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => attribute})
+    end
+
+    def update_attributes(attributes)
+        mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => attributes})
     end
 
     def update(update_params)

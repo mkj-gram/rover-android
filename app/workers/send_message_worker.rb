@@ -50,7 +50,7 @@ class SendMessageWorker
         ##################################################################
 
         if test_customer_ids.any?
-            customers = Customer.find(test_customer_ids)
+            customers = Customer.find_all(test_customer_ids)
         else
             if scroll_id
                 Sneakers.logger.info("Found scroll_id #{scroll_id}")
@@ -65,6 +65,7 @@ class SendMessageWorker
                 response = client.search(index: ::Customer.get_index_name(account), scroll: '5m', body: segment_query.merge(size: SendMessageWorker.batch_size))
             end
 
+            customers = []
 
             if response && response["hits"]["hits"].any?
                 Sneakers.logger.info("Got response of #{response['hits']['hits'].size}")
@@ -73,15 +74,17 @@ class SendMessageWorker
 
                 customers = response["hits"]["hits"].map do |document|
                     source = document["_source"]
-                    customer = Customer.new(source)
+                    customer = Customer.from_document(source.merge("_id" => document["_id"]))
+                    customer
                 end
             else
                 Sneakers.logger.info("No customers found")
-                customers = []
-                ack!
             end
         end
 
+        if customers.empty?
+            return ack!
+        end
 
         ##################################################################
         #                                                                #
@@ -105,15 +108,16 @@ class SendMessageWorker
         if message_template.save_to_inbox == false
             current_time = Time.zone.now
             # we want the tmp messages to eventually expire
-            bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.attributes.merge("expire_at" => current_time + Message.temporary_message_expire_time)}}, ordered: false )
+            bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.to_doc.merge("expire_at" => current_time + Message.temporary_message_expire_time)}}, ordered: false )
         else
-            bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.attributes}}, ordered: false )
+            bulk_write = Mongo::BulkWrite.new(Message.collection, messages_by_inbox.values.map {|message| {insert_one: message.to_doc}}, ordered: false )
         end
 
-        Sneakers.logger.info("Saving #{messages_by_inbox.values.size} messages to inboxes")
+       
 
         begin
-            bulk_write.execute
+            r = bulk_write.execute
+            Sneakers.logger.info("Successfully added #{r.inserted_ids.size} messages")
         rescue Mongo::Error::BulkWriteError => result
             # result[Mongo::Error::WRITE_ERRORS].first['index']
             # only raised when dupicates exist
@@ -121,6 +125,7 @@ class SendMessageWorker
         end
 
         if message_template.save_to_inbox
+            Sneakers.logger.info("Saving #{messages_by_inbox.values.size} messages to inboxes")
             CustomerInbox.bulk_insert(messages_by_inbox)
         end
 
@@ -149,20 +154,26 @@ class SendMessageWorker
         #                                                                #
         ##################################################################
 
-        message_instance_by_token = {}
-        devices = []
-        messages_by_inbox.each do |inbox, message_instance|
-            customer = inbox.customer
-            pushable_devices = customer.devices.select{ |device| !device.token.nil? }
-            if pushable_devices.any?
-                pushable_devices.each do |device|
-                    message_instance_by_token[device.token] = message_instance
+        # TODO
+        # REWRITE THIS OLD CODE
+        #
+        messages_by_ios_token = {}
+        messages_by_android_token = {}
+
+        messages_by_inbox.each do |inbox, message|
+            devices = inbox.customer.devices.select { |device| !device.token.nil? }
+            devices.each do |device|
+                if device.ios?
+                    messages_by_ios_token[device.token] = [message]
+                elsif device.android?
+                    messages_by_android_token[device.token] = [message]
                 end
-                devices += pushable_devices
             end
         end
 
-        send_push_notification(account, message_instance_by_token, devices)
+        send_push_notification_for_ios_messages(account, messages_by_ios_token)
+
+        send_push_notification_for_android_messages(account, messages_by_android_token)
 
         ack!
     end
@@ -177,45 +188,16 @@ class SendMessageWorker
         @client ||= Elasticsearch::Model.client
     end
 
-
-    def send_push_notification(account, message_instance_by_token, devices)
-        Sneakers.logger.info("Sending #{devices.size} notifications")
-        apns_app = account.ios_platform
-        gcm_app = account.android_platform
-
-        if apns_app && !apns_app.credentials.nil?
-            apns_devices = devices.select(&:apns_device?)
-            apns_devices_by_token = apns_devices.index_by(&:token)
-            expired_tokens = send_apns_notification(apns_app, message_instance_by_token, apns_devices)
-            expired_devices = expired_tokens.collect{|token| apns_devices_by_token[token]}
-            ExpiredTokenHelper.expire_devices(expired_devices)
-        end
-
-        if gcm_app && !gcm_app.credentials.nil?
-            gcm_devices = devices.select(&:gcm_device?)
-            gcm_devices_by_token = gcm_devices.index_by(&:token)
-            expired_tokens = send_gcm_notification(gcm_app, message_instance_by_token, gcm_devices)
-            expired_devices = expired_tokens.collect{|token| gcm_devices_by_token[token]}
-            ExpiredTokenHelper.expire_devices(expired_devices)
-        end
-
+    def send_push_notification_for_ios_messages(account, messages_by_token)
+        ios_platform = account.ios_platform
+        return if ios_platform.certificate.nil?
+        ApnsHelper.send(ios_platform, messages_by_token)
     end
 
-    def send_apns_notification(apns_app, message_instance_by_token, devices)
-        # split devices by 1000
-        expired_tokens = []
-        devices.each_slice(1000) do |devices|
-            expired_tokens += ApnsHelper.send(apns_app, message_instance_by_token, devices)
-        end
-        return expired_tokens
-    end
-
-    def send_gcm_notification(gcm_app, message_instance_by_token, devices)
-        expired_tokens = []
-        devices.each_slice(1000) do |devices|
-            expired_tokens += GcmHelper.send(gcm_app, message_instance_by_token, devices)
-        end
-        return expired_tokens
+    def send_push_notification_for_android_messages(account, messages_by_token)
+        android_platform = account.android_platform
+        return if android_platform.api_key.nil?
+        GcmHelper.send(android_platform, messages_by_token)
     end
 
 end

@@ -96,12 +96,19 @@ Rails.application.routes.draw do
         post "/proximity-messages/:id/test-message", to: 'proximity_message_templates#test_message'
 
         resources :"scheduled-messages", controller: "scheduled_message_templates", as: "scheduled_message_templates"
-
+        post "/scheduled-messages/:id/test-message", to: 'scheduled_message_templates#test_message'
+        
         get "/inbox", to: 'customer_inbox#show'
+
+        get "/inbox/:id", to: 'customer_inbox_messages#show'
+        patch "/inbox/:id", to: 'customer_inbox_messages#update'
+        delete "/inbox/:id", to: 'customer_inbox_messages#destroy'
 
         get "/inbox/messages/:id", to: 'customer_inbox_messages#show'
         patch "/inbox/messages/:id", to: 'customer_inbox_messages#update'
         delete "/inbox/messages/:id", to: 'customer_inbox_messages#destroy'
+
+        get "/inbox/:id/landing-page", to: 'customer_inbox_landing_page#show'
 
         resources :"segments", controller: "customer_segments", as: "customer_segments"
         scope :segments do
@@ -110,9 +117,10 @@ Rails.application.routes.draw do
 
         resources "ios-platforms", controller: "ios_platforms", as: "ios_platforms", only: [:show, :update] do
             post "/certificate", to: 'ios_platform_certificate#update', as: 'ios_platform_certificate'
+            delete "/certificate", to: 'ios_platform_certificate#destroy', as: 'ios_platform_certificate_destroy'
         end
 
-        resources "android-platforms", controller: "android_platforms", as: "android_platforms", except: [:index]
+        resources "android-platforms", controller: "android_platform", as: "android_platforms", except: [:index]
 
         resources :images, only: [:create]
 

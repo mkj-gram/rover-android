@@ -1,6 +1,6 @@
 class V1::IosPlatformCertificateController < V1::ApplicationController
     before_action :authenticate
-    before_action :set_ios_platform, only: [:update]
+    before_action :set_ios_platform, only: [:update, :destroy]
 
 
     def update
@@ -17,6 +17,19 @@ class V1::IosPlatformCertificateController < V1::ApplicationController
             end
         end
     end
+
+    def destroy
+        @ios_platform.credentials = {}
+        if @ios_platform.save
+            json = {
+                data: V1::IosPlatformSerializer.serialize(@ios_platform)
+            }
+            render json: json
+        else
+            render json: { errors: V1::IosPlatformErrorSerializer.serialize(@ios_platform.errors)}, status: :unprocessable_entity
+        end
+    end
+
 
 
     private

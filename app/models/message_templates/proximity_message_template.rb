@@ -9,6 +9,7 @@ class ProximityMessageTemplate < MessageTemplate
     after_save :update_approximate_customers_count
 
 
+    after_initialize :set_defaults, unless: :persisted?
 
     default_empty_array_attribute :filter_beacon_configuration_tags
     default_empty_array_attribute :filter_beacon_configuration_ids
@@ -17,6 +18,12 @@ class ProximityMessageTemplate < MessageTemplate
 
     validate :legal_trigger_event_id
 
+     def archived=(val)
+        if val == true
+            self.published = false
+        end
+        super val
+    end
 
     def filter_beacon_configurations
         @filter_beacon_configurations ||= filter_beacon_configuration_ids.any? ? BeaconConfiguration.where(id: filter_beacon_configuration_ids) : []
@@ -54,6 +61,11 @@ class ProximityMessageTemplate < MessageTemplate
         # we need to update here
         # if we changed the filters we need to update
         #
+    end
+
+    def set_defaults
+        self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]
+        self.time_schedule = Range.new(0,1440)
     end
 
     def update_archived_messages_count

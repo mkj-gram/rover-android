@@ -50,7 +50,7 @@ class MessageTemplate < ActiveRecord::Base
     )
 
     after_initialize :set_proper_time_schedule_range
-    after_initialize :set_defaults, unless: :persisted?
+   
 
     validates :title, presence: true
     validate :valid_date_schedule
@@ -81,6 +81,7 @@ class MessageTemplate < ActiveRecord::Base
                 saved_to_inbox: self.save_to_inbox,
                 content_type: self.content_type,
                 website_url: self.website_url,
+                deeplink_url: self.deeplink_url,
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s,
@@ -88,13 +89,6 @@ class MessageTemplate < ActiveRecord::Base
                 properties: properties
             }
         )
-    end
-
-    def archived=(val)
-        if val == true
-            self.published = false
-        end
-        self[:archived] = val
     end
 
     def stats
@@ -347,12 +341,6 @@ class MessageTemplate < ActiveRecord::Base
             errors.add(:properties, "invalid data type")
             return false
         end
-    end
-
-
-    def set_defaults
-        self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]
-        self.time_schedule = Range.new(0,1440)
     end
 
     def set_proper_time_schedule_range

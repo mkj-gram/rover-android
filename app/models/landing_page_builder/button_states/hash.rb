@@ -17,6 +17,12 @@ module LandingPageBuilder
                 )
             end
 
+            def each(&block)
+                [normal, highlighted, disabled, selected].each do |state|
+                    yield state
+                end
+            end
+
         end
     end
 end
