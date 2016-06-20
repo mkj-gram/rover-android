@@ -52,7 +52,17 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         records.each{|template| template.stats = stats[template.id] }
 
         json = {
-            "data" => records.map{|message| serialize_message(message)},
+            "data" => records.map do |message|
+                data = serialize_message(message)
+                data[:relationships].merge!(
+                    {
+                        :"segment" => {
+                            data: { type: "segments", id: message.customer_segment.id.to_s }
+                        }
+
+                    }
+                )
+            end,
             "meta" => {
                 "totalRecords" => message_templates.total,
                 "totalPages" => message_templates.total_pages,
@@ -60,7 +70,8 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 "totalScheduled" => current_account.scheduled_message_templates_published_count,
                 "totalArchived" => current_account.proximity_message_templates_archived_count,
                 "totalSent" => current_account.scheduled_message_templates_sent_count
-            }
+            },
+            "included" => message_templates.map(&:customer_segment).compact.uniq.map { |message| V1::CustomerSegmentSerializer.serialize(message.customer_segment) }
         }
 
         render json: json
