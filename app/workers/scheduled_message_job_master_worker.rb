@@ -52,7 +52,6 @@ class ScheduledMessageJobMasterWorker
                     # do not send if time has already passed and we aren't sending to utc timezone
                     next if local_delay == 0 && hour != 0.0
 
-                    local_delay = delay + (hour * 60 * 60 * 1000)
                     msg = {
                         message_template_id: message_template.id,
                         time_zone_offset: hour
