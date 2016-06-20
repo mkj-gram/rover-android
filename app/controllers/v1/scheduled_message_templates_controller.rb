@@ -61,6 +61,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                         }
                     }
                 end
+                data
             end,
             "meta" => {
                 "totalRecords" => message_templates.total,
