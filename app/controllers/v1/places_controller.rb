@@ -148,26 +148,34 @@ class V1::PlacesController < V1::ApplicationController
     def update
         # do we accept a google place id?
         json = flatten_request({single_record: true})
-        if @place.update_attributes(place_params(json[:data]))
-            json = {
-                "data" => serialize_place(@place)
-            }
-            render json: json
-        else
-            render json: { errors: V1::PlaceErrorSerializer.serialize(@place.errors)}, status: :unprocessable_entity
+        begin
+            if @place.update_attributes(place_params(json[:data]))
+                json = {
+                    "data" => serialize_place(@place)
+                }
+                render json: json
+            else
+                render json: { errors: V1::PlaceErrorSerializer.serialize(@place.errors)}, status: :unprocessable_entity
+            end
+        rescue ActiveRecord::RecordNotUnique => e
+            render json: {errors: [{detail: "place already exists with the same latitude and longitude", source: {pointer: "data"}}]}, status: :unprocessable_entity
         end
     end
 
     def create
         json = flatten_request({single_record: true})
         @place = current_account.places.build(place_params(json[:data]))
-        if @place.save
-            json = {
-                "data" => serialize_place(@place)
-            }
-            render json: json
-        else
-            render json: { errors: V1::PlaceErrorSerializer.serialize(@place.errors)}, status: :unprocessable_entity
+        begin
+            if @place.save
+                json = {
+                    "data" => serialize_place(@place)
+                }
+                render json: json
+            else
+                render json: { errors: V1::PlaceErrorSerializer.serialize(@place.errors)}, status: :unprocessable_entity
+            end
+        rescue ActiveRecord::RecordNotUnique => e
+            render json: {errors: [{detail: "place already exists with the same latitude and longitude", source: {pointer: "data"}}]}, status: :unprocessable_entity
         end
     end
 
