@@ -71,7 +71,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 "totalArchived" => current_account.proximity_message_templates_archived_count,
                 "totalSent" => current_account.scheduled_message_templates_sent_count
             },
-            "included" => message_templates.map(&:customer_segment).compact.uniq.map { |message| V1::CustomerSegmentSerializer.serialize(message.customer_segment) }
+            "included" => message_templates.map(&:customer_segment).compact.uniq.map { |segment| V1::CustomerSegmentSerializer.serialize(segment) }
         }
 
         render json: json
