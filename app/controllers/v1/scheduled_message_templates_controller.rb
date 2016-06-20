@@ -54,14 +54,13 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         json = {
             "data" => records.map do |message|
                 data = serialize_message(message)
-                data[:relationships].merge!(
-                    {
+                if message.customer_segment
+                    data[:relationships] = {
                         :"segment" => {
                             data: { type: "segments", id: message.customer_segment.id.to_s }
                         }
-
                     }
-                )
+                end
             end,
             "meta" => {
                 "totalRecords" => message_templates.total,
