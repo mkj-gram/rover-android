@@ -19,7 +19,7 @@ class ScheduledMessageJobMasterWorker
 
         if message_template.scheduled_local_time
             # if we are using local time make sure to start the job at the furthest timezone + 14
-            delay = [((message_template.utc - 14.hours) - Time.zone.now).to_i * 1000, 0].max
+            delay = [((message_template.scheduled_at.utc - 14.hours) - Time.zone.now).to_i * 1000, 0].max
         else
             delay = [(message_template.scheduled_at.utc - Time.zone.now).to_i * 1000, 0].max
         end
