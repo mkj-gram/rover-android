@@ -145,6 +145,8 @@ class Message
 
     class << self
         def from_document(doc)
+            doc["_id"] = BSON::ObjectId(doc["_id"]["$oid"]) if doc["_id"].is_a?(Hash) && doc["_id"].has_key?("$oid")
+            doc["customer_id"] = BSON::ObjectId(doc["customer_id"]["$oid"]) if doc["customer_id"].is_a?(Hash) && doc["customer_id"].has_key?("$oid")
             Message.new(doc)
         end
 
