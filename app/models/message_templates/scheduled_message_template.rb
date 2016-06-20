@@ -3,7 +3,7 @@ class ScheduledMessageTemplate < MessageTemplate
 
     TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
-    # validate :can_publish_message, if: -> { self.published == true }
+    validate :can_publish_message, if: -> { scheduled_at_changed? }
     validates :scheduled_time_zone, presence: true, if: -> { self.use_local_time_zone == false }
     # validate :can_modify_message
 
@@ -126,8 +126,12 @@ class ScheduledMessageTemplate < MessageTemplate
 
     def can_publish_message
         # puts "future #{Time.zone.now + 14.hours} when we send is #{scheduled_at ? scheduled_at.utc : nil}"
-        if scheduled_local_time == true && scheduled_at.utc < Time.zone.now + 14.hours
-            errors.add(:scheduled_at, "needs to be 24 hours in advance")
+        # if scheduled_local_time == true && scheduled_at.utc < Time.zone.now + 14.hours
+        #     errors.add(:scheduled_at, "needs to be 24 hours in advance")
+        # end
+        if scheduled_at.utc.beginning_of_day > Time.zone.now.beginning_of_day + 48.days
+            errors.add(:scheduled_at, "can only be scheduled 48 days in advance")
+            return false
         end
     end
 
