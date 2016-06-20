@@ -28,6 +28,7 @@ module FcmHelper
                         notification: {
                             title: message.android_title,
                             body: message.notification_text,
+                            click_action: "io.rover.messages.#{get_click_action_for_message(message)}"
                         },
                         data: { message: payload }
                     }
@@ -58,6 +59,10 @@ module FcmHelper
         end
 
         private
+
+        def get_click_action_for_message(message)
+            message.content_type.underscore.upcase
+        end
 
         def payload_from_message(inbox_message)
             json = V1::MessageSerializer.serialize(inbox_message)
