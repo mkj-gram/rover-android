@@ -1,4 +1,4 @@
-module GcmHelper
+module FcmHelper
 
     class << self
         
@@ -29,7 +29,7 @@ module GcmHelper
                             title: message.android_title,
                             body: message.notification_text,
                         },
-                        data: payload 
+                        data: { message: payload }
                     }
                     notifications.push(data)
                 end
