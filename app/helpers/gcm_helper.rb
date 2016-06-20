@@ -40,7 +40,7 @@ module GcmHelper
         def send_with_connection(connection, notifications)
             expired_tokens = []
             notifications.each do |notification|
-                response = connection.send([notification[:token]], { notification: notification[:notification], data: notification[:data]})
+                response = connection.send_with_notification_key(notification[:token], { notification: notification[:notification], data: notification[:data]})
                 body = JSON.parse(response[:body])
                 if body.has_key?("failure") && body["failure"] > 0
                     body["results"].each do |result|
