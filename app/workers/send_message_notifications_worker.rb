@@ -106,7 +106,7 @@ class SendMessageNotificationWorker
         ack!
     end
 
-    def send_ios_notifications_to_customer(customer, message, device_ids_filter)
+    def send_ios_notifications_to_customer(customer, messages, device_ids_filter)
         if @@ios_connection_pool.get(customer.account_id).nil?
             ios_platform = IosPlatform.find_by(account_id: customer.account_id)
             return if ios_platform.nil?
@@ -149,7 +149,7 @@ class SendMessageNotificationWorker
         android_devices.select! { | device| device_ids_filter.include?(device.id) } if device_ids_filter
 
         return if android_devices.empty?
-        
+
         android_messages_by_token = android_devices.inject({}) { |hash, device| hash.merge!(device.token => messages)}
 
         notifications = FcmHelper.messages_to_notifications(android_messages_by_token)
