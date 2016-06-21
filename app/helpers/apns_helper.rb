@@ -37,7 +37,15 @@ module ApnsHelper
         end
 
         def send_with_connection(connection, notifications)
-            return connection.send(notifications)
+            responses = connection.send(notifications)
+            invalid_responses = responses.select{|r| !r.success? }
+
+            if invalid_responses
+                error_message = invalid_responses.map{|r| "#{r.notification.token} => #{r.body}"}.join("\n")
+                Rails.logger.warn("APNS-ERROR: invalid responses #{error_message}")
+            end
+
+            return responses
         end
 
         private
