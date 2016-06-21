@@ -146,16 +146,16 @@ module Events
             inbox_messages_to_deliver.each{|message| track_delivered_message(message)}
             local_messages_to_deliver.each{|message| track_delivered_message(message)}
             # add them to the included array for json output
-            @included += inbox_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
-            @included += local_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
+            # @included += inbox_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
+            # @included += local_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
 
             # Quick fix add for now
             # TODO:
             # Remove this once google testing is done
             # move to state api
-            if device.os_name == "iOS" && device.remote_notifications_enabled
-                message_ids = inbox_messages_to_deliver.map(&:id) + local_messages_to_deliver.map(&:id)
-                SendMessageNotificationWorker.perform_async(customer.id, message_ids, [ device.id ])
+            if device.token
+                messages = inbox_messages_to_deliver + local_messages_to_deliver
+                SendMessageNotificationWorker.perform_async(customer.id, messages, [ device.id ])
             end
 
         end
