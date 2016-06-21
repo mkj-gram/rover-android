@@ -132,7 +132,7 @@ class SendMessageNotificationWorker
         Rails.logger.info(responses)
     end
 
-    def send_android_notifications_to_customer(customer, message, device_ids_filter)
+    def send_android_notifications_to_customer(customer, messages, device_ids_filter)
 
         api_key = @@android_api_key_cache.fetch(customer.account_id, expires_in: 10.minutes) do
             android_platform = AndroidPlatform.find_by(account_id: customer.account_id)
@@ -145,9 +145,11 @@ class SendMessageNotificationWorker
 
         return if api_key.nil?
 
-        android_devices = customer.devices.select { |device| device.os_name == "Android" && device.remote_notifications_enabled }
+        android_devices = customer.devices.select { |device| device.os_name == "Android" && device.token  }
         android_devices.select! { | device| device_ids_filter.include?(device.id) } if device_ids_filter
 
+        return if android_devices.empty?
+        
         android_messages_by_token = android_devices.inject({}) { |hash, device| hash.merge!(device.token => messages)}
 
         notifications = FcmHelper.messages_to_notifications(android_messages_by_token)
