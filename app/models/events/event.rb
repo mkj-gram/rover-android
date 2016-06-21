@@ -146,8 +146,8 @@ module Events
             inbox_messages_to_deliver.each{|message| track_delivered_message(message)}
             local_messages_to_deliver.each{|message| track_delivered_message(message)}
             # add them to the included array for json output
-            @included += inbox_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
-            @included += local_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
+            # @included += inbox_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
+            # @included += local_messages_to_deliver.map{|message| V1::MessageSerializer.serialize(message)}
 
             # Quick fix add for now
             # TODO:
