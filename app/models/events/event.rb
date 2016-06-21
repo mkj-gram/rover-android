@@ -154,8 +154,8 @@ module Events
             # Remove this once google testing is done
             # move to state api
             if device.token
-                message_ids = inbox_messages_to_deliver.map(&:id) + local_messages_to_deliver.map(&:id)
-                SendMessageNotificationWorker.perform_async(customer.id, message_ids, [ device.id ])
+                messages = inbox_messages_to_deliver + local_messages_to_deliver
+                SendMessageNotificationWorker.perform_async(customer.id, messages, [ device.id ])
             end
 
         end
