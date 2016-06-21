@@ -158,7 +158,7 @@ class SendMessageNotificationWorker
         duration = (Time.zone.now - start_time) * 1000.0
 
         MetricsClient.aggregate("fcm_notification.sent" => { value: android_devices.size })
-        MetricsClient.aggregate("fcm_notification.sent.time" => { value: (duration/responses.size.to_f).round(1) })
+        MetricsClient.aggregate("fcm_notification.sent.time" => { value: (duration/android_devices.size.to_f).round(1) })
 
     end
 
