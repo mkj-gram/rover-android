@@ -1,7 +1,7 @@
 module FcmHelper
 
     class << self
-        
+
         INVALID_REGISTRATION = "InvalidRegistration".freeze
         NOT_REGISTERED = "NotRegistered".freeze
 
@@ -23,7 +23,7 @@ module FcmHelper
             messages_by_token.each do |token, messages|
                 messages.each do |message|
                     payload = payload_from_message(message)
-                    data = { 
+                    data = {
                         token: token,
                         data: { message: payload }
                     }
@@ -55,9 +55,9 @@ module FcmHelper
 
         private
 
-        def get_click_action_for_message(message)
-            message.content_type.underscore.upcase
-        end
+        # def get_click_action_for_message(message)
+        #     format("%s.%s.%s", "io.rover", "messages",  message.content_type.underscore.upcase)
+        # end
 
         def payload_from_message(inbox_message)
             json = V1::MessageSerializer.serialize(inbox_message)
