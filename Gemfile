@@ -67,7 +67,7 @@ gem 'redis', '~> 3.2', '>= 3.2.2'
 
 gem 'fluent-logger', '~> 0.5.1'
 
-gem 'fcm', '~> 0.0.1'
+gem 'gcm', '~> 0.1.1'
 
 gem 'apns_kit', '~> 0.1.2'
 

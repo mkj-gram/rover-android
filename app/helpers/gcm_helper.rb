@@ -1,4 +1,4 @@
-module FcmHelper
+module GcmHelper
 
     class << self
         
@@ -8,7 +8,7 @@ module FcmHelper
         def send(android_platform, messages_by_token)
             return if messages_by_token.empty?
 
-            client = FCM.new(android_platform.api_key)
+            client = GCM.new(android_platform.api_key)
             expired_tokens = []
 
             notifications = messages_to_notifications(messages_by_token)
@@ -25,11 +25,6 @@ module FcmHelper
                     payload = payload_from_message(message)
                     data = { 
                         token: token,
-                        notification: {
-                            title: message.android_title,
-                            body: message.notification_text,
-                            click_action: "io.rover.messages.#{get_click_action_for_message(message)}"
-                        },
                         data: { message: payload }
                     }
                     notifications.push(data)
