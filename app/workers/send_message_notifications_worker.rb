@@ -117,6 +117,8 @@ class SendMessageNotificationWorker
         ios_devices = customer.devices.select { |device| device.os_name == "iOS" && device.remote_notifications_enabled }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
 
+        return if ios_devices.empty?
+        
         messages_by_token = ios_devices.inject({}) { |hash, device| hash.merge!(device.token => messages); hash }
 
         connection = @@ios_connection_pool.get(customer.account_id)
