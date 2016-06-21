@@ -197,7 +197,7 @@ class SendMessageWorker
     def send_push_notification_for_android_messages(account, messages_by_token)
         android_platform = account.android_platform
         return if android_platform.api_key.nil?
-        GcmHelper.send(android_platform, messages_by_token)
+        FcmHelper.send(android_platform, messages_by_token)
     end
 
 end

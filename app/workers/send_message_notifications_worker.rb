@@ -150,15 +150,15 @@ class SendMessageNotificationWorker
 
         android_messages_by_token = android_devices.inject({}) { |hash, device| hash.merge!(device.token => messages)}
 
-        notifications = GcmHelper.messages_to_notifications(android_messages_by_token)
-        connection = GCM.new(api_key)
+        notifications = FcmHelper.messages_to_notifications(android_messages_by_token)
+        connection = FCM.new(api_key)
 
         start_time = Time.zone.now
-        GcmHelper.send_with_connection(connection, notifications)
+        FcmHelper.send_with_connection(connection, notifications)
         duration = (Time.zone.now - start_time) * 1000.0
 
-        MetricsClient.aggregate("gcm_notification.sent" => { value: android_devices.size })
-        MetricsClient.aggregate("gcm_notification.sent.time" => { value: (duration/responses.size.to_f).round(1) })
+        MetricsClient.aggregate("fcm_notification.sent" => { value: android_devices.size })
+        MetricsClient.aggregate("fcm_notification.sent.time" => { value: (duration/responses.size.to_f).round(1) })
 
     end
 
