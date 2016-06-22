@@ -79,7 +79,6 @@ class V1::CustomerSegmentsController < V1::ApplicationController
         if local_params.dig(:segments, :filters)
             filtered_params[:filters] = local_params[:segments][:filters]
         end
-        puts filtered_params
         return filtered_params
     end
 

@@ -77,7 +77,6 @@ module Events
             # it bubbles up from the children appending their attributes
             run_callbacks :save do
                 # TODO save this to somewhere
-                # puts "here are the attributes i'm going to save -> #{attributes}"
                 EventsLogger.log(account.id, generation_time, attributes)
             end
 

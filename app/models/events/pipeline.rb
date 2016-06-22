@@ -8,7 +8,6 @@ module Events
             @@event_id_to_event_string_index = {}
 
             def register(object, action, model, opts = {})
-                # puts "REGISTERING #{object}, #{action}, #{model}"
                 @@lock.synchronize {
                     event_string = "#{object}:#{action}"
                     @@events[object] = {} if @@events[object].nil?
@@ -19,7 +18,6 @@ module Events
                         @@targetable_events.add(model.event_id)
                     end
                 }
-                # puts @@events
             end
 
             def build(object, action, event_attributes)

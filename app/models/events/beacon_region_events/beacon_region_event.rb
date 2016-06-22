@@ -27,7 +27,6 @@ module Events
                 else
                     BeaconConfiguration::NO_PROTOCOL
                 end
-                puts @uuid, @major, @minor
             end
 
             def attributes
