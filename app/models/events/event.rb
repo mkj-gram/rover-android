@@ -29,7 +29,7 @@ module Events
         end
 
         def attributes
-            {
+            json = {
                 event: {
                     id: self.class.event_id,
                     object: object,
@@ -46,25 +46,30 @@ module Events
                         latitude: customer.location ? customer.location.latitude : nil,
                         longitude: customer.location ? customer.location.longitude : nil
                     }
-                },
-                device: {
-                    id: device.id.to_s,
-                    locale_lang: device.locale_lang,
-                    locale_region: device.locale_region,
-                    sdk_version: device.sdk_version,
-                    time_zone: device.time_zone,
-                    platform: device.platform,
-                    os_name: device.os_name,
-                    os_version: device.os_version,
-                    model: device.model,
-                    manufacturer: device.manufacturer,
-                    background_enabled: device.background_enabled,
-                    local_notifications_enabled: device.local_notifications_enabled,
-                    remote_notifications_enabled: device.remote_notifications_enabled,
-                    bluetooth_enabled: device.bluetooth_enabled,
-                    location_monitoring_enabled: device.location_monitoring_enabled
                 }
             }
+
+            if device
+                json.merge!(
+                    device: {
+                        id: device.id.to_s,
+                        locale_lang: device.locale_lang,
+                        locale_region: device.locale_region,
+                        sdk_version: device.sdk_version,
+                        time_zone: device.time_zone,
+                        platform: device.platform,
+                        os_name: device.os_name,
+                        os_version: device.os_version,
+                        model: device.model,
+                        manufacturer: device.manufacturer,
+                        background_enabled: device.background_enabled,
+                        local_notifications_enabled: device.local_notifications_enabled,
+                        remote_notifications_enabled: device.remote_notifications_enabled,
+                        bluetooth_enabled: device.bluetooth_enabled,
+                        location_monitoring_enabled: device.location_monitoring_enabled
+                    }
+                )
+            end
         end
 
 

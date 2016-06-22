@@ -1,7 +1,7 @@
 class SendMessageWorker
     include BackgroundWorker::Worker
 
-    from_queue 'send_message',
+    from_queue 'send_message_to_customers',
         :prefetch => 1,
         :ack => true
 
@@ -24,7 +24,7 @@ class SendMessageWorker
             offset: offset
         }
 
-        enqueue_message(msg, {to_queue: 'send_message'})
+        enqueue_message(msg, {to_queue: 'send_message_to_customers'})
     end
 
     def self.batch_size
