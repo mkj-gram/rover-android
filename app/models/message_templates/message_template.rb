@@ -85,10 +85,14 @@ class MessageTemplate < ActiveRecord::Base
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s,
-                landing_page: landing_page.nil? ? nil : landing_page_template.render(opts),
+                landing_page: landing_page_template_json_cache,
                 properties: properties
             }
         )
+    end
+
+    def landing_page_template_json_cache
+        @landing_page_template_json_cache ||= landing_page_template.nil? ? nil : landing_page_template.as_json
     end
 
     def stats
