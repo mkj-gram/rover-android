@@ -10,15 +10,20 @@ module V1::AccountSerializer
             end
         end
 
-        private
 
-        def serialize(object)
+        def serialize(account)
             {
-                "id"=> object.id.to_s,
-                "type"=> "accounts",
-                "attributes"=> {
-                    "title"=> object.title,
-                    "token"=> object.token
+                "id" => account.id.to_s,
+                "type" => "accounts",
+                "attributes" => {
+                    "title" => account.title,
+                    "token" => account.token,
+                    "share-key" => account.share_key,
+                    "configuration-tags" => account.beacon_configuration_active_tag.tags,
+                    "place-tags" => account.place_active_tag.tags,
+                    "ibeacon-uuids" => account.ibeacon_configuration_uuids.configuration_uuids,
+                    "eddystone-namespaces" => account.eddystone_namespace_configuration_uuids.configuration_uuids,
+                    "message-limits" => account.message_limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)}
                 }
             }
         end

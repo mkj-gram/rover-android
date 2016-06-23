@@ -10,7 +10,7 @@ module V1::UserSerializer
             end
         end
 
-        private
+        
 
         def serialize(object)
             {
