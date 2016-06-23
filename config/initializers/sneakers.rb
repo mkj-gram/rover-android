@@ -8,6 +8,7 @@ else
 end
 
 num_workers = Integer(ENV['BACKGROUND_CONCURRENCY'] || 2)
+num_threads = Integer(ENV['BACKGROUND_THREAD_COUNT'] || 2)
 
 Sneakers.configure(
     {
@@ -20,7 +21,7 @@ Sneakers.configure(
         pid_path: "pid/sneakers.pid",
         timeout_job_after: 1800,
         prefetch: 5,
-        threads: 5,
+        threads: num_threads,
         share_threads: true,
         env: ENV['RACK_ENV'],
         durable: true,
