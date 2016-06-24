@@ -113,6 +113,7 @@ class Customer
                 indexes :locale_region, type: 'string', index: 'not_analyzed'
                 indexes :time_zone, type: 'string', index: 'not_analyzed'
                 indexes :sdk_version, type: 'string', index: 'not_analyzed'
+                indexes :app_identifier, type: 'string', index: 'not_analyzed'
                 indexes :platform, type: 'string', index: 'not_analyzed'
                 indexes :os_name, type: 'string', index: 'not_analyzed'
                 indexes :os_version, type: 'string', index: 'not_analyzed'
@@ -149,8 +150,7 @@ class Customer
     after_save :index_customer
 
     def as_indexed_json(options = {})
-
-        json = {
+        {
             account_id: self.account_id,
             identifier: self.identifier,
             first_name: self.first_name,
@@ -164,8 +164,6 @@ class Customer
             location: location_as_indexed_json,
             devices: devices_as_indexed_json(options)
         }
-        Rails.logger.debug("indexing document #{json}")
-        return json
     end
 
 
@@ -292,6 +290,26 @@ class Customer
 
         def delete_all
             mongo_client[collection_name].find().delete_many
+        end
+
+        def all_in_batches(batch_size = 1000)
+            Enumerator.new do |y|
+                mongo_client[collection_name].find().batch_size(batch_size).each do |document|
+                    y << Customer.from_document(document)
+                end
+            end
+        end
+
+        def import
+            all_in_batches.each_slice(1000) do |customers|
+                body = []
+                customers.each do |customer|
+                    body.push({ index: { _index: 'customers', _type: 'customer', _id: customer.id }})
+                    body.push(customer.as_indexed_json)
+                end
+                Customer.__elasticsearch__.client.bulk(body: body)
+                Rails.logger.info("imported #{customers.size} documents")
+            end
         end
     end
 

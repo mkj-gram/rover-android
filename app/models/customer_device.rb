@@ -18,6 +18,7 @@ class CustomerDevice
     attribute :manufacturer, NullableString
     attribute :carrier, NullableString
     attribute :background_enabled, Boolean
+    attribute :app_identifier, String
     attribute :local_notifications_enabled, Boolean
     attribute :remote_notifications_enabled, Boolean
     attribute :bluetooth_enabled, Boolean
@@ -59,6 +60,7 @@ class CustomerDevice
             locale_region: self.locale_region,
             time_zone: self.time_zone,
             sdk_version: self.sdk_version,
+            app_identifier: self.app_identifier,
             platform: self.platform,
             os_name: self.os_name,
             os_version: self.os_version,
