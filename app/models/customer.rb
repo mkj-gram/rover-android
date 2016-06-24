@@ -273,6 +273,11 @@ class Customer
             return docs
         end
 
+        def find_all_by(query)
+            docs = mongo_client[collection_name].find(query).map{|document| Customer.from_document(document)}
+            return docs
+        end
+
         def find_by(query)
             doc = mongo_client[collection_name].find(query).first
             return nil if doc.nil?
