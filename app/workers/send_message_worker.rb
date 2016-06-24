@@ -191,13 +191,15 @@ class SendMessageWorker
     def send_push_notification_for_ios_messages(account, messages_by_token)
         ios_platform = account.ios_platform
         return if ios_platform.certificate.nil?
-        ApnsHelper.send(ios_platform, messages_by_token)
+        expired_tokens = ApnsHelper.send(ios_platform, messages_by_token)
+        CustomerDeviceHelper.remove_tokens(expired_tokens)
     end
 
     def send_push_notification_for_android_messages(account, messages_by_token)
         android_platform = account.android_platform
         return if android_platform.api_key.nil?
-        FcmHelper.send(android_platform, messages_by_token)
+        expired_tokens = FcmHelper.send(android_platform, messages_by_token)
+        CustomerDeviceHelper.remove_tokens(expired_tokens)
     end
 
 end

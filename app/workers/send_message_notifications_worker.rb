@@ -129,6 +129,10 @@ class SendMessageNotificationWorker
         responses = ApnsHelper.send_with_connection(connection, notifications)
         duration = (Time.now - start_time) * 1000.0
 
+        expired_tokens = responses.select{ |response| response.invalid_token? }.map{ |response| response.notification.token }
+        
+        CustomerDeviceHelper.remove_tokens(expired_tokens)
+
         MetricsClient.aggregate("apns_notification.sent" => { value: responses.size })
         MetricsClient.aggregate("apns_notification.sent.time" => { value: (duration/responses.size.to_f).round(1) })
         Rails.logger.info(responses)
@@ -158,8 +162,10 @@ class SendMessageNotificationWorker
         connection = FCM.new(api_key)
 
         start_time = Time.zone.now
-        FcmHelper.send_with_connection(connection, notifications)
+        expired_tokens = FcmHelper.send_with_connection(connection, notifications)
         duration = (Time.zone.now - start_time) * 1000.0
+
+        CustomerDeviceHelper.remove_tokens(expired_tokens)
 
         MetricsClient.aggregate("fcm_notification.sent" => { value: android_devices.size })
         MetricsClient.aggregate("fcm_notification.sent.time" => { value: (duration/android_devices.size.to_f).round(1) })
