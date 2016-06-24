@@ -11,18 +11,9 @@ class V1::SessionsController < V1::ApplicationController
         if @user && @user.authenticate(login_params.fetch(:password, ""))
             @session = Session.build_session(@user)
             if @session.save
-                json = {
-                    "data"=> {
-                        "id"=> @session.id.to_s,
-                        "type"=> "sessions",
-                        "attributes"=> {
-                            "token"=> @session.token
-                        },
-                        "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true})
-                    }
-                }
-                
-                json = add_included(json)
+
+                json = render_session(@session)        
+
                 render json: json, location: v1_user_url(@session.user.id)
             else
                 render_errors(@session.errors)
@@ -39,17 +30,8 @@ class V1::SessionsController < V1::ApplicationController
             if current_user && @session.user_id != current_user.id
                 render_unauthorized("Validation Error", "unable to view a session which isn't yours")
             else
-                json = {
-                    "data"=> {
-                        "id"=> @session.id.to_s,
-                        "type"=> "sessions",
-                        "attributes"=> {
-                            "token"=> @session.token
-                        },
-                        "relationships"=> V1::UserSerializer.s(@session.user, {relationships: true})
-                    }
-                }
-                json = add_included(json)
+               json = render_session(@session)
+               
                 render json: json, location: v1_user_url(@session.user.id)
             end
         else
@@ -78,27 +60,24 @@ class V1::SessionsController < V1::ApplicationController
 
     private
 
-    def add_included(json)
-        should_include = whitelist_include("user.account")
-        if should_include.include?("user.account")
-            user = @session.user
-            account = user.account
-            user_json = V1::UserSerializer.serialize(user)
-            user_json.merge!({
-                relationships: {
-                    account: {
-                        data: {
-                            type: "accounts", id: account.id.to_s
-                        }
-                    }
+    def render_session(session)
+        json = {
+            "data" => {
+                "id" => session.id.to_s,
+                "type" => "sessions",
+                "attributes"=> {
+                    "token"=> session.token
+                },
+                "relationships"=> {
+                    "user" => {
+                        "data" => { "type" => "users", "id" => session.user.id.to_s }
+                    },
+                    "account" => {
+                        "data" => { "type" => "accounts", "id" => session.user.account.id.to_s }
+                    }                        
                 }
-            })
-
-            account_json = V1::AccountSerializer.serialize(account)
-
-            json[:included] =[ user_json, account_json ]
-        end
-        json
+            }
+        }
     end
 
     def session_params(local_params)
