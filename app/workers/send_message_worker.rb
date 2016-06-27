@@ -196,7 +196,8 @@ class SendMessageWorker
     def send_push_notification_for_rover_messages(messages_by_token)
         connection = RoverApnsHelper.get_connection
         notifications = ApnsHelper.messages_to_notifications(messages_by_token)
-        expired_tokens = ApnsHelper.send_with_connection(connection, notifications)
+        responses = ApnsHelper.send_with_connection(connection, notifications)
+        expired_tokens = responses.select{ |response| response.invalid_token? }.map{ |response| response.notification.token }
         CustomerDeviceHelper.remove_tokens(expired_tokens)
     end
 
