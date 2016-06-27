@@ -31,6 +31,7 @@ class LandingPageTemplate < LandingPageBuilder::Screen
         LandingPage.new(
             {
                 title: TemplateHelper.render_string(title, opts),
+                background_color: background_color,
                 rows:  rows.map do |row|
                     {
                         blocks: row.blocks.map do |block|
