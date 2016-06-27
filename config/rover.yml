@@ -1,0 +1,7 @@
+development:
+  certificate: <%= Rails.root.join("config", "certs", "apns", "rover-cert.p12") %>
+  passphrase: <%= ENV['ROVER_CERTIFICATE_PASSPHRASE'] %>
+  
+production:
+  certificate: <%= Rails.root.join("config", "certs", "apns", "rover-cert.p12") %>
+  passphrase: <%= ENV['ROVER_CERTIFICATE_PASSPHRASE'] %>

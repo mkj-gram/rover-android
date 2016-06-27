@@ -114,14 +114,28 @@ class SendMessageNotificationWorker
             @@ios_connection_pool.add(customer.account_id, connection)
         end
 
+
         ios_devices = customer.devices.select { |device| device.os_name == "iOS" && device.remote_notifications_enabled }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
 
-        return if ios_devices.empty?
-        
-        messages_by_token = ios_devices.inject({}) { |hash, device| hash.merge!(device.token => messages); hash }
+        rover_devices, ios_devices = ios_devices.partition { |device| device.app_identifier == "io.rover.Rover" }
 
-        connection = @@ios_connection_pool.get(customer.account_id)
+        if rover_devices.any?
+            send_ios_notifications_with_connection(RoverApnsHelper.get_connection, messages, rover_devices)
+        end
+
+        if ios_devices.any? 
+            connection = @@ios_connection_pool.get(customer.account_id)
+            send_ios_notifications_with_connection(connection, messages, ios_devices)
+        end
+
+
+        
+       
+    end
+
+    def send_ios_notifications_with_connection(connection, messages, devices)
+        messages_by_token = devices.inject({}) { |hash, device| hash.merge!(device.token => messages); hash }
 
         notifications = ApnsHelper.messages_to_notifications(messages_by_token)
 

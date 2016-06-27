@@ -157,6 +157,7 @@ class SendMessageWorker
         # TODO
         # REWRITE THIS OLD CODE
         #
+        messages_by_ios_rover_token = {}
         messages_by_ios_token = {}
         messages_by_android_token = {}
 
@@ -164,7 +165,11 @@ class SendMessageWorker
             devices = inbox.customer.devices.select { |device| !device.token.nil? }
             devices.each do |device|
                 if device.ios?
-                    messages_by_ios_token[device.token] = [message]
+                    if device.app_identifier == "io.rover.Rover"
+                        messages_by_ios_rover_token[device.token] = [message]
+                    else
+                        messages_by_ios_token[device.token] = [message]
+                    end
                 elsif device.android?
                     messages_by_android_token[device.token] = [message]
                 end
@@ -172,7 +177,7 @@ class SendMessageWorker
         end
 
         send_push_notification_for_ios_messages(account, messages_by_ios_token)
-
+        send_push_notification_for_rover_messages(messages_by_ios_rover_token)
         send_push_notification_for_android_messages(account, messages_by_android_token)
 
         ack!
@@ -186,6 +191,13 @@ class SendMessageWorker
 
     def client
         @client ||= Elasticsearch::Model.client
+    end
+
+    def send_push_notification_for_rover_messages(messages_by_token)
+        connection = RoverApnsHelper.get_connection
+        notifications = ApnsHelper.messages_to_notifications(messages_by_token)
+        expired_tokens = ApnsHelper.send_with_connection(connection, notifications)
+        CustomerDeviceHelper.remove_tokens(expired_tokens)
     end
 
     def send_push_notification_for_ios_messages(account, messages_by_token)
