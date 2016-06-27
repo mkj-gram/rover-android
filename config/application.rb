@@ -18,6 +18,7 @@ module RailsApi
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
         config.mongo = Rails.application.config_for(:mongo)
         config.google_oauth = Rails.application.config_for(:google_oauth)
+        config.rover = Rails.application.config_for(:rover)
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('lib')
         config.autoload_paths << Rails.root.join('app', 'models', 'message_templates')
