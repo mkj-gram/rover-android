@@ -6,7 +6,9 @@ class LandingPageTemplate < LandingPageBuilder::Screen
             return nil if obj.nil?
             return obj if !obj.is_a?(Hash)
             begin
-                LandingPageTemplate.new(obj)
+                landing_page = LandingPageTemplate.new(obj)
+                landing_page.valid = true
+                return landing_page
             rescue => e
                 Rails.logger.warn("Couldn't load object #{obj} into LandingPageTemplate")
                 invalid = LandingPageTemplate.new()
