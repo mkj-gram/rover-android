@@ -9,7 +9,7 @@ module LandingPageBuilder
         attribute :title_bar_background_color, LandingPageBuilder::Color, default: { red: 255, green: 255, blue: 255 }
         attribute :title_bar_button_color, LandingPageBuilder::Color, default: { red: 0, green: 122, blue: 255 }
         attribute :status_bar_style, String, default: "dark"
-        attribute :inherit_styles, Boolean, default: false
+        attribute :use_default_title_bar_style, Boolean, default: false
 
         def ==(other)
             return false if other.nil?
@@ -21,7 +21,7 @@ module LandingPageBuilder
                 self.title_bar_background_color == other.title_bar_background_color &&
                 self.title_bar_button_color == other.title_bar_button_color &&
                 self.status_bar_style == other.status_bar_style &&
-                self.inherit_styles == other.inherit_styles
+                self.use_default_title_bar_style == other.use_default_title_bar_style
             )
         end
     end
