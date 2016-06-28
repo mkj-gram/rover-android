@@ -18,54 +18,7 @@ class SendMessageNotificationWorker
 
             enqueue_message(msg, {to_queue: 'send_message_notifications'})
         end
-
-        def ios_connection_pool
-            @@ios_connection_pool
-        end
     end
-
-    class ApnsLongTermConnectionPool
-
-        # defaults to 10 active connections
-        def initialize(size: 10)
-            Rails.logger.info("Initializing connection pool of size #{size}")
-            @size = size
-            @connections = {}
-            @mutex = Mutex.new
-            @last_id = nil
-        end
-
-
-        def get(id)
-            @mutex.synchronize do
-                @connections[id]
-            end
-        end
-
-        def add(id, connection)
-            if @connections.size > @size
-                remove(@connections.keys.last)
-            end
-
-            @mutex.synchronize do
-                Rails.logger.info("Adding connection with id #{id}")
-                @connections[id] = connection
-            end
-        end
-
-        def remove(id)
-            @mutex.synchronize do
-                Rails.logger.info("Removing connection with id #{id}")
-                connection = @connections[id]
-                connection.shutdown if connection
-                connection = nil
-                @connections.delete(id)
-            end
-        end
-    end
-
-    @@ios_connection_pool = ApnsLongTermConnectionPool.new(size: 20)
-    @@android_api_key_cache = ActiveSupport::Cache::MemoryStore.new
 
     def perform(args)
         customer_id = args["customer_id"]
@@ -78,43 +31,11 @@ class SendMessageNotificationWorker
         send_ios_notifications_to_customer(customer, messages, device_ids_filter)
         send_android_notifications_to_customer(customer, messages, device_ids_filter)
 
-
-
-
-        # ios_platform = IosPlatform.find(customer.account_id)
-
-        # if ios_platform
-
-
-        #     connection = connection_from_ios_platform(ios_platform)
-        #     notifications =
-
-        #         # TODO
-        #         # setup long lived connections for these
-        #         expired_tokens = ApnsHelper.send(ios_platform, message_ids_by_token, ios_devices)
-
-        #     # need a way to specify the device without updating the customer
-        #     # TODO:!!!!!!
-        #     # if expired_tokens && expired_tokens.any?
-        #     #     expired_devices = ios_devices.select { |device| expired_tokens.include?(expired_tokens) }
-        #     #     expired_devices.each do |device|
-        #     #         device.update_attributes()
-        #     #     end
-        #     # end
-        # end
-
         ack!
     end
 
     def send_ios_notifications_to_customer(customer, messages, device_ids_filter)
-        if @@ios_connection_pool.get(customer.account_id).nil?
-            ios_platform = IosPlatform.find_by(account_id: customer.account_id)
-            return if ios_platform.nil?
-            connection = ApnsHelper.connection_from_ios_platform(ios_platform, pool_size: 1, heartbeat_interval: 120)
-            @@ios_connection_pool.add(customer.account_id, connection)
-        end
-
-
+        
         ios_devices = customer.devices.select { |device| device.os_name == "iOS" && device.remote_notifications_enabled }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
 
@@ -125,13 +46,11 @@ class SendMessageNotificationWorker
         end
 
         if ios_devices.any? 
-            connection = @@ios_connection_pool.get(customer.account_id)
+            ios_platform = IosPlatform.find_by(account_id: customer.account_id)
+            connection = ApnsHelper.connection_from_ios_platform(ios_platform, pool_size: 1, heartbeat_interval: 120)
             send_ios_notifications_with_connection(connection, messages, ios_devices)
         end
 
-
-        
-       
     end
 
     def send_ios_notifications_with_connection(connection, messages, devices)
@@ -154,14 +73,8 @@ class SendMessageNotificationWorker
 
     def send_android_notifications_to_customer(customer, messages, device_ids_filter)
 
-        api_key = @@android_api_key_cache.fetch(customer.account_id, expires_in: 10.minutes) do
-            android_platform = AndroidPlatform.find_by(account_id: customer.account_id)
-            if android_platform
-                android_platform.api_key
-            else
-                nil
-            end
-        end
+        android_platform = AndroidPlatform.find_by(account_id: customer.account_id)
+        api_key = android_platform.nil? ? nil : android_platform.api_key
 
         return if api_key.nil?
 
