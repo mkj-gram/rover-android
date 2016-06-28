@@ -35,7 +35,7 @@ class SendMessageNotificationWorker
     end
 
     def send_ios_notifications_to_customer(customer, messages, device_ids_filter)
-        
+
         ios_devices = customer.devices.select { |device| device.os_name == "iOS" && device.remote_notifications_enabled }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
 
@@ -49,6 +49,7 @@ class SendMessageNotificationWorker
             ios_platform = IosPlatform.find_by(account_id: customer.account_id)
             connection = ApnsHelper.connection_from_ios_platform(ios_platform, pool_size: 1, heartbeat_interval: 120)
             send_ios_notifications_with_connection(connection, messages, ios_devices)
+            connection.shutdown
         end
 
     end
