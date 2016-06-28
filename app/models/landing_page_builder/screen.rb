@@ -8,7 +8,7 @@ module LandingPageBuilder
         attribute :title_bar_text_color, LandingPageBuilder::Color, default: { red: 0, green: 0, blue: 0 }
         attribute :title_bar_background_color, LandingPageBuilder::Color, default: { red: 255, green: 255, blue: 255 }
         attribute :title_bar_button_color, LandingPageBuilder::Color, default: { red: 0, green: 122, blue: 255 }
-        attribute :status_bar_style, String, default: "light"
+        attribute :status_bar_style, String, default: "dark"
         attribute :inherit_styles, Boolean, default: false
 
         def ==(other)
