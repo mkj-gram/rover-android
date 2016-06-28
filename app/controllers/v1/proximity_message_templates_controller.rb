@@ -167,7 +167,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             local_params[:proximity_messages][:trigger_event_id] = Events::Pipeline.event_string_to_event_id(local_params[:proximity_messages][:trigger_event])
         end
 
-        local_params.fetch(:proximity_messages, {}).permit(
+        allowed_params = local_params.fetch(:proximity_messages, {}).permit(
             :title,
             :notification_text,
             :published,
@@ -195,7 +195,15 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :deep_link_url,
             :customer_segment_id,
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
-        ).merge({:landing_page => local_params.dig(:proximity_messages, :landing_page), :properties => local_params.dig(:proximity_messages, :properties)})
+        )
+
+        if local_params.fetch(:proximity_messages, {}).has_key?(:landing_page)
+            allowed_params.merge!(landing_page: local_params[:proximity_messages][:landing_page])
+        end
+
+        if local_params.fetch(:proximity_messages, {}).has_key?(:properties)
+            allowed_params.merge!(properties: local_params[:proximity_messages][:properties])
+        end
     end
 
     def render_proximity_message(message)

@@ -54,6 +54,7 @@ class MessageTemplate < ActiveRecord::Base
 
     validates :title, presence: true
     validate :valid_date_schedule
+    validate :valid_landing_page
 
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
@@ -359,6 +360,12 @@ class MessageTemplate < ActiveRecord::Base
 
         if @schedule_end_date && !valid_date(@schedule_end_date)
             errors.add(:schedule_end_date, "invalid format expecting yyyy-mm-dd")
+        end
+    end
+
+    def valid_landing_page
+        if !landing_page_template.nil? && landing_page_template.valid? == false
+            errors.add(:landing_page, "invalid")
         end
     end
 

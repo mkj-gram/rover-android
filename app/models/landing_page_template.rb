@@ -9,7 +9,9 @@ class LandingPageTemplate < LandingPageBuilder::Screen
                 LandingPageTemplate.new(obj)
             rescue => e
                 Rails.logger.warn("Couldn't load object #{obj} into LandingPageTemplate")
-                return nil
+                invalid = LandingPageTemplate.new()
+                invalid.valid = false
+                return invalid
             end
         end
 
@@ -23,8 +25,12 @@ class LandingPageTemplate < LandingPageBuilder::Screen
 
     end
 
+    def valid=(new_value)
+        @valid = new_value
+    end
+
     def valid?
-        true
+        !!@valid
     end
 
     def render(opts = {})
