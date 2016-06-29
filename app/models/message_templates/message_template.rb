@@ -11,7 +11,8 @@ class MessageTemplate < ActiveRecord::Base
 
     belongs_to :account
 
-    serialize :landing_page_template, LandingPageTemplate
+    attribute :landing_page_template, LandingPageTemplate::Type.new
+    # serialize :landing_page_template, LandingPageTemplate
     serialize :properties, JSONHash
 
     alias_attribute :landing_page, :landing_page_template

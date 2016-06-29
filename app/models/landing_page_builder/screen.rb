@@ -13,8 +13,9 @@ module LandingPageBuilder
 
         def ==(other)
             return false if other.nil?
-            (
+            return (
                 self.title == other.title &&
+                compare_rows(other.rows) &&
                 self.rows == other.rows &&
                 self.background_color == other.background_color &&
                 self.title_bar_text_color == other.title_bar_text_color &&
@@ -24,5 +25,17 @@ module LandingPageBuilder
                 self.use_default_title_bar_style == other.use_default_title_bar_style
             )
         end
+
+
+        private
+
+        def compare_rows(other_rows)
+            for i in 0..self.rows.length
+                return false if self.rows[i] != other_rows[i]
+            end
+
+            return true
+        end
+
     end
 end
