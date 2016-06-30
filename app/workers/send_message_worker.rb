@@ -5,27 +5,99 @@ class SendMessageWorker
         :prefetch => 1,
         :ack => true
 
-    def self.perform_async(message_template_id, segment_query = nil, test_customer_ids = [], scroll_id = nil, offset = 0)
 
-        if segment_query.nil?
-            message_template = MessageTemplate.find(message_template_id)
-            if message_template.customer_segment
-                segment_query = message_template.customer_segment.to_elasticsearch_query
-            else
-                segment_query = {}
+
+
+    def self.perform_async(message_template_or_id, base_query = {}, test_customer_ids = [])
+        message_template = message_template_or_id.is_a?(MessageTemplate) ? message_template_or_id : MessageTemplate.find(message_template_or_id)
+        account = message_template.account
+
+        # we need to plan our orchestration
+        # first determine what our cluster looks like
+        client = Elasticsearch::Model.client
+        segments = client.indices.segments(index: Customer.get_index_name(account))
+        # determine which shards hold our data
+        shards = segments["indices"]["customers"]["shards"].keys
+        # split queries to each shard split again by number of documents
+        shards.each do |shard|
+            for i in 1..Customer::MAX_BUCKETS
+                bucket_query = ElasticsearchHelper.merge_queries(base_query, {
+                    filter: {
+                        term: {
+                            document_bucket: i
+                        }
+                    }
+                })
+
+                job = {
+                    message_template: message_template,
+                    account: account,
+                    test_customer_ids: test_customer_ids,
+                    query: bucket_query,
+                    platform_credentials: {
+                        fcm: {
+                            api_key: account.android_platform.api_key
+                        },
+                        apns: {
+                            certificate: account.ios_platform.certificate,
+                            passphrase: account.ios_platform.passphrase
+                        }
+                    },
+                    preference: "_shards:#{shard}"
+
+                }
+                enqueue_message(job, { to_queue: 'send_message_to_customers'})
             end
         end
-
-        msg = {
-            message_template_id: message_template_id,
-            segment_query: segment_query,
-            test_customer_ids: test_customer_ids,
-            scroll_id: scroll_id,
-            offset: offset
-        }
-
-        enqueue_message(msg, {to_queue: 'send_message_to_customers'})
+        # For testing purposes if you want to trigger a full scan as 1 job
+        # bucket_query = ElasticsearchHelper.merge_queries(base_query, {
+        #             filter: {
+        #                 term: {
+        #                     document_bucket: 1
+        #                 }
+        #             }
+        #         })
+        # job = {
+        #     message_template: message_template,
+        #     account: account,
+        #     test_customer_ids: test_customer_ids,
+        #     query: base_query,
+        #     platform_credentials: {
+        #         fcm: {
+        #             api_key: account.android_platform.api_key
+        #         },
+        #         apns: {
+        #             certificate: account.ios_platform.certificate,
+        #             passphrase: account.ios_platform.passphrase
+        #         }
+        #     },
+        #     preference: ""
+        # }
+        # enqueue_message(job, { to_queue: 'send_message_to_customers'})
     end
+
+
+    # def self.perform_async(message_template_id, segment_query = nil, test_customer_ids = [], scroll_id = nil, offset = 0)
+
+    #     if segment_query.nil?
+    #         message_template = MessageTemplate.find(message_template_id)
+    #         if message_template.customer_segment
+    #             segment_query = message_template.customer_segment.to_elasticsearch_query
+    #         else
+    #             segment_query = {}
+    #         end
+    #     end
+
+    #     msg = {
+    #         message_template_id: message_template_id,
+    #         segment_query: segment_query,
+    #         test_customer_ids: test_customer_ids,
+    #         scroll_id: scroll_id,
+    #         offset: offset
+    #     }
+
+    #     enqueue_message(msg, {to_queue: 'send_message_to_customers'})
+    # end
 
     def self.batch_size
         1000

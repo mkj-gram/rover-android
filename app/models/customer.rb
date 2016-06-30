@@ -6,6 +6,9 @@ class Customer
     extend ActiveModel::Naming
     extend ActiveModel::Callbacks
 
+    MAX_BUCKETS = 5
+
+
     attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
     attribute :account_id, Integer
     attribute :identifier, NullableString
@@ -23,6 +26,7 @@ class Customer
     attribute :total_place_visits, Integer, default: 0
     attribute :last_place_visit_at, Time
     attribute :first_visit_at, Time
+    attribute :document_bucket, Integer, default: lambda { |model, attribute|  1 + rand(MAX_BUCKETS) }
     attribute :devices, Array[CustomerDevice], default: []
     attribute :created_at, Time
     attribute :updated_at, Time
@@ -106,6 +110,7 @@ class Customer
             indexes :created_at, type: 'date', index: 'not_analyzed'
             indexes :traits, type: 'object'
             indexes :location, type: "geo_point", lat_lon: true
+            indexes :document_bucket, type: 'integer'
             indexes :devices, type: 'nested' do
                 indexes :udid, type: 'string', index: 'no'
                 indexes :token, type: 'string', index: 'no'
@@ -162,6 +167,7 @@ class Customer
             age: self.age,
             gender: self.gender,
             location: location_as_indexed_json,
+            document_bucket: self.document_bucket,
             devices: devices_as_indexed_json(options)
         }
     end
