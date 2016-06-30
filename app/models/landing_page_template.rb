@@ -86,6 +86,11 @@ class LandingPageTemplate < LandingPageBuilder::Screen
             {
                 title: TemplateHelper.render_string(title, opts),
                 background_color: background_color,
+                title_bar_text_color: title_bar_text_color,
+                title_bar_background_color: title_bar_background_color,
+                title_bar_button_color: title_bar_button_color,
+                status_bar_style: status_bar_style,
+                use_default_title_bar_style: use_default_title_bar_style,
                 rows:  rows.map do |row|
                     {
                         blocks: row.blocks.map do |block|
