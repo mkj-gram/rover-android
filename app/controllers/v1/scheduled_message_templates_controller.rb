@@ -137,7 +137,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:scheduled_messages], :name, :title)
         convert_param_if_exists(local_params[:scheduled_messages], :segment_id, :customer_segment_id)
 
-        local_params.fetch(:scheduled_messages, {}).permit(
+        allowed_params = local_params.fetch(:scheduled_messages, {}).permit(
             :title,
             :notification_text,
             :published,
@@ -150,7 +150,16 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             :use_local_time_zone,
             :scheduled_time_zone,
             :scheduled_timestamp
-        ).merge({:landing_page => local_params.dig(:scheduled_messages, :landing_page), :properties => local_params.dig(:scheduled_messages, :properties)})
+        )
+
+        if local_params.fetch(:scheduled_messages, {}).has_key?(:landing_page)
+            allowed_params.merge!(landing_page: local_params[:scheduled_messages][:landing_page])
+        end
+
+        if local_params.fetch(:scheduled_messages, {}).has_key?(:properties)
+            allowed_params.merge!(properties: local_params[:scheduled_messages][:properties])
+        end
+
     end
 
 

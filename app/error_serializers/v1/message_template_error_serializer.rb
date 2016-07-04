@@ -6,5 +6,6 @@ class V1::MessageTemplateErrorSerializer < ModelError::Serializer
     attribute :schedule_start_time, error_key: :"schedule-start-time"
     attribute :schedule_end_time, error_key: :"schedule-end-time"
     attribute :action
+    attribute :landing_page, error_key: :"landing-page"
     attribute :properties
 end
