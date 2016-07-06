@@ -6,8 +6,6 @@ class SendMessageWorker
     #     :ack => true
 
 
-
-
     def self.perform_async(message_template_or_id, base_query = {}, test_customer_ids = [])
         message_template = message_template_or_id.is_a?(MessageTemplate) ? message_template_or_id : MessageTemplate.find(message_template_or_id)
         account = message_template.account
@@ -46,7 +44,7 @@ class SendMessageWorker
                     preference: "_shards:#{shard}"
 
                 }
-                enqueue_message(job, { to_queue: 'send_message_to_customers'})
+                RabbitMQPublisher.publish(job.to_json, {to_queue: 'send_message_to_customers', content_type: 'application/json'})
             end
         end
         # For testing purposes if you want to trigger a full scan as 1 job
