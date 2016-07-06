@@ -21,8 +21,12 @@ class SendMessageWorker
             for i in 1..Customer::MAX_BUCKETS
                 bucket_query = ElasticsearchHelper.merge_queries(base_query, {
                     filter: {
-                        term: {
-                            document_bucket: i
+                        bool: {
+                            must: [
+                                term: {
+                                    document_bucket: i
+                                }
+                            ]
                         }
                     }
                 })
