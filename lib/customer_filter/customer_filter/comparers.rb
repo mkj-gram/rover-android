@@ -31,8 +31,8 @@ module CustomerFilter
                     integer(opts)
                 when :float
                     float(opts)
-                when :geo_point
-                    geo_point(opts)
+                when :geofence
+                    geofence(opts)
                 else
                     return nil
                 end
@@ -54,8 +54,8 @@ module CustomerFilter
                     :integer
                 when ::Float
                     :float
-                when ::GeoPoint
-                    :geo_point
+                when ::Geofence
+                    :geofence
                 end
             end
 
@@ -87,8 +87,8 @@ module CustomerFilter
                 CustomerFilter::Comparers::Date.new(opts)
             end
 
-            def geo_point(opts)
-                CustomerFilter::Comparers::GeoPoint.new(opts)
+            def geofence(opts)
+                CustomerFilter::Comparers::Geofence.new(opts)
             end
 
         end

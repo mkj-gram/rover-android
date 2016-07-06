@@ -1,6 +1,6 @@
 module CustomerFilter
     module Comparers
-        class GeoPoint < Comparer
+        class Geofence < Comparer
 
             attr_reader :longitude, :latitude, :radius
 
