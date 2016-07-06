@@ -3,7 +3,7 @@ module Events
         class GeofenceRegionEvent < Event
 
             before_save :save_messages_to_inbox
-            after_save :track_customer_last_place_visit
+            after_save :update_device_location_state
 
             attr_reader :geofence_region, :identifier_longitude, :longitude, :latitude, :radius
 
@@ -74,23 +74,8 @@ module Events
 
             private
 
-            def track_customer_last_place_visit
-                if place && customer.last_place_visit_id != place.id
-                    current_time = Time.zone.now
-                    update_params = {
-                        "$inc" => {
-                            "total_place_visits" => 1,
-                        },
-                        "$set" => {
-                            "last_place_visit_id" => place.id,
-                            "last_place_visit_at" => current_time
-                        }
-                    }
-                    if customer.first_visit_at.nil?
-                        update_params["$set"].merge!("first_visit_at" => current_time)
-                    end
-                    customer.update(update_params)
-                end
+            def update_device_location_state
+                
             end
 
             def save_messages_to_inbox
