@@ -49,6 +49,7 @@ module BackgroundWorker
                     return :ack
                 rescue Exception => e
                     Rails.logger.info("FAILED: #{self.class.name} failed to perform #{msg}")
+                    Raven.capture_exception(exception)
                     raise e
                 end
             end
