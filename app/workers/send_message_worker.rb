@@ -23,8 +23,15 @@ class SendMessageWorker
                     filter: {
                         bool: {
                             must: [
-                                term: {
-                                    document_bucket: i
+                                {
+                                    term: {
+                                        document_bucket: i
+                                    }
+                                },
+                                {
+                                    term: {
+                                        account_id: account.id
+                                    }
                                 }
                             ]
                         }
