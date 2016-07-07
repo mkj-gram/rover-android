@@ -66,7 +66,9 @@ module Events
                         local_notifications_enabled: device.local_notifications_enabled,
                         remote_notifications_enabled: device.remote_notifications_enabled,
                         bluetooth_enabled: device.bluetooth_enabled,
-                        location_monitoring_enabled: device.location_monitoring_enabled
+                        location_monitoring_enabled: device.location_monitoring_enabled,
+                        beacon_regions_monitoring: device.beacon_regions_monitoring.map(&:to_doc),
+                        geofence_regions_monitoring: device.geofence_regions_monitoring.map(&:to_doc)
                     }
                 )
             end

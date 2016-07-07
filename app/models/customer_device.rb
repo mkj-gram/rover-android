@@ -27,6 +27,8 @@ class CustomerDevice
     attribute :location_monitoring_enabled, Boolean
     attribute :development, Boolean, default: false
     attribute :aid, NullableString
+    attribute :beacon_regions_monitoring, Array[Snapshots::BeaconRegion], default: []
+    attribute :geofence_regions_monitoring, Array[Snapshots::GeofenceRegion], default: []
 
     alias_method :udid, :_id
     alias_method :id, :_id
@@ -84,7 +86,10 @@ class CustomerDevice
     end
 
     def to_doc
-        return attributes.compact
+        current_attributes = attributes.compact
+        current_attributes[:beacon_regions_monitoring] = current_attributes[:beacon_regions_monitoring].map(&:to_doc) if current_attributes[:beacon_regions_monitoring]
+        current_attributes[:geofence_regions_monitoring] = current_attributes[:geofence_regions_monitoring].map(&:to_doc) if current_attributes[:geofence_regions_monitoring]
+        return current_attributes
     end
 
     def customer=(customer)

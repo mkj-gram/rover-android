@@ -31,12 +31,6 @@ class Customer
     def id
         _id.to_s
     end
-    # track_dirty_attributes :a
-    # index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
-    # index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
-    # index({"account_id": 1, "traits": 1}, {partial_filter_expression: {"traits" => {"$exists" => true}}})
-    # index({"devices.token": 1}, {unique: true, partial_filter_expression: {"devices.token" => {"$exists" => true}}})
-    # embeds_many :devices, class_name: "CustomerDevice"
 
     def self.search_string_mapping
         {
@@ -106,8 +100,6 @@ class Customer
             indexes :traits, type: 'object'
             indexes :document_bucket, type: 'integer'
             indexes :devices, type: 'nested' do
-                indexes :udid, type: 'string', index: 'no'
-                indexes :token, type: 'string', index: 'no'
                 indexes :locale_lang, type: 'string', index: 'not_analyzed'
                 indexes :locale_region, type: 'string', index: 'not_analyzed'
                 indexes :time_zone, type: 'string', index: 'not_analyzed'
