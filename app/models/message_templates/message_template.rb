@@ -93,6 +93,13 @@ class MessageTemplate < ActiveRecord::Base
         )
     end
 
+    def as_json(options = {})
+        json = super options
+        json["ios_title"] = get_ios_title
+        json["android_title"] = get_android_title
+        json
+    end
+
     def landing_page_template_json_cache
         @landing_page_template_json_cache ||= landing_page_template.nil? ? nil : landing_page_template.as_json
     end

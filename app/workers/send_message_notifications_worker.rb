@@ -67,8 +67,8 @@ class SendMessageNotificationWorker
         
         CustomerDeviceHelper.remove_tokens(expired_tokens)
 
-        MetricsClient.aggregate("apns_notification.sent" => { value: responses.size })
-        MetricsClient.aggregate("apns_notification.sent.time" => { value: (duration/responses.size.to_f).round(1) })
+        MetricsClient.aggregate("apns.notifications.sent" => { value: responses.size })
+        MetricsClient.aggregate("apns.notifications.sent.time" => { value: (duration/responses.size.to_f).round(1) })
         Rails.logger.info(responses)
     end
 
@@ -95,8 +95,8 @@ class SendMessageNotificationWorker
 
         CustomerDeviceHelper.remove_tokens(expired_tokens)
 
-        MetricsClient.aggregate("fcm_notification.sent" => { value: android_devices.size })
-        MetricsClient.aggregate("fcm_notification.sent.time" => { value: (duration/android_devices.size.to_f).round(1) })
+        MetricsClient.aggregate("fcm.notifications.sent" => { value: android_devices.size })
+        MetricsClient.aggregate("fcm.notifications.sent.time" => { value: (duration/android_devices.size.to_f).round(1) })
 
     end
 
