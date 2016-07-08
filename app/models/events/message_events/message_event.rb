@@ -43,7 +43,7 @@ module Events
                             deeplink_url: message.deeplink_url,
                             timestamp: message.timestamp,
                             landing_page: message.landing_page.to_json,
-                            properties: message.properties
+                            properties: message.properties.to_json
                         }
                     )
                 end

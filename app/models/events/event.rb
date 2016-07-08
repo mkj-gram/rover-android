@@ -199,16 +199,18 @@ module Events
         end
 
         def track_delivered_message(message)
-            attributes = {
+            input = {
                 object: "message",
                 action: "added-to-inbox",
-                message: message,
+                message: message
+               
+            }.with_indifferent_access
+            extras = {
                 account: account,
                 device: device,
                 customer: customer
-            }.with_indifferent_access
-
-            event = Events::Pipeline.build("message", "added-to-inbox", attributes)
+            }
+            event = Events::Pipeline.build("message", "added-to-inbox", input, extras)
             event.save
         end
 
