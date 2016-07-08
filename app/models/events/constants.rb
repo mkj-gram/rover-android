@@ -30,9 +30,17 @@ module Events
 
         # Message Events 101-120
         MESSAGE_EVENT_ID = 101
-        MESSAGE_DELIVERED_EVENT_ID = 102
-        MESSAGE_OPENED_EVENT_ID = 103
+        MESSAGE_ADDED_TO_INBOX_EVENT_ID = 102
+        MESSAGE_OPENED_EVENT_ID = 103 # could be from notification or inbox
         MESSAGE_DELETED_EVENT_ID = 104
+
+        # Notification Events 121-140
+        NOTIFICATION_SENT = 121
+        NOTIFICATION_FAILED = 122
+
+        # Rate limiting events 141-160
+        GLOBAL_RATE_LIMIT_EXCEEDED = 141
+        MESSAGE_RATE_LIMIT_EXCEEDED = 142  # this is only for proximity events
 
     end
 end

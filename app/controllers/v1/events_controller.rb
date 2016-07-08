@@ -22,12 +22,12 @@ class V1::EventsController < V1::ApplicationController
         else
             Raven.user_context(account_id: current_account.id, customer_id: customer.id, customer_identifier: customer.identifier, customer_name: customer.name)
 
-            attributes = event_attributes.merge({account: current_account, device: device, customer: customer})
+            meta_data = { account: current_account, device: device, customer: customer }
 
             object = event_attributes[:object]
             action = event_attributes[:action]
 
-            event = Events::Pipeline.build(object, action, attributes)
+            event = Events::Pipeline.build(object, action, event_attributes, meta_data)
             event.save
 
             json = event.to_json

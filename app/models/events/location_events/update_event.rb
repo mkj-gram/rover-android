@@ -10,9 +10,9 @@ module Events
             Events::Pipeline.register("location", "update", self, { targetable: true })
 
 
-            after_save :set_beacon_regions_monitoring
-            after_save :set_geofence_regions_monitoring
-
+            before_save :set_beacon_regions_monitoring
+            before_save :set_geofence_regions_monitoring
+            before_save :set_device_location
 
             def set_beacon_regions_monitoring
                 @ibeacon_regions = ibeacon_wildcard_regions

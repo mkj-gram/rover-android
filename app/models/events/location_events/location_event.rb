@@ -2,7 +2,7 @@ module Events
     module LocationEvents
         class LocationEvent < Event
 
-            before_save :update_customer_location
+            before_save :set_device_location
 
             def self.event_id
                 Event::LOCATION_EVENT_ID
@@ -10,19 +10,16 @@ module Events
 
             attr_reader :longitude, :latitude, :radius, :region_limit
 
-            def initialize(event_attributes)
-                super
+            def initialize(event_attributes, extra)
+                super event_attributes, extra
                 @longitude = event_attributes[:longitude]
                 @latitude = event_attributes[:latitude]
                 @radius = event_attributes[:radius]
                 @region_limit = device.ios? ? 20 : 100
             end
 
-            def update_customer_location
-                if customer
-                    customer.location = GeoPoint.new(latitude: latitude, longitude: longitude)
-                    customer.save
-                end
+            def set_device_location
+                device.location = Snapshots::Location(latitude: latitude, longitude: longitude, accuracy: radius) if device
             end
 
             # def attributes

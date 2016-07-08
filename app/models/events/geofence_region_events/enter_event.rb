@@ -1,6 +1,5 @@
 module Events
     module GeofenceRegionEvents
-
         class EnterEvent < GeofenceRegionEvent
 
             def self.event_id
@@ -9,7 +8,13 @@ module Events
 
             Events::Pipeline.register("geofence-region", "enter", self, { targetable: true })
 
-        end
 
+            before_save :set_device_location
+
+            def set_device_location
+        		device.location = Snapshots::Location.new(longitude: longitude, latitude: latitude, accuracy: radius)
+            end
+
+        end
     end
 end

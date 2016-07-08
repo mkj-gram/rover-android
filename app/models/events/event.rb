@@ -8,7 +8,7 @@ module Events
 
         TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
-        attr_reader :account, :customer, :device, :object, :action, :generation_time
+        attr_reader :account, :customer, :device, :object, :action, :generation_time, :source
         attr_reader :messages
         # attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
 
@@ -16,14 +16,15 @@ module Events
             Events::Constants::UNKNOWN_EVENT_ID
         end
 
-        def initialize(event_attributes)
+        def initialize(event_attributes, extra)
             @id = SecureRandom.uuid
-            @account = event_attributes[:account]
+            @account = extra.delete(:account)
             @object = event_attributes[:object]
             @action = event_attributes[:action]
-            @customer = event_attributes[:customer]
-            @device = event_attributes[:device]
+            @customer = extra.delete(:customer)
+            @device = extra(:device)
             @generation_time = get_time(event_attributes[:time])
+            @raw_input = event_attributes.to_json
             @included = []
             @messages = []
         end
@@ -34,44 +35,63 @@ module Events
                     id: self.class.event_id,
                     object: object,
                     action: action,
-                    timestamp: generation_time.to_i
+                    timestamp: generation_time.to_i,
+                    input: @raw_input,
+                    source: source
                 },
                 customer: {
-                    id: customer.id.to_s,
+                    id: customer.id,
                     identifier: customer.identifier,
-                    gender: customer.gender,
+                    first_name: customer.first_name,
+                    last_name: customer.last_name,
+                    email: customer.email,
                     age: customer.age,
-                    tags: customer.tags,
-                    location: {
-                        latitude: customer.location ? customer.location.latitude : nil,
-                        longitude: customer.location ? customer.location.longitude : nil
-                    }
+                    gender: customer.gender,
+                    phone_number: customer.phone_number,
+                    tags: customer.tags
                 }
             }
+
 
             if device
                 json.merge!(
                     device: {
-                        id: device.id.to_s,
+                        id: device.id,
+                        token: device.token,
                         locale_lang: device.locale_lang,
-                        locale_region: device.locale_region,
-                        sdk_version: device.sdk_version,
                         time_zone: device.time_zone,
+                        sdk_version: device.sdk_version,
                         platform: device.platform,
                         os_name: device.os_name,
                         os_version: device.os_version,
                         model: device.model,
                         manufacturer: device.manufacturer,
+                        carrier: device.carrier,
+                        app_identifier: device.app_identifier,
                         background_enabled: device.background_enabled,
-                        local_notifications_enabled: device.local_notifications_enabled,
-                        remote_notifications_enabled: device.remote_notifications_enabled,
+                        notifications_enabled: device.notifications_enabled,
                         bluetooth_enabled: device.bluetooth_enabled,
                         location_monitoring_enabled: device.location_monitoring_enabled,
-                        beacon_regions_monitoring: device.beacon_regions_monitoring.map(&:to_doc),
-                        geofence_regions_monitoring: device.geofence_regions_monitoring.map(&:to_doc)
+                        development: device.development,
+                        aid: device.aid,
+                        beacon_regions_monitoring: device.beacon_regions_monitoring.to_json,
+                        geofence_regions_monitoring: device.geofence_regions_monitoring.to_json
                     }
                 )
+
+                if device.location
+                    json[:device].merge!(
+                        location: {
+                            latitude: device.location.latitude,
+                            longitude: device.location.longitude,
+                            accuracy: device.location.accuracy,
+                            timestamp: device.location.timestamp
+                        }
+                    )
+                end
             end
+
+            return json
         end
 
 
@@ -85,6 +105,12 @@ module Events
             run_callbacks :save do
                 # TODO save this to somewhere
                 EventsLogger.log(account.id, generation_time, attributes)
+            end
+
+            # Some event has updated the state of the customer so lets save the changes
+            # Reindex if necessary 
+            if customer.changes.any? || device.changes.any?
+                customer.save
             end
 
             MetricsClient.aggregate("events.#{object}.#{action}" => { value: 1, source: "account_#{account.id}" })
@@ -175,14 +201,14 @@ module Events
         def track_delivered_message(message)
             attributes = {
                 object: "message",
-                action: "delivered",
+                action: "added-to-inbox",
                 message: message,
                 account: account,
                 device: device,
                 customer: customer
             }.with_indifferent_access
 
-            event = Events::Pipeline.build("message", "delivered", attributes)
+            event = Events::Pipeline.build("message", "added-to-inbox", attributes)
             event.save
         end
 

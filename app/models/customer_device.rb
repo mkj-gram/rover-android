@@ -18,15 +18,15 @@ class CustomerDevice
     attribute :model, NullableString
     attribute :manufacturer, NullableString
     attribute :carrier, NullableString
-    attribute :background_enabled, Boolean
     attribute :app_identifier, String
     attribute :location, Snapshots::Location
-    attribute :local_notifications_enabled, Boolean
-    attribute :remote_notifications_enabled, Boolean
+    attribute :background_enabled, Boolean
+    attribute :notifications_enabled, Boolean
     attribute :bluetooth_enabled, Boolean
     attribute :location_monitoring_enabled, Boolean
     attribute :development, Boolean, default: false
     attribute :aid, NullableString
+    # Track state of what the device is monitoring for
     attribute :beacon_regions_monitoring, Array[Snapshots::BeaconRegion], default: []
     attribute :geofence_regions_monitoring, Array[Snapshots::GeofenceRegion], default: []
 
@@ -72,8 +72,7 @@ class CustomerDevice
             manufacturer: self.manufacturer,
             carrier: self.carrier,
             background_enabled: self.background_enabled,
-            local_notifications_enabled: self.local_notifications_enabled,
-            remote_notifications_enabled: self.remote_notifications_enabled,
+            notifications_enabled: self.notifications_enabled,
             location_monitoring_enabled: self.location_monitoring_enabled,
             bluetooth_enabled: self.bluetooth_enabled,
             development: self.development,
@@ -90,6 +89,10 @@ class CustomerDevice
         current_attributes[:beacon_regions_monitoring] = current_attributes[:beacon_regions_monitoring].map(&:to_doc) if current_attributes[:beacon_regions_monitoring]
         current_attributes[:geofence_regions_monitoring] = current_attributes[:geofence_regions_monitoring].map(&:to_doc) if current_attributes[:geofence_regions_monitoring]
         return current_attributes
+    end
+
+    def remote_notifications_enabled=(new_value)
+        self.notifications_enabled = new_value
     end
 
     def customer=(customer)

@@ -2,12 +2,11 @@ module Events
     module BeaconRegionEvents
         class BeaconRegionEvent < Event
 
-            after_save :track_customer_last_place_visit
             before_save :save_messages_to_inbox
+            before_save :set_device_location
 
-
-            def initialize(event_attributes)
-                super
+            def initialize(event_attributes, extra)
+                super event_attributes, extra
                 @configuration_id = event_attributes[:configuration_id]
                 @uuid = event_attributes[:uuid]
                 @major = event_attributes[:major_number]
@@ -36,13 +35,15 @@ module Events
                         {
                             configuration: {
                                 id: beacon_configuration.id,
+                                place_id: beacon_configuration.place_id,
                                 title: beacon_configuration.title,
                                 protocol: beacon_configuration.protocol,
                                 tags: beacon_configuration.tags,
+                                enabled: beacon_configuration.enabled,
                                 shared: beacon_configuration.shared,
                                 uuid: beacon_configuration.uuid,
-                                major: beacon_configuration.major,
-                                minor: beacon_configuration.minor,
+                                major_number: beacon_configuration.major,
+                                minor_number: beacon_configuration.minor,
                                 namespace: beacon_configuration.namespace,
                                 instance_id: beacon_configuration.instance_id,
                                 url: beacon_configuration.url
@@ -58,14 +59,17 @@ module Events
                                 id: place.id,
                                 title: place.title,
                                 address: place.address,
-                                postal_code: place.postal_code,
                                 city: place.city,
                                 province: place.province,
                                 country: place.country,
+                                postal_code: place.postal_code,
                                 latitude: place.latitude,
                                 longitude: place.longitude,
                                 tags: place.tags,
-                                shared: place.shared
+                                google_place_id: place.google_place_id,
+                                enabled: place.enabled,
+                                shared: place.shared,
+                                beacon_configurations_count: place.beacon_configurations_count
                             }
                         }
                     )
@@ -118,27 +122,14 @@ module Events
 
             private
 
-            def track_customer_last_place_visit
-                if place && customer.last_place_visit_id != place.id
-                    current_time = Time.zone.now
-                    update_params = {
-                        "$inc" => {
-                            "total_place_visits" => 1,
-                        },
-                        "$set" => {
-                            "last_place_visit_id" => place.id,
-                            "last_place_visit_at" => current_time
-                        }
-                    }
-                    if customer.first_visit_at.nil?
-                        update_params["$set"].merge!("first_visit_at" => current_time)
-                    end
-                    customer.update(update_params)
+            def set_device_location
+                if place
+                    device.location = Snapshots::Location.new(longitude: place.longitude, latitude: place.latitude, accuracy: place.radius)
                 end
             end
 
+
             def save_messages_to_inbox
-                puts "after save"
                 @proximity_messages = get_messages_for_beacon_configuration(beacon_configuration) || []
                 if @proximity_messages && @proximity_messages.any?
                     deliver_messages(@proximity_messages)

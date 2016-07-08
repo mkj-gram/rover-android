@@ -20,10 +20,10 @@ module Events
                 }
             end
 
-            def build(object, action, event_attributes)
+            def build(object, action, event_attributes, extra_attributes)
                 model = @@events.dig(object, action)
-                return Events::Event.new(event_attributes) if model.nil?
-                return model.new(event_attributes)
+                return Events::Event.new(event_attributes, extra_attributes ) if model.nil?
+                return model.new(event_attributes, extra_attributes)
             end
 
             def targetable_event?(event_id)

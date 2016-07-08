@@ -16,8 +16,8 @@ module Events
 
             attr_reader :source
 
-            def initialize(event_attributes)
-                super
+            def initialize(event_attributes, extra)
+                super event_attributes, extra
                 @source = event_attributes["source"]
             end
 
