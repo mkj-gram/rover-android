@@ -35,12 +35,12 @@ module Events
         MESSAGE_DELETED_EVENT_ID = 104
 
         # Notification Events 121-140
-        NOTIFICATION_SENT = 121
-        NOTIFICATION_FAILED = 122
+        NOTIFICATION_SENT_EVENT_ID = 121
+        NOTIFICATION_FAILED_EVENT_ID = 122
 
         # Rate limiting events 141-160
-        GLOBAL_RATE_LIMIT_EXCEEDED = 141
-        MESSAGE_RATE_LIMIT_EXCEEDED = 142  # this is only for proximity events
+        GLOBAL_RATE_LIMIT_EXCEEDED_EVENT_ID = 141
+        MESSAGE_RATE_LIMIT_EXCEEDED_EVENT_ID = 142  # this is only for proximity events
 
     end
 end

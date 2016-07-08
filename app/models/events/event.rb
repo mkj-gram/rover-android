@@ -8,7 +8,7 @@ module Events
 
         TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
-        attr_reader :account, :customer, :device, :object, :action, :generation_time, :source
+        attr_reader :customer, :device, :object, :action, :generation_time, :source
         attr_reader :messages
         # attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
 
@@ -19,11 +19,13 @@ module Events
         def initialize(event_attributes, extra)
             @id = SecureRandom.uuid
             @account = extra.delete(:account)
+            @account_id = extra.delete(:account_id)
             @object = event_attributes[:object]
             @action = event_attributes[:action]
             @customer = extra.delete(:customer)
             @device = extra.delete(:device)
             @generation_time = get_time(event_attributes[:time])
+            @errors = event_attributes.delete(:errors)
             @raw_input = event_attributes.to_json
             @included = []
             @messages = []
@@ -36,8 +38,9 @@ module Events
                     object: object,
                     action: action,
                     timestamp: generation_time.to_i,
+                    source: source,
                     input: @raw_input,
-                    source: source
+                    errors: @errors
                 },
                 customer: {
                     id: customer.id,
@@ -94,6 +97,13 @@ module Events
             return json
         end
 
+        def account
+            @account ||= !@account_id.nil? ? Account.find(@account_id) : nil
+        end
+
+        def account_id
+            @account_id ||= account ? account.id : nil
+        end
 
         def save
             if self.class.event_id == Events::Constants::UNKNOWN_EVENT_ID
@@ -104,7 +114,7 @@ module Events
             # it bubbles up from the children appending their attributes
             run_callbacks :save do
                 # TODO save this to somewhere
-                EventsLogger.log(account.id, generation_time, attributes)
+                EventsLogger.log(account_id, generation_time, attributes)
             end
 
             # Some event has updated the state of the customer so lets save the changes
@@ -113,7 +123,7 @@ module Events
                 customer.save
             end
 
-            MetricsClient.aggregate("events.#{object}.#{action}" => { value: 1, source: "account_#{account.id}" })
+            MetricsClient.aggregate("events.#{object}.#{action}" => { value: 1, source: "account_#{account_id}" })
         end
 
         def today_schedule_column
@@ -154,7 +164,7 @@ module Events
             # track messages
             #
             message_templates.each do |template|
-                MetricsClient.aggregate("#{template.metric_type}.delivered" => { value: 1, source: "account_#{account.id}" })
+                MetricsClient.aggregate("#{template.metric_type}.delivered" => { value: 1, source: "account_#{account_id}" })
             end
 
             message_templates.each {|template| template.account = account }
@@ -257,10 +267,10 @@ module Events
                             bool: {
                                 should: [
                                     {
-                                        term: { account_id: account.id }
+                                        term: { account_id: account_id }
                                     },
                                     {
-                                        term: { shared_account_ids: account.id }
+                                        term: { shared_account_ids: account_id }
                                     }
                                 ],
                                 must: [
