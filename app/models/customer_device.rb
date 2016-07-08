@@ -151,7 +151,7 @@ class CustomerDevice
             "manufacturer" => manufacturer,
             "carrier" => carrier,
             "background-enabled" => background_enabled,
-            "remote-notifications-enabled" => remote_notifications_enabled,
+            "notifications-enabled" => notifications_enabled,
             "bluetooth-enabled" => bluetooth_enabled,
             "location-monitoring-enabled" => location_monitoring_enabled
         }
