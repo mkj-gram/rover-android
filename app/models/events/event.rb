@@ -22,7 +22,7 @@ module Events
             @object = event_attributes[:object]
             @action = event_attributes[:action]
             @customer = extra.delete(:customer)
-            @device = extra(:device)
+            @device = extra.delete(:device)
             @generation_time = get_time(event_attributes[:time])
             @raw_input = event_attributes.to_json
             @included = []

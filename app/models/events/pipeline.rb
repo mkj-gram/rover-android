@@ -22,6 +22,7 @@ module Events
 
             def build(object, action, event_attributes, extra_attributes)
                 model = @@events.dig(object, action)
+                event_attributes.merge!(object: object, action: action)
                 return Events::Event.new(event_attributes, extra_attributes ) if model.nil?
                 return model.new(event_attributes, extra_attributes)
             end
