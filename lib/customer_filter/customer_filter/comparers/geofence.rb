@@ -37,9 +37,14 @@ module CustomerFilter
                 when Comparers::Methods::UNKNOWN_VALUE
                     v.nil?
                 when Comparers::Methods::GEOFENCE
-                    # v is the customers current geo_point
-                    distance = ::GeoPoint.distance_between(v, geo_point)
-                    distance <= radius
+                    if v.nil?
+                        false
+                    else
+                        device_geo_point = ::GeoPoint.new(latitude: v.latitude, longitude: v.longitude)
+                        # v is the customers current geo_point
+                        distance = ::GeoPoint.distance_between(device_geo_point, geo_point)
+                        distance <= radius
+                    end
                 else
                     false
                 end
