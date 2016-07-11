@@ -30,7 +30,7 @@ module Events
                             content_type: message.content_type,
                             website_url: message.website_url,
                             deeplink_url: message.deeplink_url,
-                            timestamp: message.timestamp,
+                            timestamp: message.timestamp.to_i,
                             landing_page: message.landing_page.to_json,
                             properties: message.properties.to_json
                         }
