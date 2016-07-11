@@ -42,7 +42,7 @@ class V1::CustomerInboxMessagesController < V1::ApplicationController
         @message = Message.find(params[:id])
         if @message.nil?
             head :not_found
-        elsif @message.customer_id != current_customer.id
+        elsif @message.customer_id != current_customer._id
             head :forbidden
         end
     end
