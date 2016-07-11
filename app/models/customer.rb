@@ -324,6 +324,15 @@ class Customer
 
     end
 
+    def location
+        most_recent_device = devices.select { |device| device.location }.sort_by { |device| device.location? ? device.location.timestamp }.last
+        if most_recent_device.nil?
+            return nil
+        else
+            return most_recent_device.location
+        end
+    end
+
     def build_device(attributes)
         CustomerDevice.new(attributes.merge(customer: self))
     end
