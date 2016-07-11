@@ -22,7 +22,7 @@ module Events
 
             def set_geofence_regions_monitoring
                 @geofence_regions = closest_geofence_regions(region_limit - device.beacon_regions_monitoring.size)
-                geofence_snapshots = geofence_regions.map { |geofence| Snapshots::GeofenceRegion.new(latitude: geofence.latitude, longitude: geofence.longitude, radius: geofence.radius)}
+                geofence_snapshots = @geofence_regions.map { |geofence| Snapshots::GeofenceRegion.new(latitude: geofence.latitude, longitude: geofence.longitude, radius: geofence.radius)}
                 device.geofence_regions_monitoring = geofence_snapshots
             end
 
