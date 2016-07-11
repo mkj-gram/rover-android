@@ -160,7 +160,7 @@ namespace :account do
                     version = os == "iOS" ? ios_os_versions.sample : android_os_versions.sample
                     model = os == "iOS" ? "iPhone" : "Google"
                     c = Customer.new(account_id: @account.id, identifier: SecureRandom.uuid, name: Faker::Name.name, email: Faker::Internet.email, age: 15 + rand(40), gender: gender.sample, place: GeoPoint.new(latitude: lat, longitude: lng) )
-                    c.devices.build(udid: SecureRandom.uuid, locale_lang: languages.sample, locale_region: region.sample, time_zone: timezones.sample, sdk_version: "4.0.0", os_name: os, os_version: version, model: model, background_enabled: true_false.sample, local_notifications_enabled: true_false.sample, remote_notifications_enabled: true_false.sample, bluetooth_enabled: true_false.sample, place_monitoring_enabled: true_false.sample  )
+                    c.devices.build(udid: SecureRandom.uuid, locale_lang: languages.sample, locale_region: region.sample, time_zone: timezones.sample, sdk_version: "4.0.0", os_name: os, os_version: version, model: model, background_enabled: true_false.sample, local_notifications_enabled: true_false.sample, notifications_enabled: true_false.sample, bluetooth_enabled: true_false.sample, place_monitoring_enabled: true_false.sample  )
                     c.save
                     show_percentage((current_record/ num_customers.to_f) * 100)
                     current_record += 1
@@ -180,7 +180,7 @@ namespace :account do
                     version = os == "iOS" ? ios_os_versions.sample : android_os_versions.sample
                     model = os == "iOS" ? "iPhone" : "Google"
                     c = Customer.new(account_id: @account.id, identifier: SecureRandom.uuid, name: Faker::Name.name, email: Faker::Internet.email, age: 15 + rand(40), gender: gender.sample, place: GeoPoint.new(latitude: lat, longitude: lng) )
-                    c.devices.build(udid: SecureRandom.uuid, locale_lang: languages.sample, locale_region: region.sample, time_zone: timezones.sample, sdk_version: "4.0.0", os_name: os, os_version: version, model: model, background_enabled: true_false.sample, local_notifications_enabled: true_false.sample, remote_notifications_enabled: true_false.sample, bluetooth_enabled: true_false.sample, place_monitoring_enabled: true_false.sample  )
+                    c.devices.build(udid: SecureRandom.uuid, locale_lang: languages.sample, locale_region: region.sample, time_zone: timezones.sample, sdk_version: "4.0.0", os_name: os, os_version: version, model: model, background_enabled: true_false.sample, local_notifications_enabled: true_false.sample, notifications_enabled: true_false.sample, bluetooth_enabled: true_false.sample, place_monitoring_enabled: true_false.sample  )
                     c.save
                     show_percentage((current_record/ num_customers.to_f) * 100)
                     current_record += 1

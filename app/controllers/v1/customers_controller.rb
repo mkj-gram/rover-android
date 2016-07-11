@@ -107,8 +107,7 @@ class V1::CustomersController < V1::ApplicationController
                 :"model" => device.model,
                 :"manufacturer" => device.manufacturer,
                 :"carrier" => device.manufacturer,
-                :"local-notifications-enabled" => device.local_notifications_enabled,
-                :"remote-notifications-enabled" => device.remote_notifications_enabled,
+                :"notifications-enabled" => device.notifications_enabled,
                 :"location-monitoring-enabled" => device.location_monitoring_enabled,
                 :"background-enabled" => device.background_enabled,
                 :"bluetooth-enabled" => device.bluetooth_enabled

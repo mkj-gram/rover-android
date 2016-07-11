@@ -12,8 +12,7 @@ FactoryGirl.define do
         manufacturer "apple"
         carrier "rogers"
         idfa "abc"
-        local_notifications_enabled true
-        remote_notifications_enabled true
+        notifications_enabled true
         bluetooth_enabled true
     end
 end
