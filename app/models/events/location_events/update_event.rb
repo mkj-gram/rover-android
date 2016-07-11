@@ -16,7 +16,7 @@ module Events
 
             def set_beacon_regions_monitoring
                 @ibeacon_regions = ibeacon_wildcard_regions
-                beacon_regions = ibeacon_regions.map { |ibeacon| Snapshots::BeaconRegion.new(uuid: ibeacon.uuid, major_number: ibeacon.major, minor_number: ibeacon.minor) }
+                beacon_regions = @ibeacon_regions.map { |ibeacon| Snapshots::BeaconRegion.new(uuid: ibeacon.uuid, major_number: ibeacon.major, minor_number: ibeacon.minor) }
                 device.beacon_regions_monitoring = beacon_regions
             end
 
