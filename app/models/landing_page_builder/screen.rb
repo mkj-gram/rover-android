@@ -10,6 +10,15 @@ module LandingPageBuilder
         attribute :title_bar_button_color, LandingPageBuilder::Color, default: { red: 0, green: 122, blue: 255 }
         attribute :status_bar_style, String, default: "dark"
         attribute :use_default_title_bar_style, Boolean, default: false
+        attribute :status_bar_color, LandingPageBuilder::Color, default: lambda { |model, attribute|
+            if (model.title_bar_background_color)
+                color = model.title_bar_background_color
+                h, s, l = ::ColorConverter.rgbToHsl(color.red, color.green, color.blue)
+                l = [l - 0.1, 0].max
+                r, g, b = ::ColorConverter.hslToRgb(h, s, l)
+                return { red: r, green: g, blue: b, alpha: 1 }
+            end 
+        }
 
         def ==(other)
             return false if other.nil?
@@ -22,7 +31,8 @@ module LandingPageBuilder
                 self.title_bar_background_color == other.title_bar_background_color &&
                 self.title_bar_button_color == other.title_bar_button_color &&
                 self.status_bar_style == other.status_bar_style &&
-                self.use_default_title_bar_style == other.use_default_title_bar_style
+                self.use_default_title_bar_style == other.use_default_title_bar_style &&
+                self.status_bar_color == other.status_bar_color
             )
         end
 
