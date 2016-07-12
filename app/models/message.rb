@@ -123,7 +123,7 @@ class Message
 
     def customer=(new_customer)
         @customer = new_customer
-        self[:customer_id] = @customer.id
+        self[:customer_id] = @customer._id
     end
 
     def customer
