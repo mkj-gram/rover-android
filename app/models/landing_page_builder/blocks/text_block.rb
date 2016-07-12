@@ -4,7 +4,8 @@ module LandingPageBuilder
             include Virtus.model
             include LandingPageBuilder::Concerns::HasText
             include LandingPageBuilder::Concerns::HasBackground
-
+            include LandingPageBuilder::Concerns::HasBorder
+            
             def ==(other)
                 return false if other.nil?
                 (
