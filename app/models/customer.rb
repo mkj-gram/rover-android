@@ -20,12 +20,7 @@ class Customer
     attribute :phone_number, NullableString
     attribute :tags, Array[NullableString]
     attribute :traits, Hash
-    attribute :location, GeoPoint
     attribute :inbox_updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
-    attribute :last_place_visit_id, Integer
-    attribute :total_place_visits, Integer, default: 0
-    attribute :last_place_visit_at, Time
-    attribute :first_visit_at, Time
     attribute :document_bucket, Integer, default: lambda { |model, attribute|  1 + rand(MAX_BUCKETS) }
     attribute :devices, Array[CustomerDevice], default: []
     attribute :created_at, Time
@@ -36,12 +31,6 @@ class Customer
     def id
         _id.to_s
     end
-    # track_dirty_attributes :a
-    # index({"account_id": 1, "devices._id": 1}, {unique: true, partial_filter_expression: {"devices._id" => {"$exists" => true}}})
-    # index({"account_id": 1, "identifier": 1},  {unique: true, partial_filter_expression: {"identifier" => {"$exists" => true}}})
-    # index({"account_id": 1, "traits": 1}, {partial_filter_expression: {"traits" => {"$exists" => true}}})
-    # index({"devices.token": 1}, {unique: true, partial_filter_expression: {"devices.token" => {"$exists" => true}}})
-    # embeds_many :devices, class_name: "CustomerDevice"
 
     def self.search_string_mapping
         {
@@ -109,16 +98,14 @@ class Customer
             indexes :tags, type: 'string', index: 'not_analyzed'
             indexes :created_at, type: 'date', index: 'not_analyzed'
             indexes :traits, type: 'object'
-            indexes :location, type: "geo_point", lat_lon: true
             indexes :document_bucket, type: 'integer'
             indexes :devices, type: 'nested' do
-                indexes :udid, type: 'string', index: 'no'
-                indexes :token, type: 'string', index: 'no'
                 indexes :locale_lang, type: 'string', index: 'not_analyzed'
                 indexes :locale_region, type: 'string', index: 'not_analyzed'
                 indexes :time_zone, type: 'string', index: 'not_analyzed'
                 indexes :sdk_version, type: 'string', index: 'not_analyzed'
                 indexes :app_identifier, type: 'string', index: 'not_analyzed'
+                indexes :location, type: "geo_point", lat_lon: true
                 indexes :platform, type: 'string', index: 'not_analyzed'
                 indexes :os_name, type: 'string', index: 'not_analyzed'
                 indexes :os_version, type: 'string', index: 'not_analyzed'
@@ -126,8 +113,7 @@ class Customer
                 indexes :manufacturer, type: 'string', index: 'not_analyzed'
                 indexes :carrier, type: 'string', index: 'not_analyzed'
                 indexes :background_enabled, type: 'boolean', index: 'not_analyzed'
-                indexes :local_notifications_enabled, type: 'boolean', index: 'not_analyzed'
-                indexes :remote_notifications_enabled, type: 'boolean', index: 'not_analyzed'
+                indexes :notifications_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :location_monitoring_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :bluetooth_enabled, type: 'boolean', index: 'not_analyzed'
                 indexes :development, type: 'boolean', index: 'not_analyzed'
@@ -166,7 +152,6 @@ class Customer
             traits: self.traits,
             age: self.age,
             gender: self.gender,
-            location: location_as_indexed_json,
             document_bucket: self.document_bucket,
             devices: devices_as_indexed_json(options)
         }
@@ -225,7 +210,6 @@ class Customer
         current_attributes = attributes
         # work around since virtus doesn't do nested attributes
         current_attributes[:devices] = current_attributes[:devices].map(&:to_doc) if current_attributes[:devices]
-        current_attributes[:location] = current_attributes[:location].to_doc if current_attributes[:location]
         current_attributes.delete_if{|k,v| v.nil? }
         return current_attributes
     end
@@ -252,10 +236,11 @@ class Customer
 
     class << self
         def from_document(doc)
-            location = doc.delete(:location)
+            devices = doc.delete(:devices)
             customer = Customer.new(doc.merge(new_record: false))
+            devices = devices.map{ |device_doc| CustomerDevice.from_document(device_doc)}
+            customer.devices = devices
             customer.devices.each { |device| device.customer = customer } if customer.devices.any?
-            customer.location = GeoPoint.new(latitude: location.first, longitude: location.last) if location
             customer.changes_applied # force an update for what attributes are
             return customer
         end
@@ -339,6 +324,15 @@ class Customer
 
     end
 
+    def location
+        most_recent_device = (devices || []).select { |device| device.location }.sort_by { |device| device.location.timestamp }.last
+        if most_recent_device.nil?
+            return nil
+        else
+            return most_recent_device.location
+        end
+    end
+
     def build_device(attributes)
         CustomerDevice.new(attributes.merge(customer: self))
     end
@@ -369,24 +363,55 @@ class Customer
             create
         else
             run_callbacks :save do
-                # grab the changes
-                if changes.any?
-                    setters = changes.inject({}) do |hash, (k,v)|
+                # check to see if any devices changed
+                #  if devices has changed we need to loop through the ones that have changes
+                # else just use simple find update
+                if devices.any? { |device| device.changes.any? }
+                    customer_changes = changes
+                    customer_changes.delete(:devices)
+
+                    devices.each do |device|
+                        next if device.changes.empty?
+
+                        setters = device.changes.inject({}) do |hash, (k,v)|
+                            new_value = v.last
+                            new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
+                            hash.merge!({"devices.$.#{k.to_s}" => new_value})
+                            hash
+                        end
+
+                        setters.merge!("devices.$.updated_at" => Time.zone.now)
+
+                        setters = customer_changes.inject(setters) do |hash, (k,v)|
+                            new_value = v.last
+                            new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
+                            hash.merge!({k.to_s => new_value})
+                            hash
+                        end
+
+                        setters.merge!("updated_at" => Time.zone.now)
+                        mongo_client[collection_name].find({"_id" => self._id, "devices._id" => device._id}).update_one({"$set" => setters})
+                        customer_changes = {}
+                    end
+                else
+                    customer_changes = changes
+                    customer_changes.delete(:devices)
+
+                    setters = customer_changes.inject({}) do |hash, (k,v)|
                         new_value = v.last
                         new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
-                        if new_value.is_a?(Array) && new_value.first.respond_to?(:to_doc)
-                            new_value = new_value.map(&:to_doc)
-                        end
-                        hash.merge!({ k.to_s => new_value })
+                        hash.merge!({k.to_s => new_value})
                         hash
                     end
-                    mongo_client[collection_name].find("_id" => self._id).update_one({"$set" => setters.merge("updated_at" => Time.zone.now)})
-                    self.new_record = false
-                    true
+
+                    setters.merge!("updated_at" => Time.zone.now)
+                    mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => setters})
                 end
+                self.new_record = false
+                true # last line must return true if all changes went through
             end
-            self.new_record = false
             changes_applied
+            devices.each(&:changes_applied)
         end
         return self
     end
@@ -460,52 +485,10 @@ class Customer
         format("%s %s", first_name, last_name)
     end
 
-    def location_as_indexed_json
-        if self.location
-            {lat: self.location.latitude, lon: self.location.longitude}
-        else
-            nil
-        end
-    end
-
-    # def update_attributes_async(new_attributes)
-    #     merge(new_attributes)
-    #     if needs_update?
-    #         UpdateCustomerAttributesWorker.perform_async(self.id, new_attributes)
-    #     end
-    # end
-
-    # def merge(new_attributes)
-    #     new_traits = new_attributes.delete(:traits)
-    #     new_tags = new_attributes.delete(:tags)
-
-    #     new_attributes[:traits] = self.traits.merge!(new_traits) if new_traits && new_traits.any?
-    #     new_attributes[:tags] = (self.tags + new_tags).uniq if new_tags && new_tags.any?
-
-    #     new_attributes.each do |attribute, value|
-    #         self[attribute] = value
-    #     end
-    # end
-
-    # def merge_and_update_attributes(new_attributes)
-    #     if new_attributes.any?
-    #         merge(new_attributes)
-    #         self.update_attributes(new_attributes)
-    #     end
-    # end
-
-    # def reindex_devices
-    #     self.__elasticsearch__.update_document_attributes({ devices: devices_as_indexed_json })
-    # end
-
     # private
 
     def format_variable(value)
         value.nil? ? "nil" : value
-    end
-
-    def persist
-        # mongo_client[collection_name].
     end
 
     def update_active_traits
@@ -586,7 +569,6 @@ class Customer
                 id: self.id.to_s
             }
         )
-
     end
 
 end

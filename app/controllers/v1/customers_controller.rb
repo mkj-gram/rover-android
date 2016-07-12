@@ -6,7 +6,7 @@ class V1::CustomersController < V1::ApplicationController
 
     def index
 
-        should_include = ["devices", "last-place"]
+        should_include = ["devices"]
 
         query = {
             fields: ["_id"],
@@ -45,14 +45,6 @@ class V1::CustomersController < V1::ApplicationController
             included += customers.map{|customer| customer.devices.map{|device| serialize_device(device)}}.flatten
         end
 
-        if should_include.include?("last-place")
-            place_ids  = customers.map{|customer| customer.last_place_visit_id }.compact
-            if place_ids.any?
-                places = Place.where(id: place_ids).all
-                included += places.map{|place| V1::PlaceSerializer.serialize(place)}
-            end
-        end
-
         json["included"] = included if included.any?
         render json: json
     end
@@ -60,11 +52,6 @@ class V1::CustomersController < V1::ApplicationController
     def show
 
         included = @customer.devices.map{|device| serialize_device(device)}
-
-        if !@customer.last_place_visit_id.nil?
-            place = Place.find(@customer.last_place_visit_id)
-            included.push(V1::PlaceSerializer.serialize(place)) if place
-        end
 
         json = {
             data: serialize_customer(@customer),
@@ -92,19 +79,14 @@ class V1::CustomersController < V1::ApplicationController
     def render_customer(customer)
     end
 
-    def serialize_customer(customer, places_cache = {})
-        should_include = ["devices", "last-place"]
+    def serialize_customer(customer)
+        should_include = ["devices"]
 
         relationships = {}
 
         if should_include.include?("devices")
             relationships[:devices] = { data: customer.devices.map { |device| { type: "devices", id: device.id }}}
         end
-
-        if should_include.include?("last-place") && customer.last_place_visit_id
-            relationships[:"last-place"] = { data: { type: "places", id: customer.last_place_visit_id }}
-        end
-
 
         V1::CustomerSerializer.serialize(customer).merge(relationships: relationships)
     end
@@ -125,8 +107,7 @@ class V1::CustomersController < V1::ApplicationController
                 :"model" => device.model,
                 :"manufacturer" => device.manufacturer,
                 :"carrier" => device.manufacturer,
-                :"local-notifications-enabled" => device.local_notifications_enabled,
-                :"remote-notifications-enabled" => device.remote_notifications_enabled,
+                :"notifications-enabled" => device.notifications_enabled,
                 :"location-monitoring-enabled" => device.location_monitoring_enabled,
                 :"background-enabled" => device.background_enabled,
                 :"bluetooth-enabled" => device.bluetooth_enabled

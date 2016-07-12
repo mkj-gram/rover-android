@@ -25,10 +25,10 @@ module CustomerFilter
                 "os_name" => :string,
                 "os_version" => :string,
                 "model" => :string,
+                "location" => :geofence,
                 "manufacturer" => :string,
                 "background_enabled" => :boolean,
-                "local_notifications_enabled" => :boolean,
-                "remote_notifications_enabled" => :boolean,
+                "notifications_enabled" => :boolean,
                 "bluetooth_enabled" => :boolean,
                 "location_monitoring_enabled" => :boolean
             }

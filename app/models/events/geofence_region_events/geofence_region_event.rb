@@ -3,12 +3,11 @@ module Events
         class GeofenceRegionEvent < Event
 
             before_save :save_messages_to_inbox
-            after_save :track_customer_last_place_visit
 
             attr_reader :geofence_region, :identifier_longitude, :longitude, :latitude, :radius
 
-            def initialize(event_attributes)
-                super
+            def initialize(event_attributes, extra)
+                super event_attributes, extra
                 @geofence_region = GeofenceRegion.new(event_attributes[:identifier])
                 @latitude = event_attributes[:latitude]
                 @longitude = event_attributes[:longitude]
@@ -19,26 +18,29 @@ module Events
             def attributes
                 parent_attributes = super
 
-                if place
+                 if place
                     parent_attributes.merge!(
                         {
                             place: {
                                 id: place.id,
                                 title: place.title,
                                 address: place.address,
-                                postal_code: place.postal_code,
                                 city: place.city,
                                 province: place.province,
                                 country: place.country,
+                                postal_code: place.postal_code,
                                 latitude: place.latitude,
                                 longitude: place.longitude,
                                 tags: place.tags,
-                                shared: place.shared
+                                google_place_id: place.google_place_id,
+                                enabled: place.enabled,
+                                shared: place.shared,
+                                beacon_configurations_count: place.beacon_configurations_count
                             }
                         }
                     )
                 end
-
+                
                 return parent_attributes
             end
 
@@ -74,28 +76,8 @@ module Events
 
             private
 
-            def track_customer_last_place_visit
-                if place && customer.last_place_visit_id != place.id
-                    current_time = Time.zone.now
-                    update_params = {
-                        "$inc" => {
-                            "total_place_visits" => 1,
-                        },
-                        "$set" => {
-                            "last_place_visit_id" => place.id,
-                            "last_place_visit_at" => current_time
-                        }
-                    }
-                    if customer.first_visit_at.nil?
-                        update_params["$set"].merge!("first_visit_at" => current_time)
-                    end
-                    customer.update(update_params)
-                end
-            end
-
             def save_messages_to_inbox
                 # TODO Refractor both beacon_region_event and place_event use the same structure
-                puts "after save"
                 @proximity_messages = get_message_for_place(place) || []
                 if @proximity_messages && @proximity_messages.any?
                     deliver_messages(@proximity_messages)
