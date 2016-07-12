@@ -80,6 +80,7 @@ end
 
 require 'core_ext/hash'
 require 'core_ext/string'
+require 'color_converter/color_converter'
 require 'iso_639'
 require 'iso_3166'
 
