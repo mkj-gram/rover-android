@@ -44,7 +44,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
         elasticsearch_query = ScheduledMessageTemplate.search(query)
 
-        message_templates = elasticsearch_query.per_page(page_size).page(current_page).records
+        message_templates = elasticsearch_query.per_page([page_size,50].min).page(current_page).records
 
         records = message_templates.includes(:customer_segment).to_a
         # next grab all stats
