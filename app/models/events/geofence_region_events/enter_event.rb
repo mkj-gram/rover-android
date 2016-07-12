@@ -12,7 +12,9 @@ module Events
             before_save :set_device_location
 
             def set_device_location
-        		device.location = Snapshots::Location.new(longitude: longitude, latitude: latitude, accuracy: radius)
+                if longitude && latitude
+                    device.location = Snapshots::Location.new(longitude: longitude, latitude: latitude, accuracy: radius)
+                end
             end
 
         end

@@ -8,10 +8,16 @@ module Events
 
             def initialize(event_attributes, extra)
                 super event_attributes, extra
-                @geofence_region = GeofenceRegion.new(event_attributes[:identifier])
-                @latitude = event_attributes[:latitude]
-                @longitude = event_attributes[:longitude]
-                @radius = event_attributes[:radius]
+                if event_attributes[:identifier]
+                    @geofence_region = GeofenceRegion.new(event_attributes[:identifier])
+                    @latitude = @geofence_region.latitude
+                    @longitude = @geofence_region.longitude
+                    @radius = @geofence_region.radius
+                else
+                    @latitude = event_attributes[:latitude]
+                    @longitude = event_attributes[:longitude]
+                    @radius = event_attributes[:radius]
+                end
             end
 
 

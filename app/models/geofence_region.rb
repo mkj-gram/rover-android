@@ -9,15 +9,15 @@ class GeofenceRegion
 
     def initialize(attributes = {})
         if attributes.is_a?(String)
-            latitude, longitude = attributes.split(":")
-            super(latitude: latitude.to_f, longitude: longitude.to_f)
+            latitude, longitude, radius = attributes.split(":")
+            super(latitude: latitude.to_f, longitude: longitude.to_f, radius: radius.to_f)
         else
             super
         end
     end
 
     def id
-        "#{latitude}:#{longitude}"
+        "#{latitude}:#{longitude}:#{radius}"
     end
 
     def serialize
