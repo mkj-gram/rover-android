@@ -18,7 +18,9 @@ class V1::CustomerInboxLandingPageController < V1::ApplicationController
         @message = Message.find(params[:id])
         if @message.nil?
             head :not_found
-        elsif @message.customer_id != current_customer._id
+        elsif @message.customer_id.is_a?(BSON::ObjectId) && @message.customer_id != current_customer._id
+            head :forbidden
+        elsif !@message.customer_id.is_a?(BSON::ObjectId) && @message.customer_id != current_customer.id
             head :forbidden
         end
     end
