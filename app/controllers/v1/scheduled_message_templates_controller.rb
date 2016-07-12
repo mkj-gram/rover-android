@@ -71,7 +71,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 "totalArchived" => current_account.proximity_message_templates_archived_count,
                 "totalSent" => current_account.scheduled_message_templates_sent_count
             },
-            "included" => message_templates.map(&:customer_segment).compact.uniq.map { |segment| V1::CustomerSegmentSerializer.serialize(segment) }
+            "included" => records.map(&:customer_segment).compact.uniq.map { |segment| V1::CustomerSegmentSerializer.serialize(segment) }
         }
 
         render json: json
@@ -275,6 +275,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
     def serialize_message(message, extra_attributes = {})
         message.account = current_account
+        message.customer_segment.account = current_account if message.customer_segment
         {
             type: "scheduled-messages",
             id: message.id.to_s,
