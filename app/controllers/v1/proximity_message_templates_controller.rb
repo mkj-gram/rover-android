@@ -68,7 +68,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         elasticsearch_query = ProximityMessageTemplate.search(query)
 
-        message_templates = elasticsearch_query.per_page(page_size).page(current_page).records
+        message_templates = elasticsearch_query.per_page([page_size, 50].min).page(current_page).records
 
         records = message_templates.includes(:customer_segment).to_a
         # next grab all stats
@@ -299,6 +299,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     def serialize_message(message, extra_attributes = {})
         # extra_attributes.merge!(:landing_page_template => message.landing_page_template.to_json) if message.landing_page_template
         message.account = current_account
+        message.customer_segment.account = current_account if message.customer_segment
         {
             type: "proximity-messages",
             id: message.id.to_s,
