@@ -450,7 +450,7 @@ class Customer
 
     def destroy
         return if new_record?
-        run_callbacks :destroy
+        run_callbacks :destroy do
             mongo_client[collection_name].delete_one("_id" => self._id)
         end
     end
