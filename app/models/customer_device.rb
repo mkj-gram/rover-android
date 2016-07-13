@@ -76,7 +76,7 @@ class CustomerDevice
             location_monitoring_enabled: self.location_monitoring_enabled,
             bluetooth_enabled: self.bluetooth_enabled,
             development: self.development,
-            location: self.location ? { lat: self.location.latitude, lon: self.location.longitude } : nil
+            location: self.location && self.location.latitude && self.location.longitude ? { lat: self.location.latitude, lon: self.location.longitude } : nil
         }
     end
 
