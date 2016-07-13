@@ -6,6 +6,8 @@ module LandingPageBuilder
             include LandingPageBuilder::Concerns::HasBackground
             include LandingPageBuilder::Concerns::HasBorder
 
+            attribute :border_width, Float, default: 0
+            
             def ==(other)
                 return false if other.nil?
                 (
