@@ -53,7 +53,7 @@ class SendMessageWorker
                             api_key: account.android_platform.api_key
                         },
                         apns: {
-                            certificate: account.ios_platform.certificate,
+                            certificate: Base64.encode64(account.ios_platform.certificate),
                             passphrase: account.ios_platform.passphrase
                         }
                     },
