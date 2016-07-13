@@ -197,6 +197,7 @@ class Customer
             index: Customer.index_name,
             name: Customer.get_index_name(account),
             body: {
+                routing: "customers",
                 filter: {
                     term: {
                         account_id: account.id
