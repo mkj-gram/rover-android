@@ -47,7 +47,7 @@ class SendMessageWorker
                     account: account,
                     test_customer_ids: test_customer_ids,
                     query: bucket_query,
-                    segment: customer_segment
+                    segment: customer_segment,
                     platform_credentials: {
                         fcm: {
                             api_key: account.android_platform.api_key
