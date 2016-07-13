@@ -528,7 +528,6 @@ class Customer
         # going from no identifier to named
         if identifier.nil? && changes.include?(:devices) && changes[:devices].first.any? && changes[:devices].last.empty?
             Rails.logger.info("#{self._id}: this anonymous user doesn't have a device anymore")
-            decrement_customers_count
             self.destroy
         elsif identifier.nil? && devices.any?
             self.index_elasticsearch_document
