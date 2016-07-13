@@ -450,7 +450,9 @@ class Customer
 
     def destroy
         return if new_record?
-        mongo_client[collection_name].delete_one("_id" => self._id)
+        run_callbacks :destroy do
+            mongo_client[collection_name].delete_one("_id" => self._id)
+        end
     end
 
     def message_attributes
@@ -526,12 +528,7 @@ class Customer
         # going from no identifier to named
         if identifier.nil? && changes.include?(:devices) && changes[:devices].first.any? && changes[:devices].last.empty?
             Rails.logger.info("#{self._id}: this anonymous user doesn't have a device anymore")
-            decrement_customers_count
-            begin
-                self.delete_elasticsearch_document
-            rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
-                Rails.logger.warn(e)
-            end
+            self.destroy
         elsif identifier.nil? && devices.any?
             self.index_elasticsearch_document
         elsif !identifier.nil?
