@@ -9,7 +9,11 @@ class SendMessageWorker
     def self.perform_async(message_template_or_id, base_query = {}, test_customer_ids = [])
         message_template = message_template_or_id.is_a?(MessageTemplate) ? message_template_or_id : MessageTemplate.find(message_template_or_id)
         account = message_template.account
-
+        if message_template.customer_segment
+            customer_segment = { filters: message_template.customer_segment.filters.map(&:dump) }
+        else
+            customer_segment = {}
+        end
         # we need to plan our orchestration
         # first determine what our cluster looks like
         client = Elasticsearch::Model.client
@@ -43,6 +47,7 @@ class SendMessageWorker
                     account: account,
                     test_customer_ids: test_customer_ids,
                     query: bucket_query,
+                    segment: customer_segment,
                     platform_credentials: {
                         fcm: {
                             api_key: account.android_platform.api_key
