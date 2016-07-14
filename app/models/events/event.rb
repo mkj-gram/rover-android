@@ -62,6 +62,7 @@ module Events
                         id: device.id,
                         token: device.token,
                         locale_lang: device.locale_lang,
+                        locale_region: device.locale_region,
                         time_zone: device.time_zone,
                         sdk_version: device.sdk_version,
                         platform: device.platform,
