@@ -85,10 +85,12 @@ class SendMessageNotificationWorker
 
             if response.success?
                 event = Events::Pipeline.build("notification", "sent", input, extra)
+                event.raw_input = nil
                 event.save
             else
                 input.merge!(errors: [ response.failure_reason ])
                 event = Events::Pipeline.build("notification", "failed", input, extra)
+                event.raw_input = nil
                 event.save
             end
         end

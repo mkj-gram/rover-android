@@ -8,9 +8,8 @@ module Events
 
         TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
-        attr_reader :customer, :device, :object, :action, :generation_time, :source
-        attr_reader :messages
-        # attr_reader :inbox_messages, :local_messages # inbox_messages are messages that are persisted where local are one off messages
+        attr_reader :customer, :device, :object, :action, :generation_time, :source, :messages
+        attr_accessor :raw_input
 
         def self.event_id
             Events::Constants::UNKNOWN_EVENT_ID
@@ -18,6 +17,7 @@ module Events
 
         def initialize(event_attributes, extra)
             @id = SecureRandom.uuid
+            event_attributes[:id] = @id
             @account = extra.delete(:account)
             @account_id = extra.delete(:account_id)
             @object = event_attributes[:object]
@@ -221,6 +221,7 @@ module Events
                 customer: customer
             }
             event = Events::Pipeline.build("message", "added-to-inbox", input, extras)
+            event.raw_input = nil
             event.save
         end
 
