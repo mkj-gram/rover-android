@@ -538,7 +538,15 @@ class Customer
     end
 
     def index_elasticsearch_document(opts = {})
-        Rails.logger.info("Indexing #{self._id} from Elasticsearch".green.bold)
+
+        changed_device = devices.find{|d| d.changes.any? }
+
+        if changed_device && changed_device.changes.has_key?(:location) && [:latitude, :longitude].all? {|attribute| changed_device.changes[:location].first[attribute] == changed_device.changes[:location].last[attribute] }
+            Rails.logger.info("Skipping Elasticsearch index because only location timestamp has changed".green.bold)
+            return
+        end
+
+        Rails.logger.info("Indexing #{self._id} to Elasticsearch".green.bold)
         client = __elasticsearch__.client
         document = self.as_indexed_json
 
