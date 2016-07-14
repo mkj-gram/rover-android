@@ -37,7 +37,8 @@ class CustomerDevice
     before_validation { self.locale_lang = self.locale_lang.downcase if self.locale_lang }
     before_validation { self.locale_region = self.locale_region.downcase if self.locale_region }
     before_validation { self.locale_region = Iso3166.convert_alpha3_to_alpha2(self.locale_region) if self.locale_region && self.locale_region.length == 3}
-
+    before_validation { self.carrier = self.carrier.downcase if self.carrier }
+    
     validate :valid_locale_lang
     validate :valid_locale_region
     validate :valid_platform
