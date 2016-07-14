@@ -4,7 +4,7 @@ class ScheduledMessageTemplate < MessageTemplate
     TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
     validate :can_publish_message, if: -> { scheduled_at_changed? }
-    validates :scheduled_time_zone, presence: true, if: -> { self.use_local_time_zone == false }
+    validates :scheduled_time_zone, presence: true, if: -> { self.published == true && self.use_local_time_zone == false }
     # validate :can_modify_message
 
     before_save :update_scheduled_token
