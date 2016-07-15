@@ -47,7 +47,7 @@ class SendMessageNotificationWorker
 
         if ios_devices.any? 
             ios_platform = IosPlatform.find_by(account_id: customer.account_id)
-            connection = ApnsHelper.connection_from_ios_platform(ios_platform, pool_size: 1, heartbeat_interval: 120)
+            connection = ApnsHelper.connection_from_ios_platform(ios_platform, pool_size: 1, heartbeat_interval: 0)
             send_ios_notifications_with_connection(connection, messages, ios_devices)
             connection.shutdown
         end
@@ -55,6 +55,10 @@ class SendMessageNotificationWorker
     end
 
     def send_ios_notifications_with_connection(connection, messages, devices)
+        return if connection.nil?
+        return if messages.nil?
+        return if devices.nil?
+
         messages_by_token = devices.inject({}) { |hash, device| hash.merge!(device.token => messages); hash }
 
         notifications = ApnsHelper.messages_to_notifications(messages_by_token)
