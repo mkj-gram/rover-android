@@ -541,7 +541,7 @@ class Customer
 
         changed_device = devices.find{|d| d.changes.any? }
 
-        if changed_device && changed_device.changes.has_key?(:location) && [:latitude, :longitude].all? {|attribute| changed_device.changes[:location].first[attribute] == changed_device.changes[:location].last[attribute] }
+        if changed_device && !changed_device.location_updated?
             Rails.logger.info("Skipping Elasticsearch index because only location timestamp has changed".green.bold)
             return
         end

@@ -109,6 +109,16 @@ class CustomerDevice
         self[:_id] = new_udid.upcase
     end
 
+    def location_updated?
+        return (
+            self.changes.has_key?(:location) &&
+            (
+                self.changes[:location].first.nil? ||
+                [:latitude, :longitude].any? {|attribute| self.changes[:location].first[attribute] != self.changes[:location].last[attribute] } 
+            )
+        )
+    end
+
     def device_type
         @device_type ||= platform == "iOS" ? IOS_DEVICE : ANDROID_DEVICE
     end
