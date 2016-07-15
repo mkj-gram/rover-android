@@ -1,3 +1,4 @@
+
 class IosPlatform < ActiveRecord::Base
     include Platformable
 
@@ -37,6 +38,12 @@ class IosPlatform < ActiveRecord::Base
         self.credentials = ( self.credentials || {}).merge(passphrase: new_passphrase)
     end
 
+    def bundle_id
+        id = super
+        return id if id
+        return apns_certificate.bundle_id if apns_certificate
+        return nil
+    end
 
     private
 

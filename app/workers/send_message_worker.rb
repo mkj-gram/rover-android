@@ -54,7 +54,8 @@ class SendMessageWorker
                         },
                         apns: {
                             certificate: account.ios_platform.certificate ? Base64.encode64(account.ios_platform.certificate) : nil,
-                            passphrase: account.ios_platform.passphrase
+                            passphrase: account.ios_platform.passphrase,
+                            topic: account.ios_platform.bundle_id
                         }
                     },
                     preference: "_shards:#{shard}"
