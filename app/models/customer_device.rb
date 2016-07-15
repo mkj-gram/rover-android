@@ -86,7 +86,8 @@ class CustomerDevice
     end
 
     def to_doc
-        current_attributes = attributes.compact
+        current_attributes = attributes
+        current_attributes.delete(:token) if current_attributes.has_key?(:token) && current_attributes[:token].nil?
         current_attributes[:location] = current_attributes[:location].to_doc if current_attributes[:location]
         current_attributes[:beacon_regions_monitoring] = current_attributes[:beacon_regions_monitoring].map(&:to_doc) if current_attributes[:beacon_regions_monitoring]
         current_attributes[:geofence_regions_monitoring] = current_attributes[:geofence_regions_monitoring].map(&:to_doc) if current_attributes[:geofence_regions_monitoring]
