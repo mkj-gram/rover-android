@@ -19,7 +19,7 @@ module CustomerFilter
                 when Comparers::Methods::ANY_VALUE
                     true
                 when Comparers::Methods::IN
-                    v.include?(@value)
+                    @value.include?(v)
                 when Comparers::Methods::UNKNOWN_VALUE
                     v.nil?
                 else
