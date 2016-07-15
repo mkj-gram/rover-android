@@ -42,7 +42,7 @@ module Events
             private
 
             def needs_update
-                @needs_update ||= device && device.changes.include?(:location) && [:latitude, :longitude].any? {|attribute| device.changes[:location].first[attribute] != device.changes[:location].last[attribute] }
+                @needs_update ||= device && device.changes.include?(:location) && ( device.changes[:location].first.nil? || [:latitude, :longitude].any? {|attribute| device.changes[:location].first[attribute] != device.changes[:location].last[attribute] } )
             end
 
         end
