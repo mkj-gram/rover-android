@@ -23,7 +23,7 @@ module ApnsHelper
                 messages.each do |message|
                     payload = payload_from_message(message)
                     # message.ios_sound_file
-                    notifications.push(ApnsKit::Notification.new(token: token, sound: 'default', alert: { title: message.ios_title, body: message.notification_text }, data: payload ))
+                    notifications.push(ApnsKit::Notification.new(token: token, sound: 'default', alert: { title: message.ios_title, body: message.notification_text }, data: payload, _rover: true))
                 end
             end
             return notifications

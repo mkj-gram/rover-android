@@ -25,7 +25,8 @@ module FcmHelper
                     payload = payload_from_message(message)
                     data = {
                         token: token,
-                        data: { message: payload }
+                        data: { message: payload, _rover: true },
+
                     }
                     notifications.push(data)
                 end
