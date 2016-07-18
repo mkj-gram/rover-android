@@ -136,7 +136,6 @@ CREATE TABLE accounts (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customers_count integer DEFAULT 0,
-    message_limits hstore[] DEFAULT '{}'::hstore[],
     proximity_message_templates_draft_count integer DEFAULT 0,
     proximity_message_templates_published_count integer DEFAULT 0,
     proximity_message_templates_archived_count integer DEFAULT 0,
@@ -145,7 +144,9 @@ CREATE TABLE accounts (
     scheduled_message_templates_draft_count integer DEFAULT 0,
     scheduled_message_templates_published_count integer DEFAULT 0,
     scheduled_message_templates_sent_count integer DEFAULT 0,
-    scheduled_message_templates_archived_count integer DEFAULT 0
+    scheduled_message_templates_archived_count integer DEFAULT 0,
+    message_limits jsonb[] DEFAULT '{}'::jsonb[],
+    searchable_gimbal_places_count integer DEFAULT 0
 );
 
 
@@ -582,7 +583,6 @@ CREATE TABLE message_templates (
     trigger_event_id integer,
     dwell_time_in_seconds integer,
     customer_segment_id integer,
-    limits hstore[],
     filter_beacon_configuration_tags character varying[],
     filter_beacon_configuration_ids integer[],
     filter_place_tags character varying[],
@@ -605,7 +605,8 @@ CREATE TABLE message_templates (
     properties jsonb,
     deeplink_url character varying,
     scheduled_time_zone character varying,
-    sent boolean DEFAULT false
+    sent boolean DEFAULT false,
+    limits jsonb[] DEFAULT '{}'::jsonb[]
 );
 
 
@@ -1926,4 +1927,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160615145618');
 INSERT INTO schema_migrations (version) VALUES ('20160615154052');
 
 INSERT INTO schema_migrations (version) VALUES ('20160615173908');
+
+INSERT INTO schema_migrations (version) VALUES ('20160624145408');
+
+INSERT INTO schema_migrations (version) VALUES ('20160718184151');
 

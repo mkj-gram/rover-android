@@ -2,6 +2,9 @@ class GimbalIntegration < ThirdPartyIntegration
 
     validates :api_key, presence: true
 
+    alias_attribute :api_key, :credentials
+
+    # after_destroy :remove_old_gimbal_places
 
     def self.model_type
         @@model_type ||= "gimbal-integration"
@@ -14,18 +17,6 @@ class GimbalIntegration < ThirdPartyIntegration
     def model_type(opts = {})
         should_pluralize = opts.fetch(:pluralize, true)
         should_pluralize ? GimbalIntegration.model_type_pluralized : GimbalIntegration.model_type
-    end
-
-    def set_credentials(api_key)
-        self.credentials = {api_key: api_key}
-    end
-
-    def api_key
-        if self.credentials
-            self.credentials[:api_key]
-        else
-            nil
-        end
     end
 
     def credentials_json
@@ -41,34 +32,57 @@ class GimbalIntegration < ThirdPartyIntegration
     def sync!
 
         stats = {
-            added_beacons_count: 0,
-            modified_beacons_count: 0,
-            removed_beacons_count: 0,
-            beacons_changed_configuration_count: 0
+            added_places_count: 0,
+            removed_places_count: 0,
+            modified_places_count: 0
         }
 
+        current_page = 1
+        total_pages = Float::INFINITY
         # grab all the places
-        api_places_index = client.places.index_by(&:id)
+        while current_page <= total_pages do
 
-        api_place_ids = api_places_index.keys
+            response = client.places(true, { per_page: 50, page: current_page })
 
-        gimbal_places = GimbalPlace.where(id: api_place_ids).all
+            current_page += 1
+            total_pages = Integer(response[:headers]["total-pages"] || 0) # guard if the pages aren't in the response and we inifinite loop
+          
 
-        new_api_places = (api_place_ids - gimbal_places.map(&:id)).collect{|id| api_places_index[id] }
+            api_places_index = response[:places].index_by(&:id)
 
-        new_gimbal_places = new_api_places.map{|api_place| GimbalPlace.new(account_id: self.account_id, id: api_place.id, name: api_place.name )}
+            api_place_ids = api_places_index.keys
 
-        old_gimbal_places = gimbal_places.select{|gimbal_place| api_places_index[gimbal_place.id].nil? }
+            gimbal_places = GimbalPlace.where(account_id: self.account_id, id: api_place_ids).all
 
-        new_gimbal_places.each do |gimbal_place|
-            if gimbal_place.save
-                added_beacons_count += 1
+            new_api_places = (api_place_ids - gimbal_places.map(&:id)).collect{|id| api_places_index[id] }
+
+            new_gimbal_places = new_api_places.map{|api_place| GimbalPlace.new(account_id: self.account_id, id: api_place.id, name: api_place.name )}
+
+            old_gimbal_places = gimbal_places.select{|gimbal_place| api_places_index[gimbal_place.id].nil? }
+
+            modified_gimbal_places = gimbal_places.select do |gimbal_place|
+                api_places_index[gimbal_place.id] && api_places_index[gimbal_place.id].name != gimbal_place.name 
             end
-        end
+            
 
-        old_gimbal_places.each do |gimbal_place|
-            if gimbal_place.destroy
-                removed_beacons_count += 1
+            new_gimbal_places.each do |gimbal_place|
+                if gimbal_place.save
+                    stats[:added_places_count] += 1
+                end
+            end
+
+            # TODO 
+            # figure out a way to find places which no longer exist on gimbals system
+            old_gimbal_places.each do |gimbal_place|
+                if gimbal_place.destroy
+                    stats[:removed_places_count] += 1
+                end
+            end
+
+            modified_gimbal_places.each do |gimbal_place|
+                if gimbal_place.update_attribute(:name, api_places_index[gimbal_place.id].name)
+                    stats[:modified_places_count] += 1
+                end
             end
         end
 

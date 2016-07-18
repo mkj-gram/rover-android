@@ -1,5 +1,6 @@
 class GimbalPlace < ActiveRecord::Base
     include Elasticsearch::Model
+    
     self.primary_key = :id
 
     after_commit on: [:create, :update] do
@@ -10,7 +11,7 @@ class GimbalPlace < ActiveRecord::Base
         __elasticsearch__.delete_document
     end
 
-    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 2, number_of_replicas: 1}).merge(
+    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 1}).merge(
         {
             analysis:  {
                 filter: {
