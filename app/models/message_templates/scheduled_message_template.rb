@@ -129,7 +129,7 @@ class ScheduledMessageTemplate < MessageTemplate
         # if scheduled_local_time == true && scheduled_at.utc < Time.zone.now + 14.hours
         #     errors.add(:scheduled_at, "needs to be 24 hours in advance")
         # end
-        if scheduled_at.utc.beginning_of_day > Time.zone.now.beginning_of_day + 48.days
+        if scheduled_at && scheduled_at.utc.beginning_of_day > Time.zone.now.beginning_of_day + 48.days
             errors.add(:scheduled_at, "can only be scheduled 48 days in advance")
             return false
         end
