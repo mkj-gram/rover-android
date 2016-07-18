@@ -6,7 +6,7 @@ class V1::CustomersController < V1::ApplicationController
 
     def index
 
-        if pagination_type == "cursor"
+        if pagination_type == 'cursor'
             index_by_page_cursor
         else
             index_by_page_number
@@ -81,7 +81,11 @@ class V1::CustomersController < V1::ApplicationController
     end
 
     def pagination_type
-        params.fetch(:paginationType, "number")
+        if params.has_key?(:page) && params[:page].has_key?(:number)
+            return 'page'
+        else
+            return 'cursor'
+        end
     end
 
     def index_by_page_number
