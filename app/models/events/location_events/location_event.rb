@@ -8,18 +8,18 @@ module Events
                 Event::LOCATION_EVENT_ID
             end
 
-            attr_reader :longitude, :latitude, :radius, :region_limit
+            attr_reader :longitude, :latitude, :accuracy, :region_limit
 
             def initialize(event_attributes, extra)
                 super event_attributes, extra
                 @longitude = event_attributes[:longitude]
                 @latitude = event_attributes[:latitude]
-                @radius = event_attributes[:radius]
+                @accuracy = event_attributes.has_key?(:accuracy) ? event_attributes[:accuracy] : event_attributes[:radius]
                 @region_limit = device.ios? ? 20 : 100
             end
 
             def set_device_location
-                device.location = Snapshots::Location.new(latitude: latitude, longitude: longitude, accuracy: radius) if device
+                device.location = Snapshots::Location.new(latitude: latitude, longitude: longitude, accuracy: accuracy) if device
             end
 
             # def attributes
