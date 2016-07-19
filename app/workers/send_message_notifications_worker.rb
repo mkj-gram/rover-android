@@ -72,9 +72,7 @@ class SendMessageNotificationWorker
             next if device.nil?
             customer = device.customer
             next if customer.nil?
-            messages = messages_by_token[response.notification.token]
-            next if messages.nil?
-            message = messages.any? ? messages.first : nil
+            message = messages.find { |message| message.id == response.notification.custom_data.dig(:data, :id) }
             next if message.nil?
 
             input = {
