@@ -257,8 +257,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
     def set_proximity_message
         @proximity_message = ProximityMessageTemplate.find_by_id(params[:id])
-        head :forbidden if @proximity_message.account_id != current_account.id
         head :not_found if @proximity_message.nil?
+        head :forbidden if @proximity_message.account_id != current_account.id
     end
 
     def query_archived
