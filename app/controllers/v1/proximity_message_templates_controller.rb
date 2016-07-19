@@ -71,6 +71,16 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         message_templates = elasticsearch_query.per_page([page_size, 50].min).page(current_page).records
 
         records = message_templates.includes(:customer_segment).to_a
+
+        included = []
+
+        filter_place_ids = records.map(&:filter_place_ids).flatten.uniq.compact
+        filter_beacon_configuration_ids = records.map(&:filter_beacon_configuration_ids).flatten.uniq.compact
+
+        included += Place.where(id: filter_place_ids).all.map{|place| V1::PlaceSerializer.serialize(place)}
+        included += BeaconConfiguration.where(id: filter_beacon_configuration_ids).all.map {|beacon_configuration| V1::BeaconConfigurationSerializer.serialize(beacon_configuration)}
+       
+       
         # next grab all stats
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
         records.each{|template| template.stats = stats[template.id] }
@@ -83,7 +93,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 "totalDrafts" => current_account.proximity_message_templates_draft_count,
                 "totalPublished" => current_account.proximity_message_templates_published_count,
                 "totalArchived" => current_account.proximity_message_templates_archived_count
-            }
+            },
+            "included" => included
         }
 
         render json: json
