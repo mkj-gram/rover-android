@@ -71,6 +71,16 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         message_templates = elasticsearch_query.per_page([page_size, 50].min).page(current_page).records
 
         records = message_templates.includes(:customer_segment).to_a
+
+        included = []
+
+        filter_place_ids = records.map(&:filter_place_ids).flatten.uniq.compact
+        filter_beacon_configuration_ids = records.map(&:filter_beacon_configuration_ids).flatten.uniq.compact
+
+        included += Place.where(id: filter_place_ids).all.map{|place| V1::PlaceSerializer.serialize(place)}
+        included += BeaconConfiguration.where(id: filter_beacon_configuration_ids).all.map {|beacon_configuration| V1::BeaconConfigurationSerializer.serialize(beacon_configuration)}
+       
+       
         # next grab all stats
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
         records.each{|template| template.stats = stats[template.id] }
@@ -83,7 +93,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 "totalDrafts" => current_account.proximity_message_templates_draft_count,
                 "totalPublished" => current_account.proximity_message_templates_published_count,
                 "totalArchived" => current_account.proximity_message_templates_archived_count
-            }
+            },
+            "included" => included
         }
 
         render json: json
@@ -222,56 +233,19 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         }
 
         included = []
-        if should_include.include?("beacons")
-            json[:data][:relationships] = {} if json[:data][:relationships].nil?
-            if message.filter_beacon_configuration_ids
-                json[:data][:relationships].merge!(
-                    {
-                        configurations: {
-                            data: message.filter_beacon_configuration_ids.map{|beacon_id| {type: "configurations", id: beacon_id}}
-                        }
-                    }
-                )
-                beacon_configurations = message.filter_beacon_configurations
-                included += beacon_configurations.map{|configuration| V1::BeaconConfigurationSerializer.serialize(configuration)}
-            else
-                json[:data][:relationships].merge({beacons: {data: []}})
-            end
+
+        if should_include.include?("beacons") && message.filter_beacon_configuration_ids.any?
+            beacon_configurations = message.filter_beacon_configurations
+            included += beacon_configurations.map{|configuration| V1::BeaconConfigurationSerializer.serialize(configuration)}
         end
 
-        if should_include.include?("places")
-            json[:data][:relationships] = {} if json[:data][:relationships].nil?
-            if message.filter_place_ids
-
-                json[:data][:relationships].merge!(
-                    {
-                        places: {
-                            data: message.filter_place_ids.map{|place_id| {type: "places", id: place_id}}
-                        }
-                    }
-                )
-                places = message.filter_places
-                included += places.map{|place| V1::PlaceSerializer.serialize(place)}
-            else
-                json[:data][:relationships].merge!({places: {data: []}})
-            end
+        if should_include.include?("places") && message.filter_place_ids.any?
+            places = message.filter_places
+            included += places.map{|place| V1::PlaceSerializer.serialize(place)}
         end
 
-        if should_include.include?("segment")
-            json[:data][:relationships] = {} if json[:data][:relationships].nil?
-            if message.customer_segment
-                json[:data][:relationships].merge!(
-                    {
-                        :"segment" => {
-                            data: { type: "segments", id: message.customer_segment.id.to_s }
-                        }
-
-                    }
-                )
-                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
-            else
-                json[:data][:relationships].merge!({:"segment" => {data: nil}})
-            end
+        if should_include.include?("segment") && message.customer_segment
+            included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
         end
 
         if included.any?
@@ -284,6 +258,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     def set_proximity_message
         @proximity_message = ProximityMessageTemplate.find_by_id(params[:id])
         head :not_found if @proximity_message.nil?
+        head :forbidden if @proximity_message.account_id != current_account.id
     end
 
     def query_archived
@@ -300,7 +275,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         # extra_attributes.merge!(:landing_page_template => message.landing_page_template.to_json) if message.landing_page_template
         message.account = current_account
         message.customer_segment.account = current_account if message.customer_segment
-        {
+        json = {
             type: "proximity-messages",
             id: message.id.to_s,
             attributes: {
@@ -336,8 +311,43 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"unique-opens" => message.stats.unique_opens,
                 :"landing-page" => message.landing_page.as_json(dasherize: true),
                 :"properties" => message.properties,
-            }.merge(extra_attributes)
+            }.merge(extra_attributes),
+            relationships: {}
         }
+
+        if message.filter_beacon_configuration_ids.any?
+            json[:relationships].merge!(
+                    {
+                        configurations: {
+                            data: message.filter_beacon_configuration_ids.map{|beacon_id| {type: "configurations", id: beacon_id}}
+                        }
+                    }
+                )
+        end
+
+        if message.filter_place_ids.any?
+            json[:relationships].merge!(
+                    {
+                        places: {
+                            data: message.filter_place_ids.map{|place_id| {type: "places", id: place_id}}
+                        }
+                    }
+                )
+        end
+
+        if message.customer_segment_id
+            json[:relationships].merge!(
+                    {
+                        :"segment" => {
+                            data: { type: "segments", id: message.customer_segment_id.to_s }
+                        }
+
+                    }
+                )
+        end
+
+        return json
+
     end
 
     def serialize_limit(limit)

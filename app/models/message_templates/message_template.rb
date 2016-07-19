@@ -101,7 +101,7 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def landing_page_template_json_cache
-        @landing_page_template_json_cache ||= landing_page_template.nil? ? nil : landing_page_template.as_json
+        @landing_page_template_json_cache ||= content_type == 'landing-page' && !landing_page_template.nil? ? landing_page_template.as_json : nil 
     end
 
     def stats

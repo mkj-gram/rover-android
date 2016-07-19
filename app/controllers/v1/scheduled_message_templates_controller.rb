@@ -52,17 +52,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         records.each{|template| template.stats = stats[template.id] }
 
         json = {
-            "data" => records.map do |message|
-                data = serialize_message(message)
-                if message.customer_segment
-                    data[:relationships] = {
-                        :"segment" => {
-                            data: { type: "segments", id: message.customer_segment.id.to_s }
-                        }
-                    }
-                end
-                data
-            end,
+            "data" => records.map{ |message| serialize_message(message)},
             "meta" => {
                 "totalRecords" => message_templates.total,
                 "totalPages" => message_templates.total_pages,
@@ -172,21 +162,8 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
         included = []
 
-        if should_include.include?("segment")
-            json[:data][:relationships] = {} if json[:data][:relationships].nil?
-            if message.customer_segment
-                json[:data][:relationships].merge!(
-                    {
-                        :"segment" => {
-                            data: { type: "segments", id: message.customer_segment.id.to_s }
-                        }
-
-                    }
-                )
-                included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
-            else
-                json[:data][:relationships].merge!({:"segment" => {data: nil}})
-            end
+        if should_include.include?("segment") &&  message.customer_segment
+           included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
         end
 
         if included.any?
@@ -269,14 +246,15 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
     def set_scheduled_message
         @scheduled_message = ScheduledMessageTemplate.find_by_id(params[:id])
-        head :not_found if @scheduled_message.nil? || @scheduled_message.account_id != current_account.id
+        head :not_found if @scheduled_message.nil?
+        head :forbidden if @scheduled_message.account_id != current_account.id 
     end
 
 
     def serialize_message(message, extra_attributes = {})
         message.account = current_account
         message.customer_segment.account = current_account if message.customer_segment
-        {
+        json = {
             type: "scheduled-messages",
             id: message.id.to_s,
             attributes: {
@@ -300,8 +278,18 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 :"scheduled-timestamp" => message.scheduled_timestamp,
                 :"use-local-time-zone" => message.use_local_time_zone,
                 :"scheduled-time-zone" => message.scheduled_time_zone
-            }.merge(extra_attributes)
+            }.merge(extra_attributes),
+            relationships: {}
         }
+
+        if message.customer_segment_id
+            json[:relationships].merge!({
+                segment: {
+                    data: { type: "segments", id: message.customer_segment_id.to_s }
+                }
+            })
+        end
+        return json
     end
 
 end
