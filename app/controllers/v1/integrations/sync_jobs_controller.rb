@@ -69,6 +69,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
                 id = json.dig(:data, :estimote_sync_jobs, :integration_id) if id.nil?
                 id = json.dig(:data, :kontakt_sync_jobs, :integration_id) if id.nil?
                 id = json.dig(:data, :beacon_sync_jobs, :integration_id) if id.nil?
+                id = json.dig(:data, :gimbal_sync_jobs, :integration_id) if id.nil?
                 id = json.dig(:data, :google_sync_jobs, :integration_id) if id.nil?
             end
 
@@ -78,6 +79,8 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
 
     def set_resource
         @job = ThirdPartyIntegrationSyncJob.find_by_id(params[:id])
+        head :not_found if @job.nil?
+        head :forbidden if @job.account_id != current_account.id
         @integration = @job.third_party_integration if @job
     end
 

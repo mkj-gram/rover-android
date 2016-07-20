@@ -143,7 +143,7 @@ class V1::IntegrationsController < V1::ApplicationController
         options = gimbal_integration_params(json[:data])
         api_key = options.delete(:api_key)
         integration = GimbalIntegration.new(options)
-        integration.set_credentials(api_key)
+        integration.api_key = api_key
         integration.account_id = current_account.id
         return integration
     end

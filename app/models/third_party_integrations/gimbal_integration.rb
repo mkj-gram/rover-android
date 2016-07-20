@@ -5,6 +5,13 @@ class GimbalIntegration < ThirdPartyIntegration
     alias_attribute :api_key, :credentials
 
     # after_destroy :remove_old_gimbal_places
+     
+    has_many :sync_jobs, class_name: "GimbalSyncJob", foreign_key:  "third_party_integration_id" do
+        def latest
+            last
+        end
+    end
+
 
     def self.model_type
         @@model_type ||= "gimbal-integration"
@@ -28,7 +35,7 @@ class GimbalIntegration < ThirdPartyIntegration
     def client
         @client ||= GimbalApi.new(api_key)
     end
-
+    
     def sync!
 
         stats = {
