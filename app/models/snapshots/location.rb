@@ -17,5 +17,11 @@ module Snapshots
 			}.compact
 		end
 
+		def ==(other)
+			return false if other.nil?
+			return false if !other.is_a?(Snapshots::Location)
+			return ( self.latitude == other.latitude && self.longitude == other.longitude && self.accuracy == other.accuracy )
+		end
+
 	end
 end

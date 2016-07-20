@@ -19,7 +19,12 @@ module Events
             end
 
             def set_device_location
-                device.location = Snapshots::Location.new(latitude: latitude, longitude: longitude, accuracy: accuracy) if device
+                new_location = Snapshots::Location.new(latitude: latitude, longitude: longitude, accuracy: accuracy)
+                if device.location && device.location != new_location
+                    device.location = new_location
+                elsif device.location.nil?
+                    device.location = new_location
+                end
             end
 
             # def attributes

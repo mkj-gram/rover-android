@@ -394,7 +394,7 @@ class Customer
                         mongo_client[collection_name].find({"_id" => self._id, "devices._id" => device._id}).update_one({"$set" => setters})
                         customer_changes = {}
                     end
-                else
+                elsif self.changes.any?
                     customer_changes = changes
                     customer_changes.delete(:devices)
 
