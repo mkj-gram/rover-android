@@ -31,7 +31,7 @@ module Events
                 # apply all filters
                 current_time = DateTime.now
                 message_templates.select do |message_template|
-                    message_template.within_schedule(current_time) && message_template.within_customer_segment(customer, device)
+                    message_template.within_schedule(current_time) && message_template.apply_gimbal_filters(gimbal_place) && message_template.within_customer_segment(customer, device)
                 end
             end
 
