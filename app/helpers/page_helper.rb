@@ -4,7 +4,7 @@ module PageHelper
         @current_page ||= params.has_key?(:page) && params[:page].has_key?(:number) ? params[:page][:number].to_i + 1 : 1
     end
 
-    def current_cursor(default)
+    def current_cursor(default = nil)
         @current_cursor ||= params.has_key?(:page) && params[:page].has_key?(:cursor) ? params[:page][:cursor] : default
     end
 
