@@ -18,7 +18,9 @@ class ProximityMessageTemplate < MessageTemplate
 
     validate :legal_trigger_event_id
 
-     def archived=(val)
+    belongs_to :gimbal_place, foreign_key: 'filter_gimbal_place_id'
+
+    def archived=(val)
         if val == true
             self.published = false
         end
