@@ -36,7 +36,7 @@ class GimbalIntegration < ThirdPartyIntegration
         @client ||= GimbalApi.new(api_key)
     end
     
-    def sync!
+    def sync!(calling_job = nil)
 
         stats = {
             added_places_count: 0,
