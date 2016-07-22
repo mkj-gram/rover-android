@@ -9,7 +9,7 @@ class LandingPage
 
         def type_cast_from_user(value)
             # when programmer sets the value
-            if !value.nil? && value.is_a(Hash)
+            if !value.nil? && value.is_a?(Hash)
                 load_landing_page_from_json(value, false)
             else
                 nil

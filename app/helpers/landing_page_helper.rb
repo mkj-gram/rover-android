@@ -7,8 +7,6 @@ module LandingPageHelper
         end
 
         def set_defaults!(landing_page)
-            p "loading defaults for"
-            p landing_page
             defaults!(landing_page, "rows", [])
             landing_page["rows"].each { |row| set_row_defaults!(row)}
             defaults!(landing_page, "background-color", { "red" => 255, "green" => 255, "blue" => 255, "alpha" => 1.0 })
@@ -27,15 +25,12 @@ module LandingPageHelper
         end
 
         def set_row_defaults!(row)
-            defaults!(row, "height", { "type" => 'points', "value" => 0 })
             defaults!(row, "blocks", [])
             row["blocks"].each { |block| set_block_defaults!(block) }
         end
 
         def set_block_defaults!(block)
             defaults!(block, "type", 'block')
-            defaults!(block, "width", { "type" => 'points', "value" => 170 })
-            defaults!(block, "height", { "type" => 'points', "value" => 280 })
             defaults!(block, "position", 'stacked')
             defaults!(block, "alignment", { "horizontal" => 'fill', "vertical" => 'top' })
             defaults!(block, "offset", { "top" => { "type" => 'points', "value" => 20 }, "right" => { "type" => 'points', "value" => 20 }, "bottom" => { "type" => 'points', "value" => 20 }, "left" => { "type" => 'points', "value" => 20 }, "center" => { "type" => 'points', "value" => 0 }, "middle" => { "type" => 'points', "value" => 0 } })
