@@ -5,7 +5,7 @@ class DasherizeLandingPages < ActiveRecord::Migration
 
         MessageTemplate.where.not(landing_page_template: nil).find_in_batches(batch_size: 100) do |templates|
             templates.each do |message_template|
-                message_template.update_column(:landing_page_template, MultiJson.dump(message_template.landing_page.as_json.deep_transform_keys{|key| key.gsub(/\_/, "-")}))
+                message_template.update_column(:landing_page_template, Oj.dump(message_template.landing_page.as_json.deep_transform_keys{|key| key.gsub(/\_/, "-")}))
             end
         end
 
@@ -26,7 +26,7 @@ class DasherizeLandingPages < ActiveRecord::Migration
 
         MessageTemplate.where.not(landing_page_template: nil).find_in_batches(batch_size: 100) do |templates|
             templates.each do |message_template|
-                message_template.update_column(:landing_page_template, MultiJson.dump(message_template.landing_page.as_json.deep_transform_keys{|key| key.gsub(/\-/, "_")}))
+                message_template.update_column(:landing_page_template, Oj.dump(message_template.landing_page.as_json.deep_transform_keys{|key| key.gsub(/\-/, "_")}))
             end
         end
 

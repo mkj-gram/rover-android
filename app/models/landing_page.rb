@@ -18,7 +18,7 @@ class LandingPage
 
         def type_cast_from_database(value)
             if String === value
-                json = ::ActiveSupport::JSON.decode(value) rescue nil
+                json = Oj.load(value) rescue nil
                 load_landing_page_from_json(json, true)
             else
                 super value
@@ -72,7 +72,7 @@ class LandingPage
     end
 
     def to_json
-        MultiJson.dump(as_json)
+        Oj.dump(as_json)
     end
 
 end

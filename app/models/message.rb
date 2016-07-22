@@ -84,7 +84,7 @@ class Message
     def to_doc
         doc = attributes
         landing_page = doc.delete(:landing_page)
-        doc.merge!(landing_page: landing_page.to_doc) if landing_page
+        doc.merge!(landing_page: landing_page.as_json) if landing_page
         doc.compact!
         doc
     end

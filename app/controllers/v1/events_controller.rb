@@ -32,7 +32,7 @@ class V1::EventsController < V1::ApplicationController
 
             json = event.to_json
 
-            render json: json
+            render json: Oj.dump(json)
         end
     end
 

@@ -7,15 +7,17 @@ class V1::CustomerInboxController < V1::ApplicationController
         if stale?(last_modified: current_customer.inbox_updated_at )
             Librato.timing('inbox.render.time') do
                 messages = current_customer.inbox.messages.reverse!
-
+                start_time  = Time.now
                 json = {
                     data: messages.map{|message| V1::MessageSerializer.serialize(message)},
                     meta: {
                         "unread-messages-count" => messages.count { |message| message.read == false }
                     }
                 }
+                end_time = Time.now
 
-                render json: json
+                puts "TOOK: #{(end_time - start_time)} seconds"
+                render json: Oj.dump(json)
             end
         end
 
