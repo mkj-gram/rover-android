@@ -11,7 +11,7 @@ class MessageTemplate < ActiveRecord::Base
 
     belongs_to :account
 
-    attribute :landing_page_template, LandingPageTemplate::Type.new
+    attribute :landing_page_template, LandingPage::Type.new
     # serialize :landing_page_template, LandingPageTemplate
     serialize :properties, JSONHash
 
@@ -87,7 +87,7 @@ class MessageTemplate < ActiveRecord::Base
                 timestamp: Time.zone.now,
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s,
-                landing_page: landing_page_template_json_cache,
+                landing_page: landing_page_template,
                 properties: properties
             }
         )
