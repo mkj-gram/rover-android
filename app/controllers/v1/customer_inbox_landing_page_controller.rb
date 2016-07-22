@@ -5,9 +5,11 @@ class V1::CustomerInboxLandingPageController < V1::ApplicationController
     def show
         expires_in 365.days
 
-        json = @message.landing_page ? @message.landing_page.as_json(dasherize: true) : {}
-
-        render json: json
+        Librato.timing('inbox.landing_page.render.time') do
+            json = @message.landing_page ? @message.landing_page.as_json(dasherize: true) : {}
+            render json: json
+        end
+        
     end
 
 
