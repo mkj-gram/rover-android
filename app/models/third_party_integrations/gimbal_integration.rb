@@ -28,7 +28,7 @@ class GimbalIntegration < ThirdPartyIntegration
 
     def credentials_json
         {
-            "api-key" => self.api_key,
+            "api-key" => self.api_key
         }
     end
 
