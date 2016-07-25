@@ -60,7 +60,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
     def get_integration_id
         @integration_id ||= -> {
             id = params[:integration_id] || params[:estimote_integration_id] || params[:kontakt_integration_id] || params[:gimbal_integration_id] || params[:google_integration_id]
-            
+
             if id.nil?
                 # this request might have the integrations id in the payload
                 json = flatten_request({single_record: true})
@@ -79,9 +79,9 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
 
     def set_resource
         @job = ThirdPartyIntegrationSyncJob.find_by_id(params[:id])
-        head :not_found if @job.nil?
-        head :forbidden if @job.account_id != current_account.id
+        head :not_found if @job.nil? and return
         @integration = @job.third_party_integration if @job
+        head :forbidden if @integration.account_id != current_account.id and return
     end
 
 end
