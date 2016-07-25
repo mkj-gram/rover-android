@@ -70,7 +70,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
         end
 
         search_query = Elasticsearch::Model.search(query, [GimbalPlace])
-        gimbal_places = search_query.per_page(page_size).page(current_page).results
+        results = search_query.per_page(page_size).page(current_page).results
 
         json = {
             "data" => results.map{|gimbal_place| serialize_elasticsearch_gimbal_place(gimbal_place)},
