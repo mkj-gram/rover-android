@@ -250,7 +250,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         end
 
         if should_include.include?("gimbal-places") && message.gimbal_places
-            included += [V1::GimbalPlaceSerializer.serialize(message.gimbal_place)]
+            included += message.gimbal_places.map{|gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place)}
         end
 
         if included.any?
