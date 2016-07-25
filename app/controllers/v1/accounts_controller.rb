@@ -59,7 +59,7 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
-        gimbal_integration = current_account.gimbal_integration.first
+        gimbal_integration = current_account.gimbal_integrations.first
         if gimbal_integration
             json["data"]["relationships"].merge!(
                 {
