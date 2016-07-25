@@ -58,6 +58,21 @@ class V1::AccountsController < V1::ApplicationController
                 }
             )
         end
+
+        gimbal_integration = current_account.gimbal_integration.first
+        if gimbal_integration
+            json["data"]["relationships"].merge!(
+                {
+                    "gimbal-integration" => {
+                        "data" => {
+                            "type" => "gimbal-integrations",
+                            "id" => gimbal_integration.id.to_s
+                        }
+                    }
+                }
+            )
+        end
+
         google_integration = current_account.google_integration
         if google_integration
             json["data"]["relationships"].merge!(
@@ -72,19 +87,7 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
-        gimbal_integration = current_account.gimbal_integration
-        if gimbal_integration
-            json["data"]["relationships"].merge!(
-                {
-                    "gimbal-integration" => {
-                        "data" => {
-                            "type" => "gimbal-integrations",
-                            "id" => gimbal_integration.id.to_s
-                        }
-                    }
-                }
-            )
-        end
+
 
         ios_platform = current_account.ios_platform
         if ios_platform
