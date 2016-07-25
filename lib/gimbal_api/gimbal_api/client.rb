@@ -17,7 +17,7 @@ module GimbalApi
                     GimbalApi::Place.new(opts)
                 end
             elsif response.response.code == "401"
-                places = []
+                raise GimbalApi::Errors::Unauthorized, "invalid credentials"
             else
                 places = []
             end
