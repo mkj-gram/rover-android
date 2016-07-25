@@ -111,6 +111,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
     def serialize_gimbal_place(gimbal_place)
         {
             id: gimbal_place.id.to_s,
+            type: 'gimbal-places'
             attributes: {
                 name: gimbal_place.name,
             }
@@ -121,6 +122,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
         source = gimbal_place._source
         {
             id: gimbal_place.id,
+            type: 'gimbal-places'
             attributes: {
                 name: source.name
             }
