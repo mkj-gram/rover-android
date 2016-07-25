@@ -13,6 +13,7 @@ class DasherizeLandingPages < ActiveRecord::Migration
 
         Message.all_in_batches.each_slice(1000) do |messages|
             messages.each do |message|
+                next if message.landing_page.nil?
                 converted_landing_page = message.landing_page.as_json.deep_transform_keys{|key| key.gsub(/\_/, "-")}
                 message.update_attribute({"landing_page" =>  converted_landing_page})
             end
@@ -34,6 +35,7 @@ class DasherizeLandingPages < ActiveRecord::Migration
 
         Message.all_in_batches.each_slice(1000) do |messages|
             messages.each do |message|
+                next if message.landing_page.nil?
                 converted_landing_page = message.landing_page.as_json.deep_transform_keys{|key| key.gsub(/\-/, "_")}
                 message.update_attribute({"landing_page" =>  converted_landing_page})
             end
