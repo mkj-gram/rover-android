@@ -3,7 +3,7 @@ class GimbalIntegration < ThirdPartyIntegration
     validates :api_key, presence: true
 
     alias_attribute :api_key, :credentials
-
+    after_create :create_sync_job!
     # after_destroy :remove_old_gimbal_places
      
     has_many :sync_jobs, class_name: "GimbalSyncJob", foreign_key:  "third_party_integration_id" do
