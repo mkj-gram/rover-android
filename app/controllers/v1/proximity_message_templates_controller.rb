@@ -190,7 +190,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             {:filter_beacon_configuration_ids => []},
             {:filter_place_tags => []},
             {:filter_place_ids => []},
-            :filter_gimbal_place_ids,
+            {:filter_gimbal_place_ids => []},
             :schedule_start_date,
             :schedule_end_date,
             :schedule_start_time,
@@ -219,7 +219,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "places", "segment", "gimbal-place"] # when ember can implement include on get whitelist_include(["beacons", "places"])
+        should_include = ["beacons", "places", "segment", "gimbal-places"] # when ember can implement include on get whitelist_include(["beacons", "places"])
 
 
 
@@ -249,7 +249,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
         end
 
-        if should_include.include?("gimbal-place") && message.gimbal_place
+        if should_include.include?("gimbal-places") && message.gimbal_places
             included += [V1::GimbalPlaceSerializer.serialize(message.gimbal_place)]
         end
 
