@@ -18,6 +18,7 @@ class V1::AccountsController < V1::ApplicationController
                     "place-tags" => current_account.place_active_tag.tags,
                     "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
+                    "is-gimbal-enabled" => current_account.gimbal_integrations.count >= 1,
                     "message-limits" => current_account.message_limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)}
                 },
                 "relationships" => {
