@@ -588,7 +588,6 @@ CREATE TABLE message_templates (
     filter_beacon_configuration_ids integer[],
     filter_place_tags character varying[],
     filter_place_ids integer[],
-    filter_gimbal_place_id character varying,
     content_type character varying,
     website_url character varying,
     created_at timestamp without time zone NOT NULL,
@@ -607,7 +606,8 @@ CREATE TABLE message_templates (
     deeplink_url character varying,
     scheduled_time_zone character varying,
     sent boolean DEFAULT false,
-    limits jsonb[] DEFAULT '{}'::jsonb[]
+    limits jsonb[] DEFAULT '{}'::jsonb[],
+    filter_gimbal_place_ids character varying[]
 );
 
 
@@ -1943,4 +1943,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160718184151');
 INSERT INTO schema_migrations (version) VALUES ('20160722125948');
 
 INSERT INTO schema_migrations (version) VALUES ('20160725164758');
+
+INSERT INTO schema_migrations (version) VALUES ('20160725200403');
 

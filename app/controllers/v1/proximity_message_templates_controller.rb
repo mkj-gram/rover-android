@@ -76,7 +76,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         filter_place_ids = records.map(&:filter_place_ids).flatten.uniq.compact
         filter_beacon_configuration_ids = records.map(&:filter_beacon_configuration_ids).flatten.uniq.compact
-        filter_gimbal_place_ids = records.map(&:filter_gimbal_place_id).uniq.compact
+        filter_gimbal_place_ids = records.map(&:filter_gimbal_place_ids).flatten.uniq.compact
 
         included += Place.where(id: filter_place_ids).all.map{|place| V1::PlaceSerializer.serialize(place)}
         included += BeaconConfiguration.where(id: filter_beacon_configuration_ids).all.map {|beacon_configuration| V1::BeaconConfigurationSerializer.serialize(beacon_configuration)}
@@ -170,7 +170,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :place_tags, :filter_place_tags)
         convert_param_if_exists(local_params[:proximity_messages], :place_ids, :filter_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
-        convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_id, :filter_gimbal_place_id)
+        convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_ids, :filter_gimbal_place_ids)
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
         param_should_be_array(local_params[:proximity_messages], :filter_place_tags)
         param_should_be_array(local_params[:proximity_messages], :limits)
@@ -190,7 +190,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             {:filter_beacon_configuration_ids => []},
             {:filter_place_tags => []},
             {:filter_place_ids => []},
-            :filter_gimbal_place_id,
+            :filter_gimbal_place_ids,
             :schedule_start_date,
             :schedule_end_date,
             :schedule_start_time,
@@ -339,11 +339,11 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             )
         end
 
-        if message.filter_gimbal_place_id
+        if message.filter_gimbal_place_ids.any?
             json[:relationships].merge!(
                 {
-                    :"gimbal-place" => {
-                        data: { type: "gimbal-place", id: message.filter_gimbal_place_id.to_s }
+                    :"gimbal-places" => {
+                        data: message.filter_gimbal_place_ids.map{|gimbal_place_id| { type: "gimbal-places", id: gimbal_place_id }}
                     } 
                 }
             )
