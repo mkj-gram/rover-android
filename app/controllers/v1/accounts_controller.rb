@@ -72,6 +72,19 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
+        gimbal_integration = current_account.gimbal_integration
+        if gimbal_integration
+            json["data"]["relationships"].merge!(
+                {
+                    "gimbal-integration" => {
+                        "data" => {
+                            "type" => "gimbal-integrations",
+                            "id" => gimbal_integration.id.to_s
+                        }
+                    }
+                }
+            )
+        end
 
         ios_platform = current_account.ios_platform
         if ios_platform
@@ -101,11 +114,11 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
-        included = [estimote_integration, kontakt_integration, google_integration].compact.map do |integration|
+        included = [estimote_integration, kontakt_integration, gimbal_integration, google_integration].compact.map do |integration|
             serialize_integration(integration)
         end
 
-        included += [estimote_integration, kontakt_integration, google_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
+        included += [estimote_integration, kontakt_integration, gimbal_integration, google_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
             V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
         end
 
