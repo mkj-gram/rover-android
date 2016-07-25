@@ -515,7 +515,8 @@ CREATE TABLE gimbal_places (
     id character varying NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    gimbal_integration_id integer
 );
 
 
@@ -1631,6 +1632,13 @@ CREATE INDEX index_gimbal_places_on_account_id ON gimbal_places USING btree (acc
 
 
 --
+-- Name: index_gimbal_places_on_gimbal_integration_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_gimbal_places_on_gimbal_integration_id ON gimbal_places USING btree (gimbal_integration_id);
+
+
+--
 -- Name: index_gimbal_places_on_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1931,4 +1939,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160615173908');
 INSERT INTO schema_migrations (version) VALUES ('20160624145408');
 
 INSERT INTO schema_migrations (version) VALUES ('20160718184151');
+
+INSERT INTO schema_migrations (version) VALUES ('20160722125948');
+
+INSERT INTO schema_migrations (version) VALUES ('20160725164758');
 

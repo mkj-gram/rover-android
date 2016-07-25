@@ -4,13 +4,15 @@ class GimbalIntegration < ThirdPartyIntegration
 
     alias_attribute :api_key, :credentials
     after_create :create_sync_job!
-    # after_destroy :remove_old_gimbal_places
+    after_destroy :remove_old_gimbal_places
      
     has_many :sync_jobs, class_name: "GimbalSyncJob", foreign_key:  "third_party_integration_id" do
         def latest
             last
         end
     end
+
+    has_many :gimbal_places
 
 
     def self.model_type
@@ -59,11 +61,11 @@ class GimbalIntegration < ThirdPartyIntegration
 
             api_place_ids = api_places_index.keys
 
-            gimbal_places = GimbalPlace.where(account_id: self.account_id, id: api_place_ids).all
+            gimbal_places = GimbalPlace.where(account_id: self.account_id, id: api_place_ids, gimbal_integration_id: self.id).all
 
             new_api_places = (api_place_ids - gimbal_places.map(&:id)).collect{|id| api_places_index[id] }
 
-            new_gimbal_places = new_api_places.map{|api_place| GimbalPlace.new(account_id: self.account_id, id: api_place.id, name: api_place.name )}
+            new_gimbal_places = new_api_places.map{|api_place| self.gimbal_places.build(account_id: self.account_id, id: api_place.id, name: api_place.name )}
 
             old_gimbal_places = gimbal_places.select{|gimbal_place| api_places_index[gimbal_place.id].nil? }
 
@@ -94,6 +96,10 @@ class GimbalIntegration < ThirdPartyIntegration
         end
 
         return stats
+    end
+
+    def remove_old_gimbal_places
+        GimbalIntegrationRemovePlacesWorker.perform_async(self.id)
     end
 
 end
