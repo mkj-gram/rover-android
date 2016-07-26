@@ -19,7 +19,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
 
         if query_keyword
             # search based on title
-            must_filter.push(
+            should_query.push(
                 {
                     match_phrase: {
                         name: query_keyword
