@@ -33,7 +33,15 @@ module Events
                     filter_gimbal_place_ids = nil
                 end
 
-                message_templates = ProximityMessageTemplate.where(account_id: account.id, published: true, filter_gimbal_place_ids: filter_gimbal_place_ids, trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
+                query = ProximityMessageTemplate.where(account_id: account.id, published: true, trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight)
+                
+                if gimbal_place
+                    query = query.where("filter_gimbal_place_ids <@ '{?}'::int[] OR filter_gimbal_place_ids IS NULL", gimbal_place.id)
+                else
+                    query = query.where(filter_gimbal_place_ids: nil)
+                end
+
+                message_templates = query.all.to_a
                 # apply all filters
                 current_time = DateTime.now
                 message_templates.select do |message_template|
