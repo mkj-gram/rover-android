@@ -343,7 +343,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             json[:relationships].merge!(
                 {
                     :"gimbal-places" => {
-                        data: message.filter_gimbal_place_ids.map{|gimbal_place_id| { type: "gimbal-places", id: gimbal_place_id }}
+                        data: message.filter_gimbal_place_ids.map{|gimbal_place_id| { type: "gimbal-places", id: gimbal_place_id.to_s }}
                     } 
                 }
             )
