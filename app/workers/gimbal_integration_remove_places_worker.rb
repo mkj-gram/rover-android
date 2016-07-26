@@ -22,6 +22,7 @@ class GimbalIntegrationRemovePlacesWorker
         end
 
         begin
+            Sneakers.looger.info("Removing #{bulk.size} gimbal places from Elasticsearch")
             Elasticsearch::Model.client.bulk(body: bulk)
             return ack!
         rescue Exception => e
