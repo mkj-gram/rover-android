@@ -61,11 +61,11 @@ class GimbalIntegration < ThirdPartyIntegration
 
             api_place_ids = api_places_index.keys
 
-            gimbal_places = GimbalPlace.where(account_id: self.account_id, id: api_place_ids, gimbal_integration_id: self.id).all
+            gimbal_places = GimbalPlace.where(gimbal_place_id: api_place_ids, gimbal_integration_id: self.id).all
 
-            new_api_places = (api_place_ids - gimbal_places.map(&:id)).collect{|id| api_places_index[id] }
+            new_api_places = (api_place_ids - gimbal_places.map(&:gimbal_place_id)).collect{|id| api_places_index[id] }
 
-            new_gimbal_places = new_api_places.map{|api_place| self.gimbal_places.build(account_id: self.account_id, id: api_place.id, name: api_place.name )}
+            new_gimbal_places = new_api_places.map{|api_place| self.gimbal_places.build(account_id: self.account_id, gimbal_place_id: api_place.id, name: api_place.name )}
 
             old_gimbal_places = gimbal_places.select{|gimbal_place| api_places_index[gimbal_place.id].nil? }
 

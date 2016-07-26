@@ -136,6 +136,7 @@ CREATE TABLE accounts (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     customers_count integer DEFAULT 0,
+    message_limits hstore[] DEFAULT '{}'::hstore[],
     proximity_message_templates_draft_count integer DEFAULT 0,
     proximity_message_templates_published_count integer DEFAULT 0,
     proximity_message_templates_archived_count integer DEFAULT 0,
@@ -145,7 +146,6 @@ CREATE TABLE accounts (
     scheduled_message_templates_published_count integer DEFAULT 0,
     scheduled_message_templates_sent_count integer DEFAULT 0,
     scheduled_message_templates_archived_count integer DEFAULT 0,
-    message_limits jsonb[] DEFAULT '{}'::jsonb[],
     searchable_gimbal_places_count integer DEFAULT 0
 );
 
@@ -512,12 +512,32 @@ ALTER SEQUENCE customers_id_seq OWNED BY customers.id;
 
 CREATE TABLE gimbal_places (
     account_id integer NOT NULL,
-    id character varying NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    gimbal_integration_id integer
+    gimbal_integration_id integer,
+    id integer NOT NULL,
+    gimbal_place_id character varying
 );
+
+
+--
+-- Name: gimbal_places_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE gimbal_places_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: gimbal_places_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE gimbal_places_id_seq OWNED BY gimbal_places.id;
 
 
 --
@@ -584,6 +604,7 @@ CREATE TABLE message_templates (
     trigger_event_id integer,
     dwell_time_in_seconds integer,
     customer_segment_id integer,
+    limits hstore[],
     filter_beacon_configuration_tags character varying[],
     filter_beacon_configuration_ids integer[],
     filter_place_tags character varying[],
@@ -606,8 +627,7 @@ CREATE TABLE message_templates (
     deeplink_url character varying,
     scheduled_time_zone character varying,
     sent boolean DEFAULT false,
-    limits jsonb[] DEFAULT '{}'::jsonb[],
-    filter_gimbal_place_ids character varying[]
+    filter_gimbal_place_ids integer[] DEFAULT '{}'::integer[]
 );
 
 
@@ -1144,6 +1164,13 @@ ALTER TABLE ONLY customers ALTER COLUMN id SET DEFAULT nextval('customers_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY gimbal_places ALTER COLUMN id SET DEFAULT nextval('gimbal_places_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY ios_platforms ALTER COLUMN id SET DEFAULT nextval('ios_platforms_id_seq'::regclass);
 
 
@@ -1303,6 +1330,14 @@ ALTER TABLE ONLY customer_segments
 
 ALTER TABLE ONLY customers
     ADD CONSTRAINT customers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: gimbal_places_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY gimbal_places
+    ADD CONSTRAINT gimbal_places_pkey PRIMARY KEY (id);
 
 
 --
@@ -1625,13 +1660,6 @@ CREATE INDEX index_customers_on_account_id_and_traits ON customers USING gin (ac
 
 
 --
--- Name: index_gimbal_places_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_gimbal_places_on_account_id ON gimbal_places USING btree (account_id);
-
-
---
 -- Name: index_gimbal_places_on_gimbal_integration_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1639,10 +1667,17 @@ CREATE INDEX index_gimbal_places_on_gimbal_integration_id ON gimbal_places USING
 
 
 --
--- Name: index_gimbal_places_on_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_gimbal_places_on_gimbal_place_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_gimbal_places_on_id ON gimbal_places USING btree (id);
+CREATE INDEX index_gimbal_places_on_gimbal_place_id ON gimbal_places USING btree (gimbal_place_id);
+
+
+--
+-- Name: index_gimbal_places_on_gimbal_place_id_and_integration_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_gimbal_places_on_gimbal_place_id_and_integration_id ON gimbal_places USING btree (gimbal_place_id, gimbal_integration_id);
 
 
 --
@@ -1936,13 +1971,11 @@ INSERT INTO schema_migrations (version) VALUES ('20160615154052');
 
 INSERT INTO schema_migrations (version) VALUES ('20160615173908');
 
-INSERT INTO schema_migrations (version) VALUES ('20160624145408');
-
 INSERT INTO schema_migrations (version) VALUES ('20160718184151');
-
-INSERT INTO schema_migrations (version) VALUES ('20160722125948');
 
 INSERT INTO schema_migrations (version) VALUES ('20160725164758');
 
 INSERT INTO schema_migrations (version) VALUES ('20160725200403');
+
+INSERT INTO schema_migrations (version) VALUES ('20160726145054');
 

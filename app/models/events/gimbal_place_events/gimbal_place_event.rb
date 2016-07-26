@@ -27,7 +27,13 @@ module Events
             end
 
             def get_messages
-                message_templates = ProximityMessageTemplate.where(account_id: account.id, published: true, filter_gimbal_place_id: [nil, gimbal_place_id], trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
+                if gimbal_place
+                    filter_gimbal_place_ids = [nil, gimbal_place.id]
+                else
+                    filter_gimbal_place_ids = nil
+                end
+
+                message_templates = ProximityMessageTemplate.where(account_id: account.id, published: true, filter_gimbal_place_id: filter_gimbal_place_ids, trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight).all.to_a
                 # apply all filters
                 current_time = DateTime.now
                 message_templates.select do |message_template|
@@ -36,7 +42,7 @@ module Events
             end
 
             def gimbal_place
-                @gimbal_place ||= GimbalPlace.where(id: gimbal_place_id).first
+                @gimbal_place ||= GimbalPlace.where(account_id: account.id, gimbal_place_id: gimbal_place_id).first
             end
 
         end
