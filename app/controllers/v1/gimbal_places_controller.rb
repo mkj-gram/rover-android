@@ -103,9 +103,9 @@ class V1::GimbalPlacesController < V1::ApplicationController
     end
 
     def set_gimbal_place
-        @gimbal_place = current_account.gimbal_places.find_by_id(params[:id])
-        head :not_found if @gimbal_place.nil? and return
-        head :forbidden if @gimbal_place.account_id != current_account.id and return
+        @gimbal_place = GimbalPlace.where(id: params[:id]).first
+        head :not_found and return if @gimbal_place.nil? 
+        head :forbidden and return if @gimbal_place.account_id != current_account.id 
     end
 
     def serialize_gimbal_place(gimbal_place)
