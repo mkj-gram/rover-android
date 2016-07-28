@@ -3,8 +3,7 @@ class GimbalIntegrationRemovePlacesWorker
 
     from_queue 'gimbal_integration_remove_places_worker'
 
-    def self.perform_async(gimbal_integration_id)
-        account_id = gimbal_integration_id.is_a?(GimbalIntegration) ? gimbal_integration_id.account_id : GimbalIntegration.find(gimbal_integration_id).account_id
+    def self.perform_async(account_id)
         msg = {account_id: account_id}
         enqueue_message(msg, {to_queue: 'gimbal_integration_remove_places_worker'})
     end

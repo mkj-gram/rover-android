@@ -4,7 +4,6 @@ class GimbalIntegration < ThirdPartyIntegration
 
     alias_attribute :api_key, :credentials
     after_commit :create_sync_job!, on: :create
-    after_commit :remove_old_gimbal_places, on: :destroy
      
     has_many :sync_jobs, class_name: "GimbalSyncJob", foreign_key:  "third_party_integration_id" do
         def latest
@@ -111,10 +110,6 @@ class GimbalIntegration < ThirdPartyIntegration
         end
 
         return stats
-    end
-
-    def remove_old_gimbal_places
-        GimbalIntegrationRemovePlacesWorker.perform_async(self.id)
     end
 
 end
