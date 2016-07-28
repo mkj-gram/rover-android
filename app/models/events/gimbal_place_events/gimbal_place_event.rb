@@ -43,7 +43,7 @@ module Events
                 query = ProximityMessageTemplate.where(account_id: account.id, published: true, trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight)
 
                 if gimbal_place
-                    query = query.where("filter_gimbal_place_ids <@ '{?}'::string[] OR filter_gimbal_place_ids IS NULL", gimbal_place.id)
+                    query = query.where(ProximityMessageTemplate.arel_table[:filter_gimbal_place_ids].contains([gimbal_place.id]).or(ProximityMessageTemplate.arel_table[:filter_gimbal_place_ids].eq(nil)))
                 else
                     query = query.where(filter_gimbal_place_ids: nil)
                 end
