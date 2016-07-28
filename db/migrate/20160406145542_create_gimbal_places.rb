@@ -1,5 +1,6 @@
 class CreateGimbalPlaces < ActiveRecord::Migration
     def change
+
         create_table :gimbal_places, id: false do |t|
             t.integer :account_id, null: false
             t.string :id, null: false
@@ -7,6 +8,7 @@ class CreateGimbalPlaces < ActiveRecord::Migration
 
             t.timestamps null: false
         end
+        
         add_index :gimbal_places, :id, unique: true
         add_index :gimbal_places, :account_id
     end

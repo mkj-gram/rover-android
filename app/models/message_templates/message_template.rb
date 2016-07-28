@@ -214,6 +214,13 @@ class MessageTemplate < ActiveRecord::Base
         filter_place(configuration) && filter_beacon_configuration(configuration)
     end
 
+    def apply_gimbal_filters(gimbal_place)
+        # if the filter exists make sure the ids match
+        # or the filter doesn't exist and the gimbal_place does exist in their account
+        return (filter_gimbal_place_id && gimbal_place && gimbal_place.id == filter_gimbal_place_id || filter_gimbal_place_id.nil? && gimbal_place)
+    end
+
+
     def approximate_customers_count
         return self.customer_segment ? self.customer_segment.customers_count : self.account.customers_count
     end

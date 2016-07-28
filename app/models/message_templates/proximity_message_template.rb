@@ -18,7 +18,9 @@ class ProximityMessageTemplate < MessageTemplate
 
     validate :legal_trigger_event_id
 
-     def archived=(val)
+    # belongs_to :gimbal_place, foreign_key: 'filter_gimbal_place_id'
+
+    def archived=(val)
         if val == true
             self.published = false
         end
@@ -39,6 +41,15 @@ class ProximityMessageTemplate < MessageTemplate
 
     def drafted_was
         published_was == false && archived_was == false
+    end
+
+    def gimbal_places
+        if filter_gimbal_place_ids && filter_gimbal_place_ids.any?
+            @gimbal_places ||= GimbalPlace.where(id: filter_gimbal_place_ids).all
+            return @gimbal_places
+        else 
+            []
+        end
     end
 
     def metric_type

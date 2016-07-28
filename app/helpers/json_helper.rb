@@ -87,7 +87,7 @@ module JsonHelper
     def get_relationship_data(relationships)
         return {} if relationships.nil?
         relationships.inject({}) do |hash, (relationship_name, value)|
-            singular_relationship_name = relationship_name.singularize
+            singular_relationship_name = relationship_name.underscore.singularize
             should_be_array = singular_relationship_name != relationship_name
             if value[:data].nil?
                 if should_be_array

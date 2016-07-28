@@ -76,10 +76,11 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         filter_place_ids = records.map(&:filter_place_ids).flatten.uniq.compact
         filter_beacon_configuration_ids = records.map(&:filter_beacon_configuration_ids).flatten.uniq.compact
+        filter_gimbal_place_ids = records.map(&:filter_gimbal_place_ids).flatten.uniq.compact
 
         included += Place.where(id: filter_place_ids).all.map{|place| V1::PlaceSerializer.serialize(place)}
         included += BeaconConfiguration.where(id: filter_beacon_configuration_ids).all.map {|beacon_configuration| V1::BeaconConfigurationSerializer.serialize(beacon_configuration)}
-       
+        included += GimbalPlace.where(id: filter_gimbal_place_ids).all.map { |gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place) }
        
         # next grab all stats
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
@@ -169,7 +170,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :place_tags, :filter_place_tags)
         convert_param_if_exists(local_params[:proximity_messages], :place_ids, :filter_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
-        convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_id, :filter_gimbal_place_id)
+        convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_ids, :filter_gimbal_place_ids)
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
         param_should_be_array(local_params[:proximity_messages], :filter_place_tags)
         param_should_be_array(local_params[:proximity_messages], :limits)
@@ -189,7 +190,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             {:filter_beacon_configuration_ids => []},
             {:filter_place_tags => []},
             {:filter_place_ids => []},
-            :filter_gimbal_place_id,
+            {:filter_gimbal_place_ids => []},
             :schedule_start_date,
             :schedule_end_date,
             :schedule_start_time,
@@ -218,7 +219,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "places", "segment"] # when ember can implement include on get whitelist_include(["beacons", "places"])
+        should_include = ["beacons", "places", "segment", "gimbal-places"] # when ember can implement include on get whitelist_include(["beacons", "places"])
 
 
 
@@ -246,6 +247,10 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         if should_include.include?("segment") && message.customer_segment
             included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
+        end
+
+        if should_include.include?("gimbal-places") && message.gimbal_places
+            included += message.gimbal_places.map{|gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place)}
         end
 
         if included.any?
@@ -297,7 +302,6 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"schedule-saturday" => message.schedule_saturday,
                 :"schedule-sunday" => message.schedule_sunday,
                 :"place-tags" => message.filter_place_tags,
-                :"gimbal-place-id" => message.filter_gimbal_place_id,
                 :"limits" => message.limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)},
                 :"save-to-inbox" => message.save_to_inbox,
                 :"content-type" => message.content_type,
@@ -317,33 +321,43 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         if message.filter_beacon_configuration_ids.any?
             json[:relationships].merge!(
-                    {
-                        configurations: {
-                            data: message.filter_beacon_configuration_ids.map{|beacon_id| {type: "configurations", id: beacon_id}}
-                        }
+                {
+                    configurations: {
+                        data: message.filter_beacon_configuration_ids.map{|beacon_id| {type: "configurations", id: beacon_id}}
                     }
-                )
+                }
+            )
         end
 
         if message.filter_place_ids.any?
             json[:relationships].merge!(
-                    {
-                        places: {
-                            data: message.filter_place_ids.map{|place_id| {type: "places", id: place_id}}
-                        }
+                {
+                    places: {
+                        data: message.filter_place_ids.map{|place_id| {type: "places", id: place_id}}
                     }
-                )
+                }
+            )
+        end
+
+        if message.filter_gimbal_place_ids.any?
+            json[:relationships].merge!(
+                {
+                    :"gimbal-places" => {
+                        data: message.filter_gimbal_place_ids.map{|gimbal_place_id| { type: "gimbal-places", id: gimbal_place_id.to_s }}
+                    } 
+                }
+            )
         end
 
         if message.customer_segment_id
             json[:relationships].merge!(
-                    {
-                        :"segment" => {
-                            data: { type: "segments", id: message.customer_segment_id.to_s }
-                        }
-
+                {
+                    :"segment" => {
+                        data: { type: "segments", id: message.customer_segment_id.to_s }
                     }
-                )
+
+                }
+            )
         end
 
         return json

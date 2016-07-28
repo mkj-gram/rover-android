@@ -9,19 +9,27 @@ module GimbalApi
             self.class.headers({'Authorization' => "Token #{api_key}"})
         end
 
-        def places
-            response = self.class.get('/places', {})
+        def places(include_headers = false, opts = {})
+            response = self.class.get('/places', query: opts)
             if response.response.code == "200"
                 places = response.parsed_response.map do |opts|
                     opts = opts.merge({"client" => self, "loaded" => false})
                     GimbalApi::Place.new(opts)
                 end
-                return places
             elsif response.response.code == "401"
-                return []
+                raise GimbalApi::Errors::Unauthorized, "invalid credentials"
             else
-                return []
+                places = []
             end
+
+            if include_headers
+                return {
+                    places: places,
+                    headers: response.headers
+                }
+            end
+
+            return places
         end
 
         def place(place_id)

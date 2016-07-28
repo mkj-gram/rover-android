@@ -84,6 +84,7 @@ Rails.application.routes.draw do
             resources :"estimote-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
             resources :"kontakt-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
             resources :"beacon-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
+            resources :"gimbal-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
             resources :"google-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
         end
 

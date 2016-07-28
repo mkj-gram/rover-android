@@ -19,7 +19,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
 
         if query_keyword
             # search based on title
-            must_filter.push(
+            should_query.push(
                 {
                     match_phrase: {
                         name: query_keyword
@@ -70,7 +70,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
         end
 
         search_query = Elasticsearch::Model.search(query, [GimbalPlace])
-        gimbal_places = search_query.per_page(page_size).page(current_page).results
+        results = search_query.per_page(page_size).page(current_page).results
 
         json = {
             "data" => results.map{|gimbal_place| serialize_elasticsearch_gimbal_place(gimbal_place)},
@@ -94,14 +94,24 @@ class V1::GimbalPlacesController < V1::ApplicationController
 
     private
 
+    def filter_params
+        params.fetch(:filter, {}).permit(:query)
+    end
+
+    def query_keyword
+        filter_params.fetch(:query, nil)
+    end
+
     def set_gimbal_place
-        @gimbal_place = current_account.gimbal_places.find_by_id(params[:id])
-        head :not_found if @gimbal_place.nil?
+        @gimbal_place = GimbalPlace.where(id: params[:id]).first
+        head :not_found and return if @gimbal_place.nil? 
+        head :forbidden and return if @gimbal_place.account_id != current_account.id 
     end
 
     def serialize_gimbal_place(gimbal_place)
         {
             id: gimbal_place.id.to_s,
+            type: 'gimbal-places',
             attributes: {
                 name: gimbal_place.name,
             }
@@ -112,6 +122,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
         source = gimbal_place._source
         {
             id: gimbal_place.id,
+            type: 'gimbal-places',
             attributes: {
                 name: source.name
             }

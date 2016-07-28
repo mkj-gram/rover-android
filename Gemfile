@@ -80,6 +80,8 @@ gem 'concurrent-ruby', '~> 1.0', '>= 1.0.1'
 
 gem 'aws-sdk', '~> 2.3', '>= 2.3.9'
 
+gem 'postgres_ext', '~> 3.0'
+
 group :development do
 
 
