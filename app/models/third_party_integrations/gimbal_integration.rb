@@ -51,7 +51,7 @@ class GimbalIntegration < ThirdPartyIntegration
         # grab all the places
         while current_page <= total_pages do
 
-            response = client.places(true, { per_page: 50, page: current_page })
+            response = client.places(true, { per_page: 500, page: current_page })
 
             current_page += 1
             total_pages = Integer(response[:headers]["total-pages"] || 0) # guard if the pages aren't in the response and we inifinite loop
@@ -61,18 +61,33 @@ class GimbalIntegration < ThirdPartyIntegration
 
             api_place_ids = api_places_index.keys
 
-            gimbal_places = GimbalPlace.where(gimbal_place_id: api_place_ids, gimbal_integration_id: self.id).all
+            gimbal_places = GimbalPlace.where(id: api_place_ids).all
 
-            new_api_places = (api_place_ids - gimbal_places.map(&:gimbal_place_id)).collect{|id| api_places_index[id] }
+            new_api_places = (api_place_ids - gimbal_places.map(&:id)).collect{|id| api_places_index[id] }
 
-            new_gimbal_places = new_api_places.map{|api_place| self.gimbal_places.build(account_id: self.account_id, gimbal_place_id: api_place.id, name: api_place.name )}
+            new_gimbal_places = new_api_places.map{|api_place| self.gimbal_places.build(account_id: self.account_id, id: api_place.id, name: api_place.name )}
 
-            old_gimbal_places = gimbal_places.select{|gimbal_place| api_places_index[gimbal_place.id].nil? }
+            old_gimbal_places = [] #gimbal_places.select{|gimbal_place| api_places_index[gimbal_place.id].nil? }
+
+            existing_non_searchable_gimbal_places = gimbal_places.select{|gimbal_place| gimbal_place.searchable == false && gimbal_place.new_record? == false }
 
             modified_gimbal_places = gimbal_places.select do |gimbal_place|
                 api_places_index[gimbal_place.id] && api_places_index[gimbal_place.id].name != gimbal_place.name 
             end
+                
+            bulk = []
+
+            existing_non_searchable_gimbal_places.each do |gimbal_place|
+                bulk += [
+                    { index: { _index: GimbalPlace.index_name, _type: GimbalPlace.document_type, _id: gimbal_place.id }},
+                    gimbal_place.as_indexed_json
+                ]
+            end
             
+            if bulk.any?
+                Elasticsearch::Model.client.bulk(body: bulk)
+                GimbalPlace.where(account_id: self.account_id, id: existing_non_searchable_gimbal_places.map(&:id)).update_all(searchable: true)
+            end
 
             new_gimbal_places.each do |gimbal_place|
                 if gimbal_place.save

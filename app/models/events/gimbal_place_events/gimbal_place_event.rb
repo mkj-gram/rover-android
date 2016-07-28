@@ -16,6 +16,18 @@ module Events
                 @gimbal_place_id = event_attributes[:gimbal_place_id]    
             end
 
+            # def attributes
+            #     parent_attributes = super
+            #     if gimbal_place
+            #         parent_attributes.merge!({
+            #             gimbal_place: {
+            #                 id: gimbal_place.id,
+            #                 name: gimbal_place.name
+            #             }
+            #         })
+            #     end
+            #     return parent_attributes
+            # end
 
             private
 
@@ -27,16 +39,11 @@ module Events
             end
 
             def get_messages
-                if gimbal_place
-                    filter_gimbal_place_ids = [nil, gimbal_place.id]
-                else
-                    filter_gimbal_place_ids = nil
-                end
 
                 query = ProximityMessageTemplate.where(account_id: account.id, published: true, trigger_event_id: self.class.event_id).where(today_schedule_column => true).where("? <@ date_schedule", generation_time_date).where("? <@ time_schedule", generation_time_minutes_since_midnight)
-                
+
                 if gimbal_place
-                    query = query.where("filter_gimbal_place_ids <@ '{?}'::int[] OR filter_gimbal_place_ids IS NULL", gimbal_place.id)
+                    query = query.where("filter_gimbal_place_ids <@ '{?}'::string[] OR filter_gimbal_place_ids IS NULL", gimbal_place.id)
                 else
                     query = query.where(filter_gimbal_place_ids: nil)
                 end
@@ -50,7 +57,7 @@ module Events
             end
 
             def gimbal_place
-                @gimbal_place ||= GimbalPlace.where(account_id: account.id, gimbal_place_id: gimbal_place_id).first
+                @gimbal_place ||= GimbalPlace.where(account_id: account.id, id: gimbal_place_id).first
             end
 
         end
