@@ -4,6 +4,8 @@ class V1::CustomerInboxController < V1::ApplicationController
 
     def show
         last_modified = current_customer.inbox_updated_at ? current_customer.inbox_updated_at.utc : Time.zone.now
+        Rails.logger.debug("If-Modified-Since #{request.headers['If-Modified-Since']}".green.bold)
+        Rails.logger.debug("Last-Modified: #{last_modified}".green.bold)
 
         if stale?(last_modified: last_modified)
             Librato.timing('inbox.render.time') do
