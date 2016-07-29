@@ -39,7 +39,7 @@ class LandingPage
         end
 
         def changed_in_place?(raw_old_value, new_value)
-            type_cast_from_database(raw_old_value).as_json != new_value.as_json
+            return type_cast_from_database(raw_old_value).as_json != new_value.as_json
         end
 
     end
@@ -65,6 +65,12 @@ class LandingPage
 
     def errors
         @errors || []
+    end
+
+    def ==(other)
+        return false if other.nil?
+        return false if !other.is_a?(LandingPage)
+        return as_json == other.as_json
     end
 
     def as_json(opts = {})
