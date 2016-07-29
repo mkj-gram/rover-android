@@ -74,7 +74,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     end
 
     def create
-        json = flatten_request({single_record: true})
+        json = flatten_request({single_record: true, except: "attributes.landing-page"})
 
         @scheduled_message = current_account.scheduled_message_templates.build(scheduled_message_params(json[:data]))
 
@@ -88,7 +88,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     end
 
     def update
-        json = flatten_request({single_record: true})
+        json = flatten_request({single_record: true, except: "attributes.landing-page"})
         if @scheduled_message.update_attributes(scheduled_message_params(json[:data]))
             json = render_scheduled_message(@scheduled_message)
             render json: json
@@ -126,7 +126,8 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     def scheduled_message_params(local_params)
         convert_param_if_exists(local_params[:scheduled_messages], :name, :title)
         convert_param_if_exists(local_params[:scheduled_messages], :segment_id, :customer_segment_id)
-
+        convert_param_if_exists(local_params[:scheduled_messages], :"landing-page", :landing_page)
+        
         allowed_params = local_params.fetch(:scheduled_messages, {}).permit(
             :title,
             :notification_text,

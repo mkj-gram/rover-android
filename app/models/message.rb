@@ -84,7 +84,7 @@ class Message
     def to_doc
         doc = attributes
         landing_page = doc.delete(:landing_page)
-        doc.merge!(landing_page: landing_page.to_doc) if landing_page
+        doc.merge!(landing_page: landing_page.as_json) if landing_page
         doc.compact!
         doc
     end
@@ -147,6 +147,7 @@ class Message
         def from_document(doc)
             doc["_id"] = BSON::ObjectId(doc["_id"]["$oid"]) if doc["_id"].is_a?(Hash) && doc["_id"].has_key?("$oid")
             doc["customer_id"] = BSON::ObjectId(doc["customer_id"]["$oid"]) if doc["customer_id"].is_a?(Hash) && doc["customer_id"].has_key?("$oid")
+            doc["landing_page"] = LandingPage.new(doc["landing_page"], true)
             Message.new(doc)
         end
 
@@ -172,6 +173,14 @@ class Message
             doc = mongo_client[collection_name].find().limit(1).first
             return nil if doc.nil?
             return Message.from_document(doc)
+        end
+
+        def all_in_batches(batch_size = 1000)
+            Enumerator.new do |y|
+                mongo_client[collection_name].find().batch_size(batch_size).each do |document|
+                    y << Message.from_document(document)
+                end
+            end
         end
     end
 

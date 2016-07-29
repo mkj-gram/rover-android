@@ -112,7 +112,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
     # create accepts everything the same as update
     def create
-        json = flatten_request({single_record: true})
+        json = flatten_request({single_record: true, except: "attributes.landing-page"})
 
         @proximity_message = current_account.proximity_message_templates.build(proximity_message_params(json[:data]))
 
@@ -126,7 +126,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def update
-        json = flatten_request({single_record: true})
+        json = flatten_request({single_record: true, except: "attributes.landing-page"})
         if @proximity_message.update_attributes(proximity_message_params(json[:data]))
             json = render_proximity_message(@proximity_message)
             render json: json
@@ -171,6 +171,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :place_ids, :filter_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
         convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_ids, :filter_gimbal_place_ids)
+        convert_param_if_exists(local_params[:proximity_messages], :"landing-page", :landing_page)
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
         param_should_be_array(local_params[:proximity_messages], :filter_place_tags)
         param_should_be_array(local_params[:proximity_messages], :limits)
@@ -246,6 +247,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         end
 
         if should_include.include?("segment") && message.customer_segment
+            message.customer_segment.account = current_account
             included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
         end
 
