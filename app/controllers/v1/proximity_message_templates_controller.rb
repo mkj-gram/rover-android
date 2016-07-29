@@ -247,6 +247,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         end
 
         if should_include.include?("segment") && message.customer_segment
+            message.customer_segment.account = current_account
             included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
         end
 
