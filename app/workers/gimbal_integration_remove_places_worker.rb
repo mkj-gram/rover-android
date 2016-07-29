@@ -22,7 +22,7 @@ class GimbalIntegrationRemovePlacesWorker
         end
 
         begin
-            Sneakers.looger.info("Removing #{bulk.size} gimbal places from Elasticsearch")
+            Sneakers.logger.info("Removing #{bulk.size} gimbal places from Elasticsearch")
             Elasticsearch::Model.client.bulk(body: bulk) if bulk.any?
             GimbalPlace.where(account_id: account_id).update_all(searchable: false)
             return ack!
