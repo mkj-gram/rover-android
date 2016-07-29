@@ -19,6 +19,7 @@ class CustomerDevice
     attribute :manufacturer, NullableString
     attribute :carrier, NullableString
     attribute :app_identifier, String
+    attribute :gimbal_mode, Boolean, default: false
     attribute :location, Snapshots::Location
     attribute :background_enabled, Boolean
     attribute :notifications_enabled, Boolean
