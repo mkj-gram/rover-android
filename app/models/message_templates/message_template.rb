@@ -200,7 +200,9 @@ class MessageTemplate < ActiveRecord::Base
             end_date = Float::INFINITY
         end
 
-        self.date_schedule = Range.new(start_date, end_date)
+        if self.date_schedule.nil? || self.date_schedule && (start_date != self.date_schedule.first || end_date != self.date_schedule.last)
+            self.date_schedule = Range.new(start_date, end_date)
+        end
     end
 
     def within_schedule(current_time)
