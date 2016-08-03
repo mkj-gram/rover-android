@@ -47,7 +47,7 @@ class V1::SessionsController < V1::ApplicationController
             elsif current_account && @session.account_id != current_account.id
                 render_unauthorized("access", "you do not have access to delete this session")
             else
-                if @session.destroy
+                if @session.expire!
                     head :no_content
                 else
                     render_errors(@session.errors, stautus: :conflict)

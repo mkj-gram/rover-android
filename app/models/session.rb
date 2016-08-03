@@ -33,6 +33,12 @@ class Session < ActiveRecord::Base
         end
     end
 
+    def expire!
+        # expire in the past in case of clock skew
+        self.update_attributes(:expires_at => Time.zone.now - 30.minutes)
+    end
+
+
     private
 
     def jwt_token
