@@ -162,6 +162,13 @@ class V1::ApplicationController < ActionController::API
         # this is jwt authentication method
         token = request.headers["Authorization"].split(' ').last
         session = Session.find_by_token(token)
+        
+        if session
+            session.track_ip_address(request.remote_ip)
+            session.keep_alive
+            session.save if session.changes.any?
+        end
+
         if session.nil?
             render_unauthorized("Validation Error", "could not find the current session")
         elsif !session.verified? || session.errors.any?

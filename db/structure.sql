@@ -727,7 +727,10 @@ CREATE TABLE sessions (
     user_id integer,
     token character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    ip_address character varying,
+    last_seen_at timestamp without time zone,
+    expires_at timestamp without time zone
 );
 
 
@@ -1941,4 +1944,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160725200403');
 INSERT INTO schema_migrations (version) VALUES ('20160726145054');
 
 INSERT INTO schema_migrations (version) VALUES ('20160728125140');
+
+INSERT INTO schema_migrations (version) VALUES ('20160803143729');
+
+INSERT INTO schema_migrations (version) VALUES ('20160803143746');
 
