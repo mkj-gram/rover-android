@@ -4,6 +4,8 @@ class Session < ActiveRecord::Base
     belongs_to :user
 
     before_create :generate_jwt_token
+    before_create :set_expires_at
+    before_create :set_last_seen_at
 
     def self.build_session(user)
         session = Session.new(account_id: user.account_id, user_id: user.id)
@@ -12,22 +14,24 @@ class Session < ActiveRecord::Base
     end
 
     def expired?
-        @expired ||= DateTime.now > expires_at
+        @expired ||= Time.zone.now > expires_at
     end
 
     def verified?
         @verified ||= jwt_token.verified?
     end
 
-
-    def duration
-        24.hours
+    def track_ip_address(ip)
+        self.ip_address = ip
     end
 
-    def expires_at
-        @expires_at ||= Time.at(jwt_token.read(:exp).to_i).to_datetime
+    def keep_alive
+        # only update keepalive every 10 mins so we aren't slamming postgres
+        if ((Time.zone.now - self.last_seen_at) > 10.minutes)
+            self.last_seen_at = Time.zone.now
+            self.expires_at = Time.zone.now + 24.hours
+        end
     end
-
 
     private
 
@@ -37,5 +41,13 @@ class Session < ActiveRecord::Base
 
     def generate_jwt_token
         self.token = JWTToken.build_token(self)
+    end
+
+    def set_expires_at
+        self.expires_at = Time.zone.now + 24.hours
+    end
+
+    def set_last_seen_at
+        self.last_seen_at = Time.zone.now
     end
 end
