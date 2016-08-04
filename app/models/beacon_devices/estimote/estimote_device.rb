@@ -32,7 +32,7 @@ class EstimoteDevice < BeaconDevice
             if estimote_device.eddystone_uid_advertiser && estimote_device.eddystone_uid_advertiser.enabled
                 eddystone_uid = estimote_device.eddystone_uid_advertiser
                 attributes.merge!({ namespace: eddystone_uid.namespace_id , instance_id: eddystone_uid.instance_id })
-                attributes[:device_data].merge({ eddystone_uid: { name: eddystone_uid.name, power: eddystone_uid.power, interval: eddystone_uid.interval }})
+                attributes[:device_data].merge!({ eddystone_uid: { name: eddystone_uid.name, power: eddystone_uid.power, interval: eddystone_uid.interval }})
             end
 
 
