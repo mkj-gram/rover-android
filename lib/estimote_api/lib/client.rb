@@ -1,7 +1,7 @@
 module EstimoteApi
     class Client
         include HTTParty
-        base_uri "https://cloud.estimote.com/v1"
+        base_uri "https://cloud.estimote.com/v2"
         format :json
         headers 'Accept' => 'application/json'
 
@@ -10,12 +10,12 @@ module EstimoteApi
         end
 
 
-        def beacons(options = {})
-            response = self.class.get('/beacons', options)
+        def devices(options = {})
+            response = self.class.get('/devices', options)
             if response.response.code == "200"
-                parsed_beacons = response.parsed_response
-                estimote_beacons = parsed_beacons.map!{|config| Beacon.new(config)}
-                return parsed_beacons
+                parsed_devices = response.parsed_response
+                estimote_devices = parsed_devices.map!{|config| Device.new(config)}
+                return parsed_devices
             elsif response.response.code == "403" || response.response.code == "401"
                 raise EstimoteApi::Errors::Unauthorized, "invalid credentials"
             else
