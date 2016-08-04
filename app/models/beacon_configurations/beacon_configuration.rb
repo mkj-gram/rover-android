@@ -112,7 +112,6 @@ class BeaconConfiguration < ActiveRecord::Base
             place: indexed_place,
             devices_meta: devices_meta
         }
-        puts "THIS IS WHAT IM RAMMING INTO Elasticsearch: #{json}"
         return json
     end
 
@@ -146,8 +145,6 @@ class BeaconConfiguration < ActiveRecord::Base
         @devices_meta ||= Rails.cache.fetch(devices_meta_cache_key) do
             devices = beacon_devices.all.to_a
             count = devices.size
-            puts "I HAVE #{count} devices".green.bold
-            puts "#{devices}".red.bold
             # there isn't any devices so return right away
             if count == 0
                 {}
