@@ -237,6 +237,7 @@ class Customer
 
     class << self
         def from_document(doc)
+            doc["_id"] = BSON::ObjectId(doc["_id"]["$oid"]) if doc["_id"].is_a?(Hash) && doc["_id"].has_key?("$oid")
             devices = doc.delete(:devices)
             customer = Customer.new(doc.merge(new_record: false))
             devices = devices.map{ |device_doc| CustomerDevice.from_document(device_doc)}

@@ -6,12 +6,12 @@ class SendMessageNotificationWorker
         :ack => true
 
     class << self
-        def perform_async(customer_id, messages = [], device_ids_filter = [])
-            return if customer_id.nil? || messages.empty?
+        def perform_async(customer, messages = [], device_ids_filter = [])
+            return if customer.nil? || messages.empty?
 
             serialized_messages = messages.map(&:to_doc)
             msg = {
-                customer_id: customer_id,
+                customer: customer.to_doc,
                 serialized_messages: serialized_messages,
                 device_ids_filter: device_ids_filter
             }
@@ -21,11 +21,13 @@ class SendMessageNotificationWorker
     end
 
     def perform(args)
-        customer_id = args["customer_id"]
+
+        # customer_id = args["customer_id"]
         serialized_messages = args["serialized_messages"]
         device_ids_filter = args["device_ids_filter"]
-
-        customer = Customer.find(customer_id)
+        customer = Customer.from_document(args["customer"])
+       
+       
         messages = serialized_messages.map{|message| Message.from_document(message)}
 
         send_ios_notifications_to_customer(customer, messages, device_ids_filter)
@@ -109,7 +111,7 @@ class SendMessageNotificationWorker
     end
 
     def send_android_notifications_to_customer(customer, messages, device_ids_filter)
-
+        
         android_devices = customer.devices.select { |device| device.os_name == "Android" && device.token  }
         android_devices.select! { | device| device_ids_filter.include?(device.id) } if device_ids_filter
 
@@ -119,6 +121,8 @@ class SendMessageNotificationWorker
 
         notifications = FcmHelper.messages_to_notifications(android_messages_by_token)
 
+        expired_tokens = []
+        duration = 0.0
         PushConnectionCache.with_fcm_connection(customer.account_id) do |connection_context|
             return if connection_context.nil? || connection_context[:connection].nil?
             start_time = Time.zone.now
@@ -126,7 +130,6 @@ class SendMessageNotificationWorker
             expired_tokens = FcmHelper.send_with_connection(connection_context[:connection], notifications)
             duration = (Time.zone.now - start_time) * 1000.0
         end
-
 
         CustomerDeviceHelper.remove_tokens(expired_tokens)
 
