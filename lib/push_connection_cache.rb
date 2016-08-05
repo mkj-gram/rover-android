@@ -81,12 +81,13 @@ module PushConnectionCache
                 platform = AndroidPlatform.where(account_id: account_id).first
                 return if platform.api_key.nil?
                 connection = FCM.new(platform.api_key)
-                return @fcm_connection_cache[account_id] = {
+                @fcm_connection_cache[account_id] = {
                     platform: platform,
                     connection: connection,
                     expires_at: Time.zone.now + expires_in,
                     lock: Mutex.new
                 }
+                return @fcm_connection_cache[account_id]
             end
         end
 
