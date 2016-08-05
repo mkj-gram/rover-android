@@ -1,5 +1,5 @@
 class BeaconDevice < ActiveRecord::Base
-
+    
     class JSONSerializer
         def self.dump(hash)
             hash.to_json

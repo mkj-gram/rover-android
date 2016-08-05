@@ -489,8 +489,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
         {
             "type" => device.model_type,
             "id" => device.id.to_s,
-            "attributes" => device.device_attributes.merge(device.configuration_attributes)
-        }
+            "attributes" => device.device_attributes
+        }.dasherize
     end
 
 

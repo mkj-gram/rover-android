@@ -65,84 +65,86 @@ class EstimoteIntegration < ThirdPartyIntegration
             beacons_changed_configuration_count: 0
         }
 
-        estimote_beacons = client.beacons
-        estimote_manufacturer_ids = Set.new
-        configurations_modified = Set.new
-        current_devices = self.beacon_devices.all.index_by(&:manufacturer_id)
-        estimote_devices = {}
-        estimote_beacons.each do |beacon|
-            # map this to a device on our end
-            if beacon.ibeacon?
-                device = EstimoteIBeaconDevice.build_from_beacon(beacon)
-            elsif beacon.eddystone_namespace?
-                device = EstimoteEddystoneNamespaceDevice.build_from_beacon(beacon)
-            elsif beacon.url?
-                # for now we don't want to track their url devices
-                device = nil
-                # device = EstimoteUrlDevice.build_from_beacon(beacon)
-            else
-                Rails.logger.warn("Unknown beacon type #{beacon.protocol}")
-                device = nil
-            end
 
-            next if device.nil?
+        estimote_devices = client.devices
+        current_devices = self.beacon_devices.all
 
-            estimote_manufacturer_ids.add(device.manufacturer_id)
-            device.account_id = self.account_id
-            device.third_party_integration_id = self.id
-            device.skip_cache_update = true
-            estimote_devices[device.manufacturer_id] = device
-        end
+        new_configurations = Set.new
+        # estimote_devices now hold multiple broadcasting signals
 
+        # we want to match the estimote with the ones we have by their identifier
 
-        # we have 2 arrays
-        # 1 is all of our devices
-        # 2 is all of estimotes devices
-        # which ones are new?
-        new_devices = estimote_devices.select{|manufacturer_id, device| current_devices[manufacturer_id].nil? }
+        estimote_devices_by_identifier = estimote_devices.index_by(&:identifier)
+        current_devices_by_identifier = current_devices.index_by(&:manufacturer_id)
 
-        existing_devices_need_update = current_devices.select{ |manufacturer_id, device| estimote_devices.include?(manufacturer_id) && device.needs_update?(estimote_devices[manufacturer_id]) }
+        # new devices are ones we don't have
+        new_estimote_devices = estimote_devices_by_identifier.select{|identifier, device| current_devices_by_identifier[identifier].nil? }
 
-        deleted_devices = current_devices.select{|manufacturer_id, device| !estimote_manufacturer_ids.include?(manufacturer_id)}
-
-        # with new devices we can just create their configs and if they exist oh well
-        new_devices.each do |manufacturer_id, device|
-            if device.save && new_config = device.create_configuration
+        new_estimote_devices.each do |identifier, device|
+            # this can map to multiple configurations
+            rover_estimote_device = EstimoteDevice.build_from_estimote_device(device)
+            rover_estimote_device.account_id = self.account_id
+            rover_estimote_device.third_party_integration_id = self.id
+            if rover_estimote_device.save
                 stats[:added_beacons_count] += 1
-                configurations_modified.add(new_config) if new_config != nil
-            end
-        end
-
-        # existing devices need to update their previous config and update their newone
-        existing_devices_need_update.each do |manufacturer_id, device|
-            existing_configuration = device.configuration
-            if existing_configuration.nil?
-                existing_configuration = device.create_configuration
-            end
-            configurations_modified.add(existing_configuration) if existing_configuration != nil
-            device.overwrite_attributes_with_device(estimote_devices[manufacturer_id])
-
-            if device.save && new_config = device.create_configuration
-                if (existing_configuration && new_config) && (existing_configuration.id != new_config.id)
-                    stats[:beacons_changed_configuration_count] += 1
-                else
-                    stats[:modified_beacons_count] += 1
+                if rover_estimote_device.ibeacon_enabled?
+                    new_configurations.add({uuid: rover_estimote_device.uuid, major: rover_estimote_device.major, minor: rover_estimote_device.minor, tags: rover_estimote_device.tags, title: rover_estimote_device.name})
                 end
-                configurations_modified.add(new_config) if new_config != nil
+
+                if rover_estimote_device.eddystone_uid_enabled?
+                    new_configurations.add({ namespace: rover_estimote_device.namespace, instance_id: rover_estimote_device.instance_id, tags: rover_estimote_device.tags, title: rover_estimote_device.name })
+                end
             end
         end
 
-        deleted_devices.each do |manufacturer_id, device|
-            device.skip_cache_update = true
-            if device.destroy
+        new_configurations.each do |configuration_opts|
+
+            configuration_opts.merge!(account_id: self.account_id)
+
+            if configuration_opts.has_key?(:uuid)
+                configuration = IBeaconConfiguration.new(configuration_opts)
+            else
+                configuration = EddystoneNamespaceConfiguration.new(configuration_opts)
+            end
+            
+            configuration.save!
+        end
+
+
+        modified_devices = current_devices_by_identifier.select { |identifier, rover_estimote_device| !estimote_devices_by_identifier[identifier].nil? && rover_estimote_device.needs_update?(estimote_devices_by_identifier[identifier]) }
+
+
+        # need a way to detect which ones just need updating to their settings
+        # and which ones configurations changed
+        modified_devices.each do |identifier, rover_estimote_device|
+
+            estimote_device = estimote_devices_by_identifier[identifier]
+            rover_estimote_device.merge_new_settings(estimote_device)
+
+            ibeacon_configuration_changed = rover_estimote_device.ibeacon_configuration_changed?
+            eddystone_uid_configuration_changed = rover_estimote_device.eddystone_uid_configuration_changed?
+            if rover_estimote_device.changes.any? && rover_estimote_device.save
+                stats[:modified_beacons_count] += 1
+
+                if ibeacon_configuration_changed
+                    stats[:beacons_changed_configuration_count] += 1
+                end
+
+                if eddystone_uid_configuration_changed
+                    stats[:beacons_changed_configuration_count] += 1
+                end
+            end
+        end
+
+        removed_devices = current_devices_by_identifier.select{ |identifier, rover_estimote_device| estimote_devices_by_identifier[identifier].nil? }
+
+        removed_devices.each do |identifier, rover_estimote_device|
+            if rover_estimote_device.destroy
                 stats[:removed_beacons_count] += 1
-                configurations_modified.add(device.configuration)
             end
         end
 
-        configurations_modified.each do |configuration|
-            configuration.touch(:beacon_devices_updated_at)
-        end
+
 
         return stats
     end
