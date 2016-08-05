@@ -1,5 +1,5 @@
 class EstimoteDevice < BeaconDevice
-
+    
     store_accessor :device_data, :hardware_type, :hardware_revision, :firmware_version, :color, :name, :tags, :form_factor, :battery_percentage, :estimated_battery_lifetime
 
     after_save :update_ibeacon_configuration
