@@ -97,18 +97,7 @@ class EstimoteIntegration < ThirdPartyIntegration
             end
         end
 
-        new_configurations.each do |configuration_opts|
 
-            configuration_opts.merge!(account_id: self.account_id)
-
-            if configuration_opts.has_key?(:uuid)
-                configuration = IBeaconConfiguration.new(configuration_opts)
-            else
-                configuration = EddystoneNamespaceConfiguration.new(configuration_opts)
-            end
-            
-            configuration.save!
-        end
 
 
         modified_devices = current_devices_by_identifier.select { |identifier, rover_estimote_device| !estimote_devices_by_identifier[identifier].nil? && rover_estimote_device.needs_update?(estimote_devices_by_identifier[identifier]) }
@@ -123,15 +112,18 @@ class EstimoteIntegration < ThirdPartyIntegration
 
             ibeacon_configuration_changed = rover_estimote_device.ibeacon_configuration_changed?
             eddystone_uid_configuration_changed = rover_estimote_device.eddystone_uid_configuration_changed?
+
             if rover_estimote_device.changes.any? && rover_estimote_device.save
                 stats[:modified_beacons_count] += 1
 
                 if ibeacon_configuration_changed
                     stats[:beacons_changed_configuration_count] += 1
+                    new_configurations.add({uuid: rover_estimote_device.uuid, major: rover_estimote_device.major, minor: rover_estimote_device.minor, tags: rover_estimote_device.tags, title: rover_estimote_device.name})
                 end
 
                 if eddystone_uid_configuration_changed
                     stats[:beacons_changed_configuration_count] += 1
+                    new_configurations.add({ namespace: rover_estimote_device.namespace, instance_id: rover_estimote_device.instance_id, tags: rover_estimote_device.tags, title: rover_estimote_device.name })
                 end
             end
         end
@@ -141,6 +133,24 @@ class EstimoteIntegration < ThirdPartyIntegration
         removed_devices.each do |identifier, rover_estimote_device|
             if rover_estimote_device.destroy
                 stats[:removed_beacons_count] += 1
+            end
+        end
+
+      
+        new_configurations.each do |configuration_opts|
+
+            configuration_opts.merge!(account_id: self.account_id)
+
+            if configuration_opts.has_key?(:uuid)
+                configuration = IBeaconConfiguration.new(configuration_opts)
+            else
+                configuration = EddystoneNamespaceConfiguration.new(configuration_opts)
+            end
+
+            begin
+                configuration.save!
+            rescue ActiveRecord::RecordNotUnique => e
+                Rails.logger.warn("Configuration #{configuration} already exists")
             end
         end
 
