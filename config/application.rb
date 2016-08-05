@@ -42,6 +42,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('app', 'classes')
 
         # config.autoload_paths << Rails.root.join('app', 'models', 'beacon_configurations', 'ibeacon_configuration')
+        config.autoload_paths << Rails.root.join('lib', 'push_connection_cache')
         config.autoload_paths << Rails.root.join('lib', 'mail_client')
         config.autoload_paths << Rails.root.join('lib', 'customer_filter')
         config.autoload_paths << Rails.root.join('lib', 'message_limit')
@@ -54,6 +55,7 @@ module RailsApi
         config.autoload_paths << Rails.root.join('lib', 'gimbal_api')
         config.autoload_paths << Rails.root.join('lib', 'time_zone_offset')
         config.autoload_paths << Rails.root.join('app', 'workers')
+
 
         config.eager_load_paths << Rails.root.join('lib', 'metrics_client')
         config.eager_load_paths << Rails.root.join('app', 'error_serializers', '**')

@@ -1,10 +1,11 @@
 module PushConnectionCache
+
+    @apns_connection_cache = {}
+    @fcm_connection_cache = {}
+
+    @master_lock = Mutex.new
+
     class << self
-
-        @apns_connection_cache = {}
-        @fcm_connection_cache = {}
-
-        @master_lock = Mutex.new
 
         # connections expire every hour and will be setup again
         def with_apns_connection(account_id, expires_in: 3600)
@@ -19,12 +20,16 @@ module PushConnectionCache
                 connection_context[:connection].shutdown
                 connection_context = create_apns_connection!(account_id, expires_in)
             end
-                
+
 
             if block_given?
                 begin
-                    connection_context[:lock].synchronize do
-                        yield connection_context
+                    if connection_context.nil?
+                        yield nil
+                    else
+                        connection_context[:lock].synchronize do
+                            yield connection_context
+                        end
                     end
                 end
             end
@@ -40,12 +45,16 @@ module PushConnectionCache
 
             if block_given?
                 begin
-                    connection_context[:lock].synchronize do
-                        yield connection_context
+                    if connection_context.nil?
+                        yield nil
+                    else
+                        connection_context[:lock].synchronize do
+                            yield connection_context
+                        end
                     end
                 end
             end
-           
+
         end
 
 
