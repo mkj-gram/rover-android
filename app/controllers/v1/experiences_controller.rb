@@ -105,11 +105,13 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def short_url
         @experience = Experiences::Experience.find_by(short_url: params[:short_url])
-
-        if stale?(last_modified: @experience.live_version_updated_at)
-            render_experience(@experience)
+        if @experience
+            if stale?(last_modified: @experience.live_version_updated_at)
+                render_experience(@experience)
+            end
+        else
+            head :not_found
         end
-
     end
 
 
@@ -123,7 +125,7 @@ class V1::ExperiencesController < V1::ApplicationController
                 head :not_found
             else
                 version = live_version ? experience.live_version : experience.current_version
-               
+
 
                 json = {
                     data: V1::ExperienceSerializer.serialize(experience, version),
