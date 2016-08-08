@@ -1,6 +1,9 @@
 module VirtusDirtyAttributes
     extend ActiveSupport::Concern
 
+    class Undefined
+    end
+
     included do
 
         def initialize(atr = {})
@@ -14,7 +17,8 @@ module VirtusDirtyAttributes
         end
 
         def changes
-            changed = to_doc.inject({}) do |hash, (k,v)|
+            new_attributes = to_doc
+            changed = new_attributes.inject({}) do |hash, (k,v)|
                 if v.is_a?(Array)
                     hash.merge!(k => [@_original_attributes[k], v]) if @_original_attributes[k].sort_by { |a| a.is_a?(Hash) ? a.values.first : a } != v.sort_by { |a| a.is_a?(Hash) ? a.values.first : a }
                 else
@@ -22,6 +26,11 @@ module VirtusDirtyAttributes
                 end
                 hash
             end
+
+            (ori.keys - new_attributes.keys).each do |key|
+                changed[key] = [ @_original_attributes[key], Undefined ]
+            end
+
             return changed || {}
         end
 
