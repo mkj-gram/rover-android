@@ -1,4 +1,3 @@
-
 class IosPlatform < ActiveRecord::Base
     include Platformable
 

@@ -237,6 +237,7 @@ class Customer
 
     class << self
         def from_document(doc)
+            doc["_id"] = BSON::ObjectId(doc["_id"]["$oid"]) if doc["_id"].is_a?(Hash) && doc["_id"].has_key?("$oid")
             devices = doc.delete(:devices)
             customer = Customer.new(doc.merge(new_record: false))
             devices = devices.map{ |device_doc| CustomerDevice.from_document(device_doc)}
@@ -374,10 +375,15 @@ class Customer
                     devices.each do |device|
                         next if device.changes.empty?
 
-                        setters = device.changes.inject({}) do |hash, (k,v)|
+                        setters = device.changes.select{|k,v| v.last != VirtusDirtyAttributes::Undefined }.inject({}) do |hash, (k,v)|
                             new_value = v.last
                             new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
                             hash.merge!({"devices.$.#{k.to_s}" => new_value})
+                            hash
+                        end
+
+                        unsetters = device.changes.select{|k,v| v.last == VirtusDirtyAttributes::Undefined }.inject({}) do |hash, (k,v)|
+                            hash.merge!({"devices.$.#{k.to_s}" => ""})
                             hash
                         end
 
@@ -391,7 +397,18 @@ class Customer
                         end
 
                         setters.merge!("updated_at" => Time.zone.now)
-                        mongo_client[collection_name].find({"_id" => self._id, "devices._id" => device._id}).update_one({"$set" => setters})
+
+                        update_command = {}
+
+                        if setters.any?
+                            update_command.merge!("$set" => setters)
+                        end
+
+                        if unsetters.any?
+                            update_command.merge!("$unset" => unsetters)
+                        end
+                        
+                        mongo_client[collection_name].find({"_id" => self._id, "devices._id" => device._id}).update_one(update_command)
                         customer_changes = {}
                     end
                 elsif self.changes.any?

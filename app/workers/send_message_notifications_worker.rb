@@ -6,12 +6,12 @@ class SendMessageNotificationWorker
         :ack => true
 
     class << self
-        def perform_async(customer_id, messages = [], device_ids_filter = [])
-            return if customer_id.nil? || messages.empty?
+        def perform_async(customer, messages = [], device_ids_filter = [])
+            return if customer.nil? || messages.empty?
 
             serialized_messages = messages.map(&:to_doc)
             msg = {
-                customer_id: customer_id,
+                customer: customer.to_doc,
                 serialized_messages: serialized_messages,
                 device_ids_filter: device_ids_filter
             }
@@ -21,11 +21,13 @@ class SendMessageNotificationWorker
     end
 
     def perform(args)
-        customer_id = args["customer_id"]
+
+        # customer_id = args["customer_id"]
         serialized_messages = args["serialized_messages"]
         device_ids_filter = args["device_ids_filter"]
-
-        customer = Customer.find(customer_id)
+        customer = Customer.from_document(args["customer"])
+       
+       
         messages = serialized_messages.map{|message| Message.from_document(message)}
 
         send_ios_notifications_to_customer(customer, messages, device_ids_filter)
@@ -45,11 +47,12 @@ class SendMessageNotificationWorker
             send_ios_notifications_with_connection(RoverApnsHelper.get_connection, messages, rover_devices)
         end
 
-        if ios_devices.any? 
-            ios_platform = IosPlatform.find_by(account_id: customer.account_id)
-            connection = ApnsHelper.connection_from_ios_platform(ios_platform, pool_size: 1, heartbeat_interval: 0)
-            send_ios_notifications_with_connection(connection, messages, ios_devices)
-            connection.shutdown
+        if ios_devices.any?
+            PushConnectionCache.with_apns_connection(customer.account_id) do |connection_context|
+                if connection_context && connection_context[:connection]
+                    send_ios_notifications_with_connection(connection_context[:connection], messages, ios_devices)
+                end
+            end
         end
 
     end
@@ -82,7 +85,7 @@ class SendMessageNotificationWorker
             extra = {
                 device: device,
                 customer: customer,
-                account_id: customer.account_id 
+                account_id: customer.account_id
             }
 
             if response.success?
@@ -99,7 +102,7 @@ class SendMessageNotificationWorker
 
 
         expired_tokens = responses.select{ |response| response.invalid_token? }.map{ |response| response.notification.token }
-        
+
         CustomerDeviceHelper.remove_tokens(expired_tokens)
 
         MetricsClient.aggregate("apns.notifications.sent" => { value: responses.size })
@@ -108,12 +111,7 @@ class SendMessageNotificationWorker
     end
 
     def send_android_notifications_to_customer(customer, messages, device_ids_filter)
-
-        android_platform = AndroidPlatform.find_by(account_id: customer.account_id)
-        api_key = android_platform.nil? ? nil : android_platform.api_key
-
-        return if api_key.nil?
-
+        
         android_devices = customer.devices.select { |device| device.os_name == "Android" && device.token  }
         android_devices.select! { | device| device_ids_filter.include?(device.id) } if device_ids_filter
 
@@ -122,12 +120,16 @@ class SendMessageNotificationWorker
         android_messages_by_token = android_devices.inject({}) { |hash, device| hash.merge!(device.token => messages)}
 
         notifications = FcmHelper.messages_to_notifications(android_messages_by_token)
-        connection = FCM.new(api_key)
 
-        start_time = Time.zone.now
-        # TODO check to see what the response was for each notification and track the event sent
-        expired_tokens = FcmHelper.send_with_connection(connection, notifications)
-        duration = (Time.zone.now - start_time) * 1000.0
+        expired_tokens = []
+        duration = 0.0
+        PushConnectionCache.with_fcm_connection(customer.account_id) do |connection_context|
+            return if connection_context.nil? || connection_context[:connection].nil?
+            start_time = Time.zone.now
+            # TODO check to see what the response was for each notification and track the event sent
+            expired_tokens = FcmHelper.send_with_connection(connection_context[:connection], notifications)
+            duration = (Time.zone.now - start_time) * 1000.0
+        end
 
         CustomerDeviceHelper.remove_tokens(expired_tokens)
 

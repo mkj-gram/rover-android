@@ -198,7 +198,7 @@ module Events
             # move to state api
             if device.token
                 messages = inbox_messages_to_deliver + local_messages_to_deliver
-                SendMessageNotificationWorker.perform_async(customer.id, messages, [ device.id ])
+                SendMessageNotificationWorker.perform_async(customer, messages, [ device.id ])
             end
 
         end
