@@ -148,6 +148,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def modify_current_version!
         if @experience.current_version
+            # TODO: implement check sum
             if  false && @experience.current_version.check_sum != params[:"checksum"] && params[:force] != true
                 # return some error
                 return false

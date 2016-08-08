@@ -198,6 +198,12 @@ module Experiences
                 return Experience.from_document(doc)
             end
 
+            def find_by(query)
+                doc = mongo[collection_name].find(query).first
+                return nil if doc.nil?
+                return Experience.from_document(doc)
+            end
+
             def find_all(ids)
                 ids = ids.map { |id| id.is_a?(String) ? BSON::ObjectId(id) : id }
                 docs = mongo[collection_name].find(_id: { "$in" => ids })
