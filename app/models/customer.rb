@@ -389,7 +389,7 @@ class Customer
 
                         setters.merge!("devices.$.updated_at" => Time.zone.now)
 
-                        setters = customer_changes.inject(setters) do |hash, (k,v)|
+                        setters = customer_changes.select{|k,v| v.last != VirtusDirtyAttributes::Undefined }.inject(setters) do |hash, (k,v)|
                             new_value = v.last
                             new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
                             hash.merge!({k.to_s => new_value})
@@ -415,7 +415,7 @@ class Customer
                     customer_changes = changes
                     customer_changes.delete(:devices)
 
-                    setters = customer_changes.inject({}) do |hash, (k,v)|
+                    setters = customer_changes.select{|k,v| v.last != VirtusDirtyAttributes::Undefined }.inject({}) do |hash, (k,v)|
                         new_value = v.last
                         new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
                         hash.merge!({k.to_s => new_value})
