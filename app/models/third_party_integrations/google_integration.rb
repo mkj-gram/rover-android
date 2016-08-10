@@ -81,7 +81,7 @@ class GoogleIntegration < ThirdPartyIntegration
             configurations.each do |configuration|
                 case configuration
                 when IBeaconConfiguration
-                    advertised_id = { id: [configuration.uuid.downcase.gsub("-", ""), configuration.major, configuration.minor].pack("H*SS"), type: "IBEACON" }
+                    advertised_id = { id: [configuration.uuid.downcase.gsub("-", ""), configuration.major, configuration.minor].pack("H*S>S>"), type: "IBEACON" }
                 when EddystoneNamespaceConfiguration
                     advertised_id = { id: [configuration.namespace.downcase, configuration.instance_id.downcase].pack("H*H*"), type: "EDDYSTONE" }
                 else
@@ -295,7 +295,7 @@ class GoogleIntegration < ThirdPartyIntegration
             new_beacons.each do |beacon|
                 case beacon.advertised_id.type
                 when "IBEACON"
-                    uuid, major, minor = beacon.advertised_id.id.unpack("H32SS")
+                    uuid, major, minor = beacon.advertised_id.id.unpack("H32S>S>")
                     uuid = "#{uuid[0..7]}-#{uuid[8..11]}-#{uuid[12..15]}-#{uuid[16..19]}-#{uuid[20..31]}"
                     new_configurations.push(
                         IBeaconConfiguration.new(
