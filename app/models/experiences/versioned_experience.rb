@@ -10,6 +10,7 @@ module Experiences
         attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
         attribute :experience_id, BSON::ObjectId
         attribute :version_title, String
+        attribute :home_screen_id, String
         attribute :screens, Array[Hash]
         attribute :screen_data, Array[Hash]
         attribute :updated_at, Time, default: lambda { |model, attribute| Time.zone.now }

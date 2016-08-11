@@ -272,9 +272,13 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def versioned_experience_params(local_params)
         # return local_params
-        return {
+        data = {
             screens: (local_params[:screens] || []).map{|screen| screen_params(screen)}
         }
+
+        data[:home_screen_id] = local_params[:home_screen_id] || data[:screens].is_a?(Array) && data[:screens].first.is_a?(Hash) ? data[:screens].first[:id] : nil
+
+        return data
     end
 
     def color_params(color)
@@ -335,6 +339,18 @@ class V1::ExperiencesController < V1::ApplicationController
         end
 
         return data
+    end
+
+    def image_params(image)
+        return nil if image.nil?
+        return {
+            height: image[:height],
+            width: image[:width],
+            type: image[:type],
+            name: image[:name],
+            size: image[:size],
+            url: image[:url]
+        }
     end
 
     def screen_params(local_params)
@@ -447,7 +463,7 @@ class V1::ExperiencesController < V1::ApplicationController
                 border_color: color_params(local_params[:border_color]),
                 border_width: local_params[:border_width],
                 border_radius: local_params[:border_radius],
-                image: local_params[:image]
+                image: image_params(local_params[:image])
             }
         )
     end
@@ -573,10 +589,10 @@ class V1::ExperiencesController < V1::ApplicationController
 
     COLOR_SCHEMA = JSONObject.(
         {
-            red: 0..255,
-            green: 0..255,
-            blue: 0..255,
-            alpha: 0.0..1.0
+            'red' => 0..255,
+            'green' => 0..255,
+            'blue' => 0..255,
+            'alpha' => 0.0..1.0
         }
     )
 
@@ -584,35 +600,35 @@ class V1::ExperiencesController < V1::ApplicationController
 
     UNIT_SCHEMA = JSONObject.(
         {
-            type: CH::G.enum('points', 'percentage'),
-            value: [ Integer, Float ] # should all be floats
+            'type' => CH::G.enum('points', 'percentage'),
+            'value' => [ Integer, Float ] # should all be floats
         }
     )
 
     OFFSET_SCHEMA = {
-        top: UNIT_SCHEMA,
-        left: UNIT_SCHEMA,
-        right: UNIT_SCHEMA,
-        bottom: UNIT_SCHEMA,
-        center: UNIT_SCHEMA,
-        middle: UNIT_SCHEMA
+        'top' => UNIT_SCHEMA,
+        'left' => UNIT_SCHEMA,
+        'right' => UNIT_SCHEMA,
+        'bottom' => UNIT_SCHEMA,
+        'center' => UNIT_SCHEMA,
+        'middle' => UNIT_SCHEMA
     }
 
     ALIGNMENT_SCHEMA = {
-        horizontal: String,
-        vertical: String
+        'horizontal' => String,
+        'vertical' => String
     }
 
     INSET_SCHEMA = {
-        top: [ Integer, Float ], # should all be floats ,
-        left: [ Integer, Float ], # should all be floats ,
-        right: [ Integer, Float ], # should all be floats ,
-        bottom: [ Integer, Float ] # should all be floats
+        'top' => [ Integer, Float ], # should all be floats ,
+        'left' => [ Integer, Float ], # should all be floats ,
+        'right' => [ Integer, Float ], # should all be floats ,
+        'bottom' => [ Integer, Float ] # should all be floats
     }
 
     FONT_SCHEMA = {
-        size: Integer,
-        weight: Integer
+        'size' => Integer,
+        'weight' => Integer
     }
 
     ACTION_SCHEMA = lambda { |value|
@@ -640,14 +656,14 @@ class V1::ExperiencesController < V1::ApplicationController
     }
 
     URL_ACTION_SCHEMA = {
-        type: CH::G.enum('open-url'),
-        url: String
+        'type' => CH::G.enum('open-url'),
+        'url' => String
     }
 
 
     SCREEN_ACTION_SCHEMA = {
-        type: CH::G.enum('go-to-screen'),
-        screenId: String
+        'type' => CH::G.enum('go-to-screen'),
+        'screen-id' => String
     }
 
     BLOCKS_SCHEMA = lambda do |value|
@@ -663,7 +679,7 @@ class V1::ExperiencesController < V1::ApplicationController
                 schema = TEXT_BLOCK_SCHEMA
             else
                 puts "unknown type"
-                return "a block, unknown type: #{value[:type]}"
+                return "a block, unknown 'type' => #{value[:type]}"
             end
 
             begin
@@ -680,110 +696,110 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     BASE_BLOCK_SCHEMA = {
-        id: String,
-        rowId: String,
-        screenId: String,
-        name: String,
-        width: UNIT_SCHEMA,
-        height: UNIT_SCHEMA,
-        position: CH::G.enum('stacked', 'floating'),
-        offset: OFFSET_SCHEMA,
-        alignment: ALIGNMENT_SCHEMA,
-        inset: INSET_SCHEMA
+        'id' => String,
+        'row-id' => String,
+        'screen-id' => String,
+        'name' => String,
+        'width' => UNIT_SCHEMA,
+        'height' => UNIT_SCHEMA,
+        'position' => CH::G.enum('stacked', 'floating'),
+        'offset' => OFFSET_SCHEMA,
+        'alignment' => ALIGNMENT_SCHEMA,
+        'inset' => INSET_SCHEMA
     }
 
 
     DEFAULT_BLOCK_SCHEMA = BASE_BLOCK_SCHEMA.merge(
         {
-            backgroundColor: COLOR_SCHEMA,
-            borderColor: COLOR_SCHEMA,
-            borderWidth: Integer,
-            borderRadius: Integer
+            'background-color' => COLOR_SCHEMA,
+            'border-color' => COLOR_SCHEMA,
+            'border-width' => Integer,
+            'border-radius' => Integer
         }
     )
 
     TEXT_BLOCK_SCHEMA = BASE_BLOCK_SCHEMA.merge(
         {
-            type: CH::G.enum('text-block'),
-            autoHeight: [ TrueClass, FalseClass ],
-            backgroundColor: COLOR_SCHEMA,
-            borderColor: COLOR_SCHEMA,
-            borderWidth: Integer,
-            borderRadius: Integer,
-            textColor: COLOR_SCHEMA,
-            textFont: FONT_SCHEMA,
-            textAlignment: CH::G.enum('left', 'right', 'center'),
-            text: String
+            'type' => CH::G.enum('text-block'),
+            'auto-height' => [ TrueClass, FalseClass ],
+            'background-color' => COLOR_SCHEMA,
+            'border-color' => COLOR_SCHEMA,
+            'border-width' => Integer,
+            'border-radius' => Integer,
+            'text-color' => COLOR_SCHEMA,
+            'text-font' => FONT_SCHEMA,
+            'text-alignment' => CH::G.enum('left', 'right', 'center'),
+            'text' => String
         }
     )
 
     IMAGE_BLOCK_SCHEMA = BASE_BLOCK_SCHEMA.merge(
         {
-            type: CH::G.enum('image-block'),
-            autoHeight: [ TrueClass, FalseClass ],
-            backgroundColor: COLOR_SCHEMA,
-            borderColor: COLOR_SCHEMA,
-            borderWidth: Integer,
-            borderRadius: Integer,
-            image: [ NilClass,
+            'type' => CH::G.enum('image-block'),
+            'auto-height' => [ TrueClass, FalseClass ],
+            'background-color' => COLOR_SCHEMA,
+            'border-color' => COLOR_SCHEMA,
+            'border-width' => Integer,
+            'border-radius' => Integer,
+            'image' => [ :optional, NilClass,
                      {
-                         height: Integer,
-                         width: Integer,
-                         type: String,
-                         name: String,
-                         size: Integer,
-                         url: String
+                         'height' => Integer,
+                         'width' => Integer,
+                         'type' => String,
+                         'name' => String,
+                         'size' => Integer,
+                         'url' => String
             }]
         }
     )
 
     BUTTON_STATE_SCHEMA = {
-        backgroundColor: COLOR_SCHEMA,
-        borderColor: COLOR_SCHEMA,
-        borderWidth: Integer,
-        borderRadius: Integer,
-        textColor: COLOR_SCHEMA,
-        textFont: FONT_SCHEMA,
-        textAlignment: CH::G.enum('left', 'right', 'center'),
-        text: String
+        'background-color' => COLOR_SCHEMA,
+        'border-color' => COLOR_SCHEMA,
+        'border-width' => Integer,
+        'border-radius' => Integer,
+        'text-color' => COLOR_SCHEMA,
+        'text-font' => FONT_SCHEMA,
+        'text-alignment' => CH::G.enum('left', 'right', 'center'),
+        'text' => String
     }
 
     BUTTON_BLOCK_SCHEMA = BASE_BLOCK_SCHEMA.merge(
         {
-            type: CH::G.enum('button-block'),
-            states: {
-                normal: BUTTON_STATE_SCHEMA,
-                highlighted: BUTTON_STATE_SCHEMA,
-                disabled: BUTTON_STATE_SCHEMA,
-                selected: BUTTON_STATE_SCHEMA
+            'type' => CH::G.enum('button-block'),
+            'states' => {
+                'normal' => BUTTON_STATE_SCHEMA,
+                'highlighted' => BUTTON_STATE_SCHEMA,
+                'disabled' => BUTTON_STATE_SCHEMA,
+                'selected' => BUTTON_STATE_SCHEMA
             },
-            action: [:optional, ACTION_SCHEMA]
+            'action' => [:optional, NilClass, ACTION_SCHEMA]
         }
     )
 
     ROWS_SCHEMA = {
-        id: String,
-        screenId: String,
-        name: String,
-        autoHeight: [ TrueClass, FalseClass ],
-        backgroundColor: COLOR_SCHEMA,
-        height: UNIT_SCHEMA,
-        blocks: [[ BLOCKS_SCHEMA ]]
+        'id' => String,
+        'screen-id' => String,
+        'name' => String,
+        'auto-height' => [ TrueClass, FalseClass ],
+        'background-color' => COLOR_SCHEMA,
+        'height' => UNIT_SCHEMA,
+        'blocks' => [[ BLOCKS_SCHEMA ]]
     }
 
     SCREEN_SCHEMA = {
-        id: String,
-        backgroundColor: COLOR_SCHEMA,
-        titleBarTextColor: COLOR_SCHEMA,
-        titleBarBackgroundColor: COLOR_SCHEMA,
-        statusBarStyle: STATUS_BAR_SCHEMA,
-        useDefaultTitleBarStyle: [ TrueClass, FalseClass ],
-        rows: [[ ROWS_SCHEMA ]]
+        'id' => String,
+        'background-color' => COLOR_SCHEMA,
+        'title-bar-text-color' => COLOR_SCHEMA,
+        'title-bar-background-color'=> COLOR_SCHEMA,
+        'status-bar-style'=> STATUS_BAR_SCHEMA,
+        'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
+        'rows' => [[ ROWS_SCHEMA ]]
     }
 
     SCHEMA = {
-        name: String,
-        screens: [[ SCREEN_SCHEMA ]]
+        'name' => String,
+        'screens' => [[ SCREEN_SCHEMA ]]
     }
 
     def validate_input(input)
