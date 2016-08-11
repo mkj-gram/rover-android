@@ -164,6 +164,7 @@ class V1::ApplicationController < ActionController::API
         session = Session.find_by_token(token)
         
         if session #&& !session.expired?
+            puts "Session Expires At: #{session.expires_at} time is #{Time.zone.now}"
             session.track_ip_address(request.remote_ip)
             session.keep_alive
             session.save if session.changes.any?
