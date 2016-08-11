@@ -6,7 +6,7 @@ class JWTToken
         payload = {
             "iss" => "rover.io",
             "sub" => session.user_id,
-            "jti" => session.id
+            "jti" => SecureRandom.uuid
         }
         return JWT.encode(payload, Rails.application.secrets.secret_key_base, 'HS256')
     end
