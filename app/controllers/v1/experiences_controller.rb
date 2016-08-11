@@ -7,11 +7,14 @@ class V1::ExperiencesController < V1::ApplicationController
 
         # query type is it published or archived?
 
+        must_filter = [{ term: { account_id: current_account.id }}]
+        must_filter += query_collection_type if query_collection_type
+
         query = {
             fields: [],
             filter: {
-                term: {
-                    account_id: current_account.id
+                bool: {
+                    must: must_filter
                 }
             },
             sort: [
@@ -31,20 +34,35 @@ class V1::ExperiencesController < V1::ApplicationController
         experiences = Experiences::Experience.find_all(experience_ids)
 
         data = []
+        included = []
+        version_ids = experiences.map{|experience| experience.current_version_id ? experience.current_version_id : experience.live_version_id }
+        versions_by_experience_id = Experiences::VersionedExperience.find_all(version_ids).index_by(&:experience_id)
 
         experiences.each do |experience|
-            version = experience.current_version || experience.live_version
-            data.push(V1::ExperienceSerializer.serialize(experience, version))
+            version = versions_by_experience_id[experience._id]
+            data.push(serialize_experience(experience, version))
         end
 
-        render json: Oj.dump({data: data })
+        render json: Oj.dump(
+            {
+                data: {
+                    experiences: data
+                },
+                meta: {
+                    totalDrafts: current_account.experiences_draft_count,
+                    totalPublished: current_account.experiences_published_count,
+                    totalArchived: current_account.experiences_archived_count,
+                    totalRecords: results.total,
+                    totalPages: results.total_pages
+                }
+        })
     end
 
     def show
 
-        if params[:current] == 'true'
-            last_modified = @experience.current_version_updated_at
-            live_version = false
+        if params[:version] == 'current'
+            live_version = @experience.current_version_id.nil? ? true : false
+            last_modified = live_version ? @experience.live_version_updated_at : @experience.current_version_updated_at
         else
             last_modified = @experience.live_version_updated_at
             live_version = true
@@ -57,42 +75,82 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def create
-        @experience = Experiences::Experience.new(experience_params(params))
-        @experience.account_id = current_account.id
-        versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(params))
-        if @experience.save
-            versioned_experience.experience_id = @experience._id
-            if versioned_experience.save
-                @experience.current_version = versioned_experience
-                if @experience.update_attribute(:current_version_id, versioned_experience._id)
-                    render_experience(@experience, false)
+
+        validation = validate_input(raw_params.dig(:data, :experience))
+
+        if validation[:errors].any?
+            render json: { errors: validation[:errors] }, status: :bad_request
+        else
+            @experience = Experiences::Experience.new(experience_params(formatted_params))
+            @experience.account_id = current_account.id
+            versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+            if @experience.save
+                versioned_experience.experience_id = @experience._id
+                if versioned_experience.save
+                    @experience.current_version = versioned_experience
+                    if @experience.update_attribute(:current_version_id, versioned_experience._id)
+                        render_experience(@experience, false)
+                    else
+                        head :internal_server_error
+                    end
                 else
                     head :internal_server_error
                 end
             else
                 head :internal_server_error
             end
-        else
-            head :internal_server_error
         end
     end
 
     def update
         # The meat
-        updates = experience_params(params)
-        if params[:'has-unpublished-changes'] == false && @experience.current_version
-            @experience.live_version = @experience.current_version
-            @experience.current_version_id = nil
-            current_time = Time.zone.now
-            updates.merge!({ current_version_id: nil, live_version_id: @experience.live_version_id, current_version_updated_at: current_time, live_version_updated_at: current_time  })
-        end
-
-        if @experience.update_attributes(updates)
-            render_experience(@experience)
+       
+        validation = validate_input(raw_params.dig(:data, :experience))
+        if validation[:errors].any?
+            render json: { errors: validation[:errors] }, status: :bad_request
         else
-            render json: { error: "Haven't thought this far"}
-        end
+            updates = experience_params(formatted_params)
+            updates.each do |k,v|
+                @experience[k] = v
+            end
 
+            if formatted_params[:has_unpublished_changes] == false && @experience.current_version
+                # we are making the current version live
+                versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+                @experience.current_version.merge!(versioned_experience)
+                @experience.current_version.save
+                @experience.live_version = @experience.current_version
+                @experience.current_version_id = nil
+                current_time = Time.zone.now
+                @experience.current_version_updated_at = current_time
+                @experience.live_version_updated_at = current_time
+                live_version = true
+            elsif formatted_params[:has_unpublished_changes] == true && @experience.current_version
+                versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+                @experience.current_version.merge!(versioned_experience)
+                if @experience.current_version.changes.any?
+                    @experience.current_version_updated_at = Time.zone.now
+                end
+                @experience.current_version.save
+                live_version = false
+            elsif formatted_params[:has_unpublished_changes] == true && @experience.current_version.nil?
+                versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+                @experience.current_version = versioned_experience
+                if @experience.current_version.changes.any?
+                    @experience.current_version_updated_at = Time.zone.now
+                end
+                @experience.current_version.save
+                live_version = false
+            else
+                live_version = true
+            end
+
+            if @experience.save
+                render_experience(@experience, live_version)
+            else
+                head :internal_server_error
+            end
+        end
     end
 
     def destroy
@@ -126,18 +184,57 @@ class V1::ExperiencesController < V1::ApplicationController
             else
                 version = live_version ? experience.live_version : experience.current_version
 
-
                 json = {
-                    data: V1::ExperienceSerializer.serialize(experience, version),
-                    meta: {
-                        current_version_id: experience.current_version_id.to_s,
-                        live_version_id: experience.live_version_id.to_s
+                    data: {
+                        experience: serialize_experience(experience, version)
                     }
                 }
 
                 render json: Oj.dump(json)
             end
 
+        end
+    end
+
+    def query_collection_type
+        type = params.dig(:filter, :collectionType)
+        case type
+        when "drafts"
+            [
+                {
+                    term: {
+                        is_archived: false
+                    }
+                },
+                {
+                    term: {
+                        is_published: false
+                    }
+                }
+            ]
+        when "published"
+            [
+                {
+                    term: {
+                        is_archived: false
+                    }
+                },
+                {
+                    term: {
+                        is_published: true
+                    }
+                }
+            ]
+        when "archived"
+            [
+                {
+                    term: {
+                        is_archived: true
+                    }
+                }
+            ]
+        else
+            nil
         end
     end
 
@@ -148,109 +245,550 @@ class V1::ExperiencesController < V1::ApplicationController
         head :forbidden and return if @experience.account_id != current_account.id
     end
 
-    def modify_current_version!
-        if @experience.current_version
-            # TODO: implement check sum
-            if  false && @experience.current_version.check_sum != params[:"checksum"] && params[:force] != true
-                # return some error
-                return false
-            else
-                @experience.current_version.merge_experience!(versioned_experience_params(params))
-                if @experience.current_version.save
-                    return true
-                else
-                    return false
-                    # return some error
-                end
-            end
-        else
-            # create the versioned experience
-            versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(params))
-            versioned_experience.experience_id = @experience._id
-            if versioned_experience.save
-                if @experience.update_attribute(:current_version_id, versioned_experience._id)
-                    return true
-                else
-                    return false
-                end
-            else
-                return false
-            end
-        end
 
+    def serialize_experience(experience, version)
+        Rails.cache.fetch("/experiences/#{experience.id}/version/#{version.id}/#{version.updated_at.to_i}-serialize-cache") do
+            V1::ExperienceSerializer.serialize(experience, version)
+        end
+    end
+
+    def formatted_params
+        @formatted_params ||= -> {
+            data = raw_params.dig(:data, :experience) || {}
+            ActionController::Parameters.new(data.deep_transform_keys {|key| key = key.to_s.underscore })
+        }.call
     end
 
     def experience_params(local_params)
-        local_params.permit(:title, :published, :archived)
+        convert_param_if_exists(local_params, :name, :title)
+        local_params.permit(:title, :is_published, :is_archived)
     end
 
     def versioned_experience_params(local_params)
-        versioned_experience = local_params.fetch(:experience, {}).permit(
-            :has_unpublished_changes,
-            :published,
-            :archived,
-        )
-
-        versioned_experience[:screens] = local_params[:screens] if local_params.has_key?(:screens)
-        versioned_experience[:screens].map!{|screen| screen_params(screen)} if versioned_experience[:screens]
-        versioned_experience.dasherize! # convert back to a dasherized document
-        return versioned_experience
+        # return local_params
+        return {
+            screens: (local_params[:screens] || []).map{|screen| screen_params(screen)}
+        }
     end
 
-    def color_params(local_params, fallback = { red: 255, green: 255, blue: 255, alpha: 1.0 })
-        local_params = ActionController::Parameters.new(fallback) if local_params.nil?
-        color = local_params.permit(:red, :green, :blue, :alpha)
-        color[:red] = [255, [0, color[:red].to_i].max].min
-        color[:green] = [255, [0, color[:green].to_i].max].min
-        color[:blue] = [255, [0, color[:blue].to_i].max].min
-        color[:alpha] = [1.0, [0.0, color[:alpha].to_i].max].min
-        return color
+    def color_params(color)
+        {
+            red: color[:red],
+            green: color[:green],
+            blue: color[:blue]
+        }
+    end
+
+    def unit_params(unit)
+        {
+            type: unit[:type],
+            value: unit[:value].to_f
+        }
+    end
+
+    def offset_params(offset)
+        {
+            top: unit_params(offset[:top]),
+            left: unit_params(offset[:left]),
+            right: unit_params(offset[:right]),
+            bottom: unit_params(offset[:bottom]),
+            center: unit_params(offset[:center]),
+            middle: unit_params(offset[:middle])
+        }
+    end
+
+    def alignment_params(alignment)
+        {
+            horizontal: alignment[:horizontal],
+            vertical: alignment[:vertical]
+        }
+    end
+
+
+    def inset_params(inset)
+        {
+            top: inset[:top],
+            left: inset[:left],
+            right: inset[:right],
+            bottom: inset[:bottom]
+        }
+    end
+
+    def action_params(action)
+
+        data = {
+            type: action[:type]
+        }
+
+        case action[:type]
+        when 'go-to-screen'
+            data.merge!({ screen_id: action[:screen_id], experience_id: action[:experience_id] })
+        when 'open-url'
+            data.merge!({ url: action[:url] })
+        end
+
+        return data
     end
 
     def screen_params(local_params)
-        # settings for a screen
-        screen = local_params.permit(
-            :id,
-            :background_color,
-            :title_bar_text_color,
-            :title_bar_background_color,
-            :title_bar_button_color,
-            :status_bar_style,
-            :use_default_title_bar_style,
-            :status_bar_color
-        )
-
-        screen[:background_color] = color_params(screen[:background_color], { red: 255, green: 255, blue: 255, alpha: 1.0 })
-        screen[:title_bar_text_color] = color_params(screen[:title_bar_text_color], { red: 0, green: 0, blue: 0, alpha: 1.0 })
-        screen[:title_bar_background_color] = color_params(screen[:title_bar_background_color], { red: 255, green: 255, blue: 255, alpha: 1.0 })
-        screen[:title_bar_button_color] = color_params(screen[:title_bar_button_color], { red: 0, green: 122, blue: 255, alpha: 1.0 })
-        screen[:status_bar_style] = ['dark', 'light'].include?(screen[:status_bar_style]) ? screen[:status_bar_style] : 'dark'
-        screen[:use_default_title_bar_style] = screen[:use_default_title_bar_style] || false
-
-        if screen[:status_bar_color].nil? && screen[:title_bar_background_color]
-            color = screen[:title_bar_background_color]
-            h, s, l = ::ColorConverter.rgbToHsl(color[:red], color[:green], color[:blue])
-            l = [ l - 0.1, 0].max
-            r, g, b = ::ColorConverter.hslToRgb(h,s,l)
-            screen[:status_bar_color] = { red: r, green: g, blue: b, alpha: 1.0 }
-        end
-
-        screen[:rows] = [] if screen[:rows].nil?
-        screen[:rows] = screen[:rows].map{|row| row_params(row)}
-        return screen
+        return {
+            id: local_params[:id],
+            experience_id: @experience.id,
+            name: local_params[:name],
+            background_color: color_params(local_params[:background_color]),
+            title_bar_text_color: color_params(local_params[:title_bar_text_color]),
+            title_bar_background_color: color_params(local_params[:title_bar_background_color]),
+            status_bar_style: local_params[:status_bar_style],
+            use_default_title_bar_style: local_params[:use_default_title_bar_style],
+            rows: (local_params[:rows] || []).map{|row| row_params(row)}
+        }
     end
 
     def row_params(local_params)
-        # TODO
-        # parse the screen
-        return local_params
+        return {
+            id: local_params[:id],
+            screen_id: local_params[:screen_id],
+            experience_id: @experience.id,
+            name: local_params[:name],
+            auto_height: local_params[:auto_height],
+            height: unit_params(local_params[:height]),
+            background_color: color_params(local_params[:background_color]),
+            blocks: local_params[:blocks] || []
+        }
     end
 
     def block_params(local_params)
-        # TODO
-        # parse the block
-        return local_params
+        case local_params[:type]
+        when Experiences::Block::TEXT_BLOCK_TYPE
+            return text_block_params(local_params)
+        when Experiences::Block::BUTTON_BLOCK_TYPE
+            return button_block_params(local_params)
+        when Experiences::Block::IMAGE_BLOCK_TYPE
+            return image_block_params(local_params)
+        when Experiences::Block::DEFAULT_BLOCK_TYPE
+            return default_block_params(local_params)
+        else
+            {}
+        end
     end
+
+    def base_block_params(local_params)
+        return {
+            id: local_params[:id],
+            row_id: local_params[:row_id],
+            screen_id: local_params[:screen_id],
+            experience_id: @experience.id,
+            name: local_params[:name],
+            width: unit_params(local_params[:width]),
+            type: local_params[:type],
+            height: unit_params(local_params[:height]),
+            position: local_params[:position],
+            offset: offset_params(local_params[:offset]),
+            alignment: alignment_params(local_params[:alignment]),
+            inset: inset_params(local_params[:inset])
+        }
+    end
+
+    def text_block_params(local_params)
+        return base_block_params(local_params).merge(
+            {
+                auto_height: local_params[:auto_height],
+                background_color: color_params(local_params[:background_color]),
+                border_color: color_params(local_params[:border_color]),
+                border_width: local_params[:border_width],
+                border_radius: local_params[:border_radius],
+                text_color: color_params(local_params[:text_color]),
+                text_font: local_params[:text_font],
+                text_alignment: local_params[:text_alignment],
+                text: local_params[:text]
+            }
+        )
+    end
+
+    def button_state_params(local_params)
+        return {
+            background_color: color_params(local_params[:background_color]),
+            border_color: color_params(local_params[:border_color]),
+            border_width: local_params[:border_width],
+            border_radius: local_params[:border_radius],
+            text_color: color_params(local_params[:text_color]),
+            text_font: local_params[:text_font],
+            text_alignment: local_params[:text_alignment],
+            text: text
+        }
+    end
+
+    def button_block_params(local_params)
+        return base_block_params(local_params).merge(
+            {
+                states: {
+                    normal: button_state_params(local_params[:states][:normal]),
+                    highlighted: button_state_params(local_params[:states][:highlighted]),
+                    disabled: button_state_params(local_params[:states][:disabled]),
+                    selected: button_state_params(local_params[:states][:selected])
+                },
+                action: action_params(local_param[:action])
+            }
+        )
+    end
+
+    def image_block_params(local_params)
+        return base_block_params(local_params).merge(
+            {
+                auto_height: local_params[:auto_height],
+                background_color: color_params(local_params[:background_color]),
+                border_color: color_params(local_params[:border_color]),
+                border_width: local_params[:border_width],
+                border_radius: local_params[:border_radius],
+                image: local_params[:image]
+            }
+        )
+    end
+
+    def default_block_params(local_params)
+        return base_block_params(local_params).merge(
+            {
+                background_color: color_params(local_params[:background_color]),
+                border_color: color_params(local_params[:border_color]),
+                border_width: local_params[:border_width],
+                border_radius: local_params[:border_radius]
+            }
+        )
+    end
+
+
+    def raw_params
+        @raw_params ||= Oj.load(request.raw_post).with_indifferent_access
+    end
+
+    # def block_params(local_params)
+    #     # base block
+    #     {
+    #         :id,
+    #         :row_id,
+    #         :screen_id,
+    #         :experience_id,
+    #         :name,
+    #         :width => unit,
+    #         :type => String 'default-block',
+    #         :height => unit,
+    #         :position => String 'stacked',
+    #         :offset => offset { :top, :left, :right, :bottom, :center, :middle } => { unit },
+    #         :alignment => alignment,
+    #         :inset => inset { :top, :left, :right, :bottom } => { unit },
+    #     }
+    #     # default block
+    #     {
+    #         :background_color,
+    #         :border_color,
+    #         :border_width => Integer,
+    #         :border_radius => Integer
+    #     }
+    #     # text block
+    #     {
+    #         type: 'text-block',
+    #         :auto_height,
+    #         :background_color,
+    #         :border_color,
+    #         :border_width,
+    #         :border_radius,
+    #         :text_color => color,
+    #         :text_font => { size: , weight: },
+    #         :text_align => String, ['left', 'right', 'center'],
+    #         :text => 'html'
+    #     }
+    #     # button block
+    #     props = {
+    #         :background_color,
+    #         :border_color,
+    #         :border_width,
+    #         :border_radius,
+    #         :text_color => color,
+    #         :text_font => { size: , weight: },
+    #         :text_align => String, ['left', 'right', 'center'],
+    #         :text => 'html'
+    #     }
+
+    #     {
+    #         type: 'button-block',
+    #         states: {
+    #             :normal => { props },
+    #             :highlighted => { props },
+    #             :disabled => { props },
+    #             :selected => { props }
+    #         }
+    #     }
+    #     # image block
+    #     {
+    #         type: 'image-block',
+    #         :auto_height,
+    #         :background_color,
+    #         :border_color,
+    #         :border_width,
+    #         :border_radius,
+    #         :image => image {  :height, :width, :type, :name, :size, :url },
+    #     }
+
+    #     # only on image and buttons
+    #     {
+    #         action: {
+    #             type: [ 'go-to-screen', 'open-url'],
+    #             experience_id: "123"
+    #             screen_id: "123",
+    #             url: "http://gogole.ca"
+    #         }
+    #     }
+    #     # TODO
+    #     # parse the block
+    #     return local_params
+    # end
+
+
+
+    #############################
+    # JSON experience validator #
+    #############################
+    JSONObject = lambda { |schema|
+        lambda do |input|
+            if input.is_a?(Hash)
+                begin
+                    ClassyHash.validate(input, schema)
+                    return true
+                rescue Exception => e
+                    puts "BAD JSONObject"
+                    e.message
+                end
+            else
+                "an object"
+            end
+        end
+    }
+
+    COLOR_SCHEMA = JSONObject.(
+        {
+            red: 0..255,
+            green: 0..255,
+            blue: 0..255,
+            alpha: 0.0..1.0
+        }
+    )
+
+    STATUS_BAR_SCHEMA  = CH::G.enum('dark', 'light')
+
+    UNIT_SCHEMA = JSONObject.(
+        {
+            type: CH::G.enum('points', 'percentage'),
+            value: [ Integer, Float ] # should all be floats
+        }
+    )
+
+    OFFSET_SCHEMA = {
+        top: UNIT_SCHEMA,
+        left: UNIT_SCHEMA,
+        right: UNIT_SCHEMA,
+        bottom: UNIT_SCHEMA,
+        center: UNIT_SCHEMA,
+        middle: UNIT_SCHEMA
+    }
+
+    ALIGNMENT_SCHEMA = {
+        horizontal: String,
+        vertical: String
+    }
+
+    INSET_SCHEMA = {
+        top: [ Integer, Float ], # should all be floats ,
+        left: [ Integer, Float ], # should all be floats ,
+        right: [ Integer, Float ], # should all be floats ,
+        bottom: [ Integer, Float ] # should all be floats
+    }
+
+    FONT_SCHEMA = {
+        size: Integer,
+        weight: Integer
+    }
+
+    ACTION_SCHEMA = lambda { |value|
+        if value.is_a?(Hash)
+            case value[:type]
+            when 'open-url'.freeze
+                schema = URL_ACTION_SCHEMA
+            when 'go-to-screen'.freeze
+                schema = SCREEN_ACTION_SCHEMA
+            else
+                return "a valid action, recieved #{value[:type]}"
+            end
+
+            begin
+                ClassyHash.validate(value, schema)
+                return true
+            rescue => e
+                return e.message
+            end
+        elsif value.nil?
+            return true
+        else
+            "action object"
+        end
+    }
+
+    URL_ACTION_SCHEMA = {
+        type: CH::G.enum('open-url'),
+        url: String
+    }
+
+
+    SCREEN_ACTION_SCHEMA = {
+        type: CH::G.enum('go-to-screen'),
+        screenId: String
+    }
+
+    BLOCKS_SCHEMA = lambda do |value|
+        if value.is_a?(Hash)
+            case value[:type] || value["type"]
+            when 'default-block'
+                schema = DEFAULT_BLOCK_SCHEMA
+            when 'image-block'
+                schema = IMAGE_BLOCK_SCHEMA
+            when 'button-block'
+                schema = BUTTON_BLOCK_SCHEMA
+            when 'text-block'
+                schema = TEXT_BLOCK_SCHEMA
+            else
+                puts "unknown type"
+                return "a block, unknown type: #{value[:type]}"
+            end
+
+            begin
+                ClassyHash.validate(value, schema)
+                return true
+            rescue => e
+                puts "BAD BLOCK"
+                return e.message
+            end
+        else
+            # error message
+            return "an object"
+        end
+    end
+
+    BASE_BLOCK_SCHEMA = {
+        id: String,
+        rowId: String,
+        screenId: String,
+        name: String,
+        width: UNIT_SCHEMA,
+        height: UNIT_SCHEMA,
+        position: CH::G.enum('stacked', 'floating'),
+        offset: OFFSET_SCHEMA,
+        alignment: ALIGNMENT_SCHEMA,
+        inset: INSET_SCHEMA
+    }
+
+
+    DEFAULT_BLOCK_SCHEMA = BASE_BLOCK_SCHEMA.merge(
+        {
+            backgroundColor: COLOR_SCHEMA,
+            borderColor: COLOR_SCHEMA,
+            borderWidth: Integer,
+            borderRadius: Integer
+        }
+    )
+
+    TEXT_BLOCK_SCHEMA = BASE_BLOCK_SCHEMA.merge(
+        {
+            type: CH::G.enum('text-block'),
+            autoHeight: [ TrueClass, FalseClass ],
+            backgroundColor: COLOR_SCHEMA,
+            borderColor: COLOR_SCHEMA,
+            borderWidth: Integer,
+            borderRadius: Integer,
+            textColor: COLOR_SCHEMA,
+            textFont: FONT_SCHEMA,
+            textAlignment: CH::G.enum('left', 'right', 'center'),
+            text: String
+        }
+    )
+
+    IMAGE_BLOCK_SCHEMA = BASE_BLOCK_SCHEMA.merge(
+        {
+            type: CH::G.enum('image-block'),
+            autoHeight: [ TrueClass, FalseClass ],
+            backgroundColor: COLOR_SCHEMA,
+            borderColor: COLOR_SCHEMA,
+            borderWidth: Integer,
+            borderRadius: Integer,
+            image: [ NilClass, 
+                {
+                        height: Integer,
+                        width: Integer,
+                        type: String,
+                        name: String,
+                        size: Integer,
+                        url: String
+            }]
+        }
+    )
+
+    BUTTON_STATE_SCHEMA = {
+        backgroundColor: COLOR_SCHEMA,
+        borderColor: COLOR_SCHEMA,
+        borderWidth: Integer,
+        borderRadius: Integer,
+        textColor: COLOR_SCHEMA,
+        textFont: FONT_SCHEMA,
+        textAlignment: CH::G.enum('left', 'right', 'center'),
+        text: String
+    }
+
+    BUTTON_BLOCK_SCHEMA = BASE_BLOCK_SCHEMA.merge(
+        {
+            type: CH::G.enum('button-block'),
+            states: {
+                normal: BUTTON_STATE_SCHEMA,
+                highlighted: BUTTON_STATE_SCHEMA,
+                disabled: BUTTON_STATE_SCHEMA,
+                selected: BUTTON_STATE_SCHEMA
+            },
+            action: [:optional, ACTION_SCHEMA]
+        }
+    )
+
+    ROWS_SCHEMA = {
+        id: String,
+        screenId: String,
+        name: String,
+        autoHeight: [ TrueClass, FalseClass ],
+        backgroundColor: COLOR_SCHEMA,
+        height: UNIT_SCHEMA,
+        blocks: [[ BLOCKS_SCHEMA ]]
+    }
+
+    SCREEN_SCHEMA = {
+        id: String,
+        backgroundColor: COLOR_SCHEMA,
+        titleBarTextColor: COLOR_SCHEMA,
+        titleBarBackgroundColor: COLOR_SCHEMA,
+        statusBarStyle: STATUS_BAR_SCHEMA,
+        useDefaultTitleBarStyle: [ TrueClass, FalseClass ],
+        rows: [[ ROWS_SCHEMA ]]
+    }
+
+    SCHEMA = {
+        name: String,
+        screens: [[ SCREEN_SCHEMA ]]
+    }
+
+    def validate_input(input)
+        begin
+            ClassyHash.validate(input, SCHEMA)
+            return {errors: []}
+        rescue => e
+            puts e.message
+            return { errors: [e.message] }
+        end
+    end
+
 
 
 end

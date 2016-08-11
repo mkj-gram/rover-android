@@ -7,20 +7,24 @@ module Experiences
         extend ActiveModel::Naming
         extend ActiveModel::Callbacks
 
-        SHORT_URL_SEED = [*(0..9),*('a'..'z'),*('A'..'Z'),"-", ".", "_"]
-        
+        SHORT_URL_SEED = [*(0..9),*('a'..'z'),*('A'..'Z')]
+
         index_name 'experiences'
         document_type 'experience'
 
         define_model_callbacks :save, :create, :update, :destroy
 
-        after_save on: [:create, :update] do
-            __elasticsearch__.index_document
+        after_save do
+            response =  __elasticsearch__.index_document
+            Rails.logger.info("Indexing Elasticsearch response: #{response}".green.bold)
         end
 
-        after_save on: [:destroy] do
-            __elasticsearch__.delete_document
+        after_destroy do
+            response = __elasticsearch__.delete_document
+            Rails.logger.info("Deleting Elasticsearch response: #{response}".green.bold)
         end
+
+        after_save :update_counter_cache
 
         attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
         attribute :short_url, String, default: lambda { |model, attribute| SHORT_URL_SEED.sample(6).join }
@@ -28,14 +32,14 @@ module Experiences
         attribute :title, String
         # current_version is used because the front-end doesn't know of versioned experiences
         # if in the future it is aware of versions this attribute isn't needed anymore
-        # once an experience has been published it can no longer be edited
+        # once an experience has been is_published it can no longer be edited
         attribute :current_version_id, BSON::ObjectId
         attribute :live_version_id, BSON::ObjectId
         attribute :current_version_updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
         attribute :live_version_updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
 
-        attribute :published, Boolean, default: false
-        attribute :archived, Boolean, default: false
+        attribute :is_published, Boolean, default: false
+        attribute :is_archived, Boolean, default: false
 
         attribute :created_at, Time, default: lambda { |model, attribute| Time.zone.now }
         attribute :updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
@@ -68,8 +72,8 @@ module Experiences
         mapping do
             indexes :account_id, type: 'integer', index: 'not_analyzed'
             indexes :title, type: 'string', analyzer: "autocomplete", search_analyzer: "simple"
-            indexes :published, type: 'boolean', index: 'not_analyzed'
-            indexes :archived, type: 'boolean', index: 'not_analyzed'
+            indexes :is_published, type: 'boolean', index: 'not_analyzed'
+            indexes :is_archived, type: 'boolean', index: 'not_analyzed'
             indexes :updated_at, type: 'date'
             indexes :created_at, type: 'date'
         end
@@ -87,8 +91,8 @@ module Experiences
                 title: title,
                 short_url: short_url,
                 account_id: account_id,
-                published: published,
-                archived: archived,
+                is_published: is_published,
+                is_archived: is_archived,
                 current_version_id: current_version_id,
                 live_version_id: live_version_id,
                 current_version_updated_at: current_version_updated_at,
@@ -97,12 +101,11 @@ module Experiences
         end
 
         def as_indexed_json(opts = {})
-            puts "Indexing document".green.bold
             {
                 account_id: account_id,
                 title: title,
-                published: published,
-                archived: archived,
+                is_published: is_published,
+                is_archived: is_archived,
                 updated_at: updated_at,
                 created_at: created_at
             }
@@ -134,8 +137,9 @@ module Experiences
         end
 
         def create
-            run_callbacks :create do
-                run_callbacks :save do
+
+            run_callbacks :save do
+                run_callbacks :create do
                     self.created_at = Time.zone.now
                     mongo[collection_name].insert_one(to_doc.merge("created_at" => self.created_at))
                     self.new_record = false
@@ -153,6 +157,8 @@ module Experiences
                 create
             elsif changes.any?
 
+                puts "CHANGES ARE".blue.bold
+                puts changes
                 self.updated_at = Time.zone.now
 
                 setters = changes.inject({}) do |hash, (k,v)|
@@ -205,6 +211,7 @@ module Experiences
             end
 
             def find_all(ids)
+                return [] if ids.empty?
                 ids = ids.map { |id| id.is_a?(String) ? BSON::ObjectId(id) : id }
                 docs = mongo[collection_name].find(_id: { "$in" => ids })
                 docs = docs.map { |doc| Experience.from_document(doc) }
@@ -220,8 +227,67 @@ module Experiences
             end
         end
 
+        def published_was
+            if changes.include?(:is_published)
+                return changes[:is_published].first
+            else
+                is_published
+            end
+        end
+
+        def archived_was
+            if changes.include?(:is_archived)
+                return changes[:is_archived].first
+            else
+                is_archived
+            end
+        end
 
         private
+
+        def get_counter_column_from_status(status)
+            case status
+            when :draft
+                :experiences_draft_count
+            when :is_archived
+                :experiences_archived_count
+            when :is_published
+                :experiences_published_count
+            end
+        end
+
+        def previous_status
+            if published_was == false && archived_was == false
+                :draft
+            elsif published_was == true && archived_was == false
+                :is_published
+            elsif archived_was == false
+                :is_archived
+            else
+                :nil
+            end
+        end
+
+        def current_status
+            if is_archived
+                :is_archived
+            elsif is_published
+                :is_published
+            else
+                :draft
+            end
+        end
+
+        def update_counter_cache
+            puts "previous_status: #{previous_status} current_status: #{current_status}".red.bold
+            if previous_status != current_status
+                if previous_status != :nil
+                    Account.update_counters(self.account_id, get_counter_column_from_status(previous_status) => -1, get_counter_column_from_status(current_status) => 1)
+                else
+                    Account.update_counters(self.account_id, get_counter_column_from_status(current_status) => 1)
+                end
+            end
+        end
 
         def mongo
             $mongo

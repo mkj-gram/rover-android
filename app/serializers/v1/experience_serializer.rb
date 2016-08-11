@@ -3,16 +3,13 @@ module V1::ExperienceSerializer
         def serialize(experience, version)
             has_unpublished_changes = !experience.current_version_id.nil?
             {
-                type: 'experiences',
-                id: experience.id,
-                attributes: {
-                    title: experience.title,
-                    :'has-unpublished-changes' => has_unpublished_changes,
-                    published: experience.published,
-                    archived: experience.archived,
-                    :'short-url' => experience.short_url,
-                    screens: version.screens.map{|screen| screen.merge("experience-id" => experience.id)}
-                }
+                id: experience.id.to_s,
+                name: experience.title,
+                hasUnpublishedChanges: has_unpublished_changes,
+                isPublished: experience.is_published,
+                isArchived: experience.is_archived,
+                shortUrl: experience.short_url,
+                screens: version.screens.as_json.map{|screen| screen.deep_transform_keys{|key| key.to_s.camelize(:lower)}}
             }
         end
     end
