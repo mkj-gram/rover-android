@@ -37,6 +37,7 @@ module Experiences
             {
                 _id: _id,
                 experience_id: experience_id,
+                home_screen_id: home_screen_id,
                 screens: screens, #screens.map(&:to_doc),
                 version_title: version_title,
                 updated_at: updated_at,
