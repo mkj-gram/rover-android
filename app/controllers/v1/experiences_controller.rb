@@ -281,7 +281,8 @@ class V1::ExperiencesController < V1::ApplicationController
         {
             red: color[:red],
             green: color[:green],
-            blue: color[:blue]
+            blue: color[:blue],
+            alpha: color[:alpha]
         }
     end
 
