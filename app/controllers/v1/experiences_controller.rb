@@ -76,7 +76,10 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def create
 
-        validation = validate_input(raw_params.dig(:data, :experience))
+        input = raw_params.dig(:data, :experience)
+        input[:screens] = [] if input[:screens].nil?
+
+        validation = validate_input(input)
 
         if validation[:errors].any?
             render json: { errors: validation[:errors] }, status: :bad_request
@@ -104,8 +107,11 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def update
         # The meat
-       
-        validation = validate_input(raw_params.dig(:data, :experience))
+
+        input = raw_params.dig(:data, :experience)
+        input[:screens] = [] if input[:screens].nil?
+
+        validation = validate_input(input)
         if validation[:errors].any?
             render json: { errors: validation[:errors] }, status: :bad_request
         else
@@ -718,14 +724,14 @@ class V1::ExperiencesController < V1::ApplicationController
             borderColor: COLOR_SCHEMA,
             borderWidth: Integer,
             borderRadius: Integer,
-            image: [ NilClass, 
-                {
-                        height: Integer,
-                        width: Integer,
-                        type: String,
-                        name: String,
-                        size: Integer,
-                        url: String
+            image: [ NilClass,
+                     {
+                         height: Integer,
+                         width: Integer,
+                         type: String,
+                         name: String,
+                         size: Integer,
+                         url: String
             }]
         }
     )
