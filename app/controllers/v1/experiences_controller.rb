@@ -144,6 +144,7 @@ class V1::ExperiencesController < V1::ApplicationController
             @experience.current_version_id = nil
             @experience.live_version_updated_at = Time.zone.now
             @experience.current_version_updated_at = Time.zone.now
+            @experience.is_published = true
             if @experience.save
                 render_experience(@experience, true)
             else
