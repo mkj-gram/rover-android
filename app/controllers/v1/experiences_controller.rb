@@ -145,6 +145,7 @@ class V1::ExperiencesController < V1::ApplicationController
                 if @experience.current_version.changes.any?
                     @experience.current_version_updated_at = Time.zone.now
                 end
+                @experience.current_version.experience_id = @experience._id
                 @experience.current_version.save
                 live_version = false
             else
