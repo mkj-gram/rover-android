@@ -356,6 +356,7 @@ class V1::ExperiencesController < V1::ApplicationController
             title_bar_background_color: color_params(local_params[:title_bar_background_color]),
             status_bar_style: local_params[:status_bar_style],
             use_default_title_bar_style: local_params[:use_default_title_bar_style],
+            has_unpublished_changes: local_params.has_key?(:has_unpublished_changes) ? local_params[:has_unpublished_changes] : false,
             rows: (local_params[:rows] || []).map{|row| row_params(row)}
         }
     end
@@ -704,6 +705,7 @@ class V1::ExperiencesController < V1::ApplicationController
         'title-bar-background-color'=> COLOR_SCHEMA,
         'status-bar-style'=> STATUS_BAR_SCHEMA,
         'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
+        'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
         'rows' => [[ ROWS_SCHEMA ]]
     }
 
