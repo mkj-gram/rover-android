@@ -611,7 +611,8 @@ CREATE TABLE message_templates (
     deeplink_url character varying,
     scheduled_time_zone character varying,
     sent boolean DEFAULT false,
-    filter_gimbal_place_ids character varying[] DEFAULT '{}'::character varying[]
+    filter_gimbal_place_ids character varying[] DEFAULT '{}'::character varying[],
+    experience_id character varying
 );
 
 
@@ -1955,4 +1956,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160803143746');
 INSERT INTO schema_migrations (version) VALUES ('20160805122220');
 
 INSERT INTO schema_migrations (version) VALUES ('20160810123340');
+
+INSERT INTO schema_migrations (version) VALUES ('20160812165514');
 
