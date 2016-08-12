@@ -1,7 +1,7 @@
 class V1::ExperiencesController < V1::ApplicationController
 
     before_action :authenticate, except: [:short_url]
-    before_action :set_experience, only: [:show, :update, :destroy]
+    before_action :set_experience, only: [:show, :update, :publish, :revert ]
 
     def index
 
@@ -120,44 +120,57 @@ class V1::ExperiencesController < V1::ApplicationController
                 @experience[k] = v
             end
 
-            if formatted_params[:has_unpublished_changes] == false && @experience.current_version
-                # we are making the current version live
-                versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
-                @experience.current_version.merge!(versioned_experience)
-                @experience.current_version.save
-                @experience.live_version = @experience.current_version
-                @experience.current_version_id = nil
-                current_time = Time.zone.now
-                @experience.current_version_updated_at = current_time
-                @experience.live_version_updated_at = current_time
-                live_version = true
-            elsif formatted_params[:has_unpublished_changes] == true && @experience.current_version
-                versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
-                @experience.current_version.merge!(versioned_experience)
-                if @experience.current_version.changes.any?
-                    @experience.current_version_updated_at = Time.zone.now
-                end
-                @experience.current_version.save
-                live_version = false
-            elsif formatted_params[:has_unpublished_changes] == true && @experience.current_version.nil?
-                versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
-                @experience.current_version = versioned_experience
-                if @experience.current_version.changes.any?
-                    @experience.current_version_updated_at = Time.zone.now
-                end
-                @experience.current_version.experience_id = @experience._id
-                @experience.current_version.save
-                live_version = false
+            if @experience.current_version.nil?
+                @experience.current_version = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+                @experience.experience_id = @experience._id
             else
-                render json: { errors: ["attempted to overwrite the live version without setting has-unpublished-changes to true"]}, status: :bad_request
-                return
+                versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+                @experience.current_version.merge!(versioned_experience)
             end
 
-            if @experience.save
-                render_experience(@experience, live_version)
+            if @experience.current_version.save
+                @experience.current_version_updated_at = Time.zone.now
+                if @experience.save
+                    render_experience(@experience, false)
+                else
+                    head :internal_server_error
+                end
             else
                 head :internal_server_error
             end
+        end
+    end
+
+    def publish
+        if @experience.current_version_id
+            @experience.live_version_id = @experience.current_version_id
+            @experience.current_version_id = nil
+            @experience.live_version_updated_at = Time.zone.now
+            @experience.current_version_updated_at = Time.zone.now
+            if @experience.save
+                render_experience(@experience, false)
+            else
+                head :internal_server_error
+            end
+        else
+            render json: { errors: ["nothing to publish"] }, status: :unprocessable_entity
+        end
+    end
+
+    def revert
+        if @experience.current_version_id
+            if @experience.drop_current_version
+                @experience.current_version_updated_at = Time.zone.now
+                if @experience.save
+                    render_experience(@experience, true)
+                else
+                    head :internal_server_error
+                end
+            else
+                head :internal_server_error
+            end
+        else
+            render json: { errors: ["nothing to revert"] }, status: :unprocessable_entity
         end
     end
 
@@ -654,13 +667,13 @@ class V1::ExperiencesController < V1::ApplicationController
             'border-width' => Integer,
             'border-radius' => Integer,
             'image' => [ :optional, NilClass,
-                     {
-                         'height' => Integer,
-                         'width' => Integer,
-                         'type' => String,
-                         'name' => String,
-                         'size' => Integer,
-                         'url' => String
+                         {
+                             'height' => Integer,
+                             'width' => Integer,
+                             'type' => String,
+                             'name' => String,
+                             'size' => Integer,
+                             'url' => String
             }]
         }
     )

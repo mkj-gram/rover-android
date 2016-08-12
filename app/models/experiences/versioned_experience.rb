@@ -132,6 +132,11 @@ module Experiences
                 return docs
             end
 
+            def delete(id)
+                id = BSON::ObjectId(id) if id.is_a?(String)
+                return mongo[collection_name].find(_id: id).delete_one
+            end
+
             def delete_all(query)
                 $mongo[collection_name].find(query).delete_many
             end

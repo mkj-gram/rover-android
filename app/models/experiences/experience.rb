@@ -136,6 +136,10 @@ module Experiences
             return self
         end
 
+        def drop_current_version
+            VersionedExperience.delete(_id: self.current_version_id)
+        end
+
         def create
 
             run_callbacks :save do
