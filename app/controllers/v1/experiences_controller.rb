@@ -188,22 +188,30 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def render_experience(experience, live_version = true)
         Librato.timing('experience.render.time') do
+            version_id = live_version ? experience.live_version_id : experience.current_version_id
+            updated_at = live_version ? experience.live_version_updated_at : experience.current_version_updated_at
 
-            version = live_version ? experience.live_version : experience.current_version
-            if version.nil?
-                head :not_found
-            else
-                version = live_version ? experience.live_version : experience.current_version
+            cache_key = "/experiences/#{experience.id}/version/#{version_id}/#{updated_at.to_i}-json-cache"
 
-                json = {
-                    data: {
-                        experience: serialize_experience(experience, version)
+            json = Rails.cache.fetch(cache_key) do
+                version = Experiences::VersionedExperience.find(version_id)
+                if version
+                    data = {
+                        data: {
+                            experience: serialize_experience(experience, version)
+                        }
                     }
-                }
-
-                render json: Oj.dump(json)
+                    Oj.dump(json)
+                else
+                    nil
+                end
             end
 
+            if json
+                render json: json
+            else
+                head :not_found
+            end
         end
     end
 
