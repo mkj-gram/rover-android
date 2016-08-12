@@ -148,7 +148,8 @@ class V1::ExperiencesController < V1::ApplicationController
                 @experience.current_version.save
                 live_version = false
             else
-                live_version = true
+                render json: { errors: ["attempted to overwrite the live version without setting has-unpublished-changes to true"]}, status: :bad_request
+                return
             end
 
             if @experience.save
