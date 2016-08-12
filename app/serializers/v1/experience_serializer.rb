@@ -9,7 +9,7 @@ module V1::ExperienceSerializer
                 'is-published' => experience.is_published,
                 'is-archived' => experience.is_archived,
                 'short-url' => experience.short_url,
-                'home-screen-id' => version.home_screen_id, 
+                'home-screen-id' => version.nil? ? nil : version.home_screen_id,
                 screens: version.nil? ? [] : version.screens.as_json.map{|screen| screen.deep_transform_keys{|key| key.to_s.dasherize }}
             }
         end
