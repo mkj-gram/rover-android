@@ -131,6 +131,10 @@ module Experiences
                 docs = docs.map { |doc| VersionedExperience.from_document(doc) }
                 return docs
             end
+
+            def delete_all(query)
+                $mongo[collection_name].find(query).delete_many
+            end
         end
 
         private

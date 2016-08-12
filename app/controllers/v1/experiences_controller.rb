@@ -159,14 +159,6 @@ class V1::ExperiencesController < V1::ApplicationController
         end
     end
 
-    def destroy
-        if Experiences::VersionedExperience.delete_all(experience_id: @experience._id) && @experience.destroy
-            head :no_content
-        else
-            head :internal_server_error
-        end
-    end
-
     def short_url
         @experience = Experiences::Experience.find_by(short_url: params[:short_url])
         if @experience

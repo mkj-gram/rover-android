@@ -190,6 +190,13 @@ module Experiences
             mongo[collection_name].find(_id: _id).update_one("$set" => attributes)
         end
 
+        def destroy
+            run_callbacks :destroy do
+                $mongo[collection_name].find(_id: self._id).delete_one
+            end
+        end
+
+
 
         class << self
 
