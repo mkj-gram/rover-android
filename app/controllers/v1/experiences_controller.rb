@@ -202,7 +202,7 @@ class V1::ExperiencesController < V1::ApplicationController
                         experience: serialize_experience(experience, version)
                     }
                 }
-                Oj.dump(json)
+                Oj.dump(data)
             end
 
 
