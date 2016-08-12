@@ -148,7 +148,7 @@ class V1::ExperiencesController < V1::ApplicationController
             @experience.live_version_updated_at = Time.zone.now
             @experience.current_version_updated_at = Time.zone.now
             if @experience.save
-                render_experience(@experience, false)
+                render_experience(@experience, true)
             else
                 head :internal_server_error
             end
