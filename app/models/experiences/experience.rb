@@ -142,11 +142,11 @@ module Experiences
                 run_callbacks :create do
                     self.created_at = Time.zone.now
                     mongo[collection_name].insert_one(to_doc.merge("created_at" => self.created_at))
-                    self.new_record = false
                     true
                 end
             end
 
+            self.new_record = false
             changes_applied
             return self
         end
@@ -170,12 +170,13 @@ module Experiences
 
                 run_callbacks :save do
                     mongo[collection_name].find("_id" => self._id).update_one("$set" => setters)
-                    self.new_record = false
                     true
                 end
 
+                self.new_record = false
                 changes_applied
                 return self
+
             else
                 return self
             end
@@ -264,7 +265,9 @@ module Experiences
         end
 
         def previous_status
-            if published_was == false && archived_was == false
+            if new_record?
+                :nil
+            elsif published_was == false && archived_was == false
                 :draft
             elsif published_was == true && archived_was == false
                 :is_published
