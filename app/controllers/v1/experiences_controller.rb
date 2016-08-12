@@ -86,19 +86,16 @@ class V1::ExperiencesController < V1::ApplicationController
         else
             @experience = Experiences::Experience.new(experience_params(formatted_params))
             @experience.account_id = current_account.id
-            versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
             if @experience.save
-                versioned_experience.experience_id = @experience._id
-                if versioned_experience.save
-                    @experience.current_version = versioned_experience
-                    if @experience.update_attribute(:current_version_id, versioned_experience._id)
-                        render_experience(@experience, false)
-                    else
-                        head :internal_server_error
-                    end
-                else
-                    head :internal_server_error
-                end
+
+                json = {
+                    data: {
+                        experience: V1::ExperienceSerializer.serialize(@experience, nil)
+                    }
+                }
+
+                render json: Oj.dump(json)
+
             else
                 head :internal_server_error
             end
