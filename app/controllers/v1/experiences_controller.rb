@@ -257,10 +257,10 @@ class V1::ExperiencesController < V1::ApplicationController
 
 
     def serialize_experience(experience, version)
-        version_updated_at = experience.live_version_id == version._id ? experience.live_version_updated_at.to_i : experience.current_version_updated_at.to_i
-        Rails.cache.fetch("/experiences/#{experience.id}/version/#{version.id}/#{version_updated_at}-serialize-cache") do
+        # version_updated_at = experience.live_version_id == version._id ? experience.live_version_updated_at.to_i : experience.current_version_updated_at.to_i
+        # Rails.cache.fetch("/experiences/#{experience.id}/version/#{version.id}/#{version_updated_at}-serialize-cache") do
             V1::ExperienceSerializer.serialize(experience, version)
-        end
+        # end
     end
 
     def formatted_params
