@@ -148,6 +148,7 @@ class Message
         def from_document(doc)
             doc["_id"] = BSON::ObjectId(doc["_id"]["$oid"]) if doc["_id"].is_a?(Hash) && doc["_id"].has_key?("$oid")
             doc["customer_id"] = BSON::ObjectId(doc["customer_id"]["$oid"]) if doc["customer_id"].is_a?(Hash) && doc["customer_id"].has_key?("$oid")
+            doc["experience_id"] = BSON::ObjectId(doc["experience_id"]["$oid"]) if doc["experience_id"].is_a?(Hash) && doc["experience_id"].has_key?("$oid")
             doc["landing_page"] = LandingPage.new(doc["landing_page"], true)
             Message.new(doc)
         end
