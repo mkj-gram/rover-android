@@ -122,7 +122,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
             if @experience.current_version.nil?
                 @experience.current_version = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
-                @experience.experience_id = @experience._id
+                @experience.current_version.experience_id = @experience._id
             else
                 versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
                 @experience.current_version.merge!(versioned_experience)
