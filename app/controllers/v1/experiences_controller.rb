@@ -369,6 +369,7 @@ class V1::ExperiencesController < V1::ApplicationController
             experience_id: @experience.id,
             name: local_params[:name],
             background_color: color_params(local_params[:background_color]),
+            title_bar_text: local_params[:title_bar_text],
             title_bar_text_color: color_params(local_params[:title_bar_text_color]),
             title_bar_background_color: color_params(local_params[:title_bar_background_color]),
             status_bar_style: local_params[:status_bar_style],
@@ -718,6 +719,7 @@ class V1::ExperiencesController < V1::ApplicationController
     SCREEN_SCHEMA = {
         'id' => String,
         'background-color' => COLOR_SCHEMA,
+        'title-bar-text' => [:optional, NilClass, String],
         'title-bar-text-color' => COLOR_SCHEMA,
         'title-bar-background-color'=> COLOR_SCHEMA,
         'status-bar-style'=> STATUS_BAR_SCHEMA,
