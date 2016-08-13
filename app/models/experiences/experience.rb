@@ -171,8 +171,6 @@ module Experiences
                 create
             elsif changes.any?
 
-                puts "CHANGES ARE".blue.bold
-                puts changes
                 self.updated_at = Time.zone.now
 
                 setters = changes.inject({}) do |hash, (k,v)|
@@ -303,7 +301,6 @@ module Experiences
         end
 
         def update_counter_cache
-            puts "previous_status: #{previous_status} current_status: #{current_status}".red.bold
             if previous_status != current_status
                 if previous_status != :nil
                     Account.update_counters(self.account_id, get_counter_column_from_status(previous_status) => -1, get_counter_column_from_status(current_status) => 1)

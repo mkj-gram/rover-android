@@ -218,15 +218,16 @@ class V1::ExperiencesController < V1::ApplicationController
                 cache_key = "/experiences/#{experience.id}/#{experience.updated_at.to_i}/version/#{version_id}/#{updated_at.to_i}-json-cache"
             end
 
-            puts "cache key #{cache_key}"
+
             json = Rails.cache.fetch(cache_key) do
+                Rails.logger.info("Generating cache for experience #{experience.id}".red)
                 version = Experiences::VersionedExperience.find(version_id)
                 data = {
                     data: {
                         experience: serialize_experience(experience, version)
                     }
                 }
-                json = Oj.dump(data)
+                Oj.dump(data)
             end
 
 
