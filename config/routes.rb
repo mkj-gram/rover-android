@@ -137,6 +137,8 @@ Rails.application.routes.draw do
         resources :experiences, only: [:index, :show, :create, :update, :destroy]
         patch '/experiences/:id/publish', to: 'experiences#publish'
         patch '/experiences/:id/revert', to: 'experiences#revert'
+        patch '/experiences/:id/archive', to: 'experiences#archive'
+        patch '/experiences/:id/unarchive', to: 'experiences#unarchive'
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".

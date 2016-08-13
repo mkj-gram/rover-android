@@ -96,7 +96,9 @@ module Experiences
                 current_version_id: current_version_id,
                 live_version_id: live_version_id,
                 current_version_updated_at: current_version_updated_at,
-                live_version_updated_at: live_version_updated_at
+                live_version_updated_at: live_version_updated_at,
+                updated_at: updated_at,
+                created_at: created_at
             }
         end
 
@@ -109,6 +111,10 @@ module Experiences
                 updated_at: updated_at,
                 created_at: created_at
             }
+        end
+
+        def latest_version_id
+            current_version_id.nil? ? live_version_id : current_version_id
         end
 
         def current_version
@@ -137,7 +143,11 @@ module Experiences
         end
 
         def drop_current_version
-            VersionedExperience.delete(_id: self.current_version_id)
+            success = VersionedExperience.delete(_id: self.current_version_id)
+            if success
+                self.current_version_id = nil
+            end
+            return success
         end
 
         def create

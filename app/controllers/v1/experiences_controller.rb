@@ -1,7 +1,7 @@
 class V1::ExperiencesController < V1::ApplicationController
 
     before_action :authenticate, except: [:short_url]
-    before_action :set_experience, only: [:show, :update, :publish, :revert ]
+    before_action :set_experience, only: [:show, :update, :publish, :revert, :archive, :unarchive ]
 
     def index
 
@@ -172,6 +172,26 @@ class V1::ExperiencesController < V1::ApplicationController
         end
     end
 
+    def archive
+        @experience.is_archived = true
+        if @experience.save
+            live_version = @experience.current_version_id.nil? ? true : false
+            render_experience(@experience, live_version)
+        else
+            head :internal_server_error
+        end
+    end
+
+    def unarchive
+        @experience.is_archived = false
+        if @experience.save
+            live_version = @experience.current_version_id.nil? ? true : false
+            render_experience(@experience, live_version)
+        else
+            head :internal_server_error
+        end
+    end
+
     def short_url
         @experience = Experiences::Experience.find_by(short_url: params[:short_url])
         if @experience
@@ -190,11 +210,15 @@ class V1::ExperiencesController < V1::ApplicationController
         Librato.timing('experience.render.time') do
             version_id = live_version ? experience.live_version_id : experience.current_version_id
 
+            if version_id.nil?
+                puts experience.updated_at
+                cache_key = "/experiences/#{experience.id}/#{experience.updated_at.to_i}"
+            else
+                updated_at = live_version ? experience.live_version_updated_at : experience.current_version_updated_at
+                cache_key = "/experiences/#{experience.id}/#{experience.updated_at.to_i}/version/#{version_id}/#{updated_at.to_i}-json-cache"
+            end
 
-            updated_at = live_version ? experience.live_version_updated_at : experience.current_version_updated_at
-
-            cache_key = "/experiences/#{experience.id}/version/#{version_id}/#{updated_at.to_i}-json-cache"
-
+            puts "cache key #{cache_key}"
             json = Rails.cache.fetch(cache_key) do
                 version = Experiences::VersionedExperience.find(version_id)
                 data = {
@@ -202,12 +226,12 @@ class V1::ExperiencesController < V1::ApplicationController
                         experience: serialize_experience(experience, version)
                     }
                 }
-                Oj.dump(data)
+                json = Oj.dump(data)
             end
 
 
             render json: json
-            
+
         end
     end
 
