@@ -428,6 +428,8 @@ class V1::ExperiencesController < V1::ApplicationController
             return image_block_params(local_params)
         when Experiences::Block::DEFAULT_BLOCK_TYPE
             return default_block_params(local_params)
+        when Experiences::Block::WEB_VIEW_BLOCK_TYPE
+            return web_view_block_params(local_params)
         else
             {}
         end
@@ -513,6 +515,14 @@ class V1::ExperiencesController < V1::ApplicationController
                 border_color: color_params(local_params[:border_color]),
                 border_width: local_params[:border_width],
                 border_radius: local_params[:border_radius]
+            }
+        )
+    end
+
+    def web_view_block_params(local_params)
+        return default_block_params(local_params).merge(
+            {
+                url: local_params[:url]
             }
         )
     end
@@ -632,6 +642,8 @@ class V1::ExperiencesController < V1::ApplicationController
                 schema = BUTTON_BLOCK_SCHEMA
             when 'text-block'
                 schema = TEXT_BLOCK_SCHEMA
+            when 'web-view-block'
+                schema = WEB_VIEW_BLOCK_SCHEMA
             else
                 puts "unknown type"
                 return "a block, unknown 'type' => #{value[:type]}"
@@ -729,6 +741,13 @@ class V1::ExperiencesController < V1::ApplicationController
                 'selected' => BUTTON_STATE_SCHEMA
             },
             'action' => [:optional, NilClass, ACTION_SCHEMA]
+        }
+    )
+
+    WEB_VIEW_BLOCK_SCHEMA = DEFAULT_BLOCK_SCHEMA.merge(
+        {
+            'type' => CH::G.enum('web-view-block'),
+            'url' => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
         }
     )
 
