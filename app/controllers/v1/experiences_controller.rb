@@ -79,7 +79,7 @@ class V1::ExperiencesController < V1::ApplicationController
         input = raw_params.dig(:data, :experience)
         input[:screens] = [] if input[:screens].nil?
 
-        validation = validate_input(input)
+        validation = validate_input(CREATE_SCHEMA, input)
 
         if validation[:errors].any?
             render json: { errors: validation[:errors] }, status: :bad_request
@@ -108,7 +108,7 @@ class V1::ExperiencesController < V1::ApplicationController
         input = raw_params.dig(:data, :experience)
         input[:screens] = [] if input[:screens].nil?
 
-        validation = validate_input(input)
+        validation = validate_input(UPDATED_SCHEMA, input)
         if validation[:errors].any?
             render json: { errors: validation[:errors] }, status: :bad_request
         else
@@ -394,10 +394,11 @@ class V1::ExperiencesController < V1::ApplicationController
             experience_id: @experience.id,
             name: local_params[:name],
             background_color: color_params(local_params[:background_color]),
-            title_bar_text: local_params[:title_bar_text],
+            title: local_params[:title_bar_text],
             title_bar_text_color: color_params(local_params[:title_bar_text_color]),
             title_bar_background_color: color_params(local_params[:title_bar_background_color]),
             title_bar_button_color: color_params(local_params[:title_bar_button_color]),
+            title_bar_buttons: local_params[:title_bar_buttons],
             status_bar_style: local_params[:status_bar_style],
             use_default_title_bar_style: local_params[:use_default_title_bar_style],
             has_unpublished_changes: local_params.has_key?(:has_unpublished_changes) ? local_params[:has_unpublished_changes] : false,
@@ -764,24 +765,31 @@ class V1::ExperiencesController < V1::ApplicationController
     SCREEN_SCHEMA = {
         'id' => String,
         'background-color' => COLOR_SCHEMA,
-        'title-bar-text' => [:optional, NilClass, String],
+        'title' => [:optional, NilClass, String],
         'title-bar-text-color' => COLOR_SCHEMA,
         'title-bar-background-color'=> COLOR_SCHEMA,
         'title-bar-button-color' => COLOR_SCHEMA,
+        'title-bar-buttons' => CH::G.enum('close', 'back', 'both'),
         'status-bar-style'=> STATUS_BAR_SCHEMA,
         'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
         'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
         'rows' => [[ ROWS_SCHEMA ]]
     }
 
-    SCHEMA = {
+    CREATE_SCHEMA = {
         'name' => String,
         'screens' => [[ SCREEN_SCHEMA ]]
     }
 
-    def validate_input(input)
+    UPDATE_SCHEMA = {
+        'name' => String,
+        'home-screen-id' => String,
+        'screens' => [[ SCREEN_SCHEMA ]]
+    }
+
+    def validate_input(schema, input)
         begin
-            ClassyHash.validate(input, SCHEMA)
+            ClassyHash.validate(input, schema)
             return {errors: []}
         rescue => e
             puts e.message
