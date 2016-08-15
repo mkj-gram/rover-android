@@ -273,7 +273,7 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def sparse_fieldset
-        @sparse_fieldset ||= params.dig(:fields, :experiences).split(",").map(&:to_sym) || []
+        @sparse_fieldset ||= (params.dig(:fields, :experiences) || "".freeze).split(",").map(&:to_sym) || []
     end
 
     def query_keyword
