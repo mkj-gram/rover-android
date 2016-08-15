@@ -60,7 +60,7 @@ class MessageTemplate < ActiveRecord::Base
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validate :valid_properties
-
+    validates :content_type, inclusion: { in: ['landing-page', 'custom', 'experience', 'website', 'deep-link']}
 
     def as_indexed_json(opts = {})
         {
@@ -88,6 +88,7 @@ class MessageTemplate < ActiveRecord::Base
                 ios_title: get_ios_title.to_s,
                 android_title: get_android_title.to_s,
                 landing_page: landing_page_template,
+                experience_id: self.experience_id.nil? ? nil : BSON::ObjectId(self.experience_id),
                 properties: properties
             }
         )

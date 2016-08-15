@@ -8,7 +8,7 @@ class V1::ImagesController < V1::ApplicationController
                 {
                     acl: "public-read", # accepts private, public-read, public-read-write, authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control
                     body: params[:image], # file/IO object, or string data
-                    key:  "messages/uploads/#{Digest::MD5.hexdigest(current_account.id.to_s)}/#{SecureRandom.uuid}-#{params[:image].original_filename}", # required
+                    key:  "uploads/#{Digest::MD5.hexdigest(current_account.id.to_s)}/#{SecureRandom.uuid}-#{params[:image].original_filename}", # required
                     metadata: {
                         "ContentType" => params[:image].content_type,
                     },
@@ -17,7 +17,10 @@ class V1::ImagesController < V1::ApplicationController
                     use_accelerate_endpoint: false,
                 }
             )
-            render json: { "image-url" => resp.public_url }
+            s3url = URI(resp.public_url)
+            url = URI("https://images-rover-io.imgix.net")
+            url.path = s3url.path.gsub(/images.rover.io\//, '')
+            render json: { "image-url" => url.to_s }
         else
             head :bad_request
         end

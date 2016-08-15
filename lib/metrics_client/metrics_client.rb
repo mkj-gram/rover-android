@@ -3,10 +3,12 @@ require 'colorize'
 require 'concurrent'
 module MetricsClient
 
+    @mutex = Mutex.new
+    @submitter_lock = Mutex.new
+
     class << self
 
-        @@mutex = Mutex.new
-        @@submitter_lock = Mutex.new
+
 
         def aggregator
             return @aggregator if @aggregator
@@ -15,7 +17,7 @@ module MetricsClient
         end
 
         def aggregate(opts)
-            @@submitter_lock.synchronize do
+            @submitter_lock.synchronize do
                 aggregator.add(opts)
             end
         end
@@ -32,30 +34,32 @@ module MetricsClient
         def flush!
             return if aggregator.empty?
             submitter_queue = ::Librato::Metrics::Queue.new(prefix: config.prefix, source: config.source)
-            @@submitter_lock.synchronize do
+            @submitter_lock.synchronize do
                 submitter_queue.merge!(aggregator)
                 aggregator.clear
             end
             Rails.logger.debug(submitter_queue.queued)
             submitter_queue.submit if !submitter_queue.empty?
+            submitter_queue.clear
+            submitter_queue = nil
         end
 
         def submitter
-            @@submitter
+            @submitter
         end
 
         private
 
         def config
-            @@config ||= ::Librato::Rails::Configuration.new
+            @config ||= ::Librato::Rails::Configuration.new
         end
 
         def authenticate!
             return if @authenticated
-            @@mutex.synchronize {
+            @mutex.synchronize {
                 Librato::Metrics.authenticate(config.user, config.token)
                 flush_interval = config.flush_interval || 60
-                @@submitter = Concurrent::TimerTask.new(execution_interval: flush_interval, timeout_interval: 30) do
+                @submitter = Concurrent::TimerTask.new(execution_interval: flush_interval, timeout_interval: 30) do
                     Rails.logger.info("[ MetricsClient ] Submitting Metrics!".blue.bold)
                     begin
                         MetricsClient.flush!
@@ -67,7 +71,7 @@ module MetricsClient
 
                 @aggregator = ::Librato::Metrics::Aggregator.new(prefix: config.prefix, source: config.source)
             }
-            @@submitter.execute
+            @submitter.execute
         end
 
     end

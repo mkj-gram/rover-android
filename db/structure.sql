@@ -146,7 +146,10 @@ CREATE TABLE accounts (
     scheduled_message_templates_published_count integer DEFAULT 0,
     scheduled_message_templates_sent_count integer DEFAULT 0,
     scheduled_message_templates_archived_count integer DEFAULT 0,
-    searchable_gimbal_places_count integer DEFAULT 0
+    searchable_gimbal_places_count integer DEFAULT 0,
+    experiences_draft_count integer DEFAULT 0,
+    experiences_published_count integer DEFAULT 0,
+    experiences_archived_count integer DEFAULT 0
 );
 
 
@@ -608,7 +611,8 @@ CREATE TABLE message_templates (
     deeplink_url character varying,
     scheduled_time_zone character varying,
     sent boolean DEFAULT false,
-    filter_gimbal_place_ids character varying[] DEFAULT '{}'::character varying[]
+    filter_gimbal_place_ids character varying[] DEFAULT '{}'::character varying[],
+    experience_id character varying
 );
 
 
@@ -1950,4 +1954,8 @@ INSERT INTO schema_migrations (version) VALUES ('20160803143729');
 INSERT INTO schema_migrations (version) VALUES ('20160803143746');
 
 INSERT INTO schema_migrations (version) VALUES ('20160805122220');
+
+INSERT INTO schema_migrations (version) VALUES ('20160810123340');
+
+INSERT INTO schema_migrations (version) VALUES ('20160812165514');
 
