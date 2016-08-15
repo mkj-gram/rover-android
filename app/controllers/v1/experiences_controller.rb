@@ -769,7 +769,7 @@ class V1::ExperiencesController < V1::ApplicationController
         'title-bar-text-color' => COLOR_SCHEMA,
         'title-bar-background-color'=> COLOR_SCHEMA,
         'title-bar-button-color' => COLOR_SCHEMA,
-        'title-bar-buttons' => CH::G.enum('close', 'back', 'both'),
+        'title-bar-buttons' => CH::G.enum('close', 'back', 'both', 'none'),
         'status-bar-style'=> STATUS_BAR_SCHEMA,
         'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
         'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
