@@ -394,7 +394,7 @@ class V1::ExperiencesController < V1::ApplicationController
             experience_id: @experience.id,
             name: local_params[:name],
             background_color: color_params(local_params[:background_color]),
-            title: local_params[:title_bar_text],
+            title: local_params[:title],
             title_bar_text_color: color_params(local_params[:title_bar_text_color]),
             title_bar_background_color: color_params(local_params[:title_bar_background_color]),
             title_bar_button_color: color_params(local_params[:title_bar_button_color]),
