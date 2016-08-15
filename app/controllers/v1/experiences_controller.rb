@@ -74,7 +74,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def create
 
-        input = raw_params.dig(:data, :experience)
+        input = raw_params.dig(:data, :attributes)
         input[:screens] = [] if input[:screens].nil?
 
         validation = validate_input(CREATE_SCHEMA, input)
@@ -101,7 +101,7 @@ class V1::ExperiencesController < V1::ApplicationController
     def update
         # The meat
 
-        input = raw_params.dig(:data, :experience)
+        input = raw_params.dig(:data, :attributes)
         input[:screens] = [] if input[:screens].nil?
 
         validation = validate_input(UPDATE_SCHEMA, input)
