@@ -10,21 +10,50 @@ class V1::ExperiencesController < V1::ApplicationController
         must_filter = [{ term: { account_id: current_account.id }}]
         must_filter += query_collection_type if query_collection_type
 
-        query = {
-            fields: [],
-            filter: {
-                bool: {
-                    must: must_filter
-                }
-            },
-            sort: [
-                {
-                    updated_at: {
-                        order: 'desc'
+        if query_keyword
+            query = {
+                fields: [],
+                query: {
+                    filtered: {
+                        query: {
+                            match_phrase: {
+                                title: query_keyword
+                            }
+                        },
+                        filter: {
+                            bool: {
+                                must: must_filter
+                            }
+                        }
                     }
-                }
-            ]
-        }
+                },
+                sort: [
+                    {
+                        updated_at: {
+                            order: 'desc'
+                        }
+                    }
+                ]
+
+            }
+        else
+            query = {
+                fields: [],
+                filter: {
+                    bool: {
+                        must: must_filter
+                    }
+                },
+                sort: [
+                    {
+                        updated_at: {
+                            order: 'desc'
+                        }
+                    }
+                ]
+
+            }
+        end
 
         search_query = Elasticsearch::Model.search(query, [Experiences::Experience])
         results = search_query.per_page(page_size).page(current_page).results
@@ -33,14 +62,27 @@ class V1::ExperiencesController < V1::ApplicationController
 
         experiences = Experiences::Experience.find_all(experience_ids)
 
-        data = []
-        included = []
-        version_ids = experiences.map{|experience| experience.current_version_id ? experience.current_version_id : experience.live_version_id }
-        versions_by_experience_id = Experiences::VersionedExperience.find_all(version_ids).index_by(&:experience_id)
+        if sparse_fieldset.any? && sparse_fieldset.include?(:screens)
+            load_version_document = true
+        else
+            load_version_document = false
+        end
 
-        experiences.each do |experience|
-            version = versions_by_experience_id[experience._id]
-            data.push(serialize_experience(experience, version))
+
+        data = []
+
+        if load_version_document
+            version_ids = experiences.map{|experience| experience.current_version_id ? experience.current_version_id : experience.live_version_id }
+            versions_by_experience_id = Experiences::VersionedExperience.find_all(version_ids).index_by(&:experience_id)
+
+            experiences.each do |experience|
+                version = versions_by_experience_id[experience._id]
+                data.push(serialize_experience(experience, version, { fields: sparse_fieldset }))
+            end
+        else
+            experiences.each do |experience|
+                data.push(serialize_experience(experience, nil, { fields: sparse_fieldset }))
+            end
         end
 
         render json: Oj.dump(
@@ -230,6 +272,14 @@ class V1::ExperiencesController < V1::ApplicationController
         end
     end
 
+    def sparse_fieldset
+        @sparse_fieldset ||= params.dig(:fields, :experiences).split(",").map(&:to_sym) || []
+    end
+
+    def query_keyword
+        params.dig(:filter, :query)
+    end
+
     def query_collection_type
         type = params.dig(:filter, :collectionType)
         case type
@@ -280,10 +330,10 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
 
-    def serialize_experience(experience, version)
+    def serialize_experience(experience, version, opts = {})
         # version_updated_at = experience.live_version_id == version._id ? experience.live_version_updated_at.to_i : experience.current_version_updated_at.to_i
         # Rails.cache.fetch("/experiences/#{experience.id}/version/#{version.id}/#{version_updated_at}-serialize-cache") do
-        V1::ExperienceSerializer.serialize(experience, version)
+        V1::ExperienceSerializer.serialize(experience, version, opts)
         # end
     end
 
@@ -743,54 +793,54 @@ class V1::ExperiencesController < V1::ApplicationController
         {
             'type' => CH::G.enum('web-view-block'),
             'url' => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
-        }
-    )
+                                        }
+                                        )
 
-    ROWS_SCHEMA = {
-        'id' => String,
-        'screen-id' => String,
-        'name' => String,
-        'auto-height' => [ TrueClass, FalseClass ],
-        'background-color' => COLOR_SCHEMA,
-        'height' => UNIT_SCHEMA,
-        'blocks' => [[ BLOCKS_SCHEMA ]]
-    }
+                                        ROWS_SCHEMA = {
+                                            'id' => String,
+                                            'screen-id' => String,
+                                            'name' => String,
+                                            'auto-height' => [ TrueClass, FalseClass ],
+                                            'background-color' => COLOR_SCHEMA,
+                                            'height' => UNIT_SCHEMA,
+                                            'blocks' => [[ BLOCKS_SCHEMA ]]
+                                        }
 
-    SCREEN_SCHEMA = {
-        'id' => String,
-        'background-color' => COLOR_SCHEMA,
-        'title' => [:optional, NilClass, String],
-        'title-bar-text-color' => COLOR_SCHEMA,
-        'title-bar-background-color'=> COLOR_SCHEMA,
-        'title-bar-button-color' => COLOR_SCHEMA,
-        'title-bar-buttons' => CH::G.enum('close', 'back', 'both', 'none'),
-        'status-bar-style'=> STATUS_BAR_SCHEMA,
-        'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
-        'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
-        'rows' => [[ ROWS_SCHEMA ]]
-    }
+                                        SCREEN_SCHEMA = {
+                                            'id' => String,
+                                            'background-color' => COLOR_SCHEMA,
+                                            'title' => [:optional, NilClass, String],
+                                            'title-bar-text-color' => COLOR_SCHEMA,
+                                            'title-bar-background-color'=> COLOR_SCHEMA,
+                                            'title-bar-button-color' => COLOR_SCHEMA,
+                                            'title-bar-buttons' => CH::G.enum('close', 'back', 'both', 'none'),
+                                            'status-bar-style'=> STATUS_BAR_SCHEMA,
+                                            'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
+                                            'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
+                                            'rows' => [[ ROWS_SCHEMA ]]
+                                        }
 
-    CREATE_SCHEMA = {
-        'name' => String,
-        'screens' => [[ SCREEN_SCHEMA ]]
-    }
+                                        CREATE_SCHEMA = {
+                                            'name' => String,
+                                            'screens' => [[ SCREEN_SCHEMA ]]
+                                        }
 
-    UPDATE_SCHEMA = {
-        'name' => String,
-        'home-screen-id' => String,
-        'screens' => [[ SCREEN_SCHEMA ]]
-    }
+                                        UPDATE_SCHEMA = {
+                                            'name' => String,
+                                            'home-screen-id' => String,
+                                            'screens' => [[ SCREEN_SCHEMA ]]
+                                        }
 
-    def validate_input(schema, input)
-        begin
-            ClassyHash.validate(input, schema)
-            return {errors: []}
-        rescue => e
-            puts e.message
-            return { errors: [e.message] }
-        end
-    end
+                                        def validate_input(schema, input)
+                                            begin
+                                                ClassyHash.validate(input, schema)
+                                                return {errors: []}
+                                            rescue => e
+                                                puts e.message
+                                                return { errors: [e.message] }
+                                            end
+                                        end
 
 
 
-end
+                                        end
