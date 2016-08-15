@@ -4,6 +4,7 @@ module V1::ExperienceSerializer
             has_unpublished_changes = !experience.current_version_id.nil?
             {
                 id: experience.id.to_s,
+                type: 'experiences'.freeze,
                 attributes: {
                     name: experience.title,
                     'has-unpublished-changes' => has_unpublished_changes,
