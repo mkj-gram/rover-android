@@ -17,9 +17,9 @@ class V1::ImagesController < V1::ApplicationController
                     use_accelerate_endpoint: false,
                 }
             )
-            url = URI(resp.public_url)
-            url.host = 'images-rover-io.imgix.net'
-            url.scheme = 'https'
+            s3url = URI(resp.public_url)
+            url = URI("https://images-rover-io.imgix.net")
+            url.path = s3url.path.gsub(/images.rover.io\//, '')
             render json: { "image-url" => url.to_s }
         else
             head :bad_request
