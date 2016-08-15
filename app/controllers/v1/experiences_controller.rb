@@ -108,7 +108,7 @@ class V1::ExperiencesController < V1::ApplicationController
         input = raw_params.dig(:data, :experience)
         input[:screens] = [] if input[:screens].nil?
 
-        validation = validate_input(UPDATED_SCHEMA, input)
+        validation = validate_input(UPDATE_SCHEMA, input)
         if validation[:errors].any?
             render json: { errors: validation[:errors] }, status: :bad_request
         else
