@@ -45,9 +45,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
         render json: Oj.dump(
             {
-                data: {
-                    experiences: data
-                },
+                data: data,
                 meta: {
                     totalDrafts: current_account.experiences_draft_count,
                     totalPublished: current_account.experiences_published_count,
@@ -89,9 +87,7 @@ class V1::ExperiencesController < V1::ApplicationController
             if @experience.save
 
                 json = {
-                    data: {
-                        experience: V1::ExperienceSerializer.serialize(@experience, nil)
-                    }
+                    data: V1::ExperienceSerializer.serialize(@experience, nil)
                 }
 
                 render json: Oj.dump(json)
@@ -223,9 +219,7 @@ class V1::ExperiencesController < V1::ApplicationController
                 Rails.logger.info("Generating cache for experience #{experience.id}".red)
                 version = Experiences::VersionedExperience.find(version_id)
                 data = {
-                    data: {
-                        experience: serialize_experience(experience, version)
-                    }
+                    data: serialize_experience(experience, version)
                 }
                 Oj.dump(data)
             end
@@ -295,7 +289,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def formatted_params
         @formatted_params ||= -> {
-            data = raw_params.dig(:data, :experience) || {}
+            data = raw_params.dig(:data, :attributes) || {}
             ActionController::Parameters.new(data.deep_transform_keys {|key| key = key.to_s.underscore })
         }.call
     end
