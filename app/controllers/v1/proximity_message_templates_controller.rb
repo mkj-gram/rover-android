@@ -77,11 +77,12 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         filter_place_ids = records.map(&:filter_place_ids).flatten.uniq.compact
         filter_beacon_configuration_ids = records.map(&:filter_beacon_configuration_ids).flatten.uniq.compact
         filter_gimbal_place_ids = records.map(&:filter_gimbal_place_ids).flatten.uniq.compact
+        experience_ids = records.map(&:experience_id).uniq.compact
 
         included += Place.where(id: filter_place_ids).all.map{|place| V1::PlaceSerializer.serialize(place)}
         included += BeaconConfiguration.where(id: filter_beacon_configuration_ids).all.map {|beacon_configuration| V1::BeaconConfigurationSerializer.serialize(beacon_configuration)}
         included += GimbalPlace.where(id: filter_gimbal_place_ids).all.map { |gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place) }
-       
+        included += Experiences::Experience.find_all(experience_ids).map{|experience| V1::ExperienceSerializer.serialize(experience, nil, {fields: [:name, :"short-url"]})}
         # next grab all stats
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
         records.each{|template| template.stats = stats[template.id] }
@@ -207,6 +208,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :website_url,
             :deep_link_url,
             :customer_segment_id,
+            :experience_id,
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
         )
 
@@ -220,7 +222,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "places", "segment", "gimbal-places"] # when ember can implement include on get whitelist_include(["beacons", "places"])
+        should_include = ["beacons", "places", "segment", "gimbal-places", "experience"] # when ember can implement include on get whitelist_include(["beacons", "places"])
 
 
 
@@ -253,6 +255,11 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         if should_include.include?("gimbal-places") && message.gimbal_places
             included += message.gimbal_places.map{|gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place)}
+        end
+
+        if should_include.include?("experience") && message.experience_id
+            experience = Experiences::Experience.find(message.experience_id)
+            included += [ V1::ExperienceSerializer.serialize(experience, nil, {fields: [:title, :"short-url" ]})] if experience
         end
 
         if included.any?
@@ -346,7 +353,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 {
                     :"gimbal-places" => {
                         data: message.filter_gimbal_place_ids.map{|gimbal_place_id| { type: "gimbal-places", id: gimbal_place_id.to_s }}
-                    } 
+                    }
                 }
             )
         end
@@ -358,6 +365,16 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                         data: { type: "segments", id: message.customer_segment_id.to_s }
                     }
 
+                }
+            )
+        end
+
+        if message.experience_id
+            json[:relationships].merge!(
+                {
+                    :"experience" => {
+                        data: { type: "experiences", id: message.experience_id }
+                    }
                 }
             )
         end
