@@ -51,6 +51,12 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
         records.each{|template| template.stats = stats[template.id] }
 
+        experience_ids = records.map(&:experience_id).uniq.compact
+        included = []
+
+        included += records.map(&:customer_segment).compact.uniq.map { |segment| V1::CustomerSegmentSerializer.serialize(segment) }
+        included += Experiences::Experience.find_all(experience_ids).map{|experience| V1::ExperienceSerializer.serialize(experience, nil, {fields: [:name, :"short-url"]})}
+
         json = {
             "data" => records.map{ |message| serialize_message(message)},
             "meta" => {
@@ -61,7 +67,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 "totalArchived" => current_account.proximity_message_templates_archived_count,
                 "totalSent" => current_account.scheduled_message_templates_sent_count
             },
-            "included" => records.map(&:customer_segment).compact.uniq.map { |segment| V1::CustomerSegmentSerializer.serialize(segment) }
+            "included" => included
         }
 
         render json: json
@@ -140,7 +146,8 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             :customer_segment_id,
             :use_local_time_zone,
             :scheduled_time_zone,
-            :scheduled_timestamp
+            :scheduled_timestamp,
+            :experience_id
         )
 
         if local_params.fetch(:scheduled_messages, {}).has_key?(:landing_page)
@@ -155,7 +162,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
 
     def render_scheduled_message(message)
-        should_include = ["segment"]
+        should_include = ["segment", "experience"]
 
         json = {
             data: serialize_message(message)
@@ -165,6 +172,11 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
         if should_include.include?("segment") &&  message.customer_segment
            included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
+        end
+
+        if should_include.include?("experience") && message.experience_id
+            experience = Experiences::Experience.find(message.experience_id)
+            included += [ V1::ExperienceSerializer.serialize(experience, nil, {fields: [:title, :"short-url" ]})] if experience
         end
 
         if included.any?
@@ -290,6 +302,15 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 }
             })
         end
+
+        if message.experience_id
+            json[:relationships].merge!({
+                experience: {
+                    data: { type: "experiences".freeze, id: message.experience_id }
+                }
+            })
+        end
+        
         return json
     end
 
