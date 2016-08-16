@@ -176,7 +176,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
         if should_include.include?("experience") && message.experience_id
             experience = Experiences::Experience.find(message.experience_id)
-            included += [ V1::ExperienceSerializer.serialize(experience, nil, {fields: [:title, :"short-url" ]})] if experience
+            included += [ V1::ExperienceSerializer.serialize(experience, nil, {fields: [:name, :"short-url" ]})] if experience
         end
 
         if included.any?
@@ -310,7 +310,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 }
             })
         end
-        
+
         return json
     end
 
