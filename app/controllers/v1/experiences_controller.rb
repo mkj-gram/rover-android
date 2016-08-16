@@ -433,7 +433,7 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def screen_params(local_params)
-        return {
+        screen = {
             id: local_params[:id],
             experience_id: @experience.id,
             name: local_params[:name],
@@ -448,6 +448,16 @@ class V1::ExperiencesController < V1::ApplicationController
             has_unpublished_changes: local_params.has_key?(:has_unpublished_changes) ? local_params[:has_unpublished_changes] : false,
             rows: (local_params[:rows] || []).map{|row| row_params(row)}
         }
+
+        if local_params[:status_bar_color].nil? && local_params[:title_bar_background_color]
+            color = local_params[:title_bar_background_color]
+            h, s, l = ::ColorConverter.rgbToHsl(color[:red], color[:green], color[:blue])
+            l = [ l - 0.1, 0].max
+            r, g, b = ::ColorConverter.hslToRgb(h,s,l)
+            screen[:status_bar_color] = { red: r, green: g, blue: b, alpha: 1 }
+        end
+
+        return screen
     end
 
     def row_params(local_params)
@@ -793,54 +803,55 @@ class V1::ExperiencesController < V1::ApplicationController
         {
             'type' => CH::G.enum('web-view-block'),
             'url' => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
-                                        }
-                                        )
+        }
+    )
 
-                                        ROWS_SCHEMA = {
-                                            'id' => String,
-                                            'screen-id' => String,
-                                            'name' => String,
-                                            'auto-height' => [ TrueClass, FalseClass ],
-                                            'background-color' => COLOR_SCHEMA,
-                                            'height' => UNIT_SCHEMA,
-                                            'blocks' => [[ BLOCKS_SCHEMA ]]
-                                        }
+    ROWS_SCHEMA = {
+        'id' => String,
+        'screen-id' => String,
+        'name' => String,
+        'auto-height' => [ TrueClass, FalseClass ],
+        'background-color' => COLOR_SCHEMA,
+        'height' => UNIT_SCHEMA,
+        'blocks' => [[ BLOCKS_SCHEMA ]]
+    }
 
-                                        SCREEN_SCHEMA = {
-                                            'id' => String,
-                                            'background-color' => COLOR_SCHEMA,
-                                            'title' => [:optional, NilClass, String],
-                                            'title-bar-text-color' => COLOR_SCHEMA,
-                                            'title-bar-background-color'=> COLOR_SCHEMA,
-                                            'title-bar-button-color' => COLOR_SCHEMA,
-                                            'title-bar-buttons' => CH::G.enum('close', 'back', 'both', 'none'),
-                                            'status-bar-style'=> STATUS_BAR_SCHEMA,
-                                            'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
-                                            'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
-                                            'rows' => [[ ROWS_SCHEMA ]]
-                                        }
+    SCREEN_SCHEMA = {
+        'id' => String,
+        'background-color' => COLOR_SCHEMA,
+        'title' => [:optional, NilClass, String],
+        'title-bar-text-color' => COLOR_SCHEMA,
+        'title-bar-background-color'=> COLOR_SCHEMA,
+        'title-bar-button-color' => COLOR_SCHEMA,
+        'title-bar-buttons' => CH::G.enum('close', 'back', 'both', 'none'),
+        'status-bar-style' => STATUS_BAR_SCHEMA,
+        'status-bar-color' => [:optional, COLOR_SCHEMA],
+        'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
+        'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
+        'rows' => [[ ROWS_SCHEMA ]]
+    }
 
-                                        CREATE_SCHEMA = {
-                                            'name' => String,
-                                            'screens' => [[ SCREEN_SCHEMA ]]
-                                        }
+    CREATE_SCHEMA = {
+        'name' => String,
+        'screens' => [[ SCREEN_SCHEMA ]]
+    }
 
-                                        UPDATE_SCHEMA = {
-                                            'name' => String,
-                                            'home-screen-id' => String,
-                                            'screens' => [[ SCREEN_SCHEMA ]]
-                                        }
+    UPDATE_SCHEMA = {
+        'name' => String,
+        'home-screen-id' => String,
+        'screens' => [[ SCREEN_SCHEMA ]]
+    }
 
-                                        def validate_input(schema, input)
-                                            begin
-                                                ClassyHash.validate(input, schema)
-                                                return {errors: []}
-                                            rescue => e
-                                                puts e.message
-                                                return { errors: [e.message] }
-                                            end
-                                        end
+    def validate_input(schema, input)
+        begin
+            ClassyHash.validate(input, schema)
+            return {errors: []}
+        rescue => e
+            puts e.message
+            return { errors: [e.message] }
+        end
+    end
 
 
 
-                                        end
+end
