@@ -406,7 +406,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def action_params(action)
         return nil if action.nil?
-        
+
         data = {
             type: action[:type]
         }
@@ -559,7 +559,8 @@ class V1::ExperiencesController < V1::ApplicationController
                 border_color: color_params(local_params[:border_color]),
                 border_width: local_params[:border_width],
                 border_radius: local_params[:border_radius],
-                image: image_params(local_params[:image])
+                image: image_params(local_params[:image]),
+                action: action_params(local_params[:action])
             }
         )
     end
