@@ -492,7 +492,7 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def base_block_params(local_params)
-        return {
+        base_block = {
             id: local_params[:id],
             row_id: local_params[:row_id],
             screen_id: local_params[:screen_id],
@@ -504,8 +504,18 @@ class V1::ExperiencesController < V1::ApplicationController
             position: local_params[:position],
             offset: offset_params(local_params[:offset]),
             alignment: alignment_params(local_params[:alignment]),
-            inset: inset_params(local_params[:inset])
+            inset: inset_params(local_params[:inset]),
+            background_image: image_params(local_params[:background_image])
         }
+
+        if base_block[:background_image]
+            base_block.merge!({
+                background_content_mode: local_params.has_key?(:background_content_mode) ? local_params[:background_content_mode] : 'original',
+                background_scale: local_params.has_key?(:background_scale) ? Integer(local_params[:background_scale]) : 1
+            })
+        end
+        
+        return base_block
     end
 
     def text_block_params(local_params)
@@ -707,6 +717,13 @@ class V1::ExperiencesController < V1::ApplicationController
                 return "a block, unknown 'type' => #{value[:type]}"
             end
 
+            if value["background-image"]
+                schema = schema.merge({
+                    'background-content-mode' => CH::G.enum('original', 'stretch', 'tile', 'fill', 'fit'),
+                    'background-scale' => CH::G.enum(1,2,3)
+                })
+            end
+
             begin
                 ClassyHash.validate(value, schema)
                 return true
@@ -720,6 +737,15 @@ class V1::ExperiencesController < V1::ApplicationController
         end
     end
 
+    IMAGE_SCHEMA = {
+        'height' => Integer,
+        'width' => Integer,
+        'type' => String,
+        'name' => String,
+        'size' => Integer,
+        'url' => String
+    }
+
     BASE_BLOCK_SCHEMA = {
         'id' => String,
         'row-id' => String,
@@ -730,7 +756,8 @@ class V1::ExperiencesController < V1::ApplicationController
         'position' => CH::G.enum('stacked', 'floating'),
         'offset' => OFFSET_SCHEMA,
         'alignment' => ALIGNMENT_SCHEMA,
-        'inset' => INSET_SCHEMA
+        'inset' => INSET_SCHEMA,
+        'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
     }
 
 
@@ -766,15 +793,7 @@ class V1::ExperiencesController < V1::ApplicationController
             'border-color' => COLOR_SCHEMA,
             'border-width' => Integer,
             'border-radius' => Integer,
-            'image' => [ :optional, NilClass,
-                         {
-                             'height' => Integer,
-                             'width' => Integer,
-                             'type' => String,
-                             'name' => String,
-                             'size' => Integer,
-                             'url' => String
-            }]
+            'image' => [ :optional, NilClass, IMAGE_SCHEMA]
         }
     )
 
