@@ -405,6 +405,7 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def action_params(action)
+        return nil if action.nil?
 
         data = {
             type: action[:type]
@@ -469,7 +470,7 @@ class V1::ExperiencesController < V1::ApplicationController
             auto_height: local_params[:auto_height],
             height: unit_params(local_params[:height]),
             background_color: color_params(local_params[:background_color]),
-            blocks: local_params[:blocks] || []
+            blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }
         }
     end
 
@@ -532,7 +533,7 @@ class V1::ExperiencesController < V1::ApplicationController
             text_color: color_params(local_params[:text_color]),
             text_font: local_params[:text_font],
             text_alignment: local_params[:text_alignment],
-            text: text
+            text: local_params[:text]
         }
     end
 
@@ -545,7 +546,7 @@ class V1::ExperiencesController < V1::ApplicationController
                     disabled: button_state_params(local_params[:states][:disabled]),
                     selected: button_state_params(local_params[:states][:selected])
                 },
-                action: action_params(local_param[:action])
+                action: action_params(local_params[:action])
             }
         )
     end
@@ -558,7 +559,8 @@ class V1::ExperiencesController < V1::ApplicationController
                 border_color: color_params(local_params[:border_color]),
                 border_width: local_params[:border_width],
                 border_radius: local_params[:border_radius],
-                image: image_params(local_params[:image])
+                image: image_params(local_params[:image]),
+                action: action_params(local_params[:action])
             }
         )
     end
@@ -577,7 +579,8 @@ class V1::ExperiencesController < V1::ApplicationController
     def web_view_block_params(local_params)
         return default_block_params(local_params).merge(
             {
-                url: local_params[:url]
+                url: local_params[:url],
+                scrollable: local_params.has_key?(:scrollable) ? local_params[:scrollable] : false
             }
         )
     end
@@ -802,7 +805,8 @@ class V1::ExperiencesController < V1::ApplicationController
     WEB_VIEW_BLOCK_SCHEMA = DEFAULT_BLOCK_SCHEMA.merge(
         {
             'type' => CH::G.enum('web-view-block'),
-            'url' => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
+            'url' => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/,
+            'scrollable' => [:optional, TrueClass, FalseClass]
         }
     )
 
