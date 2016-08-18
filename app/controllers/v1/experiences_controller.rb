@@ -405,7 +405,8 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def action_params(action)
-
+        return nil if action.nil?
+        
         data = {
             type: action[:type]
         }
@@ -469,7 +470,7 @@ class V1::ExperiencesController < V1::ApplicationController
             auto_height: local_params[:auto_height],
             height: unit_params(local_params[:height]),
             background_color: color_params(local_params[:background_color]),
-            blocks: local_params[:blocks] || []
+            blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }
         }
     end
 
@@ -532,7 +533,7 @@ class V1::ExperiencesController < V1::ApplicationController
             text_color: color_params(local_params[:text_color]),
             text_font: local_params[:text_font],
             text_alignment: local_params[:text_alignment],
-            text: text
+            text: local_params[:text]
         }
     end
 
@@ -545,7 +546,7 @@ class V1::ExperiencesController < V1::ApplicationController
                     disabled: button_state_params(local_params[:states][:disabled]),
                     selected: button_state_params(local_params[:states][:selected])
                 },
-                action: action_params(local_param[:action])
+                action: action_params(local_params[:action])
             }
         )
     end
