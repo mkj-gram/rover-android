@@ -577,7 +577,8 @@ class V1::ExperiencesController < V1::ApplicationController
     def web_view_block_params(local_params)
         return default_block_params(local_params).merge(
             {
-                url: local_params[:url]
+                url: local_params[:url],
+                scrollable: local_params.has_key?(:scrollable) ? local_params[:scrollable] : false
             }
         )
     end
@@ -802,7 +803,8 @@ class V1::ExperiencesController < V1::ApplicationController
     WEB_VIEW_BLOCK_SCHEMA = DEFAULT_BLOCK_SCHEMA.merge(
         {
             'type' => CH::G.enum('web-view-block'),
-            'url' => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
+            'url' => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/,
+            'scrollable' => [:optional, TrueClass, FalseClass]
         }
     )
 
