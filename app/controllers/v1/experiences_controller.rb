@@ -514,7 +514,7 @@ class V1::ExperiencesController < V1::ApplicationController
                 background_scale: local_params.has_key?(:background_scale) ? Integer(local_params[:background_scale]) : 1
             })
         end
-        
+
         return base_block
     end
 
@@ -829,17 +829,36 @@ class V1::ExperiencesController < V1::ApplicationController
         }
     )
 
-    ROWS_SCHEMA = {
+    ROW_BASE_SCHEMA = {
         'id' => String,
         'screen-id' => String,
         'name' => String,
         'auto-height' => [ TrueClass, FalseClass ],
         'background-color' => COLOR_SCHEMA,
         'height' => UNIT_SCHEMA,
+        'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
         'blocks' => [[ BLOCKS_SCHEMA ]]
     }
 
-    SCREEN_SCHEMA = {
+    ROWS_SCHEMA = lambda { |value|  
+        schema = ROW_BASE_SCHEMA
+        if value["background-image"]
+            schema = schema.merge({
+                'background-content-mode' => CH::G.enum('original', 'stretch', 'tile', 'fill', 'fit'),
+                'background-scale' => CH::G.enum(1,2,3)
+            })
+        end
+
+        begin
+            ClassyHash.validate(value, schema)
+            return true
+        rescue => e
+            puts "BAD ROW"
+            return e.message
+        end
+    }
+
+    BASE_SCREEN_SCHEMA = {
         'id' => String,
         'background-color' => COLOR_SCHEMA,
         'title' => [:optional, NilClass, String],
@@ -851,8 +870,29 @@ class V1::ExperiencesController < V1::ApplicationController
         'status-bar-color' => [:optional, COLOR_SCHEMA],
         'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
         'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
+        'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
         'rows' => [[ ROWS_SCHEMA ]]
     }
+
+
+    SCREEN_SCHEMA = lambda { |value| 
+        schema = BASE_SCREEN_SCHEMA
+        if value["background-image"]
+            schema = schema.merge({
+                'background-content-mode' => CH::G.enum('original', 'stretch', 'tile', 'fill', 'fit'),
+                'background-scale' => CH::G.enum(1,2,3)
+            })
+        end
+
+        begin
+            ClassyHash.validate(value, schema)
+            return true
+        rescue => e
+            puts "BAD SCREEN"
+            return e.message
+        end
+    }
+
 
     CREATE_SCHEMA = {
         'name' => String,
