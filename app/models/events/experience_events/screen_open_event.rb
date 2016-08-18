@@ -1,7 +1,7 @@
 module Events
     module ExperienceEvents
 
-        class ScreenOpenEvent < ExperienceEvent
+        class ScreenOpenedEvent < ExperienceEvent
 
             def self.event_id
                 Events::Constants::EXPERIENCE_SCREEN_OPENED_EVENT_ID
@@ -10,8 +10,9 @@ module Events
             Events::Pipeline.register("experience", "screen-opened", self, { targetable: false })
 
             def initialize(event_attributes, extra)
+                @from_screen_id = event_attributes.delete("from_screen_id")
+                @from_block_id = event_attributes.delete("from_block_id")
                 super event_attributes, extra
-                @source = event_attributes["source"]
                 @screen_id = event_attributes["screen_id"]
             end
 
@@ -19,6 +20,10 @@ module Events
 
             def attributes
                 parent_attributes = super
+                parent_attributes.merge!({
+                    from_screen_id: @from_screen_id,
+                    from_block_id: @from_block_id
+                })
                 if @screen_id && parent_attributes[:experience]
                     parent_attributes[:experience].merge!({ screen_id: @screen_id })
                 end

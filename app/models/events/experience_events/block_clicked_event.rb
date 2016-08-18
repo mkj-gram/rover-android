@@ -11,7 +11,6 @@ module Events
 
             def initialize(event_attributes, extra)
                 super event_attributes, extra
-                @source = event_attributes["source"]
                 @screen_id = event_attributes["screen_id"]
                 @block_id = event_attributes["block_id"]
             end

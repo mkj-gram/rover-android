@@ -1,7 +1,7 @@
 module Events
     module ExperienceEvents
 
-        class CloseEvent < ExperienceEvent
+        class ClosedEvent < ExperienceEvent
 
             def self.event_id
                 Events::Constants::EXPERIENCE_CLOSED_EVENT_ID
@@ -9,6 +9,6 @@ module Events
 
             Events::Pipeline.register("experience", "closed", self, { targetable: false })
         end
-        
+
     end
 end
