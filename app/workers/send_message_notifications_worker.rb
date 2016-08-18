@@ -38,7 +38,7 @@ class SendMessageNotificationWorker
 
     def send_ios_notifications_to_customer(customer, messages, device_ids_filter)
 
-        ios_devices = customer.devices.select { |device| device.os_name == "iOS" && device.notifications_enabled }
+        ios_devices = customer.devices.select { |device| device.os_name == "iOS" && !device.token.nil? }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
 
         rover_devices, ios_devices = ios_devices.partition { |device| device.app_identifier == "io.rover.Rover" }
