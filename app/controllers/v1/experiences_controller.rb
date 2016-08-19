@@ -447,6 +447,7 @@ class V1::ExperiencesController < V1::ApplicationController
             status_bar_style: local_params[:status_bar_style],
             use_default_title_bar_style: local_params[:use_default_title_bar_style],
             has_unpublished_changes: local_params.has_key?(:has_unpublished_changes) ? local_params[:has_unpublished_changes] : false,
+            background_image: image_params(local_params[:background_image]),
             rows: (local_params[:rows] || []).map{|row| row_params(row)}
         }
 
@@ -458,11 +459,18 @@ class V1::ExperiencesController < V1::ApplicationController
             screen[:status_bar_color] = { red: r, green: g, blue: b, alpha: 1 }
         end
 
+        if screen[:background_image]
+            screen.merge!({
+                background_content_mode: local_params.has_key?(:background_content_mode) ? local_params[:background_content_mode] : 'original',
+                background_scale: local_params.has_key?(:background_scale) ? Integer(local_params[:background_scale]) : 1
+            })
+        end
+
         return screen
     end
 
     def row_params(local_params)
-        return {
+        row = {
             id: local_params[:id],
             screen_id: local_params[:screen_id],
             experience_id: @experience.id,
@@ -470,8 +478,18 @@ class V1::ExperiencesController < V1::ApplicationController
             auto_height: local_params[:auto_height],
             height: unit_params(local_params[:height]),
             background_color: color_params(local_params[:background_color]),
+            background_image: image_params(local_params[:background_image]),
             blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }
         }
+
+        if row[:background_image]
+            row.merge!({
+                background_content_mode: local_params.has_key?(:background_content_mode) ? local_params[:background_content_mode] : 'original',
+                background_scale: local_params.has_key?(:background_scale) ? Integer(local_params[:background_scale]) : 1
+            })
+        end
+
+        return row
     end
 
     def block_params(local_params)
