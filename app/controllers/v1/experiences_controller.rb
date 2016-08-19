@@ -620,6 +620,7 @@ class V1::ExperiencesController < V1::ApplicationController
             {
                 barcode_type: local_params[:barcode_type],
                 barcode_text: local_params[:barcode_text],
+                barcode_scale: local_params[:barcode_scale],
                 image: image_params(local_params[:image])
             }
         )
