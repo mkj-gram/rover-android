@@ -447,6 +447,7 @@ class V1::ExperiencesController < V1::ApplicationController
             status_bar_style: local_params[:status_bar_style],
             use_default_title_bar_style: local_params[:use_default_title_bar_style],
             has_unpublished_changes: local_params.has_key?(:has_unpublished_changes) ? local_params[:has_unpublished_changes] : false,
+            background_image: image_params(local_params[:background_image]),
             rows: (local_params[:rows] || []).map{|row| row_params(row)}
         }
 
@@ -458,11 +459,18 @@ class V1::ExperiencesController < V1::ApplicationController
             screen[:status_bar_color] = { red: r, green: g, blue: b, alpha: 1 }
         end
 
+        if screen[:background_image]
+            screen.merge!({
+                background_content_mode: local_params.has_key?(:background_content_mode) ? local_params[:background_content_mode] : 'original',
+                background_scale: local_params.has_key?(:background_scale) ? Integer(local_params[:background_scale]) : 1
+            })
+        end
+
         return screen
     end
 
     def row_params(local_params)
-        return {
+        row = {
             id: local_params[:id],
             screen_id: local_params[:screen_id],
             experience_id: @experience.id,
@@ -470,8 +478,18 @@ class V1::ExperiencesController < V1::ApplicationController
             auto_height: local_params[:auto_height],
             height: unit_params(local_params[:height]),
             background_color: color_params(local_params[:background_color]),
+            background_image: image_params(local_params[:background_image]),
             blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }
         }
+
+        if row[:background_image]
+            row.merge!({
+                background_content_mode: local_params.has_key?(:background_content_mode) ? local_params[:background_content_mode] : 'original',
+                background_scale: local_params.has_key?(:background_scale) ? Integer(local_params[:background_scale]) : 1
+            })
+        end
+
+        return row
     end
 
     def block_params(local_params)
@@ -492,7 +510,7 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def base_block_params(local_params)
-        return {
+        base_block = {
             id: local_params[:id],
             row_id: local_params[:row_id],
             screen_id: local_params[:screen_id],
@@ -504,8 +522,18 @@ class V1::ExperiencesController < V1::ApplicationController
             position: local_params[:position],
             offset: offset_params(local_params[:offset]),
             alignment: alignment_params(local_params[:alignment]),
-            inset: inset_params(local_params[:inset])
+            inset: inset_params(local_params[:inset]),
+            background_image: image_params(local_params[:background_image])
         }
+
+        if base_block[:background_image]
+            base_block.merge!({
+                background_content_mode: local_params.has_key?(:background_content_mode) ? local_params[:background_content_mode] : 'original',
+                background_scale: local_params.has_key?(:background_scale) ? Integer(local_params[:background_scale]) : 1
+            })
+        end
+
+        return base_block
     end
 
     def text_block_params(local_params)
@@ -707,6 +735,13 @@ class V1::ExperiencesController < V1::ApplicationController
                 return "a block, unknown 'type' => #{value[:type]}"
             end
 
+            if value["background-image"]
+                schema = schema.merge({
+                    'background-content-mode' => CH::G.enum('original', 'stretch', 'tile', 'fill', 'fit'),
+                    'background-scale' => CH::G.enum(1,2,3)
+                })
+            end
+
             begin
                 ClassyHash.validate(value, schema)
                 return true
@@ -720,6 +755,15 @@ class V1::ExperiencesController < V1::ApplicationController
         end
     end
 
+    IMAGE_SCHEMA = {
+        'height' => Integer,
+        'width' => Integer,
+        'type' => String,
+        'name' => String,
+        'size' => Integer,
+        'url' => String
+    }
+
     BASE_BLOCK_SCHEMA = {
         'id' => String,
         'row-id' => String,
@@ -730,7 +774,8 @@ class V1::ExperiencesController < V1::ApplicationController
         'position' => CH::G.enum('stacked', 'floating'),
         'offset' => OFFSET_SCHEMA,
         'alignment' => ALIGNMENT_SCHEMA,
-        'inset' => INSET_SCHEMA
+        'inset' => INSET_SCHEMA,
+        'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
     }
 
 
@@ -766,15 +811,7 @@ class V1::ExperiencesController < V1::ApplicationController
             'border-color' => COLOR_SCHEMA,
             'border-width' => Integer,
             'border-radius' => Integer,
-            'image' => [ :optional, NilClass,
-                         {
-                             'height' => Integer,
-                             'width' => Integer,
-                             'type' => String,
-                             'name' => String,
-                             'size' => Integer,
-                             'url' => String
-            }]
+            'image' => [ :optional, NilClass, IMAGE_SCHEMA]
         }
     )
 
@@ -810,17 +847,36 @@ class V1::ExperiencesController < V1::ApplicationController
         }
     )
 
-    ROWS_SCHEMA = {
+    ROW_BASE_SCHEMA = {
         'id' => String,
         'screen-id' => String,
         'name' => String,
         'auto-height' => [ TrueClass, FalseClass ],
         'background-color' => COLOR_SCHEMA,
         'height' => UNIT_SCHEMA,
+        'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
         'blocks' => [[ BLOCKS_SCHEMA ]]
     }
 
-    SCREEN_SCHEMA = {
+    ROWS_SCHEMA = lambda { |value|  
+        schema = ROW_BASE_SCHEMA
+        if value["background-image"]
+            schema = schema.merge({
+                'background-content-mode' => CH::G.enum('original', 'stretch', 'tile', 'fill', 'fit'),
+                'background-scale' => CH::G.enum(1,2,3)
+            })
+        end
+
+        begin
+            ClassyHash.validate(value, schema)
+            return true
+        rescue => e
+            puts "BAD ROW"
+            return e.message
+        end
+    }
+
+    BASE_SCREEN_SCHEMA = {
         'id' => String,
         'background-color' => COLOR_SCHEMA,
         'title' => [:optional, NilClass, String],
@@ -832,8 +888,29 @@ class V1::ExperiencesController < V1::ApplicationController
         'status-bar-color' => [:optional, COLOR_SCHEMA],
         'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
         'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
+        'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
         'rows' => [[ ROWS_SCHEMA ]]
     }
+
+
+    SCREEN_SCHEMA = lambda { |value| 
+        schema = BASE_SCREEN_SCHEMA
+        if value["background-image"]
+            schema = schema.merge({
+                'background-content-mode' => CH::G.enum('original', 'stretch', 'tile', 'fill', 'fit'),
+                'background-scale' => CH::G.enum(1,2,3)
+            })
+        end
+
+        begin
+            ClassyHash.validate(value, schema)
+            return true
+        rescue => e
+            puts "BAD SCREEN"
+            return e.message
+        end
+    }
+
 
     CREATE_SCHEMA = {
         'name' => String,
