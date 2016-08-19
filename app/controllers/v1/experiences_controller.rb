@@ -526,7 +526,7 @@ class V1::ExperiencesController < V1::ApplicationController
             alignment: alignment_params(local_params[:alignment]),
             inset: inset_params(local_params[:inset]),
             background_image: image_params(local_params[:background_image]),
-            opacity: local_params.has_key?(:opacity) ? local_params[:opacity] : 100
+            opacity: local_params.has_key?(:opacity) ? local_params[:opacity].to_f : 1.0
         }
 
         if base_block[:background_image]
@@ -791,7 +791,7 @@ class V1::ExperiencesController < V1::ApplicationController
         'alignment' => ALIGNMENT_SCHEMA,
         'inset' => INSET_SCHEMA,
         'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
-        'opacity' => [:optional, 0..100]
+        'opacity' => [:optional, 0.0..1.0]
     }
 
 
