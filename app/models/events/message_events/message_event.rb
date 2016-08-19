@@ -46,6 +46,13 @@ module Events
                             properties: message.properties.to_json
                         }
                     )
+
+                    if message.experience_id
+                        parent_attributes[:experience] = {
+                            id: message.experience_id.to_s
+                        }
+                    end
+
                 end
 
                 return parent_attributes
