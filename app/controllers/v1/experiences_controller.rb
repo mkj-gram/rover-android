@@ -504,6 +504,8 @@ class V1::ExperiencesController < V1::ApplicationController
             return default_block_params(local_params)
         when Experiences::Block::WEB_VIEW_BLOCK_TYPE
             return web_view_block_params(local_params)
+        when Experiences::Block::BARCODE_BLOCK_TYPE
+            return barcode_block_params(local_params)
         else
             {}
         end

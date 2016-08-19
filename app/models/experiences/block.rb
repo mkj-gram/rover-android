@@ -6,6 +6,7 @@ module Experiences
 		IMAGE_BLOCK_TYPE = 'image-block'.freeze
 		DEFAULT_BLOCK_TYPE = 'default-block'.freeze
 		WEB_VIEW_BLOCK_TYPE = 'web-view-block'.freeze
-
+		BARCODE_BLOCK_TYPE = 'barcode-block'.freeze
+		
 	end
 end
