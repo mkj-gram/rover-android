@@ -616,12 +616,11 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def barcode_block_params(local_params)
-        return default_block_params(local_params).merge(
+        return image_block_params(local_params).merge(
             {
                 barcode_type: local_params[:barcode_type],
                 barcode_text: local_params[:barcode_text],
-                barcode_scale: local_params[:barcode_scale],
-                image: image_params(local_params[:image])
+                barcode_scale: local_params[:barcode_scale]
             }
         )
     end
