@@ -7,7 +7,7 @@ module Events
                 Events::Constants::EXPERIENCE_CLOSED_EVENT_ID
             end
 
-            Events::Pipeline.register("experience", "closed", self, { targetable: false })
+            Events::Pipeline.register("experience", "dismissed", self, { targetable: false })
         end
 
     end

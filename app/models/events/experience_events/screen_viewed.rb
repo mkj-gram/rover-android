@@ -4,10 +4,10 @@ module Events
         class ScreenOpenedEvent < ExperienceEvent
 
             def self.event_id
-                Events::Constants::EXPERIENCE_SCREEN_OPENED_EVENT_ID
+                Events::Constants::EXPERIENCE_SCREEN_VIEWED_EVENT_ID
             end
 
-            Events::Pipeline.register("experience", "screen-opened", self, { targetable: false })
+            Events::Pipeline.register("experience", "screen-viewed", self, { targetable: false })
 
             def initialize(event_attributes, extra)
                 @from_screen_id = event_attributes.delete("from_screen_id")
