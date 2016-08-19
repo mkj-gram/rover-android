@@ -17,8 +17,8 @@ module Events
                 if experience
                     parent_attributes.merge!({
                         experience: {
-                            id: experience.id,
-                            version_id: experience.live_version_id
+                            id: experience.id.to_s,
+                            version_id: experience.live_version_id.to_s
                         }
                     })
                 end
