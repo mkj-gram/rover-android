@@ -479,7 +479,7 @@ class V1::ExperiencesController < V1::ApplicationController
             height: unit_params(local_params[:height]),
             background_color: color_params(local_params[:background_color]),
             background_image: image_params(local_params[:background_image]),
-            blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }
+            blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }.compact
         }
 
         if row[:background_image]
@@ -504,8 +504,10 @@ class V1::ExperiencesController < V1::ApplicationController
             return default_block_params(local_params)
         when Experiences::Block::WEB_VIEW_BLOCK_TYPE
             return web_view_block_params(local_params)
+        when Experiences::Block::BARCODE_BLOCK_TYPE
+            return barcode_block_params(local_params)
         else
-            {}
+            nil
         end
     end
 
@@ -609,6 +611,16 @@ class V1::ExperiencesController < V1::ApplicationController
             {
                 url: local_params[:url],
                 scrollable: local_params.has_key?(:scrollable) ? local_params[:scrollable] : false
+            }
+        )
+    end
+
+    def barcode_block_params(local_params)
+        return image_block_params(local_params).merge(
+            {
+                barcode_type: local_params[:barcode_type],
+                barcode_text: local_params[:barcode_text],
+                barcode_scale: local_params[:barcode_scale]
             }
         )
     end
@@ -730,6 +742,8 @@ class V1::ExperiencesController < V1::ApplicationController
                 schema = TEXT_BLOCK_SCHEMA
             when 'web-view-block'
                 schema = WEB_VIEW_BLOCK_SCHEMA
+            when 'barcode-block'
+                schema = BARCODE_BLOCK_SCHEMA
             else
                 puts "unknown type"
                 return "a block, unknown 'type' => #{value[:type]}"
@@ -844,6 +858,15 @@ class V1::ExperiencesController < V1::ApplicationController
             'type' => CH::G.enum('web-view-block'),
             'url' => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/,
             'scrollable' => [:optional, TrueClass, FalseClass]
+        }
+    )
+
+    BARCODE_BLOCK_SCHEMA = DEFAULT_BLOCK_SCHEMA.merge(
+        {
+            'type' => CH::G.enum('barcode-block'),
+            'barcode-type' => CH::G.enum('code128', 'hibcpdf417', 'azteccode', 'qrcode'),
+            'barcode-text' => String,
+            'image' => IMAGE_SCHEMA
         }
     )
 
