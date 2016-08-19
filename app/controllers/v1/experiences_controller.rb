@@ -479,7 +479,7 @@ class V1::ExperiencesController < V1::ApplicationController
             height: unit_params(local_params[:height]),
             background_color: color_params(local_params[:background_color]),
             background_image: image_params(local_params[:background_image]),
-            blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }
+            blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }.compact
         }
 
         if row[:background_image]
@@ -507,7 +507,7 @@ class V1::ExperiencesController < V1::ApplicationController
         when Experiences::Block::BARCODE_BLOCK_TYPE
             return barcode_block_params(local_params)
         else
-            {}
+            nil
         end
     end
 
