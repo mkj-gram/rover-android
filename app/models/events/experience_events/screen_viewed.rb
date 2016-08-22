@@ -20,7 +20,7 @@ module Events
 
             def attributes
                 parent_attributes = super
-                parent_attributes.merge!({
+                parent_attributes[:event].merge!({
                     from_screen_id: @from_screen_id,
                     from_block_id: @from_block_id
                 })
