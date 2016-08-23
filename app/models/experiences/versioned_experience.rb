@@ -48,6 +48,7 @@ module Experiences
         def merge!(other)
             self.screens = other.screens
             self.version_title = other.version_title
+            self.home_screen_id = other.home_screen_id
         end
 
         def check_sum
