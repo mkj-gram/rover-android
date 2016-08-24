@@ -184,7 +184,8 @@ class V1::ExperiencesController < V1::ApplicationController
             @experience.current_version_updated_at = Time.zone.now
             @experience.is_published = true
             if @experience.save
-                render_experience(@experience, true)
+                current_account.reload
+                render_expereince_with_meta(@experience, true)
             else
                 head :internal_server_error
             end
@@ -213,8 +214,9 @@ class V1::ExperiencesController < V1::ApplicationController
     def archive
         @experience.is_archived = true
         if @experience.save
+            current_account.reload
             live_version = @experience.current_version_id.nil? ? true : false
-            render_experience(@experience, live_version)
+            render_expereince_with_meta(@experience, live_version)
         else
             head :internal_server_error
         end
@@ -223,8 +225,9 @@ class V1::ExperiencesController < V1::ApplicationController
     def unarchive
         @experience.is_archived = false
         if @experience.save
+            current_account.reload
             live_version = @experience.current_version_id.nil? ? true : false
-            render_experience(@experience, live_version)
+            render_expereince_with_meta(@experience, live_version)
         else
             head :internal_server_error
         end
@@ -243,6 +246,22 @@ class V1::ExperiencesController < V1::ApplicationController
 
 
     private
+
+    def render_expereince_with_meta(experience, live_version = true)
+        live_version = @experience.current_version_id.nil? ? true : false
+        version_id = live_version ? experience.live_version_id : experience.current_version_id
+        version = Experiences::VersionedExperience.find(version_id)
+        data = {
+            data: serialize_experience(experience, version),
+            meta: {
+                totalDrafts: current_account.experiences_draft_count,
+                totalPublished: current_account.experiences_published_count,
+                totalArchived: current_account.experiences_archived_count
+            }
+        }
+        
+        render json: Oj.dump(data)
+    end
 
     def render_experience(experience, live_version = true)
         Librato.timing('experience.render.time') do
