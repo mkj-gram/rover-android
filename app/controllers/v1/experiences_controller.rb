@@ -119,17 +119,25 @@ class V1::ExperiencesController < V1::ApplicationController
         input = raw_params.dig(:data, :attributes)
         input[:screens] = [] if input[:screens].nil?
 
-        validation = validate_input(CREATE_SCHEMA, input)
+        if input[:screens].length >= 1
+            validation = validate_input(UPDATE_SCHEMA, input)
+        else
+            validation = validate_input(CREATE_SCHEMA, input)
+        end
 
         if validation[:errors].any?
             render json: { errors: validation[:errors] }, status: :bad_request
         else
             @experience = Experiences::Experience.new(experience_params(formatted_params))
+            @experience.current_version = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+            @experience.current_version.experience_id = @experience._id
+
             @experience.account_id = current_account.id
-            if @experience.save
+
+            if @experience.save && @experience.current_version.save
 
                 json = {
-                    data: V1::ExperienceSerializer.serialize(@experience, nil)
+                    data: V1::ExperienceSerializer.serialize(@experience, @experience.current_version)
                 }
 
                 render json: Oj.dump(json)
