@@ -62,10 +62,10 @@ class V1::ExperiencesController < V1::ApplicationController
 
         experiences = Experiences::Experience.find_all(experience_ids)
 
-        if sparse_fieldset.any? && sparse_fieldset.include?(:screens)
-            load_version_document = true
-        else
+        if sparse_fieldset.any? && !sparse_fieldset.include?(:screens)
             load_version_document = false
+        else
+            load_version_document = true
         end
 
 
