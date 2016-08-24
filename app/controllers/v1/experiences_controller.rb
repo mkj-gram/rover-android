@@ -352,10 +352,13 @@ class V1::ExperiencesController < V1::ApplicationController
     def versioned_experience_params(local_params)
         # return local_params
         data = {
-            screens: (local_params[:screens] || []).map{|screen| screen_params(screen)}
+            screens: (local_params[:screens] || []).map{|screen| screen_params(screen)},
+            home_screen_id: local_params[:home_screen_id]
         }
 
-        data[:home_screen_id] = local_params[:home_screen_id] || data[:screens].is_a?(Array) && data[:screens].first.is_a?(Hash) ? data[:screens].first[:id] : nil
+        if data[:home_screen_id].nil?
+            data[:home_screen_id] = data[:screens].is_a?(Array) && data[:screens].first.is_a?(Hash) ? data[:screens].first[:id] : nil
+        end
 
         return data
     end
