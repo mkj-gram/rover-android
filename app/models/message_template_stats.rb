@@ -46,6 +46,21 @@ class MessageTemplateStats
         end
     end
 
+    def to_doc
+        {
+            _id: _id,
+            total_delivered: total_delivered,
+            total_notification_opens: total_notification_opens,
+            total_inbox_opens: total_inbox_opens,
+            total_opens: total_opens,
+            unique_opens: unique_opens
+        }
+    end
+
+    def create
+        mongo_client[collection_name].insert_one(self.to_doc)
+    end
+
     def mongo_client
         MessageTemplateStats.mongo_client
     end
