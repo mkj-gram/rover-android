@@ -54,6 +54,7 @@ class V1::EventsController < V1::ApplicationController
         elsif (!user_attributes[:identifier].nil? && (customer.identifier.nil? || customer.identifier != user_attributes[:identifier]))
             # the identifier has changed
             Rails.logger.info("get_customer_and_device: the identifier has changed".red.bold)
+
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
             if existing_customer.nil?
                 # we want a new customer object here because we don't
@@ -86,7 +87,7 @@ class V1::EventsController < V1::ApplicationController
             device.merge_attributes!(device_params(device_attributes))
             customer.merge_attributes!(customer_params(user_attributes))
         end
-
+        
         # update any fields that need updating if nothing has changed
         customer.save
         return [customer, device]
@@ -96,7 +97,9 @@ class V1::EventsController < V1::ApplicationController
         # its possible here that the devices is created with an identifier
         if user_attributes[:identifier]
             # a customer
+            remove_duplicate_device_by_token(device_attributes[:token])
             existing_customer = Customer.find_by(account_id: current_account.id, identifier: user_attributes[:identifier])
+            
             if existing_customer
                 device = existing_customer.build_device(device_params(device_attributes))
                 device.udid = current_device_udid
@@ -120,6 +123,7 @@ class V1::EventsController < V1::ApplicationController
     def create_anonymous_customer(user_attributes, device_attributes)
         # this is the case where we create a customer without an identifier
         # make sure incase if someone calls this function they aren't setting the identifier
+        remove_duplicate_device_by_token(device_attributes[:token])
         user_attributes.delete(:identifier)
         customer = Customer.new(customer_params(user_attributes))
         device = customer.build_device(device_params(device_attributes))
@@ -127,6 +131,17 @@ class V1::EventsController < V1::ApplicationController
         customer.devices = [device]
         customer.save
         return [customer, device]
+    end
+
+    def remove_duplicate_device_by_token(token)
+        return if token.nil?
+        customer = Customer.find_by(account_id: current_account.id, "devices.token" => token)
+        device = customer.nil? ? nil : customer.devices.find {|device| device.token == token}
+        if customer && device
+            Rails.logger.info("Removing device with the same push token: #{token}".red.bold)
+            # old device
+            customer.remove_device(device)
+        end
     end
 
     def event_params(local_params)

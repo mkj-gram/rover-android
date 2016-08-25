@@ -129,7 +129,7 @@ class Customer
 
     after_destroy do
         begin
-            __elasticsearch__.delete_document
+           self.delete_elasticsearch_document
         rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
             Rails.logger.warn(e)
         end
@@ -447,7 +447,7 @@ class Customer
     end
 
     def remove_device(device)
-        devices.delete_if{|stored_device| stored_device._id == device._id}
+        self.devices.delete_if{|stored_device| stored_device._id == device._id}
         run_callbacks :save do
             mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => { "updated_at" => Time.zone.now }, "$pull" => {"devices" => {"_id" => device._id}}})
         end
@@ -458,7 +458,7 @@ class Customer
     def add_device(device)
         return false if !device.valid?
         return true if devices.one?{ |stored_device| stored_device._id == device._id }
-        devices << device
+        self.devices << device
         run_callbacks :save do
             mongo_client[collection_name].find({"_id" => self._id}).update_one({ "$set" => { "updated_at" => Time.zone.now }, "$push" => {"devices" => device.to_doc}})
         end
