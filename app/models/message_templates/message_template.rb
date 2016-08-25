@@ -62,6 +62,8 @@ class MessageTemplate < ActiveRecord::Base
     validate :valid_properties
     validates :content_type, inclusion: { in: ['landing-page', 'custom', 'experience', 'website', 'deep-link']}
 
+    after_create :create_stats_document
+
     def as_indexed_json(opts = {})
         {
             account_id: self.account_id,
@@ -355,6 +357,15 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     private
+
+    def create_stats_document
+        stats = MessageTemplateStats.new(_id: self.id)
+        begin
+            stats.create
+        rescue Mongo::Error::OperationFailure => e
+            Rails.logger.warn(e)
+        end
+    end
 
     def valid_properties
         return true if properties.nil?
