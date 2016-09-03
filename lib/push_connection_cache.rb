@@ -8,7 +8,7 @@ module PushConnectionCache
     class << self
 
         # connections expire every hour and will be setup again
-        def with_apns_connection(account_id, expires_in: 3600)
+        def with_apns_connection(account_id, expires_in: 600)
             # first lock by account_id
 
             connection_context = @apns_connection_cache[account_id]
