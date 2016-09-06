@@ -34,6 +34,15 @@ internals.get = function(request, reply) {
 				return reply({status: 500, error: err});
 			}
 
+			if (messageIds.length == 0) {
+				return reply({
+					data: [],
+					meta: {
+						'unread-messages-count': 0
+					}
+				});
+			}
+
 			methods.message.findAll(messageIds, { excludeFields: ['landing_page'] }, (err, messages) => {
 				if (err) {
 					return reply({ status: 500, error: err });
