@@ -768,6 +768,9 @@ module.exports.register = function(server, options, next) {
 							radius: Joi.number(),
 							// Location
 							accuracy: Joi.number().optional(),
+							// Messages
+							'message-id': Joi.string(),
+							'source': Joi.only('inbox', 'notification')
 						}).rename('time', 'timestamp')
 						.when('object', {
 							is: 'beacon-region',
@@ -793,6 +796,13 @@ module.exports.register = function(server, options, next) {
 								latitude: Joi.optional(),
 								longitude: Joi.optional(),
 								radius: Joi.optional(),
+							})
+						})
+						.when('object', {
+							is: 'message',
+							then: Joi.object().keys({
+								'message-id': Joi.required(),
+								source: Joi.optional()
 							})
 						})
 					}
