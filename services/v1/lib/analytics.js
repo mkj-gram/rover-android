@@ -13,9 +13,12 @@ internals.capture = function(event) {
 	const logger = server.plugins.logger.logger;
 
 	let tag = internals.getTag(event);
+	let record = event.toRecord();
 
 	logger.debug(`Service: [analytics.capture]: ${tag}`);
-	fluentd.emit(tag, event.toRecord(), event.timestamp);
+	logger.debug(JSON.stringify(record));
+	
+	fluentd.emit(tag, record, event.timestamp);
 };
 
 module.exports = {
