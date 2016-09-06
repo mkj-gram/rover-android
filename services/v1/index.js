@@ -11,6 +11,7 @@ const ProximityMessageService = require('./lib/proximity-message');
 const CustomerSegmentService = require('./lib/customer-segment');
 const AnalyticsService = require('./lib/analytics');
 const MessageTemplateStatsService = require('./lib/message-template-stats');
+const GimbalPlaceService = require('./lib/gimbal-place');
 
 module.exports.register = function(server, options, next) {
 
@@ -55,6 +56,8 @@ module.exports.register = function(server, options, next) {
 	server.method('analytics.capture', AnalyticsService.capture, { bind: server });
 
 	server.method('messageTemplateStats.update', MessageTemplateStatsService.update, { bind: server });
+
+	server.method('gimbalPlace.findByAccountIdAndGimbalPlaceId', GimbalPlaceService.findByAccountIdAndGimbalPlaceId, { bind: server });
 	next();
 };
 

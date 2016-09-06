@@ -770,7 +770,9 @@ module.exports.register = function(server, options, next) {
 							accuracy: Joi.number().optional(),
 							// Messages
 							'message-id': Joi.string(),
-							'source': Joi.only('inbox', 'notification')
+							'source': Joi.only('inbox', 'notification'),
+							// Gimbal
+							'gimbal-place-id': Joi.string()
 						}).rename('time', 'timestamp')
 						.when('object', {
 							is: 'beacon-region',
@@ -803,6 +805,12 @@ module.exports.register = function(server, options, next) {
 							then: Joi.object().keys({
 								'message-id': Joi.required(),
 								source: Joi.optional()
+							})
+						})
+						.when('object', {
+							is: 'gimbal-place',
+							then: Joi.object().keys({
+								'gimbal-place-id': Joi.required()
 							})
 						})
 					}
