@@ -12,6 +12,7 @@ const CustomerSegmentService = require('./lib/customer-segment');
 const AnalyticsService = require('./lib/analytics');
 const MessageTemplateStatsService = require('./lib/message-template-stats');
 const GimbalPlaceService = require('./lib/gimbal-place');
+const RateLimitService = require('./lib/rate-limit');
 
 module.exports.register = function(server, options, next) {
 
@@ -58,6 +59,10 @@ module.exports.register = function(server, options, next) {
 	server.method('messageTemplateStats.update', MessageTemplateStatsService.update, { bind: server });
 
 	server.method('gimbalPlace.findByAccountIdAndGimbalPlaceId', GimbalPlaceService.findByAccountIdAndGimbalPlaceId, { bind: server });
+
+	server.method('rateLimit.update', RateLimitService.update, { bind: server });
+	server.method('rateLimit.withinLimit', RateLimitService.withinLimit, { bind: server });
+	
 	next();
 };
 
