@@ -16,59 +16,59 @@ const RateLimitService = require('./lib/rate-limit');
 
 module.exports.register = function(server, options, next) {
 
-	server.method('customer.find', CustomerService.find, { bind: server });
-	server.method('customer.findByQuery', CustomerService.findByQuery, { bind: server });
-	server.method('customer.update', CustomerService.update, { bind: server });
-	server.method('customer.updateByDevice', CustomerService.updateByDevice, { bind: server });
-	server.method('customer.create', CustomerService.create, { bind: server });
-	server.method('customer.delete', CustomerService.delete, { bind: server });
-	server.method('customer.pushDevice', CustomerService.pushDevice, { bind: server });
-	server.method('customer.pullDevice', CustomerService.pullDevice, { bind: server });
-	server.method('customer.index', CustomerService.index, { bind: server });
-	server.method('customer.deleteIndex', CustomerService.deleteIndex, { bind: server });
+    server.method('customer.find', CustomerService.find, { bind: server });
+    server.method('customer.findByQuery', CustomerService.findByQuery, { bind: server });
+    server.method('customer.update', CustomerService.update, { bind: server });
+    server.method('customer.updateByDevice', CustomerService.updateByDevice, { bind: server });
+    server.method('customer.create', CustomerService.create, { bind: server });
+    server.method('customer.delete', CustomerService.delete, { bind: server });
+    server.method('customer.pushDevice', CustomerService.pushDevice, { bind: server });
+    server.method('customer.pullDevice', CustomerService.pullDevice, { bind: server });
+    server.method('customer.index', CustomerService.index, { bind: server });
+    server.method('customer.deleteIndex', CustomerService.deleteIndex, { bind: server });
 
-	server.method('inbox.find', InboxService.find, { bind: server });
-	server.method('inbox.addMessage', InboxService.addMessage, { bind: server });
-	server.method('inbox.deleteMessage', InboxService.deleteMessage, { bind: server });
+    server.method('inbox.find', InboxService.find, { bind: server });
+    server.method('inbox.addMessage', InboxService.addMessage, { bind: server });
+    server.method('inbox.deleteMessage', InboxService.deleteMessage, { bind: server });
 
-	server.method('message.find', MessageService.find, { bind: server });
-	server.method('message.findAll', MessageService.findAll, { bind: server });
-	server.method('message.update', MessageService.update, { bind: server });
-	server.method('message.deleteOne', MessageService.deleteOne, { bind: server });
-	server.method('message.bulkInsert', MessageService.bulkInsert, { bind: server });
+    server.method('message.find', MessageService.find, { bind: server });
+    server.method('message.findAll', MessageService.findAll, { bind: server });
+    server.method('message.update', MessageService.update, { bind: server });
+    server.method('message.deleteOne', MessageService.deleteOne, { bind: server });
+    server.method('message.bulkInsert', MessageService.bulkInsert, { bind: server });
 
-	server.method('account.find', AccountService.find, { bind: server });
-	server.method('account.incrementCounter', AccountService.incrementCounter, { bind: server });
-	server.method('account.decrementCounter', AccountService.decrementCounter, { bind: server });
+    server.method('account.find', AccountService.find, { bind: server });
+    server.method('account.incrementCounter', AccountService.incrementCounter, { bind: server });
+    server.method('account.decrementCounter', AccountService.decrementCounter, { bind: server });
 
-	server.method('beaconConfiguration.findById', BeaconConfigurationService.findById, { bind: server });
-	server.method('beaconConfiguration.findByIBeaconProtocol', BeaconConfigurationService.findByIBeaconProtocol, { bind: server });
-	server.method('beaconConfiguration.findByEddystoneNamespaceProtocol', BeaconConfigurationService.findByEddystoneNamespaceProtocol, { bind: server });
+    server.method('beaconConfiguration.findById', BeaconConfigurationService.findById, { bind: server });
+    server.method('beaconConfiguration.findByIBeaconProtocol', BeaconConfigurationService.findByIBeaconProtocol, { bind: server });
+    server.method('beaconConfiguration.findByEddystoneNamespaceProtocol', BeaconConfigurationService.findByEddystoneNamespaceProtocol, { bind: server });
 
-	server.method('place.findById', PlaceService.findById, { bind: server });
-	server.method('place.findByCoordinates', PlaceService.findByCoordinates, { bind: server });
+    server.method('place.findById', PlaceService.findById, { bind: server });
+    server.method('place.findByCoordinates', PlaceService.findByCoordinates, { bind: server });
 
-	server.method('activeConfigurationUUID.findByAccountId', ActiveConfigurationUUIDService.findByAccountId, { bind: server });
+    server.method('activeConfigurationUUID.findByAccountId', ActiveConfigurationUUIDService.findByAccountId, { bind: server });
 
-	server.method('proximityMessage.beaconTriggered', ProximityMessageService.beaconTriggered, { bind: server });
-	server.method('proximityMessage.geofenceTriggered', ProximityMessageService.geofenceTriggered, { bind: server });
+    server.method('proximityMessage.beaconTriggered', ProximityMessageService.beaconTriggered, { bind: server });
+    server.method('proximityMessage.geofenceTriggered', ProximityMessageService.geofenceTriggered, { bind: server });
 
-	server.method('customerSegment.findById', CustomerSegmentService.findById, { bind: server });
-	
-	server.method('analytics.capture', AnalyticsService.capture, { bind: server });
+    server.method('customerSegment.findById', CustomerSegmentService.findById, { bind: server });
+    
+    server.method('analytics.capture', AnalyticsService.capture, { bind: server });
 
-	server.method('messageTemplateStats.update', MessageTemplateStatsService.update, { bind: server });
+    server.method('messageTemplateStats.update', MessageTemplateStatsService.update, { bind: server });
 
-	server.method('gimbalPlace.findByAccountIdAndGimbalPlaceId', GimbalPlaceService.findByAccountIdAndGimbalPlaceId, { bind: server });
+    server.method('gimbalPlace.findByAccountIdAndGimbalPlaceId', GimbalPlaceService.findByAccountIdAndGimbalPlaceId, { bind: server });
 
-	server.method('rateLimit.update', RateLimitService.update, { bind: server });
-	server.method('rateLimit.withinLimit', RateLimitService.withinLimit, { bind: server });
-	
-	next();
+    server.method('rateLimit.update', RateLimitService.update, { bind: server });
+    server.method('rateLimit.withinLimit', RateLimitService.withinLimit, { bind: server });
+    
+    next();
 };
 
 module.exports.register.attributes = {
-	name: 'v1-services',
+    name: 'v1-services',
 };
 
 
