@@ -34,6 +34,22 @@ internals.addMessage = function(customer, message, callback) {
 	});
 };
 
+internals.deleteMessage = function(customer, messageId, callback) {
+	const server = this;
+	const redis = server.plugins.redis.client;
+	const logger = server.plugins.logger.logger;
+	const inboxKey = internals.getInboxKey(customer._id.toString());
+	
+	logger.debug('Service: [inbox.deleteMessage] ' + util.format("Key: %s %s", inboxKey, messageId));
+	redis.lrem(inboxKey, 1, messageId, (err, response) => {
+		if (err) {
+			return callback(err, null);
+		}
+
+		return callback(null, response);
+	});
+};
+
 
 // @private
 internals.getInboxKey = (customerId) => {
@@ -43,5 +59,6 @@ internals.getInboxKey = (customerId) => {
 
 module.exports = {
 	find: internals.find,
-	addMessage: internals.addMessage
+	addMessage: internals.addMessage,
+	deleteMessage: internals.deleteMessage
 }

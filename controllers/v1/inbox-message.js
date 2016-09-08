@@ -105,14 +105,20 @@ internals.destroy = function(request, reply) {
 				return reply({ status: 500, error: "Failed to delete message "});
 			}
 
-			methods.customer.update(customer._id, { "$set": { "inbox_updated_at": moment.utc(new Date).toDate() }}, (err) => {
+			methods.inbox.deleteMessage(customer, message._id.toString(), (err) => {
 				if (err) {
-					return reply({ status: 500, error: "Failed to update inbox cache"});
+					return reply({ status: 500, error: "Failed to delete message "});
 				}
 
-				return reply().code(204);
+				methods.customer.update(customer._id, { "$set": { "inbox_updated_at": moment.utc(new Date).toDate() }}, (err) => {
+					if (err) {
+						return reply({ status: 500, error: "Failed to update inbox cache"});
+					}
+
+					return reply().code(204);
+				});
 			});
-		})
+		});
 	});
 };
 

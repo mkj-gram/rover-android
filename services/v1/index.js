@@ -29,6 +29,7 @@ module.exports.register = function(server, options, next) {
 
 	server.method('inbox.find', InboxService.find, { bind: server });
 	server.method('inbox.addMessage', InboxService.addMessage, { bind: server });
+	server.method('inbox.deleteMessage', InboxService.deleteMessage, { bind: server });
 
 	server.method('message.find', MessageService.find, { bind: server });
 	server.method('message.findAll', MessageService.findAll, { bind: server });
