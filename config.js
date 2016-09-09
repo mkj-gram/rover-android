@@ -45,7 +45,7 @@ const store = new Confidence.Store({
         },
         database: {
             $filter: 'env',
-            production: 'rover',
+            production: process.env.POSTGRESQL_DB_DATABASE,
             $default: 'rover-local'
         },
         host: {
@@ -63,7 +63,7 @@ const store = new Confidence.Store({
     elasticsearch: {
         hosts: {
             $filter: 'env',
-            production: process.env.ELASTICSEARCH_HOSTS,
+            production: process.env.ELASTICSEARCH_URLS,
             $default: "127.0.0.1:9200"
         },
         log: 'info'
