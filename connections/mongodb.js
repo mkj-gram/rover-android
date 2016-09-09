@@ -6,6 +6,7 @@ const Joi = require('joi');
 const MongoClient = Mongodb.MongoClient;
 const ObjectID = Mongodb.ObjectID;
 const fs = require('fs');
+const path = require('path');
 
 module.exports.register = function(server, options, next) {
     
