@@ -13,6 +13,7 @@ const AnalyticsService = require('./lib/analytics');
 const MessageTemplateStatsService = require('./lib/message-template-stats');
 const GimbalPlaceService = require('./lib/gimbal-place');
 const RateLimitService = require('./lib/rate-limit');
+const ExperienceService = require('./lib/experience');
 
 module.exports.register = function(server, options, next) {
 
@@ -64,6 +65,7 @@ module.exports.register = function(server, options, next) {
     server.method('rateLimit.update', RateLimitService.update, { bind: server });
     server.method('rateLimit.withinLimit', RateLimitService.withinLimit, { bind: server });
     
+    server.method('experience.find', ExperienceService.find, { bind: server });
     next();
 };
 
