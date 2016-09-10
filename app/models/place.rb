@@ -9,7 +9,7 @@ class Place < ActiveRecord::Base
         __elasticsearch__.delete_document
     end
 
-    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 1}).merge(
+    settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 2 }).merge(
         {
             analysis:  {
                 filter: {
