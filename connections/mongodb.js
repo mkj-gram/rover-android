@@ -17,7 +17,7 @@ module.exports.register = function(server, options, next) {
 
     if (!util.isNullOrUndefined(mongoConfig.sslCertFile)) {
         mongoConfig.ssl = true
-        mongoConfig.sslCert = [fs.readFileSync(path.join(process.cwd(), sslCert))];
+        mongoConfig.sslCert = [fs.readFileSync(path.join(process.cwd(), mongoConfig.sslCertFile))];
         delete mongoConfig['sslCertFile'];
     }
 
