@@ -23,5 +23,15 @@ module Snapshots
 			return ( self.latitude == other.latitude && self.longitude == other.longitude && self.accuracy == other.accuracy )
 		end
 
+		def to_geo_point
+			@geo_point ||= ::GeoPoint.new(latitude: self.latitude, longitude: self.longitude)
+		end
+
+		def distance_between(other)
+			return 0 if other.nil?
+			return 0 if !other.is_a?(Snapshots::Location)
+			return GeoPoint.distance_between(self.to_geo_point, other.to_geo_point)
+		end
+
 	end
 end
