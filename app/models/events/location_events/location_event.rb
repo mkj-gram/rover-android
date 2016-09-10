@@ -20,8 +20,11 @@ module Events
 
             def set_device_location
                 new_location = Snapshots::Location.new(latitude: latitude, longitude: longitude, accuracy: accuracy)
-                if device.location && device.location != new_location && device.location.distance_between(new_location) > 250
-                    device.location = new_location
+                if device.location && device.location != new_location
+                    distance = device.location.distance_between(new_location)
+                    if (distance >= 250 && new_location.accuracy <= 250) || distance >= 1000
+                        device.location = new_location
+                    end
                 elsif device.location.nil?
                     device.location = new_location
                 end
