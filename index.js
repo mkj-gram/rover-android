@@ -45,7 +45,7 @@ server.register({
 
 server.register({
     register: require('./connections/redis'),
-    options: { url: Config.get('/connections/redis/url')}
+    options: { url: Config.get('/redis/url')}
 }, (err) => {
     if (err) {
         throw err;
