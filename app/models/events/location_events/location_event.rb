@@ -22,6 +22,7 @@ module Events
                 new_location = Snapshots::Location.new(latitude: latitude, longitude: longitude, accuracy: accuracy)
                 if device.location && device.location != new_location
                     distance = device.location.distance_between(new_location)
+                    MetricsClient.aggregate("events.#{object}.#{action}.distance" => { value: distance })
                     if (distance >= 250 && new_location.accuracy <= 250) || distance >= 1000
                         device.location = new_location
                     end
