@@ -104,7 +104,9 @@ internals.delete = function(customer, callback) {
 internals.pushDevice = function(customer, device, callback) {
     const server = this;
 
-    let update = {"$set": { "updated_at": moment.utc(new Date).toDate() } , "$push": { "devices": device }}
+    customer.updated_at = moment.utc(new Date).toDate()
+    
+    let update = {"$set": { "updated_at":  customer.updated_at } , "$push": { "devices": device }}
 
     internals.update.bind(server)(customer._id, update, (err, success) => {
         if (err) {
@@ -126,7 +128,9 @@ internals.pushDevice = function(customer, device, callback) {
 internals.pullDevice = function(customer, device, callback) {
     const server = this;
 
-    let update = { "$set": { "updated_at": moment.utc(new Date).toDate() }, "$pull": { "devices": { "_id": device._id }}}
+    customer.updated_at = moment.utc(new Date).toDate()
+
+    let update = { "$set": { "updated_at": customer.updated_at }, "$pull": { "devices": { "_id": device._id }}}
     internals.update.bind(server)(customer._id, update, (err, success) => {
         if (err) {
             return callback(err);
@@ -146,24 +150,23 @@ internals.pullDevice = function(customer, device, callback) {
 
 internals.index = function(customer, callback) {
     const server = this;
-    const elasticsearch = server.plugins.elasticsearch.client;
+    // const elasticsearch = server.plugins.elasticsearch.client;
+    const queue = server.plugins.elasticsearch.queue;
     const logger = server.plugins.logger.logger;
 
     let doc = internals.asIndexedJson(customer);
 
     logger.debug('Service: [customer.index] \n' + util.inspect(doc, true, null, false));
-    elasticsearch.index({
+    
+    queue.index({
         index: internals.getIndexForCustomer(customer),
         type: 'customer',
         id: customer._id.toString(),
-        body: doc
-    }, (err, response) => {
-        if (err) {
-            return callback(err);
-        }
-
-        return callback(null, response);
+        body: doc,
+        version: moment.utc(customer.updated_at).unix()
     });
+
+    return callback();
 };
 
 internals.deleteIndex = function(customer, callback) {

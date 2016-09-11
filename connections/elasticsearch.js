@@ -3,7 +3,8 @@
 const util = require('util');
 const elasticsearch = require('elasticsearch');
 const Joi = require('joi');
-
+const ElasticsearchQueue = require('../lib/elasticsearch-queue');
+const Config = require('../config');
 
 module.exports.register = function(server, options, next) {
     
@@ -15,6 +16,11 @@ module.exports.register = function(server, options, next) {
         }
 
         server.expose('client', client);
+
+        let queue = new ElasticsearchQueue(client, Config.get('/elasticsearch/flush_interval'), 250);
+        queue.start();
+
+        server.expose('queue', queue);
         next();
     });
 

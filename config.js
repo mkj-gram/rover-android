@@ -66,6 +66,11 @@ const store = new Confidence.Store({
             production: process.env.ELASTICSEARCH_URLS,
             $default: "127.0.0.1:9200"
         },
+        flush_interval: {
+            $filter: 'env',
+            production: parseInt(process.env.ELASTICSEARCH_FLUSH_INTERVAL) || 10000,
+            $default: 30000
+        },
         log: 'info'
     },
     amqp: {
