@@ -100,7 +100,10 @@ internals.partialUpdateCustomerAndDevice = function(server, customer, device, ne
             logger.debug(customerUpdates);
             logger.debug(deviceUpdates);
 
-            let update = { };
+            customer.updated_at = moment.utc(new Date).toDate();
+
+            let update = { updated_at: customer.updated_at };
+            
             Object.keys(customerUpdates).forEach(key => {
                 update[key] = customerUpdates[key]
             });
