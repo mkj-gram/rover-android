@@ -163,7 +163,7 @@ internals.index = function(customer, callback) {
         type: 'customer',
         id: customer._id.toString(),
         body: doc,
-        version: moment.utc(customer.updated_at).unix()
+        version: moment.utc(customer.updated_at).valueOf() // Grabs unix time in milliseconds
     });
 
     return callback();
