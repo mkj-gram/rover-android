@@ -30,11 +30,9 @@ module Events
                 # how do we determine if we should query for more fences?
                 # simple case small amount of geofences
                 limit = region_limit - device.beacon_regions_monitoring.size
-                puts limit
                 should_reload_geofences = false
 
                 if account.places_count <= limit
-                    puts 'WITHIN LIMIT'
                     # simple case for when all geofence regions
                     if (device.geofence_regions_monitoring_updated_at.nil? || account.places_updated_at > device.geofence_regions_monitoring_updated_at)
                         should_reload_geofences = true
