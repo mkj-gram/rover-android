@@ -349,6 +349,7 @@ class Customer
         return false if !valid?
         run_callbacks :create do
             run_callbacks :save do
+                self.updated_at = Time.zone.now
                 mongo_client[collection_name].insert_one(to_doc.merge("created_at" => Time.zone.now))
                 self.new_record = false
                 true
@@ -369,11 +370,15 @@ class Customer
                 #  if devices has changed we need to loop through the ones that have changes
                 # else just use simple find update
                 if devices.any? { |device| device.changes.any? }
+                    self.updated_at = Time.zone.now
                     customer_changes = changes
                     customer_changes.delete(:devices)
+                   
 
                     devices.each do |device|
                         next if device.changes.empty?
+
+                        device.updated_at = Time.zone.now
 
                         setters = device.changes.select{|k,v| v.last != VirtusDirtyAttributes::Undefined }.inject({}) do |hash, (k,v)|
                             new_value = v.last
@@ -387,16 +392,12 @@ class Customer
                             hash
                         end
 
-                        setters.merge!("devices.$.updated_at" => Time.zone.now)
-
                         setters = customer_changes.select{|k,v| v.last != VirtusDirtyAttributes::Undefined }.inject(setters) do |hash, (k,v)|
                             new_value = v.last
                             new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
                             hash.merge!({k.to_s => new_value})
                             hash
                         end
-
-                        setters.merge!("updated_at" => Time.zone.now)
 
                         update_command = {}
 
@@ -412,9 +413,10 @@ class Customer
                         customer_changes = {}
                     end
                 elsif self.changes.any?
+                    self.updated_at = Time.zone.now
                     customer_changes = changes
                     customer_changes.delete(:devices)
-
+                
                     setters = customer_changes.select{|k,v| v.last != VirtusDirtyAttributes::Undefined }.inject({}) do |hash, (k,v)|
                         new_value = v.last
                         new_value = new_value.to_doc if new_value.respond_to?(:to_doc)
@@ -422,7 +424,6 @@ class Customer
                         hash
                     end
 
-                    setters.merge!("updated_at" => Time.zone.now)
                     mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => setters})
                 end
                 self.new_record = false
@@ -449,7 +450,8 @@ class Customer
     def remove_device(device)
         self.devices.delete_if{|stored_device| stored_device._id == device._id}
         run_callbacks :save do
-            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => { "updated_at" => Time.zone.now }, "$pull" => {"devices" => {"_id" => device._id}}})
+            self.updated_at = Time.zone.now
+            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => { "updated_at" => self.updated_at }, "$pull" => {"devices" => {"_id" => device._id}}})
         end
         changes_applied
         return true
@@ -460,7 +462,8 @@ class Customer
         return true if devices.one?{ |stored_device| stored_device._id == device._id }
         self.devices << device
         run_callbacks :save do
-            mongo_client[collection_name].find({"_id" => self._id}).update_one({ "$set" => { "updated_at" => Time.zone.now }, "$push" => {"devices" => device.to_doc}})
+            self.updated_at = Time.zone.now
+            mongo_client[collection_name].find({"_id" => self._id}).update_one({ "$set" => { "updated_at" => self.updated_at }, "$push" => {"devices" => device.to_doc}})
         end
         changes_applied
         return true
@@ -562,16 +565,15 @@ class Customer
             Rails.logger.info("Skipping Elasticsearch index because only location timestamp has changed".green.bold)
             return
         end
-
-        Rails.logger.info("Indexing #{self._id} to Elasticsearch".green.bold)
-        client = __elasticsearch__.client
+        
         document = self.as_indexed_json
 
-        client.index(
+        ElasticsearchQueue.index(
             {
                 index: Customer.get_index_name(self),
                 type:  Customer.document_type,
                 id:    self.id.to_s,
+                version: (self.updated_at.to_f * 1000).to_i,
                 body:  document
             }.merge(opts)
         )
@@ -585,11 +587,12 @@ class Customer
     def delete_elasticsearch_document
         Rails.logger.info("Deleting #{self._id} from Elasticsearch".green.bold)
         client = __elasticsearch__.client
-        client.delete(
+        ElasticsearchQueue.delete(
             {
                 index: Customer.get_index_name(self),
                 type: Customer.document_type,
-                id: self.id.to_s
+                id: self.id.to_s,
+                version: (self.updated_at.to_f * 1000).to_i
             }
         )
     end
