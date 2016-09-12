@@ -10,19 +10,23 @@ module ElasticsearchQueue
         def index(index: , type: , id: , version: , body: )
             start!
             @lock.synchronize do
-                @queue[id] = {
-                    index: { _index: index, _type: type, _id: id, _version: version, _version_type: 'external' },
-                    body: body
-                }
+                if @queue[id].nil? || version > ( @queue[id].dig(:index, :_version) || @queue[id].dig(:delete, :_version) || 0)
+                    @queue[id] = {
+                        index: { _index: index, _type: type, _id: id, _version: version, _version_type: 'external' },
+                        body: body
+                    }
+                end
             end
         end
 
         def delete(index: , type: , id: , version: )
             start!
             @lock.synchronize do
-                @queue[id] = {
-                    delete: { _index: index, _type: type, _id: id, _version: version, _version_type: 'external' }
-                }
+                if @queue[id].nil? || version > ( @queue[id].dig(:index, :_version) || @queue[id].dig(:delete, :_version) || 0)
+                    @queue[id] = {
+                        delete: { _index: index, _type: type, _id: id, _version: version, _version_type: 'external' }
+                    }
+                end
             end
         end
 
@@ -81,7 +85,7 @@ module ElasticsearchQueue
             end
 
             Rails.logger.info("Sending bulk request to Elasticsearch".green.bold)
-            
+
             client = Elasticsearch::Model.client
 
             response = client.bulk(body: bulk)
