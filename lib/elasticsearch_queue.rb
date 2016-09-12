@@ -28,11 +28,15 @@ module ElasticsearchQueue
 
         def start!
             if @scheduler.nil?
-                Rails.logger.info("ElasticsearchQueue started".green.bold)
-                @scheduler = Concurrent::TimerTask.new(execution_interval: 10, timeout_interval: 5) do
-                    self.flush!
+                @lock.synchronize do
+                    if @scheduler.nil?
+                        Rails.logger.info("ElasticsearchQueue started".green.bold)
+                        @scheduler = Concurrent::TimerTask.new(execution_interval: 10, timeout_interval: 5) do
+                            self.flush!
+                        end
+                        @scheduler.execute
+                    end
                 end
-                @scheduler.execute
             end
         end
 
