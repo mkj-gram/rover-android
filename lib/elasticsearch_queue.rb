@@ -1,12 +1,14 @@
 module ElasticsearchQueue
 
+    @flush_interval = 10
+    @queue = Hash.new
     @lock = Mutex.new
-    @queue = {}
-    @timer = nil
+    @scheduler = nil
 
     class << self
 
         def index(index: , type: , id: , version: , body: )
+            start!
             @lock.synchronize do
                 @queue[id] = {
                     index: { _index: index, _type: type, _id: id, _version: version, _version_type: 'external' },
@@ -16,6 +18,7 @@ module ElasticsearchQueue
         end
 
         def delete(index: , type: , id: , version: )
+            start!
             @lock.synchronize do
                 @queue[id] = {
                     delete: { _index: index, _type: type, _id: id, _version: version, _version_type: 'external' }
@@ -23,31 +26,29 @@ module ElasticsearchQueue
             end
         end
 
-        def start
-            if @timer.nil?
+        def start!
+            if @scheduler.nil?
                 Rails.logger.info("ElasticsearchQueue started".green.bold)
-                @timer = Concurrent::TimerTask.new(execution_interval: 10, timeout_interval: 5) do
-                    ElasticsearchQueue.flush
+                @scheduler = Concurrent::TimerTask.new(execution_interval: 10, timeout_interval: 5) do
+                    self.flush!
                 end
-                @timer.execute
+                @scheduler.execute
             end
         end
 
-        def stop
-            if @timer
-                Rails.logger.info("ElasticsearchQueue stopped".green.bold)
-                @timer.shutdown
-                @timer = nil
+        def stop!
+            if @scheduler
+                @scheduler.shutdown
             end
         end
 
-        def flush
+        def flush!
 
             flush_queue = nil
 
             @lock.synchronize do
                 flush_queue = @queue
-                @queue = {}
+                @queue = Hash.new
             end
 
             if flush_queue.empty?
@@ -61,12 +62,12 @@ module ElasticsearchQueue
             flush_queue.each do |k,v|
                 if v[:index]
                     bulk.push({
-                        index: v[:index]
+                                index: v[:index]
                     })
                     bulk.push(v[:body])
                 elsif v[:delete]
                     bulk.push({
-                        delete: v[:delete]
+                                delete: v[:delete]
                     })
                 end
             end
@@ -76,14 +77,13 @@ module ElasticsearchQueue
             end
 
             Rails.logger.info("Sending bulk request to Elasticsearch".green.bold)
-            Rails.logger.debug(bulk)
+            
             client = Elasticsearch::Model.client
 
             response = client.bulk(body: bulk)
 
             Rails.logger.info("Bulk Response: #{response}".green.bold)
         end
-
     end
 
 end
