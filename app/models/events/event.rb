@@ -261,7 +261,7 @@ module Events
             @customer_inbox ||= CustomerInbox.find(customer.id)
         end
 
-        def closest_geofence_regions(limit = 20)
+        def closest_geofence_regions(limit = 20, query_all = true)
             query = {
                 query: {
                     filtered: {
@@ -278,17 +278,6 @@ module Events
                                 must: [
                                     {
                                         term: { enabled: true }
-                                    },
-                                    {
-                                        geo_distance: {
-                                            distance: "10km",
-                                            optimize_bbox: "indexed",
-                                            distance_type: "sloppy_arc",
-                                            location: {
-                                                lat: latitude,
-                                                lon: longitude
-                                            }
-                                        }
                                     }
                                 ]
                             }
@@ -304,13 +293,28 @@ module Events
                             },
                             order: "asc",
                             unit: "km",
-                            distance_type: "sloppy_arc"
+                            distance_type: "plane",
                         }
                     }
                 ]
             }
 
-
+            if query_all == false
+                query[:query][:filtered][:filter][:bool][:must].push(
+                    {
+                        geo_distance: {
+                            distance: "10km",
+                            optimize_bbox: "indexed",
+                            distance_type: "sloppy_arc",
+                            location: {
+                                lat: latitude,
+                                lon: longitude
+                            }
+                        }
+                    }
+                )
+            end
+            
             places = Elasticsearch::Model.search(query, [Place])
             places.per_page(limit).page(0).results.map do |document|
                 latitude = document._source.location.lat
