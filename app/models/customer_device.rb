@@ -29,8 +29,9 @@ class CustomerDevice
     attribute :aid, NullableString
     # Track state of what the device is monitoring for
     attribute :beacon_regions_monitoring, Array[Snapshots::BeaconRegion], default: []
+    attribute :beacon_regions_monitoring_updated_at, Time
     attribute :geofence_regions_monitoring, Array[Snapshots::GeofenceRegion], default: []
-
+    attribute :geofence_regions_monitoring_updated_at, Time
     attribute :created_at, Time
     attribute :updated_at, Time
 

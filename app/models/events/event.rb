@@ -278,6 +278,17 @@ module Events
                                 must: [
                                     {
                                         term: { enabled: true }
+                                    },
+                                    {
+                                        geo_distance: {
+                                            distance: "10km",
+                                            optimize_bbox: "indexed",
+                                            distance_type: "sloppy_arc",
+                                            location: {
+                                                lat: latitude,
+                                                lon: longitude
+                                            }
+                                        }
                                     }
                                 ]
                             }
@@ -293,7 +304,7 @@ module Events
                             },
                             order: "asc",
                             unit: "km",
-                            :"distance_type" => "plane"
+                            distance_type: "sloppy_arc"
                         }
                     }
                 ]
