@@ -68,7 +68,7 @@ class BeaconConfiguration < ActiveRecord::Base
     after_create :increment_account_beacons_count
     after_destroy :decrement_account_beacons_count
 
-    belongs_to :account
+    belongs_to :account, touch: :beacon_configurations_updated_at
     belongs_to :place, counter_cache: :beacon_configurations_count
 
     has_many :shared_beacon_configurations

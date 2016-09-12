@@ -67,7 +67,7 @@ class Place < ActiveRecord::Base
     validates :longitude, presence: true, inclusion: { in: -180..180, message: "must be between -180 and 180" }
 
 
-    belongs_to :account
+    belongs_to :account, touch: :places_updated_at
     has_many :beacon_configurations
 
     # before_save :update_address_from_google_place

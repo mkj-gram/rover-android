@@ -369,8 +369,10 @@ class Customer
                 # check to see if any devices changed
                 #  if devices has changed we need to loop through the ones that have changes
                 # else just use simple find update
+                current_time = Time.zone.now
+
                 if devices.any? { |device| device.changes.any? }
-                    self.updated_at = Time.zone.now
+                   
                     customer_changes = changes
                     customer_changes.delete(:devices)
                    
@@ -378,7 +380,7 @@ class Customer
                     devices.each do |device|
                         next if device.changes.empty?
 
-                        device.updated_at = Time.zone.now
+                        device.updated_at = current_time
 
                         setters = device.changes.select{|k,v| v.last != VirtusDirtyAttributes::Undefined }.inject({}) do |hash, (k,v)|
                             new_value = v.last
@@ -401,6 +403,9 @@ class Customer
 
                         update_command = {}
 
+                        setters.merge!("updated_at" => current_time)
+                        self.updated_at = current_time
+
                         if setters.any?
                             update_command.merge!("$set" => setters)
                         end
@@ -413,7 +418,7 @@ class Customer
                         customer_changes = {}
                     end
                 elsif self.changes.any?
-                    self.updated_at = Time.zone.now
+                    
                     customer_changes = changes
                     customer_changes.delete(:devices)
                 
@@ -424,7 +429,12 @@ class Customer
                         hash
                     end
 
-                    mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => setters})
+                    if setters.any?
+                        setters.merge!("updated_at" => current_time)
+                        self.updated_at = current_time
+
+                        mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => setters})
+                    end
                 end
                 self.new_record = false
                 true # last line must return true if all changes went through
