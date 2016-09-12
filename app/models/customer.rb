@@ -429,11 +429,27 @@ class Customer
                         hash
                     end
 
-                    if setters.any?
-                        setters.merge!("updated_at" => current_time)
-                        self.updated_at = current_time
+                    unsetters = customer_changes.select{|k,v| v.last == VirtusDirtyAttributes::Undefined }.inject({}) do |hash, (k,v)|
+                        hash.merge!({k => ""})
+                        hash
+                    end
 
-                        mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => setters})
+                    update_command = {}
+
+                    if setters.any?
+                        update_command.merge!("$set" => setters)
+                       
+                    end
+
+                    if unsetters.any?
+                        update_command.merge!("$unset" => unsetters)
+                    end
+
+                    if update_command.any?
+                        self.updated_at = current_time
+                        update_command["$set"] = {} if update_command["$set"].nil?
+                        update_command["$set"].merge!("updated_at" => current_time)
+                        mongo_client[collection_name].find({"_id" => self._id}).update_one(update_command)
                     end
                 end
                 self.new_record = false
