@@ -149,7 +149,9 @@ CREATE TABLE accounts (
     searchable_gimbal_places_count integer DEFAULT 0,
     experiences_draft_count integer DEFAULT 0,
     experiences_published_count integer DEFAULT 0,
-    experiences_archived_count integer DEFAULT 0
+    experiences_archived_count integer DEFAULT 0,
+    places_updated_at timestamp without time zone DEFAULT '2016-09-12 13:44:11.613236'::timestamp without time zone,
+    beacon_configurations_updated_at timestamp without time zone DEFAULT '2016-09-12 13:44:11.619784'::timestamp without time zone
 );
 
 
@@ -1958,4 +1960,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160805122220');
 INSERT INTO schema_migrations (version) VALUES ('20160810123340');
 
 INSERT INTO schema_migrations (version) VALUES ('20160812165514');
+
+INSERT INTO schema_migrations (version) VALUES ('20160912173745');
 
