@@ -31,6 +31,9 @@ class CustomerDevice
     attribute :beacon_regions_monitoring, Array[Snapshots::BeaconRegion], default: []
     attribute :geofence_regions_monitoring, Array[Snapshots::GeofenceRegion], default: []
 
+    attribute :created_at, Time
+    attribute :updated_at, Time
+
     alias_method :udid, :_id
     alias_method :id, :_id
     define_model_callbacks :save, :create, :update, :destroy
