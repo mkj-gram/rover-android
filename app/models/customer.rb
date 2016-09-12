@@ -349,6 +349,7 @@ class Customer
         return false if !valid?
         run_callbacks :create do
             run_callbacks :save do
+                self.updated_at = Time.zone.now
                 mongo_client[collection_name].insert_one(to_doc.merge("created_at" => Time.zone.now))
                 self.new_record = false
                 true
@@ -449,7 +450,8 @@ class Customer
     def remove_device(device)
         self.devices.delete_if{|stored_device| stored_device._id == device._id}
         run_callbacks :save do
-            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => { "updated_at" => Time.zone.now }, "$pull" => {"devices" => {"_id" => device._id}}})
+            self.updated_at = Time.zone.now
+            mongo_client[collection_name].find({"_id" => self._id}).update_one({"$set" => { "updated_at" => self.updated_at }, "$pull" => {"devices" => {"_id" => device._id}}})
         end
         changes_applied
         return true
@@ -460,7 +462,8 @@ class Customer
         return true if devices.one?{ |stored_device| stored_device._id == device._id }
         self.devices << device
         run_callbacks :save do
-            mongo_client[collection_name].find({"_id" => self._id}).update_one({ "$set" => { "updated_at" => Time.zone.now }, "$push" => {"devices" => device.to_doc}})
+            self.updated_at = Time.zone.now
+            mongo_client[collection_name].find({"_id" => self._id}).update_one({ "$set" => { "updated_at" => self.updated_at }, "$push" => {"devices" => device.to_doc}})
         end
         changes_applied
         return true
@@ -584,11 +587,12 @@ class Customer
     def delete_elasticsearch_document
         Rails.logger.info("Deleting #{self._id} from Elasticsearch".green.bold)
         client = __elasticsearch__.client
-        client.delete(
+        ElasticsearchQueue.delete(
             {
                 index: Customer.get_index_name(self),
                 type: Customer.document_type,
-                id: self.id.to_s
+                id: self.id.to_s,
+                version: (self.updated_at.to_f * 1000).to_i
             }
         )
     end
