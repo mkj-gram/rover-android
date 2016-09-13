@@ -80,6 +80,13 @@ const store = new Confidence.Store({
             $default: 'amqp://localhost'
         }
     },
+    log: {
+        level: {
+            $filter: 'env',
+            production: process.env.LOG_LEVEL || 'info',
+            $default: 'debug'
+        }
+    }
 });
 
 const criteria = {
