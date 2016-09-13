@@ -1,5 +1,6 @@
 'use strict';
 var Promise = require('bluebird');
+var _ = require('underscore');
 const util = require('util');
 const ISO3611 = require('../../lib/iso-3611');
 const moment = require('moment');
@@ -33,7 +34,7 @@ internals.customerDifferences = function(fromCustomer, toCustomer) {
         if (key != 'devices' && key != '_id' && key != 'updated_at' && key != 'created_at') {
             if (util.isArray(fromCustomer[key]) && util.isArray(toCustomer[key])) {
                 // if in if because we don't want the next else if to run
-                if (!internals.compareArrays(fromCustomer[key], toCustomer[key])) {
+                if (!_.isEqual(fromCustomer[key], toCustomer[key])) {
                     customerUpdates[key] = toCustomer[key];
                     fromCustomer[key] = toCustomer[key];
                 }
@@ -51,6 +52,33 @@ internals.customerDifferences = function(fromCustomer, toCustomer) {
 
     return customerUpdates;
 };
+
+internals.deviceDifferences = function (fromDevice, toDevice) {
+
+    let deviceUpdates = {};
+
+    Object.keys(fromDevice).forEach(key => {
+        if (key != '_id' && key != 'updated_at' && key != 'created_at') {
+            if (key == 'location' || key == 'beacon_regions_monitoring' || key == 'geofence_regions_monitoring' || key == 'beacon_regions_monitoring_updated_at' || key == 'geofence_regions_monitoring_updated_at') {
+                if (!util.isUndefined(toDevice[key]) && !_.isEqual(fromDevice[key], toDevice[key])) {
+                   deviceUpdates[key] = toDevice[key];
+                   fromDevice[key] = toDevice[key];
+                }
+            } else if (util.isArray(fromDevice[key]) && util.isArray(toDevice[key])) {
+                if (!_.isEqual(fromDevice[key], toDevice[key])) {
+                    deviceUpdates[key] = toDevice[key];
+                    fromDevice[key] = toDevice[key];
+                }
+            } else if (fromDevice[key] != toDevice[key]) {
+               
+                deviceUpdates[key] = toDevice[key];
+                fromDevice[key] = toDevice[key];
+            }
+        }
+    });
+
+    return deviceUpdates
+}
 
 internals.needsReindexing = function(customerUpdates, deviceUpdates) {
     if (Object.keys(customerUpdates).length == 1 && customerUpdates.inbox_updated_at) {
@@ -78,25 +106,14 @@ internals.partialUpdateCustomerAndDevice = function(server, customer, device, ne
         Object.assign(customerUpdates, internals.customerDifferences(newCustomer, customer));
 
         // find the differences between device and payload
-        
-        Object.keys(device).forEach(key => {
-            if (key != '_id' && key != 'updated_at' && key != 'created_at' && device[key] != newDevice[key]) {
-                deviceUpdates[key] = newDevice[key];
-                device[key] = newDevice[key];
-            }
-        });
+        Object.assign(deviceUpdates, internals.deviceDifferences(device, newDevice));
 
-        Object.keys(newDevice).forEach(key => {
-            if (key != '_id' && key != 'updated_at' && key != 'created_at' && device[key] != newDevice[key]) {
-                deviceUpdates[key] = newDevice[key];
-                device[key] = newDevice[key]
-            }
-        });
-        
+        Object.assign(deviceUpdates, internals.deviceDifferences(newDevice, device));
 
 
         if (Object.keys(customerUpdates).length > 0 || Object.keys(deviceUpdates).length > 0 ) {
             logger.info("Updating Customer! " + customer._id.toString());
+            
             logger.debug(customerUpdates);
             logger.debug(deviceUpdates);
 
