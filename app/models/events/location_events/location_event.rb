@@ -22,8 +22,8 @@ module Events
             def should_process_event
                 if device.location && device.location != @new_location
                     distance = device.location.distance_between(@new_location)
-                    MetricsClient.aggregate("events.#{object}.#{action}.distance" => { value: distance, source: device.platform })
-                    MetricsClient.aggregate("events.#{object}.#{action}.accuracy" => { value: @new_location.accuracy, source: device.platform })
+                    MetricsClient.aggregate("events.#{object}.#{action}.distance" => { value: distance, source: device.platform }) if distance
+                    MetricsClient.aggregate("events.#{object}.#{action}.accuracy" => { value: @new_location.accuracy, source: device.platform }) if @new_location.accuracy
                     if distance >= 50 && @new_location.accuracy <= 200
                         return true
                     end
