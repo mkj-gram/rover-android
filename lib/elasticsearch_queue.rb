@@ -1,6 +1,6 @@
 module ElasticsearchQueue
 
-    @flush_interval = 10
+    @flush_interval = 30
     @queue = Hash.new
     @lock = Mutex.new
     @scheduler = nil
