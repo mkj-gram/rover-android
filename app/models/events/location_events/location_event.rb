@@ -15,6 +15,7 @@ module Events
                 @longitude = event_attributes[:longitude]
                 @latitude = event_attributes[:latitude]
                 @accuracy = event_attributes.has_key?(:accuracy) ? event_attributes[:accuracy] : event_attributes[:radius]
+                @accuracy = 5 if @accuracy.nil?
                 @region_limit = device.ios? ? 20 : 100
                 @new_location = Snapshots::Location.new(latitude: @latitude, longitude: @longitude, accuracy: @accuracy)
             end
@@ -24,8 +25,12 @@ module Events
                     distance = device.location.distance_between(@new_location)
                     MetricsClient.aggregate("events.#{object}.#{action}.distance" => { value: distance, source: device.platform }) if distance
                     MetricsClient.aggregate("events.#{object}.#{action}.accuracy" => { value: @new_location.accuracy, source: device.platform }) if @new_location.accuracy
-                    if distance >= 50 && @new_location.accuracy <= 200
+                    if distance >= 50 && @new_location.accuracy <= 200 || distance > 5000
+                        MetricsClient.aggregate("events.#{object}.#{action}.processed" => { value: 1, source: device.platform })
                         return true
+                    else
+                         MetricsClient.aggregate("events.#{object}.#{action}.dropped" => { value: 1, source: device.platform })
+                         return false
                     end
                 elsif device.location.nil?
                     return true
