@@ -29,9 +29,9 @@ module Events
                     end
                 elsif device.location.nil?
                     return true
-                else 
-                    return false
                 end
+
+                return false
             end
 
             def set_device_location
