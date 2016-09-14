@@ -111,6 +111,10 @@ module Events
                 Rails.logger.info("An event #{object}, #{action} was not recorded")
                 return true
             end
+
+            if should_process_event == false
+                return true
+            end
             # save works the opposite way than to_json
             # it bubbles up from the children appending their attributes
             run_callbacks :save do
@@ -125,6 +129,10 @@ module Events
             end
 
             MetricsClient.aggregate("events.#{object}.#{action}" => { value: 1, source: "account_#{account_id}" })
+        end
+
+        def should_process_event
+            return true
         end
 
         def today_schedule_column
@@ -314,7 +322,7 @@ module Events
                     }
                 )
             end
-            
+
             places = Elasticsearch::Model.search(query, [Place])
             places.per_page(limit).page(0).results.map do |document|
                 latitude = document._source.location.lat
