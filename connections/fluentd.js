@@ -12,7 +12,7 @@ module.exports.register = function(server, options, next) {
     
     logger.configure(null, {
        host: 'localhost',
-       port: 24224,
+       port: 24284,
        timeout: 3.0,
        reconnectInterval: 600000 // 10 minutes
     });
