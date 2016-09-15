@@ -611,7 +611,12 @@ internals.parseCustomerPayload = function(accountId, payload) {
         delete customer.identifier;
     }
 
-    customer.tags = customer.tags.filter(tag => !util.isNullOrUndefined(tag));
+    if (customer.tags && util.isArray(customer.tags)) {
+        customer.tags = customer.tags.filter(tag => !util.isNullOrUndefined(tag));
+    } else {
+        customer.tags = [];
+    }
+    
     return customer;
 };
 
