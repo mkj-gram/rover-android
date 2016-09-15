@@ -509,6 +509,7 @@ class V1::ExperiencesController < V1::ApplicationController
             height: unit_params(local_params[:height]),
             background_color: color_params(local_params[:background_color]),
             background_image: image_params(local_params[:background_image]),
+            is_collapsed: local_params[:is_collapsed].nil? ? false : local_params[:is_collapsed],
             blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }.compact
         }
 
@@ -912,6 +913,7 @@ class V1::ExperiencesController < V1::ApplicationController
         'background-color' => COLOR_SCHEMA,
         'height' => UNIT_SCHEMA,
         'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
+        'is-collapsed' => [ TrueClass, FalseClass ],
         'blocks' => [[ BLOCKS_SCHEMA ]]
     }
 
