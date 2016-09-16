@@ -747,7 +747,7 @@ module.exports.register = function(server, options, next) {
                                 'gender': Joi.string().optional().allow(null).empty(''),
                                 'phone-number': Joi.string().optional().allow(null).empty(''),
                                 'tags':  Joi.array().items(Joi.string().empty('')).unique().sparse().allow(null),
-                                'traits': Joi.object().unknown().allow(null)
+                                'traits': Joi.object().unknown().empty({})
                             }).required(),
                             device: Joi.object().unknown().keys({
                                 token: Joi.string().optional().allow(null),
