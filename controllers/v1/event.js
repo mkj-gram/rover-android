@@ -784,7 +784,15 @@ module.exports.register = function(server, options, next) {
                             'message-id': Joi.string(),
                             'source': Joi.only('inbox', 'notification'),
                             // Gimbal
-                            'gimbal-place-id': Joi.string()
+                            'gimbal-place-id': Joi.string(),
+                            // Experiences
+                            'experience-id': Joi.string(),
+                            'version-id': Joi.string(),
+                            'from-screen-id': Joi.string(),
+                            'from-block-id': Joi.string().optional(),
+                            'screen-id': Joi.string(),
+                            'block-id': Joi.string(),
+                            'block-action': Joi.object().unknown()
                         }).rename('time', 'timestamp')
                         .when('object', {
                             is: 'beacon-region',
