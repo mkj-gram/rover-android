@@ -150,7 +150,7 @@ internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, c
         ];
 
         let currentDayName = internals.getDay(timestamp);
-        
+
         client.query({
             text: GEOFENCE_TRIGGERED_QUERIES[currentDayName].text,
             name: GEOFENCE_TRIGGERED_QUERIES[currentDayName].name,
@@ -163,7 +163,6 @@ internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, c
             }
 
             const messages = result.rows;
-
             return callback(null, messages);
 
         });

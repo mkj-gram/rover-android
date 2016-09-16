@@ -12,7 +12,7 @@ internals.find = function(id, args, callback) {
     const ObjectId = server.plugins.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
-    logger.debug(`Service: [message.find: ${id}] ` + util.inspect(args, true, null, false));
+    logger.debug(`Service: [experience.find: ${id}] ` + util.inspect(args, true, null, false));
 
     let formattedArgs = {}
 
