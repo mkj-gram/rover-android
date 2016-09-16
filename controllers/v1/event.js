@@ -177,7 +177,7 @@ internals.create = function(request, reply) {
         device: devicePayload,
         event: eventPayload
     }
-    
+    logger.debug(request.payload);
     logger.debug(util.format("%s %j", "Started Request:", request.payload));
 
     internals.identify(request, (err, customer) => {
