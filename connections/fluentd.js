@@ -8,15 +8,13 @@ const util = require('util');
 
 
 module.exports.register = function(server, options, next) {
-    const logger = require('fluent-logger');
-    
-    logger.configure(null, {
-       host: 'localhost',
-       port: 24284,
-       timeout: 3.0,
-       reconnectInterval: 600000 // 10 minutes
+    const logger = require('fluent-logger').createFluentSender(null, {
+        host: '127.0.0.1',
+        port: 24284,
+        timeout: 3.0,
+        reconnectInterval: 600000 // 10 minutes
     });
-
+    
     server.expose('logger', logger);
 
     next();
