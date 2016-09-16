@@ -61,8 +61,8 @@ internals.deviceDifferences = function (fromDevice, toDevice) {
         if (key != '_id' && key != 'updated_at' && key != 'created_at') {
             if (key == 'location' || key == 'beacon_regions_monitoring' || key == 'geofence_regions_monitoring' || key == 'beacon_regions_monitoring_updated_at' || key == 'geofence_regions_monitoring_updated_at') {
                 if (!util.isUndefined(toDevice[key]) && !_.isEqual(fromDevice[key], toDevice[key])) {
-                   deviceUpdates[key] = toDevice[key];
-                   fromDevice[key] = toDevice[key];
+                    deviceUpdates[key] = toDevice[key];
+                    fromDevice[key] = toDevice[key];
                 }
             } else if (util.isArray(fromDevice[key]) && util.isArray(toDevice[key])) {
                 if (!_.isEqual(fromDevice[key], toDevice[key])) {
@@ -103,12 +103,12 @@ internals.partialUpdateCustomerAndDevice = function(server, customer, device, ne
 
         Object.assign(customerUpdates, internals.customerDifferences(customer, newCustomer));
 
-        Object.assign(customerUpdates, internals.customerDifferences(newCustomer, customer));
+        // Object.assign(customerUpdates, internals.customerDifferences(newCustomer, customer));
 
         // find the differences between device and payload
         Object.assign(deviceUpdates, internals.deviceDifferences(device, newDevice));
 
-        Object.assign(deviceUpdates, internals.deviceDifferences(newDevice, device));
+        // Object.assign(deviceUpdates, internals.deviceDifferences(newDevice, device));
 
 
         if (Object.keys(customerUpdates).length > 0 || Object.keys(deviceUpdates).length > 0 ) {
