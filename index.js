@@ -165,6 +165,16 @@ tasks.push(function(callback) {
 });
 
 
+process.on('SIGINT', function() {
+    console.log("Shutting down");
+    let queue = server.plugins.elasticsearch.queue;
+
+    queue.flush(function() {
+        process.exit(0);
+    });
+});
+
+
 async.series(tasks, function(err) {
     if (err) {
         throw err;
