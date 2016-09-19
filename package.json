@@ -2,7 +2,7 @@
   "name": "sdk-api",
   "version": "0.0.1",
   "description": "Nodejs Application handling all sdk api calls",
-  "main": "index.js",
+  "main": "start.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,6 +25,7 @@
     "moment": "^2.14.1",
     "mongodb": "^2.2.6",
     "pg": "^6.1.0",
+    "pm2": "^2.0.12",
     "redis": "^2.6.2",
     "underscore": "^1.8.3"
   },
