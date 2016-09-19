@@ -16,5 +16,16 @@ pm2.connect(function() {
 		if (err) return console.error('Error while launching applications', err.stack || err);
 		console.log('PM2 and application has been succesfully started');
 		console.log('Running ' + instances + ' instances with max memory of ' + maxMemory + " M");
+		pm2.launchBus(function(err, bus) {
+			console.log('[PM2] Log streaming started');
+
+			bus.on('log:out', function(packet) {
+				console.log(packet.data);
+			});
+
+			bus.on('log:err', function(packet) {
+				console.error(packet.data);
+			});
+    	});
 	});
 });
