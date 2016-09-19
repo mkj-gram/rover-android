@@ -68,7 +68,7 @@ const store = new Confidence.Store({
         },
         flush_interval: {
             $filter: 'env',
-            production: parseInt(process.env.ELASTICSEARCH_FLUSH_INTERVAL) || 10000,
+            production: parseInt(process.env.ELASTICSEARCH_FLUSH_INTERVAL) || 60000,
             $default: 30000
         },
         log: 'info'
