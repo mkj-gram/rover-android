@@ -83,7 +83,7 @@ const store = new Confidence.Store({
     raven: {
         enabled: {
             $filter: 'env',
-            production: true,
+            production: process.env.RAVEN_ENABLED === undefined ? true : Boolean(process.env.RAVEN_ENABLED),
             $default: false
         },
         url: {
