@@ -99,19 +99,9 @@ class V1::ExperiencesController < V1::ApplicationController
     end
 
     def show
+        version_id = params[:version_id] || "live"
 
-        if params[:version] == 'current'
-            live_version = @experience.current_version_id.nil? ? true : false
-            last_modified = live_version ? @experience.live_version_updated_at : @experience.current_version_updated_at
-        else
-            last_modified = @experience.live_version_updated_at
-            live_version = true
-        end
-
-        if stale?(last_modified: last_modified)
-            render_experience(@experience, live_version )
-        end
-
+        render_experience(@experience, version_id)
     end
 
     def create
@@ -150,6 +140,12 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def update
         # The meat
+        version_id = params[:version_id] || 'current'
+
+        if version_id == 'live' || version_id == @experience.live_version_id
+            render json: { errors: ['Cannot update the current live version'] }, status: 422
+            return
+        end
 
         input = raw_params.dig(:data, :attributes)
         input[:screens] = [] if input[:screens].nil?
@@ -163,51 +159,85 @@ class V1::ExperiencesController < V1::ApplicationController
                 @experience[k] = v
             end
 
-            if @experience.current_version.nil?
-                @experience.current_version = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
-                @experience.current_version.experience_id = @experience._id
+            if version_id == 'current' || version_id == @experience.current_version_id
+                if @experience.current_version.nil?
+                    @experience.current_version = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+                    @experience.current_version.experience_id = @experience._id
+                    @experience.current_version_updated_at = Time.zone.now
+                    @version = @experience.current_version
+                else
+                    versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+                    @experience.current_version.merge!(versioned_experience)
+                    @experience.current_version_updated_at = Time.zone.now
+                    @version = @experience.current_version
+                end
             else
-                versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
-                @experience.current_version.merge!(versioned_experience)
+                @version = Experiences::VersionedExperience.find(version_id)
+                if @version.experience_id != @experience._id
+                    @version = nil
+                else
+                    versioned_experience = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
+                    @version.merge!(versioned_experience)
+                end
             end
 
-            if @experience.current_version.save
-                @experience.current_version_updated_at = Time.zone.now
-                if @experience.save
-                    render_experience(@experience, false)
+            if @version
+                if @version.save && @experience.save
+                    render_experience(@experience, @version.id)
                 else
                     head :internal_server_error
                 end
             else
-                head :internal_server_error
+                head :not_found
             end
         end
     end
 
     def publish
-        if @experience.current_version_id
-            @experience.live_version_id = @experience.current_version_id
-            @experience.current_version_id = nil
+        version_id = params[:version_id]
+
+        if version_id == 'live' || version_id == @experience.live_version_id
+            render json: { errors: ["version is already live"] }, status: 422
+            return
+        end
+
+        if version_id == 'current'
+            version_id = @experience.current_version_id
+        end
+
+        version = Experiences::VersionedExperience.find(version_id)
+
+        if version
+            @experience.live_version_id = version._id
             @experience.live_version_updated_at = Time.zone.now
-            @experience.current_version_updated_at = Time.zone.now
             @experience.is_published = true
+
+            if version_id == @experience.current_version_id
+                @experience.current_version_id = nil
+                @experience.current_version_updated_at = Time.zone.now
+            end
+            
             if @experience.save
                 current_account.reload
-                render_expereince_with_meta(@experience, true)
+                render_expereince_with_meta(@experience, version_id)
             else
-                head :internal_server_error
-            end
+                 head :internal_server_error
+             end
+           
         else
-            render json: { errors: ["nothing to publish"] }, status: :unprocessable_entity
+            render json: { errors: ["version does not exist"] }, status: 404
         end
     end
 
     def revert
-        if @experience.current_version_id
+        # revert is only for the current version
+        # ideally a delete to /experiences/:id/:version_id would just delete the version
+        
+        if @experience.current_version_id && !@experience.live_version_id.nil?
             if @experience.drop_current_version
                 @experience.current_version_updated_at = Time.zone.now
                 if @experience.save
-                    render_experience(@experience, true)
+                    render_experience(@experience, @experience.live_version_id)
                 else
                     head :internal_server_error
                 end
@@ -216,6 +246,43 @@ class V1::ExperiencesController < V1::ApplicationController
             end
         else
             render json: { errors: ["nothing to revert"] }, status: :unprocessable_entity
+        end
+    end
+
+    def delete_version
+        
+        version_id = params[:version_id]
+
+        if version_id == 'live' || version_id == @experience.live_version_id
+            render json: { errors: ["cannot delete live version"] }, status: 422
+            return
+        end
+
+        if version_id == 'current'
+            version_id = @experience.current_version_id
+        end
+
+        version = Experiences::VersionedExperience.find(version_id)
+
+        if version.experience_id != @experience._id
+            render json: { errors: ["version does not belong to this experience"] }, status: 422
+            return
+        end
+
+        if version
+            if version_id == @experience.current_version_id
+                @experience.current_version_updated_at = Time.zone.now
+                @experience.current_version_id = nil
+            end
+
+            if version.destroy && @experience.save
+                render_experience(@experience, @expereince.live_version_id)
+            else
+                head :internal_server_error
+            end
+
+        else
+            render json: { errors: ["version does not exist"] }, status: 404
         end
     end
 
@@ -271,31 +338,27 @@ class V1::ExperiencesController < V1::ApplicationController
         render json: Oj.dump(data)
     end
 
-    def render_experience(experience, live_version = true)
+    def render_experience(experience, version_id)
+
+        if version_id == 'current'
+            version_id = experience.current_version_id || experience.live_version_id
+        elsif version_id == 'live'
+            version_id = experience.live_version_id
+        end
+            
         Librato.timing('experience.render.time') do
-            version_id = live_version ? experience.live_version_id : experience.current_version_id
 
-            if version_id.nil?
-                puts experience.updated_at
-                cache_key = "/experiences/#{experience.id}/#{experience.updated_at.to_i}"
-            else
-                updated_at = live_version ? experience.live_version_updated_at : experience.current_version_updated_at
-                cache_key = "/experiences/#{experience.id}/#{experience.updated_at.to_i}/version/#{version_id}/#{updated_at.to_i}-json-cache"
-            end
+            version = Experiences::VersionedExperience.find(version_id)
 
-
-            json = Rails.cache.fetch(cache_key) do
-                Rails.logger.info("Generating cache for experience #{experience.id}".red)
-                version = Experiences::VersionedExperience.find(version_id)
+            if version
                 data = {
                     data: serialize_experience(experience, version)
                 }
-                Oj.dump(data)
+                
+                render json: Oj.dump(data) 
+            else 
+                head :not_found
             end
-
-
-            render json: json
-
         end
     end
 

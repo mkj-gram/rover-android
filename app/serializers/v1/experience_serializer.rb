@@ -7,6 +7,7 @@ module V1::ExperienceSerializer
                 type: 'experiences'.freeze,
                 attributes: {
                     name: experience.title,
+                    :'version-id' => version.nil? ? nil : version.id,
                     :'has-unpublished-changes' => has_unpublished_changes,
                     :'is-published' => experience.is_published,
                     :'is-archived' => experience.is_archived,
