@@ -31,6 +31,17 @@ tasks.push(function(callback) {
     });
 });
 
+tasks.push(function(callback) {
+    server.register(require('./plugins/librato'), (err) => {
+        if (err) {
+            return callback(err);
+        }
+        logger = server.plugins['logger'].logger;
+        logger.info("Librato initialized!");
+        return callback();
+    })
+});
+
 
 
 // Setup a connection pool to postgres

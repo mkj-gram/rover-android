@@ -91,6 +91,23 @@ const store = new Confidence.Store({
             production: 'https://4b0fe3b746964332954978480ac2c03c:eba7ea90434a4c68953ba5619a35a144@sentry.io/100292'
         }
     },
+    librato: {
+        email: {
+            $filter: 'env',
+            production: process.env.LIBRATO_EMAIL,
+            $default: "sean@rover.io"
+        },
+        token: {
+            $filter: 'env',
+            production: process.env.LIBRATO_TOKEN,
+            $default: "c7696e27af3b14c91fdfa5eafbe8854dbdbbe57aa1af2fea2b536b6d3ed8f2b0"
+        },
+        prefix: {
+            $filter: 'env',
+            production: "sdk-api." + (process.env.LIBRATO_PREFIX || "production") + ".",
+            $default: "sdk-api.development" + "."
+        }
+    },
     log: {
         level: {
             $filter: 'env',
