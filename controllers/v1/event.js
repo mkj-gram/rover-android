@@ -787,9 +787,9 @@ module.exports.register = function(server, options, next) {
                             'gimbal-place-id': Joi.string(),
                             // Experiences
                             'experience-id': Joi.string(),
-                            'version-id': Joi.string(),
-                            'from-screen-id': Joi.string(),
-                            'from-block-id': Joi.string().optional(),
+                            'version-id': Joi.string().optional(),
+                            'from-screen-id': Joi.string().optional().allow(null),
+                            'from-block-id': Joi.string().optional().allow(null),
                             'screen-id': Joi.string(),
                             'block-id': Joi.string(),
                             'block-action': Joi.object().unknown()
