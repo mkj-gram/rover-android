@@ -312,7 +312,7 @@ class V1::ExperiencesController < V1::ApplicationController
         @experience = Experiences::Experience.find_by(short_url: params[:short_url])
         if @experience
             if stale?(last_modified: @experience.live_version_updated_at)
-                render_experience(@experience)
+                render_experience(@experience, @experience.live_version_id)
             end
         else
             head :not_found
