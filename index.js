@@ -4,6 +4,11 @@ const Config = require('./config');
 const async = require('async');
 const server = new Hapi.Server();
 
+if (Config.get('/raven/enabled')) {
+    const raven = require('raven');
+    const ravenClient = new raven.Client(Config.get('/raven/url'));
+    ravenClient.patchGlobal();
+}
 
 server.connection({
     host: Config.get('/connection/host'),

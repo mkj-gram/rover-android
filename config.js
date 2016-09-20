@@ -80,6 +80,17 @@ const store = new Confidence.Store({
             $default: 'amqp://localhost'
         }
     },
+    raven: {
+        enabled: {
+            $filter: 'env',
+            production: true,
+            $default: false
+        },
+        url: {
+            $filter: 'env',
+            production: 'https://4b0fe3b746964332954978480ac2c03c:eba7ea90434a4c68953ba5619a35a144@sentry.io/100292'
+        }
+    },
     log: {
         level: {
             $filter: 'env',
