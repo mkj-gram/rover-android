@@ -100,8 +100,13 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def show
         version_id = params[:version_id] || "live"
-
-        render_experience(@experience, version_id)
+        if version_id == 'live' || version_id == @experience.live_version_id.to_s
+            if stale?(last_modified: @experience.live_version_updated_at)
+                render_experience(@experience, version_id)
+            end
+        else
+            render_experience(@experience, version_id)
+        end
     end
 
     def create
