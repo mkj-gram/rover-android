@@ -1,6 +1,7 @@
 module PushConnectionCache
 
-    @apns_connection_cache = {}
+    @apns_development_connection_cache = {}
+    @apns_production_connection_cache = {};
     @fcm_connection_cache = {}
 
     @master_lock = Mutex.new
@@ -8,17 +9,17 @@ module PushConnectionCache
     class << self
 
         # connections expire every hour and will be setup again
-        def with_apns_connection(account_id, expires_in: 600)
+        def with_apns_connection(account_id, development: false, expires_in: 300)
             # first lock by account_id
 
             connection_context = @apns_connection_cache[account_id]
 
             if connection_context.nil?
-                connection_context = create_apns_connection!(account_id, expires_in)
+                connection_context = create_apns_connection!(account_id, development, expires_in)
             elsif connection_context[:expires_at] < Time.zone.now
                 # Apns Kit uses threads that we must shutdown before recreating the client
                 connection_context[:connection].shutdown
-                connection_context = create_apns_connection!(account_id, expires_in)
+                connection_context = create_apns_connection!(account_id, development, expires_in)
             end
 
 
@@ -60,18 +61,27 @@ module PushConnectionCache
 
         private
 
-        def create_apns_connection!(account_id, expires_in)
+        def create_apns_connection!(account_id, development, expires_in)
             @master_lock.synchronize do
                 Rails.logger.info("Setting up APNS connection cache for account #{account_id}")
                 platform = IosPlatform.where(account_id: account_id).first
                 return if platform.certificate.nil?
-                connection = ApnsHelper.connection_from_ios_platform(platform, heartbeat_interval: 60)
-                return @apns_connection_cache[account_id] = {
-                    platform: platform,
-                    connection: connection,
-                    expires_at: Time.zone.now + expires_in,
-                    lock: Mutex.new
-                }
+                connection = ApnsHelper.connection_from_ios_platform(platform, development: development, heartbeat_interval: 60)
+                if development == true
+                    return @apns_development_connection_cache[account_id] = {
+                        platform: platform,
+                        connection: connection,
+                        expires_at: Time.zone.now + expires_in,
+                        lock: Mutex.new
+                    }
+                else
+                    return @apns_production_connection_cache[account_id] = {
+                        platform: platform,
+                        connection: connection,
+                        expires_at: Time.zone.now + expires_in,
+                        lock: Mutex.new
+                    }
+                end
             end
         end
 
