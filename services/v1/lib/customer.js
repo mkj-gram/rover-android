@@ -150,8 +150,8 @@ internals.pullDevice = function(customer, device, callback) {
 
 internals.index = function(customer, callback) {
     const server = this;
-    // const elasticsearch = server.plugins.elasticsearch.client;
-    const queue = server.plugins.elasticsearch.queue;
+    // const elasticsearch = server.connections.elasticsearch.client;
+    const queue = server.connections.elasticsearch.queue;
     const logger = server.plugins.logger.logger;
 
     let doc = internals.asIndexedJson(customer);
@@ -171,7 +171,7 @@ internals.index = function(customer, callback) {
 
 internals.deleteIndex = function(customer, callback) {
     const server = this;
-    const elasticsearch = server.plugins.elasticsearch.client;
+    const elasticsearch = server.connections.elasticsearch.client;
     const logger = server.plugins.logger.logger;
 
     logger.debug('Service: [customer.deleteIndex] id: ' + customer._id);

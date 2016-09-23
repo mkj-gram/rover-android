@@ -5,7 +5,7 @@ const internals = {};
 
 internals.findById = function(id, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
 
     postgres.connect((err, client, done) => {
         if (err) {
@@ -34,7 +34,7 @@ internals.findById = function(id, callback) {
 
 internals.findByIBeaconProtocol = function(accountId, uuid, majorNumber, minorNumber, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [beaconConfiguration.findByIBeaconProtocol] account_id: ${accountId} uuid: ${uuid} major: ${majorNumber} minor: ${minorNumber}`);
@@ -67,7 +67,7 @@ internals.findByIBeaconProtocol = function(accountId, uuid, majorNumber, minorNu
 
 internals.findByEddystoneNamespaceProtocol = function(accountId, uuid, majorNumber, minorNumber, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [beaconConfiguration.findByEddystoneNamespaceProtocol] account_id: ${accountId} `);

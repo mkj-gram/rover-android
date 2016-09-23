@@ -9,7 +9,7 @@ internals.getTag = function(event) {
 
 internals.capture = function(event) {
     const server = this;
-    const fluentd = server.plugins.fluentd.logger;
+    const fluentd = server.connections.fluentd.logger;
     const logger = server.plugins.logger.logger;
 
     let tag = internals.getTag(event);

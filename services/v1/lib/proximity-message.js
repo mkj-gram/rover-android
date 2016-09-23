@@ -77,7 +77,7 @@ internals.getDay = function(timestamp) {
 
 internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConfiguration, place, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
     const logger = server.plugins.logger.logger;
 
     logger.debug(util.format("%s %j %j", `Service: [proximityMessage.beaconTriggered] account_id: ${accountId} triggerId: ${triggerId}`, beaconConfiguration, place));
@@ -129,7 +129,7 @@ internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConf
 
 internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
 
     if (util.isNullOrUndefined(place)) {
         return callback(null, []);
@@ -171,7 +171,7 @@ internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, c
 
 internals.gimbalPlaceTriggered = function(accountId, triggerId, timestamp, gimbalPlace, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
 
     if (util.isNullOrUndefined(gimbalPlace)) {
         return callback(null, []);

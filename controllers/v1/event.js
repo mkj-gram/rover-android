@@ -10,6 +10,26 @@ const Event = require('../../lib/event');
 
 const internals = {};
 
+internals.writeError = function(reply, status, message) {
+    reply.writeHead(status, {
+        'Content-Type': 'application/json'
+    });
+    reply.write(JSON.stringify(message));
+    reply.end();
+};
+
+internals.dig = function(obj, ...keys) {
+    let result = obj;
+    for(let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+        result = result[key];
+        if (util.isNullOrUndefined(result)) {
+            return undefined;
+        }
+    }
+    return result;
+};
+
 internals.compareArrays = (arr1, arr2) => {
 
     if(arr1.length !== arr2.length) {
@@ -157,6 +177,7 @@ internals.partialUpdateCustomerAndDevice = function(server, customer, device, ne
     }); 
 };
 
+
 // POST /v1/events
 internals.create = function(request, reply) {
     
@@ -165,45 +186,58 @@ internals.create = function(request, reply) {
     // parse the payload
     const currentAccountId = request.auth.credentials.account.id;
     const currentDeviceId = request.headers['x-rover-device-id'];
-    
-    let customerPayload = internals.parseCustomerPayload(currentAccountId, request.payload.data.attributes.user)
 
-    let devicePayload = internals.parseDevicePayload(currentDeviceId, request.payload.data.attributes.device);
-
-    let eventPayload = internals.parseEventPayload(request.payload.data.attributes);
-
-    request.payload = {
-        customer: customerPayload,
-        device: devicePayload,
-        event: eventPayload
+    console.log(internals.dig(request, 'payload'));
+    if (util.isNullOrUndefined(internals.dig(request, 'payload', 'data', 'attributes'))) {
+        return internals.writeError(reply, 400, { status: 400, error: "Invalid JSONAPI"});
     }
-    logger.debug(request.payload);
-    logger.debug(util.format("%s %j", "Started Request:", request.payload));
 
-    internals.identify(request, (err, customer) => {
+    let parseTasks = {
+        customer: function(callback) {
+            internals.parseCustomerPayload(currentAccountId, request.payload.data.attributes.user, callback)
+        },
+        device: function(callback) {
+            internals.parseDevicePayload(currentDeviceId, request.payload.data.attributes.device, callback);
+        },
+        event: function(callback) {
+            internals.parseEventPayload(request.payload.data.attributes, callback)
+        }
+    };
+
+    async.parallel(parseTasks, (err, results) => {
         if (err) {
-            logger.error(util.format('%s %f', 'Request Failed', request.payload));
-            logger.error(err);
-            return reply({ status: 500, error: err }).code(500);
+            return internals.writeError(reply, 400, { status: 400,  error: err })
+        }
+        request.payload = {
+            customer: results.customer,
+            device: results.device,
+            event: results.event
         }
 
-        if (customer) {
-            //return internals.processEvent(request, reply, customer);
-            internals.updateCustomer(request, customer, (err, updatedCustomer) => {
-                if (err) {
-                    logger.error(util.format('%s %f', 'Request Failed', request.payload));
-                    logger.error(err);
-                    return reply({ status: 500, error: err }).code(500);
-                }
+        internals.identify(request, (err, customer) => {
+            if (err) {
+                logger.error(util.format('%s %f', 'Request Failed', request.payload));
+                logger.error(err);
+                return internals.writeError(reply, 500, { status: 500, error: err });
+            }
 
-                return internals.processEvent(request, reply, updatedCustomer);
-            });
-        } else {
-            logger.error(util.format('%s %f', 'Request Failed to identify customer', request.payload));
-            return reply({ status: 500, error: "Failed to identify customer" }).code(500);
-        }
+            if (customer) {
+                //return internals.processEvent(request, reply, customer);
+                internals.updateCustomer(request, customer, (err, updatedCustomer) => {
+                    if (err) {
+                        logger.error(util.format('%s %f', 'Request Failed', request.payload));
+                        logger.error(err);
+                        return internals.writeError(reply, 500, { status: 500, error: err });
+                    }
+
+                    return internals.processEvent(request, reply, updatedCustomer);
+                });
+            } else {
+                logger.error(util.format('%s %f', 'Request Failed to identify customer', request.payload));
+                return internals.writeError(reply, 500, { status: 500, error: "Failed to identify customer" });
+            }
+        });
     });
-
 };
 
 /*
@@ -214,7 +248,7 @@ internals.create = function(request, reply) {
 internals.identify = function(request, callback) {
     const methods = request.server.methods;
 
-    methods.getCurrentCustomer(request, (err, customer) => {
+    methods.application.getCurrentCustomer(request, (err, customer) => {
 
         if (err) {
             return callback("Failed to load customer");
@@ -522,13 +556,15 @@ internals.processEvent = function(request, reply, customer) {
 
     event.process((err, newCustomer, newDeivce, eventResponse) => {
         if (err) {
-            logger.error(util.format('%s', 'Processor Failed', args));
-            logger.error(err);
-            return reply({ status: 500, message: "Internal Server Error: support has been notified"}).code(500);
+            return internals.writeError(reply, 500, { status: 500, message: err });
         }
 
         internals.partialUpdateCustomerAndDevice(request.server, customer, device, newCustomer, newDeivce).then(({ customer, device }) => {
-           reply(eventResponse).code(200); 
+            reply.writeHead(200, {
+                'Content-Type': 'application/json'
+            });
+            reply.write(JSON.stringify(eventResponse));
+            return reply.end();
         });
     })
 };
@@ -601,60 +637,105 @@ internals.underscoreKeys = function(obj) {
     return underscorePayload;
 };
 
-internals.parseCustomerPayload = function(accountId, payload) {
-    // if empty string we treat them as null
-    // we don't want to treat not setting the value as null this is bad!
-    let customer = internals.underscoreKeys(payload);
-    customer.account_id = accountId;
+const customerSchema = Joi.object().required().keys({
+    'identifier': Joi.string().optional().allow(null).empty(''),
+    'first-name': Joi.string().optional().allow(null).empty(''),
+    'last-name': Joi.string().optional().allow(null).empty(''),
+    'email': Joi.string().optional().allow(null).empty(''),
+    'age': Joi.number().min(0).max(199).optional().allow(null).empty(''),
+    'gender': Joi.string().optional().allow(null).empty(''),
+    'phone-number': Joi.string().optional().allow(null).empty(''),
+    'tags':  Joi.array().items(Joi.string().empty('')).unique().sparse().allow(null),
+    'traits': Joi.object().unknown().empty({})
+});
 
-    if (util.isNull(customer.identifier)) {
-        delete customer.identifier;
-    }
+internals.parseCustomerPayload = function(accountId, payload, callback) {
 
-    if (customer.tags && util.isArray(customer.tags)) {
-        customer.tags = customer.tags.filter(tag => !util.isNullOrUndefined(tag));
-    } else {
-        customer.tags = [];
-    }
-    
-    return customer;
-};
-
-internals.parseDevicePayload = function(id, payload) {
-    let device = internals.underscoreKeys(payload);
-    
-    delete device.udid;
-    device._id = id;
-
-    if (device.locale_lang) {
-        device.locale_lang = device.locale_lang.toLowerCase();
-    }
-
-    if (device.locale_region) {
-        device.locale_region = device.locale_region.toLowerCase();
-
-        if (device.locale_region.length == 3) {
-            device.locale_region = ISO3611.convert_alpha3_to_alpha2(device.locale_region);
+    Joi.validate(payload, customerSchema, { stripUnknown: true }, (err, value) => {
+        if (err) {
+            return callback(err);
         }
-    }
 
-    if (device.carrier) {
-        device.carrier = device.carrier.toLowerCase();
-    }
+        let customer = internals.underscoreKeys(value);
+        customer.account_id = accountId;
 
-    if (device.remote_notifications_enabled) {
-        device.notifications_enabled = device.remote_notifications_enabled;
-        delete device.remote_notifications_enabled;
-    }
+        if (util.isNull(customer.identifier)) {
+            delete customer.identifier;
+        }
 
-    return device;
+        if (customer.tags && util.isArray(customer.tags)) {
+            customer.tags = customer.tags.filter(tag => !util.isNullOrUndefined(tag));
+        } else {
+            customer.tags = [];
+        }
+        
+        return callback(null, customer);
+    });
 };
 
-internals.parseEventPayload = function(payload) {
+const deviceSchema = Joi.object().required().keys({
+    'token': Joi.string().optional().allow(null),
+    'locale-lang': Joi.string().optional().allow(null),
+    'locale-region': Joi.string().optional().allow(null),
+    'time-zone': Joi.string().optional().allow(null),
+    'sdk-version': Joi.string().regex(/(\d+\.\d+\.\d+)|(\d+\.\d+)/, 'version'),
+    'platform': Joi.any().only('iOS', 'Android').required(),
+    'os-name': Joi.any().only('iOS', 'Android').required(),
+    'os-version': Joi.string().regex(/(\d+\.\d+\.\d+)|(\d+\.\d+)/, 'version'),
+    'model': Joi.string().optional().allow(null),
+    'manufacturer': Joi.string().optional().allow(null),
+    'carrier': Joi.string().optional().allow(null),
+    'app-identifier': Joi.string().required(),
+    'background-enabled': Joi.boolean().required(),
+    'notifications-enabled': Joi.boolean().required(),
+    'location-monitoring-enabled': Joi.boolean().required(),
+    'bluetooth-enabled': Joi.boolean().required(),
+    'development': Joi.boolean().default(false),
+    'aid': Joi.string().allow(null)
+}).rename('remote-notifications-enabled', 'notifications-enabled');
+
+internals.parseDevicePayload = function(id, payload, callback) {
+
+    Joi.validate(payload, deviceSchema, { stripUnknown: true }, (err, value) => {
+        if (err) {
+            return callback(err);
+        }
+
+        let device = internals.underscoreKeys(value);
+    
+        delete device.udid;
+        device._id = id;
+
+        if (device.locale_lang) {
+            device.locale_lang = device.locale_lang.toLowerCase();
+        }
+
+        if (device.locale_region) {
+            device.locale_region = device.locale_region.toLowerCase();
+
+            if (device.locale_region.length == 3) {
+                device.locale_region = ISO3611.convert_alpha3_to_alpha2(device.locale_region);
+            }
+        }
+
+        if (device.carrier) {
+            device.carrier = device.carrier.toLowerCase();
+        }
+
+        if (device.remote_notifications_enabled) {
+            device.notifications_enabled = device.remote_notifications_enabled;
+            delete device.remote_notifications_enabled;
+        }
+
+        return callback(null, device);
+    });
+};
+
+internals.parseEventPayload = function(payload, callback) {
     const eventAttributes = Object.assign(payload);
     delete eventAttributes['user'];
     delete eventAttributes['device'];
-    return eventAttributes;
+    return callback(null, eventAttributes);
 };
 
 /*

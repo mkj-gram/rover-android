@@ -2,7 +2,7 @@
 
 const validateToken = (request, token, callback) => {
 
-    const postgres = request.server.plugins.postgres.client;
+    const postgres = request.server.connections.postgres.client;
 
     postgres.connect((err, client, done) => {
         if (err) {

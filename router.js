@@ -21,7 +21,7 @@ const InboxMatcher = new RegExp("^\/v1\/inbox$", 'i');
 const InboxController = require('./controllers/v1/inbox');
 const InboxMessagesController = require('./controllers/v1/inbox-message');
 const InboxLandingPageController = require('./controllers/v1/inbox-landing-page');
-const EventsController = require('./controllers/v1/events');
+const EventsController = require('./controllers/v1/event');
 
 const unauthenticatedResponse = function(req, res) {
     res.writeHead(401, {
@@ -48,8 +48,7 @@ const route = function(req, res) {
 
 
     req.server = server;
-    // console.log(url);
-    // console.log(method);
+
     if (method == httpMethods.GET) {
         RoverApiAuth.authenticate(req, (authenticated) => {
             if (!authenticated) {
@@ -84,7 +83,7 @@ const route = function(req, res) {
        
         let match;
         // reverse logic since there is only 1 endpoint for post, slightly optimized
-        if(match = url.match(EventsMatcher) {
+        if(match = url.match(EventsMatcher)) {
             let concatStream = concat({ encoding: 'string' },function(payload) {
                 try {
                     req.payload = JSON.parse(payload);
