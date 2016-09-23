@@ -103,6 +103,19 @@ class CustomerDevice
         self.notifications_enabled = new_value
     end
 
+    def development=(new_value)
+        if !self.sdk_version.nil? && new_value != self.development
+            major, minor, revision = sdk_version.split(".").map(&:to_i)
+            if major >= 1 && minor >= 1
+                super new_value
+            else
+                return self.development
+            end
+        else
+            return self.development
+        end
+    end
+
     def customer=(customer)
         @customer = customer
     end
