@@ -8,8 +8,8 @@ const internals = {};
 
 internals.find = function(id, args, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [experience.find: ${id}] ` + util.inspect(args, true, null, false));

@@ -12,8 +12,8 @@ internals.find = function(id) {
 
 internals.findByQuery = function(query, callback) {
     const server = this; 
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug('Service: [customer.findByQuery] \n' + util.inspect(query, true, null, false));
@@ -28,8 +28,8 @@ internals.findByQuery = function(query, callback) {
 
 internals.update = function(id, update, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug('Service: [customer.update] \n' + util.inspect(update, true, null, false));
@@ -46,8 +46,8 @@ internals.update = function(id, update, callback) {
 // rename this
 internals.updateByDevice = function(id, deviceId, update, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug('Service: [customer.updateByDevice] \n' + util.inspect(update, true, null, false));
@@ -63,8 +63,8 @@ internals.updateByDevice = function(id, deviceId, update, callback) {
 
 internals.create = function(doc, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     if (util.isNullOrUndefined(doc._id)) {
@@ -86,8 +86,8 @@ internals.create = function(doc, callback) {
 
 internals.delete = function(customer, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug('Service: [customer.delete] \n' + customer._id);

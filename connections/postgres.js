@@ -30,7 +30,8 @@ module.exports.register = function(server, connectionOptions, next) {
                 return next(err);
             }
             done();
-            server.expose('client', pool);
+            server.connections.postgres = {};
+            server.connections.postgres.client = pool;
             next();
         });
     });

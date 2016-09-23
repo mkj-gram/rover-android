@@ -10,8 +10,8 @@ const internals = {};
 
 internals.find = function(id, args, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [message.find: ${id}] ` + util.inspect(args, true, null, false));
@@ -42,8 +42,8 @@ internals.find = function(id, args, callback) {
 
 internals.findAll = function(ids, args, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [message.findAll: ${ids}] ` + util.inspect(args, true, null, false));
@@ -70,8 +70,8 @@ internals.findAll = function(ids, args, callback) {
 
 internals.update = function(id, updates, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [message.update: ${id}] ` + util.inspect(updates, true, null, false));
@@ -86,8 +86,8 @@ internals.update = function(id, updates, callback) {
 
 internals.deleteOne = function(id, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [message.deleteOne: ${id} ]`);
@@ -103,8 +103,8 @@ internals.deleteOne = function(id, callback) {
 
 internals.bulkInsert = function(messages, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [message.bulkInsert: ${messages.length} messages ]`);

@@ -26,8 +26,10 @@ module.exports.register = function(server, options, next) {
         if (err) {
             return next(err);
         }
-        server.expose('client', db);
-        server.expose('ObjectId', ObjectID);
+        server.connections.mongodb = {};
+        server.connections.mongodb.client = db;
+        server.connections.mongodb.ObjectId = ObjectID;
+        
         next();
     });
 

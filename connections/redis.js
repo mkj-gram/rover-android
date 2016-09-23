@@ -21,7 +21,8 @@ module.exports.register = function(server, options, next) {
             logger.warn(err);
         });
 
-        server.expose('client', redisClient);
+        server.connections.redis = {};
+        server.connections.redis.client = redisClient;
 
         next();
     });

@@ -715,134 +715,137 @@ internals.parseEventPayload = function(payload) {
     "aid": "00000-0000-0000-00000"
  */
 
-module.exports.register = function(server, options, next) {
-    server.route({
-        method: 'POST',
-        path: '/v1/events',
-        handler: internals.create,
-        config: {
-            validate: {
-                failAction: (request, reply, source, error) => {
-                    let logger = request.server.plugins.logger.logger;
-                    logger.error(util.format("%s %j", error.message, request.payload));
-                    return reply(error);
-                },
-                options: {
-                    stripUnknown: false
-                },
-                payload: {
-                    data: {
-                        type: 'events',
-                        id: Joi.string().optional(),
-                        attributes: Joi.object().keys({
-                            object: Joi.string().required(),
-                            action: Joi.string().required(),
-                            timestamp: [Joi.date().iso(), Joi.date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZ")],
-                            user: Joi.object().keys({
-                                'identifier': Joi.string().optional().allow(null).empty(''),
-                                'first-name': Joi.string().optional().allow(null).empty(''),
-                                'last-name': Joi.string().optional().allow(null).empty(''),
-                                'email': Joi.string().optional().allow(null).empty(''),
-                                'age': Joi.number().min(0).max(199).optional().allow(null).empty(''),
-                                'gender': Joi.string().optional().allow(null).empty(''),
-                                'phone-number': Joi.string().optional().allow(null).empty(''),
-                                'tags':  Joi.array().items(Joi.string().empty('')).unique().sparse().allow(null),
-                                'traits': Joi.object().unknown().empty({})
-                            }).required(),
-                            device: Joi.object().unknown().keys({
-                                token: Joi.string().optional().allow(null),
-                                'locale-lang': Joi.string().optional().allow(null),
-                                'locale-region': Joi.string().optional().allow(null),
-                                'time-zone': Joi.string().optional().allow(null),
-                                'sdk-version': Joi.string().regex(/(\d+\.\d+\.\d+)|(\d+\.\d+)/, 'version'),
-                                'platform': Joi.any().only('iOS', 'Android').required(),
-                                'os-name': Joi.any().only('iOS', 'Android').required(),
-                                'os-version': Joi.string().regex(/(\d+\.\d+\.\d+)|(\d+\.\d+)/, 'version'),
-                                'model': Joi.string().optional().allow(null),
-                                'manufacturer': Joi.string().optional().allow(null),
-                                'carrier': Joi.string().optional().allow(null),
-                                'app-identifier': Joi.string().required(),
-                                'background-enabled': Joi.boolean().required(),
-                                'notifications-enabled': Joi.boolean().required(),
-                                'location-monitoring-enabled': Joi.boolean().required(),
-                                'bluetooth-enabled': Joi.boolean().required(),
-                                'development': Joi.boolean().default(false),
-                                'aid': Joi.string().allow(null)
-                            }).required().rename('remote-notifications-enabled', 'notifications-enabled'),
-                            // Beacon Region
-                            uuid: Joi.string(),
-                            'major-number': Joi.number().min(0).max(65535),
-                            'minor-number': Joi.number().min(0).max(65535),
-                            // Geofence Region
-                            identifier: Joi.string(),
-                            latitude: Joi.number().precision(6),
-                            longitude: Joi.number().precision(6),
-                            radius: Joi.number(),
-                            // Location
-                            accuracy: Joi.number().optional(),
-                            // Messages
-                            'message-id': Joi.string(),
-                            'source': Joi.only('inbox', 'notification'),
-                            // Gimbal
-                            'gimbal-place-id': Joi.string(),
-                            // Experiences
-                            'experience-id': Joi.string(),
-                            'version-id': Joi.string().optional(),
-                            'from-screen-id': Joi.string().optional().allow(null),
-                            'from-block-id': Joi.string().optional().allow(null),
-                            'screen-id': Joi.string(),
-                            'block-id': Joi.string(),
-                            'block-action': Joi.object().unknown()
-                        }).rename('time', 'timestamp')
-                        .when('object', {
-                            is: 'beacon-region',
-                            then: Joi.object().keys({
-                                uuid: Joi.required(),
-                                'major-number': Joi.required(),
-                                'minor-number': Joi.required()
-                            })
-                        })
-                        .when('object', {
-                            is: 'location',
-                            then: Joi.object().keys({
-                                latitude: Joi.required(),
-                                longitude: Joi.required(),
-                                accuracy: Joi.optional(),
-                                radius: Joi.optional() // old sdk
-                            })
-                        })
-                        .when('object', {
-                            is: 'geofence-region',
-                            then: Joi.object().keys({
-                                identifier: Joi.required(),
-                                latitude: Joi.optional(),
-                                longitude: Joi.optional(),
-                                radius: Joi.optional(),
-                            })
-                        })
-                        .when('object', {
-                            is: 'message',
-                            then: Joi.object().keys({
-                                'message-id': Joi.required(),
-                                source: Joi.optional()
-                            })
-                        })
-                        .when('object', {
-                            is: 'gimbal-place',
-                            then: Joi.object().keys({
-                                'gimbal-place-id': Joi.required()
-                            })
-                        })
-                    }
-                }
-            }
-        }
-    });
-    next();
+module.exports = {
+    create: internals.create
 };
+// module.exports.register = function(server, options, next) {
+//     server.route({
+//         method: 'POST',
+//         path: '/v1/events',
+//         handler: internals.create,
+//         config: {
+//             validate: {
+//                 failAction: (request, reply, source, error) => {
+//                     let logger = request.server.plugins.logger.logger;
+//                     logger.error(util.format("%s %j", error.message, request.payload));
+//                     return reply(error);
+//                 },
+//                 options: {
+//                     stripUnknown: false
+//                 },
+//                 payload: {
+//                     data: {
+//                         type: 'events',
+//                         id: Joi.string().optional(),
+//                         attributes: Joi.object().keys({
+//                             object: Joi.string().required(),
+//                             action: Joi.string().required(),
+//                             timestamp: [Joi.date().iso(), Joi.date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZ")],
+//                             user: Joi.object().keys({
+//                                 'identifier': Joi.string().optional().allow(null).empty(''),
+//                                 'first-name': Joi.string().optional().allow(null).empty(''),
+//                                 'last-name': Joi.string().optional().allow(null).empty(''),
+//                                 'email': Joi.string().optional().allow(null).empty(''),
+//                                 'age': Joi.number().min(0).max(199).optional().allow(null).empty(''),
+//                                 'gender': Joi.string().optional().allow(null).empty(''),
+//                                 'phone-number': Joi.string().optional().allow(null).empty(''),
+//                                 'tags':  Joi.array().items(Joi.string().empty('')).unique().sparse().allow(null),
+//                                 'traits': Joi.object().unknown().empty({})
+//                             }).required(),
+//                             device: Joi.object().unknown().keys({
+//                                 token: Joi.string().optional().allow(null),
+//                                 'locale-lang': Joi.string().optional().allow(null),
+//                                 'locale-region': Joi.string().optional().allow(null),
+//                                 'time-zone': Joi.string().optional().allow(null),
+//                                 'sdk-version': Joi.string().regex(/(\d+\.\d+\.\d+)|(\d+\.\d+)/, 'version'),
+//                                 'platform': Joi.any().only('iOS', 'Android').required(),
+//                                 'os-name': Joi.any().only('iOS', 'Android').required(),
+//                                 'os-version': Joi.string().regex(/(\d+\.\d+\.\d+)|(\d+\.\d+)/, 'version'),
+//                                 'model': Joi.string().optional().allow(null),
+//                                 'manufacturer': Joi.string().optional().allow(null),
+//                                 'carrier': Joi.string().optional().allow(null),
+//                                 'app-identifier': Joi.string().required(),
+//                                 'background-enabled': Joi.boolean().required(),
+//                                 'notifications-enabled': Joi.boolean().required(),
+//                                 'location-monitoring-enabled': Joi.boolean().required(),
+//                                 'bluetooth-enabled': Joi.boolean().required(),
+//                                 'development': Joi.boolean().default(false),
+//                                 'aid': Joi.string().allow(null)
+//                             }).required().rename('remote-notifications-enabled', 'notifications-enabled'),
+//                             // Beacon Region
+//                             uuid: Joi.string(),
+//                             'major-number': Joi.number().min(0).max(65535),
+//                             'minor-number': Joi.number().min(0).max(65535),
+//                             // Geofence Region
+//                             identifier: Joi.string(),
+//                             latitude: Joi.number().precision(6),
+//                             longitude: Joi.number().precision(6),
+//                             radius: Joi.number(),
+//                             // Location
+//                             accuracy: Joi.number().optional(),
+//                             // Messages
+//                             'message-id': Joi.string(),
+//                             'source': Joi.only('inbox', 'notification'),
+//                             // Gimbal
+//                             'gimbal-place-id': Joi.string(),
+//                             // Experiences
+//                             'experience-id': Joi.string(),
+//                             'version-id': Joi.string().optional(),
+//                             'from-screen-id': Joi.string().optional().allow(null),
+//                             'from-block-id': Joi.string().optional().allow(null),
+//                             'screen-id': Joi.string(),
+//                             'block-id': Joi.string(),
+//                             'block-action': Joi.object().unknown()
+//                         }).rename('time', 'timestamp')
+//                         .when('object', {
+//                             is: 'beacon-region',
+//                             then: Joi.object().keys({
+//                                 uuid: Joi.required(),
+//                                 'major-number': Joi.required(),
+//                                 'minor-number': Joi.required()
+//                             })
+//                         })
+//                         .when('object', {
+//                             is: 'location',
+//                             then: Joi.object().keys({
+//                                 latitude: Joi.required(),
+//                                 longitude: Joi.required(),
+//                                 accuracy: Joi.optional(),
+//                                 radius: Joi.optional() // old sdk
+//                             })
+//                         })
+//                         .when('object', {
+//                             is: 'geofence-region',
+//                             then: Joi.object().keys({
+//                                 identifier: Joi.required(),
+//                                 latitude: Joi.optional(),
+//                                 longitude: Joi.optional(),
+//                                 radius: Joi.optional(),
+//                             })
+//                         })
+//                         .when('object', {
+//                             is: 'message',
+//                             then: Joi.object().keys({
+//                                 'message-id': Joi.required(),
+//                                 source: Joi.optional()
+//                             })
+//                         })
+//                         .when('object', {
+//                             is: 'gimbal-place',
+//                             then: Joi.object().keys({
+//                                 'gimbal-place-id': Joi.required()
+//                             })
+//                         })
+//                     }
+//                 }
+//             }
+//         }
+//     });
+//     next();
+// };
 
-module.exports.register.attributes = {
-    name: 'event-controller',
-};
+// module.exports.register.attributes = {
+//     name: 'event-controller',
+// };
 
 

@@ -7,8 +7,8 @@ const collection = "message_template_stats";
 
 internals.update = function(id, updates, callback) {
     const server = this;
-    const mongodb = server.plugins.mongodb.client;
-    const ObjectId = server.plugins.mongodb.ObjectId;
+    const mongodb = server.connections.mongodb.client;
+    const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [messageTemplateStats.update: ${id}] ` + util.inspect(updates, true, null, false));

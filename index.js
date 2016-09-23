@@ -1,8 +1,17 @@
 'use strict';
-const Hapi = require('hapi');
+
+const http  = require('http');
 const Config = require('./config');
 const async = require('async');
-const server = new Hapi.Server();
+const router = require('./router');
+
+const server = {
+    plugins: {},
+    connections: {},
+    methods: {}
+};
+
+
 
 if (Config.get('/raven/enabled')) {
     const raven = require('raven');
@@ -10,41 +19,36 @@ if (Config.get('/raven/enabled')) {
     ravenClient.patchGlobal();
 }
 
-server.connection({
-    host: Config.get('/connection/host'),
-    port: Config.get('/connection/port')
-});
 
 // Setup Log4js application wide
-var logger; 
+var Logger; 
 
 let tasks = [];
 
 tasks.push(function(callback) {
-    server.register(require('./plugins/logger'), (err) => {
+    let logger = require('./plugins/logger');
+    logger.register(server, {}, (err) => {
         if (err) {
             return callback(err);
         }
-        logger = server.plugins['logger'].logger;
-        logger.info("Log4js initialized!");
+
+        Logger = server.plugins.logger.logger;
+        Logger.info("Log4js initialized");
         return callback();
     });
 });
 
 tasks.push(function(callback) {
-    server.register(require('./plugins/librato'), (err) => {
+    let librato = require('./plugins/librato');
+    librato.register(server, {}, (err) => {
         if (err) {
             return callback(err);
         }
-        logger = server.plugins['logger'].logger;
-        logger.info("Librato initialized!");
+        Logger.info("Librato initialized!");
         return callback();
-    })
+    });
 });
 
-
-
-// Setup a connection pool to postgres
 
 const postgresConnectionOptions = {
     host: Config.get('/postgres/host'),
@@ -55,152 +59,171 @@ const postgresConnectionOptions = {
 };
 
 tasks.push(function(callback) {
-    server.register({
-        register: require('./connections/postgres'),
-        options: postgresConnectionOptions
-    }, (err) => {
+    let postgres = require('./connections/postgres');
+    postgres.register(server, postgresConnectionOptions, (err) => {
         if (err) {
             return callback(err);
         }
-        logger.info("Postgres Pool initialized!");
+        Logger.info("Postgres Pool initialized!");
         return callback();
     });
 });
 
 
 tasks.push(function(callback) {
-    server.register({
-        register: require('./connections/redis'),
-        options: { url: Config.get('/redis/url')}
-    }, (err) => {
+    let redis = require('./connections/redis');
+    redis.register(server, { url: Config.get('/redis/url') }, (err) => {
         if (err) {
             return callback(err);
         }
-        logger.info("Redis Client initialized!");
-        return callback();
-    });
-});
-
-tasks.push(function(callback) {
-    server.register({
-        register: require('./connections/mongodb'),
-        options: { urls: Config.get('/mongo/urls'), sslCertFile: Config.get('/mongo/sslCertFile') }
-    }, (err) => {
-        if (err) {
-            return callback(err);
-        }
-        logger.info("MongoDB Client initialized!");
+        Logger.info("Redis Client initialized!");
         return callback();
     });
 });
 
 
 tasks.push(function(callback) {
-    server.register({
-        register: require('./connections/elasticsearch'),
-        options: { host: Config.get('/elasticsearch/hosts'), log: Config.get('/elasticsearch/log') }
-    }, (err) => {
+    let mongo = require('./connections/mongodb');
+    mongo.register(server, { urls: Config.get('/mongo/urls'), sslCertFile: Config.get('/mongo/sslCertFile') }, (err) => {
         if (err) {
             return callback(err);
         }
-        logger.info("Elasticsearch Client initialized!");
+        Logger.info("MongoDB Client initialized!");
         return callback();
     });
-})
+});
+
+
+
 
 tasks.push(function(callback) {
-    server.register({
-        register: require('./connections/rabbitmq'),
-        options: { url: Config.get('/amqp/url')}
-    }, (err) => {
+    let elasticsearch = require('./connections/elasticsearch');
+    elasticsearch.register(server, { host: Config.get('/elasticsearch/hosts'), log: Config.get('/elasticsearch/log') }, (err) => {
         if (err) {
             return callback(err);
         }
-        logger.info("RabbitMQ Client initialized!");
+        Logger.info("Elasticsearch Client initialized!");
         return callback();
-    });    
-})
+    });
+});
+
 
 tasks.push(function(callback) {
-    server.register(require('./connections/fluentd'), (err) => {
+    let rabbitmq = require('./connections/rabbitmq');
+    rabbitmq.register(server, { url: Config.get('/amqp/url') }, (err) => {
         if (err) {
             return callback(err);
         }
-        logger.info("RabbitMQ Client initialized!");
+        Logger.info("RabbitMQ Client initialized!");
         return callback();
-    });   
-})
+    });
+});
 
 
-// register application common code
+
 tasks.push(function(callback) {
-    server.register(require('./application/common'), (err) => {
-        if (err) {
-            return callback(err)
-        }
-        logger.info('Application common initialized');
-        return callback();
-    });  
-})
-
-
-// register rover token auth scheme
-tasks.push(function(callback) {
-    server.register([require('./auth/rover-api-auth'), require('./application/rover-auth-strategies')], (err) => {
+    let fluentd = require('./connections/fluentd');
+    fluentd.register(server, {}, (err) => {
         if (err) {
             return callback(err);
         }
-
-        logger.info("X-Rover-Api-Key auth strategy initialized!");
+        Logger.info("FluentD Client initialized!");
         return callback();
-    });   
+    });
+});
+
+
+// Register application common code
+tasks.push(function(callback) {
+    let common = require('./application/common');
+    common.register(server, {}, (err) => {
+        if (err) {
+            return callback(err);
+        }
+        Logger.info('Application common initialized');
+        return callback();
+    });
 });
 
 
 // Register the services
 tasks.push(function(callback) {
-    server.register(require('./services/v1'), (err) => {
+    let services = require('./services/v1');
+    services.register(server, {}, (err) => {
         if (err) {
             return callback(err);
         }
-
-        logger.info("Services initialized!");
+        Logger.info("Services initialized!");
         return callback();
     });
 });
 
-// Register the controllers
-tasks.push(function(callback) {
-    server.register([require('./controllers/v1/event'), require('./controllers/v1/inbox'), require('./controllers/v1/inbox-message'), require('./controllers/v1/inbox-landing-page')], (err) => {
-        if (err) {
-            return callback(err);
-        }
-        logger.info("Controllers initialized!");
-        return callback();
-    });
-});
-
+const httpServer = http.createServer(router(server));
 
 process.on('SIGINT', function() {
     console.log("Shutting down");
-    let queue = server.plugins.elasticsearch.queue;
+    let queue = server.connections.elasticsearch.queue;
 
     queue.flush(function() {
         process.exit(0);
     });
 });
 
+process.on('uncaughtException', function( err ) {
+    console.error(err.stack);
+});
 
-async.series(tasks, function(err) {
+async.series(tasks, (err) => {
     if (err) {
         throw err;
     }
-
-    server.start((err) => {
-    if (err) {
-            throw err
+    httpServer.listen({
+        host: Config.get('/connection/host'),
+        port: Config.get('/connection/port'),
+        exclusive: false
+    }, function(err) {
+        if (err) {
+            throw err;
         }
-
-        logger.info('Server running at:', server.info.uri);
+        Logger.info('server started');
     });
 });
+
+
+
+// // register rover token auth scheme
+// tasks.push(function(callback) {
+//     server.register([require('./auth/rover-api-auth'), require('./application/rover-auth-strategies')], (err) => {
+//         if (err) {
+//             return callback(err);
+//         }
+
+//         logger.info("X-Rover-Api-Key auth strategy initialized!");
+//         return callback();
+//     });   
+// });
+
+
+// // Register the services
+// tasks.push(function(callback) {
+//     server.register(require('./services/v1'), (err) => {
+//         if (err) {
+//             return callback(err);
+//         }
+
+//         logger.info("Services initialized!");
+//         return callback();
+//     });
+// });
+
+// // Register the controllers
+// tasks.push(function(callback) {
+//     server.register([require('./controllers/v1/event'), require('./controllers/v1/inbox'), require('./controllers/v1/inbox-message'), require('./controllers/v1/inbox-landing-page')], (err) => {
+//         if (err) {
+//             return callback(err);
+//         }
+//         logger.info("Controllers initialized!");
+//         return callback();
+//     });
+// });
+

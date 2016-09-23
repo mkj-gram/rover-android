@@ -15,12 +15,14 @@ module.exports.register = function(server, options, next) {
             return next(err);
         }
 
-        server.expose('client', client);
+        server.connections.elasticsearch = {};
+        server.connections.elasticsearch.client = client;
 
         let queue = new ElasticsearchQueue(client, Config.get('/elasticsearch/flush_interval'), 250);
         queue.start();
 
-        server.expose('queue', queue);
+        server.connections.elasticsearch.queue = queue;
+        
         next();
     });
 
