@@ -47,11 +47,11 @@ class SendMessageNotificationWorker
             rover_development_devices, rover_production_devices = rover_devices.partition { |device| device.development == true }
 
             if rover_production_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.production_connection, messages, rover_development_devices)
+                send_ios_notifications_with_connection(RoverApnsHelper.production_connection, messages, rover_production_devices)
             end
 
             if rover_development_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.development_connection, messages, rover_production_devices)
+                send_ios_notifications_with_connection(RoverApnsHelper.development_connection, messages, rover_development_devices)
             end
             
         end

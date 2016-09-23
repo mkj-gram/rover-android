@@ -63,7 +63,7 @@ module PushConnectionCache
 
         def create_apns_connection!(account_id, development, expires_in)
             @master_lock.synchronize do
-                Rails.logger.info("Setting up APNS connection cache for account #{account_id} development: #{development}")
+                puts "Setting up APNS connection cache for account #{account_id} development: #{development}"
                 platform = IosPlatform.where(account_id: account_id).first
                 return if platform.certificate.nil?
                 connection = ApnsHelper.connection_from_ios_platform(platform, development: development, heartbeat_interval: 60)
