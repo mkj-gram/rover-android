@@ -1,10 +1,11 @@
 const concat = require('concat-stream');
+
 const httpMethods = {
     GET: "GET",
     POST: "POST",
     PATCH: "PATCH",
     DELETE: "DELETE"
-}
+};
 
 const notFoundError = JSON.stringify({ errors: [ { message:  "I can't find what you are looking for" } ] });
 const notFoundLength = Buffer.byteLength(notFoundError);
