@@ -56,17 +56,20 @@ internals.customerDifferences = function(fromCustomer, toCustomer) {
                 // if in if because we don't want the next else if to run
                 if (!_.isEqual(fromCustomer[key], toCustomer[key])) {
                     customerUpdates[key] = toCustomer[key];
-                    fromCustomer[key] = toCustomer[key];
                 }
             } else if (fromCustomer[key] instanceof Date && toCustomer[key] instanceof Date) {
                 if (fromCustomer[key].getTime() != toCustomer[key].getTime()) {
                     customerUpdates[key] = toCustomer[key];
-                    fromCustomer[key] = toCustomer[key];
                 }
             } else if (!util.isUndefined(toCustomer[key]) && fromCustomer[key] != toCustomer[key]) {
                 customerUpdates[key] = toCustomer[key];
-                fromCustomer[key] = toCustomer[key];
             }  
+        }
+    });
+
+    Object.keys(toCustomer).forEach(key => {
+        if (util.isUndefined(fromCustomer[key]) && !util.isUndefined(toCustomer[key])) {
+            customerUpdates[key] = toCustomer[key];
         }
     });
 
@@ -82,19 +85,21 @@ internals.deviceDifferences = function (fromDevice, toDevice) {
             if (key == 'location' || key == 'beacon_regions_monitoring' || key == 'geofence_regions_monitoring' || key == 'beacon_regions_monitoring_updated_at' || key == 'geofence_regions_monitoring_updated_at') {
                 if (!util.isUndefined(toDevice[key]) && !_.isEqual(fromDevice[key], toDevice[key])) {
                     deviceUpdates[key] = toDevice[key];
-                    fromDevice[key] = toDevice[key];
                 }
             } else if (util.isArray(fromDevice[key]) && util.isArray(toDevice[key])) {
                 if (!_.isEqual(fromDevice[key], toDevice[key])) {
                     deviceUpdates[key] = toDevice[key];
-                    fromDevice[key] = toDevice[key];
                 }
             } else if (fromDevice[key] != toDevice[key]) {
-               
                 deviceUpdates[key] = toDevice[key];
-                fromDevice[key] = toDevice[key];
             }
         }
+    });
+
+    Object.keys(toDevice).forEach(key => {
+        if (util.isUndefined(fromDevice[key]) && !util.isUndefined(toDevice[key])) {
+            deviceUpdates[key];
+        }   
     });
 
     return deviceUpdates
@@ -136,6 +141,9 @@ internals.partialUpdateCustomerAndDevice = function(server, customer, device, ne
             
             logger.debug(customerUpdates);
             logger.debug(deviceUpdates);
+
+            util._extend(customer, customerUpdates);
+            util._extend(device, deviceUpdates);
 
             customer.updated_at = moment.utc(new Date).toDate();
 
@@ -398,18 +406,28 @@ internals.updateCustomer = function(request, customer, callback) {
 
     }
 
-    if (util.isNullOrUndefined(customer.identifier) && !util.isNullOrUndefined(customerPayload.identifier)) {
+    if (util.isNullOrUndefined(customer.identifier) && !util.isNullOrUndefined(customerPayload.identifier) || (!util.isNullOrUndefined(customer.identifier) && !util.isNullOrUndefined(customerPayload.identifier) && customer.identifier != customerPayload.identifier)) {
         updateTasks = updateTasks.then(() => new Promise((resolve, reject) => {
-            logger.info('Customer has gone from anonymous to named');
+            if (util.isNullOrUndefined(customer.identifier)) {
+                logger.info('Customer has gone from anonymous to named');
+            } else {
+                logger.info('Customer has switched identifiers');
+            }
+            
 
             methods.customer.findByQuery({ "account_id": currentAccountId, "identifier": customerPayload.identifier }, (err, existingCustomer) => {
                 if (err) {
                     return reject("Failed to find existing customer to merge with");
                 }
 
-                if (util.isNullOrUndefined(existingCustomer)) {
-                    logger.info('No exisitng customer exists');
+                // logic branch
+                if (util.isNullOrUndefined(existingCustomer) && util.isNullOrUndefined(customer.identifier)) {
+                    logger.info('No exisitng customer exists - merging');
                     return resolve(customer);
+                }  else if (util.isNullOrUndefined(existingCustomer)) {
+                    logger.info('No existing customer exits - creating');
+                } else {
+                    logger.info('Existing customer - swapping device');
                 }
 
                 let tasks = [];
@@ -464,30 +482,43 @@ internals.updateCustomer = function(request, customer, callback) {
                     });
                 });
 
-                tasks.push((callback) => {
-                    methods.customer.pushDevice(existingCustomer, device, (err, existingCustomer) => {
-                        if (err) {
-                            logger.error(err);
-                            return callback(err);
-                        }
-
-                        methods.customer.index(existingCustomer, (err) => {
+                if (util.isNullOrUndefined(existingCustomer)) {
+                    tasks.push((callback) => {
+                        internals.createCustomer(request, (err, newCustomer) => {
+                            if (err) {
+                                logger.error(err);
+                                return callback(err);
+                            }
+                            existingCustomer = newCustomer;
+                            return callback(null, existingCustomer);
+                        });  
+                    });
+                } else {
+                     tasks.push((callback) => {
+                        methods.customer.pushDevice(existingCustomer, device, (err, existingCustomer) => {
                             if (err) {
                                 logger.error(err);
                                 return callback(err);
                             }
 
-                            return callback(null, existingCustomer)
-                        })
+                            methods.customer.index(existingCustomer, (err) => {
+                                if (err) {
+                                    logger.error(err);
+                                    return callback(err);
+                                }
+
+                                return callback(null, existingCustomer)
+                            })
+                        });
                     });
-                });
+                }
 
                 async.series(tasks, (err, results) => {
                     if (err) {
                         return reject(err);
                     }
 
-                    return resolve(results[1]);
+                    return resolve(results[results.length - 1]);
                 });
             });
         }));
