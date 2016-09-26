@@ -75,6 +75,7 @@ internals.get = function(request, reply) {
 
                     reply.writeHead(200, {
                         'Content-Type': 'application/json',
+                        'Cache-Control': 'max-age=0, private, must-revalidate',
                         'Last-Modified': customer.inbox_updated_at.toUTCString()
                     });
                     reply.write(JSON.stringify({
@@ -88,6 +89,7 @@ internals.get = function(request, reply) {
             });
         } else {
             reply.writeHead(304, {
+                'Cache-Control': 'max-age=0, private, must-revalidate',
                 'Last-Modified': customer.inbox_updated_at.toUTCString()
             });
             return reply.end();
