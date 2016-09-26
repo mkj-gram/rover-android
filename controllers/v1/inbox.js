@@ -5,7 +5,8 @@ const internals = {};
 
 
 internals.isStale = function(request, lastModified) {
-    return true;
+    let ifModifiedSince = request.headers['if-modified-since'];
+    return ifModifiedSince !== lastModified;
 };
 
 // GET /v1/inbox
@@ -73,7 +74,8 @@ internals.get = function(request, reply) {
                     }
 
                     reply.writeHead(200, {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Last-Modified': customer.inbox_updated_at.toUTCString()
                     });
                     reply.write(JSON.stringify({
                         data: data,
