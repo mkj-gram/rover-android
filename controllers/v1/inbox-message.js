@@ -5,38 +5,50 @@ const util = require('util');
 const moment = require('moment');
 const internals = {};
 
+const updateSchema = Joi.object().required().keys({
+    data: Joi.object().required().keys({
+        attributes: Joi.object().required().keys({
+            read: Joi.boolean().optional()
+        })
+    })
+});
+
+internals.writeError = function(reply, status, message) {
+    reply.writeHead(status, {
+        'Content-Type': 'application/json'
+    });
+    reply.write(JSON.stringify(message));
+    reply.end();
+};
 
 internals.beforeFilter = function(request, reply, callback) {
     const methods = request.server.methods;
     const logger = request.server.plugins.logger.logger;
     const messageId = request.params.id;
 
-    logger.info('Started ' + request.method + ' ' + request.path + ' for ' + request.info.remoteAddress);
-    logger.info(request.params);
-
-    methods.getCurrentCustomer(request, (err, customer) => {
+    methods.application.getCurrentCustomer(request, (err, customer) => {
         if (err) {
-            return reply({ status: 500, error: "Failed to find customer"}).code(500);
+            return internals.writeError(reply, 500, { status: 500, error: "Failed to find customer"});
         }
 
         if (util.isNullOrUndefined(customer)) {
-            return reply({ status: 422, error: "Failed to find customer"}).code(422);
+            return internals.writeError(reply, 422, { status: 422, error: "Failed to find customer"});
         }
         
         methods.message.find(messageId, { excludedFields: ['landing_page'] }, (err, message) => {
             if (err) {
-                return reply({ status: 500, error: err });
+                return internals.writeError(reply, 500, { status: 500, error: err });
             }
 
             if (message) {
                 if (customer._id.equals(message.customer_id)) {
                     return callback(customer, message); 
                 } else {
-                    return reply({ status: 403, error: 'Cannot view message'}).code(403);
+                   return internals.writeError(reply, 403, { status: 403, error: 'Cannot view message'});
                 }
             }
 
-            return reply({ status: 404, error: 'Message not found'}).code(404); 
+            return internals.writeError(reply, 404, { status: 404, error: 'Message not found'})
         });
     });
 };
@@ -45,9 +57,16 @@ internals.beforeFilter = function(request, reply, callback) {
 internals.get = function(request, reply) {
 
     internals.beforeFilter(request, reply, (customer, message) => {
-        return reply({ data: internals.serialize(message) });
-    });
+        reply.writeHead(200, {
+            'Content-Type': 'application/json'
+        });
 
+        reply.write(JSON.stringify({
+            data: internals.serialize(message)
+        }));
+
+        return reply.end();
+    });
 };
 
 
@@ -59,38 +78,56 @@ internals.update = function(request, reply) {
     internals.beforeFilter(request, reply, (customer, message) => {
         const server = request.server;
         const methods = server.methods;
-        const attributes = request.payload.data.attributes;
 
-        // detect the difference in attributes
-        let updates = {};
-
-        Object.keys(attributes).forEach((key) => {
-            if (message[key] != attributes[key]) {
-                updates[key] = attributes[key];
-                message[key] = attributes[key];
+        Joi.validate(request.payload, updateSchema, { stripUnknown: true }, (err, value) => {
+            if (err) {
+                return internals.writeError(reply, 400, { status: 400, error: err });
             }
-        });
 
-        if (Object.keys(updates).length > 0) {
-            let currentTime = moment.utc(new Date).toDate();
-            updates = util._extend(updates, { updated_at: currentTime });
-            methods.message.update(message._id, { "$set": updates }, (err, response) => {
-                if (err) {
-                    return reply({ status: 500, error: "Failed to update message"}).code(500);
+            const attributes = value.data.attributes;
+
+            // detect the difference in attributes
+            let updates = {};
+
+            Object.keys(attributes).forEach((key) => {
+                if (message[key] != attributes[key]) {
+                    updates[key] = attributes[key];
+                    message[key] = attributes[key];
                 }
-
-                methods.customer.update(customer._id, { "$set": { inbox_updated_at: currentTime }}, (err, response) => {
-                    if (err) {
-                        return reply({ status: 500, error: "Failed to inbox cache key"}).code(500);
-                    }
-
-                    return reply({ data: internals.serialize(message) });
-                });
             });
 
-        } else {
-            reply({ data: internals.serialize(message) });
-        }
+            if (Object.keys(updates).length > 0) {
+                let currentTime = moment.utc(new Date).toDate();
+                updates = util._extend(updates, { updated_at: currentTime });
+                methods.message.update(message._id, { "$set": updates }, (err, response) => {
+                    if (err) {
+                        return internals.writeError(reply, 500, { status: 500, error: "Failed to update message"});
+                    }
+
+                    methods.customer.update(customer._id, { "$set": { inbox_updated_at: currentTime }}, (err, response) => {
+                        if (err) {
+                            return internals.writeError(reply, 500, { status: 500, error: "Failed to update inbox cache key"});
+                        }
+                        reply.writeHead(200, {
+                            'Content-Type': 'application/json'
+                        });
+                        reply.write(JSON.stringify({
+                            data: internals.serialize(message)
+                        }));
+                        return reply.end();
+                    });
+                });
+
+            } else {
+                reply.writeHead(200, {
+                    'Content-Type': 'application/json'
+                });
+                reply.write(JSON.stringify({
+                    data: internals.serialize(message)
+                }));
+                return reply.end();
+            }
+        });
     });
 };
 
@@ -102,107 +139,31 @@ internals.destroy = function(request, reply) {
     internals.beforeFilter(request, reply, (customer, message) => {
         methods.message.deleteOne(message._id, (err) => {
             if (err) {
-                return reply({ status: 500, error: "Failed to delete message "});
+                return internals.writeError(reply, 500, { status: 500, error: "Failed to delete message "});
             }
 
             methods.inbox.deleteMessage(customer, message._id.toString(), (err) => {
                 if (err) {
-                    return reply({ status: 500, error: "Failed to delete message "});
+                    return internals.writeError(reply, 500, { status: 500, error: "Failed to delete message "});
                 }
 
                 methods.customer.update(customer._id, { "$set": { "inbox_updated_at": moment.utc(new Date).toDate() }}, (err) => {
                     if (err) {
-                        return reply({ status: 500, error: "Failed to update inbox cache"});
+                        return internals.writeError(reply, 500, { status: 500, error: "Failed to update inbox cache"});
                     }
-
-                    return reply().code(204);
+                    reply.writeHead(204, {});
+                    return reply.end();
                 });
             });
         });
     });
 };
 
-
-module.exports.register = function(server, options, next) {
-
-    const messageIdSchema = {
-        params: {
-            id: Joi.string().hex().length(24).required()
-        }
-    };
-
-    const updateMessageSchema = {
-        payload: {
-            data: Joi.object().keys({
-                type: Joi.string().equal('messages'),
-                id: Joi.string(),
-                attributes: Joi.object().keys({
-                    read: Joi.boolean().optional()
-                })
-            })
-        }
-    };
-
-    server.route({
-        method: 'GET',
-        path: '/v1/inbox/messages/{id}',
-        handler: internals.get,
-        config: {
-            validate: messageIdSchema
-        }
-    });
-
-    server.route({
-        method: 'GET',
-        path: '/v1/inbox/{id}',
-        handler: internals.get,
-        config: {
-            validate: messageIdSchema
-        }
-    });
-
-    server.route({
-        method: 'PATCH',
-        path: '/v1/inbox/messages/{id}',
-        handler: internals.update,
-        config: {
-            validate: util._extend(updateMessageSchema, messageIdSchema)
-        }
-    });
-
-    server.route({
-        method: 'PATCH',
-        path: '/v1/inbox/{id}',
-        handler: internals.update,
-        config: {
-            validate: util._extend(updateMessageSchema, messageIdSchema)
-        }
-    });
-
-    server.route({
-        method: 'DELETE',
-        path: '/v1/inbox/messages/{id}',
-        handler: internals.destroy,
-        config: {
-            validate: messageIdSchema
-        }
-    });
-
-    server.route({
-        method: 'DELETE',
-        path: '/v1/inbox/{id}',
-        handler: internals.destroy,
-        config: {
-            validate: messageIdSchema
-        }
-    });
-
-    next();
-};
-
-module.exports.register.attributes = {
-    name: 'inbox-message-controller',
-};
+module.exports = {
+    get: internals.get,
+    update: internals.update,
+    destroy: internals.destroy
+}
 
 internals.serialize = function(message) {
     return {

@@ -6,7 +6,7 @@ const internals = {};
 internals.findById = function(id, callback) {
 
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
 
     postgres.connect((err, client, done) => {
         if (err) {
@@ -34,7 +34,7 @@ internals.findById = function(id, callback) {
 
 internals.findByCoordinates = function(latitude, longitude, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
 
     postgres.connect((err, client, done) => {
         if (err) {

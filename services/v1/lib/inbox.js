@@ -6,7 +6,7 @@ const internals = {};
 
 internals.find = function(customer, args, callback) {
     const server = this;
-    const redis = server.plugins.redis.client;
+    const redis = server.connections.redis.client;
     const inboxKey = internals.getInboxKey(customer._id.toString());
 
     redis.lrange(inboxKey, 0, -1, (err, response) => {
@@ -20,7 +20,7 @@ internals.find = function(customer, args, callback) {
 
 internals.addMessage = function(customer, message, callback) {
     const server = this;
-    const redis = server.plugins.redis.client;
+    const redis = server.connections.redis.client;
     const logger = server.plugins.logger.logger;
     const inboxKey = internals.getInboxKey(customer._id.toString());
 
@@ -36,7 +36,7 @@ internals.addMessage = function(customer, message, callback) {
 
 internals.deleteMessage = function(customer, messageId, callback) {
     const server = this;
-    const redis = server.plugins.redis.client;
+    const redis = server.connections.redis.client;
     const logger = server.plugins.logger.logger;
     const inboxKey = internals.getInboxKey(customer._id.toString());
     

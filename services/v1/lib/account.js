@@ -5,7 +5,7 @@ const internals = {};
 
 internals.find = function(id, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
 
     postgres.connect((err, client, done) => {
         if (err) {
@@ -34,7 +34,7 @@ internals.find = function(id, callback) {
 
 internals.incrementCounter = function(id, column, incrementBy, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
     const logger = server.plugins.logger.logger;
 
     logger.debug('Service: [account.incrementCounter] id: ' + id + ' column: ' + column + ' by: ' + incrementBy);
@@ -66,7 +66,7 @@ internals.incrementCounter = function(id, column, incrementBy, callback) {
 
 internals.decrementCounter = function(id, column, decrementBy, callback) {
     const server = this;
-    const postgres = server.plugins.postgres.client;
+    const postgres = server.connections.postgres.client;
     const logger = server.plugins.logger.logger;
 
     logger.debug('Service: [account.decrementCounter] id: ' + id + ' column: ' + column + ' by: ' + decrementBy);

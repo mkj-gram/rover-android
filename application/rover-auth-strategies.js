@@ -2,7 +2,7 @@
 
 const validateToken = (request, token, callback) => {
 
-    const postgres = request.server.plugins.postgres.client;
+    const postgres = request.server.connections.postgres.client;
 
     postgres.connect((err, client, done) => {
         if (err) {
@@ -35,7 +35,7 @@ const validateToken = (request, token, callback) => {
 };
 
 const validateDeviceId = (request, deviceId, callback) => {
-    const mongo = request.server.plugins.mongodb.client;
+    const mongo = request.server.connections.mongodb.client;
 
 
     callback(null, false);

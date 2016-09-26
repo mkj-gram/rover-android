@@ -9,16 +9,18 @@ const rabbitmqConfigSchema = Joi.object().keys({
 
 module.exports.register = function(server, options, next) {
 
+    server.connections.rabbitmq = {};
+
     Joi.validate(options, rabbitmqConfigSchema, (err, value) => {
         if (err) {
             next(err);
         }
         const logger = server.plugins.logger.logger;
+
         amqp.connect(options.url)
             .then(connection => connection.createChannel())
             .then(channel => {
-                server.expose('channel', channel);
-
+                server.connections.rabbitmq.channel = channel;
                 return next();
             })
             .catch(err => {

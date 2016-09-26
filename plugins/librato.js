@@ -9,7 +9,8 @@ module.exports.register = function(server, opts, next) {
 	const librato = require('librato-node');
     librato.configure({ email: Config.get('/librato/email'), token: Config.get('/librato/token'), prefix: Config.get('/librato/prefix')});
     librato.start();
-    server.expose('client', librato);
+    server.plugins.librato = {};
+    server.plugins.librato.client =  librato;
     next();
 };
 

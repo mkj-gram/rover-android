@@ -39,7 +39,7 @@ class LimitExceeded extends Error {
 
 internals.update = function(customer, messageTemplate, globalLimits, callback) {
     const server = this;
-    const redis = server.plugins.redis.client;
+    const redis = server.connections.redis.client;
     const messageRateLimitKey = internals.getMessageRateLimitKey(customer, messageTemplate);
     const globalRateLimitKey = internals.getGlobalRateLimitKey(customer);
 
@@ -92,7 +92,7 @@ internals.withinLimit = function(customer, messageTemplate, globalLimits, callba
     // first check the global limit
     // then check the individual limit
     const server = this;
-    const redis = server.plugins.redis.client;
+    const redis = server.connections.redis.client;
     const messageRateLimitKey = internals.getMessageRateLimitKey(customer, messageTemplate);
     const globalRateLimitKey = internals.getGlobalRateLimitKey(customer);
     const currentTime = moment.utc(new Date);

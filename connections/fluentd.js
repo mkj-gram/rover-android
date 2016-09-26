@@ -2,11 +2,6 @@
 
 const util = require('util');
 
-
-
-
-
-
 module.exports.register = function(server, options, next) {
     const logger = require('fluent-logger').createFluentSender(null, {
         host: '127.0.0.1',
@@ -15,8 +10,9 @@ module.exports.register = function(server, options, next) {
         reconnectInterval: 600000 // 10 minutes
     });
     
-    server.expose('logger', logger);
-
+    server.connections.fluentd = {};
+    server.connections.fluentd.logger = logger;
+    
     next();
 };
 

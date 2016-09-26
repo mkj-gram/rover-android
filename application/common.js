@@ -3,7 +3,8 @@
 const ObjectId = require('mongodb').ObjectID;
 
 module.exports.register = function(server, options, next) {
-    server.method('getCurrentCustomer', getCurrentCustomer, { bind: server });
+    server.methods.application = {};
+    server.methods.application.getCurrentCustomer = getCurrentCustomer.bind(server);
     next();
 };
 
