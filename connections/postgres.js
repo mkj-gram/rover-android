@@ -11,7 +11,8 @@ const optionsSchema = Joi.object().keys({
     host: Joi.string(),
     port: Joi.number().integer(),
     max: Joi.number().integer(),
-    idleTimeoutMillis: Joi.number().integer()
+    idleTimeoutMillis: Joi.number().integer(),
+    ssl: Joi.boolean()
 });
 
 module.exports.register = function(server, connectionOptions, next) {
