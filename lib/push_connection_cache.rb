@@ -11,9 +11,12 @@ module PushConnectionCache
         # connections expire every hour and will be setup again
         def with_apns_connection(account_id, development: false, expires_in: 300)
             # first lock by account_id
-
-            connection_context = @apns_connection_cache[account_id]
-
+            if development == true
+                connection_context = @apns_development_connection_cache[account_id]
+            else
+                connection_context = @apns_production_connection_cache[account_id]
+            end
+            
             if connection_context.nil?
                 connection_context = create_apns_connection!(account_id, development, expires_in)
             elsif connection_context[:expires_at] < Time.zone.now
