@@ -13,7 +13,7 @@ internals.update = function(id, updates, callback) {
 
     logger.debug(`Service: [messageTemplateStats.update: ${id}] ` + util.inspect(updates, true, null, false));
 
-    mongodb.collection(collection).updateOne({ _id: ObjectId(id) }, updates, function(err, response) {
+    mongodb.collection(collection).updateOne({ _id: id }, updates, function(err, response) {
         if (err) {
             return callback(err);
         }
