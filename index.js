@@ -55,7 +55,8 @@ const postgresConnectionOptions = {
     port: Config.get('/postgres/port'),
     user: Config.get('/postgres/username'),
     password: Config.get('/postgres/password'),
-    database: Config.get('/postgres/database')
+    database: Config.get('/postgres/database'),
+    ssl: Config.get('/postgres/ssl')
 };
 
 tasks.push(function(callback) {
@@ -162,11 +163,39 @@ const httpServer = http.createServer(router(server));
 
 process.on('SIGINT', function() {
     console.log("Shutting down");
+    let tasks = [];
     let queue = server.connections.elasticsearch.queue;
+    let librato = server.plugins.librato.client;
 
-    queue.flush(function() {
-        process.exit(0);
-    });
+    if (librato) {
+        tasks.push(function(callback) {
+            librato.stop(function(err) {
+                if (err) {
+                    console.error(err);
+                }
+                return callback();
+            });
+        });
+    }
+    if (queue) {
+        tasks.push(function(callback) {
+            queue.flush(function() {
+                return callback();
+            });
+        });
+    }
+
+    if (tasks.length > 0) {
+        async.parallel(tasks, function(err, results) {
+            if (err) {
+                console.error(err);
+            }
+            return process.exit();
+        })
+    } else {
+        return process.exit();
+    }
+    
 });
 
 process.on('uncaughtException', function( err ) {
@@ -188,42 +217,3 @@ async.series(tasks, (err) => {
         Logger.info('server started');
     });
 });
-
-
-
-// // register rover token auth scheme
-// tasks.push(function(callback) {
-//     server.register([require('./auth/rover-api-auth'), require('./application/rover-auth-strategies')], (err) => {
-//         if (err) {
-//             return callback(err);
-//         }
-
-//         logger.info("X-Rover-Api-Key auth strategy initialized!");
-//         return callback();
-//     });   
-// });
-
-
-// // Register the services
-// tasks.push(function(callback) {
-//     server.register(require('./services/v1'), (err) => {
-//         if (err) {
-//             return callback(err);
-//         }
-
-//         logger.info("Services initialized!");
-//         return callback();
-//     });
-// });
-
-// // Register the controllers
-// tasks.push(function(callback) {
-//     server.register([require('./controllers/v1/event'), require('./controllers/v1/inbox'), require('./controllers/v1/inbox-message'), require('./controllers/v1/inbox-landing-page')], (err) => {
-//         if (err) {
-//             return callback(err);
-//         }
-//         logger.info("Controllers initialized!");
-//         return callback();
-//     });
-// });
-

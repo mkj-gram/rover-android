@@ -41,19 +41,36 @@ const notFoundResponse = function(req, res) {
     res.end();
 }
 
+const routerWrapper = function(server, res) {
+    return {
+        writeHead: res.writeHead.bind(res),
+        write: res.write.bind(res),
+        end: function(args) {
+            const requestEndTime = new Date();
+            const totalTime = requestEndTime - this._requestStartTime;
+            const librato = server.plugins.librato.client;
+            librato.measure('request.total', 1, { source: 'sdk-api'});
+            librato.measure('request.time', totalTime, { source: 'sdk-api' });
+            return res.end.bind(res)(args);
+        },
+        _requestStartTime: new Date()
+    }
+}
+
 const route = function(req, res) {
     const server = this;
 
     let url = req.url
     let method = req.method;
 
+    const wrapper = routerWrapper(server, res);
 
     req.server = server;
 
     if (method == httpMethods.GET) {
         RoverApiAuth.authenticate(req, (authenticated) => {
             if (!authenticated) {
-                return unauthenticatedResponse(req, res);
+                return unauthenticatedResponse(req, wrapper);
             }
 
             let match;
@@ -61,23 +78,23 @@ const route = function(req, res) {
                 req.params = {
                     id: match[1]
                 }
-                return InboxLandingPageController.get(req, res);
+                return InboxLandingPageController.get(req, wrapper);
             } else if(match = url.match(InboxMessageMatcher)) {
                 // GET /v1/inbox/messages/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
-                return InboxMessagesController.get(req, res);
+                return InboxMessagesController.get(req, wrapper);
             } else if (match = url.match(InboxMessageMatcher2)) {
                 // GET /v1/inbox/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
-                return InboxMessagesController.get(req, res);
+                return InboxMessagesController.get(req, wrapper);
             } else if(match = url.match(InboxMatcher)) {
-                return InboxController.get(req, res);
+                return InboxController.get(req, wrapper);
             } else {
-                return notFoundResponse(req, res);
+                return notFoundResponse(req, wrapper);
             }
         });
     } else if(method == httpMethods.POST) {
@@ -90,24 +107,24 @@ const route = function(req, res) {
                     req.payload = JSON.parse(payload);
                 } catch(err) {
                     console.error(err);
-                    res.writeHead(400, {
+                    wrapper.writeHead(400, {
                     'Content-Type': 'application/json'
                     });
-                    res.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
-                    return res.end();
+                    wrapper.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
+                    return wrapper.end();
                 }
                 RoverApiAuth.authenticate(req, (authenticated) => {
                     if (!authenticated) {
-                        return unauthenticatedResponse(req, res);
+                        return unauthenticatedResponse(req, wrapper);
                     }
                     
-                    return EventsController.create(req, res);
+                    return EventsController.create(req, wrapper);
                 });
             });
             // read data and pipe it to our stream
             req.on('data', function(chunk) { concatStream.write(chunk) }).on('end', function() { concatStream.end()} );
         } else {
-            return notFoundResponse(req, res);
+            return notFoundResponse(req, wrapper);
         }
         
     } else if(method == httpMethods.PATCH) {
@@ -117,15 +134,15 @@ const route = function(req, res) {
                 req.payload = JSON.parse(payload);
             } catch (err) {
                 console.error(err);
-                res.writeHead(400, {
+                wrapper.writeHead(400, {
                     'Content-Type': 'application/json'
                 });
-                res.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
-                return res.end();
+                wrapper.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
+                return wrapper.end();
             }
             RoverApiAuth.authenticate(req, (authenticated) => {
                 if (!authenticated) {
-                    return unauthenticatedResponse(req, res);
+                    return unauthenticatedResponse(req, wrapper);
                 }
                 let match;
 
@@ -134,15 +151,15 @@ const route = function(req, res) {
                     req.params = {
                         id: match[1]
                     };
-                    return InboxMessagesController.update(req, res);
+                    return InboxMessagesController.update(req, wrapper);
                 } else if (match = url.match(InboxMessageMatcher2)) {
                     // GET /v1/inbox/57e4181bc69a2845d977f7c0
                     req.params = {
                         id: match[1]
                     };
-                    return InboxMessagesController.update(req, res);
+                    return InboxMessagesController.update(req, wrapper);
                 } else {
-                    return notFoundResponse(req, res);
+                    return notFoundResponse(req, wrapper);
                 }
             });
         });
@@ -152,7 +169,7 @@ const route = function(req, res) {
     } else if(method == httpMethods.DELETE) { 
         RoverApiAuth.authenticate(req, (authenticated) => {
             if (!authenticated) {
-                return unauthenticatedResponse(req, res);
+                return unauthenticatedResponse(req, wrapper);
             }
 
             let match;
@@ -162,19 +179,19 @@ const route = function(req, res) {
                 req.params = {
                     id: match[1]
                 };
-                return InboxMessagesController.destroy(req, res);
+                return InboxMessagesController.destroy(req, wrapper);
             } else if (match = url.match(InboxMessageMatcher2)) {
                 // DELETE /v1/inbox/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
-                return InboxMessagesController.destroy(req, res);
+                return InboxMessagesController.destroy(req, wrapper);
             } else {
-                return notFoundResponse(req, res);
+                return notFoundResponse(req, wrapper);
             }
         });
     } else {
-        return notFoundResponse(req, res);
+        return notFoundResponse(req, wrapper);
     }
 }
 

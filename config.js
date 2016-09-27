@@ -57,6 +57,11 @@ const store = new Confidence.Store({
             $filter: 'env',
             production: process.env.POSTGRESQL_DB_PORT,
             $default: 5432
+        },
+        ssl: {
+            $filter: 'env',
+            production: true,
+            $default: false
         }
 
     },
@@ -104,8 +109,8 @@ const store = new Confidence.Store({
         },
         prefix: {
             $filter: 'env',
-            production: "sdk-api." + (process.env.LIBRATO_PREFIX || "production") + ".",
-            $default: "sdk-api.development" + "."
+            production: (process.env.LIBRATO_PREFIX || "production") + ".",
+            $default: "development" + "."
         }
     },
     log: {
