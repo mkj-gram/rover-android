@@ -17,7 +17,7 @@ internals.capture = function(event) {
 
     logger.debug(`Service: [analytics.capture]: ${tag}`);
     logger.debug(JSON.stringify(record));
-    fluentd.emit(tag, record, event.unixTimestamp());
+    fluentd.emit(tag, record, event.utcUnixTimestamp());
 };
 
 module.exports = {
