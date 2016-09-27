@@ -61,9 +61,9 @@ DAYNAMES.forEach((dayname) => {
 
 const internals = {};
 
-internals.secondsSinceMidnight = function(timestamp) {
-    let midnight = moment.utc(timestamp).startOf('day');
-    return moment.utc(timestamp).diff(midnight, 'minutes');
+internals.minutesSinceMidnight = function(timestamp) {
+    let midnight = moment(timestamp).startOf('day');
+    return moment(timestamp).diff(midnight, 'minutes');
 };
 
 internals.beginningOfDayAsUnixTimestamp = function(timestamp) {
@@ -95,10 +95,10 @@ internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConf
             callback(err);
         }
 
-        let values = [
+        var values = [
             accountId, // $1
             triggerId, // $2
-            internals.secondsSinceMidnight(timestamp), // $3
+            internals.minutesSinceMidnight(timestamp), // $3
             internals.beginningOfDayAsUnixTimestamp(timestamp), // $4
             [beaconConfiguration.id], // $5
             beaconConfiguration.tags || [], // $6
@@ -143,7 +143,7 @@ internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, c
         let values = [
             accountId, // $1
             triggerId, // $2
-            internals.secondsSinceMidnight(timestamp), // $3
+            internals.minutesSinceMidnight(timestamp), // $3
             internals.beginningOfDayAsUnixTimestamp(timestamp), // $4
             [place.id], // $5
             place.tags || [] // $6
@@ -185,7 +185,7 @@ internals.gimbalPlaceTriggered = function(accountId, triggerId, timestamp, gimba
         let values = [
             accountId, // $1
             triggerId, // $2
-            internals.secondsSinceMidnight(timestamp), // $3
+            internals.minutesSinceMidnight(timestamp), // $3
             internals.beginningOfDayAsUnixTimestamp(timestamp), // $4
             [gimbalPlace.id] // $5
         ];
