@@ -8,7 +8,7 @@ internals.isStale = function(request, lastModified) {
     if (util.isNullOrUndefined(lastModified)) {
         return true
     } else {
-        lastModified = lastModified.toUTCString();
+        lastModified = moment(lastModified).toDate().toUTCString();
     }
     let ifModifiedSince = request.headers['if-modified-since'];
     return ifModifiedSince !== lastModified;
