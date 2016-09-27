@@ -197,6 +197,7 @@ class CustomerDevice
                 # work around since if development is assigned before sdk_version it drops it
                 device.development = doc["development"] || doc[:development]
             end
+            device.changes_applied
             return device
         end
 
