@@ -758,6 +758,17 @@ internals.parseDevicePayload = function(id, payload, callback) {
             delete device.remote_notifications_enabled;
         }
 
+        if (device.development == true) {
+            const sdkVersion = device.sdk_version.split('.').map(i => parseInt(i));
+            const sdkMajor = sdkVersion[0];
+            const sdkMinor = sdkVersion[1];
+            const sdkRevision = sdkVersion[2];
+            // We only trust development flag from sdk version 1.1.0+
+            if (!(sdkMajor >= 1 && sdkMinor >= 1)) {
+                device.development = false;
+            }
+        }
+
         return callback(null, device);
     });
 };
