@@ -96,7 +96,7 @@ class CustomerDevice
         current_attributes[:location] = current_attributes[:location].to_doc if current_attributes[:location]
         current_attributes[:beacon_regions_monitoring] = current_attributes[:beacon_regions_monitoring].map(&:to_doc) if current_attributes[:beacon_regions_monitoring]
         current_attributes[:geofence_regions_monitoring] = current_attributes[:geofence_regions_monitoring].map(&:to_doc) if current_attributes[:geofence_regions_monitoring]
-        current_attributes.delete(:development) if development == true
+        current_attributes.delete(:development) if development == false
         return current_attributes
     end
 
