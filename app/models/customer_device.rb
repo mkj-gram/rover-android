@@ -192,7 +192,12 @@ class CustomerDevice
 
     class << self
         def from_document(doc)
-            return CustomerDevice.new(doc.merge(new_record: false))
+            device = CustomerDevice.new(doc.merge(new_record: false))
+            if doc["development"] || doc[:development]
+                # work around since if development is assigned before sdk_version it drops it
+                device.development = doc["development"] || doc[:development]
+            end
+            return device
         end
 
     end
