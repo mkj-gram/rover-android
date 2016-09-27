@@ -80,7 +80,7 @@ internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConf
     const postgres = server.connections.postgres.client;
     const logger = server.plugins.logger.logger;
 
-    logger.debug(util.format("%s %j %j", `Service: [proximityMessage.beaconTriggered] account_id: ${accountId} triggerId: ${triggerId}`, beaconConfiguration, place));
+    logger.debug(util.format("%s %j %j", `Service: [proximityMessage.beaconTriggered] account_id: ${accountId} triggerId: ${triggerId} timestamp: ${moment(timestamp).format()}`, beaconConfiguration, place));
 
     if (util.isNullOrUndefined(beaconConfiguration)) {
         return callback(null, []);
@@ -107,7 +107,7 @@ internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConf
         ];
 
         logger.debug(values);
-        
+
         let currentDayName = internals.getDay(timestamp);
         
         client.query({
