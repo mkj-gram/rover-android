@@ -759,14 +759,15 @@ internals.parseDevicePayload = function(id, payload, callback) {
         }
 
         if (device.development == true) {
-            logger.info("DEVELOPMENT DEVICE DETECTED");
+
+            console.info("DEVELOPMENT DEVICE DETECTED");
             const sdkVersion = device.sdk_version.split('.').map(i => parseInt(i));
             const sdkMajor = sdkVersion[0];
             const sdkMinor = sdkVersion[1];
             const sdkRevision = sdkVersion[2];
             // We only trust development flag from sdk version 1.1.0+
             if (!(sdkMajor >= 1 && sdkMinor >= 1)) {
-                logger.info("DEVELOPMENT DEVICE SHUTDOWN");
+                console.info("DEVELOPMENT DEVICE SHUTDOWN");
                 device.development = false;
             }
         }
