@@ -98,7 +98,7 @@ internals.deviceDifferences = function (fromDevice, toDevice) {
 
     Object.keys(toDevice).forEach(key => {
         if (util.isUndefined(fromDevice[key]) && !util.isUndefined(toDevice[key])) {
-            deviceUpdates[key];
+            deviceUpdates[key] = toDevice[key];
         }   
     });
 
