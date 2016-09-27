@@ -32,7 +32,14 @@ module ApnsHelper
         def connection_from_ios_platform(ios_platform, opts = {})
             return nil if ios_platform.certificate.nil?
             certificate = ApnsKit::Certificate.from_p12_file(ios_platform.certificate, ios_platform.passphrase)
-            client = ApnsKit::Client.production(certificate, opts)
+            development = opts.delete(:development)
+            
+            if development
+                client = ApnsKit::Client.development(certificate, opts)
+            else
+                client = ApnsKit::Client.production(certificate, opts)
+            end
+
             return client
         end
 

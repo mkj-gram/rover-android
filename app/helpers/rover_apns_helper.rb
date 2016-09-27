@@ -2,8 +2,12 @@ module RoverApnsHelper
 
 	class << self
 
-		def get_connection
-            @connection ||= ApnsKit::Client.production(get_certificate, pool_size: 1, heartbeat_interval: 60)
+		def production_connection
+            @production_connection ||= ApnsKit::Client.production(get_certificate, pool_size: 1, heartbeat_interval: 60)
+		end
+
+		def development_connection
+			@development_connection ||= ApnsKit::Client.development(get_certificate, pool_size: 1, heartbeat_interval: 60)
 		end
 
 		def get_certificate

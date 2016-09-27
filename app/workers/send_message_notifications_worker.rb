@@ -44,17 +44,37 @@ class SendMessageNotificationWorker
         rover_devices, ios_devices = ios_devices.partition { |device| device.app_identifier == "io.rover.Rover" }
 
         if rover_devices.any?
-            send_ios_notifications_with_connection(RoverApnsHelper.get_connection, messages, rover_devices)
+            rover_development_devices, rover_production_devices = rover_devices.partition { |device| device.development == true }
+
+            if rover_production_devices.any?
+                send_ios_notifications_with_connection(RoverApnsHelper.production_connection, messages, rover_production_devices)
+            end
+
+            if rover_development_devices.any?
+                send_ios_notifications_with_connection(RoverApnsHelper.development_connection, messages, rover_development_devices)
+            end
+            
         end
 
         if ios_devices.any?
-            PushConnectionCache.with_apns_connection(customer.account_id) do |connection_context|
-                if connection_context && connection_context[:connection]
-                    send_ios_notifications_with_connection(connection_context[:connection], messages, ios_devices)
+            ios_development_devices, ios_production_devices = ios_devices.partition { |device| device.development == true }
+
+            if ios_development_devices.any?
+                PushConnectionCache.with_apns_connection(customer.account_id, development: true) do |connection_context|
+                    if connection_context && connection_context[:connection]
+                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_development_devices)
+                    end
+                end
+            end
+
+            if ios_production_devices.any?
+                PushConnectionCache.with_apns_connection(customer.account_id) do |connection_context|
+                    if connection_context && connection_context[:connection]
+                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_production_devices)
+                    end
                 end
             end
         end
-
     end
 
     def send_ios_notifications_with_connection(connection, messages, devices)
