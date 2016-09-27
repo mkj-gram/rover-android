@@ -5,6 +5,11 @@ const internals = {};
 
 
 internals.isStale = function(request, lastModified) {
+    if (util.isNullOrUndefined(lastModified)) {
+        return true
+    } else {
+        lastModified = lastModified.toUTCString();
+    }
     let ifModifiedSince = request.headers['if-modified-since'];
     return ifModifiedSince !== lastModified;
 };
@@ -33,7 +38,7 @@ internals.get = function(request, reply) {
         }
 
 
-        if (internals.isStale(request, customer.inbox_updated_at.toUTCString())) {
+        if (internals.isStale(request, customer.inbox_updated_at)) {
             methods.inbox.find(customer, {}, (err, messageIds) => {
                 if (err) {
                     reply.writeHead(500, {
