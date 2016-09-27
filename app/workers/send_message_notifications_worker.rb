@@ -62,7 +62,7 @@ class SendMessageNotificationWorker
             if ios_development_devices.any?
                 PushConnectionCache.with_apns_connection(customer.account_id, development: true) do |connection_context|
                     if connection_context && connection_context[:connection]
-                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_devices)
+                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_development_devices)
                     end
                 end
             end
@@ -70,7 +70,7 @@ class SendMessageNotificationWorker
             if ios_production_devices.any?
                 PushConnectionCache.with_apns_connection(customer.account_id) do |connection_context|
                     if connection_context && connection_context[:connection]
-                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_devices)
+                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_production_devices)
                     end
                 end
             end
