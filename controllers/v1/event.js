@@ -393,7 +393,7 @@ internals.updateCustomer = function(request, customer, callback) {
     let updateTasks = Promise.resolve();
 
     if (device.token != devicePayload.token && !util.isNullOrUndefined(devicePayload.token)) {
-        logger.info(`Device: ${device._id} token has changed`);
+        logger.info(`Device: ${device._id} token has changed from ${device.token} to ${devicePayload.token}`);
         updateTasks = updateTasks.then(() => new Promise((resolve, reject) => {
             internals.findAndRemoveDeviceByToken.bind(request.server)(currentAccountId, devicePayload.token, (err) => {
                 if (err) {
