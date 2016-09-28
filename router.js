@@ -63,7 +63,7 @@ const route = function(req, res) {
     let url = req.url
     let method = req.method;
 
-    const wrapper = routerWrapper(server, res);
+    const wrapper =  res; // routerWrapper(server, res);
 
     req.server = server;
 
