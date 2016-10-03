@@ -14,9 +14,9 @@ const notFoundLength = Buffer.byteLength(notFoundError);
 const RoverApiAuth = require('./auth/rover-api-auth');
 
 const EventsMatcher = new RegExp("^\/v1\/events$");
-const InboxLandingPageMatcher = new RegExp("^\/v1\/inbox\/(.*)\/landing-page$", 'i');
-const InboxMessageMatcher = new RegExp("^\/v1\/inbox\/messages\/([a-f0-9]{24})$");
-const InboxMessageMatcher2 = new RegExp("^\/v1\/inbox\/([a-f0-9]{24})$");
+const InboxLandingPageMatcher = new RegExp("^\/v1\/inbox\/+([a-f0-9]{24})\/+landing-page$", 'i');
+const InboxMessageMatcher = new RegExp("^\/v1\/inbox\/+messages\/+([a-f0-9]{24})$");
+const InboxMessageMatcher2 = new RegExp("^\/v1\/inbox\/+([a-f0-9]{24})$");
 const InboxMatcher = new RegExp("^\/v1\/inbox$", 'i');
 
 const InboxController = require('./controllers/v1/inbox');
