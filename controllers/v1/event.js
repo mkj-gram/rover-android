@@ -747,7 +747,7 @@ internals.parseDevicePayload = function(id, payload, callback) {
             device.locale_region = device.locale_region.toLowerCase();
 
             if (device.locale_region.length == 3) {
-                device.locale_region = ISO3611.convert_alpha3_to_alpha2(device.locale_region);
+                device.locale_region = ISO3611.convertAlpha3ToAlpha2(device.locale_region);
             }
         }
 
