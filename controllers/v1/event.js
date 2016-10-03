@@ -369,6 +369,8 @@ internals.createCustomer = function(request, callback) {
         // need to create the customer because it doesn't exist
         createCustomerTask = createCustomerTask.then(() => new Promise((resolve, reject) => {
             logger.info('Creating new anonymous customer! for account id: ' + accountId);
+            logger.info(customerPayload);
+            logger.info(devicePayload);
             return insertCustomer(customerPayload, devicePayload, resolve, reject);
         }));
     }
