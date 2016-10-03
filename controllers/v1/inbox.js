@@ -1,6 +1,7 @@
 'use strict';
 const util = require('util');
 const moment = require('moment');
+var dasherize = require('dasherize');
 const internals = {};
 
 
@@ -116,7 +117,7 @@ internals.serialize = function(message) {
             'content-type': message.content_type,
             'website-url': message.website_url,
             'deep-link-url': message.deeplink_url,
-            'landing-page': message.landing_page,
+            'landing-page': dasherize(message.landing_page),
             'experience-id': message.experience_id,
             'properties': message.properties || {},
             'timestamp': moment.utc(message.timestamp).toISOString()
