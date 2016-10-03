@@ -713,9 +713,9 @@ const deviceSchema = Joi.object().required().keys({
     'platform': Joi.any().only('iOS', 'Android').required(),
     'os-name': Joi.any().only('iOS', 'Android').required(),
     'os-version': Joi.string().regex(/(\d+\.\d+\.\d+)|(\d+\.\d+)/, 'version'),
-    'model': Joi.string().optional().allow(null),
-    'manufacturer': Joi.string().optional().allow(null),
-    'carrier': Joi.string().optional().allow(null),
+    'model': Joi.string().optional().allow(null).empty(''),
+    'manufacturer': Joi.string().optional().allow(null).empty(''),
+    'carrier': Joi.string().optional().allow(null).empty(''),
     'app-identifier': Joi.string().required(),
     'background-enabled': Joi.boolean().required(),
     'notifications-enabled': Joi.boolean().required(),
@@ -760,14 +760,12 @@ internals.parseDevicePayload = function(id, payload, callback) {
 
         if (device.development == true) {
 
-            console.info("DEVELOPMENT DEVICE DETECTED");
             const sdkVersion = device.sdk_version.split('.').map(i => parseInt(i));
             const sdkMajor = sdkVersion[0];
             const sdkMinor = sdkVersion[1];
             const sdkRevision = sdkVersion[2];
             // We only trust development flag from sdk version 1.1.0+
             if (!(sdkMajor >= 1 && sdkMinor >= 1)) {
-                console.info("DEVELOPMENT DEVICE SHUTDOWN");
                 device.development = false;
             }
         }
