@@ -195,7 +195,7 @@ internals.create = function(request, reply) {
 
     // parse the payload
     const currentAccountId = request.auth.credentials.account.id;
-    const currentDeviceId = request.headers['x-rover-device-id'];
+    const currentDeviceId = request.headers['x-rover-device-id'].toUpperCase();
 
     if (util.isNullOrUndefined(internals.dig(request, 'payload', 'data', 'attributes'))) {
         return internals.writeError(reply, 400, { status: 400, error: "Invalid JSONAPI"});
@@ -388,7 +388,7 @@ internals.updateCustomer = function(request, customer, callback) {
     // customer is the current customer we have identified the device with
     const customerPayload = request.payload.customer;
     const devicePayload = request.payload.device;
-    const currentDeviceId = request.headers['x-rover-device-id'];
+    const currentDeviceId = request.headers['x-rover-device-id'].toUpperCase();
     const currentAccountId = request.auth.credentials.account.id;
 
     const device = customer.devices.find((device) => { return device._id == currentDeviceId });
@@ -572,7 +572,7 @@ internals.processEvent = function(request, reply, customer) {
     // we have the current customer and the device 
     const logger = request.server.plugins.logger.logger;
 
-    const currentDeviceId = request.headers['x-rover-device-id'];
+    const currentDeviceId = request.headers['x-rover-device-id'].toUpperCase();
     let device = customer.devices.find((device) => { return device._id == currentDeviceId });
 
     let args = {

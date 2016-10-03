@@ -18,7 +18,7 @@ const getCurrentCustomer = function (request, callback) {
     const server = this;
     const methods = server.methods;
 
-    const deviceId = request.headers['x-rover-device-id'];
+    const deviceId = request.headers['x-rover-device-id'].toUpperCase();
 
     if (!deviceId) {
         return callback('Device ID missing', null);
