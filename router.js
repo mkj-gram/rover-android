@@ -49,6 +49,9 @@ const routerWrapper = function(server, res) {
             const requestEndTime = new Date();
             const totalTime = requestEndTime - this._requestStartTime;
             const librato = server.plugins.librato.client;
+            // TODO
+            // optimize! calling librato.measure is slowing us down by 100 req/second
+            // maybe create our own library
             librato.measure('request.total', 1, { source: 'sdk-api'});
             librato.measure('request.time', totalTime, { source: 'sdk-api' });
             return res.end.bind(res)(args);
@@ -63,7 +66,7 @@ const route = function(req, res) {
     let url = req.url
     let method = req.method;
 
-    const wrapper =  res; // routerWrapper(server, res);
+    const wrapper = routerWrapper(server, res);
 
     req.server = server;
 
