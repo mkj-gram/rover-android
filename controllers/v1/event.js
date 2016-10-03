@@ -197,7 +197,6 @@ internals.create = function(request, reply) {
     const currentAccountId = request.auth.credentials.account.id;
     const currentDeviceId = request.headers['x-rover-device-id'];
 
-    console.log(internals.dig(request, 'payload'));
     if (util.isNullOrUndefined(internals.dig(request, 'payload', 'data', 'attributes'))) {
         return internals.writeError(reply, 400, { status: 400, error: "Invalid JSONAPI"});
     }
