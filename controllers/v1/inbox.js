@@ -62,7 +62,7 @@ internals.get = function(request, reply) {
                     return reply.end();
                 }
 
-                methods.message.findAll(messageIds, { excludeFields: ['landing_page'] }, (err, messages) => {
+                methods.message.findAll(messageIds, {}, (err, messages) => {
                     if (err) {
                         return reply({ status: 500, error: err });
                     }
@@ -116,7 +116,7 @@ internals.serialize = function(message) {
             'content-type': message.content_type,
             'website-url': message.website_url,
             'deep-link-url': message.deeplink_url,
-            'landing-page': null, // we always render null so that the sdk is able to grab and render the inbox quickly
+            'landing-page': message.landing_page,
             'experience-id': message.experience_id,
             'properties': message.properties || {},
             'timestamp': moment.utc(message.timestamp).toISOString()
