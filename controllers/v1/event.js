@@ -14,7 +14,9 @@ internals.writeError = function(reply, status, message) {
     reply.writeHead(status, {
         'Content-Type': 'application/json'
     });
-    reply.write(JSON.stringify(message));
+    let jsonMessage = JSON.stringify(message);
+    console.error(jsonMessage);
+    reply.write(jsonMessage);
     reply.end();
 };
 
@@ -717,12 +719,12 @@ const deviceSchema = Joi.object().required().keys({
     'manufacturer': Joi.string().optional().allow(null).empty(''),
     'carrier': Joi.string().optional().allow(null).empty(''),
     'app-identifier': Joi.string().required(),
-    'background-enabled': Joi.boolean().required(),
-    'notifications-enabled': Joi.boolean().required(),
-    'location-monitoring-enabled': Joi.boolean().required(),
-    'bluetooth-enabled': Joi.boolean().required(),
-    'development': Joi.boolean().default(false),
-    'aid': Joi.string().allow(null)
+    'background-enabled': Joi.boolean().optional().empty('').default(false),
+    'notifications-enabled': Joi.boolean().optional().empty('').default(true),
+    'location-monitoring-enabled': Joi.boolean().optional().empty('').default(false),
+    'bluetooth-enabled': Joi.boolean().optional().empty('').default(false),
+    'development': Joi.boolean().optional().empty('').default(false),
+    'aid': Joi.string().optional().allow(null)
 }).rename('remote-notifications-enabled', 'notifications-enabled');
 
 internals.parseDevicePayload = function(id, payload, callback) {
