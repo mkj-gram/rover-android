@@ -17,7 +17,7 @@ const optionsSchema = Joi.object().keys({
 
 module.exports.register = function(server, connectionOptions, next) {
 
-    const config = extend({ max: 15, idleTimeoutMillis: 30000, ssl: true }, connectionOptions);
+    const config = extend({ max: 5, idleTimeoutMillis: 30000, ssl: true }, connectionOptions);
 
     Joi.validate(config, optionsSchema, function(err, value) {
         if (err) {
