@@ -18,15 +18,12 @@ internals.findByQuery = function(query, callback) {
     const librato = server.plugins.librato.client;
 
     logger.debug('Service: [customer.findByQuery] \n' + util.inspect(query, true, null, false));
-    const startTime = Date.now();
 
     mongodb.collection(collection).findOne(query, {}, function(err, doc) {
         if (err) {
             return callback(err, null);
         }
 
-        const totalTime =  Date.now() - startTime;
-        librato.measure('mongodb.command.find.duration', totalTime, { source: 'sdk-api' });
         return callback(null, doc);
     });
 };
