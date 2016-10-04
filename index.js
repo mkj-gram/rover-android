@@ -1,5 +1,5 @@
 'use strict';
-
+require('newrelic');
 const http  = require('http');
 const Config = require('./config');
 const async = require('async');
