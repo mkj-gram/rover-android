@@ -1,12 +1,16 @@
 'use strict';
-require('newrelic');
+var newrelic = require('newrelic');
 const http  = require('http');
 const Config = require('./config');
 const async = require('async');
 const router = require('./router');
 
 const server = {
-    plugins: {},
+    plugins: {
+        newrelic: {
+            client: newrelic
+        }
+    },
     connections: {},
     methods: {}
 };

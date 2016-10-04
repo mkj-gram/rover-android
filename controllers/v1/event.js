@@ -571,6 +571,7 @@ internals.updateCustomer = function(request, customer, callback) {
 internals.processEvent = function(request, reply, customer) {
     // we have the current customer and the device 
     const logger = request.server.plugins.logger.logger;
+    const newrelic = request.server.plugins.newrelic.client;
 
     const currentDeviceId = request.headers['x-rover-device-id'].toUpperCase();
     let device = customer.devices.find((device) => { return device._id == currentDeviceId });
@@ -586,6 +587,7 @@ internals.processEvent = function(request, reply, customer) {
     
     let event = Event.init(args);
 
+    newrelic.setTransactionName(event.getTransactionName());
     
 
     event.process((err, newCustomer, newDeivce, eventResponse) => {
