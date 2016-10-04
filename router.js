@@ -62,6 +62,7 @@ const routerWrapper = function(server, res) {
 
 const route = function(req, res) {
     const server = this;
+    const newrelic = server.plugins.newrelic.client;
 
     let url = req.url
     let method = req.method;
@@ -81,20 +82,24 @@ const route = function(req, res) {
                 req.params = {
                     id: match[1]
                 }
+                newrelic.setTransactionName("/v1/inbox/messages/landing-page");
                 return InboxLandingPageController.get(req, wrapper);
             } else if(match = url.match(InboxMessageMatcher)) {
                 // GET /v1/inbox/messages/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
+                newrelic.setTransactionName("/v1/inbox/messages");
                 return InboxMessagesController.get(req, wrapper);
             } else if (match = url.match(InboxMessageMatcher2)) {
                 // GET /v1/inbox/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
+                newrelic.setTransactionName("/v1/inbox/messages");
                 return InboxMessagesController.get(req, wrapper);
             } else if(match = url.match(InboxMatcher)) {
+                newrelic.setTransactionName("/v1/inbox");
                 return InboxController.get(req, wrapper);
             } else {
                 return notFoundResponse(req, wrapper);
@@ -154,12 +159,14 @@ const route = function(req, res) {
                     req.params = {
                         id: match[1]
                     };
+                    newrelic.setTransactionName("/v1/inbox/messages");
                     return InboxMessagesController.update(req, wrapper);
                 } else if (match = url.match(InboxMessageMatcher2)) {
                     // GET /v1/inbox/57e4181bc69a2845d977f7c0
                     req.params = {
                         id: match[1]
                     };
+                    newrelic.setTransactionName("/v1/inbox/messages");
                     return InboxMessagesController.update(req, wrapper);
                 } else {
                     return notFoundResponse(req, wrapper);
@@ -182,12 +189,14 @@ const route = function(req, res) {
                 req.params = {
                     id: match[1]
                 };
+                newrelic.setTransactionName("/v1/inbox/messages");
                 return InboxMessagesController.destroy(req, wrapper);
             } else if (match = url.match(InboxMessageMatcher2)) {
                 // DELETE /v1/inbox/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
+                newrelic.setTransactionName("/v1/inbox/messages");
                 return InboxMessagesController.destroy(req, wrapper);
             } else {
                 return notFoundResponse(req, wrapper);
