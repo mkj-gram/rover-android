@@ -41,25 +41,6 @@ const notFoundResponse = function(req, res) {
     res.end();
 }
 
-const routerWrapper = function(server, res) {
-    return {
-        writeHead: res.writeHead.bind(res),
-        write: res.write.bind(res),
-        end: function(args) {
-            const requestEndTime = new Date();
-            const totalTime = requestEndTime - this._requestStartTime;
-            const librato = server.plugins.librato.client;
-            // TODO
-            // optimize! calling librato.measure is slowing us down by 100 req/second
-            // maybe create our own library
-            librato.measure('request.total', 1, { source: 'sdk-api'});
-            librato.measure('request.time', totalTime, { source: 'sdk-api' });
-            return res.end.bind(res)(args);
-        },
-        _requestStartTime: new Date()
-    }
-}
-
 const route = function(req, res) {
     const server = this;
     const newrelic = server.plugins.newrelic.client;
@@ -67,14 +48,22 @@ const route = function(req, res) {
     let url = req.url
     let method = req.method;
 
-    const wrapper = routerWrapper(server, res);
+    res._startTime = Date.now();
+
+    res.on('finish', function() {
+        const requestEndTime = Date.now();
+        const totalTime = requestEndTime - res._startTime;
+        const librato = server.plugins.librato.client;
+        librato.measure('request.total', 1, { source: 'sdk-api'});
+        librato.measure('request.time', totalTime, { source: 'sdk-api' });
+    });
 
     req.server = server;
 
     if (method == httpMethods.GET) {
         RoverApiAuth.authenticate(req, (authenticated) => {
             if (!authenticated) {
-                return unauthenticatedResponse(req, wrapper);
+                return unauthenticatedResponse(req, res);
             }
 
             let match;
@@ -83,26 +72,26 @@ const route = function(req, res) {
                     id: match[1]
                 }
                 newrelic.setTransactionName("v1/inbox/messages/landing-page");
-                return InboxLandingPageController.get(req, wrapper);
+                return InboxLandingPageController.get(req, res);
             } else if(match = url.match(InboxMessageMatcher)) {
                 // GET /v1/inbox/messages/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
                 newrelic.setTransactionName("v1/inbox/messages");
-                return InboxMessagesController.get(req, wrapper);
+                return InboxMessagesController.get(req, res);
             } else if (match = url.match(InboxMessageMatcher2)) {
                 // GET /v1/inbox/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
                 newrelic.setTransactionName("v1/inbox/messages");
-                return InboxMessagesController.get(req, wrapper);
+                return InboxMessagesController.get(req, res);
             } else if(match = url.match(InboxMatcher)) {
                 newrelic.setTransactionName("v1/inbox");
-                return InboxController.get(req, wrapper);
+                return InboxController.get(req, res);
             } else {
-                return notFoundResponse(req, wrapper);
+                return notFoundResponse(req, res);
             }
         });
     } else if(method == httpMethods.POST) {
@@ -115,24 +104,24 @@ const route = function(req, res) {
                     req.payload = JSON.parse(payload);
                 } catch(err) {
                     console.error(err);
-                    wrapper.writeHead(400, {
+                    res.writeHead(400, {
                     'Content-Type': 'application/json'
                     });
-                    wrapper.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
-                    return wrapper.end();
+                    res.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
+                    return res.end();
                 }
                 RoverApiAuth.authenticate(req, (authenticated) => {
                     if (!authenticated) {
-                        return unauthenticatedResponse(req, wrapper);
+                        return unauthenticatedResponse(req, res);
                     }
                     
-                    return EventsController.create(req, wrapper);
+                    return EventsController.create(req, res);
                 });
             });
             // read data and pipe it to our stream
             req.on('data', function(chunk) { concatStream.write(chunk) }).on('end', function() { concatStream.end()} );
         } else {
-            return notFoundResponse(req, wrapper);
+            return notFoundResponse(req, res);
         }
         
     } else if(method == httpMethods.PATCH) {
@@ -142,15 +131,15 @@ const route = function(req, res) {
                 req.payload = JSON.parse(payload);
             } catch (err) {
                 console.error(err);
-                wrapper.writeHead(400, {
+                res.writeHead(400, {
                     'Content-Type': 'application/json'
                 });
-                wrapper.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
-                return wrapper.end();
+                res.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
+                return res.end();
             }
             RoverApiAuth.authenticate(req, (authenticated) => {
                 if (!authenticated) {
-                    return unauthenticatedResponse(req, wrapper);
+                    return unauthenticatedResponse(req, res);
                 }
                 let match;
 
@@ -160,16 +149,16 @@ const route = function(req, res) {
                         id: match[1]
                     };
                     newrelic.setTransactionName("v1/inbox/messages");
-                    return InboxMessagesController.update(req, wrapper);
+                    return InboxMessagesController.update(req, res);
                 } else if (match = url.match(InboxMessageMatcher2)) {
                     // GET /v1/inbox/57e4181bc69a2845d977f7c0
                     req.params = {
                         id: match[1]
                     };
                     newrelic.setTransactionName("v1/inbox/messages");
-                    return InboxMessagesController.update(req, wrapper);
+                    return InboxMessagesController.update(req, res);
                 } else {
-                    return notFoundResponse(req, wrapper);
+                    return notFoundResponse(req, res);
                 }
             });
         });
@@ -179,7 +168,7 @@ const route = function(req, res) {
     } else if(method == httpMethods.DELETE) { 
         RoverApiAuth.authenticate(req, (authenticated) => {
             if (!authenticated) {
-                return unauthenticatedResponse(req, wrapper);
+                return unauthenticatedResponse(req, res);
             }
 
             let match;
@@ -190,20 +179,20 @@ const route = function(req, res) {
                     id: match[1]
                 };
                 newrelic.setTransactionName("v1/inbox/messages");
-                return InboxMessagesController.destroy(req, wrapper);
+                return InboxMessagesController.destroy(req, res);
             } else if (match = url.match(InboxMessageMatcher2)) {
                 // DELETE /v1/inbox/57e4181bc69a2845d977f7c0
                 req.params = {
                     id: match[1]
                 };
                 newrelic.setTransactionName("v1/inbox/messages");
-                return InboxMessagesController.destroy(req, wrapper);
+                return InboxMessagesController.destroy(req, res);
             } else {
-                return notFoundResponse(req, wrapper);
+                return notFoundResponse(req, res);
             }
         });
     } else {
-        return notFoundResponse(req, wrapper);
+        return notFoundResponse(req, res);
     }
 }
 
