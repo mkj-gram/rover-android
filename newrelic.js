@@ -25,6 +25,6 @@ exports.config = {
   },
   transaction_tracer: {
     enabled: true,
-    apdex_f: 100
+    apdex_f: 0.1
   }
 }
