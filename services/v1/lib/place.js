@@ -5,7 +5,7 @@ const LRU = require('lru-cache');
 const radPerDeg = Math.PI / 180.0;
 
 const placeLruOptions = { 
-    max: 2430000, // can store up to 2.43 MB
+    max: 1048576, // can store up to 10 MB of places
     length: function(n, key) { return n.length * 405 } // return the array length * average object size of a place
 };
 
@@ -149,7 +149,7 @@ internals.sortedPlacesByDistance = function(places, latitude, longitude, limit, 
             return distance;
         }
     });
-    
+
     return callback(null, placesCopy.slice(0, limit));
 };
 
