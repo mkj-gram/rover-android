@@ -64,6 +64,8 @@ module.exports.register = function(server, options, next) {
     server.methods.beaconConfiguration.findByEddystoneNamespaceProtocol = BeaconConfigurationService.findByEddystoneNamespaceProtocol.bind(server);
 
     server.methods.place.findById = PlaceService.findById.bind(server);
+    server.methods.place.findAll = PlaceService.findAll.bind(server);
+    server.methods.place.closestPlaces = PlaceService.closestPlaces.bind(server);
     server.methods.place.findByCoordinates = PlaceService.findByCoordinates.bind(server);
 
     server.methods.activeConfigurationUUID.findByAccountId = ActiveConfigurationUUIDService.findByAccountId.bind(server);
