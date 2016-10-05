@@ -1,7 +1,7 @@
 'use strict';
-
+const util = require('util');
 const internals = {};
-const LRU = require("lru-cache");
+const LRU = require('lru-cache');
 const radPerDeg = Math.PI / 180.0;
 
 const placeLruOptions = { 
@@ -10,6 +10,19 @@ const placeLruOptions = {
 };
 
 const placeLruCache = LRU(placeLruOptions);
+
+
+internals.parsePlace = function(place) {
+    if (!util.isNullOrUndefined(place.longitude)) {
+        place.longitude = parseFloat(place.longitude);
+    }
+
+    if (!util.isNullOrUndefined(place.latitude)) {
+        place.latitude = parseFloat(place.latitude);
+    }
+
+    return place;
+};
 
 internals.findById = function(id, callback) {
 
@@ -32,7 +45,7 @@ internals.findById = function(id, callback) {
                 return callback(err);
             }
 
-            const place = result.rows[0];
+            const place = internals.parsePlace(result.rows[0]);
 
             return callback(null, place);
 
@@ -62,6 +75,10 @@ internals.findAll = function(account, callback) {
 
             const places = result.rows;
 
+            for (var i = places.length - 1; i >= 0; i--) {
+                internals.parsePlace(places[i]);
+            }
+
             return callback(null, places);
 
         });
@@ -88,7 +105,7 @@ internals.findByCoordinates = function(latitude, longitude, callback) {
                 return callback(err);
             }
 
-            const place = result.rows[0];
+            const place = internals.parsePlace(result.rows[0])
 
             return callback(null, place);
 
@@ -132,7 +149,7 @@ internals.sortedPlacesByDistance = function(places, latitude, longitude, limit, 
             return distance;
         }
     });
-    
+    console.log(places);
     return callback(null, placesCopy.slice(0, limit));
 };
 
