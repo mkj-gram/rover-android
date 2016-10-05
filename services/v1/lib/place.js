@@ -117,7 +117,7 @@ internals.closestPlaces = function(account, latitude, longitude, limit = 100, ca
     const server = this;
 
     let cacheKey = `${account.id}-${account.places_updated_at.getTime()}`
-    console.log(cacheKey);
+    
     if (!placeLruCache.has(cacheKey)) {
         // find all places
         server.methods.place.findAll(account, (err, places) => {
