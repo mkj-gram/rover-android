@@ -149,7 +149,7 @@ internals.sortedPlacesByDistance = function(places, latitude, longitude, limit, 
             return distance;
         }
     });
-    console.log(places);
+    
     return callback(null, placesCopy.slice(0, limit));
 };
 
