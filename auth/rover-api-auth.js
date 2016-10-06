@@ -1,7 +1,7 @@
 'use strict';
 
 const util = require('util');
-const LRU = require("lru-cache");
+const LRU = require('lru-cache');
 
 const cacheOptions = {
     max: 500,
