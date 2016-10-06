@@ -4,10 +4,13 @@ class V1::ImagesController < V1::ApplicationController
 
     def create
         if params.has_key?(:image) && params[:image].is_a?(ActionDispatch::Http::UploadedFile)
+            
+            compressed_image = Tinify.from_file(params[:image])
+
             resp = S3_IMAGE_BUCKET.put_object(
                 {
                     acl: "public-read", # accepts private, public-read, public-read-write, authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control
-                    body: params[:image], # file/IO object, or string data
+                    body: compressed_image, # file/IO object, or string data
                     key:  "uploads/#{Digest::MD5.hexdigest(current_account.id.to_s)}/#{SecureRandom.uuid}-#{params[:image].original_filename}", # required
                     metadata: {
                         "ContentType" => params[:image].content_type,

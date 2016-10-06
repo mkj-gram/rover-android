@@ -80,6 +80,8 @@ gem 'aws-sdk', '~> 2.3', '>= 2.3.9'
 
 gem 'postgres_ext', '~> 3.0'
 
+gem 'tinify', '~> 1.3'
+
 group :development do
 
 
