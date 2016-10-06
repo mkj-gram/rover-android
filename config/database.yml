@@ -2,7 +2,7 @@ test:
     adapter: postgresql
     encoding: unicode
     database: rover-test
-    pool: 15
+    pool: 5
     username: rover_test
     password: password1
 
@@ -10,7 +10,7 @@ development:
     adapter: postgresql
     encoding: unicode
     database: rover-local
-    pool: 15
+    pool: 5
     username: rover_development
     password: password1
 
@@ -18,7 +18,7 @@ production:
     adapter: postgresql
     encoding: unicode
     database: rover
-    pool: 15
+    pool: 5
     username: <%=ENV['POSTGRESQL_DB_USERNAME']%>
     password: <%=ENV['POSTGRESQL_DB_PASSWORD']%>
     host: <%=ENV['POSTGRESQL_DB_HOST']%>
