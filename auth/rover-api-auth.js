@@ -1,7 +1,16 @@
 'use strict';
 
-const Hoek = require('hoek');
-const Boom = require('boom');
+const util = require('util');
+const LRU = require("lru-cache");
+const cacheOptions = {
+    max: 500,
+    length: function(n, key) {
+        return 1;
+    },
+    maxAge: 60000
+}
+
+var accountCache = LRU(options);
 
 const internals = {};
 
@@ -15,42 +24,54 @@ internals.authenticate = function(request, callback) {
         return callback(false, "Missing credentials");
     }
 
-    postgres.connect((err, client, done) => {
-        if (err) {
-            done();
-            return callback(false, "Could not find credentials");
-        }
+    let cachedAccount = accountCache.get(authorization);
 
-        // Use a prepared statement to find the account
-        client.query({
-            text: 'SELECT  "accounts".* FROM "accounts" WHERE "accounts"."token" = $1 LIMIT 1',
-            values: [authorization],
-            name: 'account-by-token'
-        }, function(err, result) {
-            done();
-
+    if (util.isNullOrUndefined(cachedAccount)) {
+        postgres.connect((err, client, done) => {
             if (err) {
+                done();
                 return callback(false, "Could not find credentials");
             }
 
-            const account = result.rows[0];
+            // Use a prepared statement to find the account
+            client.query({
+                text: 'SELECT  "accounts".* FROM "accounts" WHERE "accounts"."token" = $1 LIMIT 1',
+                values: [authorization],
+                name: 'account-by-token'
+            }, function(err, result) {
+                done();
 
-            if (account) {
-                request.auth = {
-                    credentials: {
-                        account: account
-                    }
-                };
-                return callback(true);
-            } else {
-                request.auth = {
-                    credentials: {}
-                };
-                return callback(false);
-            }
+                if (err) {
+                    return callback(false, "Could not find credentials");
+                }
 
+                const account = result.rows[0];
+
+                if (account) {
+                    accountCache.set(authorization, account);
+                    request.auth = {
+                        credentials: {
+                            account: account
+                        }
+                    };
+                    return callback(true);
+                } else {
+                    request.auth = {
+                        credentials: {}
+                    };
+                    return callback(false);
+                }
+
+            });
         });
-    });
+    } else {
+        request.auth = {
+            credentials: {
+                account: cachedAccount
+            }
+        };
+        return callback(true);
+    }
 };
 
 module.exports = {
