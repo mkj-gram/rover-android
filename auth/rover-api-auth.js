@@ -11,7 +11,7 @@ const cacheOptions = {
     maxAge: 60000
 }
 
-var accountCache = LRU(cacheOptions);
+const accountCache = LRU(cacheOptions);
 
 const internals = {};
 
