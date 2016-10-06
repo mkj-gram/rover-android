@@ -2,6 +2,7 @@
 
 const util = require('util');
 const LRU = require("lru-cache");
+
 const cacheOptions = {
     max: 500,
     length: function(n, key) {
@@ -10,7 +11,7 @@ const cacheOptions = {
     maxAge: 60000
 }
 
-var accountCache = LRU(options);
+var accountCache = LRU(cacheOptions);
 
 const internals = {};
 
