@@ -5,7 +5,7 @@ class V1::ImagesController < V1::ApplicationController
     def create
         if params.has_key?(:image) && params[:image].is_a?(ActionDispatch::Http::UploadedFile)
 
-            compressed_image = Tinify.from_buffer(params[:image].read)
+            compressed_image = Tinify.from_buffer(params[:image].read).to_buffer
 
             resp = S3_IMAGE_BUCKET.put_object(
                 {
