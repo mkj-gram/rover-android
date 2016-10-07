@@ -7,7 +7,48 @@ const moment = require('moment');
 const async = require('async');
 const Joi = require('joi');
 const Event = require('../../lib/event');
+const VersionRegex = /\d+\.\d+\.\d+$|\d+\.\d+$/;
 
+const Type = {
+    STRING: 0,
+    INTEGER: 1,
+    BOOLEAN: 2
+};
+
+const customerPayloadKeys = new Set([
+    'account-id', 
+    'identifier', 
+    'tags', 
+    'first-name', 
+    'last-name', 
+    'email', 
+    'gender', 
+    'phone-number', 
+    'age', 
+    'traits'
+]);
+
+const devicePayloadKeys = new Set([
+    'token',
+    'locale-lang',
+    'locale-region',
+    'time-zone',
+    'sdk-version',
+    'platform',
+    'os-name',
+    'os-version',
+    'model',
+    'manufacturer',
+    'carrier',
+    'app-identifier',
+    'background-enabled',
+    'remote-notifications-enabled',
+    'notifications-enabled',
+    'location-monitoring-enabled',
+    'bluetooth-enabled',
+    'development',
+    'aid'
+]);
 const internals = {};
 
 internals.writeError = function(reply, status, message) {
@@ -203,51 +244,53 @@ internals.create = function(request, reply) {
         return internals.writeError(reply, 400, { status: 400, error: "Invalid JSONAPI"});
     }
 
-    let parseTasks = {
-        customer: function(callback) {
-            internals.parseCustomerPayload(currentAccountId, request.payload.data.attributes.user, callback)
-        },
-        device: function(callback) {
-            internals.parseDevicePayload(currentDeviceId, request.payload.data.attributes.device, callback);
-        },
-        event: function(callback) {
-            internals.parseEventPayload(request.payload.data.attributes, callback)
-        }
-    };
+    let customer = internals.parseCustomerPayload(currentAccountId, request.payload.data.attributes.user);
+    
+    if (customer.error) {
+        return internals.writeError(reply, 400, { status: 400,  error: customer });
+    }
 
-    async.parallel(parseTasks, (err, results) => {
+    let device = internals.parseDevicePayload(currentDeviceId, request.payload.data.attributes.device);
+
+    if (device.error) {
+        return internals.writeError(reply, 400, { status: 400,  error: device }); 
+    }
+
+    let event = internals.parseEventPayload(request.payload.data.attributes);
+
+    if (event.error) {
+        return internals.writeError(reply, 400, { status: 400,  error: event }); 
+    }
+
+   
+    request.payload = {
+        customer: customer,
+        device: device,
+        event: event
+    }
+
+    internals.identify(request, (err, customer) => {
         if (err) {
-            return internals.writeError(reply, 400, { status: 400,  error: err })
-        }
-        request.payload = {
-            customer: results.customer,
-            device: results.device,
-            event: results.event
+            logger.error(util.format('%s %f', 'Request Failed', request.payload));
+            logger.error(err);
+            return internals.writeError(reply, 500, { status: 500, error: err });
         }
 
-        internals.identify(request, (err, customer) => {
-            if (err) {
-                logger.error(util.format('%s %f', 'Request Failed', request.payload));
-                logger.error(err);
-                return internals.writeError(reply, 500, { status: 500, error: err });
-            }
+        if (customer) {
+            //return internals.processEvent(request, reply, customer);
+            internals.updateCustomer(request, customer, (err, updatedCustomer) => {
+                if (err) {
+                    logger.error(util.format('%s %f', 'Request Failed', request.payload));
+                    logger.error(err);
+                    return internals.writeError(reply, 500, { status: 500, error: err });
+                }
 
-            if (customer) {
-                //return internals.processEvent(request, reply, customer);
-                internals.updateCustomer(request, customer, (err, updatedCustomer) => {
-                    if (err) {
-                        logger.error(util.format('%s %f', 'Request Failed', request.payload));
-                        logger.error(err);
-                        return internals.writeError(reply, 500, { status: 500, error: err });
-                    }
-
-                    return internals.processEvent(request, reply, updatedCustomer);
-                });
-            } else {
-                logger.error(util.format('%s %f', 'Request Failed to identify customer', request.payload));
-                return internals.writeError(reply, 500, { status: 500, error: "Failed to identify customer" });
-            }
-        });
+                return internals.processEvent(request, reply, updatedCustomer);
+            });
+        } else {
+            logger.error(util.format('%s %f', 'Request Failed to identify customer', request.payload));
+            return internals.writeError(reply, 500, { status: 500, error: "Failed to identify customer" });
+        }
     });
 };
 
@@ -662,22 +705,38 @@ internals.findAndRemoveDeviceByToken = function(accountId, token, callback) {
         "random": "value"
     }
  */
-internals.underscoreKeys = function(obj) {
+internals.underscoreKeys = function(obj, allowedKeysSet) {
     const underscorePayload = {};
 
     Object.keys(obj).forEach(key => {
         let underscoreKey = key.replace(/\-/g, '_');
         let value = obj[key];
-
-        if (util.isString(value) && value == '') {
-            value = null;
+        if (allowedKeysSet && allowedKeysSet.has(key) || util.isNullOrUndefined(allowedKeysSet)) {
+            underscorePayload[underscoreKey] = value;
         }
-
-        underscorePayload[underscoreKey] = value
-
     });
 
     return underscorePayload;
+};
+
+// node will optimize this as an inline function
+internals.parseValue = function(payload, key, type) {
+    const value = payload[key];
+
+    if (type == Type.STRING) {
+        if (!util.isString(value) || util.isString(value) && value.length == 0) {
+            payload[key] = null;
+        } 
+    } else if (type == Type.BOOLEAN) {
+        if (!util.isBoolean(value) || util.isString(value) && value.length == 0) {
+            payload[key] = false;
+        }
+    } else if (type == Type.INTEGER) {
+        if (typeof value != 'number') {
+            payload[key] = null;
+        }
+    }
+
 };
 
 const customerSchema = Joi.object().required().keys({
@@ -692,28 +751,32 @@ const customerSchema = Joi.object().required().keys({
     'traits': Joi.object().unknown().empty({})
 });
 
-internals.parseCustomerPayload = function(accountId, payload, callback) {
 
-    Joi.validate(payload, customerSchema, { stripUnknown: true }, (err, value) => {
-        if (err) {
-            return callback(err);
-        }
 
-        let customer = internals.underscoreKeys(value);
-        customer.account_id = accountId;
+internals.parseCustomerPayload = function(accountId, payload) {
 
-        if (util.isNull(customer.identifier)) {
-            delete customer.identifier;
-        }
+    let customer = internals.underscoreKeys(payload, customerPayloadKeys);
+    customer.account_id = accountId;
 
-        if (customer.tags && util.isArray(customer.tags)) {
-            customer.tags = customer.tags.filter(tag => !util.isNullOrUndefined(tag));
-        } else {
-            customer.tags = [];
-        }
-        
-        return callback(null, customer);
-    });
+    if (util.isNull(customer.identifier)) {
+        delete customer.identifier;
+    }
+
+    if (customer.tags && util.isArray(customer.tags)) {
+        customer.tags = customer.tags.filter(tag => !util.isNullOrUndefined(tag));
+    } else {
+        customer.tags = [];
+    }
+
+    internals.parseValue(customer, 'first_name', Type.STRING);
+    internals.parseValue(customer, 'last_name', Type.STRING);
+    internals.parseValue(customer, 'email', Type.STRING);
+    internals.parseValue(customer, 'gender', Type.STRING);
+    internals.parseValue(customer, 'phone_number', Type.STRING);
+
+    internals.parseValue(customer, 'age', Type.INTEGER);
+    
+    return customer;
 };
 
 const deviceSchema = Joi.object().required().keys({
@@ -737,60 +800,89 @@ const deviceSchema = Joi.object().required().keys({
     'aid': Joi.string().optional().allow(null)
 }).rename('remote-notifications-enabled', 'notifications-enabled');
 
-internals.parseDevicePayload = function(id, payload, callback) {
+internals.parseDevicePayload = function(id, payload) {
 
-    Joi.validate(payload, deviceSchema, { stripUnknown: true }, (err, value) => {
-        if (err) {
-            return callback(err);
-        }
 
-        let device = internals.underscoreKeys(value);
+    let device = internals.underscoreKeys(payload, devicePayloadKeys);
+
+    delete device.udid;
+    device._id = id;
+
+    if (!util.isString(device.app_identifier) || util.isString(device.app_identifier) && device.app_identifier.length == 0) {
+        return ({ error: true, message: "device.app-identifier must be a valid string and not empty"});
+    }
+
+    if (!util.isNullOrUndefined(device.remote_notifications_enabled)) {
+        device.notifications_enabled = device.remote_notifications_enabled;
+        delete device.remote_notifications_enabled;
+    }
     
-        delete device.udid;
-        device._id = id;
+    if (util.isNullOrUndefined(device.sdk_version) || !util.isNullOrUndefined(device.sdk_version) && util.isNullOrUndefined(device.sdk_version.match(VersionRegex))) {
+        return ({ error: true,  message: "device.sdk-version must be a valid gnu version number"});
+    }
 
-        if (device.locale_lang) {
-            device.locale_lang = device.locale_lang.toLowerCase();
+    if (util.isNullOrUndefined(device.os_version) || !util.isNullOrUndefined(device.os_version) && util.isNullOrUndefined(device.os_version.match(VersionRegex))) {
+        return ({ error: true, message: "device.os-version must be a valid gnu version number"});
+    }
+
+    internals.parseValue(device, 'token', Type.STRING);
+    internals.parseValue(device, 'locale_lang', Type.STRING);
+    internals.parseValue(device, 'locale_region', Type.STRING);
+    internals.parseValue(device, 'time_zone', Type.STRING);
+    internals.parseValue(device, 'sdk_version', Type.STRING);
+    internals.parseValue(device, 'platform', Type.STRING);
+    internals.parseValue(device, 'os_name', Type.STRING);
+    internals.parseValue(device, 'model', Type.STRING);
+    internals.parseValue(device, 'manufacturer', Type.STRING);
+    internals.parseValue(device, 'carrier', Type.STRING);
+    internals.parseValue(device, 'background_enabled', Type.BOOLEAN);
+    internals.parseValue(device, 'remote_notifications_enabled', Type.BOOLEAN);
+    internals.parseValue(device, 'location_monitoring_enabled', Type.BOOLEAN);
+    internals.parseValue(device, 'bluetooth_enabled', Type.BOOLEAN);
+    internals.parseValue(device, 'development', Type.BOOLEAN);
+    internals.parseValue(device, 'aid', Type.STRING);
+
+    if (device.locale_lang) {
+        device.locale_lang = device.locale_lang.toLowerCase();
+    }
+
+    if (device.locale_region) {
+        device.locale_region = device.locale_region.toLowerCase();
+
+        if (device.locale_region.length == 3) {
+            device.locale_region = ISO3611.convertAlpha3ToAlpha2(device.locale_region);
         }
+    }
 
-        if (device.locale_region) {
-            device.locale_region = device.locale_region.toLowerCase();
+    if (device.carrier) {
+        device.carrier = device.carrier.toLowerCase();
+    }
 
-            if (device.locale_region.length == 3) {
-                device.locale_region = ISO3611.convertAlpha3ToAlpha2(device.locale_region);
-            }
+    if (device.remote_notifications_enabled) {
+        device.notifications_enabled = device.remote_notifications_enabled;
+        delete device.remote_notifications_enabled;
+    }
+
+    if (device.development == true) {
+
+        const sdkVersion = device.sdk_version.split('.').map(i => parseInt(i));
+        const sdkMajor = sdkVersion[0];
+        const sdkMinor = sdkVersion[1];
+        const sdkRevision = sdkVersion[2];
+        // We only trust development flag from sdk version 1.1.0+
+        if (!(sdkMajor >= 1 && sdkMinor >= 1)) {
+            device.development = false;
         }
+    }
 
-        if (device.carrier) {
-            device.carrier = device.carrier.toLowerCase();
-        }
-
-        if (device.remote_notifications_enabled) {
-            device.notifications_enabled = device.remote_notifications_enabled;
-            delete device.remote_notifications_enabled;
-        }
-
-        if (device.development == true) {
-
-            const sdkVersion = device.sdk_version.split('.').map(i => parseInt(i));
-            const sdkMajor = sdkVersion[0];
-            const sdkMinor = sdkVersion[1];
-            const sdkRevision = sdkVersion[2];
-            // We only trust development flag from sdk version 1.1.0+
-            if (!(sdkMajor >= 1 && sdkMinor >= 1)) {
-                device.development = false;
-            }
-        }
-
-        return callback(null, device);
-    });
+    return device
 };
 
 internals.parseEventPayload = function(payload, callback) {
     const eventAttributes = Object.assign(payload);
     delete eventAttributes['user'];
     delete eventAttributes['device'];
-    return callback(null, eventAttributes);
+    return eventAttributes;
 };
 
 /*
