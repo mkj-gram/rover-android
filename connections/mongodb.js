@@ -13,7 +13,7 @@ module.exports.register = function(server, options, next) {
     const url = options.urls;
     // TODO
     // validate connection string
-    let mongoConfig = util._extend({ sslValidate: false }, options); 
+    let mongoConfig = util._extend({ sslValidate: false, poolSize: 25 }, options); 
 
     if (!util.isNullOrUndefined(mongoConfig.sslCertFile)) {
         mongoConfig.ssl = true
@@ -21,7 +21,7 @@ module.exports.register = function(server, options, next) {
         delete mongoConfig['sslCertFile'];
     }
 
-    MongoClient.connect(url, { mongos: mongoConfig }, function(err, db) {
+    MongoClient.connect(url, mongoConfig, function(err, db) {
         
         if (err) {
             return next(err);
