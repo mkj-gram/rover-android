@@ -17,7 +17,7 @@ internals.findByQuery = function(query, callback) {
     const logger = server.plugins.logger.logger;
     const librato = server.plugins.librato.client;
 
-    logger.debug('Service: [customer.findByQuery] \n' + util.inspect(query, true, null, false));
+    // logger.debug('Service: [customer.findByQuery] \n' + util.inspect(query, true, null, false));
 
     mongodb.collection(collection).findOne(query, {}, function(err, doc) {
         if (err) {
