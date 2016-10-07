@@ -7,7 +7,8 @@ const moment = require('moment');
 const async = require('async');
 const Joi = require('joi');
 const Event = require('../../lib/event');
-const VersionRegex = /\d+\.\d+\.\d+|\d+\.\d+/;
+const VersionRegex = /\d+\.\d+\.\d+$|\d+\.\d+$/;
+
 const Type = {
     STRING: 0,
     INTEGER: 1,
@@ -243,51 +244,53 @@ internals.create = function(request, reply) {
         return internals.writeError(reply, 400, { status: 400, error: "Invalid JSONAPI"});
     }
 
-    let parseTasks = {
-        customer: function(callback) {
-            internals.parseCustomerPayload(currentAccountId, request.payload.data.attributes.user, callback)
-        },
-        device: function(callback) {
-            internals.parseDevicePayload(currentDeviceId, request.payload.data.attributes.device, callback);
-        },
-        event: function(callback) {
-            internals.parseEventPayload(request.payload.data.attributes, callback)
-        }
-    };
+    let customer = internals.parseCustomerPayload(currentAccountId, request.payload.data.attributes.user);
+    
+    if (customer.error) {
+        return internals.writeError(reply, 400, { status: 400,  error: customer });
+    }
 
-    async.parallel(parseTasks, (err, results) => {
+    let device = internals.parseDevicePayload(currentDeviceId, request.payload.data.attributes.device);
+
+    if (device.error) {
+        return internals.writeError(reply, 400, { status: 400,  error: device }); 
+    }
+
+    let event = internals.parseEventPayload(request.payload.data.attributes);
+
+    if (event.error) {
+        return internals.writeError(reply, 400, { status: 400,  error: event }); 
+    }
+
+   
+    request.payload = {
+        customer: customer,
+        device: device,
+        event: event
+    }
+
+    internals.identify(request, (err, customer) => {
         if (err) {
-            return internals.writeError(reply, 400, { status: 400,  error: err })
-        }
-        request.payload = {
-            customer: results.customer,
-            device: results.device,
-            event: results.event
+            logger.error(util.format('%s %f', 'Request Failed', request.payload));
+            logger.error(err);
+            return internals.writeError(reply, 500, { status: 500, error: err });
         }
 
-        internals.identify(request, (err, customer) => {
-            if (err) {
-                logger.error(util.format('%s %f', 'Request Failed', request.payload));
-                logger.error(err);
-                return internals.writeError(reply, 500, { status: 500, error: err });
-            }
+        if (customer) {
+            //return internals.processEvent(request, reply, customer);
+            internals.updateCustomer(request, customer, (err, updatedCustomer) => {
+                if (err) {
+                    logger.error(util.format('%s %f', 'Request Failed', request.payload));
+                    logger.error(err);
+                    return internals.writeError(reply, 500, { status: 500, error: err });
+                }
 
-            if (customer) {
-                //return internals.processEvent(request, reply, customer);
-                internals.updateCustomer(request, customer, (err, updatedCustomer) => {
-                    if (err) {
-                        logger.error(util.format('%s %f', 'Request Failed', request.payload));
-                        logger.error(err);
-                        return internals.writeError(reply, 500, { status: 500, error: err });
-                    }
-
-                    return internals.processEvent(request, reply, updatedCustomer);
-                });
-            } else {
-                logger.error(util.format('%s %f', 'Request Failed to identify customer', request.payload));
-                return internals.writeError(reply, 500, { status: 500, error: "Failed to identify customer" });
-            }
-        });
+                return internals.processEvent(request, reply, updatedCustomer);
+            });
+        } else {
+            logger.error(util.format('%s %f', 'Request Failed to identify customer', request.payload));
+            return internals.writeError(reply, 500, { status: 500, error: "Failed to identify customer" });
+        }
     });
 };
 
@@ -750,7 +753,7 @@ const customerSchema = Joi.object().required().keys({
 
 
 
-internals.parseCustomerPayload = function(accountId, payload, callback) {
+internals.parseCustomerPayload = function(accountId, payload) {
 
     let customer = internals.underscoreKeys(payload, customerPayloadKeys);
     customer.account_id = accountId;
@@ -773,7 +776,7 @@ internals.parseCustomerPayload = function(accountId, payload, callback) {
 
     internals.parseValue(customer, 'age', Type.INTEGER);
     
-    return callback(null, customer);
+    return customer;
 };
 
 const deviceSchema = Joi.object().required().keys({
@@ -797,7 +800,7 @@ const deviceSchema = Joi.object().required().keys({
     'aid': Joi.string().optional().allow(null)
 }).rename('remote-notifications-enabled', 'notifications-enabled');
 
-internals.parseDevicePayload = function(id, payload, callback) {
+internals.parseDevicePayload = function(id, payload) {
 
 
     let device = internals.underscoreKeys(payload, devicePayloadKeys);
@@ -806,20 +809,20 @@ internals.parseDevicePayload = function(id, payload, callback) {
     device._id = id;
 
     if (!util.isString(device.app_identifier) || util.isString(device.app_identifier) && device.app_identifier.length == 0) {
-        return callback({ message: "device.app-identifier must be a valid string and not empty"});
+        return ({ error: true, message: "device.app-identifier must be a valid string and not empty"});
     }
 
     if (!util.isNullOrUndefined(device.remote_notifications_enabled)) {
         device.notifications_enabled = device.remote_notifications_enabled;
         delete device.remote_notifications_enabled;
     }
-
+    
     if (util.isNullOrUndefined(device.sdk_version) || !util.isNullOrUndefined(device.sdk_version) && util.isNullOrUndefined(device.sdk_version.match(VersionRegex))) {
-        return callback({ message: "device.sdk-version must be a valid gnu version number"});
+        return ({ error: true,  message: "device.sdk-version must be a valid gnu version number"});
     }
 
     if (util.isNullOrUndefined(device.os_version) || !util.isNullOrUndefined(device.os_version) && util.isNullOrUndefined(device.os_version.match(VersionRegex))) {
-        return callback({ message: "device.os-version must be a valid gnu version number"});
+        return ({ error: true, message: "device.os-version must be a valid gnu version number"});
     }
 
     internals.parseValue(device, 'token', Type.STRING);
@@ -838,9 +841,6 @@ internals.parseDevicePayload = function(id, payload, callback) {
     internals.parseValue(device, 'bluetooth_enabled', Type.BOOLEAN);
     internals.parseValue(device, 'development', Type.BOOLEAN);
     internals.parseValue(device, 'aid', Type.STRING);
-
-    // sdk-version
-
 
     if (device.locale_lang) {
         device.locale_lang = device.locale_lang.toLowerCase();
@@ -875,14 +875,14 @@ internals.parseDevicePayload = function(id, payload, callback) {
         }
     }
 
-    return callback(null, device);
+    return device
 };
 
 internals.parseEventPayload = function(payload, callback) {
     const eventAttributes = Object.assign(payload);
     delete eventAttributes['user'];
     delete eventAttributes['device'];
-    return callback(null, eventAttributes);
+    return eventAttributes;
 };
 
 /*
