@@ -763,7 +763,7 @@ internals.parseCustomerPayload = function(accountId, payload) {
     }
 
     if (customer.tags && util.isArray(customer.tags)) {
-        customer.tags = customer.tags.filter(tag => !util.isNullOrUndefined(tag));
+        customer.tags = customer.tags.filter(tag => { return (!util.isNullOrUndefined(tag) && util.isString(tag) && tag.length > 0) });
     } else {
         customer.tags = [];
     }
