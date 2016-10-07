@@ -34,10 +34,14 @@ internals.get = function(request, reply) {
                     reply.writeHead(204);
                     return reply.end();
                 } else {
+                    let response = JSON.stringify(internals.serialize(message));
+
                     reply.writeHead(200, {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Connection': 'keep-alive',
+                        'Content-Length': Buffer.byteLength(response, "utf-8")
                     });
-                    reply.write(JSON.stringify(internals.serialize(message)));
+                    reply.write(response);
                     return reply.end();
                 } 
             } else {

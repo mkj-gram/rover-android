@@ -4,6 +4,8 @@ const moment = require('moment');
 var dasherize = require('dasherize');
 const internals = {};
 
+const emptyInboxResponse = JSON.stringify({ data: [], meta: { 'unread-messages-count': 0 } });
+const emptyInboxContentLength = Buffer.byteLength(emptyInboxResponse, "utf-8");
 
 internals.isStale = function(request, lastModified) {
     if (util.isNullOrUndefined(lastModified)) {
@@ -52,14 +54,11 @@ internals.get = function(request, reply) {
                 
                 if (messageIds.length == 0) {
                     reply.writeHead(200, {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Connection': 'keep-alive',
+                        'Content-Length': emptyInboxContentLength
                     });
-                    reply.write(JSON.stringify({
-                        data: [],
-                        meta: {
-                            'unread-messages-count': 0
-                        }
-                    }));
+                    reply.write(emptyInboxResponse);
                     return reply.end();
                 }
 
@@ -79,23 +78,28 @@ internals.get = function(request, reply) {
                         }
                     }
 
-                    reply.writeHead(200, {
-                        'Content-Type': 'application/json',
-                        'Cache-Control': 'max-age=0, private, must-revalidate',
-                        'Last-Modified': customer.inbox_updated_at.toUTCString()
-                    });
-                    reply.write(JSON.stringify({
+                    let response = JSON.stringify({
                         data: data,
                         meta: {
                             'unread-messages-count': unreadMessageCount
                         }
-                    }));
+                    });
+
+                    reply.writeHead(200, {
+                        'Content-Type': 'application/json',
+                        'Connection': 'keep-alive',
+                        'Cache-Control': 'max-age=0, private, must-revalidate',
+                        'Last-Modified': customer.inbox_updated_at.toUTCString(),
+                        'Content-Length': Buffer.byteLength(response, "utf-8")
+                    });
+                    reply.write(response);
                     return reply.end();
                 });
             });
         } else {
             reply.writeHead(304, {
                 'Cache-Control': 'max-age=0, private, must-revalidate',
+                'Connection': 'keep-alive',
                 'Last-Modified': customer.inbox_updated_at.toUTCString()
             });
             return reply.end();

@@ -58,7 +58,8 @@ internals.get = function(request, reply) {
 
     internals.beforeFilter(request, reply, (customer, message) => {
         reply.writeHead(200, {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Connection': 'keep-alive'
         });
 
         reply.write(JSON.stringify({
@@ -109,7 +110,8 @@ internals.update = function(request, reply) {
                             return internals.writeError(reply, 500, { status: 500, error: "Failed to update inbox cache key"});
                         }
                         reply.writeHead(200, {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Connection': 'keep-alive'
                         });
                         reply.write(JSON.stringify({
                             data: internals.serialize(message)
@@ -120,7 +122,8 @@ internals.update = function(request, reply) {
 
             } else {
                 reply.writeHead(200, {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Connection': 'keep-alive'
                 });
                 reply.write(JSON.stringify({
                     data: internals.serialize(message)
