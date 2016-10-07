@@ -29,7 +29,7 @@ const customerPayloadKeys = new Set([
 
 const devicePayloadKeys = new Set([
     'token',
-    'locale-lange',
+    'locale-lang',
     'locale-region',
     'time-zone',
     'sdk-version',
@@ -823,7 +823,7 @@ internals.parseDevicePayload = function(id, payload, callback) {
     }
 
     internals.parseValue(device, 'token', Type.STRING);
-    internals.parseValue(device, 'locale_region', Type.STRING);
+    internals.parseValue(device, 'locale_lang', Type.STRING);
     internals.parseValue(device, 'locale_region', Type.STRING);
     internals.parseValue(device, 'time_zone', Type.STRING);
     internals.parseValue(device, 'sdk_version', Type.STRING);
