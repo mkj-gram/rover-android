@@ -11,12 +11,14 @@ const Event = require('../../lib/event');
 const internals = {};
 
 internals.writeError = function(reply, status, message) {
+    let response = JSON.stringify(message);
     reply.writeHead(status, {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(response, "utf-8")
     });
-    let jsonMessage = JSON.stringify(message);
-    console.error(jsonMessage);
-    reply.write(jsonMessage);
+    
+    console.error(response);
+    reply.write(response);
     reply.end();
 };
 
@@ -596,10 +598,15 @@ internals.processEvent = function(request, reply, customer) {
         }
 
         internals.partialUpdateCustomerAndDevice(request.server, customer, device, newCustomer, newDeivce).then(({ customer, device }) => {
+
+            let response = JSON.stringify(eventResponse);
+
             reply.writeHead(200, {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Connection': 'keep-alive',
+                'Content-Length': Buffer.byteLength(response, "utf-8")
             });
-            reply.write(JSON.stringify(eventResponse));
+            reply.write(response);
             return reply.end();
         });
     })
