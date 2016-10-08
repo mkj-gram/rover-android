@@ -625,13 +625,13 @@ internals.processEvent = function(request, reply, customer) {
     newrelic.setTransactionName(event.getTransactionName());
     
 
-    event.process((err, newCustomer, newDeivce, eventResponse) => {
+    event.process((err, newCustomer, newDevice, eventResponse) => {
         if (err) {
             return internals.writeError(reply, 500, { status: 500, message: err });
         }
 
-        internals.partialUpdateCustomerAndDevice(request.server, customer, device, newCustomer, newDeivce).then(({ customer, device }) => {
-
+        internals.partialUpdateCustomerAndDevice(request.server, customer, device, newCustomer, newDevice).then(({ customer, device }) => {
+            
             let response = JSON.stringify(eventResponse);
 
             reply.writeHead(200, {
