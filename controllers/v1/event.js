@@ -168,18 +168,8 @@ internals.partialUpdateCustomerAndDevice = function(server, customer, device, ne
         // what is customer
         
         // calculate the differences between each object
-        let customerUpdates = {};
-        let deviceUpdates = {};
-
-        Object.assign(customerUpdates, internals.customerDifferences(customer, newCustomer));
-
-        // Object.assign(customerUpdates, internals.customerDifferences(newCustomer, customer));
-
-        // find the differences between device and payload
-        Object.assign(deviceUpdates, internals.deviceDifferences(device, newDevice));
-
-        // Object.assign(deviceUpdates, internals.deviceDifferences(newDevice, device));
-
+        let customerUpdates = internals.customerDifferences(customer, newCustomer);
+        let deviceUpdates = internals.deviceDifferences(device, newDevice);
 
         if (Object.keys(customerUpdates).length > 0 || Object.keys(deviceUpdates).length > 0 ) {
             logger.info("Updating Customer! " + customer._id.toString());
