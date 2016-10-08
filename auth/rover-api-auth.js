@@ -71,7 +71,10 @@ internals.authenticate = function(request, callback) {
                 account: cachedAccount
             }
         };
-        return callback(true);
+        process.nextTick(function() {
+            return callback(true);
+        });
+        return;
     }
 };
 
