@@ -1,17 +1,9 @@
 'use strict';
 
 const util = require('util');
-const LRU = require('lru-cache');
+const TimedCache = require('../lib/timed-cache');
 
-const cacheOptions = {
-    max: 500,
-    length: function(n, key) {
-        return 1;
-    },
-    maxAge: 60000
-}
-
-const accountCache = LRU(cacheOptions);
+const accountCache = new TimedCache();
 
 const internals = {};
 
@@ -28,6 +20,7 @@ internals.authenticate = function(request, callback) {
     let cachedAccount = accountCache.get(authorization);
 
     if (util.isNullOrUndefined(cachedAccount)) {
+        console.log("Not Cached");
         postgres.connect((err, client, done) => {
             if (err) {
                 done();
@@ -49,18 +42,25 @@ internals.authenticate = function(request, callback) {
                 const account = result.rows[0];
 
                 if (account) {
-                    accountCache.set(authorization, account);
+                    accountCache.set(authorization, account, 60000);
                     request.auth = {
                         credentials: {
                             account: account
                         }
                     };
-                    return callback(true);
+
+                    process.nextTick(function() {
+                        return callback(true);
+                    });
+                    return;
                 } else {
                     request.auth = {
                         credentials: {}
                     };
-                    return callback(false);
+                    process.nextTick(function() {
+                        return callback(false);
+                    });
+                    return;
                 }
 
             });
