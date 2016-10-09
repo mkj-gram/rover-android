@@ -20,7 +20,7 @@ internals.authenticate = function(request, callback) {
     let cachedAccount = accountCache.get(authorization);
 
     if (util.isNullOrUndefined(cachedAccount)) {
-        console.log("Not Cached");
+        
         postgres.connect((err, client, done) => {
             if (err) {
                 done();
