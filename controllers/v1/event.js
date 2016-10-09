@@ -172,7 +172,7 @@ internals.partialUpdateCustomerAndDevice = function(server, customer, device, ne
         let deviceUpdates = internals.deviceDifferences(device, newDevice);
 
         if (Object.keys(customerUpdates).length > 0 || Object.keys(deviceUpdates).length > 0 ) {
-            logger.info("Updating Customer! " + customer._id.toString());
+            logger.debug("Updating Customer! " + customer._id.toString());
             
             logger.debug(customerUpdates);
             logger.debug(deviceUpdates);
