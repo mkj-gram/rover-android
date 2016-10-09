@@ -36,7 +36,7 @@ internals.get = function(request, reply) {
             reply.writeHead(404, {
                 'Content-Type': 'application/json'
             });
-            reply.write(JSON.stringify({ errors: [ { message: "You must create and submit and event first before loading inbox" }]}));
+            reply.write(JSON.stringify({ errors: [ { message: "You must create and submit an event before loading the inbox" }]}));
             return reply.end();
         }
 
