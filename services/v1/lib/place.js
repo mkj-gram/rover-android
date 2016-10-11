@@ -140,7 +140,7 @@ internals.sortedPlacesByDistance = function(places, latitude, longitude, limit, 
     // copy the array we don't want to mutate it
     let placesCopy = places.slice();
 
-    placesCopy.sort(place => {
+    const getCachedDistance = function(place, latitude, longitude) {
         if (distanceCache[place.id]) {
             return distanceCache[place.id];
         } else {
@@ -148,6 +148,10 @@ internals.sortedPlacesByDistance = function(places, latitude, longitude, limit, 
             distanceCache[place.id] = distance;
             return distance;
         }
+    };
+
+    placesCopy.sort(function(a,b) {
+        return getCachedDistance(a, latitude, longitude) - getCachedDistance(b, latitude, longitude);
     });
 
     return callback(null, placesCopy.slice(0, limit));
