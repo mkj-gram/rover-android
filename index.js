@@ -168,8 +168,17 @@ const httpServer = http.createServer(router(server));
 process.on('SIGINT', function() {
     console.log("Shutting down");
     let tasks = [];
-    let queue = server.connections.elasticsearch.queue;
-    let librato = server.plugins.librato.client;
+    let queue;
+    let librato;
+
+    if (server.connections && server.connections.elasticsearch && server.connections.elasticsearch.queue) {
+        queue = server.connections.elasticsearch.queue;
+    }
+
+    if (server.plugins && server.plugins.librato && server.plugins.librato.client) {
+        librato = server.plugins.librato.client;    
+    }
+    
 
     if (librato) {
         tasks.push(function(callback) {
