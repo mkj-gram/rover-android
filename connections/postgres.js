@@ -1,7 +1,7 @@
 'use strict';
 
 const extend = require('util')._extend;
-const pg = require('pg');
+const pg = require('pg').native;
 const Joi = require('joi');
 
 const optionsSchema = Joi.object().keys({
