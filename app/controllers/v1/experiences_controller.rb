@@ -511,7 +511,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
         case action[:type]
         when 'go-to-screen'
-            data.merge!({ screen_id: action[:screen_id], experience_id: action[:experience_id] })
+            data.merge!({ screen_id: action[:screen_id], experience_id: @experience.id })
         when 'open-url'
             data.merge!({ url: action[:url] })
         end
