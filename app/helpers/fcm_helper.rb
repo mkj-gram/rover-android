@@ -38,6 +38,11 @@ module FcmHelper
             expired_tokens = []
             notifications.each do |notification|
                 response = connection.send_with_notification_key(notification[:token], { notification: notification[:notification], data: notification[:data]})
+                
+                if response[:status] == 401
+                    return []
+                end
+
                 body = JSON.parse(response[:body])
                 if body.has_key?("failure") && body["failure"] > 0
                     body["results"].each do |result|
