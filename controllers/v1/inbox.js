@@ -7,6 +7,14 @@ const internals = {};
 const emptyInboxResponse = JSON.stringify({ data: [], meta: { 'unread-messages-count': 0 } });
 const emptyInboxContentLength = Buffer.byteLength(emptyInboxResponse, "utf-8");
 
+internals.getLastModifiedAt = function(customer) {
+    if (util.isNullOrUndefined(customer.inbox_updated_at)) {
+        return undefined;
+    } else {
+        return moment(customer.inbox_updated_at).toDate().toUTCString();
+    }
+}
+
 internals.isStale = function(request, lastModified) {
     if (util.isNullOrUndefined(lastModified)) {
         return true
@@ -85,23 +93,40 @@ internals.get = function(request, reply) {
                         }
                     });
 
-                    reply.writeHead(200, {
+                    let headers = {
                         'Content-Type': 'application/json',
                         'Connection': 'keep-alive',
                         'Cache-Control': 'max-age=0, private, must-revalidate',
-                        'Last-Modified': customer.inbox_updated_at.toUTCString(),
                         'Content-Length': Buffer.byteLength(response, "utf-8")
-                    });
+                    }
+
+                    let lastModifiedAt = internals.getLastModifiedAt(customer);
+                    if (!util.isNullOrUndefined(lastModifiedAt)) {
+                        util._extend(headers, {
+                            'Last-Modified': lastModifiedAt
+                        });
+                    }
+                    reply.writeHead(200, headers);
                     reply.write(response);
                     return reply.end();
                 });
             });
         } else {
-            reply.writeHead(304, {
+
+            let headers = {
                 'Cache-Control': 'max-age=0, private, must-revalidate',
                 'Connection': 'keep-alive',
-                'Last-Modified': customer.inbox_updated_at.toUTCString()
-            });
+                'Content-Length': 0
+            }
+
+            let lastModifiedAt = internals.getLastModifiedAt(customer);
+            if (!util.isNullOrUndefined(lastModifiedAt)) {
+                util._extend(headers, {
+                    'Last-Modified': lastModifiedAt
+                });
+            }
+
+            reply.writeHead(304, headers);
             return reply.end();
         }        
     });
