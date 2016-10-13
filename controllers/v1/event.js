@@ -748,7 +748,7 @@ internals.parseCustomerPayload = function(accountId, payload) {
     let customer = internals.underscoreKeys(payload, customerPayloadKeys);
     customer.account_id = accountId;
 
-    if (util.isNull(customer.identifier)) {
+    if (util.isNull(customer.identifier) || util.isString(customer.identifier) && customer.identifier.length == 0) {
         delete customer.identifier;
     }
 
