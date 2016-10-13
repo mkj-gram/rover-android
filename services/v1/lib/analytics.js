@@ -1,7 +1,7 @@
 'use strict';
 
 const internals = {};
-const TWELEVE_HOURS = 43200;
+const THRESHOLD_HOURS = 50400;
 
 internals.getTag = function(event) {
     return `account_${event._account.id}.event`;
@@ -16,7 +16,7 @@ internals.capture = function(event) {
     let tag = internals.getTag(event);
     let record = event.toRecord();
 
-    if (timestamp > Math.floor(Date.now() / 1000) + TWELEVE_HOURS ) {
+    if (timestamp > Math.floor(Date.now() / 1000) + THRESHOLD_HOURS ) {
         logger.warn("Event was generated too far in the future: " + tag);
         logger.warn(record);
         return;
