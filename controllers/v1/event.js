@@ -712,6 +712,10 @@ internals.underscoreKeys = function(obj, allowedKeysSet) {
 // node will optimize this as an inline function
 internals.parseValue = function(payload, key, type) {
     const value = payload[key];
+    
+    if (util.isUndefined(value)) {
+        return;
+    }
 
     if (type == Type.STRING) {
         if (!util.isString(value) || util.isString(value) && value.length == 0) {
