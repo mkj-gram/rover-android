@@ -28,27 +28,40 @@ internals.beforeFilter = function(request, reply, callback) {
 
     methods.application.getCurrentCustomer(request, (err, customer) => {
         if (err) {
-            return internals.writeError(reply, 500, { status: 500, error: "Failed to find customer"});
+            internals.writeError(reply, 500, { status: 500, error: "Failed to find customer"});
+            return callback(err);
         }
 
         if (util.isNullOrUndefined(customer)) {
-            return internals.writeError(reply, 422, { status: 422, error: "Failed to find customer"});
+            internals.writeError(reply, 422, { status: 422, error: "Failed to find customer"});
+            return callback(err);
         }
         
         methods.message.find(messageId, { excludedFields: ['landing_page'] }, (err, message) => {
             if (err) {
-                return internals.writeError(reply, 500, { status: 500, error: err });
+                internals.writeError(reply, 500, { status: 500, error: err });
+                return callback(err);
             }
 
             if (message) {
-                if (customer._id.equals(message.customer_id)) {
-                    return callback(customer, message); 
-                } else {
-                   return internals.writeError(reply, 403, { status: 403, error: 'Cannot view message'});
-                }
+                let templateId = message.message_template_id;
+
+                methods.messageTemplate.find(templateId, { useCache: true }, (err, template) => {
+                    if (err) {
+                        internals.writeError(reply, 500, { status: 500, error: 'Cannot find message'});
+                        return callback(err);
+                    }
+                    if (customer._id.equals(message.customer_id)) {
+                        return callback(null, customer, message, template); 
+                    } else {
+                       internals.writeError(reply, 403, { status: 403, error: 'Cannot view message'});
+                       return callback(err);
+                    }
+                });
             }
 
-            return internals.writeError(reply, 404, { status: 404, error: 'Message not found'})
+            internals.writeError(reply, 404, { status: 404, error: 'Message not found'});
+            return callback(err);
         });
     });
 };
@@ -56,14 +69,20 @@ internals.beforeFilter = function(request, reply, callback) {
 // GET /v1/inbox/messages/:id
 internals.get = function(request, reply) {
 
-    internals.beforeFilter(request, reply, (customer, message) => {
+    internals.beforeFilter(request, reply, (err, customer, message, template) => {
+
+        if (err) {
+            // error was raised we shouldn't do anything
+            return;
+        }
+
         reply.writeHead(200, {
             'Content-Type': 'application/json',
             'Connection': 'keep-alive'
         });
 
         reply.write(JSON.stringify({
-            data: internals.serialize(message)
+            data: internals.serialize(message, template)
         }));
 
         return reply.end();
@@ -76,7 +95,12 @@ internals.update = function(request, reply) {
 
     const methods = request.server.methods;
 
-    internals.beforeFilter(request, reply, (customer, message) => {
+    internals.beforeFilter(request, reply, (err, customer, message, template) => {
+        
+        if (err) {
+            return;
+        }
+
         const server = request.server;
         const methods = server.methods;
 
@@ -139,7 +163,12 @@ internals.destroy = function(request, reply) {
 
     const methods = request.server.methods;
 
-    internals.beforeFilter(request, reply, (customer, message) => {
+    internals.beforeFilter(request, reply, (err, customer, message, template) => {
+        
+        if (err) {
+            return;
+        }
+
         methods.message.deleteOne(message._id, (err) => {
             if (err) {
                 return internals.writeError(reply, 500, { status: 500, error: "Failed to delete message "});
@@ -162,32 +191,32 @@ internals.destroy = function(request, reply) {
     });
 };
 
+internals.serialize = function(message, template) {
+    return {
+        id: message._id.toString(),
+        type: 'messages',
+        attributes: {
+            'notification-text': template.notification_text,
+            'ios-title': message.ios_title || template.ios_title || "",
+            'android-title': message.ios_title || template.android_title || "",
+            'tags': template.tags || [],
+            'read': message.read,
+            'saved-to-inbox': message.saved_to_inbox,
+            'content-type': template.content_type,
+            'website-url': template.website_url,
+            'deep-link-url': template.deeplink_url,
+            'landing-page': dasherize(template.landing_page),
+            'experience-id': template.experience_id,
+            'properties': template.properties || {},
+            'timestamp': moment.utc(message.timestamp).toISOString()
+        }
+    }
+};
+
 module.exports = {
     get: internals.get,
     update: internals.update,
     destroy: internals.destroy
 }
-
-internals.serialize = function(message) {
-    return {
-        id: message._id.toString(),
-        type: 'messages',
-        attributes: {
-            'notification-text': message.notification_text,
-            'ios-title': message.ios_title,
-            'android-title': message.android_title,
-            'tags': message.tags,
-            'read': message.read,
-            'saved-to-inbox': message.saved_to_inbox,
-            'content-type': message.content_type,
-            'website-url': message.website_url,
-            'deep-link-url': message.deeplink_url,
-            'landing-page': null, // we always render null so that the sdk is able to grab and render the inbox quickly
-            'experience-id': message.experience_id,
-            'properties': message.properties || {},
-            'timestamp': moment.utc(message.timestamp).toISOString()
-        }
-    }
-};
 
 
