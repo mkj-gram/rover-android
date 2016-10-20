@@ -3,6 +3,7 @@ const CustomerService = require('./lib/customer');
 const EventService = require('./lib/event');
 const InboxService = require('./lib/inbox');
 const MessageService = require('./lib/message');
+const MessageTemplateService = require('./lib/message-template');
 const AccountService = require('./lib/account');
 const BeaconConfigurationService = require('./lib/beacon-configuration');
 const PlaceService = require('./lib/place');
@@ -19,6 +20,7 @@ module.exports.register = function(server, options, next) {
     server.methods.customer = {};
     server.methods.inbox = {};
     server.methods.message = {};
+    server.methods.messageTemplate = {};
     server.methods.account = {};
     server.methods.beaconConfiguration = {};
     server.methods.place = {};
@@ -55,6 +57,9 @@ module.exports.register = function(server, options, next) {
     server.methods.message.deleteOne = MessageService.deleteOne.bind(server);
     server.methods.message.bulkInsert = MessageService.bulkInsert.bind(server);
 
+    server.methods.messageTemplate.find = MessageTemplateService.find.bind(server);
+    server.methods.messageTemplate.findAll = MessageTemplateService.findAll.bind(server);
+    
     server.methods.account.find = AccountService.find.bind(server);
     server.methods.account.incrementCounter = AccountService.incrementCounter.bind(server);
     server.methods.account.decrementCounter = AccountService.decrementCounter.bind(server);

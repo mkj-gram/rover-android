@@ -2,6 +2,7 @@
 const util = require('util');
 const moment = require('moment');
 var dasherize = require('dasherize');
+const underscore = require('underscore');
 const internals = {};
 
 const emptyInboxResponse = JSON.stringify({ data: [], meta: { 'unread-messages-count': 0 } });
@@ -75,40 +76,54 @@ internals.get = function(request, reply) {
                         return reply({ status: 500, error: err });
                     }
 
-                    const data = messages.map(message => internals.serialize(message));
+                    let templateIds = Array.from(new Set(messages.map(message => message.message_template_id)));
                     
-                    data.reverse();
-
-                    let unreadMessageCount = 0;
-                    for ( var i = 0; i < messages.length ; i++ ) {
-                        if (messages[i].read == false) {
-                            unreadMessageCount++;
+                    methods.messageTemplate.findAll(templateIds, { useCache: true }, (err, templates) => {
+                        if (err) {
+                            return reply({ status: 500, error: err });
                         }
-                    }
 
-                    let response = JSON.stringify({
-                        data: data,
-                        meta: {
-                            'unread-messages-count': unreadMessageCount
-                        }
-                    });
+                        let templateIndex = underscore.indexBy(templates, 'id');
 
-                    let headers = {
-                        'Content-Type': 'application/json',
-                        'Connection': 'keep-alive',
-                        'Cache-Control': 'max-age=0, private, must-revalidate',
-                        'Content-Length': Buffer.byteLength(response, "utf-8")
-                    }
-
-                    let lastModifiedAt = internals.getLastModifiedAt(customer);
-                    if (!util.isNullOrUndefined(lastModifiedAt)) {
-                        util._extend(headers, {
-                            'Last-Modified': lastModifiedAt
+                        const data = messages.map(message => {
+                            let template = templateIndex[message.message_template_id];
+                            return internals.serialize(message, template);
                         });
-                    }
-                    reply.writeHead(200, headers);
-                    reply.write(response);
-                    return reply.end();
+
+                        data.reverse();
+
+                        let unreadMessageCount = 0;
+                        for ( var i = 0; i < messages.length ; i++ ) {
+                            if (messages[i].read == false) {
+                                unreadMessageCount++;
+                            }
+                        }
+
+                        let response = JSON.stringify({
+                            data: data,
+                            meta: {
+                                'unread-messages-count': unreadMessageCount
+                            }
+                        });
+
+                        let headers = {
+                            'Content-Type': 'application/json',
+                            'Connection': 'keep-alive',
+                            'Cache-Control': 'max-age=0, private, must-revalidate',
+                            'Content-Length': Buffer.byteLength(response, "utf-8")
+                        }
+
+                        let lastModifiedAt = internals.getLastModifiedAt(customer);
+                        if (!util.isNullOrUndefined(lastModifiedAt)) {
+                            util._extend(headers, {
+                                'Last-Modified': lastModifiedAt
+                            });
+                        }
+                        reply.writeHead(200, headers);
+                        reply.write(response);
+                        return reply.end();
+
+                    });
                 });
             });
         } else {
@@ -132,23 +147,23 @@ internals.get = function(request, reply) {
     });
 };
 
-internals.serialize = function(message) {
+internals.serialize = function(message, template) {
     return {
         id: message._id.toString(),
         type: 'messages',
         attributes: {
-            'notification-text': message.notification_text,
-            'ios-title': message.ios_title,
-            'android-title': message.android_title,
-            'tags': message.tags,
+            'notification-text': template.notification_text,
+            'ios-title': template.ios_title || "",
+            'android-title': template.android_title || "",
+            'tags': template.tags || [],
             'read': message.read,
             'saved-to-inbox': message.saved_to_inbox,
-            'content-type': message.content_type,
-            'website-url': message.website_url,
-            'deep-link-url': message.deeplink_url,
-            'landing-page': dasherize(message.landing_page),
-            'experience-id': message.experience_id,
-            'properties': message.properties || {},
+            'content-type': template.content_type,
+            'website-url': template.website_url,
+            'deep-link-url': template.deeplink_url,
+            'landing-page': dasherize(template.landing_page),
+            'experience-id': template.experience_id,
+            'properties': template.properties || {},
             'timestamp': moment.utc(message.timestamp).toISOString()
         }
     }
