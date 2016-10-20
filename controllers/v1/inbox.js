@@ -153,8 +153,8 @@ internals.serialize = function(message, template) {
         type: 'messages',
         attributes: {
             'notification-text': template.notification_text,
-            'ios-title': template.ios_title || "",
-            'android-title': template.android_title || "",
+            'ios-title': message.ios_title || template.ios_title || "",
+            'android-title': message.ios_title || template.android_title || "",
             'tags': template.tags || [],
             'read': message.read,
             'saved-to-inbox': message.saved_to_inbox,
