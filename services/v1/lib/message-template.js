@@ -47,7 +47,13 @@ internals.find = function(id, args, callback) {
     logger.debug(`Service: [message-template.find: ${id}] ` + util.inspect(args, true, null, false));
 
     if (args && args.useCache == true) {
-    	let cacheKey = id.toString();
+
+    	// Cache for 5 mins
+    	// TODO:
+    	// content api should include cache key for when messages have been updated
+    	let nearestInterval = Math.round((Date.now() / 1000) / 300) * 300;
+    	let cacheKey = `${id.toString()}-${nearestInterval}`;
+
     	if (!templateCache.has(cacheKey)) {
     		internals.getById(server, id, (err, template) => {
     			if (err) {
@@ -77,7 +83,7 @@ internals.findAll = function(ids, args, callback) {
 		if (err) {
 			return callback(err);
 		}
-		
+
 		return callback(null, results.filter(template => !util.isNullOrUndefined(template)));
 	});
 
