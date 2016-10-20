@@ -161,7 +161,7 @@ internals.serialize = function(message, template) {
             'content-type': template.content_type,
             'website-url': template.website_url,
             'deep-link-url': template.deeplink_url,
-            'landing-page': dasherize(template.landing_page),
+            'landing-page': dasherize(template.landing_page_template),
             'experience-id': template.experience_id,
             'properties': template.properties || {},
             'timestamp': moment.utc(message.timestamp).toISOString()
