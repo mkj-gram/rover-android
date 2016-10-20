@@ -62,6 +62,7 @@ class MessageTemplate < ActiveRecord::Base
     validate :valid_properties
     validates :content_type, inclusion: { in: ['landing-page', 'custom', 'experience', 'website', 'deep-link']}
 
+    before_create :set_app_titles
     after_create :create_stats_document
 
     def as_indexed_json(opts = {})
@@ -357,6 +358,11 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     private
+
+    def set_app_titles
+        self.ios_title = get_ios_title
+        self.android_title = get_android_title
+    end
 
     def create_stats_document
         stats = MessageTemplateStats.new(_id: self.id)
