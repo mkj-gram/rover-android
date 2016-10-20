@@ -138,7 +138,7 @@ internals.update = function(request, reply) {
                             'Connection': 'keep-alive'
                         });
                         reply.write(JSON.stringify({
-                            data: internals.serialize(message)
+                            data: internals.serialize(message, template)
                         }));
                         return reply.end();
                     });
@@ -150,7 +150,7 @@ internals.update = function(request, reply) {
                     'Connection': 'keep-alive'
                 });
                 reply.write(JSON.stringify({
-                    data: internals.serialize(message)
+                    data: internals.serialize(message, template)
                 }));
                 return reply.end();
             }
@@ -164,7 +164,7 @@ internals.destroy = function(request, reply) {
     const methods = request.server.methods;
 
     internals.beforeFilter(request, reply, (err, customer, message, template) => {
-        
+
         if (err) {
             return;
         }
