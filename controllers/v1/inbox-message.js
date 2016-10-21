@@ -3,6 +3,7 @@
 const Joi = require('joi');
 const util = require('util');
 const moment = require('moment');
+var dasherize = require('dasherize');
 const internals = {};
 
 const updateSchema = Joi.object().required().keys({
@@ -37,7 +38,7 @@ internals.beforeFilter = function(request, reply, callback) {
             return callback(err);
         }
         
-        methods.message.find(messageId, { excludedFields: ['landing_page'] }, (err, message) => {
+        methods.message.find(messageId, { fields: ['_id', 'customer_id', 'message_template_id'] }, (err, message) => {
             if (err) {
                 internals.writeError(reply, 500, { status: 500, error: err });
                 return callback(err);
@@ -51,17 +52,18 @@ internals.beforeFilter = function(request, reply, callback) {
                         internals.writeError(reply, 500, { status: 500, error: 'Cannot find message'});
                         return callback(err);
                     }
-                    if (customer._id.equals(message.customer_id)) {
+
+                    if (template && customer._id.equals(message.customer_id)) {
                         return callback(null, customer, message, template); 
                     } else {
                        internals.writeError(reply, 403, { status: 403, error: 'Cannot view message'});
                        return callback(err);
                     }
                 });
+            } else {
+                internals.writeError(reply, 404, { status: 404, error: 'Message not found'});
+                return callback("Not found");  
             }
-
-            internals.writeError(reply, 404, { status: 404, error: 'Message not found'});
-            return callback(err);
         });
     });
 };
@@ -70,7 +72,7 @@ internals.beforeFilter = function(request, reply, callback) {
 internals.get = function(request, reply) {
 
     internals.beforeFilter(request, reply, (err, customer, message, template) => {
-
+        
         if (err) {
             // error was raised we shouldn't do anything
             return;
