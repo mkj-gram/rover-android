@@ -17,53 +17,50 @@ class SendMessageWorker
         # we need to plan our orchestration
         # first determine what our cluster looks like
         client = Elasticsearch::Model.client
-        segments = client.indices.segments(index: Customer.get_index_name(account))
+        # segments = client.indices.segments(index: Customer.get_index_name(account))
         # determine which shards hold our data
-        shards = segments["indices"]["customers"]["shards"].keys
+        # shards = segments["indices"]["customers"]["shards"].keys
         # split queries to each shard split again by number of documents
-        shards.each do |shard|
-            for i in 1..Customer::MAX_BUCKETS
-                bucket_query = ElasticsearchHelper.merge_queries(base_query, {
-                    filter: {
-                        bool: {
-                            must: [
-                                {
-                                    term: {
-                                        document_bucket: i
-                                    }
-                                },
-                                {
-                                    term: {
-                                        account_id: account.id
-                                    }
+
+        for i in 1..Customer::MAX_BUCKETS
+            bucket_query = ElasticsearchHelper.merge_queries(base_query, {
+                filter: {
+                    bool: {
+                        must: [
+                            {
+                                term: {
+                                    document_bucket: i
                                 }
-                            ]
-                        }
+                            }
+                        ]
                     }
-                })
+                },
+                sort: [
+                    "_doc"
+                ]
+            })
 
-                job = {
-                    message_template: message_template,
-                    account: account,
-                    test_customer_ids: test_customer_ids,
-                    query: bucket_query,
-                    segment: customer_segment,
-                    platform_credentials: {
-                        fcm: {
-                            api_key: account.android_platform.api_key
-                        },
-                        apns: {
-                            certificate: account.ios_platform.certificate ? Base64.encode64(account.ios_platform.certificate) : nil,
-                            passphrase: account.ios_platform.passphrase,
-                            topic: account.ios_platform.bundle_id
-                        }
+            job = {
+                message_template: message_template,
+                account: account,
+                test_customer_ids: test_customer_ids,
+                query: bucket_query,
+                segment: customer_segment,
+                platform_credentials: {
+                    fcm: {
+                        api_key: account.android_platform.api_key
                     },
-                    preference: "_shards:#{shard}"
-
+                    apns: {
+                        certificate: account.ios_platform.certificate ? Base64.encode64(account.ios_platform.certificate) : nil,
+                        passphrase: account.ios_platform.passphrase,
+                        topic: account.ios_platform.bundle_id
+                    }
                 }
-                RabbitMQPublisher.publish(job.to_json, {to_queue: 'send_message_to_customers', content_type: 'application/json'})
-            end
+            }
+
+            RabbitMQPublisher.publish(job.to_json, {to_queue: 'send_message_to_customers', content_type: 'application/json'})
         end
+        
         # For testing purposes if you want to trigger a full scan as 1 job
         # bucket_query = ElasticsearchHelper.merge_queries(base_query, {
         #             filter: {
