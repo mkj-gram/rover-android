@@ -6,6 +6,20 @@ const moment = require('moment');
 const internals = {};
 const collection = 'customers';
 
+internals.parseVersion = function(version) {
+    if (!util.isNullOrUndefined(version) && util.isString(version)) {
+        let parsedVersion = version.split('.').map(i => parseInt(i));
+        return {
+            major: parsedVersion[0],
+            minor: parsedVersion[1],
+            revision: parsedVersion[2]
+        }
+    } else {
+        return version;
+    }
+};
+
+
 internals.find = function(id) {
     return id;
 };
@@ -229,11 +243,11 @@ internals.deviceAsIndexedJson = function(device) {
         locale_lang: device.locale_lang,
         locale_region: device.locale_region,
         time_zone: device.time_zone,
-        sdk_version: device.sdk_version,
+        sdk_version: internals.parseVersion(device.sdk_version),
         app_identifier: device.app_identifier,
         platform: device.platform,
         os_name: device.os_name,
-        os_version: device.os_version,
+        os_version: internals.parseVersion(device.os_version),
         model: device.model,
         manufacturer: device.manufacturer,
         carrier: device.carrier,
