@@ -70,11 +70,11 @@ class CustomerDevice
             locale_lang: self.locale_lang,
             locale_region: self.locale_region,
             time_zone: self.time_zone,
-            sdk_version: self.sdk_version,
+            sdk_version: self.parsed_sdk_version,
             app_identifier: self.app_identifier,
             platform: self.platform,
             os_name: self.os_name,
-            os_version: self.os_version,
+            os_version: self.parsed_os_version,
             model: self.model,
             manufacturer: self.manufacturer,
             carrier: self.carrier,
@@ -114,6 +114,32 @@ class CustomerDevice
             end
         else
             return self.development
+        end
+    end
+
+    def parsed_os_version
+        if os_version
+            major, minor, revision = os_version.split('.').map(&:to_i)
+            return {
+                major: major,
+                minor: minor,
+                revision: revision
+            }    
+        else
+            return nil
+        end
+    end
+
+    def parsed_sdk_version
+        if sdk_version
+            major, minor, revision = sdk_version.split('.').map(&:to_i)
+            return {
+                major: major,
+                minor: minor,
+                revision: revision
+            }    
+        else
+            return nil
         end
     end
 

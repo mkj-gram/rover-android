@@ -8,6 +8,7 @@ class Customer
 
     MAX_BUCKETS = 5
 
+    index_name("customers_v2")
 
     attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
     attribute :account_id, Integer
@@ -103,12 +104,20 @@ class Customer
                 indexes :locale_lang, type: 'string', index: 'not_analyzed'
                 indexes :locale_region, type: 'string', index: 'not_analyzed'
                 indexes :time_zone, type: 'string', index: 'not_analyzed'
-                indexes :sdk_version, type: 'string', index: 'not_analyzed'
+                indexes :sdk_version, type: 'object', dynamic: false do
+                    indexes :major, type: 'integer', index: 'not_analyzed'
+                    indexes :minor, type: 'integer', index: 'not_analyzed'
+                    indexes :revision, type: 'integer', index: 'not_analyzed'
+                end
                 indexes :app_identifier, type: 'string', index: 'not_analyzed'
                 indexes :location, type: "geo_point", lat_lon: true
                 indexes :platform, type: 'string', index: 'not_analyzed'
                 indexes :os_name, type: 'string', index: 'not_analyzed'
-                indexes :os_version, type: 'string', index: 'not_analyzed'
+                indexes :os_version, type: 'object', dynamic: false do
+                    indexes :major, type: 'integer', index: 'not_analyzed'
+                    indexes :minor, type: 'integer', index: 'not_analyzed'
+                    indexes :revision, type: 'integer', index: 'not_analyzed'
+                end
                 indexes :model, type: 'string', index: 'not_analyzed'
                 indexes :manufacturer, type: 'string', index: 'not_analyzed'
                 indexes :carrier, type: 'string', index: 'not_analyzed'
@@ -166,8 +175,8 @@ class Customer
 
     def self.create_index!(opts = {})
         client = Customer.__elasticsearch__.client
-        settings = Customer.settings.to_hash.merge(BeaconConfigurationVisit.settings.to_hash)
-        mappings = Customer.mappings.to_hash.merge(BeaconConfigurationVisit.mappings.to_hash)
+        settings = Customer.settings.to_hash
+        mappings = Customer.mappings.to_hash
         dynamic_templates = [
             {
                 strings: {
@@ -197,7 +206,6 @@ class Customer
             index: Customer.index_name,
             name: Customer.get_index_name(account),
             body: {
-                routing: "customers",
                 filter: {
                     term: {
                         account_id: account.id
