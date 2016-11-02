@@ -25,7 +25,7 @@ module Events
             @customer = extra.delete(:customer)
             @device = extra.delete(:device)
             @generation_time = get_time(event_attributes[:time])
-            @errors = event_attributes.delete(:errors)
+            @errors = event_attributes.delete(:errors) || []
             @raw_input = event_attributes.to_json
             @included = []
             @messages = []
