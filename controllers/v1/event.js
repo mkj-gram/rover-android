@@ -762,6 +762,8 @@ internals.parseCustomerPayload = function(accountId, payload) {
         } else {
             customer.tags = [];
         }
+    } else if(customer.hasOwnProperty('tags')) {
+        customer.tags = [];
     }
 
     internals.parseValue(customer, 'first_name', Type.STRING);
