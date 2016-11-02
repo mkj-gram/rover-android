@@ -35,12 +35,12 @@ module FcmHelper
         end
 
         def send_with_connection(connection, notifications)
-            expired_tokens = []
+            responses = []
             notifications.each do |notification|
                 response = connection.send_with_notification_key(notification[:token], { notification: notification[:notification], data: notification[:data]})
                 
                 if response[:status] == 401
-                    return []
+                    return [{ token: notification[:token], data: notification[:data], success: false, failure: true, error: "Unauthorized"}]
                 end
 
                 body = JSON.parse(response[:body])
@@ -48,15 +48,14 @@ module FcmHelper
                     body["results"].each do |result|
                         if result.has_key?("error")
                             Rails.logger.warn("Error while sending notification to android device #{result["error"]}")
-                        end
-
-                        if result.has_key?("error") && (result["error"] == INVALID_REGISTRATION || result["error"] == NOT_REGISTERED)
-                            expired_tokens.push(notification[:token])
+                            responses.push({ token: notification[:token], data: notification[:data], success: false, failure: true, error: result["error"]})
                         end
                     end
+                else
+                    responses.push({ token: notification[:token], data: notification[:data], success: true, failure: false, error: nil })
                 end
             end
-            return expired_tokens
+            return responses
         end
 
         private

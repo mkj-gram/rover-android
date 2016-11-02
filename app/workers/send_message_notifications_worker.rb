@@ -5,6 +5,9 @@ class SendMessageNotificationWorker
         :prefetch => 15,
         :ack => true
 
+    INVALID_REGISTRATION = "InvalidRegistration".freeze
+    NOT_REGISTERED = "NotRegistered".freeze
+
     class << self
         def perform_async(customer, messages = [], device_ids_filter = [])
             return if customer.nil? || messages.empty?
@@ -41,7 +44,9 @@ class SendMessageNotificationWorker
         ios_devices = customer.devices.select { |device| device.os_name == "iOS" && !device.token.nil? }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
 
-        rover_devices, ios_devices = ios_devices.partition { |device| device.app_identifier == "io.rover.Rover" }
+        rover_devices, ios_devices = ios_devices.partition { |device| device.app_identifier == "io.rover.Rover" || device.app_identifier == "io.rover.debug" }
+
+        rover_debug_devices, rover_devices = rover_devices.partition { |device| device.app_identifier == "io.rover.debug"  }
 
         if rover_devices.any?
             rover_development_devices, rover_production_devices = rover_devices.partition { |device| device.development == true }
@@ -53,7 +58,18 @@ class SendMessageNotificationWorker
             if rover_development_devices.any?
                 send_ios_notifications_with_connection(RoverApnsHelper.development_connection, messages, rover_development_devices)
             end
-            
+        end
+
+        if rover_debug_devices.any?
+            rover_debug_development_devices, rover_debug_production_devices = rover_debug_devices.partition { |device| device.development == true }
+
+            if rover_debug_production_devices.any?
+                send_ios_notifications_with_connection(RoverApnsHelper.debug_production_connection, messages, rover_debug_production_devices)
+            end
+
+            if rover_debug_development_devices.any?
+                send_ios_notifications_with_connection(RoverApnsHelper.debug_development_connection, messages, rover_debug_development_devices)
+            end
         end
 
         if ios_devices.any?
@@ -147,7 +163,42 @@ class SendMessageNotificationWorker
             return if connection_context.nil? || connection_context[:connection].nil?
             start_time = Time.zone.now
             # TODO check to see what the response was for each notification and track the event sent
-            expired_tokens = FcmHelper.send_with_connection(connection_context[:connection], notifications)
+            responses = FcmHelper.send_with_connection(connection_context[:connection], notifications)
+
+            responses.each do |response|
+                device = android_devices.find { |device| device.token == response[:token] }
+                next if device.nil?
+                customer = device.customer
+                next if customer.nil?
+                message = messages.find { |message| message.id == response.dig(:data, :message, :id) }
+                next if message.nil?
+
+                input = {
+                    message: message
+                }
+
+                extra = {
+                    device: device,
+                    customer: customer,
+                    account_id: customer.account_id
+                }
+
+                if response[:success]
+                    event = Events::Pipeline.build("notification", "sent", input, extra)
+                    event.raw_input = nil
+                    event.save
+                else
+                    if response[:error] == INVALID_REGISTRATION || response[:error] == NOT_REGISTERED
+                        expired_tokens.push(response[:token])
+                    end
+                    input.merge!(errors: [ response[:error] ])
+                    event = Events::Pipeline.build("notification", "failed", input, extra)
+                    event.raw_input = nil
+                    event.save
+                end
+            end
+            
+
             duration = (Time.zone.now - start_time) * 1000.0
         end
 
