@@ -711,7 +711,7 @@ class V1::ExperiencesController < V1::ApplicationController
         return default_block_params(local_params).merge(
             {
                 url: local_params[:url],
-                scrollable: local_params.has_key?(:scrollable) ? local_params[:scrollable] : false
+                scrollable: local_params.has_key?(:scrollable) ? local_params[:scrollable] : true
             }
         )
     end
