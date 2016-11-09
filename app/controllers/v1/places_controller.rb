@@ -221,6 +221,7 @@ class V1::PlacesController < V1::ApplicationController
 
     def place_params(local_params)
         convert_param_if_exists(local_params[:places], :name, :title)
+        param_should_be_array(local_params[:places], :tags)
         local_params.fetch(:places, {}).permit(:enabled, :title, :address, :city, :province, :country, :postal_code,  :latitude, :longitude, :radius, :google_place_id, {:tags => []})
     end
 
