@@ -187,22 +187,20 @@ internals.index = function(customer, callback) {
 
 internals.deleteIndex = function(customer, callback) {
     const server = this;
-    const elasticsearch = server.connections.elasticsearch.client;
+    // const elasticsearch = server.connections.elasticsearch.client;
+    const queue = server.connections.elasticsearch.queue;
     const logger = server.plugins.logger.logger;
 
     logger.debug('Service: [customer.deleteIndex] id: ' + customer._id);
     
-    elasticsearch.delete({
+    queue.delete({
         index: internals.getIndexForCustomer(customer),
         type: 'customer',
-        id: customer._id.toString()
-    }, (err, response) => {
-        if (err) {
-            return callback(err);
-        }
-
-        return callback(null, response);
+        id: customer._id.toString(),
+        version: moment.utc(customer.updated_at).valueOf()
     });
+
+    return callback();
 };
 
 internals.getIndexForCustomer = function(customer) {
