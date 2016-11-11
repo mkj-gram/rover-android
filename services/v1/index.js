@@ -77,6 +77,7 @@ module.exports.register = function(server, options, next) {
 
     server.methods.proximityMessage.beaconTriggered = ProximityMessageService.beaconTriggered.bind(server);
     server.methods.proximityMessage.geofenceTriggered = ProximityMessageService.geofenceTriggered.bind(server);
+    server.methods.proximityMessage.gimbalPlaceTriggered = ProximityMessageService.gimbalPlaceTriggered.bind(server);
 
     server.methods.customerSegment.findById = CustomerSegmentService.findById.bind(server);
     
