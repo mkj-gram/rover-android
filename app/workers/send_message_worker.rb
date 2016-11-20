@@ -48,7 +48,8 @@ class SendMessageWorker
                 segment: customer_segment,
                 platform_credentials: {
                     fcm: {
-                        api_key: account.android_platform.api_key
+                        api_key: account.android_platform.api_key,
+                        sender_id: account.android_platform.sender_id
                     },
                     apns: {
                         certificate: account.ios_platform.certificate ? Base64.encode64(account.ios_platform.certificate) : nil,
