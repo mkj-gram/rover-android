@@ -5,12 +5,33 @@ class AndroidPlatform < ActiveRecord::Base
     # validates :package_name, presence: true
 
     belongs_to :account
-    
-    alias_attribute :api_key, :credentials
 
     # before_save :update_name_cache
 
 
+    def api_key
+        if !credentials.nil? && credentials.is_a?(Hash)
+            return credentials[:api_key]
+        else
+            return nil
+        end
+    end
+
+    def sender_id
+        if !credentials.nil? && credentials.is_a?(Hash)
+            return credentials[:sender_id]
+        else
+            return nil
+        end
+    end
+
+    def api_key=(new_api_key)
+        self.credentials = (credentials || {}).merge(:api_key => new_api_key)
+    end
+
+    def sender_id=(new_sender_id)
+        self.credentials = (credentials || {}).merge(:sender_id => new_sender_id)
+    end
     
 
     private

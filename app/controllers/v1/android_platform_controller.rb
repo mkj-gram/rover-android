@@ -64,7 +64,7 @@ class V1::AndroidPlatformController < V1::ApplicationController
 
     def android_platform_params(local_params)
         convert_param_if_exists(local_params[:android_platforms], :name, :title)
-        local_params.fetch(:android_platforms, {}).permit(:api_key, :title, :package_name)
+        local_params.fetch(:android_platforms, {}).permit(:api_key, :sender_id, :title, :package_name)
     end
 
 end
