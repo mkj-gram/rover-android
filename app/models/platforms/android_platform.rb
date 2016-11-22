@@ -3,7 +3,9 @@ class AndroidPlatform < ActiveRecord::Base
 
     # validates :api_key, presence: true
     # validates :package_name, presence: true
-
+    validates :api_key, presence: true, if: -> { !new_record? && sender_id.nil? && messaging_token.nil? }
+    validates :sender_id, presence: true, if: -> { !new_record? && api_key.nil? }
+    validates :messaging_token, presence: true, if: -> { !new_record? && api_key.nil? }
     belongs_to :account
 
     # before_save :update_name_cache
@@ -34,7 +36,7 @@ class AndroidPlatform < ActiveRecord::Base
     end
 
     def api_key=(new_api_key)
-        add_attribute_to_credentials(:api_token, new_api_key.to_s)
+        add_attribute_to_credentials(:api_key, new_api_key.to_s)
     end
 
     def sender_id=(new_sender_id)
