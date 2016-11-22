@@ -41,7 +41,7 @@ class AndroidPlatform < ActiveRecord::Base
         add_attribute_to_credentials(:sender_id, new_messaging_token)
     end
 
-    def messaging_token(new_messaging_token)
+    def messaging_token=(new_messaging_token)
         add_attribute_to_credentials(:messaging_token, new_messaging_token)
     end
     
