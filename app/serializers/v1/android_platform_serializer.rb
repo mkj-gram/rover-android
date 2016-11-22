@@ -7,6 +7,7 @@ module V1::AndroidPlatformSerializer
                 attributes: {
                     :"api-key" => android_platform.api_key,
                     :"sender-id" => android_platform.sender_id,
+                    :"messaging-token" => android_platform.messaging_token,
                     :"package-name" => android_platform.package_name
                 }
             }
