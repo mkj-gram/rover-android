@@ -34,11 +34,11 @@ class AndroidPlatform < ActiveRecord::Base
     end
 
     def api_key=(new_api_key)
-        add_attribute_to_credentials(:api_token, new_messaging_token.to_s)
+        add_attribute_to_credentials(:api_token, new_api_key.to_s)
     end
 
     def sender_id=(new_sender_id)
-        add_attribute_to_credentials(:sender_id, new_messaging_token.to_s)
+        add_attribute_to_credentials(:sender_id, new_sender_id.to_s)
     end
 
     def messaging_token=(new_messaging_token)
