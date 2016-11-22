@@ -49,7 +49,8 @@ class SendMessageWorker
                 platform_credentials: {
                     fcm: {
                         api_key: account.android_platform.api_key,
-                        sender_id: account.android_platform.sender_id
+                        sender_id: account.android_platform.sender_id,
+                        messaging_token: account.android_platform.messaging_token
                     },
                     apns: {
                         certificate: account.ios_platform.certificate ? Base64.encode64(account.ios_platform.certificate) : nil,

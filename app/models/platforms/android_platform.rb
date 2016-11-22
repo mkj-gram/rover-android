@@ -3,7 +3,9 @@ class AndroidPlatform < ActiveRecord::Base
 
     # validates :api_key, presence: true
     # validates :package_name, presence: true
-
+    validates :api_key, presence: true, if: -> { !new_record? && sender_id.nil? && messaging_token.nil? }
+    validates :sender_id, presence: true, if: -> { !new_record? && api_key.nil? }
+    validates :messaging_token, presence: true, if: -> { !new_record? && api_key.nil? }
     belongs_to :account
 
     # before_save :update_name_cache
@@ -25,16 +27,32 @@ class AndroidPlatform < ActiveRecord::Base
         end
     end
 
+    def messaging_token
+        if !credentials.nil? && credentials.is_a?(Hash)
+            return credentials[:messaging_token]
+        else
+            return nil
+        end
+    end
+
     def api_key=(new_api_key)
-        self.credentials = (credentials || {}).merge(:api_key => new_api_key)
+        add_attribute_to_credentials(:api_key, new_api_key.to_s)
     end
 
     def sender_id=(new_sender_id)
-        self.credentials = (credentials || {}).merge(:sender_id => new_sender_id)
+        add_attribute_to_credentials(:sender_id, new_sender_id.to_s)
+    end
+
+    def messaging_token=(new_messaging_token)
+        add_attribute_to_credentials(:messaging_token, new_messaging_token.to_s)
     end
     
 
     private
+
+    def add_attribute_to_credentials(name, value)
+         self.credentials = (credentials || {}).merge(name => value)
+    end
 
     def update_name_cache
         if title_changed?
