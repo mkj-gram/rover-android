@@ -221,8 +221,10 @@ class V1::ExperiencesController < V1::ApplicationController
                 @experience.current_version_id = nil
                 @experience.current_version_updated_at = Time.zone.now
             end
+
+            version.screens.each { |screen| screen["has_unpublished_changes"] = false }
             
-            if @experience.save
+            if version.save && @experience.save
                 current_account.reload
                 render_expereince_with_meta(@experience, version_id)
             else
