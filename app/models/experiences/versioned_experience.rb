@@ -16,19 +16,6 @@ module Experiences
         attribute :updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
         attribute :created_at, Time
 
-        def initialize(args = {})
-            # if args[:from_db]
-            #     puts "NOT LOADING SCREENS SINCE ITS FROM DB".red.bold
-            #     # don't load the model if we don't need to
-            #     args[:screen_data] = args.delete(:screens) || args.delete("screens")
-            #     @screens_loaded = false
-            # end
-
-            super args
-            @_original_attributes = to_doc
-            @_new_record = args[:new_record].nil? ? true : args[:new_record]
-        end
-
         def id
             _id.to_s
         end
