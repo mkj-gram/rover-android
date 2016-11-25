@@ -8,7 +8,7 @@ module VirtusDirtyAttributes
 
         def initialize(atr = {})
             super atr
-            @_original_attributes = to_doc
+            @_original_attributes = (to_doc).deep_dup
             @_new_record = atr[:new_record].nil? ? true : atr[:new_record]
         end
 
