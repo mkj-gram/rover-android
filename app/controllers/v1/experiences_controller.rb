@@ -969,7 +969,7 @@ class V1::ExperiencesController < V1::ApplicationController
     BARCODE_BLOCK_SCHEMA = DEFAULT_BLOCK_SCHEMA.merge(
         {
             'type' => CH::G.enum('barcode-block'),
-            'barcode-type' => CH::G.enum('code128', 'hibcpdf417', 'azteccode', 'qrcode'),
+            'barcode-type' => CH::G.enum('code128', 'hibcpdf417', 'azteccode', 'qrcode', 'upca'),
             'barcode-text' => String,
             'image' => IMAGE_SCHEMA
         }
