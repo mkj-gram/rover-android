@@ -159,11 +159,13 @@ class V1::ApplicationController < ActionController::API
     end
 
     def authenticate_user
+        browser = Browser.new(request.user_agent)
+        is_mobile_device = browser.device.mobile?
         # this is jwt authentication method
         token = request.headers["Authorization"].split(' ').last
         session = Session.find_by_token(token)
         
-        if session && !session.expired?
+        if session && ( !session.expired? || is_mobile_device )
             session.track_ip_address(request.remote_ip)
             session.keep_alive
             session.save if session.changes.any?

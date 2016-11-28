@@ -82,6 +82,8 @@ gem 'postgres_ext', '~> 3.0'
 
 gem 'tinify', '~> 1.3'
 
+gem 'browser', '~> 2.3', require: "browser/browser"
+
 group :development do
 
 
