@@ -14,6 +14,7 @@ class V1::ApplicationController < ActionController::API
 
     APPLICATION_API_KEY_HEADER = "X-Rover-Api-Key".freeze
     APPLICATION_DEVICE_ID_HEADER = "X-Rover-Device-Id".freeze
+    EXPERIENCE_APP_USER_AGENT = /Experiences\/\d+/
 
 
     rescue_from(ActionController::ParameterMissing) do |parameter_missing_exception|
@@ -160,7 +161,8 @@ class V1::ApplicationController < ActionController::API
 
     def authenticate_user
         browser = Browser.new(request.user_agent)
-        is_mobile_device = browser.device.mobile?
+        is_mobile_device = browser.device.mobile? || ((request.user_agent =~ EXPERIENCE_APP_USER_AGENT) != nil)
+
         # this is jwt authentication method
         token = request.headers["Authorization"].split(' ').last
         session = Session.find_by_token(token)
