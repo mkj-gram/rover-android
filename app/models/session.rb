@@ -14,7 +14,7 @@ class Session < ActiveRecord::Base
     end
 
     def expired?
-        @expired ||= Time.zone.now > expires_at
+        Time.zone.now > expires_at
     end
 
     def verified?
@@ -27,7 +27,7 @@ class Session < ActiveRecord::Base
 
     def keep_alive
         # only update keepalive every 10 mins so we aren't slamming postgres
-        if ((Time.zone.now - self.last_seen_at) > 10.minutes)
+        if ((Time.zone.now - self.last_seen_at) > 10.minutes) || self.expired?
             self.last_seen_at = Time.zone.now
             self.expires_at = Time.zone.now + 24.hours
         end
