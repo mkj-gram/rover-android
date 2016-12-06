@@ -8,7 +8,7 @@ module Events
 
         TIME_REGEX = /^\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}/
 
-        attr_reader :customer, :device, :object, :action, :generation_time, :source, :messages
+        attr_reader :customer, :device, :object, :action, :generation_time, :source, :messages, :trigger_arguments
         attr_accessor :raw_input
 
         def self.event_id
@@ -22,8 +22,10 @@ module Events
             @account_id = extra.delete(:account_id)
             @object = event_attributes[:object]
             @action = event_attributes[:action]
+            @trigger_event_id = event_attributes.delete(:trigger_event_id)
             @customer = extra.delete(:customer)
             @device = extra.delete(:device)
+            @trigger_arguments = extra.delete(:trigger_arguments)
             @generation_time = get_time(event_attributes[:time])
             @errors = event_attributes.delete(:errors) || []
             @raw_input = event_attributes.to_json
@@ -37,6 +39,7 @@ module Events
                     id: self.class.event_id,
                     object: object,
                     action: action,
+                    trigger_event_id: @trigger_event_id,
                     timestamp: generation_time.to_i,
                     source: source,
                     input: @raw_input,
@@ -95,6 +98,62 @@ module Events
                 end
             end
 
+            if trigger_arguments
+                if trigger_arguments.has_key?(:_place)
+                    
+                    place = trigger_arguments[:_place]
+
+                    json.merge!(
+                        {
+                            place: {
+                                id: place[:id],
+                                title: place[:title],
+                                address: place[:address],
+                                city: place[:city],
+                                province: place[:province],
+                                country: place[:country],
+                                postal_code: place[:postal_code],
+                                latitude: place[:latitude],
+                                longitude: place[:longitude],
+                                tags: place[:tags],
+                                google_place_id: place[:google_place_id],
+                                enabled: place[:enabled],
+                                shared: place[:shared],
+                                beacon_configurations_count: place[:beacon_configurations_count]
+                            }
+                        }
+                    )
+                end
+
+                if trigger_arguments.has_key?(:_beaconConfiguration)
+
+                    beacon_configuration = trigger_arguments[:_beaconConfiguration]
+
+                    json.merge!(
+                        {
+                            configuration: {
+                                id: beacon_configuration[:id],
+                                place_id: beacon_configuration[:place_id],
+                                title: beacon_configuration[:title],
+                                protocol: beacon_configuration[:protocol],
+                                tags: beacon_configuration[:tags],
+                                enabled: beacon_configuration[:enabled],
+                                shared: beacon_configuration[:shared],
+                                uuid: beacon_configuration[:uuid],
+                                major_number: beacon_configuration[:major],
+                                minor_number: beacon_configuration[:minor],
+                                namespace: beacon_configuration[:namespace],
+                                instance_id: beacon_configuration[:instance_id],
+                                url: beacon_configuration[:url]
+                            }
+                        }
+                    )
+
+                end
+                
+            end
+
+            
             return json
         end
 

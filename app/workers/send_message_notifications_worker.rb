@@ -29,17 +29,18 @@ class SendMessageNotificationWorker
         serialized_messages = args["serialized_messages"]
         device_ids_filter = args["device_ids_filter"]
         customer = Customer.from_document(args["customer"])
-       
+        trigger_event_id = args["trigger_event_id"]
+        trigger_arguments = args["trigger_arguments"]
        
         messages = serialized_messages.map{|message| Message.from_document(message)}
 
-        send_ios_notifications_to_customer(customer, messages, device_ids_filter)
-        send_android_notifications_to_customer(customer, messages, device_ids_filter)
+        send_ios_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
+        send_android_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
 
         ack!
     end
 
-    def send_ios_notifications_to_customer(customer, messages, device_ids_filter)
+    def send_ios_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
 
         ios_devices = customer.devices.select { |device| device.os_name == "iOS" && !device.token.nil? }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
@@ -52,11 +53,11 @@ class SendMessageNotificationWorker
             rover_development_devices, rover_production_devices = rover_devices.partition { |device| device.development == true }
 
             if rover_production_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.production_connection, messages, rover_production_devices)
+                send_ios_notifications_with_connection(RoverApnsHelper.production_connection, messages, rover_production_devices, trigger_event_id, trigger_arguments)
             end
 
             if rover_development_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.development_connection, messages, rover_development_devices)
+                send_ios_notifications_with_connection(RoverApnsHelper.development_connection, messages, rover_development_devices, trigger_event_id, trigger_arguments)
             end
         end
 
@@ -64,11 +65,11 @@ class SendMessageNotificationWorker
             rover_debug_development_devices, rover_debug_production_devices = rover_debug_devices.partition { |device| device.development == true }
 
             if rover_debug_production_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.debug_production_connection, messages, rover_debug_production_devices)
+                send_ios_notifications_with_connection(RoverApnsHelper.debug_production_connection, messages, rover_debug_production_devices, trigger_event_id, trigger_arguments)
             end
 
             if rover_debug_development_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.debug_development_connection, messages, rover_debug_development_devices)
+                send_ios_notifications_with_connection(RoverApnsHelper.debug_development_connection, messages, rover_debug_development_devices, trigger_event_id, trigger_arguments)
             end
         end
 
@@ -78,7 +79,7 @@ class SendMessageNotificationWorker
             if ios_development_devices.any?
                 PushConnectionCache.with_apns_connection(customer.account_id, development: true) do |connection_context|
                     if connection_context && connection_context[:connection]
-                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_development_devices)
+                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_development_devices, trigger_event_id, trigger_arguments)
                     end
                 end
             end
@@ -86,14 +87,14 @@ class SendMessageNotificationWorker
             if ios_production_devices.any?
                 PushConnectionCache.with_apns_connection(customer.account_id) do |connection_context|
                     if connection_context && connection_context[:connection]
-                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_production_devices)
+                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_production_devices, trigger_event_id, trigger_arguments)
                     end
                 end
             end
         end
     end
 
-    def send_ios_notifications_with_connection(connection, messages, devices)
+    def send_ios_notifications_with_connection(connection, messages, devices, trigger_event_id, trigger_arguments)
         return if connection.nil?
         return if messages.nil?
         return if devices.nil?
@@ -115,13 +116,15 @@ class SendMessageNotificationWorker
             next if message.nil?
 
             input = {
-                message: message
+                message: message,
+                trigger_event_id: trigger_event_id
             }
 
             extra = {
                 device: device,
                 customer: customer,
-                account_id: customer.account_id
+                account_id: customer.account_id,
+                trigger_arguments: trigger_arguments
             }
 
             if response.success?
@@ -146,7 +149,7 @@ class SendMessageNotificationWorker
         Rails.logger.info(responses)
     end
 
-    def send_android_notifications_to_customer(customer, messages, device_ids_filter)
+    def send_android_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
         
         android_devices = customer.devices.select { |device| device.os_name == "Android" && device.token  }
         android_devices.select! { | device| device_ids_filter.include?(device.id) } if device_ids_filter
@@ -174,13 +177,15 @@ class SendMessageNotificationWorker
                 next if message.nil?
 
                 input = {
-                    message: message
+                    message: message,
+                    trigger_event_id: trigger_event_id
                 }
 
                 extra = {
                     device: device,
                     customer: customer,
-                    account_id: customer.account_id
+                    account_id: customer.account_id,
+                    trigger_arguments: trigger_arguments
                 }
 
                 if response[:success]
