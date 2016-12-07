@@ -39,7 +39,7 @@ module Events
                     id: self.class.event_id,
                     object: object,
                     action: action,
-                    trigger_event_id: @trigger_event_id,
+                    triggered_event_id: @trigger_event_id,
                     timestamp: generation_time.to_i,
                     source: source,
                     input: @raw_input,
