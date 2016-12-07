@@ -32,8 +32,8 @@ describe Events::NotificationEvents, "new" do
 
         # expect(record[:place]).to eq(trigger_arguments[:_place])
 
-        expect(record[:event]).to include(:trigger_event_id)
-        expect(record[:event][:trigger_event_id]).to eq(2)
+        expect(record[:event]).to include(:triggered_event_id)
+        expect(record[:event][:triggered_event_id]).to eq(2)
     end
 
     it 'generates palce triggered arguments for its attributes' do
@@ -60,8 +60,8 @@ describe Events::NotificationEvents, "new" do
 
         # expect(record[:place]).to eq(trigger_arguments[:_place])
 
-        expect(record[:event]).to include(:trigger_event_id)
-        expect(record[:event][:trigger_event_id]).to eq(22)
+        expect(record[:event]).to include(:triggered_event_id)
+        expect(record[:event][:triggered_event_id]).to eq(22)
 
         expect(record[:configuration][:id]).to eq(configurationId)
     end
