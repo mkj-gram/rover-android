@@ -551,13 +551,15 @@ class V1::ExperiencesController < V1::ApplicationController
             rows: (local_params[:rows] || []).map{|row| row_params(row)}
         }
 
-        if local_params[:status_bar_color].nil? && local_params[:title_bar_background_color]
+        if local_params[:status_bar_color].nil?
             color = local_params[:title_bar_background_color]
             h, s, l = ::ColorConverter.rgbToHsl(color[:red], color[:green], color[:blue])
             l = [ l - 0.1, 0].max
             r, g, b = ::ColorConverter.hslToRgb(h,s,l)
-            screen[:status_bar_color] = { red: r, green: g, blue: b, alpha: 1 }
+            local_params[:status_bar_color] = { red: r, green: g, blue: b, alpha: 1}
         end
+
+        screen[:status_bar_color] = color_params(local_params[:status_bar_color])
 
         if screen[:background_image]
             screen.merge!({
