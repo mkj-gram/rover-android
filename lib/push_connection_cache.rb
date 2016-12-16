@@ -92,8 +92,9 @@ module PushConnectionCache
             @master_lock.synchronize do
                 Rails.logger.info("Setting up FCM connection cache for account #{account_id}")
                 platform = AndroidPlatform.where(account_id: account_id).first
-                return if platform.api_key.nil?
-                connection = FCM.new(platform.api_key)
+                api_key = !android_platform.messaging_token.nil? ? android_platform.messaging_token : android_platform.api_key
+                return if api_key.nil?
+                connection = FCM.new(api_key)
                 @fcm_connection_cache[account_id] = {
                     platform: platform,
                     connection: connection,
