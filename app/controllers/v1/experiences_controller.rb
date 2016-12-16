@@ -545,6 +545,7 @@ class V1::ExperiencesController < V1::ApplicationController
             title_bar_button_color: color_params(local_params[:title_bar_button_color]),
             title_bar_buttons: local_params[:title_bar_buttons],
             status_bar_style: local_params[:status_bar_style],
+            status_bar_auto_color: local_params.has_key?(:status_bar_auto_color) ? local_params[:status_bar_auto_color] : true
             use_default_title_bar_style: local_params[:use_default_title_bar_style],
             has_unpublished_changes: local_params.has_key?(:has_unpublished_changes) ? local_params[:has_unpublished_changes] : false,
             background_image: image_params(local_params[:background_image]),
@@ -1017,6 +1018,7 @@ class V1::ExperiencesController < V1::ApplicationController
         'title-bar-buttons' => CH::G.enum('close', 'back', 'both', 'none'),
         'status-bar-style' => STATUS_BAR_SCHEMA,
         'status-bar-color' => [:optional, COLOR_SCHEMA],
+        'status-bar-auto-color' => [:optional, TrueClass, FalseClass ],
         'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
         'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
         'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
