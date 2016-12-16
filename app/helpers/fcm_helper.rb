@@ -8,7 +8,9 @@ module FcmHelper
         def send(android_platform, messages_by_token)
             return if messages_by_token.empty?
 
-            client = FCM.new(android_platform.api_key)
+            api_key = !android_platform.messaging_token.nil? ? android_platform.messaging_token : android_platform.api_key
+
+            client = FCM.new(api_key)
             expired_tokens = []
 
             notifications = messages_to_notifications(messages_by_token)
