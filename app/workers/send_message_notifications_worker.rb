@@ -40,7 +40,7 @@ class SendMessageNotificationWorker
         ack!
     end
 
-    def get_production_connection_for(app_identifier)
+    def get_production_connection_for(account_id, app_identifier)
         return if !block_given?
 
         case app_identifier
@@ -51,7 +51,7 @@ class SendMessageNotificationWorker
         when "ios.rover.Inbox"
             yield RoverApnsHelper.inbox_production_connection
         else
-            PushConnectionCache.with_apns_connection(customer.account_id) do |connection_context|
+            PushConnectionCache.with_apns_connection(account_id) do |connection_context|
                 if connection_context && connection_context[:connection]
                     yield connection_context[:connection]
                 else
@@ -61,7 +61,7 @@ class SendMessageNotificationWorker
         end
     end
 
-    def get_development_connection_for(app_identifier)
+    def get_development_connection_for(account_id, app_identifier)
         return if !block_given?
 
         case app_identifier
@@ -72,7 +72,7 @@ class SendMessageNotificationWorker
         when "ios.rover.Inbox"
             yield RoverApnsHelper.inbox_development_connection
         else
-            PushConnectionCache.with_apns_connection(customer.account_id, development: true) do |connection_context|
+            PushConnectionCache.with_apns_connection(account_id, development: true) do |connection_context|
                 if connection_context && connection_context[:connection]
                     yield connection_context[:connection]
                 else
@@ -89,11 +89,13 @@ class SendMessageNotificationWorker
 
         grouped_devices_by_app_identifier = ios_devices.group_by { |device| device.app_identifier }
 
+        account_id = customer.account_id
+
         grouped_devices_by_app_identifier.each do |app_identifier, devices|
             development_devices, production_devices = devices.partition { |device| device.development == true  }
 
             if development_devices.any?
-                get_development_connection_for(app_identifier) do |connection|
+                get_development_connection_for(account_id, app_identifier) do |connection|
                     if !connection.nil?
                         send_ios_notifications_with_connection(connection, messages, development_devices, trigger_event_id, trigger_arguments)
                     end
@@ -101,7 +103,7 @@ class SendMessageNotificationWorker
             end
 
             if production_devices.any?
-                get_production_connection_for(app_identifier) do |connection|
+                get_production_connection_for(account_id, app_identifier) do |connection|
                     if !connection.nil?
                         send_ios_notifications_with_connection(connection, messages, production_devices, trigger_event_id, trigger_arguments)
                     end
