@@ -18,6 +18,14 @@ module RoverApnsHelper
             @debug_development_connection ||= ApnsKit::Client.development(get_debug_certificate, pool_size: 1, heartbeat_interval: 60)
         end
 
+        def inbox_production_connection
+            @inbox_production_connection ||= ApnsKit::Client.production(get_inbox_certificate, pool_size: 1, heartbeat_interval: 60)
+        end
+
+        def inbox_development_connection
+            @inbox_development_connection ||= ApnsKit::Client.development(get_inbox_certificate, pool_size: 1, heartbeat_interval: 60)
+        end
+
         def get_certificate
             @certificate ||= -> {
                 cert_data = File.read(Rails.configuration.rover["certificate"])
@@ -29,6 +37,13 @@ module RoverApnsHelper
             @debug_certificate ||= -> {
                 cert_data = File.read(Rails.configuration.rover["debug_certificate"])
                 return ApnsKit::Certificate.from_p12_file(cert_data, Rails.configuration.rover["debug_passphrase"])
+            }.call
+        end
+
+        def get_inbox_certificate
+            @inbox_certificate ||= -> {
+                cert_data = File.read(Rails.configuration.rover["inbox_certificate"])
+                return ApnsKit::Certificate.from_p12_file(cert_data, Rails.configuration.rover["inbox_passphrase"])
             }.call
         end
     end
