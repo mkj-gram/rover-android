@@ -40,54 +40,70 @@ class SendMessageNotificationWorker
         ack!
     end
 
+    def get_production_connection_for(app_identifier)
+        return if !block_given?
+
+        case app_identifier
+        when "io.rover.Rover"
+            yield RoverApnsHelper.production_connection
+        when "io.rover.debug"
+            yield RoverApnsHelper.debug_production_connection
+        when "ios.rover.Inbox"
+            yield RoverApnsHelper.inbox_production_connection
+        else
+            PushConnectionCache.with_apns_connection(customer.account_id) do |connection_context|
+                if connection_context && connection_context[:connection]
+                    yield connection_context[:connection]
+                else
+                    yield nil
+                end
+            end
+        end
+    end
+
+    def get_development_connection_for(app_identifier)
+        return if !block_given?
+
+        case app_identifier
+        when "io.rover.Rover"
+            yield RoverApnsHelper.development_connection
+        when "io.rover.debug"
+            yield RoverApnsHelper.debug_development_connection
+        when "ios.rover.Inbox"
+            yield RoverApnsHelper.inbox_development_connection
+        else
+            PushConnectionCache.with_apns_connection(customer.account_id, development: true) do |connection_context|
+                if connection_context && connection_context[:connection]
+                    yield connection_context[:connection]
+                else
+                    yield nil
+                end
+            end
+        end
+    end
+
     def send_ios_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
 
         ios_devices = customer.devices.select { |device| device.os_name == "iOS" && !device.token.nil? }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
 
-        rover_devices, ios_devices = ios_devices.partition { |device| device.app_identifier == "io.rover.Rover" || device.app_identifier == "io.rover.debug" }
+        grouped_devices_by_app_identifier = ios_devices.group_by { |device| device.app_identifier }
 
-        rover_debug_devices, rover_devices = rover_devices.partition { |device| device.app_identifier == "io.rover.debug"  }
+        grouped_devices_by_app_identifier.each do |app_identifier, devices|
+            development_devices, production_devices = devices.partition { |device| device.development == true  }
 
-        if rover_devices.any?
-            rover_development_devices, rover_production_devices = rover_devices.partition { |device| device.development == true }
-
-            if rover_production_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.production_connection, messages, rover_production_devices, trigger_event_id, trigger_arguments)
-            end
-
-            if rover_development_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.development_connection, messages, rover_development_devices, trigger_event_id, trigger_arguments)
-            end
-        end
-
-        if rover_debug_devices.any?
-            rover_debug_development_devices, rover_debug_production_devices = rover_debug_devices.partition { |device| device.development == true }
-
-            if rover_debug_production_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.debug_production_connection, messages, rover_debug_production_devices, trigger_event_id, trigger_arguments)
-            end
-
-            if rover_debug_development_devices.any?
-                send_ios_notifications_with_connection(RoverApnsHelper.debug_development_connection, messages, rover_debug_development_devices, trigger_event_id, trigger_arguments)
-            end
-        end
-
-        if ios_devices.any?
-            ios_development_devices, ios_production_devices = ios_devices.partition { |device| device.development == true }
-
-            if ios_development_devices.any?
-                PushConnectionCache.with_apns_connection(customer.account_id, development: true) do |connection_context|
-                    if connection_context && connection_context[:connection]
-                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_development_devices, trigger_event_id, trigger_arguments)
+            if development_devices.any?
+                get_development_connection_for(app_identifier) do |connection|
+                    if !connection.nil?
+                        send_ios_notifications_with_connection(connection, messages, development_devices, trigger_event_id, trigger_arguments)
                     end
                 end
             end
 
-            if ios_production_devices.any?
-                PushConnectionCache.with_apns_connection(customer.account_id) do |connection_context|
-                    if connection_context && connection_context[:connection]
-                        send_ios_notifications_with_connection(connection_context[:connection], messages, ios_production_devices, trigger_event_id, trigger_arguments)
+            if production_devices.any?
+                get_production_connection_for(app_identifier) do |connection|
+                    if !connection.nil?
+                        send_ios_notifications_with_connection(connection, messages, production_devices, trigger_event_id, trigger_arguments)
                     end
                 end
             end
