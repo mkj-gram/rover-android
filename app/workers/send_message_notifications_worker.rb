@@ -48,7 +48,7 @@ class SendMessageNotificationWorker
             yield RoverApnsHelper.production_connection
         when "io.rover.debug"
             yield RoverApnsHelper.debug_production_connection
-        when "ios.rover.Inbox"
+        when "io.rover.Inbox"
             yield RoverApnsHelper.inbox_production_connection
         else
             PushConnectionCache.with_apns_connection(account_id) do |connection_context|
@@ -69,7 +69,7 @@ class SendMessageNotificationWorker
             yield RoverApnsHelper.development_connection
         when "io.rover.debug"
             yield RoverApnsHelper.debug_development_connection
-        when "ios.rover.Inbox"
+        when "io.rover.Inbox"
             yield RoverApnsHelper.inbox_development_connection
         else
             PushConnectionCache.with_apns_connection(account_id, development: true) do |connection_context|
