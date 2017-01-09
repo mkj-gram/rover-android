@@ -151,7 +151,8 @@ CREATE TABLE accounts (
     experiences_archived_count integer DEFAULT 0,
     places_updated_at timestamp without time zone DEFAULT '2016-09-12 13:44:11.613236'::timestamp without time zone,
     beacon_configurations_updated_at timestamp without time zone DEFAULT '2016-09-12 13:44:11.619784'::timestamp without time zone,
-    message_limits jsonb[] DEFAULT '{}'::jsonb[]
+    message_limits jsonb[] DEFAULT '{}'::jsonb[],
+    subdomain character varying
 );
 
 
@@ -1474,6 +1475,13 @@ CREATE UNIQUE INDEX index_accounts_on_share_key ON accounts USING btree (share_k
 
 
 --
+-- Name: index_accounts_on_subdomain; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_accounts_on_subdomain ON accounts USING btree (subdomain);
+
+
+--
 -- Name: index_accounts_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1961,9 +1969,13 @@ INSERT INTO schema_migrations (version) VALUES ('20160810123340');
 
 INSERT INTO schema_migrations (version) VALUES ('20160812165514');
 
+INSERT INTO schema_migrations (version) VALUES ('20160830174603');
+
 INSERT INTO schema_migrations (version) VALUES ('20160912173745');
 
 INSERT INTO schema_migrations (version) VALUES ('20160916171657');
 
 INSERT INTO schema_migrations (version) VALUES ('20161120125344');
+
+INSERT INTO schema_migrations (version) VALUES ('20170106151352');
 

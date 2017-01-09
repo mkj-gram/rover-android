@@ -13,6 +13,7 @@ class V1::AccountsController < V1::ApplicationController
                 "attributes" => {
                     "title" => current_account.title,
                     "token" => current_account.token,
+                    "subdomain" => current_account.subdomain,
                     "share-key" => current_account.share_key,
                     "configuration-tags" => current_account.beacon_configuration_active_tag.tags,
                     "place-tags" => current_account.place_active_tag.tags,
@@ -158,7 +159,7 @@ class V1::AccountsController < V1::ApplicationController
 
     def account_params(local_params)
         param_should_be_array(local_params[:accounts], :message_limits)
-        local_params.require(:accounts).permit(:title, {:message_limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]})
+        local_params.require(:accounts).permit(:title, :subdomain, {:message_limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]})
     end
 
     def serialize_integration(integration)
