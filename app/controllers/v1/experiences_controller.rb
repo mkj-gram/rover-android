@@ -330,7 +330,7 @@ class V1::ExperiencesController < V1::ApplicationController
     private
 
     def get_subdomain(experience)
-        if current_account.id == experience.account_id
+        if !current_account.nil? && current_account.id == experience.account_id
             return current_account.subdomain
         else
             account = Account.find(experience.account_id)
