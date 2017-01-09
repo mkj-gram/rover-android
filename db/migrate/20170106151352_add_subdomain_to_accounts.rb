@@ -6,7 +6,7 @@ class AddSubdomainToAccounts < ActiveRecord::Migration
 
         Account.order(id: :desc).find_each(batch_size: 100) do |account|
 
-            base_subdomain = account.title.downcase.gsub(/\s+/, "-")
+            base_subdomain = account.title ? account.title.downcase.gsub(/\s+/, "-") : SecureRandom.hex
             subdomain = base_subdomain
             current_count = 1
 
