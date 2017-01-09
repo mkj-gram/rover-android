@@ -9,7 +9,7 @@ class Account < ActiveRecord::Base
 
     message_limit_attribute :message_limits
 
-    validates :subdomain, presence: true
+    validates :subdomain, presence: true, subdomain: true
 
     before_validation :generate_subdomain, on: :create
 

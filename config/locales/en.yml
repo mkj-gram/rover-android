@@ -24,6 +24,10 @@ en:
     commons:
         email_wrong_format: "Invalid email address"
         email_missing: "Please provide an email address"
+        subdomain_length: "must have between 3 and 63 letters"
+        subdomain_reserved_name: "cannot be a reserved name"
+        subdomain_start_end_hyphen: "cannot start or end with a hyphen"
+        subdomain_illegal_characters: "must be alphanumeric; A-Z, 0-9 or hyphen"
   unauthorized:
     protected: "You do not have permission to access this resource"
     invalid_token: "Invalid token"
