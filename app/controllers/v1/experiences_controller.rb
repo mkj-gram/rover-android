@@ -132,7 +132,7 @@ class V1::ExperiencesController < V1::ApplicationController
             if @experience.save && @experience.current_version.save
 
                 json = {
-                    data: V1::ExperienceSerializer.serialize(@experience, @experience.current_version)
+                    data: serialize_experience(@experience, @experience.current_version)
                 }
 
                 render json: Oj.dump(json)
@@ -329,6 +329,15 @@ class V1::ExperiencesController < V1::ApplicationController
 
     private
 
+    def get_subdomain(experience)
+        if current_account.id == experience.account_id
+            return current_account.subdomain
+        else
+            account = Account.find(experience.account_id)
+            return account ? account.subdomain : nil
+        end
+    end
+
     def render_expereince_with_meta(experience, live_version = true)
         live_version = @experience.current_version_id.nil? ? true : false
         version_id = live_version ? experience.live_version_id : experience.current_version_id
@@ -428,10 +437,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
 
     def serialize_experience(experience, version, opts = {})
-        # version_updated_at = experience.live_version_id == version._id ? experience.live_version_updated_at.to_i : experience.current_version_updated_at.to_i
-        # Rails.cache.fetch("/experiences/#{experience.id}/version/#{version.id}/#{version_updated_at}-serialize-cache") do
-        V1::ExperienceSerializer.serialize(experience, version, opts)
-        # end
+        V1::ExperienceSerializer.serialize(experience, version, get_subdomain(experience), opts)
     end
 
     def formatted_params

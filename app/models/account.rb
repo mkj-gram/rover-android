@@ -9,6 +9,10 @@ class Account < ActiveRecord::Base
 
     message_limit_attribute :message_limits
 
+    validates :subdomain, presence: true, subdomain: true
+
+    before_validation :generate_subdomain, on: :create
+
     before_create :generate_share_key
     after_create :create_active_tags_index
     after_create :create_active_configuration_uuids_index
@@ -132,6 +136,19 @@ class Account < ActiveRecord::Base
     def create_active_configuration_uuids_index
         ActiveEddystoneConfigurationUuid.create(account_id: self.id)
         ActiveIBeaconConfigurationUuid.create(account_id: self.id)
+    end
+
+    def generate_subdomain
+        if self.subdomain.nil?
+            domain = self.title.downcase.gsub(/\s+/, "-")
+            current_count = 1
+
+            self.subdomain = loop do
+                break domain unless Account.exists?(subdomain: domain)
+                domain = domain + "#{current_count}"
+                current_count += 1
+            end 
+        end
     end
 
     def generate_share_key
