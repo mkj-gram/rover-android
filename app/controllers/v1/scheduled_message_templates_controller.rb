@@ -47,9 +47,12 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         message_templates = elasticsearch_query.per_page([page_size,50].min).page(current_page).records
 
         records = message_templates.includes(:customer_segment).to_a
-        # next grab all stats
+
+        # Preload all stats into their respective records
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
+        experience_stats = ExperienceStats.find_all(records.map(&:experience_id).compact.uniq.map{|i| BSON::ObjectId(i) }).index_by(&:id)
         records.each{|template| template.stats = stats[template.id] }
+        records.each{|template| template.experience_stats = experience_stats[template.experience_id] }
 
         experience_ids = records.map(&:experience_id).uniq.compact
         included = []
@@ -286,6 +289,9 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
                 :"total-opens" => message.stats.total_opens,
                 :"unique-opens" => message.stats.unique_opens,
+                :"total-notifications-sent" => message.stats.total_notifications_sent,
+                :"total-notifications-failed" => message.stats.total_notifications_failed,
+                :"total-experience-opens" => message.experience_stats.total_opens,
                 :"landing-page" => message.landing_page.as_json(dasherize: true),
                 :"properties" => message.properties,
                 :"scheduled-timestamp" => message.scheduled_timestamp,

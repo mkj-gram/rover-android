@@ -83,9 +83,12 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         included += BeaconConfiguration.where(id: filter_beacon_configuration_ids).all.map {|beacon_configuration| V1::BeaconConfigurationSerializer.serialize(beacon_configuration)}
         included += GimbalPlace.where(id: filter_gimbal_place_ids).all.map { |gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place) }
         included += Experiences::Experience.find_all(experience_ids).map{|experience| V1::ExperienceSerializer.serialize(experience, nil, {fields: [:name, :"short-url"]})}
-        # next grab all stats
+        
+        # Preload all stats into their respective records
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
+        experience_stats = ExperienceStats.find_all(records.map(&:experience_id).compact.uniq.map{|i| BSON::ObjectId(i) }).index_by(&:id)
         records.each{|template| template.stats = stats[template.id] }
+        records.each{|template| template.experience_stats = experience_stats[template.experience_id] }
 
         json = {
             "data" => records.map{|message| serialize_message(message)},
@@ -322,6 +325,9 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
                 :"total-opens" => message.stats.total_opens,
                 :"unique-opens" => message.stats.unique_opens,
+                :"total-notifications-sent" => message.stats.total_notifications_sent,
+                :"total-notifications-failed" => message.stats.total_notifications_failed,
+                :"total-experience-opens" => message.experience_stats.total_opens,
                 :"landing-page" => message.landing_page.as_json(dasherize: true),
                 :"properties" => message.properties,
             }.merge(extra_attributes),

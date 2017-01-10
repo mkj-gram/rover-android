@@ -116,6 +116,18 @@ class MessageTemplate < ActiveRecord::Base
         @stats = new_stats.nil? ? MessageTemplateStats.new(message_template_id: self.id) : new_stats
     end
 
+    def experience_stats
+        if self.content_type == "experience" && self.experience_id
+            @experience_stats ||= ExperienceStats.find(self.experience_id) || ExperienceStats.new(experience_id: self.experience_id)
+        else
+            return ExperienceStats.new(experience_id: self.experience_id)
+        end
+    end
+
+    def experience_stats=(new_stats)
+        @experience_stats = new_stats.nil? ? ExperienceStats.new(experience_id: self.experience_id) : new_stats
+    end
+
     def schedule_start_date
         @schedule_start_date ||= if schedule_start_parsed_time
             Date.parse(schedule_start_parsed_time.to_s).to_s

@@ -7,6 +7,8 @@ class MessageTemplateStats
     attribute :total_inbox_opens, Integer, default: 0
     attribute :total_opens, Integer, default: 0
     attribute :unique_opens, Integer, default: 0
+    attribute :total_notifications_sent, Integer, default: 0
+    attribute :total_notifications_failed, Integer, default: 0
 
     alias_method :message_template_id, :_id
 
