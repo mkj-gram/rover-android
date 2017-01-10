@@ -31,6 +31,6 @@ internals.incrementCounter = function(id, counter, incrementBy, callback) {
 };
 
 module.exports = {
-    update: internals.update
+    update: internals.update,
     incrementCounter: internals.incrementCounter
 }
