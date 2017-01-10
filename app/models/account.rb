@@ -140,7 +140,8 @@ class Account < ActiveRecord::Base
 
     def generate_subdomain
         if self.subdomain.nil?
-            domain = self.title.downcase.gsub(/\s+/, "-")
+            domain = (self.title || SecureRandom.hex).downcase.lstrip.gsub(/[^a-z0-9\-\s]*/i, "").gsub(/\s+/,"-").chomp("-")
+            domain[0] = "" if domain[0] == '-'
             current_count = 1
 
             self.subdomain = loop do
