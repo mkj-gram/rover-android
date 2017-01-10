@@ -15,6 +15,7 @@ const MessageTemplateStatsService = require('./lib/message-template-stats');
 const GimbalPlaceService = require('./lib/gimbal-place');
 const RateLimitService = require('./lib/rate-limit');
 const ExperienceService = require('./lib/experience');
+const ExperienceStatsService = require('./lib/experience-stats');
 
 module.exports.register = function(server, options, next) {
     server.methods.customer = {};
@@ -32,6 +33,7 @@ module.exports.register = function(server, options, next) {
     server.methods.gimbalPlace = {};
     server.methods.rateLimit = {};
     server.methods.experience = {};
+    server.methods.experienceStats = {};
 
     server.methods.customer.find = CustomerService.find.bind(server);
     server.methods.customer.findByQuery = CustomerService.findByQuery.bind(server);
@@ -91,6 +93,9 @@ module.exports.register = function(server, options, next) {
     server.methods.rateLimit.withinLimit = RateLimitService.withinLimit.bind(server);
     
     server.methods.experience.find = ExperienceService.find.bind(server);
+
+    server.methods.experienceStats.update = ExperienceStatsService.update.bind(server);
+    server.methods.experienceStats.incrementCounter = ExperienceStatsService.incrementCounter.bind(server);
     next();
 };
 
