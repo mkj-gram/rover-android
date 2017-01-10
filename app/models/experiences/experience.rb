@@ -19,6 +19,8 @@ module Experiences
             Rails.logger.info("Indexing Elasticsearch response: #{response}".green.bold)
         end
 
+        after_create :create_stats_document
+
         after_destroy do
             response = __elasticsearch__.delete_document
             Rails.logger.info("Deleting Elasticsearch response: #{response}".green.bold)
@@ -316,6 +318,10 @@ module Experiences
 
         def collection_name
             'experiences'.freeze
+        end
+
+        def create_stats_document
+            ExperienceStats.new(experience_id: self._id).create
         end
     end
 end
