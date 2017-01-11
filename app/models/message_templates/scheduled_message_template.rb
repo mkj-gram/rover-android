@@ -107,6 +107,14 @@ class ScheduledMessageTemplate < MessageTemplate
         self.scheduled_local_time ? self.scheduled_local_time : false
     end
 
+    def approximate_customers_count
+        if current_status == :sent || current_status == :archived
+            return self.stats ? self.stats.total_audience_size || 0 : 0
+        else
+            return super
+        end
+    end
+
     private
 
 
