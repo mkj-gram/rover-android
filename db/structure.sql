@@ -542,7 +542,9 @@ CREATE TABLE ios_platforms (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     certificate_expires_at timestamp without time zone,
-    certificate_filename character varying
+    certificate_filename character varying,
+    app_id_prefix character varying,
+    app_store_id integer
 );
 
 
@@ -1978,4 +1980,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160916171657');
 INSERT INTO schema_migrations (version) VALUES ('20161120125344');
 
 INSERT INTO schema_migrations (version) VALUES ('20170106151352');
+
+INSERT INTO schema_migrations (version) VALUES ('20170112144734');
 
