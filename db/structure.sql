@@ -544,7 +544,7 @@ CREATE TABLE ios_platforms (
     certificate_expires_at timestamp without time zone,
     certificate_filename character varying,
     app_id_prefix character varying,
-    app_store_id integer
+    app_store_id character varying
 );
 
 
