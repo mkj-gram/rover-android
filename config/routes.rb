@@ -144,7 +144,8 @@ Rails.application.routes.draw do
         patch '/experiences/:id/unarchive', to: 'experiences#unarchive'
         delete '/experiences/:id/:version_id', to: 'experiences#delete_version'
         resources '/experiences/:id/', controller: 'experiences', as: 'versioned_experience', param: :version_id, only: [:show, :update, :destroy]
-       
+        
+        get '/app-profiles/:id', to: 'app_profiles#show'
     end
     # The priority is based upon order of creation: first created -> highest priority.
     # See how all your routes lay out with "rake routes".
