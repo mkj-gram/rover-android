@@ -34,6 +34,7 @@ class V1::AppProfilesController < V1::ApplicationController
             json = {
                 data: {
                     id: profile.id,
+                    type: "app-profiles",
                     attributes: {
                         :"app-id-prefix" => profile.app_id_prefix,
                         :"app-store-id" => profile.app_store_id,
