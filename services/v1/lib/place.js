@@ -85,7 +85,7 @@ internals.findAll = function(account, callback) {
     });
 };
 
-internals.findByCoordinates = function(latitude, longitude, callback) {
+internals.findByCoordinates = function(account, latitude, longitude, callback) {
     const server = this;
     const postgres = server.connections.postgres.client;
 
@@ -95,9 +95,9 @@ internals.findByCoordinates = function(latitude, longitude, callback) {
         }
 
         client.query({
-            text: 'SELECT  "places".* FROM "places" WHERE "places"."latitude" = $1 AND "places"."longitude" = $2 LIMIT 1',
-            values: [latitude, longitude],
-            name: 'find-place-by-coordinates'
+            text: 'SELECT  "places".* FROM "places" WHERE "places"."account_id" = $1 AND "places"."latitude" = $2 AND "places"."longitude" = $3 LIMIT 1',
+            values: [account.id, latitude, longitude],
+            name: 'find-place-by-coordinates-and-account-id'
         }, function(err, result) {
             done();
 
