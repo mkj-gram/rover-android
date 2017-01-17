@@ -41,7 +41,7 @@ class V1::IosPlatformController < V1::ApplicationController
     end
 
     def ios_platform_params(local_params)
-        local_params.fetch(:ios_platforms, {}).permit(:name)
+        local_params.fetch(:ios_platforms, {}).permit(:name, :app_id_prefix, :app_store_id)
     end
 
 end
