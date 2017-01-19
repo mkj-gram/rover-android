@@ -45,7 +45,7 @@ class V1::IosPlatformsController < V1::ApplicationController
 
     def ios_platform_params(local_params)
         convert_param_if_exists(local_params[:ios_platforms], :name, :title)
-        local_params.fetch(:ios_platforms, {}).permit(:title, :app_id_prefix, :app_store_id)
+        local_params.fetch(:ios_platforms, {}).permit(:title, :app_id_prefix, :app_store_id, :bundle_id)
     end
 
 end
