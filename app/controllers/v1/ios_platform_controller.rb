@@ -1,4 +1,4 @@
-class V1::IosPlatformController < V1::ApplicationController
+class V1::IosPlatformsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:update]
     before_action :check_access, only: [:show, :update]
