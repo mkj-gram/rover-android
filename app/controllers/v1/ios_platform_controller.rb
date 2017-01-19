@@ -14,6 +14,9 @@ class V1::IosPlatformsController < V1::ApplicationController
     end
 
     def update
+        
+        json = flatten_request({single_record: true})
+
         if @ios_platform.update(ios_platform_params(json[:data]))
             json = {
                 data: serialize_ios_platform(@ios_platform)
