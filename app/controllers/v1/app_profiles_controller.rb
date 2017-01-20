@@ -1,53 +1,77 @@
 class V1::AppProfilesController < V1::ApplicationController
 
-    AppProfile = Struct.new("AppProfile", :id, :app_id_prefix, :app_store_id, :bundle_id )
+    IosAppProfile = Struct.new("IosAppProfile", :app_id_prefix, :app_store_id, :bundle_id )
+    AndroidAppProfile = Struct.new("AndroidAppProfile", :package_name, :sha256_cert_fingerprints)
 
     def show
 
         if params[:id] == "inbox"
-            profile = AppProfile.new("inbox", "WDEZX8QD47", "1191905560", "io.rover.Inbox")
+            ios_app_profile = IosAppProfile.new("WDEZX8QD47", "1191905560", "io.rover.Inbox")
+            android_app_profile = nil
         else
-            profile = get_profile_for_id(params[:id])
+            ios_app_profile, android_app_profile = get_profile_for_id(params[:id])
         end
 
-        render_app_profile(profile)
+        render_app_profile(params[:id], ios_app_profile, android_app_profile)
     end
 
 
 
     private
 
+
     def get_profile_for_id(id)
         account = Account.find_by(subdomain: id)
         if account
             ios_platform = account.ios_platform
             android_platform = account.android_platform
-            return AppProfile.new(id, ios_platform.app_id_prefix, ios_platform.app_store_id, ios_platform.bundle_id)
+            ios_app_profile  = IosAppProfile.new(ios_platform.app_id_prefix, ios_platform.app_store_id, ios_platform.bundle_id)
+            android_app_profile = AndroidAppProfile.new(android_platform.package_name, android_platform.sha256_cert_fingerprints)
+
+            return [ ios_app_profile, android_app_profile ]
         else
             return nil
         end
     end
 
 
-    def render_app_profile(profile)
-        if profile
-            json = {
-                data: {
-                    id: profile.id,
-                    type: "app-profiles",
-                    attributes: {
-                        :"app-id-prefix" => profile.app_id_prefix,
-                        :"app-store-id" => profile.app_store_id,
-                        :"bundle-id" => profile.bundle_id,
-                    }
+    def render_app_profile(id, ios_app_profile, android_app_profile)
+        json = {
+            data: {
+                id: id.to_s,
+                type: "app-profiles",
+                attributes: {
+                    :"ios" => render_ios_app_profile(ios_app_profile),
+                    :"android" => render_android_app_profile(android_app_profile)
                 }
             }
+        }
 
-            expires_in 5.minutes, public: false
+        expires_in 5.minutes, public: false
 
-            render json: json
+        render json: json
+    end
+
+    def render_ios_app_profile(ios_profile)
+        if ios_profile
+            return {
+                :"app-id-prefix" => ios_profile.app_id_prefix,
+                :"app-store-id" => ios_profile.app_store_id,
+                :"bundle-id" => ios_profile.bundle_id,
+            }
         else
-            head :not_found
+            return {}
+        end
+    end
+
+    def render_android_app_profile(android_profile)
+        if android_profile
+            return {
+                :"package-name" => android_profile.package_name,
+                :"sha256-cert-fingerprints" => android_profile.sha256_cert_fingerprints
+            }
+        else
+            return {}
         end
     end
 
