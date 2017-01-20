@@ -27,7 +27,7 @@ class V1::AndroidPlatformsController < V1::ApplicationController
 
     def update
         json = flatten_request({single_record: true})
-        if @android_platform.update_attributes!(android_platform_params(json[:data]))
+        if @android_platform.update_attributes(android_platform_params(json[:data]))
             json = {
                 data: serialize_android_platform(@android_platform)
             }
