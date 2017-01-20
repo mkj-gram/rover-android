@@ -1,4 +1,4 @@
-class V1::AndroidPlatformController < V1::ApplicationController
+class V1::AndroidPlatformsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:create, :update]
     before_action :check_access, only: [:index, :show, :create, :update, :destroy]
@@ -27,7 +27,7 @@ class V1::AndroidPlatformController < V1::ApplicationController
 
     def update
         json = flatten_request({single_record: true})
-        if @android_platform.update_attributes(android_platform_params(json[:data]))
+        if @android_platform.update_attributes!(android_platform_params(json[:data]))
             json = {
                 data: serialize_android_platform(@android_platform)
             }
@@ -64,7 +64,7 @@ class V1::AndroidPlatformController < V1::ApplicationController
 
     def android_platform_params(local_params)
         convert_param_if_exists(local_params[:android_platforms], :name, :title)
-        local_params.fetch(:android_platforms, {}).permit(:api_key, :sender_id, :messaging_token, :title, :package_name)
+        local_params.fetch(:android_platforms, {}).permit(:api_key, :sender_id, :messaging_token, :title, :package_name, { :sha256_cert_fingerprints => [] })
     end
 
 end

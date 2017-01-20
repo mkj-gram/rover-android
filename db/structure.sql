@@ -2,12 +2,17 @@
 -- PostgreSQL database dump
 --
 
+-- Dumped from database version 9.6.1
+-- Dumped by pg_dump version 9.6.1
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
@@ -82,7 +87,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: account_invites; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: account_invites; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE account_invites (
@@ -116,7 +121,7 @@ ALTER SEQUENCE account_invites_id_seq OWNED BY account_invites.id;
 
 
 --
--- Name: accounts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: accounts; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE accounts (
@@ -149,8 +154,8 @@ CREATE TABLE accounts (
     experiences_draft_count integer DEFAULT 0,
     experiences_published_count integer DEFAULT 0,
     experiences_archived_count integer DEFAULT 0,
-    places_updated_at timestamp without time zone DEFAULT '2016-09-12 13:44:11.613236'::timestamp without time zone,
-    beacon_configurations_updated_at timestamp without time zone DEFAULT '2016-09-12 13:44:11.619784'::timestamp without time zone,
+    places_updated_at timestamp without time zone DEFAULT '2017-01-19 13:35:09.206665'::timestamp without time zone,
+    beacon_configurations_updated_at timestamp without time zone DEFAULT '2017-01-19 13:35:09.210985'::timestamp without time zone,
     message_limits jsonb[] DEFAULT '{}'::jsonb[],
     subdomain character varying
 );
@@ -176,7 +181,7 @@ ALTER SEQUENCE accounts_id_seq OWNED BY accounts.id;
 
 
 --
--- Name: active_configuration_uuids; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: active_configuration_uuids; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE active_configuration_uuids (
@@ -207,7 +212,7 @@ ALTER SEQUENCE active_configuration_uuids_id_seq OWNED BY active_configuration_u
 
 
 --
--- Name: active_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: active_tags; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE active_tags (
@@ -238,7 +243,7 @@ ALTER SEQUENCE active_tags_id_seq OWNED BY active_tags.id;
 
 
 --
--- Name: android_platforms; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: android_platforms; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE android_platforms (
@@ -250,7 +255,8 @@ CREATE TABLE android_platforms (
     encrypted_credentials_salt text,
     encrypted_credentials_iv text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    sha256_cert_fingerprints character varying[]
 );
 
 
@@ -274,7 +280,7 @@ ALTER SEQUENCE android_platforms_id_seq OWNED BY android_platforms.id;
 
 
 --
--- Name: beacon_configurations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: beacon_configurations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE beacon_configurations (
@@ -324,7 +330,7 @@ ALTER SEQUENCE beacon_configurations_id_seq OWNED BY beacon_configurations.id;
 
 
 --
--- Name: beacon_devices; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: beacon_devices; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE beacon_devices (
@@ -363,7 +369,7 @@ ALTER SEQUENCE beacon_devices_id_seq OWNED BY beacon_devices.id;
 
 
 --
--- Name: customer_active_traits; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_active_traits; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE customer_active_traits (
@@ -394,7 +400,7 @@ ALTER SEQUENCE customer_active_traits_id_seq OWNED BY customer_active_traits.id;
 
 
 --
--- Name: customer_devices; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_devices; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE customer_devices (
@@ -442,7 +448,7 @@ ALTER SEQUENCE customer_devices_id_seq OWNED BY customer_devices.id;
 
 
 --
--- Name: customer_segments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_segments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE customer_segments (
@@ -476,7 +482,7 @@ ALTER SEQUENCE customer_segments_id_seq OWNED BY customer_segments.id;
 
 
 --
--- Name: customers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customers; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE customers (
@@ -513,7 +519,7 @@ ALTER SEQUENCE customers_id_seq OWNED BY customers.id;
 
 
 --
--- Name: gimbal_places; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: gimbal_places; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE gimbal_places (
@@ -528,7 +534,7 @@ CREATE TABLE gimbal_places (
 
 
 --
--- Name: ios_platforms; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: ios_platforms; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE ios_platforms (
@@ -568,7 +574,7 @@ ALTER SEQUENCE ios_platforms_id_seq OWNED BY ios_platforms.id;
 
 
 --
--- Name: message_templates; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: message_templates; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE message_templates (
@@ -641,7 +647,7 @@ ALTER SEQUENCE message_templates_id_seq OWNED BY message_templates.id;
 
 
 --
--- Name: password_resets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: password_resets; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE password_resets (
@@ -673,7 +679,7 @@ ALTER SEQUENCE password_resets_id_seq OWNED BY password_resets.id;
 
 
 --
--- Name: places; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: places; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE places (
@@ -718,7 +724,7 @@ ALTER SEQUENCE places_id_seq OWNED BY places.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE schema_migrations (
@@ -727,7 +733,7 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: sessions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: sessions; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE sessions (
@@ -763,7 +769,7 @@ ALTER SEQUENCE sessions_id_seq OWNED BY sessions.id;
 
 
 --
--- Name: shared_beacon_configurations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: shared_beacon_configurations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE shared_beacon_configurations (
@@ -794,7 +800,7 @@ ALTER SEQUENCE shared_beacon_configurations_id_seq OWNED BY shared_beacon_config
 
 
 --
--- Name: third_party_integration_sync_jobs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: third_party_integration_sync_jobs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE third_party_integration_sync_jobs (
@@ -831,7 +837,7 @@ ALTER SEQUENCE third_party_integration_sync_jobs_id_seq OWNED BY third_party_int
 
 
 --
--- Name: third_party_integrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: third_party_integrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE third_party_integrations (
@@ -872,7 +878,7 @@ ALTER SEQUENCE third_party_integrations_id_seq OWNED BY third_party_integrations
 
 
 --
--- Name: user_acls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_acls; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE user_acls (
@@ -956,7 +962,7 @@ ALTER SEQUENCE user_acls_id_seq OWNED BY user_acls.id;
 
 
 --
--- Name: user_roles; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_roles; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE user_roles (
@@ -1040,7 +1046,7 @@ ALTER SEQUENCE user_roles_id_seq OWNED BY user_roles.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE users (
@@ -1077,161 +1083,161 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: account_invites id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY account_invites ALTER COLUMN id SET DEFAULT nextval('account_invites_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: accounts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY accounts ALTER COLUMN id SET DEFAULT nextval('accounts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: active_configuration_uuids id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY active_configuration_uuids ALTER COLUMN id SET DEFAULT nextval('active_configuration_uuids_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: active_tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY active_tags ALTER COLUMN id SET DEFAULT nextval('active_tags_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: android_platforms id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY android_platforms ALTER COLUMN id SET DEFAULT nextval('android_platforms_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: beacon_configurations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY beacon_configurations ALTER COLUMN id SET DEFAULT nextval('beacon_configurations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: beacon_devices id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY beacon_devices ALTER COLUMN id SET DEFAULT nextval('beacon_devices_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: customer_active_traits id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customer_active_traits ALTER COLUMN id SET DEFAULT nextval('customer_active_traits_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: customer_devices id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customer_devices ALTER COLUMN id SET DEFAULT nextval('customer_devices_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: customer_segments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customer_segments ALTER COLUMN id SET DEFAULT nextval('customer_segments_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: customers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customers ALTER COLUMN id SET DEFAULT nextval('customers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: ios_platforms id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ios_platforms ALTER COLUMN id SET DEFAULT nextval('ios_platforms_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: message_templates id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY message_templates ALTER COLUMN id SET DEFAULT nextval('message_templates_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: password_resets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY password_resets ALTER COLUMN id SET DEFAULT nextval('password_resets_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: places id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY places ALTER COLUMN id SET DEFAULT nextval('places_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: sessions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY sessions ALTER COLUMN id SET DEFAULT nextval('sessions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: shared_beacon_configurations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY shared_beacon_configurations ALTER COLUMN id SET DEFAULT nextval('shared_beacon_configurations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: third_party_integration_sync_jobs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY third_party_integration_sync_jobs ALTER COLUMN id SET DEFAULT nextval('third_party_integration_sync_jobs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: third_party_integrations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY third_party_integrations ALTER COLUMN id SET DEFAULT nextval('third_party_integrations_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_acls id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_acls ALTER COLUMN id SET DEFAULT nextval('user_acls_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_roles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles ALTER COLUMN id SET DEFAULT nextval('user_roles_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
 --
--- Name: account_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: account_invites account_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY account_invites
@@ -1239,7 +1245,7 @@ ALTER TABLE ONLY account_invites
 
 
 --
--- Name: accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY accounts
@@ -1247,7 +1253,7 @@ ALTER TABLE ONLY accounts
 
 
 --
--- Name: active_configuration_uuids_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: active_configuration_uuids active_configuration_uuids_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY active_configuration_uuids
@@ -1255,7 +1261,7 @@ ALTER TABLE ONLY active_configuration_uuids
 
 
 --
--- Name: active_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: active_tags active_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY active_tags
@@ -1263,7 +1269,7 @@ ALTER TABLE ONLY active_tags
 
 
 --
--- Name: android_platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: android_platforms android_platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY android_platforms
@@ -1271,7 +1277,7 @@ ALTER TABLE ONLY android_platforms
 
 
 --
--- Name: beacon_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: beacon_configurations beacon_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY beacon_configurations
@@ -1279,7 +1285,7 @@ ALTER TABLE ONLY beacon_configurations
 
 
 --
--- Name: beacon_devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: beacon_devices beacon_devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY beacon_devices
@@ -1287,7 +1293,7 @@ ALTER TABLE ONLY beacon_devices
 
 
 --
--- Name: customer_active_traits_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_active_traits customer_active_traits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customer_active_traits
@@ -1295,7 +1301,7 @@ ALTER TABLE ONLY customer_active_traits
 
 
 --
--- Name: customer_devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_devices customer_devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customer_devices
@@ -1303,7 +1309,7 @@ ALTER TABLE ONLY customer_devices
 
 
 --
--- Name: customer_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_segments customer_segments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customer_segments
@@ -1311,7 +1317,7 @@ ALTER TABLE ONLY customer_segments
 
 
 --
--- Name: customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customers customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customers
@@ -1319,7 +1325,7 @@ ALTER TABLE ONLY customers
 
 
 --
--- Name: ios_platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: ios_platforms ios_platforms_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ios_platforms
@@ -1327,7 +1333,7 @@ ALTER TABLE ONLY ios_platforms
 
 
 --
--- Name: message_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: message_templates message_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY message_templates
@@ -1335,7 +1341,7 @@ ALTER TABLE ONLY message_templates
 
 
 --
--- Name: password_resets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: password_resets password_resets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY password_resets
@@ -1343,7 +1349,7 @@ ALTER TABLE ONLY password_resets
 
 
 --
--- Name: places_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: places places_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY places
@@ -1351,7 +1357,7 @@ ALTER TABLE ONLY places
 
 
 --
--- Name: sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY sessions
@@ -1359,7 +1365,7 @@ ALTER TABLE ONLY sessions
 
 
 --
--- Name: shared_beacon_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: shared_beacon_configurations shared_beacon_configurations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY shared_beacon_configurations
@@ -1367,7 +1373,7 @@ ALTER TABLE ONLY shared_beacon_configurations
 
 
 --
--- Name: third_party_integration_sync_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: third_party_integration_sync_jobs third_party_integration_sync_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY third_party_integration_sync_jobs
@@ -1375,7 +1381,7 @@ ALTER TABLE ONLY third_party_integration_sync_jobs
 
 
 --
--- Name: third_party_integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: third_party_integrations third_party_integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY third_party_integrations
@@ -1383,7 +1389,7 @@ ALTER TABLE ONLY third_party_integrations
 
 
 --
--- Name: user_acls_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_acls user_acls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_acls
@@ -1391,7 +1397,7 @@ ALTER TABLE ONLY user_acls
 
 
 --
--- Name: user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_roles user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY user_roles
@@ -1399,7 +1405,7 @@ ALTER TABLE ONLY user_roles
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
@@ -1407,427 +1413,427 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: account_eddystone_namespace_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: account_eddystone_namespace_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX account_eddystone_namespace_index ON beacon_configurations USING btree (account_id, namespace, instance_id);
 
 
 --
--- Name: account_ibeacon_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: account_ibeacon_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX account_ibeacon_index ON beacon_configurations USING btree (account_id, uuid, major, minor);
 
 
 --
--- Name: beacon_configurations_pending_google_updates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: beacon_configurations_pending_google_updates; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX beacon_configurations_pending_google_updates ON beacon_configurations USING btree (account_id, has_pending_google_updates);
 
 
 --
--- Name: beacon_configurations_registered_with_google; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: beacon_configurations_registered_with_google; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX beacon_configurations_registered_with_google ON beacon_configurations USING btree (account_id, registered_with_google);
 
 
 --
--- Name: beacon_configurations_type_created_at_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: beacon_configurations_type_created_at_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX beacon_configurations_type_created_at_index ON beacon_configurations USING btree (account_id, type, created_at);
 
 
 --
--- Name: index_account_eddystone_devices; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_account_eddystone_devices; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_account_eddystone_devices ON beacon_devices USING btree (account_id, namespace, instance_id);
 
 
 --
--- Name: index_account_ibeacon_devices; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_account_ibeacon_devices; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_account_ibeacon_devices ON beacon_devices USING btree (account_id, uuid, major, minor);
 
 
 --
--- Name: index_account_invites_on_invited_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_account_invites_on_invited_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_account_invites_on_invited_email ON account_invites USING btree (invited_email);
 
 
 --
--- Name: index_account_invites_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_account_invites_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_account_invites_on_token ON account_invites USING btree (token);
 
 
 --
--- Name: index_accounts_on_share_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_accounts_on_share_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_accounts_on_share_key ON accounts USING btree (share_key);
 
 
 --
--- Name: index_accounts_on_subdomain; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_accounts_on_subdomain; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_accounts_on_subdomain ON accounts USING btree (subdomain);
 
 
 --
--- Name: index_accounts_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_accounts_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_accounts_on_token ON accounts USING btree (token);
 
 
 --
--- Name: index_active_configuration_uuids_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_active_configuration_uuids_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_active_configuration_uuids_on_account_id ON active_configuration_uuids USING btree (account_id);
 
 
 --
--- Name: index_active_configuration_uuids_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_active_configuration_uuids_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_active_configuration_uuids_on_account_id_and_type ON active_configuration_uuids USING btree (account_id, type);
 
 
 --
--- Name: index_active_tags_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_active_tags_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_active_tags_on_account_id ON active_tags USING btree (account_id);
 
 
 --
--- Name: index_active_tags_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_active_tags_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_active_tags_on_account_id_and_type ON active_tags USING btree (account_id, type);
 
 
 --
--- Name: index_android_platforms_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_android_platforms_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_android_platforms_on_account_id ON android_platforms USING btree (account_id);
 
 
 --
--- Name: index_beacon_configurations_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_configurations_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_beacon_configurations_on_account_id ON beacon_configurations USING btree (account_id);
 
 
 --
--- Name: index_beacon_configurations_on_account_id_and_tags; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_configurations_on_account_id_and_tags; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_beacon_configurations_on_account_id_and_tags ON beacon_configurations USING gin (account_id, tags);
 
 
 --
--- Name: index_beacon_configurations_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_configurations_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_beacon_configurations_on_account_id_and_type ON beacon_configurations USING btree (account_id, type);
 
 
 --
--- Name: index_beacon_configurations_on_google_beacon_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_configurations_on_google_beacon_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_beacon_configurations_on_google_beacon_name ON beacon_configurations USING btree (google_beacon_name);
 
 
 --
--- Name: index_beacon_configurations_on_place_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_configurations_on_place_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_beacon_configurations_on_place_id ON beacon_configurations USING btree (place_id);
 
 
 --
--- Name: index_beacon_configurations_on_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_configurations_on_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_beacon_configurations_on_url ON beacon_configurations USING btree (url);
 
 
 --
--- Name: index_beacon_configurations_on_uuid; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_configurations_on_uuid; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_beacon_configurations_on_uuid ON beacon_configurations USING btree (uuid);
 
 
 --
--- Name: index_beacon_devices_on_account_id_and_manufacturer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_devices_on_account_id_and_manufacturer_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_beacon_devices_on_account_id_and_manufacturer_id ON beacon_devices USING btree (account_id, manufacturer_id);
 
 
 --
--- Name: index_beacon_devices_on_account_id_and_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_devices_on_account_id_and_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_beacon_devices_on_account_id_and_url ON beacon_devices USING btree (account_id, url);
 
 
 --
--- Name: index_beacon_devices_on_third_party_integration_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_beacon_devices_on_third_party_integration_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_beacon_devices_on_third_party_integration_id ON beacon_devices USING btree (third_party_integration_id);
 
 
 --
--- Name: index_customer_active_traits_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customer_active_traits_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_customer_active_traits_on_account_id ON customer_active_traits USING btree (account_id);
 
 
 --
--- Name: index_customer_active_traits_on_account_id_and_trait_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customer_active_traits_on_account_id_and_trait_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_customer_active_traits_on_account_id_and_trait_key ON customer_active_traits USING btree (account_id, trait_key);
 
 
 --
--- Name: index_customer_devices_on_udid; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customer_devices_on_udid; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_customer_devices_on_udid ON customer_devices USING btree (udid);
 
 
 --
--- Name: index_customer_segments_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customer_segments_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_customer_segments_on_account_id ON customer_segments USING btree (account_id);
 
 
 --
--- Name: index_customers_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customers_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_customers_on_account_id ON customers USING btree (account_id);
 
 
 --
--- Name: index_customers_on_account_id_and_identifier; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customers_on_account_id_and_identifier; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_customers_on_account_id_and_identifier ON customers USING btree (account_id, identifier);
 
 
 --
--- Name: index_customers_on_account_id_and_traits; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customers_on_account_id_and_traits; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_customers_on_account_id_and_traits ON customers USING gin (account_id, traits);
 
 
 --
--- Name: index_gimbal_places_on_gimbal_integration_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_gimbal_places_on_gimbal_integration_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_gimbal_places_on_gimbal_integration_id ON gimbal_places USING btree (gimbal_integration_id);
 
 
 --
--- Name: index_gimbal_places_on_id_and_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_gimbal_places_on_id_and_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_gimbal_places_on_id_and_account_id ON gimbal_places USING btree (id, account_id);
 
 
 --
--- Name: index_ios_platforms_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_ios_platforms_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_ios_platforms_on_account_id ON ios_platforms USING btree (account_id);
 
 
 --
--- Name: index_password_resets_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_password_resets_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_password_resets_on_email ON password_resets USING btree (email);
 
 
 --
--- Name: index_password_resets_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_password_resets_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_password_resets_on_token ON password_resets USING btree (token);
 
 
 --
--- Name: index_password_resets_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_password_resets_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_password_resets_on_user_id ON password_resets USING btree (user_id);
 
 
 --
--- Name: index_places_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_places_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_places_on_account_id ON places USING btree (account_id);
 
 
 --
--- Name: index_places_on_account_id_and_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_places_on_account_id_and_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_places_on_account_id_and_latitude_and_longitude ON places USING btree (account_id, latitude, longitude);
 
 
 --
--- Name: index_places_on_account_id_and_tags; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_places_on_account_id_and_tags; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_places_on_account_id_and_tags ON places USING gin (account_id, tags);
 
 
 --
--- Name: index_published_proximity_messages_by_trigger_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_published_proximity_messages_by_trigger_event_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_published_proximity_messages_by_trigger_event_id ON message_templates USING btree (account_id, type, published, trigger_event_id) WHERE ((published = true) AND ((type)::text = 'ProximityMessageTemplate'::text));
 
 
 --
--- Name: index_sessions_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_sessions_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_sessions_on_account_id ON sessions USING btree (account_id);
 
 
 --
--- Name: index_sessions_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_sessions_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_sessions_on_token ON sessions USING btree (token);
 
 
 --
--- Name: index_shared_beacon_configurations_on_owner_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_shared_beacon_configurations_on_owner_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_shared_beacon_configurations_on_owner_account_id ON shared_beacon_configurations USING btree (owner_account_id);
 
 
 --
--- Name: index_shared_beacon_configurations_on_shared_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_shared_beacon_configurations_on_shared_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_shared_beacon_configurations_on_shared_account_id ON shared_beacon_configurations USING btree (shared_account_id);
 
 
 --
--- Name: index_third_party_integrations_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_third_party_integrations_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_third_party_integrations_on_account_id ON third_party_integrations USING btree (account_id);
 
 
 --
--- Name: index_third_party_integrations_on_account_id_and_enabled; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_third_party_integrations_on_account_id_and_enabled; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_third_party_integrations_on_account_id_and_enabled ON third_party_integrations USING btree (account_id, enabled);
 
 
 --
--- Name: index_third_party_integrations_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_third_party_integrations_on_account_id_and_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_third_party_integrations_on_account_id_and_type ON third_party_integrations USING btree (account_id, type);
 
 
 --
--- Name: index_third_party_integrations_on_google_project_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_third_party_integrations_on_google_project_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_third_party_integrations_on_google_project_id ON third_party_integrations USING btree (google_project_id);
 
 
 --
--- Name: index_user_acls_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_acls_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_acls_on_user_id ON user_acls USING btree (user_id);
 
 
 --
--- Name: index_user_roles_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_roles_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_roles_on_account_id ON user_roles USING btree (account_id);
 
 
 --
--- Name: index_users_on_account_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_account_id ON users USING btree (account_id);
 
 
 --
--- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_email ON users USING btree (email);
 
 
 --
--- Name: integration_sync_job_integration_created_at_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: integration_sync_job_integration_created_at_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX integration_sync_job_integration_created_at_index ON third_party_integration_sync_jobs USING btree (created_at DESC NULLS LAST);
 
 
 --
--- Name: integration_sync_job_integration_finished_at_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: integration_sync_job_integration_finished_at_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX integration_sync_job_integration_finished_at_index ON third_party_integration_sync_jobs USING btree (finished_at DESC NULLS LAST);
 
 
 --
--- Name: integration_sync_job_integration_id_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: integration_sync_job_integration_id_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX integration_sync_job_integration_id_index ON third_party_integration_sync_jobs USING btree (third_party_integration_id);
 
 
 --
--- Name: integration_sync_job_integration_started_at_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: integration_sync_job_integration_started_at_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX integration_sync_job_integration_started_at_index ON third_party_integration_sync_jobs USING btree (started_at DESC NULLS LAST);
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
@@ -1837,7 +1843,7 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "$user", public;
 
 INSERT INTO schema_migrations (version) VALUES ('20151229224601');
 
@@ -1971,8 +1977,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160810123340');
 
 INSERT INTO schema_migrations (version) VALUES ('20160812165514');
 
-INSERT INTO schema_migrations (version) VALUES ('20160830174603');
-
 INSERT INTO schema_migrations (version) VALUES ('20160912173745');
 
 INSERT INTO schema_migrations (version) VALUES ('20160916171657');
@@ -1982,4 +1986,6 @@ INSERT INTO schema_migrations (version) VALUES ('20161120125344');
 INSERT INTO schema_migrations (version) VALUES ('20170106151352');
 
 INSERT INTO schema_migrations (version) VALUES ('20170112144734');
+
+INSERT INTO schema_migrations (version) VALUES ('20170120154253');
 
