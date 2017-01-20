@@ -1,4 +1,4 @@
-class V1::AndroidPlatformController < V1::ApplicationController
+class V1::AndroidPlatformsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:create, :update]
     before_action :check_access, only: [:index, :show, :create, :update, :destroy]
@@ -63,8 +63,9 @@ class V1::AndroidPlatformController < V1::ApplicationController
     end
 
     def android_platform_params(local_params)
+        param_should_be_array(local_params[:android_platforms], :sha256_cert_fingerprints)
         convert_param_if_exists(local_params[:android_platforms], :name, :title)
-        local_params.fetch(:android_platforms, {}).permit(:api_key, :sender_id, :messaging_token, :title, :package_name)
+        local_params.fetch(:android_platforms, {}).permit(:api_key, :sender_id, :messaging_token, :title, :package_name, { :sha256_cert_fingerprints => [] })
     end
 
 end
