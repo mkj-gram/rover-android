@@ -1,4 +1,4 @@
-class V1::IosPlatformController < V1::ApplicationController
+class V1::IosPlatformsController < V1::ApplicationController
     before_action :authenticate
     before_action :validate_json_schema, only: [:update]
     before_action :check_access, only: [:show, :update]
@@ -14,6 +14,9 @@ class V1::IosPlatformController < V1::ApplicationController
     end
 
     def update
+        
+        json = flatten_request({single_record: true})
+
         if @ios_platform.update(ios_platform_params(json[:data]))
             json = {
                 data: serialize_ios_platform(@ios_platform)
@@ -41,7 +44,8 @@ class V1::IosPlatformController < V1::ApplicationController
     end
 
     def ios_platform_params(local_params)
-        local_params.fetch(:ios_platforms, {}).permit(:name)
+        convert_param_if_exists(local_params[:ios_platforms], :name, :title)
+        local_params.fetch(:ios_platforms, {}).permit(:title, :app_id_prefix, :app_store_id, :bundle_id)
     end
 
 end

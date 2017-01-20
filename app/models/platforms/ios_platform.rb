@@ -37,13 +37,6 @@ class IosPlatform < ActiveRecord::Base
         self.credentials = ( self.credentials || {}).merge(passphrase: new_passphrase)
     end
 
-    def bundle_id
-        id = super
-        return id if id
-        return apns_certificate.bundle_id if apns_certificate
-        return nil
-    end
-
     private
 
     def apns_certificate
@@ -62,12 +55,9 @@ class IosPlatform < ActiveRecord::Base
     end
 
     def set_app_identifier
-        if credentials_changed?
-            if apns_certificate
-                self.bundle_id = apns_certificate.app_bundle_id
-            else
-                self.bundle_id = nil
-            end
+        # overwrite the bundle id if a certificate exists
+        if apns_certificate
+            self.bundle_id = apns_certificate.app_bundle_id
         end
     end
 
