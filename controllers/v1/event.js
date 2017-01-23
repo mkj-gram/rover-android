@@ -7,7 +7,7 @@ const moment = require('moment');
 const async = require('async');
 const Joi = require('joi');
 const Event = require('../../lib/event');
-const VersionRegex = /\d+\.\d+\.\d+$|\d+\.\d+$/;
+const VersionRegex = /\d+\.\d+\.\d+|\d+\.\d+/;
 
 const Type = {
     STRING: 0,
