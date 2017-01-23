@@ -5,17 +5,23 @@ const moment = require('moment');
 
 const internals = {};
 const collection = 'customers';
+const VersionRegex = /\d+\.\d+\.\d+|\d+\.\d+/;
 
 internals.parseVersion = function(version) {
     if (!util.isNullOrUndefined(version) && util.isString(version)) {
-        let parsedVersion = version.split('.').map(i => parseInt(i));
-        return {
-            major: parsedVersion[0],
-            minor: parsedVersion[1],
-            revision: parsedVersion[2]
+        let capturedVersion = version.match(VersionRegex);
+        if (!util.isNullOrUndefined(capturedVersion) && capturedVersion.length > 0) {
+            let parsedVersion = capturedVersion[0].split('.').map(i => parseInt(i));
+            return {
+                major: parsedVersion[0],
+                minor: parsedVersion[1],
+                revision: parsedVersion[2]
+            }
+        } else {
+            return {}
         }
     } else {
-        return version;
+        return {};
     }
 };
 
