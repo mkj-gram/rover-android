@@ -3,8 +3,8 @@ module V1::ExperienceSerializer
         def serialize(experience, version, subdomain = "", opts = {})
             has_unpublished_changes = !experience.current_version_id.nil?
 
-            simulator_url = subdomain.empty? ? "https://rvr.co/#{experience.short_url}" : "https://#{subdomain}.rvr.co/#{experience.short_url}"
-
+            simulator_url = build_simulator_url(subdomain, experience.short_url)
+            
             data = {
                 id: experience.id.to_s,
                 type: 'experiences'.freeze,
@@ -28,5 +28,18 @@ module V1::ExperienceSerializer
             return data
 
         end
+
+
+        private
+
+        def build_simulator_url(subdomain, short_url)
+            host = Rails.configuration.simulator["host"]
+            if subdomain.nil? || subdomain.empty?
+                "https://#{host}/#{short_url}"
+            else
+                "https://#{subdomain}.#{host}/#{short_url}"
+            end
+        end
+
     end
 end

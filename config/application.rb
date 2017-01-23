@@ -20,6 +20,7 @@ module RailsApi
         config.google_oauth = Rails.application.config_for(:google_oauth)
         config.rover = Rails.application.config_for(:rover)
         config.sentry = Rails.application.config_for(:sentry)
+        config.simulator = Rails.application.config_for(:simulator)
         
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('lib')
