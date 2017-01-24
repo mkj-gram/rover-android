@@ -58,7 +58,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
         included = []
 
         included += records.map(&:customer_segment).compact.uniq.map { |segment| V1::CustomerSegmentSerializer.serialize(segment) }
-        included += Experiences::Experience.find_all(experience_ids).map{|experience| V1::ExperienceSerializer.serialize(experience, nil, {fields: [:name, :"short-url"]})}
+        included += Experiences::Experience.find_all(experience_ids).map{|experience| V1::ExperienceSerializer.serialize(experience, nil, current_account.subdomain, {fields: [:name, :"short-url", :"simulator-url"]})}
 
         json = {
             "data" => records.map{ |message| serialize_message(message)},
@@ -179,7 +179,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
         if should_include.include?("experience") && message.experience_id
             experience = Experiences::Experience.find(message.experience_id)
-            included += [ V1::ExperienceSerializer.serialize(experience, nil, {fields: [:name, :"short-url" ]})] if experience
+            included += [ V1::ExperienceSerializer.serialize(experience, nil, current_account.subdomain, {fields: [:name, :"short-url", :"simulator-url" ]})] if experience
         end
 
         if included.any?
