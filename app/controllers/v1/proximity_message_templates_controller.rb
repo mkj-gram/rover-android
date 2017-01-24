@@ -82,7 +82,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         included += Place.where(id: filter_place_ids).all.map{|place| V1::PlaceSerializer.serialize(place)}
         included += BeaconConfiguration.where(id: filter_beacon_configuration_ids).all.map {|beacon_configuration| V1::BeaconConfigurationSerializer.serialize(beacon_configuration)}
         included += GimbalPlace.where(id: filter_gimbal_place_ids).all.map { |gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place) }
-        included += Experiences::Experience.find_all(experience_ids).map{|experience| V1::ExperienceSerializer.serialize(experience, nil, {fields: [:name, :"short-url"]})}
+        included += Experiences::Experience.find_all(experience_ids).map{|experience| V1::ExperienceSerializer.serialize(experience, nil, current_account.subdomain, {fields: [:name, :"short-url", :"simulator-url"]})}
         
         # Preload all stats into their respective records
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
@@ -262,7 +262,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         if should_include.include?("experience") && message.experience_id
             experience = Experiences::Experience.find(message.experience_id)
-            included += [ V1::ExperienceSerializer.serialize(experience, nil, {fields: [:name, :"short-url" ]})] if experience
+            included += [ V1::ExperienceSerializer.serialize(experience, nil, current_account.subdomain, {fields: [:name, :"short-url", :"simulator-url" ]})] if experience
         end
 
         if included.any?
