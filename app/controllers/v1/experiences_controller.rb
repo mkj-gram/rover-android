@@ -317,13 +317,35 @@ class V1::ExperiencesController < V1::ApplicationController
 
     def short_url
         @experience = Experiences::Experience.find_by(short_url: params[:short_url])
-        if @experience
-            if stale?(last_modified: @experience.live_version_updated_at)
-                expires_in 1.minute, public: true
-                render_experience(@experience, @experience.live_version_id)
-            end
-        else
+
+        version_id = params[:version] || params[:version_id] || "live"
+
+        if @experience.nil?
             head :not_found
+            return
+        end
+
+        if version_id != "live"
+            view_token = params[:viewToken] || params[:view_token]
+            if view_token.nil? || view_token != @experience.view_token
+                head :forbidden 
+                return
+            end
+        end
+
+        if version_id == "current"
+            last_modified = @experience.current_version_updated_at
+
+        elsif version_id == "live"
+            expires_in 1.minute, public: true
+            last_modified = @experience.live_version_updated_at
+        else
+            experience_version = @experience.get_version(version_id)
+            last_modified = experience_version.nil? ? nil : experience_version.updated_at
+        end
+
+        if stale?(last_modified: last_modified)
+            render_experience(@experience, version_id, { exclude_fields: [:"view-token"] })
         end
     end
 
@@ -355,7 +377,7 @@ class V1::ExperiencesController < V1::ApplicationController
         render json: Oj.dump(data)
     end
 
-    def render_experience(experience, version_id)
+    def render_experience(experience, version_id, opts = {})
 
         if version_id == 'current'
             version_id = experience.current_version_id || experience.live_version_id
@@ -369,7 +391,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
             if version
                 data = {
-                    data: serialize_experience(experience, version)
+                    data: serialize_experience(experience, version, opts)
                 }
                 
                 render json: Oj.dump(data) 
