@@ -11,6 +11,7 @@ module V1::ExperienceSerializer
                 attributes: {
                     name: experience.title,
                     :'version-id' => version.nil? ? nil : version.id,
+                    :'view-token' => experience.view_token,
                     :'has-unpublished-changes' => has_unpublished_changes,
                     :'is-published' => experience.is_published,
                     :'is-archived' => experience.is_archived,
@@ -23,6 +24,12 @@ module V1::ExperienceSerializer
             
             if opts[:fields] && opts[:fields].is_a?(Array) && opts[:fields].any?
                 data[:attributes].slice!(*opts[:fields])
+            end
+
+            if opts[:exclude_fields] && opts[:exclude_fields].is_a?(Array) && opts[:exclude_fields].any?
+                opts[:exclude_fields].each do |field|
+                    data[:attributes].delete(field)
+                end
             end
 
             return data

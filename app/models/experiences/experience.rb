@@ -19,6 +19,7 @@ module Experiences
             Rails.logger.info("Indexing Elasticsearch response: #{response}".green.bold)
         end
 
+        before_create :generate_view_token
         after_create :create_stats_document
 
         after_destroy do
@@ -32,6 +33,7 @@ module Experiences
         attribute :short_url, String, default: lambda { |model, attribute| SHORT_URL_SEED.sample(6).join }
         attribute :account_id, Integer
         attribute :title, String
+        attribute :view_token, String
         # current_version is used because the front-end doesn't know of versioned experiences
         # if in the future it is aware of versions this attribute isn't needed anymore
         # once an experience has been is_published it can no longer be edited
@@ -46,7 +48,7 @@ module Experiences
         attribute :created_at, Time, default: lambda { |model, attribute| Time.zone.now }
         attribute :updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
 
-        settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 1}).merge(
+        settings index: ElasticsearchShardCountHelper.get_settings({ number_of_shards: 1, number_of_replicas: 1 }).merge(
             {
                 analysis:  {
                     filter: {
@@ -92,6 +94,7 @@ module Experiences
                 _id: _id,
                 title: title,
                 short_url: short_url,
+                view_token: view_token,
                 account_id: account_id,
                 is_published: is_published,
                 is_archived: is_archived,
@@ -144,6 +147,12 @@ module Experiences
             return self
         end
 
+        def get_version(version_id)
+            versioned_experience = VersionedExperience.find(version_id)
+            return nil if versioned_experience.nil? || versioned_experience.experience_id != self._id
+            return versioned_experience
+        end
+
         def drop_current_version
             success = VersionedExperience.delete(_id: self.current_version_id)
             if success
@@ -153,6 +162,8 @@ module Experiences
         end
 
         def create
+            
+            return false if validate == false
 
             run_callbacks :save do
                 run_callbacks :create do
@@ -168,7 +179,9 @@ module Experiences
         end
 
         def save
-            # save
+            
+            return false if validate == false
+
             if new_record?
                 create
             elsif changes.any?
@@ -238,6 +251,14 @@ module Experiences
                 docs = mongo[collection_name].find(_id: { "$in" => ids })
                 docs = docs.map { |doc| Experience.from_document(doc) }
                 return docs
+            end
+
+            def all_in_batches(batch_size = 1000)
+                Enumerator.new do |y|
+                    mongo[collection_name].find().batch_size(batch_size).each do |document|
+                        y << Experience.from_document(document)
+                    end
+                end
             end
 
             def mongo
@@ -322,6 +343,10 @@ module Experiences
 
         def create_stats_document
             ExperienceStats.new(experience_id: self._id).create
+        end
+
+        def generate_view_token
+            self.view_token ||= SecureRandom.hex(12)
         end
     end
 end
