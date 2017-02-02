@@ -106,6 +106,8 @@ class V1::IntegrationsController < V1::ApplicationController
             build_kontat_integration(json)
         when "gimbal-integrations"
             build_gimbal_integration(json)
+        when "xenio-integrations"
+            build_xenio_integration(json)
         else
             nil
         end
@@ -150,6 +152,17 @@ class V1::IntegrationsController < V1::ApplicationController
 
     def gimbal_integration_params(local_params)
         return local_params[:gimbal_integrations].permit(:enabled, :api_key)
+    end
+
+    def build_xenio_integration(json)
+        options = xenio_integration_params(json[:data])
+        integration = XenioIntegration.new(options)
+        integration.account_id = current_account.id
+        return integration
+    end
+
+    def xenio_integration_params(local_params)
+        return local_params.fetch(:xenio_integrations, {}).permit(:enabled, :api_key, :customer_id)
     end
 
     def get_integrations

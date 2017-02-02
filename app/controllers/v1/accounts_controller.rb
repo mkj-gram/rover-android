@@ -17,6 +17,8 @@ class V1::AccountsController < V1::ApplicationController
                     "share-key" => current_account.share_key,
                     "configuration-tags" => current_account.beacon_configuration_active_tag.tags,
                     "place-tags" => current_account.place_active_tag.tags,
+                    "xenio-zone-tags" => current_account.xenio_zone_active_tag.tags,
+                    "xenio-place-tags" => current_account.xenio_place_active_tag.tags,
                     "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
                     "is-gimbal-enabled" => current_account.gimbal_integrations.count >= 1,

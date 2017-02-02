@@ -157,7 +157,9 @@ CREATE TABLE accounts (
     places_updated_at timestamp without time zone DEFAULT '2017-01-19 13:35:09.206665'::timestamp without time zone,
     beacon_configurations_updated_at timestamp without time zone DEFAULT '2017-01-19 13:35:09.210985'::timestamp without time zone,
     message_limits jsonb[] DEFAULT '{}'::jsonb[],
-    subdomain character varying
+    subdomain character varying,
+    searchable_xenio_zones_count integer DEFAULT 0,
+    searchable_xenio_places_count integer DEFAULT 0
 );
 
 
@@ -1083,6 +1085,39 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
+-- Name: xenio_places; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE xenio_places (
+    id character varying NOT NULL,
+    account_id integer NOT NULL,
+    name character varying,
+    tags character varying[] DEFAULT '{}'::character varying[],
+    xenio_integration_id integer,
+    "integer" integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: xenio_zones; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE xenio_zones (
+    id character varying NOT NULL,
+    account_id integer NOT NULL,
+    name character varying,
+    place_id character varying,
+    tags character varying[] DEFAULT '{}'::character varying[],
+    xenio_integration_id integer,
+    "integer" integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
 -- Name: account_invites id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1805,6 +1840,34 @@ CREATE INDEX index_users_on_email ON users USING btree (email);
 
 
 --
+-- Name: index_xenio_places_on_id_and_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_xenio_places_on_id_and_account_id ON xenio_places USING btree (id, account_id);
+
+
+--
+-- Name: index_xenio_places_on_xenio_integration_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_xenio_places_on_xenio_integration_id ON xenio_places USING btree (xenio_integration_id);
+
+
+--
+-- Name: index_xenio_zones_on_id_and_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_xenio_zones_on_id_and_account_id ON xenio_zones USING btree (id, account_id);
+
+
+--
+-- Name: index_xenio_zones_on_xenio_integration_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_xenio_zones_on_xenio_integration_id ON xenio_zones USING btree (xenio_integration_id);
+
+
+--
 -- Name: integration_sync_job_integration_created_at_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1988,4 +2051,10 @@ INSERT INTO schema_migrations (version) VALUES ('20170106151352');
 INSERT INTO schema_migrations (version) VALUES ('20170112144734');
 
 INSERT INTO schema_migrations (version) VALUES ('20170120154253');
+
+INSERT INTO schema_migrations (version) VALUES ('20170202144059');
+
+INSERT INTO schema_migrations (version) VALUES ('20170202144747');
+
+INSERT INTO schema_migrations (version) VALUES ('20170202195609');
 
