@@ -78,7 +78,7 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
-        xenio_integration = current_account.xenio_integration.first
+        xenio_integration = current_account.xenio_integrations.first
         if xenio_integration
             json["data"]["relationships"].merge!(
                 {
