@@ -136,11 +136,11 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
-        included = [estimote_integration, kontakt_integration, gimbal_integration, google_integration].compact.map do |integration|
+        included = [estimote_integration, kontakt_integration, gimbal_integration, google_integration, xenio_integration].compact.map do |integration|
             serialize_integration(integration)
         end
 
-        included += [estimote_integration, kontakt_integration, gimbal_integration, google_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
+        included += [estimote_integration, kontakt_integration, gimbal_integration, google_integration, xenio_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
             V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
         end
 
