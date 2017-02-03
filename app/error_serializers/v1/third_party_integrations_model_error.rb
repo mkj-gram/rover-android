@@ -7,4 +7,8 @@ class V1::ThirdPartyIntegrationsModelError < ModelError::Serializer
 
     # kontakt specific errors
     # attribute :api_key, error_key: :"app-key"
+    
+
+   	# xenio specific errors
+   	attribute :customer_id, error_key: :"customer-id"
 end
