@@ -5,6 +5,8 @@ class XenioIntegration < ThirdPartyIntegration
     validates :account_id, presence: true
 
     after_commit :create_sync_job!, on: :create
+    after_destroy :remove_xenio_zones
+    after_destroy :remove_xenio_places
 
     has_many :sync_jobs, class_name: "XenioSyncJob", foreign_key:  "third_party_integration_id" do
 
@@ -16,6 +18,9 @@ class XenioIntegration < ThirdPartyIntegration
             last(2).last
         end
     end
+
+    has_many :xenio_zones, foreign_key: "xenio_integration_id"
+    has_many :xenio_places, foreign_key: "xenio_integration_id"
 
     def self.model_type
         @@model_type ||= "xenio-integration"
@@ -158,4 +163,14 @@ class XenioIntegration < ThirdPartyIntegration
         return stats
     end
 
+
+    private
+
+    def remove_xenio_zones
+        xenio_zones.destroy_all
+    end
+
+    def remove_xenio_places
+        xenio_places.destroy_all
+    end
 end
