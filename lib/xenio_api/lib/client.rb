@@ -1,5 +1,6 @@
 require_relative 'zone'
 require_relative 'place'
+require_relative 'request_error'
 
 module XenioApi
     class Client
@@ -17,7 +18,10 @@ module XenioApi
         def zones
             raw_response = make_request("GET", "/zones")
 
-            # throw error
+            status_code = raw_response.response.code.to_i
+            if !(status_code >= 200 && status_code < 400)
+                raise XenioApi::RequestError, raw_response.body
+            end
 
             response = raw_response.parsed_response
 
@@ -31,8 +35,10 @@ module XenioApi
         def places
             raw_response = make_request("GET", "/places")
 
-            # TODO:
-            # Throw error on failure
+            status_code = raw_response.response.code.to_i
+            if !(status_code >= 200 && status_code < 400)
+                raise XenioApi::RequestError, raw_response.body
+            end
             
             response = raw_response.parsed_response
 
