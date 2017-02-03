@@ -22,6 +22,7 @@ class V1::AccountsController < V1::ApplicationController
                     "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
                     "is-gimbal-enabled" => current_account.gimbal_integrations.count >= 1,
+                    "is-xenio-enabled" => current_account.xenio_integrations.count >= 1,
                     "message-limits" => current_account.message_limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)}
                 },
                 "relationships" => {
@@ -71,6 +72,20 @@ class V1::AccountsController < V1::ApplicationController
                         "data" => {
                             "type" => "gimbal-integrations",
                             "id" => gimbal_integration.id.to_s
+                        }
+                    }
+                }
+            )
+        end
+
+        xenio_integration = current_account.xenio_integration.first
+        if xenio_integration
+            json["data"]["relationships"].merge!(
+                {
+                    "xenio-integration" => {
+                        "data" => {
+                            "type" => "xenio-integrations",
+                            "id" => xenio_integration.id.to_s
                         }
                     }
                 }
