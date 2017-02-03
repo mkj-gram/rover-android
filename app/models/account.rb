@@ -44,6 +44,7 @@ class Account < ActiveRecord::Base
     has_many :estimote_integrations
     has_many :kontakt_integrations
     has_many :gimbal_integrations
+    has_many :xenio_integrations
     has_one :google_integration
     has_many :customer_segments
     has_many :account_invites, dependent: :destroy
