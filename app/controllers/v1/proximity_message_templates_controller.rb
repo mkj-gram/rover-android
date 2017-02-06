@@ -239,7 +239,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "places", "segment", "gimbal-places", "experience"] # when ember can implement include on get whitelist_include(["beacons", "places"])
+        should_include = ["beacons", "places", "segment", "gimbal-places", "xenio-zones", "xenio-places", "experience"] # when ember can implement include on get whitelist_include(["beacons", "places"])
 
 
 
