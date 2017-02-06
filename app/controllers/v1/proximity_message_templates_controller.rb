@@ -274,11 +274,11 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             included += message.gimbal_places.map{|gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place)}
         end
 
-        if should_include.included?("xenio-zones") && message.xenio_zones
+        if should_include.include?("xenio-zones") && message.xenio_zones
             included += message.xenio_zones.map{|xenio_zone| V1::XenioZoneSerializer.serialize(xenio_zone) }
         end
 
-        if should_include.included?("xenio-places") && message.xenio_places
+        if should_include.include?("xenio-places") && message.xenio_places
             included += message.xenio_places.map{|xenio_place| V1::XenioPlaceSerializer.serialize(xenio_place) }
         end
 
