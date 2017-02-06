@@ -50,5 +50,11 @@ module Events
         EXPERIENCE_SCREEN_CLOSED_EVENT_ID = 165
         EXPERIENCE_BLOCK_CLICKED_EVENT_ID = 166
 
+        # Xenio events 200-219
+        XENIO_ZONE_ENTER_ID = 200
+        XENIO_ZONE_EXIT_ID = 201
+        XENIO_PLACE_ENTER_ID = 202
+        XENIO_PLACE_EXIT_ID = 203
+
     end
 end
