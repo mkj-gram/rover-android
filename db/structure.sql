@@ -625,7 +625,11 @@ CREATE TABLE message_templates (
     sent boolean DEFAULT false,
     filter_gimbal_place_ids character varying[] DEFAULT '{}'::character varying[],
     experience_id character varying,
-    limits jsonb[] DEFAULT '{}'::jsonb[]
+    limits jsonb[] DEFAULT '{}'::jsonb[],
+    filter_xenio_zone_tags character varying[] DEFAULT '{}'::character varying[],
+    filter_xenio_zone_ids character varying[] DEFAULT '{}'::character varying[],
+    filter_xenio_place_tags character varying[] DEFAULT '{}'::character varying[],
+    filter_xenio_place_ids character varying[] DEFAULT '{}'::character varying[]
 );
 
 
@@ -2057,4 +2061,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170202144059');
 INSERT INTO schema_migrations (version) VALUES ('20170202144747');
 
 INSERT INTO schema_migrations (version) VALUES ('20170202195609');
+
+INSERT INTO schema_migrations (version) VALUES ('20170206171327');
 

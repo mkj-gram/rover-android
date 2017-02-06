@@ -77,13 +77,16 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         filter_place_ids = records.map(&:filter_place_ids).flatten.uniq.compact
         filter_beacon_configuration_ids = records.map(&:filter_beacon_configuration_ids).flatten.uniq.compact
         filter_gimbal_place_ids = records.map(&:filter_gimbal_place_ids).flatten.uniq.compact
+        filter_xenio_zone_ids = records.map(&:filter_xenio_zone_ids).flatten.uniq.compact
+        filter_xenio_place_ids = records.map(&:filter_xenio_place_ids).flatten.uniq.compact
         experience_ids = records.map(&:experience_id).uniq.compact
 
         included += Place.where(id: filter_place_ids).all.map{|place| V1::PlaceSerializer.serialize(place)}
         included += BeaconConfiguration.where(id: filter_beacon_configuration_ids).all.map {|beacon_configuration| V1::BeaconConfigurationSerializer.serialize(beacon_configuration)}
         included += GimbalPlace.where(id: filter_gimbal_place_ids).all.map { |gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place) }
         included += Experiences::Experience.find_all(experience_ids).map{|experience| V1::ExperienceSerializer.serialize(experience, nil, current_account.subdomain, {fields: [:name, :"short-url", :"simulator-url"]})}
-        
+        included += XenioZone.where(id: filter_xenio_zone_ids).all.map{|zone| V1::XenioZoneSerializer.serialize(zone) }
+        included += XenioPlace.where(id: filter_xenio_place_ids).all.map{|place| V1::XenioPlaceSerializer.serialize(place) }
         # Preload all stats into their respective records
         stats = MessageTemplateStats.find_all(records.map(&:id).compact).index_by(&:id)
         experience_stats = ExperienceStats.find_all(records.map(&:experience_id).compact.uniq.map{|i| BSON::ObjectId(i) }).index_by(&:id)
@@ -173,11 +176,18 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :configuration_ids, :filter_beacon_configuration_ids)
         convert_param_if_exists(local_params[:proximity_messages], :place_tags, :filter_place_tags)
         convert_param_if_exists(local_params[:proximity_messages], :place_ids, :filter_place_ids)
+        convert_param_if_exists(local_params[:proximity_messages], :xenio_zone_tags, :filter_xenio_zone_tags)
+        convert_param_if_exists(local_params[:proximity_messages], :xenio_zone_ids, :filter_xenio_zone_ids)
+        convert_param_if_exists(local_params[:proximity_messages], :xenio_place_tags, :filter_xenio_place_tags)
+        convert_param_if_exists(local_params[:proximity_messages], :xenio_place_ids, :filter_xenio_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
         convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_ids, :filter_gimbal_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :"landing-page", :landing_page)
+
         param_should_be_array(local_params[:proximity_messages], :filter_beacon_configuration_tags)
         param_should_be_array(local_params[:proximity_messages], :filter_place_tags)
+        param_should_be_array(local_params[:proximity_messages], :filter_xenio_zone_tags)
+        param_should_be_array(local_params[:proximity_messages], :filter_xenio_place_tags)
         param_should_be_array(local_params[:proximity_messages], :limits)
 
         if local_params[:proximity_messages].has_key?(:trigger_event)
@@ -196,6 +206,10 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             {:filter_place_tags => []},
             {:filter_place_ids => []},
             {:filter_gimbal_place_ids => []},
+            {:filter_xenio_zone_tags => []},
+            {:filter_xenio_zone_ids => []},
+            {:filter_xenio_place_tags => []},
+            {:filter_xenio_place_ids => []},
             :schedule_start_date,
             :schedule_end_date,
             :schedule_start_time,
@@ -260,6 +274,14 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             included += message.gimbal_places.map{|gimbal_place| V1::GimbalPlaceSerializer.serialize(gimbal_place)}
         end
 
+        if should_include.included?("xenio-zones") && message.xenio_zones
+            included += message.xenio_zones.map{|xenio_zone| V1::XenioZoneSerializer.serialize(xenio_zone) }
+        end
+
+        if should_include.included?("xenio-places") && message.xenio_places
+            included += message.xenio_places.map{|xenio_place| V1::XenioPlaceSerializer.serialize(xenio_place) }
+        end
+
         if should_include.include?("experience") && message.experience_id
             experience = Experiences::Experience.find(message.experience_id)
             included += [ V1::ExperienceSerializer.serialize(experience, nil, current_account.subdomain, {fields: [:name, :"short-url", :"simulator-url" ]})] if experience
@@ -302,6 +324,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 archived: message.archived,
                 :"trigger-event" => Events::Pipeline.event_id_to_event_string(message.trigger_event_id),
                 :"configuration-tags" => message.filter_beacon_configuration_tags,
+                :"xenio-zone-tags" => message.filter_xenio_zone_tags,
+                :"xenio-place-tags" => message.filter_xenio_place_tags,
                 :"schedule-start-date" => message.schedule_start_date,
                 :"schedule-end-date" => message.schedule_end_date,
                 :"schedule-start-time" => message.schedule_start_time,
@@ -349,6 +373,26 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 {
                     places: {
                         data: message.filter_place_ids.map{|place_id| {type: "places", id: place_id}}
+                    }
+                }
+            )
+        end
+
+        if message.filter_xenio_zone_ids.any?
+            json[:relationships].merge!(
+                {
+                    :"xenio-zones" => {
+                        data: message.filter_xenio_zone_ids.map{|zone_id| {type: "xenio-zones", id: zone_id }}
+                    }
+                }
+            )
+        end
+
+        if message.filter_xenio_place_ids.any?
+            json[:relationships].merge!(
+                {
+                    :"xenio-places" => {
+                        data: message.filter_xenio_place_ids.map{|place_id| {type: "xenio-places", id: place_id }}
                     }
                 }
             )
