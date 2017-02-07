@@ -1,7 +1,7 @@
 class CreateXenioPlaces < ActiveRecord::Migration
     def change
-        create_table :xenio_places, id: false do |t|
-            t.string :id, null: false
+        create_table :xenio_places do |t|
+            t.string :xenio_id, null: false
             t.integer :account_id, null: false
             t.string :name
             t.string :tags, array: true, default: []

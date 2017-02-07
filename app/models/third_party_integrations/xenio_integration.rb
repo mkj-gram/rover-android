@@ -92,13 +92,13 @@ class XenioIntegration < ThirdPartyIntegration
         ############################# 
 
         zones = client.zones
-        current_zones = XenioZone.where(id: zones.map(&:id), account_id: self.account_id).all
+        current_zones = XenioZone.where(xenio_id: zones.map(&:id), account_id: self.account_id).all
 
-        indexed_current_zones = current_zones.index_by(&:id)
+        indexed_current_zones = current_zones.index_by(&:xenio_id)
         indexed_zones = zones.index_by(&:id)
 
         # zones that need to be saved
-        new_zones = zones.select{|zone| indexed_current_zones[zone.id].nil? }.map{|zone| XenioZone.new(id: zone.id, name: zone.name, tags: zone.tags, place_id: zone.place_id, account_id: self.account_id, xenio_integration_id: self.id) }
+        new_zones = zones.select{|zone| indexed_current_zones[zone.id].nil? }.map{|zone| XenioZone.new(xenio_id: zone.id, name: zone.name, tags: zone.tags, place_id: zone.place_id, account_id: self.account_id, xenio_integration_id: self.id) }
 
         # zones which have to update their configuration
         updated_zones = (current_zones.map do |current_zone|
@@ -129,13 +129,13 @@ class XenioIntegration < ThirdPartyIntegration
         ############################# 
 
         places = client.places
-        current_places = XenioPlace.where(id: places.map(&:id), account_id: self.account_id).all
+        current_places = XenioPlace.where(xenio_id: places.map(&:id), account_id: self.account_id).all
 
-        indexed_current_places = current_places.index_by(&:id)
+        indexed_current_places = current_places.index_by(&:xenio_id)
         indexed_places = places.index_by(&:id)
 
         # places that need to be saved
-        new_places = places.select{|place| indexed_current_places[place.id].nil? }.map{|place| XenioPlace.new(id: place.id, name: place.name, tags: place.tags, account_id: self.account_id, xenio_integration_id: self.id) }
+        new_places = places.select{|place| indexed_current_places[place.id].nil? }.map{|place| XenioPlace.new(xenio_id: place.id, name: place.name, tags: place.tags, account_id: self.account_id, xenio_integration_id: self.id) }
 
         # places which have to update their configuration
         updated_places = (current_places.map do |current_place|

@@ -1093,7 +1093,8 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 --
 
 CREATE TABLE xenio_places (
-    id character varying NOT NULL,
+    id integer NOT NULL,
+    xenio_id character varying NOT NULL,
     account_id integer NOT NULL,
     name character varying,
     tags character varying[] DEFAULT '{}'::character varying[],
@@ -1105,11 +1106,31 @@ CREATE TABLE xenio_places (
 
 
 --
+-- Name: xenio_places_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE xenio_places_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: xenio_places_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE xenio_places_id_seq OWNED BY xenio_places.id;
+
+
+--
 -- Name: xenio_zones; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE xenio_zones (
-    id character varying NOT NULL,
+    id integer NOT NULL,
+    xenio_id character varying NOT NULL,
     account_id integer NOT NULL,
     name character varying,
     place_id character varying,
@@ -1119,6 +1140,25 @@ CREATE TABLE xenio_zones (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
+
+
+--
+-- Name: xenio_zones_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE xenio_zones_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: xenio_zones_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE xenio_zones_id_seq OWNED BY xenio_zones.id;
 
 
 --
@@ -1273,6 +1313,20 @@ ALTER TABLE ONLY user_roles ALTER COLUMN id SET DEFAULT nextval('user_roles_id_s
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- Name: xenio_places id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY xenio_places ALTER COLUMN id SET DEFAULT nextval('xenio_places_id_seq'::regclass);
+
+
+--
+-- Name: xenio_zones id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY xenio_zones ALTER COLUMN id SET DEFAULT nextval('xenio_zones_id_seq'::regclass);
 
 
 --
@@ -1449,6 +1503,22 @@ ALTER TABLE ONLY user_roles
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: xenio_places xenio_places_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY xenio_places
+    ADD CONSTRAINT xenio_places_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: xenio_zones xenio_zones_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY xenio_zones
+    ADD CONSTRAINT xenio_zones_pkey PRIMARY KEY (id);
 
 
 --
@@ -1858,10 +1928,10 @@ CREATE INDEX index_xenio_places_on_xenio_integration_id ON xenio_places USING bt
 
 
 --
--- Name: index_xenio_zones_on_id_and_account_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_xenio_zones_on_xenio_id_and_account_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_xenio_zones_on_id_and_account_id ON xenio_zones USING btree (id, account_id);
+CREATE UNIQUE INDEX index_xenio_zones_on_xenio_id_and_account_id ON xenio_zones USING btree (xenio_id, account_id);
 
 
 --

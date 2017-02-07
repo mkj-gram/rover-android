@@ -1,7 +1,7 @@
 class CreateXenioZones < ActiveRecord::Migration
     def change
-        create_table :xenio_zones, id: false do |t|
-            t.string :id, null: false
+        create_table :xenio_zones do |t|
+            t.string :xenio_id, null: false
             t.integer :account_id, null: false
             t.string :name
             t.string :place_id
@@ -11,7 +11,7 @@ class CreateXenioZones < ActiveRecord::Migration
         end
 
 
-        add_index :xenio_zones, [:id, :account_id], unique: true
+        add_index :xenio_zones, [:xenio_id, :account_id], unique: true
         add_index :xenio_zones, :xenio_integration_id
     end
 end
