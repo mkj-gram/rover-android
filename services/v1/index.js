@@ -36,6 +36,8 @@ module.exports.register = function(server, options, next) {
     server.methods.rateLimit = {};
     server.methods.experience = {};
     server.methods.experienceStats = {};
+    server.methods.xenioZone = {};
+    server.methods.xenioPlace = {};
 
     server.methods.customer.find = CustomerService.find.bind(server);
     server.methods.customer.findByQuery = CustomerService.findByQuery.bind(server);
