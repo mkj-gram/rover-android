@@ -89,8 +89,8 @@ DAYNAMES.forEach((dayname) => {
                             AND $3::int <@ "message_templates".time_schedule 
                             AND $4::int <@ "message_templates".date_schedule 
                             AND schedule_${dayname} = true
-                            AND ("message_templates".filter_xenio_place_ids = '{}'::int[] OR $7::int[] <@ "message_templates".filter_xenio_place_ids)
-                            AND ("message_templates".filter_xenio_place_tags = '{}'::character varying[] OR $8::character varying[] @> "message_templates".filter_xenio_place_tags)`,
+                            AND ("message_templates".filter_xenio_place_ids = '{}'::int[] OR $5::int[] <@ "message_templates".filter_xenio_place_ids)
+                            AND ("message_templates".filter_xenio_place_tags = '{}'::character varying[] OR $6::character varying[] @> "message_templates".filter_xenio_place_tags)`,
         name: `xenio-place-triggered-proximity-messages-for-${dayname}`
     }
 });
