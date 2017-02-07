@@ -102,7 +102,7 @@ class XenioIntegration < ThirdPartyIntegration
 
         # zones which have to update their configuration
         updated_zones = (current_zones.map do |current_zone|
-                             matched_zone = indexed_zones[current_zone.id]
+                             matched_zone = indexed_zones[current_zone.xenio_id]
                              current_zone.name = matched_zone.name
                              current_zone.tags = matched_zone.tags
                              current_zone.place_id = matched_zone.place_id
@@ -139,7 +139,7 @@ class XenioIntegration < ThirdPartyIntegration
 
         # places which have to update their configuration
         updated_places = (current_places.map do |current_place|
-            matched_place = indexed_places[current_place.id]
+            matched_place = indexed_places[current_place.xenio_id]
             current_place.name = matched_place.name
             current_place.tags = matched_place.tags
             current_place
