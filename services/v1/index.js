@@ -16,6 +16,8 @@ const GimbalPlaceService = require('./lib/gimbal-place');
 const RateLimitService = require('./lib/rate-limit');
 const ExperienceService = require('./lib/experience');
 const ExperienceStatsService = require('./lib/experience-stats');
+const XenioZoneService = require('./lib/xenio-zone');
+const XenioPlaceService = require('./lib/xenio-place');
 
 module.exports.register = function(server, options, next) {
     server.methods.customer = {};
@@ -98,6 +100,9 @@ module.exports.register = function(server, options, next) {
 
     server.methods.experienceStats.update = ExperienceStatsService.update.bind(server);
     server.methods.experienceStats.incrementCounter = ExperienceStatsService.incrementCounter.bind(server);
+
+    server.methods.xenioZone.findById = XenioZoneService.findById.bind(server);
+    server.methods.xenioPlace.findById = XenioPlaceService.findById.bind(server);
     next();
 };
 
