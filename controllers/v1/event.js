@@ -95,10 +95,11 @@ internals.compareArrays = (arr1, arr2) => {
 internals.customerDifferences = function(fromCustomer, toCustomer) {
     let customerUpdates = {};
 
-    const missingKeys = _.difference(Object.keys(fromCustomer), Object.keys(toCustomer));
-    fromCustomer = _.omit(fromCustomer, ['devices', '_id', 'updated_at', 'created_at'].concat(missingKeys));
+    // const missingKeys = _.difference(Object.keys(fromCustomer), Object.keys(toCustomer));
+    // fromCustomer = _.omit(fromCustomer, ['devices', '_id', 'updated_at', 'created_at'].concat(missingKeys));
+    toCustomer = _.omit(toCustomer, ['devices', '_id', 'updated_at', 'created_at']);
 
-    Object.keys(fromCustomer).forEach(key => {
+    Object.keys(toCustomer).forEach(key => {
         if (!_.isEqual(fromCustomer[key], toCustomer[key])) {
             customerUpdates[key] = toCustomer[key]
         }
