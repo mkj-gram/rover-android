@@ -95,8 +95,6 @@ internals.compareArrays = (arr1, arr2) => {
 internals.customerDifferences = function(fromCustomer, toCustomer) {
     let customerUpdates = {};
 
-    // const missingKeys = _.difference(Object.keys(fromCustomer), Object.keys(toCustomer));
-    // fromCustomer = _.omit(fromCustomer, ['devices', '_id', 'updated_at', 'created_at'].concat(missingKeys));
     toCustomer = _.omit(toCustomer, ['devices', '_id', 'updated_at', 'created_at']);
 
     Object.keys(toCustomer).forEach(key => {
@@ -110,19 +108,13 @@ internals.customerDifferences = function(fromCustomer, toCustomer) {
 
 internals.deviceDifferences = function (fromDevice, toDevice) {
 
-   
-    // we go through fromDevice and remove keys which aren't present in toDevice
-    // this way if the key isn't present we aren't saving the value as undefined
-    const missingKeys = _.difference(Object.keys(fromDevice), Object.keys(toDevice));
-    fromDevice = _.omit(fromDevice, ['_id', 'updated_at', 'created_at'].concat(missingKeys));
-    
-    // we need a way to get the updates
-    // when they don't pass in the key it means we skip it unless we force missing
+    toDevice = _.omit(toDevice, ['_id', 'updated_at', 'created_at']);
+
     let deviceUpdates = {};
 
-    Object.keys(fromDevice).forEach(key => {
+    Object.keys(toDevice).forEach(key => {
         if (!_.isEqual(fromDevice[key], toDevice[key])) {
-            deviceUpdates = toDevice[key];
+            deviceUpdates[key] = toDevice[key];
         }
     });
 
