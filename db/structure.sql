@@ -627,9 +627,9 @@ CREATE TABLE message_templates (
     experience_id character varying,
     limits jsonb[] DEFAULT '{}'::jsonb[],
     filter_xenio_zone_tags character varying[] DEFAULT '{}'::character varying[],
-    filter_xenio_zone_ids character varying[] DEFAULT '{}'::character varying[],
+    filter_xenio_zone_ids integer[] DEFAULT '{}'::integer[],
     filter_xenio_place_tags character varying[] DEFAULT '{}'::character varying[],
-    filter_xenio_place_ids character varying[] DEFAULT '{}'::character varying[]
+    filter_xenio_place_ids integer[] DEFAULT '{}'::integer[]
 );
 
 
