@@ -95,26 +95,12 @@ internals.compareArrays = (arr1, arr2) => {
 internals.customerDifferences = function(fromCustomer, toCustomer) {
     let customerUpdates = {};
 
-    Object.keys(fromCustomer).forEach(key => {
-        if (key != 'devices' && key != '_id' && key != 'updated_at' && key != 'created_at') {
-            if (util.isArray(fromCustomer[key]) && util.isArray(toCustomer[key])) {
-                // if in if because we don't want the next else if to run
-                if (!_.isEqual(fromCustomer[key], toCustomer[key])) {
-                    customerUpdates[key] = toCustomer[key];
-                }
-            } else if (fromCustomer[key] instanceof Date && toCustomer[key] instanceof Date) {
-                if (fromCustomer[key].getTime() != toCustomer[key].getTime()) {
-                    customerUpdates[key] = toCustomer[key];
-                }
-            } else if (!util.isUndefined(toCustomer[key]) && fromCustomer[key] != toCustomer[key]) {
-                customerUpdates[key] = toCustomer[key];
-            }  
-        }
-    });
+    const missingKeys = _.difference(Object.keys(fromCustomer), Object.keys(toCustomer));
+    fromCustomer = _.omit(fromCustomer, ['devices', '_id', 'updated_at', 'created_at'].concat(missingKeys));
 
-    Object.keys(toCustomer).forEach(key => {
-        if (util.isUndefined(fromCustomer[key]) && !util.isUndefined(toCustomer[key])) {
-            customerUpdates[key] = toCustomer[key];
+    Object.keys(fromCustomer).forEach(key => {
+        if (!_.isEqual(fromCustomer[key], toCustomer[key])) {
+            customerUpdates[key] = toCustomer[key]
         }
     });
 
@@ -123,28 +109,20 @@ internals.customerDifferences = function(fromCustomer, toCustomer) {
 
 internals.deviceDifferences = function (fromDevice, toDevice) {
 
+   
+    // we go through fromDevice and remove keys which aren't present in toDevice
+    // this way if the key isn't present we aren't saving the value as undefined
+    const missingKeys = _.difference(Object.keys(fromDevice), Object.keys(toDevice));
+    fromDevice = _.omit(fromDevice, ['_id', 'updated_at', 'created_at'].concat(missingKeys));
+    
+    // we need a way to get the updates
+    // when they don't pass in the key it means we skip it unless we force missing
     let deviceUpdates = {};
 
     Object.keys(fromDevice).forEach(key => {
-        if (key != '_id' && key != 'updated_at' && key != 'created_at') {
-            if (key == 'location' || key == 'beacon_regions_monitoring' || key == 'geofence_regions_monitoring' || key == 'beacon_regions_monitoring_updated_at' || key == 'geofence_regions_monitoring_updated_at') {
-                if (!util.isUndefined(toDevice[key]) && !_.isEqual(fromDevice[key], toDevice[key])) {
-                    deviceUpdates[key] = toDevice[key];
-                }
-            } else if (util.isArray(fromDevice[key]) && util.isArray(toDevice[key])) {
-                if (!_.isEqual(fromDevice[key], toDevice[key])) {
-                    deviceUpdates[key] = toDevice[key];
-                }
-            } else if (fromDevice[key] != toDevice[key]) {
-                deviceUpdates[key] = toDevice[key];
-            }
+        if (!_.isEqual(fromDevice[key], toDevice[key])) {
+            deviceUpdates = toDevice[key];
         }
-    });
-
-    Object.keys(toDevice).forEach(key => {
-        if (util.isUndefined(fromDevice[key]) && !util.isUndefined(toDevice[key])) {
-            deviceUpdates[key] = toDevice[key];
-        }   
     });
 
     return deviceUpdates
@@ -696,6 +674,10 @@ internals.findAndRemoveDeviceByToken = function(accountId, token, callback) {
     }
  */
 internals.underscoreKeys = function(obj, allowedKeysSet) {
+    if (util.isNullOrUndefined(obj)) {
+        return {};
+    }
+
     const underscorePayload = {};
 
     Object.keys(obj).forEach(key => {
@@ -806,22 +788,22 @@ internals.parseDevicePayload = function(id, payload) {
     delete device.udid;
     device._id = id;
 
-    if (!util.isString(device.app_identifier) || util.isString(device.app_identifier) && device.app_identifier.length == 0) {
-        return ({ error: true, message: "device.app-identifier must be a valid string and not empty"});
-    }
+    // if (!util.isString(device.app_identifier) || util.isString(device.app_identifier) && device.app_identifier.length == 0) {
+    //     return ({ error: true, message: "device.app-identifier must be a valid string and not empty"});
+    // }
 
     if (!util.isNullOrUndefined(device.remote_notifications_enabled)) {
         device.notifications_enabled = device.remote_notifications_enabled;
         delete device.remote_notifications_enabled;
     }
     
-    if (util.isNullOrUndefined(device.sdk_version) || !util.isNullOrUndefined(device.sdk_version) && util.isNullOrUndefined(device.sdk_version.match(VersionRegex))) {
-        return ({ error: true,  message: "device.sdk-version must be a valid gnu version number"});
-    }
+    // if (util.isNullOrUndefined(device.sdk_version) || !util.isNullOrUndefined(device.sdk_version) && util.isNullOrUndefined(device.sdk_version.match(VersionRegex))) {
+    //     return ({ error: true,  message: "device.sdk-version must be a valid gnu version number"});
+    // }
 
-    if (util.isNullOrUndefined(device.os_version) || !util.isNullOrUndefined(device.os_version) && util.isNullOrUndefined(device.os_version.match(VersionRegex))) {
-        return ({ error: true, message: "device.os-version must be a valid gnu version number"});
-    }
+    // if (util.isNullOrUndefined(device.os_version) || !util.isNullOrUndefined(device.os_version) && util.isNullOrUndefined(device.os_version.match(VersionRegex))) {
+    //     return ({ error: true, message: "device.os-version must be a valid gnu version number"});
+    // }
 
     internals.parseValue(device, 'token', Type.STRING);
     internals.parseValue(device, 'locale_lang', Type.STRING);
