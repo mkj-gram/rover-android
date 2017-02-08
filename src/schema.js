@@ -11,8 +11,8 @@ import {
 import GraphQLJSON from 'graphql-type-json'
 import uuid from 'node-uuid'
 
-const eventInputType = new GraphQLInputObjectType({
-    name: 'EventInput',
+const eventType = new GraphQLInputObjectType({
+    name: 'Event',
     fields: {
         name: {
             type: GraphQLString
@@ -22,24 +22,6 @@ const eventInputType = new GraphQLInputObjectType({
         },
         attributes: {
             type: GraphQLJSON
-        }
-    }
-})
-
-const eventType = new GraphQLObjectType({
-    name: 'Event',
-    fields: {
-        id: {
-            type: new GraphQLNonNull(GraphQLID)
-        },
-        name: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        timestamp: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        attributes: {
-            type: new GraphQLNonNull(GraphQLJSON)
         }
     }
 })
@@ -60,21 +42,23 @@ const mutationType = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
         trackEvents: {
-            type: new GraphQLList(eventType),
+            type: GraphQLString,
             args: {
                 events: {
-                    type: new GraphQLList(eventInputType)
+                    type: new GraphQLList(eventType)
                 }
             },
             resolve(_, { events }) {
-                return events.map(eventInput => {
-                    return {
+                const logs = events.forEach(event => {
+                	return JSON.stringify({
                         id: uuid.v4(),
-                        name: eventInput.name,
-                        timestamp: eventInput.timestamp,
-                        attributes: eventInput.attributes
-                    }
+                        name: event.name,
+                        timestamp: event.timestamp,
+                        attributes: event.attributes
+                    })
                 })
+                console.log(logs)
+                return 'success'
             }
         }
     }
