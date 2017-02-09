@@ -1,14 +1,14 @@
 FROM ruby:2.3
 
-WORKDIR /app
+WORKDIR /opt/content-api
+ADD Gemfile /opt/content-api/Gemfile
+ADD Gemfile.lock /opt/content-api/Gemfile.lock
 
-ADD Gemfile* /app/
+RUN bundle config --global silence_root_warning 1 \
+    && bundle install --path vendor/bundle \
+    && bundle clean
 
-RUN bundle config --global silence_root_warning 1
-
-RUN bundle install --path vendor/bundle
-
-ADD ./ /app
+ADD ./ /opt/content-api/
 
 EXPOSE 80
 
