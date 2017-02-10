@@ -116,7 +116,7 @@ const store = new Confidence.Store({
     cruncher_buffer_client: {
         host: {
             $filter: 'env',
-            production: process.env.CRUNCHER_BUFFER_CLIENT_IP || '127.0.0.1',
+            production: process.env.CRUNCHER_BUFFER_CLIENT_HOST || '127.0.0.1',
             $default: '127.0.0.1'
         },
         port: 24284
