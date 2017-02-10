@@ -113,6 +113,14 @@ const store = new Confidence.Store({
             $default: "development" + "."
         }
     },
+    cruncher_buffer_client: {
+        host: {
+            $filter: 'env',
+            production: process.env.CRUNCHER_BUFFER_CLIENT_IP || '127.0.0.1',
+            $default: '127.0.0.1'
+        },
+        port: 24284
+    },
     log: {
         level: {
             $filter: 'env',

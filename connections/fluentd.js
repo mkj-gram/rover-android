@@ -1,11 +1,12 @@
 'use strict';
 
 const util = require('util');
+const Config = require('../config');
 
 module.exports.register = function(server, options, next) {
     const logger = require('fluent-logger').createFluentSender(null, {
-        host: '127.0.0.1',
-        port: 24284,
+        host: Config.get("/cruncher_buffer_client/host"),
+        port: Config.get("/cruncher_buffer_client/port"),
         timeout: 3.0,
         reconnectInterval: 600000 // 10 minutes
     });
