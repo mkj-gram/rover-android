@@ -8,7 +8,7 @@ module EventsLogger
         end
 
         def client
-            @client ||= Fluent::Logger::FluentLogger.new(nil, host: ENV["CRUNCHER_BUFFER_CLIENT_IP"] || "localhost", port: 24284)
+            @client ||= Fluent::Logger::FluentLogger.new(nil, host: ENV["CRUNCHER_BUFFER_CLIENT_HOST"] || "localhost", port: 24284)
         end
     end
 end
