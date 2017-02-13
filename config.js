@@ -27,7 +27,7 @@ const store = new Confidence.Store({
             production: process.env.MONGODB_URI,
             $default: 'mongodb://localhost:27017/rover-local'
         },
-        sslCertFile: {
+        sslCert: {
             $filter: 'env',
             production: process.env.MONGODB_SSL_CERT
         }
@@ -68,7 +68,7 @@ const store = new Confidence.Store({
     elasticsearch: {
         hosts: {
             $filter: 'env',
-            production: process.env.ELASTICSEARCH_URLS,
+            production: process.env.ELASTICSEARCH_URLS.split(','),
             $default: "127.0.0.1:9200"
         },
         flush_interval: {
