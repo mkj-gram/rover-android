@@ -16,7 +16,7 @@ module RailsApi
         config.mailgun = Rails.application.config_for(:mailgun)
         config.password_reset = Rails.application.config_for(:password_reset)
         config.elasticsearch = Rails.application.config_for(:elasticsearch)
-        config.mongo = Rails.application.config_for(:mongo)
+        # config.mongo = Rails.application.config_for(:mongo)
         config.google_oauth = Rails.application.config_for(:google_oauth)
         config.rover = Rails.application.config_for(:rover)
         config.sentry = Rails.application.config_for(:sentry)
