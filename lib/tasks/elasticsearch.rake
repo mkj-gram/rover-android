@@ -84,6 +84,13 @@ namespace :elasticsearch do
             end
         end
 
+        desc "Import Experiences"
+        task :experiences => :environment do
+            Experiences::Experience.all_in_batches.each do |experience|
+                experience.__elasticsearch__.index_document
+            end
+        end
+
         desc "Import Places"
         task :places => :environment do
             Place.import
