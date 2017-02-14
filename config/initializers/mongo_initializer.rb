@@ -1,6 +1,19 @@
 # Mongoid.logger.level = Logger::DEBUG
 # Mongo::Logger.logger.level = Logger::DEBUG
-config = Rails.configuration.mongo.with_indifferent_access
+# 
+if Rails.env.production?
+    config = {
+        ssl: true,
+        ssl_ca_cert_string: ENV["MONGODB_SSL_CERT"],
+        uri: ENV["MONGODB_URI"]
+    }
+else
+  config = {
+      ssl: false,
+      uri: "mongodb://localhost:27017/rover-local"
+  }
+end
+
 
 defaults = {
     ssl: false,
@@ -14,6 +27,7 @@ defaults = {
 }
 
 mongo_config = (defaults.merge(config)).symbolize_keys
+
 uri = mongo_config.delete(:uri)
 
 $mongo = Mongo::Client.new(uri, mongo_config)
