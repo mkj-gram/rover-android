@@ -12,8 +12,8 @@ namespace :elasticsearch do
     task :create_indexes => :environment do
 
         puts "Creating BeaconConfiguration Index"
-        beacon_configuration_models = [IBeaconConfiguration, EddystoneNamespaceConfiguration, UrlConfiguration, BeaconConfiguration]
-        settings = beacon_configuration_models.map(&:settings).reduce({}, &:merge)
+        beacon_configuration_models = [IBeaconConfiguration, EddystoneNamespaceConfiguration, UrlConfiguration]
+        settings = beacon_configuration_models.map(&:settings).reduce({}, &:merge).merge(BeaconConfiguration.settings)
         mappings = beacon_configuration_models.map(&:mappings).reduce({}, &:merge)
         create_index!(BeaconConfiguration.index_name, settings, mappings)
 
@@ -24,8 +24,8 @@ namespace :elasticsearch do
 
 
         puts "Creating Messages Index"
-        message_models = [ProximityMessageTemplate, ScheduledMessageTemplate, MessageTemplate]
-        settings = message_models.map(&:settings).reduce({}, &:merge)
+        message_models = [ProximityMessageTemplate, ScheduledMessageTemplate]
+        settings = message_models.map(&:settings).reduce({}, &:merge).merge(MessageTemplate.settings)
         mappings = message_models.map(&:mappings).reduce({}, &:merge)
         create_index!(MessageTemplate.index_name, settings, mappings)
 
