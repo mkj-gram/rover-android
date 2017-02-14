@@ -1,7 +1,7 @@
 production:
     uri: <%= ENV["MONGODB_URI"] %>
     ssl: true
-    ssl_ca_cert: <%= ENV["MONGODB_SSL_CERT"] %>
+    ssl_cert_string: <%= ENV["MONGODB_SSL_CERT"] %>
 
 development:
     uri: "mongodb://localhost:27017/rover-local"
