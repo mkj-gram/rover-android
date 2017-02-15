@@ -89,7 +89,7 @@ tasks.push(function(callback) {
 
 tasks.push(function(callback) {
     let mongo = require('./connections/mongodb');
-    mongo.register(server, { urls: Config.get('/mongo/urls'), sslCertFile: Config.get('/mongo/sslCertFile') }, (err) => {
+    mongo.register(server, { urls: Config.get('/mongo/urls'), sslCA: [ Config.get('/mongo/sslCert') ] }, (err) => {
         if (err) {
             return callback(err);
         }
