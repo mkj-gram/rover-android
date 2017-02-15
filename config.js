@@ -18,7 +18,7 @@ const store = new Confidence.Store({
     redis: {
         url: {
             $filter: 'env',
-            production: process.env.REDISCLOUD_URL,
+            production: process.env.REDIS_URL,
         }
     },
     mongo: {
