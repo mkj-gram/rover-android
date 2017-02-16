@@ -54,7 +54,7 @@ class Customer
         }
     end
 
-    settings index: ElasticsearchShardCountHelper.get_settings({number_of_shards: 3, number_of_replicas: 1}).merge(
+    settings index: ElasticsearchShardCountHelper.get_settings({number_of_shards: 3, number_of_replicas: 0}).merge(
         {
             analysis:  {
                 filter: {
