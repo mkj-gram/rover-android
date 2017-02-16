@@ -8,7 +8,7 @@ class Customer
 
     MAX_BUCKETS = 5
 
-    index_name("customers_v2")
+    index_name("customers")
 
     attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
     attribute :account_id, Integer
