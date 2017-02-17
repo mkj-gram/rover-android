@@ -71,7 +71,11 @@ internals.beginningOfDayAsUnixTimestamp = function(timestamp) {
 };
 
 internals.getDay = function(timestamp) {
-    return DAYNAMES[moment(timestamp).day()];
+    let day = moment(timestamp).day();
+    if (util.isNullOrUndefined(day)) {
+        day = moment(Date.now()).day()
+    }
+    return DAYNAMES[day];
 };
 
 
