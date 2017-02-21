@@ -15,6 +15,8 @@ class ProximityMessageTemplate < MessageTemplate
     default_empty_array_attribute :filter_beacon_configuration_ids
     default_empty_array_attribute :filter_place_tags
     default_empty_array_attribute :filter_place_ids
+    default_empty_array_attribute :filter_xenio_zone_ids
+    default_empty_array_attribute :filter_xenio_place_ids
 
     validate :legal_trigger_event_id
 
@@ -33,6 +35,14 @@ class ProximityMessageTemplate < MessageTemplate
 
     def filter_places
         @filter_places ||= filter_place_ids.any? ? Place.where(id: filter_place_ids).all : []
+    end
+
+    def xenio_zones
+        @xenio_zones ||= filter_xenio_zone_ids.any? ? XenioZone.where(id: filter_xenio_zone_ids).all : []
+    end
+
+    def xenio_places
+        @xenio_places ||= filter_xenio_place_ids.any? ? XenioPlace.where(id: filter_xenio_place_ids).all : []
     end
 
     def drafted

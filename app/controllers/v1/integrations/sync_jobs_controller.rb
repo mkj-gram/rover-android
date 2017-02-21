@@ -59,7 +59,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
 
     def get_integration_id
         @integration_id ||= -> {
-            id = params[:integration_id] || params[:estimote_integration_id] || params[:kontakt_integration_id] || params[:gimbal_integration_id] || params[:google_integration_id]
+            id = params[:integration_id] || params[:estimote_integration_id] || params[:kontakt_integration_id] || params[:gimbal_integration_id] || params[:google_integration_id] || params[:xenio_integration_id]
 
             if id.nil?
                 # this request might have the integrations id in the payload
@@ -71,6 +71,7 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
                 id = json.dig(:data, :beacon_sync_jobs, :integration_id) if id.nil?
                 id = json.dig(:data, :gimbal_sync_jobs, :integration_id) if id.nil?
                 id = json.dig(:data, :google_sync_jobs, :integration_id) if id.nil?
+                id = json.dig(:data, :xenio_sync_jobs, :integration_id) if id.nil?
             end
 
             return id

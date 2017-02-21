@@ -17,9 +17,12 @@ class V1::AccountsController < V1::ApplicationController
                     "share-key" => current_account.share_key,
                     "configuration-tags" => current_account.beacon_configuration_active_tag.tags,
                     "place-tags" => current_account.place_active_tag.tags,
+                    "xenio-zone-tags" => current_account.xenio_zone_active_tag.tags,
+                    "xenio-place-tags" => current_account.xenio_place_active_tag.tags,
                     "ibeacon-uuids" => current_account.ibeacon_configuration_uuids.configuration_uuids,
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
                     "is-gimbal-enabled" => current_account.gimbal_integrations.count >= 1,
+                    "is-xenio-enabled" => current_account.xenio_integrations.count >= 1,
                     "message-limits" => current_account.message_limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)}
                 },
                 "relationships" => {
@@ -75,6 +78,20 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
+        xenio_integration = current_account.xenio_integrations.first
+        if xenio_integration
+            json["data"]["relationships"].merge!(
+                {
+                    "xenio-integration" => {
+                        "data" => {
+                            "type" => "xenio-integrations",
+                            "id" => xenio_integration.id.to_s
+                        }
+                    }
+                }
+            )
+        end
+
         google_integration = current_account.google_integration
         if google_integration
             json["data"]["relationships"].merge!(
@@ -119,11 +136,11 @@ class V1::AccountsController < V1::ApplicationController
             )
         end
 
-        included = [estimote_integration, kontakt_integration, gimbal_integration, google_integration].compact.map do |integration|
+        included = [estimote_integration, kontakt_integration, gimbal_integration, google_integration, xenio_integration].compact.map do |integration|
             serialize_integration(integration)
         end
 
-        included += [estimote_integration, kontakt_integration, gimbal_integration, google_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
+        included += [estimote_integration, kontakt_integration, gimbal_integration, google_integration, xenio_integration].compact.select{|integration| !integration.latest_sync_job.nil? }.map do |integration|
             V1::ThirdPartyIntegrationSyncJobSerializer.serialize_with_integration(integration.latest_sync_job, integration)
         end
 

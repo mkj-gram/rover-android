@@ -54,7 +54,8 @@ Rails.application.routes.draw do
         resources "configurations", controller: "beacon_configurations", as: "beacon_configuration"
 
         resources "gimbal-places", controller: "gimbal_places", as: "gimbal_place", only: [:index, :show]
-
+        resources "xenio-zones", controller: "xenio_zones", as: "xenio_zones", only: [:index, :show]
+        resources "xenio-places", controller: "xenio_places", as: "xenio_place", only: [:index, :show]
 
         resources :integrations, only: [:index, :show, :create, :update, :destroy] do
             scope module: "integrations" do
@@ -80,12 +81,19 @@ Rails.application.routes.draw do
             end
         end
 
+        resources "xenio-integrations", controller: "integrations", as: "xenio_integrations", only: [:index, :show, :create, :update, :destroy], integration_type: "xenio-integrations" do
+            scope module: "integrations" do
+                resources "sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            end
+        end
+
         scope module: "integrations" do
             resources :"estimote-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
             resources :"kontakt-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
             resources :"beacon-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
             resources :"gimbal-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
             resources :"google-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show, :index]
+            resources :"xenio-sync-jobs", controller: "sync_jobs", as: "sync_jobs", only: [:create, :show]
         end
 
 

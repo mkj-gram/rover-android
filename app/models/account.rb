@@ -44,6 +44,7 @@ class Account < ActiveRecord::Base
     has_many :estimote_integrations
     has_many :kontakt_integrations
     has_many :gimbal_integrations
+    has_many :xenio_integrations
     has_one :google_integration
     has_many :customer_segments
     has_many :account_invites, dependent: :destroy
@@ -51,6 +52,8 @@ class Account < ActiveRecord::Base
     has_one :default_user_role, class_name: "UserRole", primary_key: "default_user_role_id", foreign_key: "id"
     has_one :beacon_configuration_active_tag
     has_one :place_active_tag
+    has_one :xenio_zone_active_tag
+    has_one :xenio_place_active_tag
     has_one :ibeacon_configuration_uuids, class_name: "ActiveIBeaconConfigurationUuid"
     has_one :eddystone_namespace_configuration_uuids, class_name: "ActiveEddystoneConfigurationUuid"
 
@@ -131,6 +134,8 @@ class Account < ActiveRecord::Base
     def create_active_tags_index
         BeaconConfigurationActiveTag.create(account_id: self.id)
         PlaceActiveTag.create(account_id: self.id)
+        XenioZoneActiveTag.create(account_id: self.id)
+        XenioPlaceActiveTag.create(account_id: self.id)
     end
 
     def create_active_configuration_uuids_index
