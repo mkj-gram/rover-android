@@ -1,7 +1,6 @@
 class XenioIntegration < ThirdPartyIntegration
 
     validates :api_key, presence: true
-    validates :customer_id, presence: true
     validates :account_id, presence: true
 
     after_commit :create_sync_job!, on: :create
@@ -35,8 +34,8 @@ class XenioIntegration < ThirdPartyIntegration
         should_pluralize ? XenioIntegration.model_type_pluralized : XenioIntegration.model_type
     end
 
-    def set_credentials(api_key, customer_id)
-        self.credentials = { api_key: api_key, customer_id: customer_id }
+    def set_credentials(api_key)
+        self.credentials = { api_key: api_key }
     end
 
     def api_key
@@ -48,30 +47,17 @@ class XenioIntegration < ThirdPartyIntegration
     end
 
     def api_key=(new_key)
-        set_credentials(new_key, customer_id)
-    end
-
-    def customer_id
-        if self.credentials
-            self.credentials[:customer_id]
-        else
-            nil
-        end
-    end
-
-    def customer_id=(new_customer_id)
-        set_credentials(api_key, new_customer_id)
+        set_credentials(new_key)
     end
 
     def credentials_json
         {
-            "api-key" => api_key,
-            "customer-id" => customer_id
+            "api-key" => api_key
         }
     end
 
     def client
-        @client ||= XenioApi.new(api_key, customer_id)
+        @client ||= XenioApi.new(api_key)
     end
 
 
