@@ -16,6 +16,8 @@ const GimbalPlaceService = require('./lib/gimbal-place');
 const RateLimitService = require('./lib/rate-limit');
 const ExperienceService = require('./lib/experience');
 const ExperienceStatsService = require('./lib/experience-stats');
+const XenioZoneService = require('./lib/xenio-zone');
+const XenioPlaceService = require('./lib/xenio-place');
 
 module.exports.register = function(server, options, next) {
     server.methods.customer = {};
@@ -34,6 +36,8 @@ module.exports.register = function(server, options, next) {
     server.methods.rateLimit = {};
     server.methods.experience = {};
     server.methods.experienceStats = {};
+    server.methods.xenioZone = {};
+    server.methods.xenioPlace = {};
 
     server.methods.customer.find = CustomerService.find.bind(server);
     server.methods.customer.findByQuery = CustomerService.findByQuery.bind(server);
@@ -80,6 +84,8 @@ module.exports.register = function(server, options, next) {
     server.methods.proximityMessage.beaconTriggered = ProximityMessageService.beaconTriggered.bind(server);
     server.methods.proximityMessage.geofenceTriggered = ProximityMessageService.geofenceTriggered.bind(server);
     server.methods.proximityMessage.gimbalPlaceTriggered = ProximityMessageService.gimbalPlaceTriggered.bind(server);
+    server.methods.proximityMessage.xenioZoneTriggered = ProximityMessageService.xenioZoneTriggered.bind(server);
+    server.methods.proximityMessage.xenioPlaceTriggered = ProximityMessageService.xenioPlaceTriggered.bind(server);
 
     server.methods.customerSegment.findById = CustomerSegmentService.findById.bind(server);
     
@@ -96,6 +102,9 @@ module.exports.register = function(server, options, next) {
 
     server.methods.experienceStats.update = ExperienceStatsService.update.bind(server);
     server.methods.experienceStats.incrementCounter = ExperienceStatsService.incrementCounter.bind(server);
+
+    server.methods.xenioZone.findById = XenioZoneService.findById.bind(server);
+    server.methods.xenioPlace.findById = XenioPlaceService.findById.bind(server);
     next();
 };
 
