@@ -5,14 +5,16 @@ require_relative 'request_error'
 module XenioApi
     class Client
         include HTTParty
+
         base_uri "https://jvh69qvt73.execute-api.us-west-2.amazonaws.com/roverdev"
         format :json
         headers 'Accept' => 'application/json'
         headers 'User-Agent' => "Rover-Sync"
 
-        def initialize(api_key, customer_id)
+        CUSTOMER_ID = "9A065B55-E43B-446C-A144-9A2045AFF85B"
+
+        def initialize(api_key)
             @headers = {'X-Api-Key' => api_key}
-            @customer_id = customer_id
         end
 
         def zones
@@ -56,7 +58,7 @@ module XenioApi
             opts = {} if opts.nil?
             # /CUSTOMERID/ZONES
             # /CUSTOMERID/PLACES
-            endpoint = File.join("/", @customer_id, endpoint)
+            endpoint = File.join("/", CUSTOMER_ID , endpoint)
 
             case type
             when "POST"
