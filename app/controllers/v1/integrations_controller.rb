@@ -162,7 +162,7 @@ class V1::IntegrationsController < V1::ApplicationController
     end
 
     def xenio_integration_params(local_params)
-        return local_params.fetch(:xenio_integrations, {}).permit(:enabled, :api_key, :customer_id)
+        return local_params.fetch(:xenio_integrations, {}).permit(:enabled, :customer_id)
     end
 
     def get_integrations
