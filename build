@@ -1,0 +1,113 @@
+#!/usr/bin/env ruby
+require 'optparse'
+
+class Logger
+
+    def initialize(level = 1)
+        @level = level
+    end
+
+    def info(i)
+        $stdout.write(i + "\n")
+    end
+
+    def debug(i)
+        $stdout.write(i + "\n") if  @level < 1
+    end
+
+end
+
+@supported_languages = ["ruby", "node"]
+
+@options = { output: "lib", language: "ruby" }
+
+OptionParser.new do |opts|
+    opts.banner = "Usage: builder.rb [options]"
+
+    opts.on("-v", "--verbose", "Run verbosely") do |v|
+        @options[:verbose] = v
+    end
+
+    opts.on("-o", "--output outfile", "Compiled output dir") do |v|
+        @options[:output] = v
+    end
+
+    opts.on("-l", "--lang language", "Which language to compile to") do |v|
+        @options[:language] = v
+    end
+
+end.parse!
+
+@logger = Logger.new(@options[:verbose] == true ? 0 : 1)
+
+def get_imports(file)
+    
+    if !File.file?(file) || file.nil? || file.empty?
+        return []
+    end
+
+    imports = File.open(file).grep(/import/)
+    imported_files = imports.map{|statement| /\"(.*)\"/.match(statement)[1] }
+    
+    return (imported_files + imported_files.map{ |file| get_imports(file) }.flatten).uniq
+end
+
+
+# Compilers
+
+def compile_ruby(build_files)
+    
+    output = @options[:output] || "lib"
+    cmd = "protoc --ruby_out=#{output} --grpc_out=#{output} --plugin=protoc-gen-grpc=`which grpc_tools_ruby_protoc_plugin` #{build_files.join(' ')}"
+    @logger.debug("Running: " + cmd)
+    status = system(cmd)
+    @logger.debug("Status: #{status}")
+    
+end
+
+def compile_node(build_files)
+    output = @options[:output] || "lib"
+    cmd = "protoc --js_out=#{output} --grpc_out=#{output} --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` #{build_files.join(' ')}"
+    @logger.debug("Running: " + cmd)
+    status = system(cmd)
+    @logger.debug("Status: #{status}")
+end
+
+def main
+   
+    if ARGV[0].nil?
+        @logger.info("Error: Please provide a directory or proto file")
+        exit 1
+    end
+
+    if !@supported_languages.include?(@options[:language])
+        @logger.info("Error: I do not know how to compile #{@options[:language]}")
+        @logger.info("Supported Languages are {#{@supported_languages.join(', ')}}")
+        exit 1
+    end
+
+    if File.directory?(ARGV[0])
+        files = Dir[File.join(ARGV[0], "**/*.proto")]
+    else
+        files = [ ARGV[0] ]
+    end
+
+
+    build_files = files
+    files.each do |file|
+       build_files += get_imports(file).delete_if{|import_file| !File.file?(import_file) }
+    end
+
+    case @options[:language]
+    when "ruby"
+        compile_ruby(build_files)
+    when "node"
+        compile_node(build_files)
+    else
+        puts "Ummm"
+        exit 1
+    end
+    
+end
+
+main
