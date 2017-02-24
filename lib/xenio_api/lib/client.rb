@@ -10,11 +10,10 @@ module XenioApi
         format :json
         headers 'Accept' => 'application/json'
         headers 'User-Agent' => "Rover-Sync"
+        headers 'X-Api-Key' => "Gl0PAKpEEJ2f3cbv9T70C44KVySXY9Te1wV9thjp"
 
-        CUSTOMER_ID = "9A065B55-E43B-446C-A144-9A2045AFF85B"
-
-        def initialize(api_key)
-            @headers = {'X-Api-Key' => api_key}
+        def initialize(customer_id)
+            @customer_id = customer_id
         end
 
         def zones
@@ -58,7 +57,7 @@ module XenioApi
             opts = {} if opts.nil?
             # /CUSTOMERID/ZONES
             # /CUSTOMERID/PLACES
-            endpoint = File.join("/", CUSTOMER_ID , endpoint)
+            endpoint = File.join("/", @customer_id , endpoint)
 
             case type
             when "POST"
