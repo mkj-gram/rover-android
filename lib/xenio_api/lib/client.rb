@@ -61,9 +61,9 @@ module XenioApi
 
             case type
             when "POST"
-                return self.class.post(endpoint, query: opts[:query], headers: @headers)
+                return self.class.post(endpoint, query: opts[:query])
             else
-                return self.class.get(endpoint, query: opts[:query], headers: @headers)
+                return self.class.get(endpoint, query: opts[:query])
             end
         end
     end
