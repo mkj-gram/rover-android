@@ -67,7 +67,7 @@ end
 
 def compile_node(build_files)
     output = @options[:output] || "lib"
-    cmd = "protoc --js_out=#{output} --grpc_out=#{output} --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` #{build_files.join(' ')}"
+    cmd = "protoc --js_out=import_style=commonjs,binary:#{output} --grpc_out=#{output} --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` #{build_files.join(' ')}"
     @logger.debug("Running: " + cmd)
     status = system(cmd)
     @logger.debug("Status: #{status}")
