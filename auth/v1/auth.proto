@@ -14,6 +14,15 @@ message Token {
 }
 
 /*
+    Resource
+    name: String representing the name of the resource
+          exp -> [ Events, Messages, Experiences ]
+ */
+message Resource {
+    string name = 1;
+}
+
+/*
     Account
  */
 message Account {
@@ -44,7 +53,7 @@ message GetAccountRequest {
 message GetAccountReply {
     common.v1.OperationResult result = 1;
 
-    Account account = 1;
+    Account account = 2;
 }
 
 
@@ -149,11 +158,12 @@ message AuthenticateTokenReply {
 
 message HasAccessRequest {
     Token token = 1;
+    Resource resource = 2;
 }
 
 message HasAccessReply {
     common.v1.OperationResult result = 1;
-    bool success = 1;
+    bool has_access = 2;
 }
 
 /*
