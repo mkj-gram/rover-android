@@ -177,34 +177,34 @@ service Auth {
     /*
         Basic crud operations for Accounts
      */
-    rpc GetAccount(GetAccountRequest) returns (GetAccountReply) {};
-    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountReply) {};
-    rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountReply) {};
+    rpc getAccount(GetAccountRequest) returns (GetAccountReply) {};
+    rpc createAccount(CreateAccountRequest) returns (CreateAccountReply) {};
+    rpc updateAccount(UpdateAccountRequest) returns (UpdateAccountReply) {};
     
 
 
     /*
         Basic crud operations for Users
      */
-    rpc GetUser(GetUserRequest) returns (GetUserReply) {};
-    rpc CreateUser(CreateUserRequest) returns (CreateUserReply) {};
-    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserReply) {};
+    rpc getUser(GetUserRequest) returns (GetUserReply) {};
+    rpc createUser(CreateUserRequest) returns (CreateUserReply) {};
+    rpc updateUser(UpdateUserRequest) returns (UpdateUserReply) {};
 
     /*
         A user session is simple sign on using email & password based authentication to generate a new JWT token
         A session is not stored in any db instead the token is used to map back to a user
      */
-    rpc CreateUserSession(CreateUserSessionRequest) returns (CreateUserSessionReply) {};
+    rpc createUserSession(CreateUserSessionRequest) returns (CreateUserSessionReply) {};
 
 
     /*
         Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
      */
-    rpc AuthenticateToken(AuthenticateTokenRequest) returns (AuthenticateTokenReply) {};
+    rpc authenticateToken(AuthenticateTokenRequest) returns (AuthenticateTokenReply) {};
 
     /*
         Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
         has access to the requested resource
      */
-    rpc HasAccess(HasAccessRequest) returns (HasAccessReply) {};
+    rpc hasAccess(HasAccessRequest) returns (HasAccessReply) {};
 }
