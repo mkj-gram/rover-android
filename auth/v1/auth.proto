@@ -1,0 +1,220 @@
+syntax = "proto3";
+
+package auth.v1;
+
+import "common/v1/response.proto";
+
+
+/*
+    Token
+ */
+
+message Token {
+    string key = 1;
+}
+
+/*
+    Account
+ */
+message Account {
+    int32 id = 1;
+    string token = 2;
+    string sdkToken = 3;
+    string webAnalyticsToken = 4;
+}
+
+/*
+    User
+
+
+ */
+message User {
+    int32 id = 1;
+    Acl acl = 2;
+
+    string email = 3;
+    string password = 4;
+}
+
+/*
+    Acl
+ */
+message Acl {
+    repeated AclItem permissions = 1;
+}
+
+/*
+    AclItem
+ */
+message AclItem {
+    string resource = 1;
+    repeated Grant grants = 2;
+}
+
+/*
+    Grant
+ */
+message Grant {
+    string type = 1;
+}
+
+
+
+/*
+    Account Rpc Requests & Replies
+ */
+message GetAccountRequest {
+    int32 account_id = 1;
+}
+
+message GetAccountReply {
+    common.v1.OperationResult result = 1;
+
+    Account account = 1;
+}
+
+
+message CreateAccountRequest {
+    // The account you wish to create
+    Account account = 1;
+}
+
+message CreateAccountReply {
+    common.v1.OperationResult result = 1;
+
+    // The account that was created
+    Account account = 2;
+}
+
+message UpdateAccountRequest {
+    int32 account_id = 1;
+    Account account = 2;
+}
+
+message UpdateAccountReply {
+    common.v1.OperationResult result = 1;
+
+    Account account = 2;
+}
+
+// Look up an account by any of their tokens
+message GetAccountByTokenRequest {
+    Token token = 1;
+}
+
+message GetAccountByTokenReply {
+    common.v1.OperationResult result = 1;
+
+    Account account = 2;
+}
+
+
+/*
+    User Rpc Requests & Replies
+ */
+
+message GetUserRequest {
+    int32 user_id = 1;
+}
+
+message GetUserReply {
+    common.v1.OperationResult result = 1;
+
+    User user = 2;
+}
+
+message CreateUserRequest {
+    User user = 1;
+}
+
+message CreateUserReply {
+    common.v1.OperationResult result = 1;
+
+    User user = 2;
+}
+
+message UpdateUserRequest {
+    int32 user_id = 1;
+    User user = 2;
+}
+
+message UpdateUserReply {
+    common.v1.OperationResult result = 1;
+    User user = 2;
+}
+
+
+
+/*
+    Session Rpc Requests & Replies
+ */
+
+message GetUserSessionRequest {
+    Token token = 1;
+}
+
+message GetUserSessionReply {
+    common.v1.OperationResult result = 1;
+
+    User user = 2;
+    Token token = 3;
+}
+
+message CreateUserSessionRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message CreateUserSessionReply {
+    common.v1.OperationResult result = 1;
+
+    User user = 2;
+    Token token = 3;
+}
+
+
+
+
+/*
+    
+    Service for handling authenticate of Users and Accounts
+    as well as provides ACL to protect resources
+
+ */
+service AuthService {
+
+    /*
+        Basic crud operations for Accounts
+     */
+    rpc GetAccount(GetAccountRequest) returns (GetAccountReply) {};
+    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountReply) {};
+    rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountReply) {};
+    rpc GetAccountByToken(GetAccountByTokenRequest) returns (GetAccountByTokenReply) {};
+
+
+    /*
+        Basic crud operations for Users
+     */
+    rpc GetUser(GetUserRequest) returns (GetUserReply) {};
+    rpc CreateUser(CreateUserRequest) returns (CreateUserReply) {};
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserReply) {};
+
+    /*
+        A user session is simple sign on using email & password based authentication to generate a new JWT token
+        A session is not stored in any db instead the token is used to map back to a user
+     */
+    rpc GetUserSession(GetUserSessionRequest) returns (GetUserSessionReply) {};
+    rpc CreateUserSession(CreateUserSessionRequest) returns (CreateUserSessionReply) {};
+
+
+    /*
+        Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
+     */
+    rpc AuthenticateToken(AuthenticateTokenRequest) returns (AuthenticateTokenReply) {};
+
+    /*
+        Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
+        has access to the requested resource
+     */
+    rpc HasAccess(HasAccessRequest) returns (HasAccessReply) {};
+}
