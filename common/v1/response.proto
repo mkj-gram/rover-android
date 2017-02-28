@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package rover.common.v1;
+package common.v1;
 
 
 /*

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package rover.pushy.v1;
+package pushy.v1;
 
 import "common/v1/response.proto";
 
@@ -223,7 +223,7 @@ service PushyService {
     
     // push
     rpc SendNotification(SendNotificationRequest)   returns (SendNotificationResponse) {};
-    rpc SendNotifications(stream SendNotificationRequest) returns (SendNotificationResult) {};
+    rpc SendNotificationStream(stream SendNotificationRequest) returns (SendNotificationResult) {};
     
     // Device rpc crud calls
     rpc GetDevice(GetDeviceRequest)         returns (GetDeviceResponse) {};
