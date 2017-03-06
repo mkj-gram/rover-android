@@ -1,0 +1,51 @@
+{
+  "name": "@rover/react-icons",
+  "version": "1.0.0",
+  "description": "Rover's Icon Component Library",
+  "main": "es/index.js",
+  "module": "es/index.js",
+  "jsnext:main": "es/index.js",
+  "files": [
+    "es",
+    "src"
+  ],
+  "scripts": {
+    "clean": "rimraf es coverage",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:es": "BABEL_ENV=es babel src --out-dir es",
+    "build": "npm run build:es",
+    "prepublish": "npm run clean && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "rover",
+    "experience",
+    "experiences",
+    "phone"
+  ],
+  "authors": [
+    "Sean Rucker <sean@rover.io> (https://github.com/seanrucker",
+    "Alex Graham <alex@rover.io> (https://github.com/alexjgraham"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RoverPlatform/web-common/issues"
+  },
+  "homepage": "https://github.com/RoverPlatform/web-common#readme",
+  "dependencies": {
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-tether": "^0.5.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.23.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.23.0",
+    "rimraf": "^2.6.1"
+  }
+}
