@@ -3,7 +3,7 @@ import React from 'react'
 import AddButton from './AddButton'
 import Anchor from './Anchor'
 
-import { text as textStyle, large } from '../styles/typography'
+import { text as textStyle, large } from './styles/typography'
 
 const { Component } = React
 

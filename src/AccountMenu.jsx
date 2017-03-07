@@ -4,8 +4,8 @@ import Anchor from './Anchor'
 import Icon from './Icon'
 import Popover from './Popover'
 
-import { text, large, semibold, truncate } from '../styles/typography'
-import { graphite } from '../styles/colors'
+import { text, large, semibold, truncate } from './styles/typography'
+import { graphite } from './styles/colors'
 
 const { Component } = React
 
@@ -49,7 +49,7 @@ class AccountMenu extends Component {
                 style={popoverStyle}
             >
                 <div style={containerStyle}>
-                    <Anchor style={nameStyle} onClick={this.showPopover}>{children}</Anchor>
+                    <div style={nameStyle} onClick={this.showPopover}>{children}</div>
                     <Anchor style={chevronStyle} onClick={this.showPopover}>
                         <Icon type="chevron-down"/>
                     </Anchor>

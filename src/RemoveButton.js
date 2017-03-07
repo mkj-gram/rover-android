@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
-import RemoveIcon from './icons/RemoveIcon'
-import { red, silver } from '../styles/colors'
+import { RemoveIcon } from '@rover/react-icons'
+import { red, silver } from './styles/colors'
 
 class RemoveButton extends Component {
 

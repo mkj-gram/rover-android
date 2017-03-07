@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { text } from '../../styles/typography'
-import { silver } from '../../styles/colors'
+import { text } from '../styles/typography'
+import { silver } from '../styles/colors'
 
 const { Component } = React
 

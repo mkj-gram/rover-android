@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 
-import { graphite, titanium } from '../../styles/colors'
-import { semibold, text } from '../../styles/typography'
+import { graphite, titanium } from '../styles/colors'
+import { semibold, text } from '../styles/typography'
 
 const Select = ({ isDisabled, style, children, ...rest }) => {
     style = {

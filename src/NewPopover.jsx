@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import RoundedButton from '../../common/components/RoundedButton'
-import Label from '../../common/components/forms/Label'
-import NewButton from '../../common/components/NewButton'
-import Popover from '../../common/components/Popover'
-import TextField from '../../common/components/forms/TextField'
+import RoundedButton from './RoundedButton'
+import Label from './forms/Label'
+import NewButton from './NewButton'
+import Popover from './Popover'
+import TextField from './forms/TextField'
 
 class NewPopover extends Component {
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { findDOMNode } from 'react-dom'
 
-import { flexContainer } from '../../styles/layout'
+import { flexContainer } from '../styles/layout'
 
 class Table extends Component {
 

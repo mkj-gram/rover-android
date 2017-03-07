@@ -1,7 +1,7 @@
 import React, { Children, Component, PropTypes } from 'react'
 
-import { steel } from '../styles/colors'
-import { text } from '../styles/typography'
+import { steel } from './styles/colors'
+import { text } from './styles/typography'
 
 class Button extends Component {
 

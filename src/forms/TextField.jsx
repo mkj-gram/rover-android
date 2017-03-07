@@ -2,8 +2,8 @@ import React from 'react'
 
 import Label from './Label'
 
-import { graphite, titanium } from '../../styles/colors'
-import { unselectable } from '../../styles/typography'
+import { graphite, titanium } from '../styles/colors'
+import { unselectable } from '../styles/typography'
 
 const { Component } = React
 

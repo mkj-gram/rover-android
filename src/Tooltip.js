@@ -1,5 +1,5 @@
 import React from 'react'
-import { graphite } from '../../common/styles/colors'
+import { graphite } from './styles/colors'
 
 const ToolTip = ({ message }) =>
     <div>

@@ -1,12 +1,12 @@
 import React, { Component, Children, PropTypes, cloneElement } from 'react'
 
-import { slashes } from '../../styles/backgrounds'
-import { cloud, hexa, silver, steel, titanium } from '../../styles/colors'
-import { text, truncate } from '../../styles/typography'
+import { slashes } from '../styles/backgrounds'
+import { cloud, hexa, silver, steel, titanium } from '../styles/colors'
+import { text, truncate } from '../styles/typography'
 
 import TextField from '../forms/TextField'
-import PartialLockIcon from '../icons/PartialLockIcon'
-import LockIcon from '../icons/LockIcon'
+import { PartialLockIcon } from '@rover/react-icons'
+import { LockIcon } from '@rover/react-icons'
 
 class Layer extends Component {
 

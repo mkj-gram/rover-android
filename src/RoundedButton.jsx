@@ -2,7 +2,7 @@ import React from 'react'
 
 import Anchor from './Anchor'
 
-import { cloud, silver, steel } from '../styles/colors'
+import { cloud, silver, steel } from './styles/colors'
 
 const Button = ({ primaryColor, type, isDisabled, isLoading, style, children, onClick, ...rest }) => {
 

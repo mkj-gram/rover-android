@@ -1,10 +1,10 @@
 import React, { Component, PropTypes, cloneElement } from 'react'
 
-import ArrowIconDown from '../icons/ArrowIconDown'
-import ArrowIconRight from '../icons/ArrowIconRight'
+import { ArrowIconDown } from '@rover/react-icons'
+import { ArrowIconRight } from '@rover/react-icons'
 
-import { cloud, hexa, silver, steel, titanium } from '../../styles/colors'
-import { text, truncate } from '../../styles/typography'
+import { cloud, hexa, silver, steel, titanium } from '../styles/colors'
+import { text, truncate } from '../styles/typography'
 
 import TextField from '../forms/TextField'
 

@@ -34,7 +34,11 @@ export default ({
     }
 
     return (
-        <Modal isOpen={isOpen} onAfterOpen={onAfterOpen} onRequestClose={onRequestClose} closeTimeoutMS={closeTimeoutMS} style={style}>
+        <Modal
+            isOpen={isOpen}
+            onAfterOpen={onAfterOpen} onRequestClose={onRequestClose} closeTimeoutMS={closeTimeoutMS}
+            contentLabel="Rover Platform"
+            style={style}>
             <IconButton 
                 type={'close'} 
                 onClick={onRequestClose} 

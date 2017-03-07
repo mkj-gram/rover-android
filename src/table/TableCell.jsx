@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { text, truncate } from '../../styles/typography'
+import { text, truncate } from '../styles/typography'
 
 const TableCell = ({ isFirst, isLast, isHead, style, children }) => {
     

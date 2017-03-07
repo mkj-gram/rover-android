@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 
-import { silver } from '../../styles/colors'
-import { semibold, text } from '../../styles/typography'
+import { silver } from '../styles/colors'
+import { semibold, text } from '../styles/typography'
 
 const Checkbox = ({ isChecked, isDisabled, label, primaryColor, style, checkedStyle, labelStyle, ...rest }) => {
     style = {

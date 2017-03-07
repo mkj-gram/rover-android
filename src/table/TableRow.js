@@ -1,6 +1,6 @@
 import React, { Component, PropTypes, cloneElement } from 'react'
 
-import { straw } from '../../../common/styles/colors'
+import { straw } from '../styles/colors'
 
 class TableRow extends Component {
 

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { scrollContainer } from '../../styles/layout'
+import { scrollContainer } from '../styles/layout'
 
 const TableBody = ({ style, children }) => {
     

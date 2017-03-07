@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { text } from '../../../common/styles/typography'
+import { text } from '../styles/typography'
 
 const LayerList = ({ style, children, ...rest }) => {
 

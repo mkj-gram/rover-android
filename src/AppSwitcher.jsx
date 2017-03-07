@@ -5,18 +5,18 @@ import Anchor from './Anchor'
 import Icon from './Icon'
 import Popover from './Popover'
 
-import ProximityIcon from './images/app-icons/ProximityIcon'
-import MessagesIcon from './images/app-icons/MessagesIcon'
-import ExperiencesIcon from './images/app-icons/ExperiencesIcon'
-import AnalyticsIcon from './images/app-icons/AnalyticsIcon'
-import CustomersIcon from './images/app-icons/CustomersIcon'
-import SettingsIcon from './images/app-icons/SettingsIcon'
+import { ProximityIcon } from '@rover/react-icons'
+import { MessagesIcon } from '@rover/react-icons'
+import { ExperiencesIcon } from '@rover/react-icons'
+import { AnalyticsIcon } from '@rover/react-icons'
+import { CustomersIcon } from '@rover/react-icons'
+import { SettingsIcon } from '@rover/react-icons'
 
-import GimbalIcon from './images/app-icons/GimbalIcon'
-import XenioIcon from './images/app-icons/XenioIcon'
+import { GimbalIcon } from '@rover/react-icons'
+import { XenioIcon } from '@rover/react-icons'
 
-import { graphite } from '../styles/colors'
-import { text, light, bold, uppercase } from '../styles/typography'
+import { graphite } from './styles/colors'
+import { text, light, bold, uppercase } from './styles/typography'
 
 const { Component } = React
 

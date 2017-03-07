@@ -2,7 +2,7 @@ import React from 'react'
 
 import TableCell from './TableCell'
 
-import { cloud } from '../../styles/colors'
+import { cloud } from '../styles/colors'
 
 const EmptyTableCell = ({ style, ...rest }) => {
 

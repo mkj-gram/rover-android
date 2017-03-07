@@ -3,7 +3,7 @@ import React from 'react'
 import Anchor from './Anchor'
 import Icon from './Icon'
 
-import { text, truncate } from '../styles/typography'
+import { text, truncate } from './styles/typography'
 
 const Breadcrumbs = ({ primaryColor, items, style }) => {
 
