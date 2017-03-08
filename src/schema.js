@@ -11,6 +11,18 @@ import {
 import GraphQLJSON from 'graphql-type-json'
 import uuid from 'node-uuid'
 
+const experienceType = new GraphQLObjectType({
+	name: 'Experience',
+	fields: {
+		id: {
+			type: new GraphQLNonNull(GraphQLID)
+		},
+		name: {
+			type: new GraphQLNonNull(GraphQLString)
+		}
+	}
+})
+
 const eventType = new GraphQLInputObjectType({
     name: 'Event',
     fields: {
@@ -29,10 +41,18 @@ const eventType = new GraphQLInputObjectType({
 const queryType = new GraphQLObjectType({
     name: 'Query',
     fields: {
-        hello: {
-            type: GraphQLString,
-            resolve() {
-                return 'Hello, world!'
+        experience: {
+            type: experienceType,
+            args: {
+            	id: {
+            		type: new GraphQLNonNull(GraphQLID)
+            	}
+            },
+            resolve(_, { id }) {
+                return {
+                	id: id,
+                	name: 'My Experience'
+                }
             }
         }
     }
