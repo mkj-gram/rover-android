@@ -8,6 +8,8 @@ export const onyx = '#434343'
 
 export const steel = '#818181'
 
+export const chalice = '#ADADAD'
+
 export const silver = '#BCBCBC'
 
 export const titanium = '#D8D8D8'
@@ -23,6 +25,8 @@ export const offwhite = '#F5F5F5'
 export const blue = '#35A7F8'
 
 export const mint = '#59D698'
+
+export const turquoise = '#1DD2B5'
 
 export const straw = '#FFFEF4'
 
