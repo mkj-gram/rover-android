@@ -10,6 +10,8 @@ import NavBar from './NavBar'
 import NewButton from './NewButton'
 import NewPopover from './NewPopover'
 import Popover from './Popover'
+import PrimaryNavigator from './PrimaryNavigator'
+import ProgressBar from './ProgressBar'
 import RemoveButton from './RemoveButton'
 import RoundedButton from './RoundedButton'
 import TabBar from './TabBar'
@@ -46,12 +48,14 @@ import {
     onyx,
     steel,
     silver,
+    chalice,
     titanium,
     mercury,
     cloud,
     offwhite,
     blue,
     mint,
+    turquoise,
     straw,
     red,
     pink,
@@ -85,6 +89,8 @@ export {
     NewButton,
     NewPopover,
     Popover,
+    PrimaryNavigator,
+    ProgressBar,
     RemoveButton,
     RoundedButton,
     TabBar,
@@ -113,12 +119,14 @@ export {
     onyx,
     steel,
     silver,
+    chalice,
     titanium,
     mercury,
     cloud,
     offwhite,
     blue,
     mint,
+    turquoise,
     straw,
     red,
     pink,
