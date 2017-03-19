@@ -35,10 +35,8 @@ module Events
 
         def attributes
             json = {
+                event_name: "#{object} #{action}",
                 event: {
-                    id: self.class.event_id,
-                    object: object,
-                    action: action,
                     triggered_event_id: @trigger_event_id,
                     timestamp: generation_time.to_i,
                     source: source,
