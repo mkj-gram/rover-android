@@ -205,7 +205,15 @@ internals.create = function(request, reply) {
         return internals.writeError(reply, 400, { status: 400, error: "Invalid JSONAPI"});
     }
 
-    let customer = internals.parseCustomerPayload(currentAccountId, request.payload.data.attributes.user);
+    let customer = {};
+
+    if (request.headers['x-rover-customer-id']) {
+        customer = {
+            identifier: request.headers['x-rover-customer-id']
+        }
+    } else {
+        customer = internals.parseCustomerPayload(currentAccountId, request.payload.data.attributes.user)
+    }
     
     if (customer.error) {
         return internals.writeError(reply, 400, { status: 400,  error: customer });
@@ -239,6 +247,7 @@ internals.create = function(request, reply) {
 
         if (customer) {
             //return internals.processEvent(request, reply, customer);
+
             internals.updateCustomer(request, customer, (err, updatedCustomer) => {
                 if (err) {
                     logger.error(util.format('%s %f', 'Request Failed', request.payload));
@@ -587,7 +596,7 @@ internals.processEvent = function(request, reply, customer) {
         customer: customer,
         device: device,
         account: request.auth.credentials.account,
-        input: request.payload.event
+        event: request.payload.event
     };
 
     
@@ -852,11 +861,34 @@ internals.parseDevicePayload = function(id, payload) {
 };
 
 internals.parseEventPayload = function(payload, callback) {
-    const eventAttributes = Object.assign(payload);
-    delete eventAttributes['user'];
-    delete eventAttributes['device'];
+
+    const eventAttributes = {
+        timestamp: payload.timestamp
+    }
+
+    if (payload.name) {
+        eventAttributes.name = payload.name
+    }
+
+    if (payload.object && payload.action) {
+        eventAttributes.name = payload.object + " " + payload.action;
+    }
+
+    if (payload.attributes) {
+        eventAttributes.attributes = payload.attributes
+    } else {
+        let attributes = Object.assign({}, payload)
+        delete attributes["user"]
+        delete attributes["device"]
+        delete attributes["timestamp"]
+        delete attributes["name"]
+
+        eventAttributes.attributes = attributes;
+    }
+
     return eventAttributes;
 };
+
 
 /*
     "locale-lang": "en",

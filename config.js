@@ -68,7 +68,7 @@ const store = new Confidence.Store({
     elasticsearch: {
         hosts: {
             $filter: 'env',
-            production: process.env.ELASTICSEARCH_URLS.split(','),
+            production: (process.env.ELASTICSEARCH_URLS || "").split(','),
             $default: "127.0.0.1:9200"
         },
         flush_interval: {

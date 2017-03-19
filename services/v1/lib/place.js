@@ -13,6 +13,11 @@ const placeLruCache = LRU(placeLruOptions);
 
 
 internals.parsePlace = function(place) {
+    
+    if (util.isNullOrUndefined(place)) {
+        return undefined
+    }
+
     if (!util.isNullOrUndefined(place.longitude)) {
         place.longitude = parseFloat(place.longitude);
     }
