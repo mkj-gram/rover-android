@@ -40,7 +40,7 @@ module Events
                     triggered_event_id: @trigger_event_id,
                     timestamp: generation_time.to_i,
                     source: source,
-                    input: @raw_input,
+                    attributes: @raw_input,
                     errors: @errors
                 },
                 customer: {
