@@ -523,8 +523,8 @@ internals.updateCustomer = function(request, customer, callback) {
                 } else {
                     
                     tasks.push((callback) => {
-                        exisitngCustomer.inbox_updated_at = moment.utc().toDate()
-                        methods.customer.update(exisitngCustomer.id, {"$set": { "inbox_updated_at": exisitngCustomer.inbox_updated_at }},  (err) => {
+                        existingCustomer.inbox_updated_at = moment.utc().toDate()
+                        methods.customer.update(existingCustomer.id, {"$set": { "inbox_updated_at": existingCustomer.inbox_updated_at }},  (err) => {
                             if (err) {
                                 logger.error(err)
                                 return callback(err)
