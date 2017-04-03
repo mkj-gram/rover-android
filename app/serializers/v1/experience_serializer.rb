@@ -1,9 +1,9 @@
 module V1::ExperienceSerializer
     class << self
-        def serialize(experience, version, subdomain = "", opts = {})
+        def serialize(experience, version, subdomain = "", cname = nil, opts = {})
             has_unpublished_changes = !experience.current_version_id.nil?
 
-            simulator_url = build_simulator_url(subdomain, experience.short_url)
+            simulator_url = build_simulator_url(subdomain, cname, experience.short_url)
             
             data = {
                 id: experience.id.to_s,
@@ -39,8 +39,8 @@ module V1::ExperienceSerializer
 
         private
 
-        def build_simulator_url(subdomain, short_url)
-            host = Rails.configuration.simulator["host"]
+        def build_simulator_url(subdomain, cname, short_url)
+            host = cname.nil? ? Rails.configuration.simulator["host"] : cname
             if subdomain.nil? || subdomain.empty?
                 "https://#{host}/#{short_url}"
             else
