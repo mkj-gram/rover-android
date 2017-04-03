@@ -431,7 +431,6 @@ internals.updateCustomer = function(request, customer, callback) {
             } else {
                 logger.info('Customer has switched identifiers');
             }
-            
 
             methods.customer.findByQuery({ "account_id": currentAccountId, "identifier": customerPayload.identifier }, (err, existingCustomer) => {
                 if (err) {
@@ -458,46 +457,56 @@ internals.updateCustomer = function(request, customer, callback) {
                 //
                 // 
                 tasks.push((callback) => {
-                    methods.customer.pullDevice(customer, device, (err, customer) => {
+
+                    customer.inbox_updated_at = moment.utc().toDate()
+                    methods.customer.update(customer.id, {"$set": { "inbox_updated_at": customer.inbox_updated_at  }}, (err) => {
                         if (err) {
                             logger.error(err);
-                            return callback(err);
+                            return callback(err)
                         }
 
-                        if (customer.devices.length == 0 && util.isNullOrUndefined(customer.identifier)) {
-                            methods.customer.delete(customer, (err) => {
-                                if (err) {
-                                    logger.err(err);
-                                    return callback(err);
-                                }
 
-                                methods.account.decrementCounter(currentAccountId, 'customers_count', 1, (err) => {
+                        methods.customer.pullDevice(customer, device, (err, customer) => {
+                            if (err) {
+                                logger.error(err);
+                                return callback(err);
+                            }
+
+                            if (customer.devices.length == 0 && util.isNullOrUndefined(customer.identifier)) {
+                                methods.customer.delete(customer, (err) => {
                                     if (err) {
-                                        logger.error(err);
+                                        logger.err(err);
                                         return callback(err);
                                     }
 
-                                    methods.customer.deleteIndex(customer, (err) => {
+                                    methods.account.decrementCounter(currentAccountId, 'customers_count', 1, (err) => {
                                         if (err) {
                                             logger.error(err);
                                             return callback(err);
                                         }
 
-                                        return callback(null);
+                                        methods.customer.deleteIndex(customer, (err) => {
+                                            if (err) {
+                                                logger.error(err);
+                                                return callback(err);
+                                            }
+
+                                            return callback(null);
+                                        });
                                     });
                                 });
-                            });
-                            
-                        } else {
-                            methods.customer.index(customer, (err) => {
-                                if (err) {
-                                    logger.error(err);
-                                    return callback(err);
-                                }
-                                return callback(null, customer);
-                            });
-                        }
-                    });
+                                
+                            } else {
+                                methods.customer.index(customer, (err) => {
+                                    if (err) {
+                                        logger.error(err);
+                                        return callback(err);
+                                    }
+                                    return callback(null, customer);
+                                });
+                            }
+                        });
+                    })
                 });
 
                 if (util.isNullOrUndefined(existingCustomer)) {
@@ -512,22 +521,31 @@ internals.updateCustomer = function(request, customer, callback) {
                         });  
                     });
                 } else {
-                     tasks.push((callback) => {
-                        methods.customer.pushDevice(existingCustomer, device, (err, existingCustomer) => {
+                    
+                    tasks.push((callback) => {
+                        exisitngCustomer.inbox_updated_at = moment.utc().toDate()
+                        methods.customer.update(exisitngCustomer.id, {"$set": { "inbox_updated_at": exisitngCustomer.inbox_updated_at }},  (err) => {
                             if (err) {
-                                logger.error(err);
-                                return callback(err);
+                                logger.error(err)
+                                return callback(err)
                             }
 
-                            methods.customer.index(existingCustomer, (err) => {
+                            methods.customer.pushDevice(existingCustomer, device, (err, existingCustomer) => {
                                 if (err) {
                                     logger.error(err);
                                     return callback(err);
                                 }
 
-                                return callback(null, existingCustomer)
-                            })
-                        });
+                                methods.customer.index(existingCustomer, (err) => {
+                                    if (err) {
+                                        logger.error(err);
+                                        return callback(err);
+                                    }
+
+                                    return callback(null, existingCustomer)
+                                })
+                            });
+                        })
                     });
                 }
 
