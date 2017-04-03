@@ -159,7 +159,8 @@ CREATE TABLE accounts (
     message_limits jsonb[] DEFAULT '{}'::jsonb[],
     subdomain character varying,
     searchable_xenio_zones_count integer DEFAULT 0,
-    searchable_xenio_places_count integer DEFAULT 0
+    searchable_xenio_places_count integer DEFAULT 0,
+    cname character varying
 );
 
 
@@ -2133,4 +2134,6 @@ INSERT INTO schema_migrations (version) VALUES ('20170202144747');
 INSERT INTO schema_migrations (version) VALUES ('20170202195609');
 
 INSERT INTO schema_migrations (version) VALUES ('20170206171327');
+
+INSERT INTO schema_migrations (version) VALUES ('20170403141655');
 

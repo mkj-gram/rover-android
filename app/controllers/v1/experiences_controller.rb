@@ -352,6 +352,15 @@ class V1::ExperiencesController < V1::ApplicationController
 
     private
 
+    def get_cname(experience)
+        if !current_account.nil? && current_account.id == experience.account_id 
+            return current_account.cname
+        else
+            account = Account.find(experience.account_id)
+            return account ? account.cname : nil
+        end
+    end
+
     def get_subdomain(experience)
         if !current_account.nil? && current_account.id == experience.account_id
             return current_account.subdomain
@@ -384,7 +393,7 @@ class V1::ExperiencesController < V1::ApplicationController
         elsif version_id == 'live'
             version_id = experience.live_version_id
         end
-            
+
         Librato.timing('experience.render.time') do
 
             version = Experiences::VersionedExperience.find(version_id)
@@ -460,7 +469,16 @@ class V1::ExperiencesController < V1::ApplicationController
 
 
     def serialize_experience(experience, version, opts = {})
-        V1::ExperienceSerializer.serialize(experience, version, get_subdomain(experience), opts)
+        cname = get_cname(experience)
+
+        if !cname.nil?
+            # don't use the subdomain when we are using a cname
+            subdomain = nil
+        else
+            subdomain = get_subdomain(experience)
+        end
+        
+        return V1::ExperienceSerializer.serialize(experience, version, subdomain, cname, opts)
     end
 
     def formatted_params
