@@ -1,27 +1,20 @@
 import { 
     GraphQLID, 
-    GraphQLInputObjectType, 
+    GraphQLInputObjectType,
+    GraphQLInt,
     GraphQLList, 
     GraphQLNonNull, 
     GraphQLObjectType, 
     GraphQLSchema, 
-    GraphQLString 
+    GraphQLString,
 } from 'graphql'
+
+import { getViewer } from './database'
+
+import { CampaignRootType, campaignMutations, nodeField } from './types/CampaignTypes'
 
 import GraphQLJSON from 'graphql-type-json'
 import uuid from 'node-uuid'
-
-const experienceType = new GraphQLObjectType({
-	name: 'Experience',
-	fields: {
-		id: {
-			type: new GraphQLNonNull(GraphQLID)
-		},
-		name: {
-			type: new GraphQLNonNull(GraphQLString)
-		}
-	}
-})
 
 const eventType = new GraphQLInputObjectType({
     name: 'Event',
@@ -41,20 +34,11 @@ const eventType = new GraphQLInputObjectType({
 const queryType = new GraphQLObjectType({
     name: 'Query',
     fields: {
-        experience: {
-            type: experienceType,
-            args: {
-            	id: {
-            		type: new GraphQLNonNull(GraphQLID)
-            	}
-            },
-            resolve(_, { id }) {
-                return {
-                	id: id,
-                	name: 'My Experience'
-                }
-            }
-        }
+        campaign: {
+            type: CampaignRootType,
+            resolve: () => getViewer()
+        },
+        node: nodeField
     }
 })
 
@@ -80,8 +64,10 @@ const mutationType = new GraphQLObjectType({
                 console.log(logs)
                 return 'success'
             }
-        }
+        },
+        ...campaignMutations
     }
+        
 })
 
 const schema = new GraphQLSchema({
