@@ -622,14 +622,21 @@ internals.processEvent = function(request, reply, customer) {
 
     newrelic.setTransactionName(event.getTransactionName());
     
+    let eventCallbackCount = 0
+    let partialUpdateCallbackCount = 0
 
     event.process((err, newCustomer, newDevice, eventResponse) => {
+        
+        eventCallbackCount += 1
+
         if (err) {
             return internals.writeError(reply, 500, { status: 500, message: err });
         }
 
         internals.partialUpdateCustomerAndDevice(request.server, customer, device, newCustomer, newDevice).then(({ customer, device }) => {
             
+            partialUpdateCallbackCount += 1
+
             let response = JSON.stringify(eventResponse);
 
             reply.writeHead(200, {
@@ -637,7 +644,20 @@ internals.processEvent = function(request, reply, customer) {
                 'Connection': 'keep-alive',
                 'Content-Length': Buffer.byteLength(response, "utf-8")
             });
-            
+
+            if (eventCallbackCount > 1) {
+                logger.error("Event Callback Count exceeded: " + eventCallbackCount )
+                logger.error(response)
+                logger.error(customer, device, newCustomer, newDevice)
+                
+            }
+
+            if (partialUpdateCallbackCount > 1) {
+                logger.error("Event Callback Count exceeded: " + partialUpdateCallbackCount )
+                logger.error(response)
+                logger.error(customer, device, newCustomer, newDevice)
+            }
+
             return reply.end(response)
         });
     })
