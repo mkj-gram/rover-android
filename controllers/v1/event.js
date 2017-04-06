@@ -637,8 +637,8 @@ internals.processEvent = function(request, reply, customer) {
                 'Connection': 'keep-alive',
                 'Content-Length': Buffer.byteLength(response, "utf-8")
             });
-            reply.write(response);
-            return reply.end();
+            
+            return reply.end(response)
         });
     })
 };
