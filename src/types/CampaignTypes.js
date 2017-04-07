@@ -343,7 +343,7 @@ const ChangeCampaignNameMutation = mutationWithClientMutationId({
             resolve: () => getViewer()
         }
     },
-    mutateAndGetPayload: ({ name }) => {
+    mutateAndGetPayload: ({ name, id }) => {
         const localCampaignId = fromGlobalId(id).id
         updateCampaignData(id, 'name', name)
         return { localCampaignId }
