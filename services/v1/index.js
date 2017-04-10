@@ -99,6 +99,7 @@ module.exports.register = function(server, options, next) {
     server.methods.rateLimit.withinLimit = RateLimitService.withinLimit.bind(server);
     
     server.methods.experience.find = ExperienceService.find.bind(server);
+    server.methods.experience.findVersion = ExperienceService.findVersion.bind(server);
 
     server.methods.experienceStats.update = ExperienceStatsService.update.bind(server);
     server.methods.experienceStats.incrementCounter = ExperienceStatsService.incrementCounter.bind(server);
