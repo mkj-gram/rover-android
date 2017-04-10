@@ -1,4 +1,4 @@
-FROM ruby:2.3
+FROM ruby:2.3.3
 
 WORKDIR /opt/content-api
 ADD Gemfile /opt/content-api/Gemfile
