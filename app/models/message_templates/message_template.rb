@@ -50,7 +50,7 @@ class MessageTemplate < ActiveRecord::Base
         }
     )
 
-    after_initialize :set_proper_time_schedule_range
+    before_save :set_proper_time_schedule_range
    
 
     validates :title, presence: true
@@ -169,13 +169,14 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def schedule_start_time=(val)
+        val = [val, 0].max
         # integer of minutes
         @schedule_start_time = val
         self.time_schedule = Range.new(@schedule_start_time, schedule_end_time)
     end
 
     def schedule_end_time=(val)
-        val = 1440 if val.nil?
+        val = [val, 1440].min
         @schedule_end_time = val
         self.time_schedule = Range.new(schedule_start_time, @schedule_end_time)
     end
@@ -396,6 +397,8 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def set_proper_time_schedule_range
+        # BUG with Rails postgres adapter
+        # Basically ruby Ranges are inferior to postgres ranges
         self.time_schedule = Range.new(schedule_start_time, schedule_end_time - 1)
     end
 
