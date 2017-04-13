@@ -86,7 +86,7 @@ class ProximityMessageTemplate < MessageTemplate
 
     def set_defaults
         self.limits ||= [MessageLimit::Limit.new(message_limit: 1, number_of_days: 1)]
-        self.time_schedule = Range.new(0,1440)
+        self.time_schedule ||= Range.new(0,1440)
     end
 
     def update_archived_messages_count
