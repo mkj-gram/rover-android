@@ -58,7 +58,6 @@ class MessageTemplate < ActiveRecord::Base
     validate :valid_landing_page
 
     validates :schedule_start_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
-    validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
     validate :valid_properties
     validates :content_type, inclusion: { in: ['landing-page', 'custom', 'experience', 'website', 'deep-link']}
 

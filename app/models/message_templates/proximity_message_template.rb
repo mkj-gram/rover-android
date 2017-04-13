@@ -11,6 +11,8 @@ class ProximityMessageTemplate < MessageTemplate
 
     after_initialize :set_defaults, unless: :persisted?
 
+    validates :schedule_end_time, inclusion: { in: 0..1440, message: "must be between 0 and 1440" }
+
     default_empty_array_attribute :filter_beacon_configuration_tags
     default_empty_array_attribute :filter_beacon_configuration_ids
     default_empty_array_attribute :filter_place_tags
