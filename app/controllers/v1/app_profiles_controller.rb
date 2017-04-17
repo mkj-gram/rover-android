@@ -18,7 +18,7 @@ class V1::AppProfilesController < V1::ApplicationController
             ios_app_profile, android_app_profile = get_profile_for_cname(host)
         end
 
-        render_app_profile(params[:id], ios_app_profile, android_app_profile)
+        render_app_profile(host, ios_app_profile, android_app_profile)
     end
 
 
