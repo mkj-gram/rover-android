@@ -4,15 +4,21 @@ class V1::AppProfilesController < V1::ApplicationController
     AndroidAppProfile = Struct.new("AndroidAppProfile", :package_name, :sha256_cert_fingerprints)
 
     def show
+        host = params[:host]
 
-        if params[:id] == "inbox"
-            ios_app_profile = IosAppProfile.new("WDEZX8QD47", "1191905560", "io.rover.Inbox")
-            android_app_profile = nil
+        if /.*\.rover\.io/ =~ host
+            subdomain = host.split('.').first
+            if subdomain == "inbox"
+                ios_app_profile = IosAppProfile.new("WDEZX8QD47", "1191905560", "io.rover.Inbox")
+                android_app_profile = nil
+            else
+                ios_app_profile, android_app_profile = get_profile_for_subdomain(subdomain)
+            end
         else
-            ios_app_profile, android_app_profile = get_profile_for_id(params[:id])
+            ios_app_profile, android_app_profile = get_profile_for_cname(host)
         end
 
-        render_app_profile(params[:id], ios_app_profile, android_app_profile)
+        render_app_profile(host, ios_app_profile, android_app_profile)
     end
 
 
@@ -20,8 +26,22 @@ class V1::AppProfilesController < V1::ApplicationController
     private
 
 
-    def get_profile_for_id(id)
-        account = Account.find_by(subdomain: id)
+    def get_profile_for_cname(host)
+        account = Account.find_by(cname: host)
+        if account
+            ios_platform = account.ios_platform
+            android_platform = account.android_platform
+            ios_app_profile  = IosAppProfile.new(ios_platform.app_id_prefix, ios_platform.app_store_id, ios_platform.bundle_id)
+            android_app_profile = AndroidAppProfile.new(android_platform.package_name, android_platform.sha256_cert_fingerprints)
+
+            return [ ios_app_profile, android_app_profile ]
+        else
+            return nil
+        end
+    end
+
+    def get_profile_for_subdomain(subdomain)
+        account = Account.find_by(subdomain: subdomain)
         if account
             ios_platform = account.ios_platform
             android_platform = account.android_platform
