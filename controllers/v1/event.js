@@ -630,7 +630,14 @@ internals.processEvent = function(request, reply, customer) {
         eventCallbackCount += 1
 
         if (err) {
-            return internals.writeError(reply, 500, { status: 500, message: err });
+            const status = err.status || 500
+            let message = "unknown"
+
+            if (status < 500 && err.message) {
+                message = err.message
+            }
+
+            return internals.writeError(reply, status, { status: status, message: message });
         }
 
         internals.partialUpdateCustomerAndDevice(request.server, customer, device, newCustomer, newDevice).then(({ customer, device }) => {
