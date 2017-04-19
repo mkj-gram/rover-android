@@ -362,11 +362,11 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def get_ios_title
-        self.ios_title
+        self.ios_title || self.account.ios_platform_name || self.account.title
     end
 
     def get_android_title
-        self.android_title
+        self.android_title || self.account.android_platform_name || self.account.title
     end
 
     private
