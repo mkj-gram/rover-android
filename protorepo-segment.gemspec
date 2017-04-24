@@ -6,8 +6,8 @@ require 'protorepo/segment/version'
 Gem::Specification.new do |spec|
   spec.name          = "protorepo-segment"
   spec.version       = Protorepo::Segment::VERSION
-  spec.authors       = ["Chris Recalis"]
-  spec.email         = ["crecalis@gmail.com"]
+  spec.authors       = ["Rover Labs Inc"]
+  spec.email         = ["gopher@rover.io"]
 
   spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
