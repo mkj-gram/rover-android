@@ -1,11 +1,13 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'protorepo/segment/version'
+require 'segment/version'
+
+
 
 Gem::Specification.new do |spec|
-  spec.name          = "protorepo-segment"
-  spec.version       = Protorepo::Segment::VERSION
+  spec.name          = "segment"
+  spec.version       = Segment::VERSION
   spec.authors       = ["Rover Labs Inc"]
   spec.email         = ["gopher@rover.io"]
 

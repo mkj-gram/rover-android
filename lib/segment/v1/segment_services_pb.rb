@@ -4,6 +4,7 @@
 require 'grpc'
 require 'segment/v1/segment_pb'
 
+
 module Segment
   module V1
     module Segment
