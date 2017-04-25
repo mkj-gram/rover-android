@@ -84,6 +84,9 @@ gem 'tinify', '~> 1.3'
 
 gem 'browser', '~> 2.3', require: "browser/browser"
 
+
+gem 'rover-segment', git: "https://#{ENV['GIT_AUTH_TOKEN']}:x-oauth-basic@github.com/RoverPlatform/protorepo-segment-ruby", branch: 'master', require: "rover/segment"
+
 group :development do
 
 
