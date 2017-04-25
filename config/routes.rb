@@ -124,6 +124,8 @@ Rails.application.routes.draw do
             post "/calculate", to: "customer_segment_calculate#create", as: "customer_segment_calculate"
         end
 
+        resources :"static-segments", controller: "static_segments", as: "static_segments"
+
         resources "ios-platforms", controller: "ios_platforms", as: "ios_platforms", only: [:show, :update] do
             post "/certificate", to: 'ios_platform_certificate#update', as: 'ios_platform_certificate'
             delete "/certificate", to: 'ios_platform_certificate#destroy', as: 'ios_platform_certificate_destroy'

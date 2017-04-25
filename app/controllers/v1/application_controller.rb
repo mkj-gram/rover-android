@@ -22,6 +22,20 @@ class V1::ApplicationController < ActionController::API
         render_errors(error, status: :bad_request)
     end
 
+    GRPC_CODE_TO_HTTP_CODE = {
+            4 => 408,
+            5 => 404,
+            6 => 409,
+            7 => 403,
+            8 => 429,
+            9 => 428,
+            12 => 501,
+            13 => 500,
+            14 => 503,
+            15 => 500,
+            16 => 401
+    }
+
     #
     # Authenticates a request as either an application or user.
     #
@@ -78,6 +92,11 @@ class V1::ApplicationController < ActionController::API
     def resource
         nil
     end
+
+    def grpc_error_code_to_http_code(code)
+        GRPC_CODE_TO_HTTP_CODE.has_key?(code) ? GRPC_CODE_TO_HTTP_CODE[code] : 500
+    end
+
 
     def current_account
         @current_account ||= -> {
