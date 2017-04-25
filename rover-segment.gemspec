@@ -1,13 +1,12 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'segment/version'
-
+require 'rover/segment/version'
 
 
 Gem::Specification.new do |spec|
-  spec.name          = "segment"
-  spec.version       = Segment::VERSION
+  spec.name          = "rover-segment"
+  spec.version       = Rover::Segment::VERSION
   spec.authors       = ["Rover Labs Inc"]
   spec.email         = ["gopher@rover.io"]
 
