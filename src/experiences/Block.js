@@ -1,26 +1,19 @@
 import { GraphQLBoolean, GraphQLFloat, GraphQLID, GraphQLInt, GraphQLInterfaceType, GraphQLNonNull } from 'graphql'
 
-import BackgroundContentMode from './BackgroundContentMode'
-import BackgroundScale from './BackgroundScale'
+import BackgroundMixin from './BackgroundMixin'
 import BlockAction from './BlockAction'
 import BorderMixin from './BorderMixin'
-import Color from './Color'
 import HorizontalAlignment from './HorizontalAlignment'
-import Image from './Image'
 import Inset from './Inset'
 import Length from './Length'
 import Offset from './Offset'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
 
-class BaseBlock {
+let Block = class {
 
     constructor({ action,
                   autoHeight,
-                  backgroundColor,
-                  backgroundContentMode,
-                  backgroundImage,
-                  backgroundScale,
                   experienceId,
                   height,
                   id,
@@ -36,10 +29,6 @@ class BaseBlock {
 
         this.action = action
         this.autoHeight = autoHeight
-        this.backgroundColor = backgroundColor
-        this.backgroundContentMode = backgroundContentMode
-        this.backgroundImage = backgroundImage
-        this.backgroundScale = backgroundScale
         this.experienceId = experienceId
         this.height = height
         this.id = id
@@ -55,7 +44,7 @@ class BaseBlock {
     }
 }
 
-BaseBlock.normalizeJSON = json => {
+Block.normalizeJSON = json => {
     if (!json) {
         return {}
     }
@@ -63,15 +52,6 @@ BaseBlock.normalizeJSON = json => {
     return {
         action: (json['action'] || {})['type'],
         autoHeight: json['auto-height'] || false,
-        backgroundColor: Color.fromJSON(json['background-color']) || new Color({
-            red: 255,
-            green: 255,
-            blue: 255,
-            alpha: 1.0
-        }),
-        backgroundContentMode: json['background-content-mode'],
-        backgroundImage: Image.fromJSON(json['background-image']),
-        backgroundScale: json['background-scale'],
         experienceId: json['experience-id'],
         height: Length.fromJSON(json['height']),
         id: json['id'],
@@ -87,13 +67,9 @@ BaseBlock.normalizeJSON = json => {
     }
 }
 
-BaseBlock.fields = {
+Block.fields = {
     action: { type: BlockAction.type },
     autoHeight: { type: new GraphQLNonNull(GraphQLBoolean) },
-    backgroundColor: { type: new GraphQLNonNull(Color.type) },
-    backgroundContentMode: { type: BackgroundContentMode.type },
-    backgroundImage: { type: Image.type },
-    backgroundScale: { type: BackgroundScale.type },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     height: { type: new GraphQLNonNull(Length.type) },
     id: { type: new GraphQLNonNull(GraphQLID) },
@@ -108,7 +84,9 @@ BaseBlock.fields = {
     width: { type: Length.type }
 }
 
-class Block extends BorderMixin(BaseBlock) { }
+Block = class extends BackgroundMixin(Block) { }
+
+Block = class extends BorderMixin(Block) { }
 
 Block.fromJSON = json => {
     const props = Block.normalizeJSON(json)
