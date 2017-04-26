@@ -23,9 +23,9 @@ const schema = new GraphQLSchema({
     		EditableTextBlock.type,
     		EditableWebViewBlock.type,
     		ImageBlock.type,
+            RectangleBlock.type,
     		TextBlock.type,
-    		WebViewBlock.type,
-    		RectangleBlock.type]
+    		WebViewBlock.type]
 })
 
 export default schema
