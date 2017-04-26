@@ -1,5 +1,5 @@
 import { GraphQLList, GraphQLString } from 'graphql'
-import EventInputType from '../types/EventInputType'
+import EventInputType from './EventInputType'
 
 const TrackEventsMutation = {
     type: GraphQLString,

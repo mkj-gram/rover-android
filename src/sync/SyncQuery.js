@@ -1,8 +1,8 @@
 import uuid from 'node-uuid'
-import SyncResultType from '../types/SyncResultType'
+import SyncResult from './SyncResult'
 
 const SyncQuery = {
-    type: SyncResultType,
+    type: SyncResult.type,
     resolve() {
         return {
             profile: {

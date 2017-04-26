@@ -8,19 +8,11 @@ import {
 
 import GraphQLJSON from 'graphql-type-json'
 
-const GenderType = new GraphQLEnumType({
-    name: 'Gender',
-    values: {
-        MALE: { 
-            value: 'male' 
-        },
-        FEMALE: { 
-            value: 'female'
-        }
-    }
-})
+import Gender from './Gender'
 
-const ProfileType = new GraphQLObjectType({
+class Profile { }
+
+Profile.type = new GraphQLObjectType({
     name: 'Profile',
     fields: {
         profileID: {
@@ -36,7 +28,7 @@ const ProfileType = new GraphQLObjectType({
             type: GraphQLString
         },
         gender: {
-            type: GenderType
+            type: Gender.type
         },
         age: {
             type: GraphQLInt
@@ -53,4 +45,4 @@ const ProfileType = new GraphQLObjectType({
     }
 })
 
-export default ProfileType
+export default Profile
