@@ -4,25 +4,18 @@ import { GraphQLBoolean,
 		 GraphQLNonNull, 
 		 GraphQLObjectType } from 'graphql'
 
-import BackgroundContentMode from './BackgroundContentMode'
-import BackgroundScale from './BackgroundScale'
+import BackgroundMixin from './BackgroundMixin'
 import BarcodeBlock from './BarcodeBlock'
 import Block from './Block'
-import Color from './Color'
-import Image from './Image'
 import ImageBlock from './ImageBlock'
 import Length from './Length'
 import RectangleBlock from './RectangleBlock'
 import TextBlock from './TextBlock'
 import WebViewBlock from './WebViewBlock'
 
-class Row {
+let Row = class {
 
 	constructor({ autoHeight,
-				  backgroundColor,
-				  backgroundImage,
-				  backgroundContentMode,
-				  backgroundScale,
 				  blocks,
 				  experienceId,
 				  height,
@@ -30,10 +23,6 @@ class Row {
 				  screenId }) {
 
 		this.autoHeight = autoHeight
-	    this.backgroundColor = backgroundColor
-	    this.backgroundImage = backgroundImage
-	    this.backgroundContentMode = backgroundContentMode
-	    this.backgroundScale = backgroundScale
 	    this.blocks = blocks
 	    this.experienceId = experienceId
 	    this.height = height
@@ -73,10 +62,6 @@ Row.normalizeJSON = json => {
 	
     return {
         autoHeight: json['auto-height'],
-        backgroundColor: Color.fromJSON(json['background-color']),
-        backgroundImage: Image.fromJSON(json['background-image']),
-        backgroundContentMode: json['background-content-mode'],
-        backgroundScale: json['background-scale'],
         blocks: (json['blocks'] || []).map(Row.blockFromJSON),
         experienceId: json['experience-id'],
         height: Length.fromJSON(json['height']),
@@ -87,16 +72,14 @@ Row.normalizeJSON = json => {
 
 Row.fields = {
     autoHeight: { type: new GraphQLNonNull(GraphQLBoolean) },
-    backgroundColor: { type: new GraphQLNonNull(Color.type) },
-    backgroundImage: { type: Image.type },
-    backgroundContentMode: { type: BackgroundContentMode.type },
-    backgroundScale: { type: BackgroundScale.type },
     blocks: { type: new GraphQLNonNull(new GraphQLList(Block.type)) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     height: { type: new GraphQLNonNull(Length.type) },
     id: { type: new GraphQLNonNull(GraphQLID) },
     screenId: { type: new GraphQLNonNull(GraphQLID) }
 }
+
+Row = class extends BackgroundMixin(Row) { }
 
 Row.type = new GraphQLObjectType({
     name: 'Row',

@@ -5,21 +5,15 @@ import { GraphQLBoolean,
          GraphQLObjectType, 
          GraphQLString } from 'graphql'
 
-import BackgroundContentMode from './BackgroundContentMode'
-import BackgroundScale from './BackgroundScale'
+import BackgroundMixin from './BackgroundMixin'
 import Color from './Color'
-import Image from './Image'
 import Row from './Row'
 import StatusBarStyle from './StatusBarStyle'
 import TitleBarButtons from './TitleBarButtons'
 
-class Screen {
+let Screen = class {
 
-	constructor({ autoColorStatusBar, 
-				  backgroundColor, 
-				  backgroundImage, 
-				  backgroundContentMode,
-				  backgroundScale,
+	constructor({ autoColorStatusBar,
 				  experienceId,
 				  id,
 				  rows,
@@ -33,10 +27,6 @@ class Screen {
 				  useDefaultTitleBarStyle }) {
 
 		this.autoColorStatusBar = autoColorStatusBar
-		this.backgroundColor = backgroundColor
-    	this.backgroundImage = backgroundImage
-        this.backgroundContentMode = backgroundContentMode
-        this.backgroundScale = backgroundScale
         this.experienceId = experienceId
         this.id = id
         this.rows = rows
@@ -63,10 +53,6 @@ Screen.normalizeJSON = json => {
 
     return {
         autoColorStatusBar: Color.fromJSON(json['status-bar-auto-color']),
-        backgroundColor: Color.fromJSON(json['background-color']),
-        backgroundImage: Image.fromJSON(json['background-image']),
-        backgroundContentMode: json['background-content-mode'],
-        backgroundScale: json['background-scale'],
         experienceId: json['experience-id'],
         id: json['id'],
         rows: (json['rows'] || []).map(Row.fromJSON),
@@ -83,10 +69,6 @@ Screen.normalizeJSON = json => {
 
 Screen.fields = {
     autoColorStatusBar: { type: new GraphQLNonNull(GraphQLBoolean) },
-    backgroundColor: { type: new GraphQLNonNull(Color.type) },
-    backgroundImage: { type: Image.type },
-    backgroundContentMode: { type: BackgroundContentMode.type },
-    backgroundScale: { type: BackgroundScale.type },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     id: { type: new GraphQLNonNull(GraphQLID) },
     rows: { type: new GraphQLNonNull(new GraphQLList(Row.type)) },
@@ -99,6 +81,8 @@ Screen.fields = {
     titleBarTextColor: { type: Color.type },
     useDefaultTitleBarStyle: { type: new GraphQLNonNull(GraphQLBoolean) }
 }
+
+Screen = class extends BackgroundMixin(Screen) { }
 
 Screen.type = new GraphQLObjectType({
     name: 'Screen',
