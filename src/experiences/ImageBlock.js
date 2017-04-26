@@ -2,9 +2,8 @@ import { GraphQLObjectType } from 'graphql'
 
 import Block from './Block'
 import Image from './Image'
-import RectangleBlock from './RectangleBlock'
 
-class ImageBlock extends RectangleBlock {
+class ImageBlock extends Block {
 
 	constructor(props) {
 		super(props)
@@ -26,13 +25,13 @@ ImageBlock.normalizeJSON = json => {
     }
     
     return {
-        ...RectangleBlock.normalizeJSON(json),
+        ...Block.normalizeJSON(json),
         image: Image.fromJSON(json['image'])
     }
 }
 
 ImageBlock.fields = {
-    ...RectangleBlock.fields,
+    ...Block.fields,
     image: { type: Image.type }
 }
 

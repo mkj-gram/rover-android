@@ -2,9 +2,8 @@ import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql'
 
 import Block from './Block'
 import BarcodeFormat from './BarcodeFormat'
-import RectangleBlock from './RectangleBlock'
 
-class BarcodeBlock extends RectangleBlock {
+class BarcodeBlock extends Block {
 
 	constructor(props) {
 		super(props)
@@ -30,7 +29,7 @@ BarcodeBlock.normalizeJSON = json => {
     }
     
     return {
-        ...RectangleBlock.normalizeJSON(json),
+        ...Block.normalizeJSON(json),
         barcodeScale: json['barcode-scale'],
         barcodeText: json['barcode-text'],
         barcodeFormat: json['barcode-type']
@@ -38,7 +37,7 @@ BarcodeBlock.normalizeJSON = json => {
 }
 
 BarcodeBlock.fields = {
-    ...RectangleBlock.fields,
+    ...Block.fields,
     barcodeScale: { type: GraphQLString },
     barcodeText: { type: GraphQLString },
     barcodeFormat: { type: new GraphQLNonNull(BarcodeFormat.type) }

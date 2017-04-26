@@ -1,9 +1,8 @@
 import { GraphQLBoolean, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql'
 
 import Block from './Block'
-import RectangleBlock from './RectangleBlock'
 
-class WebViewBlock extends RectangleBlock {
+class WebViewBlock extends Block {
 
 	constructor(props) {
 		super(props)
@@ -26,14 +25,14 @@ WebViewBlock.normalizeJSON = json => {
     }
     
     return {
-        ...RectangleBlock.normalizeJSON(json),
+        ...Block.normalizeJSON(json),
         isScrollingEnabled: json['scrollable'],
         url: json['url']
     }
 }
 
 WebViewBlock.fields = {
-    ...RectangleBlock.fields,
+    ...Block.fields,
     isScrollingEnabled: { type: new GraphQLNonNull(GraphQLBoolean) },
     url: { type: GraphQLString }
 }

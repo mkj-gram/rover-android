@@ -3,6 +3,7 @@ import { GraphQLBoolean, GraphQLFloat, GraphQLID, GraphQLInt, GraphQLInterfaceTy
 import BackgroundContentMode from './BackgroundContentMode'
 import BackgroundScale from './BackgroundScale'
 import BlockAction from './BlockAction'
+import BorderMixin from './BorderMixin'
 import Color from './Color'
 import HorizontalAlignment from './HorizontalAlignment'
 import Image from './Image'
@@ -12,9 +13,49 @@ import Offset from './Offset'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
 
-class Block { }
+class BaseBlock {
 
-Block.normalizeJSON = json => {
+    constructor({ action,
+                  autoHeight,
+                  backgroundColor,
+                  backgroundContentMode,
+                  backgroundImage,
+                  backgroundScale,
+                  experienceId,
+                  height,
+                  id,
+                  inset,
+                  horizontalAlignment,
+                  offset,
+                  opacity,
+                  position,
+                  rowId,
+                  screenId,
+                  verticalAlignment,
+                  width }) {
+
+        this.action = action
+        this.autoHeight = autoHeight
+        this.backgroundColor = backgroundColor
+        this.backgroundContentMode = backgroundContentMode
+        this.backgroundImage = backgroundImage
+        this.backgroundScale = backgroundScale
+        this.experienceId = experienceId
+        this.height = height
+        this.id = id
+        this.inset = inset
+        this.horizontalAlignment = horizontalAlignment
+        this.offset = offset
+        this.opacity = opacity
+        this.position = position
+        this.rowId = rowId
+        this.screenId = screenId
+        this.verticalAlignment = verticalAlignment
+        this.width = width
+    }
+}
+
+BaseBlock.normalizeJSON = json => {
     if (!json) {
         return {}
     }
@@ -31,14 +72,6 @@ Block.normalizeJSON = json => {
         backgroundContentMode: json['background-content-mode'],
         backgroundImage: Image.fromJSON(json['background-image']),
         backgroundScale: json['background-scale'],
-        borderColor: Color.fromJSON(json['border-color']) || new Color({
-            red: 0,
-            green: 0,
-            blue: 0,
-            alpha: 1.0
-        }),
-        borderRadius: json['border-radius'] || 0,
-        borderWidth: json['border-width'] || 0,
         experienceId: json['experience-id'],
         height: Length.fromJSON(json['height']),
         id: json['id'],
@@ -54,16 +87,13 @@ Block.normalizeJSON = json => {
     }
 }
 
-Block.fields = {
+BaseBlock.fields = {
     action: { type: BlockAction.type },
     autoHeight: { type: new GraphQLNonNull(GraphQLBoolean) },
     backgroundColor: { type: new GraphQLNonNull(Color.type) },
     backgroundContentMode: { type: BackgroundContentMode.type },
     backgroundImage: { type: Image.type },
     backgroundScale: { type: BackgroundScale.type },
-    borderColor: { type: new GraphQLNonNull(Color.type) },
-    borderRadius: { type: new GraphQLNonNull(GraphQLInt) },
-    borderWidth: { type: new GraphQLNonNull(GraphQLInt) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     height: { type: new GraphQLNonNull(Length.type) },
     id: { type: new GraphQLNonNull(GraphQLID) },
@@ -76,6 +106,13 @@ Block.fields = {
     screenId: { type: new GraphQLNonNull(GraphQLID) },
     verticalAlignment: { type: new GraphQLNonNull(VerticalAlignment.type) },
     width: { type: Length.type }
+}
+
+class Block extends BorderMixin(BaseBlock) { }
+
+Block.fromJSON = json => {
+    const props = Block.normalizeJSON(json)
+    return new Block(props)
 }
 
 Block.type = new GraphQLInterfaceType({

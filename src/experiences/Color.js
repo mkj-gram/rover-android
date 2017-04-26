@@ -2,10 +2,11 @@ import { GraphQLFloat, GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'gra
 
 class Color {
 
-	constructor({ red,
-				  green,
-				  blue,
-				  alpha }) {
+	constructor(props) {
+		const { red = 255,
+				green = 255,
+				blue = 255,
+				alpha = 255 } = props
 
 		this.red = red
         this.green = green
@@ -15,8 +16,13 @@ class Color {
 }
 
 Color.fromJSON = json => {
+	const props = Color.normalizeJSON(json)
+	return new Color(props)
+}
+
+Color.normalizeJSON = json => {
 	if (!json) {
-		return null
+		return {}
 	}
 
 	return new Color({
