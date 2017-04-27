@@ -1,11 +1,15 @@
-import { GraphQLFloat, GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql'
+import { GraphQLFloat, 
+		 GraphQLInt, 
+		 GraphQLNonNull, 
+		 GraphQLObjectType } from 'graphql'
 
 import FontWeight from './FontWeight'
 
 class Font {
 
-	constructor({ size,
-				  weight }) {
+	constructor(props) {
+		const { size,
+				weight } = props
 
 		this.size = size
         this.weight = weight

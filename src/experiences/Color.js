@@ -1,4 +1,7 @@
-import { GraphQLFloat, GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql'
+import { GraphQLFloat, 
+		 GraphQLInt, 
+		 GraphQLNonNull, 
+		 GraphQLObjectType } from 'graphql'
 
 class Color {
 

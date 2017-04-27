@@ -1,11 +1,16 @@
-import { GraphQLFloat, GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql'
+import { GraphQLFloat, 
+		 GraphQLInt, 
+		 GraphQLNonNull, 
+		 GraphQLObjectType } from 'graphql'
 
 class Inset {
 
-	constructor({ bottom,
-				  left,
-				  right,
-				  top }) { 
+	constructor(props) {
+
+		const { bottom,
+				left,
+				right,
+				top } = props
 
 		this.bottom = bottom
         this.left = left

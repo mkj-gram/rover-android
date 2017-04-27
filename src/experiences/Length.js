@@ -3,7 +3,11 @@ import Unit from './Unit'
 
 class Length {
 
-	constructor({ unit, value }) {
+	constructor(props) {
+
+        const { unit, 
+                value } = props
+                
 		this.unit = unit
 		this.value = value
 	}

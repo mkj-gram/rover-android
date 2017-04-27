@@ -3,12 +3,14 @@ import Length from './Length'
 
 class Offset {
 
-	constructor({ bottom,
-				  center,
-				  left,
-				  middle,
-				  right,
-				  top }) {
+	constructor(props) {
+
+        const { bottom,
+                center,
+                left,
+                middle,
+                right,
+                top } = props
 
 		this.bottom = bottom
 		this.center = center

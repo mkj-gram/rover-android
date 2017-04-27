@@ -1,18 +1,11 @@
 import { GraphQLObjectType } from 'graphql'
 
 import Block from './Block'
-import Image from './Image'
+import HasBackground from './HasBackground'
+import HasBorder from './HasBorder'
+import HasImage from './HasImage'
 
-class ImageBlock extends Block {
-
-	constructor(props) {
-		super(props)
-
-		const { image } = props
-
-    	this.image = image
-	}
-}
+class ImageBlock extends HasImage(Block(null)) { }
 
 ImageBlock.fromJSON = json => {
     const props = ImageBlock.normalizeJSON(json)
@@ -26,19 +19,19 @@ ImageBlock.normalizeJSON = json => {
     
     return {
         ...Block.normalizeJSON(json),
-        image: Image.fromJSON(json['image'])
+        ...HasImage.normalizeJSON(json)
     }
 }
 
 ImageBlock.fields = {
     ...Block.fields,
-    image: { type: Image.type }
+    ...HasImage.fields
 }
 
 ImageBlock.type = new GraphQLObjectType({
     name: 'ImageBlock',
     description: 'An image block that contains only the publicly accessible fields',
-    interfaces: [Block.type],
+    interfaces: [Block.type, HasBackground.type, HasBorder.type, HasImage.type],
     fields: ImageBlock.fields,
     isTypeOf: data => data instanceof ImageBlock
 })

@@ -4,23 +4,26 @@ import { GraphQLBoolean,
 		 GraphQLNonNull, 
 		 GraphQLObjectType } from 'graphql'
 
-import BackgroundMixin from './BackgroundMixin'
 import BarcodeBlock from './BarcodeBlock'
 import Block from './Block'
+import HasBackground from './HasBackground'
 import ImageBlock from './ImageBlock'
 import Length from './Length'
 import RectangleBlock from './RectangleBlock'
 import TextBlock from './TextBlock'
 import WebViewBlock from './WebViewBlock'
 
-let Row = class {
+class Row extends HasBackground(null) {
 
-	constructor({ autoHeight,
-				  blocks,
-				  experienceId,
-				  height,
-				  id,
-				  screenId }) {
+	constructor(props) {
+        super(props)
+
+        const { autoHeight,
+                blocks,
+                experienceId,
+                height,
+                id,
+                screenId } = props
 
 		this.autoHeight = autoHeight
 	    this.blocks = blocks
@@ -61,6 +64,7 @@ Row.normalizeJSON = json => {
     }
 	
     return {
+        ...HasBackground.normalizeJSON(json),
         autoHeight: json['auto-height'],
         blocks: (json['blocks'] || []).map(Row.blockFromJSON),
         experienceId: json['experience-id'],
@@ -71,6 +75,7 @@ Row.normalizeJSON = json => {
 }
 
 Row.fields = {
+    ...HasBackground.fields,
     autoHeight: { type: new GraphQLNonNull(GraphQLBoolean) },
     blocks: { type: new GraphQLNonNull(new GraphQLList(Block.type)) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
@@ -79,12 +84,12 @@ Row.fields = {
     screenId: { type: new GraphQLNonNull(GraphQLID) }
 }
 
-Row = class extends BackgroundMixin(Row) { }
-
 Row.type = new GraphQLObjectType({
     name: 'Row',
     description: 'A row that contains only the publicly accessible fields',
-    fields: Row.fields
+    interfaces: [HasBackground.type],
+    fields: Row.fields,
+    isTypeOf: data => data instanceof Row
 })
 
 export default Row

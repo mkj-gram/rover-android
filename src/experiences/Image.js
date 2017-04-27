@@ -1,12 +1,17 @@
-import { GraphQLInt, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql'
+import { GraphQLInt, 
+         GraphQLNonNull, 
+         GraphQLObjectType, 
+         GraphQLString } from 'graphql'
 
 class Image {
 
-	constructor({ height,
-				  name,
-				  size,
-				  width,
-				  url }) {
+	constructor(props) {
+        
+        const { height,
+                name,
+                size,
+                width,
+                url } = props
 
 		this.height = height
         this.name = name

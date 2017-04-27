@@ -1,32 +1,34 @@
 import { GraphQLObjectType } from 'graphql'
 
 import Block from './Block'
+import HasBackground from './HasBackground'
+import HasBorder from './HasBorder'
 
-class RectangleBlock extends Block { }
+class RectangleBlock extends Block(null) { }
 
 RectangleBlock.fromJSON = json => {
-	const props = RectangleBlock.normalizeJSON(json)
-	return new RectangleBlock(props)
+    const props = RectangleBlock.normalizeJSON(json)
+    return new RectangleBlock(props)
 }
 
 RectangleBlock.normalizeJSON = json => {
-	if (!json) {
+    if (!json) {
         return {}
     }
     
     return {
-    	...Block.normalizeJSON(json)
+        ...Block.normalizeJSON(json)
     }
 }
 
 RectangleBlock.fields = {
-	...Block.fields
+    ...Block.fields
 }
 
 RectangleBlock.type = new GraphQLObjectType({
     name: 'RectangleBlock',
     description: 'A rectangle block that contains only the publicly accessible fields',
-    interfaces: [Block.type],
+    interfaces: [Block.type, HasBackground.type, HasBorder.type],
     fields: RectangleBlock.fields,
     isTypeOf: data => data instanceof RectangleBlock
 })

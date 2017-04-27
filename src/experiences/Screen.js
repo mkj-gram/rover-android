@@ -5,26 +5,29 @@ import { GraphQLBoolean,
          GraphQLObjectType, 
          GraphQLString } from 'graphql'
 
-import BackgroundMixin from './BackgroundMixin'
 import Color from './Color'
+import HasBackground from './HasBackground'
 import Row from './Row'
 import StatusBarStyle from './StatusBarStyle'
 import TitleBarButtons from './TitleBarButtons'
 
-let Screen = class {
+class Screen extends HasBackground(null) {
 
-	constructor({ autoColorStatusBar,
-				  experienceId,
-				  id,
-				  rows,
-				  statusBarStyle,
-				  statusBarColor,
-				  titleBarBackgroundColor,
-				  titleBarButtons,
-				  titleBarButtonColor,
-				  titleBarText,
-				  titleBarTextColor,
-				  useDefaultTitleBarStyle }) {
+	constructor(props) {
+        super(props)
+
+        const { autoColorStatusBar,
+                experienceId,
+                id,
+                rows,
+                statusBarStyle,
+                statusBarColor,
+                titleBarBackgroundColor,
+                titleBarButtons,
+                titleBarButtonColor,
+                titleBarText,
+                titleBarTextColor,
+                useDefaultTitleBarStyle } = props
 
 		this.autoColorStatusBar = autoColorStatusBar
         this.experienceId = experienceId
@@ -52,6 +55,7 @@ Screen.normalizeJSON = json => {
     }
 
     return {
+        ...HasBackground.normalizeJSON(json),
         autoColorStatusBar: Color.fromJSON(json['status-bar-auto-color']),
         experienceId: json['experience-id'],
         id: json['id'],
@@ -68,6 +72,7 @@ Screen.normalizeJSON = json => {
 }
 
 Screen.fields = {
+    ...HasBackground.fields,
     autoColorStatusBar: { type: new GraphQLNonNull(GraphQLBoolean) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     id: { type: new GraphQLNonNull(GraphQLID) },
@@ -82,12 +87,12 @@ Screen.fields = {
     useDefaultTitleBarStyle: { type: new GraphQLNonNull(GraphQLBoolean) }
 }
 
-Screen = class extends BackgroundMixin(Screen) { }
-
 Screen.type = new GraphQLObjectType({
     name: 'Screen',
     description: 'A screen that contains only the publicly accessible fields',
-    fields: Screen.fields
+    interfaces: [HasBackground.type],
+    fields: Screen.fields,
+    isTypeOf: data => data instanceof Screen
 })
 
 export default Screen

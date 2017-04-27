@@ -1,8 +1,13 @@
-import { GraphQLBoolean, GraphQLFloat, GraphQLID, GraphQLInt, GraphQLInterfaceType, GraphQLNonNull } from 'graphql'
+import { GraphQLBoolean, 
+         GraphQLFloat, 
+         GraphQLID, 
+         GraphQLInt, 
+         GraphQLInterfaceType, 
+         GraphQLNonNull } from 'graphql'
 
-import BackgroundMixin from './BackgroundMixin'
 import BlockAction from './BlockAction'
-import BorderMixin from './BorderMixin'
+import HasBackground from './HasBackground'
+import HasBorder from './HasBorder'
 import HorizontalAlignment from './HorizontalAlignment'
 import Inset from './Inset'
 import Length from './Length'
@@ -10,38 +15,46 @@ import Offset from './Offset'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
 
-let Block = class {
+const Block = SuperClass => {
 
-    constructor({ action,
-                  autoHeight,
-                  experienceId,
-                  height,
-                  id,
-                  inset,
-                  horizontalAlignment,
-                  offset,
-                  opacity,
-                  position,
-                  rowId,
-                  screenId,
-                  verticalAlignment,
-                  width }) {
+    class ChildClass extends SuperClass {
 
-        this.action = action
-        this.autoHeight = autoHeight
-        this.experienceId = experienceId
-        this.height = height
-        this.id = id
-        this.inset = inset
-        this.horizontalAlignment = horizontalAlignment
-        this.offset = offset
-        this.opacity = opacity
-        this.position = position
-        this.rowId = rowId
-        this.screenId = screenId
-        this.verticalAlignment = verticalAlignment
-        this.width = width
+        constructor(props) {
+            super(props)
+
+            const { action,
+                    autoHeight,
+                    experienceId,
+                    height,
+                    id,
+                    inset,
+                    horizontalAlignment,
+                    offset,
+                    opacity,
+                    position,
+                    rowId,
+                    screenId,
+                    verticalAlignment,
+                    width } = props
+
+            this.action = action
+            this.autoHeight = autoHeight
+            this.experienceId = experienceId
+            this.height = height
+            this.id = id
+            this.inset = inset
+            this.horizontalAlignment = horizontalAlignment
+            this.offset = offset
+            this.opacity = opacity
+            this.position = position
+            this.rowId = rowId
+            this.screenId = screenId
+            this.verticalAlignment = verticalAlignment
+            this.width = width
+        }
     }
+
+    return HasBackground(HasBorder(ChildClass))
 }
 
 Block.normalizeJSON = json => {
@@ -50,6 +63,8 @@ Block.normalizeJSON = json => {
     }
     
     return {
+        ...HasBackground.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json),
         action: (json['action'] || {})['type'],
         autoHeight: json['auto-height'] || false,
         experienceId: json['experience-id'],
@@ -68,6 +83,8 @@ Block.normalizeJSON = json => {
 }
 
 Block.fields = {
+    ...HasBackground.fields,
+    ...HasBorder.fields,
     action: { type: BlockAction.type },
     autoHeight: { type: new GraphQLNonNull(GraphQLBoolean) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
@@ -82,15 +99,6 @@ Block.fields = {
     screenId: { type: new GraphQLNonNull(GraphQLID) },
     verticalAlignment: { type: new GraphQLNonNull(VerticalAlignment.type) },
     width: { type: Length.type }
-}
-
-Block = class extends BackgroundMixin(Block) { }
-
-Block = class extends BorderMixin(Block) { }
-
-Block.fromJSON = json => {
-    const props = Block.normalizeJSON(json)
-    return new Block(props)
 }
 
 Block.type = new GraphQLInterfaceType({
