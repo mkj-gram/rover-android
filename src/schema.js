@@ -1,7 +1,10 @@
 import { GraphQLSchema } from 'graphql'
 
 import BarcodeBlock from './experiences/BarcodeBlock'
+import ButtonBlock from './experiences/ButtonBlock'
+import ButtonState from './experiences/ButtonState'
 import EditableBarcodeBlock from './experiences/EditableBarcodeBlock'
+import EditableButtonBlock from './experiences/EditableButtonBlock'
 import EditableImageBlock from './experiences/EditableImageBlock'
 import EditableRectangleBlock from './experiences/EditableRectangleBlock'
 import EditableTextBlock from './experiences/EditableTextBlock'
@@ -17,6 +20,9 @@ const schema = new GraphQLSchema({
     query: Query.type,
     mutation: Mutation.type,
     types: [BarcodeBlock.type,
+            ButtonBlock.type,
+            ButtonState.type,
+            EditableButtonBlock.type,
     		EditableBarcodeBlock.type,
     		EditableImageBlock.type,
     		EditableRectangleBlock.type,

@@ -6,6 +6,7 @@ import { GraphQLBoolean,
 
 import BarcodeBlock from './BarcodeBlock'
 import Block from './Block'
+import ButtonBlock from './ButtonBlock'
 import HasBackground from './HasBackground'
 import ImageBlock from './ImageBlock'
 import Length from './Length'
@@ -42,6 +43,8 @@ Row.blockFromJSON = json => {
     switch (json['type']) {
     case 'barcode-block':
         return BarcodeBlock.fromJSON(json)
+    case 'button-block':
+        return ButtonBlock.fromJSON(json)
     case 'image-block':
         return ImageBlock.fromJSON(json)
     case 'text-block':

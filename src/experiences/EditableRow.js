@@ -6,6 +6,7 @@ import {
 	GraphQLString } from 'graphql'
 
 import EditableBarcodeBlock from './EditableBarcodeBlock'
+import EditableButtonBlock from './EditableButtonBlock'
 import EditableBlock from './EditableBlock'
 import EditableImageBlock from './EditableImageBlock'
 import EditableRectangleBlock from './EditableRectangleBlock'
@@ -36,6 +37,8 @@ EditableRow.blockFromJSON = json => {
     switch (json['type']) {
     case 'barcode-block':
         return EditableBarcodeBlock.fromJSON(json)
+    case 'button-block':
+        return EditableButtonBlock.fromJSON(json)
     case 'image-block':
         return EditableImageBlock.fromJSON(json)
     case 'text-block':

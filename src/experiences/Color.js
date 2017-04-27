@@ -28,12 +28,12 @@ Color.normalizeJSON = json => {
 		return {}
 	}
 
-	return new Color({
+	return {
 		red: json['red'],
 		green: json['green'],
 		blue: json['blue'],
 		alpha: json['alpha']
-	})
+	}
 }
 
 Color.type = new GraphQLObjectType({
