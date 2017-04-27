@@ -5,7 +5,7 @@ import HasBackground from './HasBackground'
 import HasBarcode from './HasBarcode'
 import HasBorder from './HasBorder'
 
-class BarcodeBlock extends HasBarcode(Block(null)) { }
+class BarcodeBlock extends HasBorder(HasBarcode(HasBackground(Block(null)))) { }
 
 BarcodeBlock.fromJSON = json => {
     const props = BarcodeBlock.normalizeJSON(json)
@@ -19,13 +19,17 @@ BarcodeBlock.normalizeJSON = json => {
     
     return {
         ...Block.normalizeJSON(json),
-        ...HasBarcode.normalizeJSON(json)
+        ...HasBackground.normalizeJSON(json),
+        ...HasBarcode.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json)
     }
 }
 
 BarcodeBlock.fields = {
     ...Block.fields,
-    ...HasBarcode.fields
+    ...HasBackground.fields,
+    ...HasBarcode.fields,
+    ...HasBorder.fields
 }
 
 BarcodeBlock.type = new GraphQLObjectType({

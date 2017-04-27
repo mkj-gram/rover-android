@@ -4,7 +4,7 @@ import Block from './Block'
 import HasBackground from './HasBackground'
 import HasBorder from './HasBorder'
 
-class RectangleBlock extends Block(null) { }
+class RectangleBlock extends HasBorder(HasBackground(Block(null))) { }
 
 RectangleBlock.fromJSON = json => {
     const props = RectangleBlock.normalizeJSON(json)
@@ -17,12 +17,16 @@ RectangleBlock.normalizeJSON = json => {
     }
     
     return {
-        ...Block.normalizeJSON(json)
+        ...Block.normalizeJSON(json),
+        ...HasBackground.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json)
     }
 }
 
 RectangleBlock.fields = {
-    ...Block.fields
+    ...Block.fields,
+    ...HasBackground.fields,
+    ...HasBorder.fields
 }
 
 RectangleBlock.type = new GraphQLObjectType({

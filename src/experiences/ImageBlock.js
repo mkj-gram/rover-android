@@ -5,7 +5,7 @@ import HasBackground from './HasBackground'
 import HasBorder from './HasBorder'
 import HasImage from './HasImage'
 
-class ImageBlock extends HasImage(Block(null)) { }
+class ImageBlock extends HasImage(HasBorder(HasBackground(Block(null)))) { }
 
 ImageBlock.fromJSON = json => {
     const props = ImageBlock.normalizeJSON(json)
@@ -19,12 +19,16 @@ ImageBlock.normalizeJSON = json => {
     
     return {
         ...Block.normalizeJSON(json),
+        ...HasBackground.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json),
         ...HasImage.normalizeJSON(json)
     }
 }
 
 ImageBlock.fields = {
     ...Block.fields,
+    ...HasBackground.fields,
+    ...HasBorder.fields,
     ...HasImage.fields
 }
 

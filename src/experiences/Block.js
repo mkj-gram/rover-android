@@ -6,8 +6,6 @@ import { GraphQLBoolean,
          GraphQLNonNull } from 'graphql'
 
 import BlockAction from './BlockAction'
-import HasBackground from './HasBackground'
-import HasBorder from './HasBorder'
 import HorizontalAlignment from './HorizontalAlignment'
 import Inset from './Inset'
 import Length from './Length'
@@ -54,7 +52,7 @@ const Block = SuperClass => {
         }
     }
 
-    return HasBackground(HasBorder(ChildClass))
+    return ChildClass
 }
 
 Block.normalizeJSON = json => {
@@ -63,8 +61,6 @@ Block.normalizeJSON = json => {
     }
     
     return {
-        ...HasBackground.normalizeJSON(json),
-        ...HasBorder.normalizeJSON(json),
         action: (json['action'] || {})['type'],
         autoHeight: json['auto-height'] || false,
         experienceId: json['experience-id'],
@@ -83,8 +79,6 @@ Block.normalizeJSON = json => {
 }
 
 Block.fields = {
-    ...HasBackground.fields,
-    ...HasBorder.fields,
     action: { type: BlockAction.type },
     autoHeight: { type: new GraphQLNonNull(GraphQLBoolean) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },

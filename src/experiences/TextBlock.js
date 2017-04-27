@@ -5,7 +5,7 @@ import HasBackground from './HasBackground'
 import HasBorder from './HasBorder'
 import HasText from './HasText'
 
-class TextBlock extends HasText(Block(null)) { }
+class TextBlock extends HasText(HasBorder(HasBackground(Block(null)))) { }
 
 TextBlock.fromJSON = json => {
     const props = TextBlock.normalizeJSON(json)
@@ -19,12 +19,16 @@ TextBlock.normalizeJSON = json => {
     
     return {
         ...Block.normalizeJSON(json),
+        ...HasBackground.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json),
         ...HasText.normalizeJSON(json)
     }
 }
 
 TextBlock.fields = {
     ...Block.fields,
+    ...HasBackground.fields,
+    ...HasBorder.fields,
     ...HasText.fields
 }
 

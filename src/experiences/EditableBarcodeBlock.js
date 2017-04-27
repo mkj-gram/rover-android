@@ -6,7 +6,7 @@ import HasBackground from './HasBackground'
 import HasBarcode from './HasBarcode'
 import HasBorder from './HasBorder'
 
-class EditableBarcodeBlock extends HasBarcode(EditableBlock(null)) { }
+class EditableBarcodeBlock extends HasBorder(HasBarcode(HasBackground(EditableBlock(Block(null))))) { }
 
 EditableBarcodeBlock.fromJSON = json => {
     const props = EditableBarcodeBlock.normalizeJSON(json)
@@ -19,14 +19,20 @@ EditableBarcodeBlock.normalizeJSON = json => {
     }
     
     return {
+        ...Block.normalizeJSON(json),
         ...EditableBlock.normalizeJSON(json),
-        ...HasBarcode.normalizeJSON(json)
+        ...HasBackground.normalizeJSON(json),
+        ...HasBarcode.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json)
     }
 }
 
 EditableBarcodeBlock.fields = {
+    ...Block.fields,
     ...EditableBlock.fields,
-    ...HasBarcode.fields
+    ...HasBackground.fields,
+    ...HasBarcode.fields,
+    ...HasBorder.fields
 }
 
 EditableBarcodeBlock.type = new GraphQLObjectType({

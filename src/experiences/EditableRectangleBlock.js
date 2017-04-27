@@ -5,7 +5,7 @@ import EditableBlock from './EditableBlock'
 import HasBackground from './HasBackground'
 import HasBorder from './HasBorder'
 
-class EditableRectangleBlock extends EditableBlock(null) { }
+class EditableRectangleBlock extends HasBorder(HasBackground(EditableBlock(Block(null)))) { }
 
 EditableRectangleBlock.fromJSON = json => {
     const props = EditableRectangleBlock.normalizeJSON(json)
@@ -18,12 +18,18 @@ EditableRectangleBlock.normalizeJSON = json => {
     }
     
     return {
-        ...EditableBlock.normalizeJSON(json)
+        ...Block.normalizeJSON(json),
+        ...EditableBlock.normalizeJSON(json),
+        ...HasBackground.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json)
     }
 }
 
 EditableRectangleBlock.fields = {
-    ...EditableBlock.fields
+    ...Block.fields,
+    ...EditableBlock.fields,
+    ...HasBackground.fields,
+    ...HasBorder.fields
 }
 
 EditableRectangleBlock.type = new GraphQLObjectType({

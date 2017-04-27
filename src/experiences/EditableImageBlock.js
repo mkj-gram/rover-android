@@ -6,7 +6,7 @@ import HasBackground from './HasBackground'
 import HasBorder from './HasBorder'
 import HasImage from './HasImage'
 
-class EditableImageBlock extends HasImage(EditableBlock(null)) { }
+class EditableImageBlock extends HasImage(HasBorder(HasBackground(EditableBlock(Block(null))))) { }
 
 EditableImageBlock.fromJSON = json => {
     const props = EditableImageBlock.normalizeJSON(json)
@@ -19,13 +19,19 @@ EditableImageBlock.normalizeJSON = json => {
     }
     
     return {
+        ...Block.normalizeJSON(json),
         ...EditableBlock.normalizeJSON(json),
+        ...HasBackground.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json),
         ...HasImage.normalizeJSON(json)
     }
 }
 
 EditableImageBlock.fields = {
+    ...Block.fields,
     ...EditableBlock.fields,
+    ...HasBackground.fields,
+    ...HasBorder.fields,
     ...HasImage.fields
 }
 

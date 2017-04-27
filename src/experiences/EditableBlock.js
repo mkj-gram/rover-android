@@ -3,7 +3,6 @@ import { GraphQLInt,
 		 GraphQLNonNull, 
 		 GraphQLString } from 'graphql'
 
-import Block from './Block'
 import LockStatus from './LockStatus'
 
 const EditableBlock = SuperClass => {
@@ -26,7 +25,7 @@ const EditableBlock = SuperClass => {
 		}
 	}
 
-	return Block(ChildClass)
+	return ChildClass
 }
 
 EditableBlock.normalizeJSON = json => {
@@ -35,7 +34,6 @@ EditableBlock.normalizeJSON = json => {
     }
     
     return {
-    	...Block.normalizeJSON(json),
         clickCount: json['click-count'],
 	    lockStatus: json['lock-status'],
 	    name: json['name']
@@ -43,7 +41,6 @@ EditableBlock.normalizeJSON = json => {
 }
 
 EditableBlock.fields = {
-	...Block.fields,
 	clickCount: { type: new GraphQLNonNull(GraphQLInt) },
     lockStatus: { type: new GraphQLNonNull(LockStatus.type) },
     name: { type: new GraphQLNonNull(GraphQLString) }

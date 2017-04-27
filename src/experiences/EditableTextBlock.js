@@ -6,7 +6,7 @@ import HasBackground from './HasBackground'
 import HasBorder from './HasBorder'
 import HasText from './HasText'
 
-class EditableTextBlock extends HasText(EditableBlock(null)) { }
+class EditableTextBlock extends HasText(HasBorder(HasBackground(EditableBlock(Block(null))))) { }
 
 EditableTextBlock.fromJSON = json => {
     const props = EditableTextBlock.normalizeJSON(json)
@@ -19,13 +19,19 @@ EditableTextBlock.normalizeJSON = json => {
     }
     
     return {
+        ...Block.normalizeJSON(json),
         ...EditableBlock.normalizeJSON(json),
+        ...HasBackground.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json),
         ...HasText.normalizeJSON(json)
     }
 }
 
 EditableTextBlock.fields = {
+    ...Block.fields,
     ...EditableBlock.fields,
+    ...HasBackground.fields,
+    ...HasBorder.fields,
     ...HasText.fields
 }
 

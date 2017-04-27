@@ -6,7 +6,7 @@ import HasBackground from './HasBackground'
 import HasBorder from './HasBorder'
 import HasWebView from './HasWebView'
 
-class EditableWebViewBlock extends HasWebView(EditableBlock(null)) { }
+class EditableWebViewBlock extends HasWebView(HasBorder(HasBackground(EditableBlock(Block(null))))) { }
 
 EditableWebViewBlock.fromJSON = json => {
     const props = EditableWebViewBlock.normalizeJSON(json)
@@ -19,13 +19,19 @@ EditableWebViewBlock.normalizeJSON = json => {
     }
     
     return {
+        ...Block.normalizeJSON(json),
         ...EditableBlock.normalizeJSON(json),
+        ...HasBackground.normalizeJSON(json),
+        ...HasBorder.normalizeJSON(json),
         ...HasWebView.normalizeJSON(json)
     }
 }
 
 EditableWebViewBlock.fields = {
+    ...Block.fields,
     ...EditableBlock.fields,
+    ...HasBackground.fields,
+    ...HasBorder.fields,
     ...HasWebView.fields
 }
 
