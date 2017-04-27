@@ -18,7 +18,8 @@
     "graphql-tools": "^0.10.1",
     "graphql-type-json": "^0.1.4",
     "morgan": "^1.8.1",
-    "node-uuid": "^1.4.7"
+    "node-uuid": "^1.4.7",
+    "request": "^2.81.0"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",
