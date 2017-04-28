@@ -4,7 +4,7 @@ WORKDIR /opt/content-api
 ADD Gemfile /opt/content-api/Gemfile
 ADD Gemfile.lock /opt/content-api/Gemfile.lock
 
-ENV GIT_AUTH_TOKEN="0e072ef6aa48f3247d1fc1332b1f5e0ac3761ecb"
+ENV GIT_AUTH_TOKEN="2722d1c1dfdadf0c9a334ae6bed003bf0f4872b6"
 
 RUN bundle config --global silence_root_warning 1 \
     && bundle install --path vendor/bundle \
