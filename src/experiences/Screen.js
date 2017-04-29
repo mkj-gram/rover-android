@@ -25,7 +25,7 @@ class Screen extends HasBackground(null) {
                 titleBarBackgroundColor,
                 titleBarButtons,
                 titleBarButtonColor,
-                titleBarText,
+                titleBarText = "",
                 titleBarTextColor,
                 useDefaultTitleBarStyle } = props
 
@@ -82,8 +82,8 @@ Screen.fields = {
     titleBarBackgroundColor: { type: Color.type },
     titleBarButtons: { type: TitleBarButtons.type },
     titleBarButtonColor: { type: new GraphQLNonNull(Color.type) },
-    titleBarText: { type: GraphQLString },
-    titleBarTextColor: { type: Color.type },
+    titleBarText: { type: new GraphQLNonNull(GraphQLString) },
+    titleBarTextColor: { type: new GraphQLNonNull(Color.type) },
     useDefaultTitleBarStyle: { type: new GraphQLNonNull(GraphQLBoolean) }
 }
 
