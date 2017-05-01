@@ -41,3 +41,6 @@ Sessions track a single users sign on session. This is used to keep track of thi
 Scopes describe the high level access a token has. This access is mostly resourced based. i.e the token "abc" has access to create events / read inbox / load experiences 
 
 
+### Gateway Clients
+
+The gateways must have a way to take a token from the request header and authenticate it. They need the following information once the request is authenticated: the Account and or User. Once the gateways know who is accessing the api they then need to have the ability to ask if the current Account or User have access to a particular resource. In the Rest Gateway each route will describe the resources it is trying to access. It will then ask the Auth service if its allowed to make the grpc calls to the backend servers. The Graphql Gateway will follow the same design as the Rest Gateway. For each query type it will have an associated resource. The service must be able to handle a single resource authorization lookup or multiple in one call
