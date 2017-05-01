@@ -1,9 +1,8 @@
 syntax = "proto3";
 
-package auth.v1;
+package rover.auth.v1;
 
-import "common/v1/response.proto";
-
+import "google/protobuf/timestamp.proto";
 
 /*
     Token
@@ -11,6 +10,8 @@ import "common/v1/response.proto";
 
 message Token {
     string key = 1;
+
+    // Maybe add scope access here?
 }
 
 /*
@@ -27,9 +28,15 @@ message Resource {
  */
 message Account {
     int32 id = 1;
-    string serverToken = 2;
-    string sdkToken = 3;
-    string browserToken = 4;
+
+    // The name of the account example AirMiles
+    string name = 2;
+    string serverToken = 3;
+    string sdkToken = 4;
+    string browserToken = 5;
+
+    google.protobuf.Timestamp updated_at = 7;
+    google.protobuf.Timestamp created_at = 8;
 }
 
 /*
@@ -38,8 +45,27 @@ message Account {
 message User {
     int32 id = 1;
 
+    // The name of the user example Jacob
+    string name = 2;
     string email = 3;
     string password = 4;
+
+    google.protobuf.Timestamp updated_at = 7;
+    google.protobuf.Timestamp created_at = 8;
+}
+
+message UserSession {
+    int32 id = 1;
+
+    int32 user_id = 2;
+    int32 account_id = 3;
+    Token jwt_token = 4;
+
+    google.protobuf.Timestamp last_seen = 6;
+    google.protobuf.Timestamp expires_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+    google.protobuf.Timestamp created_at = 9;
+
 }
 
 
@@ -47,48 +73,33 @@ message User {
     Account Rpc Requests & Replies
  */
 message GetAccountRequest {
+    // The account id
     int32 account_id = 1;
 }
 
 message GetAccountReply {
-    common.v1.OperationResult result = 1;
-
-    Account account = 2;
+    Account account = 1;
 }
 
 
 message CreateAccountRequest {
-    // The account you wish to create
-    Account account = 1;
+    // The name of the account
+    // All other attributes are auto generated
+    string name = 1;
 }
 
 message CreateAccountReply {
-    common.v1.OperationResult result = 1;
-
-    // The account that was created
-    Account account = 2;
+    Account account = 1;
 }
 
 message UpdateAccountRequest {
     int32 account_id = 1;
-    Account account = 2;
+
+    string name = 2;
 }
 
 message UpdateAccountReply {
-    common.v1.OperationResult result = 1;
-
-    Account account = 2;
-}
-
-// Look up an account by any of their tokens
-message GetAccountByTokenRequest {
-    Token token = 1;
-}
-
-message GetAccountByTokenReply {
-    common.v1.OperationResult result = 1;
-
-    Account account = 2;
+    Account account = 1;
 }
 
 
@@ -101,29 +112,29 @@ message GetUserRequest {
 }
 
 message GetUserReply {
-    common.v1.OperationResult result = 1;
-
-    User user = 2;
-}
-
-message CreateUserRequest {
     User user = 1;
 }
 
-message CreateUserReply {
-    common.v1.OperationResult result = 1;
+message CreateUserRequest {
+    string name = 1;
+    string email = 2;
+    string password = 3;
+}
 
-    User user = 2;
+message CreateUserReply {
+    User user = 1;
 }
 
 message UpdateUserRequest {
     int32 user_id = 1;
-    User user = 2;
+    
+    string name = 2;
+    string email = 3;
+    string password = 4;
 }
 
 message UpdateUserReply {
-    common.v1.OperationResult result = 1;
-    User user = 2;
+    User user = 1;
 }
 
 
@@ -138,22 +149,21 @@ message CreateUserSessionRequest {
 }
 
 message CreateUserSessionReply {
-    common.v1.OperationResult result = 1;
-
-    User user = 2;
-    Token token = 3;
+    UserSession session = 1;
 }
 
 
-message AuthenticateTokenRequest {
+
+message AuthenticateRequest {
     Token token = 1;
 }
 
-message AuthenticateTokenReply {
-    common.v1.OperationResult result = 1;
+message AuthenticateReply {
 
-    Account account = 2;
-    User user = 3;
+    Account account = 1;
+
+    /* Optional */
+    User user = 2;
 }
 
 message HasAccessRequest {
@@ -162,8 +172,7 @@ message HasAccessRequest {
 }
 
 message HasAccessReply {
-    common.v1.OperationResult result = 1;
-    bool has_access = 2;
+    bool has_access = 1;
 }
 
 /*
@@ -177,34 +186,35 @@ service Auth {
     /*
         Basic crud operations for Accounts
      */
-    rpc getAccount(GetAccountRequest) returns (GetAccountReply) {};
-    rpc createAccount(CreateAccountRequest) returns (CreateAccountReply) {};
-    rpc updateAccount(UpdateAccountRequest) returns (UpdateAccountReply) {};
+    rpc GetAccount(GetAccountRequest) returns (GetAccountReply) {};
+    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountReply) {};
+    rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountReply) {};
     
 
 
     /*
         Basic crud operations for Users
      */
-    rpc getUser(GetUserRequest) returns (GetUserReply) {};
-    rpc createUser(CreateUserRequest) returns (CreateUserReply) {};
-    rpc updateUser(UpdateUserRequest) returns (UpdateUserReply) {};
+    rpc GetUser(GetUserRequest) returns (GetUserReply) {};
+    rpc CreateUser(CreateUserRequest) returns (CreateUserReply) {};
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserReply) {};
 
     /*
         A user session is simple sign on using email & password based authentication to generate a new JWT token
         A session is not stored in any db instead the token is used to map back to a user
      */
-    rpc createUserSession(CreateUserSessionRequest) returns (CreateUserSessionReply) {};
+    rpc CreateUserSession(CreateUserSessionRequest) returns (CreateUserSessionReply) {};
 
 
     /*
         Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
      */
-    rpc authenticateToken(AuthenticateTokenRequest) returns (AuthenticateTokenReply) {};
+    rpc Authenticate(AuthenticateRequest) returns(AuthenticateReply) {} 
+   
 
     /*
         Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
         has access to the requested resource
      */
-    rpc hasAccess(HasAccessRequest) returns (HasAccessReply) {};
+    rpc HasAccess(HasAccessRequest) returns (HasAccessReply) {};
 }
