@@ -140,7 +140,34 @@ module CustomerFilter
                             }
                         }
                     }
-
+                when Comparers::Methods::EXISTS
+                    {
+                        filter: {
+                            bool: {
+                                must: [
+                                    {
+                                        exists: {
+                                            field: attribute_name
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                when Comparers::Methods::DOES_NOT_EXIST
+                    {
+                        filter: {
+                            bool: {
+                                must_not: [
+                                    {
+                                        exists: {
+                                            field: attribute_name
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
                 else
                     {}
                 end

@@ -16,6 +16,8 @@ module CustomerFilter
             RANGE = "range".freeze
             IN = "in".freeze
             GEOFENCE = "geofence".freeze
+            EXISTS = "exists".freeze
+            DOES_NOT_EXIST = "does_not_exist".freeze
         end
     end
 end
