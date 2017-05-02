@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package rover.auth.v1;
 
+option go_package = "auth/v1;auth";
+
 import "google/protobuf/timestamp.proto";
 
 /*
