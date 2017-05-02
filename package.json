@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rover/segment-filter": "^0.0.5",
+    "@rover/segment-filter": "^0.0.8",
     "amqplib": "^0.4.2",
     "async": "^2.0.1",
     "bluebird": "^3.4.1",
