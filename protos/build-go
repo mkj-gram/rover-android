@@ -1,0 +1,7 @@
+#!/bin/bash
+
+FILES=`find protos/ -name '*.proto'`
+
+for f in $FILES; do
+  protoc -I protos/ $f --go_out=plugins=grpc:./go/apis;
+done
