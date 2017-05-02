@@ -47,7 +47,8 @@ const devicePayloadKeys = new Set([
     'location-monitoring-enabled',
     'bluetooth-enabled',
     'development',
-    'aid'
+    'aid',
+    'ip'
 ]);
 const internals = {};
 
@@ -224,6 +225,11 @@ internals.create = function(request, reply) {
     if (device.error) {
         return internals.writeError(reply, 400, { status: 400,  error: device }); 
     }
+
+    if (request.headers['x-real-ip']) {
+        device.ip = request.headers['x-real-ip']
+    }
+    
 
     let event = internals.parseEventPayload(request.payload.data.attributes);
 
