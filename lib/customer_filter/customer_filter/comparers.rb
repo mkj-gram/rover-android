@@ -7,6 +7,7 @@ require 'customer_filter/comparers/integer'
 require 'customer_filter/comparers/float'
 require 'customer_filter/comparers/array'
 require 'customer_filter/comparers/hash'
+require 'customer_filter/comparers/version'
 
 module CustomerFilter
     module Comparers
@@ -33,6 +34,8 @@ module CustomerFilter
                     float(opts)
                 when :geofence
                     geofence(opts)
+                when :version
+                    version(opts)
                 else
                     return nil
                 end
@@ -89,6 +92,10 @@ module CustomerFilter
 
             def geofence(opts)
                 CustomerFilter::Comparers::Geofence.new(opts)
+            end
+
+            def version(opts)
+                CustomerFilter::Comparers::Version.new(opts)
             end
 
         end

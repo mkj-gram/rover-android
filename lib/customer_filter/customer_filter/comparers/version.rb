@@ -1,6 +1,6 @@
 module CustomerFilter
     module Comparers
-        class String < Comparer
+        class Version < Comparer
 
             def check(v)
                 case @method
@@ -8,18 +8,12 @@ module CustomerFilter
                     v == @value
                 when Comparers::Methods::NOT_EQUAL
                     v != @value
-                when Comparers::Methods::STARTS_WITH
-                    v.starts_with?(@value)
-                when Comparers::Methods::ENDS_WITH
-                    v.ends_with?(@value)
-                when Comparers::Methods::CONTAINS
-                    v.include?(@value)
-                when Comparers::Methods::DOES_NOT_CONTAIN
-                    !v.include?(@value)
                 when Comparers::Methods::ANY_VALUE
                     true
-                when Comparers::Methods::IN
-                    @value.include?(v)
+                when Comparers::Methods::EXISTS
+                    !v.nil?
+                when Comparers::Methods::DOES_NOT_EXIST
+                    v.nil?
                 when Comparers::Methods::UNKNOWN_VALUE
                     v.nil?
                 else
@@ -36,7 +30,17 @@ module CustomerFilter
                                 must: [
                                     {
                                         term: {
-                                            attribute_name => @value
+                                            "#{attribute_name}.major" => @value[:major] || @value["major"]
+                                        }
+                                    },
+                                    {
+                                        term: {
+                                            "#{attribute_name}.minor" => @value[:minor] || @value["minor"]
+                                        }
+                                    },
+                                    {
+                                        term: {
+                                            "#{attribute_name}.revision" => @value[:revision] || @value["revision"]
                                         }
                                     }
                                 ]
@@ -50,58 +54,18 @@ module CustomerFilter
                                 must_not: [
                                     {
                                         term: {
-                                            attribute_name => @value
+                                            "#{attribute_name}.major" => @value[:major] || @value["major"]
                                         }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                when Comparers::Methods::STARTS_WITH
-                    {
-                        filter: {
-                            bool: {
-                                must: [
+                                    },
                                     {
-                                        prefix: {
-                                            attribute_name => {
-                                                value: @value
-                                            }
+                                        term: {
+                                            "#{attribute_name}.minor" => @value[:minor] || @value["minor"]
                                         }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                when Comparers::Methods::ENDS_WITH
-                    {
-                        filter: {
-                            bool: {
-                                must: [
-                                    prefix: {
-                                        "#{attribute_name}.reversed" => {
-                                            value: @value.reverse # seems like a bug with elasticsearch not reversing for us
+                                    },
+                                    {
+                                        term: {
+                                            "#{attribute_name}.revision" => @value[:revision] || @value["revision"]
                                         }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                when Comparers::Methods::CONTAINS
-                    {
-                        query: {
-                            match_phrase_prefix: {
-                                "#{attribute_name}.ngrams" => @value
-                            }
-                        }
-                    }
-                when Comparers::Methods::DOES_NOT_CONTAIN
-                    {
-                        query: {
-                            bool: {
-                                must_not: [
-                                    match_phrase_prefix: {
-                                        "#{attribute_name}.ngrams" => @value
                                     }
                                 ]
                             }
@@ -126,18 +90,6 @@ module CustomerFilter
                                 ]
                             }
 
-                        }
-                    }
-                when Comparers::Methods::IN
-                    {
-                        filter: {
-                            bool: {
-                                must: [
-                                    terms: {
-                                        attribute_name => @value,
-                                    }
-                                ]
-                            }
                         }
                     }
                 when Comparers::Methods::EXISTS
