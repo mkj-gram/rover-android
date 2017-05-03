@@ -6,6 +6,7 @@ const ISO3611 = require('../../lib/iso-3611');
 const moment = require('moment');
 const async = require('async');
 const Joi = require('joi');
+const ipaddr = require('ipaddr.js');
 const Event = require('../../lib/event');
 const VersionRegex = /\d+\.\d+\.\d+|\d+\.\d+/;
 
@@ -92,6 +93,22 @@ internals.compareArrays = (arr1, arr2) => {
     }
     return true;
 };
+
+internals.parseIP = (ip) => {
+    if (ipaddr.IPv4.isValid(ip)) {
+        return ip;
+    } else if(ipaddr.IPv6.isValid(ip)) {
+        let addr = ipaddr.IPv6.parse(ip);
+        if (addr.isIPv4MappedAddress()) {
+            return addr.toIPv4Address().toString()
+        } else {
+            // This is an IPv6 address already
+            return ip;
+        }
+    } else {
+        return undefined;
+    }
+}
 
 internals.customerDifferences = function(fromCustomer, toCustomer) {
     let customerUpdates = {};
@@ -227,7 +244,7 @@ internals.create = function(request, reply) {
     }
 
     if (request.headers['x-real-ip']) {
-        device.ip = request.headers['x-real-ip']
+        device.ip = internals.parseIP(request.headers['x-real-ip'])
     }
     
 
