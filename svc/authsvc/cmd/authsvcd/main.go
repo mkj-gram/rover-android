@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/roverplatform/rover/svc/authsvc"
+	"github.com/roverplatform/rover/svc/authsvc/db/postgres"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -17,6 +18,7 @@ var (
 	certFile = flag.String("cert-file", "cert.pem", "The TLS cert file")
 	keyFile  = flag.String("key-file", "server.key", "The TLS key file")
 	port     = flag.Int("port", 40000, "The server port")
+	dbDSN    = flag.String("db-dsn", "", "database Data Source Name")
 )
 
 func main() {
@@ -39,7 +41,17 @@ func main() {
 
 	srv := grpc.NewServer(opts...)
 
-	authsvc.Register(srv, new(authsvc.Server))
+	db, err := postgres.Open(*dbDSN)
+	if err != nil {
+		grpclog.Fatalln("main:db:open:", err)
+	}
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		grpclog.Fatalln("db:ping:", err)
+	}
+
+	authsvc.Register(srv, &authsvc.Server{DB: db})
 
 	if err := srv.Serve(lis); err != nil {
 		grpclog.Println("server.Serve:", err)

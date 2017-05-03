@@ -7,91 +7,210 @@ option go_package = "auth/v1;auth";
 import "google/protobuf/timestamp.proto";
 
 /*
+# Auth
+
+Auth is responsible for authenticating and authorizing all api requests coming
+in. The Auth service resides within a trusted network and assumes strusted clients.
+
++----------------+         +------------------+
+|                |         |                  |
+|                |         |                  |
+|    Auth Svc    |         |    Beacon Svc    |
+|                |         |                  |
+|                |         |                  |
++----^-----------+         +---------^--------+
+     |        3                  5   |
+     +----------+           +--------+
+         2      |     4    |     
+             +------------------+
+             |                  |
+             |                  |
+             |   GraphQL gateway|
+             |                  |
+             |                  |
+             +--------^---------+
+                      |
+                      |
+                    1 |  6
+                      |
+                      |
+              +---------------+
+              |               |
+              |   an api/web  |
+              |    client     |
+              +---------------+
+
+
+0. A client wants to delete a beacon with id=1 account_id=1
+1. The client reaches the gateway with a session Cookie or a `Authentication: Bearer <token>` header
+2. GraphQL takes the the session/token key and authenticates with the auth svc
+2.1 if no associated token/session info found - auth service returns an error which graphql propagates back to the client
+3. if there's an associated info then auth svc returns it account_id=1 user_id=1 scopes=[web,admin:ibeacon]
+4. the gateway given the scopes decides whether a client has enough privileges to call the becaons service and 
+4.1. in case of insufficient privileges the error is returned
+5. otherwise the graphql delegates the deletion to the beacon service
+6. the success is propagaged all the way to the client
+
+## Use Cases
+
+### Customer SDK access
+
+As a mobile app user wich has the SDK installed in an app of our Customer
+I want the SDK to be able to access rover APIs
+So in order to do it I need an account token with SDK scope
+
+### Server access
+
+As a customer I want to be able to make api calls so I need a server token
+
+### Web Analytics 
+
+As a web viewer when i browse a web experience I want the analytics code to be able to push events to API
+using a token with restricted permissions(so nothing else is comprimised)
+
+### User sessions at the Rover.io
+
+As a rover.io user i want to be able to login to rover.io through the login page
+I'll have to re-login after some time (configurabel) time of inactivity.
+
+Sessions track a single user sign-on session. This is used to keep track of
+things like when was the user last seen & what ip was used last. Sessions also
+auto expire after 24 hours ( configurable ). Once a session has expired the
+token is no longer valid and the user should be signed out of the front end.
+However a session is prolonged as long as the user accesses any of the front
+end apps. An example would be if the session has 10 mins remaining and a user
+accesses the messages app which calls the messages api. The session will now be
+extended for another 24 hours
+
+*/
+
+
+
+/*
+
+    Service for authentication of Users and Accounts
+    as well as ACL for the resource access
+*/
+
+service Auth {
+    /*
+        Basic CRUD operations for Accounts
+     */
+    rpc GetAccount(GetAccountRequest) returns (Account) {};
+    rpc CreateAccount(CreateAccountRequest) returns (Account) {};
+    rpc UpdateAccount(UpdateAccountRequest) returns (Account) {};
+
+    /*
+        Basic CRUD operations for Users
+     */
+    rpc GetUser(GetUserRequest) returns (User) {};
+    rpc CreateUser(CreateUserRequest) returns (User) {};
+    rpc UpdateUser(UpdateUserRequest) returns (User) {};
+
+    /*
+        A user session is simple sign on using email & password based authentication to generate a new JWT token
+        A session is not stored in any db instead the token is used to map back to a user
+     */
+    rpc CreateUserSession(CreateUserSessionRequest) returns (UserSession) {};
+
+    /*
+        Checks whether the supplied token key or session key corresponds to a valid 
+     */
+    rpc AuthenticateToken(AuthenticateRequest) returns(AuthContext) {} 
+    rpc AuthenticateUserSession(AuthenticateRequest) returns(AuthContext) {} 
+}
+
+/*
     Token
- */
+*/
 
 message Token {
-    string key = 1;
+    // account the token belongs to
+    int32 account_id = 1;
 
-    // Maybe add scope access here?
+    // token key
+    string key = 2;
+
+    // list of scopes
+    // by default every account gets 3 special tokens pregenerated 
+    // with scopes equal to: web, sdk, server
+    repeated string permission_scopes = 3;
+
+    google.protobuf.Timestamp updated_at = 6;
+    google.protobuf.Timestamp created_at = 7;
 }
 
 /*
-    Resource
-    name: String representing the name of the resource
-          exp -> [ Events, Messages, Experiences ]
- */
-message Resource {
-    string name = 1;
-}
-
-/*
-    Account
- */
+    Account represents customer account in the system
+*/
 message Account {
     int32 id = 1;
 
-    // The name of the account example AirMiles
+    // The name of the account.
+    // For example AirMiles
     string name = 2;
-    string serverToken = 3;
-    string sdkToken = 4;
-    string browserToken = 5;
 
-    google.protobuf.Timestamp updated_at = 7;
-    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 3;
+    google.protobuf.Timestamp created_at = 4;
 }
 
 /*
-    User
- */
+    User represents a person that accesses the rover.io and acts on behalf of a customer account
+*/
 message User {
     int32 id = 1;
 
+    // the Account.id user belongs to
+    int32 account_id = 2;
+
     // The name of the user example Jacob
-    string name = 2;
-    string email = 3;
-    string password = 4;
+    string name = 3;
+
+    // Must be unique accross all users
+    string email = 4;
+
+    repeated string permission_scopes = 6;
 
     google.protobuf.Timestamp updated_at = 7;
     google.protobuf.Timestamp created_at = 8;
 }
 
+/*
+    UserSession represents a rover.io user session.
+*/
 message UserSession {
-    int32 id = 1;
-
     int32 user_id = 2;
-    int32 account_id = 3;
-    Token jwt_token = 4;
 
-    google.protobuf.Timestamp last_seen = 6;
-    google.protobuf.Timestamp expires_at = 7;
-    google.protobuf.Timestamp updated_at = 8;
-    google.protobuf.Timestamp created_at = 9;
+    // session key
+    string key = 3;
 
+    // last seen IP address
+    string last_seen_IP = 4;
+
+    google.protobuf.Timestamp expires_at = 5;
+
+    google.protobuf.Timestamp created_at = 6;
+    // used as last_seen at timestamp
+    google.protobuf.Timestamp updated_at = 7;
 }
 
+/*
+    RPCs
+*/
 
 /*
-    Account Rpc Requests & Replies
+    Account RPC Requests & Replies
  */
+
 message GetAccountRequest {
     // The account id
     int32 account_id = 1;
 }
 
-message GetAccountReply {
-    Account account = 1;
-}
-
-
 message CreateAccountRequest {
     // The name of the account
     // All other attributes are auto generated
     string name = 1;
-}
-
-message CreateAccountReply {
-    Account account = 1;
 }
 
 message UpdateAccountRequest {
@@ -100,123 +219,61 @@ message UpdateAccountRequest {
     string name = 2;
 }
 
-message UpdateAccountReply {
-    Account account = 1;
-}
-
-
 /*
-    User Rpc Requests & Replies
+    User RPC requests & replies
  */
 
 message GetUserRequest {
-    int32 user_id = 1;
-}
-
-message GetUserReply {
-    User user = 1;
+    int32 account_id = 1;
+    int32 user_id = 2;
 }
 
 message CreateUserRequest {
-    string name = 1;
-    string email = 2;
-    string password = 3;
-}
+    int32 account_id = 1;
 
-message CreateUserReply {
-    User user = 1;
-}
-
-message UpdateUserRequest {
-    int32 user_id = 1;
-    
     string name = 2;
     string email = 3;
     string password = 4;
 }
 
-message UpdateUserReply {
-    User user = 1;
+message UpdateUserRequest {
+    int32 account_id = 1;
+    int32 user_id = 2;
+
+    string name = 3;
+    string email = 4;
+    string password = 5;
 }
 
-
-
 /*
-    Session Rpc Requests & Replies
+    Session RPC Requests & Replies
  */
 
 message CreateUserSessionRequest {
     string email = 1;
     string password = 2;
-}
 
-message CreateUserSessionReply {
-    UserSession session = 1;
-}
-
-
-
-message AuthenticateRequest {
-    Token token = 1;
-}
-
-message AuthenticateReply {
-
-    Account account = 1;
-
-    /* Optional */
-    User user = 2;
-}
-
-message HasAccessRequest {
-    Token token = 1;
-    Resource resource = 2;
-}
-
-message HasAccessReply {
-    bool has_access = 1;
+    string last_seen_IP = 3;
 }
 
 /*
-    
-    Service for handling authenticate of Users and Accounts
-    as well as provides ACL to protect resources
+    Authentication request for Token and/or UserSession
+*/
 
- */
-service Auth {
+message AuthenticateRequest {
+    // one of the: token key or session key
+    string key = 1;
+}
 
-    /*
-        Basic crud operations for Accounts
-     */
-    rpc GetAccount(GetAccountRequest) returns (GetAccountReply) {};
-    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountReply) {};
-    rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountReply) {};
-    
+// Authentication context auth reploy
+message AuthContext {
+  // the Account.id the context is bound to
+  int32 account_id = 1;
 
+  // the User.id the context is bound to
+  // optional
+  int32 user_id = 2;
 
-    /*
-        Basic crud operations for Users
-     */
-    rpc GetUser(GetUserRequest) returns (GetUserReply) {};
-    rpc CreateUser(CreateUserRequest) returns (CreateUserReply) {};
-    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserReply) {};
-
-    /*
-        A user session is simple sign on using email & password based authentication to generate a new JWT token
-        A session is not stored in any db instead the token is used to map back to a user
-     */
-    rpc CreateUserSession(CreateUserSessionRequest) returns (CreateUserSessionReply) {};
-
-
-    /*
-        Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
-     */
-    rpc Authenticate(AuthenticateRequest) returns(AuthenticateReply) {} 
-   
-
-    /*
-        Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
-        has access to the requested resource
-     */
-    rpc HasAccess(HasAccessRequest) returns (HasAccessReply) {};
+  // string tokens the context is bound to
+  repeated string permission_scopes = 3;
 }

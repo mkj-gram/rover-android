@@ -7,38 +7,61 @@ Package auth is a generated protocol buffer package.
 
 It is generated from these files:
 	auth/v1/auth.proto
+	common/v1/response.proto
+	pushy/v1/pushy.proto
 
 It has these top-level messages:
 	Token
-	Resource
 	Account
 	User
 	UserSession
 	GetAccountRequest
-	GetAccountReply
 	CreateAccountRequest
-	CreateAccountReply
 	UpdateAccountRequest
-	UpdateAccountReply
 	GetUserRequest
-	GetUserReply
 	CreateUserRequest
-	CreateUserReply
 	UpdateUserRequest
-	UpdateUserReply
 	CreateUserSessionRequest
-	CreateUserSessionReply
 	AuthenticateRequest
-	AuthenticateReply
-	HasAccessRequest
-	HasAccessReply
+	AuthContext
+	OperationResult
+	Device
+	IosPlatform
+	AndroidPlatform
+	GetDeviceRequest
+	GetDeviceResponse
+	CreateDeviceRequest
+	CreateDeviceResponse
+	DeleteDeviceRequest
+	DeleteDeviceResponse
+	UpdateDeviceRequest
+	UpdateDeviceResponse
+	GetIosPlatformRequest
+	GetIosPlatformResponse
+	CreateIosPlatformRequest
+	CreateIosPlatformResponse
+	DeleteIosPlatformRequest
+	DeleteIosPlatformResponse
+	UpdateIosPlatformRequest
+	UpdateIosPlatformResponse
+	GetAndroidPlatformRequest
+	GetAndroidPlatformResponse
+	CreateAndroidPlatformRequest
+	CreateAndroidPlatformResponse
+	DeleteAndroidPlatformRequest
+	DeleteAndroidPlatformResponse
+	UpdateAndroidPlatformRequest
+	UpdateAndroidPlatformResponse
+	SendNotificationRequest
+	SendNotificationResponse
+	SendNotificationResult
 */
 package auth
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import google_protobuf "github.com/golang/protobuf/ptypes/timestamp"
+import google_protobuf "github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 
 import (
 	context "golang.org/x/net/context"
@@ -57,13 +80,29 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Token struct {
-	Key string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	// account the token belongs to
+	AccountId int32 `protobuf:"varint,1,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
+	// token key
+	Key string `protobuf:"bytes,2,opt,name=key" json:"key,omitempty"`
+	// list of scopes
+	// by default every account gets 3 special tokens pregenerated
+	// with scopes equal to: web, sdk, server
+	PermissionScopes []string                   `protobuf:"bytes,3,rep,name=permission_scopes,json=permissionScopes" json:"permission_scopes,omitempty"`
+	UpdatedAt        *google_protobuf.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
+	CreatedAt        *google_protobuf.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
 }
 
 func (m *Token) Reset()                    { *m = Token{} }
 func (m *Token) String() string            { return proto.CompactTextString(m) }
 func (*Token) ProtoMessage()               {}
 func (*Token) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+func (m *Token) GetAccountId() int32 {
+	if m != nil {
+		return m.AccountId
+	}
+	return 0
+}
 
 func (m *Token) GetKey() string {
 	if m != nil {
@@ -72,43 +111,42 @@ func (m *Token) GetKey() string {
 	return ""
 }
 
-//
-// Resource
-// name: String representing the name of the resource
-// exp -> [ Events, Messages, Experiences ]
-type Resource struct {
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-}
-
-func (m *Resource) Reset()                    { *m = Resource{} }
-func (m *Resource) String() string            { return proto.CompactTextString(m) }
-func (*Resource) ProtoMessage()               {}
-func (*Resource) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
-
-func (m *Resource) GetName() string {
+func (m *Token) GetPermissionScopes() []string {
 	if m != nil {
-		return m.Name
+		return m.PermissionScopes
 	}
-	return ""
+	return nil
+}
+
+func (m *Token) GetUpdatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.UpdatedAt
+	}
+	return nil
+}
+
+func (m *Token) GetCreatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.CreatedAt
+	}
+	return nil
 }
 
 //
-// Account
+// Account represents customer account in the system
 type Account struct {
 	Id int32 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
-	// The name of the account example AirMiles
-	Name         string                     `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	ServerToken  string                     `protobuf:"bytes,3,opt,name=serverToken" json:"serverToken,omitempty"`
-	SdkToken     string                     `protobuf:"bytes,4,opt,name=sdkToken" json:"sdkToken,omitempty"`
-	BrowserToken string                     `protobuf:"bytes,5,opt,name=browserToken" json:"browserToken,omitempty"`
-	UpdatedAt    *google_protobuf.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
-	CreatedAt    *google_protobuf.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	// The name of the account.
+	// For example AirMiles
+	Name      string                     `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	UpdatedAt *google_protobuf.Timestamp `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
+	CreatedAt *google_protobuf.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
 }
 
 func (m *Account) Reset()                    { *m = Account{} }
 func (m *Account) String() string            { return proto.CompactTextString(m) }
 func (*Account) ProtoMessage()               {}
-func (*Account) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*Account) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *Account) GetId() int32 {
 	if m != nil {
@@ -120,27 +158,6 @@ func (m *Account) GetId() int32 {
 func (m *Account) GetName() string {
 	if m != nil {
 		return m.Name
-	}
-	return ""
-}
-
-func (m *Account) GetServerToken() string {
-	if m != nil {
-		return m.ServerToken
-	}
-	return ""
-}
-
-func (m *Account) GetSdkToken() string {
-	if m != nil {
-		return m.SdkToken
-	}
-	return ""
-}
-
-func (m *Account) GetBrowserToken() string {
-	if m != nil {
-		return m.BrowserToken
 	}
 	return ""
 }
@@ -160,25 +177,35 @@ func (m *Account) GetCreatedAt() *google_protobuf.Timestamp {
 }
 
 //
-// User
+// User represents a person that accesses the rover.io and acts on behalf of a customer account
 type User struct {
 	Id int32 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+	// the Account.id user belongs to
+	AccountId int32 `protobuf:"varint,2,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
 	// The name of the user example Jacob
-	Name      string                     `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	Email     string                     `protobuf:"bytes,3,opt,name=email" json:"email,omitempty"`
-	Password  string                     `protobuf:"bytes,4,opt,name=password" json:"password,omitempty"`
-	UpdatedAt *google_protobuf.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
-	CreatedAt *google_protobuf.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	Name string `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+	// Must be unique accross all users
+	Email            string                     `protobuf:"bytes,4,opt,name=email" json:"email,omitempty"`
+	PermissionScopes []string                   `protobuf:"bytes,6,rep,name=permission_scopes,json=permissionScopes" json:"permission_scopes,omitempty"`
+	UpdatedAt        *google_protobuf.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
+	CreatedAt        *google_protobuf.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
 }
 
 func (m *User) Reset()                    { *m = User{} }
 func (m *User) String() string            { return proto.CompactTextString(m) }
 func (*User) ProtoMessage()               {}
-func (*User) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*User) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 func (m *User) GetId() int32 {
 	if m != nil {
 		return m.Id
+	}
+	return 0
+}
+
+func (m *User) GetAccountId() int32 {
+	if m != nil {
+		return m.AccountId
 	}
 	return 0
 }
@@ -197,11 +224,11 @@ func (m *User) GetEmail() string {
 	return ""
 }
 
-func (m *User) GetPassword() string {
+func (m *User) GetPermissionScopes() []string {
 	if m != nil {
-		return m.Password
+		return m.PermissionScopes
 	}
-	return ""
+	return nil
 }
 
 func (m *User) GetUpdatedAt() *google_protobuf.Timestamp {
@@ -218,28 +245,24 @@ func (m *User) GetCreatedAt() *google_protobuf.Timestamp {
 	return nil
 }
 
+//
+// UserSession represents a rover.io user session.
 type UserSession struct {
-	Id        int32                      `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
-	UserId    int32                      `protobuf:"varint,2,opt,name=user_id,json=userId" json:"user_id,omitempty"`
-	AccountId int32                      `protobuf:"varint,3,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
-	JwtToken  *Token                     `protobuf:"bytes,4,opt,name=jwt_token,json=jwtToken" json:"jwt_token,omitempty"`
-	LastSeen  *google_protobuf.Timestamp `protobuf:"bytes,6,opt,name=last_seen,json=lastSeen" json:"last_seen,omitempty"`
-	ExpiresAt *google_protobuf.Timestamp `protobuf:"bytes,7,opt,name=expires_at,json=expiresAt" json:"expires_at,omitempty"`
-	UpdatedAt *google_protobuf.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
-	CreatedAt *google_protobuf.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	UserId int32 `protobuf:"varint,2,opt,name=user_id,json=userId" json:"user_id,omitempty"`
+	// session key
+	Key string `protobuf:"bytes,3,opt,name=key" json:"key,omitempty"`
+	// last seen IP address
+	LastSeen_IP string                     `protobuf:"bytes,4,opt,name=last_seen_IP,json=lastSeenIP" json:"last_seen_IP,omitempty"`
+	ExpiresAt   *google_protobuf.Timestamp `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt" json:"expires_at,omitempty"`
+	CreatedAt   *google_protobuf.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	// used as last_seen at timestamp
+	UpdatedAt *google_protobuf.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
 }
 
 func (m *UserSession) Reset()                    { *m = UserSession{} }
 func (m *UserSession) String() string            { return proto.CompactTextString(m) }
 func (*UserSession) ProtoMessage()               {}
-func (*UserSession) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
-
-func (m *UserSession) GetId() int32 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
+func (*UserSession) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 func (m *UserSession) GetUserId() int32 {
 	if m != nil {
@@ -248,37 +271,23 @@ func (m *UserSession) GetUserId() int32 {
 	return 0
 }
 
-func (m *UserSession) GetAccountId() int32 {
+func (m *UserSession) GetKey() string {
 	if m != nil {
-		return m.AccountId
+		return m.Key
 	}
-	return 0
+	return ""
 }
 
-func (m *UserSession) GetJwtToken() *Token {
+func (m *UserSession) GetLastSeen_IP() string {
 	if m != nil {
-		return m.JwtToken
+		return m.LastSeen_IP
 	}
-	return nil
-}
-
-func (m *UserSession) GetLastSeen() *google_protobuf.Timestamp {
-	if m != nil {
-		return m.LastSeen
-	}
-	return nil
+	return ""
 }
 
 func (m *UserSession) GetExpiresAt() *google_protobuf.Timestamp {
 	if m != nil {
 		return m.ExpiresAt
-	}
-	return nil
-}
-
-func (m *UserSession) GetUpdatedAt() *google_protobuf.Timestamp {
-	if m != nil {
-		return m.UpdatedAt
 	}
 	return nil
 }
@@ -290,8 +299,13 @@ func (m *UserSession) GetCreatedAt() *google_protobuf.Timestamp {
 	return nil
 }
 
-//
-// Account Rpc Requests & Replies
+func (m *UserSession) GetUpdatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.UpdatedAt
+	}
+	return nil
+}
+
 type GetAccountRequest struct {
 	// The account id
 	AccountId int32 `protobuf:"varint,1,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
@@ -300,29 +314,13 @@ type GetAccountRequest struct {
 func (m *GetAccountRequest) Reset()                    { *m = GetAccountRequest{} }
 func (m *GetAccountRequest) String() string            { return proto.CompactTextString(m) }
 func (*GetAccountRequest) ProtoMessage()               {}
-func (*GetAccountRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*GetAccountRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 func (m *GetAccountRequest) GetAccountId() int32 {
 	if m != nil {
 		return m.AccountId
 	}
 	return 0
-}
-
-type GetAccountReply struct {
-	Account *Account `protobuf:"bytes,1,opt,name=account" json:"account,omitempty"`
-}
-
-func (m *GetAccountReply) Reset()                    { *m = GetAccountReply{} }
-func (m *GetAccountReply) String() string            { return proto.CompactTextString(m) }
-func (*GetAccountReply) ProtoMessage()               {}
-func (*GetAccountReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
-
-func (m *GetAccountReply) GetAccount() *Account {
-	if m != nil {
-		return m.Account
-	}
-	return nil
 }
 
 type CreateAccountRequest struct {
@@ -334,29 +332,13 @@ type CreateAccountRequest struct {
 func (m *CreateAccountRequest) Reset()                    { *m = CreateAccountRequest{} }
 func (m *CreateAccountRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateAccountRequest) ProtoMessage()               {}
-func (*CreateAccountRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*CreateAccountRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
 func (m *CreateAccountRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
-}
-
-type CreateAccountReply struct {
-	Account *Account `protobuf:"bytes,1,opt,name=account" json:"account,omitempty"`
-}
-
-func (m *CreateAccountReply) Reset()                    { *m = CreateAccountReply{} }
-func (m *CreateAccountReply) String() string            { return proto.CompactTextString(m) }
-func (*CreateAccountReply) ProtoMessage()               {}
-func (*CreateAccountReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
-
-func (m *CreateAccountReply) GetAccount() *Account {
-	if m != nil {
-		return m.Account
-	}
-	return nil
 }
 
 type UpdateAccountRequest struct {
@@ -367,7 +349,7 @@ type UpdateAccountRequest struct {
 func (m *UpdateAccountRequest) Reset()                    { *m = UpdateAccountRequest{} }
 func (m *UpdateAccountRequest) String() string            { return proto.CompactTextString(m) }
 func (*UpdateAccountRequest) ProtoMessage()               {}
-func (*UpdateAccountRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+func (*UpdateAccountRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *UpdateAccountRequest) GetAccountId() int32 {
 	if m != nil {
@@ -383,30 +365,22 @@ func (m *UpdateAccountRequest) GetName() string {
 	return ""
 }
 
-type UpdateAccountReply struct {
-	Account *Account `protobuf:"bytes,1,opt,name=account" json:"account,omitempty"`
-}
-
-func (m *UpdateAccountReply) Reset()                    { *m = UpdateAccountReply{} }
-func (m *UpdateAccountReply) String() string            { return proto.CompactTextString(m) }
-func (*UpdateAccountReply) ProtoMessage()               {}
-func (*UpdateAccountReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
-
-func (m *UpdateAccountReply) GetAccount() *Account {
-	if m != nil {
-		return m.Account
-	}
-	return nil
-}
-
 type GetUserRequest struct {
-	UserId int32 `protobuf:"varint,1,opt,name=user_id,json=userId" json:"user_id,omitempty"`
+	AccountId int32 `protobuf:"varint,1,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
+	UserId    int32 `protobuf:"varint,2,opt,name=user_id,json=userId" json:"user_id,omitempty"`
 }
 
 func (m *GetUserRequest) Reset()                    { *m = GetUserRequest{} }
 func (m *GetUserRequest) String() string            { return proto.CompactTextString(m) }
 func (*GetUserRequest) ProtoMessage()               {}
-func (*GetUserRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*GetUserRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+
+func (m *GetUserRequest) GetAccountId() int32 {
+	if m != nil {
+		return m.AccountId
+	}
+	return 0
+}
 
 func (m *GetUserRequest) GetUserId() int32 {
 	if m != nil {
@@ -415,32 +389,24 @@ func (m *GetUserRequest) GetUserId() int32 {
 	return 0
 }
 
-type GetUserReply struct {
-	User *User `protobuf:"bytes,1,opt,name=user" json:"user,omitempty"`
-}
-
-func (m *GetUserReply) Reset()                    { *m = GetUserReply{} }
-func (m *GetUserReply) String() string            { return proto.CompactTextString(m) }
-func (*GetUserReply) ProtoMessage()               {}
-func (*GetUserReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
-
-func (m *GetUserReply) GetUser() *User {
-	if m != nil {
-		return m.User
-	}
-	return nil
-}
-
 type CreateUserRequest struct {
-	Name     string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Email    string `protobuf:"bytes,2,opt,name=email" json:"email,omitempty"`
-	Password string `protobuf:"bytes,3,opt,name=password" json:"password,omitempty"`
+	AccountId int32  `protobuf:"varint,1,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
+	Name      string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	Email     string `protobuf:"bytes,3,opt,name=email" json:"email,omitempty"`
+	Password  string `protobuf:"bytes,4,opt,name=password" json:"password,omitempty"`
 }
 
 func (m *CreateUserRequest) Reset()                    { *m = CreateUserRequest{} }
 func (m *CreateUserRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateUserRequest) ProtoMessage()               {}
-func (*CreateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*CreateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+
+func (m *CreateUserRequest) GetAccountId() int32 {
+	if m != nil {
+		return m.AccountId
+	}
+	return 0
+}
 
 func (m *CreateUserRequest) GetName() string {
 	if m != nil {
@@ -463,33 +429,25 @@ func (m *CreateUserRequest) GetPassword() string {
 	return ""
 }
 
-type CreateUserReply struct {
-	User *User `protobuf:"bytes,1,opt,name=user" json:"user,omitempty"`
-}
-
-func (m *CreateUserReply) Reset()                    { *m = CreateUserReply{} }
-func (m *CreateUserReply) String() string            { return proto.CompactTextString(m) }
-func (*CreateUserReply) ProtoMessage()               {}
-func (*CreateUserReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
-
-func (m *CreateUserReply) GetUser() *User {
-	if m != nil {
-		return m.User
-	}
-	return nil
-}
-
 type UpdateUserRequest struct {
-	UserId   int32  `protobuf:"varint,1,opt,name=user_id,json=userId" json:"user_id,omitempty"`
-	Name     string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	Email    string `protobuf:"bytes,3,opt,name=email" json:"email,omitempty"`
-	Password string `protobuf:"bytes,4,opt,name=password" json:"password,omitempty"`
+	AccountId int32  `protobuf:"varint,1,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
+	UserId    int32  `protobuf:"varint,2,opt,name=user_id,json=userId" json:"user_id,omitempty"`
+	Name      string `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
+	Email     string `protobuf:"bytes,4,opt,name=email" json:"email,omitempty"`
+	Password  string `protobuf:"bytes,5,opt,name=password" json:"password,omitempty"`
 }
 
 func (m *UpdateUserRequest) Reset()                    { *m = UpdateUserRequest{} }
 func (m *UpdateUserRequest) String() string            { return proto.CompactTextString(m) }
 func (*UpdateUserRequest) ProtoMessage()               {}
-func (*UpdateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+
+func (m *UpdateUserRequest) GetAccountId() int32 {
+	if m != nil {
+		return m.AccountId
+	}
+	return 0
+}
 
 func (m *UpdateUserRequest) GetUserId() int32 {
 	if m != nil {
@@ -519,31 +477,16 @@ func (m *UpdateUserRequest) GetPassword() string {
 	return ""
 }
 
-type UpdateUserReply struct {
-	User *User `protobuf:"bytes,1,opt,name=user" json:"user,omitempty"`
-}
-
-func (m *UpdateUserReply) Reset()                    { *m = UpdateUserReply{} }
-func (m *UpdateUserReply) String() string            { return proto.CompactTextString(m) }
-func (*UpdateUserReply) ProtoMessage()               {}
-func (*UpdateUserReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
-
-func (m *UpdateUserReply) GetUser() *User {
-	if m != nil {
-		return m.User
-	}
-	return nil
-}
-
 type CreateUserSessionRequest struct {
-	Email    string `protobuf:"bytes,1,opt,name=email" json:"email,omitempty"`
-	Password string `protobuf:"bytes,2,opt,name=password" json:"password,omitempty"`
+	Email       string `protobuf:"bytes,1,opt,name=email" json:"email,omitempty"`
+	Password    string `protobuf:"bytes,2,opt,name=password" json:"password,omitempty"`
+	LastSeen_IP string `protobuf:"bytes,3,opt,name=last_seen_IP,json=lastSeenIP" json:"last_seen_IP,omitempty"`
 }
 
 func (m *CreateUserSessionRequest) Reset()                    { *m = CreateUserSessionRequest{} }
 func (m *CreateUserSessionRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateUserSessionRequest) ProtoMessage()               {}
-func (*CreateUserSessionRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
+func (*CreateUserSessionRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
 func (m *CreateUserSessionRequest) GetEmail() string {
 	if m != nil {
@@ -559,127 +502,81 @@ func (m *CreateUserSessionRequest) GetPassword() string {
 	return ""
 }
 
-type CreateUserSessionReply struct {
-	Session *UserSession `protobuf:"bytes,1,opt,name=session" json:"session,omitempty"`
-}
-
-func (m *CreateUserSessionReply) Reset()                    { *m = CreateUserSessionReply{} }
-func (m *CreateUserSessionReply) String() string            { return proto.CompactTextString(m) }
-func (*CreateUserSessionReply) ProtoMessage()               {}
-func (*CreateUserSessionReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
-
-func (m *CreateUserSessionReply) GetSession() *UserSession {
+func (m *CreateUserSessionRequest) GetLastSeen_IP() string {
 	if m != nil {
-		return m.Session
+		return m.LastSeen_IP
 	}
-	return nil
+	return ""
 }
 
 type AuthenticateRequest struct {
-	Token *Token `protobuf:"bytes,1,opt,name=token" json:"token,omitempty"`
+	// one of the: token key or session key
+	Key string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 }
 
 func (m *AuthenticateRequest) Reset()                    { *m = AuthenticateRequest{} }
 func (m *AuthenticateRequest) String() string            { return proto.CompactTextString(m) }
 func (*AuthenticateRequest) ProtoMessage()               {}
-func (*AuthenticateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
+func (*AuthenticateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
-func (m *AuthenticateRequest) GetToken() *Token {
+func (m *AuthenticateRequest) GetKey() string {
 	if m != nil {
-		return m.Token
+		return m.Key
+	}
+	return ""
+}
+
+// Authentication context auth reploy
+type AuthContext struct {
+	// the Account.id the context is bound to
+	AccountId int32 `protobuf:"varint,1,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
+	// the User.id the context is bound to
+	// optional
+	UserId int32 `protobuf:"varint,2,opt,name=user_id,json=userId" json:"user_id,omitempty"`
+	// string tokens the context is bound to
+	PermissionScopes []string `protobuf:"bytes,3,rep,name=permission_scopes,json=permissionScopes" json:"permission_scopes,omitempty"`
+}
+
+func (m *AuthContext) Reset()                    { *m = AuthContext{} }
+func (m *AuthContext) String() string            { return proto.CompactTextString(m) }
+func (*AuthContext) ProtoMessage()               {}
+func (*AuthContext) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+
+func (m *AuthContext) GetAccountId() int32 {
+	if m != nil {
+		return m.AccountId
+	}
+	return 0
+}
+
+func (m *AuthContext) GetUserId() int32 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *AuthContext) GetPermissionScopes() []string {
+	if m != nil {
+		return m.PermissionScopes
 	}
 	return nil
-}
-
-type AuthenticateReply struct {
-	Account *Account `protobuf:"bytes,1,opt,name=account" json:"account,omitempty"`
-	// Optional
-	User *User `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
-}
-
-func (m *AuthenticateReply) Reset()                    { *m = AuthenticateReply{} }
-func (m *AuthenticateReply) String() string            { return proto.CompactTextString(m) }
-func (*AuthenticateReply) ProtoMessage()               {}
-func (*AuthenticateReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
-
-func (m *AuthenticateReply) GetAccount() *Account {
-	if m != nil {
-		return m.Account
-	}
-	return nil
-}
-
-func (m *AuthenticateReply) GetUser() *User {
-	if m != nil {
-		return m.User
-	}
-	return nil
-}
-
-type HasAccessRequest struct {
-	Token    *Token    `protobuf:"bytes,1,opt,name=token" json:"token,omitempty"`
-	Resource *Resource `protobuf:"bytes,2,opt,name=resource" json:"resource,omitempty"`
-}
-
-func (m *HasAccessRequest) Reset()                    { *m = HasAccessRequest{} }
-func (m *HasAccessRequest) String() string            { return proto.CompactTextString(m) }
-func (*HasAccessRequest) ProtoMessage()               {}
-func (*HasAccessRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
-
-func (m *HasAccessRequest) GetToken() *Token {
-	if m != nil {
-		return m.Token
-	}
-	return nil
-}
-
-func (m *HasAccessRequest) GetResource() *Resource {
-	if m != nil {
-		return m.Resource
-	}
-	return nil
-}
-
-type HasAccessReply struct {
-	HasAccess bool `protobuf:"varint,1,opt,name=has_access,json=hasAccess" json:"has_access,omitempty"`
-}
-
-func (m *HasAccessReply) Reset()                    { *m = HasAccessReply{} }
-func (m *HasAccessReply) String() string            { return proto.CompactTextString(m) }
-func (*HasAccessReply) ProtoMessage()               {}
-func (*HasAccessReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
-
-func (m *HasAccessReply) GetHasAccess() bool {
-	if m != nil {
-		return m.HasAccess
-	}
-	return false
 }
 
 func init() {
 	proto.RegisterType((*Token)(nil), "rover.auth.v1.Token")
-	proto.RegisterType((*Resource)(nil), "rover.auth.v1.Resource")
 	proto.RegisterType((*Account)(nil), "rover.auth.v1.Account")
 	proto.RegisterType((*User)(nil), "rover.auth.v1.User")
 	proto.RegisterType((*UserSession)(nil), "rover.auth.v1.UserSession")
 	proto.RegisterType((*GetAccountRequest)(nil), "rover.auth.v1.GetAccountRequest")
-	proto.RegisterType((*GetAccountReply)(nil), "rover.auth.v1.GetAccountReply")
 	proto.RegisterType((*CreateAccountRequest)(nil), "rover.auth.v1.CreateAccountRequest")
-	proto.RegisterType((*CreateAccountReply)(nil), "rover.auth.v1.CreateAccountReply")
 	proto.RegisterType((*UpdateAccountRequest)(nil), "rover.auth.v1.UpdateAccountRequest")
-	proto.RegisterType((*UpdateAccountReply)(nil), "rover.auth.v1.UpdateAccountReply")
 	proto.RegisterType((*GetUserRequest)(nil), "rover.auth.v1.GetUserRequest")
-	proto.RegisterType((*GetUserReply)(nil), "rover.auth.v1.GetUserReply")
 	proto.RegisterType((*CreateUserRequest)(nil), "rover.auth.v1.CreateUserRequest")
-	proto.RegisterType((*CreateUserReply)(nil), "rover.auth.v1.CreateUserReply")
 	proto.RegisterType((*UpdateUserRequest)(nil), "rover.auth.v1.UpdateUserRequest")
-	proto.RegisterType((*UpdateUserReply)(nil), "rover.auth.v1.UpdateUserReply")
 	proto.RegisterType((*CreateUserSessionRequest)(nil), "rover.auth.v1.CreateUserSessionRequest")
-	proto.RegisterType((*CreateUserSessionReply)(nil), "rover.auth.v1.CreateUserSessionReply")
 	proto.RegisterType((*AuthenticateRequest)(nil), "rover.auth.v1.AuthenticateRequest")
-	proto.RegisterType((*AuthenticateReply)(nil), "rover.auth.v1.AuthenticateReply")
-	proto.RegisterType((*HasAccessRequest)(nil), "rover.auth.v1.HasAccessRequest")
-	proto.RegisterType((*HasAccessReply)(nil), "rover.auth.v1.HasAccessReply")
+	proto.RegisterType((*AuthContext)(nil), "rover.auth.v1.AuthContext")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -694,26 +591,23 @@ const _ = grpc.SupportPackageIsVersion4
 
 type AuthClient interface {
 	//
-	// Basic crud operations for Accounts
-	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountReply, error)
-	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountReply, error)
-	UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*UpdateAccountReply, error)
+	// Basic CRUD operations for Accounts
+	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*Account, error)
+	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Account, error)
+	UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*Account, error)
 	//
-	// Basic crud operations for Users
-	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error)
-	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserReply, error)
-	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserReply, error)
+	// Basic CRUD operations for Users
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error)
 	//
 	// A user session is simple sign on using email & password based authentication to generate a new JWT token
 	// A session is not stored in any db instead the token is used to map back to a user
-	CreateUserSession(ctx context.Context, in *CreateUserSessionRequest, opts ...grpc.CallOption) (*CreateUserSessionReply, error)
+	CreateUserSession(ctx context.Context, in *CreateUserSessionRequest, opts ...grpc.CallOption) (*UserSession, error)
 	//
-	// Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
-	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateReply, error)
-	//
-	// Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
-	// has access to the requested resource
-	HasAccess(ctx context.Context, in *HasAccessRequest, opts ...grpc.CallOption) (*HasAccessReply, error)
+	// Checks whether the supplied token key or session key corresponds to a valid
+	AuthenticateToken(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthContext, error)
+	AuthenticateUserSession(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthContext, error)
 }
 
 type authClient struct {
@@ -724,8 +618,8 @@ func NewAuthClient(cc *grpc.ClientConn) AuthClient {
 	return &authClient{cc}
 }
 
-func (c *authClient) GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountReply, error) {
-	out := new(GetAccountReply)
+func (c *authClient) GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*Account, error) {
+	out := new(Account)
 	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/GetAccount", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -733,8 +627,8 @@ func (c *authClient) GetAccount(ctx context.Context, in *GetAccountRequest, opts
 	return out, nil
 }
 
-func (c *authClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountReply, error) {
-	out := new(CreateAccountReply)
+func (c *authClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Account, error) {
+	out := new(Account)
 	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/CreateAccount", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -742,8 +636,8 @@ func (c *authClient) CreateAccount(ctx context.Context, in *CreateAccountRequest
 	return out, nil
 }
 
-func (c *authClient) UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*UpdateAccountReply, error) {
-	out := new(UpdateAccountReply)
+func (c *authClient) UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*Account, error) {
+	out := new(Account)
 	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/UpdateAccount", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -751,8 +645,8 @@ func (c *authClient) UpdateAccount(ctx context.Context, in *UpdateAccountRequest
 	return out, nil
 }
 
-func (c *authClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error) {
-	out := new(GetUserReply)
+func (c *authClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
 	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/GetUser", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -760,8 +654,8 @@ func (c *authClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...gr
 	return out, nil
 }
 
-func (c *authClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserReply, error) {
-	out := new(CreateUserReply)
+func (c *authClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
 	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/CreateUser", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -769,8 +663,8 @@ func (c *authClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts
 	return out, nil
 }
 
-func (c *authClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserReply, error) {
-	out := new(UpdateUserReply)
+func (c *authClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
 	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/UpdateUser", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -778,8 +672,8 @@ func (c *authClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts
 	return out, nil
 }
 
-func (c *authClient) CreateUserSession(ctx context.Context, in *CreateUserSessionRequest, opts ...grpc.CallOption) (*CreateUserSessionReply, error) {
-	out := new(CreateUserSessionReply)
+func (c *authClient) CreateUserSession(ctx context.Context, in *CreateUserSessionRequest, opts ...grpc.CallOption) (*UserSession, error) {
+	out := new(UserSession)
 	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/CreateUserSession", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -787,18 +681,18 @@ func (c *authClient) CreateUserSession(ctx context.Context, in *CreateUserSessio
 	return out, nil
 }
 
-func (c *authClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateReply, error) {
-	out := new(AuthenticateReply)
-	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/Authenticate", in, out, c.cc, opts...)
+func (c *authClient) AuthenticateToken(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthContext, error) {
+	out := new(AuthContext)
+	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/AuthenticateToken", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authClient) HasAccess(ctx context.Context, in *HasAccessRequest, opts ...grpc.CallOption) (*HasAccessReply, error) {
-	out := new(HasAccessReply)
-	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/HasAccess", in, out, c.cc, opts...)
+func (c *authClient) AuthenticateUserSession(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthContext, error) {
+	out := new(AuthContext)
+	err := grpc.Invoke(ctx, "/rover.auth.v1.Auth/AuthenticateUserSession", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -809,26 +703,23 @@ func (c *authClient) HasAccess(ctx context.Context, in *HasAccessRequest, opts .
 
 type AuthServer interface {
 	//
-	// Basic crud operations for Accounts
-	GetAccount(context.Context, *GetAccountRequest) (*GetAccountReply, error)
-	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountReply, error)
-	UpdateAccount(context.Context, *UpdateAccountRequest) (*UpdateAccountReply, error)
+	// Basic CRUD operations for Accounts
+	GetAccount(context.Context, *GetAccountRequest) (*Account, error)
+	CreateAccount(context.Context, *CreateAccountRequest) (*Account, error)
+	UpdateAccount(context.Context, *UpdateAccountRequest) (*Account, error)
 	//
-	// Basic crud operations for Users
-	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
-	CreateUser(context.Context, *CreateUserRequest) (*CreateUserReply, error)
-	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserReply, error)
+	// Basic CRUD operations for Users
+	GetUser(context.Context, *GetUserRequest) (*User, error)
+	CreateUser(context.Context, *CreateUserRequest) (*User, error)
+	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
 	//
 	// A user session is simple sign on using email & password based authentication to generate a new JWT token
 	// A session is not stored in any db instead the token is used to map back to a user
-	CreateUserSession(context.Context, *CreateUserSessionRequest) (*CreateUserSessionReply, error)
+	CreateUserSession(context.Context, *CreateUserSessionRequest) (*UserSession, error)
 	//
-	// Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
-	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateReply, error)
-	//
-	// Checks whether the supplied token either a Rover token or JWT token that maps back to a User or Account
-	// has access to the requested resource
-	HasAccess(context.Context, *HasAccessRequest) (*HasAccessReply, error)
+	// Checks whether the supplied token key or session key corresponds to a valid
+	AuthenticateToken(context.Context, *AuthenticateRequest) (*AuthContext, error)
+	AuthenticateUserSession(context.Context, *AuthenticateRequest) (*AuthContext, error)
 }
 
 func RegisterAuthServer(s *grpc.Server, srv AuthServer) {
@@ -961,38 +852,38 @@ func _Auth_CreateUserSession_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Auth_AuthenticateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AuthenticateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).Authenticate(ctx, in)
+		return srv.(AuthServer).AuthenticateToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rover.auth.v1.Auth/Authenticate",
+		FullMethod: "/rover.auth.v1.Auth/AuthenticateToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).Authenticate(ctx, req.(*AuthenticateRequest))
+		return srv.(AuthServer).AuthenticateToken(ctx, req.(*AuthenticateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_HasAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HasAccessRequest)
+func _Auth_AuthenticateUserSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthenticateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).HasAccess(ctx, in)
+		return srv.(AuthServer).AuthenticateUserSession(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rover.auth.v1.Auth/HasAccess",
+		FullMethod: "/rover.auth.v1.Auth/AuthenticateUserSession",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).HasAccess(ctx, req.(*HasAccessRequest))
+		return srv.(AuthServer).AuthenticateUserSession(ctx, req.(*AuthenticateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1030,12 +921,12 @@ var _Auth_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_CreateUserSession_Handler,
 		},
 		{
-			MethodName: "Authenticate",
-			Handler:    _Auth_Authenticate_Handler,
+			MethodName: "AuthenticateToken",
+			Handler:    _Auth_AuthenticateToken_Handler,
 		},
 		{
-			MethodName: "HasAccess",
-			Handler:    _Auth_HasAccess_Handler,
+			MethodName: "AuthenticateUserSession",
+			Handler:    _Auth_AuthenticateUserSession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1045,60 +936,49 @@ var _Auth_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("auth/v1/auth.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 866 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x57, 0xdd, 0x8e, 0xda, 0x46,
-	0x14, 0x5e, 0x9b, 0x3f, 0xfb, 0x40, 0x48, 0x98, 0xa0, 0x84, 0xba, 0x22, 0xa1, 0x53, 0x55, 0x49,
-	0x73, 0x01, 0x5d, 0x52, 0x29, 0x6a, 0x7b, 0x45, 0x23, 0x75, 0xbb, 0x52, 0x5b, 0x45, 0x4e, 0xb6,
-	0xd2, 0xf6, 0x06, 0x79, 0xf1, 0x74, 0xf1, 0x2e, 0x60, 0xea, 0x19, 0x43, 0xf7, 0x01, 0x7a, 0xd1,
-	0xd7, 0xeb, 0xa3, 0xf4, 0x09, 0xaa, 0x99, 0xf1, 0x18, 0x33, 0xe6, 0x67, 0x41, 0x95, 0x72, 0x85,
-	0x67, 0xce, 0x37, 0xe7, 0x7c, 0xe7, 0xf3, 0x9c, 0x4f, 0x06, 0x90, 0x17, 0xb3, 0x71, 0x6f, 0x71,
-	0xda, 0xe3, 0xbf, 0xdd, 0x79, 0x14, 0xb2, 0x10, 0x3d, 0x88, 0xc2, 0x05, 0x89, 0xba, 0x62, 0x67,
-	0x71, 0xea, 0x3c, 0xbf, 0x0e, 0xc3, 0xeb, 0x09, 0xe9, 0x89, 0xe0, 0x55, 0xfc, 0x7b, 0x8f, 0x05,
-	0x53, 0x42, 0x99, 0x37, 0x9d, 0x4b, 0x3c, 0xfe, 0x04, 0x4a, 0x1f, 0xc2, 0x5b, 0x32, 0x43, 0x8f,
-	0xa0, 0x70, 0x4b, 0xee, 0x5a, 0x46, 0xc7, 0x78, 0x69, 0xbb, 0xfc, 0x11, 0x3f, 0x03, 0xcb, 0x25,
-	0x34, 0x8c, 0xa3, 0x11, 0x41, 0x08, 0x8a, 0x33, 0x6f, 0x4a, 0x92, 0xb0, 0x78, 0xc6, 0x7f, 0x99,
-	0x50, 0x19, 0x8c, 0x46, 0x61, 0x3c, 0x63, 0xa8, 0x0e, 0x66, 0xe0, 0x8b, 0x68, 0xc9, 0x35, 0x03,
-	0x3f, 0xc5, 0x9b, 0x2b, 0x3c, 0xea, 0x40, 0x95, 0x92, 0x68, 0x41, 0x22, 0x51, 0xb0, 0x55, 0x10,
-	0xa1, 0xec, 0x16, 0x72, 0xc0, 0xa2, 0xfe, 0xad, 0x0c, 0x17, 0x45, 0x38, 0x5d, 0x23, 0x0c, 0xb5,
-	0xab, 0x28, 0x5c, 0x52, 0x75, 0xbc, 0x24, 0xe2, 0x6b, 0x7b, 0xe8, 0x1b, 0x80, 0x78, 0xee, 0x7b,
-	0x8c, 0xf8, 0x43, 0x8f, 0xb5, 0x2a, 0x1d, 0xe3, 0x65, 0xb5, 0xef, 0x74, 0xa5, 0x04, 0x5d, 0x25,
-	0x41, 0xf7, 0x83, 0x92, 0xc0, 0xb5, 0x13, 0xf4, 0x80, 0xf1, 0xa3, 0xa3, 0x88, 0xa8, 0xa3, 0xd6,
-	0xfe, 0xa3, 0x09, 0x7a, 0xc0, 0xf0, 0x3f, 0x06, 0x14, 0x2f, 0x28, 0x89, 0xee, 0x25, 0x42, 0x13,
-	0x4a, 0x64, 0xea, 0x05, 0x93, 0xa4, 0x7d, 0xb9, 0xe0, 0x8d, 0xcf, 0x3d, 0x4a, 0x97, 0x61, 0xe4,
-	0xab, 0xc6, 0xd5, 0xfa, 0x23, 0x35, 0xf5, 0xaf, 0x09, 0x55, 0xde, 0xd4, 0x7b, 0x42, 0x69, 0x10,
-	0xce, 0x72, 0xbd, 0x3d, 0x85, 0x4a, 0x4c, 0x49, 0x34, 0x0c, 0x7c, 0xd1, 0x5e, 0xc9, 0x2d, 0xf3,
-	0xe5, 0xb9, 0x8f, 0xda, 0x00, 0x9e, 0xbc, 0x14, 0x3c, 0x56, 0x10, 0x31, 0x3b, 0xd9, 0x39, 0xf7,
-	0xd1, 0x29, 0xd8, 0x37, 0x4b, 0x36, 0x64, 0xe9, 0x3b, 0xae, 0xf6, 0x9b, 0xdd, 0xb5, 0x3b, 0xdb,
-	0x15, 0xef, 0xd2, 0xb5, 0x6e, 0x96, 0x4c, 0xbe, 0xd5, 0x37, 0x60, 0x4f, 0x3c, 0xca, 0x86, 0x94,
-	0x90, 0x59, 0xab, 0xbc, 0xb7, 0x09, 0x8b, 0x83, 0xdf, 0x13, 0x79, 0x1d, 0xc8, 0x9f, 0xf3, 0x20,
-	0x22, 0xf4, 0x9e, 0xca, 0x25, 0x68, 0xa9, 0x5c, 0x46, 0x74, 0xeb, 0x78, 0xd1, 0xed, 0x43, 0x44,
-	0xef, 0x43, 0xe3, 0x8c, 0xb0, 0x64, 0xa6, 0x5c, 0xf2, 0x47, 0x4c, 0x28, 0xd3, 0x04, 0x35, 0x34,
-	0x41, 0xf1, 0x5b, 0x78, 0x98, 0x3d, 0x33, 0x9f, 0xdc, 0xa1, 0xaf, 0xa0, 0x92, 0xc4, 0x05, 0xbc,
-	0xda, 0x7f, 0xa2, 0x29, 0xac, 0xd0, 0x0a, 0x86, 0x5f, 0x41, 0xf3, 0xad, 0x60, 0xa1, 0xd5, 0xde,
-	0x34, 0xf6, 0x3f, 0x00, 0xd2, 0xb0, 0xc7, 0xd5, 0x3c, 0x87, 0xe6, 0x85, 0x10, 0xed, 0xa0, 0x7e,
-	0x37, 0x0d, 0x15, 0xa7, 0xa4, 0xa5, 0x3a, 0x8e, 0xd2, 0x97, 0x50, 0x3f, 0x23, 0x8c, 0x5f, 0x7b,
-	0x45, 0x26, 0x73, 0xcd, 0x8d, 0xec, 0x35, 0xc7, 0x6f, 0xa0, 0x96, 0x42, 0x79, 0xb1, 0x17, 0x50,
-	0xe4, 0x91, 0xa4, 0xd2, 0x63, 0xad, 0x92, 0xc0, 0x09, 0x00, 0xbe, 0x84, 0x86, 0x94, 0x2f, 0x5b,
-	0x66, 0x83, 0xce, 0x2b, 0xa7, 0x30, 0xb7, 0x39, 0x45, 0x61, 0xdd, 0x29, 0xf0, 0xb7, 0xf0, 0x30,
-	0x9b, 0xfa, 0x20, 0x5a, 0x11, 0x34, 0xa4, 0x84, 0xf7, 0xe9, 0xfe, 0xff, 0x71, 0x36, 0xce, 0x37,
-	0x5b, 0xf3, 0x20, 0xbe, 0x3f, 0x41, 0x6b, 0xd5, 0x6b, 0x62, 0x52, 0x8a, 0x76, 0xca, 0xc4, 0xd8,
-	0xc6, 0xc4, 0xd4, 0x98, 0xfc, 0x02, 0x4f, 0x36, 0x64, 0xe3, 0x84, 0xbe, 0x86, 0x0a, 0x95, 0xeb,
-	0x84, 0x93, 0xb3, 0x81, 0x93, 0x3a, 0xa1, 0xa0, 0x78, 0x00, 0x8f, 0x07, 0x31, 0x1b, 0x93, 0x19,
-	0x0b, 0x46, 0x1e, 0x23, 0x8a, 0xd8, 0x2b, 0x28, 0x49, 0xe3, 0x33, 0x76, 0x18, 0x9f, 0x84, 0xe0,
-	0x19, 0x34, 0xd6, 0x53, 0x1c, 0x75, 0xa5, 0x53, 0x41, 0xcd, 0x7d, 0x82, 0x52, 0x78, 0xf4, 0xa3,
-	0x47, 0x07, 0xa3, 0x11, 0xa1, 0xf4, 0x08, 0xbe, 0xe8, 0x35, 0x58, 0x51, 0xf2, 0xb5, 0x90, 0x14,
-	0x7b, 0xaa, 0xc1, 0xd5, 0xc7, 0x84, 0x9b, 0x02, 0x71, 0x0f, 0xea, 0x99, 0xa2, 0xbc, 0xc3, 0x36,
-	0xc0, 0xd8, 0xa3, 0x43, 0x4f, 0x6c, 0x89, 0xba, 0x96, 0x6b, 0x8f, 0x15, 0xa6, 0xff, 0x77, 0x19,
-	0x8a, 0x5c, 0x16, 0xf4, 0x0e, 0x60, 0x65, 0x7b, 0xa8, 0xa3, 0x95, 0xca, 0xb9, 0xa8, 0xf3, 0x6c,
-	0x07, 0x62, 0x3e, 0xb9, 0xc3, 0x27, 0xe8, 0x12, 0x1e, 0xac, 0xf9, 0x1a, 0xfa, 0x5c, 0x3b, 0xb2,
-	0xc9, 0x21, 0x9d, 0xcf, 0x76, 0x83, 0xd2, 0xd4, 0x6b, 0xfe, 0x94, 0x4b, 0xbd, 0xc9, 0x08, 0x73,
-	0xa9, 0xf3, 0x16, 0x87, 0x4f, 0xd0, 0x19, 0x54, 0x12, 0x1f, 0x42, 0xed, 0x7c, 0x8b, 0x99, 0x61,
-	0x76, 0x3e, 0xdd, 0x16, 0x96, 0x89, 0xde, 0x01, 0xac, 0x46, 0x20, 0x27, 0x68, 0xce, 0xb2, 0x72,
-	0x82, 0x6a, 0xce, 0x23, 0x33, 0xae, 0xc6, 0x3b, 0x97, 0x31, 0xe7, 0x36, 0xb9, 0x8c, 0x9a, 0x37,
-	0xe0, 0x13, 0x44, 0xb2, 0xde, 0xa9, 0xbe, 0x4c, 0x5e, 0x6c, 0x25, 0xb2, 0x6e, 0x0b, 0xce, 0x17,
-	0xfb, 0x81, 0xb2, 0xcc, 0xaf, 0x50, 0xcb, 0x8e, 0x1e, 0xc2, 0xfa, 0x90, 0xe5, 0x47, 0xdb, 0xe9,
-	0xec, 0xc4, 0xc8, 0xbc, 0x3f, 0x83, 0x9d, 0xde, 0x76, 0xf4, 0x5c, 0x3b, 0xa0, 0x0f, 0x9f, 0xd3,
-	0xde, 0x0e, 0x10, 0xe9, 0xbe, 0xaf, 0xff, 0x56, 0x4b, 0xfe, 0x00, 0x7c, 0xc7, 0x7f, 0xaf, 0xca,
-	0xe2, 0xe3, 0xe2, 0xf5, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x64, 0xc2, 0x45, 0xdf, 0x17, 0x0c,
-	0x00, 0x00,
+	// 692 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcd, 0x4e, 0xdb, 0x4c,
+	0x14, 0x8d, 0xed, 0xfc, 0x90, 0xcb, 0x8f, 0xc8, 0x80, 0x3e, 0x22, 0x4b, 0xe8, 0x8b, 0xa6, 0x0b,
+	0xa2, 0x56, 0x72, 0x04, 0x5d, 0x55, 0x5d, 0x54, 0x29, 0xaa, 0x20, 0x9b, 0x0a, 0x05, 0xd8, 0xd0,
+	0x45, 0x64, 0x92, 0x5b, 0xb0, 0x20, 0xb6, 0xeb, 0x19, 0x53, 0xba, 0xed, 0xb6, 0xab, 0x3e, 0x43,
+	0x1f, 0xa8, 0x0f, 0xd0, 0x97, 0xa9, 0xc6, 0x1e, 0xc7, 0x8e, 0xc7, 0x01, 0x1c, 0xba, 0x8a, 0x3d,
+	0xbe, 0x73, 0xe6, 0x9c, 0x7b, 0xcf, 0x89, 0x0d, 0xc4, 0x0e, 0xf9, 0x75, 0xef, 0x6e, 0xbf, 0x27,
+	0x7e, 0x2d, 0x3f, 0xf0, 0xb8, 0x47, 0xd6, 0x03, 0xef, 0x0e, 0x03, 0x2b, 0x5a, 0xb9, 0xdb, 0x37,
+	0xff, 0xbf, 0xf2, 0xbc, 0xab, 0x5b, 0xec, 0x45, 0x0f, 0x2f, 0xc3, 0xcf, 0x3d, 0xee, 0x4c, 0x91,
+	0x71, 0x7b, 0xea, 0xc7, 0xf5, 0xf4, 0x8f, 0x06, 0xb5, 0x33, 0xef, 0x06, 0x5d, 0xb2, 0x0b, 0x60,
+	0x8f, 0xc7, 0x5e, 0xe8, 0xf2, 0x91, 0x33, 0x69, 0x6b, 0x1d, 0xad, 0x5b, 0x1b, 0x36, 0xe5, 0xca,
+	0x60, 0x42, 0x36, 0xc1, 0xb8, 0xc1, 0x6f, 0x6d, 0xbd, 0xa3, 0x75, 0x9b, 0x43, 0x71, 0x49, 0x5e,
+	0x41, 0xcb, 0xc7, 0x60, 0xea, 0x30, 0xe6, 0x78, 0xee, 0x88, 0x8d, 0x3d, 0x1f, 0x59, 0xdb, 0xe8,
+	0x18, 0xdd, 0xe6, 0x70, 0x33, 0x7d, 0x70, 0x1a, 0xad, 0x93, 0x37, 0x00, 0xa1, 0x3f, 0xb1, 0x39,
+	0x4e, 0x46, 0x36, 0x6f, 0xd7, 0x3b, 0x5a, 0x77, 0xf5, 0xc0, 0xb4, 0x62, 0x76, 0x56, 0xc2, 0xce,
+	0x3a, 0x4b, 0xd8, 0x0d, 0x9b, 0xb2, 0xba, 0xcf, 0xc5, 0xd6, 0x71, 0x80, 0xc9, 0xd6, 0xc6, 0xe3,
+	0x5b, 0x65, 0x75, 0x9f, 0xd3, 0x5f, 0x1a, 0x34, 0xfa, 0xb1, 0x04, 0xb2, 0x01, 0xfa, 0x4c, 0x97,
+	0xee, 0x4c, 0x08, 0x81, 0xaa, 0x6b, 0x4f, 0x51, 0x2a, 0x8a, 0xae, 0x73, 0x2c, 0x8d, 0xe5, 0x59,
+	0x56, 0xcb, 0xb0, 0xfc, 0xae, 0x43, 0xf5, 0x9c, 0x61, 0xa0, 0x50, 0x9c, 0x1f, 0x89, 0x9e, 0x1f,
+	0x49, 0xa2, 0xc0, 0xc8, 0x28, 0xd8, 0x86, 0x1a, 0x4e, 0x6d, 0xe7, 0x36, 0x62, 0xd0, 0x1c, 0xc6,
+	0x37, 0xc5, 0xa3, 0xaa, 0x3f, 0x69, 0x54, 0x8d, 0xe5, 0x9b, 0xb0, 0x52, 0xa6, 0x09, 0x3f, 0x74,
+	0x58, 0x15, 0x4d, 0x38, 0xc5, 0x88, 0x0b, 0xd9, 0x81, 0x46, 0xc8, 0x30, 0x48, 0x85, 0xd7, 0xc5,
+	0x6d, 0x6a, 0x44, 0x23, 0x35, 0x62, 0x07, 0xd6, 0x6e, 0x6d, 0xc6, 0x47, 0x0c, 0xd1, 0x1d, 0x0d,
+	0x4e, 0xa4, 0x74, 0x10, 0x6b, 0xa7, 0x88, 0xee, 0xe0, 0x44, 0xf0, 0xc2, 0x7b, 0xdf, 0x09, 0x90,
+	0x09, 0x5e, 0xb5, 0xc7, 0x79, 0xc9, 0x6a, 0x45, 0x52, 0xbd, 0x84, 0xa4, 0x67, 0x34, 0x92, 0x1e,
+	0x40, 0xeb, 0x08, 0xb9, 0xb4, 0xee, 0x10, 0xbf, 0x84, 0xc8, 0xf8, 0x23, 0x09, 0xa5, 0x2f, 0x61,
+	0xfb, 0x30, 0x3a, 0x3b, 0xb7, 0x2d, 0xb1, 0x89, 0x96, 0xda, 0x84, 0x0e, 0x60, 0xfb, 0x3c, 0x3a,
+	0xac, 0xd4, 0x11, 0x45, 0x99, 0xa1, 0xc7, 0xb0, 0x71, 0x84, 0x5c, 0x8c, 0xee, 0x89, 0x20, 0x8b,
+	0x26, 0x4b, 0xef, 0xa1, 0x15, 0x0b, 0x28, 0x01, 0x56, 0x94, 0xe2, 0x59, 0x06, 0x8c, 0x6c, 0x06,
+	0x4c, 0x58, 0xf1, 0x6d, 0xc6, 0xbe, 0x7a, 0xc1, 0x44, 0x3a, 0x64, 0x76, 0x4f, 0x7f, 0x6a, 0xd0,
+	0x8a, 0xfb, 0xf1, 0x0f, 0x74, 0x94, 0xc8, 0x65, 0x96, 0x53, 0x2d, 0xc7, 0xc9, 0x85, 0x76, 0xda,
+	0x0d, 0x99, 0x8a, 0x84, 0xd9, 0x0c, 0x4d, 0x5b, 0x84, 0xa6, 0xcf, 0xa3, 0x29, 0x19, 0x31, 0xf2,
+	0x19, 0xa1, 0x7b, 0xb0, 0xd5, 0x0f, 0xf9, 0x35, 0xba, 0xdc, 0x19, 0xdb, 0x1c, 0x93, 0xa3, 0x64,
+	0xdc, 0xb4, 0x59, 0xdc, 0x68, 0x00, 0xab, 0xa2, 0xf0, 0xd0, 0x73, 0x39, 0xde, 0x2f, 0xdf, 0xa5,
+	0x32, 0xaf, 0x8f, 0x83, 0xdf, 0x35, 0xa8, 0x8a, 0x43, 0xc9, 0x31, 0x40, 0x1a, 0x0c, 0xd2, 0xb1,
+	0xe6, 0x5e, 0x77, 0x96, 0x92, 0x19, 0xf3, 0xbf, 0x5c, 0x85, 0x7c, 0x4c, 0x2b, 0xe4, 0x23, 0xac,
+	0xcf, 0xc5, 0x85, 0xbc, 0xc8, 0x95, 0x16, 0x85, 0xe9, 0x61, 0xbc, 0xb9, 0x48, 0x29, 0x78, 0x45,
+	0x81, 0x7b, 0x00, 0xef, 0x1d, 0x34, 0x64, 0xae, 0xc8, 0xae, 0x2a, 0x33, 0xe3, 0x53, 0x73, 0x2b,
+	0x7f, 0x10, 0xc3, 0x80, 0x56, 0xc8, 0x07, 0x80, 0xd4, 0x40, 0x4a, 0xab, 0x94, 0xa4, 0x3d, 0x00,
+	0x93, 0x46, 0x43, 0x81, 0x51, 0x52, 0xb3, 0x08, 0xe6, 0x22, 0x1b, 0xee, 0xe4, 0x4f, 0x7e, 0x6f,
+	0x21, 0xa9, 0x79, 0xc3, 0x9b, 0x66, 0x01, 0xa8, 0x2c, 0xa1, 0x15, 0x72, 0x0e, 0xad, 0xac, 0x75,
+	0xe3, 0xef, 0x19, 0x9a, 0xef, 0xac, 0x6a, 0x6e, 0x05, 0x36, 0xe3, 0x6b, 0x5a, 0x21, 0x9f, 0x60,
+	0x27, 0xbb, 0x29, 0x4b, 0xfc, 0xd9, 0xe0, 0xef, 0x37, 0x2e, 0xd6, 0xe4, 0xe7, 0xdb, 0x5b, 0xf1,
+	0x7b, 0x59, 0x8f, 0x5e, 0x08, 0xaf, 0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0x10, 0xd3, 0xfe, 0x1a,
+	0xd5, 0x09, 0x00, 0x00,
 }

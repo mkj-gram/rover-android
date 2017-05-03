@@ -1,7 +1,20 @@
 #!/bin/bash
 
-FILES=`find protos/ -name '*.proto'`
+set -e
 
-for f in $FILES; do
-  protoc -I protos/ $f --go_out=plugins=grpc:./go/apis;
-done
+
+PROTO_PATH=./protos/
+PROTO_PATH=${PROTO_PATH}:${GOPATH}/src
+
+# map google.protobuf.timestamp.proto to our extended timestamp wich extends original Timesatmp
+# in order to be able serialize it to the DB
+# MAP="Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp"
+MAP="Mgoogle/protobuf/timestamp.proto=github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
+
+echo $PROTO_PATH
+
+FILES="`find ./protos/ -name *.proto`"
+
+# note uses gofast_out of the github.com/gogo
+protoc -I ${PROTO_PATH} --go_out=plugins=grpc,$MAP:./go/apis $FILES
+protoc -I ${PROTO_PATH} --ruby_out=./ruby/apis --grpc_out=./ruby/apis --plugin=protoc-gen-grpc=`which grpc_tools_ruby_protoc_plugin` $FILES
