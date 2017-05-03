@@ -497,6 +497,7 @@ class V1::ExperiencesController < V1::ApplicationController
         # return local_params
         data = {
             screens: (local_params[:screens] || []).map{|screen| screen_params(screen)},
+            custom_keys: local_params[:custom_keys],
             home_screen_id: local_params[:home_screen_id]
         }
 
@@ -596,6 +597,7 @@ class V1::ExperiencesController < V1::ApplicationController
             use_default_title_bar_style: local_params[:use_default_title_bar_style],
             has_unpublished_changes: local_params.has_key?(:has_unpublished_changes) ? local_params[:has_unpublished_changes] : false,
             background_image: image_params(local_params[:background_image]),
+            custom_keys: local_params[:custom_keys],
             rows: (local_params[:rows] || []).map{|row| row_params(row)}
         }
 
@@ -630,6 +632,7 @@ class V1::ExperiencesController < V1::ApplicationController
             background_color: color_params(local_params[:background_color]),
             background_image: image_params(local_params[:background_image]),
             is_collapsed: local_params[:is_collapsed].nil? ? false : local_params[:is_collapsed],
+            custom_keys: local_params[:custom_keys],
             blocks: (local_params[:blocks] || []).map{ |block| block_params(block) }.compact
         }
 
@@ -678,6 +681,7 @@ class V1::ExperiencesController < V1::ApplicationController
             inset: inset_params(local_params[:inset]),
             background_image: image_params(local_params[:background_image]),
             opacity: local_params.has_key?(:opacity) ? local_params[:opacity].to_f : 1.0,
+            custom_keys: local_params[:custom_keys],
             lock_status: local_params[:lock_status]
         }
 
@@ -922,6 +926,8 @@ class V1::ExperiencesController < V1::ApplicationController
         end
     end
 
+    CUSTOM_KEYS_SCHEMA = ->(custom_keys){ custom_keys.is_a?(Hash) && custom_keys.all? {|k,v| v.is_a?(String) } || ":custom-keys is not a flat key value object" }
+
     IMAGE_SCHEMA = {
         'height' => Integer,
         'width' => Integer,
@@ -944,6 +950,7 @@ class V1::ExperiencesController < V1::ApplicationController
         'inset' => INSET_SCHEMA,
         'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
         'opacity' => [:optional, 0.0..1.0],
+        'custom-keys' => CUSTOM_KEYS_SCHEMA,
         'local-status' => [:optional, NilClass, CH::G.enum("partial", "locked") ]
     }
 
@@ -1034,7 +1041,9 @@ class V1::ExperiencesController < V1::ApplicationController
         'height' => UNIT_SCHEMA,
         'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
         'is-collapsed' => [ TrueClass, FalseClass ],
-        'blocks' => [[ BLOCKS_SCHEMA ]]
+        'custom-keys' => CUSTOM_KEYS_SCHEMA,
+        'blocks' => [[ BLOCKS_SCHEMA ]],
+
     }
 
     ROWS_SCHEMA = lambda { |value|  
@@ -1069,6 +1078,7 @@ class V1::ExperiencesController < V1::ApplicationController
         'use-default-title-bar-style'=> [ TrueClass, FalseClass ],
         'has-unpublished-changes' => [:optional, TrueClass, FalseClass],
         'background-image' => [:optional, NilClass, IMAGE_SCHEMA ],
+        'custom-keys' => CUSTOM_KEYS_SCHEMA,
         'rows' => [[ ROWS_SCHEMA ]]
     }
 
@@ -1094,12 +1104,14 @@ class V1::ExperiencesController < V1::ApplicationController
 
     CREATE_SCHEMA = {
         'name' => String,
+        'custom-keys' => CUSTOM_KEYS_SCHEMA,
         'screens' => [[ SCREEN_SCHEMA ]]
     }
 
     UPDATE_SCHEMA = {
         'name' => String,
         'home-screen-id' => String,
+        'custom-keys' => CUSTOM_KEYS_SCHEMA,
         'screens' => [[ SCREEN_SCHEMA ]]
     }
 
