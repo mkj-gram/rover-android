@@ -18,6 +18,7 @@ module V1::ExperienceSerializer
                     :'short-url' => experience.short_url,
                     :'simulator-url' => simulator_url,
                     :'home-screen-id' => version.nil? ? nil : version.home_screen_id,
+                    :'custom-keys' => version.custom_keys,
                     screens: version.nil? ? [] : version.screens.as_json.map{|screen| screen.deep_transform_keys{|key| key.to_s.dasherize }}
                 }
             }

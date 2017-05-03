@@ -11,6 +11,7 @@ module Experiences
         attribute :experience_id, BSON::ObjectId
         attribute :version_title, String
         attribute :home_screen_id, String
+        attribute :custom_keys, Hash
         attribute :screens, Array[Hash]
         attribute :screen_data, Array[Hash]
         attribute :updated_at, Time, default: lambda { |model, attribute| Time.zone.now }
@@ -25,6 +26,7 @@ module Experiences
                 _id: _id,
                 experience_id: experience_id,
                 home_screen_id: home_screen_id,
+                custom_keys: custom_keys,
                 screens: screens, #screens.map(&:to_doc),
                 version_title: version_title,
                 updated_at: updated_at,
@@ -36,6 +38,7 @@ module Experiences
             self.screens = other.screens
             self.version_title = other.version_title
             self.home_screen_id = other.home_screen_id
+            self.custom_keys = other.custom_keys
         end
 
         def check_sum
