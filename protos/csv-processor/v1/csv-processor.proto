@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package csv_processor.v1;
+
+
+import "google/protobuf/timestamp.proto";
+
+enum JobType {
+    SEGMENT = 0;
+}
+
+enum JobStatus {
+    UNKNOWN = 0;
+    ENQUEUED = 1;
+    PROCESSING = 2;
+    FAILED = 3;
+    COMPLETED = 4;
+}
+
+message GCSObject {
+    string project_id = 1;
+    string bucket = 2;
+    string file_id = 3;
+}
+
+message LoadJob {
+    int32 id = 1;
+    int32 account_id = 2;
+    JobType type = 3;
+    JobStatus status = 4;
+    int32 progress = 5;
+    google.protobuf.Timestamp created_at = 6;
+
+
+    /* Optional */
+    string failed_reason = 7;
+
+}
+
+message SegmentLoadJobConfig {
+    int32 account_id = 1;
+    string segment_id = 2;
+    GCSObject csv = 3;
+}
+
+message GetLoadJobRequest {
+    int32 load_job_id = 1;
+}
+
+message GetLoadJobReply {
+    LoadJob job = 1;
+}
+
+message CreateLoadJobRequest {
+
+    JobType type = 1;
+
+    oneof job_config {
+        SegmentLoadJobConfig segment_load_job_config = 2;
+    }
+
+}
+
+message CreateLoadJobReply {
+    LoadJob job = 1;
+}
+
+service CsvProcessor {
+    
+    rpc GetLoadJob(GetLoadJobRequest) returns (GetLoadJobReply) {};
+
+    rpc CreateLoadJob(CreateLoadJobRequest) returns (CreateLoadJobReply) {};
+
+}
