@@ -1,4 +1,4 @@
-import { GraphQLInterfaceType, GraphQLNonNull, GraphQLString } from 'graphql'
+import { GraphQLInt, GraphQLInterfaceType, GraphQLNonNull, GraphQLString } from 'graphql'
 
 import BarcodeFormat from './BarcodeFormat'
 
@@ -35,8 +35,8 @@ HasBarcode.normalizeJSON = json => {
 }
 
 HasBarcode.fields = {
-    barcodeScale: { type: GraphQLString },
-    barcodeText: { type: GraphQLString },
+    barcodeScale: { type: new GraphQLNonNull(GraphQLInt) },
+    barcodeText: { type: new GraphQLNonNull(GraphQLString) },
     barcodeFormat: { type: new GraphQLNonNull(BarcodeFormat.type) }
 }
 
