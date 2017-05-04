@@ -20,6 +20,16 @@ const ExperienceQuery = {
         
         return new Promise((resolve, reject) => {
             request(options, (err, response, body) => {
+                if (response.statusCode === 404) {
+                    let error = new Error('No experience found with id: ' + id)
+                    return reject(error)
+                }
+
+                if (response.statusCode !== 200) {
+                    let error = new Error('Failed to retrieve experience with id: ' + id)
+                    return reject(error)   
+                }
+
                 try {
                     const json = JSON.parse(body)
                     const data = json['data']
