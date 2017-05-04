@@ -497,7 +497,7 @@ class V1::ExperiencesController < V1::ApplicationController
         # return local_params
         data = {
             screens: (local_params[:screens] || []).map{|screen| screen_params(screen)},
-            custom_keys: local_params[:custom_keys],
+            custom_keys: local_params[:custom_keys] || {},
             home_screen_id: local_params[:home_screen_id]
         }
 
@@ -1104,7 +1104,6 @@ class V1::ExperiencesController < V1::ApplicationController
 
     CREATE_SCHEMA = {
         'name' => String,
-        'custom-keys' => CUSTOM_KEYS_SCHEMA,
         'screens' => [[ SCREEN_SCHEMA ]]
     }
 
