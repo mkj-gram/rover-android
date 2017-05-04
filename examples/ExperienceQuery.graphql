@@ -39,7 +39,9 @@
         backgroundContentMode
         backgroundScale
         blocks {
+          __typename
           action {
+            __typename
             ... on GoToScreenAction {
               experienceId
               screenId
