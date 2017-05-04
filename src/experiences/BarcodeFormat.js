@@ -5,10 +5,10 @@ class BarcodeFormat { }
 BarcodeFormat.type = new GraphQLEnumType({
     name: 'BarcodeFormat',
     values: {
-        QR: { value: 'qrcode' },
-        AZTEC: { value: 'azteccode' },
+        QR_CODE: { value: 'qrcode' },
+        AZTEC_CODE: { value: 'azteccode' },
         PDF417: { value: 'hibcpdf417' },
-        CODE128: { value: 'code128' }
+        CODE_128: { value: 'code128' }
     }
 })
 
