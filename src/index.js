@@ -17,12 +17,7 @@ app.use(morgan('tiny'))
 
 app.use('/graphql', cors(), graphqlHTTP({
     schema,
-    graphiql: true,
-    formatError: error => ({
-    	message: error.message,
-		locations: error.locations,
-		stack: error.stack
-    })
+    graphiql: true
 }))
 
 app.listen(app.get('port'))
