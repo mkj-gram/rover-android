@@ -1,13 +1,13 @@
-import { GraphQLEnumType } from 'graphql'
+import { GraphQLUnionType, GraphQLString } from 'graphql'
+
+import GoToScreenAction from './GoToScreenAction'
+import OpenUrlAction from './OpenUrlAction'
 
 class BlockAction { }
 
-BlockAction.type = new GraphQLEnumType({
+BlockAction.type = new GraphQLUnionType({
     name: 'BlockAction',
-    values: {
-        GO_TO_SCREEN: { value: 'go-to-screen' },
-        OPEN_URL: { value: 'open-url' }
-    }
+    types: [GoToScreenAction.type, OpenUrlAction.type]
 })
 
 export default BlockAction

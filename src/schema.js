@@ -9,8 +9,10 @@ import EditableImageBlock from './experiences/EditableImageBlock'
 import EditableRectangleBlock from './experiences/EditableRectangleBlock'
 import EditableTextBlock from './experiences/EditableTextBlock'
 import EditableWebViewBlock from './experiences/EditableWebViewBlock'
+import GoToScreenAction from './experiences/GoToScreenAction'
 import ImageBlock from './experiences/ImageBlock'
 import Mutation from './root/Mutation'
+import OpenUrlAction from './experiences/OpenUrlAction'
 import Query from './root/Query'
 import RectangleBlock from './experiences/RectangleBlock'
 import TextBlock from './experiences/TextBlock'
@@ -28,7 +30,9 @@ const schema = new GraphQLSchema({
     		EditableRectangleBlock.type,
     		EditableTextBlock.type,
     		EditableWebViewBlock.type,
+            GoToScreenAction.type,
     		ImageBlock.type,
+            OpenUrlAction.type,
             RectangleBlock.type,
     		TextBlock.type,
     		WebViewBlock.type]
