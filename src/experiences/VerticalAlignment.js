@@ -7,7 +7,7 @@ VerticalAlignment.type = new GraphQLEnumType({
     values: {
         TOP: { value: 'top' },
         BOTTOM: { value: 'bottom' },
-        CENTER: { value: 'middle' },
+        MIDDLE: { value: 'middle' },
         FILL: { value: 'justify' },
     }
 })
