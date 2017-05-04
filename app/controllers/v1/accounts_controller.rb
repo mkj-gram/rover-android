@@ -23,7 +23,7 @@ class V1::AccountsController < V1::ApplicationController
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
                     "is-gimbal-enabled" => current_account.gimbal_integrations.count >= 1,
                     "is-xenio-enabled" => current_account.xenio_integrations.count >= 1,
-                    "xenio-planner-url" => current_account.xenio_integration.count >= 1 ? build_xenio_planner_url(current_account.xenio_integration.first) : nil,
+                    "xenio-planner-url" => current_account.xenio_integrations.count >= 1 ? build_xenio_planner_url(current_account.xenio_integrations.first) : nil,
                     "message-limits" => current_account.message_limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)}
                 },
                 "relationships" => {
