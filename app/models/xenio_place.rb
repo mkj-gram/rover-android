@@ -53,6 +53,8 @@ class XenioPlace < ActiveRecord::Base
 
     belongs_to :account, counter_cache: :searchable_xenio_places_count
 
+    before_create :add_default_name_tag
+
     before_save :ensure_non_null_tags
     after_save :update_active_tags
 
@@ -66,6 +68,12 @@ class XenioPlace < ActiveRecord::Base
 
 
     private
+
+    def add_default_name_tag
+        if self.name
+            self.tags = (( self.tags || []) + [ self.name ]).uniq
+        end
+    end
 
     def ensure_non_null_tags
         self.tags = [] if self.tags.nil?
