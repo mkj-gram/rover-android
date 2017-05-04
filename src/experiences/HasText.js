@@ -40,7 +40,7 @@ HasText.normalizeJSON = json => {
 }
 
 HasText.fields = {
-    text: { type: GraphQLString },
+    text: { type: new GraphQLNonNull(GraphQLString) },
     textAlignment: { type: new GraphQLNonNull(TextAlignment.type) },
     textColor: { type: new GraphQLNonNull(Color.type) },
     textFont: { type: new GraphQLNonNull(Font.type)}

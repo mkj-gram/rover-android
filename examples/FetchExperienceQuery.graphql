@@ -1,5 +1,5 @@
-{
-  experience(id: "5873dee6d5bf3e002de4d70e") {
+query FetchExperience($id: ID!) {
+  experience(id: $id) {
     id
     homeScreenId
     screens {
@@ -39,7 +39,17 @@
         backgroundContentMode
         backgroundScale
         blocks {
-          action
+          __typename
+          action {
+            __typename
+            ... on GoToScreenAction {
+              experienceId
+              screenId
+            }
+            ... on OpenUrlAction {
+              url
+            }
+          }
           autoHeight
           experienceId
           height {
@@ -47,6 +57,7 @@
             unit
           }
           id
+          inset
           horizontalAlignment
           offset {
             bottom {

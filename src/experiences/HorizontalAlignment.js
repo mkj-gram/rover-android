@@ -8,7 +8,7 @@ HorizontalAlignment.type = new GraphQLEnumType({
         LEFT: { value: 'left' },
         RIGHT: { value: 'right' },
         CENTER: { value: 'center' },
-        JUSTIFY: { value: 'fill' },
+        FILL: { value: 'fill' },
     }
 })
 

@@ -18,9 +18,9 @@ const HasBackground = SuperClass => {
 	                backgroundScale } = props
 
 	    	this.backgroundColor = backgroundColor
-	        this.backgroundContentMode = backgroundContentMode
+	        this.backgroundContentMode = backgroundContentMode || 'original'
 	        this.backgroundImage = backgroundImage
-	        this.backgroundScale = backgroundScale
+	        this.backgroundScale = backgroundScale || 1
 		}
 	}
 
@@ -42,9 +42,9 @@ HasBackground.normalizeJSON = json => {
 
 HasBackground.fields = {
     backgroundColor: { type: new GraphQLNonNull(Color.type) },
-    backgroundContentMode: { type: BackgroundContentMode.type },
+    backgroundContentMode: { type: new GraphQLNonNull(BackgroundContentMode.type) },
     backgroundImage: { type: Image.type },
-    backgroundScale: { type: BackgroundScale.type },
+    backgroundScale: { type: new GraphQLNonNull(BackgroundScale.type) },
 }
 
 HasBackground.type = new GraphQLInterfaceType({

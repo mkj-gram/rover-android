@@ -15,15 +15,15 @@ app.set('port', (process.env.PORT || 80))
 
 app.use(morgan('tiny'))
 
-app.use('/graphql', cors(), graphqlHTTP({
+app.use('/graphql', cors(), graphqlHTTP(req => ({
     schema,
     graphiql: true,
-    formatError: error => ({
-    	message: error.message,
-		locations: error.locations,
-		stack: error.stack
-    })
-}))
+    context: { 
+        accountToken: req.headers['x-rover-account-token'],
+        deviceId: req.headers['x-rover-device-id'],
+        profileId: req.headers['x-rover-profile-id']
+    }
+})))
 
 app.listen(app.get('port'))
 console.log('Running a GraphQL API server at localhost:4000/graphql')

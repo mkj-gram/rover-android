@@ -6,10 +6,12 @@ import { GraphQLBoolean,
          GraphQLNonNull } from 'graphql'
 
 import BlockAction from './BlockAction'
+import GoToScreenAction from './GoToScreenAction'
 import HorizontalAlignment from './HorizontalAlignment'
 import Inset from './Inset'
 import Length from './Length'
 import Offset from './Offset'
+import OpenUrlAction from './OpenUrlAction'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
 
@@ -55,13 +57,28 @@ const Block = SuperClass => {
     return ChildClass
 }
 
+Block.actionFromJSON = json => {
+    if (!json) {
+        return null
+    }
+
+    switch (json['type']) {
+    case 'go-to-screen':
+        return GoToScreenAction.fromJSON(json)
+    case 'open-url':
+        return OpenUrlAction.fromJSON(json)
+    default:
+        return null
+    }
+}
+
 Block.normalizeJSON = json => {
     if (!json) {
         return {}
     }
     
     return {
-        action: (json['action'] || {})['type'],
+        action: Block.actionFromJSON(json['action']),
         autoHeight: json['auto-height'] || false,
         experienceId: json['experience-id'],
         height: Length.fromJSON(json['height']),

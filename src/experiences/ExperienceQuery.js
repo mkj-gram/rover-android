@@ -9,17 +9,27 @@ const ExperienceQuery = {
             type: new GraphQLNonNull(GraphQLID)
         }
     },
-    resolve(_, { id }) {
+    resolve(_, { id }, context) {
         const options = {
-            url: 'https://api.rover.io/v1/experiences/' + id + '/current',
+            url: 'https://api.staging.rover.io/v1/experiences/' + id + '/current',
             headers: {
                 accept: 'application/json',
-                'x-rover-api-key': 'd6ab40e8a45e3040c372806baba387fd'
+                'x-rover-api-key': context.accountToken
             }
         }
         
         return new Promise((resolve, reject) => {
             request(options, (err, response, body) => {
+                if (response.statusCode === 404) {
+                    let error = new Error('No experience found with id: ' + id)
+                    return reject(error)
+                }
+
+                if (response.statusCode !== 200) {
+                    let error = new Error('Failed to retrieve experience with id: ' + id)
+                    return reject(error)   
+                }
+
                 try {
                     const json = JSON.parse(body)
                     const data = json['data']
