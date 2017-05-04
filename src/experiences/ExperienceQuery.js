@@ -9,12 +9,12 @@ const ExperienceQuery = {
             type: new GraphQLNonNull(GraphQLID)
         }
     },
-    resolve(_, { id }) {
+    resolve(_, { id }, context) {
         const options = {
-            url: 'https://api.rover.io/v1/experiences/' + id + '/current',
+            url: 'https://api.staging.rover.io/v1/experiences/' + id + '/current',
             headers: {
                 accept: 'application/json',
-                'x-rover-api-key': 'd6ab40e8a45e3040c372806baba387fd'
+                'x-rover-api-key': context.accountToken
             }
         }
         
