@@ -39,7 +39,15 @@
         backgroundContentMode
         backgroundScale
         blocks {
-          action
+          action {
+            ... on GoToScreenAction {
+              experienceId
+              screenId
+            }
+            ... on OpenUrlAction {
+              url
+            }
+          }
           autoHeight
           experienceId
           height {
