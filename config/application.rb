@@ -21,6 +21,7 @@ module RailsApi
         config.rover = Rails.application.config_for(:rover)
         config.sentry = Rails.application.config_for(:sentry)
         config.simulator = Rails.application.config_for(:simulator)
+        config.xenio =  Rails.application.config_for(:xenio)
         
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('lib')
