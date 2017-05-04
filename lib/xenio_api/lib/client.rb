@@ -6,7 +6,7 @@ module XenioApi
     class Client
         include HTTParty
 
-        base_uri Rails.configuration.xenio["base_uri"]
+        base_uri Rails.configuration.xenio["api_base_uri"]
         format :json
         headers 'Accept' => 'application/json'
         headers 'User-Agent' => "Rover-Sync"

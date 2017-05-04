@@ -23,6 +23,7 @@ class V1::AccountsController < V1::ApplicationController
                     "eddystone-namespaces" => current_account.eddystone_namespace_configuration_uuids.configuration_uuids,
                     "is-gimbal-enabled" => current_account.gimbal_integrations.count >= 1,
                     "is-xenio-enabled" => current_account.xenio_integrations.count >= 1,
+                    "xenio-planner-url" => current_account.xenio_integration.count >= 1 ? build_xenio_planner_url(current_account.xenio_integration.first) : nil,
                     "message-limits" => current_account.message_limits.map{|limit| V1::MessageLimitSerializer.serialize(limit)}
                 },
                 "relationships" => {
@@ -171,6 +172,16 @@ class V1::AccountsController < V1::ApplicationController
     def has_access_to_account
         if current_account.id.to_s != params[:id].to_s
             head :forbidden
+        end
+    end
+
+    def build_xenio_planner_url(xenio_integration)
+        if xenio_integration
+            base_uri = Rails.configuration.xenio["planner_uri"]
+            query_string = { custid: xenio_integration.customer_id }.to_query
+            return File.join(base_uri, "/?#{query_string}")
+        else
+            nil
         end
     end
 
