@@ -6,11 +6,11 @@ module XenioApi
     class Client
         include HTTParty
 
-        base_uri "https://jvh69qvt73.execute-api.us-west-2.amazonaws.com/roverdev"
+        base_uri Rails.configuration.xenio["base_uri"]
         format :json
         headers 'Accept' => 'application/json'
         headers 'User-Agent' => "Rover-Sync"
-        headers 'X-Api-Key' => "Gl0PAKpEEJ2f3cbv9T70C44KVySXY9Te1wV9thjp"
+        headers 'X-Api-Key' => Rails.configuration.xenio["api_token"]
 
         def initialize(customer_id)
             @customer_id = customer_id

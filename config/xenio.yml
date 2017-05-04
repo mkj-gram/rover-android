@@ -1,0 +1,6 @@
+production:
+    base_uri: <%= ENV['XENIO_BASE_URI'] || "https://rover.xenioapps.com/roverdev" %> 
+    api_token: <%= ENV['XENIO_API_TOKEN'] || "Gl0PAKpEEJ2f3cbv9T70C44KVySXY9Te1wV9thjp" %>
+development:
+    base_uri: "https://rover.xenioapps.com/roverdev"
+    api_token: "Gl0PAKpEEJ2f3cbv9T70C44KVySXY9Te1wV9thjp"
