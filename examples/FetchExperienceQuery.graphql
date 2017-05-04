@@ -1,5 +1,5 @@
-{
-  experience(id: "5873dee6d5bf3e002de4d70e") {
+query FetchExperience($id: ID!) {
+  experience(id: $id) {
     id
     homeScreenId
     screens {
@@ -57,6 +57,7 @@
             unit
           }
           id
+          inset
           horizontalAlignment
           offset {
             bottom {
