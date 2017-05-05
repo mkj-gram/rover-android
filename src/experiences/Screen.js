@@ -65,7 +65,7 @@ Screen.normalizeJSON = json => {
         titleBarBackgroundColor: Color.fromJSON(json['title-bar-background-color']),
         titleBarButtons: json['title-bar-buttons'],
         titleBarButtonColor: Color.fromJSON(json['title-bar-button-color']),
-        titleBarText: json['title-bar-text'],
+        titleBarText: json['title'],
         titleBarTextColor: Color.fromJSON(json['title-bar-text-color']),
         useDefaultTitleBarStyle: json['use-default-title-bar-style']
     }
