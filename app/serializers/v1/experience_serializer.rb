@@ -19,7 +19,7 @@ module V1::ExperienceSerializer
                     :'simulator-url' => simulator_url,
                     :'home-screen-id' => version.nil? ? nil : version.home_screen_id,
                     :'custom-keys' => version.nil? ? {} : version.custom_keys,
-                    screens: version.nil? ? [] : dasherize(version.screens.as_json, { skip: [:custom_keys] })
+                    screens: version.nil? ? [] : version.screens.as_json.map{|screen| dasherize(screen , { skip: [:custom_keys] })}
                 }
             }
             
