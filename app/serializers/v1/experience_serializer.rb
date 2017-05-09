@@ -50,11 +50,18 @@ module V1::ExperienceSerializer
         end
 
         def dasherize(input, opts = {})
+            
+            if !(input.is_a?(Hash) || input.is_a?(Array))
+                return input
+            end
+
             input.inject({}) do |new_hash, (k,v)|
                 if opts[:skip] && opts[:skip].any? {|skipfield| skipfield == k.to_sym }
                     new_hash[k.dasherize] = v
                 elsif v.is_a?(Hash)
                     new_hash[k.dasherize] = dasherize(v, opts)
+                elsif v.is_a?(Array)
+                    new_hash[k.dasherize] = v.map{|obj| dasherize(obj, opts)}
                 else
                     new_hash[k.dasherize] = v
                 end
