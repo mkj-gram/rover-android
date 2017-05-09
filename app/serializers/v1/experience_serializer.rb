@@ -19,7 +19,7 @@ module V1::ExperienceSerializer
                     :'simulator-url' => simulator_url,
                     :'home-screen-id' => version.nil? ? nil : version.home_screen_id,
                     :'custom-keys' => version.nil? ? {} : version.custom_keys,
-                    screens: version.nil? ? [] : version.screens.as_json.map{|screen| screen.deep_transform_keys{|key| key.to_s.dasherize }}
+                    screens: version.nil? ? [] : dasherize(version.screens.as_json, { skip: [:custom_keys] })
                 }
             }
             
@@ -46,6 +46,20 @@ module V1::ExperienceSerializer
                 "https://#{host}/#{short_url}"
             else
                 "https://#{subdomain}.#{host}/#{short_url}"
+            end
+        end
+
+        def dasherize(input, opts = {})
+            input.inject({}) do |new_hash, (k,v)|
+                if opts[:skip] && opts[:skip].any? {|skipfield| skipfield == k.to_sym }
+                    new_hash[k.dasherize] = v
+                elsif v.is_a?(Hash)
+                    new_hash[k.dasherize] = dasherize(v, opts)
+                else
+                    new_hash[k.dasherize] = v
+                end
+
+                new_hash
             end
         end
 
