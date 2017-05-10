@@ -42,7 +42,7 @@ class V1::ImagesController < V1::ApplicationController
                     body: compressed_file, # file/IO object, or string data
                     key:  "uploads/#{Digest::MD5.hexdigest(current_account.id.to_s)}/#{SecureRandom.uuid}-#{params[:image].original_filename}", # required
                     content_type: params[:image].content_type,
-                    cache_control: "31536000"
+                    cache_control: "31536000",
                     server_side_encryption: "AES256", # accepts AES256, aws:kms
                     storage_class: "STANDARD", # accepts STANDARD, REDUCED_REDUNDANCY, STANDARD_IA
                     use_accelerate_endpoint: false,
