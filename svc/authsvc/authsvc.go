@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/hex"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -30,7 +31,7 @@ const (
 )
 
 var (
-	// Register is a convenience wrapper for auth.RegisterAutServ
+	// Register is a convenience wrapper for auth.RegisterAuthServer
 	Register = auth.RegisterAuthServer
 
 	// TimeNow provides current time
@@ -38,7 +39,7 @@ var (
 	TimeNow = time.Now
 
 	// EncodeToString converts binary slice to a human readable string
-	// is used to generate session/token keys
+	// and is used to generate session/token keys
 	EncodeToString = hex.EncodeToString
 
 	// RandRead reads random bytes into the byte slice
@@ -51,7 +52,8 @@ var (
 	}
 )
 
-// SecretKey is a function that provides a token/session key value
+// SecretKey provides token/session key value.
+// It uses RandRead to obtain KeyLength bytes for secret
 func SecretKey() ([]byte, error) {
 	var key [KeyLength]byte
 
@@ -191,7 +193,7 @@ func (svr *Server) CreateUser(ctx context.Context, r *auth.CreateUserRequest) (*
 		usr = &User{
 			User: auth.User{
 				AccountId: r.GetAccountId(),
-				Email:     r.GetEmail(),
+				Email:     strings.ToLower(r.GetEmail()),
 				Name:      r.GetName(),
 				// NOTE: 2017-05-09: hardcoded "admin" scope
 				// TODO: this will eventually become part of the auth.CreateUserRequest
@@ -238,7 +240,7 @@ func (svr *Server) UpdateUser(ctx context.Context, r *auth.UpdateUserRequest) (*
 			User: auth.User{
 				Id:        r.GetUserId(),
 				AccountId: r.GetAccountId(),
-				Email:     r.GetEmail(),
+				Email:     strings.ToLower(r.GetEmail()),
 				Name:      r.GetName(),
 				// NOTE: 2017-05-09: hardcoded "admin" scope
 				// TODO: this will eventually become part of the auth.UpdateUserRequest
@@ -268,7 +270,7 @@ func (svr *Server) CreateUserSession(ctx context.Context, r *auth.CreateUserSess
 		return nil, grpc.Errorf(codes.InvalidArgument, `validation: user_session: nil request`)
 	}
 
-	usr, err := svr.DB.FindUserByEmail(ctx, r.GetEmail())
+	usr, err := svr.DB.FindUserByEmail(ctx, strings.ToLower(r.GetEmail()))
 	if err != nil {
 		return nil, grpc.Errorf(codes.NotFound, "db.FindUserByEmail")
 	}
@@ -340,8 +342,7 @@ func (svr *Server) AuthenticateUserSession(ctx context.Context, r *auth.Authenti
 	// shouldn't fail as now is a valid time
 	sess.UpdatedAt, _ = timestamp.TimestampProto(now)
 	sess.ExpiresAt, _ = timestamp.TimestampProto(now.Add(SessionDuration))
-	// TODO:
-	// sess.LastSeen_IP = r.LastSeenIP
+	sess.LastSeen_IP = r.GetLastSeen_IP()
 
 	if _, err = svr.DB.UpdateUserSession(ctx, sess); err != nil {
 		return nil, grpc.Errorf(codes.Unknown, "db.UpdateUserSession: user_id=%d: %s", usr.Id, err)

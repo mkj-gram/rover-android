@@ -263,6 +263,9 @@ message CreateUserSessionRequest {
 message AuthenticateRequest {
     // one of the: token key or session key
     string key = 1;
+
+    // last seen ip
+    string last_seen_IP = 2;
 }
 
 // Authentication context auth reploy

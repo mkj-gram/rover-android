@@ -7,16 +7,16 @@ import (
 
 	"golang.org/x/net/context"
 
-	auth "github.com/roverplatform/rover/go/apis/auth/v1"
 	"github.com/roverplatform/rover/svc/authsvc"
 
 	// NOTE: this is a postgres specific implementation so blank import is justified
 	_ "github.com/lib/pq"
 )
 
+// ensure DB implements authsvc.Backend
 var _ authsvc.Backend = (*DB)(nil)
 
-// DB implementation
+// DB is postgres based authsvc.Backend implementation
 type DB struct {
 	db *sql.DB
 }
@@ -31,7 +31,7 @@ func Open(dataSourceName string) (*DB, error) {
 	return &DB{db: db}, nil
 }
 
-// DB lets access underlying sql.DB
+// DB method provides access to the underlying sql.DB
 func (d *DB) DB() *sql.DB {
 	return d.db
 }
@@ -44,8 +44,4 @@ func (d *DB) Ping() error {
 // Close the db connection
 func (d *DB) Close() error {
 	return d.db.Close()
-}
-
-func (db *DB) AuthenticateToken(context.Context, *auth.AuthenticateRequest) (*auth.AuthContext, error) {
-	panic("not implemented")
 }

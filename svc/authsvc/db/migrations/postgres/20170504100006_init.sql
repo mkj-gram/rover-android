@@ -6,9 +6,9 @@ CREATE TABLE accounts (
 
 ,created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 ,updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
-
-,UNIQUE(name)
 );
+-- ensure name is case insensitively unique
+CREATE UNIQUE INDEX accounts_name_lower_key ON accounts ((lower(name)));
 
 CREATE TABLE users (
  id         SERIAL PRIMARY KEY
@@ -23,6 +23,9 @@ CREATE TABLE users (
 ,updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 
 ,UNIQUE(email)
+
+-- ensure email is lowercased
+,CONSTRAINT unique_email_lower_ck CHECK (email = lower(email))
 );
 
 CREATE TABLE user_sessions (
@@ -51,12 +54,16 @@ CREATE TABLE tokens (
 ,UNIQUE(key)
 );
 
+CREATE INDEX on tokens (account_id);
+
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
 --
 
-DROP TABLE tokens CASCADE;
-DROP TABLE user_sessions CASCADE;
-DROP TABLE users CASCADE;
-DROP TABLE accounts CASCADE;
+DROP TABLE
+   tokens
+  ,user_sessions
+  ,users
+  ,accounts
+;
 

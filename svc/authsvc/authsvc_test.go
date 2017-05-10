@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"sort"
 	"testing"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/lib/pq"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 
 	"github.com/go-test/deep"
@@ -28,6 +30,12 @@ import (
 var (
 	_ authsvc.Backend = (*postgres.DB)(nil)
 )
+
+func init() {
+	if dsn := os.Getenv("TEST_DSN"); dsn != "" {
+		testDSN = dsn
+	}
+}
 
 var (
 	testDSN        = `postgres://postgres:postgres@localhost:5432/authsvc_test?sslmode=disable`
@@ -75,7 +83,7 @@ func ts(t *testing.T, ti time.Time) *timestamp.Timestamp {
 func execSQL(t *testing.T, db *sql.DB, sql string) {
 	_, err := db.Exec(sql)
 	if err != nil {
-		if pqerr := err.(*pq.Error); pqerr != nil {
+		if pqerr, ok := err.(*pq.Error); ok {
 			t.Fatal("db.Exec:", pqerr, pqerr.Detail, pqerr.Hint)
 		}
 		t.Fatal("db.Exec:", err)
@@ -92,30 +100,22 @@ func readFile(t *testing.T, path string) []byte {
 }
 
 func TestAuthsvc(t *testing.T) {
-	// if testDSN = os.Getenv("TEST_DSN"); testDSN == "" {
-	if dsn := os.Getenv("TEST_DSN"); dsn == "" {
-		t.Skipf("Skipping: TEST_DSN unset")
-	}
-
 	var db = dbConnect(t, testDSN)
 
 	authsvc.TimeNow = func() time.Time {
 		return createdAt
 	}
 
+	// override password hasher for predictable hashes
 	authsvc.GenerateFromPassword = testHasher
 
-	// set the seeded random source
+	// NOTE: tests reset the seeded random source
 	// makes SecretKey predictable: ie for testing generated SecretKey
 	// for session/tokens
 	// authsvc.RandRead = rand.New(rand.NewSource(1)).Read
 
 	execSQL(t, db.DB(), `
-		TRUNCATE table accounts, users, user_sessions, tokens;
-
-		-- restart counters; required for expectations
-		SELECT pg_catalog.setval('accounts_id_seq', 1, true);
-		SELECT pg_catalog.setval('users_id_seq', 1, true);
+		TRUNCATE table accounts, users, user_sessions, tokens RESTART IDENTITY;
 `)
 
 	execSQL(t, db.DB(), string(readFile(t, "db/postgres/testdata/fixtures.sql")))
@@ -133,6 +133,10 @@ func TestAuthsvc(t *testing.T) {
 
 	t.Run("AuthenticateUserSession", testAuthsvc_AuthenticateUserSession)
 	t.Run("AuthenticateToken", testAuthsvc_AuthenticateToken)
+
+	t.Run("Backend/GetUserById", testDB_GetUserById)
+	t.Run("Backend/FindUserByEmail", testDB_FindUserByEmail)
+	t.Run("Backend/FindSessionByKey", testDB_FindUserSessionByKey)
 }
 
 func testAuthsvc_CreateAccount(t *testing.T) {
@@ -155,24 +159,24 @@ func testAuthsvc_CreateAccount(t *testing.T) {
 
 		args: args{context.Background(),
 			&auth.CreateAccountRequest{
-				Name: "AnAccount",
+				Name: "Account2",
 			},
 		},
 
 		want: &auth.Account{
 			Id:        3,
-			Name:      "AnAccount",
+			Name:      "Account2",
 			CreatedAt: ts(t, createdAt),
 			UpdatedAt: ts(t, createdAt),
 		},
 	}, {
 
-		name:    "creating an account with a duplicate name",
-		wantErr: grpc.Errorf(codes.Unknown, `db.CreateAccount: Scan: pq: duplicate key value violates unique constraint "accounts_name_key"`),
+		name:    "creating an account with a duplicate name, case insensitive",
+		wantErr: grpc.Errorf(codes.Unknown, `db.CreateAccount: Scan: pq: duplicate key value violates unique constraint "accounts_name_lower_key"`),
 
 		args: args{context.Background(),
 			&auth.CreateAccountRequest{
-				Name: "AnAccount",
+				Name: "accOuNT2",
 			},
 		},
 	},
@@ -230,15 +234,15 @@ func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 		wantTokens: []*auth.Token{
 			&auth.Token{
 				AccountId:        5,
-				Key:              "52fdfc072182654f163f5f0f9a621d729566c74d",
-				PermissionScopes: []string{"web"},
+				Key:              "10037c4d7bbb0407d1e2c64981855ad8681d0d86",
+				PermissionScopes: []string{"sdk"},
 				CreatedAt:        ts(t, createdAt),
 				UpdatedAt:        ts(t, createdAt),
 			},
 			&auth.Token{
 				AccountId:        5,
-				Key:              "10037c4d7bbb0407d1e2c64981855ad8681d0d86",
-				PermissionScopes: []string{"sdk"},
+				Key:              "52fdfc072182654f163f5f0f9a621d729566c74d",
+				PermissionScopes: []string{"web"},
 				CreatedAt:        ts(t, createdAt),
 				UpdatedAt:        ts(t, createdAt),
 			},
@@ -269,6 +273,11 @@ func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 				if err != nil {
 					t.Fatal("account tokens:", err)
 				}
+
+				// sort tokens by key
+				sort.Slice(got, func(i, j int) bool {
+					return got[i].Key < got[j].Key
+				})
 
 				if diff := deep.Equal(got, tt.wantTokens); diff != nil {
 					t.Error(diff)
@@ -534,13 +543,13 @@ func testAuthsvc_CreateUser(t *testing.T) {
 			},
 		},
 		{
-			name:    "error: requires unique email",
+			name:    "error: requires unique email, case insensitive",
 			wantErr: grpc.Errorf(codes.Unknown, `db.CreateUser: account_id=1: Scan: pq: duplicate key value violates unique constraint "users_email_key"`),
 
 			args: args{context.Background(),
 				&auth.CreateUserRequest{
 					AccountId: 1,
-					Email:     "user@example.com",
+					Email:     "usER@EXAmple.com",
 					Name:      "user",
 					Password:  "s3cR3t",
 				},
@@ -698,6 +707,20 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 		},
 		{
 
+			name:    "error: existing email, case insensitive",
+			wantErr: grpc.Errorf(codes.Unknown, `db.UpdateUser: account_id=1 user_id=1: Scan: pq: duplicate key value violates unique constraint "users_email_key"`),
+
+			args: args{context.Background(),
+				&auth.UpdateUserRequest{
+					Password:  "s3cR3t",
+					AccountId: 1,
+					UserId:    1,
+					Email:     "user2@EXAmple.com",
+				},
+			},
+		},
+		{
+
 			name: "updates user",
 
 			args: args{context.Background(),
@@ -777,11 +800,11 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "creates a session",
+			name: "creates a session, case insensitive email",
 
 			args: args{context.Background(),
 				&auth.CreateUserSessionRequest{
-					Email:       "user@example.com",
+					Email:       "user@EXAmple.com",
 					Password:    "s3cR3t",
 					LastSeen_IP: "2001:db8A:1234:0000:0000:0000:0000:0000",
 				},
@@ -902,7 +925,7 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 	defer db.Close()
 	var svc = authsvc.Server{DB: db}
 
-	var sess, err = db.FindSessionByKey(context.Background(), `52fdfc072182654f163f5f0f9a621d729566c74d`)
+	var sess, err = db.FindSessionByKey(context.Background(), `SESSION1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`)
 	if err != nil {
 		t.Fatal("unexpected:", err)
 	}
@@ -928,20 +951,21 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 			name: "authenticates session",
 			args: args{context.Background(),
 				&auth.AuthenticateRequest{
-					Key: `52fdfc072182654f163f5f0f9a621d729566c74d`,
+					Key:         `SESSION1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`,
+					LastSeen_IP: "127.0.0.2",
 				},
 			},
 
 			want: &auth.AuthContext{
 				AccountId:        1,
-				UserId:           3,
-				PermissionScopes: []string{"admin"},
+				UserId:           1,
+				PermissionScopes: []string{},
 			},
 
 			wantSession: &auth.UserSession{
-				UserId:      3,
-				Key:         `52fdfc072182654f163f5f0f9a621d729566c74d`,
-				LastSeen_IP: "2001:db8A:1234:0000:0000:0000:0000:0000",
+				UserId:      1,
+				Key:         `SESSION1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`,
+				LastSeen_IP: "127.0.0.2",
 				CreatedAt:   sess.CreatedAt,
 				UpdatedAt:   ts(t, now),
 				ExpiresAt:   ts(t, now.Add(authsvc.SessionDuration)),
@@ -954,7 +978,7 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 
 			args: args{context.Background(),
 				&auth.AuthenticateRequest{
-					Key: `EXPIREDSESSION`,
+					Key: `EXPIREDSESSIONaaaaaaaaaaaaaaaaaaaaaaaaaa`,
 				},
 			},
 		},
@@ -1072,6 +1096,174 @@ func testAuthsvc_AuthenticateToken(t *testing.T) {
 				if diff := deep.Equal(got, tt.wantToken); diff != nil {
 					t.Error("wantToken:", diff)
 				}
+			}
+		})
+	}
+}
+
+func testDB_GetUserById(t *testing.T) {
+	var db = dbConnect(t, testDSN)
+
+	type args struct {
+		ctx context.Context
+		id  int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *authsvc.User
+		wantErr error
+	}{
+
+		{
+			name:    "getting a non-existant user",
+			wantErr: errors.Wrap(sql.ErrNoRows, "Scan"),
+
+			args: args{
+				context.Background(),
+				-1,
+			},
+		},
+
+		{
+			name: "getting an existing user",
+
+			args: args{
+				context.Background(),
+				2,
+			},
+
+			want: &authsvc.User{
+				User: auth.User{
+					Id:               2,
+					AccountId:        1,
+					Name:             "user2",
+					Email:            "user2@example.com",
+					PermissionScopes: []string{},
+					CreatedAt:        ts(t, otherTime),
+					UpdatedAt:        ts(t, otherTime),
+				},
+				PasswordDigest: []byte("$2a$10$0tUJdIURcBTXV0KaVGexw.TBUUc8GRjuhjWsxXybIQaoQLVn/ksBa"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := db.GetUserById(tt.args.ctx, tt.args.id)
+
+			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+				t.Error("error:", diff)
+				return
+			}
+			if diff := deep.Equal(got, tt.want); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func testDB_FindUserByEmail(t *testing.T) {
+	var db = dbConnect(t, testDSN)
+
+	type args struct {
+		ctx   context.Context
+		email string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *authsvc.User
+		wantErr error
+	}{
+
+		{
+			name:    "getting a non-existant user",
+			wantErr: errors.Wrap(sql.ErrNoRows, "Scan"),
+
+			args: args{context.Background(),
+				"non-existant@email.com",
+			},
+		},
+
+		{
+			name: "getting an existing user",
+
+			args: args{context.Background(),
+				"user2@example.com",
+			},
+
+			want: &authsvc.User{
+				User: auth.User{
+					Id:               2,
+					AccountId:        1,
+					Name:             "user2",
+					Email:            "user2@example.com",
+					PermissionScopes: []string{},
+					CreatedAt:        ts(t, otherTime),
+					UpdatedAt:        ts(t, otherTime),
+				},
+				PasswordDigest: []byte("$2a$10$0tUJdIURcBTXV0KaVGexw.TBUUc8GRjuhjWsxXybIQaoQLVn/ksBa"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := db.FindUserByEmail(tt.args.ctx, tt.args.email)
+
+			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+				t.Error("error:", diff)
+				return
+			}
+			if diff := deep.Equal(got, tt.want); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func testDB_FindUserSessionByKey(t *testing.T) {
+	var db = dbConnect(t, testDSN)
+
+	type args struct {
+		ctx context.Context
+		key string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *auth.UserSession
+		wantErr error
+	}{
+		{
+			name: "finds session",
+
+			args: args{context.Background(),
+				`EXPIREDSESSIONaaaaaaaaaaaaaaaaaaaaaaaaaa`,
+			},
+
+			want: &auth.UserSession{
+				UserId:      1,
+				Key:         `EXPIREDSESSIONaaaaaaaaaaaaaaaaaaaaaaaaaa`,
+				ExpiresAt:   ts(t, createdAt.Add(-time.Hour*24)),
+				LastSeen_IP: "127.0.0.1",
+
+				CreatedAt: ts(t, createdAt),
+				UpdatedAt: ts(t, createdAt),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := db.FindSessionByKey(tt.args.ctx, tt.args.key)
+
+			if diff := deep.Equal((err), tt.wantErr); diff != nil {
+				t.Error("error:", diff)
+				return
+			}
+
+			if diff := deep.Equal(got, tt.want); diff != nil {
+				t.Error(diff)
 			}
 		})
 	}

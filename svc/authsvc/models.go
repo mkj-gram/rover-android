@@ -31,7 +31,6 @@ type Backend interface {
 	UpdateUserSession(ctx context.Context, sess *auth.UserSession) (*auth.UserSession, error)
 
 	// AuthenticateUserSession(context.Context, *auth.AuthenticateRequest) (*auth.AuthContext, error)
-	AuthenticateToken(context.Context, *auth.AuthenticateRequest) (*auth.AuthContext, error)
 	FindTokenByKey(ctx context.Context, tokenKey string) (*auth.Token, error)
 	CreateTokens(context.Context, ...*auth.Token) error
 	FindTokensByAccountId(ctx context.Context, accountID int) ([]*auth.Token, error)
