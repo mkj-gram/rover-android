@@ -12,6 +12,7 @@ import DefaultBlockIconSmall from './DefaultBlockIconSmall'
 import DuplicateIcon from './DuplicateIcon'
 import EditIcon from './DuplicateIcon'
 import ErrorIcon from './ErrorIcon'
+import GearIcon from './GearIcon'
 import HomeIcon from './HomeIcon'
 import ImageBlockIcon from './ImageBlockIcon'
 import ImageBlockIconSmall from './ImageBlockIconSmall'
@@ -96,6 +97,7 @@ export {
     EditIcon,
     ErrorIcon,
     HomeIcon,
+    GearIcon,
     ImageBlockIcon,
     ImageBlockIconSmall,
     InsetInspectorBoxOutline,
