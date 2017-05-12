@@ -1,9 +1,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net"
+
+	"github.com/namsral/flag"
 
 	"github.com/roverplatform/rover/svc/authsvc"
 	"github.com/roverplatform/rover/svc/authsvc/db/postgres"
@@ -22,6 +23,7 @@ var (
 )
 
 func main() {
+	flag.EnvironmentPrefix = "SVC"
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
