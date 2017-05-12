@@ -65,7 +65,7 @@ EditableExperience.fields = {
     isArchived: { type: new GraphQLNonNull(GraphQLBoolean) },
     isPublished: { type: new GraphQLNonNull(GraphQLBoolean) },
     name: { type: new GraphQLNonNull(GraphQLString) },
-    screens: { type: new GraphQLNonNull(new GraphQLList(EditableScreen.type)) },
+    screens: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(EditableScreen.type))) },
     simulatorUrl: { type: new GraphQLNonNull(GraphQLString) },
     viewToken: { type: new GraphQLNonNull(GraphQLString) },
     versionId: { type: GraphQLString },

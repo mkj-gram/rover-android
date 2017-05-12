@@ -76,7 +76,7 @@ Screen.fields = {
     autoColorStatusBar: { type: new GraphQLNonNull(GraphQLBoolean) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     id: { type: new GraphQLNonNull(GraphQLID) },
-    rows: { type: new GraphQLNonNull(new GraphQLList(Row.type)) },
+    rows: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Row.type))) },
     statusBarStyle: { type: new GraphQLNonNull(StatusBarStyle.type) },
     statusBarColor: { type: new GraphQLNonNull(Color.type) },
     titleBarBackgroundColor: { type: Color.type },

@@ -70,7 +70,7 @@ EditableRow.normalizeJSON = json => {
 
 EditableRow.fields = {
 	...Row.fields,
-	blocks: { type: new GraphQLNonNull(new GraphQLList(EditableBlock.type)) },
+	blocks: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(EditableBlock.type))) },
     isCollapsed: { type: new GraphQLNonNull(GraphQLBoolean) },
     name: { type: new GraphQLNonNull(GraphQLString) }
 }
