@@ -15,7 +15,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	auth "github.com/roverplatform/rover/go/apis/auth/v1"
+	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
 

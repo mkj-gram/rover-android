@@ -16,5 +16,5 @@ echo $PROTO_PATH
 FILES="`find ./protos/ -name *.proto`"
 
 # note uses gofast_out of the github.com/gogo
-protoc -I ${PROTO_PATH} --go_out=plugins=grpc,$MAP:./go/apis $FILES
-protoc -I ${PROTO_PATH} --ruby_out=./ruby/apis --grpc_out=./ruby/apis --plugin=protoc-gen-grpc=`which grpc_tools_ruby_protoc_plugin` $FILES
+protoc -I ${PROTO_PATH} --go_out=plugins=grpc,$MAP:./apis/ $FILES
+protoc -I ${PROTO_PATH} --ruby_out=./apis --grpc_out=./apis/ --plugin=protoc-gen-grpc=`which grpc_tools_ruby_protoc_plugin` $FILES

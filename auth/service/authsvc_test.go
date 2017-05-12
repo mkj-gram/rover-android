@@ -22,7 +22,7 @@ import (
 	"github.com/go-test/deep"
 
 	"github.com/pressly/goose"
-	auth "github.com/roverplatform/rover/go/apis/auth/v1"
+	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	"github.com/roverplatform/rover/auth/service"
 	"github.com/roverplatform/rover/auth/service/db/postgres"
