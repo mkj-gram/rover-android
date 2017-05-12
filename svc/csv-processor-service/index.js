@@ -1,5 +1,5 @@
 const grpc = require('grpc')
-const { CsvProcessor } = require("@rover/protorepo-csv-processor-node")
+const { CsvProcessor } = require("@rover/csv-processor")
 const Config = require('./config')
 const Queue = require('bull');
 

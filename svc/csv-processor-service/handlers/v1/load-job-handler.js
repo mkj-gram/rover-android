@@ -1,4 +1,4 @@
-const { CsvProcessor } = require("@rover/protorepo-csv-processor-node")
+const { CsvProcessor } = require("@rover/csv-processor")
 const JobStatus = CsvProcessor.V1.Models.JobStatus
 const JobType = CsvProcessor.V1.Models.JobType
 
