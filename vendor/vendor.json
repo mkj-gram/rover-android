@@ -57,6 +57,12 @@
 			"revisionTime": "2017-03-24T20:46:54Z"
 		},
 		{
+			"checksumSHA1": "kTQ58DAXtXAHAjGYSj0yNnfW9k0=",
+			"path": "github.com/namsral/flag",
+			"revision": "7fa59bdb55485001d702d9b6e15367cdf26bfde8",
+			"revisionTime": "2016-12-28T15:00:38Z"
+		},
+		{
 			"checksumSHA1": "+alGamFQmcGTgPK66CpSfF4lYbk=",
 			"path": "github.com/pkg/errors",
 			"revision": "c605e284fe17294bda444b34710735b29d1a9d90",
