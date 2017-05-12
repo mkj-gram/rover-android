@@ -80,7 +80,7 @@ Row.normalizeJSON = json => {
 Row.fields = {
     ...HasBackground.fields,
     autoHeight: { type: new GraphQLNonNull(GraphQLBoolean) },
-    blocks: { type: new GraphQLNonNull(new GraphQLList(Block.type)) },
+    blocks: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Block.type))) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     height: { type: new GraphQLNonNull(Length.type) },
     id: { type: new GraphQLNonNull(GraphQLID) },

@@ -30,7 +30,7 @@ Experience.normalizeJSON = json => {
 Experience.fields = {
     id: { type: new GraphQLNonNull(GraphQLID) },
     homeScreenId: { type: new GraphQLNonNull(GraphQLString) },
-    screens: { type: new GraphQLNonNull(new GraphQLList(Screen.type)) }
+    screens: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Screen.type))) }
 }
 
 Experience.type = new GraphQLObjectType({

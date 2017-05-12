@@ -48,7 +48,7 @@ EditableScreen.fields = {
 	...Screen.fields,
 	hasUnpublishedChanges: { type: new GraphQLNonNull(GraphQLBoolean) },
     name: { type: new GraphQLNonNull(GraphQLString) },
-    rows: { type: new GraphQLNonNull(new GraphQLList(EditableRow.type)) },
+    rows: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(EditableRow.type))) },
     views: { type: new GraphQLNonNull(GraphQLInt) }
 }
 
