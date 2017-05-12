@@ -19,7 +19,7 @@ app.use('/graphql', cors(), graphqlHTTP(req => ({
     schema,
     graphiql: true,
     context: { 
-        accountToken: req.headers['x-rover-account-token'],
+        accountToken: req.headers['x-rover-account-token'] || req.query.accountToken,
         deviceId: req.headers['x-rover-device-id'],
         profileId: req.headers['x-rover-profile-id']
     }
