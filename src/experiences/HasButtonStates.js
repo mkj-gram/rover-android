@@ -1,6 +1,7 @@
 import { GraphQLInterfaceType, GraphQLNonNull } from 'graphql'
 
 import ButtonState from './ButtonState'
+import Color from './Color'
 
 const HasButtonStates = SuperClass => {
 
@@ -13,6 +14,13 @@ const HasButtonStates = SuperClass => {
                     highlighted,
                     normal,
                     selected } = props
+
+            highlighted.textColor = new Color({
+                red: highlighted.textColor.red,
+                green: highlighted.textColor.green,
+                blue: highlighted.textColor.blue,
+                alpha: highlighted.textColor.alpha * 0.5
+            })
 
             this.disabled = disabled
             this.highlighted = highlighted
