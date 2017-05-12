@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/roverplatform/rover/svc/authsvc"
+	"github.com/roverplatform/rover/auth/service"
 
 	// NOTE: this is a postgres specific implementation so blank import is justified
 	_ "github.com/lib/pq"

@@ -5,7 +5,7 @@ import (
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
-	"github.com/roverplatform/rover/svc/authsvc"
+	"github.com/roverplatform/rover/auth/service"
 )
 
 func (d *DB) GetUserById(ctx context.Context, id int) (*authsvc.User, error) {

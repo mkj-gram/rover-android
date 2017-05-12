@@ -6,8 +6,8 @@ import (
 
 	"github.com/namsral/flag"
 
-	"github.com/roverplatform/rover/svc/authsvc"
-	"github.com/roverplatform/rover/svc/authsvc/db/postgres"
+	"github.com/roverplatform/rover/auth/service"
+	"github.com/roverplatform/rover/auth/service/db/postgres"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"

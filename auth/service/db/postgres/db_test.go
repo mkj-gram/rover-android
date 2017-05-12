@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
-	"github.com/roverplatform/rover/svc/authsvc/db/postgres"
+	"github.com/roverplatform/rover/auth/service/db/postgres"
 )
 
 var (

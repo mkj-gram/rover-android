@@ -24,8 +24,8 @@ import (
 	"github.com/pressly/goose"
 	auth "github.com/roverplatform/rover/go/apis/auth/v1"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
-	"github.com/roverplatform/rover/svc/authsvc"
-	"github.com/roverplatform/rover/svc/authsvc/db/postgres"
+	"github.com/roverplatform/rover/auth/service"
+	"github.com/roverplatform/rover/auth/service/db/postgres"
 )
 
 var (
