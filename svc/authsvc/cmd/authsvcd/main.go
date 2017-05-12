@@ -15,6 +15,8 @@ import (
 )
 
 var (
+	// NOTE: environment variables are just UPPERCASED_NAMES of the flag names
+	// ie: TLS, KEY_FILE, DB_DSN, etc
 	tls      = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
 	certFile = flag.String("cert-file", "cert.pem", "The TLS cert file")
 	keyFile  = flag.String("key-file", "server.key", "The TLS key file")

@@ -6,11 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/roverplatform/rover/svc/authsvc/db/postgres"
-
-	"github.com/go-test/deep"
 )
 
 var (
@@ -36,16 +33,16 @@ func TestDB_Ping(t *testing.T) {
 	tests := []struct {
 		name    string
 		d       *postgres.DB
-		wantErr error
+		wantErr bool
 	}{
 		{
 			name: "valid connection",
 			d:    dbConnect(t, testDSN),
 		},
 		{
-			name:    "invalid connection",
+			name:    "error: invalid connection",
 			d:       dbConnect(t, "postgres://localhost:5432/?user=invaid_user&sslmode=disable"),
-			wantErr: &pq.Error{Message: `role "invaid_user" does not exist`},
+			wantErr: true,
 		},
 	}
 
@@ -53,8 +50,8 @@ func TestDB_Ping(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var err = tt.d.Ping()
 
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
-				t.Error("error:", diff)
+			if tt.wantErr && err == nil {
+				t.Error("error expected")
 			}
 		})
 	}

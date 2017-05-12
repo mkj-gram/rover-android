@@ -21,6 +21,7 @@ import (
 
 	"github.com/go-test/deep"
 
+	"github.com/pressly/goose"
 	auth "github.com/roverplatform/rover/go/apis/auth/v1"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	"github.com/roverplatform/rover/svc/authsvc"
@@ -39,7 +40,7 @@ func init() {
 
 var (
 	testDSN        = `postgres://postgres:postgres@localhost:5432/authsvc_test?sslmode=disable`
-	migrationsPath = "db/migrations/postgres"
+	migrationsPath = "./db/migrations/postgres"
 
 	// NOTE: Postgres only allows microsecond resolution: nanoseconds are zeroed for compatibility
 	// https://github.com/lib/pq/issues/227
@@ -113,6 +114,12 @@ func TestAuthsvc(t *testing.T) {
 	// makes SecretKey predictable: ie for testing generated SecretKey
 	// for session/tokens
 	// authsvc.RandRead = rand.New(rand.NewSource(1)).Read
+
+	if path := os.Getenv("TEST_MIGRATIONS"); path != "" {
+		t.Logf("Migrating: %s", path)
+		goose.Status(db.DB(), path)
+		goose.Up(db.DB(), path)
+	}
 
 	execSQL(t, db.DB(), `
 		TRUNCATE table accounts, users, user_sessions, tokens RESTART IDENTITY;
