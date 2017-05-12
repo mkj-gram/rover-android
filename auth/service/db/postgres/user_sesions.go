@@ -4,7 +4,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/pkg/errors"
-	auth "github.com/roverplatform/rover/apis/go/auth/v1"
+	auth "github.com/roverplatform/rover/apis/auth/v1"
 )
 
 func (db *DB) CreateUserSession(ctx context.Context, sess *auth.UserSession) (*auth.UserSession, error) {

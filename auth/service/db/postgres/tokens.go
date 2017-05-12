@@ -5,7 +5,7 @@ import (
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
-	auth "github.com/roverplatform/rover/apis/go/auth/v1"
+	auth "github.com/roverplatform/rover/apis/auth/v1"
 )
 
 func (db *DB) CreateTokens(ctx context.Context, tokens ...*auth.Token) error {

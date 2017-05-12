@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	auth "github.com/roverplatform/rover/apis/go/auth/v1"
+	auth "github.com/roverplatform/rover/apis/auth/v1"
 )
 
 // Backend interface declares domain specific methods
