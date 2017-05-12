@@ -8,8 +8,8 @@ import (
 	"github.com/roverplatform/rover/auth/service"
 )
 
-func (d *DB) GetUserById(ctx context.Context, id int) (*authsvc.User, error) {
-	var usr authsvc.User
+func (d *DB) GetUserById(ctx context.Context, id int) (*service.User, error) {
+	var usr service.User
 
 	err := d.db.QueryRowContext(ctx, `
 		SELECT 
@@ -33,8 +33,8 @@ func (d *DB) GetUserById(ctx context.Context, id int) (*authsvc.User, error) {
 	return &usr, nil
 }
 
-func (db *DB) FindUserByEmail(ctx context.Context, email string) (*authsvc.User, error) {
-	var usr authsvc.User
+func (db *DB) FindUserByEmail(ctx context.Context, email string) (*service.User, error) {
+	var usr service.User
 
 	err := db.db.QueryRowContext(ctx, `
 		SELECT
@@ -59,7 +59,7 @@ func (db *DB) FindUserByEmail(ctx context.Context, email string) (*authsvc.User,
 	return &usr, nil
 }
 
-func (db *DB) CreateUser(ctx context.Context, usr *authsvc.User) (*authsvc.User, error) {
+func (db *DB) CreateUser(ctx context.Context, usr *service.User) (*service.User, error) {
 	err := db.db.QueryRowContext(ctx, `
 		INSERT INTO users (
 				account_id, name, email,
@@ -85,7 +85,7 @@ func (db *DB) CreateUser(ctx context.Context, usr *authsvc.User) (*authsvc.User,
 	return usr, nil
 }
 
-func (db *DB) UpdateUser(ctx context.Context, usr *authsvc.User) (*authsvc.User, error) {
+func (db *DB) UpdateUser(ctx context.Context, usr *service.User) (*service.User, error) {
 	err := db.db.QueryRowContext(ctx, `
 		UPDATE users
 			SET name = $3, email = $4, password_digest = $5, updated_at = $6

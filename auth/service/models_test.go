@@ -1,4 +1,4 @@
-package authsvc
+package service
 
 import (
 	"github.com/go-test/deep"

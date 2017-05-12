@@ -13,10 +13,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// ensure DB implements authsvc.Backend
-var _ authsvc.Backend = (*DB)(nil)
+// ensure DB implements service.Backend
+var _ service.Backend = (*DB)(nil)
 
-// DB is postgres based authsvc.Backend implementation
+// DB is postgres based service.Backend implementation
 type DB struct {
 	db *sql.DB
 }

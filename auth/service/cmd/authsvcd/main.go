@@ -55,7 +55,7 @@ func main() {
 		grpclog.Fatalln("db:ping:", err)
 	}
 
-	authsvc.Register(srv, &authsvc.Server{DB: db})
+	service.Register(srv, &service.Server{DB: db})
 
 	if err := srv.Serve(lis); err != nil {
 		grpclog.Println("server.Serve:", err)

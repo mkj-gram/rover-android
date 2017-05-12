@@ -1,6 +1,6 @@
 // +build integration
 
-package authsvc_test
+package service_test
 
 import (
 	"database/sql"
@@ -23,13 +23,13 @@ import (
 
 	"github.com/pressly/goose"
 	auth "github.com/roverplatform/rover/apis/auth/v1"
-	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	"github.com/roverplatform/rover/auth/service"
 	"github.com/roverplatform/rover/auth/service/db/postgres"
+	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
 
 var (
-	_ authsvc.Backend = (*postgres.DB)(nil)
+	_ service.Backend = (*postgres.DB)(nil)
 )
 
 func init() {
@@ -103,17 +103,17 @@ func readFile(t *testing.T, path string) []byte {
 func TestAuthsvc(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 
-	authsvc.TimeNow = func() time.Time {
+	service.TimeNow = func() time.Time {
 		return createdAt
 	}
 
 	// override password hasher for predictable hashes
-	authsvc.GenerateFromPassword = testHasher
+	service.GenerateFromPassword = testHasher
 
 	// NOTE: tests reset the seeded random source
 	// makes SecretKey predictable: ie for testing generated SecretKey
 	// for session/tokens
-	// authsvc.RandRead = rand.New(rand.NewSource(1)).Read
+	// service.RandRead = rand.New(rand.NewSource(1)).Read
 
 	if path := os.Getenv("TEST_MIGRATIONS"); path != "" {
 		t.Logf("Migrating: %s", path)
@@ -148,7 +148,7 @@ func TestAuthsvc(t *testing.T) {
 
 func testAuthsvc_CreateAccount(t *testing.T) {
 	var db = dbConnect(t, testDSN)
-	var svc = authsvc.Server{DB: db}
+	var svc = service.Server{DB: db}
 	defer db.Close()
 
 	type args struct {
@@ -206,10 +206,10 @@ func testAuthsvc_CreateAccount(t *testing.T) {
 
 func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 	var db = dbConnect(t, testDSN)
-	var svc = authsvc.Server{DB: db}
+	var svc = service.Server{DB: db}
 	defer db.Close()
 
-	authsvc.RandRead = rand.New(rand.NewSource(1)).Read
+	service.RandRead = rand.New(rand.NewSource(1)).Read
 
 	type args struct {
 		ctx context.Context
@@ -297,7 +297,7 @@ func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 func testAuthsvc_GetAccount(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 	defer db.Close()
-	var svc = authsvc.Server{DB: db}
+	var svc = service.Server{DB: db}
 
 	type args struct {
 		ctx context.Context
@@ -354,11 +354,11 @@ func testAuthsvc_GetAccount(t *testing.T) {
 func testAuthsvc_UpdateAccount(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 	defer db.Close()
-	var svc = authsvc.Server{DB: db}
+	var svc = service.Server{DB: db}
 
 	var now = time.Now().Truncate(time.Microsecond).UTC()
 
-	authsvc.TimeNow = func() time.Time {
+	service.TimeNow = func() time.Time {
 		return now
 	}
 
@@ -421,7 +421,7 @@ func testAuthsvc_UpdateAccount(t *testing.T) {
 func testAuthsvc_GetUser(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 	defer db.Close()
-	var svc = authsvc.Server{DB: db}
+	var svc = service.Server{DB: db}
 
 	type args struct {
 		ctx context.Context
@@ -493,11 +493,11 @@ func testAuthsvc_GetUser(t *testing.T) {
 func testAuthsvc_CreateUser(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 	defer db.Close()
-	var svc = authsvc.Server{
+	var svc = service.Server{
 		DB: db,
 	}
 
-	authsvc.TimeNow = func() time.Time {
+	service.TimeNow = func() time.Time {
 		return createdAt
 	}
 
@@ -508,7 +508,7 @@ func testAuthsvc_CreateUser(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *authsvc.User
+		want    *service.User
 		wantErr error
 	}{
 		{
@@ -522,7 +522,7 @@ func testAuthsvc_CreateUser(t *testing.T) {
 					Password:  "s3cR3t",
 				},
 			},
-			want: &authsvc.User{
+			want: &service.User{
 				User: auth.User{
 					Id:               3,
 					AccountId:        1,
@@ -606,7 +606,7 @@ func testAuthsvc_CreateUser(t *testing.T) {
 				t.Error(diff)
 			}
 
-			{ // also check the authsvc.User
+			{ // also check the service.User
 				got, err := db.GetUserById(tt.args.ctx, int(got.Id))
 				if err != nil {
 					t.Error("unexpected:", err)
@@ -623,11 +623,11 @@ func testAuthsvc_CreateUser(t *testing.T) {
 func testAuthsvc_UpdateUser(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 	defer db.Close()
-	var svc = authsvc.Server{
+	var svc = service.Server{
 		DB: db,
 	}
 
-	authsvc.TimeNow = func() time.Time {
+	service.TimeNow = func() time.Time {
 		return updatedAt
 	}
 
@@ -638,7 +638,7 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *authsvc.User
+		want    *service.User
 		wantErr error
 	}{
 		{
@@ -740,7 +740,7 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 				},
 			},
 
-			want: &authsvc.User{
+			want: &service.User{
 				User: auth.User{
 					Id:               1,
 					AccountId:        1,
@@ -769,7 +769,7 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 				t.Error(diff)
 			}
 
-			{ // also check the authsvc.User
+			{ // also check the service.User
 				got, err := db.GetUserById(tt.args.ctx, int(got.Id))
 				if err != nil {
 					t.Error("unexpected:", err)
@@ -786,15 +786,15 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 func testAuthsvc_CreateUserSession(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 	defer db.Close()
-	var svc = authsvc.Server{DB: db}
+	var svc = service.Server{DB: db}
 
 	var now = time.Now().Truncate(time.Microsecond).UTC()
 
-	authsvc.TimeNow = func() time.Time {
+	service.TimeNow = func() time.Time {
 		return now
 	}
 
-	authsvc.RandRead = rand.New(rand.NewSource(1)).Read
+	service.RandRead = rand.New(rand.NewSource(1)).Read
 
 	type args struct {
 		ctx context.Context
@@ -820,7 +820,7 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 			want: &auth.UserSession{
 				UserId:      3,
 				Key:         `52fdfc072182654f163f5f0f9a621d729566c74d`,
-				ExpiresAt:   ts(t, now.Add(authsvc.SessionDuration)),
+				ExpiresAt:   ts(t, now.Add(service.SessionDuration)),
 				LastSeen_IP: "2001:db8A:1234:0000:0000:0000:0000:0000",
 
 				CreatedAt: ts(t, now),
@@ -842,7 +842,7 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 			want: &auth.UserSession{
 				UserId:      3,
 				Key:         `10037c4d7bbb0407d1e2c64981855ad8681d0d86`,
-				ExpiresAt:   ts(t, now.Add(authsvc.SessionDuration)),
+				ExpiresAt:   ts(t, now.Add(service.SessionDuration)),
 				LastSeen_IP: "2001:db8A:1234:0000:0000:0000:0000:0000",
 
 				CreatedAt: ts(t, now),
@@ -864,7 +864,7 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 			want: &auth.UserSession{
 				UserId:      3,
 				Key:         `d1e91e00167939cb6694d2c422acd208a0072939`,
-				ExpiresAt:   ts(t, now.Add(authsvc.SessionDuration)),
+				ExpiresAt:   ts(t, now.Add(service.SessionDuration)),
 				LastSeen_IP: "",
 
 				CreatedAt: ts(t, now),
@@ -930,7 +930,7 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 	defer db.Close()
-	var svc = authsvc.Server{DB: db}
+	var svc = service.Server{DB: db}
 
 	var sess, err = db.FindSessionByKey(context.Background(), `SESSION1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`)
 	if err != nil {
@@ -939,7 +939,7 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 
 	var now = time.Now().Truncate(time.Microsecond).UTC()
 
-	authsvc.TimeNow = func() time.Time {
+	service.TimeNow = func() time.Time {
 		return now
 	}
 
@@ -975,7 +975,7 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 				LastSeen_IP: "127.0.0.2",
 				CreatedAt:   sess.CreatedAt,
 				UpdatedAt:   ts(t, now),
-				ExpiresAt:   ts(t, now.Add(authsvc.SessionDuration)),
+				ExpiresAt:   ts(t, now.Add(service.SessionDuration)),
 			},
 		},
 
@@ -1023,14 +1023,14 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 func testAuthsvc_AuthenticateToken(t *testing.T) {
 	var db = dbConnect(t, testDSN)
 	defer db.Close()
-	var svc = authsvc.Server{DB: db}
+	var svc = service.Server{DB: db}
 
 	var tok, err = db.FindTokenByKey(context.Background(), `token1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`)
 	if err != nil {
 		t.Fatal("unexpected:", err)
 	}
 
-	authsvc.RandRead = rand.New(rand.NewSource(1)).Read
+	service.RandRead = rand.New(rand.NewSource(1)).Read
 
 	type args struct {
 		ctx context.Context
@@ -1118,7 +1118,7 @@ func testDB_GetUserById(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *authsvc.User
+		want    *service.User
 		wantErr error
 	}{
 
@@ -1140,7 +1140,7 @@ func testDB_GetUserById(t *testing.T) {
 				2,
 			},
 
-			want: &authsvc.User{
+			want: &service.User{
 				User: auth.User{
 					Id:               2,
 					AccountId:        1,
@@ -1179,7 +1179,7 @@ func testDB_FindUserByEmail(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *authsvc.User
+		want    *service.User
 		wantErr error
 	}{
 
@@ -1199,7 +1199,7 @@ func testDB_FindUserByEmail(t *testing.T) {
 				"user2@example.com",
 			},
 
-			want: &authsvc.User{
+			want: &service.User{
 				User: auth.User{
 					Id:               2,
 					AccountId:        1,
