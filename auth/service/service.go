@@ -321,7 +321,7 @@ func (svr *Server) AuthenticateUserSession(ctx context.Context, r *auth.Authenti
 
 	expiresAt, err := timestamp.Time(sess.ExpiresAt)
 	if err != nil {
-		return nil, grpc.Errorf(codes.Internal, "UserSession.ExpiresAt: user_id=%d: %s", err)
+		return nil, grpc.Errorf(codes.Internal, "UserSession.ExpiresAt: user_id=%d: %s", sess.UserId, err)
 	}
 
 	var now = TimeNow()
