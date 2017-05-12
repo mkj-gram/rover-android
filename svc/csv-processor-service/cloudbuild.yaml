@@ -1,0 +1,7 @@
+steps:
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['install']
+  dir: 'svc/csv-processor-service'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/csv-processor-service', 'svc/csv-processor-service']
+images: ['gcr.io/$PROJECT_ID/csv-processor-service']
