@@ -1,4 +1,9 @@
-const { CsvProcessor } = require("@rover/csv-processor")
+const CsvProcessor = {
+    V1: {
+        Models: require('../../lib/csv-processor/v1/csv-processor_pb')
+    }
+}
+
 const JobStatus = CsvProcessor.V1.Models.JobStatus
 const JobType = CsvProcessor.V1.Models.JobType
 

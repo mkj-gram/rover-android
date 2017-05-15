@@ -1,7 +1,8 @@
 const grpc = require('grpc')
-const { CsvProcessor } = require("@rover/csv-processor")
 const Config = require('./config')
-const Queue = require('bull');
+const Queue = require('bull')
+const CsvProcessorService = require('./lib/csv-processor/v1/csv-processor_grpc_pb').CsvProcessorService
+
 
 const V1Handlers = require('./handlers/v1')
 
@@ -17,7 +18,7 @@ const context = {
     }
 }
 
-server.addService(CsvProcessor.V1.Server, V1Handlers.build(context))
+server.addService(CsvProcessorService, V1Handlers.build(context))
 
 server.bind(`${Config.get('/host')}:${Config.get('/port')}`, grpc.ServerCredentials.createInsecure())
 server.start()

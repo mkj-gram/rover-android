@@ -7,8 +7,7 @@ Package auth is a generated protocol buffer package.
 
 It is generated from these files:
 	auth/v1/auth.proto
-	common/v1/response.proto
-	pushy/v1/pushy.proto
+	csv-processor/v1/csv-processor.proto
 
 It has these top-level messages:
 	Token
@@ -24,37 +23,13 @@ It has these top-level messages:
 	CreateUserSessionRequest
 	AuthenticateRequest
 	AuthContext
-	OperationResult
-	Device
-	IosPlatform
-	AndroidPlatform
-	GetDeviceRequest
-	GetDeviceResponse
-	CreateDeviceRequest
-	CreateDeviceResponse
-	DeleteDeviceRequest
-	DeleteDeviceResponse
-	UpdateDeviceRequest
-	UpdateDeviceResponse
-	GetIosPlatformRequest
-	GetIosPlatformResponse
-	CreateIosPlatformRequest
-	CreateIosPlatformResponse
-	DeleteIosPlatformRequest
-	DeleteIosPlatformResponse
-	UpdateIosPlatformRequest
-	UpdateIosPlatformResponse
-	GetAndroidPlatformRequest
-	GetAndroidPlatformResponse
-	CreateAndroidPlatformRequest
-	CreateAndroidPlatformResponse
-	DeleteAndroidPlatformRequest
-	DeleteAndroidPlatformResponse
-	UpdateAndroidPlatformRequest
-	UpdateAndroidPlatformResponse
-	SendNotificationRequest
-	SendNotificationResponse
-	SendNotificationResult
+	GCSObject
+	LoadJob
+	SegmentLoadJobConfig
+	GetLoadJobRequest
+	GetLoadJobReply
+	CreateLoadJobRequest
+	CreateLoadJobReply
 */
 package auth
 
