@@ -16,10 +16,19 @@ class V1::ApplicationController < ActionController::API
     APPLICATION_DEVICE_ID_HEADER = "X-Rover-Device-Id".freeze
     EXPERIENCE_APP_USER_AGENT = /Experiences\/\d+/
 
-
-    rescue_from(ActionController::ParameterMissing) do |parameter_missing_exception|
+    unless Rails.application.config.consider_all_requests_local
+      rescue_from(ActionController::ParameterMissing) do |parameter_missing_exception|
         error = {title: "Missing Parameter", description: "#{parameter_missing_exception.param} parameter is required" , status: "400"}
         render_errors(error, status: :bad_request)
+      end
+
+      rescue_from(GRPC::BadStatus) do |exc|
+        status = exc.to_status
+        code = GRPC_CODE_TO_HTTP_CODE.fetch(status.code, 500)
+        error = { title: "Service Error", description: "we're on it...", status: code }
+        render_errors(error, status: code)
+        Rails.logger.info(%Q[GRPC::BadStatus: code=#{status.code} details="#{status.details}" meta=#{status.metadata}])
+      end
     end
 
     GRPC_CODE_TO_HTTP_CODE = {
@@ -173,6 +182,11 @@ class V1::ApplicationController < ActionController::API
     #
     # @return [type] [description]
     def authenticate_application
+      if USE_SVC
+        svc_authenticate_application
+        return
+      end
+
         account = Account.find_by_token(request.headers[APPLICATION_API_KEY_HEADER])
         if account
             @current_account = account
@@ -183,13 +197,18 @@ class V1::ApplicationController < ActionController::API
     end
 
     def authenticate_user
+      if USE_SVC
+        svc_authenticate_user
+        return
+      end
+
         browser = Browser.new(request.user_agent)
         is_mobile_device = browser.device.mobile? || ((request.user_agent =~ EXPERIENCE_APP_USER_AGENT) != nil)
 
         # this is jwt authentication method
         token = request.headers["Authorization"].split(' ').last
         session = Session.find_by_token(token)
-        
+
         if session && ( !session.expired? || is_mobile_device )
             session.track_ip_address(request.remote_ip)
             session.keep_alive
@@ -209,5 +228,59 @@ class V1::ApplicationController < ActionController::API
     end
 
 
+  def svc_authenticate_application
+    begin
+      auth, api = AUTHSVC_CLIENT, Rover::Auth::V1
+      auth_ctx = auth.authenticate_token(api::AuthenticateRequest.new(
+        key: request.headers[APPLICATION_API_KEY_HEADER],
+        last_seen_IP: request.remote_ip,
+      ))
+    rescue GRPC::Unauthenticated, GRPC::NotFound => e
+      logger.debug("#{e.class.name}: authenticate_token: #{e.message}")
+      render_unauthorized("Validation Error", "could not find token")
+      return
+    end
 
+    if (account = Account.find_by_id(auth_ctx.account_id))
+      @current_account = account
+      Raven.user_context(account_id: @current_account.id)
+    else
+      render_unauthorized("Validation Error", "account not found")
+    end
+  end
+
+  def svc_authenticate_user
+    browser = Browser.new(request.user_agent)
+    is_mobile_device = browser.device.mobile? || ((request.user_agent =~ EXPERIENCE_APP_USER_AGENT) != nil)
+
+    token = request.headers["Authorization"].split(' ').last
+
+    jwt_token = JWTToken.new(token)
+
+    if !jwt_token.verified?
+      render_unauthorized("Validation Error", "invalid token")
+      return
+    end
+
+    begin
+      auth, api = AUTHSVC_CLIENT, Rover::Auth::V1
+      auth_ctx = auth.authenticate_user_session(api::AuthenticateRequest.new(
+        key: jwt_token.read("jti"),
+        last_seen_IP: request.remote_ip,
+      ))
+    rescue GRPC::Unauthenticated, GRPC::NotFound => e
+      logger.debug("#{e.class.name}: authenticate_user_session: #{e.message}")
+      render_unauthorized("Validation Error", "could not find the current session")
+      return
+    end
+
+    session = Session.find_by_token(token)
+    if session.nil?
+      render_unauthorized("Validation Error", "could not find the current session")
+      return
+    end
+
+    @current_user = session.user
+    Raven.user_context(account_id: @current_user.account_id, user_id: @current_user.id, email: @current_user.email)
+  end
 end

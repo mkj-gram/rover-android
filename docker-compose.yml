@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  elasticsearch:
+    image: elasticsearch:2.4
+    ports:
+      - "9200:9200"
+
+  postgres:
+    image: rover/postgres
+    build:
+      context: .
+      dockerfile: docker/vendor/postgres/Dockerfile
+
+  auth-service:
+    image: golang:1.8-alpine
+    command: ./docker/auth-service/cmd test_run
+    ports:
+      - 5100:5100
+      - 5080:5080
+    volumes:
+      - ../rover:/go/src/github.com/roverplatform/rover
+    working_dir: /go/src/github.com/roverplatform/rover
+    environment:
+      CGO_ENABLED: 0
+      DB_DSN: "postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable"
+    links:
+      - postgres

@@ -4,6 +4,8 @@ FactoryGirl.define do
         email "test@rover.io"
         password "123456"
         password_confirmation "123456"
+
+        association :account, factory: :account
     end
 
     factory :different_user, class: User do
@@ -11,5 +13,7 @@ FactoryGirl.define do
         email "test2@rover.io"
         password "123456"
         password_confirmation "123456"
+
+        association :account, factory: :account
     end
 end

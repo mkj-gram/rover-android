@@ -99,6 +99,7 @@ service Auth {
     rpc GetAccount(GetAccountRequest) returns (Account) {};
     rpc CreateAccount(CreateAccountRequest) returns (Account) {};
     rpc UpdateAccount(UpdateAccountRequest) returns (Account) {};
+    rpc ListTokens(ListTokensRequest) returns (ListTokensResponse) {};
 
     /*
         Basic CRUD operations for Users
@@ -106,19 +107,22 @@ service Auth {
     rpc GetUser(GetUserRequest) returns (User) {};
     rpc CreateUser(CreateUserRequest) returns (User) {};
     rpc UpdateUser(UpdateUserRequest) returns (User) {};
+    rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Empty) {};
 
     /*
-        A user session is simple sign on using email & password based authentication to generate a new JWT token
-        A session is not stored in any db instead the token is used to map back to a user
+        A user session is simple sign on using email & password based authentication to generate a new session token
      */
     rpc CreateUserSession(CreateUserSessionRequest) returns (UserSession) {};
 
     /*
-        Checks whether the supplied token key or session key corresponds to a valid 
+        Checks whether the supplied token/user_session is valid
      */
-    rpc AuthenticateToken(AuthenticateRequest) returns(AuthContext) {} 
-    rpc AuthenticateUserSession(AuthenticateRequest) returns(AuthContext) {} 
+    rpc AuthenticateToken(AuthenticateRequest) returns(AuthContext) {};
+    rpc AuthenticateUserSession(AuthenticateRequest) returns(AuthContext) {};
 }
+
+// No response
+message Empty {};
 
 /*
     Token
@@ -139,6 +143,7 @@ message Token {
     google.protobuf.Timestamp updated_at = 6;
     google.protobuf.Timestamp created_at = 7;
 }
+
 
 /*
     Account represents customer account in the system
@@ -207,6 +212,7 @@ message GetAccountRequest {
     int32 account_id = 1;
 }
 
+
 message CreateAccountRequest {
     // The name of the account
     // All other attributes are auto generated
@@ -218,6 +224,16 @@ message UpdateAccountRequest {
 
     string name = 2;
 }
+
+
+message ListTokensRequest {
+  int32 account_id = 1;
+}
+
+message ListTokensResponse {
+  repeated Token tokens = 1;
+}
+
 
 /*
     User RPC requests & replies
@@ -242,7 +258,13 @@ message UpdateUserRequest {
 
     string name = 3;
     string email = 4;
-    string password = 5;
+}
+
+message UpdateUserPasswordRequest {
+    int32 account_id = 1;
+    int32 user_id = 2;
+
+    string password = 3;
 }
 
 /*

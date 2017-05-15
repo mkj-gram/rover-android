@@ -71,6 +71,17 @@ function deserialize_rover_auth_v1_CreateUserSessionRequest(buffer_arg) {
   return auth_v1_auth_pb.CreateUserSessionRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_auth_v1_Empty(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.Empty)) {
+    throw new Error('Expected argument of type rover.auth.v1.Empty');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_Empty(buffer_arg) {
+  return auth_v1_auth_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_auth_v1_GetAccountRequest(arg) {
   if (!(arg instanceof auth_v1_auth_pb.GetAccountRequest)) {
     throw new Error('Expected argument of type rover.auth.v1.GetAccountRequest');
@@ -93,6 +104,28 @@ function deserialize_rover_auth_v1_GetUserRequest(buffer_arg) {
   return auth_v1_auth_pb.GetUserRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_auth_v1_ListTokensRequest(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.ListTokensRequest)) {
+    throw new Error('Expected argument of type rover.auth.v1.ListTokensRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_ListTokensRequest(buffer_arg) {
+  return auth_v1_auth_pb.ListTokensRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_auth_v1_ListTokensResponse(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.ListTokensResponse)) {
+    throw new Error('Expected argument of type rover.auth.v1.ListTokensResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_ListTokensResponse(buffer_arg) {
+  return auth_v1_auth_pb.ListTokensResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_auth_v1_UpdateAccountRequest(arg) {
   if (!(arg instanceof auth_v1_auth_pb.UpdateAccountRequest)) {
     throw new Error('Expected argument of type rover.auth.v1.UpdateAccountRequest');
@@ -102,6 +135,17 @@ function serialize_rover_auth_v1_UpdateAccountRequest(arg) {
 
 function deserialize_rover_auth_v1_UpdateAccountRequest(buffer_arg) {
   return auth_v1_auth_pb.UpdateAccountRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_auth_v1_UpdateUserPasswordRequest(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.UpdateUserPasswordRequest)) {
+    throw new Error('Expected argument of type rover.auth.v1.UpdateUserPasswordRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_UpdateUserPasswordRequest(buffer_arg) {
+  return auth_v1_auth_pb.UpdateUserPasswordRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_rover_auth_v1_UpdateUserRequest(arg) {
@@ -256,6 +300,17 @@ var AuthService = exports.AuthService = {
     responseSerialize: serialize_rover_auth_v1_Account,
     responseDeserialize: deserialize_rover_auth_v1_Account,
   },
+  listTokens: {
+    path: '/rover.auth.v1.Auth/ListTokens',
+    requestStream: false,
+    responseStream: false,
+    requestType: auth_v1_auth_pb.ListTokensRequest,
+    responseType: auth_v1_auth_pb.ListTokensResponse,
+    requestSerialize: serialize_rover_auth_v1_ListTokensRequest,
+    requestDeserialize: deserialize_rover_auth_v1_ListTokensRequest,
+    responseSerialize: serialize_rover_auth_v1_ListTokensResponse,
+    responseDeserialize: deserialize_rover_auth_v1_ListTokensResponse,
+  },
   //
   // Basic CRUD operations for Users
   getUser: {
@@ -291,9 +346,19 @@ var AuthService = exports.AuthService = {
     responseSerialize: serialize_rover_auth_v1_User,
     responseDeserialize: deserialize_rover_auth_v1_User,
   },
+  updateUserPassword: {
+    path: '/rover.auth.v1.Auth/UpdateUserPassword',
+    requestStream: false,
+    responseStream: false,
+    requestType: auth_v1_auth_pb.UpdateUserPasswordRequest,
+    responseType: auth_v1_auth_pb.Empty,
+    requestSerialize: serialize_rover_auth_v1_UpdateUserPasswordRequest,
+    requestDeserialize: deserialize_rover_auth_v1_UpdateUserPasswordRequest,
+    responseSerialize: serialize_rover_auth_v1_Empty,
+    responseDeserialize: deserialize_rover_auth_v1_Empty,
+  },
   //
-  // A user session is simple sign on using email & password based authentication to generate a new JWT token
-  // A session is not stored in any db instead the token is used to map back to a user
+  // A user session is simple sign on using email & password based authentication to generate a new session token
   createUserSession: {
     path: '/rover.auth.v1.Auth/CreateUserSession',
     requestStream: false,
@@ -306,7 +371,7 @@ var AuthService = exports.AuthService = {
     responseDeserialize: deserialize_rover_auth_v1_UserSession,
   },
   //
-  // Checks whether the supplied token key or session key corresponds to a valid 
+  // Checks whether the supplied token/user_session is valid
   authenticateToken: {
     path: '/rover.auth.v1.Auth/AuthenticateToken',
     requestStream: false,

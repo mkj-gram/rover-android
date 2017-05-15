@@ -88,12 +88,12 @@ func (db *DB) CreateUser(ctx context.Context, usr *service.User) (*service.User,
 func (db *DB) UpdateUser(ctx context.Context, usr *service.User) (*service.User, error) {
 	err := db.db.QueryRowContext(ctx, `
 		UPDATE users
-			SET name = $3, email = $4, password_digest = $5, updated_at = $6
+			SET name = $3, email = $4, updated_at = $5
 			WHERE id = $1 AND account_id = $2
 			RETURNING id, permission_scopes, created_at
 	`,
 		usr.GetId(), usr.GetAccountId(),
-		usr.GetName(), usr.GetEmail(), usr.PasswordDigest, usr.UpdatedAt,
+		usr.GetName(), usr.GetEmail(), usr.UpdatedAt,
 	).
 		Scan(&usr.Id, pq.Array(&usr.PermissionScopes), &usr.CreatedAt)
 
@@ -102,5 +102,23 @@ func (db *DB) UpdateUser(ctx context.Context, usr *service.User) (*service.User,
 	}
 
 	return usr, nil
+}
 
+func (db *DB) UpdateUserPassword(ctx context.Context, up *service.UserPasswordUpdate) error {
+	err := db.db.QueryRowContext(ctx, `
+		UPDATE users
+			SET password_digest = $3, updated_at = $4
+			WHERE id = $1 AND account_id = $2
+			RETURNING id
+	`,
+		up.GetUserId(), up.GetAccountId(),
+		up.PasswordDigest, up.UpdatedAt,
+	).
+		Scan(&up.UserId)
+
+	if err != nil {
+		return errors.Wrap(err, "Scan")
+	}
+
+	return nil
 }

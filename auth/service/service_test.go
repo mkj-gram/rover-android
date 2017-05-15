@@ -4,10 +4,10 @@ package service_test
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
-	"os"
 	"sort"
 	"testing"
 	"time"
@@ -22,7 +22,7 @@ import (
 	"github.com/go-test/deep"
 
 	"github.com/pressly/goose"
-	auth "github.com/roverplatform/rover/apis/auth/v1"
+	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/auth/service"
 	"github.com/roverplatform/rover/auth/service/db/postgres"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
@@ -33,14 +33,15 @@ var (
 )
 
 func init() {
-	if dsn := os.Getenv("TEST_DSN"); dsn != "" {
-		testDSN = dsn
-	}
+	flag.StringVar(&testDSN, "service.DSN", `postgres://postgres:postgres@localhost:5432/authsvc_test?sslmode=disable`, "test DSN")
+	flag.StringVar(&migrationsPath, "service.migrations.dir", `./db/migrations/postgres`, "path to migrations")
+	flag.BoolVar(&migrationsRun, "service.migrations.run", false, "run migrations")
 }
 
 var (
-	testDSN        = `postgres://postgres:postgres@localhost:5432/authsvc_test?sslmode=disable`
-	migrationsPath = "./db/migrations/postgres"
+	testDSN        string
+	migrationsPath string
+	migrationsRun  bool
 
 	// NOTE: Postgres only allows microsecond resolution: nanoseconds are zeroed for compatibility
 	// https://github.com/lib/pq/issues/227
@@ -63,13 +64,18 @@ var testHasher = func(pass []byte) ([]byte, error) {
 	return []byte(hash), nil
 }
 
-func dbConnect(t *testing.T, dsn string) *postgres.DB {
-	db, err := postgres.Open(dsn)
+func dbConnect(t testing.TB, dsn string) (*postgres.DB, func() error) {
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		t.Fatal("sql.Open:", err)
+	}
+
+	pdb, err := postgres.Open(db)
 	if err != nil {
 		t.Fatal("setup:", err)
 	}
 
-	return db
+	return pdb, db.Close
 }
 
 func ts(t *testing.T, ti time.Time) *timestamp.Timestamp {
@@ -101,7 +107,8 @@ func readFile(t *testing.T, path string) []byte {
 }
 
 func TestAuthsvc(t *testing.T) {
-	var db = dbConnect(t, testDSN)
+	var db, closeDB = dbConnect(t, testDSN)
+	defer closeDB()
 
 	service.TimeNow = func() time.Time {
 		return createdAt
@@ -115,10 +122,10 @@ func TestAuthsvc(t *testing.T) {
 	// for session/tokens
 	// service.RandRead = rand.New(rand.NewSource(1)).Read
 
-	if path := os.Getenv("TEST_MIGRATIONS"); path != "" {
-		t.Logf("Migrating: %s", path)
-		goose.Status(db.DB(), path)
-		goose.Up(db.DB(), path)
+	if migrationsRun {
+		t.Logf("Migrating: %s", migrationsPath)
+		goose.Status(db.DB(), migrationsPath)
+		goose.Up(db.DB(), migrationsPath)
 	}
 
 	execSQL(t, db.DB(), `
@@ -131,10 +138,12 @@ func TestAuthsvc(t *testing.T) {
 	t.Run("CreateAccount", testAuthsvc_CreateAccount)
 	t.Run("CreateAccountWithTokens", testAuthsvc_CreateAccount_DefaultTokens)
 	t.Run("UpdateAccount", testAuthsvc_UpdateAccount)
+	t.Run("ListTokens", testAuthsvc_ListTokens)
 
 	t.Run("GetUser", testAuthsvc_GetUser)
 	t.Run("CreateUser", testAuthsvc_CreateUser)
 	t.Run("UpdateUser", testAuthsvc_UpdateUser)
+	t.Run("UpdateUserPassword", testAuthsvc_UpdateUserPassword)
 
 	t.Run("CreateUserSession", testAuthsvc_CreateUserSession)
 
@@ -147,9 +156,9 @@ func TestAuthsvc(t *testing.T) {
 }
 
 func testAuthsvc_CreateAccount(t *testing.T) {
-	var db = dbConnect(t, testDSN)
+	var db, closeDB = dbConnect(t, testDSN)
 	var svc = service.Server{DB: db}
-	defer db.Close()
+	defer closeDB()
 
 	type args struct {
 		ctx context.Context
@@ -171,22 +180,23 @@ func testAuthsvc_CreateAccount(t *testing.T) {
 		},
 
 		want: &auth.Account{
-			Id:        3,
+			Id:        1001,
 			Name:      "Account2",
 			CreatedAt: ts(t, createdAt),
 			UpdatedAt: ts(t, createdAt),
 		},
-	}, {
-
-		name:    "creating an account with a duplicate name, case insensitive",
-		wantErr: grpc.Errorf(codes.Unknown, `db.CreateAccount: Scan: pq: duplicate key value violates unique constraint "accounts_name_lower_key"`),
-
-		args: args{context.Background(),
-			&auth.CreateAccountRequest{
-				Name: "accOuNT2",
-			},
-		},
 	},
+	// {
+	// NOTE: duplicate accounts names are allowed
+	// 	name:    "creating an account with a duplicate name, case insensitive",
+	// 	wantErr: grpc.Errorf(codes.Unknown, `db.CreateAccount: Scan: pq: duplicate key value violates unique constraint "accounts_name_lower_key"`),
+	//
+	// 	args: args{context.Background(),
+	// 		&auth.CreateAccountRequest{
+	// 			Name: "accOuNT2",
+	// 		},
+	// 	},
+	// },
 	}
 
 	for _, tt := range tests {
@@ -205,9 +215,9 @@ func testAuthsvc_CreateAccount(t *testing.T) {
 }
 
 func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
-	var db = dbConnect(t, testDSN)
+	var db, closeDB = dbConnect(t, testDSN)
 	var svc = service.Server{DB: db}
-	defer db.Close()
+	defer closeDB()
 
 	service.RandRead = rand.New(rand.NewSource(1)).Read
 
@@ -233,28 +243,28 @@ func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 		},
 
 		want: &auth.Account{
-			Id:        5,
+			Id:        1002,
 			Name:      "someaccount",
 			CreatedAt: ts(t, createdAt),
 			UpdatedAt: ts(t, createdAt),
 		},
 		wantTokens: []*auth.Token{
 			&auth.Token{
-				AccountId:        5,
+				AccountId:        1002,
 				Key:              "10037c4d7bbb0407d1e2c64981855ad8681d0d86",
 				PermissionScopes: []string{"sdk"},
 				CreatedAt:        ts(t, createdAt),
 				UpdatedAt:        ts(t, createdAt),
 			},
 			&auth.Token{
-				AccountId:        5,
+				AccountId:        1002,
 				Key:              "52fdfc072182654f163f5f0f9a621d729566c74d",
 				PermissionScopes: []string{"web"},
 				CreatedAt:        ts(t, createdAt),
 				UpdatedAt:        ts(t, createdAt),
 			},
 			&auth.Token{
-				AccountId:        5,
+				AccountId:        1002,
 				Key:              "d1e91e00167939cb6694d2c422acd208a0072939",
 				PermissionScopes: []string{"server"},
 				CreatedAt:        ts(t, createdAt),
@@ -294,10 +304,91 @@ func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 	}
 }
 
-func testAuthsvc_GetAccount(t *testing.T) {
-	var db = dbConnect(t, testDSN)
-	defer db.Close()
+func testAuthsvc_ListTokens(t *testing.T) {
+	var db, closeDB = dbConnect(t, testDSN)
 	var svc = service.Server{DB: db}
+	defer closeDB()
+
+	type args struct {
+		ctx context.Context
+		r   *auth.ListTokensRequest
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *auth.ListTokensResponse
+		wantErr error
+	}{
+		{
+			name: "non existing account",
+
+			args: args{context.Background(),
+				&auth.ListTokensRequest{
+					AccountId: 999,
+				},
+			},
+
+			want: &auth.ListTokensResponse{
+				Tokens: nil,
+			},
+		},
+		{
+
+			name: "account with tokens",
+
+			args: args{context.Background(),
+				&auth.ListTokensRequest{
+					AccountId: 1,
+				},
+			},
+
+			want: &auth.ListTokensResponse{
+				Tokens: []*auth.Token{
+					&auth.Token{
+						AccountId:        1,
+						Key:              "token1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+						PermissionScopes: []string{"web"},
+						CreatedAt:        ts(t, createdAt),
+						UpdatedAt:        ts(t, createdAt),
+					},
+					&auth.Token{
+						AccountId:        1,
+						Key:              "token2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+						PermissionScopes: []string{},
+						CreatedAt:        ts(t, createdAt),
+						UpdatedAt:        ts(t, createdAt),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := svc.ListTokens(tt.args.ctx, tt.args.r)
+
+			sort.Slice(got.Tokens, func(i, j int) bool {
+				return got.Tokens[i].Key < got.Tokens[j].Key
+			})
+
+			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+				t.Fatal("error:", diff)
+				return
+			}
+
+			if diff := deep.Equal(got, tt.want); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func testAuthsvc_GetAccount(t *testing.T) {
+	var db, closeDB = dbConnect(t, testDSN)
+	var svc = service.Server{DB: db}
+	defer closeDB()
 
 	type args struct {
 		ctx context.Context
@@ -352,9 +443,9 @@ func testAuthsvc_GetAccount(t *testing.T) {
 }
 
 func testAuthsvc_UpdateAccount(t *testing.T) {
-	var db = dbConnect(t, testDSN)
-	defer db.Close()
+	var db, closeDB = dbConnect(t, testDSN)
 	var svc = service.Server{DB: db}
+	defer closeDB()
 
 	var now = time.Now().Truncate(time.Microsecond).UTC()
 
@@ -419,9 +510,9 @@ func testAuthsvc_UpdateAccount(t *testing.T) {
 }
 
 func testAuthsvc_GetUser(t *testing.T) {
-	var db = dbConnect(t, testDSN)
-	defer db.Close()
+	var db, closeDB = dbConnect(t, testDSN)
 	var svc = service.Server{DB: db}
+	defer closeDB()
 
 	type args struct {
 		ctx context.Context
@@ -491,11 +582,9 @@ func testAuthsvc_GetUser(t *testing.T) {
 }
 
 func testAuthsvc_CreateUser(t *testing.T) {
-	var db = dbConnect(t, testDSN)
-	defer db.Close()
-	var svc = service.Server{
-		DB: db,
-	}
+	var db, closeDB = dbConnect(t, testDSN)
+	var svc = service.Server{DB: db}
+	defer closeDB()
 
 	service.TimeNow = func() time.Time {
 		return createdAt
@@ -524,7 +613,7 @@ func testAuthsvc_CreateUser(t *testing.T) {
 			},
 			want: &service.User{
 				User: auth.User{
-					Id:               3,
+					Id:               1001,
 					AccountId:        1,
 					Name:             "user",
 					Email:            "user@example.com",
@@ -621,11 +710,9 @@ func testAuthsvc_CreateUser(t *testing.T) {
 }
 
 func testAuthsvc_UpdateUser(t *testing.T) {
-	var db = dbConnect(t, testDSN)
-	defer db.Close()
-	var svc = service.Server{
-		DB: db,
-	}
+	var db, closeDB = dbConnect(t, testDSN)
+	var svc = service.Server{DB: db}
+	defer closeDB()
 
 	service.TimeNow = func() time.Time {
 		return updatedAt
@@ -643,20 +730,6 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 	}{
 		{
 
-			name:    "error: requires password",
-			wantErr: grpc.Errorf(codes.InvalidArgument, `validate: user_id=-1: password: is too short`),
-
-			args: args{
-				context.Background(),
-				&auth.UpdateUserRequest{
-					AccountId: 1,
-					UserId:    -1,
-					Email:     "newemail@example.com",
-				},
-			},
-		},
-		{
-
 			name:    "error: update non-existing user",
 			wantErr: grpc.Errorf(codes.NotFound, `db.UpdateUser: account_id=1 user_id=-1`),
 
@@ -666,7 +739,6 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 					AccountId: 1,
 					UserId:    -1,
 					Email:     "newemail@example.com",
-					Password:  "s3cR3t",
 				},
 			},
 		},
@@ -677,7 +749,6 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 
 			args: args{context.Background(),
 				&auth.UpdateUserRequest{
-					Password:  "s3cR3t",
 					AccountId: -1,
 					UserId:    1,
 					Email:     "newemail@example.com",
@@ -691,7 +762,6 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 
 			args: args{context.Background(),
 				&auth.UpdateUserRequest{
-					Password:  "s3cR3t",
 					AccountId: -1,
 					UserId:    -1,
 					Email:     "newemail@example.com",
@@ -705,7 +775,6 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 
 			args: args{context.Background(),
 				&auth.UpdateUserRequest{
-					Password:  "s3cR3t",
 					AccountId: 1,
 					UserId:    1,
 					Email:     "user2@example.com",
@@ -719,11 +788,34 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 
 			args: args{context.Background(),
 				&auth.UpdateUserRequest{
-					Password:  "s3cR3t",
 					AccountId: 1,
 					UserId:    1,
 					Email:     "user2@EXAmple.com",
 				},
+			},
+		},
+		{
+
+			name: "error: donesn't require password",
+			args: args{
+				context.Background(),
+				&auth.UpdateUserRequest{
+					AccountId: 1,
+					UserId:    1,
+					Email:     "newemail@example.com",
+				},
+			},
+
+			want: &service.User{
+				User: auth.User{
+					Id:               1,
+					AccountId:        1,
+					Email:            "newemail@example.com",
+					CreatedAt:        ts(t, createdAt.UTC()),
+					UpdatedAt:        ts(t, updatedAt),
+					PermissionScopes: []string{},
+				},
+				PasswordDigest: []byte("$2a$10$0tUJdIURcBTXV0KaVGexw.TBUUc8GRjuhjWsxXybIQaoQLVn/ksBa"),
 			},
 		},
 		{
@@ -735,8 +827,7 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 					AccountId: 1,
 					UserId:    1,
 
-					Password: "s3cR3t2",
-					Email:    "user1+newemail@example.com",
+					Email: "user1+newemail@example.com",
 				},
 			},
 
@@ -749,7 +840,7 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 					UpdatedAt:        ts(t, updatedAt),
 					PermissionScopes: []string{},
 				},
-				PasswordDigest: []byte("$2a$10$4z9/n/if/POObOcLw1l3yulRff96jSg.BvDCHkaW54amvtgH67fjG"),
+				PasswordDigest: []byte("$2a$10$0tUJdIURcBTXV0KaVGexw.TBUUc8GRjuhjWsxXybIQaoQLVn/ksBa"),
 			},
 		},
 	}
@@ -783,10 +874,116 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 	}
 }
 
-func testAuthsvc_CreateUserSession(t *testing.T) {
-	var db = dbConnect(t, testDSN)
-	defer db.Close()
+func testAuthsvc_UpdateUserPassword(t *testing.T) {
+	var db, closeDB = dbConnect(t, testDSN)
 	var svc = service.Server{DB: db}
+	defer closeDB()
+
+	var now = time.Now().Truncate(time.Microsecond).UTC()
+
+	service.TimeNow = func() time.Time {
+		return now
+	}
+
+	type args struct {
+		ctx context.Context
+		r   *auth.UpdateUserPasswordRequest
+	}
+	tests := []struct {
+		name     string
+		args     args
+		want     *auth.Empty
+		wantUser *service.User
+		wantErr  error
+	}{
+		{
+
+			name:    "error: update non-existing user",
+			wantErr: grpc.Errorf(codes.NotFound, `db.UpdateUserPassword: account_id=1 user_id=-1`),
+
+			args: args{
+				context.Background(),
+				&auth.UpdateUserPasswordRequest{
+					AccountId: 1,
+					UserId:    -1,
+					Password:  "s3cR3t",
+				},
+			},
+		},
+		{
+
+			name:    "error: requires valid password",
+			wantErr: grpc.Errorf(codes.InvalidArgument, `validate: user_id=1: password: is too short`),
+			args: args{
+				context.Background(),
+				&auth.UpdateUserPasswordRequest{
+					AccountId: 1,
+					UserId:    1,
+					// Password: "
+				},
+			},
+		},
+		{
+
+			name: "updates user password",
+
+			args: args{context.Background(),
+				&auth.UpdateUserPasswordRequest{
+					AccountId: 1,
+					UserId:    1,
+					Password:  "superpass",
+				},
+			},
+
+			want: new(auth.Empty),
+
+			wantUser: &service.User{
+				User: auth.User{
+					Id:               1,
+					AccountId:        1,
+					Email:            "user1+newemail@example.com",
+					CreatedAt:        ts(t, createdAt),
+					UpdatedAt:        ts(t, now),
+					PermissionScopes: []string{},
+				},
+				PasswordDigest: []byte("$2a$10$ks1VmZFoct73WZfJZyDhnuvv9gWIgGsHfiE5P9bV02PsiBlesrrey"),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := svc.UpdateUserPassword(tt.args.ctx, tt.args.r)
+
+			if err != nil || tt.wantErr != nil {
+				if diff := deep.Equal(err, tt.wantErr); diff != nil {
+					t.Error("error:", diff)
+				}
+				return
+			}
+
+			if diff := deep.Equal(got, tt.want); diff != nil {
+				t.Error(diff)
+			}
+
+			{ // also check the service.User
+				got, err := db.GetUserById(tt.args.ctx, int(tt.args.r.GetUserId()))
+				if err != nil {
+					t.Error("unexpected:", err)
+				}
+
+				if diff := deep.Equal(got, tt.wantUser); diff != nil {
+					t.Error(diff)
+				}
+			}
+		})
+	}
+}
+
+func testAuthsvc_CreateUserSession(t *testing.T) {
+	var db, closeDB = dbConnect(t, testDSN)
+	var svc = service.Server{DB: db}
+	defer closeDB()
 
 	var now = time.Now().Truncate(time.Microsecond).UTC()
 
@@ -811,7 +1008,7 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 
 			args: args{context.Background(),
 				&auth.CreateUserSessionRequest{
-					Email:       "user@EXAmple.com",
+					Email:       "user3@EXAmple.com",
 					Password:    "s3cR3t",
 					LastSeen_IP: "2001:db8A:1234:0000:0000:0000:0000:0000",
 				},
@@ -834,7 +1031,7 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 			args: args{context.Background(),
 				&auth.CreateUserSessionRequest{
 					Password:    "s3cR3t",
-					Email:       "user@example.com",
+					Email:       "user3@example.com",
 					LastSeen_IP: "2001:db8A:1234:0000:0000:0000:0000:0000",
 				},
 			},
@@ -856,7 +1053,7 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 			args: args{context.Background(),
 				&auth.CreateUserSessionRequest{
 					Password:    "s3cR3t",
-					Email:       "user@example.com",
+					Email:       "user3@example.com",
 					LastSeen_IP: "",
 				},
 			},
@@ -878,7 +1075,7 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 
 			args: args{context.Background(),
 				&auth.CreateUserSessionRequest{
-					Email:       "user@example.com",
+					Email:       "user3@example.com",
 					LastSeen_IP: "2001:db8A:1234:0000:0000:0000:0000:0000",
 				},
 			},
@@ -890,8 +1087,8 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 
 			args: args{context.Background(),
 				&auth.CreateUserSessionRequest{
-					Password:    "s3cR3t2",
-					Email:       "user@example.com",
+					Password:    "wrongone",
+					Email:       "user3@example.com",
 					LastSeen_IP: "2001:db8A:1234:0000:0000:0000:0000:0000",
 				},
 			},
@@ -928,9 +1125,9 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 }
 
 func testAuthsvc_AuthenticateUserSession(t *testing.T) {
-	var db = dbConnect(t, testDSN)
-	defer db.Close()
+	var db, closeDB = dbConnect(t, testDSN)
 	var svc = service.Server{DB: db}
+	defer closeDB()
 
 	var sess, err = db.FindSessionByKey(context.Background(), `SESSION1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`)
 	if err != nil {
@@ -1021,9 +1218,9 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 	}
 }
 func testAuthsvc_AuthenticateToken(t *testing.T) {
-	var db = dbConnect(t, testDSN)
-	defer db.Close()
+	var db, closeDB = dbConnect(t, testDSN)
 	var svc = service.Server{DB: db}
+	defer closeDB()
 
 	var tok, err = db.FindTokenByKey(context.Background(), `token1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`)
 	if err != nil {
@@ -1109,7 +1306,8 @@ func testAuthsvc_AuthenticateToken(t *testing.T) {
 }
 
 func testDB_GetUserById(t *testing.T) {
-	var db = dbConnect(t, testDSN)
+	var db, closeDB = dbConnect(t, testDSN)
+	defer closeDB()
 
 	type args struct {
 		ctx context.Context
@@ -1170,7 +1368,8 @@ func testDB_GetUserById(t *testing.T) {
 }
 
 func testDB_FindUserByEmail(t *testing.T) {
-	var db = dbConnect(t, testDSN)
+	var db, closeDB = dbConnect(t, testDSN)
+	defer closeDB()
 
 	type args struct {
 		ctx   context.Context
@@ -1229,7 +1428,8 @@ func testDB_FindUserByEmail(t *testing.T) {
 }
 
 func testDB_FindUserSessionByKey(t *testing.T) {
-	var db = dbConnect(t, testDSN)
+	var db, closeDB = dbConnect(t, testDSN)
+	defer closeDB()
 
 	type args struct {
 		ctx context.Context
@@ -1274,4 +1474,42 @@ func testDB_FindUserSessionByKey(t *testing.T) {
 			}
 		})
 	}
+}
+
+func BenchmarkService(b *testing.B) {
+
+	var (
+		db, closeDB = dbConnect(b, testDSN)
+
+		svc = service.Server{DB: db}
+		ctx = context.Background()
+	)
+
+	defer closeDB()
+
+	b.ResetTimer()
+
+	b.Run("AuthenticateToken", func(b *testing.B) {
+		for i := 0; i < b.N; i += 1 {
+			_, err := svc.AuthenticateToken(ctx, &auth.AuthenticateRequest{
+				Key:         "key",
+				LastSeen_IP: "127.0.0.1",
+			})
+			if err != nil && i == 0 {
+				b.Log("first errror:", err)
+			}
+		}
+	})
+
+	b.Run("AuthenticateUserSession", func(b *testing.B) {
+		for i := 0; i < b.N; i += 1 {
+			_, err := svc.AuthenticateUserSession(ctx, &auth.AuthenticateRequest{
+				Key:         "key",
+				LastSeen_IP: "127.0.0.1",
+			})
+			if err != nil && i == 0 {
+				b.Log("first errror:", err)
+			}
+		}
+	})
 }

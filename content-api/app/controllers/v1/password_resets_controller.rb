@@ -60,6 +60,12 @@ class V1::PasswordResetsController < V1::ApplicationController
                     render json: { errors: [{ detail: "can't be blank", source: {pointer: "data/attributes/password"}}]}, status: :unprocessable_entity
                 else
                     if @password_reset.reset_password(new_password)
+                        if USE_SVC
+                          svc_reset_password(
+                            new_password,
+                            user: @password_reset.user,
+                          )
+                        end
                         head :no_content
                     else
                         render json: { errors: V1::PasswordResetErrorSerializer.serialize(@password_reset.user.errors) }, status: :unprocessable_entity
@@ -75,6 +81,15 @@ class V1::PasswordResetsController < V1::ApplicationController
     end
 
     private
+
+    def svc_reset_password(pass, user:)
+      auth, api = AUTHSVC_CLIENT, Rover::Auth::V1
+      auth.update_user_password(api::UpdateUserPasswordRequest.new(
+        password: pass,
+        user_id: user.id,
+        account_id: user.account_id,
+      ))
+    end
 
     def password_reset_create_params(local_params)
         local_params.require(:password_resets)

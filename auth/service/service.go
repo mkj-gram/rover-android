@@ -15,7 +15,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	auth "github.com/roverplatform/rover/apis/auth/v1"
+	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
 
@@ -39,7 +39,7 @@ var (
 	TimeNow = time.Now
 
 	// EncodeToString converts binary slice to a human readable string
-	// and is used to generate session/token keys
+	// and is used to encode session/token keys
 	EncodeToString = hex.EncodeToString
 
 	// RandRead reads random bytes into the byte slice
@@ -53,7 +53,7 @@ var (
 )
 
 // SecretKey provides token/session key value.
-// It uses RandRead to obtain KeyLength bytes for secret
+// It uses RandRead to obtain KeyLength number of random bytes
 func SecretKey() ([]byte, error) {
 	var key [KeyLength]byte
 
@@ -123,11 +123,14 @@ func (svr *Server) GetAccount(ctx context.Context, r *auth.GetAccountRequest) (*
 
 	acct, err := svr.DB.GetAccount(ctx, r)
 
-	if errors.Cause(err) == sql.ErrNoRows {
-		return nil, grpc.Errorf(codes.NotFound, "db.GetAccount: account_id=%d", r.GetAccountId())
+	if err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, grpc.Errorf(codes.NotFound, "db.GetAccount: account_id=%d", r.GetAccountId())
+		}
+		return nil, grpc.Errorf(codes.Unknown, "db.GetAccount: account_id=%d", r.GetAccountId())
 	}
 
-	return acct, err
+	return acct, nil
 }
 
 // UpdateAccount implements auth.AuthServer
@@ -145,12 +148,26 @@ func (svr *Server) UpdateAccount(ctx context.Context, r *auth.UpdateAccountReque
 	)
 
 	acct, err := svr.DB.UpdateAccount(ctx, acct)
-
-	if errors.Cause(err) == sql.ErrNoRows {
-		return nil, grpc.Errorf(codes.NotFound, "db.UpdateAccount: account_id=%d", r.GetAccountId())
+	if err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, grpc.Errorf(codes.NotFound, "db.UpdateAccount: account_id=%d", r.GetAccountId())
+		}
+		return nil, grpc.Errorf(codes.Unknown, "db.UpdateAccount: account_id=%d", r.GetAccountId())
 	}
 
-	return acct, err
+	return acct, nil
+}
+
+// ListTokens implements auth.ListTokens
+func (svr *Server) ListTokens(ctx context.Context, r *auth.ListTokensRequest) (*auth.ListTokensResponse, error) {
+	toks, err := svr.DB.FindTokensByAccountId(ctx, int(r.GetAccountId()))
+	if err != nil {
+		return nil, grpc.Errorf(codes.Unknown, "db.FindTokensByAccountId: account_id=%d", r.GetAccountId())
+	}
+
+	return &auth.ListTokensResponse{
+		Tokens: toks,
+	}, nil
 }
 
 // GetUser implements auth.AuthServer
@@ -183,7 +200,7 @@ func (svr *Server) CreateUser(ctx context.Context, r *auth.CreateUserRequest) (*
 
 	passwordDigest, err := GenerateFromPassword([]byte(r.GetPassword()))
 	if err != nil {
-		return nil, grpc.Errorf(codes.Internal, `generate_digest: %s`, err)
+		return nil, grpc.Errorf(codes.Unknown, `generate_digest: %s`, err)
 	}
 
 	var (
@@ -219,17 +236,8 @@ func (svr *Server) CreateUser(ctx context.Context, r *auth.CreateUserRequest) (*
 
 // UpdateUser implements auth.AuthServer
 func (svr *Server) UpdateUser(ctx context.Context, r *auth.UpdateUserRequest) (*auth.User, error) {
-	if err := validatePassword(r.GetPassword()); err != nil {
-		return nil, grpc.Errorf(codes.InvalidArgument, `validate: user_id=%d: %v`, r.GetUserId(), err)
-	}
-
 	if err := validateEmail(r.GetEmail()); err != nil {
 		return nil, grpc.Errorf(codes.InvalidArgument, `validate: user_id=%d: %v`, r.GetUserId(), err)
-	}
-
-	passwordDigest, err := GenerateFromPassword([]byte(r.GetPassword()))
-	if err != nil {
-		return nil, grpc.Errorf(codes.Unknown, `generate_digest: %s`, err)
 	}
 
 	var (
@@ -247,11 +255,13 @@ func (svr *Server) UpdateUser(ctx context.Context, r *auth.UpdateUserRequest) (*
 				PermissionScopes: []string{"admin"},
 				UpdatedAt:        ts,
 			},
-			PasswordDigest: passwordDigest,
+			// NOTE: regular update doesn't include password
+			// see UpdateUserPassword instead
+			// PasswordDigest: passwordDigest,
 		}
 	)
 
-	usr, err = svr.DB.UpdateUser(ctx, usr)
+	usr, err := svr.DB.UpdateUser(ctx, usr)
 
 	if err != nil {
 		if errors.Cause(err) == sql.ErrNoRows {
@@ -261,8 +271,43 @@ func (svr *Server) UpdateUser(ctx context.Context, r *auth.UpdateUserRequest) (*
 		return nil, grpc.Errorf(codes.Unknown, "db.UpdateUser: account_id=%d user_id=%d: %s", r.GetAccountId(), r.GetUserId(), err)
 	}
 
-	return &usr.User, err
+	return &usr.User, nil
 }
+
+// UpdateUserPassword implements auth.AuthServer
+func (svr *Server) UpdateUserPassword(ctx context.Context, r *auth.UpdateUserPasswordRequest) (*auth.Empty, error) {
+	if err := validatePassword(r.GetPassword()); err != nil {
+		return nil, grpc.Errorf(codes.InvalidArgument, `validate: user_id=%d: %v`, r.GetUserId(), err)
+	}
+
+	passwordDigest, err := GenerateFromPassword([]byte(r.GetPassword()))
+	if err != nil {
+		return nil, grpc.Errorf(codes.Unknown, `generate_digest: %s`, err)
+	}
+
+	var (
+		now = TimeNow()
+
+		pu = UserPasswordUpdate{
+			UpdateUserPasswordRequest: r,
+
+			UpdatedAt:      now,
+			PasswordDigest: passwordDigest,
+		}
+	)
+
+	if err := svr.DB.UpdateUserPassword(ctx, &pu); err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, grpc.Errorf(codes.NotFound, "db.UpdateUserPassword: account_id=%d user_id=%d", r.GetAccountId(), r.GetUserId())
+		}
+
+		return nil, grpc.Errorf(codes.Unknown, "db.UpdateUserPassword: account_id=%d user_id=%d: %s", r.GetAccountId(), r.GetUserId(), err)
+	}
+
+	return empty, nil
+}
+
+var empty = new(auth.Empty)
 
 // CreateUserSession implements auth.AuthServer
 func (svr *Server) CreateUserSession(ctx context.Context, r *auth.CreateUserSessionRequest) (*auth.UserSession, error) {
@@ -272,7 +317,10 @@ func (svr *Server) CreateUserSession(ctx context.Context, r *auth.CreateUserSess
 
 	usr, err := svr.DB.FindUserByEmail(ctx, strings.ToLower(r.GetEmail()))
 	if err != nil {
-		return nil, grpc.Errorf(codes.NotFound, "db.FindUserByEmail")
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, grpc.Errorf(codes.NotFound, "db.FindUserByEmail")
+		}
+		return nil, grpc.Errorf(codes.Unavailable, "db.FindUserByEmail")
 	}
 
 	if err := bcrypt.CompareHashAndPassword(usr.PasswordDigest, []byte(r.Password)); err != nil {
@@ -281,7 +329,7 @@ func (svr *Server) CreateUserSession(ctx context.Context, r *auth.CreateUserSess
 
 	key, err := SecretKey()
 	if err != nil {
-		return nil, grpc.Errorf(codes.Internal, `SecretKey: %s`, err)
+		return nil, grpc.Errorf(codes.Unknown, `SecretKey: %s`, err)
 	}
 
 	var (
@@ -321,7 +369,7 @@ func (svr *Server) AuthenticateUserSession(ctx context.Context, r *auth.Authenti
 
 	expiresAt, err := timestamp.Time(sess.ExpiresAt)
 	if err != nil {
-		return nil, grpc.Errorf(codes.Internal, "UserSession.ExpiresAt: user_id=%d: %s", sess.UserId, err)
+		return nil, grpc.Errorf(codes.Unknown, "UserSession.ExpiresAt: user_id=%d: %s", sess.UserId, err)
 	}
 
 	var now = TimeNow()

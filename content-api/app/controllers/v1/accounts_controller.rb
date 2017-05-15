@@ -36,6 +36,27 @@ class V1::AccountsController < V1::ApplicationController
             }
         }
 
+        if USE_SVC
+          resp = AUTHSVC_CLIENT.list_tokens(Rover::Auth::V1::ListTokensRequest.new(
+            account_id: current_account.id,
+          ))
+
+          by_name = -> (name) {
+            ->(tok) { tok.permission_scopes&.include?(name) }
+          }
+
+          web_token = resp.tokens.find(&by_name.("web"))&.key
+          sdk_token = resp.tokens.find(&by_name.("sdk"))&.key
+          server_token = resp.tokens.find(&by_name.("server"))&.key
+
+          attrs = json["data"]["attributes"]
+          attrs.merge!(
+            "web-token" => web_token,
+            "sdk-token" => sdk_token,
+            "server-token" => server_token,
+          )
+        end
+
         estimote_integration = current_account.estimote_integrations.first
         if estimote_integration
             json["data"]["relationships"].merge!(

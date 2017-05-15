@@ -53,7 +53,14 @@ class V1::UsersController < V1::ApplicationController
 
     # PATCH/PUT /users/1
     # Non batch request
+    # This is a password/user update action
+    # password update: {"data":{"id":"80","attributes":{"email":"user@rover.io","name":"hello","password":"asfasdf","current-password":"asdfs"},"relationships":{"account":{"data":{"type":"accounts","id":"80"}}},"type":"users"}}
+    # user_update:  {"data":{"id":"80","attributes":{"email":"user@rover.io","name":"hello"},"relationships":{"account":{"data":{"type":"accounts","id":"80"}}},"type":"users"}}
     def update
+      if USE_SVC
+        svc_update
+        return
+      end
         # when updating we need to validate the user?
         json = flatten_request({single_record: true})
         local_params = user_params(json[:data])
@@ -97,6 +104,51 @@ class V1::UsersController < V1::ApplicationController
     end
 
     private
+
+    def svc_update
+      # when updating we need to validate the user?
+      json = flatten_request({single_record: true})
+      if !@user.update(user_params(json[:data]))
+        render json: {errors: V1::UserUpdateErrorSerializer.serialize(@user.errors)}, status: :unprocessable_entity
+        return
+      end
+
+      auth, api = AUTHSVC_CLIENT, Rover::Auth::V1
+      if (up = user_params(json[:data])).fetch(:current_password, "").present?
+        auth.update_user_password(api::UpdateUserPasswordRequest.new(
+          user_id: @user.id,
+          account_id: @user.account_id,
+          password: up.fetch(:password),
+        ))
+      else
+        auth.update_user(api::UpdateUserRequest.new(
+          user_id: @user.id,
+          account_id: @user.account_id,
+          name: @user.name,
+          email: @user.email,
+        ))
+      end
+
+
+      json = {
+        "data" => {
+          "type" => "users",
+          "id" => @user.id.to_s,
+          "attributes" => {
+            "name" => @user.name,
+            "email" => @user.email,
+            "current-password" => "",
+            "password" => ""
+          },
+          "relationships" => {
+            "account" => {
+              "data" => { "type" => "account", "id" => @user.account.id.to_s }
+            }
+          }
+        }
+      }
+      render json: json
+    end
 
     def set_resource
         if params[:id].to_i == current_user.id

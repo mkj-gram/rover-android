@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# export MIGRATIONS_DIR=${MIGRATIONS_DIR:-'./auth/service/db/migrations/postgres'}
+# export DB_DSN=${DB_DSN:-'postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable'}
+
+set -e
+# set -x
+
+test_run() {
+  test "$*"
+  run "$*"
+}
+
+run() {
+	go run ./auth/service/cmd/authsvcd/main.go -db-dsn=${DB_DSN}
+}
+
+test() {
+  go test -tags integration \
+    github.com/roverplatform/rover/auth/service/... \
+    -service.DSN=${DB_DSN} \
+    -service.migrations.dir=./db/migrations/postgres \
+    -service.migrations.run true
+}
+
+bench() {
+  go test -tags integration -bench . -run NONE -benchtime 10s \
+    ./auth/service/... \
+    -service.DSN=${DB_DSN}
+}
+
+
+cmd="$1"
+shift
+
+$cmd "$*" || echo "error running $cmd"

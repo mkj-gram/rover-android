@@ -2,11 +2,11 @@ require 'jwt'
 
 class JWTToken
 
-    def self.build_token(session)
+    def self.build_token(session, jti: SecureRandom.uuid)
         payload = {
             "iss" => "rover.io",
             "sub" => session.user_id,
-            "jti" => SecureRandom.uuid
+            "jti" => jti
         }
         return JWT.encode(payload, Rails.application.secrets.secret_key_base, 'HS256')
     end
