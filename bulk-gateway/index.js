@@ -17,7 +17,7 @@ const uploader = new UploaderClient({
 
 const Auth = require('./auth')
 
-const { CsvProcessor } = require("@rover/csv-processor")
+const { CsvProcessor } = require("@rover/csv-processor-client")
 const JobStatus = CsvProcessor.V1.Models.JobStatus
 
 let CsvProcessorClient = null

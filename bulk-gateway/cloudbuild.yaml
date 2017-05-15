@@ -1,7 +1,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/npm'
   args: ['install']
-  dir: 'gateways/bulk-gateway'
+  dir: 'bulk-gateway'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/bulk-gateway', 'gateways/bulk-gateway']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/bulk-gateway', 'bulk-gateway']
 images: ['gcr.io/$PROJECT_ID/bulk-gateway']

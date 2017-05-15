@@ -1,0 +1,17 @@
+{
+  "name": "@rover/csv-processor-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "./build.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "confidence": "^3.0.2",
+    "google-protobuf": "^3.3.0",
+    "grpc": "^1.3.2"
+  }
+}

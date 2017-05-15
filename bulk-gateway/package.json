@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/storage": "^0.8.0",
-    "@rover/csv-processor": "../../node/apis/csv-processor",
+    "@rover/csv-processor-client": "../csv-processor/clients/node",
     "async": "^2.1.5",
     "confidence": "^3.0.2",
     "finalhandler": "^1.0.1",
