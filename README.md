@@ -47,6 +47,14 @@ Per-project groupping, ie:
 4. `rails-app/`, `node-app` - projects
 5. `auth/` - auth related services, clients
 
+## Git Workflow
+
+The following convention is used when building in the monorepo
+1. `master` is always buildable and deployable
+2. `staging` is used as a developing branch of features
+
+When creating new features you'll create a branch off of staging. Once your build has been tested and reviewed by your peers you will then be able to merge your branch into staging. Staging is then merged by the admins into master which will trigger production builds on release day.
+
 ## Vendoring
 
 Go `vendor`ed dependencies are managed with `govendor`. Install with `cd rover/ && make dev-deps` 
