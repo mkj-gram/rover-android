@@ -22,8 +22,14 @@ Per-project groupping, ie:
           │       └── response_pb.rb
           ├── auth
           │   └── service
-          ├── gateways
-          │   └── bulk-gateway
+          │   └── clients
+          │       ├── node
+          │       ├── ruby
+          │       └── go
+          ├── bulk-gateway
+          │   └── package.json
+          ├── grapql-gateway
+          │   └── package.json
           ├── go
           │   ├── context
           │   └── protobuf
@@ -57,5 +63,5 @@ Go `vendor`ed dependencies are managed with `govendor`. Install with `cd rover/ 
 
 ```
 cd rover
-./protos/build-go
+./protos/build
 ```
