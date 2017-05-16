@@ -1,0 +1,5 @@
+development:
+    host: "rvr.co"
+
+production:
+    host: <%=ENV['ROVER_SIMULATOR_HOST']%>

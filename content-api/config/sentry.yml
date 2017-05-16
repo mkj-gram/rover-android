@@ -1,0 +1,6 @@
+test:
+    enabled: false
+development:
+    enabled: false
+production:
+    enabled: <%= ENV['SENTRY_ENABLED'].nil? ? false : ENV['SENTRY_ENABLED'] == 'true' %>
