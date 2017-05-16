@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package segment.v1;
+
+option go_package = "segment/v1;segment";
+
+import "google/protobuf/timestamp.proto";
+
+enum PushIdType {
+    ROVER = 0;
+    ALIAS = 1;
+}
+
+message StaticSegment {
+    int32 id = 1;
+    int32 account_id = 2;
+    string title = 3;
+    int64 size = 4;
+
+    google.protobuf.Timestamp updated_at = 5;
+    google.protobuf.Timestamp created_at = 6;
+}
+
+message ListStaticSegmentRequest {
+    int32 account_id = 1;
+
+    string order_by = 2;
+
+    int32 page_size = 3;
+
+    string page_token = 4;
+}
+
+message ListStaticSegmentResponse {
+    repeated StaticSegment segments = 1;
+
+    string next_page_token = 2;
+}
+
+
+message GetStaticSegmentRequest {
+    int32 id = 1;
+
+    // Optional
+    int32 account_id = 2; 
+}
+
+message GetStaticSegmentReply {
+    StaticSegment segment = 1;
+}
+
+message CreateStaticSegmentRequest {
+    int32 account_id = 1;
+    string title = 2;
+}
+
+message CreateStaticSegmentReply {
+    StaticSegment segment = 1;
+}
+
+message UpdateStaticSegmentIdsReply {
+    StaticSegment segment = 1;
+}
+
+message GetStaticSegmentPushIdsRequest {
+    int32 segment_id = 1;
+
+    // Optional
+    int32 account_id = 2;
+}
+
+message PushId {
+    string id = 1;
+    PushIdType type = 2;
+}
+
+service Segment {
+
+    rpc ListStaticSegments(ListStaticSegmentRequest) returns (ListStaticSegmentResponse) {};
+    rpc GetStaticSegment(GetStaticSegmentRequest) returns (GetStaticSegmentReply) {};
+    rpc CreateStaticSegment(CreateStaticSegmentRequest) returns (CreateStaticSegmentReply) {};
+
+    rpc UpdateStaticSegmentPushIds(stream PushId) returns (UpdateStaticSegmentIdsReply) {};
+    rpc GetStaticSegmentPushIds(GetStaticSegmentPushIdsRequest) returns (stream PushId) {}
+}
