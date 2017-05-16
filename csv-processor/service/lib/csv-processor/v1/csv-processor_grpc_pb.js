@@ -1,7 +1,6 @@
 // GENERATED CODE -- DO NOT EDIT!
 
 'use strict';
-// HELLLO
 var grpc = require('grpc');
 var csv$processor_v1_csv$processor_pb = require('../../csv-processor/v1/csv-processor_pb.js');
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');

@@ -19,8 +19,8 @@ const store = new Confidence.Store({
         },
         prefix: {
         	$filter: 'env',
-        	production: process.env.REDIS_PREFIX || 'kue',
-        	$default: 'kue'
+        	production: process.env.REDIS_PREFIX || 'bull',
+        	$default: 'bull'
         }
     }
 })
