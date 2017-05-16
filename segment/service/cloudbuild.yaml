@@ -3,5 +3,5 @@ steps:
   args: ['install']
   dir: 'segment/service'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/segment-service', 'segment/service']
-images: ['gcr.io/$PROJECT_ID/segment-service']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/segment-service:$REVISION_ID', 'segment/service']
+images: ['gcr.io/$PROJECT_ID/segment-service:$REVISION_ID']

@@ -3,5 +3,5 @@ steps:
   args: ['install']
   dir: 'csv-processor/worker'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/csv-processor-worker', 'csv-processor/worker']
-images: ['gcr.io/$PROJECT_ID/csv-processor-worker']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/csv-processor-worker:$REVISION_ID', 'csv-processor/worker']
+images: ['gcr.io/$PROJECT_ID/csv-processor-worker:$REVISION_ID']
