@@ -1,0 +1,9 @@
+.bundle
+doc/
+log/
+spec/
+tmp/
+.env
+.gitignore
+.rspec
+README.rdoc

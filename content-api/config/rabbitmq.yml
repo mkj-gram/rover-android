@@ -1,0 +1,14 @@
+development:
+    amqp: amqp://guest:guest@127.0.0.1:5672/
+    heartbeat: 10
+    pool: 5
+    ssl: false
+
+
+production:
+    amqp: <%= ENV['CLOUDAMQP_URL'] %>
+    heartbeat: 10
+    pool: <%=ENV['WEB_CONCURRENCY'] || 5 %>
+    ssl: true
+
+

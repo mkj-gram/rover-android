@@ -1,0 +1,34 @@
+# Files in the config/locales directory are used for internationalization
+# and are automatically loaded by Rails. If you want to use locales other
+# than English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t 'hello'
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t('hello') %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more, please read the Rails Internationalization guide
+# available at http://guides.rubyonrails.org/i18n.html.
+
+en:
+  validations:
+    commons:
+        email_wrong_format: "Invalid email address"
+        email_missing: "Please provide an email address"
+        subdomain_length: "must have between 3 and 63 letters"
+        subdomain_reserved_name: "cannot be a reserved name"
+        subdomain_start_end_hyphen: "cannot start or end with a hyphen"
+        subdomain_illegal_characters: "must be alphanumeric; A-Z, 0-9 or hyphen"
+  unauthorized:
+    protected: "You do not have permission to access this resource"
+    invalid_token: "Invalid token"
+    malformed_token: "Malformed token"

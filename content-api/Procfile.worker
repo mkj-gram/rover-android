@@ -1,0 +1,2 @@
+sneakers: rake sneakers:run
+fluentd: bundle exec fluentd -c $TD_AGENT_CONF_PATH --use-v1-config

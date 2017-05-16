@@ -1,0 +1,8 @@
+production:
+    planner_uri: <%= ENV['XENIO_PLANNER_URI'] || "https://planner.xenioapps.com/" %> 
+    api_base_uri: <%= ENV['XENIO_API_BASE_URI'] || "https://rover.xenioapps.com/roverdev" %> 
+    api_token: <%= ENV['XENIO_API_TOKEN'] || "Gl0PAKpEEJ2f3cbv9T70C44KVySXY9Te1wV9thjp" %>
+development:
+    planner_uri: "https://planner.xenioapps.com/"
+    api_base_uri: "https://rover.xenioapps.com/roverdev"
+    api_token: "Gl0PAKpEEJ2f3cbv9T70C44KVySXY9Te1wV9thjp"
