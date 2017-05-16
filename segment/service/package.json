@@ -1,0 +1,23 @@
+{
+  "name": "segment-service",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "./build.sh"
+  },
+  "author": "Rover Labs Inc",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.3.0",
+    "confidence": "^3.0.2",
+    "google-protobuf": "^3.3.0",
+    "grpc": "^1.2.0",
+    "pg": "^6.1.5",
+    "redis": "^2.7.1",
+    "squel": "^5.8.0",
+    "uuid": "^3.0.1",
+    "winston": "^2.3.1"
+  }
+}

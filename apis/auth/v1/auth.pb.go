@@ -7,7 +7,6 @@ Package auth is a generated protocol buffer package.
 
 It is generated from these files:
 	auth/v1/auth.proto
-	csv-processor/v1/csv-processor.proto
 
 It has these top-level messages:
 	Token
@@ -23,13 +22,6 @@ It has these top-level messages:
 	CreateUserSessionRequest
 	AuthenticateRequest
 	AuthContext
-	GCSObject
-	LoadJob
-	SegmentLoadJobConfig
-	GetLoadJobRequest
-	GetLoadJobReply
-	CreateLoadJobRequest
-	CreateLoadJobReply
 */
 package auth
 
