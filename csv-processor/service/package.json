@@ -1,11 +1,11 @@
 {
-  "name": "csv-processor",
+  "name": "csv-processor-service",
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./build.sh"
+    "preinstall": "./build.sh"
   },
   "author": "Rover Labs Inc",
   "license": "ISC",
