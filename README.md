@@ -28,7 +28,7 @@ Per-project groupping, ie:
           │       └── go
           ├── bulk-gateway
           │   └── package.json
-          ├── grapql-gateway
+          ├── graphql-gateway
           │   └── package.json
           ├── go
           │   ├── context
