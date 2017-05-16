@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package rover.csv_processor.v1;
 
+option go_package = "csv-processor/v1;csv-processor";
 
 import "google/protobuf/timestamp.proto";
 
