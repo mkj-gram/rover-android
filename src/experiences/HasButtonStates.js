@@ -43,11 +43,39 @@ HasButtonStates.normalizeJSON = json => {
         return {}
     }
 
+    const disabled = {
+        'background-content-mode': json['background-content-mode'],
+        'background-image': json['background-image'],
+        'background-scale': json['background-scale'],
+        ...states['disabled']
+    }
+
+    const highlighted = {
+        'background-content-mode': json['background-content-mode'],
+        'background-image': json['background-image'],
+        'background-scale': json['background-scale'],
+        ...states['highlighted']
+    }
+
+    const normal = {
+        'background-content-mode': json['background-content-mode'],
+        'background-image': json['background-image'],
+        'background-scale': json['background-scale'],
+        ...states['normal']
+    }
+
+    const selected = {
+        'background-content-mode': json['background-content-mode'],
+        'background-image': json['background-image'],
+        'background-scale': json['background-scale'],
+        ...states['selected']
+    }
+
     return {
-        disabled: ButtonState.fromJSON(states['disabled']),
-        highlighted: ButtonState.fromJSON(states['highlighted']),
-        normal: ButtonState.fromJSON(states['normal']),
-        selected: ButtonState.fromJSON(states['selected'])
+        disabled: ButtonState.fromJSON(disabled),
+        highlighted: ButtonState.fromJSON(highlighted),
+        normal: ButtonState.fromJSON(normal),
+        selected: ButtonState.fromJSON(selected)
     }
 }
 
