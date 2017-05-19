@@ -1,5 +1,5 @@
 # Rover monorepo
-
+[![Build Status](https://semaphoreci.com/api/v1/projects/193709d4-f320-45ec-96f0-860600b0fe48/1322273/shields_badge.svg)](https://semaphoreci.com/rover/rover)
 ## Layout
 
 Per-project groupping, ie:
