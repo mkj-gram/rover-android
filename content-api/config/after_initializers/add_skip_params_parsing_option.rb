@@ -13,14 +13,13 @@ module AddSkipParamsParsingOption
         end
     end
 
-    
 
     private
 
     def parse_formatted_parameters(env)
+       
         request = ActionDispatch::Request.new(env)
 
-        
         if skipped_paths.include?(request.request_method_symbol.upcase) && skipped_paths[request.request_method_symbol.upcase].any? {|path_matcher| (path_matcher =~ request.path) == 0}
             ::Rails.logger.info "Skipping params parsing for path #{ request.path }"
             return nil

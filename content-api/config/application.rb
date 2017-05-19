@@ -75,6 +75,10 @@ module RailsApi
         config.time_zone = 'UTC'
         config.active_record.default_timezone = :local
 
+        config.before_eager_load do
+            Dir[File.dirname(__FILE__) + '/after_initializers/*.rb'].each {|file| require file }
+        end
+
         config.middleware.insert_before 0, "Rack::Cors" do
             allow do
                 origins '*'
