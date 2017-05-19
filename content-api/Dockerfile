@@ -1,18 +1,13 @@
 FROM ruby:2.3.3
 
 WORKDIR /opt/content-api
-ADD Gemfile /opt/content-api/Gemfile
-ADD Gemfile.lock /opt/content-api/Gemfile.lock
 
-ENV GIT_AUTH_TOKEN="2722d1c1dfdadf0c9a334ae6bed003bf0f4872b6"
+ADD ./ /opt/content-api
 
-RUN bundle config --global silence_root_warning 1 \
-	&& bundle pack \
-    && bundle install --path vendor/bundle \
-    && bundle clean
-
-ADD ./ /opt/content-api/
+RUN bundle install --local --path vendor/bundle
 
 EXPOSE 80
+
+ENV BUNDLE_APP_CONFIG=/opt/content-api/.bundle
 
 CMD bundle exec puma -C config/puma.rb

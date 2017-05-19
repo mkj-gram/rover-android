@@ -1,0 +1,7 @@
+steps:
+- name: 'ruby:2.3.3'
+  args: ['bundle', 'pack', '--all']
+  dir: 'content-api'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/content-api:$REVISION_ID', 'content-api']
+images: ['gcr.io/$PROJECT_ID/content-api:$REVISION_ID']
