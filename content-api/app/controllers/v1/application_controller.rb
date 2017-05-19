@@ -36,6 +36,10 @@ class V1::ApplicationController < ActionController::API
             16 => 401
     }
 
+    def self.skip_params_parsing(paths)
+        ActionDispatch::ParamsParser.add_to_skipped_paths(paths)
+    end
+
     #
     # Authenticates a request as either an application or user.
     #
