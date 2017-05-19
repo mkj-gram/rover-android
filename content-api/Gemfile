@@ -89,8 +89,7 @@ gem 'grpc', '~> 1.2'
 gem 'rover-segment', path: "../segment/clients/ruby/", require: 'rover/segment'
 
 group :development do
-
-
+	gem 'pry', '~> 0.10.4'
 end
 
 group :test do
