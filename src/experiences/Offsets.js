@@ -1,7 +1,7 @@
 import { GraphQLNonNull, GraphQLObjectType } from 'graphql'
 import Length from './Length'
 
-class Offset {
+class Offsets {
 
 	constructor(props) {
 
@@ -21,12 +21,12 @@ class Offset {
 	}
 }
 
-Offset.fromJSON = json => {
+Offsets.fromJSON = json => {
     if (!json) {
         return null
     }
 
-    return new Offset({
+    return new Offsets({
         bottom: Length.fromJSON(json['bottom']),
         center: Length.fromJSON(json['center']),
         left: Length.fromJSON(json['left']),
@@ -36,8 +36,8 @@ Offset.fromJSON = json => {
     })
 }
 
-Offset.type = new GraphQLObjectType({
-    name: 'Offset',
+Offsets.type = new GraphQLObjectType({
+    name: 'Offsets',
     fields: {
         bottom: { type: new GraphQLNonNull(Length.type) },
         center: { type: new GraphQLNonNull(Length.type) },
@@ -48,4 +48,4 @@ Offset.type = new GraphQLObjectType({
     }
 })
 
-export default Offset
+export default Offsets
