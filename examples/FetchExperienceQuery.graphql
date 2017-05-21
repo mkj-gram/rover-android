@@ -21,6 +21,7 @@ query FetchExperience($id: ID!) {
       backgroundScale
       experienceId
       id
+      isStretchyHeaderEnabled
       rows {
         autoHeight
         backgroundColor {
@@ -57,9 +58,14 @@ query FetchExperience($id: ID!) {
             unit
           }
           id
-          inset
+          insets {
+            bottom
+            left
+            right
+            top
+          }
           horizontalAlignment
-          offset {
+          offsets {
             bottom {
               value
               unit
