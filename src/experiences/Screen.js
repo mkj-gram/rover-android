@@ -19,6 +19,7 @@ class Screen extends HasBackground(null) {
         const { autoColorStatusBar,
                 experienceId,
                 id,
+                isStretchyHeaderEnabled,
                 rows,
                 statusBarStyle,
                 statusBarColor,
@@ -32,6 +33,7 @@ class Screen extends HasBackground(null) {
 		this.autoColorStatusBar = autoColorStatusBar
         this.experienceId = experienceId
         this.id = id
+        this.isStretchyHeaderEnabled = isStretchyHeaderEnabled === undefined ? true : isStretchyHeaderEnabled
         this.rows = rows
         this.statusBarStyle = statusBarStyle
         this.statusBarColor = statusBarColor
@@ -59,6 +61,7 @@ Screen.normalizeJSON = json => {
         autoColorStatusBar: Color.fromJSON(json['status-bar-auto-color']),
         experienceId: json['experience-id'],
         id: json['id'],
+        isStretchyHeaderEnabled: json['is-stretchy-header-enabled'],
         rows: (json['rows'] || []).map(Row.fromJSON),
         statusBarStyle: json['status-bar-style'],
         statusBarColor: Color.fromJSON(json['status-bar-color']),
@@ -76,6 +79,7 @@ Screen.fields = {
     autoColorStatusBar: { type: new GraphQLNonNull(GraphQLBoolean) },
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     id: { type: new GraphQLNonNull(GraphQLID) },
+    isStretchyHeaderEnabled: { type: new GraphQLNonNull(GraphQLBoolean) },
     rows: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Row.type))) },
     statusBarStyle: { type: new GraphQLNonNull(StatusBarStyle.type) },
     statusBarColor: { type: new GraphQLNonNull(Color.type) },
