@@ -8,9 +8,9 @@ import { GraphQLBoolean,
 import BlockAction from './BlockAction'
 import GoToScreenAction from './GoToScreenAction'
 import HorizontalAlignment from './HorizontalAlignment'
-import Inset from './Inset'
+import Insets from './Insets'
 import Length from './Length'
-import Offset from './Offset'
+import Offsets from './Offsets'
 import OpenUrlAction from './OpenUrlAction'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
@@ -27,9 +27,9 @@ const Block = SuperClass => {
                     experienceId,
                     height,
                     id,
-                    inset,
+                    insets,
                     horizontalAlignment,
-                    offset,
+                    offsets,
                     opacity,
                     position,
                     rowId,
@@ -42,9 +42,9 @@ const Block = SuperClass => {
             this.experienceId = experienceId
             this.height = height
             this.id = id
-            this.inset = inset
+            this.insets = insets
             this.horizontalAlignment = horizontalAlignment
-            this.offset = offset
+            this.offsets = offsets
             this.opacity = opacity
             this.position = position
             this.rowId = rowId
@@ -83,9 +83,9 @@ Block.normalizeJSON = json => {
         experienceId: json['experience-id'],
         height: Length.fromJSON(json['height']),
         id: json['id'],
-        inset: Inset.fromJSON(json['inset']),
+        insets: Insets.fromJSON(json['inset']),
         horizontalAlignment: (json['alignment'] || {})['horizontal'],
-        offset: Offset.fromJSON(json['offset']),
+        offsets: Offsets.fromJSON(json['offset']),
         opacity: json['opacity'],
         position: json['position'],
         rowId: json['row-id'],
@@ -101,9 +101,9 @@ Block.fields = {
     experienceId: { type: new GraphQLNonNull(GraphQLID) },
     height: { type: new GraphQLNonNull(Length.type) },
     id: { type: new GraphQLNonNull(GraphQLID) },
-    inset: { type: new GraphQLNonNull(Inset.type) },
+    insets: { type: new GraphQLNonNull(Insets.type) },
     horizontalAlignment: { type: new GraphQLNonNull(HorizontalAlignment.type) },
-    offset: { type: new GraphQLNonNull(Offset.type) },
+    offsets: { type: new GraphQLNonNull(Offsets.type) },
     opacity: { type: new GraphQLNonNull(GraphQLFloat) },
     position: { type: new GraphQLNonNull(Position.type) },
     rowId: { type: new GraphQLNonNull(GraphQLID) },

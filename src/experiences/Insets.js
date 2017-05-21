@@ -3,7 +3,7 @@ import { GraphQLFloat,
 		 GraphQLNonNull, 
 		 GraphQLObjectType } from 'graphql'
 
-class Inset {
+class Insets {
 
 	constructor(props) {
 
@@ -19,12 +19,12 @@ class Inset {
 	}
 }
 
-Inset.fromJSON = json => {
-	const props = Inset.normalizeJSON(json)
-	return new Inset(props)
+Insets.fromJSON = json => {
+	const props = Insets.normalizeJSON(json)
+	return new Insets(props)
 }
 
-Inset.normalizeJSON = json => {
+Insets.normalizeJSON = json => {
 	if (!json) {
 		return {}
 	}
@@ -37,8 +37,8 @@ Inset.normalizeJSON = json => {
 	}
 }
 
-Inset.type = new GraphQLObjectType({
-    name: 'Inset',
+Insets.type = new GraphQLObjectType({
+    name: 'Insets',
     fields: {
         bottom: { type: new GraphQLNonNull(GraphQLInt) },
         left: { type: new GraphQLNonNull(GraphQLInt) },
@@ -47,4 +47,4 @@ Inset.type = new GraphQLObjectType({
     }
 })
 
-export default Inset
+export default Insets
