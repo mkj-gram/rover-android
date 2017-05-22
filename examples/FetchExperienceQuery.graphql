@@ -3,42 +3,14 @@ query FetchExperience($id: ID!) {
     id
     homeScreenId
     screens {
+      ...backgroundFields
       autoColorStatusBar
-      backgroundColor {
-        red
-        green
-        blue
-        alpha
-      }
-      backgroundImage {
-        height
-        name
-        size
-        width
-        url
-      }
-      backgroundContentMode
-      backgroundScale
       experienceId
       id
       isStretchyHeaderEnabled
       rows {
+        ...backgroundFields
         autoHeight
-        backgroundColor {
-          red
-          green
-          blue
-          alpha
-        }
-        backgroundImage {
-          height
-          name
-          size
-          width
-          url
-        }
-        backgroundContentMode
-        backgroundScale
         blocks {
           __typename
           action {
@@ -117,6 +89,7 @@ query FetchExperience($id: ID!) {
           ... on HasImage {
             image {
               height
+              isURLOptimizationEnabled
               name
               size
               width
@@ -198,6 +171,7 @@ fragment backgroundFields on HasBackground {
   backgroundContentMode
   backgroundImage {
     height
+    isURLOptimizationEnabled
     name
     size
     width
