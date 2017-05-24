@@ -2,3 +2,4 @@
 node_modules
 content-api/vendor
 .bundle
+auth/clients/node/lib
