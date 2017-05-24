@@ -53,10 +53,8 @@ class XenioZone < ActiveRecord::Base
 
     belongs_to :account, counter_cache: :searchable_xenio_zones_count
     
-    before_create :add_default_name_tag
-
     before_save :ensure_non_null_tags
-    after_save :update_active_tags
+
 
     def as_indexed_json(opts = {})
         {
@@ -68,24 +66,9 @@ class XenioZone < ActiveRecord::Base
 
     private
 
-    def add_default_name_tag
-        if self.name
-            self.tags = (( self.tags || []) + [ self.name ]).uniq
-        end
-    end
 
     def ensure_non_null_tags
         self.tags = [] if self.tags.nil?
-    end
-
-    def update_active_tags
-        if self.changes.include?(:tags)
-            previous_tags = (tags_was || [])
-            uniq_tags = (tags || []).uniq
-            old_tags = previous_tags - uniq_tags
-            new_tags = uniq_tags - previous_tags
-            XenioZoneActiveTag.update_tags(self.account_id, old_tags, new_tags)
-        end
     end
 
 end
