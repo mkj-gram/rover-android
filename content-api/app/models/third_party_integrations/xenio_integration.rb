@@ -76,8 +76,12 @@ class XenioIntegration < ThirdPartyIntegration
         ############################# 
         #        Xenio Zones        #
         ############################# 
+        zone_tags = Set.new()
 
         zones = client.zones
+        # Auto add zone name to tags
+        zones.each{|zone| zone.tags = ((zone.tags || []) + [ zone.name ]).uniq }
+
         current_zones = XenioZone.where(xenio_id: zones.map(&:id), account_id: self.account_id).all
 
         indexed_current_zones = current_zones.index_by(&:xenio_id)
@@ -93,17 +97,22 @@ class XenioIntegration < ThirdPartyIntegration
                              current_zone.tags = matched_zone.tags
                              current_zone.place_id = matched_zone.place_id
                              current_zone
-        end).delete_if{|current_zone| !current_zone.changed? }
+        end).select{|zone| zone.changes.any? }
 
-        # zones which no longer exists
-        deleted_ids = Set.new(indexed_current_zones.keys - indexed_zones.keys)
-
-        deleted_zones = current_zones.select{ |current_zone| deleted_ids.include?(current_zone.id) }
+        deleted_zones = XenioZone.where(account_id: self.account_id).where.not(xenio_id: zones.map(&:id))
 
 
         new_zones.each(&:save)
         updated_zones.each(&:save)
         deleted_zones.each(&:destroy)
+
+        new_zones.each {|zone| zone.tags.each{ |tag| zone_tags.add(tag) } }
+        updated_zones.each {|zone| zone.tags.each { |tag| zone_tags.add(tag) } }
+        (current_zones  - updated_zones).each{|zone| zone.tags.each { |tag| zone_tags.add(tag) } }
+
+        if self.account.xenio_zone_active_tag
+            self.account.xenio_zone_active_tag.update(tags: zone_tags.to_a)
+        end
 
         stats[:added_zones_count] = new_zones.size
         stats[:updated_zones_count] = updated_zones.size
@@ -114,7 +123,12 @@ class XenioIntegration < ThirdPartyIntegration
         #       Xenio Places        #
         ############################# 
 
+        place_tags = Set.new
+
         places = client.places
+        # Auto add place name to set of tags
+        places.each{|place| place.tags = ((place.tags || []) + [place.name]).uniq }
+
         current_places = XenioPlace.where(xenio_id: places.map(&:id), account_id: self.account_id).all
 
         indexed_current_places = current_places.index_by(&:xenio_id)
@@ -129,17 +143,23 @@ class XenioIntegration < ThirdPartyIntegration
             current_place.name = matched_place.name
             current_place.tags = matched_place.tags
             current_place
-        end).delete_if{|current_place| !current_place.changed? }
+        end).select{|place| place.changes.any? }
 
-        # places which no longer exists
-        deleted_ids = Set.new(indexed_current_places.keys - indexed_places.keys)
-
-        deleted_places = current_places.select{ |current_place| deleted_ids.include?(current_place.id) }
-
+        deleted_places = XenioPlace.where(account_id: self.account_id).where.not(xenio_id: places.map(&:id))
 
         new_places.each(&:save)
         updated_places.each(&:save)
         deleted_places.each(&:destroy)
+
+
+        new_places.each {|place| place.tags.each{ |tag| place_tags.add(tag) } }
+        updated_places.each {|place| place.tags.each { |tag| place_tags.add(tag) } }
+        (current_places - updated_places).each {|place| place.tags.each { |tag| place_tags.add(tag) } }
+
+        if self.account.xenio_place_active_tag
+            self.account.xenio_place_active_tag.update(tags: place_tags.to_a)
+        end
+
 
         stats[:added_places_count] = new_places.size
         stats[:updated_places_count] = updated_places.size
@@ -153,10 +173,16 @@ class XenioIntegration < ThirdPartyIntegration
     private
 
     def remove_xenio_zones
+        if self.account.xenio_zone_active_tag
+            self.account.xenio_zone_active_tag.update(tags: [])
+        end
         xenio_zones.destroy_all
     end
 
     def remove_xenio_places
+        if self.account.xenio_place_active_tag
+            self.account.xenio_place_active_tag.update(tags: [])
+        end
         xenio_places.destroy_all
     end
 end

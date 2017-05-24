@@ -1,7 +1,7 @@
 module XenioApi
     class Place
 
-        attr_reader :id, :name, :tags
+        attr_accessor :id, :name, :tags
 
         def initialize(opts)
             @id = opts["placeid"]

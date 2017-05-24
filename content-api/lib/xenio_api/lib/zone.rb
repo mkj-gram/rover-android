@@ -1,7 +1,7 @@
 module XenioApi
     class Zone
 
-        attr_reader :id, :name, :place_id, :tags
+        attr_accessor :id, :name, :place_id, :tags
 
         def initialize(opts)
             @id = opts["zoneid"]
