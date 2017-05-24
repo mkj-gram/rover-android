@@ -18,7 +18,7 @@ end
 defaults = {
     ssl: false,
     connect_timeout: 10,
-    socket_timeout: 5,
+    socket_timeout: 30,
     max_pool_size: 5,
     min_pool_size: 1,
     wait_queue_timeout: 5,
