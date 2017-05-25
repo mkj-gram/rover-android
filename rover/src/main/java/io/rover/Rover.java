@@ -592,7 +592,7 @@ public class Rover implements EventSubmitTask.Callback {
         mSharedInstance.sendEvent(event);
     }
 
-    static void didOpenNotificationWithMessage(final io.rover.model.Message message) {
+    public static void didOpenNotificationWithMessage(final io.rover.model.Message message) {
 
         didOpenMessage(message);
 
@@ -608,7 +608,7 @@ public class Rover implements EventSubmitTask.Callback {
         }
     }
 
-    static void didDeleteNotificationWithMessage(final io.rover.model.Message message) {
+    public static void didDeleteNotificationWithMessage(final io.rover.model.Message message) {
         for (final RoverObserver observer : Rover.mSharedInstance.mObservers) {
             if (observer instanceof RoverObserver.NotificationInteractionObserver) {
                 mSharedInstance.mMainHandler.post(new Runnable() {
@@ -621,7 +621,7 @@ public class Rover implements EventSubmitTask.Callback {
         }
     }
 
-    static void didOpenMessage(final io.rover.model.Message message) {
+    public static void didOpenMessage(final io.rover.model.Message message) {
         MessageOpenEvent openEvent = new MessageOpenEvent(message, MessageOpenEvent.Source.Inbox, new Date());
         submitEvent(openEvent);
     }
