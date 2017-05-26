@@ -30,9 +30,14 @@ const Select = ({ isDisabled, style, children, ...rest }) => {
     if (isDisabled) {
         style.opacity = 0.5
     }
+    
+    const focusedBorderColor = style.focusedBorderColor || style.borderColor
+    
+    const onFocus = e => e.target.style.borderColor = focusedBorderColor
+    const onBlur = e => e.target.style.borderColor = style.borderColor
 
     return (
-        <select disabled={isDisabled} style={style} {...rest}>{children}</select>
+        <select onFocus={onFocus} onBlur={onBlur} disabled={isDisabled} style={style} {...rest}>{children}</select>
     )
 }
 

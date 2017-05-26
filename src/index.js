@@ -4,8 +4,11 @@ import Anchor from './Anchor'
 import AppSwitcher from './AppSwitcher'
 import Breadcrumbs from './Breadcrumbs'
 import Button from './Button'
+import DatePicker from './DatePicker'
+import IconButton from './IconButton'
 import LoadingIndicator from './LoadingIndicator'
 import Modal from './Modal'
+import ModalWithHeader from './ModalWithHeader'
 import NavBar from './NavBar'
 import NewButton from './NewButton'
 import NewPopover from './NewPopover'
@@ -45,7 +48,9 @@ import { flexContainer, scrollContainer } from './styles/layout'
 import {
     charcoal,
     graphite,
+    slate,
     onyx,
+    ash,
     steel,
     silver,
     chalice,
@@ -63,6 +68,7 @@ import {
     purple,
     violet,
     lavender,
+    orchid,
     rgba,
     hexa
 } from './styles/colors'
@@ -86,8 +92,11 @@ export {
     AppSwitcher,
     Breadcrumbs,
     Button,
+    DatePicker,
+    IconButton,
     LoadingIndicator,
     Modal,
+    ModalWithHeader,
     NavBar,
     NewButton,
     NewPopover,
@@ -119,7 +128,9 @@ export {
     scrollContainer,
     charcoal,
     graphite,
+    slate,
     onyx,
+    ash,
     steel,
     silver,
     chalice,
@@ -137,6 +148,7 @@ export {
     purple,
     violet,
     lavender,
+    orchid,
     rgba,
     hexa,
     text,

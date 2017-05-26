@@ -2,9 +2,13 @@
 
 export const charcoal = '#323232'
 
-export const graphite = '#5D5D5D'
+export const graphite = '#5C5D5C'
 
 export const onyx = '#434343'
+
+export const slate = '#4c4c4c'
+
+export const ash = '#6f6f6f'
 
 export const steel = '#818181'
 
@@ -41,6 +45,8 @@ export const purple = '#8357D6'
 export const violet = '#A270ff'
 
 export const lavender = '#D8C4ff'
+
+export const orchid = '#AE83FF'
 
 export const rgba = ({ red, green, blue, alpha }) => {
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`

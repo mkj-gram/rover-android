@@ -4,8 +4,17 @@ import Anchor from './Anchor'
 
 import { cloud, silver, steel } from './styles/colors'
 
-const Button = ({ primaryColor, type, isDisabled, isLoading, style, children, onClick, ...rest }) => {
-
+const Button = ({
+    primaryColor,
+    hoverColor,
+    type,
+    isDisabled,
+    isLoading,
+    style,
+    children,
+    onClick,
+    ...rest
+}) => {
     let { loadingIndicator: loadingIndicatorStyle, ...anchorStyle } = style
 
     anchorStyle = {
@@ -41,16 +50,41 @@ const Button = ({ primaryColor, type, isDisabled, isLoading, style, children, on
                 anchorStyle.color = silver
         }
     }
-    
+
+    const onMouseOver = e => {
+        const backgroundColor = type === 'primary'
+            ? hoverColor || primaryColor
+            : 'rgba(0, 0, 0, 0.0)'
+        const textColor = type === 'cancel'
+            ? hoverColor || primaryColor
+            : 'white'
+
+        e.target.style.backgroundColor = backgroundColor
+        e.target.style.color = textColor
+    }
+
+    const onMouseOut = e => {
+        type === 'primary'
+            ? (e.target.style.backgroundColor = primaryColor)
+            : (e.target.style.color = primaryColor)
+    }
+
     let loadingIndicator
     if (isLoading) {
         anchorStyle.position = 'relative'
         anchorStyle.color = 'rgba(0, 0, 0, 0.0)'
-        loadingIndicator = <div style={loadingIndicatorStyle}></div>
+        loadingIndicator = <div style={loadingIndicatorStyle} />
     }
 
     return (
-        <Anchor style={anchorStyle} isDisabled={isLoading || isDisabled} onClick={onClick} {...rest}>
+        <Anchor
+            style={anchorStyle}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
+            isDisabled={isLoading || isDisabled}
+            onClick={onClick}
+            {...rest}
+        >
             {children}
             {loadingIndicator}
         </Anchor>
@@ -59,6 +93,7 @@ const Button = ({ primaryColor, type, isDisabled, isLoading, style, children, on
 
 Button.defaultProps = {
     primaryColor: 'tomato',
+    hoverColor: null,
     style: {},
     onClick: () => null
 }
@@ -74,7 +109,7 @@ Button.defaultStyles = {
         lineHeight: '40px',
         outline: 'none',
         padding: '0 20px',
-        textAlign: 'center',
+        textAlign: 'center'
     },
     loadingIndicator: {
         borderRadius: '50%',
@@ -87,7 +122,7 @@ Button.defaultStyles = {
         marginLeft: -8,
         position: 'absolute',
         top: '50%',
-        width: 16,
+        width: 16
     }
 }
 

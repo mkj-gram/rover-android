@@ -9,6 +9,7 @@ export default ({
     onRequestClose,
     closeTimeoutMS,
     style = {},
+    hoverStyle = null,
     children
 }) => {
 
@@ -48,6 +49,7 @@ export default ({
                     right: 10,
                     zIndex: 1
                 }}
+                hoverStyle={hoverStyle}
             />
             {children}
         </Modal>
