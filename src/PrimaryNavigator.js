@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { text, semibold, large } from './styles/typography'
 import { HomeIcon } from '@rover/react-icons'
 

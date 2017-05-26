@@ -1,4 +1,5 @@
-import React, { Component, Children, PropTypes, cloneElement } from 'react'
+import React, { Component, Children, cloneElement } from 'react'
+import PropTypes from 'prop-types'
 
 import { slashes } from '../styles/backgrounds'
 import { cloud, hexa, silver, steel, titanium } from '../styles/colors'
