@@ -36,7 +36,7 @@ function traverse(currentpath, dir) {
 
     const jsFiles = getJsFiles(currentpath)
 
-    if (jsFiles.length == 0) {
+    if (jsFiles.length == 0 || currentpath == __dirname) {
         return glob
     }
 
@@ -52,12 +52,12 @@ function traverse(currentpath, dir) {
             type = "Models"
         }
 
-        glob[type] = Object.assign(glob[type], require("./" + path.join(currentpath, jsFile)))
+        glob[type] = Object.assign(glob[type], require(path.join(currentpath, jsFile)))
     })
 
     return glob
 }
 
-const definitions = traverse('.', '.')
+const definitions = traverse(__dirname, __dirname)
 
 module.exports = definitions
