@@ -1,5 +1,6 @@
-const services = require('./lib/auth/v1/auth_grpc_pb')
-const V1Models = require('./lib/auth/v1/auth_pb')
+const RoverApis = require("@rover/apis")
+const V1Models = RoverApis.auth.v1.Models
+const Client = RoverApis.auth.v1.Services.AuthClient
 const grpc = require('grpc')
 const Config = require('./config')
 const IPParse = require("@rover-common/ip-parse")
@@ -18,7 +19,7 @@ const newClient = function(opts) {
 
     console.info("Auth new Client: " + connection)
 
-    return new services.CsvProcessorClient(connection, grpc.credentials.createInsecure())
+    return new Client(connection, grpc.credentials.createInsecure())
 }
 
 
@@ -66,11 +67,8 @@ const Middleware = function(client, opts = {}) {
 
 
 module.exports = {
-    Auth: {
-        V1: {
-            Client: newClient,
-            Middleware: Middleware, 
-            Models: Object.assign( {}, V1Models, require('google-protobuf/google/protobuf/timestamp_pb.js'))
-        }
+    v1: {
+        Client: newClient,
+        Middleware: Middleware
     }
 }
