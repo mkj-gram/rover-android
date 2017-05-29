@@ -6,11 +6,11 @@ RSpec.configure do |config|
         Customer.delete_all
     end
 
-    config.around(:each) do |example|
-        DatabaseCleaner.cleaning do
-            example.run
-        end
-        Customer.delete_all
-    end
+    # config.before(:suite) do |example|
+    #     DatabaseCleaner.cleaning do
+    #         example.run
+    #     end
+    #     Customer.delete_all
+    # end
 
 end
