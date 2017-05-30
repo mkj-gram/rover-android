@@ -4,3 +4,4 @@ content-api/vendor
 .bundle
 auth/clients/node/lib/auth
 sdk-api/newrelic_agent.log
+node-phone-simulator/dist
