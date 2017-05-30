@@ -1,0 +1,43 @@
+{
+  "name": "node-phone-simulator",
+  "version": "1.1.0",
+  "description": "",
+  "engines": {
+    "node": "7.2.1"
+  },
+  "scripts": {
+    "start": "nodemon src/server --exec babel-node",
+    "watch": "webpack --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack -p && babel src -d dist",
+    "serve": "node dist/server",
+    "heroku-postbuild": "npm run build"
+  },
+  "author": "Rover Labs Inc.",
+  "license": "ISC",
+  "dependencies": {
+    "@rover/react-phone-components": "^1.4.1",
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "babel-plugin-transform-object-rest-spread": "^6.20.2",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "compression": "^1.6.2",
+    "dotenv": "^4.0.0",
+    "express": "^4.14.0",
+    "lru-cache": "^4.0.2",
+    "moment-timezone": "^0.5.13",
+    "morgan": "^1.8.1",
+    "newrelic": "^1.36.1",
+    "platform": "^1.3.4",
+    "prop-types": "^15.5.10",
+    "pug": "^2.0.0-beta6",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "request": "^2.79.0",
+    "shortid": "^2.2.8",
+    "webpack": "^2.2.0-rc.4",
+    "whatwg-fetch": "^2.0.3"
+  }
+}

@@ -1,0 +1,7 @@
+.env
+.git
+.gitignore
+Procfile
+Dockerfile
+README.md
+.DS_store
