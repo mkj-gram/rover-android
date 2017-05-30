@@ -1,0 +1,36 @@
+doctype html
+html(prefix="og: http://ogp.me/ns#")
+    head
+        title= pageTitle
+        meta(charset="utf-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        if appStoreId && host && shortUrl
+            meta(name="apple-itunes-app" content="app-id=" + appStoreId + ", app-argument=https://" + host + "/" + shortUrl)
+        meta(property="og:title" content=pageTitle)
+        meta(property="og:type" content="website")
+        meta(property="og:url" content=simulatorUrl)
+        meta(property="og:image" content=imageUrl)
+        meta(property="og:description" content=description)
+        meta(name="twitter:card" content="summary_large_image")
+        link(rel="icon" type="image/png" href="/favicon-64x64.png" sizes="64x64")
+        link(rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32")
+        link(rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16")
+
+        style(type="text/css") body,#root,html{height:100%}a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1;background:#F5F5F5}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}*,:after,:before{box-sizing:inherit}html{box-sizing:border-box}
+
+        style(type="text/css") @font-face{font-family:"San Francisco";font-weight:100;src:url(//assets.rover.io/sanfranciscodisplay-ultralight-webfont.woff)}@font-face{font-family:"San Francisco";font-weight:200;src:url(//assets.rover.io/sanfranciscodisplay-thin-webfont.woff)}@font-face{font-family:"San Francisco";font-weight:300;src:url(//assets.rover.io/sanfranciscodisplay-light-webfont.woff)}@font-face{font-family:"San Francisco";font-weight:400;src:url(//assets.rover.io/sanfranciscodisplay-regular-webfont.woff)}@font-face{font-family:"San Francisco";font-weight:500;src:url(//assets.rover.io/sanfranciscodisplay-medium-webfont.woff)}@font-face{font-family:"San Francisco";font-weight:600;src:url(//assets.rover.io/sanfranciscodisplay-semibold-webfont.woff)}@font-face{font-family:"San Francisco";font-weight:700;src:url(//assets.rover.io/sanfranciscodisplay-bold-webfont.woff)}@font-face{font-family:"San Francisco";font-weight:800;src:url(//assets.rover.io/sanfranciscodisplay-heavy-webfont.woff)}@font-face{font-family:"San Francisco";font-weight:900;src:url(//assets.rover.io/sanfranciscodisplay-black-webfont.woff)}
+
+        style(type="text/css") @keyframes slideDown{0%{transform:translateY(-6px);opacity:0}100%{transform:translateY(0);opacity:1}}@keyframes spin{to{transform:rotate(360deg);}}@keyframes open{0%{transform:translate(0,100%)}100%{transform:translate(0,0)}}@keyframes close{0%{transform:translate(0,0)}100%{transform:translate(0,100%)}}@keyframes ltr{0%{transform:translate(100%,0)}100%{transform:translate(0,0)}}@keyframes rtl{0%{transform:translate(0,0)}100%{transform:translate(100%,0)}}
+    body
+        span(style="font-family: 'San Francisco'; font-weight: 100")
+        span(style="font-family: 'San Francisco'; font-weight: 200")
+        span(style="font-family: 'San Francisco'; font-weight: 300")
+        span(style="font-family: 'San Francisco'; font-weight: 400")
+        span(style="font-family: 'San Francisco'; font-weight: 500")
+        span(style="font-family: 'San Francisco'; font-weight: 600")
+        span(style="font-family: 'San Francisco'; font-weight: 700")
+        span(style="font-family: 'San Francisco'; font-weight: 800")
+        span(style="font-family: 'San Francisco'; font-weight: 900")
+        #root!= app
+        script!= props
+        script(src="app.js")
