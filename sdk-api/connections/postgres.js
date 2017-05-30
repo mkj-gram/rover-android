@@ -6,8 +6,6 @@ const pg = require('pg').native;
 module.exports.register = function(server, connectionOptions, next) {
 
     const config = extend({ max: 10, idleTimeoutMillis: 30000 }, connectionOptions);
-
-    console.log(config)
     
     const pool = new pg.Pool(config);
 
