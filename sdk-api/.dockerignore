@@ -1,6 +1,10 @@
 build/
-node_modules/
 test/
 Dockerfile
 gulpfile.coffee
 README.md
+cloudbuild.yaml
+Gemfile
+Gemfile.lock
+Procfile
+Procfile.web

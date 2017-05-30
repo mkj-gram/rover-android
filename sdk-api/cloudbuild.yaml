@@ -1,5 +1,5 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'gcr.io/rover-production/npm:6.4.0'
   args: ['install']
   dir: 'sdk-api'
   env:
