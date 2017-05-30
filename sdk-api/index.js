@@ -60,7 +60,10 @@ const postgresConnectionOptions = {
     user: Config.get('/postgres/username'),
     password: Config.get('/postgres/password'),
     database: Config.get('/postgres/database'),
-    ssl: Config.get('/postgres/ssl')
+    ssl: {
+        sslmode: Config.get('/postgres/ssl/mode'),
+        sslcert: Config.get('/postgres/ssl/cert')
+    }
 };
 
 tasks.push(function(callback) {

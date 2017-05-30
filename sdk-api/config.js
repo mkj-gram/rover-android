@@ -1,6 +1,23 @@
 'use strict';
 
 const Confidence = require('confidence');
+const fs = require('fs');
+const path = require('path');
+
+function saveToFile(name, data) {
+    if (data === undefined) {
+        return undefined
+    }
+
+    let filename = path.join("/tmp", name)
+    fs.writeFile(filename, data, function(err) {
+        if (err) {
+            throw err
+        }
+        
+        return filename
+    })
+}
 
 const store = new Confidence.Store({
     connection: {
@@ -59,9 +76,16 @@ const store = new Confidence.Store({
             $default: 5432
         },
         ssl: {
-            $filter: 'env',
-            production: true,
-            $default: false
+            mode: {
+                $filter: 'env',
+                production: "require",
+                $default: "disable"
+            },
+            cert: {
+                $filter: 'env',
+                production: saveToFile("postgres_db_ssl.crt", process.env.POSTGRESQL_DB_SSL_CERT),
+                $default: undefined
+            }
         }
 
     },
@@ -88,7 +112,7 @@ const store = new Confidence.Store({
     raven: {
         enabled: {
             $filter: 'env',
-            production: process.env.RAVEN_ENABLED === undefined ? true : Boolean(process.env.RAVEN_ENABLED),
+            production: process.env.RAVEN_ENABLED === 'true',
             $default: false
         },
         url: {

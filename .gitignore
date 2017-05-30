@@ -3,3 +3,4 @@ node_modules
 content-api/vendor
 .bundle
 auth/clients/node/lib/auth
+sdk-api/newrelic_agent.log
