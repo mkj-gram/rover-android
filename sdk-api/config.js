@@ -59,9 +59,16 @@ const store = new Confidence.Store({
             $default: 5432
         },
         ssl: {
-            $filter: 'env',
-            production: true,
-            $default: false
+            mode: {
+                $filter: 'env',
+                production: "require",
+                $default: "disable"
+            },
+            cert: {
+                $filter: 'env',
+                production: process.env.POSTGRESQL_DB_SSL_CERT,
+                $default: undefined
+            }
         }
 
     },
@@ -88,7 +95,7 @@ const store = new Confidence.Store({
     raven: {
         enabled: {
             $filter: 'env',
-            production: process.env.RAVEN_ENABLED === undefined ? true : Boolean(process.env.RAVEN_ENABLED),
+            production: process.env.RAVEN_ENABLED === 'true',
             $default: false
         },
         url: {
