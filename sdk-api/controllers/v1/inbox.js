@@ -1,6 +1,7 @@
 'use strict';
 const util = require('util');
 const moment = require('moment');
+const AllowedScopes = ['sdk'];
 var dasherize = require('dasherize');
 const underscore = require('underscore');
 const internals = {};
@@ -28,6 +29,18 @@ internals.isStale = function(request, lastModified) {
 
 // GET /v1/inbox
 internals.get = function(request, reply) {
+
+    const currentScopes = request.auth.context.scopes;
+
+    console.log(currentScopes)
+    if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
+        reply.writeHead(403, {
+            'Content-Type': 'application/json'
+        });
+        reply.write(JSON.stringify({ status: 403, error: "Insufficient permissions" }));
+        return reply.end();
+    }
+
     // grab the current user
     const methods = request.server.methods;
     const logger = request.server.plugins.logger.logger;

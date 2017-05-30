@@ -9,6 +9,7 @@ const Joi = require('joi');
 const ipaddr = require('ipaddr.js');
 const Event = require('../../lib/event');
 const VersionRegex = /\d+\.\d+\.\d+|\d+\.\d+/;
+const AllowedScopes = ["sdk", "web", "server"]
 
 const Type = {
     STRING: 0,
@@ -213,6 +214,12 @@ internals.partialUpdateCustomerAndDevice = function(server, customer, device, ne
 // POST /v1/events
 internals.create = function(request, reply) {
     
+    const currentScopes = request.auth.context.scopes;
+
+    if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
+        return internals.writeError(reply, 403, { status: 403, error: "Insufficient permissions"})
+    }
+
     let logger = request.server.plugins.logger.logger;
 
     // parse the payload
