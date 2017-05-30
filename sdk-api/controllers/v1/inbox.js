@@ -31,8 +31,7 @@ internals.isStale = function(request, lastModified) {
 internals.get = function(request, reply) {
 
     const currentScopes = request.auth.context.scopes;
-
-    console.log(currentScopes)
+    
     if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
         reply.writeHead(403, {
             'Content-Type': 'application/json'
