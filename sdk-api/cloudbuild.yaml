@@ -1,0 +1,7 @@
+steps:
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['install']
+  dir: 'sdk-api'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID', 'sdk-api']
+images: ['gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID']
