@@ -1,6 +1,7 @@
 'use strict';
 
 const util = require('util');
+const AllowedScopes = ['sdk'];
 var dasherize = require('dasherize');
 const internals = {};
 
@@ -14,6 +15,13 @@ internals.writeError = function(reply, status, message) {
 };
 
 internals.get = function(request, reply) {
+    
+    const currentScopes = request.auth.context.scopes;
+
+    if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
+        return internals.writeError(reply, 403, { status: 403, error: "Insufficient permissions"})
+    }
+
     // gets the individual landing-page
     // TODO
     // validate the messageId being passed in

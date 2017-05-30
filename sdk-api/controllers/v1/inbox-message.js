@@ -3,6 +3,7 @@
 const Joi = require('joi');
 const util = require('util');
 const moment = require('moment');
+const AllowedScopes = ['sdk'];
 var dasherize = require('dasherize');
 const internals = {};
 
@@ -23,6 +24,13 @@ internals.writeError = function(reply, status, message) {
 };
 
 internals.beforeFilter = function(request, reply, callback) {
+    
+    const currentScopes = request.auth.context.scopes;
+
+    if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
+        return internals.writeError(reply, 403, { status: 403, error: "Insufficient permissions"})
+    }
+
     const methods = request.server.methods;
     const logger = request.server.plugins.logger.logger;
     const messageId = request.params.id;

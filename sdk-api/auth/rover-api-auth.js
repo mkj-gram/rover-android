@@ -1,7 +1,12 @@
 'use strict';
 
+
 const util = require('util');
 const TimedCache = require('../lib/timed-cache');
+
+const RoverApis = require("@rover/apis");
+const RoverAuth = require("@rover/auth-client");
+const RoverAuthClient = RoverAuth.v1.Client()
 
 const accountCache = new TimedCache();
 
@@ -17,64 +22,89 @@ internals.authenticate = function(request, callback) {
         return callback(false, "Missing credentials");
     }
 
+    // Check to see if this account is in the cache
+    
     let cachedAccount = accountCache.get(authorization);
 
     if (util.isNullOrUndefined(cachedAccount)) {
-        
-        postgres.connect((err, client, done) => {
+        const authRequest = new RoverApis.auth.v1.Models.AuthenticateRequest();
+        authRequest.setKey(authorization);
+
+        // Ask the Auth Service to authenticate the token
+        RoverAuthClient.authenticateToken(authRequest, function(err, AuthContext) {
             if (err) {
-                done();
+                console.log(err)
                 return callback(false, "Could not find credentials");
             }
+            
+            const accountId = AuthContext.getAccountId();
 
-            // Use a prepared statement to find the account
-            client.query({
-                text: 'SELECT  "accounts".* FROM "accounts" WHERE "accounts"."token" = $1 LIMIT 1',
-                values: [authorization],
-                name: 'account-by-token'
-            }, function(err, result) {
-                done();
-
+            postgres.connect((err, client, done) => {
                 if (err) {
+                    done();
                     return callback(false, "Could not find credentials");
                 }
 
-                const account = result.rows[0];
+                // Use a prepared statement to find the account
+                client.query({
+                    text: 'SELECT  "accounts".* FROM "accounts" WHERE "accounts"."id" = $1 LIMIT 1',
+                    values: [accountId],
+                    name: 'account-by-id'
+                }, function(err, result) {
+                    done();
 
-                if (account) {
-                    accountCache.set(authorization, account, 60000);
-                    request.auth = {
-                        credentials: {
-                            account: account
-                        }
-                    };
+                    if (err) {
+                        return callback(false, "Could not find account");
+                    }
 
-                    process.nextTick(function() {
-                        return callback(true);
-                    });
-                    return;
-                } else {
-                    request.auth = {
-                        credentials: {}
-                    };
-                    process.nextTick(function() {
-                        return callback(false);
-                    });
-                    return;
-                }
+                    const account = result.rows[0];
 
+                    if (account) {
+                        accountCache.set(authorization, { scopes: AuthContext.getPermissionScopesList(), account: account }, 5000);
+                        request.auth = {
+                            context: { 
+                                scopes: AuthContext.getPermissionScopesList() 
+                            },
+                            credentials: {
+                                account: account
+                            }
+                        };
+
+                        process.nextTick(function() {
+                            return callback(true);
+                        });
+                        return;
+                    } else {
+                        request.auth = {
+                            context: { 
+                                scopes: [] 
+                            },
+                            credentials: {}
+                        };
+                        
+                        return process.nextTick(function() {
+                            return callback(false);
+                        });
+                        
+                    }
+
+                });
             });
-        });
+        })
     } else {
+        // Token was previously authorized and is cached
         request.auth = {
+            context: {
+                scopes: cachedAccount.scopes
+            },
             credentials: {
-                account: cachedAccount
+                account: cachedAccount.account
             }
-        };
-        process.nextTick(function() {
-            return callback(true);
-        });
-        return;
+        }
+
+        return process.nextTick(function() {
+            return callback(true)
+        })
     }
 };
 
