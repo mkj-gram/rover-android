@@ -4,7 +4,8 @@ const httpMethods = {
     GET: "GET",
     POST: "POST",
     PATCH: "PATCH",
-    DELETE: "DELETE"
+    DELETE: "DELETE",
+    OPTIONS: "OPTIONS"
 };
 
 const notFoundError = JSON.stringify({ errors: [ { message:  "I can't find what you are looking for" } ] });
@@ -49,6 +50,8 @@ const route = function(req, res) {
     let method = req.method;
 
     res._startTime = Date.now();
+
+    res.setHeader('Access-Control-Allow-Origin', '*')
 
     res.on('finish', function() {
         const requestEndTime = Date.now();
@@ -191,6 +194,9 @@ const route = function(req, res) {
                 return notFoundResponse(req, res);
             }
         });
+    } else if(method == httpMethods.OPTIONS) {
+        res.writeHead(200)
+        return res.end()
     } else {
         return notFoundResponse(req, res);
     }
