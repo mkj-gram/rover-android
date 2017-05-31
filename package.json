@@ -1,0 +1,38 @@
+{
+  "name": "@rover/audience",
+  "version": "1.0.0",
+  "description": "Rover Audience Segmentation App",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "webpack-dev-server -d --hot --inline --port 9001",
+    "build": " rm -rf ./dist && webpack -d --inline --history-api-fallback --config webpack.config.js"
+  },
+  "author": "Rover.io",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-relay": "dev",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "css-loader": "^0.28.1",
+    "style-loader": "^0.17.0",
+    "webpack": "^2.5.1",
+    "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+    "@rover/react-bootstrap": "^1.0.0",
+    "@rover/react-icons": "^1.1.0",
+    "html-webpack-plugin": "^2.28.0",
+    "prop-types": "^15.5.10",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-relay": "dev",
+    "react-sortable-pane": "^0.5.5"
+  }
+}
