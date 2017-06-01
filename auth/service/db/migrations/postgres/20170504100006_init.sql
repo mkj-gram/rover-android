@@ -2,22 +2,23 @@
 -- SQL in section 'Up' is executed when this migration is applied
 CREATE TABLE accounts (
  id         SERIAL PRIMARY KEY
-,name       VARCHAR(128) NOT NULL
+,name       TEXT NOT NULL
 
 ,created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 ,updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
--- ensure name is case insensitively unique
-CREATE UNIQUE INDEX accounts_name_lower_key ON accounts ((lower(name)));
+-- DISABLED: -- ensure name is case insensitively unique
+-- NOTE: currently duplications are allowed
+-- CREATE UNIQUE INDEX accounts_name_lower_key ON accounts ((lower(name)));
 
 CREATE TABLE users (
  id         SERIAL PRIMARY KEY
 ,account_id integer NOT NULL REFERENCES accounts(id)
 
-,name       VARCHAR(128) NOT NULL
-,email      VARCHAR(128) NOT NULL
+,name       TEXT NOT NULL
+,email      TEXT NOT NULL
 ,password_digest VARCHAR(60) NOT NULL
-,permission_scopes varchar(50)[] NOT NULL
+,permission_scopes TEXT[] NOT NULL
 
 ,created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 ,updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
@@ -31,9 +32,9 @@ CREATE TABLE users (
 CREATE TABLE user_sessions (
  user_id integer NOT NULL REFERENCES users(id)
 
-,key        VARCHAR(40) NOT NULL
+,key        CHAR(40) NOT NULL
 
-,last_seen_IP varchar(40) NOT NULL
+,last_seen_IP VARCHAR(40) NOT NULL
 
 ,expires_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 
@@ -45,9 +46,9 @@ CREATE TABLE user_sessions (
 
 CREATE TABLE tokens (
  id         SERIAL PRIMARY KEY
-,account_id integer NOT NULL REFERENCES accounts(id)
+,account_id INTEGER NOT NULL REFERENCES accounts(id)
 ,key        VARCHAR(40) NOT NULL
-,permission_scopes varchar(50)[] NOT NULL
+,permission_scopes text[] NOT NULL
 ,created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 ,updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 

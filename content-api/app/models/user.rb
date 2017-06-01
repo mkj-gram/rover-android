@@ -21,10 +21,12 @@ class User < ActiveRecord::Base
         end
     end
 
-
+    unless USE_SVC
+    before_create :create_account, if: -> { account_id.nil? }
+    end
 
     before_create :attach_to_account, if: -> { account_id.nil? && !account_invite_token.nil? }
-    before_create :create_account, if: -> { account_id.nil? }
+
     after_create :create_user_acl
     after_create :update_account_user_id
     # after_create :generate_session

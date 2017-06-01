@@ -2,12 +2,13 @@ package service
 
 import (
 	"regexp"
+	"time"
 
 	"golang.org/x/net/context"
 
 	"github.com/pkg/errors"
 
-	auth "github.com/roverplatform/rover/apis/auth/v1"
+	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 )
 
 // Backend interface declares domain specific methods
@@ -21,6 +22,7 @@ type Backend interface {
 	// Basic CRUD operations for Users
 	CreateUser(context.Context, *User) (*User, error)
 	UpdateUser(context.Context, *User) (*User, error)
+	UpdateUserPassword(context.Context, *UserPasswordUpdate) error
 
 	GetUserById(ctx context.Context, id int) (*User, error)
 	FindUserByEmail(ctx context.Context, email string) (*User, error)
@@ -41,6 +43,14 @@ type User struct {
 	auth.User
 
 	PasswordDigest []byte
+}
+
+// UserPasswordUpdate wraps auth.UserPasswordUpdate and adds required fields
+type UserPasswordUpdate struct {
+	*auth.UpdateUserPasswordRequest
+
+	PasswordDigest []byte
+	UpdatedAt      time.Time
 }
 
 var (

@@ -3,9 +3,11 @@ class Session < ActiveRecord::Base
     belongs_to :account
     belongs_to :user
 
-    before_create :generate_jwt_token
-    before_create :set_expires_at
-    before_create :set_last_seen_at
+    unless USE_SVC
+      before_create :generate_jwt_token
+      before_create :set_expires_at
+      before_create :set_last_seen_at
+    end
 
     def self.build_session(user)
         session = Session.new(account_id: user.account_id, user_id: user.id)

@@ -4,7 +4,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/pkg/errors"
-	auth "github.com/roverplatform/rover/apis/auth/v1"
+	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 )
 
 func (d *DB) GetAccount(ctx context.Context, r *auth.GetAccountRequest) (*auth.Account, error) {

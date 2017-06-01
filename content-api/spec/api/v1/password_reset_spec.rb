@@ -97,6 +97,30 @@ describe "/v1/password-resets", :type => :request do
             password_reset = create(:password_reset)
             user = password_reset.user
 
+
+            if TESTS_STUB_SVC
+              auth, api = AUTHSVC_CLIENT, Rover::Auth::V1
+              expect(auth).to receive(:create_user_session).
+                with(api::CreateUserSessionRequest.new(
+                  email: user.email,
+                  password: new_password,
+                  last_seen_IP: "",
+              )).and_return(api::UserSession.new(
+                user_id: user.id,
+                key: 'somekey',
+                expires_at: Google::Protobuf::Timestamp.new(seconds: Time.now.to_i),
+                created_at: Google::Protobuf::Timestamp.new(seconds: Time.now.to_i),
+                updated_at: Google::Protobuf::Timestamp.new(seconds: Time.now.to_i),
+              ))
+              expect(auth).to receive(:update_user_password).
+                with(api::UpdateUserPasswordRequest.new(
+                  user_id: user.id,
+                  account_id: user.account_id,
+                  password: new_password,
+              )).and_return(api::Empty.new)
+            elsif USE_SVC
+            end
+
             patch "/v1/password-resets/#{password_reset.id}",
             {
                 data: {
@@ -112,7 +136,6 @@ describe "/v1/password-resets", :type => :request do
             expect(response).to have_http_status(204)
 
             # now attempt to log in with the new password
-
             post '/v1/sessions', {
                 data: {
                     type: 'sessions',
@@ -124,6 +147,11 @@ describe "/v1/password-resets", :type => :request do
             }
 
             expect(response).to have_http_status(200)
+            if TESTS_STUB_SVC
+              sess = double(user_id: user.id)
+              tok = JWTToken.build_token(sess, jti: 'somekey')
+              expect(json[:data][:attributes][:token]).to eq(tok)
+            end
         end
     end
 end

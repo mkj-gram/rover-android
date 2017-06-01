@@ -94,6 +94,30 @@ describe "/v1/registrations", :type => :request do
                 email = "test@rover.io"
                 password = "123456"
 
+               if TESTS_STUB_SVC
+                 expect(AUTHSVC_CLIENT).to receive(:create_account).
+                   with(Rover::Auth::V1::CreateAccountRequest.new(
+                     name: name,
+                   )).and_return(Rover::Auth::V1::Account.new(
+                     id: 1,
+                     name: name,
+                   ))
+                 expect(AUTHSVC_CLIENT).to receive(:create_user).
+                   with(Rover::Auth::V1::CreateUserRequest.new(
+                     account_id: 1,
+                     name: name,
+                     email: email,
+                     password: password,
+                   )).and_return(Rover::Auth::V1::User.new(
+                     id: 1,
+                     account_id: 1,
+                     name: name,
+                     email: email,
+                     permission_scopes: [],
+                   ))
+               elsif USE_SVC
+               end
+
                 post '/v1/registrations',
                 data: {
                     type: "registrations",
@@ -118,8 +142,32 @@ describe "/v1/registrations", :type => :request do
 
             it 'creates a new user and account with the email downcased' do
                 name = "Test"
-                email = "test@rover.io"
+                email = "test+email@rover.io"
                 password = "123456"
+
+               if TESTS_STUB_SVC
+                 expect(AUTHSVC_CLIENT).to receive(:create_account).
+                   with(Rover::Auth::V1::CreateAccountRequest.new(
+                     name: name,
+                   )).and_return(Rover::Auth::V1::Account.new(
+                     id: 1,
+                     name: name,
+                   ))
+                 expect(AUTHSVC_CLIENT).to receive(:create_user).
+                   with(Rover::Auth::V1::CreateUserRequest.new(
+                     account_id: 1,
+                     name: name,
+                     email: email.upcase,
+                     password: password,
+                   )).and_return(Rover::Auth::V1::User.new(
+                     id: 1,
+                     account_id: 1,
+                     name: name,
+                     email: email.downcase,
+                     permission_scopes: [],
+                   ))
+               elsif USE_SVC
+               end
 
                 post '/v1/registrations',
                 data: {
@@ -183,6 +231,31 @@ describe "/v1/registrations", :type => :request do
                 account = create(:account)
                 issuer = create(:user)
                 invite = AccountInvite.create!(issuer: issuer, account: account, invited_email: "test2@rover.io")
+
+
+               if TESTS_STUB_SVC
+                 expect(AUTHSVC_CLIENT).to receive(:create_account).
+                   with(Rover::Auth::V1::CreateAccountRequest.new(
+                     name: "Test",
+                   )).and_return(Rover::Auth::V1::Account.new(
+                     id: 1,
+                     name: "Test",
+                   ))
+                 expect(AUTHSVC_CLIENT).to receive(:create_user).
+                   with(Rover::Auth::V1::CreateUserRequest.new(
+                     account_id: 1,
+                     name: "Test",
+                     email: "test2@rover.io",
+                     password: "123456",
+                   )).and_return(Rover::Auth::V1::User.new(
+                     id: 1,
+                     account_id: 1,
+                     name: "Test",
+                     email: "test2@rover.io",
+                     permission_scopes: [],
+                   ))
+               elsif USE_SVC
+               end
 
                 post '/v1/registrations',
                 data: {

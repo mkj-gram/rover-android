@@ -1,9 +1,16 @@
+start:
+	docker-compose up --remove-orphans
+
+stop:
+	docker-compose down
+
 dev-deps:
 	go get -u github.com/kardianos/govendor
+	go get -u github.com/pressly/goose/cmd/goose
 	npm install -g grpc-tools
 	gem install grpc-tools
 
 protoc:
 	protos/build
 
-.PHONY: go.dev-deps protoc-go
+.PHONY: dev-deps protoc
