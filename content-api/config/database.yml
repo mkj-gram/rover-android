@@ -5,7 +5,7 @@ test:
     pool: 5
     username: rover_test
     password: password1
-    host: localhost
+    host: <%= ENV['POSTGRESQL_DB_HOST'] || "localhost" %>
 
 development:
     adapter: postgresql
@@ -14,7 +14,7 @@ development:
     pool: 5
     username: rover_development
     password: password1
-    host: localhost
+    host: <%= ENV['POSTGRESQL_DB_HOST'] || "localhost" %>
 
 production:
     adapter: postgresql

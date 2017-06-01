@@ -1,8 +1,10 @@
+DC ?= docker-compose -f docker/rover.docker-compose.yaml 
+
 start:
-	docker-compose up --remove-orphans
+	${DC} up --remove-orphans
 
 stop:
-	docker-compose down
+	${DC} down
 
 dev-deps:
 	go get -u github.com/kardianos/govendor

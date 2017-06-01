@@ -10,7 +10,7 @@ if Rails.env.production?
 else
   config = {
       ssl: false,
-      uri: "mongodb://localhost:27017/rover-local"
+      uri: ENV.fetch("MONGODB_URI",  "mongodb://localhost:27017/rover-local")
   }
 end
 

@@ -1,0 +1,28 @@
+#!/bin/sh
+
+cd /rover/content-api/
+
+_bundle() {
+  bundle install --quiet --binstubs
+}
+
+migrate() {
+  ./bin/rake db:migrate
+  ./bin/rake db:migrate RAILS_ENV=test
+}
+
+test() {
+  ./bin/rspec spec
+}
+
+run() {
+  ./bin/puma -C config/puma.rb
+}
+
+cmd="$1"
+shift
+
+for cmd in $*; do
+ $cmd
+done
+
