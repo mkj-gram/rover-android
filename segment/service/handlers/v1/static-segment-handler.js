@@ -6,12 +6,6 @@ const grpc = require('grpc')
 const squel = require("squel").useFlavour('postgres')
 
 
-const getRedisSetSize = function(redis, id) {
-    redis.scard(id, function(err, reply) {
-
-    })
-}
-
 const parseOrderQuery = function(order_by) {
 
     /*
