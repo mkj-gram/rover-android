@@ -1,10 +1,11 @@
 syntax = "proto3";
 
-package segment.v1;
+package rover.segment.v1;
 
 option go_package = "segment/v1;segment";
 
 import "google/protobuf/timestamp.proto";
+import "auth/v1/auth.proto";
 
 enum PushIdType {
     ROVER = 0;
@@ -22,13 +23,16 @@ message StaticSegment {
 }
 
 message ListStaticSegmentRequest {
-    int32 account_id = 1;
+    /* Optional */
+    rover.auth.v1.AuthContext auth_context = 1;
 
-    string order_by = 2;
+    int32 account_id = 2;
 
-    int32 page_size = 3;
+    string order_by = 3;
 
-    string page_token = 4;
+    int32 page_size = 4;
+
+    string page_token = 5;
 }
 
 message ListStaticSegmentResponse {
@@ -39,10 +43,10 @@ message ListStaticSegmentResponse {
 
 
 message GetStaticSegmentRequest {
-    int32 id = 1;
+    /* Optional */
+    rover.auth.v1.AuthContext auth_context = 1;
 
-    // Optional
-    int32 account_id = 2; 
+    int32 id = 2;
 }
 
 message GetStaticSegmentReply {
@@ -50,8 +54,12 @@ message GetStaticSegmentReply {
 }
 
 message CreateStaticSegmentRequest {
-    int32 account_id = 1;
-    string title = 2;
+
+    /* Optional */
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    int32 account_id = 2;
+    string title = 3;
 }
 
 message CreateStaticSegmentReply {
@@ -62,11 +70,9 @@ message UpdateStaticSegmentIdsReply {
     StaticSegment segment = 1;
 }
 
+/* Internal */
 message GetStaticSegmentPushIdsRequest {
     int32 segment_id = 1;
-
-    // Optional
-    int32 account_id = 2;
 }
 
 message PushId {

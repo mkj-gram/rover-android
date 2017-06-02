@@ -10,12 +10,6 @@ PATH
     rover-auth (0.0.1)
       rover-apis
 
-PATH
-  remote: ../segment/clients/ruby
-  specs:
-    rover-segment (0.1.0)
-      grpc (~> 1.2)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -395,7 +389,6 @@ DEPENDENCIES
   redis (~> 3.2, >= 3.2.2)
   rover-apis!
   rover-auth!
-  rover-segment!
   rspec-rails (~> 3.0)
   sentry-raven (~> 0.15.6)
   sneakers (~> 2.3, >= 2.3.5)

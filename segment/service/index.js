@@ -1,5 +1,5 @@
-const grpc = require('grpc')
-const SegmentV1Service = require("./lib/segment/v1/segment_grpc_pb").SegmentService
+const SegmentV1Service = require("@rover/apis").segment.v1.Services.SegmentService
+const grpc = require("grpc")
 const Config = require('./config')
 const redis = require('redis')
 const async = require('async')

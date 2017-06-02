@@ -23,42 +23,10 @@ const store = new Confidence.Store({
         }
     },
     postgres: {
-        username: {
+        dsn: {
             $filter: 'env',
-            production: process.env.POSTGRESQL_DB_USERNAME,
-            $default: 'segment_service_dev'
-        },
-        password: {
-            $filter: 'env',
-            production: process.env.POSTGRESQL_DB_PASSWORD,
-            $default: 'password'
-        },
-        database: {
-            $filter: 'env',
-            production: process.env.POSTGRESQL_DB_DATABASE,
-            $default: 'segment_service_dev'
-        },
-        host: {
-            $filter: 'env',
-            production: process.env.POSTGRESQL_DB_HOST,
-            $default: 'localhost'
-        },
-        port: {
-            $filter: 'env',
-            production: process.env.POSTGRESQL_DB_PORT,
-            $default: 5432
-        },
-        ssl: {
-            enabled: {
-                $filter: 'env',
-                production: true,
-                $default: false
-            },
-            cert: {
-                $filter: 'env',
-                production: process.env.POSTGRESQL_DB_SSL_CERT,
-                default: null
-            }
+            production: process.env.POSTGRESQL_DSN,
+            $default: "postgres://postgres:@localhost:5432/segment_service_dev?sslmode=disabled"
         }
     }
 })

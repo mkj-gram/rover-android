@@ -1,28 +1,13 @@
 default: &default
-    adapter: postgresql
-    encoding: unicode
-    pool: 5
-    timeout: 5000
-    username: segment_service_dev
-    password: password
+    dsn: postgresql://postgres:@localhost:5432/segment_service_dev?sslmode=disable
 
 test:
     <<: *default
-    database: segment_service_dev
 
 development: 
     <<: *default
-    database: segment_service_dev
 
 production:
-    adapter: postgresql
-    encoding: unicode
-    database: <%= ENV['POSTGRESQL_DB_DATABASE'] %>
-    username: <%= ENV['POSTGRESQL_DB_USERNAME'] %>
-    password: <%= ENV['POSTGRESQL_DB_PASSWORD'] %>
-    host: <%= ENV['POSTGRESQL_DB_HOST'] %>
-    port: <%= ENV['POSTGRESQL_DB_PORT'] %>
-    sslmode: require
-    sslrootcert: config/certs/postgres.pem
+    dsn: <%= ENV['POSTGRESQL_DSN'] %>
 
 
