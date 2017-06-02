@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "Rover Labs Inc",
   "license": "ISC",
@@ -17,5 +17,10 @@
     "squel": "^5.8.0",
     "uuid": "^3.0.1",
     "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^3.4.2",
+    "rewire": "^2.5.2"
   }
 }

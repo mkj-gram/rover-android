@@ -34,7 +34,9 @@ const parseOrderQuery = function(order_by) {
         const columnName = columnParts[0]
         const order = getOrder(columnParts[1])
 
-        orderQuery.push({ column: columnName, order: order })
+        if (columnName.length != 0) {
+            orderQuery.push({ column: columnName, order: order })
+        }
     })
 
     return orderQuery
