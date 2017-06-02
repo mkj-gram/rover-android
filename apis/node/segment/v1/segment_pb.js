@@ -10,6 +10,7 @@ var goog = jspb;
 var global = Function('return this')();
 
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
+var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 goog.exportSymbol('proto.segment.v1.CreateStaticSegmentReply', null, global);
 goog.exportSymbol('proto.segment.v1.CreateStaticSegmentRequest', null, global);
 goog.exportSymbol('proto.segment.v1.GetStaticSegmentPushIdsRequest', null, global);
@@ -376,10 +377,11 @@ proto.segment.v1.ListStaticSegmentRequest.prototype.toObject = function(opt_incl
  */
 proto.segment.v1.ListStaticSegmentRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    accountId: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    orderBy: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    pageSize: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    pageToken: jspb.Message.getFieldWithDefault(msg, 4, "")
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    orderBy: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    pageSize: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    pageToken: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -417,18 +419,23 @@ proto.segment.v1.ListStaticSegmentRequest.deserializeBinaryFromReader = function
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setAccountId(value);
       break;
-    case 2:
+    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setOrderBy(value);
       break;
-    case 3:
+    case 4:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setPageSize(value);
       break;
-    case 4:
+    case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setPageToken(value);
       break;
@@ -460,31 +467,39 @@ proto.segment.v1.ListStaticSegmentRequest.prototype.serializeBinary = function()
  */
 proto.segment.v1.ListStaticSegmentRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
   f = message.getAccountId();
   if (f !== 0) {
     writer.writeInt32(
-      1,
+      2,
       f
     );
   }
   f = message.getOrderBy();
   if (f.length > 0) {
     writer.writeString(
-      2,
+      3,
       f
     );
   }
   f = message.getPageSize();
   if (f !== 0) {
     writer.writeInt32(
-      3,
+      4,
       f
     );
   }
   f = message.getPageToken();
   if (f.length > 0) {
     writer.writeString(
-      4,
+      5,
       f
     );
   }
@@ -492,62 +507,92 @@ proto.segment.v1.ListStaticSegmentRequest.serializeBinaryToWriter = function(mes
 
 
 /**
- * optional int32 account_id = 1;
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.segment.v1.ListStaticSegmentRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.segment.v1.ListStaticSegmentRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.segment.v1.ListStaticSegmentRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.segment.v1.ListStaticSegmentRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional int32 account_id = 2;
  * @return {number}
  */
 proto.segment.v1.ListStaticSegmentRequest.prototype.getAccountId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
 proto.segment.v1.ListStaticSegmentRequest.prototype.setAccountId = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional string order_by = 2;
- * @return {string}
- */
-proto.segment.v1.ListStaticSegmentRequest.prototype.getOrderBy = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.segment.v1.ListStaticSegmentRequest.prototype.setOrderBy = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional int32 page_size = 3;
- * @return {number}
+ * optional string order_by = 3;
+ * @return {string}
  */
-proto.segment.v1.ListStaticSegmentRequest.prototype.getPageSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+proto.segment.v1.ListStaticSegmentRequest.prototype.getOrderBy = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
-/** @param {number} value */
-proto.segment.v1.ListStaticSegmentRequest.prototype.setPageSize = function(value) {
+/** @param {string} value */
+proto.segment.v1.ListStaticSegmentRequest.prototype.setOrderBy = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional string page_token = 4;
+ * optional int32 page_size = 4;
+ * @return {number}
+ */
+proto.segment.v1.ListStaticSegmentRequest.prototype.getPageSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/** @param {number} value */
+proto.segment.v1.ListStaticSegmentRequest.prototype.setPageSize = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional string page_token = 5;
  * @return {string}
  */
 proto.segment.v1.ListStaticSegmentRequest.prototype.getPageToken = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
 proto.segment.v1.ListStaticSegmentRequest.prototype.setPageToken = function(value) {
-  jspb.Message.setField(this, 4, value);
+  jspb.Message.setField(this, 5, value);
 };
 
 
@@ -792,8 +837,8 @@ proto.segment.v1.GetStaticSegmentRequest.prototype.toObject = function(opt_inclu
  */
 proto.segment.v1.GetStaticSegmentRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    id: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -831,12 +876,13 @@ proto.segment.v1.GetStaticSegmentRequest.deserializeBinaryFromReader = function(
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setId(value);
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
       break;
     case 2:
       var value = /** @type {number} */ (reader.readInt32());
-      msg.setAccountId(value);
+      msg.setId(value);
       break;
     default:
       reader.skipField();
@@ -866,14 +912,15 @@ proto.segment.v1.GetStaticSegmentRequest.prototype.serializeBinary = function() 
  */
 proto.segment.v1.GetStaticSegmentRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getId();
-  if (f !== 0) {
-    writer.writeInt32(
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
       1,
-      f
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getAccountId();
+  f = message.getId();
   if (f !== 0) {
     writer.writeInt32(
       2,
@@ -884,31 +931,46 @@ proto.segment.v1.GetStaticSegmentRequest.serializeBinaryToWriter = function(mess
 
 
 /**
- * optional int32 id = 1;
- * @return {number}
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
  */
-proto.segment.v1.GetStaticSegmentRequest.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.segment.v1.GetStaticSegmentRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
 };
 
 
-/** @param {number} value */
-proto.segment.v1.GetStaticSegmentRequest.prototype.setId = function(value) {
-  jspb.Message.setField(this, 1, value);
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.segment.v1.GetStaticSegmentRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.segment.v1.GetStaticSegmentRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
 };
 
 
 /**
- * optional int32 account_id = 2;
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.segment.v1.GetStaticSegmentRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional int32 id = 2;
  * @return {number}
  */
-proto.segment.v1.GetStaticSegmentRequest.prototype.getAccountId = function() {
+proto.segment.v1.GetStaticSegmentRequest.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
-proto.segment.v1.GetStaticSegmentRequest.prototype.setAccountId = function(value) {
+proto.segment.v1.GetStaticSegmentRequest.prototype.setId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
@@ -1116,8 +1178,9 @@ proto.segment.v1.CreateStaticSegmentRequest.prototype.toObject = function(opt_in
  */
 proto.segment.v1.CreateStaticSegmentRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    accountId: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    title: jspb.Message.getFieldWithDefault(msg, 2, "")
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    title: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -1155,10 +1218,15 @@ proto.segment.v1.CreateStaticSegmentRequest.deserializeBinaryFromReader = functi
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setAccountId(value);
       break;
-    case 2:
+    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setTitle(value);
       break;
@@ -1190,17 +1258,25 @@ proto.segment.v1.CreateStaticSegmentRequest.prototype.serializeBinary = function
  */
 proto.segment.v1.CreateStaticSegmentRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
   f = message.getAccountId();
   if (f !== 0) {
     writer.writeInt32(
-      1,
+      2,
       f
     );
   }
   f = message.getTitle();
   if (f.length > 0) {
     writer.writeString(
-      2,
+      3,
       f
     );
   }
@@ -1208,32 +1284,62 @@ proto.segment.v1.CreateStaticSegmentRequest.serializeBinaryToWriter = function(m
 
 
 /**
- * optional int32 account_id = 1;
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.segment.v1.CreateStaticSegmentRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.segment.v1.CreateStaticSegmentRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.segment.v1.CreateStaticSegmentRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.segment.v1.CreateStaticSegmentRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional int32 account_id = 2;
  * @return {number}
  */
 proto.segment.v1.CreateStaticSegmentRequest.prototype.getAccountId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
 proto.segment.v1.CreateStaticSegmentRequest.prototype.setAccountId = function(value) {
-  jspb.Message.setField(this, 1, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional string title = 2;
+ * optional string title = 3;
  * @return {string}
  */
 proto.segment.v1.CreateStaticSegmentRequest.prototype.getTitle = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
 proto.segment.v1.CreateStaticSegmentRequest.prototype.setTitle = function(value) {
-  jspb.Message.setField(this, 2, value);
+  jspb.Message.setField(this, 3, value);
 };
 
 
@@ -1597,8 +1703,7 @@ proto.segment.v1.GetStaticSegmentPushIdsRequest.prototype.toObject = function(op
  */
 proto.segment.v1.GetStaticSegmentPushIdsRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    segmentId: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    segmentId: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -1639,10 +1744,6 @@ proto.segment.v1.GetStaticSegmentPushIdsRequest.deserializeBinaryFromReader = fu
       var value = /** @type {number} */ (reader.readInt32());
       msg.setSegmentId(value);
       break;
-    case 2:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setAccountId(value);
-      break;
     default:
       reader.skipField();
       break;
@@ -1678,13 +1779,6 @@ proto.segment.v1.GetStaticSegmentPushIdsRequest.serializeBinaryToWriter = functi
       f
     );
   }
-  f = message.getAccountId();
-  if (f !== 0) {
-    writer.writeInt32(
-      2,
-      f
-    );
-  }
 };
 
 
@@ -1700,21 +1794,6 @@ proto.segment.v1.GetStaticSegmentPushIdsRequest.prototype.getSegmentId = functio
 /** @param {number} value */
 proto.segment.v1.GetStaticSegmentPushIdsRequest.prototype.setSegmentId = function(value) {
   jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional int32 account_id = 2;
- * @return {number}
- */
-proto.segment.v1.GetStaticSegmentPushIdsRequest.prototype.getAccountId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/** @param {number} value */
-proto.segment.v1.GetStaticSegmentPushIdsRequest.prototype.setAccountId = function(value) {
-  jspb.Message.setField(this, 2, value);
 };
 
 

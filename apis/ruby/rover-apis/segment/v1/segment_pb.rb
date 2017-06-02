@@ -4,6 +4,7 @@
 require 'google/protobuf'
 
 require 'google/protobuf/timestamp_pb'
+require 'auth/v1/auth_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "segment.v1.StaticSegment" do
     optional :id, :int32, 1
@@ -14,25 +15,27 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :created_at, :message, 6, "google.protobuf.Timestamp"
   end
   add_message "segment.v1.ListStaticSegmentRequest" do
-    optional :account_id, :int32, 1
-    optional :order_by, :string, 2
-    optional :page_size, :int32, 3
-    optional :page_token, :string, 4
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :account_id, :int32, 2
+    optional :order_by, :string, 3
+    optional :page_size, :int32, 4
+    optional :page_token, :string, 5
   end
   add_message "segment.v1.ListStaticSegmentResponse" do
     repeated :segments, :message, 1, "segment.v1.StaticSegment"
     optional :next_page_token, :string, 2
   end
   add_message "segment.v1.GetStaticSegmentRequest" do
-    optional :id, :int32, 1
-    optional :account_id, :int32, 2
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :id, :int32, 2
   end
   add_message "segment.v1.GetStaticSegmentReply" do
     optional :segment, :message, 1, "segment.v1.StaticSegment"
   end
   add_message "segment.v1.CreateStaticSegmentRequest" do
-    optional :account_id, :int32, 1
-    optional :title, :string, 2
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :account_id, :int32, 2
+    optional :title, :string, 3
   end
   add_message "segment.v1.CreateStaticSegmentReply" do
     optional :segment, :message, 1, "segment.v1.StaticSegment"
@@ -42,7 +45,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "segment.v1.GetStaticSegmentPushIdsRequest" do
     optional :segment_id, :int32, 1
-    optional :account_id, :int32, 2
   end
   add_message "segment.v1.PushId" do
     optional :id, :string, 1

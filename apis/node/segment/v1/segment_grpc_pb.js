@@ -4,6 +4,7 @@
 var grpc = require('grpc');
 var segment_v1_segment_pb = require('../../segment/v1/segment_pb.js');
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
+var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 
 function serialize_segment_v1_CreateStaticSegmentReply(arg) {
   if (!(arg instanceof segment_v1_segment_pb.CreateStaticSegmentReply)) {

@@ -1,9 +1,4 @@
-const Segment = {
-    V1: {
-        Models: require('../../lib/segment/v1/segment_pb')
-    }
-}
-
+const RoverApis = require("@rover/apis")
 const BatchBufferedStream = require('../../lib/batch-buffered-stream')
 const RedisSetStream = require('../../lib/redis-set-stream')
 const uuid = require('uuid/v1')
@@ -97,16 +92,12 @@ const getAllStaticSegments = function(postgres, scopes, callback) {
 
 }
 
-const findStaticSegmentById = function(postgres, redis, id, scope, callback) {
+const findStaticSegmentById = function(postgres, redis, id, callback) {
 
     let query = squel.select({ autoQuoteFieldNames: true })
                     .from("static_segments")
                     .where("id = ?", id)
                     .limit(1)
-    
-    if (scope.account_id) {
-        query.where('account_id = ?', scope.account_id)
-    }
 
     const { text, values } = query.toParam()
 
@@ -118,10 +109,6 @@ const findStaticSegmentById = function(postgres, redis, id, scope, callback) {
         const segment = result.rows[0]
 
         if (segment == null || segment == undefined) {
-            return callback(null, null)
-        }
-
-        if (scope.account_scope && segment.account_id.toString() !== scope.account_id) {
             return callback(null, null)
         }
 
@@ -186,9 +173,8 @@ const createNewStaticSegment = function(postgres, segment, callback) {
     })
 }
 
-const deleteStaticSegment = function(postgres, args, callback) {
+const deleteStaticSegment = function(postgres, id, callback) {
     
-    let { id } = args
 
     let deleteQuery = squel.delete()
                             .from("static_segments")
@@ -207,7 +193,7 @@ const deleteStaticSegment = function(postgres, args, callback) {
 
 const buildTimestamp = function(date) {
     if (date instanceof Date) {
-        let timestamp = new Segment.V1.Models.Timestamp()
+        let timestamp = new RoverApis.Models.Timestamp()
         let unixTime = date.getTime()
         timestamp.setSeconds(Math.floor(unixTime / 1000 ))
         timestamp.setNanos(((unixTime % 1000) * 1000000))
@@ -220,7 +206,7 @@ const buildTimestamp = function(date) {
 }
 
 const buildStaticSegmentProto = function(segment) {
-    let proto = new Segment.V1.Models.StaticSegment()
+    let proto = new RoverApis.segment.v1.Models.StaticSegment()
     
     proto.setId(segment.id)
     proto.setAccountId(segment.account_id)
@@ -246,10 +232,15 @@ const listStaticSegments = function(call, callback) {
 
     const postgres = this.clients.postgres
 
+    const AuthContext = call.request.getAuthContext()
     const accountId = call.request.getAccountId()
 
     if (accountId === 0) {
         return callback({ code: grpc.status.FAILED_PRECONDITION, message: "Account id can not be 0"})
+    }
+
+    if (AuthContext && AuthContext.getAccountId() != accountId) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
     }
 
     const order_by = call.request.getOrderBy().length == 0 ? "created_at desc" : call.request.getOrderBy()
@@ -266,7 +257,7 @@ const listStaticSegments = function(call, callback) {
             return callback(err)
         }
 
-        const reply = new Segment.V1.Models.ListStaticSegmentResponse()
+        const reply = new RoverApis.segment.v1.Models.ListStaticSegmentResponse()
 
         const segmentProtos = segments.map(buildStaticSegmentProto)
 
@@ -281,23 +272,22 @@ const getStaticSegment = function(call, callback) {
 
     const postgres = this.clients.postgres
     const redis = this.clients.redis
+    const AuthContext = call.request.getAuthContext()
     const segmentId = call.request.getId()
 
 
-    const scope = {}
-
-    if (call.request.getAccountId() != 0) {
-        scope.account_id = call.request.getAccountId()
-    }
-
-    findStaticSegmentById(postgres, redis, segmentId, scope, function(err, segment) {
+    findStaticSegmentById(postgres, redis, segmentId, function(err, segment) {
         if (err) {
             return callback(err)
         }
 
         if (segment) {
 
-            let reply = new Segment.V1.Models.GetStaticSegmentReply()
+            if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
+                return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+            }
+
+            let reply = new RoverApis.segment.v1.Models.GetStaticSegmentReply()
 
             const segmentProto = buildStaticSegmentProto(segment)
 
@@ -317,16 +307,20 @@ const createStaticSegment = function(call, callback) {
 
     const postgres = this.clients.postgres
 
-    const account_id = call.request.getAccountId()
+    const accountId = call.request.getAccountId()
     const title = call.request.getTitle()
 
     const request = {
-        account_id: account_id,
+        account_id: accountId,
         title: title
     }
 
-    if (account_id == 0) {
+    if (accountId == 0) {
         return callback({ code: grpc.status.INVALID_ARGUMENT, message: "Account ID cannot be 0" })
+    }
+
+    if (AuthContext && AuthContext.getAccountId() != accountId) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
     }
 
     createNewStaticSegment(postgres, request, function(err, segment) {
@@ -337,7 +331,7 @@ const createStaticSegment = function(call, callback) {
 
         let segmentProto = buildStaticSegmentProto(segment)
 
-        let reply = new Segment.V1.Models.CreateStaticSegmentReply()
+        let reply = new RoverApis.segment.v1.Models.CreateStaticSegmentReply()
 
         reply.setSegment(segmentProto)
 
@@ -348,7 +342,8 @@ const createStaticSegment = function(call, callback) {
 
 const destroyStaticSegment = function(call, callback) {
 
-    const postgres = this.clients.postgres;
+    const postgres = this.clients.postgres
+    const redis = this.clients.redis
 
     const id = call.request.getId()
 
@@ -356,21 +351,32 @@ const destroyStaticSegment = function(call, callback) {
         return callback({ code: grpc.status.INVALID_ARGUMENT, message: "ID cannot be 0" })
     }
 
-    const request = {
-        id: id
-    }
-
-    deleteStaticSegment(postgres, request, function(err) {
+    findStaticSegmentById(postgres, redis, id, function(err, segment) {
         if (err) {
             return callback(err)
         }
 
-        let reply = new Segment.V1.Models.DestroyStaticSegmentReply()
+        if (segment == null || segment == undefined) {
+            return callback({ code: grpc.status.NOT_FOUND, message: "Segment does not exist" })
+        }
 
-        return callback(null, reply)
+        if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
+            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+        }
+
+        deleteStaticSegment(postgres, id, function(err) {
+            if (err) {
+                return callback(err)
+            }
+
+            let reply = new RoverApis.segment.v1.Models.DestroyStaticSegmentReply()
+
+            return callback(null, reply)
+        })
     })
 }
 
+/* Internal RPC calls that don't need authentication */
 const updateStaticSegmentPushIds = function(call, callback) {
 
     const redis = this.clients.redis
@@ -450,7 +456,7 @@ const updateStaticSegmentPushIds = function(call, callback) {
                     return callback(err)
                 }
 
-                const reply = new Segment.V1.Models.UpdateStaticSegmentIdsReply()
+                const reply = new RoverApis.segment.v1.Models.UpdateStaticSegmentIdsReply()
 
                 reply.setSegment(buildStaticSegmentProto(segment))
 
@@ -516,7 +522,7 @@ const getStaticSegmentPushIds = function(call, callback) {
              */
             stream.pause()
             ids.forEach(function(id) {
-                var r = new Segment.V1.Models.PushId()
+                var r = new RoverApis.segment.v1.Models.PushId()
                 r.setId(id)
                 call.write(r)
             })

@@ -58,6 +58,10 @@ function traverse(currentpath, dir) {
     return glob
 }
 
-const definitions = traverse(__dirname, __dirname)
+
+
+const CommonModels = Object.assign({}, require('google-protobuf/google/protobuf/timestamp_pb.js'))
+
+const definitions = Object.assign({ Models: CommonModels }, traverse(__dirname, __dirname))
 
 module.exports = definitions

@@ -1,5 +1,5 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'gcr.io/rover-production/npm:6.9.1'
   args: ['install']
   dir: 'segment/service'
 - name: 'gcr.io/cloud-builders/docker'
