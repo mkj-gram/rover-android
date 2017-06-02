@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package segment.v1;
+package rover.segment.v1;
 
 option go_package = "segment/v1;segment";
 
