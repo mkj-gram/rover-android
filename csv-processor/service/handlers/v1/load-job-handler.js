@@ -1,16 +1,11 @@
-const CsvProcessor = {
-    V1: {
-        Models: require('../../lib/csv-processor/v1/csv-processor_pb')
-    }
-}
+const RoverApis = require("@rover/apis")
+const CsvProcessor = RoverApis['csv-processor']
 
-const JobStatus = CsvProcessor.V1.Models.JobStatus
-const JobType = CsvProcessor.V1.Models.JobType
+const JobStatus = CsvProcessor.v1.Models.JobStatus
+const JobType = CsvProcessor.v1.Models.JobType
 
 const getJobStatus = function(state) {
-    /* 
-        job states https://github.com/Automattic/kue#job-events
-    */
+
     switch(state) {
         case "waiting":
             return JobStatus.ENQUEUED
@@ -36,7 +31,7 @@ const getJobStatus = function(state) {
  */
 const buildTimestamp = function(date) {
     if (date instanceof Date) {
-        let timestamp = new CsvProcessor.V1.Models.Timestamp()
+        let timestamp = new RoverApis.Models.Timestamp()
         let unixTime = date.getTime()
         timestamp.setSeconds(Math.floor(unixTime / 1000 ))
         timestamp.setNanos(((unixTime % 1000) * 1000000))
@@ -58,7 +53,7 @@ const buildTimestamp = function(date) {
  */
 const buildLoadJobProto = function({ id, account_id, type, status, progress, created_at }) {
 
-    const proto = new CsvProcessor.V1.Models.LoadJob()
+    const proto = new CsvProcessor.v1.Models.LoadJob()
 
     proto.setId(id)
     proto.setAccountId(account_id)
@@ -93,7 +88,7 @@ const createSegmentLoadJob = function(call, callback) {
         }
     }).then(function(job) {
 
-        const reply = new CsvProcessor.V1.Models.CreateLoadJobReply()
+        const reply = new CsvProcessor.v1.Models.CreateLoadJobReply()
 
         const loadJob = buildLoadJobProto({
             id: job.jobId,
@@ -138,7 +133,7 @@ const getLoadJob = function(call, callback) {
             job.getState()
                 .then(function(jobState) {
 
-                    const reply = new CsvProcessor.V1.Models.GetLoadJobReply()
+                    const reply = new CsvProcessor.v1.Models.GetLoadJobReply()
                     
                     console.log(jobState)
 
@@ -174,7 +169,7 @@ const createLoadJob = function(call, callback) {
     const jobType = call.request.getType()
 
     switch(jobType) {
-        case CsvProcessor.V1.Models.JobType.SEGMENT:
+        case CsvProcessor.v1.Models.JobType.SEGMENT:
             return createSegmentLoadJob.bind(this)(call, callback)
             break
         default:
