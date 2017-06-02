@@ -1,5 +1,6 @@
-const services = require('./lib/segment/v1/segment_grpc_pb')
-const grpc = require('grpc')
+const RoverApis = require("@rover/apis")
+const Client = RoverApis.segment.v1.Services.SegmentClient
+
 const Config = require('./config')
 
 const client = function(opts) {
@@ -20,10 +21,7 @@ const client = function(opts) {
 
 
 module.exports = {
-    Segment: {
-        V1: {
-            Client: client, 
-            Models: Object.assign( {}, require('./lib/segment/v1/segment_pb'), require('google-protobuf/google/protobuf/timestamp_pb.js'))
-        }
-    }
+    v1: {
+        Client: client
+    } 
 }
