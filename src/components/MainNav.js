@@ -1,4 +1,3 @@
-// @flow
 import React from "react"
 
 import {
@@ -27,11 +26,6 @@ const MainNav = ({
     isGimbalEnabled,
     isXenioEnabled,
     onRequestSignOut = () => null
-}: {
-    name: string,
-    isGimbalEnabled: boolean,
-    isXenioEnabled: boolean,
-    onRequestSignOut: () => mixed
 }) => (
     <NavBar style={style}>
         <AppSwitcher

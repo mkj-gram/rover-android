@@ -1,4 +1,4 @@
 {
   "plugins": ["relay", "transform-object-rest-spread"],
-  "presets": ["react", "env", "stage-0", "flow"],
+  "presets": ["react", "env", "stage-0"],
 }

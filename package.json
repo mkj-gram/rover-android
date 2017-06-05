@@ -17,7 +17,6 @@
     "babel-plugin-relay": "dev",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-env": "^1.4.0",
-    "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^0.28.1",
@@ -31,8 +30,9 @@
     "html-webpack-plugin": "^2.28.0",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
+    "react-data-grid": "^2.0.46",
+    "react-data-grid-addons": "^2.0.46",
     "react-dom": "^15.5.4",
-    "react-relay": "dev",
-    "react-sortable-pane": "^0.5.5"
+    "react-relay": "dev"
   }
 }
