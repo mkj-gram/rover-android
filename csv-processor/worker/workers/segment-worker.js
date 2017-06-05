@@ -3,10 +3,11 @@ const csv = require('fast-csv')
 const storage = require('@google-cloud/storage')
 const Config = require('../config')
 const FileMeter = require('../lib/filemeter')
-const { Segment } = require('@rover/segment-client')
+const RoverApis = require('@rover/apis')
+const Segment = RoverApis.segment
 const grpc = require('grpc')
 
-let SegmentClient = Segment.V1.Client()
+let SegmentClient = require("@rover/segment-client").v1.Client()
 
 const gcs = storage({
     projectId: Config.get('/storage/project_id'),
@@ -84,9 +85,9 @@ const loadStaticSegment = function(job, done) {
         
         const csvStream = csv().on('data', function(data) {
             // data is an array of columns per line
-            const pushId = new Segment.V1.Models.PushId()
+            const pushId = new Segment.v1.Models.PushId()
             pushId.setId(data[0])
-            pushId.setType(Segment.V1.Models.PushIdType.ALIAS)
+            pushId.setType(Segment.v1.Models.PushIdType.ALIAS)
             if (callStreamActive) {
                 call.write(pushId)   
             } else {

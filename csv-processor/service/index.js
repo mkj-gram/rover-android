@@ -1,12 +1,9 @@
 const grpc = require('grpc')
 const Config = require('./config')
 const Queue = require('bull')
-const CsvProcessorService = require('./lib/csv-processor/v1/csv-processor_grpc_pb').CsvProcessorService
-
-
 const V1Handlers = require('./handlers/v1')
-
-
+const RoverApis = require("@rover/apis")
+const CsvProcessorService =  RoverApis['csv-processor'].v1.Services.CsvProcessorService
 const server = new grpc.Server()
 
 

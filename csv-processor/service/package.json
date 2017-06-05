@@ -4,16 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "./build.sh"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Rover Labs Inc",
   "license": "ISC",
   "dependencies": {
     "bull": "^2.2.6",
-    "confidence": "^3.0.2",
-    "google-protobuf": "^3.3.0",
-    "grpc": "^1.3.2",
+    "@rover/apis": "../../apis/node/",
     "morgan": "^1.8.1",
     "winston": "^2.3.1"
   }

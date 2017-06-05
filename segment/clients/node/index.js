@@ -1,6 +1,6 @@
 const RoverApis = require("@rover/apis")
 const Client = RoverApis.segment.v1.Services.SegmentClient
-
+const grpc = require('grpc')
 const Config = require('./config')
 
 const client = function(opts) {
@@ -16,7 +16,7 @@ const client = function(opts) {
 
     console.info("Segment new Client: " + connection)
 
-    return new services.SegmentClient(connection, grpc.credentials.createInsecure())
+    return new Client(connection, grpc.credentials.createInsecure())
 }
 
 

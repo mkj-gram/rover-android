@@ -1,4 +1,5 @@
-const services = require('./lib/csv-processor/v1/csv-processor_grpc_pb')
+const RoverApis = require("@rover/apis")
+const Client = RoverApis['csv-processor'].v1.Services.CsvProcessorClient
 const grpc = require('grpc')
 const Config = require('./config')
 
@@ -15,15 +16,12 @@ const client = function(opts) {
 
     console.info("CSV-Processor new Client: " + connection)
 
-    return new services.CsvProcessorClient(connection, grpc.credentials.createInsecure())
+    return new Client(connection, grpc.credentials.createInsecure())
 }
 
 
 module.exports = {
-    CsvProcessor: {
-        V1: {
-            Client: client, 
-            Models: Object.assign( {}, require('./lib/csv-processor/v1/csv-processor_pb'), require('google-protobuf/google/protobuf/timestamp_pb.js'))
-        }
+    v1: {
+        Client: client
     }
 }
