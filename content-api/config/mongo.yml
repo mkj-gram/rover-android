@@ -4,7 +4,11 @@ production:
     ssl_cert_string: <%= ENV["MONGODB_SSL_CERT"] %>
 
 development:
-    uri: "mongodb://localhost:27017/rover-local"
+    uri: <%= ENV.fetch("MONGODB_URI", "mongodb://localhost:27017/rover-local") %>
+    ssl: false
     monitoring: true
+
 test:
-    uri: "mongodb://localhost:27017/rover-test"
+    uri: <%= ENV.fetch("MONGODB_URI", "mongodb://localhost:27017/rover-test") %>
+    ssl: false
+    monitoring: true

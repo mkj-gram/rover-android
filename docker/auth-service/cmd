@@ -6,11 +6,6 @@
 set -e
 # set -x
 
-test_run() {
-  test "$*"
-  run "$*"
-}
-
 run() {
 	go run ./auth/service/cmd/authsvcd/main.go -db-dsn=${DB_DSN}
 }
@@ -30,7 +25,6 @@ bench() {
 }
 
 
-cmd="$1"
-shift
-
-$cmd "$*" || echo "error running $cmd"
+for cmd in $*; do
+  $cmd
+done

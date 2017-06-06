@@ -1,0 +1,56 @@
+version: "3"
+
+volumes:
+  cachefs:
+  pgdata:
+
+services:
+
+  mongo:
+    image: mongo
+
+  elasticsearch:
+    image: elasticsearch:2.4
+
+  postgres:
+    image: rover/postgres
+    build:
+      context: ../../rover
+      dockerfile: ./docker/vendor/postgres/Dockerfile
+    volumes:
+      - ../../rover:/rover
+      - pgdata:/var/lib/postgresql/data
+
+  content-api:
+    image: ruby:2.3.3
+    command: ./docker/content-api/cmd _bundle migrate # test
+    links:
+      - postgres
+      - mongo
+    volumes:
+      - ../../rover:/rover
+      - cachefs:/cachefs/
+    working_dir: /rover
+    environment:
+      BUNDLE_PATH: /cachefs/content-api.bundle
+      RACK_ENV: development
+      MONGODB_URI: mongodb://mongo:27017/rover-local
+      ELASTICSEARCH_URLS: elasticsearch:9200
+      WEB_CONCURRENCY: 1
+      MAX_THREADS: 1
+      POSTGRESQL_DB_HOST: postgres
+      AUTH_V1_SERVICE_HOST: auth-service
+
+
+  auth-service:
+    image: golang:1.8-alpine
+    command: ./docker/auth-service/cmd test run
+    volumes:
+      - ../../rover:/go/src/github.com/roverplatform/rover
+    working_dir: /go/src/github.com/roverplatform/rover
+    environment:
+      CGO_ENABLED: 0
+      DB_DSN: "postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable"
+    links:
+      - postgres
+

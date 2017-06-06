@@ -10,6 +10,8 @@ require 'elasticsearch/rails/instrumentation'
 module RailsApi
     class Application < Rails::Application
 
+        config.active_record.dump_schema_after_migration = false
+
         config.active_record.schema_format = :sql
         # Setup configuration per enviroment
         config.rabbitmq = Rails.application.config_for(:rabbitmq)
@@ -22,7 +24,7 @@ module RailsApi
         config.sentry = Rails.application.config_for(:sentry)
         config.simulator = Rails.application.config_for(:simulator)
         config.xenio =  Rails.application.config_for(:xenio)
-        
+
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('lib')
         config.autoload_paths << Rails.root.join('app', 'models', 'message_templates')
