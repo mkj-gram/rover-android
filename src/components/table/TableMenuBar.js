@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -8,7 +6,7 @@ import {
 } from '@rover/react-bootstrap'
 
 const tableMenuBarStyle = {
-    height: 70,
+    flex: '0 0 70px',
     width: '100%',
     backgroundColor: mercury
 }

@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react'
 import { unselectable } from '@rover/react-bootstrap'
 
