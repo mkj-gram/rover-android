@@ -124,6 +124,7 @@ class V1::ExperiencesController < V1::ApplicationController
 
         if validation[:errors].any?
             render json: { errors: validation[:errors] }, status: :bad_request
+            Rails.logger.warn("validation.experiences_controller action=create errors=#{validation[:errors]}")
         else
             @experience = Experiences::Experience.new(experience_params(formatted_params))
             @experience.current_version = Experiences::VersionedExperience.new(versioned_experience_params(formatted_params))
@@ -160,6 +161,7 @@ class V1::ExperiencesController < V1::ApplicationController
         validation = validate_input(UPDATE_SCHEMA, input)
         if validation[:errors].any?
             render json: { errors: validation[:errors] }, status: :bad_request
+            Rails.logger.warn("validation.experiences_controller action=update errors=#{validation[:errors]}")
         else
             updates = experience_params(formatted_params)
             updates.each do |k,v|
