@@ -4,45 +4,39 @@ describe "/v1/account", :type => :request do
   let(:account) { create(:account) }
 
   before :each do
-    unless TESTS_STUB_SVC
-      return
-    end
-
-    auth, api = AUTHSVC_CLIENT, Rover::Auth::V1
-
     tokens = [
-      api::Token.new(
+      Rover::Auth::V1::Token.new(
         key: 'webtoken',
         permission_scopes: ['web'],
       ),
-      api::Token.new(
+      Rover::Auth::V1::Token.new(
         key: 'servertoken',
         permission_scopes: ['server'],
       ),
-      api::Token.new(
+      Rover::Auth::V1::Token.new(
         key: 'sdktoken',
         permission_scopes: ['sdk'],
       ),
-      api::Token.new(
+      Rover::Auth::V1::Token.new(
         key: 'othertoken',
         permission_scopes: [],
       ),
     ]
 
     expect(AUTHSVC_CLIENT).to receive(:authenticate_token)
-    .with(api::AuthenticateRequest.new(
+    .with(Rover::Auth::V1::AuthenticateRequest.new(
       key: account.token,
       last_seen_IP: "127.0.0.1",
     ))
-    .and_return(api::AuthContext.new(
+    .and_return(Rover::Auth::V1::AuthContext.new(
       account_id: account.id,
     ))
 
     expect(AUTHSVC_CLIENT).to receive(:list_tokens)
-    .with(api::ListTokensRequest.new(
+    .with(Rover::Auth::V1::ListTokensRequest.new(
       account_id: account.id,
     ))
-    .and_return(api::ListTokensResponse.new(
+    .and_return(Rover::Auth::V1::ListTokensResponse.new(
       tokens: tokens,
     ))
   end
@@ -61,13 +55,11 @@ describe "/v1/account", :type => :request do
       expect(json[:data][:attributes][:"share-key"]).to eq(account.share_key)
       expect(json[:data][:attributes][:title]).to eq(account.title)
 
-      if USE_SVC
-        expect(json[:data][:attributes]).to include({
-          :"web-token" => "webtoken",
-          :"sdk-token" => "sdktoken",
-          :"server-token" => "servertoken",
-        })
-      end
+      expect(json[:data][:attributes]).to include({
+        :"web-token" => "webtoken",
+        :"sdk-token" => "sdktoken",
+        :"server-token" => "servertoken",
+      })
     end
   end
 end

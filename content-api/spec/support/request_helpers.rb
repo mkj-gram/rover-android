@@ -1,4 +1,58 @@
 module RequestHelpers
+  module AuthHelper
+
+    # do not auth anyone by default
+    def nothing_authenticates
+      unless TESTS_STUB_SVC
+        return
+      end
+
+      # by default everything is unauthenticated
+      [:authenticate_token, :authenticate_user_session, :create_user_session].each do |mthd|
+        allow(AUTHSVC_CLIENT).to receive(mthd).and_raise(GRPC::Unauthenticated)
+      end
+    end
+
+    def auth_session(user, scopes: [''] )
+      session = create(:session, user: user, token: JWTToken.build_token(double(user_id: user.id), jti: "token"))
+
+      unless TESTS_STUB_SVC
+        return session
+      end
+
+      expect(AUTHSVC_CLIENT).to receive(:authenticate_user_session).
+        with(Rover::Auth::V1::AuthenticateRequest.new(
+          key: 'token',
+          last_seen_IP: "127.0.0.1",
+        ))
+        .and_return(Rover::Auth::V1::AuthContext.new(
+          user_id: session.user_id,
+          account_id: session.user.account_id,
+          permission_scopes: scopes,
+        ))
+
+      session
+    end
+
+    def auth_token(token, account_id: 0, scopes: [''] )
+      unless TESTS_STUB_SVC
+        return session
+      end
+      expect(AUTHSVC_CLIENT).to receive(:authenticate_token).
+        with(Rover::Auth::V1::AuthenticateRequest.new(
+          key: token,
+          last_seen_IP: "127.0.0.1",
+        ))
+        .at_least(:once)
+        .and_return(Rover::Auth::V1::AuthContext.new(
+          user_id: 0,
+          account_id: account_id,
+          permission_scopes: scopes,
+        ))
+    end
+
+  end
+
     module JsonHelper
         def json
             (reparse_and_never_memoize_as_response_may_change = -> do
@@ -37,4 +91,5 @@ end
 RSpec.configure do |config|
     config.include RequestHelpers::JsonHelper, type: :request
     config.include RequestHelpers::HeaderHelper, type: :request
+    config.include RequestHelpers::AuthHelper, type: :request
 end

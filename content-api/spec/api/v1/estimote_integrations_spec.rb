@@ -1,13 +1,21 @@
 require 'rails_helper'
 
 describe "/v1/estimote-integrations", :type => :request do
+
+  let(:account) { create(:account) }
+  let(:user) { create(:user, account: account) }
+  let(:session) { create(:session, user: user, account: account) }
+  let(:estimote) { create(:estimote_integration) }
+
+  before :each do
+    nothing_authenticates
+
+    auth_token(session.account.token, account_id: session.account.id)
+  end
+
     context "GET" do
         context "when beacon exists" do
             it 'returns 200 OK' do
-
-                estimote = create(:estimote_integration)
-                account = estimote.account
-
                 get "/v1/estimote-integrations/#{estimote.id}", nil, signed_request_header(account)
 
                 expect(response).to have_http_status(200)
@@ -21,9 +29,6 @@ describe "/v1/estimote-integrations", :type => :request do
         context "when beacon doesn't exist" do
             it 'returns 404 not found' do
 
-                estimote = create(:estimote_integration)
-                account = estimote.account
-
                 get "/v1/estimote-integrations/#{estimote.id + 1}", nil, signed_request_header(account)
 
                 expect(response).to have_http_status(404)
@@ -35,7 +40,6 @@ describe "/v1/estimote-integrations", :type => :request do
         context "when input is valid" do
             it 'returns 201 Created' do
 
-                account = create(:account)
                 post "/v1/estimote-integrations",
                 {
                     data: {
@@ -50,14 +54,13 @@ describe "/v1/estimote-integrations", :type => :request do
 
                 expect(response).to have_http_status(201)
 
-                id = json[:data][:id]
+                id = json.fetch(:data).fetch(:id)
                 get "/v1/estimote-integrations/#{id}", nil, signed_request_header(account)
 
                 expect(response).to have_http_status(200)
             end
 
             it 'returns 201 Created and passes syncing' do
-                account = create(:account)
                 post "/v1/estimote-integrations",
                 {
                     data: {
@@ -82,17 +85,15 @@ describe "/v1/estimote-integrations", :type => :request do
 
                 latest_sync_id = json.dig(:data, :relationships, :"latest-sync", :data, :id)
 
-                get "/v1/estimote-integrations/#{id}/sync-jobs/#{latest_sync_id}", nil, signed_request_header(account)
+                get "/v1/estimote-sync-jobs/#{latest_sync_id}", nil, signed_request_header(account)
 
                 expect(response).to have_http_status(200)
-                expect(json[:data][:attributes][:status]).to eq("finished")
+                expect(json[:data][:attributes][:status]).to eq("queued")
             end
         end
 
         context "when input is invalid" do
             it 'return 422' do
-                account = create(:account)
-
                 post "/v1/estimote-integrations",
                 {
                     data: {

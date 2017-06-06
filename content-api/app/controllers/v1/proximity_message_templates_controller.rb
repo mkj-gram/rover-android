@@ -155,7 +155,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         # customer_ids = []
         param_should_be_array(params, :customer_ids)
         customer_ids = params[:customer_ids]
-        if customer_ids.any?
+        if customer_ids.present?
             SendMessageWorker.perform_async(@proximity_message.id, {} , customer_ids)
             head :ok
         else
@@ -255,12 +255,12 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         included = []
 
-        if should_include.include?("beacons") && message.filter_beacon_configuration_ids.any?
+        if should_include.include?("beacons") && message.filter_beacon_configuration_ids.present?
             beacon_configurations = message.filter_beacon_configurations
             included += beacon_configurations.map{|configuration| V1::BeaconConfigurationSerializer.serialize(configuration)}
         end
 
-        if should_include.include?("places") && message.filter_place_ids.any?
+        if should_include.include?("places") && message.filter_place_ids.present?
             places = message.filter_places
             included += places.map{|place| V1::PlaceSerializer.serialize(place)}
         end
@@ -287,7 +287,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             included += [ V1::ExperienceSerializer.serialize(experience, nil, current_account.subdomain, {fields: [:name, :"short-url", :"simulator-url" ]})] if experience
         end
 
-        if included.any?
+        if included.present?
             json[:included] = included
         end
 
@@ -358,7 +358,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             relationships: {}
         }
 
-        if message.filter_beacon_configuration_ids.any?
+        if message.filter_beacon_configuration_ids.present?
             json[:relationships].merge!(
                 {
                     configurations: {
@@ -368,7 +368,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             )
         end
 
-        if message.filter_place_ids.any?
+        if message.filter_place_ids.present?
             json[:relationships].merge!(
                 {
                     places: {
@@ -378,7 +378,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             )
         end
 
-        if message.filter_xenio_zone_ids.any?
+        if message.filter_xenio_zone_ids.present?
             json[:relationships].merge!(
                 {
                     :"xenio-zones" => {
@@ -388,7 +388,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             )
         end
 
-        if message.filter_xenio_place_ids.any?
+        if message.filter_xenio_place_ids.present?
             json[:relationships].merge!(
                 {
                     :"xenio-places" => {
@@ -398,7 +398,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             )
         end
 
-        if message.filter_gimbal_place_ids.any?
+        if message.filter_gimbal_place_ids.present?
             json[:relationships].merge!(
                 {
                     :"gimbal-places" => {
