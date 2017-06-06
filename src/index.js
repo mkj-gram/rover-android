@@ -60,6 +60,9 @@ import {
     red,
     pink,
     orange,
+    purple,
+    violet,
+    lavender,
     rgba,
     hexa
 } from './styles/colors'
@@ -131,6 +134,9 @@ export {
     red,
     pink,
     orange,
+    purple,
+    violet,
+    lavender,
     rgba,
     hexa,
     text,

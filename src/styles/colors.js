@@ -36,6 +36,12 @@ export const pink = '#FF00C8'
 
 export const orange = '#FFAB6F'
 
+export const purple = '#8357D6'
+
+export const violet = '#A270ff'
+
+export const lavender = '#D8C4ff'
+
 export const rgba = ({ red, green, blue, alpha }) => {
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`
 }
