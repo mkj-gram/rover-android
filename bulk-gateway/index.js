@@ -122,22 +122,22 @@ router.use(AuthMiddleware)
 
 router.put('/bulk/segments/:id/csv', authenticated, upload, function(req, res, next) {
 
-    const gcsObject = new CsvProcessor.V1.Models.GCSObject()
+    const gcsObject = new RoverApis['csv-processor'].v1.Models.GCSObject()
 
     gcsObject.setProjectId(req.file.cloudStorageObject.bucket.storage.projectId)
     gcsObject.setBucket(req.file.cloudStorageObject.bucket.id)
     gcsObject.setFileId(req.file.cloudStorageObject.id)
 
-    const segmentLoadJobConfig = new CsvProcessor.V1.Models.SegmentLoadJobConfig()
+    const segmentLoadJobConfig = new RoverApis['csv-processor'].v1.Models.SegmentLoadJobConfig()
 
     segmentLoadJobConfig.setAccountId(req.authContext.account_id)
     segmentLoadJobConfig.setSegmentId(req.params.id)
     segmentLoadJobConfig.setCsv(gcsObject)
 
 
-    const loadJobRequest = new CsvProcessor.V1.Models.CreateLoadJobRequest()
+    const loadJobRequest = new RoverApis['csv-processor'].v1.Models.CreateLoadJobRequest()
 
-    loadJobRequest.setType(CsvProcessor.V1.Models.JobType.SEGMENT)
+    loadJobRequest.setType(RoverApis['csv-processor'].v1.Models.JobType.SEGMENT)
     loadJobRequest.setSegmentLoadJobConfig(segmentLoadJobConfig)
 
     const deadline = moment().add(15, 'seconds').toDate()
@@ -159,7 +159,7 @@ router.put('/bulk/segments/:id/csv', authenticated, upload, function(req, res, n
 })
 
 router.get('/bulk/load-job/:id/csv', authenticated, function(req, res, next) {
-    const request = new CsvProcessor.V1.Models.GetLoadJobRequest()
+    const request = new RoverApis['csv-processor'].v1.Models.GetLoadJobRequest()
 
     request.setLoadJobId(req.params.id)
     
@@ -285,7 +285,7 @@ tasks.push(function(callback) {
 
 tasks.push(function(callback) {
     try {
-        CsvProcessorClient = CsvProcessor.v1.Client()
+        CsvProcessorClient = RoverApis['csv-processor'].v1.Client()
     } catch(err) {
         return callback(err)
     }
