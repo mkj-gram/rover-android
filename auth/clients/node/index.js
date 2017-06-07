@@ -48,6 +48,8 @@ const Middleware = function(client, opts = {}) {
                 scopes: AuthContext.getPermissionScopesList()
             }
 
+            req._authContext = AuthContext
+
             return next()
         }
 
