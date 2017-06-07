@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "webpack-dev-server -d --hot --inline --port 9001",
-    "build": " rm -rf ./dist && webpack -d --inline --history-api-fallback --config webpack.config.js"
+    "build": "rm -rf ./dist && webpack --config webpack.config.js"
   },
   "author": "Rover.io",
   "license": "ISC",
