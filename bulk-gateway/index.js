@@ -170,10 +170,6 @@ router.get('/bulk/load-job/:id/csv', authenticated, function(req, res, next) {
 
         const loadJob = response.getJob()
 
-        if (loadJob.getAccountId() !== req.credentials.account_id) {
-            return next({ status: 403, message: "Forbidden" })
-        }
-
         const payload = serializeLoadJob(loadJob, 'csv')
 
         res.writeHead(200, { 'content-type': 'application/json' })
