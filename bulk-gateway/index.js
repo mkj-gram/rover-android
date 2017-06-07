@@ -285,7 +285,7 @@ tasks.push(function(callback) {
 
 tasks.push(function(callback) {
     try {
-        CsvProcessorClient = RoverApis['csv-processor'].v1.Client()
+        CsvProcessorClient = CsvProcessor.v1.Client()
     } catch(err) {
         return callback(err)
     }
