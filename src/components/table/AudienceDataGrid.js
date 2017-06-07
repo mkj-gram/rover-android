@@ -70,6 +70,7 @@ class AudienceDataGrid extends Component {
         
         this.onRowsSelected = this.onRowsSelected.bind(this)
         this.onRowsDeselected = this.onRowsDeselected.bind(this)
+        this.rowGetter = this.rowGetter.bind(this)
     }
 
     createRows() {
@@ -85,6 +86,10 @@ class AudienceDataGrid extends Component {
         }
 
         return rows
+    }
+    
+    rowGetter(i) {
+        return this.state.rows[i]
     }
     
     renderCheckbox(props) {
@@ -141,10 +146,15 @@ class AudienceDataGrid extends Component {
         let rowIndexes = rows.map(r => r.rowIdx)
         this.setState({ selectedIndexes: this.state.selectedIndexes.filter(i => rowIndexes.indexOf(i) === -1 )})
     }
+    
+    getGridHeight() {
+        // 
+        return window.innerHeight - 130
+    }
 
     render() {
         return (
-            <div style={{ flex: '1 1 100%', position: 'relative' }} className="rover-data-grid">
+            <div ref={el => { this.parent = el }} style={{ flex: '1 1 100%', position: 'relative' }} className="rover-data-grid">
                 <style type="text/css">
                     {
                         `
@@ -214,9 +224,10 @@ class AudienceDataGrid extends Component {
                     <ReactDataGrid
                         rowKey="id"
                         columns={this.state.columns}
-                        rowGetter={i => this.state.rows[i]}
+                        rowGetter={this.rowGetter}
                         rowsCount={this.state.rows.length}
                         rowHeight={50}
+                        minHeight={this.getGridHeight()}
                         rowSelection={{
                             showCheckbox: true,
                             enableShiftSelect: true,
