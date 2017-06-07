@@ -16,7 +16,7 @@ describe('grpcToHttp', function() {
     })
 
     it('it defaults to http code 500 if no mapping exists', function() {
-        assert.equal(grpcToHttp(1), 500)
+        assert.equal(grpcToHttp(123), 500)
     })
 
 })
