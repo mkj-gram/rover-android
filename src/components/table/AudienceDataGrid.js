@@ -157,7 +157,6 @@ class AudienceDataGrid extends Component {
                             .rover-data-grid .react-grid-HeaderCell {
                                 background-color: ${offwhite};
                                 color: ${steel}!important;
-                                cursor: -webkit-grab!important;
                                 font-family: "Source Sans Pro", sans-serif!important;
                                 font-size: 14px!important;
                                 font-weight: 600;
