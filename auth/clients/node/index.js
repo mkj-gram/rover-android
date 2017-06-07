@@ -34,21 +34,10 @@ const Middleware = function(client, opts = {}) {
 
         request.setLastSeenIp(ip)
 
-        var authMethod = null
-
-        if (headers.hasOwnProperty('x-rover-api-key')) {
-            request.setKey(headers['x-rover-api-key'])
-            authMethod = client.authenticateToken
-        } else if (headers.hasOwnProperty('authorization')) {
-            const key = headers['authorization'].split(' ')[1]
-            request.setKey(key)
-            authMethod = client.authenticateUserSession
-        } else {
-            return next()
-        }
-
-
-        authMethod(request, function(err, AuthContext) {
+        /*
+            return function since authenticateToken and authenticateUserSession have the same response
+         */
+        const returnContext = function(err, AuthContext) {
             if (err) {
                 return next(err)
             }
@@ -60,9 +49,23 @@ const Middleware = function(client, opts = {}) {
             }
 
             return next()
-        })
+        }
 
-    } 
+        /*
+            Choose which method to authenticate with based on header values
+         */
+        if (headers.hasOwnProperty('x-rover-api-key')) {
+            request.setKey(headers['x-rover-api-key'])
+            client.authenticateToken(request, returnContext)
+        } else if (headers.hasOwnProperty('authorization')) {
+            const key = headers['authorization'].split(' ')[1]
+            request.setKey(key)
+            client.authenticateUserSession(request, returnContext)
+
+        } else {
+            return next()
+        }
+    }
 }
 
 
