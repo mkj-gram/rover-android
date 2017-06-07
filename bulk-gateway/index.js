@@ -15,10 +15,20 @@ const uploader = new UploaderClient({
     bucketName: Config.get('/storage/bucket_name')
 })
 
-const Auth = require('./auth')
+const GrpcCodes = require("@rover-common/grpc-codes")
 
-const { CsvProcessor } = require("@rover/csv-processor-client")
-const JobStatus = CsvProcessor.V1.Models.JobStatus
+const RoverApis = require("@rover/apis")
+
+/*
+    Setup Auth Client & Middleware
+ */
+const Auth = require("@rover/auth-client")
+const AuthClient = Auth.v1.Client()
+const AuthMiddleware = Auth.v1.Middleware(AuthClient)
+
+
+const CsvProcessor = require("@rover/csv-processor-client")
+const JobStatus = RoverApis['csv-processor'].v1.Models.JobStatus
 
 let CsvProcessorClient = null
 
@@ -28,27 +38,13 @@ const server = {
     connections: {}
 }
 
-const grpcCodeToHttpCode =
-{
-    4: 408,
-    5: 404,
-    6: 409,
-    7: 403,
-    8: 429,
-    9: 428,
-    12: 501,
-    13: 500,
-    14: 503,
-    15: 500,
-    16: 401
-}
 
 /***********************************
           Helper Methods
 ***********************************/
 
 const getHTTPCode = function(grpcCode) {
-    return (grpcCodeToHttpCode[grpcCode] || 500)
+    return GrpcCodes.grpcToHttp(grpcCode)
 }
 
 const loggableError = function(err) {
@@ -90,17 +86,14 @@ const serializeLoadJob = function(loadJob, format) {
              Middleware
 ***********************************/
 
-const authenticate = function(req, res, next) {
-    Auth.authenticate(req, function(err, account) {
-        if (err) {
-            return next({ status: 401 })
-        }
+const authenticated = function(req, res, next) {
+    if (req.authContext == undefined || req.authContext == null) {
+        return next({ status: 401 })
+    }
 
-        req.credentials = { account: account }
-
-        return next()
-    })
+    return next()
 }
+
 
 const upload = function(req, res, next) {
 
@@ -125,7 +118,9 @@ const upload = function(req, res, next) {
 
 const router = Router()
 
-router.put('/bulk/segments/:id/csv', authenticate, upload, function(req, res, next) {
+router.use(AuthMiddleware)
+
+router.put('/bulk/segments/:id/csv', authenticated, upload, function(req, res, next) {
 
     const gcsObject = new CsvProcessor.V1.Models.GCSObject()
 
@@ -135,7 +130,7 @@ router.put('/bulk/segments/:id/csv', authenticate, upload, function(req, res, ne
 
     const segmentLoadJobConfig = new CsvProcessor.V1.Models.SegmentLoadJobConfig()
 
-    segmentLoadJobConfig.setAccountId(req.credentials.account.id)
+    segmentLoadJobConfig.setAccountId(req.authContext.account_id)
     segmentLoadJobConfig.setSegmentId(req.params.id)
     segmentLoadJobConfig.setCsv(gcsObject)
 
@@ -163,7 +158,7 @@ router.put('/bulk/segments/:id/csv', authenticate, upload, function(req, res, ne
     });
 })
 
-router.get('/bulk/load-job/:id/csv', authenticate, function(req, res, next) {
+router.get('/bulk/load-job/:id/csv', authenticated, function(req, res, next) {
     const request = new CsvProcessor.V1.Models.GetLoadJobRequest()
 
     request.setLoadJobId(req.params.id)
@@ -175,7 +170,7 @@ router.get('/bulk/load-job/:id/csv', authenticate, function(req, res, next) {
 
         const loadJob = response.getJob()
 
-        if (loadJob.getAccountId() !== req.credentials.account.id) {
+        if (loadJob.getAccountId() !== req.credentials.account_id) {
             return next({ status: 403, message: "Forbidden" })
         }
 
@@ -221,6 +216,13 @@ router.use(function(err, req, res, next) {
 
 // error handler
 router.use(function(err, req, res, next) {
+
+    /*
+        Only errors with a code property are grpc errors
+    */ 
+    if (err.code) {
+        err.status = getHTTPCode(err.code)
+    }
 
     if (loggableError(err)) {
         console.error(err);
@@ -283,7 +285,7 @@ tasks.push(function(callback) {
 
 tasks.push(function(callback) {
     try {
-        CsvProcessorClient = CsvProcessor.V1.Client()
+        CsvProcessorClient = CsvProcessor.v1.Client()
     } catch(err) {
         return callback(err)
     }
