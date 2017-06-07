@@ -11,6 +11,7 @@
   "dependencies": {
     "bull": "^2.2.6",
     "@rover/apis": "../../apis/node/",
+    "@rover-common/grpc-codes": "../../node/grpc-codes",
     "morgan": "^1.8.1",
     "winston": "^2.3.1"
   }

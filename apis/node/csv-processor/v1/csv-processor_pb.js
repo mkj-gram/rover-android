@@ -10,6 +10,7 @@ var goog = jspb;
 var global = Function('return this')();
 
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
+var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 goog.exportSymbol('proto.rover.csv_processor.v1.CreateLoadJobReply', null, global);
 goog.exportSymbol('proto.rover.csv_processor.v1.CreateLoadJobRequest', null, global);
 goog.exportSymbol('proto.rover.csv_processor.v1.GCSObject', null, global);
@@ -789,7 +790,8 @@ proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.toObject = function(opt
  */
 proto.rover.csv_processor.v1.GetLoadJobRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    loadJobId: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    loadJobId: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -827,6 +829,11 @@ proto.rover.csv_processor.v1.GetLoadJobRequest.deserializeBinaryFromReader = fun
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setLoadJobId(value);
       break;
@@ -858,10 +865,18 @@ proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.serializeBinary = funct
  */
 proto.rover.csv_processor.v1.GetLoadJobRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
   f = message.getLoadJobId();
   if (f !== 0) {
     writer.writeInt32(
-      1,
+      2,
       f
     );
   }
@@ -869,17 +884,47 @@ proto.rover.csv_processor.v1.GetLoadJobRequest.serializeBinaryToWriter = functio
 
 
 /**
- * optional int32 load_job_id = 1;
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional int32 load_job_id = 2;
  * @return {number}
  */
 proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.getLoadJobId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
 proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.setLoadJobId = function(value) {
-  jspb.Message.setField(this, 1, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
@@ -1066,14 +1111,14 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.rover.csv_processor.v1.CreateLoadJobRequest.oneofGroups_ = [[2]];
+proto.rover.csv_processor.v1.CreateLoadJobRequest.oneofGroups_ = [[3]];
 
 /**
  * @enum {number}
  */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.JobConfigCase = {
   JOB_CONFIG_NOT_SET: 0,
-  SEGMENT_LOAD_JOB_CONFIG: 2
+  SEGMENT_LOAD_JOB_CONFIG: 3
 };
 
 /**
@@ -1111,7 +1156,8 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.toObject = function(
  */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    type: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    type: jspb.Message.getFieldWithDefault(msg, 2, 0),
     segmentLoadJobConfig: (f = msg.getSegmentLoadJobConfig()) && proto.rover.csv_processor.v1.SegmentLoadJobConfig.toObject(includeInstance, f)
   };
 
@@ -1150,10 +1196,15 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.deserializeBinaryFromReader = 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
       var value = /** @type {!proto.rover.csv_processor.v1.JobType} */ (reader.readEnum());
       msg.setType(value);
       break;
-    case 2:
+    case 3:
       var value = new proto.rover.csv_processor.v1.SegmentLoadJobConfig;
       reader.readMessage(value,proto.rover.csv_processor.v1.SegmentLoadJobConfig.deserializeBinaryFromReader);
       msg.setSegmentLoadJobConfig(value);
@@ -1186,17 +1237,25 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.serializeBinary = fu
  */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
   f = message.getType();
   if (f !== 0.0) {
     writer.writeEnum(
-      1,
+      2,
       f
     );
   }
   f = message.getSegmentLoadJobConfig();
   if (f != null) {
     writer.writeMessage(
-      2,
+      3,
       f,
       proto.rover.csv_processor.v1.SegmentLoadJobConfig.serializeBinaryToWriter
     );
@@ -1205,33 +1264,63 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.serializeBinaryToWriter = func
 
 
 /**
- * optional JobType type = 1;
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional JobType type = 2;
  * @return {!proto.rover.csv_processor.v1.JobType}
  */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.getType = function() {
-  return /** @type {!proto.rover.csv_processor.v1.JobType} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {!proto.rover.csv_processor.v1.JobType} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {!proto.rover.csv_processor.v1.JobType} value */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.setType = function(value) {
-  jspb.Message.setField(this, 1, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional SegmentLoadJobConfig segment_load_job_config = 2;
+ * optional SegmentLoadJobConfig segment_load_job_config = 3;
  * @return {?proto.rover.csv_processor.v1.SegmentLoadJobConfig}
  */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.getSegmentLoadJobConfig = function() {
   return /** @type{?proto.rover.csv_processor.v1.SegmentLoadJobConfig} */ (
-    jspb.Message.getWrapperField(this, proto.rover.csv_processor.v1.SegmentLoadJobConfig, 2));
+    jspb.Message.getWrapperField(this, proto.rover.csv_processor.v1.SegmentLoadJobConfig, 3));
 };
 
 
 /** @param {?proto.rover.csv_processor.v1.SegmentLoadJobConfig|undefined} value */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.setSegmentLoadJobConfig = function(value) {
-  jspb.Message.setOneofWrapperField(this, 2, proto.rover.csv_processor.v1.CreateLoadJobRequest.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 3, proto.rover.csv_processor.v1.CreateLoadJobRequest.oneofGroups_[0], value);
 };
 
 
@@ -1245,7 +1334,7 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.clearSegmentLoadJobC
  * @return {!boolean}
  */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.hasSegmentLoadJobConfig = function() {
-  return jspb.Message.getField(this, 2) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 

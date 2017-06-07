@@ -4,6 +4,7 @@
 require 'google/protobuf'
 
 require 'google/protobuf/timestamp_pb'
+require 'auth/v1/auth_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.csv_processor.v1.GCSObject" do
     optional :project_id, :string, 1
@@ -25,15 +26,17 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :csv, :message, 3, "rover.csv_processor.v1.GCSObject"
   end
   add_message "rover.csv_processor.v1.GetLoadJobRequest" do
-    optional :load_job_id, :int32, 1
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :load_job_id, :int32, 2
   end
   add_message "rover.csv_processor.v1.GetLoadJobReply" do
     optional :job, :message, 1, "rover.csv_processor.v1.LoadJob"
   end
   add_message "rover.csv_processor.v1.CreateLoadJobRequest" do
-    optional :type, :enum, 1, "rover.csv_processor.v1.JobType"
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :type, :enum, 2, "rover.csv_processor.v1.JobType"
     oneof :job_config do
-      optional :segment_load_job_config, :message, 2, "rover.csv_processor.v1.SegmentLoadJobConfig"
+      optional :segment_load_job_config, :message, 3, "rover.csv_processor.v1.SegmentLoadJobConfig"
     end
   end
   add_message "rover.csv_processor.v1.CreateLoadJobReply" do
