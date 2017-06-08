@@ -23,7 +23,7 @@ message StaticSegment {
 }
 
 message ListStaticSegmentRequest {
-    /* Optional */
+
     rover.auth.v1.AuthContext auth_context = 1;
 
     int32 account_id = 2;
@@ -43,7 +43,7 @@ message ListStaticSegmentResponse {
 
 
 message GetStaticSegmentRequest {
-    /* Optional */
+
     rover.auth.v1.AuthContext auth_context = 1;
 
     int32 id = 2;
@@ -54,8 +54,7 @@ message GetStaticSegmentReply {
 }
 
 message CreateStaticSegmentRequest {
-
-    /* Optional */
+    
     rover.auth.v1.AuthContext auth_context = 1;
 
     int32 account_id = 2;

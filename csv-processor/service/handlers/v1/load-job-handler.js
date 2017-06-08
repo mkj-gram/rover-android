@@ -98,6 +98,11 @@ const createSegmentLoadJob = function(call, callback) {
 
     queue.add('load-static-segment', {
         type: JobType.SEGMENT,
+        auth_context: {
+            account_id: AuthContext.getAccountId(),
+            user_id: AuthContext.getUserId(),
+            scopes: AuthContext.getPermissionScopesList()
+        },
         account_id: AuthContext.getAccountId(),
         segment_id: segmentLoadJobConfig.getSegmentId(),
         gcs_file: {
