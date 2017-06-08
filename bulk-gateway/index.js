@@ -220,9 +220,10 @@ router.use(function(err, req, res, next) {
         err.status = getHTTPCode(err.code)
     }
 
-    if (loggableError(err)) {
-        console.error(err);
+    if (err.stack) {
+        console.error(err.stack);
     }
+    
 
     res.writeHead(err.status || 500)
     res.end()
