@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@rover/apis": "../../apis/node",
+    "@rover-common/pg-connection-string": "../../node/pg-connection-string",
     "async": "^2.3.0",
     "confidence": "^3.0.2",
     "pg": "^6.1.5",

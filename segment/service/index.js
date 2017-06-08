@@ -3,7 +3,7 @@ const grpc = require("grpc")
 const Config = require('./config')
 const redis = require('redis')
 const async = require('async')
-
+const parse = require("@rover-common/pg-connection-string")
 const V1Handlers = require('./handlers/v1')
 
 
@@ -33,19 +33,15 @@ tasks.push(function(callback) {
 
     let dbDSN = Config.get('/postgres/dsn')
 
-    let pg = require('pg')
-
-    function NewClient() {
-        return new pg.Client(dbDSN)
-    }
-
-    let config = {
-        Client: NewClient,
+    let defaultConfig = {
         min: 2,
         max: 5,
         idleTimeoutMillis: 30000
     }
-    
+
+    let config = Object.assign({}, defaultConfig, parse(dbDSN))
+
+    let pg = require('pg')
 
     const pool = new pg.Pool(config)
 
@@ -54,6 +50,8 @@ tasks.push(function(callback) {
             return callback(err)
         }
 
+        console.log("Connected to postgres")
+        
         done()
 
         context.clients.postgres = pool
