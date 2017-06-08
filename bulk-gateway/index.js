@@ -220,10 +220,7 @@ router.use(function(err, req, res, next) {
         err.status = getHTTPCode(err.code)
     }
 
-    if (err.stack) {
-        console.error(err.stack);
-    }
-    
+    console.error(err)
 
     res.writeHead(err.status || 500)
     res.end()
@@ -242,30 +239,6 @@ const httpServer = http.createServer(function(req, res) {
     })
 })
 
-
-
-/***********************************
-          Setup Postgres
-***********************************/
-
-const postgresConnectionOptions = {
-    host: Config.get('/postgres/host'),
-    port: Config.get('/postgres/port'),
-    user: Config.get('/postgres/username'),
-    password: Config.get('/postgres/password'),
-    database: Config.get('/postgres/database'),
-    ssl: Config.get('/postgres/ssl')
-};
-
-tasks.push(function(callback) {
-    let postgres = require('./connections/postgres');
-    postgres.register(server, postgresConnectionOptions, (err) => {
-        if (err) {
-            return callback(err);
-        }
-        return callback();
-    });
-});
 
 /***********************************
           Connect to GCS
