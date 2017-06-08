@@ -120,10 +120,6 @@ const createSegmentLoadJob = function(call, callback) {
 
         reply.setJob(loadJob)
 
-        // DEBUG STATEMENT
-        // REMOVE LATER
-        console.log(reply.toObject())
-
         return callback(null, reply)
 
     }).catch(function(err) {
@@ -157,7 +153,7 @@ const getLoadJob = function(call, callback) {
                 return callback({ code: grpcCodes.status.NOT_FOUND, message: "LoadJob Not Found"})
             }
 
-            if (job.opts.account_id != AuthContext.getAccountId) {
+            if (job.opts.account_id != AuthContext.getAccountId()) {
                 return callback(permissionDeniedGrpcStatus)
             }
 
