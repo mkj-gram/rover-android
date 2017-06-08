@@ -31,24 +31,21 @@ tasks.push(function(callback) {
 
 tasks.push(function(callback) {
 
-    const config = {
-        host: Config.get('/postgres/host'),
-        port: Config.get('/postgres/port'),
-        user: Config.get('/postgres/username'),
-        password: Config.get('/postgres/password'),
-        database: Config.get('/postgres/database'),
-        ssl: Config.get('/postgres/ssl/enabled'),
-    };
-
-    if (Config.get('/postgres/ssl/cert')) {
-        config.cert = Buffer.from(Config.get('/postgres/ssl/cert'))
-    }
-
-    if (config.ssl == true && config.cert === undefined) {
-        return callback(new Error("Postgres ssl is enabled but no cert was given"))
-    }
+    let dbDSN = Config.get('/postgres/dsn')
 
     let pg = require('pg')
+
+    function NewClient() {
+        return new pg.Client(dbDSN)
+    }
+
+    let config = {
+        Client: NewClient,
+        min: 2,
+        max: 5,
+        idleTimeoutMillis: 30000
+    }
+    
 
     const pool = new pg.Pool(config)
 
