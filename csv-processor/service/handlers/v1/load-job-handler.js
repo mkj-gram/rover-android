@@ -195,10 +195,11 @@ const getLoadJob = function(call, callback) {
  */
 const createLoadJob = function(call, callback) {
 
+    
     const AuthContext = call.request.getAuthContext()
 
     if (!hasAccess(AuthContext)) {
-        return callback()
+        return callback(permissionDeniedGrpcStatus)
     }
     const jobType = call.request.getType()
 
@@ -207,7 +208,7 @@ const createLoadJob = function(call, callback) {
             return createSegmentLoadJob.bind(this)(call, callback)
             break
         default:
-            return callback({message: "Unknown job type", status: 400})
+            return callback({message: "Unknown job type", status: grpcCodes.status.INVALID_ARGUMENT })
     }
 }
 
