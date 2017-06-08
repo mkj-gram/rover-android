@@ -19,7 +19,7 @@ function formatRunTime(microseconds) {
         clockTime = clockTime / 1000
     }
 
-    return `${clockTime.toFixed(2)}μs`
+    return `${clockTime.toFixed(2)}${symbol}`
 }
 
 const inject = function({ name, func }) {
