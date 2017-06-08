@@ -23,7 +23,9 @@ function parse(connection) {
     let parsedConnection = {}
 
     if (url.host) {
-        parsedConnection.host = url.host
+        let parts = url.host.split(":")
+        let hostname = parts[0]
+        parsedConnection.host = hostname
     }
 
     if (url.port) {

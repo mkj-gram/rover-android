@@ -31,6 +31,13 @@ describe('parse', function() {
         assert.equal(conn.host, "localhost")
     })
 
+    it('parses the host name and removes the port', function() {
+        let dsn = "postgres://postgres@localhost:123123/"
+        let conn = parse(dsn)
+
+        assert.equal(conn.host, "localhost")
+    })
+
     it('parses the port', function() {
         let dsn = "postgres://postgres@localhost:123/"
         let conn = parse(dsn)
