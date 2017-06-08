@@ -1,5 +1,7 @@
 const winston = require('winston')
 
+winston.level = (process.env.LOG_LEVEL || 'info')
+
 const LoadJobHandler = require('./load-job-handler')
 
 const inject = function({ name, func }) {
@@ -11,6 +13,10 @@ const inject = function({ name, func }) {
         func(call, function(err, response) {
 
             const runTime = Date.now() - startTime
+
+            if (response && typeof response.toObject == 'function') {
+                winston.debug(response.toObject())
+            }
 
             winston.info("GRPC: " + name + " " + runTime + "ms")
             
