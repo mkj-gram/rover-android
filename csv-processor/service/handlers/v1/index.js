@@ -4,19 +4,38 @@ winston.level = (process.env.LOG_LEVEL || 'info')
 
 const LoadJobHandler = require('./load-job-handler')
 
+function getCurrentMicroSeconds() {
+    const hrTime = process.hrtime()
+    return (hrTime[0] * 1000000 + hrTime[1] / 1000)
+}
+
+function formatRunTime(microseconds) {
+    
+    let symbol = "μs"
+    let clockTime = microseconds
+
+    if (clockTime >= 1000) {
+        symbol = "ms"
+        clockTime = clockTime / 1000
+    }
+
+    return `${clockTime.toFixed(2)}μs`
+}
+
 const inject = function({ name, func }) {
 
     return function(call, callback) {
         
-        const startTime = Date.now()
+        const startTime = getCurrentMicroSeconds()
 
         func(call, function(err, response) {
 
-            const runTime = Date.now() - startTime
+            const runTime = getCurrentMicroSeconds() - startTime
 
+            
             const log = {
                 name: name,
-                runTime: runTime
+                runTime: formatRunTime(runTime)
             }
 
             if (response && typeof response.toObject == 'function') {
@@ -24,8 +43,6 @@ const inject = function({ name, func }) {
             }
 
             if (err) {
-                winston.error(err)
-
                 if (err.code) {
                     log.status = err.code
                 }
