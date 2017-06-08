@@ -118,9 +118,11 @@ const createSegmentLoadJob = function(call, callback) {
             created_at: new Date(job.timestamp)
         })
 
-
-        
         reply.setJob(loadJob)
+
+        // DEBUG STATEMENT
+        // REMOVE LATER
+        console.log(reply.toObject())
 
         return callback(null, reply)
 
