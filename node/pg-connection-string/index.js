@@ -8,6 +8,13 @@ function isEmpty(obj) {
     return Object.keys(obj).length == 0
 }
 
+function getFile(filepath) {
+    let contents = fs.readFileSync(filepath)
+
+    // Replace escaped \\n with a proper newline character \n
+    return new Buffer(contents.toString().replace(/\\n/g, '\n'))
+}
+
 function parse(connection) {
 
     if (connection == undefined || connection == null) {
@@ -64,15 +71,15 @@ function parse(connection) {
             let sslConnection = {}
 
             if (query.sslrootcert) {
-                sslConnection.ca = fs.readFileSync(query.sslrootcert)
+                sslConnection.ca = getFile(query.sslrootcert)
             }
 
             if (query.sslkey) {
-                sslConnection.key = fs.readFileSync(query.sslkey)
+                sslConnection.key = getFile(query.sslkey)
             }
 
             if (query.sslcert) {
-                sslConnection.cert = fs.readFileSync(query.sslcert)
+                sslConnection.cert = getFile(query.sslcert)
             }
 
             if (isEmpty(sslConnection)) {
