@@ -15,7 +15,11 @@ const inject = function({ name, func }) {
             const runTime = Date.now() - startTime
 
             if (response && typeof response.toObject == 'function') {
-                winston.debug(response.toObject())
+                winston.log("debug", response.toObject())
+            }
+
+            if (err) {
+                winston.error(err)
             }
 
             winston.info("GRPC: " + name + " " + runTime + "ms")
