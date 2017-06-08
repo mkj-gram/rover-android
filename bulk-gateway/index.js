@@ -130,7 +130,6 @@ router.put('/bulk/segments/:id/csv', authenticated, upload, function(req, res, n
 
     const segmentLoadJobConfig = new RoverApis['csv-processor'].v1.Models.SegmentLoadJobConfig()
 
-    segmentLoadJobConfig.setAuthContext(req._authContext)
     segmentLoadJobConfig.setAccountId(req.authContext.account_id)
     segmentLoadJobConfig.setSegmentId(req.params.id)
     segmentLoadJobConfig.setCsv(gcsObject)
@@ -138,6 +137,7 @@ router.put('/bulk/segments/:id/csv', authenticated, upload, function(req, res, n
 
     const loadJobRequest = new RoverApis['csv-processor'].v1.Models.CreateLoadJobRequest()
 
+    loadJobRequest.setAuthContext(req._authContext)
     loadJobRequest.setType(RoverApis['csv-processor'].v1.Models.JobType.SEGMENT)
     loadJobRequest.setSegmentLoadJobConfig(segmentLoadJobConfig)
 
