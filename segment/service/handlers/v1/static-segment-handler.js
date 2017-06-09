@@ -5,6 +5,21 @@ const uuid = require('uuid/v1')
 const grpc = require('grpc')
 const squel = require("squel").useFlavour('postgres')
 
+const AllowedScopes = ['internal', 'server', 'admin']
+
+const hasAccess = function(authContext) {
+    if (authContext == null || authContext == undefined) {
+        return false
+    }
+
+    const currentScopes = authContext.getPermissionScopesList()
+
+    if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
+        return false
+    }
+
+    return true
+}
 
 const parseOrderQuery = function(order_by) {
 
@@ -169,7 +184,7 @@ const createNewStaticSegment = function(postgres, segment, callback) {
     })
 }
 
-const deleteStaticSegment = function(postgres, id, callback) {
+const destroyStaticSegment = function(postgres, id, callback) {
     
 
     let deleteQuery = squel.delete()
@@ -336,7 +351,15 @@ const createStaticSegment = function(call, callback) {
 
 }
 
-const destroyStaticSegment = function(call, callback) {
+const deleteStaticSegment = function(call, callback) {
+
+    // First check we have the right permissions
+    
+    const AuthContext = call.request.getAuthContext()
+
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied"})
+    }
 
     const postgres = this.clients.postgres
     const redis = this.clients.redis
@@ -344,7 +367,7 @@ const destroyStaticSegment = function(call, callback) {
     const id = call.request.getId()
 
     if (id == 0) {
-        return callback({ code: grpc.status.INVALID_ARGUMENT, message: "ID cannot be 0" })
+        return callback({ code: grpc.status.NOT_FOUND, message: "Not Found" })
     }
 
     findStaticSegmentById(postgres, redis, id, function(err, segment) {
@@ -356,16 +379,16 @@ const destroyStaticSegment = function(call, callback) {
             return callback({ code: grpc.status.NOT_FOUND, message: "Segment does not exist" })
         }
 
-        if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
+        if (AuthContext.getAccountId() != segment.account_id) {
             return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
         }
 
-        deleteStaticSegment(postgres, id, function(err) {
+        destroyStaticSegment(postgres, id, function(err) {
             if (err) {
                 return callback(err)
             }
 
-            let reply = new RoverApis.segment.v1.Models.DestroyStaticSegmentReply()
+            let reply = new RoverApis.segment.v1.Models.DeleteStaticSegmentReply()
 
             return callback(null, reply)
         })
@@ -540,7 +563,7 @@ module.exports = {
     listStaticSegments: listStaticSegments,
     getStaticSegment: getStaticSegment,
     createStaticSegment: createStaticSegment,
-    destroyStaticSegment: destroyStaticSegment,
+    deleteStaticSegment: deleteStaticSegment,
     updateStaticSegmentPushIds: updateStaticSegmentPushIds,
     getStaticSegmentPushIds: getStaticSegmentPushIds
 }
