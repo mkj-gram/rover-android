@@ -1,0 +1,7 @@
+steps:
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['install']
+  dir: 'rest-gateway'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID', 'rest-gateway']
+images: ['gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID']
