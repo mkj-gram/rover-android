@@ -174,7 +174,29 @@ router.post('/', function(req, res, next) {
  *  Deletes a single static segment
  */
 router.delete('/:id', function(req, res, next) {
-    return next(makeError(501, "Not Implemented yet"))
+
+    const id = parseInt(req.params.id)
+
+    if (isNaN(id)) {
+        return next(makeError(400, "ID must be an integer"))
+    }
+
+    const request = new RoverApis.segment.v1.Models.DeleteStaticSegmentRequest()
+
+    request.setAuthContext(req._authContext)
+    request.setId(id)
+
+    SegmentClient.deleteStaticSegment(request, function(err, response) {
+        if (err) {
+            return next(err)
+        }
+
+        // response is empty 
+        
+        res.writeHead(204)
+        return res.end()
+    })
+
 })
 
 module.exports = router
