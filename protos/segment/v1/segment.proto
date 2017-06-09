@@ -65,6 +65,17 @@ message CreateStaticSegmentReply {
     StaticSegment segment = 1;
 }
 
+message DeleteStaticSegmentRequest {
+
+    rover.auth.v1.AuthContext auth_context = 1;
+    
+    int32 id = 2;
+}
+
+message DeleteStaticSegmentReply {
+    // Empty
+}
+
 message UpdateStaticSegmentIdsReply {
     StaticSegment segment = 1;
 }
@@ -84,6 +95,7 @@ service Segment {
     rpc ListStaticSegments(ListStaticSegmentRequest) returns (ListStaticSegmentResponse) {};
     rpc GetStaticSegment(GetStaticSegmentRequest) returns (GetStaticSegmentReply) {};
     rpc CreateStaticSegment(CreateStaticSegmentRequest) returns (CreateStaticSegmentReply) {};
+    rpc DeleteStaticSegment(DeleteStaticSegmentRequest) returns (DeleteStaticSegmentReply) {};
 
     rpc UpdateStaticSegmentPushIds(stream PushId) returns (UpdateStaticSegmentIdsReply) {};
     rpc GetStaticSegmentPushIds(GetStaticSegmentPushIdsRequest) returns (stream PushId) {}

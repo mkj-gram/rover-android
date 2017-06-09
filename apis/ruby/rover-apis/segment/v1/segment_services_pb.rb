@@ -19,6 +19,7 @@ module Rover
           rpc :ListStaticSegments, ListStaticSegmentRequest, ListStaticSegmentResponse
           rpc :GetStaticSegment, GetStaticSegmentRequest, GetStaticSegmentReply
           rpc :CreateStaticSegment, CreateStaticSegmentRequest, CreateStaticSegmentReply
+          rpc :DeleteStaticSegment, DeleteStaticSegmentRequest, DeleteStaticSegmentReply
           rpc :UpdateStaticSegmentPushIds, stream(PushId), UpdateStaticSegmentIdsReply
           rpc :GetStaticSegmentPushIds, GetStaticSegmentPushIdsRequest, stream(PushId)
         end
