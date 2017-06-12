@@ -39,7 +39,11 @@ const Middleware = function(client, opts = {}) {
          */
         const returnContext = function(err, AuthContext) {
             if (err) {
-                return next(err)
+                if (err.code && err.code === grpc.status.NOT_FOUND) {
+                    return next({ code: grpc.status.UNAUTHENTICATED, message: "Permission Denied" })
+                } else {
+                    return next(err)    
+                }
             }
 
             req.authContext = {
