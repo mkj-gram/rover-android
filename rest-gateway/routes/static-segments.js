@@ -32,8 +32,7 @@ router.use(mustAuthenticate)
 */
 
 function getISOString(timestamp) {
-    let date = new Date(1970, 0, 1)
-    date.setSeconds = timestamp.getSeconds()
+    let date = new Date(timestamp.getSeconds() * 1000)
     return date.toISOString()
 }
 
@@ -58,7 +57,6 @@ router.get('/', function(req, res, next) {
     const request = new RoverApis.segment.v1.Models.ListStaticSegmentRequest()
 
     request.setAuthContext(req._authContext)
-    request.setAccountId(req.authContext.account_id)
 
     if (req.query.sort) {
         request.setOrderBy(req.query.sort)
@@ -121,7 +119,7 @@ router.get('/:id', function(req, res, next) {
 router.post('/', function(req, res, next) {
 
     // Parsed json body
-    const body = request.body
+    const body = req.body
 
     /* 
         Example JSON why are we using json api spec again?
@@ -163,7 +161,7 @@ router.post('/', function(req, res, next) {
         }
 
         const jsonResponse = {
-            data: serialize(response)
+            data: serialize(response.getSegment())
         }
 
         return res.json(jsonResponse)
