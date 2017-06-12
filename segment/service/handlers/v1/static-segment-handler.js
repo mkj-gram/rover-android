@@ -244,24 +244,15 @@ const listStaticSegments = function(call, callback) {
     const postgres = this.clients.postgres
 
     const AuthContext = call.request.getAuthContext()
-    const accountId = call.request.getAccountId()
-
-    if (accountId === 0) {
-        return callback({ code: grpc.status.FAILED_PRECONDITION, message: "Account id can not be 0"})
-    }
 
     if (!hasAccess(AuthContext)) {
-        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
-    }
-
-    if (AuthContext && AuthContext.getAccountId() != accountId) {
         return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
     }
 
     const order_by = call.request.getOrderBy().length == 0 ? "created_at desc" : call.request.getOrderBy()
 
     const scope = {
-        account_id: accountId,
+        account_id: AuthContext.getAccountId(),
         order_by: order_by,
         limit: call.request.getPageSize(),
         next_page_token: call.request.getPageToken()
@@ -325,25 +316,16 @@ const createStaticSegment = function(call, callback) {
 
     const postgres = this.clients.postgres
 
-    const accountId = call.request.getAccountId()
     const title = call.request.getTitle()
-    const AuthContext = call.request.getAccountContext()
-
-    const request = {
-        account_id: accountId,
-        title: title
-    }
+    const AuthContext = call.request.getAuthContext()
 
     if (!hasAccess(AuthContext)) {
         return callback({ code: grpc.status.PERMISSION_DENIED,  message: "Permission Denied" })
     }
 
-    if (accountId == 0) {
-        return callback({ code: grpc.status.INVALID_ARGUMENT, message: "Account ID cannot be 0" })
-    }
-
-    if (AuthContext && AuthContext.getAccountId() != accountId) {
-        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+    const request = {
+        account_id: AuthContext.getAccountId(),
+        title: title
     }
 
     createNewStaticSegment(postgres, request, function(err, segment) {
