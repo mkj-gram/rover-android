@@ -26,13 +26,11 @@ message ListStaticSegmentRequest {
 
     rover.auth.v1.AuthContext auth_context = 1;
 
-    int32 account_id = 2;
+    string order_by = 2;
 
-    string order_by = 3;
+    int32 page_size = 3;
 
-    int32 page_size = 4;
-
-    string page_token = 5;
+    string page_token = 4;
 }
 
 message ListStaticSegmentResponse {
@@ -57,8 +55,7 @@ message CreateStaticSegmentRequest {
     
     rover.auth.v1.AuthContext auth_context = 1;
 
-    int32 account_id = 2;
-    string title = 3;
+    string title = 2;
 }
 
 message CreateStaticSegmentReply {

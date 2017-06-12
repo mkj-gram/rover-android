@@ -381,10 +381,9 @@ proto.rover.segment.v1.ListStaticSegmentRequest.prototype.toObject = function(op
 proto.rover.segment.v1.ListStaticSegmentRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    orderBy: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    pageSize: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    pageToken: jspb.Message.getFieldWithDefault(msg, 5, "")
+    orderBy: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    pageSize: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    pageToken: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -427,18 +426,14 @@ proto.rover.segment.v1.ListStaticSegmentRequest.deserializeBinaryFromReader = fu
       msg.setAuthContext(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setAccountId(value);
-      break;
-    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setOrderBy(value);
       break;
-    case 4:
+    case 3:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setPageSize(value);
       break;
-    case 5:
+    case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setPageToken(value);
       break;
@@ -478,31 +473,24 @@ proto.rover.segment.v1.ListStaticSegmentRequest.serializeBinaryToWriter = functi
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getAccountId();
-  if (f !== 0) {
-    writer.writeInt32(
-      2,
-      f
-    );
-  }
   f = message.getOrderBy();
   if (f.length > 0) {
     writer.writeString(
-      3,
+      2,
       f
     );
   }
   f = message.getPageSize();
   if (f !== 0) {
     writer.writeInt32(
-      4,
+      3,
       f
     );
   }
   f = message.getPageToken();
   if (f.length > 0) {
     writer.writeString(
-      5,
+      4,
       f
     );
   }
@@ -540,62 +528,47 @@ proto.rover.segment.v1.ListStaticSegmentRequest.prototype.hasAuthContext = funct
 
 
 /**
- * optional int32 account_id = 2;
- * @return {number}
- */
-proto.rover.segment.v1.ListStaticSegmentRequest.prototype.getAccountId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/** @param {number} value */
-proto.rover.segment.v1.ListStaticSegmentRequest.prototype.setAccountId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string order_by = 3;
+ * optional string order_by = 2;
  * @return {string}
  */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.getOrderBy = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.setOrderBy = function(value) {
-  jspb.Message.setField(this, 3, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional int32 page_size = 4;
+ * optional int32 page_size = 3;
  * @return {number}
  */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.getPageSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
 /** @param {number} value */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.setPageSize = function(value) {
-  jspb.Message.setField(this, 4, value);
+  jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional string page_token = 5;
+ * optional string page_token = 4;
  * @return {string}
  */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.getPageToken = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.setPageToken = function(value) {
-  jspb.Message.setField(this, 5, value);
+  jspb.Message.setField(this, 4, value);
 };
 
 
@@ -1182,8 +1155,7 @@ proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.toObject = function(
 proto.rover.segment.v1.CreateStaticSegmentRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    title: jspb.Message.getFieldWithDefault(msg, 3, "")
+    title: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -1226,10 +1198,6 @@ proto.rover.segment.v1.CreateStaticSegmentRequest.deserializeBinaryFromReader = 
       msg.setAuthContext(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setAccountId(value);
-      break;
-    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setTitle(value);
       break;
@@ -1269,17 +1237,10 @@ proto.rover.segment.v1.CreateStaticSegmentRequest.serializeBinaryToWriter = func
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getAccountId();
-  if (f !== 0) {
-    writer.writeInt32(
-      2,
-      f
-    );
-  }
   f = message.getTitle();
   if (f.length > 0) {
     writer.writeString(
-      3,
+      2,
       f
     );
   }
@@ -1317,32 +1278,17 @@ proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.hasAuthContext = fun
 
 
 /**
- * optional int32 account_id = 2;
- * @return {number}
- */
-proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.getAccountId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/** @param {number} value */
-proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.setAccountId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string title = 3;
+ * optional string title = 2;
  * @return {string}
  */
 proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.getTitle = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
 proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.setTitle = function(value) {
-  jspb.Message.setField(this, 3, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 

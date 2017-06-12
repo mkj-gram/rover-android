@@ -16,10 +16,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.segment.v1.ListStaticSegmentRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :account_id, :int32, 2
-    optional :order_by, :string, 3
-    optional :page_size, :int32, 4
-    optional :page_token, :string, 5
+    optional :order_by, :string, 2
+    optional :page_size, :int32, 3
+    optional :page_token, :string, 4
   end
   add_message "rover.segment.v1.ListStaticSegmentResponse" do
     repeated :segments, :message, 1, "rover.segment.v1.StaticSegment"
@@ -34,8 +33,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.segment.v1.CreateStaticSegmentRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :account_id, :int32, 2
-    optional :title, :string, 3
+    optional :title, :string, 2
   end
   add_message "rover.segment.v1.CreateStaticSegmentReply" do
     optional :segment, :message, 1, "rover.segment.v1.StaticSegment"
