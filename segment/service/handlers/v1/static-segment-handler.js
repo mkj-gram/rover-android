@@ -250,6 +250,10 @@ const listStaticSegments = function(call, callback) {
         return callback({ code: grpc.status.FAILED_PRECONDITION, message: "Account id can not be 0"})
     }
 
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+    }
+
     if (AuthContext && AuthContext.getAccountId() != accountId) {
         return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
     }
@@ -286,6 +290,9 @@ const getStaticSegment = function(call, callback) {
     const AuthContext = call.request.getAuthContext()
     const segmentId = call.request.getId()
 
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+    }
 
     findStaticSegmentById(postgres, redis, segmentId, function(err, segment) {
         if (err) {
@@ -320,10 +327,15 @@ const createStaticSegment = function(call, callback) {
 
     const accountId = call.request.getAccountId()
     const title = call.request.getTitle()
+    const AuthContext = call.request.getAccountContext()
 
     const request = {
         account_id: accountId,
         title: title
+    }
+
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED,  message: "Permission Denied" })
     }
 
     if (accountId == 0) {
@@ -412,15 +424,13 @@ const updateStaticSegmentPushIds = function(call, callback) {
 
     let idsAddedToSet = 0
 
-    const scope = {}
-
-    if (accountId != 0) {
-        scope.account_id = accountId
-    }
-
-    findStaticSegmentById(postgres, redis, segmentId, scope, function(err, segment) {
+    findStaticSegmentById(postgres, redis, segmentId, function(err, segment) {
         if (err) {
             return callback(err)
+        }
+
+        if (segment.account_id != accountId) {
+            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied "})
         }
 
         if (segment == null || segment == undefined) {
