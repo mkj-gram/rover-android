@@ -59,11 +59,14 @@ app.use(function(err, req, res, next) {
 /* Server Boot */
 
 function normalizePort() {
-    if (isNaN(process.PORT)) {
+
+    let port = parseInt(process.env.PORT)
+
+    if (isNaN(port)) {
         return 3000
     }
 
-    return parseInt(process.env.PORT)
+    return port
 }
 
 const port = normalizePort()
