@@ -1,6 +1,6 @@
 const RoverApis = require("@rover/apis")
 const BatchBufferedStream = require('../../lib/batch-buffered-stream')
-const RedisSetStream = require('../../lib/redis-set-stream')
+const RedisBatchRead = require('../../lib/redis-batch-read')
 const uuid = require('uuid/v1')
 const grpc = require('grpc')
 const squel = require("squel").useFlavour('postgres')
@@ -505,17 +505,21 @@ const getStaticSegmentPushIds = function(call, callback) {
     const postgres = this.clients.postgres
     const redis = this.clients.redis
 
-    const accountId = call.request.getAccountId()
+    const batchSize = call.request.getBatchSize()
+    const AuthContext = call.request.getAuthContext()
     const segmentId = call.request.getSegmentId()
-    const scope = {}
 
-    if (accountId != 0) {
-        scope.account_id = accountId
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
     }
 
-    findStaticSegmentById(postgres, redis, segmentId, scope, function(err, segment) {
+    findStaticSegmentById(postgres, redis, segmentId, function(err, segment) {
         if (err) {
             return callback(err)
+        }
+
+        if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
+            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
         }
 
         if (segment == null || segment == undefined) {
@@ -525,35 +529,39 @@ const getStaticSegmentPushIds = function(call, callback) {
         const redisSetId = segment.redis_set_id
 
         if (redisSetId == null || redisSetId == undefined) {
-            return call.end()
+            // Return a message with no push ids and let the client know they are finished
+            const reply = new RoverApis.segment.v1.Models.GetStaticSegmentPushIdsReply()
+            reply.setFinished(true)
+            return callback(null, reply)
         }
 
-        const stream = new RedisSetStream(redis, redisSetId, 10000, {})
+        const batch = new RedisBatchRead(redis, redisSetId, 10000, {})
 
-        var start = Date.now()
+        batch.read(function(err, ids, nextCursor) {
+            if (err) {
+                return callback(err)
+            }
 
-        stream.on('data', function(ids) {
-            /*
-                We immediatly pause the stream because well Node...
-                Node won't give grpc the chance to begin streaming because it gets in a tight loop
-                where its reading from redis and buffering all the write calls. We use process.nextTick
-                to allow grpc to breath and begin streaming the request
-             */
-            stream.pause()
-            ids.forEach(function(id) {
-                var r = new RoverApis.segment.v1.Models.PushId()
-                r.setId(id)
-                call.write(r)
-            })
+            const reply = new RoverApis.segment.v1.Models.GetStaticSegmentPushIdsReply()
 
-            process.nextTick(function() { 
-                stream.resume()
-            })
-            
-        })
+            if (nextCursor == null || nextCursor == undefined) {
+                reply.setFinished(true)
+            } else {
+                reply.setFinished(false)
+                reply.setNextCursor(nextCursor)
+            }
 
-        stream.on('end', function() {
-            return call.end()       
+            if (ids && isArray(ids)) {
+                const pushIds = ids.map(id => {
+                    const pushId = new RoverApis.segment.v1.Models.PushId()
+                    pushId.setId(id)
+                    pushId.setType(RoverApis.segment.v1.Models.PushIdType.ALIAS)
+                })
+
+                reply.setPushIdsList(pushIds)
+            }
+
+            return callback(null, reply)
         })
 
     })    
