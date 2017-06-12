@@ -13,7 +13,7 @@ const AuthMiddleware = Auth.v1.Middleware(AuthClient)
 /* Setup Express Server */
 const app = express()
 
-app.use(logger('dev'))
+app.use(logger('common'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(AuthMiddleware)
