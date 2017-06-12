@@ -58,7 +58,7 @@ router.get('/', function(req, res, next) {
     const request = new RoverApis.segment.v1.Models.ListStaticSegmentRequest()
 
     request.setAuthContext(req._authContext)
-    request.setAccountId(requ.authContext.account_id)
+    request.setAccountId(req.authContext.account_id)
 
     if (req.query.sort) {
         request.setOrderBy(req.query.sort)
