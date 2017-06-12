@@ -12,11 +12,16 @@ import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import App from '../app'
 
+import RoverApis from '@rover/apis'
+import Auth from '@rover/auth-client'
+
 dotenv.config()
 
 if (process.env.NEW_RELIC_ENABLED === 'true') {
     require('newrelic')
 }
+
+const AuthClient = Auth.v1.Client()
 
 const app = express()
 
@@ -107,6 +112,7 @@ app.get('/:shortUrl', (req, res, next) => {
     let iosAppProfile = null
     let androidAppProfile = null
     let experience = null
+    let analyticsToken = null
     const userAgent = req.headers['user-agent']
     const isMobile = /Mobile/.test(userAgent)
     const isAndroid =
@@ -137,8 +143,13 @@ app.get('/:shortUrl', (req, res, next) => {
             const experienceId = Object.keys(response.experiences)[0]
             experience = response.experiences[experienceId]
         })
+        .then(() => getAnalyticsToken(experience.accountId))
+        .then(token => {
+            analyticsToken = token
+        })
         .then(() => {
             renderExperienceHtml(experience, !version, {
+                analyticsToken: analyticsToken,
                 isMobile: isMobile,
                 isAndroid: isAndroid,
                 showStatusBar: showStatusBar,
@@ -153,11 +164,11 @@ app.get('/:shortUrl', (req, res, next) => {
                 description: getTextDescription(experience),
                 simulatorUrl: experience.simulatorUrl
             })
-                .then(html => {
-                    res.setHeader('Content-Type', 'text/html; charset=utf-8')
-                    res.send(html)
-                })
-                .catch(respondWithError(res))
+            .then(html => {
+                res.setHeader('Content-Type', 'text/html; charset=utf-8')
+                res.send(html)
+            })
+            .catch(respondWithError(res))
         })
         .catch(respondWithError(res))
 })
@@ -230,6 +241,7 @@ const fetchAppProfile = appProfileId => {
 
 const renderExperienceHtml = (experience, useRenderCache, options) => {
     let {
+        analyticsToken,
         isMobile,
         isAndroid,
         showStatusBar,
@@ -246,19 +258,24 @@ const renderExperienceHtml = (experience, useRenderCache, options) => {
     } = options
 
     function render() {
+        const analyticsURL = process.env.ANALYTICS_URL
         return new Promise((resolve, reject) => {
             const reactApp = ReactDOMServer.renderToString(
                 <App
                     experience={experience}
+                    analyticsToken={analyticsToken}
+                    analyticsURL={analyticsURL}
                     isMobile={isMobile}
                     isAndroid={isAndroid}
                     showStatusBar={showStatusBar}
                     showCloseButton={showCloseButton}
                 />
             )
-
+            
             const props = {
                 experience: experience,
+                analyticsToken: analyticsToken,
+                analyticsURL: analyticsURL,
                 showStatusBar: showStatusBar,
                 showCloseButton: showCloseButton,
                 isAndroid: isAndroid,
@@ -370,6 +387,7 @@ const fetchExperienceByShortUrl = (shortUrl, version, token) => {
             resolve({
                 experiences: {
                     [id]: {
+                        accountId: attributes['account-id'],
                         hasUnpublishedChanges: attributes[
                             'has-unpublished-changes'
                         ],
@@ -385,6 +403,30 @@ const fetchExperienceByShortUrl = (shortUrl, version, token) => {
                     }
                 }
             })
+        })
+    })
+}
+
+const getAnalyticsToken = accountId => {
+    return new Promise((resolve, reject) => {
+        
+        const request = new RoverApis.auth.v1.Models.ListTokensRequest()
+        request.setAccountId(accountId)
+        
+        AuthClient.listTokens(request, (err, response) => {
+            if (err) {
+                reject({ statuscode: 500 })
+            }
+            
+            const tokens = response.getTokensList()
+            
+            const webToken = tokens.find(token => token.getPermissionScopesList().includes('web'))
+            
+            if (webToken) {
+                return resolve(webToken.getKey())
+            }
+            
+            return reject({ statuscode: 500 })
         })
     })
 }

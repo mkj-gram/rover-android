@@ -3,22 +3,24 @@ import moment from 'moment'
 import 'moment-timezone'
 import 'whatwg-fetch'
 
-export const sendData = data =>
-    fetch('https://api.staging.rover.io/v1/events', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-ROVER-API-KEY': 'f7979c3a98fff4ade7cf2c68553e267c'
-            },
-            body: JSON.stringify(getBody(data))
-        })
+export const sendData = (name, data, analyticsToken, analyticsURL) =>
+    fetch(analyticsURL, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-ROVER-API-KEY': analyticsToken,
+            'X-ROVER-DEVICE-ID': localStorage.getItem('rover-device-id')
+        },
+        body: JSON.stringify(getBody(name, data))
+    })
 
-const getBody = (data = {}) => ({
+const getBody = (name = '', data = {}) => ({
     data: {
         type: 'events',
         attributes: {
             timestamp: new Date().toISOString(),
+            name: name,
             attributes: data,
             device: {
                 'locale-lang': navigator.language.slice(0, 2),
