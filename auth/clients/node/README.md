@@ -11,7 +11,7 @@ var Auth = require("@rover/auth-client")
 var AuthClient = Auth.v1.Client()
 
 /* Build the request */
-var request = new RoverApis.auth.v1.AuthenticateRequest()
+var request = new RoverApis.auth.v1.Models.AuthenticateRequest()
 request.setKey("token123")
 
 AuthClient.authenticateToken(request, function(err, AuthContext) {
