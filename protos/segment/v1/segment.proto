@@ -82,7 +82,17 @@ message UpdateStaticSegmentIdsReply {
 
 /* Internal */
 message GetStaticSegmentPushIdsRequest {
-    int32 segment_id = 1;
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    int32 segment_id = 2;
+    string cursor = 3;
+    int32 batch_size = 4;
+}
+
+message GetStaticSegmentPushIdsReply {
+    repeated PushId push_ids = 1;
+    string next_cursor = 2;
+    bool finished = 3;
 }
 
 message PushId {
@@ -98,5 +108,5 @@ service Segment {
     rpc DeleteStaticSegment(DeleteStaticSegmentRequest) returns (DeleteStaticSegmentReply) {};
 
     rpc UpdateStaticSegmentPushIds(stream PushId) returns (UpdateStaticSegmentIdsReply) {};
-    rpc GetStaticSegmentPushIds(GetStaticSegmentPushIdsRequest) returns (stream PushId) {}
+    rpc GetStaticSegmentPushIds(GetStaticSegmentPushIdsRequest) returns (GetStaticSegmentPushIdsReply) {}
 }
