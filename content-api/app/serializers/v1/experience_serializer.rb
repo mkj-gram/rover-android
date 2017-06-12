@@ -10,6 +10,7 @@ module V1::ExperienceSerializer
                 type: 'experiences'.freeze,
                 attributes: {
                     name: experience.title,
+                    :'account-id' => experience.account_id,
                     :'version-id' => version.nil? ? nil : version.id,
                     :'view-token' => experience.view_token,
                     :'has-unpublished-changes' => has_unpublished_changes,
