@@ -52,6 +52,7 @@ const route = function(req, res) {
     res._startTime = Date.now();
 
     res.setHeader('Access-Control-Allow-Origin', '*')
+    rest.setHeader('Access-Control-Allow-Headers', 'X-Rover-Api-Key, X-Rover-Device-Id')
 
     res.on('finish', function() {
         const requestEndTime = Date.now();
