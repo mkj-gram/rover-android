@@ -51,8 +51,7 @@ const route = function(req, res) {
 
     res._startTime = Date.now();
 
-    res.setHeader('Access-Control-Allow-Origin', '*')
-    res.setHeader('Access-Control-Allow-Headers', 'X-Rover-Api-Key, X-Rover-Device-Id')
+   
 
     res.on('finish', function() {
         const requestEndTime = Date.now();
@@ -196,6 +195,11 @@ const route = function(req, res) {
             }
         });
     } else if(method == httpMethods.OPTIONS) {
+        res.setHeader('Access-Control-Allow-Origin', '*')
+
+        allowedHeaders = req.headers['access-control-request-headers'] || ''
+        res.setHeader('Access-Control-Allow-Headers', allowedHeaders)
+
         res.writeHead(200)
         return res.end()
     } else {
