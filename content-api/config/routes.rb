@@ -141,6 +141,8 @@ Rails.application.routes.draw do
             end
         end
 
+        get '/experience-list-items', to: "experience_list_items#index"
+
         get '/experiences/:short_url', to: 'experiences#short_url', constraints: { short_url: /\w{6}/ }
         get '/experiences', to: 'experiences#index'
         post '/experiences', to: 'experiences#create'
