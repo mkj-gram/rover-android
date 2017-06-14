@@ -41,7 +41,7 @@ function serialize(segment) {
         'id': segment.getId(),
         'type': "static-segments",
         'attributes': {
-            'title': segment.getTitle(),
+            'name': segment.getTitle(),
             'size': segment.getSize(),
             'updated-at': getISOString(segment.getUpdatedAt()),
             'created-at': getISOString(segment.getCreatedAt())
@@ -145,15 +145,15 @@ router.post('/', function(req, res, next) {
         return next(makeError(400, "Attributes cannot be left blank"))
     }
 
-    if (body.data.attributes.title == undefined || body.data.attributes.title == null) {
-        return next(makeError(400, "Title must be set and cannot be null"))
+    if (body.data.attributes.name == undefined || body.data.attributes.name == null) {
+        return next(makeError(400, "Name must be set and cannot be null"))
     }
 
     const request = new RoverApis.segment.v1.Models.CreateStaticSegmentRequest()
 
     
     request.setAuthContext(req._authContext)
-    request.setTitle(body.data.attributes.title)
+    request.setTitle(body.data.attributes.name)
 
     SegmentClient.createStaticSegment(request, function(err, response) {
         if (err) {
