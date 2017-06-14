@@ -141,7 +141,9 @@ Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
             nextCursor = response.getNextCursor()
             finished = response.getFinished()
 
-            const identifiers = response.getPushIdsList().map(pushId => return pushId.id)
+            const identifiers = response.getPushIdsList().map(function(pushId) {
+                return pushId.id
+            })
 
             let jobArgs = Object.assign({}, args, { customer_identifiers: identifiers })
 

@@ -1,5 +1,5 @@
 steps:
-- name: 'gcr.io/rover-production/npm:5.11.1'
+- name: 'gcr.io/rover-production/npm:6.9.1'
   args: ['install']
   dir: 'scheduled-messages-worker'
   env:
