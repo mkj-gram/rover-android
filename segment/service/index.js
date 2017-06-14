@@ -2,11 +2,15 @@ require('newrelic')
 const Config = require('./config')
 const SegmentV1Service = require("@rover/apis").segment.v1.Services.SegmentService
 const grpc = require("grpc")
-const Config = require('./config')
 const redis = require('redis')
 const async = require('async')
 const parse = require("@rover-common/pg-connection-string")
 const V1Handlers = require('./handlers/v1')
+
+if (Config.get('/raven/enabled')) {
+    const Raven = require('raven')
+    Raven.config(Config.get('/raven/dsn')).install();
+}
 
 
 const server = new grpc.Server()
