@@ -133,7 +133,7 @@ router.post('/', function(req, res, next) {
         }
     */
    
-    if (body.data == undefined || body.null) {
+    if (body == null || body.data == undefined || body.data == null) {
         return next(makeError(400, "Invalid JSON API"))
     }
 
