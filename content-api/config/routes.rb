@@ -119,8 +119,8 @@ Rails.application.routes.draw do
 
         get "/inbox/:id/landing-page", to: 'customer_inbox_landing_page#show'
 
-        resources :"segments", controller: "customer_segments", as: "customer_segments"
-        scope :segments do
+        resources :"dynamic-segments", controller: "customer_segments", as: "customer_segments"
+        scope :"dynamic-segments" do
             post "/calculate", to: "customer_segment_calculate#create", as: "customer_segment_calculate"
         end
 
