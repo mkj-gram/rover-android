@@ -4,7 +4,7 @@ const Client = RoverApis.auth.v1.Services.AuthClient
 const grpc = require('grpc')
 const Config = require('./config')
 const IPParse = require("@rover-common/ip-parse")
-
+const jwtDecode = require('jwt-decode')
 
 const newClient = function(opts) {
 
@@ -65,8 +65,21 @@ const Middleware = function(client, opts = {}) {
             client.authenticateToken(request, returnContext)
         } else if (headers.hasOwnProperty('authorization')) {
             const key = headers['authorization'].split(' ')[1]
-            request.setKey(key)
-            client.authenticateUserSession(request, returnContext)
+            let jwt = {}
+
+            try {
+                jwt = jwtDecode(key)
+            } catch(e) {
+                return next({ code: grpc.status.INVALID_ARGUMENT, message: "Invalid JWT token" })
+            }
+
+            if (jwt.jti) {
+                request.setKey(jwt.jti)
+                return client.authenticateUserSession(request, returnContext)
+            } else {
+                return next({ code: grpc.status.INVALID_ARGUMENT, message: "Invalid JWT token" })
+            }
+           
 
         } else {
             return next()
