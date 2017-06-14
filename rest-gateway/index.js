@@ -4,7 +4,7 @@ const path = require('path')
 const logger = require('morgan')
 const bodyParser = require('body-parser')
 const grpcCodes = require("@rover-common/grpc-codes")
-
+const cors = require('cors')
 /* Setup Auth Client and Middleware */
 const Auth = require('@rover/auth-client')
 const AuthClient = Auth.v1.Client()
@@ -13,6 +13,7 @@ const AuthMiddleware = Auth.v1.Middleware(AuthClient)
 /* Setup Express Server */
 const app = express()
 
+app.use(cors())
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
