@@ -118,6 +118,20 @@ const upload = function(req, res, next) {
 
 const router = Router()
 
+if (Config.get('/raven/enabled')) {
+    console.info("Setting up Sentry Raven")
+
+    const Raven = require('raven')
+
+    Raven.config(Config.get('/raven/dsn')).install();
+
+    // The request handler must be the first middleware on the app
+    router.use(Raven.requestHandler());
+
+    router.use(Raven.errorHandler());
+}
+
+
 router.use(AuthMiddleware)
 
 router.put('/bulk/segments/:id/csv', authenticated, upload, function(req, res, next) {

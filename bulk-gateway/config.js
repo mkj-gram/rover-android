@@ -43,6 +43,18 @@ const store = new Confidence.Store({
             production: process.env.STORAGE_BUCKET_NAME,
             $default: 'bulk-service'
         }
+    },
+    raven: {
+        enabled: {
+            $filter: 'env',
+            production: process.env.RAVEN_ENABLED == 'true',
+            $default: false
+        },
+        dsn: {
+            $filter: 'env',
+            production: process.env.RAVEN_DSN,
+            $default: ''
+        }
     }
 });
 
