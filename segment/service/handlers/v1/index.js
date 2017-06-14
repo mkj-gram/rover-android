@@ -1,7 +1,7 @@
 const winston = require('winston')
 const StaticSegmentHandler = require('./static-segment-handler')
 const newrelic = require('newrelic')
-const Config = require("../../Config")
+const Config = require("../../config")
 
 let Raven = null
 
