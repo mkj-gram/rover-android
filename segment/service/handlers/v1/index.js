@@ -15,42 +15,48 @@ const inject = function({ name, func }) {
         
         const startTime = Date.now()
 
-        func(call, newrelic.createWebTransaction(name, function(err, response) {
+        const transaction = newrelic.createWebTransaction(name, function() {
 
-            newrelic.endTransaction()
+            func(call, function(err, response) {
 
-            const runTime = Date.now() - startTime
+                newrelic.endTransaction()
 
-            if (err) {
+                const runTime = Date.now() - startTime
 
-                /*
-                    Only log errors which are Nodejs Errors
-                    gRPC validation errors are objects
-                */
-                if (err instanceof Error && Raven != null) {
-                    Raven.captureException(err)
-                }
+                if (err) {
 
-                winston.error("GRPC: " + name + " " + runTime + "ms", err)
+                    /*
+                        Only log errors which are Nodejs Errors
+                        gRPC validation errors are objects
+                    */
+                    if (err instanceof Error && Raven != null) {
+                        Raven.captureException(err)
+                    }
 
-                let grpcError = {
-                    code: parseInt(err.code) || 0,
-                    message: err.message || "Unknown"
-                }
-                
-                console.error(grpcError)
+                    winston.error("GRPC: " + name + " " + runTime + "ms", err)
 
-                if (callback != null && callback != undefined) {
-                    return callback(grpcError)
+                    let grpcError = {
+                        code: parseInt(err.code) || 0,
+                        message: err.message || "Unknown"
+                    }
+                    
+                    console.error(grpcError)
+
+                    if (callback != null && callback != undefined) {
+                        return callback(grpcError)
+                    } else {
+                        return call.emit("error", grpcError)
+                    }
+                    
                 } else {
-                    return call.emit("error", grpcError)
+                    winston.info("GRPC: " + name + " " + runTime + "ms")
+                    return callback(null, response)
                 }
-                
-            } else {
-                winston.info("GRPC: " + name + " " + runTime + "ms")
-                return callback(null, response)
-            }
-        }))
+            })
+        })
+
+        /* Start the transaction */
+        transaction()
     }
 }
 
