@@ -22,7 +22,7 @@ if (Config.get('/raven/enabled')) {
 }
 app.use(cors())
 app.use(logger('dev'))
-app.use(bodyParser.json())
+app.use(bodyParser.json({ type: ['application/json', 'application/vnd.api+json'] }))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(AuthMiddleware)
 app.disable('x-powered-by');
