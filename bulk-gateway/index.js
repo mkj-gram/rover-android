@@ -131,6 +131,9 @@ if (Config.get('/raven/enabled')) {
     router.use(Raven.errorHandler());
 }
 
+/* Add Cors support */
+const cors = require('cors')
+router.use(cors())
 
 router.use(AuthMiddleware)
 
