@@ -5,6 +5,8 @@ const logger = require('morgan')
 const bodyParser = require('body-parser')
 const grpcCodes = require("@rover-common/grpc-codes")
 const cors = require('cors')
+const Config = require('./config')
+const Raven = require('raven')
 /* Setup Auth Client and Middleware */
 const Auth = require('@rover/auth-client')
 const AuthClient = Auth.v1.Client()
@@ -13,6 +15,11 @@ const AuthMiddleware = Auth.v1.Middleware(AuthClient)
 /* Setup Express Server */
 const app = express()
 
+if (Config.get('/raven/enabled')) {
+    Raven.config(Config.get('/raven/dsn')).install();
+    app.use(Raven.requestHandler());
+    app.use(Raven.errorHandler());
+}
 app.use(cors())
 app.use(logger('dev'))
 app.use(bodyParser.json())
@@ -59,7 +66,7 @@ app.use(function(err, req, res, next) {
 
 function normalizePort() {
 
-    let port = parseInt(process.env.PORT)
+    let port = parseInt(Config.get('/port'))
 
     if (isNaN(port)) {
         return 3000
