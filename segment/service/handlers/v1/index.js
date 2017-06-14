@@ -1,6 +1,6 @@
 const winston = require('winston')
-
 const StaticSegmentHandler = require('./static-segment-handler')
+const newrelic = require('newrelic')
 
 const inject = function({ name, func }) {
 
@@ -8,7 +8,9 @@ const inject = function({ name, func }) {
         
         const startTime = Date.now()
 
-        func(call, function(err, response) {
+        func(call, newrelic.createWebTransaction(name, function(err, response) {
+
+            newrelic.endTransaction()
 
             const runTime = Date.now() - startTime
 
@@ -29,7 +31,7 @@ const inject = function({ name, func }) {
                 winston.info("GRPC: " + name + " " + runTime + "ms")
                 return callback(null, response)
             }
-        })
+        }))
     }
 }
 

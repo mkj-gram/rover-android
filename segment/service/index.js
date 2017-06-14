@@ -1,3 +1,5 @@
+require('newrelic')
+const Config = require('./config')
 const SegmentV1Service = require("@rover/apis").segment.v1.Services.SegmentService
 const grpc = require("grpc")
 const Config = require('./config')
