@@ -284,7 +284,7 @@ JobProcessor.prototype._getSegmentFromService = function() {
             }        
 
             const identifiers = response.getPushIdsList().map(function(pushId) {
-                return pushId.id
+                return pushId.getId()
             })
 
             this._getCustomersFromIdentifiers(identifiers)

@@ -33,6 +33,9 @@ internals.findAllByIdentifier = function(account_id, identifiers, callback) {
     const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
+    /* filter out bad identifiers */
+
+    identifiers = identifiers.filter(identifier => identifier)
     mongodb.collection(collection).find({ account_id: account_id, identifier: { $in: identifiers }}).toArray((err, docs) => {
         if (err) {
             return callback(err, null);
