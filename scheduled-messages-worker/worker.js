@@ -84,7 +84,7 @@ Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
     let authContext = new RoverApis.auth.v1.Models.AuthContext()
 
     authContext.setAccountId(args.account.id)
-    authContext.setPermissionsScopeList(["internal", "app:smw"])
+    authContext.setPermissionScopesList(["internal", "app:smw"])
 
 
     // somehow we keep going till 
@@ -125,6 +125,8 @@ Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
 
         request.setAuthContext(authContext)
         request.setCursor(nextCursor)
+        request.setSegmentId(args.static_segment_id)
+        request.setBatchSize(1000)
 
         readbatch(request, function(err, response) {
             if (err) {
