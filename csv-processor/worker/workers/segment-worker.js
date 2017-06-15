@@ -52,7 +52,7 @@ const loadStaticSegment = function(job, done) {
 
     SegmentClient.getStaticSegment(getStaticSegmentRequest, function(err, staticSegment) {
         if (err) {
-            return callback(err)
+            return done(err)
         }
 
         const gcsFile = jobData.gcs_file
