@@ -41,7 +41,7 @@ const loadStaticSegment = function(job, done) {
     authContext.setPermissionScopesList(jobData.auth_context.scopes)
 
     const segmentId = jobData.segment_id
-    const accountId = authContext.getAccount()
+    const accountId = authContext.getAccountId()
 
     // First we check if we have access to the static segment and it exists
     
