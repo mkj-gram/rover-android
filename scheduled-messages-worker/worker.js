@@ -131,7 +131,7 @@ Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
         request.setSegmentId(args.static_segment_id)
         request.setBatchSize(1000)
 
-        debug("Reading batch: staticSegmentId=" + args.static_segment_id + " nextCursor=" + nextCursor)
+        debug("Reading batch: staticSegmentId=" + args.static_segment_id + "finished= " + finished + " nextCursor=" + nextCursor)
         readbatch(request, function(err, response) {
             if (err) {
                 finished = true
