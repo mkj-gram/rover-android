@@ -42,7 +42,7 @@ message LoadJob {
 
 message SegmentLoadJobConfig {
     int32 account_id = 1;
-    string segment_id = 2;
+    int32 segment_id = 2;
     GCSObject csv = 3;
 }
 

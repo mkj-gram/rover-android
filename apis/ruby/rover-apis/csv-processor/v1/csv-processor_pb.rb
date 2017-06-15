@@ -22,7 +22,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.csv_processor.v1.SegmentLoadJobConfig" do
     optional :account_id, :int32, 1
-    optional :segment_id, :string, 2
+    optional :segment_id, :int32, 2
     optional :csv, :message, 3, "rover.csv_processor.v1.GCSObject"
   end
   add_message "rover.csv_processor.v1.GetLoadJobRequest" do

@@ -580,7 +580,7 @@ proto.rover.csv_processor.v1.SegmentLoadJobConfig.prototype.toObject = function(
 proto.rover.csv_processor.v1.SegmentLoadJobConfig.toObject = function(includeInstance, msg) {
   var f, obj = {
     accountId: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    segmentId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    segmentId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     csv: (f = msg.getCsv()) && proto.rover.csv_processor.v1.GCSObject.toObject(includeInstance, f)
   };
 
@@ -623,7 +623,7 @@ proto.rover.csv_processor.v1.SegmentLoadJobConfig.deserializeBinaryFromReader = 
       msg.setAccountId(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
+      var value = /** @type {number} */ (reader.readInt32());
       msg.setSegmentId(value);
       break;
     case 3:
@@ -667,8 +667,8 @@ proto.rover.csv_processor.v1.SegmentLoadJobConfig.serializeBinaryToWriter = func
     );
   }
   f = message.getSegmentId();
-  if (f.length > 0) {
-    writer.writeString(
+  if (f !== 0) {
+    writer.writeInt32(
       2,
       f
     );
@@ -700,15 +700,15 @@ proto.rover.csv_processor.v1.SegmentLoadJobConfig.prototype.setAccountId = funct
 
 
 /**
- * optional string segment_id = 2;
- * @return {string}
+ * optional int32 segment_id = 2;
+ * @return {number}
  */
 proto.rover.csv_processor.v1.SegmentLoadJobConfig.prototype.getSegmentId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
-/** @param {string} value */
+/** @param {number} value */
 proto.rover.csv_processor.v1.SegmentLoadJobConfig.prototype.setSegmentId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
