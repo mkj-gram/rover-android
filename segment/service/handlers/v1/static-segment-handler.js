@@ -570,6 +570,7 @@ const getStaticSegmentPushIds = function(call, callback) {
                     const pushId = new RoverApis.segment.v1.Models.PushId()
                     pushId.setId(id)
                     pushId.setType(RoverApis.segment.v1.Models.PushIdType.ALIAS)
+                    return pushId
                 })
 
                 reply.setPushIdsList(pushIds)
