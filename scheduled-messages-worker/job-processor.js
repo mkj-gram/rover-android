@@ -320,7 +320,7 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
                 return reject(new JobError("failed to read customers from mongo", true));
             }
 
-            logger.debug("_getCustomersFromIdentifiers: " + totalTime +  "ms");
+            this._debug("Finished reading customers")
 
             let parsedCustomers = customers.map(parseCustomer);
 
