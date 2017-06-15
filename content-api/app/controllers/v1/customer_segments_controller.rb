@@ -72,12 +72,12 @@ class V1::CustomerSegmentsController < V1::ApplicationController
 
     def customer_segment_params(local_params)
 
-        convert_param_if_exists(local_params[:"dynamic-segments"], :name, :title)
-        param_should_be_array(local_params[:"dynamic-segments"], :filters)
+        convert_param_if_exists(local_params[:dynamic_segments], :name, :title)
+        param_should_be_array(local_params[:dynamic_segments], :filters)
 
-        filtered_params = local_params.fetch(:"dynamic-segments", {}).permit(:title)
-        if local_params.dig(:"dynamic-segments", :filters)
-            filtered_params[:filters] = local_params[:"dynamic-segments"][:filters]
+        filtered_params = local_params.fetch(:dynamic_segments, {}).permit(:title)
+        if local_params.dig(:dynamic_segments, :filters)
+            filtered_params[:filters] = local_params[:dynamic_segments][:filters]
         end
         return filtered_params
     end
