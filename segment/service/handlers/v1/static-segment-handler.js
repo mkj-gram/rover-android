@@ -510,12 +510,12 @@ const getStaticSegmentPushIds = function(call, callback) {
             return callback(err)
         }
 
-        if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
-            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
-        }
-
         if (segment == null || segment == undefined) {
             return callback({ code: grpc.status.NOT_FOUND, message: "Segment not found" })
+        }
+
+        if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
+            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
         }
 
         const redisSetId = segment.redis_set_id
@@ -527,7 +527,7 @@ const getStaticSegmentPushIds = function(call, callback) {
             return callback(null, reply)
         }
 
-        const batch = new RedisBatchRead(redis, redisSetId, 10000, {})
+        const batch = new RedisBatchRead(redis, redisSetId, batchSize, {})
 
         batch.read(function(err, ids, nextCursor) {
             if (err) {
