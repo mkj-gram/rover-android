@@ -7,7 +7,7 @@ const JobError = require('./errors/job-error');
 const RoverApis = require("@rover/apis");
 const async = require("async");
 const retry = require('retry');
-const debug = require('debug')
+const debug = require('debug')('worker')
 
 debug.log = console.info.bind(console)
 
