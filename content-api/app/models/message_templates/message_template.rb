@@ -127,6 +127,16 @@ class MessageTemplate < ActiveRecord::Base
         @experience_stats = new_stats.nil? ? ExperienceStats.new(experience_id: self.experience_id) : new_stats
     end
 
+    def customer_segment_id=(id)
+        self[:customer_segment_id] = id
+        self[:static_segment_id] = nil
+    end
+
+    def static_segment_id=(id)
+        self[:static_segment_id] = id
+        self[:customer_segment_id] = nil
+    end
+    
     def schedule_start_date
         @schedule_start_date ||= if schedule_start_parsed_time
             Date.parse(schedule_start_parsed_time.to_s).to_s
