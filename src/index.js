@@ -5,6 +5,7 @@ import BarcodeBlockIcon from './BarcodeBlockIcon'
 import BarcodeBlockIconSmall from './BarcodeBlockIconSmall'
 import ButtonBlockIcon from './ButtonBlockIcon'
 import ButtonBlockIconSmall from './ButtonBlockIconSmall'
+import CalendarIconSmall from './CalendarIconSmall'
 import ClipboardIcon from './ClipboardIcon'
 import ColorPaletteIcon from './ColorPaletteIcon'
 import DefaultBlockIcon from './DefaultBlockIcon'
@@ -89,6 +90,7 @@ export {
     BarcodeBlockIconSmall,
     ButtonBlockIcon,
     ButtonBlockIconSmall,
+    CalendarIconSmall,
     ClipboardIcon,
     ColorPaletteIcon,
     DefaultBlockIcon,
