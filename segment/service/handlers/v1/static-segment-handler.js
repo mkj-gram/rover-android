@@ -565,7 +565,7 @@ const getStaticSegmentPushIds = function(call, callback) {
                 reply.setNextCursor(nextCursor)
             }
 
-            if (ids && isArray(ids)) {
+            if (ids) {
                 const pushIds = ids.map(id => {
                     const pushId = new RoverApis.segment.v1.Models.PushId()
                     pushId.setId(id)
