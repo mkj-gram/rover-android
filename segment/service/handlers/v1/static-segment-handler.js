@@ -101,7 +101,7 @@ const getAllStaticSegments = function(postgres, redis, scopes, callback) {
         const populatedSegments = segments.filter(segment => segment.redis_set_id)
         const redisSetIds = populatedSegments.map(segment => segment.redis_set_id)
 
-        multi = client.multi()
+        multi = redis.multi()
 
         redisSetIds.forEach(setId => {
             multi.scard(setId)
@@ -118,7 +118,7 @@ const getAllStaticSegments = function(postgres, redis, scopes, callback) {
 
             return callback(null, segments)
         })
-        
+
     })
 
 }
