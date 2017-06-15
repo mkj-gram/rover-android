@@ -26,6 +26,7 @@ module.exports.register = function(server, options, next) {
     server.methods.customer.pullDevice = CustomerService.pullDevice.bind(server);
     server.methods.customer.index = CustomerService.index.bind(server);
     server.methods.customer.deleteIndex = CustomerService.deleteIndex.bind(server);
+    server.methods.customer.findAllByIdentifier = CustomerService.findAllByIdentifier.bind(server);
 
 
 
