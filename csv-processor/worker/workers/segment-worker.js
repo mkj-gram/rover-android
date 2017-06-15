@@ -1,4 +1,3 @@
-const winston = require('winston')
 const csv = require('fast-csv')
 const storage = require('@google-cloud/storage')
 const Config = require('../config')
@@ -16,7 +15,7 @@ const gcs = storage({
 
 
 const updateJobProgress = function(job, progress) {
-    winston.info("Job: id=" + job.jobId + " progress=" + progress)
+    console.info("Job: id=" + job.jobId + " progress=" + progress)
     job.progress(progress)
 }
 
@@ -63,20 +62,20 @@ const loadStaticSegment = function(job, done) {
 
         file.get(function(err, _, apiResponse) {
             if (err) {
-                winston.error(err)
+                console.error(err)
                 return done(err)
             }
 
             let fileSize = file.metadata.size || 0
             let totalBytesProcessed = 0
 
-            winston.debug("FileSize: " + fileSize)
+            console.info("FileSize: " + fileSize)
 
             // file.metadata has been populated.
             
             const remoteReadStream = bucket.file(gcsFile.file_id).createReadStream();
 
-            winston.debug("Started", gcsFile)
+            console.info("Started", gcsFile)
 
             var meta = new grpc.Metadata();
             meta.add('account_id', `${accountId}`)
@@ -93,7 +92,7 @@ const loadStaticSegment = function(job, done) {
                 
                 updateJobProgress(job, 100)
 
-                winston.info("Segment Updated: ", res.getSegment().toObject())
+                console.info("Segment Updated: ", res.getSegment().toObject())
 
                 return done()
             })
@@ -148,13 +147,13 @@ const init = function(context) {
     const queue = context.queues.staticSegment
 
     queue.process(function(job, done) {
-        winston.info("Job Started: ", job.opts)
+        console.info("Job Started: ", job.opts)
         
         let callbackHasBeenCalled = false
 
         loadStaticSegment(job, function(err) {
             if (err) {
-                winston.error("Job Failed: jobId=" + job.jobId + " code=" + err.code , err)
+                console.error("Job Failed: jobId=" + job.jobId + " code=" + err.code , err)
             }
             
             if (callbackHasBeenCalled == false) {
