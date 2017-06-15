@@ -49,8 +49,11 @@ const loadStaticSegment = function(job, done) {
     getStaticSegmentRequest.setAuthContext(authContext)
     getStaticSegmentRequest.setId(segmentId)
 
+    console.info("Getting static segment")
+
     SegmentClient.getStaticSegment(getStaticSegmentRequest, function(err, staticSegment) {
         if (err) {
+            console.error(err)
             return done(err)
         }
 
