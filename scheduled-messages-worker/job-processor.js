@@ -313,9 +313,9 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
 
         let methods = this._server.methods;
         let logger = this._server.plugins.logger.logger;
+        let accountId = this._context.account.id;
 
-
-        methods.customer.findAllByIdentifier(identifiers, (err, customers) => {
+        methods.customer.findAllByIdentifier(accountId, identifiers, (err, customers) => {
             if (err) {
                 return reject(new JobError("failed to read customers from mongo", true));
             }

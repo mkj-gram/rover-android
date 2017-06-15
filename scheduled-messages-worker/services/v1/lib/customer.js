@@ -27,13 +27,13 @@ internals.findAll = function(ids, callback) {
     });
 };
 
-internals.findAllByIdentifier = function(identifiers, callback) {
+internals.findAllByIdentifier = function(account_id, identifiers, callback) {
     const server = this;
     const mongodb = server.connections.mongodb.client;
     const ObjectId = server.connections.mongodb.ObjectId;
     const logger = server.plugins.logger.logger;
 
-    mongodb.collection(collection).find({ identifier: { $in: identifiers }}).toArray((err, docs) => {
+    mongodb.collection(collection).find({ account_id: account_id, identifier: { $in: identifiers }}).toArray((err, docs) => {
         if (err) {
             return callback(err, null);
         }
