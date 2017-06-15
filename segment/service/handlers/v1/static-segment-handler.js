@@ -521,6 +521,7 @@ const getStaticSegmentPushIds = function(call, callback) {
     const batchSize = call.request.getBatchSize()
     const AuthContext = call.request.getAuthContext()
     const segmentId = call.request.getSegmentId()
+    const currentCursor = call.request.getCursor()
 
     if (!hasAccess(AuthContext)) {
         return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
@@ -548,7 +549,7 @@ const getStaticSegmentPushIds = function(call, callback) {
             return callback(null, reply)
         }
 
-        const batch = new RedisBatchRead(redis, redisSetId, batchSize, {})
+        const batch = new RedisBatchRead(redis, redisSetId, batchSize, currentCursor, {})
 
         batch.read(function(err, ids, nextCursor) {
             if (err) {
