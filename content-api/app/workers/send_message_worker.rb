@@ -42,6 +42,7 @@ class SendMessageWorker
 
             job = {
                 message_template: message_template,
+                static_segment_id: message_template.static_segment_id,
                 account: account,
                 test_customer_ids: test_customer_ids,
                 query: bucket_query,
