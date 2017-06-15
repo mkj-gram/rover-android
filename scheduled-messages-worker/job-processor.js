@@ -277,7 +277,7 @@ JobProcessor.prototype._getSegmentFromService = function() {
         request.setSegmentId(this._context.staticSegmentId)
         request.setBatchSize(READ_BATCH_SIZE)
 
-        debug("Reading batch: staticSegmentId=" + this._context.staticSegmentId + " nextCursor=" + nextCursor)
+        this._debug("Reading batch: staticSegmentId=" + this._context.staticSegmentId + " nextCursor=" + nextCursor)
         readbatch(request, function(err, response) {
             if (err) {
                 return reject(err)
