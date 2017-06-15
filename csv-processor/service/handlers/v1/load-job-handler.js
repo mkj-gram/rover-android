@@ -118,7 +118,7 @@ const createSegmentLoadJob = function(call, callback) {
             id: job.jobId,
             account_id: segmentLoadJobConfig.getAccountId(),
             type: JobType.SEGMENT,
-            status: getJobStatus("enqueue"),
+            status: getJobStatus("waiting"),
             progress: 0,
             created_at: new Date(job.timestamp)
         })
