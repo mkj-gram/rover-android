@@ -180,7 +180,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :xenio_zone_ids, :filter_xenio_zone_ids)
         convert_param_if_exists(local_params[:proximity_messages], :xenio_place_tags, :filter_xenio_place_tags)
         convert_param_if_exists(local_params[:proximity_messages], :xenio_place_ids, :filter_xenio_place_ids)
-        convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
+        convert_param_if_exists(local_params[:proximity_messages], :dynamic_segment_id, :customer_segment_id)
         convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_ids, :filter_gimbal_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :"landing-page", :landing_page)
 
