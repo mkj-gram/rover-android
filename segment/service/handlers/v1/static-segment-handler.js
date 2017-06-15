@@ -57,7 +57,7 @@ const parseOrderQuery = function(order_by) {
     return orderQuery
 }
 
-const getAllStaticSegments = function(postgres, scopes, callback) {
+const getAllStaticSegments = function(postgres, redis, scopes, callback) {
 
     /*
         scopes -> {
@@ -98,7 +98,27 @@ const getAllStaticSegments = function(postgres, scopes, callback) {
 
         const segments = result.rows
 
-        return callback(null, segments)
+        const populatedSegments = segments.filter(segment => segment.redis_set_id)
+        const redisSetIds = populatedSegments.map(segment => segment.redis_set_id)
+
+        multi = client.multi()
+
+        redisSetIds.forEach(setId => {
+            multi.scard(setId)
+        })
+
+        multi.exec(function(err, replies) {
+            if (err) {
+                return callback(err)
+            }
+
+            populatedSegments.forEach((segment, index) => {
+                segment.size = replies[index]
+            })
+
+            return callback(null, segments)
+        })
+        
     })
 
 }
@@ -242,6 +262,7 @@ const buildStaticSegmentProto = function(segment) {
 const listStaticSegments = function(call, callback) {
 
     const postgres = this.clients.postgres
+    const redis = this.clients.redis
 
     const AuthContext = call.request.getAuthContext()
 
@@ -258,7 +279,7 @@ const listStaticSegments = function(call, callback) {
         next_page_token: call.request.getPageToken()
     }
 
-    getAllStaticSegments(postgres, scope, function(err, segments) {
+    getAllStaticSegments(postgres, redis, scope, function(err, segments) {
         if (err) {
             return callback(err)
         }
