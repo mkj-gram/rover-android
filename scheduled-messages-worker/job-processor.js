@@ -39,7 +39,7 @@ const hasPushToken = (device) => {
 
 const parseCustomer = (customer) => {
     // we are coming from elasticsearch here
-    if (cusotmer.hasOwnProperty("_source")) {
+    if (customer.hasOwnProperty("_source")) {
         let source = customer._source;
         source._id = ObjectID(customer._id);
         return source;
