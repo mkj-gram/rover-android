@@ -170,15 +170,13 @@ JobProcessor.prototype.process = function(done) {
 
     let self = this;
 
-    const job = Promise
+    let job = Promise
     .resolve()
 
     if (util.isArray(this._context.customerIdentifiers)) {
-        job = job
-        .then(() => this._getCustomersFromIdentifiers())
+        job = job.then(() => this._getCustomersFromIdentifiers())
     } else {
-        job = job
-        .then(() => this._getSegmentFromElasticsearch())
+        job = job.then(() => this._getSegmentFromElasticsearch())
         .then(response => this._queueNextJob(response))
         .then(() => this._filterCustomersBySegment())
     }
