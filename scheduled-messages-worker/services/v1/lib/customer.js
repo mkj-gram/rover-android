@@ -322,5 +322,6 @@ module.exports = {
     pushDevice: internals.pushDevice,
     pullDevice: internals.pullDevice,
     index: internals.index,
-    deleteIndex: internals.deleteIndex 
+    deleteIndex: internals.deleteIndex,
+    findAllByIdentifier: internals.findAllByIdentifier
 }
