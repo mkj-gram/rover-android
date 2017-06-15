@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rover/apis": "../../../apis/node",
     "@rover-common/ip-parse": "../../../node/ip-parse",
-    "confidence": "^3.0.2"
+    "@rover/apis": "../../../apis/node",
+    "confidence": "^3.0.2",
+    "jwt-decode": "^2.2.0"
   }
 }

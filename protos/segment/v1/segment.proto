@@ -23,16 +23,14 @@ message StaticSegment {
 }
 
 message ListStaticSegmentRequest {
-    /* Optional */
+
     rover.auth.v1.AuthContext auth_context = 1;
 
-    int32 account_id = 2;
+    string order_by = 2;
 
-    string order_by = 3;
+    int32 page_size = 3;
 
-    int32 page_size = 4;
-
-    string page_token = 5;
+    string page_token = 4;
 }
 
 message ListStaticSegmentResponse {
@@ -43,7 +41,7 @@ message ListStaticSegmentResponse {
 
 
 message GetStaticSegmentRequest {
-    /* Optional */
+
     rover.auth.v1.AuthContext auth_context = 1;
 
     int32 id = 2;
@@ -54,16 +52,25 @@ message GetStaticSegmentReply {
 }
 
 message CreateStaticSegmentRequest {
-
-    /* Optional */
+    
     rover.auth.v1.AuthContext auth_context = 1;
 
-    int32 account_id = 2;
-    string title = 3;
+    string title = 2;
 }
 
 message CreateStaticSegmentReply {
     StaticSegment segment = 1;
+}
+
+message DeleteStaticSegmentRequest {
+
+    rover.auth.v1.AuthContext auth_context = 1;
+    
+    int32 id = 2;
+}
+
+message DeleteStaticSegmentReply {
+    // Empty
 }
 
 message UpdateStaticSegmentIdsReply {
@@ -72,7 +79,17 @@ message UpdateStaticSegmentIdsReply {
 
 /* Internal */
 message GetStaticSegmentPushIdsRequest {
-    int32 segment_id = 1;
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    int32 segment_id = 2;
+    string cursor = 3;
+    int32 batch_size = 4;
+}
+
+message GetStaticSegmentPushIdsReply {
+    repeated PushId push_ids = 1;
+    string next_cursor = 2;
+    bool finished = 3;
 }
 
 message PushId {
@@ -85,7 +102,8 @@ service Segment {
     rpc ListStaticSegments(ListStaticSegmentRequest) returns (ListStaticSegmentResponse) {};
     rpc GetStaticSegment(GetStaticSegmentRequest) returns (GetStaticSegmentReply) {};
     rpc CreateStaticSegment(CreateStaticSegmentRequest) returns (CreateStaticSegmentReply) {};
+    rpc DeleteStaticSegment(DeleteStaticSegmentRequest) returns (DeleteStaticSegmentReply) {};
 
     rpc UpdateStaticSegmentPushIds(stream PushId) returns (UpdateStaticSegmentIdsReply) {};
-    rpc GetStaticSegmentPushIds(GetStaticSegmentPushIdsRequest) returns (stream PushId) {}
+    rpc GetStaticSegmentPushIds(GetStaticSegmentPushIdsRequest) returns (GetStaticSegmentPushIdsReply) {}
 }

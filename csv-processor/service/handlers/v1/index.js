@@ -1,18 +1,60 @@
 const winston = require('winston')
 
+winston.level = (process.env.LOG_LEVEL || 'info')
+
 const LoadJobHandler = require('./load-job-handler')
+
+function getCurrentMicroSeconds() {
+    const hrTime = process.hrtime()
+    return (hrTime[0] * 1000000 + hrTime[1] / 1000)
+}
+
+function formatRunTime(microseconds) {
+    
+    let symbol = "μs"
+    let clockTime = microseconds
+
+    if (clockTime >= 1000) {
+        symbol = "ms"
+        clockTime = clockTime / 1000
+    }
+
+    return `${clockTime.toFixed(2)}${symbol}`
+}
 
 const inject = function({ name, func }) {
 
     return function(call, callback) {
         
-        const startTime = Date.now()
+        const startTime = getCurrentMicroSeconds()
 
         func(call, function(err, response) {
 
-            const runTime = Date.now() - startTime
+            const runTime = getCurrentMicroSeconds() - startTime
 
-            winston.info("GRPC: " + name + " " + runTime + "ms")
+            
+            const log = {
+                name: name,
+                runTime: formatRunTime(runTime)
+            }
+
+            if (response && typeof response.toObject == 'function') {
+                winston.log("debug", response.toObject())
+            }
+
+            if (err) {
+                if (err.code) {
+                    log.status = err.code
+                }
+
+                if (err.message) {
+                    log.message = err.message
+                }
+            } else {
+                log.status = "ok"
+            }
+
+            winston.info("GRPC", log)
             
             return callback(err, response)
         })

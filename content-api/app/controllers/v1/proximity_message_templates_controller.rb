@@ -180,7 +180,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :xenio_zone_ids, :filter_xenio_zone_ids)
         convert_param_if_exists(local_params[:proximity_messages], :xenio_place_tags, :filter_xenio_place_tags)
         convert_param_if_exists(local_params[:proximity_messages], :xenio_place_ids, :filter_xenio_place_ids)
-        convert_param_if_exists(local_params[:proximity_messages], :segment_id, :customer_segment_id)
+        convert_param_if_exists(local_params[:proximity_messages], :dynamic_segment_id, :customer_segment_id)
         convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_ids, :filter_gimbal_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :"landing-page", :landing_page)
 
@@ -225,6 +225,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :website_url,
             :deep_link_url,
             :customer_segment_id,
+            :static_segment_id,
             :experience_id,
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
         )
@@ -239,7 +240,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     end
 
     def render_proximity_message(message)
-        should_include = ["beacons", "places", "segment", "gimbal-places", "xenio-zones", "xenio-places", "experience"] # when ember can implement include on get whitelist_include(["beacons", "places"])
+        should_include = ["beacons", "places", "dynamic-segment", "gimbal-places", "xenio-zones", "xenio-places", "experience"] # when ember can implement include on get whitelist_include(["beacons", "places"])
 
 
 
@@ -265,7 +266,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             included += places.map{|place| V1::PlaceSerializer.serialize(place)}
         end
 
-        if should_include.include?("segment") && message.customer_segment
+        if should_include.include?("dynamic-segment") && message.customer_segment
             message.customer_segment.account = current_account
             included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
         end
@@ -411,10 +412,20 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         if message.customer_segment_id
             json[:relationships].merge!(
                 {
-                    :"segment" => {
-                        data: { type: "segments", id: message.customer_segment_id.to_s }
+                    :"dynamic-segment" => {
+                        data: { type: "dynamic-segments", id: message.customer_segment_id.to_s }
                     }
 
+                }
+            )
+        end
+
+        if message.static_segment_id
+            json[:relationships].merge!(
+                {
+                    :"static-segment" => {
+                        data: { type: "static-segment", id: message.static_segment_id.to_s }
+                    }
                 }
             )
         end

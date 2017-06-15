@@ -1,8 +1,27 @@
 const RoverApis = require("@rover/apis")
 const CsvProcessor = RoverApis['csv-processor']
+const grpcCodes = require("@rover-common/grpc-codes")
 
 const JobStatus = CsvProcessor.v1.Models.JobStatus
 const JobType = CsvProcessor.v1.Models.JobType
+
+const AllowedScopes = ["internal", "server"]
+
+const permissionDeniedGrpcStatus = { code: grpcCodes.status.PERMISSION_DENIED, message: "You do not have permission to access this resource" }
+
+const hasAccess = function(authContext) {
+    if (authContext == null || authContext == undefined) {
+        return false
+    }
+
+    const currentScopes = authContext.getPermissionScopesList()
+
+    if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
+        return false
+    }
+
+    return true
+}
 
 const getJobStatus = function(state) {
 
@@ -75,11 +94,16 @@ const createSegmentLoadJob = function(call, callback) {
 
     const queue = this.queues.staticSegment
     const segmentLoadJobConfig = call.request.getSegmentLoadJobConfig()
-
+    const AuthContext = call.request.getAuthContext()
 
     queue.add('load-static-segment', {
         type: JobType.SEGMENT,
-        account_id: segmentLoadJobConfig.getAccountId(),
+        auth_context: {
+            account_id: AuthContext.getAccountId(),
+            user_id: AuthContext.getUserId(),
+            scopes: AuthContext.getPermissionScopesList()
+        },
+        account_id: AuthContext.getAccountId(),
         segment_id: segmentLoadJobConfig.getSegmentId(),
         gcs_file: {
             project_id: segmentLoadJobConfig.getCsv().getProjectId(),
@@ -94,13 +118,11 @@ const createSegmentLoadJob = function(call, callback) {
             id: job.jobId,
             account_id: segmentLoadJobConfig.getAccountId(),
             type: JobType.SEGMENT,
-            status: getJobStatus("enqueue"),
+            status: getJobStatus("waiting"),
             progress: 0,
             created_at: new Date(job.timestamp)
         })
 
-
-        
         reply.setJob(loadJob)
 
         return callback(null, reply)
@@ -123,19 +145,27 @@ const getLoadJob = function(call, callback) {
     const loadJobQuery = call.request
     const loadJobId = loadJobQuery.getLoadJobId()
 
+    const AuthContext = call.request.getAuthContext()
+
+    if (!hasAccess(AuthContext)) {
+        return callback(permissionDeniedGrpcStatus)
+    }
+
     queue.getJob(loadJobId.toString())
         .then(function(job) {
 
             if (!job) {
-                return callback({ code: 5, message: "LoadJob Not Found"})
+                return callback({ code: grpcCodes.status.NOT_FOUND, message: "LoadJob Not Found"})
+            }
+
+            if (job.opts.account_id != AuthContext.getAccountId()) {
+                return callback(permissionDeniedGrpcStatus)
             }
 
             job.getState()
                 .then(function(jobState) {
 
                     const reply = new CsvProcessor.v1.Models.GetLoadJobReply()
-                    
-                    console.log(jobState)
 
                     const loadJob = buildLoadJobProto({
                         id: job.jobId,
@@ -166,6 +196,12 @@ const getLoadJob = function(call, callback) {
  */
 const createLoadJob = function(call, callback) {
 
+    
+    const AuthContext = call.request.getAuthContext()
+
+    if (!hasAccess(AuthContext)) {
+        return callback(permissionDeniedGrpcStatus)
+    }
     const jobType = call.request.getType()
 
     switch(jobType) {
@@ -173,7 +209,7 @@ const createLoadJob = function(call, callback) {
             return createSegmentLoadJob.bind(this)(call, callback)
             break
         default:
-            return callback({message: "Unknown job type", status: 400})
+            return callback({message: "Unknown job type", status: grpcCodes.status.INVALID_ARGUMENT })
     }
 }
 

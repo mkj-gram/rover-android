@@ -1,8 +1,5 @@
 FROM node:6.9.1
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-   libpq-dev
-
 WORKDIR /opt/bulk-gateway
 
 ADD . /opt/bulk-gateway

@@ -13,6 +13,9 @@ var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/time
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 goog.exportSymbol('proto.rover.segment.v1.CreateStaticSegmentReply', null, global);
 goog.exportSymbol('proto.rover.segment.v1.CreateStaticSegmentRequest', null, global);
+goog.exportSymbol('proto.rover.segment.v1.DeleteStaticSegmentReply', null, global);
+goog.exportSymbol('proto.rover.segment.v1.DeleteStaticSegmentRequest', null, global);
+goog.exportSymbol('proto.rover.segment.v1.GetStaticSegmentPushIdsReply', null, global);
 goog.exportSymbol('proto.rover.segment.v1.GetStaticSegmentPushIdsRequest', null, global);
 goog.exportSymbol('proto.rover.segment.v1.GetStaticSegmentReply', null, global);
 goog.exportSymbol('proto.rover.segment.v1.GetStaticSegmentRequest', null, global);
@@ -378,10 +381,9 @@ proto.rover.segment.v1.ListStaticSegmentRequest.prototype.toObject = function(op
 proto.rover.segment.v1.ListStaticSegmentRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    orderBy: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    pageSize: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    pageToken: jspb.Message.getFieldWithDefault(msg, 5, "")
+    orderBy: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    pageSize: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    pageToken: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -424,18 +426,14 @@ proto.rover.segment.v1.ListStaticSegmentRequest.deserializeBinaryFromReader = fu
       msg.setAuthContext(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setAccountId(value);
-      break;
-    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setOrderBy(value);
       break;
-    case 4:
+    case 3:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setPageSize(value);
       break;
-    case 5:
+    case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setPageToken(value);
       break;
@@ -475,31 +473,24 @@ proto.rover.segment.v1.ListStaticSegmentRequest.serializeBinaryToWriter = functi
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getAccountId();
-  if (f !== 0) {
-    writer.writeInt32(
-      2,
-      f
-    );
-  }
   f = message.getOrderBy();
   if (f.length > 0) {
     writer.writeString(
-      3,
+      2,
       f
     );
   }
   f = message.getPageSize();
   if (f !== 0) {
     writer.writeInt32(
-      4,
+      3,
       f
     );
   }
   f = message.getPageToken();
   if (f.length > 0) {
     writer.writeString(
-      5,
+      4,
       f
     );
   }
@@ -537,62 +528,47 @@ proto.rover.segment.v1.ListStaticSegmentRequest.prototype.hasAuthContext = funct
 
 
 /**
- * optional int32 account_id = 2;
- * @return {number}
- */
-proto.rover.segment.v1.ListStaticSegmentRequest.prototype.getAccountId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/** @param {number} value */
-proto.rover.segment.v1.ListStaticSegmentRequest.prototype.setAccountId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string order_by = 3;
+ * optional string order_by = 2;
  * @return {string}
  */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.getOrderBy = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.setOrderBy = function(value) {
-  jspb.Message.setField(this, 3, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional int32 page_size = 4;
+ * optional int32 page_size = 3;
  * @return {number}
  */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.getPageSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
 /** @param {number} value */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.setPageSize = function(value) {
-  jspb.Message.setField(this, 4, value);
+  jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional string page_token = 5;
+ * optional string page_token = 4;
  * @return {string}
  */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.getPageToken = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
 proto.rover.segment.v1.ListStaticSegmentRequest.prototype.setPageToken = function(value) {
-  jspb.Message.setField(this, 5, value);
+  jspb.Message.setField(this, 4, value);
 };
 
 
@@ -1179,8 +1155,7 @@ proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.toObject = function(
 proto.rover.segment.v1.CreateStaticSegmentRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    title: jspb.Message.getFieldWithDefault(msg, 3, "")
+    title: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -1223,10 +1198,6 @@ proto.rover.segment.v1.CreateStaticSegmentRequest.deserializeBinaryFromReader = 
       msg.setAuthContext(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setAccountId(value);
-      break;
-    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setTitle(value);
       break;
@@ -1266,17 +1237,10 @@ proto.rover.segment.v1.CreateStaticSegmentRequest.serializeBinaryToWriter = func
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getAccountId();
-  if (f !== 0) {
-    writer.writeInt32(
-      2,
-      f
-    );
-  }
   f = message.getTitle();
   if (f.length > 0) {
     writer.writeString(
-      3,
+      2,
       f
     );
   }
@@ -1314,32 +1278,17 @@ proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.hasAuthContext = fun
 
 
 /**
- * optional int32 account_id = 2;
- * @return {number}
- */
-proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.getAccountId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/** @param {number} value */
-proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.setAccountId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string title = 3;
+ * optional string title = 2;
  * @return {string}
  */
 proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.getTitle = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
 proto.rover.segment.v1.CreateStaticSegmentRequest.prototype.setTitle = function(value) {
-  jspb.Message.setField(this, 3, value);
+  jspb.Message.setField(this, 2, value);
 };
 
 
@@ -1497,6 +1446,304 @@ proto.rover.segment.v1.CreateStaticSegmentReply.prototype.clearSegment = functio
  */
 proto.rover.segment.v1.CreateStaticSegmentReply.prototype.hasSegment = function() {
   return jspb.Message.getField(this, 1) != null;
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.segment.v1.DeleteStaticSegmentRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.segment.v1.DeleteStaticSegmentRequest.displayName = 'proto.rover.segment.v1.DeleteStaticSegmentRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.segment.v1.DeleteStaticSegmentRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.segment.v1.DeleteStaticSegmentRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    id: jspb.Message.getFieldWithDefault(msg, 2, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.segment.v1.DeleteStaticSegmentRequest}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.segment.v1.DeleteStaticSegmentRequest;
+  return proto.rover.segment.v1.DeleteStaticSegmentRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.segment.v1.DeleteStaticSegmentRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.segment.v1.DeleteStaticSegmentRequest}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setId(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.segment.v1.DeleteStaticSegmentRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.segment.v1.DeleteStaticSegmentRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getId();
+  if (f !== 0) {
+    writer.writeInt32(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.segment.v1.DeleteStaticSegmentRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional int32 id = 2;
+ * @return {number}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.prototype.getId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.segment.v1.DeleteStaticSegmentRequest.prototype.setId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.segment.v1.DeleteStaticSegmentReply = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.segment.v1.DeleteStaticSegmentReply, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.segment.v1.DeleteStaticSegmentReply.displayName = 'proto.rover.segment.v1.DeleteStaticSegmentReply';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentReply.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.segment.v1.DeleteStaticSegmentReply.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.segment.v1.DeleteStaticSegmentReply} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentReply.toObject = function(includeInstance, msg) {
+  var f, obj = {
+
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.segment.v1.DeleteStaticSegmentReply}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentReply.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.segment.v1.DeleteStaticSegmentReply;
+  return proto.rover.segment.v1.DeleteStaticSegmentReply.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.segment.v1.DeleteStaticSegmentReply} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.segment.v1.DeleteStaticSegmentReply}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentReply.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.segment.v1.DeleteStaticSegmentReply.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.segment.v1.DeleteStaticSegmentReply.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.segment.v1.DeleteStaticSegmentReply} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.segment.v1.DeleteStaticSegmentReply.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
 };
 
 
@@ -1703,7 +1950,10 @@ proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.toObject = funct
  */
 proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    segmentId: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    segmentId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    cursor: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    batchSize: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
   if (includeInstance) {
@@ -1741,8 +1991,21 @@ proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.deserializeBinaryFromReade
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setSegmentId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setCursor(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setBatchSize(value);
       break;
     default:
       reader.skipField();
@@ -1772,10 +2035,32 @@ proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.serializeBinary 
  */
 proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
   f = message.getSegmentId();
   if (f !== 0) {
     writer.writeInt32(
-      1,
+      2,
+      f
+    );
+  }
+  f = message.getCursor();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getBatchSize();
+  if (f !== 0) {
+    writer.writeInt32(
+      4,
       f
     );
   }
@@ -1783,17 +2068,301 @@ proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.serializeBinaryToWriter = 
 
 
 /**
- * optional int32 segment_id = 1;
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional int32 segment_id = 2;
  * @return {number}
  */
 proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.getSegmentId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
 
 /** @param {number} value */
 proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.setSegmentId = function(value) {
-  jspb.Message.setField(this, 1, value);
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional string cursor = 3;
+ * @return {string}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.getCursor = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.setCursor = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional int32 batch_size = 4;
+ * @return {number}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.getBatchSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.segment.v1.GetStaticSegmentPushIdsRequest.prototype.setBatchSize = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.segment.v1.GetStaticSegmentPushIdsReply.repeatedFields_, null);
+};
+goog.inherits(proto.rover.segment.v1.GetStaticSegmentPushIdsReply, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.segment.v1.GetStaticSegmentPushIdsReply.displayName = 'proto.rover.segment.v1.GetStaticSegmentPushIdsReply';
+}
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.repeatedFields_ = [1];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.segment.v1.GetStaticSegmentPushIdsReply.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.segment.v1.GetStaticSegmentPushIdsReply} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    pushIdsList: jspb.Message.toObjectList(msg.getPushIdsList(),
+    proto.rover.segment.v1.PushId.toObject, includeInstance),
+    nextCursor: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    finished: jspb.Message.getFieldWithDefault(msg, 3, false)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.segment.v1.GetStaticSegmentPushIdsReply}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.segment.v1.GetStaticSegmentPushIdsReply;
+  return proto.rover.segment.v1.GetStaticSegmentPushIdsReply.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.segment.v1.GetStaticSegmentPushIdsReply} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.segment.v1.GetStaticSegmentPushIdsReply}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new proto.rover.segment.v1.PushId;
+      reader.readMessage(value,proto.rover.segment.v1.PushId.deserializeBinaryFromReader);
+      msg.addPushIds(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setNextCursor(value);
+      break;
+    case 3:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setFinished(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.segment.v1.GetStaticSegmentPushIdsReply.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.segment.v1.GetStaticSegmentPushIdsReply} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getPushIdsList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      1,
+      f,
+      proto.rover.segment.v1.PushId.serializeBinaryToWriter
+    );
+  }
+  f = message.getNextCursor();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getFinished();
+  if (f) {
+    writer.writeBool(
+      3,
+      f
+    );
+  }
+};
+
+
+/**
+ * repeated PushId push_ids = 1;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<!proto.rover.segment.v1.PushId>}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.getPushIdsList = function() {
+  return /** @type{!Array.<!proto.rover.segment.v1.PushId>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.rover.segment.v1.PushId, 1));
+};
+
+
+/** @param {!Array.<!proto.rover.segment.v1.PushId>} value */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.setPushIdsList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 1, value);
+};
+
+
+/**
+ * @param {!proto.rover.segment.v1.PushId=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.rover.segment.v1.PushId}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.addPushIds = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.rover.segment.v1.PushId, opt_index);
+};
+
+
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.clearPushIdsList = function() {
+  this.setPushIdsList([]);
+};
+
+
+/**
+ * optional string next_cursor = 2;
+ * @return {string}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.getNextCursor = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.setNextCursor = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional bool finished = 3;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.getFinished = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 3, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.segment.v1.GetStaticSegmentPushIdsReply.prototype.setFinished = function(value) {
+  jspb.Message.setField(this, 3, value);
 };
 
 

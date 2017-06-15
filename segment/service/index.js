@@ -1,10 +1,16 @@
+require('newrelic')
+const Config = require('./config')
 const SegmentV1Service = require("@rover/apis").segment.v1.Services.SegmentService
 const grpc = require("grpc")
-const Config = require('./config')
 const redis = require('redis')
 const async = require('async')
-
+const parse = require("@rover-common/pg-connection-string")
 const V1Handlers = require('./handlers/v1')
+
+if (Config.get('/raven/enabled')) {
+    const Raven = require('raven')
+    Raven.config(Config.get('/raven/dsn')).install();
+}
 
 
 const server = new grpc.Server()
@@ -31,22 +37,15 @@ tasks.push(function(callback) {
 
 tasks.push(function(callback) {
 
-    const config = {
-        host: Config.get('/postgres/host'),
-        port: Config.get('/postgres/port'),
-        user: Config.get('/postgres/username'),
-        password: Config.get('/postgres/password'),
-        database: Config.get('/postgres/database'),
-        ssl: Config.get('/postgres/ssl/enabled'),
-    };
+    let dbDSN = Config.get('/postgres/dsn')
 
-    if (Config.get('/postgres/ssl/cert')) {
-        config.cert = Buffer.from(Config.get('/postgres/ssl/cert'))
+    let defaultConfig = {
+        min: 2,
+        max: 5,
+        idleTimeoutMillis: 30000
     }
 
-    if (config.ssl == true && config.cert === undefined) {
-        return callback(new Error("Postgres ssl is enabled but no cert was given"))
-    }
+    let config = Object.assign({}, defaultConfig, parse(dbDSN))
 
     let pg = require('pg')
 
@@ -57,6 +56,8 @@ tasks.push(function(callback) {
             return callback(err)
         }
 
+        console.log("Connected to postgres")
+        
         done()
 
         context.clients.postgres = pool

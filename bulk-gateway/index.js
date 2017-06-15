@@ -15,10 +15,20 @@ const uploader = new UploaderClient({
     bucketName: Config.get('/storage/bucket_name')
 })
 
-const Auth = require('./auth')
+const GrpcCodes = require("@rover-common/grpc-codes")
 
-const { CsvProcessor } = require("@rover/csv-processor-client")
-const JobStatus = CsvProcessor.V1.Models.JobStatus
+const RoverApis = require("@rover/apis")
+
+/*
+    Setup Auth Client & Middleware
+ */
+const Auth = require("@rover/auth-client")
+const AuthClient = Auth.v1.Client()
+const AuthMiddleware = Auth.v1.Middleware(AuthClient)
+
+
+const CsvProcessor = require("@rover/csv-processor-client")
+const JobStatus = RoverApis['csv-processor'].v1.Models.JobStatus
 
 let CsvProcessorClient = null
 
@@ -28,27 +38,13 @@ const server = {
     connections: {}
 }
 
-const grpcCodeToHttpCode =
-{
-    4: 408,
-    5: 404,
-    6: 409,
-    7: 403,
-    8: 429,
-    9: 428,
-    12: 501,
-    13: 500,
-    14: 503,
-    15: 500,
-    16: 401
-}
 
 /***********************************
           Helper Methods
 ***********************************/
 
 const getHTTPCode = function(grpcCode) {
-    return (grpcCodeToHttpCode[grpcCode] || 500)
+    return GrpcCodes.grpcToHttp(grpcCode)
 }
 
 const loggableError = function(err) {
@@ -90,17 +86,14 @@ const serializeLoadJob = function(loadJob, format) {
              Middleware
 ***********************************/
 
-const authenticate = function(req, res, next) {
-    Auth.authenticate(req, function(err, account) {
-        if (err) {
-            return next({ status: 401 })
-        }
+const authenticated = function(req, res, next) {
+    if (req.authContext == undefined || req.authContext == null) {
+        return next({ status: 401 })
+    }
 
-        req.credentials = { account: account }
-
-        return next()
-    })
+    return next()
 }
+
 
 const upload = function(req, res, next) {
 
@@ -125,24 +118,44 @@ const upload = function(req, res, next) {
 
 const router = Router()
 
-router.put('/bulk/segments/:id/csv', authenticate, upload, function(req, res, next) {
+if (Config.get('/raven/enabled')) {
+    console.info("Setting up Sentry Raven")
 
-    const gcsObject = new CsvProcessor.V1.Models.GCSObject()
+    const Raven = require('raven')
+
+    Raven.config(Config.get('/raven/dsn')).install();
+
+    // The request handler must be the first middleware on the app
+    router.use(Raven.requestHandler());
+
+    router.use(Raven.errorHandler());
+}
+
+/* Add Cors support */
+const cors = require('cors')
+router.use(cors())
+
+router.use(AuthMiddleware)
+
+router.put('/bulk/segments/:id/csv', authenticated, upload, function(req, res, next) {
+
+    const gcsObject = new RoverApis['csv-processor'].v1.Models.GCSObject()
 
     gcsObject.setProjectId(req.file.cloudStorageObject.bucket.storage.projectId)
     gcsObject.setBucket(req.file.cloudStorageObject.bucket.id)
     gcsObject.setFileId(req.file.cloudStorageObject.id)
 
-    const segmentLoadJobConfig = new CsvProcessor.V1.Models.SegmentLoadJobConfig()
+    const segmentLoadJobConfig = new RoverApis['csv-processor'].v1.Models.SegmentLoadJobConfig()
 
-    segmentLoadJobConfig.setAccountId(req.credentials.account.id)
+    segmentLoadJobConfig.setAccountId(req.authContext.account_id)
     segmentLoadJobConfig.setSegmentId(req.params.id)
     segmentLoadJobConfig.setCsv(gcsObject)
 
 
-    const loadJobRequest = new CsvProcessor.V1.Models.CreateLoadJobRequest()
+    const loadJobRequest = new RoverApis['csv-processor'].v1.Models.CreateLoadJobRequest()
 
-    loadJobRequest.setType(CsvProcessor.V1.Models.JobType.SEGMENT)
+    loadJobRequest.setAuthContext(req._authContext)
+    loadJobRequest.setType(RoverApis['csv-processor'].v1.Models.JobType.SEGMENT)
     loadJobRequest.setSegmentLoadJobConfig(segmentLoadJobConfig)
 
     const deadline = moment().add(15, 'seconds').toDate()
@@ -163,9 +176,10 @@ router.put('/bulk/segments/:id/csv', authenticate, upload, function(req, res, ne
     });
 })
 
-router.get('/bulk/load-job/:id/csv', authenticate, function(req, res, next) {
-    const request = new CsvProcessor.V1.Models.GetLoadJobRequest()
+router.get('/bulk/load-job/:id/csv', authenticated, function(req, res, next) {
+    const request = new RoverApis['csv-processor'].v1.Models.GetLoadJobRequest()
 
+    request.setAuthContext(req._authContext)
     request.setLoadJobId(req.params.id)
     
     CsvProcessorClient.getLoadJob(request, function(err, response) {
@@ -174,10 +188,6 @@ router.get('/bulk/load-job/:id/csv', authenticate, function(req, res, next) {
         }
 
         const loadJob = response.getJob()
-
-        if (loadJob.getAccountId() !== req.credentials.account.id) {
-            return next({ status: 403, message: "Forbidden" })
-        }
 
         const payload = serializeLoadJob(loadJob, 'csv')
 
@@ -222,9 +232,14 @@ router.use(function(err, req, res, next) {
 // error handler
 router.use(function(err, req, res, next) {
 
-    if (loggableError(err)) {
-        console.error(err);
+    /*
+        Only errors with a code property are grpc errors
+    */ 
+    if (err.code) {
+        err.status = getHTTPCode(err.code)
     }
+
+    console.error(err)
 
     res.writeHead(err.status || 500)
     res.end()
@@ -244,30 +259,6 @@ const httpServer = http.createServer(function(req, res) {
 })
 
 
-
-/***********************************
-          Setup Postgres
-***********************************/
-
-const postgresConnectionOptions = {
-    host: Config.get('/postgres/host'),
-    port: Config.get('/postgres/port'),
-    user: Config.get('/postgres/username'),
-    password: Config.get('/postgres/password'),
-    database: Config.get('/postgres/database'),
-    ssl: Config.get('/postgres/ssl')
-};
-
-tasks.push(function(callback) {
-    let postgres = require('./connections/postgres');
-    postgres.register(server, postgresConnectionOptions, (err) => {
-        if (err) {
-            return callback(err);
-        }
-        return callback();
-    });
-});
-
 /***********************************
           Connect to GCS
 ***********************************/
@@ -283,7 +274,7 @@ tasks.push(function(callback) {
 
 tasks.push(function(callback) {
     try {
-        CsvProcessorClient = CsvProcessor.V1.Client()
+        CsvProcessorClient = CsvProcessor.v1.Client()
     } catch(err) {
         return callback(err)
     }

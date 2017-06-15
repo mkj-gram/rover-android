@@ -26,7 +26,19 @@ const store = new Confidence.Store({
         dsn: {
             $filter: 'env',
             production: process.env.POSTGRESQL_DSN,
-            $default: "postgres://postgres:@localhost:5432/segment_service_dev?sslmode=disabled"
+            $default: "postgres://postgres:@localhost:5432/segment_service_dev?sslmode=disable"
+        }
+    },
+    raven: {
+        enabled: {
+            $filter: 'env',
+            production: process.env.RAVEN_ENABLED == 'true',
+            $default: false
+        },
+        dsn: {
+            $filter: 'env',
+            production: process.env.RAVEN_DSN,
+            $default: ''
         }
     }
 })

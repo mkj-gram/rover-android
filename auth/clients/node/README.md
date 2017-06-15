@@ -8,10 +8,10 @@
 var RoverApis = require("@rover/apis")
 var Auth = require("@rover/auth-client")
 
-var AuthClient = Auth.Client()
+var AuthClient = Auth.v1.Client()
 
 /* Build the request */
-var request = new RoverApis.auth.v1.AuthenticateRequest()
+var request = new RoverApis.auth.v1.Models.AuthenticateRequest()
 request.setKey("token123")
 
 AuthClient.authenticateToken(request, function(err, AuthContext) {
@@ -45,10 +45,10 @@ var app = express()
 const Auth = require("@rover/auth-client")
 
 /* Generates a default client */
-const AuthClient = Auth.Client()
+const AuthClient = Auth.v1.Client()
 
 /* Generates auth middleware with provided AuthCient */
-const AuthMiddleware = Auth.Middleware(AuthClient)
+const AuthMiddleware = Auth.v1.Middleware(AuthClient)
 
 /* Apply Middleware to entire app */
 app.use(AuthMiddleware)
@@ -77,4 +77,6 @@ app.get('/users', AuthMiddleware, (req, res) => {
 	req.authContext = undefined
 })
 ```
+
+**NOTE!** if you require the original AuthContext ie the protobuf definition and not the JSON representation the variable is set as `req._authContext` 
 

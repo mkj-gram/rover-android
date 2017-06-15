@@ -1,0 +1,22 @@
+{
+  "name": "rest-gateway",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rover-common/grpc-codes": "../node/grpc-codes",
+    "@rover/auth-client": "../auth/clients/node",
+    "@rover/segment-client": "../segment/clients/node",
+    "body-parser": "^1.17.2",
+    "confidence": "^3.0.2",
+    "cors": "^2.8.3",
+    "express": "^4.15.3",
+    "morgan": "^1.8.2",
+    "raven": "^2.0.2"
+  }
+}

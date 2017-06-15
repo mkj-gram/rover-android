@@ -2,7 +2,7 @@ module V1::CustomerSegmentSerializer
     class << self
         def serialize(customer_segment)
             {
-                "type" => "segments",
+                "type" => "dynamic-segments",
                 "id" => customer_segment.id.to_s,
                 "attributes" => {
                     "name" => customer_segment.title,

@@ -28,6 +28,39 @@ function deserialize_rover_segment_v1_CreateStaticSegmentRequest(buffer_arg) {
   return segment_v1_segment_pb.CreateStaticSegmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_segment_v1_DeleteStaticSegmentReply(arg) {
+  if (!(arg instanceof segment_v1_segment_pb.DeleteStaticSegmentReply)) {
+    throw new Error('Expected argument of type rover.segment.v1.DeleteStaticSegmentReply');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_segment_v1_DeleteStaticSegmentReply(buffer_arg) {
+  return segment_v1_segment_pb.DeleteStaticSegmentReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_segment_v1_DeleteStaticSegmentRequest(arg) {
+  if (!(arg instanceof segment_v1_segment_pb.DeleteStaticSegmentRequest)) {
+    throw new Error('Expected argument of type rover.segment.v1.DeleteStaticSegmentRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_segment_v1_DeleteStaticSegmentRequest(buffer_arg) {
+  return segment_v1_segment_pb.DeleteStaticSegmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_segment_v1_GetStaticSegmentPushIdsReply(arg) {
+  if (!(arg instanceof segment_v1_segment_pb.GetStaticSegmentPushIdsReply)) {
+    throw new Error('Expected argument of type rover.segment.v1.GetStaticSegmentPushIdsReply');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_segment_v1_GetStaticSegmentPushIdsReply(buffer_arg) {
+  return segment_v1_segment_pb.GetStaticSegmentPushIdsReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_segment_v1_GetStaticSegmentPushIdsRequest(arg) {
   if (!(arg instanceof segment_v1_segment_pb.GetStaticSegmentPushIdsRequest)) {
     throw new Error('Expected argument of type rover.segment.v1.GetStaticSegmentPushIdsRequest');
@@ -140,6 +173,17 @@ var SegmentService = exports.SegmentService = {
     responseSerialize: serialize_rover_segment_v1_CreateStaticSegmentReply,
     responseDeserialize: deserialize_rover_segment_v1_CreateStaticSegmentReply,
   },
+  deleteStaticSegment: {
+    path: '/rover.segment.v1.Segment/DeleteStaticSegment',
+    requestStream: false,
+    responseStream: false,
+    requestType: segment_v1_segment_pb.DeleteStaticSegmentRequest,
+    responseType: segment_v1_segment_pb.DeleteStaticSegmentReply,
+    requestSerialize: serialize_rover_segment_v1_DeleteStaticSegmentRequest,
+    requestDeserialize: deserialize_rover_segment_v1_DeleteStaticSegmentRequest,
+    responseSerialize: serialize_rover_segment_v1_DeleteStaticSegmentReply,
+    responseDeserialize: deserialize_rover_segment_v1_DeleteStaticSegmentReply,
+  },
   updateStaticSegmentPushIds: {
     path: '/rover.segment.v1.Segment/UpdateStaticSegmentPushIds',
     requestStream: true,
@@ -154,13 +198,13 @@ var SegmentService = exports.SegmentService = {
   getStaticSegmentPushIds: {
     path: '/rover.segment.v1.Segment/GetStaticSegmentPushIds',
     requestStream: false,
-    responseStream: true,
+    responseStream: false,
     requestType: segment_v1_segment_pb.GetStaticSegmentPushIdsRequest,
-    responseType: segment_v1_segment_pb.PushId,
+    responseType: segment_v1_segment_pb.GetStaticSegmentPushIdsReply,
     requestSerialize: serialize_rover_segment_v1_GetStaticSegmentPushIdsRequest,
     requestDeserialize: deserialize_rover_segment_v1_GetStaticSegmentPushIdsRequest,
-    responseSerialize: serialize_rover_segment_v1_PushId,
-    responseDeserialize: deserialize_rover_segment_v1_PushId,
+    responseSerialize: serialize_rover_segment_v1_GetStaticSegmentPushIdsReply,
+    responseDeserialize: deserialize_rover_segment_v1_GetStaticSegmentPushIdsReply,
   },
 };
 

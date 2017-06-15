@@ -1,10 +1,25 @@
 const RoverApis = require("@rover/apis")
 const BatchBufferedStream = require('../../lib/batch-buffered-stream')
-const RedisSetStream = require('../../lib/redis-set-stream')
+const RedisBatchRead = require('../../lib/redis-batch-read')
 const uuid = require('uuid/v1')
 const grpc = require('grpc')
 const squel = require("squel").useFlavour('postgres')
 
+const AllowedScopes = ['internal', 'server', 'admin']
+
+const hasAccess = function(authContext) {
+    if (authContext == null || authContext == undefined) {
+        return false
+    }
+
+    const currentScopes = authContext.getPermissionScopesList()
+
+    if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
+        return false
+    }
+
+    return true
+}
 
 const parseOrderQuery = function(order_by) {
 
@@ -42,7 +57,7 @@ const parseOrderQuery = function(order_by) {
     return orderQuery
 }
 
-const getAllStaticSegments = function(postgres, scopes, callback) {
+const getAllStaticSegments = function(postgres, redis, scopes, callback) {
 
     /*
         scopes -> {
@@ -83,7 +98,27 @@ const getAllStaticSegments = function(postgres, scopes, callback) {
 
         const segments = result.rows
 
-        return callback(null, segments)
+        const populatedSegments = segments.filter(segment => segment.redis_set_id)
+        const redisSetIds = populatedSegments.map(segment => segment.redis_set_id)
+
+        multi = redis.multi()
+
+        redisSetIds.forEach(setId => {
+            multi.scard(setId)
+        })
+
+        multi.exec(function(err, replies) {
+            if (err) {
+                return callback(err)
+            }
+
+            populatedSegments.forEach((segment, index) => {
+                segment.size = replies[index]
+            })
+
+            return callback(null, segments)
+        })
+
     })
 
 }
@@ -169,7 +204,7 @@ const createNewStaticSegment = function(postgres, segment, callback) {
     })
 }
 
-const deleteStaticSegment = function(postgres, id, callback) {
+const destroyStaticSegment = function(postgres, id, callback) {
     
 
     let deleteQuery = squel.delete()
@@ -227,28 +262,24 @@ const buildStaticSegmentProto = function(segment) {
 const listStaticSegments = function(call, callback) {
 
     const postgres = this.clients.postgres
+    const redis = this.clients.redis
 
     const AuthContext = call.request.getAuthContext()
-    const accountId = call.request.getAccountId()
 
-    if (accountId === 0) {
-        return callback({ code: grpc.status.FAILED_PRECONDITION, message: "Account id can not be 0"})
-    }
-
-    if (AuthContext && AuthContext.getAccountId() != accountId) {
+    if (!hasAccess(AuthContext)) {
         return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
     }
 
     const order_by = call.request.getOrderBy().length == 0 ? "created_at desc" : call.request.getOrderBy()
 
     const scope = {
-        account_id: accountId,
+        account_id: AuthContext.getAccountId(),
         order_by: order_by,
         limit: call.request.getPageSize(),
         next_page_token: call.request.getPageToken()
     }
 
-    getAllStaticSegments(postgres, scope, function(err, segments) {
+    getAllStaticSegments(postgres, redis, scope, function(err, segments) {
         if (err) {
             return callback(err)
         }
@@ -271,6 +302,9 @@ const getStaticSegment = function(call, callback) {
     const AuthContext = call.request.getAuthContext()
     const segmentId = call.request.getId()
 
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+    }
 
     findStaticSegmentById(postgres, redis, segmentId, function(err, segment) {
         if (err) {
@@ -303,20 +337,16 @@ const createStaticSegment = function(call, callback) {
 
     const postgres = this.clients.postgres
 
-    const accountId = call.request.getAccountId()
     const title = call.request.getTitle()
+    const AuthContext = call.request.getAuthContext()
+
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED,  message: "Permission Denied" })
+    }
 
     const request = {
-        account_id: accountId,
+        account_id: AuthContext.getAccountId(),
         title: title
-    }
-
-    if (accountId == 0) {
-        return callback({ code: grpc.status.INVALID_ARGUMENT, message: "Account ID cannot be 0" })
-    }
-
-    if (AuthContext && AuthContext.getAccountId() != accountId) {
-        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
     }
 
     createNewStaticSegment(postgres, request, function(err, segment) {
@@ -336,7 +366,15 @@ const createStaticSegment = function(call, callback) {
 
 }
 
-const destroyStaticSegment = function(call, callback) {
+const deleteStaticSegment = function(call, callback) {
+
+    // First check we have the right permissions
+    
+    const AuthContext = call.request.getAuthContext()
+
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied"})
+    }
 
     const postgres = this.clients.postgres
     const redis = this.clients.redis
@@ -344,7 +382,7 @@ const destroyStaticSegment = function(call, callback) {
     const id = call.request.getId()
 
     if (id == 0) {
-        return callback({ code: grpc.status.INVALID_ARGUMENT, message: "ID cannot be 0" })
+        return callback({ code: grpc.status.NOT_FOUND, message: "Not Found" })
     }
 
     findStaticSegmentById(postgres, redis, id, function(err, segment) {
@@ -356,16 +394,16 @@ const destroyStaticSegment = function(call, callback) {
             return callback({ code: grpc.status.NOT_FOUND, message: "Segment does not exist" })
         }
 
-        if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
+        if (AuthContext.getAccountId() != segment.account_id) {
             return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
         }
 
-        deleteStaticSegment(postgres, id, function(err) {
+        destroyStaticSegment(postgres, id, function(err) {
             if (err) {
                 return callback(err)
             }
 
-            let reply = new RoverApis.segment.v1.Models.DestroyStaticSegmentReply()
+            let reply = new RoverApis.segment.v1.Models.DeleteStaticSegmentReply()
 
             return callback(null, reply)
         })
@@ -389,15 +427,13 @@ const updateStaticSegmentPushIds = function(call, callback) {
 
     let idsAddedToSet = 0
 
-    const scope = {}
-
-    if (accountId != 0) {
-        scope.account_id = accountId
-    }
-
-    findStaticSegmentById(postgres, redis, segmentId, scope, function(err, segment) {
+    findStaticSegmentById(postgres, redis, segmentId, function(err, segment) {
         if (err) {
             return callback(err)
+        }
+
+        if (segment.account_id != accountId) {
+            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied "})
         }
 
         if (segment == null || segment == undefined) {
@@ -482,15 +518,16 @@ const getStaticSegmentPushIds = function(call, callback) {
     const postgres = this.clients.postgres
     const redis = this.clients.redis
 
-    const accountId = call.request.getAccountId()
+    const batchSize = call.request.getBatchSize()
+    const AuthContext = call.request.getAuthContext()
     const segmentId = call.request.getSegmentId()
-    const scope = {}
+    const currentCursor = call.request.getCursor()
 
-    if (accountId != 0) {
-        scope.account_id = accountId
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
     }
 
-    findStaticSegmentById(postgres, redis, segmentId, scope, function(err, segment) {
+    findStaticSegmentById(postgres, redis, segmentId, function(err, segment) {
         if (err) {
             return callback(err)
         }
@@ -499,38 +536,47 @@ const getStaticSegmentPushIds = function(call, callback) {
             return callback({ code: grpc.status.NOT_FOUND, message: "Segment not found" })
         }
 
+        if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
+            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+        }
+
         const redisSetId = segment.redis_set_id
 
         if (redisSetId == null || redisSetId == undefined) {
-            return call.end()
+            // Return a message with no push ids and let the client know they are finished
+            const reply = new RoverApis.segment.v1.Models.GetStaticSegmentPushIdsReply()
+            reply.setFinished(true)
+            return callback(null, reply)
         }
 
-        const stream = new RedisSetStream(redis, redisSetId, 10000, {})
+        const batch = new RedisBatchRead(redis, redisSetId, batchSize, currentCursor, {})
 
-        var start = Date.now()
+        batch.read(function(err, ids, nextCursor) {
+            if (err) {
+                return callback(err)
+            }
 
-        stream.on('data', function(ids) {
-            /*
-                We immediatly pause the stream because well Node...
-                Node won't give grpc the chance to begin streaming because it gets in a tight loop
-                where its reading from redis and buffering all the write calls. We use process.nextTick
-                to allow grpc to breath and begin streaming the request
-             */
-            stream.pause()
-            ids.forEach(function(id) {
-                var r = new RoverApis.segment.v1.Models.PushId()
-                r.setId(id)
-                call.write(r)
-            })
+            const reply = new RoverApis.segment.v1.Models.GetStaticSegmentPushIdsReply()
 
-            process.nextTick(function() { 
-                stream.resume()
-            })
-            
-        })
+            if (nextCursor == null || nextCursor == undefined) {
+                reply.setFinished(true)
+            } else {
+                reply.setFinished(false)
+                reply.setNextCursor(nextCursor)
+            }
 
-        stream.on('end', function() {
-            return call.end()       
+            if (ids) {
+                const pushIds = ids.map(id => {
+                    const pushId = new RoverApis.segment.v1.Models.PushId()
+                    pushId.setId(id)
+                    pushId.setType(RoverApis.segment.v1.Models.PushIdType.ALIAS)
+                    return pushId
+                })
+
+                reply.setPushIdsList(pushIds)
+            }
+
+            return callback(null, reply)
         })
 
     })    
@@ -540,7 +586,7 @@ module.exports = {
     listStaticSegments: listStaticSegments,
     getStaticSegment: getStaticSegment,
     createStaticSegment: createStaticSegment,
-    destroyStaticSegment: destroyStaticSegment,
+    deleteStaticSegment: deleteStaticSegment,
     updateStaticSegmentPushIds: updateStaticSegmentPushIds,
     getStaticSegmentPushIds: getStaticSegmentPushIds
 }

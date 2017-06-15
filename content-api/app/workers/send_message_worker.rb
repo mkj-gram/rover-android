@@ -22,7 +22,9 @@ class SendMessageWorker
         # shards = segments["indices"]["customers"]["shards"].keys
         # split queries to each shard split again by number of documents
 
-        for i in 1..Customer::MAX_BUCKETS
+        job_count = message_template.static_segment_id.present? ? 1 : Customer::MAX_BUCKETS
+        
+        for i in 1..job_count
             bucket_query = ElasticsearchHelper.merge_queries(base_query, {
                 filter: {
                     bool: {
@@ -42,6 +44,7 @@ class SendMessageWorker
 
             job = {
                 message_template: message_template,
+                static_segment_id: message_template.static_segment_id,
                 account: account,
                 test_customer_ids: test_customer_ids,
                 query: bucket_query,

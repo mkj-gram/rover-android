@@ -1,0 +1,38 @@
+{
+  "name": "scheduled-message-worker",
+  "version": "2.0.0",
+  "description": "Sends and saves messages to customers",
+  "main": "index.js",
+  "dependencies": {
+    "@rover/node-fcm-ccs": "0.0.3",
+    "@rover/segment-client": "../segment/clients/node",
+    "@rover/segment-filter": "0.0.8",
+    "amqplib": "^0.4.2",
+    "apn": "^2.1.4",
+    "async": "^2.1.2",
+    "bluebird": "^3.4.6",
+    "confidence": "^3.0.2",
+    "debug": "^2.3.3",
+    "elasticsearch": "^11.0.1",
+    "fluent-logger": "^2.1.0",
+    "librato-node": "^4.1.0",
+    "log4js": "^0.6.38",
+    "moment": "^2.15.1",
+    "mongodb": "^2.2.10",
+    "node-gcm": "^0.14.4",
+    "raven": "^0.12.1",
+    "redis": "^2.6.2",
+    "retry": "^0.10.1",
+    "uuid": "^2.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": "6.9.1"
+  }
+}

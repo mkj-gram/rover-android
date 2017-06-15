@@ -44,36 +44,16 @@ const store = new Confidence.Store({
             $default: 'bulk-service'
         }
     },
-    postgres: {
-        username: {
+    raven: {
+        enabled: {
             $filter: 'env',
-            production: process.env.POSTGRESQL_DB_USERNAME,
-            $default: 'rover_development'
-        },
-        password: {
-            $filter: 'env',
-            production: process.env.POSTGRESQL_DB_PASSWORD,
-            $default: 'password1'
-        },
-        database: {
-            $filter: 'env',
-            production: process.env.POSTGRESQL_DB_DATABASE,
-            $default: 'rover-local'
-        },
-        host: {
-            $filter: 'env',
-            production: process.env.POSTGRESQL_DB_HOST,
-            $default: 'localhost'
-        },
-        port: {
-            $filter: 'env',
-            production: process.env.POSTGRESQL_DB_PORT,
-            $default: 5432
-        },
-        ssl: {
-            $filter: 'env',
-            production: true,
+            production: process.env.RAVEN_ENABLED == 'true',
             $default: false
+        },
+        dsn: {
+            $filter: 'env',
+            production: process.env.RAVEN_DSN,
+            $default: ''
         }
     }
 });

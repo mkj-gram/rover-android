@@ -134,7 +134,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
     def scheduled_message_params(local_params)
         convert_param_if_exists(local_params[:scheduled_messages], :name, :title)
-        convert_param_if_exists(local_params[:scheduled_messages], :segment_id, :customer_segment_id)
+        convert_param_if_exists(local_params[:scheduled_messages], :dynamic_segment_id, :customer_segment_id)
         convert_param_if_exists(local_params[:scheduled_messages], :"landing-page", :landing_page)
         
         allowed_params = local_params.fetch(:scheduled_messages, {}).permit(
@@ -147,6 +147,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             :website_url,
             :deep_link_url,
             :customer_segment_id,
+            :static_segment_id,
             :use_local_time_zone,
             :scheduled_time_zone,
             :scheduled_timestamp,
@@ -165,7 +166,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
 
     def render_scheduled_message(message)
-        should_include = ["segment", "experience"]
+        should_include = ["dynamic-segment", "experience"]
 
         json = {
             data: serialize_message(message)
@@ -173,7 +174,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
         included = []
 
-        if should_include.include?("segment") &&  message.customer_segment
+        if should_include.include?("dynamic-segment") &&  message.customer_segment
            included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
         end
 
@@ -303,8 +304,8 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
 
         if message.customer_segment_id
             json[:relationships].merge!({
-                segment: {
-                    data: { type: "segments", id: message.customer_segment_id.to_s }
+                :"dynamic-segment" => {
+                    data: { type: "dynamic-segments", id: message.customer_segment_id.to_s }
                 }
             })
         end
@@ -313,6 +314,14 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
             json[:relationships].merge!({
                 experience: {
                     data: { type: "experiences".freeze, id: message.experience_id }
+                }
+            })
+        end
+
+        if message.static_segment_id
+            json[:relationships].merge!({
+                :"static-segment" => {
+                    data: { type: "static-segments", id: message.static_segment_id.to_s }
                 }
             })
         end

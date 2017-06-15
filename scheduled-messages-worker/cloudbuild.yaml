@@ -1,0 +1,9 @@
+steps:
+- name: 'gcr.io/rover-production/npm:6.9.1'
+  args: ['install']
+  dir: 'scheduled-messages-worker'
+  env:
+    - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/scheduled-messages-worker:$REVISION_ID', 'scheduled-messages-worker']
+images: ['gcr.io/$PROJECT_ID/scheduled-messages-worker:$REVISION_ID']

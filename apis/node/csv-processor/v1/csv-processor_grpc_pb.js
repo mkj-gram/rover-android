@@ -4,6 +4,7 @@
 var grpc = require('grpc');
 var csv$processor_v1_csv$processor_pb = require('../../csv-processor/v1/csv-processor_pb.js');
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
+var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 
 function serialize_rover_csv_processor_v1_CreateLoadJobReply(arg) {
   if (!(arg instanceof csv$processor_v1_csv$processor_pb.CreateLoadJobReply)) {
