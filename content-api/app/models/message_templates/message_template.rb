@@ -128,11 +128,19 @@ class MessageTemplate < ActiveRecord::Base
     end
 
     def customer_segment_id=(id)
+        if id.nil? && self[:customer_segment_id].nil?
+            return
+        end
+
         self[:customer_segment_id] = id
         self[:static_segment_id] = nil
     end
 
     def static_segment_id=(id)
+        if id.nil? && self[:static_segment_id].nil?
+            return
+        end
+        
         self[:static_segment_id] = id
         self[:customer_segment_id] = nil
     end
