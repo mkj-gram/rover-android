@@ -173,7 +173,7 @@ async.series(tasks, (err) => {
         throw err;
     }
     
-    let SegmentClient = require("@rover/segment-client").Segment.V1.Client()
+    let SegmentClient = require("@rover/segment-client").v1.Client()
 
     server.connections["segment"] = SegmentClient
 
