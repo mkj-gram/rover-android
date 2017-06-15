@@ -83,7 +83,7 @@ Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
     let nextCursor = ''
     let authContext = new RoverApis.auth.v1.Models.AuthContext()
 
-    authContext.setAccountId(msg.account.id)
+    authContext.setAccountId(args.account.id)
     authContext.setPermissionsScopeList(["internal", "app:smw"])
 
 
