@@ -7,6 +7,9 @@ const JobError = require('./errors/job-error');
 const RoverApis = require("@rover/apis");
 const async = require("async");
 const retry = require('retry');
+const debug = require('debug')
+
+debug.log = console.info.bind(console)
 
 const RETRY_TIMEOUT = 500;
 const MAX_RETRY = 10;
@@ -74,7 +77,7 @@ Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
     // First start streaming the customer identifiers from segment service
     
 
-
+    debug("Getting static segments")
     let channel = this._server.connections.rabbitmq.channel;
     let workerQueue = this._server.connections.rabbitmq.workerQueue;
     let logger = this._server.plugins.logger.logger;
@@ -128,6 +131,7 @@ Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
         request.setSegmentId(args.static_segment_id)
         request.setBatchSize(1000)
 
+        debug("Reading batch: staticSegmentId=" + args.static_segment_id + " nextCursor=" + nextCursor)
         readbatch(request, function(err, response) {
             if (err) {
                 finished = true
@@ -151,17 +155,20 @@ Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
 
             delete jobArgs["static_segment_id"]
 
+            debug("Publishing new job")
             channel.sendToQueue(workerQueue.queue, new Buffer(JSON.stringify(jobArgs)), {})
 
             return next()
             
         })
     }, function() {
-        return finished == true
+        return finished == false
     }, function(err) {
         if (err) {
             console.error("Error: Static Segment Push failed", err)
         }
+
+        debug("Static segment reading finished")
         
         // TODO: add in backoff at the queue level it could be that this one worker instance is bugged
         channel.ack(msg)
