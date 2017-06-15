@@ -13,6 +13,8 @@ const fcm = require('node-gcm');
 const fcmCCS = require('@rover/node-fcm-ccs');
 const apn = require('apn');
 const ObjectID = require('mongodb').ObjectID;
+const RoverApis = require("@rover/apis")
+const retry = require('retry');
 
 const JobError = require('./errors/job-error');
 const RoverEvent = require('./rover-event');
@@ -86,7 +88,7 @@ const roverInboxApnsDevelopmentClient = new apn.Provider({
 });
 
 const JOB_STATE = {
-    _getSegmentFromElasticsearch: 1,
+    _getSegment: 1,
     _queueNextJob: 2,
     _getCustomersFromMongo: 3,
     _rateLimitMessages: 4,
@@ -152,7 +154,8 @@ JobProcessor.prototype.getErrorContext = function() {
         },
         preference: this._context.preference,
         query: this._context.query,
-        segment: this._context.segment
+        segment: this._context.segment,
+        static_segment_id: this._context.staticSegmentId
     }  
 };
 
@@ -173,12 +176,14 @@ JobProcessor.prototype.process = function(done) {
     let job = Promise
     .resolve()
 
-    if (util.isArray(this._context.customerIdentifiers)) {
-        job = job.then(() => this._getCustomersFromIdentifiers())
+    if (!util.isNullOrUndefined(this._context.staticSegmentId)) {
+        job = job.then(() => this._getSegmentFromService())
+            .then(response => this._queueNextJob(response))
+
     } else {
         job = job.then(() => this._getSegmentFromElasticsearch())
-        .then(response => this._queueNextJob(response))
-        .then(() => this._filterCustomersBySegment())
+            .then(response => this._queueNextJob(response))
+            .then(() => this._filterCustomersBySegment())
     }
     
     job
@@ -221,11 +226,85 @@ JobProcessor.prototype._getElasticsearchIndex = function(account) {
     return "customers_account_" + account.id;
 };
 
-JobProcessor.prototype._getCustomersFromIdentifiers = function() {
+JobProcessor.prototype._getSegmentFromService = function() {
+    return new Promise((resolve, reject) => {
+        this._debug("Reading batch from Segment service");
 
-    if (util.isNullOrUndefined(this._context.customerIdentifiers) || util.isArray(this._context.customerIdentifiers) && this._context.customerIdentifiers.length == 0) {
-        this._customers = [];
-        return Promise.resolve();
+        let SegmentClient = require("@rover/segment-client").v1.Client()
+
+        let nextCursor = this._context.nextCursor || ''
+
+        let authContext = new RoverApis.auth.v1.Models.AuthContext()
+
+        authContext.setAccountId(this._context.account.id)
+        authContext.setPermissionScopesList(["internal", "app:smw"])
+
+        const readbatch = function(request, callback) {
+
+            const operation = retry.operation({
+                retries: 5,
+                factor: 2,
+                minTimeout: 1 * 1000,
+                maxTimeout: 60 * 1000,
+                randomize: false,
+            });
+
+            operation.attempt(function(current) {
+                // 20 second timeout
+                const deadline = new Date(Date.now() + 20 * 1000)
+
+                SegmentClient.getStaticSegmentPushIds(request, { deadline: deadline }, function(err, response) {
+                    /* Check if we should retry */
+                    if (operation.retry(err)) {
+                        return;
+                    }
+
+                    if (err) {
+                        return callback(err)
+                    }
+
+                    return callback(null, response)
+                })
+            })
+        }
+
+
+        
+        const request = new RoverApis.segment.v1.Models.GetStaticSegmentPushIdsRequest()
+
+        request.setAuthContext(authContext)
+        request.setCursor(nextCursor)
+        request.setSegmentId(this._context.staticSegmentId)
+        request.setBatchSize(READ_BATCH_SIZE)
+
+        debug("Reading batch: staticSegmentId=" + this._context.staticSegmentId + " nextCursor=" + nextCursor)
+        readbatch(request, function(err, response) {
+            if (err) {
+                return reject(err)
+            }        
+
+            const identifiers = response.getPushIdsList().map(function(pushId) {
+                return pushId.id
+            })
+
+            this._getCustomersFromIdentifiers(identifiers)
+            .then(customers => {
+                this.updateState(JOB_STATE._getSegment)
+                this._customers = customers
+                return resolve(response)
+            })
+            .catch(err => {
+                return reject(err)
+            })
+        })
+        
+    })
+}
+
+JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
+
+    if (util.isNullOrUndefined(identifiers) || util.isArray(identifiers) && identifiers.length == 0) {
+        return Promise.resolve([]);
     }
 
     return new Promise((resolve, reject) => {
@@ -236,16 +315,16 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function() {
         let logger = this._server.plugins.logger.logger;
 
 
-        methods.customer.findAllByIdentifier(this._customerIds, (err, customers) => {
+        methods.customer.findAllByIdentifier(identifiers, (err, customers) => {
             if (err) {
                 return reject(new JobError("failed to read customers from mongo", true));
             }
 
             logger.debug("_getCustomersFromIdentifiers: " + totalTime +  "ms");
 
-            this._customers = customers.map(parseCustomer);
+            let parsedCustomers = customers.map(parseCustomer);
 
-            return resolve();
+            return resolve(parsedCustomers);
         });
     });
 
@@ -337,7 +416,7 @@ JobProcessor.prototype._getSegmentFromElasticsearch = function() {
                 this._customers = customers;
 
                 this._debug("Finished reading: " + this._customers.length + " customers");
-                this.updateState(JOB_STATE._getSegmentFromElasticsearch);
+                this.updateState(JOB_STATE._getSegment);
                 return resolve(lastResponse);
             });
         }).catch(err => {
@@ -350,21 +429,38 @@ JobProcessor.prototype._getSegmentFromElasticsearch = function() {
 JobProcessor.prototype._queueNextJob = function(response) {
     // this._previousState < JOB_STATE._queueNextJob
     // means if we crashed before this function could run we are allowed to queue the next job
-    // if however we crash finding cusotmers from mongo we shouldn't queue the job again or else there will be
+    // if however we crash finding customers from mongo we shouldn't queue the job again or else there will be
     // duplicate job
-    
-    if (this._previousState < JOB_STATE._queueNextJob && this._customers.length >= BATCH_SIZE) {
+    // 
+
+    let queueMore = false
+
+    if (response instanceof RoverApis.segment.v1.Models.GetStaticSegmentPushIdsReply) {
+        queueMore = response.getFinished() == false
+    } else {
+        queueMore = this._customers.length >= BATCH_SIZE
+    }
+
+    if (this._previousState < JOB_STATE._queueNextJob && queueMore) {
         this._debug("Queueing next job");
-        let newOffset = this._context.offset + response.hits.hits.length;
+
         let nextJobArguments = {
             message_template: this._context.messageTemplate,
             account: this._context.account,
             query: this._context.query,
             segment: this._context.segment,
+            static_segment_id: this._context.staticSegmentId,
             platform_credentials: this._context.platformCredentials,
-            test_customer_ids: this._context.testCustomerIds,
-            scroll_id: response._scroll_id,
-            offset: newOffset
+            static_segment_id: this._context.staticSegmentId,
+            test_customer_ids: this._context.testCustomerIds
+        }
+
+        if (response instanceof RoverApis.segment.v1.Models.GetStaticSegmentPushIdsReply) {
+            nextJobArguments["next_cursor"] = response.getNextCursor()
+        } else {
+            let newOffset = this._context.offset + response.hits.hits.length;
+            nextJobArguments["scroll_id"] = response._scroll_id
+            nextJobArguments["offset"] = newOffset
         }
 
         let channel = this._server.connections.rabbitmq.channel;

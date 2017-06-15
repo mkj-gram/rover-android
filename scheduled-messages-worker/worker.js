@@ -64,117 +64,6 @@ Worker.prototype.displayMetrics = function() {
     return;
 }
 
-
-
-
-
-
-
-Worker.prototype.generateStaticSegmentJobs = function(msg, args) {
-        
-    // Args are the original payload
-    // 
-    // First start streaming the customer identifiers from segment service
-    
-
-    debug("Getting static segments")
-    let channel = this._server.connections.rabbitmq.channel;
-    let workerQueue = this._server.connections.rabbitmq.workerQueue;
-    let logger = this._server.plugins.logger.logger;
-    let SegmentClient = this._server.connections.segment;
-
-    let nextCursor = ''
-    let authContext = new RoverApis.auth.v1.Models.AuthContext()
-
-    authContext.setAccountId(args.account.id)
-    authContext.setPermissionScopesList(["internal", "app:smw"])
-
-
-    // somehow we keep going till 
-    let finished = false
-
-    const readbatch = function(request, callback) {
-
-        const operation = retry.operation({
-            retries: 5,
-            factor: 2,
-            minTimeout: 1 * 1000,
-            maxTimeout: 60 * 1000,
-            randomize: false,
-        });
-
-        operation.attempt(function(current) {
-            // 20 second timeout
-            const deadline = new Date(Date.now() + 20 * 1000)
-
-            SegmentClient.getStaticSegmentPushIds(request, { deadline: deadline }, function(err, response) {
-                /* Check if we should retry */
-                if (operation.retry(err)) {
-                    return;
-                }
-
-                if (err) {
-                    return callback(err)
-                }
-
-                return callback(null, response)
-            })
-        })
-    }
-
-
-    async.doWhilst(function(next) {
-        const request = new RoverApis.segment.v1.Models.GetStaticSegmentPushIdsRequest()
-
-        request.setAuthContext(authContext)
-        request.setCursor(nextCursor)
-        request.setSegmentId(args.static_segment_id)
-        request.setBatchSize(1000)
-
-        debug("Reading batch: staticSegmentId=" + args.static_segment_id + " finished= " + finished + " nextCursor=" + nextCursor)
-        readbatch(request, function(err, response) {
-            if (err) {
-                finished = true
-                return next(err)
-            }
-
-            /* 
-                repeated PushId push_ids = 1;
-                string next_cursor = 2;
-                bool finished = 3;
-            */
-            
-            nextCursor = response.getNextCursor()
-            finished = response.getFinished()
-
-            const identifiers = response.getPushIdsList().map(function(pushId) {
-                return pushId.id
-            })
-
-            let jobArgs = Object.assign({}, args, { customer_identifiers: identifiers })
-
-            delete jobArgs["static_segment_id"]
-
-            debug("Publishing new job")
-            channel.sendToQueue(workerQueue.queue, new Buffer(JSON.stringify(jobArgs)), {})
-
-            return next()
-            
-        })
-    }, function() {
-        return finished == false
-    }, function(err) {
-        if (err) {
-            console.error("Error: Static Segment Push failed", err)
-        }
-
-        debug("Static segment reading finished")
-        
-        // TODO: add in backoff at the queue level it could be that this one worker instance is bugged
-        channel.ack(msg)
-    })
-};
-
 Worker.prototype.work = function(msg) {
 
     // check to see the type of segment being passed in is
@@ -185,17 +74,13 @@ Worker.prototype.work = function(msg) {
 
     let args = JSON.parse(msg.content);
 
-
-    if (!util.isNullOrUndefined(args.static_segment_id)) {
-        return this.generateStaticSegmentJobs(msg, args);
-    }
-
     let context = {
         messageTemplate: args.message_template,
         account: args.account,
         query: args.query,
         testCustomerIds: args.test_customer_ids,
-        customerIdentifiers: args.customer_identifiers,
+        staticSegmentId: args.static_segment_id,
+        nextCursor: args.next_cursor,
         scrollId: args.scroll_id,
         offset: args.offset,
         platformCredentials: args.platform_credentials,
