@@ -53,6 +53,11 @@ const route = function(req, res) {
 
     res.setHeader('Access-Control-Allow-Origin', '*')
 
+    // Allow all headers that cors is request
+    allowedHeaders = req.headers['access-control-request-headers'] || ''
+    res.setHeader('Access-Control-Allow-Headers', allowedHeaders)
+
+
     res.on('finish', function() {
         const requestEndTime = Date.now();
         const totalTime = requestEndTime - res._startTime;
