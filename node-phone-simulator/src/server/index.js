@@ -258,7 +258,7 @@ const renderExperienceHtml = (experience, useRenderCache, options) => {
     } = options
 
     function render() {
-        const analyticsURL = process.env.ANALYTICS_URL
+        const analyticsURL = process.env.ANALYTICS_URL || `https://api.rover.io/v1/events`
         return new Promise((resolve, reject) => {
             const reactApp = ReactDOMServer.renderToString(
                 <App
