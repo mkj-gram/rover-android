@@ -6,3 +6,6 @@ auth/clients/node/lib/auth
 sdk-api/newrelic_agent.log
 node-phone-simulator/dist
 newrelic_agent.log
+node-phone-simulator/public/app.js
+node-phone-simulator/.env
+

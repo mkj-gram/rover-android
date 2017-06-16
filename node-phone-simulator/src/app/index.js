@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
 import PropTypes from 'prop-types'
-import shortid from 'shortid'
+
+import uuidV4 from 'uuid/v4'
 
 import { sendData } from './lib/roverAnalytics'
 
@@ -12,30 +13,43 @@ class App extends Component {
 	constructor(props) {
 		super(props)
 		
-		this.state = { platform: null }
+		this.state = { platform: null, experienceSessionId: uuidV4() }
 
 		this.getScreenBackground = this.getScreenBackground.bind(this)
 		this.updatePlatform = this.updatePlatform.bind(this)
 	}
 	
 	componentWillMount() {
-		const { experience } = this.props
+		const {
+			analyticsToken,
+			analyticsURL,
+			experience,
+			showStatusBar
+		} = this.props
+		
 		const { id, versionId } = experience
-		if (typeof window !== 'undefined') {
-			let experienceSessionId = localStorage.getItem('rover_experience_session')
-			if (experienceSessionId === null) {
-				experienceSessionId = shortid.generate()
-				localStorage.setItem('rover_experience_session', experienceSessionId)
-			}
-			sendData({
-			    name: 'experience launched',
-			    args: {
-			        'experience-id': id,
-			        'version-id': versionId,
-			        'experience-session-id': experienceSessionId
-			    }
-			})
+		
+		const { experienceSessionId } = this.state
+		
+		if (typeof window !== 'undefined' && !showStatusBar) {
+		    let deviceId = localStorage.getItem('rover-device-id')
+		    if (deviceId === null) {
+		        deviceId = uuidV4()
+		        localStorage.setItem('rover-device-id', deviceId)
+		    }
+		    const name = 'experience launched'
+		    sendData(
+		        name,
+		        {
+		            'experience-id': id,
+		            'version-id': versionId,
+		            'experience-session-id': experienceSessionId
+		        },
+		        analyticsToken,
+				analyticsURL
+		    )
 		}
+
 	}
 
 	componentDidMount() {
@@ -80,22 +94,27 @@ class App extends Component {
 	}
 	
 	renderRows(screenId, handleClick, isCurrentScreen) {
-		const { experience } = this.props
+		const { analyticsToken, analyticsURL, experience, showStatusBar } = this.props
+		const { experienceSessionId } = this.state
 		const screen = experience.screens[screenId]
 		if (!screen.rows) {
-			return
+		    return
 		}
+
 		
-		if (typeof window !== 'undefined' && isCurrentScreen) {
-			sendData({
-				name: 'experience screen viewed',
-				args: {
-					'experience-id': experience.id,
-					'experience-session-id': localStorage.getItem('rover_experience_session'),
-					'version-id': experience.versionId,
-					'screen-id': screenId
-				}
-			})
+		if (typeof window !== 'undefined' && isCurrentScreen && !showStatusBar) {
+		    const name = 'experience screen-viewed'
+		    sendData(
+		        name,
+		        {
+		            'experience-id': experience.id,
+		            'experience-session-id': experienceSessionId,
+		            'version-id': experience.versionId,
+		            'screen-id': screenId
+		        },
+		        analyticsToken,
+				analyticsURL
+		    )
 		}
 
 		const rowValues = Object.keys(screen.rows).map(key => screen.rows[key])
@@ -117,7 +136,8 @@ class App extends Component {
 	}
 	
 	renderBlocks(row, handleClick) {
-		const { isAndroid, experience } = this.props
+		const { analyticsToken, analyticsURL, isAndroid, experience, showStatusBar } = this.props
+		const { experienceSessionId } = this.state
 		
 		return () => {
 			if (!row.blocks) {
@@ -128,24 +148,22 @@ class App extends Component {
 			
 			const handleBlockClick = ({ action, id, screenId, type }) => {
 				handleClick(action)
-				if (action) {
+				if (action && !showStatusBar) {
 					const { type, url } = action
+					const name = 'experience block-clicked'
 					const attributes = {
-						name: 'experience block clicked',
-						args: {
-							'experience-id': experience.id,
-							'version-id': experience.versionId,
-							'experience-session-id': localStorage.getItem('rover_experience_session'),
-							'screen-id': screenId,
-							'block-id': id,
-							'block-action': {
-								type,
-								url,
-								'screen-id': action.screenId
-							}
+						'experience-id': experience.id,
+						'version-id': experience.versionId,
+						'experience-session-id': experienceSessionId,
+						'screen-id': screenId,
+						'block-id': id,
+						'block-action': {
+							type,
+							url,
+							'screen-id': action.screenId
 						}
 					}
-					sendData(attributes)
+					sendData(name, attributes, analyticsToken, analyticsURL)
 				}
 			}
 			
@@ -270,6 +288,7 @@ class App extends Component {
 
 App.propTypes = {
 	experience: PropTypes.shape({
+		analyticsToken: PropTypes.string,
 		hasUnpublishedChanges: PropTypes.bool,
 		homeScreenId: PropTypes.string,
 		id: PropTypes.string,
