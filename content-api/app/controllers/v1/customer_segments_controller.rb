@@ -4,7 +4,7 @@ class V1::CustomerSegmentsController < V1::ApplicationController
     before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
     before_action :set_customer_segment, only: [:show, :update, :destroy]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
     
     def index
         # show all segments
