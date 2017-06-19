@@ -6,7 +6,7 @@ module PermissionsHelper
 
     def _check_permissions(allowed_permissions = [])
         if !(current_auth_ctx && current_auth_ctx.permission_scopes.any? { |scope| allowed_permissions.include?(scope) })
-            logger.debug("User or Account do not have sufficient permissions needed: #{allowed_permissions} had: #{current_auth_ctx.permission_scopes}")
+            logger.warn("User or Account does not have sufficient permissions needed: #{allowed_permissions} had: #{current_auth_ctx.permission_scopes}")
             render_forbidden("Forbidden", "You do not have sufficent permissions")
         end
     end
@@ -17,7 +17,9 @@ module PermissionsHelper
                 controller_methods = [controller_methods]
             end
             
-            before_action -> { _check_permissions(permissions) }, if: lambda { |c| controller_methods == [:all] || controller_methods.include?(c.action_name) }
+            controller_methods = controller_methods.map(&:to_sym)
+
+            before_action -> { _check_permissions(permissions) } , if: lambda { |c| controller_methods == [:all] || controller_methods.include?(c.action_name.to_sym) }
         end
     end
 
