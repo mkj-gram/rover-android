@@ -7,7 +7,7 @@ module PermissionsHelper
     def _check_permissions(allowed_permissions = [])
         if !(current_auth_ctx && current_auth_ctx.permission_scopes.any? { |scope| allowed_permissions.include?(scope) })
             logger.debug("User or Account do not have sufficient permissions needed: #{allowed_permissions} had: #{current_auth_ctx.permission_scopes}")
-            render_forbidden("NOP", "E")
+            render_forbidden("Forbidden", "You do not have sufficent permissions")
         end
     end
 
