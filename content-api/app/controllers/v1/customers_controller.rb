@@ -4,6 +4,8 @@ class V1::CustomersController < V1::ApplicationController
     before_action :check_access, only: [:index, :show, :create, :update, :destroy]
     before_action :set_customer, only: [:show]
 
+    allow :admin, :server
+    
     def index
 
         if pagination_type == 'cursor'

@@ -3,7 +3,7 @@ class V1::CustomerSegmentCalculateController < V1::ApplicationController
     before_action :validate_json_schema, only: [:create]
     before_action :check_access, only: [:create]
 
-
+    allow :admin, :server
 
     def create
         json = flatten_request({single_record: true})

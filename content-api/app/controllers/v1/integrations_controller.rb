@@ -9,6 +9,8 @@ class V1::IntegrationsController < V1::ApplicationController
     before_action :validate_json_schema,    only: [:create, :update]
     before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
 
+    allow :admin, :server
+    
     def index
 
         # show all integrations

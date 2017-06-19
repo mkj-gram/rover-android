@@ -5,7 +5,8 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
     before_action :set_proximity_message,   only: [:show, :update, :destroy, :test_message]
 
-
+    allow :admin, :server
+    
     def index
         # list all proximity messages
         # queryby status?

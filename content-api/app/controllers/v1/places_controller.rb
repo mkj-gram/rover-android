@@ -4,6 +4,8 @@ class V1::PlacesController < V1::ApplicationController
     before_action :check_access, only: [:index, :show, :create, :update, :destroy]
     before_action :set_place, only: [:show, :update, :destroy]
 
+    allow :admin, :server
+    
     def index
         should_query = []
         should_filter = []

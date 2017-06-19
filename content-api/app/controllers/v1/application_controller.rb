@@ -5,6 +5,7 @@ class V1::ApplicationController < ActionController::API
     include IncludeHelper
     include JsonHelper
     include RenderHelper
+    include PermissionsHelper
 
 
     before_action :set_locale
@@ -110,6 +111,9 @@ class V1::ApplicationController < ActionController::API
         GRPC_CODE_TO_HTTP_CODE.has_key?(code) ? GRPC_CODE_TO_HTTP_CODE[code] : 500
     end
 
+    def current_auth_ctx
+        return @current_auth_ctx
+    end
 
     def current_account
         @current_account ||= -> {
@@ -243,6 +247,7 @@ class V1::ApplicationController < ActionController::API
 
     if (account = Account.find_by_id(auth_ctx.account_id))
       @current_account = account
+      @current_auth_ctx = auth_ctx
       Raven.user_context(account_id: @current_account.id)
     else
       render_unauthorized("Validation Error", "account not found")
@@ -281,6 +286,7 @@ class V1::ApplicationController < ActionController::API
     end
 
     @current_user = session.user
+    @current_auth_ctx = auth_ctx
     Raven.user_context(account_id: @current_user.account_id, user_id: @current_user.id, email: @current_user.email)
   end
 end

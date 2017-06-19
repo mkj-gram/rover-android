@@ -16,7 +16,7 @@ describe "/v1/users", :type => :request do
       )).and_return(Rover::Auth::V1::AuthContext.new(
         user_id: session.user_id,
         account_id: session.user.account_id,
-        permission_scopes: [''],
+        permission_scopes: ['admin'],
       ))
     end
   end

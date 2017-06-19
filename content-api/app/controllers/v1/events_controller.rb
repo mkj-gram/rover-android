@@ -3,6 +3,8 @@ class V1::EventsController < V1::ApplicationController
     before_action :validate_json_schema
     before_action :device_id_header_present
 
+    allow :admin, :server, :sdk
+
     instrument_action :create
 
     def create

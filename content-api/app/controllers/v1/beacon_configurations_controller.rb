@@ -5,6 +5,8 @@ class V1::BeaconConfigurationsController < V1::ApplicationController
     before_action :set_resource,            only: [:show, :update, :destroy]
     before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
 
+    allow :admin, :server
+    
     @@protocol_types = Set.new([IBeaconConfiguration.protocol, EddystoneNamespaceConfiguration.protocol, UrlConfiguration.protocol])
 
     def index
