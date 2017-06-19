@@ -4,6 +4,8 @@ class V1::AccountInvitesController < V1::ApplicationController
     before_action :check_access, only: [:index, :show, :create, :update, :destroy]
     before_action :set_account_invite, only: [:show, :update, :destroy]
 
+    allow :all, ["admin", "server"]
+    
     # GET /account_invites
     def index
         @account_invites = current_account.account_invites.order("id").where("id >= ?", current_cursor).limit(page_size + 1)

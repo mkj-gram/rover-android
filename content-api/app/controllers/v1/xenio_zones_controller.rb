@@ -3,6 +3,8 @@ class V1::XenioZonesController < V1::ApplicationController
     before_action :validate_json_schema, only: [:create, :update]
     before_action :set_xenio_zone, only: [:show, :update, :destroy]
 
+    allow :all, ["admin", "server"]
+
     def index
         should_query = []
         should_filter = []

@@ -4,6 +4,8 @@ class V1::AndroidPlatformsController < V1::ApplicationController
     before_action :check_access, only: [:index, :show, :create, :update, :destroy]
     before_action :set_android_platform, only: [:show, :update, :destroy]
 
+    allow :all, ["admin", "server"]
+    
     def show
         json = {
             data: serialize_android_platform(@android_platform)

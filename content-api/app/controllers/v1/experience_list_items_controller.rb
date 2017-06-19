@@ -2,6 +2,7 @@ class V1::ExperienceListItemsController < V1::ApplicationController
 
     before_action :authenticate
    
+    allow :all, ["admin", "server", "sdk"]
 
     def index
         # grab all experiences

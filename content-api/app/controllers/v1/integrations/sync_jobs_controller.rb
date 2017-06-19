@@ -4,6 +4,8 @@ class V1::Integrations::SyncJobsController < V1::ApplicationController
     before_action :set_resource, only: [:show]
     before_action :validate_json_schema,    only: [:create]
 
+    allow :all, ["admin", "server"]
+    
     def index
         integration = ThirdPartyIntegration.find_by_id(get_integration_id)
         if integration
