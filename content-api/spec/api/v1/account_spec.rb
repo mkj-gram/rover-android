@@ -30,6 +30,7 @@ describe "/v1/account", :type => :request do
     ))
     .and_return(Rover::Auth::V1::AuthContext.new(
       account_id: account.id,
+      permission_scopes: ["admin"]
     ))
 
     expect(AUTHSVC_CLIENT).to receive(:list_tokens)

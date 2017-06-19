@@ -14,7 +14,7 @@ describe "/v1/places", :type => :request do
   before :each do
     nothing_authenticates
 
-    auth_token(session.account.token, account_id: session.account.id)
+    auth_token(session.account.token, account_id: session.account.id, scopes: ['admin'])
   end
 
   context "GET" do

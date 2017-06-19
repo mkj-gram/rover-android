@@ -10,7 +10,7 @@ describe "/v1/events", :type => :request do
   before :each do
     nothing_authenticates
 
-    auth_token(account.token, account_id: account.id)
+    auth_token(account.token, account_id: account.id, scopes: ['server'])
   end
 
   it 'updates the devices sdk version' do
