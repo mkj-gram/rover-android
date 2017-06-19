@@ -2,7 +2,7 @@ class V1::IosPlatformCertificateController < V1::ApplicationController
     before_action :authenticate
     before_action :set_ios_platform, only: [:update, :destroy]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
     
     def update
         if params.has_key?(:certificate) && params[:certificate].is_a?(ActionDispatch::Http::UploadedFile) && params[:certificate].content_type != "application/x-pkcs12"

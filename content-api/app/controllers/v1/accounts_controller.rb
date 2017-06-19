@@ -4,7 +4,7 @@ class V1::AccountsController < V1::ApplicationController
     before_action :has_access_to_account
     before_action :check_access, only: [:show, :update]
 
-    allow :all, ["admin", "server"]
+   	allow :admin, :server
 
     # GET /accounts/:id
     def show

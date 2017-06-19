@@ -4,7 +4,7 @@ class V1::IosPlatformsController < V1::ApplicationController
     before_action :check_access, only: [:show, :update]
     before_action :set_ios_platform, only: [:show, :update]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
 
     def show
         json = {

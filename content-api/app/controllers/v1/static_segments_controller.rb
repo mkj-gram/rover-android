@@ -3,7 +3,7 @@ class V1::StaticSegmentsController < V1::ApplicationController
     before_action :validate_json_schema, only: [:create, :update]
     before_action :set_static_segment, only: [:show, :destroy]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
     
     def index
         

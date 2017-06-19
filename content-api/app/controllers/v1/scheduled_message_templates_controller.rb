@@ -5,7 +5,7 @@ class V1::ScheduledMessageTemplatesController < V1::ApplicationController
     before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
     before_action :set_scheduled_message,   only: [:show, :update, :destroy, :test_message]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
     
     def index
         should_query = []

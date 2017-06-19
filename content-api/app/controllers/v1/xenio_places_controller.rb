@@ -3,7 +3,7 @@ class V1::XenioPlacesController < V1::ApplicationController
     before_action :validate_json_schema, only: [:create, :update]
     before_action :set_xenio_place, only: [:show, :update, :destroy]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
 
     def index
         should_query = []

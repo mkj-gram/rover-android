@@ -3,7 +3,7 @@ class V1::GimbalPlacesController < V1::ApplicationController
     before_action :validate_json_schema, only: [:create, :update]
     before_action :set_gimbal_place, only: [:show, :update, :destroy]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
     
     def index
         should_query = []

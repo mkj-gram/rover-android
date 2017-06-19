@@ -4,7 +4,7 @@ class V1::AndroidPlatformsController < V1::ApplicationController
     before_action :check_access, only: [:index, :show, :create, :update, :destroy]
     before_action :set_android_platform, only: [:show, :update, :destroy]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
     
     def show
         json = {

@@ -2,7 +2,7 @@ class V1::ImagesController < V1::ApplicationController
 
     before_action :authenticate
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
     
     SUPPORTED_CONTENT_TYPES = ["image/png", "image/jpeg", "image/jpg"].freeze
 

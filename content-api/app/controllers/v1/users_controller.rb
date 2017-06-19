@@ -7,7 +7,7 @@ class V1::UsersController < V1::ApplicationController
     before_action :set_resource,            only: [:show, :update, :destroy]
     before_action :check_access,            only: [:index, :show, :update, :destroy]
 
-    allow [:index, :show, :update, :destroy], ["admin", "server"]
+    allow :admin, :server, except: [:create]
 
     # GET /users
     # Returns paged user's who belong to an account

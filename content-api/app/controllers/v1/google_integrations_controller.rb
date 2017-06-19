@@ -5,7 +5,7 @@ class V1::GoogleIntegrationsController < V1::ApplicationController
     # before_action :check_access,            only: [:index, :show, :create, :update, :destroy]
     before_action :set_google_integration, only: [:show, :update, :destroy]
 
-    allow :all, ["admin", "server"]
+    allow :admin, :server
     
     def show
         # grab the integration

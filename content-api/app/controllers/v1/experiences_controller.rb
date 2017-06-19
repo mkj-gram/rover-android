@@ -3,8 +3,8 @@ class V1::ExperiencesController < V1::ApplicationController
     before_action :authenticate, except: [:short_url]
     before_action :set_experience, only: [:show, :update, :publish, :revert, :archive, :unarchive ]
 
-    allow :show, ["admin", "server", "sdk"]
-    allow [:index, :create, :update, :publish, :revert, :delete_version, :archive, :unarchive], ["admin", "server"]
+    allow :admin, :server, :sdk, only: [:show]
+    allow :admin, :server, only: [:index, :create, :update, :publish, :revert, :delete_version, :archive, :unarchive]
 
     skip_params_parsing POST: ['/v1/experiences/*', '/experiences/*'], PATCH: ['/v1/experiences/*', '/experiences/*']
 
