@@ -31,11 +31,16 @@ app.use(morgan('tiny'))
 
 app.use(express.static('public'))
 app.use(compression())
+app.disable('x-powered-by');
 
 app.set('port', process.env.PORT || 80)
 
 app.set('views', 'views')
 app.set('view engine', 'pug')
+
+app.get('/healthcheck', (req, res) => {
+    res.status(200).end()
+})
 
 app.get('/.well-known/assetlinks.json', (req, res) => {
     const host = req.headers.host
