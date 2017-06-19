@@ -31,7 +31,7 @@ app.use(morgan('tiny'))
 
 app.use(express.static('public'))
 app.use(compression())
-app.disable('x-powered-by');
+app.disable('x-powered-by')
 
 app.set('port', process.env.PORT || 80)
 
