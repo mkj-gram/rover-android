@@ -18,6 +18,7 @@
   "dependencies": {
     "@rover/auth-client": "../auth/clients/node",
     "@rover/react-phone-components": "1.5.1",
+    "async": "^2.4.1",
     "babel-cli": "^6.18.0",
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",

@@ -2,17 +2,35 @@ import platform from 'platform'
 import moment from 'moment'
 import 'moment-timezone'
 import 'whatwg-fetch'
+import queue from 'async/queue'
+
+const eventQueue = queue(
+    ({ name, data, analyticsToken, analyticsURL }, callback) => {
+        fetch(analyticsURL, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-ROVER-API-KEY': analyticsToken,
+                'X-ROVER-DEVICE-ID': localStorage.getItem('rover-device-id')
+            },
+            body: JSON.stringify(getBody(name, data))
+        })
+        .then(() => callback())
+        .catch(err => {
+            console.error(err)
+            return callback()
+        })
+    },
+    1
+)
 
 export const sendData = (name, data, analyticsToken, analyticsURL) =>
-    fetch(analyticsURL, {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            'X-ROVER-API-KEY': analyticsToken,
-            'X-ROVER-DEVICE-ID': localStorage.getItem('rover-device-id')
-        },
-        body: JSON.stringify(getBody(name, data))
+    eventQueue.push({
+        name: name,
+        data: data,
+        analyticsToken: analyticsToken,
+        analyticsURL: analyticsURL
     })
 
 const getBody = (name = '', data = {}) => ({
