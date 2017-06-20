@@ -176,7 +176,7 @@ router.put('/bulk/segments/:id/csv', authenticated, upload, function(req, res, n
     });
 })
 
-router.get('/bulk/load-job/:id/csv', authenticated, function(req, res, next) {
+router.get('/bulk/load-jobs/:id/csv', authenticated, function(req, res, next) {
     const request = new RoverApis['csv-processor'].v1.Models.GetLoadJobRequest()
 
     request.setAuthContext(req._authContext)
