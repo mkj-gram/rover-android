@@ -26,6 +26,7 @@ const INBOX_KEY_PREFIX = "inbox_";
 const RATE_LIMIT_KEY_PREFIX = "msgrl_";
 const INBOX_LIMIT = 150;
 const LIBRATO_SOURCE = 'scheduled-messages-worker';
+const APNS_CONCURRENCY = Config.get('/worker/apns_concurrency');
 
 const isEmptyObject = (obj) => {
     return !Object.keys(obj).length;
@@ -861,8 +862,11 @@ JobProcessor.prototype._sendNotifications = function() {
 
         if (!util.isNullOrUndefined(senderId) && !util.isNullOrUndefined(messagingToken)) {
             var androidClient = fcmCCS.Client(senderId, messagingToken, {});
-            // Allow for 2000 notifications allowed before rate limiting
-            androidClient.maxPendingMessages = 2000;
+            /*
+                There should only be 100 outstanding messages
+                https://developers.google.com/cloud-messaging/ccs#flow
+            */
+            androidClient.maxPendingMessages = 100;
             pushPromises.push(this._sendAndroidXMPPNotifications(androidClient, androidMessages));
         } else if(!util.isNullOrUndefined(apiKey)) {
             let androidClient = fcm.Sender(apiKey);
@@ -1275,7 +1279,7 @@ JobProcessor.prototype._sendIOSNotifications = function(client, topic, iosMessag
 
         // TODO: 
         // update concurrency when core node http2 is merged
-    }).then(results => {
+    },{ concurrency: APNS_CONCURRENCY }).then(results => {
 
         apnsDebug("Finished sending ios notifications");
 

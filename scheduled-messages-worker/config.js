@@ -70,6 +70,11 @@ var store = new Confidence.Store({
 			$filter: 'env',
 			production: (parseInt(process.env.WORKER_READ_BATCH_SIZE) || 500),
 			$default: 500
+		},
+		apns_concurrency: {
+			$filter: 'env',
+			production:  (parseInt(process.env.WORKER_APNS_CONCURRENCY) || 30),
+			$default: 30
 		}
 	},
 	raven: {
