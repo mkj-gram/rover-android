@@ -1,26 +1,22 @@
-const kue = require('kue')
+const Queue = require('bull')
 const Config = require('./config')
 
-const queue = kue.createQueue({
-    prefix: Config.get('/redis/prefix'),
-    redis: Config.get('/redis/url')
-});
+const staticSegmentQueue = Queue('static-segments', Config.get('/redis/url'))
 
 
-queue.create('load-static-segment', {
-    type: 0,
-    account_id: 1,
-    segment_id: 2,
-    gcs_file: {
-        project_id: 'rover-development',
-        bucket: 'bulk-service',
-        file_id: '07030c6f7c58030b443f43de86d3a75164b25c506f80ad84e54c807d2f994eef.csv'
+staticSegmentQueue.add('load-static-segment', 
+{
+    "type": 0,
+    "auth_context": {
+        "account_id": 65,
+        "user_id": 0,
+        "scopes": ["server"]
+    },
+    "account_id": 65,
+    "segment_id": 108,
+    "gcs_file": {
+        "project_id": "rover-production",
+        "bucket": "bulk-gateway-uploads",
+        "file_id": "c284c7252329568afdf6b965e1df33e38e52ab6e886bd5a39475e21b1bcbbe53.csv"
     }
-}).save(function(err) {
-	if (err) {
-		console.log("...")
-	}
-
-	console.log("DONE")
-	process.exit(0)
 })

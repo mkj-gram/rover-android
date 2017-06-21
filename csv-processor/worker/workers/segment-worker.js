@@ -1,3 +1,4 @@
+var Promise = require('bluebird')
 const csv = require('fast-csv')
 const storage = require('@google-cloud/storage')
 const Config = require('../config')
@@ -5,6 +6,7 @@ const FileMeter = require('../lib/filemeter')
 const RoverApis = require('@rover/apis')
 const Segment = RoverApis.segment
 const grpc = require('grpc')
+const PrefixedLogger = require('../lib/prefixed-logger')
 
 let SegmentClient = require("@rover/segment-client").v1.Client()
 
@@ -13,9 +15,10 @@ const gcs = storage({
     credentials: Config.get('/storage/credentials')
 })
 
+const JOB_TIMEOUT = Config.get('/job/timeout')
+const JOB_CONCURRENCY = Config.get('/job/concurrency')
 
 const updateJobProgress = function(job, progress) {
-    console.info("Job: id=" + job.jobId + " progress=" + progress)
     job.progress(progress)
 }
 
@@ -31,146 +34,150 @@ const updateJobProgress = function(job, progress) {
         }
     }
  */
-const loadStaticSegment = function(job, done) {
+const loadStaticSegment = function(job, logger) {
     
-    const jobData = job.opts
+    return new Promise((resolve, reject) => {
+        const jobData = job.opts
 
-    const authContext = new RoverApis.auth.v1.Models.AuthContext()
-    authContext.setAccountId(jobData.auth_context.account_id)
-    authContext.setUserId(jobData.auth_context.user_id)
-    authContext.setPermissionScopesList(jobData.auth_context.scopes)
+        const authContext = new RoverApis.auth.v1.Models.AuthContext()
+        authContext.setAccountId(jobData.auth_context.account_id)
+        authContext.setUserId(jobData.auth_context.user_id)
+        authContext.setPermissionScopesList(jobData.auth_context.scopes)
 
-    const segmentId = jobData.segment_id
-    const accountId = authContext.getAccountId()
+        const segmentId = jobData.segment_id
+        const accountId = authContext.getAccountId()
 
-    // First we check if we have access to the static segment and it exists
-    
-    const getStaticSegmentRequest = new RoverApis.segment.v1.Models.GetStaticSegmentRequest()
-    getStaticSegmentRequest.setAuthContext(authContext)
-    getStaticSegmentRequest.setId(segmentId)
+        // First we check if we have access to the static segment and it exists
+        
+        const getStaticSegmentRequest = new RoverApis.segment.v1.Models.GetStaticSegmentRequest()
+        getStaticSegmentRequest.setAuthContext(authContext)
+        getStaticSegmentRequest.setId(segmentId)
 
-    console.info("Getting static segment")
+        logger.info("Getting static segment")
 
-    SegmentClient.getStaticSegment(getStaticSegmentRequest, function(err, staticSegment) {
-        if (err) {
-            console.error(err)
-            return done(err)
-        }
-
-        const gcsFile = jobData.gcs_file
-
-        const bucket = gcs.bucket(gcsFile.bucket)
-
-        const file = bucket.file(gcsFile.file_id)
-
-        file.get(function(err, _, apiResponse) {
+        SegmentClient.getStaticSegment(getStaticSegmentRequest, function(err, staticSegment) {
             if (err) {
-                console.error(err)
-                return done(err)
+                return reject(err)
             }
 
-            let fileSize = file.metadata.size || 0
-            let totalBytesProcessed = 0
+            const gcsFile = jobData.gcs_file
 
-            console.info("FileSize: " + fileSize)
+            const bucket = gcs.bucket(gcsFile.bucket)
 
-            // file.metadata has been populated.
-            
-            const remoteReadStream = bucket.file(gcsFile.file_id).createReadStream();
+            const file = bucket.file(gcsFile.file_id)
 
-            console.info("Started", gcsFile)
-
-            var meta = new grpc.Metadata();
-            meta.add('account_id', `${accountId}`)
-            meta.add('static_segment_id', `${segmentId}`)
-
-            let callStreamActive = true
-
-            const call = SegmentClient.updateStaticSegmentPushIds(meta, function(err, res) {
+            file.get(function(err, _, apiResponse) {
                 if (err) {
-                    callStreamActive = false
-                    remoteReadStream.end()
-                    return done(err)
+                    return reject(err)
                 }
+
+                let fileSize = file.metadata.size || 0
+                let totalBytesProcessed = 0
+
+                logger.info("FileSize: " + fileSize)
+
+                // file.metadata has been populated.
                 
-                updateJobProgress(job, 100)
+                const remoteReadStream = bucket.file(gcsFile.file_id).createReadStream();
 
-                console.info("Segment Updated: ", res.getSegment().toObject())
+                logger.info("Started", gcsFile)
 
-                return done()
-            })
-            
-            const csvStream = csv().on('data', function(data) {
-                // data is an array of columns per line
-                const pushId = new Segment.v1.Models.PushId()
-                pushId.setId(data[0])
-                pushId.setType(Segment.v1.Models.PushIdType.ALIAS)
-                if (callStreamActive) {
-                    call.write(pushId)   
-                } else {
-                    csvStream.close()
-                }
-            }).on('end', function() {
-                if (callStreamActive) {
-                    updateJobProgress(job, 90)
-                    call.end()
-                }
-            }).on('error', function() {
-                if (callStreamActive) {
-                    call.cancel()
-                    return done(err)
-                }
-            })
+                var meta = new grpc.Metadata();
+                meta.add('account_id', `${accountId}`)
+                meta.add('static_segment_id', `${segmentId}`)
 
-            
-            /* 
-                FileMeter gives us events whenever we read in new data
-                We use this to update the job progress
-            */
+                let callStreamActive = true
 
-            const meter = new FileMeter()
+                const call = SegmentClient.updateStaticSegmentPushIds(meta, function(err, res) {
+                    if (err) {
+                        callStreamActive = false
+                        remoteReadStream.end()
+                        return reject(err)
+                    }
+                    
+                    updateJobProgress(job, 100)
 
-            meter.on("bytesRead", function(bytesRead) {
-                const progress = Math.floor(Math.min(((totalBytesProcessed / fileSize) * 100)))
-                // We update progress up to 90% since the last 10% is waiting for the grpc call to finish
-                if (callStreamActive) {
-                    updateJobProgress(job, Math.min(progress, 90))
-                }
+                    logger.info("Segment Updated: ", res.getSegment().toObject())
+
+                    return resolve()
+                })
                 
-                totalBytesProcessed += bytesRead
-            })
+                const csvStream = csv().on('data', function(data) {
+                    // data is an array of columns per line
+                    const pushId = new Segment.v1.Models.PushId()
+                    pushId.setId(data[0])
+                    pushId.setType(Segment.v1.Models.PushIdType.ALIAS)
+                    if (callStreamActive) {
+                        call.write(pushId)   
+                    } else {
+                        csvStream.close()
+                    }
+                }).on('end', function() {
+                    if (callStreamActive) {
+                        updateJobProgress(job, 90)
+                        call.end()
+                    }
+                }).on('error', function() {
+                    if (callStreamActive) {
+                        call.cancel()
+                        return reject(err)
+                    }
+                })
 
-            return remoteReadStream.pipe(meter).pipe(csvStream)
-        });
-    })    
+                
+                /* 
+                    FileMeter gives us events whenever we read in new data
+                    We use this to update the job progress
+                */
+
+                const meter = new FileMeter()
+
+                meter.on("bytesRead", function(bytesRead) {
+                    const progress = Math.floor(Math.min(((totalBytesProcessed / fileSize) * 100)))
+                    // We update progress up to 90% since the last 10% is waiting for the grpc call to finish
+                    if (callStreamActive) {
+                        updateJobProgress(job, Math.min(progress, 90))
+                    }
+                    
+                    totalBytesProcessed += bytesRead
+                })
+
+                return remoteReadStream.pipe(meter).pipe(csvStream)
+            });
+        })
+    })
 }
 
 const init = function(context) {
 
     const queue = context.queues.staticSegment
+    const Raven = context.raven
 
-    queue.process(function(job, done) {
-        console.info("Job Started: ", job.opts)
+    queue.process(JOB_CONCURRENCY, function(job, done) {
         
-        let callbackHasBeenCalled = false
 
-        loadStaticSegment(job, function(err) {
-            if (err) {
-                console.error("Job Failed: jobId=" + job.jobId + " code=" + err.code , err)
+        const logger = new PrefixedLogger("JOB " + job.jobId)
+
+        logger.info("started")
+
+        loadStaticSegment(job, logger)
+        .timeout(JOB_TIMEOUT)
+        .then(() => {
+            logger.info("Completed")
+            return done()
+        })
+        .catch(Promise.TimeoutError, (err) => {
+            logger.error("timed out")
+            return done(err)
+        })
+        .catch(err => {
+            if (Raven && !(err.hasOwnProperty('code') && err.hasOwnProperty('metadata'))) {
+                // This is not a grpc error
+                Raven.captureException(err);
             }
+            logger.error("failed", err)
+            return done(err)
             
-            if (callbackHasBeenCalled == false) {
-                callbackHasBeenCalled = true
-
-                if (err) {
-                    const message = err.message || err.details || "unknown"
-                    return done(err)
-                } else {
-                    return done()
-                }
-               
-            }
-
         })
     })
 }
