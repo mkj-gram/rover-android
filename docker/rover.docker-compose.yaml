@@ -54,3 +54,15 @@ services:
     links:
       - postgres
 
+  audience-service:
+    image: golang:1.8-alpine
+    command: ./docker/audience-service/cmd test run
+    volumes:
+      - ../../rover:/go/src/github.com/roverplatform/rover
+    working_dir: /go/src/github.com/roverplatform/rover
+    environment:
+      CGO_ENABLED: 0
+      # DB_DSN: "postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable"
+    # links:
+      # - postgres
+

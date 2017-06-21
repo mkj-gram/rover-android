@@ -23,7 +23,7 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import google_protobuf "github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
-import rover_auth_v1 "auth/v1"
+import rover_auth_v1 "github.com/roverplatform/rover/apis/go/auth/v1"
 
 import (
 	context "golang.org/x/net/context"

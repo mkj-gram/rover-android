@@ -12,11 +12,13 @@ import (
 // Timestamp is an extension of the official timestamp.Timestamp
 // that enables DB mapping by implementing database/sql/driver.Valuer
 // and database/sql.Scanner interfaces
-type Timestamp timestamp.Timestamp
+type Timestamp struct {
+	timestamp.Timestamp
+}
 
 // Time converts Timestamp to time.Time unless there's an error
 func Time(ts *Timestamp) (time.Time, error) {
-	return ptypes.Timestamp((*timestamp.Timestamp)(ts))
+	return ptypes.Timestamp(&ts.Timestamp)
 }
 
 // TimestampProto converts time.Time to *Timestamp unless an error
@@ -26,7 +28,7 @@ func TimestampProto(t time.Time) (*Timestamp, error) {
 		return nil, err
 	}
 
-	return (*Timestamp)(ts), nil
+	return &Timestamp{*ts}, nil
 }
 
 // Value converts Time value into a value that DB undestands

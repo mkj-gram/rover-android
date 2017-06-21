@@ -1,0 +1,266 @@
+syntax = "proto3";
+
+package rover.audience.v1;
+
+option go_package = "audience/v1;audience";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+// import "google/protobuf/null.proto";
+
+import "auth/v1/auth.proto";
+
+// Audience service is responsible for managing profiles & devices as well as static & dynamic segments.
+service Audience {
+
+  //
+  // Profiles
+  //
+
+  // CreateProfile creates a new empty profile under a given account.
+  rpc CreateProfile(CreateProfileRequest) returns (Profile);
+  //  DeleteProfile deletes a profile from db and all segments
+  rpc DeleteProfile(DeleteProfileRequest) returns (Profile);
+  // UpdateProfile updates profile with provided subset of attributes
+  rpc UpdateProfile(UpdateProfileRequest) returns (Profile);
+
+  // GetProfileByDeviceId returns a profile which is associated to the device id
+  rpc GetProfileByDeviceId(GetProfileByDeviceIdRequest) returns (Profile);
+
+  // GetProfileSchema returns the currently tracked profiles schema by account id
+  rpc GetProfileSchema(GetProfileSchemaRequest) returns (ProfileSchema);
+
+  //
+  // Devices
+  //
+
+  // CreateDevice creates a an "empty" device under a given account.
+  rpc CreateDevice(CreateDeviceRequest) returns (Device);
+  // DeleteDevice deletes device from the database and removes it from any segments
+  rpc DeleteDevice(DeleteDeviceRequest) returns (Device);
+  // PutDevice updates the device
+  rpc PutDevice(PutDeviceRequest) returns (Device);
+
+  // SetDevicePushToken
+  rpc SetDevicePushToken(SetDevicePushTokenRequest) returns (google.protobuf.Empty);
+
+  // PutDevice updates the device
+  rpc SetDeviceProfile(SetDeviceProfileRequest) returns (Device);
+}
+
+
+//
+// Profile
+//
+
+message CreateProfileRequest {
+  auth.v1.AuthContext auth_context = 1;
+}
+
+message DeleteProfileRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string profile_id = 2;
+}
+
+message UpdateProfileRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string id = 2;
+  string profile_id = 3;
+
+  map<string, ValueUpdates> attributes = 4;
+}
+
+message GetProfileByDeviceIdRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string device_id = 2;
+}
+
+message GetProfileSchemaRequest {
+  auth.v1.AuthContext auth_context = 1;
+}
+
+
+// Profile represents a variable set of a user attributes that customer pushes to Rover.
+// It can be thought as a flat JSON object of simple key-value pairs ( There is no nesting of attributes )
+message Profile {
+  string id  = 1;
+  int32 account_id = 2;
+  // identifier represents an id used by customers to map back this profile to their data
+  string identifier = 3;
+
+  // profile attributes
+  map<string, Value> attributes = 4;
+}
+
+
+// ProfileSchema describes profiles' schema with the collection of SchemaAttribute descriptors
+message ProfileSchema {
+  repeated SchemaAttribute attributes = 10;
+}
+
+//
+// Device
+//
+
+message CreateDeviceRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string profile_id = 2;
+}
+
+message DeleteDeviceRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string id = 2;
+}
+
+// Device.id, and Device.account_id
+message PutDeviceRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  Device device = 2;
+}
+
+message SetDevicePushTokenRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string id = 2;
+  string token = 3;
+}
+
+message SetDeviceProfileRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string id = 2;
+  string profile_id = 3;
+}
+
+// Devices represent a single device that the Rover sdk is installed on. The
+// currently supported platforms are iOS,  Android, and Web. A device is the
+// last state that the sdk reported to the server. Only the device itself is
+// allowed to update its state no one elses.
+message Device {
+  string id                            = 1;
+  int32 account_id                     = 2;
+
+  // TODO: attributes
+  string token                         = 3;
+  string locale_lang                   = 5;
+  string locale_region                 = 6;
+  string time_zone                     = 7;
+  string sdk_version                   = 8;
+  string platform                      = 9;
+  string os_name                       = 10;
+  string os_version                    = 11;
+  string model                         = 12;
+  string manufacturer                  = 13;
+  string carrier                       = 14;
+  string app_identifier                = 15;
+
+  // an app gets a quota for 20 ibeacon slots.
+  // the app can update those slots dynamically.
+  // if gimbal_mode is set those slots are managed by gimbal instead of rover
+  bool gimbal_mode                     = 16;
+
+  // Location location                    = 17;
+  bool background_enabled              = 18;
+  bool notifications_enabled           = 19;
+  bool bluetooth_enabled               = 20;
+  bool location_monitoring_enabled     = 21;
+  bool development                     = 22;
+  string aid                           = 23;
+
+  google.protobuf.Timestamp created_at = 24;
+  google.protobuf.Timestamp updated_at = 25;
+}
+
+
+//
+// Value
+//
+
+// ValueUpdates allows bulk updates as adding/removing tags in the same call
+message ValueUpdates {
+  repeated ValueUpdate values = 1;
+}
+
+// ValueUpdate represents a change that needs to be applied to already existing value
+message ValueUpdate {
+  Value value = 1;
+  UpdateType update_type = 3;
+
+  // UpdateType describes possible updates
+  enum UpdateType {
+    SET = 0;
+    DELETE = 1;
+    CLEAR = 2;
+    // ADD and REMOVE are for array_values
+    ADD = 3;
+    REMOVE = 4;
+  }
+}
+
+message Value {
+  // Array a values container
+  message Array {
+    repeated Value values = 1;
+  }
+
+  oneof value_type {
+
+    bool boolean_value = 1;
+    int64 integer_value = 2;
+    double double_value = 3;
+    string string_value = 4;
+
+    Array array_value = 5;
+    Version version_value = 6;
+    Null null_value = 8;
+
+    google.protobuf.Timestamp timestamp_value = 7;
+  }
+}
+
+//
+// Schema
+//
+
+message SchemaAttribute {
+  int32 account_id = 1;
+  // attribute id
+  string id = 2;
+  // attribute name
+  string attribute = 3;
+  // attribute type descriptor, ie string/array[string]
+  string attributeType = 4;
+
+  // attribute path if nested
+  string path = 5;
+
+  // attribute created at timestamp
+  google.protobuf.Timestamp created_at = 20;
+}
+
+
+//
+// Version
+//
+
+message Version {
+  int32 major = 1;
+  int32 minor = 2;
+  /* optional */
+  int32 revision = 3;
+}
+
+//
+// Null
+//
+
+enum Null {
+  // Null value.
+  NULL = 0;
+}
+
+

@@ -17,6 +17,13 @@ var (
 	_ sql.Scanner   = (*timestamp.Timestamp)(nil)
 )
 
+func ts(seconds int64, nanos int32) *timestamp.Timestamp {
+	var ts timestamp.Timestamp
+	ts.Nanos = nanos
+	ts.Seconds = seconds
+	return &ts
+}
+
 func Test_Time(t *testing.T) {
 	tcases := []struct {
 		exp    time.Time
@@ -25,14 +32,11 @@ func Test_Time(t *testing.T) {
 	}{
 		{
 			exp: time.Unix(12345, 0).UTC(),
-			in: &timestamp.Timestamp{
-				Nanos:   0,
-				Seconds: 12345,
-			},
+			in:  ts(12345, 0),
 		},
 		{
 			expErr: fmt.Errorf("timestamp: nanos:-1 : nanos not in range [0, 1e9)"),
-			in:     &timestamp.Timestamp{Seconds: 0, Nanos: -1},
+			in:     ts(0, -1),
 		},
 	}
 
@@ -65,11 +69,8 @@ func Test_TimestampProto(t *testing.T) {
 		in  time.Time
 	}{
 		{
-			in: time.Unix(12345, 0).UTC(),
-			exp: &timestamp.Timestamp{
-				Nanos:   0,
-				Seconds: 12345,
-			},
+			in:  time.Unix(12345, 0).UTC(),
+			exp: ts(12345, 0),
 		},
 		{
 			expErr: fmt.Errorf("timestamp: seconds:-62135596810  before 0001-01-01"),
@@ -106,11 +107,8 @@ func Test_Scan(t *testing.T) {
 		in  interface{}
 	}{
 		{
-			in: time.Unix(12345, 0).UTC(),
-			exp: &timestamp.Timestamp{
-				Nanos:   0,
-				Seconds: 12345,
-			},
+			in:  time.Unix(12345, 0).UTC(),
+			exp: ts(12345, 0),
 		},
 		{
 			expErr: fmt.Errorf(`timestamp: cannot convert from time.Time:"0000-12-31 23:59:50 +0000 UTC":timestamp: seconds:-62135596810  before 0001-01-01`),
@@ -157,15 +155,15 @@ func Test_Value(t *testing.T) {
 	}{
 		{
 			exp: time.Unix(12345, 0).UTC(),
-			in:  &timestamp.Timestamp{Seconds: 12345, Nanos: 0},
+			in:  ts(12345, 0),
 		}, {
 			// from nil
 			in:  nil,
 			exp: nil,
 		},
 		{
-			expErr: fmt.Errorf(`timestamp: unable value &timestamp.Timestamp{Seconds:0, Nanos:-1}: timestamp: nanos:-1 : nanos not in range [0, 1e9)`),
-			in:     &timestamp.Timestamp{Seconds: 0, Nanos: -1},
+			expErr: fmt.Errorf(`timestamp: unable value &timestamp.Timestamp{Timestamp:timestamp.Timestamp{Seconds:0, Nanos:-1}}: timestamp: nanos:-1 : nanos not in range [0, 1e9)`),
+			in:     ts(0, -1),
 		},
 	}
 
