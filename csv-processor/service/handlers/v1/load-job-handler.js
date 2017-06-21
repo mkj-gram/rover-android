@@ -78,7 +78,7 @@ const buildLoadJobProto = function({ id, account_id, type, status, progress, cre
     proto.setAccountId(account_id)
     proto.setType(type)
     proto.setStatus(status)
-    proto.setProgress(0)
+    proto.setProgress(progress)
     proto.setCreatedAt(buildTimestamp(created_at))
 
     return proto
