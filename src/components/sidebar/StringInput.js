@@ -20,11 +20,18 @@ class StringInput extends Component {
 
     updateComparison(comparison) {
         const { predicate, updateFn } = this.props
-        const { attribute } = predicate
-        const { value } = this.state
+        const { attribute, category, type } = predicate
+        let { value } = this.state
+        
+        if (comparison === 'is unknown') {
+            value = ''
+        }
+        
         updateFn({
             attribute,
             comparison,
+            category,
+            type,
             value
         })
         this.setState({ comparison })
@@ -32,24 +39,26 @@ class StringInput extends Component {
 
     updateValue(value) {
         const { predicate, updateFn } = this.props
-        const { attribute } = predicate
+        const { attribute, category, type } = predicate
         const { comparison } = this.state
         updateFn({
             attribute,
             comparison,
+            category,
+            type,
             value
         })
         this.setState({ value })
     }
 
     render() {
-        const { predicate, attributeType } = this.props
-        const { attribute } = predicate
+        const { predicate } = this.props
+        const { attribute, category } = predicate
         const { value, comparison } = this.state
         return (
-            <div style={{ ...text, ...light, color: silver }}>
+            <div style={{ ...text, ...light, color: silver, width: 380 }}>
                 <ModalInputPrompt
-                    attributeType={attributeType}
+                    attributeType={category}
                     attribute={attribute}
                 />
                 <div
@@ -111,7 +120,8 @@ StringInput.propTypes = {
     predicate: PropTypes.shape({
         attribute: PropTypes.string.isRequired,
         value: PropTypes.string.isRequired,
-        comparison: PropTypes.string.isRequired
+        comparison: PropTypes.string.isRequired,
+        category: PropTypes.string.isRequired
     }),
     updateFn: PropTypes.func.isRequired
 }
@@ -120,7 +130,8 @@ StringInput.defaultProps = {
     predicate: {
         attribute: '',
         value: '',
-        comparison: 'is'
+        comparison: 'is',
+        category: 'device'
     },
     updateFn: () => null
 }

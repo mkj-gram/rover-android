@@ -38,7 +38,7 @@ class DateInput extends Component {
         const { start, end, comparison } = this.state
 
         switch (comparison) {
-            case 'in-between':
+            case 'in between':
                 return this.renderInBetweenCalendarInput(start, end)
                 break
             case 'after':
@@ -46,9 +46,9 @@ class DateInput extends Component {
             case 'before':
                 return this.renderCalendarInput(start)
                 break
-            case 'more-than':
+            case 'more than':
             case 'exactly':
-            case 'less-than':
+            case 'less than':
             default:
                 return this.renderRelativeDatePicker(start)
         }
@@ -133,19 +133,21 @@ class DateInput extends Component {
 
     updateComparison(comparison) {
         const { predicate, updateFn } = this.props
-        const { attribute } = predicate
+        const { attribute, type, category } = predicate
         const start = moment()
         let end = {}
         
-        if (comparison === 'in-between') {
+        if (comparison === 'in between') {
             end = moment()
         }
         
-        const value = { ...start, ...end }
+        const value = { start, end }
         
         updateFn({
             attribute,
             comparison,
+            type,
+            category,
             value
         })
         
@@ -154,7 +156,7 @@ class DateInput extends Component {
     
     updateValue(value) {
         const { predicate, updateFn } = this.props
-        const { attribute } = predicate
+        const { attribute, type, category } = predicate
         const { comparison, start, end } = this.state
         
         const newValue = {
@@ -166,6 +168,8 @@ class DateInput extends Component {
         updateFn({
             attribute,
             comparison,
+            type,
+            category,
             value: newValue
         })
         
@@ -173,14 +177,14 @@ class DateInput extends Component {
     }
 
     render() {
-        const { predicate, attributeType } = this.props
-        const { attribute } = predicate
+        const { predicate } = this.props
+        const { attribute, category } = predicate
         const { value, comparison } = this.state
         return (
-            <div style={{ ...text, ...light, color: silver }}>
+            <div style={{ ...text, ...light, color: silver, width: 444 }}>
                 <ModalInputPrompt
                     attribute={attribute}
-                    attributeType={attributeType}
+                    attributeType={category}
                 />
                 <div
                     style={{
@@ -211,15 +215,15 @@ class DateInput extends Component {
                         onChange={e => this.updateComparison(e.target.value)}
                     >
                         <optgroup label="Relative">
-                            <option value="more-than">More than</option>
+                            <option value="more than">More than</option>
                             <option value="exactly">Exactly</option>
-                            <option value="less-than">Less than</option>
+                            <option value="less than">Less than</option>
                         </optgroup>
                         <optgroup label="Absolute">
                             <option value="after">After</option>
                             <option value="on">On</option>
                             <option value="before">Before</option>
-                            <option value="in-between">In Between</option>
+                            <option value="in between">In Between</option>
                         </optgroup>
                     </Select>
                     {this.renderDatePicker()}
@@ -236,7 +240,9 @@ DateInput.propTypes = {
             start: PropTypes.object,
             end: PropTypes.object
         }),
-        comparison: PropTypes.string.isRequired
+        comparison: PropTypes.string.isRequired,
+        category: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired
     }),
     updateFn: PropTypes.func.isRequired
 }
@@ -248,7 +254,9 @@ DateInput.defaultProps = {
             start: {},
             end: {}
         },
-        comparison: ''
+        comparison: '',
+        category: 'device',
+        type: 'date'
     },
     updateFn: () => ''
 }

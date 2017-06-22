@@ -6,14 +6,18 @@ module.exports = {
     output: {
         filename: "[name].[hash].js",
         path: path.resolve(__dirname, "dist/audience"),
-        publicPath: "/"
+        publicPath: "/audience/"
     },
     module: {
         rules: [
             {
+                test: /\.exec\.js$/,
+                loader: "script-loader"
+            },
+            {
                 test: /\.(js|jsx)$/,
                 loader: "babel-loader",
-                exclude: /node_modules/
+                exclude: [/node_modules/, /\.exec\.js$/]
             },
             {
                 test: /\.css$/,
@@ -34,5 +38,5 @@ module.exports = {
         publicPath: "/audience/",
         contentBase: "/"
     },
-    devtool: "source-map",
+    devtool: "source-map"
 }
