@@ -92,6 +92,16 @@ message GetStaticSegmentPushIdsReply {
     bool finished = 3;
 }
 
+message IsInStaticSegmentRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+    int32 segment_id = 2;
+    PushId push_id = 3;
+}
+
+message IsInStaticSegmentReply {
+    bool yes = 1;
+}
+
 message PushId {
     string id = 1;
     PushIdType type = 2;
@@ -106,4 +116,6 @@ service Segment {
 
     rpc UpdateStaticSegmentPushIds(stream PushId) returns (UpdateStaticSegmentIdsReply) {};
     rpc GetStaticSegmentPushIds(GetStaticSegmentPushIdsRequest) returns (GetStaticSegmentPushIdsReply) {}
+
+    rpc IsInStaticSegment(IsInStaticSegmentRequest) returns (IsInStaticSegmentReply) {}
 }

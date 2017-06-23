@@ -22,6 +22,7 @@ module Rover
           rpc :DeleteStaticSegment, DeleteStaticSegmentRequest, DeleteStaticSegmentReply
           rpc :UpdateStaticSegmentPushIds, stream(PushId), UpdateStaticSegmentIdsReply
           rpc :GetStaticSegmentPushIds, GetStaticSegmentPushIdsRequest, GetStaticSegmentPushIdsReply
+          rpc :IsInStaticSegment, IsInStaticSegmentRequest, IsInStaticSegmentReply
         end
 
         Stub = Service.rpc_stub_class

@@ -582,11 +582,65 @@ const getStaticSegmentPushIds = function(call, callback) {
     })    
 }
 
+const isInStaticSegment = function(call, callback) {
+
+    const postgres = this.clients.postgres
+    const redis = this.clients.redis
+
+    const pushId = call.request.getPushId()
+    const AuthContext = call.request.getAuthContext()
+    const segmentId = call.request.getSegmentId()
+
+    if (!hasAccess(AuthContext)) {
+        return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+    }
+
+    if (pushId == null || pushId == undefined) {
+        return callback({ status: grpc.status.INVALID_ARGUMENT, message: "pushId cannot be empty" })
+    }
+
+    findStaticSegmentById(postgres, redis, segmentId, function(err, segment) {
+        if (err) {
+            return callback(err)
+        }
+
+        if (segment == null || segment == undefined) {
+            return callback({ code: grpc.status.NOT_FOUND, message: "Segment not found" })
+        }
+
+        if (AuthContext && AuthContext.getAccountId() != segment.account_id) {
+            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+        }
+
+        const redisSetId = segment.redis_set_id
+
+        if (redisSetId == null || redisSetId == undefined) {
+            // Return a message with no push ids and let the client know they are finished
+            const reply = new RoverApis.segment.v1.Models.IsInStaticSegmentReply()
+            reply.setYes(false)
+            return callback(null, reply)
+        }
+
+        redis.sismember(redisSetId, pushId.getId(), function(err, redisReply) {
+            if (err) {
+                return callback(err)
+            }
+
+            const reply = new RoverApis.segment.v1.Models.IsInStaticSegmentReply()
+            // 1 == true, 0 == false
+            // https://redis.io/commands/sismember
+            reply.setYes(redisReply == 1)
+            return callback(null, reply)
+        })
+    })
+}
+
 module.exports = {
     listStaticSegments: listStaticSegments,
     getStaticSegment: getStaticSegment,
     createStaticSegment: createStaticSegment,
     deleteStaticSegment: deleteStaticSegment,
     updateStaticSegmentPushIds: updateStaticSegmentPushIds,
-    getStaticSegmentPushIds: getStaticSegmentPushIds
+    getStaticSegmentPushIds: getStaticSegmentPushIds,
+    isInStaticSegment: isInStaticSegment
 }

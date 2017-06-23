@@ -94,6 +94,28 @@ function deserialize_rover_segment_v1_GetStaticSegmentRequest(buffer_arg) {
   return segment_v1_segment_pb.GetStaticSegmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_segment_v1_IsInStaticSegmentReply(arg) {
+  if (!(arg instanceof segment_v1_segment_pb.IsInStaticSegmentReply)) {
+    throw new Error('Expected argument of type rover.segment.v1.IsInStaticSegmentReply');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_segment_v1_IsInStaticSegmentReply(buffer_arg) {
+  return segment_v1_segment_pb.IsInStaticSegmentReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_segment_v1_IsInStaticSegmentRequest(arg) {
+  if (!(arg instanceof segment_v1_segment_pb.IsInStaticSegmentRequest)) {
+    throw new Error('Expected argument of type rover.segment.v1.IsInStaticSegmentRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_segment_v1_IsInStaticSegmentRequest(buffer_arg) {
+  return segment_v1_segment_pb.IsInStaticSegmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_segment_v1_ListStaticSegmentRequest(arg) {
   if (!(arg instanceof segment_v1_segment_pb.ListStaticSegmentRequest)) {
     throw new Error('Expected argument of type rover.segment.v1.ListStaticSegmentRequest');
@@ -205,6 +227,17 @@ var SegmentService = exports.SegmentService = {
     requestDeserialize: deserialize_rover_segment_v1_GetStaticSegmentPushIdsRequest,
     responseSerialize: serialize_rover_segment_v1_GetStaticSegmentPushIdsReply,
     responseDeserialize: deserialize_rover_segment_v1_GetStaticSegmentPushIdsReply,
+  },
+  isInStaticSegment: {
+    path: '/rover.segment.v1.Segment/IsInStaticSegment',
+    requestStream: false,
+    responseStream: false,
+    requestType: segment_v1_segment_pb.IsInStaticSegmentRequest,
+    responseType: segment_v1_segment_pb.IsInStaticSegmentReply,
+    requestSerialize: serialize_rover_segment_v1_IsInStaticSegmentRequest,
+    requestDeserialize: deserialize_rover_segment_v1_IsInStaticSegmentRequest,
+    responseSerialize: serialize_rover_segment_v1_IsInStaticSegmentReply,
+    responseDeserialize: deserialize_rover_segment_v1_IsInStaticSegmentReply,
   },
 };
 

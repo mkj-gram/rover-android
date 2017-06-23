@@ -58,6 +58,14 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :next_cursor, :string, 2
     optional :finished, :bool, 3
   end
+  add_message "rover.segment.v1.IsInStaticSegmentRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :segment_id, :int32, 2
+    optional :push_id, :message, 3, "rover.segment.v1.PushId"
+  end
+  add_message "rover.segment.v1.IsInStaticSegmentReply" do
+    optional :yes, :bool, 1
+  end
   add_message "rover.segment.v1.PushId" do
     optional :id, :string, 1
     optional :type, :enum, 2, "rover.segment.v1.PushIdType"
@@ -83,6 +91,8 @@ module Rover
       UpdateStaticSegmentIdsReply = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.segment.v1.UpdateStaticSegmentIdsReply").msgclass
       GetStaticSegmentPushIdsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.segment.v1.GetStaticSegmentPushIdsRequest").msgclass
       GetStaticSegmentPushIdsReply = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.segment.v1.GetStaticSegmentPushIdsReply").msgclass
+      IsInStaticSegmentRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.segment.v1.IsInStaticSegmentRequest").msgclass
+      IsInStaticSegmentReply = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.segment.v1.IsInStaticSegmentReply").msgclass
       PushId = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.segment.v1.PushId").msgclass
       PushIdType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.segment.v1.PushIdType").enummodule
     end
