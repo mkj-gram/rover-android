@@ -1,5 +1,7 @@
 'use strict'
 
+import 'newrelic'
+
 import dotenv from 'dotenv'
 import express from 'express'
 import lruCache from 'lru-cache'
@@ -17,9 +19,6 @@ import Auth from '@rover/auth-client'
 
 dotenv.config()
 
-if (process.env.NEW_RELIC_ENABLED === 'true') {
-    require('newrelic')
-}
 
 const AuthClient = Auth.v1.Client()
 
