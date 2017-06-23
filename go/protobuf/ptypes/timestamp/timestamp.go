@@ -18,6 +18,10 @@ type Timestamp struct {
 
 // Time converts Timestamp to time.Time unless there's an error
 func Time(ts *Timestamp) (time.Time, error) {
+	if ts == nil {
+		return time.Time{}, fmt.Errorf("Time: nil ts")
+	}
+
 	return ptypes.Timestamp(&ts.Timestamp)
 }
 
