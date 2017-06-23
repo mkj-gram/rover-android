@@ -127,6 +127,13 @@ tasks.push(function(callback) {
     });
 });
 
+tasks.push(function(callback) {
+    let segmentClient = require("@rover/segment-client").v1.Client()
+
+    server.connections.segment = segmentClient
+
+    return callback()
+})
 
 
 tasks.push(function(callback) {

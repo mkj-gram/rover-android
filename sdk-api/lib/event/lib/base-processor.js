@@ -180,38 +180,58 @@ class BaseProcessor {
         });
     }
 
+    filterMessageByDynamicSegment(messageTemplate, resolve, reject) {
+        let server = this._server;
+        let methods = server.methods;
+
+        methods.customerSegment.findById(messageTemplate.customer_segment_id, (err, customerSegment) => {
+            if (err) {
+                logger.error(err);
+                return resolve(null);
+            }
+
+            let segment = new SegmentFilter(customerSegment.filters);
+            segment.withinSegment(this._customer, this._device, (failure) => {
+                if (failure) {
+                    return resolve(null);
+                }
+
+                return resolve(messageTemplate);
+            });
+        });
+    }
+
+    filterMessageByStaticSegment(messageTemplate, resolve, reject) {
+        let server = this._server;
+        let methods = server.methods;
+
+        methods.staticSegment.withinSegment(messageTemplate.account_id, messageTemplate.static_segment_id, this._customer.identifier, (inSegment) => {
+            if (inSegment == true) {
+                return resolve(messageTemplate)
+            }
+
+            return resolve(null)
+        })
+    }
+
     filterMessagesBySegment(messageTemplates, callback) {
         if (util.isNullOrUndefined(messageTemplates) || messageTemplates.length == 0) {
             return callback(null, []);
         }
 
-        let server = this._server;
-        let methods = server.methods;
-
         Promise.map(messageTemplates, (messageTemplate) => new Promise((resolve, reject) => {
             
+            if (messageTemplate.static_segment_id) {
+                return this.filterMessageByStaticSegment(messageTemplate, resolve, reject);
+            } else if(messageTemplate.customer_segment_id) {
+                return this.filterMessageByDynamicSegment(messageTemplate, resolve, reject);
+            } else {
+                return resolve(messageTemplate)
+            }
+
             if (util.isNullOrUndefined(messageTemplate.customer_segment_id)) {
                 return resolve(messageTemplate);
             }
-
-            // this message template has a segment
-            
-            methods.customerSegment.findById(messageTemplate.customer_segment_id, (err, customerSegment) => {
-                if (err) {
-                    logger.error(err);
-                    return resolve(null);
-                }
-
-                let segment = new SegmentFilter(customerSegment.filters);
-                segment.withinSegment(this._customer, this._device, (failure) => {
-                    if (failure) {
-                        return resolve(null);
-                    }
-
-                    return resolve(messageTemplate);
-                });
-            });
-
         })).then(messageTemplatesToDeliver => {
             const filteredMessageTemplates = messageTemplatesToDeliver.filter(message => { return !util.isNullOrUndefined(message)});
             return callback(null, filteredMessageTemplates);

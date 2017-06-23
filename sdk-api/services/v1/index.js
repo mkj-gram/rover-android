@@ -18,6 +18,7 @@ const ExperienceService = require('./lib/experience');
 const ExperienceStatsService = require('./lib/experience-stats');
 const XenioZoneService = require('./lib/xenio-zone');
 const XenioPlaceService = require('./lib/xenio-place');
+const StaticSegmentService = require('./lib/static-segments');
 
 module.exports.register = function(server, options, next) {
     server.methods.customer = {};
@@ -38,6 +39,7 @@ module.exports.register = function(server, options, next) {
     server.methods.experienceStats = {};
     server.methods.xenioZone = {};
     server.methods.xenioPlace = {};
+    server.methods.staticSegment = {};
 
     server.methods.customer.find = CustomerService.find.bind(server);
     server.methods.customer.findByQuery = CustomerService.findByQuery.bind(server);
@@ -106,6 +108,9 @@ module.exports.register = function(server, options, next) {
 
     server.methods.xenioZone.findById = XenioZoneService.findById.bind(server);
     server.methods.xenioPlace.findById = XenioPlaceService.findById.bind(server);
+
+    server.methods.staticSegment.withinSegment = StaticSegmentService.withinSegment.bind(server);
+
     next();
 };
 

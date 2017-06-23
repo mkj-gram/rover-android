@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@rover/auth-client": "../auth/clients/node",
+    "@rover/segment-client": "../segment/clients/node",
     "@rover/segment-filter": "^0.0.8",
     "amqplib": "^0.4.2",
     "async": "^2.0.1",
