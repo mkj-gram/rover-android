@@ -15,6 +15,7 @@ class ExperienceBaseProcessor extends BaseProcessor {
         this._versionId = args.event.attributes["version-id"] || args.event.attributes["veresion-id"];
         this._experienceSessionId = args.event.attributes["experience-session-id"];
 
+        this._campaignId = args.event.attributes["campaign-id"] ? String(args.event.attributes["campaign-id"]) : null;
         this._versionedExperienceFields = ['title', 'screens.id', 'screens.name', 'screens.rows.id', 'screens.rows.name', 'screens.rows.blocks.id', 'screens.rows.blocks.type', 'screens.rows.blocks.name', 'screens.rows.blocks.action']
     }
     
@@ -109,6 +110,16 @@ class ExperienceBaseProcessor extends BaseProcessor {
             record.event.experience_session_id = this._experienceSessionId;
 
             Object.assign(record, experienceRecord);
+        }
+
+        if (this._campaignId) {
+            let campaignRecord = {
+                campaign: {
+                    id: this._campaignId
+                }
+            }
+
+            Object.assign(record, campaignRecord)
         }
         
         
