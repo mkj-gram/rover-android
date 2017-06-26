@@ -7,6 +7,7 @@ const RoverApis = require('@rover/apis')
 const Segment = RoverApis.segment
 const grpc = require('grpc')
 const PrefixedLogger = require('../lib/prefixed-logger')
+const Errors = require('../lib/errors')
 
 let SegmentClient = require("@rover/segment-client").v1.Client()
 
@@ -76,6 +77,10 @@ const loadStaticSegment = function(job, logger) {
 
                 logger.info("FileSize: " + fileSize)
 
+                if (fileSize == 0) {
+                    return reject(new Errors.EmptyFileError("file has 0 bytes"))
+                }
+                
                 // file.metadata has been populated.
                 
                 const remoteReadStream = bucket.file(gcsFile.file_id).createReadStream();
@@ -117,7 +122,7 @@ const loadStaticSegment = function(job, logger) {
                         updateJobProgress(job, 90)
                         call.end()
                     }
-                }).on('error', function() {
+                }).on('error', function(err) {
                     if (callStreamActive) {
                         call.cancel()
                         return reject(err)
@@ -168,6 +173,10 @@ const init = function(context) {
         })
         .catch(Promise.TimeoutError, (err) => {
             logger.error("timed out")
+            return done(err)
+        })
+        .catch(Errors.EmptyFileError, (err) => {
+            logger.error(err)
             return done(err)
         })
         .catch(err => {
