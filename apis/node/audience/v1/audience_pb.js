@@ -17,18 +17,29 @@ goog.exportSymbol('proto.rover.audience.v1.CreateProfileRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DeleteDeviceRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DeleteProfileRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Device', null, global);
+goog.exportSymbol('proto.rover.audience.v1.Device.RegionMonitoringMode', null, global);
+goog.exportSymbol('proto.rover.audience.v1.GeofenceRegion', null, global);
+goog.exportSymbol('proto.rover.audience.v1.GetDeviceRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.GetProfileByDeviceIdRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.GetProfileByIdentifierRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.GetProfileSchemaRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.IBeaconRegion', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Null', null, global);
+goog.exportSymbol('proto.rover.audience.v1.Platform', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Profile', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ProfileSchema', null, global);
-goog.exportSymbol('proto.rover.audience.v1.PutDeviceRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.SchemaAttribute', null, global);
 goog.exportSymbol('proto.rover.audience.v1.SetDeviceProfileRequest', null, global);
-goog.exportSymbol('proto.rover.audience.v1.SetDevicePushTokenRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceLocationRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDevicePushTokenRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateProfileIdentifierRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateProfileRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Value', null, global);
-goog.exportSymbol('proto.rover.audience.v1.Value.Array', null, global);
+goog.exportSymbol('proto.rover.audience.v1.Value.StringArray', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ValueUpdate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ValueUpdate.UpdateType', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ValueUpdates', null, global);
@@ -421,8 +432,7 @@ proto.rover.audience.v1.UpdateProfileRequest.prototype.toObject = function(opt_i
 proto.rover.audience.v1.UpdateProfileRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    id: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    profileId: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    profileId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.ValueUpdates.toObject) : []
   };
 
@@ -467,13 +477,9 @@ proto.rover.audience.v1.UpdateProfileRequest.deserializeBinaryFromReader = funct
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
       msg.setProfileId(value);
       break;
-    case 4:
+    case 5:
       var value = msg.getAttributesMap();
       reader.readMessage(value, function(message, reader) {
         jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.ValueUpdates.deserializeBinaryFromReader);
@@ -515,23 +521,16 @@ proto.rover.audience.v1.UpdateProfileRequest.serializeBinaryToWriter = function(
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getId();
+  f = message.getProfileId();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
-  f = message.getProfileId();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
   f = message.getAttributesMap(true);
   if (f && f.getLength() > 0) {
-    f.serializeBinary(4, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter);
+    f.serializeBinary(5, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter);
   }
 };
 
@@ -567,50 +566,246 @@ proto.rover.audience.v1.UpdateProfileRequest.prototype.hasAuthContext = function
 
 
 /**
- * optional string id = 2;
+ * optional string profile_id = 2;
  * @return {string}
  */
-proto.rover.audience.v1.UpdateProfileRequest.prototype.getId = function() {
+proto.rover.audience.v1.UpdateProfileRequest.prototype.getProfileId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.UpdateProfileRequest.prototype.setId = function(value) {
+proto.rover.audience.v1.UpdateProfileRequest.prototype.setProfileId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional string profile_id = 3;
- * @return {string}
- */
-proto.rover.audience.v1.UpdateProfileRequest.prototype.getProfileId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.UpdateProfileRequest.prototype.setProfileId = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * map<string, ValueUpdates> attributes = 4;
+ * map<string, ValueUpdates> attributes = 5;
  * @param {boolean=} opt_noLazyCreate Do not create the map if
  * empty, instead returning `undefined`
  * @return {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>}
  */
 proto.rover.audience.v1.UpdateProfileRequest.prototype.getAttributesMap = function(opt_noLazyCreate) {
   return /** @type {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>} */ (
-      jspb.Message.getMapField(this, 4, opt_noLazyCreate,
+      jspb.Message.getMapField(this, 5, opt_noLazyCreate,
       proto.rover.audience.v1.ValueUpdates));
 };
 
 
 proto.rover.audience.v1.UpdateProfileRequest.prototype.clearAttributesMap = function() {
   this.getAttributesMap().clear();
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateProfileIdentifierRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateProfileIdentifierRequest.displayName = 'proto.rover.audience.v1.UpdateProfileIdentifierRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateProfileIdentifierRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateProfileIdentifierRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    profileId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    identifier: jspb.Message.getFieldWithDefault(msg, 3, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateProfileIdentifierRequest}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateProfileIdentifierRequest;
+  return proto.rover.audience.v1.UpdateProfileIdentifierRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateProfileIdentifierRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateProfileIdentifierRequest}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProfileId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setIdentifier(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateProfileIdentifierRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateProfileIdentifierRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getProfileId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getIdentifier();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string profile_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.getProfileId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.setProfileId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional string identifier = 3;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.getIdentifier = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateProfileIdentifierRequest.prototype.setIdentifier = function(value) {
+  jspb.Message.setField(this, 3, value);
 };
 
 
@@ -794,6 +989,190 @@ proto.rover.audience.v1.GetProfileByDeviceIdRequest.prototype.getDeviceId = func
 
 /** @param {string} value */
 proto.rover.audience.v1.GetProfileByDeviceIdRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.GetProfileByIdentifierRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.GetProfileByIdentifierRequest.displayName = 'proto.rover.audience.v1.GetProfileByIdentifierRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.GetProfileByIdentifierRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.GetProfileByIdentifierRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    identifier: jspb.Message.getFieldWithDefault(msg, 2, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.GetProfileByIdentifierRequest}
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.GetProfileByIdentifierRequest;
+  return proto.rover.audience.v1.GetProfileByIdentifierRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.GetProfileByIdentifierRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.GetProfileByIdentifierRequest}
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setIdentifier(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.GetProfileByIdentifierRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.GetProfileByIdentifierRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getIdentifier();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.GetProfileByIdentifierRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string identifier = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.prototype.getIdentifier = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.GetProfileByIdentifierRequest.prototype.setIdentifier = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
@@ -1004,7 +1383,9 @@ proto.rover.audience.v1.Profile.toObject = function(includeInstance, msg) {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     identifier: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Value.toObject) : []
+    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Value.toObject) : [],
+    createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1059,6 +1440,16 @@ proto.rover.audience.v1.Profile.deserializeBinaryFromReader = function(msg, read
         jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.Value.deserializeBinaryFromReader);
          });
       break;
+    case 5:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCreatedAt(value);
+      break;
+    case 6:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setUpdatedAt(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1111,6 +1502,22 @@ proto.rover.audience.v1.Profile.serializeBinaryToWriter = function(message, writ
   f = message.getAttributesMap(true);
   if (f && f.getLength() > 0) {
     f.serializeBinary(4, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.Value.serializeBinaryToWriter);
+  }
+  f = message.getCreatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      5,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getUpdatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      6,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
   }
 };
 
@@ -1175,6 +1582,66 @@ proto.rover.audience.v1.Profile.prototype.getAttributesMap = function(opt_noLazy
 
 proto.rover.audience.v1.Profile.prototype.clearAttributesMap = function() {
   this.getAttributesMap().clear();
+};
+
+
+/**
+ * optional google.protobuf.Timestamp created_at = 5;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.rover.audience.v1.Profile.prototype.getCreatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.rover.audience.v1.Profile.prototype.setCreatedAt = function(value) {
+  jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+proto.rover.audience.v1.Profile.prototype.clearCreatedAt = function() {
+  this.setCreatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Profile.prototype.hasCreatedAt = function() {
+  return jspb.Message.getField(this, 5) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp updated_at = 6;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.rover.audience.v1.Profile.prototype.getUpdatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.rover.audience.v1.Profile.prototype.setUpdatedAt = function(value) {
+  jspb.Message.setWrapperField(this, 6, value);
+};
+
+
+proto.rover.audience.v1.Profile.prototype.clearUpdatedAt = function() {
+  this.setUpdatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Profile.prototype.hasUpdatedAt = function() {
+  return jspb.Message.getField(this, 6) != null;
 };
 
 
@@ -1357,6 +1824,190 @@ proto.rover.audience.v1.ProfileSchema.prototype.clearAttributesList = function()
  * @extends {jspb.Message}
  * @constructor
  */
+proto.rover.audience.v1.GetDeviceRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.GetDeviceRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.GetDeviceRequest.displayName = 'proto.rover.audience.v1.GetDeviceRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.GetDeviceRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.GetDeviceRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.GetDeviceRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.GetDeviceRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.GetDeviceRequest}
+ */
+proto.rover.audience.v1.GetDeviceRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.GetDeviceRequest;
+  return proto.rover.audience.v1.GetDeviceRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.GetDeviceRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.GetDeviceRequest}
+ */
+proto.rover.audience.v1.GetDeviceRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.GetDeviceRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.GetDeviceRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.GetDeviceRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.GetDeviceRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.GetDeviceRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.GetDeviceRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.GetDeviceRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.GetDeviceRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.GetDeviceRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.GetDeviceRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.rover.audience.v1.CreateDeviceRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
@@ -1393,7 +2044,8 @@ proto.rover.audience.v1.CreateDeviceRequest.prototype.toObject = function(opt_in
 proto.rover.audience.v1.CreateDeviceRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    profileId: jspb.Message.getFieldWithDefault(msg, 2, "")
+    profileId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -1439,6 +2091,10 @@ proto.rover.audience.v1.CreateDeviceRequest.deserializeBinaryFromReader = functi
       var value = /** @type {string} */ (reader.readString());
       msg.setProfileId(value);
       break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1479,6 +2135,13 @@ proto.rover.audience.v1.CreateDeviceRequest.serializeBinaryToWriter = function(m
   if (f.length > 0) {
     writer.writeString(
       2,
+      f
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
       f
     );
   }
@@ -1530,6 +2193,1186 @@ proto.rover.audience.v1.CreateDeviceRequest.prototype.setProfileId = function(va
 };
 
 
+/**
+ * optional string device_id = 3;
+ * @return {string}
+ */
+proto.rover.audience.v1.CreateDeviceRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.CreateDeviceRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDevicePushTokenRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDevicePushTokenRequest.displayName = 'proto.rover.audience.v1.UpdateDevicePushTokenRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDevicePushTokenRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDevicePushTokenRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    deviceTokenKey: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    apsEnvironment: jspb.Message.getFieldWithDefault(msg, 4, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDevicePushTokenRequest}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDevicePushTokenRequest;
+  return proto.rover.audience.v1.UpdateDevicePushTokenRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDevicePushTokenRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDevicePushTokenRequest}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceTokenKey(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setApsEnvironment(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDevicePushTokenRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDevicePushTokenRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getDeviceTokenKey();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getApsEnvironment();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional string device_token_key = 3;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.getDeviceTokenKey = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setDeviceTokenKey = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional string aps_environment = 4;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.getApsEnvironment = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setApsEnvironment = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.displayName = 'proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest;
+  return proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceLocationRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceLocationRequest.displayName = 'proto.rover.audience.v1.UpdateDeviceLocationRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceLocationRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceLocationRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    locationAccuracy: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    locationLatitude: +jspb.Message.getFieldWithDefault(msg, 4, 0.0),
+    locationLongitude: +jspb.Message.getFieldWithDefault(msg, 5, 0.0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceLocationRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceLocationRequest;
+  return proto.rover.audience.v1.UpdateDeviceLocationRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceLocationRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceLocationRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setLocationAccuracy(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setLocationLatitude(value);
+      break;
+    case 5:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setLocationLongitude(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceLocationRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceLocationRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getLocationAccuracy();
+  if (f !== 0) {
+    writer.writeInt32(
+      3,
+      f
+    );
+  }
+  f = message.getLocationLatitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      4,
+      f
+    );
+  }
+  f = message.getLocationLongitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      5,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional int32 location_accuracy = 3;
+ * @return {number}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getLocationAccuracy = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setLocationAccuracy = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional double location_latitude = 4;
+ * @return {number}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getLocationLatitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 4, 0.0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setLocationLatitude = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional double location_longitude = 5;
+ * @return {number}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getLocationLongitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 5, 0.0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setLocationLongitude = function(value) {
+  jspb.Message.setField(this, 5, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.repeatedFields_, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.displayName = 'proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest';
+}
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.repeatedFields_ = [3];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    regionsList: jspb.Message.toObjectList(msg.getRegionsList(),
+    proto.rover.audience.v1.GeofenceRegion.toObject, includeInstance)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest;
+  return proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    case 3:
+      var value = new proto.rover.audience.v1.GeofenceRegion;
+      reader.readMessage(value,proto.rover.audience.v1.GeofenceRegion.deserializeBinaryFromReader);
+      msg.addRegions(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getRegionsList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      3,
+      f,
+      proto.rover.audience.v1.GeofenceRegion.serializeBinaryToWriter
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * repeated GeofenceRegion regions = 3;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<!proto.rover.audience.v1.GeofenceRegion>}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.getRegionsList = function() {
+  return /** @type{!Array.<!proto.rover.audience.v1.GeofenceRegion>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.rover.audience.v1.GeofenceRegion, 3));
+};
+
+
+/** @param {!Array.<!proto.rover.audience.v1.GeofenceRegion>} value */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.setRegionsList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 3, value);
+};
+
+
+/**
+ * @param {!proto.rover.audience.v1.GeofenceRegion=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.rover.audience.v1.GeofenceRegion}
+ */
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.addRegions = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.rover.audience.v1.GeofenceRegion, opt_index);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest.prototype.clearRegionsList = function() {
+  this.setRegionsList([]);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.repeatedFields_, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.displayName = 'proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest';
+}
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.repeatedFields_ = [3];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    regionsList: jspb.Message.toObjectList(msg.getRegionsList(),
+    proto.rover.audience.v1.IBeaconRegion.toObject, includeInstance)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest;
+  return proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    case 3:
+      var value = new proto.rover.audience.v1.IBeaconRegion;
+      reader.readMessage(value,proto.rover.audience.v1.IBeaconRegion.deserializeBinaryFromReader);
+      msg.addRegions(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getRegionsList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      3,
+      f,
+      proto.rover.audience.v1.IBeaconRegion.serializeBinaryToWriter
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * repeated IBeaconRegion regions = 3;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<!proto.rover.audience.v1.IBeaconRegion>}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.getRegionsList = function() {
+  return /** @type{!Array.<!proto.rover.audience.v1.IBeaconRegion>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.rover.audience.v1.IBeaconRegion, 3));
+};
+
+
+/** @param {!Array.<!proto.rover.audience.v1.IBeaconRegion>} value */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.setRegionsList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 3, value);
+};
+
+
+/**
+ * @param {!proto.rover.audience.v1.IBeaconRegion=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.rover.audience.v1.IBeaconRegion}
+ */
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.addRegions = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.rover.audience.v1.IBeaconRegion, opt_index);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest.prototype.clearRegionsList = function() {
+  this.setRegionsList([]);
+};
+
+
 
 /**
  * Generated by JsPbCodeGenerator.
@@ -1577,7 +3420,7 @@ proto.rover.audience.v1.DeleteDeviceRequest.prototype.toObject = function(opt_in
 proto.rover.audience.v1.DeleteDeviceRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    id: jspb.Message.getFieldWithDefault(msg, 2, "")
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -1621,7 +3464,7 @@ proto.rover.audience.v1.DeleteDeviceRequest.deserializeBinaryFromReader = functi
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setId(value);
+      msg.setDeviceId(value);
       break;
     default:
       reader.skipField();
@@ -1659,7 +3502,7 @@ proto.rover.audience.v1.DeleteDeviceRequest.serializeBinaryToWriter = function(m
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getId();
+  f = message.getDeviceId();
   if (f.length > 0) {
     writer.writeString(
       2,
@@ -1700,429 +3543,17 @@ proto.rover.audience.v1.DeleteDeviceRequest.prototype.hasAuthContext = function(
 
 
 /**
- * optional string id = 2;
+ * optional string device_id = 2;
  * @return {string}
  */
-proto.rover.audience.v1.DeleteDeviceRequest.prototype.getId = function() {
+proto.rover.audience.v1.DeleteDeviceRequest.prototype.getDeviceId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.DeleteDeviceRequest.prototype.setId = function(value) {
+proto.rover.audience.v1.DeleteDeviceRequest.prototype.setDeviceId = function(value) {
   jspb.Message.setField(this, 2, value);
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.rover.audience.v1.PutDeviceRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
-};
-goog.inherits(proto.rover.audience.v1.PutDeviceRequest, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.PutDeviceRequest.displayName = 'proto.rover.audience.v1.PutDeviceRequest';
-}
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.rover.audience.v1.PutDeviceRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.PutDeviceRequest.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.PutDeviceRequest} msg The msg instance to transform.
- * @return {!Object}
- */
-proto.rover.audience.v1.PutDeviceRequest.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    device: (f = msg.getDevice()) && proto.rover.audience.v1.Device.toObject(includeInstance, f)
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.PutDeviceRequest}
- */
-proto.rover.audience.v1.PutDeviceRequest.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.PutDeviceRequest;
-  return proto.rover.audience.v1.PutDeviceRequest.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.rover.audience.v1.PutDeviceRequest} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.PutDeviceRequest}
- */
-proto.rover.audience.v1.PutDeviceRequest.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = new auth_v1_auth_pb.AuthContext;
-      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
-      msg.setAuthContext(value);
-      break;
-    case 2:
-      var value = new proto.rover.audience.v1.Device;
-      reader.readMessage(value,proto.rover.audience.v1.Device.deserializeBinaryFromReader);
-      msg.setDevice(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.rover.audience.v1.PutDeviceRequest.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.PutDeviceRequest.serializeBinaryToWriter(this, writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the given message to binary data (in protobuf wire
- * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.PutDeviceRequest} message
- * @param {!jspb.BinaryWriter} writer
- */
-proto.rover.audience.v1.PutDeviceRequest.serializeBinaryToWriter = function(message, writer) {
-  var f = undefined;
-  f = message.getAuthContext();
-  if (f != null) {
-    writer.writeMessage(
-      1,
-      f,
-      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
-    );
-  }
-  f = message.getDevice();
-  if (f != null) {
-    writer.writeMessage(
-      2,
-      f,
-      proto.rover.audience.v1.Device.serializeBinaryToWriter
-    );
-  }
-};
-
-
-/**
- * optional rover.auth.v1.AuthContext auth_context = 1;
- * @return {?proto.rover.auth.v1.AuthContext}
- */
-proto.rover.audience.v1.PutDeviceRequest.prototype.getAuthContext = function() {
-  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
-    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
-};
-
-
-/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
-proto.rover.audience.v1.PutDeviceRequest.prototype.setAuthContext = function(value) {
-  jspb.Message.setWrapperField(this, 1, value);
-};
-
-
-proto.rover.audience.v1.PutDeviceRequest.prototype.clearAuthContext = function() {
-  this.setAuthContext(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.rover.audience.v1.PutDeviceRequest.prototype.hasAuthContext = function() {
-  return jspb.Message.getField(this, 1) != null;
-};
-
-
-/**
- * optional Device device = 2;
- * @return {?proto.rover.audience.v1.Device}
- */
-proto.rover.audience.v1.PutDeviceRequest.prototype.getDevice = function() {
-  return /** @type{?proto.rover.audience.v1.Device} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Device, 2));
-};
-
-
-/** @param {?proto.rover.audience.v1.Device|undefined} value */
-proto.rover.audience.v1.PutDeviceRequest.prototype.setDevice = function(value) {
-  jspb.Message.setWrapperField(this, 2, value);
-};
-
-
-proto.rover.audience.v1.PutDeviceRequest.prototype.clearDevice = function() {
-  this.setDevice(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.rover.audience.v1.PutDeviceRequest.prototype.hasDevice = function() {
-  return jspb.Message.getField(this, 2) != null;
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
-};
-goog.inherits(proto.rover.audience.v1.SetDevicePushTokenRequest, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.SetDevicePushTokenRequest.displayName = 'proto.rover.audience.v1.SetDevicePushTokenRequest';
-}
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.SetDevicePushTokenRequest.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.SetDevicePushTokenRequest} msg The msg instance to transform.
- * @return {!Object}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    id: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    token: jspb.Message.getFieldWithDefault(msg, 3, "")
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.SetDevicePushTokenRequest}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.SetDevicePushTokenRequest;
-  return proto.rover.audience.v1.SetDevicePushTokenRequest.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.rover.audience.v1.SetDevicePushTokenRequest} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.SetDevicePushTokenRequest}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = new auth_v1_auth_pb.AuthContext;
-      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
-      msg.setAuthContext(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setId(value);
-      break;
-    case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setToken(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.SetDevicePushTokenRequest.serializeBinaryToWriter(this, writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the given message to binary data (in protobuf wire
- * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.SetDevicePushTokenRequest} message
- * @param {!jspb.BinaryWriter} writer
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.serializeBinaryToWriter = function(message, writer) {
-  var f = undefined;
-  f = message.getAuthContext();
-  if (f != null) {
-    writer.writeMessage(
-      1,
-      f,
-      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
-    );
-  }
-  f = message.getId();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = message.getToken();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-};
-
-
-/**
- * optional rover.auth.v1.AuthContext auth_context = 1;
- * @return {?proto.rover.auth.v1.AuthContext}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.getAuthContext = function() {
-  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
-    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
-};
-
-
-/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.setAuthContext = function(value) {
-  jspb.Message.setWrapperField(this, 1, value);
-};
-
-
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.clearAuthContext = function() {
-  this.setAuthContext(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.hasAuthContext = function() {
-  return jspb.Message.getField(this, 1) != null;
-};
-
-
-/**
- * optional string id = 2;
- * @return {string}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.getId = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.setId = function(value) {
-  jspb.Message.setField(this, 2, value);
-};
-
-
-/**
- * optional string token = 3;
- * @return {string}
- */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.getToken = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.SetDevicePushTokenRequest.prototype.setToken = function(value) {
-  jspb.Message.setField(this, 3, value);
 };
 
 
@@ -2173,7 +3604,7 @@ proto.rover.audience.v1.SetDeviceProfileRequest.prototype.toObject = function(op
 proto.rover.audience.v1.SetDeviceProfileRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    id: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     profileId: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
@@ -2218,7 +3649,7 @@ proto.rover.audience.v1.SetDeviceProfileRequest.deserializeBinaryFromReader = fu
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setId(value);
+      msg.setDeviceId(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
@@ -2260,7 +3691,7 @@ proto.rover.audience.v1.SetDeviceProfileRequest.serializeBinaryToWriter = functi
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getId();
+  f = message.getDeviceId();
   if (f.length > 0) {
     writer.writeString(
       2,
@@ -2308,16 +3739,16 @@ proto.rover.audience.v1.SetDeviceProfileRequest.prototype.hasAuthContext = funct
 
 
 /**
- * optional string id = 2;
+ * optional string device_id = 2;
  * @return {string}
  */
-proto.rover.audience.v1.SetDeviceProfileRequest.prototype.getId = function() {
+proto.rover.audience.v1.SetDeviceProfileRequest.prototype.getDeviceId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.SetDeviceProfileRequest.prototype.setId = function(value) {
+proto.rover.audience.v1.SetDeviceProfileRequest.prototype.setDeviceId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
@@ -2348,13 +3779,989 @@ proto.rover.audience.v1.SetDeviceProfileRequest.prototype.setProfileId = functio
  * @extends {jspb.Message}
  * @constructor
  */
-proto.rover.audience.v1.Device = function(opt_data) {
+proto.rover.audience.v1.UpdateDeviceRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceRequest.displayName = 'proto.rover.audience.v1.UpdateDeviceRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    apsEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    deviceTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    appName: jspb.Message.getFieldWithDefault(msg, 12, ""),
+    appVersion: jspb.Message.getFieldWithDefault(msg, 13, ""),
+    appBuild: jspb.Message.getFieldWithDefault(msg, 14, ""),
+    appNamespace: jspb.Message.getFieldWithDefault(msg, 15, ""),
+    deviceManufacturer: jspb.Message.getFieldWithDefault(msg, 16, ""),
+    osName: jspb.Message.getFieldWithDefault(msg, 17, ""),
+    osVersion: (f = msg.getOsVersion()) && proto.rover.audience.v1.Version.toObject(includeInstance, f),
+    deviceModel: jspb.Message.getFieldWithDefault(msg, 19, ""),
+    frameworksMap: (f = msg.getFrameworksMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Version.toObject) : [],
+    localeLanguage: jspb.Message.getFieldWithDefault(msg, 21, ""),
+    localeRegion: jspb.Message.getFieldWithDefault(msg, 22, ""),
+    localeScript: jspb.Message.getFieldWithDefault(msg, 23, ""),
+    isWifiEnabled: jspb.Message.getFieldWithDefault(msg, 24, false),
+    isCellularEnabled: jspb.Message.getFieldWithDefault(msg, 25, false),
+    screenWidth: jspb.Message.getFieldWithDefault(msg, 26, 0),
+    screenHeight: jspb.Message.getFieldWithDefault(msg, 27, 0),
+    carrierName: jspb.Message.getFieldWithDefault(msg, 28, ""),
+    radio: jspb.Message.getFieldWithDefault(msg, 29, ""),
+    timeZone: jspb.Message.getFieldWithDefault(msg, 30, ""),
+    platform: jspb.Message.getFieldWithDefault(msg, 31, 0),
+    isBackgroundEnabled: jspb.Message.getFieldWithDefault(msg, 32, false),
+    isLocationMonitoringEnabled: jspb.Message.getFieldWithDefault(msg, 33, false),
+    isBluetoothEnabled: jspb.Message.getFieldWithDefault(msg, 34, false),
+    advertisingId: jspb.Message.getFieldWithDefault(msg, 35, ""),
+    ip: jspb.Message.getFieldWithDefault(msg, 36, ""),
+    regionMonitoringMode: jspb.Message.getFieldWithDefault(msg, 37, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceRequest;
+  return proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setApsEnvironment(value);
+      break;
+    case 11:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceTokenKey(value);
+      break;
+    case 12:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAppName(value);
+      break;
+    case 13:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAppVersion(value);
+      break;
+    case 14:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAppBuild(value);
+      break;
+    case 15:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAppNamespace(value);
+      break;
+    case 16:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceManufacturer(value);
+      break;
+    case 17:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOsName(value);
+      break;
+    case 18:
+      var value = new proto.rover.audience.v1.Version;
+      reader.readMessage(value,proto.rover.audience.v1.Version.deserializeBinaryFromReader);
+      msg.setOsVersion(value);
+      break;
+    case 19:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceModel(value);
+      break;
+    case 20:
+      var value = msg.getFrameworksMap();
+      reader.readMessage(value, function(message, reader) {
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.Version.deserializeBinaryFromReader);
+         });
+      break;
+    case 21:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocaleLanguage(value);
+      break;
+    case 22:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocaleRegion(value);
+      break;
+    case 23:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocaleScript(value);
+      break;
+    case 24:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsWifiEnabled(value);
+      break;
+    case 25:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsCellularEnabled(value);
+      break;
+    case 26:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setScreenWidth(value);
+      break;
+    case 27:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setScreenHeight(value);
+      break;
+    case 28:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setCarrierName(value);
+      break;
+    case 29:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setRadio(value);
+      break;
+    case 30:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setTimeZone(value);
+      break;
+    case 31:
+      var value = /** @type {!proto.rover.audience.v1.Platform} */ (reader.readEnum());
+      msg.setPlatform(value);
+      break;
+    case 32:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsBackgroundEnabled(value);
+      break;
+    case 33:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsLocationMonitoringEnabled(value);
+      break;
+    case 34:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsBluetoothEnabled(value);
+      break;
+    case 35:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAdvertisingId(value);
+      break;
+    case 36:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setIp(value);
+      break;
+    case 37:
+      var value = /** @type {!proto.rover.audience.v1.Device.RegionMonitoringMode} */ (reader.readEnum());
+      msg.setRegionMonitoringMode(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getApsEnvironment();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
+      f
+    );
+  }
+  f = message.getDeviceTokenKey();
+  if (f.length > 0) {
+    writer.writeString(
+      11,
+      f
+    );
+  }
+  f = message.getAppName();
+  if (f.length > 0) {
+    writer.writeString(
+      12,
+      f
+    );
+  }
+  f = message.getAppVersion();
+  if (f.length > 0) {
+    writer.writeString(
+      13,
+      f
+    );
+  }
+  f = message.getAppBuild();
+  if (f.length > 0) {
+    writer.writeString(
+      14,
+      f
+    );
+  }
+  f = message.getAppNamespace();
+  if (f.length > 0) {
+    writer.writeString(
+      15,
+      f
+    );
+  }
+  f = message.getDeviceManufacturer();
+  if (f.length > 0) {
+    writer.writeString(
+      16,
+      f
+    );
+  }
+  f = message.getOsName();
+  if (f.length > 0) {
+    writer.writeString(
+      17,
+      f
+    );
+  }
+  f = message.getOsVersion();
+  if (f != null) {
+    writer.writeMessage(
+      18,
+      f,
+      proto.rover.audience.v1.Version.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceModel();
+  if (f.length > 0) {
+    writer.writeString(
+      19,
+      f
+    );
+  }
+  f = message.getFrameworksMap(true);
+  if (f && f.getLength() > 0) {
+    f.serializeBinary(20, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.Version.serializeBinaryToWriter);
+  }
+  f = message.getLocaleLanguage();
+  if (f.length > 0) {
+    writer.writeString(
+      21,
+      f
+    );
+  }
+  f = message.getLocaleRegion();
+  if (f.length > 0) {
+    writer.writeString(
+      22,
+      f
+    );
+  }
+  f = message.getLocaleScript();
+  if (f.length > 0) {
+    writer.writeString(
+      23,
+      f
+    );
+  }
+  f = message.getIsWifiEnabled();
+  if (f) {
+    writer.writeBool(
+      24,
+      f
+    );
+  }
+  f = message.getIsCellularEnabled();
+  if (f) {
+    writer.writeBool(
+      25,
+      f
+    );
+  }
+  f = message.getScreenWidth();
+  if (f !== 0) {
+    writer.writeInt32(
+      26,
+      f
+    );
+  }
+  f = message.getScreenHeight();
+  if (f !== 0) {
+    writer.writeInt32(
+      27,
+      f
+    );
+  }
+  f = message.getCarrierName();
+  if (f.length > 0) {
+    writer.writeString(
+      28,
+      f
+    );
+  }
+  f = message.getRadio();
+  if (f.length > 0) {
+    writer.writeString(
+      29,
+      f
+    );
+  }
+  f = message.getTimeZone();
+  if (f.length > 0) {
+    writer.writeString(
+      30,
+      f
+    );
+  }
+  f = message.getPlatform();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      31,
+      f
+    );
+  }
+  f = message.getIsBackgroundEnabled();
+  if (f) {
+    writer.writeBool(
+      32,
+      f
+    );
+  }
+  f = message.getIsLocationMonitoringEnabled();
+  if (f) {
+    writer.writeBool(
+      33,
+      f
+    );
+  }
+  f = message.getIsBluetoothEnabled();
+  if (f) {
+    writer.writeBool(
+      34,
+      f
+    );
+  }
+  f = message.getAdvertisingId();
+  if (f.length > 0) {
+    writer.writeString(
+      35,
+      f
+    );
+  }
+  f = message.getIp();
+  if (f.length > 0) {
+    writer.writeString(
+      36,
+      f
+    );
+  }
+  f = message.getRegionMonitoringMode();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      37,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional string aps_environment = 10;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getApsEnvironment = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setApsEnvironment = function(value) {
+  jspb.Message.setField(this, 10, value);
+};
+
+
+/**
+ * optional string device_token_key = 11;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getDeviceTokenKey = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceTokenKey = function(value) {
+  jspb.Message.setField(this, 11, value);
+};
+
+
+/**
+ * optional string app_name = 12;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAppName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setAppName = function(value) {
+  jspb.Message.setField(this, 12, value);
+};
+
+
+/**
+ * optional string app_version = 13;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAppVersion = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 13, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setAppVersion = function(value) {
+  jspb.Message.setField(this, 13, value);
+};
+
+
+/**
+ * optional string app_build = 14;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAppBuild = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setAppBuild = function(value) {
+  jspb.Message.setField(this, 14, value);
+};
+
+
+/**
+ * optional string app_namespace = 15;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAppNamespace = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 15, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setAppNamespace = function(value) {
+  jspb.Message.setField(this, 15, value);
+};
+
+
+/**
+ * optional string device_manufacturer = 16;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getDeviceManufacturer = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 16, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceManufacturer = function(value) {
+  jspb.Message.setField(this, 16, value);
+};
+
+
+/**
+ * optional string os_name = 17;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getOsName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setOsName = function(value) {
+  jspb.Message.setField(this, 17, value);
+};
+
+
+/**
+ * optional Version os_version = 18;
+ * @return {?proto.rover.audience.v1.Version}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getOsVersion = function() {
+  return /** @type{?proto.rover.audience.v1.Version} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Version, 18));
+};
+
+
+/** @param {?proto.rover.audience.v1.Version|undefined} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setOsVersion = function(value) {
+  jspb.Message.setWrapperField(this, 18, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.clearOsVersion = function() {
+  this.setOsVersion(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.hasOsVersion = function() {
+  return jspb.Message.getField(this, 18) != null;
+};
+
+
+/**
+ * optional string device_model = 19;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getDeviceModel = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 19, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceModel = function(value) {
+  jspb.Message.setField(this, 19, value);
+};
+
+
+/**
+ * map<string, Version> frameworks = 20;
+ * @param {boolean=} opt_noLazyCreate Do not create the map if
+ * empty, instead returning `undefined`
+ * @return {!jspb.Map<string,!proto.rover.audience.v1.Version>}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getFrameworksMap = function(opt_noLazyCreate) {
+  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.Version>} */ (
+      jspb.Message.getMapField(this, 20, opt_noLazyCreate,
+      proto.rover.audience.v1.Version));
+};
+
+
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.clearFrameworksMap = function() {
+  this.getFrameworksMap().clear();
+};
+
+
+/**
+ * optional string locale_language = 21;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getLocaleLanguage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 21, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setLocaleLanguage = function(value) {
+  jspb.Message.setField(this, 21, value);
+};
+
+
+/**
+ * optional string locale_region = 22;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getLocaleRegion = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 22, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setLocaleRegion = function(value) {
+  jspb.Message.setField(this, 22, value);
+};
+
+
+/**
+ * optional string locale_script = 23;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getLocaleScript = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 23, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setLocaleScript = function(value) {
+  jspb.Message.setField(this, 23, value);
+};
+
+
+/**
+ * optional bool is_wifi_enabled = 24;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsWifiEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 24, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsWifiEnabled = function(value) {
+  jspb.Message.setField(this, 24, value);
+};
+
+
+/**
+ * optional bool is_cellular_enabled = 25;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsCellularEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 25, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsCellularEnabled = function(value) {
+  jspb.Message.setField(this, 25, value);
+};
+
+
+/**
+ * optional int32 screen_width = 26;
+ * @return {number}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getScreenWidth = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 26, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setScreenWidth = function(value) {
+  jspb.Message.setField(this, 26, value);
+};
+
+
+/**
+ * optional int32 screen_height = 27;
+ * @return {number}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getScreenHeight = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 27, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setScreenHeight = function(value) {
+  jspb.Message.setField(this, 27, value);
+};
+
+
+/**
+ * optional string carrier_name = 28;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getCarrierName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 28, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setCarrierName = function(value) {
+  jspb.Message.setField(this, 28, value);
+};
+
+
+/**
+ * optional string radio = 29;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getRadio = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 29, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setRadio = function(value) {
+  jspb.Message.setField(this, 29, value);
+};
+
+
+/**
+ * optional string time_zone = 30;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getTimeZone = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 30, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setTimeZone = function(value) {
+  jspb.Message.setField(this, 30, value);
+};
+
+
+/**
+ * optional Platform platform = 31;
+ * @return {!proto.rover.audience.v1.Platform}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getPlatform = function() {
+  return /** @type {!proto.rover.audience.v1.Platform} */ (jspb.Message.getFieldWithDefault(this, 31, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.Platform} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setPlatform = function(value) {
+  jspb.Message.setField(this, 31, value);
+};
+
+
+/**
+ * optional bool is_background_enabled = 32;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsBackgroundEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 32, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsBackgroundEnabled = function(value) {
+  jspb.Message.setField(this, 32, value);
+};
+
+
+/**
+ * optional bool is_location_monitoring_enabled = 33;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsLocationMonitoringEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 33, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsLocationMonitoringEnabled = function(value) {
+  jspb.Message.setField(this, 33, value);
+};
+
+
+/**
+ * optional bool is_bluetooth_enabled = 34;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsBluetoothEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 34, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsBluetoothEnabled = function(value) {
+  jspb.Message.setField(this, 34, value);
+};
+
+
+/**
+ * optional string advertising_id = 35;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAdvertisingId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 35, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setAdvertisingId = function(value) {
+  jspb.Message.setField(this, 35, value);
+};
+
+
+/**
+ * optional string ip = 36;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIp = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 36, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIp = function(value) {
+  jspb.Message.setField(this, 36, value);
+};
+
+
+/**
+ * optional Device.RegionMonitoringMode region_monitoring_mode = 37;
+ * @return {!proto.rover.audience.v1.Device.RegionMonitoringMode}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getRegionMonitoringMode = function() {
+  return /** @type {!proto.rover.audience.v1.Device.RegionMonitoringMode} */ (jspb.Message.getFieldWithDefault(this, 37, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.Device.RegionMonitoringMode} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setRegionMonitoringMode = function(value) {
+  jspb.Message.setField(this, 37, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.Device = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.Device.repeatedFields_, null);
 };
 goog.inherits(proto.rover.audience.v1.Device, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   proto.rover.audience.v1.Device.displayName = 'proto.rover.audience.v1.Device';
 }
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.rover.audience.v1.Device.repeatedFields_ = [49,51];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -2384,28 +4791,55 @@ proto.rover.audience.v1.Device.prototype.toObject = function(opt_includeInstance
 proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    token: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    localeLang: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    localeRegion: jspb.Message.getFieldWithDefault(msg, 6, ""),
-    timeZone: jspb.Message.getFieldWithDefault(msg, 7, ""),
-    sdkVersion: jspb.Message.getFieldWithDefault(msg, 8, ""),
-    platform: jspb.Message.getFieldWithDefault(msg, 9, ""),
-    osName: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    osVersion: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    model: jspb.Message.getFieldWithDefault(msg, 12, ""),
-    manufacturer: jspb.Message.getFieldWithDefault(msg, 13, ""),
-    carrier: jspb.Message.getFieldWithDefault(msg, 14, ""),
-    appIdentifier: jspb.Message.getFieldWithDefault(msg, 15, ""),
-    gimbalMode: jspb.Message.getFieldWithDefault(msg, 16, false),
-    backgroundEnabled: jspb.Message.getFieldWithDefault(msg, 18, false),
-    notificationsEnabled: jspb.Message.getFieldWithDefault(msg, 19, false),
-    bluetoothEnabled: jspb.Message.getFieldWithDefault(msg, 20, false),
-    locationMonitoringEnabled: jspb.Message.getFieldWithDefault(msg, 21, false),
-    development: jspb.Message.getFieldWithDefault(msg, 22, false),
-    aid: jspb.Message.getFieldWithDefault(msg, 23, ""),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    accountId: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    profileId: jspb.Message.getFieldWithDefault(msg, 4, ""),
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
+    updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    apsEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    deviceTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    deviceTokenIsActive: jspb.Message.getFieldWithDefault(msg, 12, false),
+    deviceTokenCreatedAt: (f = msg.getDeviceTokenCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    deviceTokenUpdatedAt: (f = msg.getDeviceTokenUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    deviceTokenUnregisteredAt: (f = msg.getDeviceTokenUnregisteredAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    appName: jspb.Message.getFieldWithDefault(msg, 16, ""),
+    appVersion: jspb.Message.getFieldWithDefault(msg, 17, ""),
+    appBuild: jspb.Message.getFieldWithDefault(msg, 18, ""),
+    appNamespace: jspb.Message.getFieldWithDefault(msg, 19, ""),
+    deviceManufacturer: jspb.Message.getFieldWithDefault(msg, 20, ""),
+    deviceModel: jspb.Message.getFieldWithDefault(msg, 23, ""),
+    osName: jspb.Message.getFieldWithDefault(msg, 21, ""),
+    osVersion: (f = msg.getOsVersion()) && proto.rover.audience.v1.Version.toObject(includeInstance, f),
+    frameworksMap: (f = msg.getFrameworksMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Version.toObject) : [],
+    localeLanguage: jspb.Message.getFieldWithDefault(msg, 25, ""),
+    localeRegion: jspb.Message.getFieldWithDefault(msg, 26, ""),
+    localeScript: jspb.Message.getFieldWithDefault(msg, 27, ""),
+    isWifiEnabled: jspb.Message.getFieldWithDefault(msg, 28, false),
+    isCellularEnabled: jspb.Message.getFieldWithDefault(msg, 29, false),
+    screenWidth: jspb.Message.getFieldWithDefault(msg, 30, 0),
+    screenHeight: jspb.Message.getFieldWithDefault(msg, 31, 0),
+    carrierName: jspb.Message.getFieldWithDefault(msg, 32, ""),
+    radio: jspb.Message.getFieldWithDefault(msg, 33, ""),
+    timeZone: jspb.Message.getFieldWithDefault(msg, 34, ""),
+    platform: jspb.Message.getFieldWithDefault(msg, 35, 0),
+    isBackgroundEnabled: jspb.Message.getFieldWithDefault(msg, 36, false),
+    isLocationMonitoringEnabled: jspb.Message.getFieldWithDefault(msg, 37, false),
+    isBluetoothEnabled: jspb.Message.getFieldWithDefault(msg, 38, false),
+    advertisingId: jspb.Message.getFieldWithDefault(msg, 39, ""),
+    ip: jspb.Message.getFieldWithDefault(msg, 40, ""),
+    locationAccuracy: jspb.Message.getFieldWithDefault(msg, 41, 0),
+    locationLatitude: +jspb.Message.getFieldWithDefault(msg, 42, 0.0),
+    locationLongitude: +jspb.Message.getFieldWithDefault(msg, 43, 0.0),
+    locationRegion: jspb.Message.getFieldWithDefault(msg, 44, ""),
+    locationCity: jspb.Message.getFieldWithDefault(msg, 45, ""),
+    locationStreet: jspb.Message.getFieldWithDefault(msg, 46, ""),
+    regionMonitoringMode: jspb.Message.getFieldWithDefault(msg, 47, 0),
+    ibeaconMonitoringRegionsUpdatedAt: (f = msg.getIbeaconMonitoringRegionsUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    ibeaconMonitoringRegionsList: jspb.Message.toObjectList(msg.getIbeaconMonitoringRegionsList(),
+    proto.rover.audience.v1.IBeaconRegion.toObject, includeInstance),
+    geofenceMonitoringRegionsUpdatedAt: (f = msg.getGeofenceMonitoringRegionsUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    geofenceMonitoringRegionsList: jspb.Message.toObjectList(msg.getGeofenceMonitoringRegionsList(),
+    proto.rover.audience.v1.GeofenceRegion.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -2447,94 +4881,204 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
       msg.setId(value);
       break;
     case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    case 3:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setAccountId(value);
       break;
-    case 3:
+    case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setToken(value);
+      msg.setProfileId(value);
       break;
     case 5:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setLocaleLang(value);
-      break;
-    case 6:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setLocaleRegion(value);
-      break;
-    case 7:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setTimeZone(value);
-      break;
-    case 8:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSdkVersion(value);
-      break;
-    case 9:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setPlatform(value);
-      break;
-    case 10:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOsName(value);
-      break;
-    case 11:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOsVersion(value);
-      break;
-    case 12:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setModel(value);
-      break;
-    case 13:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setManufacturer(value);
-      break;
-    case 14:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setCarrier(value);
-      break;
-    case 15:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setAppIdentifier(value);
-      break;
-    case 16:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setGimbalMode(value);
-      break;
-    case 18:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setBackgroundEnabled(value);
-      break;
-    case 19:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setNotificationsEnabled(value);
-      break;
-    case 20:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setBluetoothEnabled(value);
-      break;
-    case 21:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setLocationMonitoringEnabled(value);
-      break;
-    case 22:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setDevelopment(value);
-      break;
-    case 23:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setAid(value);
-      break;
-    case 24:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setCreatedAt(value);
       break;
-    case 25:
+    case 6:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setUpdatedAt(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setApsEnvironment(value);
+      break;
+    case 11:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceTokenKey(value);
+      break;
+    case 12:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setDeviceTokenIsActive(value);
+      break;
+    case 13:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setDeviceTokenCreatedAt(value);
+      break;
+    case 14:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setDeviceTokenUpdatedAt(value);
+      break;
+    case 15:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setDeviceTokenUnregisteredAt(value);
+      break;
+    case 16:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAppName(value);
+      break;
+    case 17:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAppVersion(value);
+      break;
+    case 18:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAppBuild(value);
+      break;
+    case 19:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAppNamespace(value);
+      break;
+    case 20:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceManufacturer(value);
+      break;
+    case 23:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceModel(value);
+      break;
+    case 21:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setOsName(value);
+      break;
+    case 22:
+      var value = new proto.rover.audience.v1.Version;
+      reader.readMessage(value,proto.rover.audience.v1.Version.deserializeBinaryFromReader);
+      msg.setOsVersion(value);
+      break;
+    case 24:
+      var value = msg.getFrameworksMap();
+      reader.readMessage(value, function(message, reader) {
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.Version.deserializeBinaryFromReader);
+         });
+      break;
+    case 25:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocaleLanguage(value);
+      break;
+    case 26:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocaleRegion(value);
+      break;
+    case 27:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocaleScript(value);
+      break;
+    case 28:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsWifiEnabled(value);
+      break;
+    case 29:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsCellularEnabled(value);
+      break;
+    case 30:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setScreenWidth(value);
+      break;
+    case 31:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setScreenHeight(value);
+      break;
+    case 32:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setCarrierName(value);
+      break;
+    case 33:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setRadio(value);
+      break;
+    case 34:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setTimeZone(value);
+      break;
+    case 35:
+      var value = /** @type {!proto.rover.audience.v1.Platform} */ (reader.readEnum());
+      msg.setPlatform(value);
+      break;
+    case 36:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsBackgroundEnabled(value);
+      break;
+    case 37:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsLocationMonitoringEnabled(value);
+      break;
+    case 38:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsBluetoothEnabled(value);
+      break;
+    case 39:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAdvertisingId(value);
+      break;
+    case 40:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setIp(value);
+      break;
+    case 41:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setLocationAccuracy(value);
+      break;
+    case 42:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setLocationLatitude(value);
+      break;
+    case 43:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setLocationLongitude(value);
+      break;
+    case 44:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocationRegion(value);
+      break;
+    case 45:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocationCity(value);
+      break;
+    case 46:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocationStreet(value);
+      break;
+    case 47:
+      var value = /** @type {!proto.rover.audience.v1.Device.RegionMonitoringMode} */ (reader.readEnum());
+      msg.setRegionMonitoringMode(value);
+      break;
+    case 48:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setIbeaconMonitoringRegionsUpdatedAt(value);
+      break;
+    case 49:
+      var value = new proto.rover.audience.v1.IBeaconRegion;
+      reader.readMessage(value,proto.rover.audience.v1.IBeaconRegion.deserializeBinaryFromReader);
+      msg.addIbeaconMonitoringRegions(value);
+      break;
+    case 50:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setGeofenceMonitoringRegionsUpdatedAt(value);
+      break;
+    case 51:
+      var value = new proto.rover.audience.v1.GeofenceRegion;
+      reader.readMessage(value,proto.rover.audience.v1.GeofenceRegion.deserializeBinaryFromReader);
+      msg.addGeofenceMonitoringRegions(value);
       break;
     default:
       reader.skipField();
@@ -2571,150 +5115,31 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
       f
     );
   }
-  f = message.getAccountId();
-  if (f !== 0) {
-    writer.writeInt32(
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
       2,
       f
     );
   }
-  f = message.getToken();
-  if (f.length > 0) {
-    writer.writeString(
+  f = message.getAccountId();
+  if (f !== 0) {
+    writer.writeInt32(
       3,
       f
     );
   }
-  f = message.getLocaleLang();
+  f = message.getProfileId();
   if (f.length > 0) {
     writer.writeString(
-      5,
-      f
-    );
-  }
-  f = message.getLocaleRegion();
-  if (f.length > 0) {
-    writer.writeString(
-      6,
-      f
-    );
-  }
-  f = message.getTimeZone();
-  if (f.length > 0) {
-    writer.writeString(
-      7,
-      f
-    );
-  }
-  f = message.getSdkVersion();
-  if (f.length > 0) {
-    writer.writeString(
-      8,
-      f
-    );
-  }
-  f = message.getPlatform();
-  if (f.length > 0) {
-    writer.writeString(
-      9,
-      f
-    );
-  }
-  f = message.getOsName();
-  if (f.length > 0) {
-    writer.writeString(
-      10,
-      f
-    );
-  }
-  f = message.getOsVersion();
-  if (f.length > 0) {
-    writer.writeString(
-      11,
-      f
-    );
-  }
-  f = message.getModel();
-  if (f.length > 0) {
-    writer.writeString(
-      12,
-      f
-    );
-  }
-  f = message.getManufacturer();
-  if (f.length > 0) {
-    writer.writeString(
-      13,
-      f
-    );
-  }
-  f = message.getCarrier();
-  if (f.length > 0) {
-    writer.writeString(
-      14,
-      f
-    );
-  }
-  f = message.getAppIdentifier();
-  if (f.length > 0) {
-    writer.writeString(
-      15,
-      f
-    );
-  }
-  f = message.getGimbalMode();
-  if (f) {
-    writer.writeBool(
-      16,
-      f
-    );
-  }
-  f = message.getBackgroundEnabled();
-  if (f) {
-    writer.writeBool(
-      18,
-      f
-    );
-  }
-  f = message.getNotificationsEnabled();
-  if (f) {
-    writer.writeBool(
-      19,
-      f
-    );
-  }
-  f = message.getBluetoothEnabled();
-  if (f) {
-    writer.writeBool(
-      20,
-      f
-    );
-  }
-  f = message.getLocationMonitoringEnabled();
-  if (f) {
-    writer.writeBool(
-      21,
-      f
-    );
-  }
-  f = message.getDevelopment();
-  if (f) {
-    writer.writeBool(
-      22,
-      f
-    );
-  }
-  f = message.getAid();
-  if (f.length > 0) {
-    writer.writeString(
-      23,
+      4,
       f
     );
   }
   f = message.getCreatedAt();
   if (f != null) {
     writer.writeMessage(
-      24,
+      5,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -2722,13 +5147,321 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
   f = message.getUpdatedAt();
   if (f != null) {
     writer.writeMessage(
-      25,
+      6,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
+  f = message.getApsEnvironment();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
+      f
+    );
+  }
+  f = message.getDeviceTokenKey();
+  if (f.length > 0) {
+    writer.writeString(
+      11,
+      f
+    );
+  }
+  f = message.getDeviceTokenIsActive();
+  if (f) {
+    writer.writeBool(
+      12,
+      f
+    );
+  }
+  f = message.getDeviceTokenCreatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      13,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceTokenUpdatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      14,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceTokenUnregisteredAt();
+  if (f != null) {
+    writer.writeMessage(
+      15,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getAppName();
+  if (f.length > 0) {
+    writer.writeString(
+      16,
+      f
+    );
+  }
+  f = message.getAppVersion();
+  if (f.length > 0) {
+    writer.writeString(
+      17,
+      f
+    );
+  }
+  f = message.getAppBuild();
+  if (f.length > 0) {
+    writer.writeString(
+      18,
+      f
+    );
+  }
+  f = message.getAppNamespace();
+  if (f.length > 0) {
+    writer.writeString(
+      19,
+      f
+    );
+  }
+  f = message.getDeviceManufacturer();
+  if (f.length > 0) {
+    writer.writeString(
+      20,
+      f
+    );
+  }
+  f = message.getDeviceModel();
+  if (f.length > 0) {
+    writer.writeString(
+      23,
+      f
+    );
+  }
+  f = message.getOsName();
+  if (f.length > 0) {
+    writer.writeString(
+      21,
+      f
+    );
+  }
+  f = message.getOsVersion();
+  if (f != null) {
+    writer.writeMessage(
+      22,
+      f,
+      proto.rover.audience.v1.Version.serializeBinaryToWriter
+    );
+  }
+  f = message.getFrameworksMap(true);
+  if (f && f.getLength() > 0) {
+    f.serializeBinary(24, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.Version.serializeBinaryToWriter);
+  }
+  f = message.getLocaleLanguage();
+  if (f.length > 0) {
+    writer.writeString(
+      25,
+      f
+    );
+  }
+  f = message.getLocaleRegion();
+  if (f.length > 0) {
+    writer.writeString(
+      26,
+      f
+    );
+  }
+  f = message.getLocaleScript();
+  if (f.length > 0) {
+    writer.writeString(
+      27,
+      f
+    );
+  }
+  f = message.getIsWifiEnabled();
+  if (f) {
+    writer.writeBool(
+      28,
+      f
+    );
+  }
+  f = message.getIsCellularEnabled();
+  if (f) {
+    writer.writeBool(
+      29,
+      f
+    );
+  }
+  f = message.getScreenWidth();
+  if (f !== 0) {
+    writer.writeInt32(
+      30,
+      f
+    );
+  }
+  f = message.getScreenHeight();
+  if (f !== 0) {
+    writer.writeInt32(
+      31,
+      f
+    );
+  }
+  f = message.getCarrierName();
+  if (f.length > 0) {
+    writer.writeString(
+      32,
+      f
+    );
+  }
+  f = message.getRadio();
+  if (f.length > 0) {
+    writer.writeString(
+      33,
+      f
+    );
+  }
+  f = message.getTimeZone();
+  if (f.length > 0) {
+    writer.writeString(
+      34,
+      f
+    );
+  }
+  f = message.getPlatform();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      35,
+      f
+    );
+  }
+  f = message.getIsBackgroundEnabled();
+  if (f) {
+    writer.writeBool(
+      36,
+      f
+    );
+  }
+  f = message.getIsLocationMonitoringEnabled();
+  if (f) {
+    writer.writeBool(
+      37,
+      f
+    );
+  }
+  f = message.getIsBluetoothEnabled();
+  if (f) {
+    writer.writeBool(
+      38,
+      f
+    );
+  }
+  f = message.getAdvertisingId();
+  if (f.length > 0) {
+    writer.writeString(
+      39,
+      f
+    );
+  }
+  f = message.getIp();
+  if (f.length > 0) {
+    writer.writeString(
+      40,
+      f
+    );
+  }
+  f = message.getLocationAccuracy();
+  if (f !== 0) {
+    writer.writeInt32(
+      41,
+      f
+    );
+  }
+  f = message.getLocationLatitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      42,
+      f
+    );
+  }
+  f = message.getLocationLongitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      43,
+      f
+    );
+  }
+  f = message.getLocationRegion();
+  if (f.length > 0) {
+    writer.writeString(
+      44,
+      f
+    );
+  }
+  f = message.getLocationCity();
+  if (f.length > 0) {
+    writer.writeString(
+      45,
+      f
+    );
+  }
+  f = message.getLocationStreet();
+  if (f.length > 0) {
+    writer.writeString(
+      46,
+      f
+    );
+  }
+  f = message.getRegionMonitoringMode();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      47,
+      f
+    );
+  }
+  f = message.getIbeaconMonitoringRegionsUpdatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      48,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getIbeaconMonitoringRegionsList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      49,
+      f,
+      proto.rover.audience.v1.IBeaconRegion.serializeBinaryToWriter
+    );
+  }
+  f = message.getGeofenceMonitoringRegionsUpdatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      50,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getGeofenceMonitoringRegionsList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
+      51,
+      f,
+      proto.rover.audience.v1.GeofenceRegion.serializeBinaryToWriter
+    );
+  }
 };
 
+
+/**
+ * @enum {number}
+ */
+proto.rover.audience.v1.Device.RegionMonitoringMode = {
+  UNDEFINED: 0,
+  ROVER: 1,
+  GIMBAL: 2
+};
 
 /**
  * optional string id = 1;
@@ -2746,330 +5479,63 @@ proto.rover.audience.v1.Device.prototype.setId = function(value) {
 
 
 /**
- * optional int32 account_id = 2;
- * @return {number}
+ * optional string device_id = 2;
+ * @return {string}
  */
-proto.rover.audience.v1.Device.prototype.getAccountId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+proto.rover.audience.v1.Device.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
-/** @param {number} value */
-proto.rover.audience.v1.Device.prototype.setAccountId = function(value) {
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setDeviceId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional string token = 3;
- * @return {string}
+ * optional int32 account_id = 3;
+ * @return {number}
  */
-proto.rover.audience.v1.Device.prototype.getToken = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+proto.rover.audience.v1.Device.prototype.getAccountId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setToken = function(value) {
+/** @param {number} value */
+proto.rover.audience.v1.Device.prototype.setAccountId = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional string locale_lang = 5;
+ * optional string profile_id = 4;
  * @return {string}
  */
-proto.rover.audience.v1.Device.prototype.getLocaleLang = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+proto.rover.audience.v1.Device.prototype.getProfileId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setLocaleLang = function(value) {
-  jspb.Message.setField(this, 5, value);
+proto.rover.audience.v1.Device.prototype.setProfileId = function(value) {
+  jspb.Message.setField(this, 4, value);
 };
 
 
 /**
- * optional string locale_region = 6;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getLocaleRegion = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setLocaleRegion = function(value) {
-  jspb.Message.setField(this, 6, value);
-};
-
-
-/**
- * optional string time_zone = 7;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getTimeZone = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setTimeZone = function(value) {
-  jspb.Message.setField(this, 7, value);
-};
-
-
-/**
- * optional string sdk_version = 8;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getSdkVersion = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setSdkVersion = function(value) {
-  jspb.Message.setField(this, 8, value);
-};
-
-
-/**
- * optional string platform = 9;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getPlatform = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setPlatform = function(value) {
-  jspb.Message.setField(this, 9, value);
-};
-
-
-/**
- * optional string os_name = 10;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getOsName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setOsName = function(value) {
-  jspb.Message.setField(this, 10, value);
-};
-
-
-/**
- * optional string os_version = 11;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getOsVersion = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setOsVersion = function(value) {
-  jspb.Message.setField(this, 11, value);
-};
-
-
-/**
- * optional string model = 12;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getModel = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setModel = function(value) {
-  jspb.Message.setField(this, 12, value);
-};
-
-
-/**
- * optional string manufacturer = 13;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getManufacturer = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 13, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setManufacturer = function(value) {
-  jspb.Message.setField(this, 13, value);
-};
-
-
-/**
- * optional string carrier = 14;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getCarrier = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setCarrier = function(value) {
-  jspb.Message.setField(this, 14, value);
-};
-
-
-/**
- * optional string app_identifier = 15;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getAppIdentifier = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 15, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setAppIdentifier = function(value) {
-  jspb.Message.setField(this, 15, value);
-};
-
-
-/**
- * optional bool gimbal_mode = 16;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.rover.audience.v1.Device.prototype.getGimbalMode = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 16, false));
-};
-
-
-/** @param {boolean} value */
-proto.rover.audience.v1.Device.prototype.setGimbalMode = function(value) {
-  jspb.Message.setField(this, 16, value);
-};
-
-
-/**
- * optional bool background_enabled = 18;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.rover.audience.v1.Device.prototype.getBackgroundEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 18, false));
-};
-
-
-/** @param {boolean} value */
-proto.rover.audience.v1.Device.prototype.setBackgroundEnabled = function(value) {
-  jspb.Message.setField(this, 18, value);
-};
-
-
-/**
- * optional bool notifications_enabled = 19;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.rover.audience.v1.Device.prototype.getNotificationsEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 19, false));
-};
-
-
-/** @param {boolean} value */
-proto.rover.audience.v1.Device.prototype.setNotificationsEnabled = function(value) {
-  jspb.Message.setField(this, 19, value);
-};
-
-
-/**
- * optional bool bluetooth_enabled = 20;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.rover.audience.v1.Device.prototype.getBluetoothEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 20, false));
-};
-
-
-/** @param {boolean} value */
-proto.rover.audience.v1.Device.prototype.setBluetoothEnabled = function(value) {
-  jspb.Message.setField(this, 20, value);
-};
-
-
-/**
- * optional bool location_monitoring_enabled = 21;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.rover.audience.v1.Device.prototype.getLocationMonitoringEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 21, false));
-};
-
-
-/** @param {boolean} value */
-proto.rover.audience.v1.Device.prototype.setLocationMonitoringEnabled = function(value) {
-  jspb.Message.setField(this, 21, value);
-};
-
-
-/**
- * optional bool development = 22;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.rover.audience.v1.Device.prototype.getDevelopment = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 22, false));
-};
-
-
-/** @param {boolean} value */
-proto.rover.audience.v1.Device.prototype.setDevelopment = function(value) {
-  jspb.Message.setField(this, 22, value);
-};
-
-
-/**
- * optional string aid = 23;
- * @return {string}
- */
-proto.rover.audience.v1.Device.prototype.getAid = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 23, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setAid = function(value) {
-  jspb.Message.setField(this, 23, value);
-};
-
-
-/**
- * optional google.protobuf.Timestamp created_at = 24;
+ * optional google.protobuf.Timestamp created_at = 5;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.audience.v1.Device.prototype.getCreatedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 24));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.audience.v1.Device.prototype.setCreatedAt = function(value) {
-  jspb.Message.setWrapperField(this, 24, value);
+  jspb.Message.setWrapperField(this, 5, value);
 };
 
 
@@ -3083,23 +5549,23 @@ proto.rover.audience.v1.Device.prototype.clearCreatedAt = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Device.prototype.hasCreatedAt = function() {
-  return jspb.Message.getField(this, 24) != null;
+  return jspb.Message.getField(this, 5) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp updated_at = 25;
+ * optional google.protobuf.Timestamp updated_at = 6;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.audience.v1.Device.prototype.getUpdatedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 25));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.audience.v1.Device.prototype.setUpdatedAt = function(value) {
-  jspb.Message.setWrapperField(this, 25, value);
+  jspb.Message.setWrapperField(this, 6, value);
 };
 
 
@@ -3113,7 +5579,1193 @@ proto.rover.audience.v1.Device.prototype.clearUpdatedAt = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Device.prototype.hasUpdatedAt = function() {
-  return jspb.Message.getField(this, 25) != null;
+  return jspb.Message.getField(this, 6) != null;
+};
+
+
+/**
+ * optional string aps_environment = 10;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getApsEnvironment = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setApsEnvironment = function(value) {
+  jspb.Message.setField(this, 10, value);
+};
+
+
+/**
+ * optional string device_token_key = 11;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getDeviceTokenKey = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setDeviceTokenKey = function(value) {
+  jspb.Message.setField(this, 11, value);
+};
+
+
+/**
+ * optional bool device_token_is_active = 12;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.Device.prototype.getDeviceTokenIsActive = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 12, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.Device.prototype.setDeviceTokenIsActive = function(value) {
+  jspb.Message.setField(this, 12, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp device_token_created_at = 13;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.rover.audience.v1.Device.prototype.getDeviceTokenCreatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 13));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.rover.audience.v1.Device.prototype.setDeviceTokenCreatedAt = function(value) {
+  jspb.Message.setWrapperField(this, 13, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearDeviceTokenCreatedAt = function() {
+  this.setDeviceTokenCreatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasDeviceTokenCreatedAt = function() {
+  return jspb.Message.getField(this, 13) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp device_token_updated_at = 14;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.rover.audience.v1.Device.prototype.getDeviceTokenUpdatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 14));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.rover.audience.v1.Device.prototype.setDeviceTokenUpdatedAt = function(value) {
+  jspb.Message.setWrapperField(this, 14, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearDeviceTokenUpdatedAt = function() {
+  this.setDeviceTokenUpdatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasDeviceTokenUpdatedAt = function() {
+  return jspb.Message.getField(this, 14) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp device_token_unregistered_at = 15;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.rover.audience.v1.Device.prototype.getDeviceTokenUnregisteredAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 15));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.rover.audience.v1.Device.prototype.setDeviceTokenUnregisteredAt = function(value) {
+  jspb.Message.setWrapperField(this, 15, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearDeviceTokenUnregisteredAt = function() {
+  this.setDeviceTokenUnregisteredAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasDeviceTokenUnregisteredAt = function() {
+  return jspb.Message.getField(this, 15) != null;
+};
+
+
+/**
+ * optional string app_name = 16;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getAppName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 16, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setAppName = function(value) {
+  jspb.Message.setField(this, 16, value);
+};
+
+
+/**
+ * optional string app_version = 17;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getAppVersion = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setAppVersion = function(value) {
+  jspb.Message.setField(this, 17, value);
+};
+
+
+/**
+ * optional string app_build = 18;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getAppBuild = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 18, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setAppBuild = function(value) {
+  jspb.Message.setField(this, 18, value);
+};
+
+
+/**
+ * optional string app_namespace = 19;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getAppNamespace = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 19, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setAppNamespace = function(value) {
+  jspb.Message.setField(this, 19, value);
+};
+
+
+/**
+ * optional string device_manufacturer = 20;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getDeviceManufacturer = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 20, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setDeviceManufacturer = function(value) {
+  jspb.Message.setField(this, 20, value);
+};
+
+
+/**
+ * optional string device_model = 23;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getDeviceModel = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 23, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setDeviceModel = function(value) {
+  jspb.Message.setField(this, 23, value);
+};
+
+
+/**
+ * optional string os_name = 21;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getOsName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 21, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setOsName = function(value) {
+  jspb.Message.setField(this, 21, value);
+};
+
+
+/**
+ * optional Version os_version = 22;
+ * @return {?proto.rover.audience.v1.Version}
+ */
+proto.rover.audience.v1.Device.prototype.getOsVersion = function() {
+  return /** @type{?proto.rover.audience.v1.Version} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Version, 22));
+};
+
+
+/** @param {?proto.rover.audience.v1.Version|undefined} value */
+proto.rover.audience.v1.Device.prototype.setOsVersion = function(value) {
+  jspb.Message.setWrapperField(this, 22, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearOsVersion = function() {
+  this.setOsVersion(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasOsVersion = function() {
+  return jspb.Message.getField(this, 22) != null;
+};
+
+
+/**
+ * map<string, Version> frameworks = 24;
+ * @param {boolean=} opt_noLazyCreate Do not create the map if
+ * empty, instead returning `undefined`
+ * @return {!jspb.Map<string,!proto.rover.audience.v1.Version>}
+ */
+proto.rover.audience.v1.Device.prototype.getFrameworksMap = function(opt_noLazyCreate) {
+  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.Version>} */ (
+      jspb.Message.getMapField(this, 24, opt_noLazyCreate,
+      proto.rover.audience.v1.Version));
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearFrameworksMap = function() {
+  this.getFrameworksMap().clear();
+};
+
+
+/**
+ * optional string locale_language = 25;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getLocaleLanguage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 25, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setLocaleLanguage = function(value) {
+  jspb.Message.setField(this, 25, value);
+};
+
+
+/**
+ * optional string locale_region = 26;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getLocaleRegion = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 26, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setLocaleRegion = function(value) {
+  jspb.Message.setField(this, 26, value);
+};
+
+
+/**
+ * optional string locale_script = 27;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getLocaleScript = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 27, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setLocaleScript = function(value) {
+  jspb.Message.setField(this, 27, value);
+};
+
+
+/**
+ * optional bool is_wifi_enabled = 28;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.Device.prototype.getIsWifiEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 28, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.Device.prototype.setIsWifiEnabled = function(value) {
+  jspb.Message.setField(this, 28, value);
+};
+
+
+/**
+ * optional bool is_cellular_enabled = 29;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.Device.prototype.getIsCellularEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 29, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.Device.prototype.setIsCellularEnabled = function(value) {
+  jspb.Message.setField(this, 29, value);
+};
+
+
+/**
+ * optional int32 screen_width = 30;
+ * @return {number}
+ */
+proto.rover.audience.v1.Device.prototype.getScreenWidth = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 30, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.Device.prototype.setScreenWidth = function(value) {
+  jspb.Message.setField(this, 30, value);
+};
+
+
+/**
+ * optional int32 screen_height = 31;
+ * @return {number}
+ */
+proto.rover.audience.v1.Device.prototype.getScreenHeight = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 31, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.Device.prototype.setScreenHeight = function(value) {
+  jspb.Message.setField(this, 31, value);
+};
+
+
+/**
+ * optional string carrier_name = 32;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getCarrierName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 32, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setCarrierName = function(value) {
+  jspb.Message.setField(this, 32, value);
+};
+
+
+/**
+ * optional string radio = 33;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getRadio = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 33, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setRadio = function(value) {
+  jspb.Message.setField(this, 33, value);
+};
+
+
+/**
+ * optional string time_zone = 34;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getTimeZone = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 34, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setTimeZone = function(value) {
+  jspb.Message.setField(this, 34, value);
+};
+
+
+/**
+ * optional Platform platform = 35;
+ * @return {!proto.rover.audience.v1.Platform}
+ */
+proto.rover.audience.v1.Device.prototype.getPlatform = function() {
+  return /** @type {!proto.rover.audience.v1.Platform} */ (jspb.Message.getFieldWithDefault(this, 35, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.Platform} value */
+proto.rover.audience.v1.Device.prototype.setPlatform = function(value) {
+  jspb.Message.setField(this, 35, value);
+};
+
+
+/**
+ * optional bool is_background_enabled = 36;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.Device.prototype.getIsBackgroundEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 36, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.Device.prototype.setIsBackgroundEnabled = function(value) {
+  jspb.Message.setField(this, 36, value);
+};
+
+
+/**
+ * optional bool is_location_monitoring_enabled = 37;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.Device.prototype.getIsLocationMonitoringEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 37, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.Device.prototype.setIsLocationMonitoringEnabled = function(value) {
+  jspb.Message.setField(this, 37, value);
+};
+
+
+/**
+ * optional bool is_bluetooth_enabled = 38;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.Device.prototype.getIsBluetoothEnabled = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 38, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.Device.prototype.setIsBluetoothEnabled = function(value) {
+  jspb.Message.setField(this, 38, value);
+};
+
+
+/**
+ * optional string advertising_id = 39;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getAdvertisingId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 39, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setAdvertisingId = function(value) {
+  jspb.Message.setField(this, 39, value);
+};
+
+
+/**
+ * optional string ip = 40;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getIp = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 40, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setIp = function(value) {
+  jspb.Message.setField(this, 40, value);
+};
+
+
+/**
+ * optional int32 location_accuracy = 41;
+ * @return {number}
+ */
+proto.rover.audience.v1.Device.prototype.getLocationAccuracy = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 41, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.Device.prototype.setLocationAccuracy = function(value) {
+  jspb.Message.setField(this, 41, value);
+};
+
+
+/**
+ * optional double location_latitude = 42;
+ * @return {number}
+ */
+proto.rover.audience.v1.Device.prototype.getLocationLatitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 42, 0.0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.Device.prototype.setLocationLatitude = function(value) {
+  jspb.Message.setField(this, 42, value);
+};
+
+
+/**
+ * optional double location_longitude = 43;
+ * @return {number}
+ */
+proto.rover.audience.v1.Device.prototype.getLocationLongitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 43, 0.0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.Device.prototype.setLocationLongitude = function(value) {
+  jspb.Message.setField(this, 43, value);
+};
+
+
+/**
+ * optional string location_region = 44;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getLocationRegion = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 44, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setLocationRegion = function(value) {
+  jspb.Message.setField(this, 44, value);
+};
+
+
+/**
+ * optional string location_city = 45;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getLocationCity = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 45, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setLocationCity = function(value) {
+  jspb.Message.setField(this, 45, value);
+};
+
+
+/**
+ * optional string location_street = 46;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getLocationStreet = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 46, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setLocationStreet = function(value) {
+  jspb.Message.setField(this, 46, value);
+};
+
+
+/**
+ * optional RegionMonitoringMode region_monitoring_mode = 47;
+ * @return {!proto.rover.audience.v1.Device.RegionMonitoringMode}
+ */
+proto.rover.audience.v1.Device.prototype.getRegionMonitoringMode = function() {
+  return /** @type {!proto.rover.audience.v1.Device.RegionMonitoringMode} */ (jspb.Message.getFieldWithDefault(this, 47, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.Device.RegionMonitoringMode} value */
+proto.rover.audience.v1.Device.prototype.setRegionMonitoringMode = function(value) {
+  jspb.Message.setField(this, 47, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.rover.audience.v1.Device.prototype.getIbeaconMonitoringRegionsUpdatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 48));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.rover.audience.v1.Device.prototype.setIbeaconMonitoringRegionsUpdatedAt = function(value) {
+  jspb.Message.setWrapperField(this, 48, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearIbeaconMonitoringRegionsUpdatedAt = function() {
+  this.setIbeaconMonitoringRegionsUpdatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasIbeaconMonitoringRegionsUpdatedAt = function() {
+  return jspb.Message.getField(this, 48) != null;
+};
+
+
+/**
+ * repeated IBeaconRegion ibeacon_monitoring_regions = 49;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<!proto.rover.audience.v1.IBeaconRegion>}
+ */
+proto.rover.audience.v1.Device.prototype.getIbeaconMonitoringRegionsList = function() {
+  return /** @type{!Array.<!proto.rover.audience.v1.IBeaconRegion>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.rover.audience.v1.IBeaconRegion, 49));
+};
+
+
+/** @param {!Array.<!proto.rover.audience.v1.IBeaconRegion>} value */
+proto.rover.audience.v1.Device.prototype.setIbeaconMonitoringRegionsList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 49, value);
+};
+
+
+/**
+ * @param {!proto.rover.audience.v1.IBeaconRegion=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.rover.audience.v1.IBeaconRegion}
+ */
+proto.rover.audience.v1.Device.prototype.addIbeaconMonitoringRegions = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 49, opt_value, proto.rover.audience.v1.IBeaconRegion, opt_index);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearIbeaconMonitoringRegionsList = function() {
+  this.setIbeaconMonitoringRegionsList([]);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.rover.audience.v1.Device.prototype.getGeofenceMonitoringRegionsUpdatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 50));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.rover.audience.v1.Device.prototype.setGeofenceMonitoringRegionsUpdatedAt = function(value) {
+  jspb.Message.setWrapperField(this, 50, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearGeofenceMonitoringRegionsUpdatedAt = function() {
+  this.setGeofenceMonitoringRegionsUpdatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasGeofenceMonitoringRegionsUpdatedAt = function() {
+  return jspb.Message.getField(this, 50) != null;
+};
+
+
+/**
+ * repeated GeofenceRegion geofence_monitoring_regions = 51;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<!proto.rover.audience.v1.GeofenceRegion>}
+ */
+proto.rover.audience.v1.Device.prototype.getGeofenceMonitoringRegionsList = function() {
+  return /** @type{!Array.<!proto.rover.audience.v1.GeofenceRegion>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.rover.audience.v1.GeofenceRegion, 51));
+};
+
+
+/** @param {!Array.<!proto.rover.audience.v1.GeofenceRegion>} value */
+proto.rover.audience.v1.Device.prototype.setGeofenceMonitoringRegionsList = function(value) {
+  jspb.Message.setRepeatedWrapperField(this, 51, value);
+};
+
+
+/**
+ * @param {!proto.rover.audience.v1.GeofenceRegion=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.rover.audience.v1.GeofenceRegion}
+ */
+proto.rover.audience.v1.Device.prototype.addGeofenceMonitoringRegions = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 51, opt_value, proto.rover.audience.v1.GeofenceRegion, opt_index);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearGeofenceMonitoringRegionsList = function() {
+  this.setGeofenceMonitoringRegionsList([]);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.IBeaconRegion = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.IBeaconRegion, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.IBeaconRegion.displayName = 'proto.rover.audience.v1.IBeaconRegion';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.IBeaconRegion.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.IBeaconRegion.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.IBeaconRegion} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.IBeaconRegion.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    uuid: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    major: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    minor: jspb.Message.getFieldWithDefault(msg, 3, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.IBeaconRegion}
+ */
+proto.rover.audience.v1.IBeaconRegion.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.IBeaconRegion;
+  return proto.rover.audience.v1.IBeaconRegion.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.IBeaconRegion} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.IBeaconRegion}
+ */
+proto.rover.audience.v1.IBeaconRegion.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUuid(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setMajor(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setMinor(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.IBeaconRegion.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.IBeaconRegion.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.IBeaconRegion} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.IBeaconRegion.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getUuid();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getMajor();
+  if (f !== 0) {
+    writer.writeInt32(
+      2,
+      f
+    );
+  }
+  f = message.getMinor();
+  if (f !== 0) {
+    writer.writeInt32(
+      3,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string uuid = 1;
+ * @return {string}
+ */
+proto.rover.audience.v1.IBeaconRegion.prototype.getUuid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.IBeaconRegion.prototype.setUuid = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional int32 major = 2;
+ * @return {number}
+ */
+proto.rover.audience.v1.IBeaconRegion.prototype.getMajor = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.IBeaconRegion.prototype.setMajor = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional int32 minor = 3;
+ * @return {number}
+ */
+proto.rover.audience.v1.IBeaconRegion.prototype.getMinor = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.IBeaconRegion.prototype.setMinor = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.GeofenceRegion = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.GeofenceRegion, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.GeofenceRegion.displayName = 'proto.rover.audience.v1.GeofenceRegion';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.GeofenceRegion.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.GeofenceRegion.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.GeofenceRegion} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.GeofenceRegion.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    latitude: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
+    longitude: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
+    radius: jspb.Message.getFieldWithDefault(msg, 4, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.GeofenceRegion}
+ */
+proto.rover.audience.v1.GeofenceRegion.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.GeofenceRegion;
+  return proto.rover.audience.v1.GeofenceRegion.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.GeofenceRegion} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.GeofenceRegion}
+ */
+proto.rover.audience.v1.GeofenceRegion.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setLatitude(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setLongitude(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setRadius(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.GeofenceRegion.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.GeofenceRegion.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.GeofenceRegion} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.GeofenceRegion.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+  f = message.getLatitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      2,
+      f
+    );
+  }
+  f = message.getLongitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      3,
+      f
+    );
+  }
+  f = message.getRadius();
+  if (f !== 0) {
+    writer.writeInt32(
+      4,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string id = 1;
+ * @return {string}
+ */
+proto.rover.audience.v1.GeofenceRegion.prototype.getId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.GeofenceRegion.prototype.setId = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional double latitude = 2;
+ * @return {number}
+ */
+proto.rover.audience.v1.GeofenceRegion.prototype.getLatitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 2, 0.0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.GeofenceRegion.prototype.setLatitude = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional double longitude = 3;
+ * @return {number}
+ */
+proto.rover.audience.v1.GeofenceRegion.prototype.getLongitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 3, 0.0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.GeofenceRegion.prototype.setLongitude = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional int32 radius = 4;
+ * @return {number}
+ */
+proto.rover.audience.v1.GeofenceRegion.prototype.getRadius = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.GeofenceRegion.prototype.setRadius = function(value) {
+  jspb.Message.setField(this, 4, value);
 };
 
 
@@ -3331,8 +6983,8 @@ proto.rover.audience.v1.ValueUpdate.prototype.toObject = function(opt_includeIns
  */
 proto.rover.audience.v1.ValueUpdate.toObject = function(includeInstance, msg) {
   var f, obj = {
-    value: (f = msg.getValue()) && proto.rover.audience.v1.Value.toObject(includeInstance, f),
-    updateType: jspb.Message.getFieldWithDefault(msg, 3, 0)
+    updateType: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    value: (f = msg.getValue()) && proto.rover.audience.v1.Value.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3370,13 +7022,13 @@ proto.rover.audience.v1.ValueUpdate.deserializeBinaryFromReader = function(msg, 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = /** @type {!proto.rover.audience.v1.ValueUpdate.UpdateType} */ (reader.readEnum());
+      msg.setUpdateType(value);
+      break;
+    case 2:
       var value = new proto.rover.audience.v1.Value;
       reader.readMessage(value,proto.rover.audience.v1.Value.deserializeBinaryFromReader);
       msg.setValue(value);
-      break;
-    case 3:
-      var value = /** @type {!proto.rover.audience.v1.ValueUpdate.UpdateType} */ (reader.readEnum());
-      msg.setUpdateType(value);
       break;
     default:
       reader.skipField();
@@ -3406,19 +7058,19 @@ proto.rover.audience.v1.ValueUpdate.prototype.serializeBinary = function() {
  */
 proto.rover.audience.v1.ValueUpdate.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getValue();
-  if (f != null) {
-    writer.writeMessage(
-      1,
-      f,
-      proto.rover.audience.v1.Value.serializeBinaryToWriter
-    );
-  }
   f = message.getUpdateType();
   if (f !== 0.0) {
     writer.writeEnum(
-      3,
+      1,
       f
+    );
+  }
+  f = message.getValue();
+  if (f != null) {
+    writer.writeMessage(
+      2,
+      f,
+      proto.rover.audience.v1.Value.serializeBinaryToWriter
     );
   }
 };
@@ -3429,25 +7081,38 @@ proto.rover.audience.v1.ValueUpdate.serializeBinaryToWriter = function(message, 
  */
 proto.rover.audience.v1.ValueUpdate.UpdateType = {
   SET: 0,
-  DELETE: 1,
-  CLEAR: 2,
   ADD: 3,
   REMOVE: 4
 };
 
 /**
- * optional Value value = 1;
+ * optional UpdateType update_type = 1;
+ * @return {!proto.rover.audience.v1.ValueUpdate.UpdateType}
+ */
+proto.rover.audience.v1.ValueUpdate.prototype.getUpdateType = function() {
+  return /** @type {!proto.rover.audience.v1.ValueUpdate.UpdateType} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.ValueUpdate.UpdateType} value */
+proto.rover.audience.v1.ValueUpdate.prototype.setUpdateType = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional Value value = 2;
  * @return {?proto.rover.audience.v1.Value}
  */
 proto.rover.audience.v1.ValueUpdate.prototype.getValue = function() {
   return /** @type{?proto.rover.audience.v1.Value} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Value, 1));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Value, 2));
 };
 
 
 /** @param {?proto.rover.audience.v1.Value|undefined} value */
 proto.rover.audience.v1.ValueUpdate.prototype.setValue = function(value) {
-  jspb.Message.setWrapperField(this, 1, value);
+  jspb.Message.setWrapperField(this, 2, value);
 };
 
 
@@ -3461,22 +7126,7 @@ proto.rover.audience.v1.ValueUpdate.prototype.clearValue = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.ValueUpdate.prototype.hasValue = function() {
-  return jspb.Message.getField(this, 1) != null;
-};
-
-
-/**
- * optional UpdateType update_type = 3;
- * @return {!proto.rover.audience.v1.ValueUpdate.UpdateType}
- */
-proto.rover.audience.v1.ValueUpdate.prototype.getUpdateType = function() {
-  return /** @type {!proto.rover.audience.v1.ValueUpdate.UpdateType} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
-};
-
-
-/** @param {!proto.rover.audience.v1.ValueUpdate.UpdateType} value */
-proto.rover.audience.v1.ValueUpdate.prototype.setUpdateType = function(value) {
-  jspb.Message.setField(this, 3, value);
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -3506,7 +7156,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.rover.audience.v1.Value.oneofGroups_ = [[1,2,3,4,5,6,8,7]];
+proto.rover.audience.v1.Value.oneofGroups_ = [[1,2,3,4,5,7,8]];
 
 /**
  * @enum {number}
@@ -3517,10 +7167,9 @@ proto.rover.audience.v1.Value.ValueTypeCase = {
   INTEGER_VALUE: 2,
   DOUBLE_VALUE: 3,
   STRING_VALUE: 4,
-  ARRAY_VALUE: 5,
-  VERSION_VALUE: 6,
-  NULL_VALUE: 8,
-  TIMESTAMP_VALUE: 7
+  STRING_ARRAY_VALUE: 5,
+  NULL_VALUE: 7,
+  TIMESTAMP_VALUE: 8
 };
 
 /**
@@ -3562,9 +7211,8 @@ proto.rover.audience.v1.Value.toObject = function(includeInstance, msg) {
     integerValue: jspb.Message.getFieldWithDefault(msg, 2, 0),
     doubleValue: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
     stringValue: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    arrayValue: (f = msg.getArrayValue()) && proto.rover.audience.v1.Value.Array.toObject(includeInstance, f),
-    versionValue: (f = msg.getVersionValue()) && proto.rover.audience.v1.Version.toObject(includeInstance, f),
-    nullValue: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    stringArrayValue: (f = msg.getStringArrayValue()) && proto.rover.audience.v1.Value.StringArray.toObject(includeInstance, f),
+    nullValue: jspb.Message.getFieldWithDefault(msg, 7, 0),
     timestampValue: (f = msg.getTimestampValue()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
 
@@ -3619,20 +7267,15 @@ proto.rover.audience.v1.Value.deserializeBinaryFromReader = function(msg, reader
       msg.setStringValue(value);
       break;
     case 5:
-      var value = new proto.rover.audience.v1.Value.Array;
-      reader.readMessage(value,proto.rover.audience.v1.Value.Array.deserializeBinaryFromReader);
-      msg.setArrayValue(value);
+      var value = new proto.rover.audience.v1.Value.StringArray;
+      reader.readMessage(value,proto.rover.audience.v1.Value.StringArray.deserializeBinaryFromReader);
+      msg.setStringArrayValue(value);
       break;
-    case 6:
-      var value = new proto.rover.audience.v1.Version;
-      reader.readMessage(value,proto.rover.audience.v1.Version.deserializeBinaryFromReader);
-      msg.setVersionValue(value);
-      break;
-    case 8:
+    case 7:
       var value = /** @type {!proto.rover.audience.v1.Null} */ (reader.readEnum());
       msg.setNullValue(value);
       break;
-    case 7:
+    case 8:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setTimestampValue(value);
@@ -3693,33 +7336,25 @@ proto.rover.audience.v1.Value.serializeBinaryToWriter = function(message, writer
       f
     );
   }
-  f = message.getArrayValue();
+  f = message.getStringArrayValue();
   if (f != null) {
     writer.writeMessage(
       5,
       f,
-      proto.rover.audience.v1.Value.Array.serializeBinaryToWriter
+      proto.rover.audience.v1.Value.StringArray.serializeBinaryToWriter
     );
   }
-  f = message.getVersionValue();
-  if (f != null) {
-    writer.writeMessage(
-      6,
-      f,
-      proto.rover.audience.v1.Version.serializeBinaryToWriter
-    );
-  }
-  f = /** @type {!proto.rover.audience.v1.Null} */ (jspb.Message.getField(message, 8));
+  f = /** @type {!proto.rover.audience.v1.Null} */ (jspb.Message.getField(message, 7));
   if (f != null) {
     writer.writeEnum(
-      8,
+      7,
       f
     );
   }
   f = message.getTimestampValue();
   if (f != null) {
     writer.writeMessage(
-      7,
+      8,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -3738,19 +7373,19 @@ proto.rover.audience.v1.Value.serializeBinaryToWriter = function(message, writer
  * @extends {jspb.Message}
  * @constructor
  */
-proto.rover.audience.v1.Value.Array = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.Value.Array.repeatedFields_, null);
+proto.rover.audience.v1.Value.StringArray = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.Value.StringArray.repeatedFields_, null);
 };
-goog.inherits(proto.rover.audience.v1.Value.Array, jspb.Message);
+goog.inherits(proto.rover.audience.v1.Value.StringArray, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.Value.Array.displayName = 'proto.rover.audience.v1.Value.Array';
+  proto.rover.audience.v1.Value.StringArray.displayName = 'proto.rover.audience.v1.Value.StringArray';
 }
 /**
  * List of repeated fields within this message type.
  * @private {!Array<number>}
  * @const
  */
-proto.rover.audience.v1.Value.Array.repeatedFields_ = [1];
+proto.rover.audience.v1.Value.StringArray.repeatedFields_ = [1];
 
 
 
@@ -3765,8 +7400,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.rover.audience.v1.Value.Array.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.Value.Array.toObject(opt_includeInstance, this);
+proto.rover.audience.v1.Value.StringArray.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.Value.StringArray.toObject(opt_includeInstance, this);
 };
 
 
@@ -3775,13 +7410,12 @@ proto.rover.audience.v1.Value.Array.prototype.toObject = function(opt_includeIns
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.Value.Array} msg The msg instance to transform.
+ * @param {!proto.rover.audience.v1.Value.StringArray} msg The msg instance to transform.
  * @return {!Object}
  */
-proto.rover.audience.v1.Value.Array.toObject = function(includeInstance, msg) {
+proto.rover.audience.v1.Value.StringArray.toObject = function(includeInstance, msg) {
   var f, obj = {
-    valuesList: jspb.Message.toObjectList(msg.getValuesList(),
-    proto.rover.audience.v1.Value.toObject, includeInstance)
+    valuesList: jspb.Message.getField(msg, 1)
   };
 
   if (includeInstance) {
@@ -3795,23 +7429,23 @@ proto.rover.audience.v1.Value.Array.toObject = function(includeInstance, msg) {
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.Value.Array}
+ * @return {!proto.rover.audience.v1.Value.StringArray}
  */
-proto.rover.audience.v1.Value.Array.deserializeBinary = function(bytes) {
+proto.rover.audience.v1.Value.StringArray.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.Value.Array;
-  return proto.rover.audience.v1.Value.Array.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.rover.audience.v1.Value.StringArray;
+  return proto.rover.audience.v1.Value.StringArray.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.rover.audience.v1.Value.Array} msg The message object to deserialize into.
+ * @param {!proto.rover.audience.v1.Value.StringArray} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.Value.Array}
+ * @return {!proto.rover.audience.v1.Value.StringArray}
  */
-proto.rover.audience.v1.Value.Array.deserializeBinaryFromReader = function(msg, reader) {
+proto.rover.audience.v1.Value.StringArray.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -3819,8 +7453,7 @@ proto.rover.audience.v1.Value.Array.deserializeBinaryFromReader = function(msg, 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new proto.rover.audience.v1.Value;
-      reader.readMessage(value,proto.rover.audience.v1.Value.deserializeBinaryFromReader);
+      var value = /** @type {string} */ (reader.readString());
       msg.addValues(value);
       break;
     default:
@@ -3836,9 +7469,9 @@ proto.rover.audience.v1.Value.Array.deserializeBinaryFromReader = function(msg, 
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.rover.audience.v1.Value.Array.prototype.serializeBinary = function() {
+proto.rover.audience.v1.Value.StringArray.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.Value.Array.serializeBinaryToWriter(this, writer);
+  proto.rover.audience.v1.Value.StringArray.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -3846,51 +7479,48 @@ proto.rover.audience.v1.Value.Array.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.Value.Array} message
+ * @param {!proto.rover.audience.v1.Value.StringArray} message
  * @param {!jspb.BinaryWriter} writer
  */
-proto.rover.audience.v1.Value.Array.serializeBinaryToWriter = function(message, writer) {
+proto.rover.audience.v1.Value.StringArray.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getValuesList();
   if (f.length > 0) {
-    writer.writeRepeatedMessage(
+    writer.writeRepeatedString(
       1,
-      f,
-      proto.rover.audience.v1.Value.serializeBinaryToWriter
+      f
     );
   }
 };
 
 
 /**
- * repeated Value values = 1;
+ * repeated string values = 1;
  * If you change this array by adding, removing or replacing elements, or if you
  * replace the array itself, then you must call the setter to update it.
- * @return {!Array.<!proto.rover.audience.v1.Value>}
+ * @return {!Array.<string>}
  */
-proto.rover.audience.v1.Value.Array.prototype.getValuesList = function() {
-  return /** @type{!Array.<!proto.rover.audience.v1.Value>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.rover.audience.v1.Value, 1));
+proto.rover.audience.v1.Value.StringArray.prototype.getValuesList = function() {
+  return /** @type {!Array.<string>} */ (jspb.Message.getField(this, 1));
 };
 
 
-/** @param {!Array.<!proto.rover.audience.v1.Value>} value */
-proto.rover.audience.v1.Value.Array.prototype.setValuesList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 1, value);
+/** @param {!Array.<string>} value */
+proto.rover.audience.v1.Value.StringArray.prototype.setValuesList = function(value) {
+  jspb.Message.setField(this, 1, value || []);
 };
 
 
 /**
- * @param {!proto.rover.audience.v1.Value=} opt_value
+ * @param {!string} value
  * @param {number=} opt_index
- * @return {!proto.rover.audience.v1.Value}
  */
-proto.rover.audience.v1.Value.Array.prototype.addValues = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.rover.audience.v1.Value, opt_index);
+proto.rover.audience.v1.Value.StringArray.prototype.addValues = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 1, value, opt_index);
 };
 
 
-proto.rover.audience.v1.Value.Array.prototype.clearValuesList = function() {
+proto.rover.audience.v1.Value.StringArray.prototype.clearValuesList = function() {
   this.setValuesList([]);
 };
 
@@ -4014,23 +7644,23 @@ proto.rover.audience.v1.Value.prototype.hasStringValue = function() {
 
 
 /**
- * optional Array array_value = 5;
- * @return {?proto.rover.audience.v1.Value.Array}
+ * optional StringArray string_array_value = 5;
+ * @return {?proto.rover.audience.v1.Value.StringArray}
  */
-proto.rover.audience.v1.Value.prototype.getArrayValue = function() {
-  return /** @type{?proto.rover.audience.v1.Value.Array} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Value.Array, 5));
+proto.rover.audience.v1.Value.prototype.getStringArrayValue = function() {
+  return /** @type{?proto.rover.audience.v1.Value.StringArray} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Value.StringArray, 5));
 };
 
 
-/** @param {?proto.rover.audience.v1.Value.Array|undefined} value */
-proto.rover.audience.v1.Value.prototype.setArrayValue = function(value) {
+/** @param {?proto.rover.audience.v1.Value.StringArray|undefined} value */
+proto.rover.audience.v1.Value.prototype.setStringArrayValue = function(value) {
   jspb.Message.setOneofWrapperField(this, 5, proto.rover.audience.v1.Value.oneofGroups_[0], value);
 };
 
 
-proto.rover.audience.v1.Value.prototype.clearArrayValue = function() {
-  this.setArrayValue(undefined);
+proto.rover.audience.v1.Value.prototype.clearStringArrayValue = function() {
+  this.setStringArrayValue(undefined);
 };
 
 
@@ -4038,58 +7668,28 @@ proto.rover.audience.v1.Value.prototype.clearArrayValue = function() {
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.audience.v1.Value.prototype.hasArrayValue = function() {
+proto.rover.audience.v1.Value.prototype.hasStringArrayValue = function() {
   return jspb.Message.getField(this, 5) != null;
 };
 
 
 /**
- * optional Version version_value = 6;
- * @return {?proto.rover.audience.v1.Version}
- */
-proto.rover.audience.v1.Value.prototype.getVersionValue = function() {
-  return /** @type{?proto.rover.audience.v1.Version} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Version, 6));
-};
-
-
-/** @param {?proto.rover.audience.v1.Version|undefined} value */
-proto.rover.audience.v1.Value.prototype.setVersionValue = function(value) {
-  jspb.Message.setOneofWrapperField(this, 6, proto.rover.audience.v1.Value.oneofGroups_[0], value);
-};
-
-
-proto.rover.audience.v1.Value.prototype.clearVersionValue = function() {
-  this.setVersionValue(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.rover.audience.v1.Value.prototype.hasVersionValue = function() {
-  return jspb.Message.getField(this, 6) != null;
-};
-
-
-/**
- * optional Null null_value = 8;
+ * optional Null null_value = 7;
  * @return {!proto.rover.audience.v1.Null}
  */
 proto.rover.audience.v1.Value.prototype.getNullValue = function() {
-  return /** @type {!proto.rover.audience.v1.Null} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+  return /** @type {!proto.rover.audience.v1.Null} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
 };
 
 
 /** @param {!proto.rover.audience.v1.Null} value */
 proto.rover.audience.v1.Value.prototype.setNullValue = function(value) {
-  jspb.Message.setOneofField(this, 8, proto.rover.audience.v1.Value.oneofGroups_[0], value);
+  jspb.Message.setOneofField(this, 7, proto.rover.audience.v1.Value.oneofGroups_[0], value);
 };
 
 
 proto.rover.audience.v1.Value.prototype.clearNullValue = function() {
-  jspb.Message.setOneofField(this, 8, proto.rover.audience.v1.Value.oneofGroups_[0], undefined);
+  jspb.Message.setOneofField(this, 7, proto.rover.audience.v1.Value.oneofGroups_[0], undefined);
 };
 
 
@@ -4098,23 +7698,23 @@ proto.rover.audience.v1.Value.prototype.clearNullValue = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Value.prototype.hasNullValue = function() {
-  return jspb.Message.getField(this, 8) != null;
+  return jspb.Message.getField(this, 7) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp timestamp_value = 7;
+ * optional google.protobuf.Timestamp timestamp_value = 8;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.audience.v1.Value.prototype.getTimestampValue = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.audience.v1.Value.prototype.setTimestampValue = function(value) {
-  jspb.Message.setOneofWrapperField(this, 7, proto.rover.audience.v1.Value.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 8, proto.rover.audience.v1.Value.oneofGroups_[0], value);
 };
 
 
@@ -4128,7 +7728,7 @@ proto.rover.audience.v1.Value.prototype.clearTimestampValue = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Value.prototype.hasTimestampValue = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 8) != null;
 };
 
 
@@ -4181,7 +7781,7 @@ proto.rover.audience.v1.SchemaAttribute.toObject = function(includeInstance, msg
     accountId: jspb.Message.getFieldWithDefault(msg, 1, 0),
     id: jspb.Message.getFieldWithDefault(msg, 2, ""),
     attribute: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    attributetype: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    attributeType: jspb.Message.getFieldWithDefault(msg, 4, ""),
     path: jspb.Message.getFieldWithDefault(msg, 5, ""),
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
@@ -4234,13 +7834,13 @@ proto.rover.audience.v1.SchemaAttribute.deserializeBinaryFromReader = function(m
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setAttributetype(value);
+      msg.setAttributeType(value);
       break;
     case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setPath(value);
       break;
-    case 20:
+    case 10:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setCreatedAt(value);
@@ -4294,7 +7894,7 @@ proto.rover.audience.v1.SchemaAttribute.serializeBinaryToWriter = function(messa
       f
     );
   }
-  f = message.getAttributetype();
+  f = message.getAttributeType();
   if (f.length > 0) {
     writer.writeString(
       4,
@@ -4311,7 +7911,7 @@ proto.rover.audience.v1.SchemaAttribute.serializeBinaryToWriter = function(messa
   f = message.getCreatedAt();
   if (f != null) {
     writer.writeMessage(
-      20,
+      10,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -4365,16 +7965,16 @@ proto.rover.audience.v1.SchemaAttribute.prototype.setAttribute = function(value)
 
 
 /**
- * optional string attributeType = 4;
+ * optional string attribute_type = 4;
  * @return {string}
  */
-proto.rover.audience.v1.SchemaAttribute.prototype.getAttributetype = function() {
+proto.rover.audience.v1.SchemaAttribute.prototype.getAttributeType = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.SchemaAttribute.prototype.setAttributetype = function(value) {
+proto.rover.audience.v1.SchemaAttribute.prototype.setAttributeType = function(value) {
   jspb.Message.setField(this, 4, value);
 };
 
@@ -4395,18 +7995,18 @@ proto.rover.audience.v1.SchemaAttribute.prototype.setPath = function(value) {
 
 
 /**
- * optional google.protobuf.Timestamp created_at = 20;
+ * optional google.protobuf.Timestamp created_at = 10;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.audience.v1.SchemaAttribute.prototype.getCreatedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 20));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 10));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.audience.v1.SchemaAttribute.prototype.setCreatedAt = function(value) {
-  jspb.Message.setWrapperField(this, 20, value);
+  jspb.Message.setWrapperField(this, 10, value);
 };
 
 
@@ -4420,7 +8020,7 @@ proto.rover.audience.v1.SchemaAttribute.prototype.clearCreatedAt = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.SchemaAttribute.prototype.hasCreatedAt = function() {
-  return jspb.Message.getField(this, 20) != null;
+  return jspb.Message.getField(this, 10) != null;
 };
 
 
@@ -4617,6 +8217,15 @@ proto.rover.audience.v1.Version.prototype.setRevision = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
+
+/**
+ * @enum {number}
+ */
+proto.rover.audience.v1.Platform = {
+  UNDEFINED: 0,
+  MOBILE: 1,
+  WEB: 2
+};
 
 /**
  * @enum {number}

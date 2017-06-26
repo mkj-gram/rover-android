@@ -6,7 +6,6 @@ option go_package = "audience/v1;audience";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
-// import "google/protobuf/null.proto";
 
 import "auth/v1/auth.proto";
 
@@ -20,12 +19,14 @@ service Audience {
   // CreateProfile creates a new empty profile under a given account.
   rpc CreateProfile(CreateProfileRequest) returns (Profile);
   //  DeleteProfile deletes a profile from db and all segments
-  rpc DeleteProfile(DeleteProfileRequest) returns (Profile);
+  rpc DeleteProfile(DeleteProfileRequest) returns (google.protobuf.Empty);
   // UpdateProfile updates profile with provided subset of attributes
-  rpc UpdateProfile(UpdateProfileRequest) returns (Profile);
+  rpc UpdateProfile(UpdateProfileRequest) returns (google.protobuf.Empty);
+  rpc UpdateProfileIdentifier(UpdateProfileIdentifierRequest) returns (google.protobuf.Empty);
 
   // GetProfileByDeviceId returns a profile which is associated to the device id
   rpc GetProfileByDeviceId(GetProfileByDeviceIdRequest) returns (Profile);
+  rpc GetProfileByIdentifier(GetProfileByIdentifierRequest) returns (Profile);
 
   // GetProfileSchema returns the currently tracked profiles schema by account id
   rpc GetProfileSchema(GetProfileSchemaRequest) returns (ProfileSchema);
@@ -34,18 +35,25 @@ service Audience {
   // Devices
   //
 
-  // CreateDevice creates a an "empty" device under a given account.
-  rpc CreateDevice(CreateDeviceRequest) returns (Device);
+  // GetDevice returns the device for a given device id
+  rpc GetDevice(GetDeviceRequest) returns (Device);
+
+  rpc CreateDevice(CreateDeviceRequest) returns (google.protobuf.Empty);
+
+  // Device Updates
+  rpc UpdateDevice(UpdateDeviceRequest) returns (google.protobuf.Empty);
+  rpc UpdateDevicePushToken(UpdateDevicePushTokenRequest) returns (google.protobuf.Empty);
+  rpc UpdateDeviceUnregisterPushToken(UpdateDeviceUnregisterPushTokenRequest) returns (google.protobuf.Empty);
+  rpc UpdateDeviceLocation(UpdateDeviceLocationRequest) returns (google.protobuf.Empty);
+  rpc UpdateDeviceGeofenceMonitoring(UpdateDeviceGeofenceMonitoringRequest) returns (google.protobuf.Empty);
+  rpc UpdateDeviceIBeaconMonitoring(UpdateDeviceIBeaconMonitoringRequest) returns (google.protobuf.Empty);
+
+  // SetDeviceProfile sets the profile the device belongs to
+  rpc SetDeviceProfile(SetDeviceProfileRequest) returns (google.protobuf.Empty);
+
   // DeleteDevice deletes device from the database and removes it from any segments
-  rpc DeleteDevice(DeleteDeviceRequest) returns (Device);
-  // PutDevice updates the device
-  rpc PutDevice(PutDeviceRequest) returns (Device);
+  rpc DeleteDevice(DeleteDeviceRequest) returns (google.protobuf.Empty);
 
-  // SetDevicePushToken
-  rpc SetDevicePushToken(SetDevicePushTokenRequest) returns (google.protobuf.Empty);
-
-  // PutDevice updates the device
-  rpc SetDeviceProfile(SetDeviceProfileRequest) returns (Device);
 }
 
 
@@ -65,15 +73,27 @@ message DeleteProfileRequest {
 message UpdateProfileRequest {
   auth.v1.AuthContext auth_context = 1;
 
-  string id = 2;
-  string profile_id = 3;
+  string profile_id = 2;
 
-  map<string, ValueUpdates> attributes = 4;
+  map<string, ValueUpdates> attributes = 5;
+}
+
+message UpdateProfileIdentifierRequest {
+  auth.v1.AuthContext auth_context = 1;
+  // profile to set identifier on
+  string profile_id = 2;
+  // the identifier value to set the identifier to
+  string identifier = 3;
 }
 
 message GetProfileByDeviceIdRequest {
   auth.v1.AuthContext auth_context = 1;
   string device_id = 2;
+}
+
+message GetProfileByIdentifierRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string identifier = 2;
 }
 
 message GetProfileSchemaRequest {
@@ -89,8 +109,12 @@ message Profile {
   // identifier represents an id used by customers to map back this profile to their data
   string identifier = 3;
 
+
   // profile attributes
   map<string, Value> attributes = 4;
+
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
 }
 
 
@@ -103,78 +127,263 @@ message ProfileSchema {
 // Device
 //
 
-message CreateDeviceRequest {
+message GetDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
 
-  string profile_id = 2;
+  string device_id = 2;
+}
+
+message CreateDeviceRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string profile_id                = 2;
+  string device_id                 = 3;
+}
+
+message UpdateDevicePushTokenRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string device_id        = 2;
+
+  string device_token_key = 3;
+  string aps_environment  = 4;
+}
+
+message UpdateDeviceUnregisterPushTokenRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string device_id        = 2;
+}
+
+message UpdateDeviceLocationRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string device_id                    = 2;
+
+  int32  location_accuracy            = 3;
+  double location_latitude            = 4;
+  double location_longitude           = 5;
+}
+
+message UpdateDeviceGeofenceMonitoringRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string device_id = 2;
+
+  repeated GeofenceRegion regions = 3;
+}
+
+message UpdateDeviceIBeaconMonitoringRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string device_id = 2;
+
+  repeated IBeaconRegion regions = 3;
 }
 
 message DeleteDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
 
-  string id = 2;
-}
-
-// Device.id, and Device.account_id
-message PutDeviceRequest {
-  auth.v1.AuthContext auth_context = 1;
-
-  Device device = 2;
-}
-
-message SetDevicePushTokenRequest {
-  auth.v1.AuthContext auth_context = 1;
-
-  string id = 2;
-  string token = 3;
+  string device_id = 2;
 }
 
 message SetDeviceProfileRequest {
   auth.v1.AuthContext auth_context = 1;
 
-  string id = 2;
+  string device_id = 2;
   string profile_id = 3;
 }
+
+// Every event comes with DeviceContext populated
+message UpdateDeviceRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string device_id = 2;
+
+  string aps_environment              = 10;
+  string device_token_key             = 11;
+  string app_name                     = 12;
+  string app_version                  = 13;
+  string app_build                    = 14;
+  string app_namespace                = 15;
+  string device_manufacturer          = 16;
+  string os_name                      = 17;
+  Version os_version                  = 18;
+  string device_model                 = 19;
+  map<string, Version> frameworks     = 20;
+  string locale_language              = 21;
+  string locale_region                = 22;
+  string locale_script                = 23;
+  bool is_wifi_enabled                = 24;
+  bool is_cellular_enabled            = 25;
+  int32 screen_width                  = 26;
+  int32 screen_height                 = 27;
+  string carrier_name                 = 28;
+  string radio                        = 29;
+  string time_zone                    = 30;
+  Platform platform                   = 31;
+  bool is_background_enabled          = 32;
+  bool is_location_monitoring_enabled = 33;
+  bool is_bluetooth_enabled           = 34;
+  string advertising_id               = 35;
+  string ip                           = 36;
+
+  Device.RegionMonitoringMode region_monitoring_mode = 37;
+}
+
 
 // Devices represent a single device that the Rover sdk is installed on. The
 // currently supported platforms are iOS,  Android, and Web. A device is the
 // last state that the sdk reported to the server. Only the device itself is
 // allowed to update its state no one elses.
 message Device {
+
+  // db id
   string id                            = 1;
-  int32 account_id                     = 2;
 
-  // TODO: attributes
-  string token                         = 3;
-  string locale_lang                   = 5;
-  string locale_region                 = 6;
-  string time_zone                     = 7;
-  string sdk_version                   = 8;
-  string platform                      = 9;
-  string os_name                       = 10;
-  string os_version                    = 11;
-  string model                         = 12;
-  string manufacturer                  = 13;
-  string carrier                       = 14;
-  string app_identifier                = 15;
+  // device id: unique per account
+  string device_id                     = 2;
 
-  // an app gets a quota for 20 ibeacon slots.
-  // the app can update those slots dynamically.
-  // if gimbal_mode is set those slots are managed by gimbal instead of rover
-  bool gimbal_mode                     = 16;
+  // the account_id the device belongs to
+  int32 account_id                     = 3;
 
-  // Location location                    = 17;
-  bool background_enabled              = 18;
-  bool notifications_enabled           = 19;
-  bool bluetooth_enabled               = 20;
-  bool location_monitoring_enabled     = 21;
-  bool development                     = 22;
-  string aid                           = 23;
+  // the profile id the device belongs to
+  // hex encoded 12 bytes value
+  string profile_id                    = 4;
 
-  google.protobuf.Timestamp created_at = 24;
-  google.protobuf.Timestamp updated_at = 25;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+
+  // Attributes
+
+  // A string equal to either "development" or "production" which indicates the
+  // envrionment the app was built on and used by the server to determine which
+  // APNS API to use.
+  string aps_environment = 10;
+
+  // the token key value
+  string device_token_key             = 11;
+
+  bool device_token_is_active       = 12;
+  google.protobuf.Timestamp device_token_created_at = 13;
+  google.protobuf.Timestamp device_token_updated_at = 14;
+  google.protobuf.Timestamp device_token_unregistered_at = 15;
+
+
+  // The name of the application. E.g. "Air Miles"
+  string app_name                 = 16;
+
+  // The version of the application. E.g. "1.0"
+  string app_version              = 17;
+
+  // The build number of the application. E.g. "55". On iOS the build number
+  // increases each time a build is submitted to the app store for testing.
+  // For the same version number there are often multiple builds.
+  string app_build                = 18;
+
+  // The app developer's unique namespace. E.g. "com.airmiles".
+  string app_namespace            = 19;
+
+  // For iOS this will also be Apple and on Android could be
+  // Samsung, LG etc.
+  string device_manufacturer      = 20;
+
+  // E.g. "iPhone9,2" or "Galaxy4"
+  string device_model              = 23;
+
+  // Either "iOS" or "Android"
+  string os_name                  = 21;
+
+  // The version of iOS or Android running on the device.
+  Version os_version              = 22;
+
+  // An dictionary of Rover framework names mapped to versions. 
+  //  E.g. { "RoverEvents": "1.2.1", "RoverPush": "1.0.3" }
+  map<string, Version> frameworks = 24;
+
+  // E.g. "en"
+  string locale_language          = 25;
+
+  // E.g. "US"
+  string locale_region            = 26;
+
+  // Used mostly in Chinese languages... another 2-character code.
+  string locale_script            = 27;
+
+  // Boolean indicates if WiFi is turned on and has signal.
+  bool is_wifi_enabled            = 28;
+
+  // Boolean indicates if cell radio is on and has signal.
+  bool is_cellular_enabled        = 29;
+
+  // Resolution of the screen in points or DPI
+  int32 screen_width             = 30;
+
+  // Resolution of the screen in points or DPI
+  int32 screen_height            = 31;
+
+  // The name of the cellular provider. E.g. "Rogers" or "Verizon".
+  string carrier_name             = 32;
+
+  // The type of cell radio. E.g. "3G" or "LTE".
+  string radio                    = 33;
+
+  // The current device time zone. E.g. "America/Toronto".
+  string time_zone                    = 34;
+
+  Platform platform                   = 35;
+
+  bool is_background_enabled          = 36;
+  bool is_location_monitoring_enabled = 37;
+  bool is_bluetooth_enabled           = 38;
+
+  string advertising_id               = 39;
+
+  // ip address
+  string ip                           = 40;
+
+  // End Attributes
+
+  // Location
+  int32  location_accuracy            = 41;
+  double location_latitude            = 42;
+  double location_longitude           = 43;
+  string location_region              = 44;
+  string location_city                = 45;
+  string location_street              = 46;
+
+  enum RegionMonitoringMode {
+    UNDEFINED = 0;
+    ROVER = 1;
+    GIMBAL = 2;
+  }
+
+  RegionMonitoringMode region_monitoring_mode = 47;
+
+  google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
+  repeated IBeaconRegion ibeacon_monitoring_regions = 49;
+
+  google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
+  repeated GeofenceRegion geofence_monitoring_regions = 51;
 }
 
+
+enum Platform {
+  UNDEFINED = 0;
+  MOBILE    = 1;
+  WEB       = 2;
+}
+
+message IBeaconRegion {
+  string uuid = 1;
+  int32 major = 2;
+  int32 minor = 3;
+}
+
+message GeofenceRegion {
+  string id        = 1;
+  double latitude  = 2;
+  double longitude = 3;
+  int32 radius     = 4;
+}
 
 //
 // Value
@@ -187,24 +396,22 @@ message ValueUpdates {
 
 // ValueUpdate represents a change that needs to be applied to already existing value
 message ValueUpdate {
-  Value value = 1;
-  UpdateType update_type = 3;
+  UpdateType update_type = 1;
+  Value value = 2;
 
   // UpdateType describes possible updates
   enum UpdateType {
     SET = 0;
-    DELETE = 1;
-    CLEAR = 2;
-    // ADD and REMOVE are for array_values
+    // ADD and REMOVE are for array[string]
     ADD = 3;
     REMOVE = 4;
   }
 }
 
+// Value represents supported value types the system accepts
 message Value {
-  // Array a values container
-  message Array {
-    repeated Value values = 1;
+  message StringArray {
+    repeated string values = 1;
   }
 
   oneof value_type {
@@ -214,11 +421,11 @@ message Value {
     double double_value = 3;
     string string_value = 4;
 
-    Array array_value = 5;
-    Version version_value = 6;
-    Null null_value = 8;
+    StringArray string_array_value = 5;
 
-    google.protobuf.Timestamp timestamp_value = 7;
+    Null null_value = 7;
+
+    google.protobuf.Timestamp timestamp_value = 8;
   }
 }
 
@@ -226,6 +433,8 @@ message Value {
 // Schema
 //
 
+
+// SchemaAttribute describes type information about an attribute
 message SchemaAttribute {
   int32 account_id = 1;
   // attribute id
@@ -233,13 +442,14 @@ message SchemaAttribute {
   // attribute name
   string attribute = 3;
   // attribute type descriptor, ie string/array[string]
-  string attributeType = 4;
+  // see Value for all possible types
+  string attribute_type = 4;
 
   // attribute path if nested
   string path = 5;
 
-  // attribute created at timestamp
-  google.protobuf.Timestamp created_at = 20;
+  // attribute creation time
+  google.protobuf.Timestamp created_at = 10;
 }
 
 

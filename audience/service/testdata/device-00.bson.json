@@ -1,0 +1,72 @@
+{
+  "_id": { "$oid": "59713dbd4dd7a7932aa66453" },
+  "device_id": "adevice00",
+  "profile_id": { "$oid": "00000000000000000000aaa2" },
+  "account_id": 1,
+  "app_build": "23",
+  "app_name": "Air Miles",
+  "app_namespace": "com.airmiles",
+  "app_version": "1.0",
+  "carrier_name": "rogers",
+  "device_manufacturer": "Apple",
+
+  "created_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
+
+  "aps_environment": "development",
+
+  "device_token_key": "abc",
+  "device_token_is_active": true,
+  "device_token_created_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "device_token_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "device_token_unregistered_at": null,
+
+  "frameworks": {
+    "RoverEvents": { "major": 1, "minor": 2, "revision": 2 },
+    "RoverPush": { "major": 1, "minor": 0, "revision": 3 }
+  },
+
+  "is_background_enabled": true,
+  "is_bluetooth_enabled": true,
+  "is_cellular_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_wifi_enabled": true,
+  "locale_language": "en",
+  "locale_region": "us",
+  "locale_script": "zz",
+
+  "location_accuracy": 65,
+  "location_latitude": 22.00101,
+  "location_longitude": -32.1231,
+  "location_city": "Toronto",
+  "location_street": "55 Adelaide Street East",
+  "location_region": "Canada",
+
+  "device_model": "iPhone7,2",
+  "os_name": "iOS",
+  "os_version": {
+    "major": 1,
+    "minor": 2,
+    "revision": 3
+  },
+  "platform": "WEB",
+  "radio": "LTE",
+  "region_monitoring_mode": "GIMBAL",
+  "screen_height": 720,
+  "screen_width": 1080,
+  "time_zone": "America/Toronto",
+
+  "geofence_monitoring_regions_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "geofence_monitoring_regions": [
+    {
+      "id": "37.331701:-122.030847:50",
+      "latitude": 37.331701, "longitude": -122.030847,
+      "radius": 50
+    }
+  ],
+  "ibeacon_monitoring_regions_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "ibeacon_monitoring_regions": [
+    { "uuid": "1h1h1", "major": 1, "minor": 2 },
+    { "uuid": "0001", "major": 3, "minor": 4 }
+  ]
+}

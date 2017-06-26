@@ -12,16 +12,25 @@ It has these top-level messages:
 	CreateProfileRequest
 	DeleteProfileRequest
 	UpdateProfileRequest
+	UpdateProfileIdentifierRequest
 	GetProfileByDeviceIdRequest
+	GetProfileByIdentifierRequest
 	GetProfileSchemaRequest
 	Profile
 	ProfileSchema
+	GetDeviceRequest
 	CreateDeviceRequest
+	UpdateDevicePushTokenRequest
+	UpdateDeviceUnregisterPushTokenRequest
+	UpdateDeviceLocationRequest
+	UpdateDeviceGeofenceMonitoringRequest
+	UpdateDeviceIBeaconMonitoringRequest
 	DeleteDeviceRequest
-	PutDeviceRequest
-	SetDevicePushTokenRequest
 	SetDeviceProfileRequest
+	UpdateDeviceRequest
 	Device
+	IBeaconRegion
+	GeofenceRegion
 	ValueUpdates
 	ValueUpdate
 	Value
@@ -53,6 +62,30 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+type Platform int32
+
+const (
+	Platform_UNDEFINED Platform = 0
+	Platform_MOBILE    Platform = 1
+	Platform_WEB       Platform = 2
+)
+
+var Platform_name = map[int32]string{
+	0: "UNDEFINED",
+	1: "MOBILE",
+	2: "WEB",
+}
+var Platform_value = map[string]int32{
+	"UNDEFINED": 0,
+	"MOBILE":    1,
+	"WEB":       2,
+}
+
+func (x Platform) String() string {
+	return proto.EnumName(Platform_name, int32(x))
+}
+func (Platform) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
 type Null int32
 
 const (
@@ -70,31 +103,51 @@ var Null_value = map[string]int32{
 func (x Null) String() string {
 	return proto.EnumName(Null_name, int32(x))
 }
-func (Null) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (Null) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+type Device_RegionMonitoringMode int32
+
+const (
+	Device_UNDEFINED Device_RegionMonitoringMode = 0
+	Device_ROVER     Device_RegionMonitoringMode = 1
+	Device_GIMBAL    Device_RegionMonitoringMode = 2
+)
+
+var Device_RegionMonitoringMode_name = map[int32]string{
+	0: "UNDEFINED",
+	1: "ROVER",
+	2: "GIMBAL",
+}
+var Device_RegionMonitoringMode_value = map[string]int32{
+	"UNDEFINED": 0,
+	"ROVER":     1,
+	"GIMBAL":    2,
+}
+
+func (x Device_RegionMonitoringMode) String() string {
+	return proto.EnumName(Device_RegionMonitoringMode_name, int32(x))
+}
+func (Device_RegionMonitoringMode) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{19, 0}
+}
 
 // UpdateType describes possible updates
 type ValueUpdate_UpdateType int32
 
 const (
-	ValueUpdate_SET    ValueUpdate_UpdateType = 0
-	ValueUpdate_DELETE ValueUpdate_UpdateType = 1
-	ValueUpdate_CLEAR  ValueUpdate_UpdateType = 2
-	// ADD and REMOVE are for array_values
+	ValueUpdate_SET ValueUpdate_UpdateType = 0
+	// ADD and REMOVE are for array[string]
 	ValueUpdate_ADD    ValueUpdate_UpdateType = 3
 	ValueUpdate_REMOVE ValueUpdate_UpdateType = 4
 )
 
 var ValueUpdate_UpdateType_name = map[int32]string{
 	0: "SET",
-	1: "DELETE",
-	2: "CLEAR",
 	3: "ADD",
 	4: "REMOVE",
 }
 var ValueUpdate_UpdateType_value = map[string]int32{
 	"SET":    0,
-	"DELETE": 1,
-	"CLEAR":  2,
 	"ADD":    3,
 	"REMOVE": 4,
 }
@@ -102,7 +155,7 @@ var ValueUpdate_UpdateType_value = map[string]int32{
 func (x ValueUpdate_UpdateType) String() string {
 	return proto.EnumName(ValueUpdate_UpdateType_name, int32(x))
 }
-func (ValueUpdate_UpdateType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{14, 0} }
+func (ValueUpdate_UpdateType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{23, 0} }
 
 type CreateProfileRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
@@ -146,9 +199,8 @@ func (m *DeleteProfileRequest) GetProfileId() string {
 
 type UpdateProfileRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
-	Id          string                     `protobuf:"bytes,2,opt,name=id" json:"id,omitempty"`
-	ProfileId   string                     `protobuf:"bytes,3,opt,name=profile_id,json=profileId" json:"profile_id,omitempty"`
-	Attributes  map[string]*ValueUpdates   `protobuf:"bytes,4,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	ProfileId   string                     `protobuf:"bytes,2,opt,name=profile_id,json=profileId" json:"profile_id,omitempty"`
+	Attributes  map[string]*ValueUpdates   `protobuf:"bytes,5,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 }
 
 func (m *UpdateProfileRequest) Reset()                    { *m = UpdateProfileRequest{} }
@@ -161,13 +213,6 @@ func (m *UpdateProfileRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 		return m.AuthContext
 	}
 	return nil
-}
-
-func (m *UpdateProfileRequest) GetId() string {
-	if m != nil {
-		return m.Id
-	}
-	return ""
 }
 
 func (m *UpdateProfileRequest) GetProfileId() string {
@@ -184,6 +229,40 @@ func (m *UpdateProfileRequest) GetAttributes() map[string]*ValueUpdates {
 	return nil
 }
 
+type UpdateProfileIdentifierRequest struct {
+	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	// profile to set identifier on
+	ProfileId string `protobuf:"bytes,2,opt,name=profile_id,json=profileId" json:"profile_id,omitempty"`
+	// the identifier value to set the identifier to
+	Identifier string `protobuf:"bytes,3,opt,name=identifier" json:"identifier,omitempty"`
+}
+
+func (m *UpdateProfileIdentifierRequest) Reset()                    { *m = UpdateProfileIdentifierRequest{} }
+func (m *UpdateProfileIdentifierRequest) String() string            { return proto.CompactTextString(m) }
+func (*UpdateProfileIdentifierRequest) ProtoMessage()               {}
+func (*UpdateProfileIdentifierRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *UpdateProfileIdentifierRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *UpdateProfileIdentifierRequest) GetProfileId() string {
+	if m != nil {
+		return m.ProfileId
+	}
+	return ""
+}
+
+func (m *UpdateProfileIdentifierRequest) GetIdentifier() string {
+	if m != nil {
+		return m.Identifier
+	}
+	return ""
+}
+
 type GetProfileByDeviceIdRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
 	DeviceId    string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
@@ -192,7 +271,7 @@ type GetProfileByDeviceIdRequest struct {
 func (m *GetProfileByDeviceIdRequest) Reset()                    { *m = GetProfileByDeviceIdRequest{} }
 func (m *GetProfileByDeviceIdRequest) String() string            { return proto.CompactTextString(m) }
 func (*GetProfileByDeviceIdRequest) ProtoMessage()               {}
-func (*GetProfileByDeviceIdRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*GetProfileByDeviceIdRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 func (m *GetProfileByDeviceIdRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -208,6 +287,30 @@ func (m *GetProfileByDeviceIdRequest) GetDeviceId() string {
 	return ""
 }
 
+type GetProfileByIdentifierRequest struct {
+	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	Identifier  string                     `protobuf:"bytes,2,opt,name=identifier" json:"identifier,omitempty"`
+}
+
+func (m *GetProfileByIdentifierRequest) Reset()                    { *m = GetProfileByIdentifierRequest{} }
+func (m *GetProfileByIdentifierRequest) String() string            { return proto.CompactTextString(m) }
+func (*GetProfileByIdentifierRequest) ProtoMessage()               {}
+func (*GetProfileByIdentifierRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+func (m *GetProfileByIdentifierRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *GetProfileByIdentifierRequest) GetIdentifier() string {
+	if m != nil {
+		return m.Identifier
+	}
+	return ""
+}
+
 type GetProfileSchemaRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
 }
@@ -215,7 +318,7 @@ type GetProfileSchemaRequest struct {
 func (m *GetProfileSchemaRequest) Reset()                    { *m = GetProfileSchemaRequest{} }
 func (m *GetProfileSchemaRequest) String() string            { return proto.CompactTextString(m) }
 func (*GetProfileSchemaRequest) ProtoMessage()               {}
-func (*GetProfileSchemaRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*GetProfileSchemaRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *GetProfileSchemaRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -232,13 +335,15 @@ type Profile struct {
 	// identifier represents an id used by customers to map back this profile to their data
 	Identifier string `protobuf:"bytes,3,opt,name=identifier" json:"identifier,omitempty"`
 	// profile attributes
-	Attributes map[string]*Value `protobuf:"bytes,4,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Attributes map[string]*Value          `protobuf:"bytes,4,rep,name=attributes" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	CreatedAt  *google_protobuf.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	UpdatedAt  *google_protobuf.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
 }
 
 func (m *Profile) Reset()                    { *m = Profile{} }
 func (m *Profile) String() string            { return proto.CompactTextString(m) }
 func (*Profile) ProtoMessage()               {}
-func (*Profile) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*Profile) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
 func (m *Profile) GetId() string {
 	if m != nil {
@@ -268,6 +373,20 @@ func (m *Profile) GetAttributes() map[string]*Value {
 	return nil
 }
 
+func (m *Profile) GetCreatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.CreatedAt
+	}
+	return nil
+}
+
+func (m *Profile) GetUpdatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.UpdatedAt
+	}
+	return nil
+}
+
 // ProfileSchema describes profiles' schema with the collection of SchemaAttribute descriptors
 type ProfileSchema struct {
 	Attributes []*SchemaAttribute `protobuf:"bytes,10,rep,name=attributes" json:"attributes,omitempty"`
@@ -276,7 +395,7 @@ type ProfileSchema struct {
 func (m *ProfileSchema) Reset()                    { *m = ProfileSchema{} }
 func (m *ProfileSchema) String() string            { return proto.CompactTextString(m) }
 func (*ProfileSchema) ProtoMessage()               {}
-func (*ProfileSchema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*ProfileSchema) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 func (m *ProfileSchema) GetAttributes() []*SchemaAttribute {
 	if m != nil {
@@ -285,15 +404,40 @@ func (m *ProfileSchema) GetAttributes() []*SchemaAttribute {
 	return nil
 }
 
+type GetDeviceRequest struct {
+	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	DeviceId    string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
+}
+
+func (m *GetDeviceRequest) Reset()                    { *m = GetDeviceRequest{} }
+func (m *GetDeviceRequest) String() string            { return proto.CompactTextString(m) }
+func (*GetDeviceRequest) ProtoMessage()               {}
+func (*GetDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+
+func (m *GetDeviceRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *GetDeviceRequest) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
+	}
+	return ""
+}
+
 type CreateDeviceRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
 	ProfileId   string                     `protobuf:"bytes,2,opt,name=profile_id,json=profileId" json:"profile_id,omitempty"`
+	DeviceId    string                     `protobuf:"bytes,3,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
 }
 
 func (m *CreateDeviceRequest) Reset()                    { *m = CreateDeviceRequest{} }
 func (m *CreateDeviceRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateDeviceRequest) ProtoMessage()               {}
-func (*CreateDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*CreateDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
 func (m *CreateDeviceRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -309,15 +453,206 @@ func (m *CreateDeviceRequest) GetProfileId() string {
 	return ""
 }
 
+func (m *CreateDeviceRequest) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
+	}
+	return ""
+}
+
+type UpdateDevicePushTokenRequest struct {
+	AuthContext    *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	DeviceId       string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
+	DeviceTokenKey string                     `protobuf:"bytes,3,opt,name=device_token_key,json=deviceTokenKey" json:"device_token_key,omitempty"`
+	ApsEnvironment string                     `protobuf:"bytes,4,opt,name=aps_environment,json=apsEnvironment" json:"aps_environment,omitempty"`
+}
+
+func (m *UpdateDevicePushTokenRequest) Reset()                    { *m = UpdateDevicePushTokenRequest{} }
+func (m *UpdateDevicePushTokenRequest) String() string            { return proto.CompactTextString(m) }
+func (*UpdateDevicePushTokenRequest) ProtoMessage()               {}
+func (*UpdateDevicePushTokenRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+
+func (m *UpdateDevicePushTokenRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *UpdateDevicePushTokenRequest) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
+	}
+	return ""
+}
+
+func (m *UpdateDevicePushTokenRequest) GetDeviceTokenKey() string {
+	if m != nil {
+		return m.DeviceTokenKey
+	}
+	return ""
+}
+
+func (m *UpdateDevicePushTokenRequest) GetApsEnvironment() string {
+	if m != nil {
+		return m.ApsEnvironment
+	}
+	return ""
+}
+
+type UpdateDeviceUnregisterPushTokenRequest struct {
+	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	DeviceId    string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
+}
+
+func (m *UpdateDeviceUnregisterPushTokenRequest) Reset() {
+	*m = UpdateDeviceUnregisterPushTokenRequest{}
+}
+func (m *UpdateDeviceUnregisterPushTokenRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateDeviceUnregisterPushTokenRequest) ProtoMessage()    {}
+func (*UpdateDeviceUnregisterPushTokenRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{12}
+}
+
+func (m *UpdateDeviceUnregisterPushTokenRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *UpdateDeviceUnregisterPushTokenRequest) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
+	}
+	return ""
+}
+
+type UpdateDeviceLocationRequest struct {
+	AuthContext       *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	DeviceId          string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
+	LocationAccuracy  int32                      `protobuf:"varint,3,opt,name=location_accuracy,json=locationAccuracy" json:"location_accuracy,omitempty"`
+	LocationLatitude  float64                    `protobuf:"fixed64,4,opt,name=location_latitude,json=locationLatitude" json:"location_latitude,omitempty"`
+	LocationLongitude float64                    `protobuf:"fixed64,5,opt,name=location_longitude,json=locationLongitude" json:"location_longitude,omitempty"`
+}
+
+func (m *UpdateDeviceLocationRequest) Reset()                    { *m = UpdateDeviceLocationRequest{} }
+func (m *UpdateDeviceLocationRequest) String() string            { return proto.CompactTextString(m) }
+func (*UpdateDeviceLocationRequest) ProtoMessage()               {}
+func (*UpdateDeviceLocationRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+
+func (m *UpdateDeviceLocationRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *UpdateDeviceLocationRequest) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
+	}
+	return ""
+}
+
+func (m *UpdateDeviceLocationRequest) GetLocationAccuracy() int32 {
+	if m != nil {
+		return m.LocationAccuracy
+	}
+	return 0
+}
+
+func (m *UpdateDeviceLocationRequest) GetLocationLatitude() float64 {
+	if m != nil {
+		return m.LocationLatitude
+	}
+	return 0
+}
+
+func (m *UpdateDeviceLocationRequest) GetLocationLongitude() float64 {
+	if m != nil {
+		return m.LocationLongitude
+	}
+	return 0
+}
+
+type UpdateDeviceGeofenceMonitoringRequest struct {
+	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	DeviceId    string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
+	Regions     []*GeofenceRegion          `protobuf:"bytes,3,rep,name=regions" json:"regions,omitempty"`
+}
+
+func (m *UpdateDeviceGeofenceMonitoringRequest) Reset()         { *m = UpdateDeviceGeofenceMonitoringRequest{} }
+func (m *UpdateDeviceGeofenceMonitoringRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateDeviceGeofenceMonitoringRequest) ProtoMessage()    {}
+func (*UpdateDeviceGeofenceMonitoringRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{14}
+}
+
+func (m *UpdateDeviceGeofenceMonitoringRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *UpdateDeviceGeofenceMonitoringRequest) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
+	}
+	return ""
+}
+
+func (m *UpdateDeviceGeofenceMonitoringRequest) GetRegions() []*GeofenceRegion {
+	if m != nil {
+		return m.Regions
+	}
+	return nil
+}
+
+type UpdateDeviceIBeaconMonitoringRequest struct {
+	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	DeviceId    string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
+	Regions     []*IBeaconRegion           `protobuf:"bytes,3,rep,name=regions" json:"regions,omitempty"`
+}
+
+func (m *UpdateDeviceIBeaconMonitoringRequest) Reset()         { *m = UpdateDeviceIBeaconMonitoringRequest{} }
+func (m *UpdateDeviceIBeaconMonitoringRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateDeviceIBeaconMonitoringRequest) ProtoMessage()    {}
+func (*UpdateDeviceIBeaconMonitoringRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{15}
+}
+
+func (m *UpdateDeviceIBeaconMonitoringRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *UpdateDeviceIBeaconMonitoringRequest) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
+	}
+	return ""
+}
+
+func (m *UpdateDeviceIBeaconMonitoringRequest) GetRegions() []*IBeaconRegion {
+	if m != nil {
+		return m.Regions
+	}
+	return nil
+}
+
 type DeleteDeviceRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
-	Id          string                     `protobuf:"bytes,2,opt,name=id" json:"id,omitempty"`
+	DeviceId    string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
 }
 
 func (m *DeleteDeviceRequest) Reset()                    { *m = DeleteDeviceRequest{} }
 func (m *DeleteDeviceRequest) String() string            { return proto.CompactTextString(m) }
 func (*DeleteDeviceRequest) ProtoMessage()               {}
-func (*DeleteDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (*DeleteDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
 func (m *DeleteDeviceRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -326,80 +661,23 @@ func (m *DeleteDeviceRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	return nil
 }
 
-func (m *DeleteDeviceRequest) GetId() string {
+func (m *DeleteDeviceRequest) GetDeviceId() string {
 	if m != nil {
-		return m.Id
-	}
-	return ""
-}
-
-// Device.id, and Device.account_id
-type PutDeviceRequest struct {
-	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
-	Device      *Device                    `protobuf:"bytes,2,opt,name=device" json:"device,omitempty"`
-}
-
-func (m *PutDeviceRequest) Reset()                    { *m = PutDeviceRequest{} }
-func (m *PutDeviceRequest) String() string            { return proto.CompactTextString(m) }
-func (*PutDeviceRequest) ProtoMessage()               {}
-func (*PutDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
-
-func (m *PutDeviceRequest) GetAuthContext() *rover_auth_v1.AuthContext {
-	if m != nil {
-		return m.AuthContext
-	}
-	return nil
-}
-
-func (m *PutDeviceRequest) GetDevice() *Device {
-	if m != nil {
-		return m.Device
-	}
-	return nil
-}
-
-type SetDevicePushTokenRequest struct {
-	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
-	Id          string                     `protobuf:"bytes,2,opt,name=id" json:"id,omitempty"`
-	Token       string                     `protobuf:"bytes,3,opt,name=token" json:"token,omitempty"`
-}
-
-func (m *SetDevicePushTokenRequest) Reset()                    { *m = SetDevicePushTokenRequest{} }
-func (m *SetDevicePushTokenRequest) String() string            { return proto.CompactTextString(m) }
-func (*SetDevicePushTokenRequest) ProtoMessage()               {}
-func (*SetDevicePushTokenRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
-
-func (m *SetDevicePushTokenRequest) GetAuthContext() *rover_auth_v1.AuthContext {
-	if m != nil {
-		return m.AuthContext
-	}
-	return nil
-}
-
-func (m *SetDevicePushTokenRequest) GetId() string {
-	if m != nil {
-		return m.Id
-	}
-	return ""
-}
-
-func (m *SetDevicePushTokenRequest) GetToken() string {
-	if m != nil {
-		return m.Token
+		return m.DeviceId
 	}
 	return ""
 }
 
 type SetDeviceProfileRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
-	Id          string                     `protobuf:"bytes,2,opt,name=id" json:"id,omitempty"`
+	DeviceId    string                     `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
 	ProfileId   string                     `protobuf:"bytes,3,opt,name=profile_id,json=profileId" json:"profile_id,omitempty"`
 }
 
 func (m *SetDeviceProfileRequest) Reset()                    { *m = SetDeviceProfileRequest{} }
 func (m *SetDeviceProfileRequest) String() string            { return proto.CompactTextString(m) }
 func (*SetDeviceProfileRequest) ProtoMessage()               {}
-func (*SetDeviceProfileRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*SetDeviceProfileRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
 func (m *SetDeviceProfileRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -408,9 +686,9 @@ func (m *SetDeviceProfileRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	return nil
 }
 
-func (m *SetDeviceProfileRequest) GetId() string {
+func (m *SetDeviceProfileRequest) GetDeviceId() string {
 	if m != nil {
-		return m.Id
+		return m.DeviceId
 	}
 	return ""
 }
@@ -422,49 +700,359 @@ func (m *SetDeviceProfileRequest) GetProfileId() string {
 	return ""
 }
 
+// Every event comes with DeviceContext populated
+type UpdateDeviceRequest struct {
+	AuthContext                 *rover_auth_v1.AuthContext  `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	DeviceId                    string                      `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
+	ApsEnvironment              string                      `protobuf:"bytes,10,opt,name=aps_environment,json=apsEnvironment" json:"aps_environment,omitempty"`
+	DeviceTokenKey              string                      `protobuf:"bytes,11,opt,name=device_token_key,json=deviceTokenKey" json:"device_token_key,omitempty"`
+	AppName                     string                      `protobuf:"bytes,12,opt,name=app_name,json=appName" json:"app_name,omitempty"`
+	AppVersion                  string                      `protobuf:"bytes,13,opt,name=app_version,json=appVersion" json:"app_version,omitempty"`
+	AppBuild                    string                      `protobuf:"bytes,14,opt,name=app_build,json=appBuild" json:"app_build,omitempty"`
+	AppNamespace                string                      `protobuf:"bytes,15,opt,name=app_namespace,json=appNamespace" json:"app_namespace,omitempty"`
+	DeviceManufacturer          string                      `protobuf:"bytes,16,opt,name=device_manufacturer,json=deviceManufacturer" json:"device_manufacturer,omitempty"`
+	OsName                      string                      `protobuf:"bytes,17,opt,name=os_name,json=osName" json:"os_name,omitempty"`
+	OsVersion                   *Version                    `protobuf:"bytes,18,opt,name=os_version,json=osVersion" json:"os_version,omitempty"`
+	DeviceModel                 string                      `protobuf:"bytes,19,opt,name=device_model,json=deviceModel" json:"device_model,omitempty"`
+	Frameworks                  map[string]*Version         `protobuf:"bytes,20,rep,name=frameworks" json:"frameworks,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	LocaleLanguage              string                      `protobuf:"bytes,21,opt,name=locale_language,json=localeLanguage" json:"locale_language,omitempty"`
+	LocaleRegion                string                      `protobuf:"bytes,22,opt,name=locale_region,json=localeRegion" json:"locale_region,omitempty"`
+	LocaleScript                string                      `protobuf:"bytes,23,opt,name=locale_script,json=localeScript" json:"locale_script,omitempty"`
+	IsWifiEnabled               bool                        `protobuf:"varint,24,opt,name=is_wifi_enabled,json=isWifiEnabled" json:"is_wifi_enabled,omitempty"`
+	IsCellularEnabled           bool                        `protobuf:"varint,25,opt,name=is_cellular_enabled,json=isCellularEnabled" json:"is_cellular_enabled,omitempty"`
+	ScreenWidth                 int32                       `protobuf:"varint,26,opt,name=screen_width,json=screenWidth" json:"screen_width,omitempty"`
+	ScreenHeight                int32                       `protobuf:"varint,27,opt,name=screen_height,json=screenHeight" json:"screen_height,omitempty"`
+	CarrierName                 string                      `protobuf:"bytes,28,opt,name=carrier_name,json=carrierName" json:"carrier_name,omitempty"`
+	Radio                       string                      `protobuf:"bytes,29,opt,name=radio" json:"radio,omitempty"`
+	TimeZone                    string                      `protobuf:"bytes,30,opt,name=time_zone,json=timeZone" json:"time_zone,omitempty"`
+	Platform                    Platform                    `protobuf:"varint,31,opt,name=platform,enum=rover.audience.v1.Platform" json:"platform,omitempty"`
+	IsBackgroundEnabled         bool                        `protobuf:"varint,32,opt,name=is_background_enabled,json=isBackgroundEnabled" json:"is_background_enabled,omitempty"`
+	IsLocationMonitoringEnabled bool                        `protobuf:"varint,33,opt,name=is_location_monitoring_enabled,json=isLocationMonitoringEnabled" json:"is_location_monitoring_enabled,omitempty"`
+	IsBluetoothEnabled          bool                        `protobuf:"varint,34,opt,name=is_bluetooth_enabled,json=isBluetoothEnabled" json:"is_bluetooth_enabled,omitempty"`
+	AdvertisingId               string                      `protobuf:"bytes,35,opt,name=advertising_id,json=advertisingId" json:"advertising_id,omitempty"`
+	Ip                          string                      `protobuf:"bytes,36,opt,name=ip" json:"ip,omitempty"`
+	RegionMonitoringMode        Device_RegionMonitoringMode `protobuf:"varint,37,opt,name=region_monitoring_mode,json=regionMonitoringMode,enum=rover.audience.v1.Device_RegionMonitoringMode" json:"region_monitoring_mode,omitempty"`
+}
+
+func (m *UpdateDeviceRequest) Reset()                    { *m = UpdateDeviceRequest{} }
+func (m *UpdateDeviceRequest) String() string            { return proto.CompactTextString(m) }
+func (*UpdateDeviceRequest) ProtoMessage()               {}
+func (*UpdateDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
+
+func (m *UpdateDeviceRequest) GetAuthContext() *rover_auth_v1.AuthContext {
+	if m != nil {
+		return m.AuthContext
+	}
+	return nil
+}
+
+func (m *UpdateDeviceRequest) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetApsEnvironment() string {
+	if m != nil {
+		return m.ApsEnvironment
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetDeviceTokenKey() string {
+	if m != nil {
+		return m.DeviceTokenKey
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetAppName() string {
+	if m != nil {
+		return m.AppName
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetAppVersion() string {
+	if m != nil {
+		return m.AppVersion
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetAppBuild() string {
+	if m != nil {
+		return m.AppBuild
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetAppNamespace() string {
+	if m != nil {
+		return m.AppNamespace
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetDeviceManufacturer() string {
+	if m != nil {
+		return m.DeviceManufacturer
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetOsName() string {
+	if m != nil {
+		return m.OsName
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetOsVersion() *Version {
+	if m != nil {
+		return m.OsVersion
+	}
+	return nil
+}
+
+func (m *UpdateDeviceRequest) GetDeviceModel() string {
+	if m != nil {
+		return m.DeviceModel
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetFrameworks() map[string]*Version {
+	if m != nil {
+		return m.Frameworks
+	}
+	return nil
+}
+
+func (m *UpdateDeviceRequest) GetLocaleLanguage() string {
+	if m != nil {
+		return m.LocaleLanguage
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetLocaleRegion() string {
+	if m != nil {
+		return m.LocaleRegion
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetLocaleScript() string {
+	if m != nil {
+		return m.LocaleScript
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetIsWifiEnabled() bool {
+	if m != nil {
+		return m.IsWifiEnabled
+	}
+	return false
+}
+
+func (m *UpdateDeviceRequest) GetIsCellularEnabled() bool {
+	if m != nil {
+		return m.IsCellularEnabled
+	}
+	return false
+}
+
+func (m *UpdateDeviceRequest) GetScreenWidth() int32 {
+	if m != nil {
+		return m.ScreenWidth
+	}
+	return 0
+}
+
+func (m *UpdateDeviceRequest) GetScreenHeight() int32 {
+	if m != nil {
+		return m.ScreenHeight
+	}
+	return 0
+}
+
+func (m *UpdateDeviceRequest) GetCarrierName() string {
+	if m != nil {
+		return m.CarrierName
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetRadio() string {
+	if m != nil {
+		return m.Radio
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetTimeZone() string {
+	if m != nil {
+		return m.TimeZone
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetPlatform() Platform {
+	if m != nil {
+		return m.Platform
+	}
+	return Platform_UNDEFINED
+}
+
+func (m *UpdateDeviceRequest) GetIsBackgroundEnabled() bool {
+	if m != nil {
+		return m.IsBackgroundEnabled
+	}
+	return false
+}
+
+func (m *UpdateDeviceRequest) GetIsLocationMonitoringEnabled() bool {
+	if m != nil {
+		return m.IsLocationMonitoringEnabled
+	}
+	return false
+}
+
+func (m *UpdateDeviceRequest) GetIsBluetoothEnabled() bool {
+	if m != nil {
+		return m.IsBluetoothEnabled
+	}
+	return false
+}
+
+func (m *UpdateDeviceRequest) GetAdvertisingId() string {
+	if m != nil {
+		return m.AdvertisingId
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetIp() string {
+	if m != nil {
+		return m.Ip
+	}
+	return ""
+}
+
+func (m *UpdateDeviceRequest) GetRegionMonitoringMode() Device_RegionMonitoringMode {
+	if m != nil {
+		return m.RegionMonitoringMode
+	}
+	return Device_UNDEFINED
+}
+
 // Devices represent a single device that the Rover sdk is installed on. The
 // currently supported platforms are iOS,  Android, and Web. A device is the
 // last state that the sdk reported to the server. Only the device itself is
 // allowed to update its state no one elses.
 type Device struct {
-	Id        string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	AccountId int32  `protobuf:"varint,2,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
-	// TODO: attributes
-	Token         string `protobuf:"bytes,3,opt,name=token" json:"token,omitempty"`
-	LocaleLang    string `protobuf:"bytes,5,opt,name=locale_lang,json=localeLang" json:"locale_lang,omitempty"`
-	LocaleRegion  string `protobuf:"bytes,6,opt,name=locale_region,json=localeRegion" json:"locale_region,omitempty"`
-	TimeZone      string `protobuf:"bytes,7,opt,name=time_zone,json=timeZone" json:"time_zone,omitempty"`
-	SdkVersion    string `protobuf:"bytes,8,opt,name=sdk_version,json=sdkVersion" json:"sdk_version,omitempty"`
-	Platform      string `protobuf:"bytes,9,opt,name=platform" json:"platform,omitempty"`
-	OsName        string `protobuf:"bytes,10,opt,name=os_name,json=osName" json:"os_name,omitempty"`
-	OsVersion     string `protobuf:"bytes,11,opt,name=os_version,json=osVersion" json:"os_version,omitempty"`
-	Model         string `protobuf:"bytes,12,opt,name=model" json:"model,omitempty"`
-	Manufacturer  string `protobuf:"bytes,13,opt,name=manufacturer" json:"manufacturer,omitempty"`
-	Carrier       string `protobuf:"bytes,14,opt,name=carrier" json:"carrier,omitempty"`
-	AppIdentifier string `protobuf:"bytes,15,opt,name=app_identifier,json=appIdentifier" json:"app_identifier,omitempty"`
-	// an app gets a quota for 20 ibeacon slots.
-	// the app can update those slots dynamically.
-	// if gimbal_mode is set those slots are managed by gimbal instead of rover
-	GimbalMode bool `protobuf:"varint,16,opt,name=gimbal_mode,json=gimbalMode" json:"gimbal_mode,omitempty"`
-	// Location location                    = 17;
-	BackgroundEnabled         bool                       `protobuf:"varint,18,opt,name=background_enabled,json=backgroundEnabled" json:"background_enabled,omitempty"`
-	NotificationsEnabled      bool                       `protobuf:"varint,19,opt,name=notifications_enabled,json=notificationsEnabled" json:"notifications_enabled,omitempty"`
-	BluetoothEnabled          bool                       `protobuf:"varint,20,opt,name=bluetooth_enabled,json=bluetoothEnabled" json:"bluetooth_enabled,omitempty"`
-	LocationMonitoringEnabled bool                       `protobuf:"varint,21,opt,name=location_monitoring_enabled,json=locationMonitoringEnabled" json:"location_monitoring_enabled,omitempty"`
-	Development               bool                       `protobuf:"varint,22,opt,name=development" json:"development,omitempty"`
-	Aid                       string                     `protobuf:"bytes,23,opt,name=aid" json:"aid,omitempty"`
-	CreatedAt                 *google_protobuf.Timestamp `protobuf:"bytes,24,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
-	UpdatedAt                 *google_protobuf.Timestamp `protobuf:"bytes,25,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
+	// db id
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	// device id: unique per account
+	DeviceId string `protobuf:"bytes,2,opt,name=device_id,json=deviceId" json:"device_id,omitempty"`
+	// the account_id the device belongs to
+	AccountId int32 `protobuf:"varint,3,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
+	// the profile id the device belongs to
+	// hex encoded 12 bytes value
+	ProfileId string                     `protobuf:"bytes,4,opt,name=profile_id,json=profileId" json:"profile_id,omitempty"`
+	CreatedAt *google_protobuf.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	UpdatedAt *google_protobuf.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
+	// A string equal to either "development" or "production" which indicates the
+	// envrionment the app was built on and used by the server to determine which
+	// APNS API to use.
+	ApsEnvironment string `protobuf:"bytes,10,opt,name=aps_environment,json=apsEnvironment" json:"aps_environment,omitempty"`
+	// the token key value
+	DeviceTokenKey            string                     `protobuf:"bytes,11,opt,name=device_token_key,json=deviceTokenKey" json:"device_token_key,omitempty"`
+	DeviceTokenIsActive       bool                       `protobuf:"varint,12,opt,name=device_token_is_active,json=deviceTokenIsActive" json:"device_token_is_active,omitempty"`
+	DeviceTokenCreatedAt      *google_protobuf.Timestamp `protobuf:"bytes,13,opt,name=device_token_created_at,json=deviceTokenCreatedAt" json:"device_token_created_at,omitempty"`
+	DeviceTokenUpdatedAt      *google_protobuf.Timestamp `protobuf:"bytes,14,opt,name=device_token_updated_at,json=deviceTokenUpdatedAt" json:"device_token_updated_at,omitempty"`
+	DeviceTokenUnregisteredAt *google_protobuf.Timestamp `protobuf:"bytes,15,opt,name=device_token_unregistered_at,json=deviceTokenUnregisteredAt" json:"device_token_unregistered_at,omitempty"`
+	// The name of the application. E.g. "Air Miles"
+	AppName string `protobuf:"bytes,16,opt,name=app_name,json=appName" json:"app_name,omitempty"`
+	// The version of the application. E.g. "1.0"
+	AppVersion string `protobuf:"bytes,17,opt,name=app_version,json=appVersion" json:"app_version,omitempty"`
+	// The build number of the application. E.g. "55". On iOS the build number
+	// increases each time a build is submitted to the app store for testing.
+	// For the same version number there are often multiple builds.
+	AppBuild string `protobuf:"bytes,18,opt,name=app_build,json=appBuild" json:"app_build,omitempty"`
+	// The app developer's unique namespace. E.g. "com.airmiles".
+	AppNamespace string `protobuf:"bytes,19,opt,name=app_namespace,json=appNamespace" json:"app_namespace,omitempty"`
+	// For iOS this will also be Apple and on Android could be
+	// Samsung, LG etc.
+	DeviceManufacturer string `protobuf:"bytes,20,opt,name=device_manufacturer,json=deviceManufacturer" json:"device_manufacturer,omitempty"`
+	// E.g. "iPhone9,2" or "Galaxy4"
+	DeviceModel string `protobuf:"bytes,23,opt,name=device_model,json=deviceModel" json:"device_model,omitempty"`
+	// Either "iOS" or "Android"
+	OsName string `protobuf:"bytes,21,opt,name=os_name,json=osName" json:"os_name,omitempty"`
+	// The version of iOS or Android running on the device.
+	OsVersion *Version `protobuf:"bytes,22,opt,name=os_version,json=osVersion" json:"os_version,omitempty"`
+	// An dictionary of Rover framework names mapped to versions.
+	//  E.g. { "RoverEvents": "1.2.1", "RoverPush": "1.0.3" }
+	Frameworks map[string]*Version `protobuf:"bytes,24,rep,name=frameworks" json:"frameworks,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// E.g. "en"
+	LocaleLanguage string `protobuf:"bytes,25,opt,name=locale_language,json=localeLanguage" json:"locale_language,omitempty"`
+	// E.g. "US"
+	LocaleRegion string `protobuf:"bytes,26,opt,name=locale_region,json=localeRegion" json:"locale_region,omitempty"`
+	// Used mostly in Chinese languages... another 2-character code.
+	LocaleScript string `protobuf:"bytes,27,opt,name=locale_script,json=localeScript" json:"locale_script,omitempty"`
+	// Boolean indicates if WiFi is turned on and has signal.
+	IsWifiEnabled bool `protobuf:"varint,28,opt,name=is_wifi_enabled,json=isWifiEnabled" json:"is_wifi_enabled,omitempty"`
+	// Boolean indicates if cell radio is on and has signal.
+	IsCellularEnabled bool `protobuf:"varint,29,opt,name=is_cellular_enabled,json=isCellularEnabled" json:"is_cellular_enabled,omitempty"`
+	// Resolution of the screen in points or DPI
+	ScreenWidth int32 `protobuf:"varint,30,opt,name=screen_width,json=screenWidth" json:"screen_width,omitempty"`
+	// Resolution of the screen in points or DPI
+	ScreenHeight int32 `protobuf:"varint,31,opt,name=screen_height,json=screenHeight" json:"screen_height,omitempty"`
+	// The name of the cellular provider. E.g. "Rogers" or "Verizon".
+	CarrierName string `protobuf:"bytes,32,opt,name=carrier_name,json=carrierName" json:"carrier_name,omitempty"`
+	// The type of cell radio. E.g. "3G" or "LTE".
+	Radio string `protobuf:"bytes,33,opt,name=radio" json:"radio,omitempty"`
+	// The current device time zone. E.g. "America/Toronto".
+	TimeZone                    string   `protobuf:"bytes,34,opt,name=time_zone,json=timeZone" json:"time_zone,omitempty"`
+	Platform                    Platform `protobuf:"varint,35,opt,name=platform,enum=rover.audience.v1.Platform" json:"platform,omitempty"`
+	IsBackgroundEnabled         bool     `protobuf:"varint,36,opt,name=is_background_enabled,json=isBackgroundEnabled" json:"is_background_enabled,omitempty"`
+	IsLocationMonitoringEnabled bool     `protobuf:"varint,37,opt,name=is_location_monitoring_enabled,json=isLocationMonitoringEnabled" json:"is_location_monitoring_enabled,omitempty"`
+	IsBluetoothEnabled          bool     `protobuf:"varint,38,opt,name=is_bluetooth_enabled,json=isBluetoothEnabled" json:"is_bluetooth_enabled,omitempty"`
+	AdvertisingId               string   `protobuf:"bytes,39,opt,name=advertising_id,json=advertisingId" json:"advertising_id,omitempty"`
+	// ip address
+	Ip string `protobuf:"bytes,40,opt,name=ip" json:"ip,omitempty"`
+	// Location
+	LocationAccuracy                   int32                       `protobuf:"varint,41,opt,name=location_accuracy,json=locationAccuracy" json:"location_accuracy,omitempty"`
+	LocationLatitude                   float64                     `protobuf:"fixed64,42,opt,name=location_latitude,json=locationLatitude" json:"location_latitude,omitempty"`
+	LocationLongitude                  float64                     `protobuf:"fixed64,43,opt,name=location_longitude,json=locationLongitude" json:"location_longitude,omitempty"`
+	LocationRegion                     string                      `protobuf:"bytes,44,opt,name=location_region,json=locationRegion" json:"location_region,omitempty"`
+	LocationCity                       string                      `protobuf:"bytes,45,opt,name=location_city,json=locationCity" json:"location_city,omitempty"`
+	LocationStreet                     string                      `protobuf:"bytes,46,opt,name=location_street,json=locationStreet" json:"location_street,omitempty"`
+	RegionMonitoringMode               Device_RegionMonitoringMode `protobuf:"varint,47,opt,name=region_monitoring_mode,json=regionMonitoringMode,enum=rover.audience.v1.Device_RegionMonitoringMode" json:"region_monitoring_mode,omitempty"`
+	IbeaconMonitoringRegionsUpdatedAt  *google_protobuf.Timestamp  `protobuf:"bytes,48,opt,name=ibeacon_monitoring_regions_updated_at,json=ibeaconMonitoringRegionsUpdatedAt" json:"ibeacon_monitoring_regions_updated_at,omitempty"`
+	IbeaconMonitoringRegions           []*IBeaconRegion            `protobuf:"bytes,49,rep,name=ibeacon_monitoring_regions,json=ibeaconMonitoringRegions" json:"ibeacon_monitoring_regions,omitempty"`
+	GeofenceMonitoringRegionsUpdatedAt *google_protobuf.Timestamp  `protobuf:"bytes,50,opt,name=geofence_monitoring_regions_updated_at,json=geofenceMonitoringRegionsUpdatedAt" json:"geofence_monitoring_regions_updated_at,omitempty"`
+	GeofenceMonitoringRegions          []*GeofenceRegion           `protobuf:"bytes,51,rep,name=geofence_monitoring_regions,json=geofenceMonitoringRegions" json:"geofence_monitoring_regions,omitempty"`
 }
 
 func (m *Device) Reset()                    { *m = Device{} }
 func (m *Device) String() string            { return proto.CompactTextString(m) }
 func (*Device) ProtoMessage()               {}
-func (*Device) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+func (*Device) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
 func (m *Device) GetId() string {
 	if m != nil {
 		return m.Id
+	}
+	return ""
+}
+
+func (m *Device) GetDeviceId() string {
+	if m != nil {
+		return m.DeviceId
 	}
 	return ""
 }
@@ -476,135 +1064,9 @@ func (m *Device) GetAccountId() int32 {
 	return 0
 }
 
-func (m *Device) GetToken() string {
+func (m *Device) GetProfileId() string {
 	if m != nil {
-		return m.Token
-	}
-	return ""
-}
-
-func (m *Device) GetLocaleLang() string {
-	if m != nil {
-		return m.LocaleLang
-	}
-	return ""
-}
-
-func (m *Device) GetLocaleRegion() string {
-	if m != nil {
-		return m.LocaleRegion
-	}
-	return ""
-}
-
-func (m *Device) GetTimeZone() string {
-	if m != nil {
-		return m.TimeZone
-	}
-	return ""
-}
-
-func (m *Device) GetSdkVersion() string {
-	if m != nil {
-		return m.SdkVersion
-	}
-	return ""
-}
-
-func (m *Device) GetPlatform() string {
-	if m != nil {
-		return m.Platform
-	}
-	return ""
-}
-
-func (m *Device) GetOsName() string {
-	if m != nil {
-		return m.OsName
-	}
-	return ""
-}
-
-func (m *Device) GetOsVersion() string {
-	if m != nil {
-		return m.OsVersion
-	}
-	return ""
-}
-
-func (m *Device) GetModel() string {
-	if m != nil {
-		return m.Model
-	}
-	return ""
-}
-
-func (m *Device) GetManufacturer() string {
-	if m != nil {
-		return m.Manufacturer
-	}
-	return ""
-}
-
-func (m *Device) GetCarrier() string {
-	if m != nil {
-		return m.Carrier
-	}
-	return ""
-}
-
-func (m *Device) GetAppIdentifier() string {
-	if m != nil {
-		return m.AppIdentifier
-	}
-	return ""
-}
-
-func (m *Device) GetGimbalMode() bool {
-	if m != nil {
-		return m.GimbalMode
-	}
-	return false
-}
-
-func (m *Device) GetBackgroundEnabled() bool {
-	if m != nil {
-		return m.BackgroundEnabled
-	}
-	return false
-}
-
-func (m *Device) GetNotificationsEnabled() bool {
-	if m != nil {
-		return m.NotificationsEnabled
-	}
-	return false
-}
-
-func (m *Device) GetBluetoothEnabled() bool {
-	if m != nil {
-		return m.BluetoothEnabled
-	}
-	return false
-}
-
-func (m *Device) GetLocationMonitoringEnabled() bool {
-	if m != nil {
-		return m.LocationMonitoringEnabled
-	}
-	return false
-}
-
-func (m *Device) GetDevelopment() bool {
-	if m != nil {
-		return m.Development
-	}
-	return false
-}
-
-func (m *Device) GetAid() string {
-	if m != nil {
-		return m.Aid
+		return m.ProfileId
 	}
 	return ""
 }
@@ -623,6 +1085,372 @@ func (m *Device) GetUpdatedAt() *google_protobuf.Timestamp {
 	return nil
 }
 
+func (m *Device) GetApsEnvironment() string {
+	if m != nil {
+		return m.ApsEnvironment
+	}
+	return ""
+}
+
+func (m *Device) GetDeviceTokenKey() string {
+	if m != nil {
+		return m.DeviceTokenKey
+	}
+	return ""
+}
+
+func (m *Device) GetDeviceTokenIsActive() bool {
+	if m != nil {
+		return m.DeviceTokenIsActive
+	}
+	return false
+}
+
+func (m *Device) GetDeviceTokenCreatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.DeviceTokenCreatedAt
+	}
+	return nil
+}
+
+func (m *Device) GetDeviceTokenUpdatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.DeviceTokenUpdatedAt
+	}
+	return nil
+}
+
+func (m *Device) GetDeviceTokenUnregisteredAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.DeviceTokenUnregisteredAt
+	}
+	return nil
+}
+
+func (m *Device) GetAppName() string {
+	if m != nil {
+		return m.AppName
+	}
+	return ""
+}
+
+func (m *Device) GetAppVersion() string {
+	if m != nil {
+		return m.AppVersion
+	}
+	return ""
+}
+
+func (m *Device) GetAppBuild() string {
+	if m != nil {
+		return m.AppBuild
+	}
+	return ""
+}
+
+func (m *Device) GetAppNamespace() string {
+	if m != nil {
+		return m.AppNamespace
+	}
+	return ""
+}
+
+func (m *Device) GetDeviceManufacturer() string {
+	if m != nil {
+		return m.DeviceManufacturer
+	}
+	return ""
+}
+
+func (m *Device) GetDeviceModel() string {
+	if m != nil {
+		return m.DeviceModel
+	}
+	return ""
+}
+
+func (m *Device) GetOsName() string {
+	if m != nil {
+		return m.OsName
+	}
+	return ""
+}
+
+func (m *Device) GetOsVersion() *Version {
+	if m != nil {
+		return m.OsVersion
+	}
+	return nil
+}
+
+func (m *Device) GetFrameworks() map[string]*Version {
+	if m != nil {
+		return m.Frameworks
+	}
+	return nil
+}
+
+func (m *Device) GetLocaleLanguage() string {
+	if m != nil {
+		return m.LocaleLanguage
+	}
+	return ""
+}
+
+func (m *Device) GetLocaleRegion() string {
+	if m != nil {
+		return m.LocaleRegion
+	}
+	return ""
+}
+
+func (m *Device) GetLocaleScript() string {
+	if m != nil {
+		return m.LocaleScript
+	}
+	return ""
+}
+
+func (m *Device) GetIsWifiEnabled() bool {
+	if m != nil {
+		return m.IsWifiEnabled
+	}
+	return false
+}
+
+func (m *Device) GetIsCellularEnabled() bool {
+	if m != nil {
+		return m.IsCellularEnabled
+	}
+	return false
+}
+
+func (m *Device) GetScreenWidth() int32 {
+	if m != nil {
+		return m.ScreenWidth
+	}
+	return 0
+}
+
+func (m *Device) GetScreenHeight() int32 {
+	if m != nil {
+		return m.ScreenHeight
+	}
+	return 0
+}
+
+func (m *Device) GetCarrierName() string {
+	if m != nil {
+		return m.CarrierName
+	}
+	return ""
+}
+
+func (m *Device) GetRadio() string {
+	if m != nil {
+		return m.Radio
+	}
+	return ""
+}
+
+func (m *Device) GetTimeZone() string {
+	if m != nil {
+		return m.TimeZone
+	}
+	return ""
+}
+
+func (m *Device) GetPlatform() Platform {
+	if m != nil {
+		return m.Platform
+	}
+	return Platform_UNDEFINED
+}
+
+func (m *Device) GetIsBackgroundEnabled() bool {
+	if m != nil {
+		return m.IsBackgroundEnabled
+	}
+	return false
+}
+
+func (m *Device) GetIsLocationMonitoringEnabled() bool {
+	if m != nil {
+		return m.IsLocationMonitoringEnabled
+	}
+	return false
+}
+
+func (m *Device) GetIsBluetoothEnabled() bool {
+	if m != nil {
+		return m.IsBluetoothEnabled
+	}
+	return false
+}
+
+func (m *Device) GetAdvertisingId() string {
+	if m != nil {
+		return m.AdvertisingId
+	}
+	return ""
+}
+
+func (m *Device) GetIp() string {
+	if m != nil {
+		return m.Ip
+	}
+	return ""
+}
+
+func (m *Device) GetLocationAccuracy() int32 {
+	if m != nil {
+		return m.LocationAccuracy
+	}
+	return 0
+}
+
+func (m *Device) GetLocationLatitude() float64 {
+	if m != nil {
+		return m.LocationLatitude
+	}
+	return 0
+}
+
+func (m *Device) GetLocationLongitude() float64 {
+	if m != nil {
+		return m.LocationLongitude
+	}
+	return 0
+}
+
+func (m *Device) GetLocationRegion() string {
+	if m != nil {
+		return m.LocationRegion
+	}
+	return ""
+}
+
+func (m *Device) GetLocationCity() string {
+	if m != nil {
+		return m.LocationCity
+	}
+	return ""
+}
+
+func (m *Device) GetLocationStreet() string {
+	if m != nil {
+		return m.LocationStreet
+	}
+	return ""
+}
+
+func (m *Device) GetRegionMonitoringMode() Device_RegionMonitoringMode {
+	if m != nil {
+		return m.RegionMonitoringMode
+	}
+	return Device_UNDEFINED
+}
+
+func (m *Device) GetIbeaconMonitoringRegionsUpdatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.IbeaconMonitoringRegionsUpdatedAt
+	}
+	return nil
+}
+
+func (m *Device) GetIbeaconMonitoringRegions() []*IBeaconRegion {
+	if m != nil {
+		return m.IbeaconMonitoringRegions
+	}
+	return nil
+}
+
+func (m *Device) GetGeofenceMonitoringRegionsUpdatedAt() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.GeofenceMonitoringRegionsUpdatedAt
+	}
+	return nil
+}
+
+func (m *Device) GetGeofenceMonitoringRegions() []*GeofenceRegion {
+	if m != nil {
+		return m.GeofenceMonitoringRegions
+	}
+	return nil
+}
+
+type IBeaconRegion struct {
+	Uuid  string `protobuf:"bytes,1,opt,name=uuid" json:"uuid,omitempty"`
+	Major int32  `protobuf:"varint,2,opt,name=major" json:"major,omitempty"`
+	Minor int32  `protobuf:"varint,3,opt,name=minor" json:"minor,omitempty"`
+}
+
+func (m *IBeaconRegion) Reset()                    { *m = IBeaconRegion{} }
+func (m *IBeaconRegion) String() string            { return proto.CompactTextString(m) }
+func (*IBeaconRegion) ProtoMessage()               {}
+func (*IBeaconRegion) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
+
+func (m *IBeaconRegion) GetUuid() string {
+	if m != nil {
+		return m.Uuid
+	}
+	return ""
+}
+
+func (m *IBeaconRegion) GetMajor() int32 {
+	if m != nil {
+		return m.Major
+	}
+	return 0
+}
+
+func (m *IBeaconRegion) GetMinor() int32 {
+	if m != nil {
+		return m.Minor
+	}
+	return 0
+}
+
+type GeofenceRegion struct {
+	Id        string  `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Latitude  float64 `protobuf:"fixed64,2,opt,name=latitude" json:"latitude,omitempty"`
+	Longitude float64 `protobuf:"fixed64,3,opt,name=longitude" json:"longitude,omitempty"`
+	Radius    int32   `protobuf:"varint,4,opt,name=radius" json:"radius,omitempty"`
+}
+
+func (m *GeofenceRegion) Reset()                    { *m = GeofenceRegion{} }
+func (m *GeofenceRegion) String() string            { return proto.CompactTextString(m) }
+func (*GeofenceRegion) ProtoMessage()               {}
+func (*GeofenceRegion) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
+
+func (m *GeofenceRegion) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *GeofenceRegion) GetLatitude() float64 {
+	if m != nil {
+		return m.Latitude
+	}
+	return 0
+}
+
+func (m *GeofenceRegion) GetLongitude() float64 {
+	if m != nil {
+		return m.Longitude
+	}
+	return 0
+}
+
+func (m *GeofenceRegion) GetRadius() int32 {
+	if m != nil {
+		return m.Radius
+	}
+	return 0
+}
+
 // ValueUpdates allows bulk updates as adding/removing tags in the same call
 type ValueUpdates struct {
 	Values []*ValueUpdate `protobuf:"bytes,1,rep,name=values" json:"values,omitempty"`
@@ -631,7 +1459,7 @@ type ValueUpdates struct {
 func (m *ValueUpdates) Reset()                    { *m = ValueUpdates{} }
 func (m *ValueUpdates) String() string            { return proto.CompactTextString(m) }
 func (*ValueUpdates) ProtoMessage()               {}
-func (*ValueUpdates) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*ValueUpdates) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
 
 func (m *ValueUpdates) GetValues() []*ValueUpdate {
 	if m != nil {
@@ -642,21 +1470,14 @@ func (m *ValueUpdates) GetValues() []*ValueUpdate {
 
 // ValueUpdate represents a change that needs to be applied to already existing value
 type ValueUpdate struct {
-	Value      *Value                 `protobuf:"bytes,1,opt,name=value" json:"value,omitempty"`
-	UpdateType ValueUpdate_UpdateType `protobuf:"varint,3,opt,name=update_type,json=updateType,enum=rover.audience.v1.ValueUpdate_UpdateType" json:"update_type,omitempty"`
+	UpdateType ValueUpdate_UpdateType `protobuf:"varint,1,opt,name=update_type,json=updateType,enum=rover.audience.v1.ValueUpdate_UpdateType" json:"update_type,omitempty"`
+	Value      *Value                 `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
 func (m *ValueUpdate) Reset()                    { *m = ValueUpdate{} }
 func (m *ValueUpdate) String() string            { return proto.CompactTextString(m) }
 func (*ValueUpdate) ProtoMessage()               {}
-func (*ValueUpdate) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
-
-func (m *ValueUpdate) GetValue() *Value {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
+func (*ValueUpdate) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
 
 func (m *ValueUpdate) GetUpdateType() ValueUpdate_UpdateType {
 	if m != nil {
@@ -665,14 +1486,21 @@ func (m *ValueUpdate) GetUpdateType() ValueUpdate_UpdateType {
 	return ValueUpdate_SET
 }
 
+func (m *ValueUpdate) GetValue() *Value {
+	if m != nil {
+		return m.Value
+	}
+	return nil
+}
+
+// Value represents supported value types the system accepts
 type Value struct {
 	// Types that are valid to be assigned to ValueType:
 	//	*Value_BooleanValue
 	//	*Value_IntegerValue
 	//	*Value_DoubleValue
 	//	*Value_StringValue
-	//	*Value_ArrayValue
-	//	*Value_VersionValue
+	//	*Value_StringArrayValue
 	//	*Value_NullValue
 	//	*Value_TimestampValue
 	ValueType isValue_ValueType `protobuf_oneof:"value_type"`
@@ -681,7 +1509,7 @@ type Value struct {
 func (m *Value) Reset()                    { *m = Value{} }
 func (m *Value) String() string            { return proto.CompactTextString(m) }
 func (*Value) ProtoMessage()               {}
-func (*Value) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
+func (*Value) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
 
 type isValue_ValueType interface {
 	isValue_ValueType()
@@ -699,27 +1527,23 @@ type Value_DoubleValue struct {
 type Value_StringValue struct {
 	StringValue string `protobuf:"bytes,4,opt,name=string_value,json=stringValue,oneof"`
 }
-type Value_ArrayValue struct {
-	ArrayValue *Value_Array `protobuf:"bytes,5,opt,name=array_value,json=arrayValue,oneof"`
-}
-type Value_VersionValue struct {
-	VersionValue *Version `protobuf:"bytes,6,opt,name=version_value,json=versionValue,oneof"`
+type Value_StringArrayValue struct {
+	StringArrayValue *Value_StringArray `protobuf:"bytes,5,opt,name=string_array_value,json=stringArrayValue,oneof"`
 }
 type Value_NullValue struct {
-	NullValue Null `protobuf:"varint,8,opt,name=null_value,json=nullValue,enum=rover.audience.v1.Null,oneof"`
+	NullValue Null `protobuf:"varint,7,opt,name=null_value,json=nullValue,enum=rover.audience.v1.Null,oneof"`
 }
 type Value_TimestampValue struct {
-	TimestampValue *google_protobuf.Timestamp `protobuf:"bytes,7,opt,name=timestamp_value,json=timestampValue,oneof"`
+	TimestampValue *google_protobuf.Timestamp `protobuf:"bytes,8,opt,name=timestamp_value,json=timestampValue,oneof"`
 }
 
-func (*Value_BooleanValue) isValue_ValueType()   {}
-func (*Value_IntegerValue) isValue_ValueType()   {}
-func (*Value_DoubleValue) isValue_ValueType()    {}
-func (*Value_StringValue) isValue_ValueType()    {}
-func (*Value_ArrayValue) isValue_ValueType()     {}
-func (*Value_VersionValue) isValue_ValueType()   {}
-func (*Value_NullValue) isValue_ValueType()      {}
-func (*Value_TimestampValue) isValue_ValueType() {}
+func (*Value_BooleanValue) isValue_ValueType()     {}
+func (*Value_IntegerValue) isValue_ValueType()     {}
+func (*Value_DoubleValue) isValue_ValueType()      {}
+func (*Value_StringValue) isValue_ValueType()      {}
+func (*Value_StringArrayValue) isValue_ValueType() {}
+func (*Value_NullValue) isValue_ValueType()        {}
+func (*Value_TimestampValue) isValue_ValueType()   {}
 
 func (m *Value) GetValueType() isValue_ValueType {
 	if m != nil {
@@ -756,16 +1580,9 @@ func (m *Value) GetStringValue() string {
 	return ""
 }
 
-func (m *Value) GetArrayValue() *Value_Array {
-	if x, ok := m.GetValueType().(*Value_ArrayValue); ok {
-		return x.ArrayValue
-	}
-	return nil
-}
-
-func (m *Value) GetVersionValue() *Version {
-	if x, ok := m.GetValueType().(*Value_VersionValue); ok {
-		return x.VersionValue
+func (m *Value) GetStringArrayValue() *Value_StringArray {
+	if x, ok := m.GetValueType().(*Value_StringArrayValue); ok {
+		return x.StringArrayValue
 	}
 	return nil
 }
@@ -791,8 +1608,7 @@ func (*Value) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, 
 		(*Value_IntegerValue)(nil),
 		(*Value_DoubleValue)(nil),
 		(*Value_StringValue)(nil),
-		(*Value_ArrayValue)(nil),
-		(*Value_VersionValue)(nil),
+		(*Value_StringArrayValue)(nil),
 		(*Value_NullValue)(nil),
 		(*Value_TimestampValue)(nil),
 	}
@@ -818,21 +1634,16 @@ func _Value_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	case *Value_StringValue:
 		b.EncodeVarint(4<<3 | proto.WireBytes)
 		b.EncodeStringBytes(x.StringValue)
-	case *Value_ArrayValue:
+	case *Value_StringArrayValue:
 		b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ArrayValue); err != nil {
-			return err
-		}
-	case *Value_VersionValue:
-		b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.VersionValue); err != nil {
+		if err := b.EncodeMessage(x.StringArrayValue); err != nil {
 			return err
 		}
 	case *Value_NullValue:
-		b.EncodeVarint(8<<3 | proto.WireVarint)
+		b.EncodeVarint(7<<3 | proto.WireVarint)
 		b.EncodeVarint(uint64(x.NullValue))
 	case *Value_TimestampValue:
-		b.EncodeVarint(7<<3 | proto.WireBytes)
+		b.EncodeVarint(8<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.TimestampValue); err != nil {
 			return err
 		}
@@ -874,30 +1685,22 @@ func _Value_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) 
 		x, err := b.DecodeStringBytes()
 		m.ValueType = &Value_StringValue{x}
 		return true, err
-	case 5: // value_type.array_value
+	case 5: // value_type.string_array_value
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(Value_Array)
+		msg := new(Value_StringArray)
 		err := b.DecodeMessage(msg)
-		m.ValueType = &Value_ArrayValue{msg}
+		m.ValueType = &Value_StringArrayValue{msg}
 		return true, err
-	case 6: // value_type.version_value
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Version)
-		err := b.DecodeMessage(msg)
-		m.ValueType = &Value_VersionValue{msg}
-		return true, err
-	case 8: // value_type.null_value
+	case 7: // value_type.null_value
 		if wire != proto.WireVarint {
 			return true, proto.ErrInternalBadWireType
 		}
 		x, err := b.DecodeVarint()
 		m.ValueType = &Value_NullValue{Null(x)}
 		return true, err
-	case 7: // value_type.timestamp_value
+	case 8: // value_type.timestamp_value
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
@@ -927,22 +1730,17 @@ func _Value_OneofSizer(msg proto.Message) (n int) {
 		n += proto.SizeVarint(4<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.StringValue)))
 		n += len(x.StringValue)
-	case *Value_ArrayValue:
-		s := proto.Size(x.ArrayValue)
+	case *Value_StringArrayValue:
+		s := proto.Size(x.StringArrayValue)
 		n += proto.SizeVarint(5<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
-	case *Value_VersionValue:
-		s := proto.Size(x.VersionValue)
-		n += proto.SizeVarint(6<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(s))
-		n += s
 	case *Value_NullValue:
-		n += proto.SizeVarint(8<<3 | proto.WireVarint)
+		n += proto.SizeVarint(7<<3 | proto.WireVarint)
 		n += proto.SizeVarint(uint64(x.NullValue))
 	case *Value_TimestampValue:
 		s := proto.Size(x.TimestampValue)
-		n += proto.SizeVarint(7<<3 | proto.WireBytes)
+		n += proto.SizeVarint(8<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case nil:
@@ -952,23 +1750,23 @@ func _Value_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-// Array a values container
-type Value_Array struct {
-	Values []*Value `protobuf:"bytes,1,rep,name=values" json:"values,omitempty"`
+type Value_StringArray struct {
+	Values []string `protobuf:"bytes,1,rep,name=values" json:"values,omitempty"`
 }
 
-func (m *Value_Array) Reset()                    { *m = Value_Array{} }
-func (m *Value_Array) String() string            { return proto.CompactTextString(m) }
-func (*Value_Array) ProtoMessage()               {}
-func (*Value_Array) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15, 0} }
+func (m *Value_StringArray) Reset()                    { *m = Value_StringArray{} }
+func (m *Value_StringArray) String() string            { return proto.CompactTextString(m) }
+func (*Value_StringArray) ProtoMessage()               {}
+func (*Value_StringArray) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24, 0} }
 
-func (m *Value_Array) GetValues() []*Value {
+func (m *Value_StringArray) GetValues() []string {
 	if m != nil {
 		return m.Values
 	}
 	return nil
 }
 
+// SchemaAttribute describes type information about an attribute
 type SchemaAttribute struct {
 	AccountId int32 `protobuf:"varint,1,opt,name=account_id,json=accountId" json:"account_id,omitempty"`
 	// attribute id
@@ -976,17 +1774,18 @@ type SchemaAttribute struct {
 	// attribute name
 	Attribute string `protobuf:"bytes,3,opt,name=attribute" json:"attribute,omitempty"`
 	// attribute type descriptor, ie string/array[string]
-	AttributeType string `protobuf:"bytes,4,opt,name=attributeType" json:"attributeType,omitempty"`
+	// see Value for all possible types
+	AttributeType string `protobuf:"bytes,4,opt,name=attribute_type,json=attributeType" json:"attribute_type,omitempty"`
 	// attribute path if nested
 	Path string `protobuf:"bytes,5,opt,name=path" json:"path,omitempty"`
-	// attribute created at timestamp
-	CreatedAt *google_protobuf.Timestamp `protobuf:"bytes,20,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	// attribute creation time
+	CreatedAt *google_protobuf.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
 }
 
 func (m *SchemaAttribute) Reset()                    { *m = SchemaAttribute{} }
 func (m *SchemaAttribute) String() string            { return proto.CompactTextString(m) }
 func (*SchemaAttribute) ProtoMessage()               {}
-func (*SchemaAttribute) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
+func (*SchemaAttribute) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
 
 func (m *SchemaAttribute) GetAccountId() int32 {
 	if m != nil {
@@ -1040,7 +1839,7 @@ type Version struct {
 func (m *Version) Reset()                    { *m = Version{} }
 func (m *Version) String() string            { return proto.CompactTextString(m) }
 func (*Version) ProtoMessage()               {}
-func (*Version) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
+func (*Version) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
 
 func (m *Version) GetMajor() int32 {
 	if m != nil {
@@ -1067,23 +1866,34 @@ func init() {
 	proto.RegisterType((*CreateProfileRequest)(nil), "rover.audience.v1.CreateProfileRequest")
 	proto.RegisterType((*DeleteProfileRequest)(nil), "rover.audience.v1.DeleteProfileRequest")
 	proto.RegisterType((*UpdateProfileRequest)(nil), "rover.audience.v1.UpdateProfileRequest")
+	proto.RegisterType((*UpdateProfileIdentifierRequest)(nil), "rover.audience.v1.UpdateProfileIdentifierRequest")
 	proto.RegisterType((*GetProfileByDeviceIdRequest)(nil), "rover.audience.v1.GetProfileByDeviceIdRequest")
+	proto.RegisterType((*GetProfileByIdentifierRequest)(nil), "rover.audience.v1.GetProfileByIdentifierRequest")
 	proto.RegisterType((*GetProfileSchemaRequest)(nil), "rover.audience.v1.GetProfileSchemaRequest")
 	proto.RegisterType((*Profile)(nil), "rover.audience.v1.Profile")
 	proto.RegisterType((*ProfileSchema)(nil), "rover.audience.v1.ProfileSchema")
+	proto.RegisterType((*GetDeviceRequest)(nil), "rover.audience.v1.GetDeviceRequest")
 	proto.RegisterType((*CreateDeviceRequest)(nil), "rover.audience.v1.CreateDeviceRequest")
+	proto.RegisterType((*UpdateDevicePushTokenRequest)(nil), "rover.audience.v1.UpdateDevicePushTokenRequest")
+	proto.RegisterType((*UpdateDeviceUnregisterPushTokenRequest)(nil), "rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest")
+	proto.RegisterType((*UpdateDeviceLocationRequest)(nil), "rover.audience.v1.UpdateDeviceLocationRequest")
+	proto.RegisterType((*UpdateDeviceGeofenceMonitoringRequest)(nil), "rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest")
+	proto.RegisterType((*UpdateDeviceIBeaconMonitoringRequest)(nil), "rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest")
 	proto.RegisterType((*DeleteDeviceRequest)(nil), "rover.audience.v1.DeleteDeviceRequest")
-	proto.RegisterType((*PutDeviceRequest)(nil), "rover.audience.v1.PutDeviceRequest")
-	proto.RegisterType((*SetDevicePushTokenRequest)(nil), "rover.audience.v1.SetDevicePushTokenRequest")
 	proto.RegisterType((*SetDeviceProfileRequest)(nil), "rover.audience.v1.SetDeviceProfileRequest")
+	proto.RegisterType((*UpdateDeviceRequest)(nil), "rover.audience.v1.UpdateDeviceRequest")
 	proto.RegisterType((*Device)(nil), "rover.audience.v1.Device")
+	proto.RegisterType((*IBeaconRegion)(nil), "rover.audience.v1.IBeaconRegion")
+	proto.RegisterType((*GeofenceRegion)(nil), "rover.audience.v1.GeofenceRegion")
 	proto.RegisterType((*ValueUpdates)(nil), "rover.audience.v1.ValueUpdates")
 	proto.RegisterType((*ValueUpdate)(nil), "rover.audience.v1.ValueUpdate")
 	proto.RegisterType((*Value)(nil), "rover.audience.v1.Value")
-	proto.RegisterType((*Value_Array)(nil), "rover.audience.v1.Value.Array")
+	proto.RegisterType((*Value_StringArray)(nil), "rover.audience.v1.Value.StringArray")
 	proto.RegisterType((*SchemaAttribute)(nil), "rover.audience.v1.SchemaAttribute")
 	proto.RegisterType((*Version)(nil), "rover.audience.v1.Version")
+	proto.RegisterEnum("rover.audience.v1.Platform", Platform_name, Platform_value)
 	proto.RegisterEnum("rover.audience.v1.Null", Null_name, Null_value)
+	proto.RegisterEnum("rover.audience.v1.Device_RegionMonitoringMode", Device_RegionMonitoringMode_name, Device_RegionMonitoringMode_value)
 	proto.RegisterEnum("rover.audience.v1.ValueUpdate_UpdateType", ValueUpdate_UpdateType_name, ValueUpdate_UpdateType_value)
 }
 
@@ -1101,23 +1911,29 @@ type AudienceClient interface {
 	// CreateProfile creates a new empty profile under a given account.
 	CreateProfile(ctx context.Context, in *CreateProfileRequest, opts ...grpc.CallOption) (*Profile, error)
 	//  DeleteProfile deletes a profile from db and all segments
-	DeleteProfile(ctx context.Context, in *DeleteProfileRequest, opts ...grpc.CallOption) (*Profile, error)
+	DeleteProfile(ctx context.Context, in *DeleteProfileRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
 	// UpdateProfile updates profile with provided subset of attributes
-	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*Profile, error)
+	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	UpdateProfileIdentifier(ctx context.Context, in *UpdateProfileIdentifierRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
 	// GetProfileByDeviceId returns a profile which is associated to the device id
 	GetProfileByDeviceId(ctx context.Context, in *GetProfileByDeviceIdRequest, opts ...grpc.CallOption) (*Profile, error)
+	GetProfileByIdentifier(ctx context.Context, in *GetProfileByIdentifierRequest, opts ...grpc.CallOption) (*Profile, error)
 	// GetProfileSchema returns the currently tracked profiles schema by account id
 	GetProfileSchema(ctx context.Context, in *GetProfileSchemaRequest, opts ...grpc.CallOption) (*ProfileSchema, error)
-	// CreateDevice creates a an "empty" device under a given account.
-	CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*Device, error)
+	// GetDevice returns the device for a given device id
+	GetDevice(ctx context.Context, in *GetDeviceRequest, opts ...grpc.CallOption) (*Device, error)
+	CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	// Device Updates
+	UpdateDevice(ctx context.Context, in *UpdateDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	UpdateDevicePushToken(ctx context.Context, in *UpdateDevicePushTokenRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	UpdateDeviceUnregisterPushToken(ctx context.Context, in *UpdateDeviceUnregisterPushTokenRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	UpdateDeviceLocation(ctx context.Context, in *UpdateDeviceLocationRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	UpdateDeviceGeofenceMonitoring(ctx context.Context, in *UpdateDeviceGeofenceMonitoringRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	UpdateDeviceIBeaconMonitoring(ctx context.Context, in *UpdateDeviceIBeaconMonitoringRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
+	// SetDeviceProfile sets the profile the device belongs to
+	SetDeviceProfile(ctx context.Context, in *SetDeviceProfileRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
 	// DeleteDevice deletes device from the database and removes it from any segments
-	DeleteDevice(ctx context.Context, in *DeleteDeviceRequest, opts ...grpc.CallOption) (*Device, error)
-	// PutDevice updates the device
-	PutDevice(ctx context.Context, in *PutDeviceRequest, opts ...grpc.CallOption) (*Device, error)
-	// SetDevicePushToken
-	SetDevicePushToken(ctx context.Context, in *SetDevicePushTokenRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
-	// PutDevice updates the device
-	SetDeviceProfile(ctx context.Context, in *SetDeviceProfileRequest, opts ...grpc.CallOption) (*Device, error)
+	DeleteDevice(ctx context.Context, in *DeleteDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
 }
 
 type audienceClient struct {
@@ -1137,8 +1953,8 @@ func (c *audienceClient) CreateProfile(ctx context.Context, in *CreateProfileReq
 	return out, nil
 }
 
-func (c *audienceClient) DeleteProfile(ctx context.Context, in *DeleteProfileRequest, opts ...grpc.CallOption) (*Profile, error) {
-	out := new(Profile)
+func (c *audienceClient) DeleteProfile(ctx context.Context, in *DeleteProfileRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
 	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/DeleteProfile", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -1146,9 +1962,18 @@ func (c *audienceClient) DeleteProfile(ctx context.Context, in *DeleteProfileReq
 	return out, nil
 }
 
-func (c *audienceClient) UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*Profile, error) {
-	out := new(Profile)
+func (c *audienceClient) UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
 	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/UpdateProfile", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audienceClient) UpdateProfileIdentifier(ctx context.Context, in *UpdateProfileIdentifierRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/UpdateProfileIdentifier", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1164,6 +1989,15 @@ func (c *audienceClient) GetProfileByDeviceId(ctx context.Context, in *GetProfil
 	return out, nil
 }
 
+func (c *audienceClient) GetProfileByIdentifier(ctx context.Context, in *GetProfileByIdentifierRequest, opts ...grpc.CallOption) (*Profile, error) {
+	out := new(Profile)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/GetProfileByIdentifier", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *audienceClient) GetProfileSchema(ctx context.Context, in *GetProfileSchemaRequest, opts ...grpc.CallOption) (*ProfileSchema, error) {
 	out := new(ProfileSchema)
 	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/GetProfileSchema", in, out, c.cc, opts...)
@@ -1173,8 +2007,17 @@ func (c *audienceClient) GetProfileSchema(ctx context.Context, in *GetProfileSch
 	return out, nil
 }
 
-func (c *audienceClient) CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*Device, error) {
+func (c *audienceClient) GetDevice(ctx context.Context, in *GetDeviceRequest, opts ...grpc.CallOption) (*Device, error) {
 	out := new(Device)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/GetDevice", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audienceClient) CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
 	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/CreateDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -1182,36 +2025,72 @@ func (c *audienceClient) CreateDevice(ctx context.Context, in *CreateDeviceReque
 	return out, nil
 }
 
-func (c *audienceClient) DeleteDevice(ctx context.Context, in *DeleteDeviceRequest, opts ...grpc.CallOption) (*Device, error) {
-	out := new(Device)
-	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/DeleteDevice", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *audienceClient) PutDevice(ctx context.Context, in *PutDeviceRequest, opts ...grpc.CallOption) (*Device, error) {
-	out := new(Device)
-	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/PutDevice", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *audienceClient) SetDevicePushToken(ctx context.Context, in *SetDevicePushTokenRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+func (c *audienceClient) UpdateDevice(ctx context.Context, in *UpdateDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
 	out := new(google_protobuf1.Empty)
-	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/SetDevicePushToken", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/UpdateDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *audienceClient) SetDeviceProfile(ctx context.Context, in *SetDeviceProfileRequest, opts ...grpc.CallOption) (*Device, error) {
-	out := new(Device)
+func (c *audienceClient) UpdateDevicePushToken(ctx context.Context, in *UpdateDevicePushTokenRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/UpdateDevicePushToken", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audienceClient) UpdateDeviceUnregisterPushToken(ctx context.Context, in *UpdateDeviceUnregisterPushTokenRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/UpdateDeviceUnregisterPushToken", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audienceClient) UpdateDeviceLocation(ctx context.Context, in *UpdateDeviceLocationRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/UpdateDeviceLocation", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audienceClient) UpdateDeviceGeofenceMonitoring(ctx context.Context, in *UpdateDeviceGeofenceMonitoringRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/UpdateDeviceGeofenceMonitoring", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audienceClient) UpdateDeviceIBeaconMonitoring(ctx context.Context, in *UpdateDeviceIBeaconMonitoringRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/UpdateDeviceIBeaconMonitoring", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audienceClient) SetDeviceProfile(ctx context.Context, in *SetDeviceProfileRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
 	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/SetDeviceProfile", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audienceClient) DeleteDevice(ctx context.Context, in *DeleteDeviceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
+	out := new(google_protobuf1.Empty)
+	err := grpc.Invoke(ctx, "/rover.audience.v1.Audience/DeleteDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1224,23 +2103,29 @@ type AudienceServer interface {
 	// CreateProfile creates a new empty profile under a given account.
 	CreateProfile(context.Context, *CreateProfileRequest) (*Profile, error)
 	//  DeleteProfile deletes a profile from db and all segments
-	DeleteProfile(context.Context, *DeleteProfileRequest) (*Profile, error)
+	DeleteProfile(context.Context, *DeleteProfileRequest) (*google_protobuf1.Empty, error)
 	// UpdateProfile updates profile with provided subset of attributes
-	UpdateProfile(context.Context, *UpdateProfileRequest) (*Profile, error)
+	UpdateProfile(context.Context, *UpdateProfileRequest) (*google_protobuf1.Empty, error)
+	UpdateProfileIdentifier(context.Context, *UpdateProfileIdentifierRequest) (*google_protobuf1.Empty, error)
 	// GetProfileByDeviceId returns a profile which is associated to the device id
 	GetProfileByDeviceId(context.Context, *GetProfileByDeviceIdRequest) (*Profile, error)
+	GetProfileByIdentifier(context.Context, *GetProfileByIdentifierRequest) (*Profile, error)
 	// GetProfileSchema returns the currently tracked profiles schema by account id
 	GetProfileSchema(context.Context, *GetProfileSchemaRequest) (*ProfileSchema, error)
-	// CreateDevice creates a an "empty" device under a given account.
-	CreateDevice(context.Context, *CreateDeviceRequest) (*Device, error)
+	// GetDevice returns the device for a given device id
+	GetDevice(context.Context, *GetDeviceRequest) (*Device, error)
+	CreateDevice(context.Context, *CreateDeviceRequest) (*google_protobuf1.Empty, error)
+	// Device Updates
+	UpdateDevice(context.Context, *UpdateDeviceRequest) (*google_protobuf1.Empty, error)
+	UpdateDevicePushToken(context.Context, *UpdateDevicePushTokenRequest) (*google_protobuf1.Empty, error)
+	UpdateDeviceUnregisterPushToken(context.Context, *UpdateDeviceUnregisterPushTokenRequest) (*google_protobuf1.Empty, error)
+	UpdateDeviceLocation(context.Context, *UpdateDeviceLocationRequest) (*google_protobuf1.Empty, error)
+	UpdateDeviceGeofenceMonitoring(context.Context, *UpdateDeviceGeofenceMonitoringRequest) (*google_protobuf1.Empty, error)
+	UpdateDeviceIBeaconMonitoring(context.Context, *UpdateDeviceIBeaconMonitoringRequest) (*google_protobuf1.Empty, error)
+	// SetDeviceProfile sets the profile the device belongs to
+	SetDeviceProfile(context.Context, *SetDeviceProfileRequest) (*google_protobuf1.Empty, error)
 	// DeleteDevice deletes device from the database and removes it from any segments
-	DeleteDevice(context.Context, *DeleteDeviceRequest) (*Device, error)
-	// PutDevice updates the device
-	PutDevice(context.Context, *PutDeviceRequest) (*Device, error)
-	// SetDevicePushToken
-	SetDevicePushToken(context.Context, *SetDevicePushTokenRequest) (*google_protobuf1.Empty, error)
-	// PutDevice updates the device
-	SetDeviceProfile(context.Context, *SetDeviceProfileRequest) (*Device, error)
+	DeleteDevice(context.Context, *DeleteDeviceRequest) (*google_protobuf1.Empty, error)
 }
 
 func RegisterAudienceServer(s *grpc.Server, srv AudienceServer) {
@@ -1301,6 +2186,24 @@ func _Audience_UpdateProfile_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Audience_UpdateProfileIdentifier_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProfileIdentifierRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudienceServer).UpdateProfileIdentifier(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rover.audience.v1.Audience/UpdateProfileIdentifier",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudienceServer).UpdateProfileIdentifier(ctx, req.(*UpdateProfileIdentifierRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Audience_GetProfileByDeviceId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetProfileByDeviceIdRequest)
 	if err := dec(in); err != nil {
@@ -1315,6 +2218,24 @@ func _Audience_GetProfileByDeviceId_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AudienceServer).GetProfileByDeviceId(ctx, req.(*GetProfileByDeviceIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Audience_GetProfileByIdentifier_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProfileByIdentifierRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudienceServer).GetProfileByIdentifier(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rover.audience.v1.Audience/GetProfileByIdentifier",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudienceServer).GetProfileByIdentifier(ctx, req.(*GetProfileByIdentifierRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1337,6 +2258,24 @@ func _Audience_GetProfileSchema_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Audience_GetDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudienceServer).GetDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rover.audience.v1.Audience/GetDevice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudienceServer).GetDevice(ctx, req.(*GetDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Audience_CreateDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateDeviceRequest)
 	if err := dec(in); err != nil {
@@ -1355,56 +2294,110 @@ func _Audience_CreateDevice_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Audience_DeleteDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteDeviceRequest)
+func _Audience_UpdateDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDeviceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AudienceServer).DeleteDevice(ctx, in)
+		return srv.(AudienceServer).UpdateDevice(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rover.audience.v1.Audience/DeleteDevice",
+		FullMethod: "/rover.audience.v1.Audience/UpdateDevice",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AudienceServer).DeleteDevice(ctx, req.(*DeleteDeviceRequest))
+		return srv.(AudienceServer).UpdateDevice(ctx, req.(*UpdateDeviceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Audience_PutDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PutDeviceRequest)
+func _Audience_UpdateDevicePushToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDevicePushTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AudienceServer).PutDevice(ctx, in)
+		return srv.(AudienceServer).UpdateDevicePushToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rover.audience.v1.Audience/PutDevice",
+		FullMethod: "/rover.audience.v1.Audience/UpdateDevicePushToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AudienceServer).PutDevice(ctx, req.(*PutDeviceRequest))
+		return srv.(AudienceServer).UpdateDevicePushToken(ctx, req.(*UpdateDevicePushTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Audience_SetDevicePushToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetDevicePushTokenRequest)
+func _Audience_UpdateDeviceUnregisterPushToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDeviceUnregisterPushTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AudienceServer).SetDevicePushToken(ctx, in)
+		return srv.(AudienceServer).UpdateDeviceUnregisterPushToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rover.audience.v1.Audience/SetDevicePushToken",
+		FullMethod: "/rover.audience.v1.Audience/UpdateDeviceUnregisterPushToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AudienceServer).SetDevicePushToken(ctx, req.(*SetDevicePushTokenRequest))
+		return srv.(AudienceServer).UpdateDeviceUnregisterPushToken(ctx, req.(*UpdateDeviceUnregisterPushTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Audience_UpdateDeviceLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDeviceLocationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudienceServer).UpdateDeviceLocation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rover.audience.v1.Audience/UpdateDeviceLocation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudienceServer).UpdateDeviceLocation(ctx, req.(*UpdateDeviceLocationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Audience_UpdateDeviceGeofenceMonitoring_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDeviceGeofenceMonitoringRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudienceServer).UpdateDeviceGeofenceMonitoring(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rover.audience.v1.Audience/UpdateDeviceGeofenceMonitoring",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudienceServer).UpdateDeviceGeofenceMonitoring(ctx, req.(*UpdateDeviceGeofenceMonitoringRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Audience_UpdateDeviceIBeaconMonitoring_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDeviceIBeaconMonitoringRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudienceServer).UpdateDeviceIBeaconMonitoring(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rover.audience.v1.Audience/UpdateDeviceIBeaconMonitoring",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudienceServer).UpdateDeviceIBeaconMonitoring(ctx, req.(*UpdateDeviceIBeaconMonitoringRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1427,6 +2420,24 @@ func _Audience_SetDeviceProfile_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Audience_DeleteDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudienceServer).DeleteDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rover.audience.v1.Audience/DeleteDevice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudienceServer).DeleteDevice(ctx, req.(*DeleteDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Audience_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "rover.audience.v1.Audience",
 	HandlerType: (*AudienceServer)(nil),
@@ -1444,32 +2455,60 @@ var _Audience_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Audience_UpdateProfile_Handler,
 		},
 		{
+			MethodName: "UpdateProfileIdentifier",
+			Handler:    _Audience_UpdateProfileIdentifier_Handler,
+		},
+		{
 			MethodName: "GetProfileByDeviceId",
 			Handler:    _Audience_GetProfileByDeviceId_Handler,
+		},
+		{
+			MethodName: "GetProfileByIdentifier",
+			Handler:    _Audience_GetProfileByIdentifier_Handler,
 		},
 		{
 			MethodName: "GetProfileSchema",
 			Handler:    _Audience_GetProfileSchema_Handler,
 		},
 		{
+			MethodName: "GetDevice",
+			Handler:    _Audience_GetDevice_Handler,
+		},
+		{
 			MethodName: "CreateDevice",
 			Handler:    _Audience_CreateDevice_Handler,
 		},
 		{
-			MethodName: "DeleteDevice",
-			Handler:    _Audience_DeleteDevice_Handler,
+			MethodName: "UpdateDevice",
+			Handler:    _Audience_UpdateDevice_Handler,
 		},
 		{
-			MethodName: "PutDevice",
-			Handler:    _Audience_PutDevice_Handler,
+			MethodName: "UpdateDevicePushToken",
+			Handler:    _Audience_UpdateDevicePushToken_Handler,
 		},
 		{
-			MethodName: "SetDevicePushToken",
-			Handler:    _Audience_SetDevicePushToken_Handler,
+			MethodName: "UpdateDeviceUnregisterPushToken",
+			Handler:    _Audience_UpdateDeviceUnregisterPushToken_Handler,
+		},
+		{
+			MethodName: "UpdateDeviceLocation",
+			Handler:    _Audience_UpdateDeviceLocation_Handler,
+		},
+		{
+			MethodName: "UpdateDeviceGeofenceMonitoring",
+			Handler:    _Audience_UpdateDeviceGeofenceMonitoring_Handler,
+		},
+		{
+			MethodName: "UpdateDeviceIBeaconMonitoring",
+			Handler:    _Audience_UpdateDeviceIBeaconMonitoring_Handler,
 		},
 		{
 			MethodName: "SetDeviceProfile",
 			Handler:    _Audience_SetDeviceProfile_Handler,
+		},
+		{
+			MethodName: "DeleteDevice",
+			Handler:    _Audience_DeleteDevice_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1479,97 +2518,161 @@ var _Audience_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("audience/v1/audience.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 1464 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x58, 0x6f, 0x73, 0xdb, 0x44,
-	0x13, 0x8f, 0xe2, 0xd8, 0xb1, 0xd7, 0x76, 0xe2, 0x5e, 0xdd, 0x46, 0x71, 0x9e, 0xa7, 0xc9, 0xa8,
-	0x14, 0x42, 0x01, 0x87, 0xa4, 0x03, 0xb4, 0x30, 0x30, 0xe3, 0x34, 0x86, 0xa4, 0xa4, 0xa5, 0x55,
-	0xd2, 0x16, 0xfa, 0x02, 0x73, 0xb6, 0x2e, 0xb6, 0x88, 0xac, 0x13, 0xd2, 0xc9, 0x83, 0x79, 0xc5,
-	0x0b, 0x66, 0xf8, 0x52, 0xf0, 0x0d, 0x78, 0xc7, 0x07, 0xe1, 0x0b, 0xc0, 0x0c, 0x73, 0x7f, 0x24,
-	0xcb, 0xaa, 0xec, 0xb6, 0x33, 0x01, 0xde, 0xe9, 0xf6, 0x7e, 0xfb, 0xdb, 0xbd, 0xdb, 0xbb, 0xdd,
-	0x3d, 0x41, 0x03, 0x87, 0x96, 0x4d, 0xdc, 0x1e, 0xd9, 0x19, 0xed, 0xee, 0x44, 0xdf, 0x4d, 0xcf,
-	0xa7, 0x8c, 0xa2, 0x4b, 0x3e, 0x1d, 0x11, 0xbf, 0x19, 0x4b, 0x47, 0xbb, 0x8d, 0xcd, 0x3e, 0xa5,
-	0x7d, 0x87, 0xec, 0x08, 0x40, 0x37, 0x3c, 0xdb, 0x61, 0xf6, 0x90, 0x04, 0x0c, 0x0f, 0x3d, 0xa9,
-	0xd3, 0xd8, 0x48, 0x03, 0xc8, 0xd0, 0x63, 0x63, 0x35, 0x89, 0x70, 0xc8, 0x06, 0xd2, 0x10, 0x1b,
-	0x48, 0x99, 0xf1, 0x18, 0xea, 0x77, 0x7d, 0x82, 0x19, 0x79, 0xe8, 0xd3, 0x33, 0xdb, 0x21, 0x26,
-	0xf9, 0x2e, 0x24, 0x01, 0x43, 0x1f, 0x43, 0x85, 0xa3, 0x3a, 0x3d, 0xea, 0x32, 0xf2, 0x3d, 0xd3,
-	0xb5, 0x2d, 0x6d, 0xbb, 0xbc, 0xd7, 0x68, 0x46, 0x3e, 0xb1, 0x41, 0x73, 0xb4, 0xdb, 0x6c, 0x85,
-	0x6c, 0x70, 0x57, 0x22, 0xcc, 0x32, 0x9e, 0x0c, 0x0c, 0x06, 0xf5, 0x03, 0xe2, 0x90, 0x0b, 0xa6,
-	0x45, 0xff, 0x07, 0xf0, 0x24, 0x61, 0xc7, 0xb6, 0xf4, 0xc5, 0x2d, 0x6d, 0xbb, 0x64, 0x96, 0x94,
-	0xe4, 0xc8, 0x32, 0x7e, 0x5d, 0x84, 0xfa, 0x63, 0xcf, 0xba, 0xe8, 0xd5, 0xa0, 0x15, 0x58, 0x8c,
-	0xcd, 0x2d, 0xda, 0x56, 0xca, 0x8d, 0x5c, 0xca, 0x0d, 0xf4, 0x14, 0x00, 0x33, 0xe6, 0xdb, 0xdd,
-	0x90, 0x91, 0x40, 0x5f, 0xda, 0xca, 0x6d, 0x97, 0xf7, 0x3e, 0x68, 0x3e, 0x17, 0xcd, 0x66, 0x96,
-	0xab, 0xcd, 0x56, 0xac, 0xd9, 0x76, 0x99, 0x3f, 0x36, 0x13, 0x54, 0x8d, 0xaf, 0x61, 0x35, 0x35,
-	0x8d, 0x6a, 0x90, 0x3b, 0x27, 0x63, 0xb1, 0xa0, 0x92, 0xc9, 0x3f, 0xd1, 0x7b, 0x90, 0x1f, 0x61,
-	0x27, 0x24, 0xc2, 0xdf, 0xf2, 0xde, 0x66, 0x86, 0xe1, 0x27, 0x7c, 0x5e, 0x5a, 0x0f, 0x4c, 0x89,
-	0xfe, 0x70, 0xf1, 0xb6, 0x66, 0x8c, 0x61, 0xe3, 0x33, 0xc2, 0x94, 0x43, 0xfb, 0xe3, 0x03, 0x32,
-	0xb2, 0x7b, 0xe4, 0xc8, 0xba, 0xa0, 0x5d, 0xdc, 0x80, 0x92, 0x25, 0x18, 0x27, 0xb1, 0x2b, 0x5a,
-	0xca, 0x84, 0xf1, 0x25, 0xac, 0x4d, 0x4c, 0x9f, 0xf4, 0x06, 0x64, 0x88, 0x2f, 0xe8, 0x28, 0xfe,
-	0xa5, 0xc1, 0xb2, 0xe2, 0x55, 0x81, 0xd4, 0x92, 0x81, 0xc4, 0xbd, 0x1e, 0x0d, 0x5d, 0x16, 0xf9,
-	0x94, 0x37, 0x4b, 0x4a, 0x72, 0x64, 0xa1, 0x6b, 0x00, 0xb6, 0x45, 0x5c, 0x66, 0x9f, 0xd9, 0xc4,
-	0x57, 0x71, 0x4e, 0x48, 0xd0, 0xbd, 0x8c, 0x40, 0xdf, 0xcc, 0xd8, 0x6f, 0x65, 0x7e, 0x6e, 0x6c,
-	0x9f, 0xbe, 0x4c, 0x6c, 0x9b, 0xd3, 0xb1, 0xd5, 0x67, 0xc5, 0x36, 0x19, 0xd4, 0x13, 0xa8, 0x4e,
-	0x6d, 0x2b, 0xda, 0x9f, 0xf2, 0x1a, 0x84, 0xd7, 0x46, 0x06, 0x93, 0x84, 0xc7, 0x4e, 0x25, 0xbd,
-	0x35, 0x02, 0xb8, 0x2c, 0xd3, 0x86, 0x3c, 0x23, 0xff, 0xce, 0xf5, 0xb6, 0xe0, 0xb2, 0x4c, 0x2a,
-	0x17, 0x6a, 0x34, 0x75, 0xb9, 0x8d, 0x9f, 0x34, 0xa8, 0x3d, 0x0c, 0xd9, 0x85, 0xda, 0xd8, 0x85,
-	0x82, 0x3c, 0xe9, 0x2a, 0x70, 0xeb, 0x19, 0xdb, 0xad, 0x0c, 0x2a, 0xa0, 0xf1, 0xa3, 0x06, 0xeb,
-	0x27, 0x44, 0xb9, 0xf1, 0x30, 0x0c, 0x06, 0xa7, 0xf4, 0x9c, 0xb8, 0xff, 0x50, 0x42, 0xab, 0x43,
-	0x9e, 0x71, 0x7a, 0x75, 0xc6, 0xe5, 0xc0, 0xf8, 0x59, 0x83, 0xb5, 0x89, 0x0b, 0xff, 0x61, 0x46,
-	0x35, 0x7e, 0x29, 0x40, 0x41, 0xba, 0xf1, 0xaa, 0x57, 0x38, 0x73, 0x65, 0x68, 0x13, 0xca, 0x0e,
-	0xed, 0x61, 0x87, 0x74, 0x1c, 0xec, 0xf6, 0xf5, 0xbc, 0xbc, 0xd9, 0x52, 0x74, 0x8c, 0xdd, 0x3e,
-	0xba, 0x0e, 0x55, 0x05, 0xf0, 0x49, 0xdf, 0xa6, 0xae, 0x5e, 0x10, 0x90, 0x8a, 0x14, 0x9a, 0x42,
-	0xc6, 0x13, 0x1a, 0xaf, 0xbf, 0x9d, 0x1f, 0xa8, 0x4b, 0xf4, 0x65, 0x99, 0xd0, 0xb8, 0xe0, 0x19,
-	0x75, 0x09, 0x37, 0x11, 0x58, 0xe7, 0x9d, 0x11, 0xf1, 0x03, 0xae, 0x5f, 0x94, 0x26, 0x02, 0xeb,
-	0xfc, 0x89, 0x94, 0xa0, 0x06, 0x14, 0x3d, 0x07, 0xb3, 0x33, 0xea, 0x0f, 0xf5, 0x92, 0x54, 0x8e,
-	0xc6, 0x68, 0x0d, 0x96, 0x69, 0xd0, 0x71, 0xf1, 0x90, 0xe8, 0x20, 0xa6, 0x0a, 0x34, 0x78, 0x80,
-	0x87, 0x84, 0xaf, 0x96, 0x06, 0x31, 0x69, 0x59, 0xee, 0x13, 0x0d, 0x22, 0xce, 0x3a, 0xe4, 0x87,
-	0xd4, 0x22, 0x8e, 0x5e, 0x91, 0xab, 0x15, 0x03, 0x64, 0x40, 0x65, 0x88, 0xdd, 0xf0, 0x0c, 0xf7,
-	0x58, 0xe8, 0x13, 0x5f, 0xaf, 0xca, 0xb5, 0x24, 0x65, 0x48, 0x87, 0xe5, 0x1e, 0xf6, 0x7d, 0x9e,
-	0xe7, 0x56, 0xc4, 0x74, 0x34, 0x44, 0x37, 0x60, 0x05, 0x7b, 0x5e, 0x27, 0x91, 0x08, 0x57, 0x05,
-	0xa0, 0x8a, 0x3d, 0xef, 0x68, 0x92, 0x0b, 0x37, 0xa1, 0xdc, 0xb7, 0x87, 0x5d, 0xec, 0x74, 0xb8,
-	0x51, 0xbd, 0xb6, 0xa5, 0x6d, 0x17, 0x4d, 0x90, 0xa2, 0xfb, 0xd4, 0x22, 0xe8, 0x1d, 0x40, 0x5d,
-	0xdc, 0x3b, 0xef, 0xfb, 0x34, 0x74, 0xad, 0x0e, 0x71, 0x71, 0xd7, 0x21, 0x96, 0x8e, 0x04, 0xee,
-	0xd2, 0x64, 0xa6, 0x2d, 0x27, 0xd0, 0x2d, 0xb8, 0xe2, 0x52, 0xce, 0xdd, 0xc3, 0xcc, 0xa6, 0x6e,
-	0x10, 0x6b, 0x5c, 0x16, 0x1a, 0xf5, 0xa9, 0xc9, 0x48, 0xe9, 0x2d, 0xb8, 0xd4, 0x75, 0x42, 0xc2,
-	0x28, 0x65, 0x83, 0x58, 0xa1, 0x2e, 0x14, 0x6a, 0xf1, 0x44, 0x04, 0xfe, 0x04, 0x36, 0x78, 0x38,
-	0x39, 0x41, 0x67, 0x48, 0x5d, 0x9b, 0x51, 0xdf, 0x76, 0xfb, 0xb1, 0xda, 0x15, 0xa1, 0xb6, 0x1e,
-	0x41, 0xee, 0xc7, 0x88, 0x48, 0x7f, 0x0b, 0xca, 0x16, 0x19, 0x11, 0x87, 0x7a, 0x43, 0xe2, 0x32,
-	0xfd, 0xaa, 0xc0, 0x27, 0x45, 0x3c, 0x81, 0x63, 0xdb, 0xd2, 0xd7, 0x64, 0x02, 0xc7, 0xb6, 0x85,
-	0xee, 0x00, 0xf4, 0x44, 0xde, 0xb4, 0x3a, 0x98, 0xe9, 0xba, 0xba, 0x34, 0xb2, 0x69, 0x6b, 0x46,
-	0x4d, 0x5b, 0xf3, 0x34, 0xea, 0xea, 0xcc, 0x92, 0x42, 0xb7, 0x18, 0x57, 0x0d, 0x45, 0xc9, 0x16,
-	0xaa, 0xeb, 0x2f, 0x56, 0x55, 0xe8, 0x16, 0x33, 0x3e, 0x85, 0x4a, 0xb2, 0xe4, 0xa3, 0xf7, 0xa1,
-	0x20, 0xea, 0x43, 0xa0, 0x6b, 0x22, 0xfb, 0x5f, 0x9b, 0xdf, 0x23, 0x98, 0x0a, 0x6d, 0xfc, 0xa6,
-	0x41, 0x39, 0x21, 0x9f, 0x94, 0x23, 0xed, 0xa5, 0xca, 0x11, 0xba, 0x07, 0x65, 0xe9, 0x54, 0x87,
-	0x8d, 0x3d, 0x22, 0xae, 0xe4, 0xca, 0xde, 0x9b, 0xf3, 0x8d, 0xab, 0x2e, 0xe9, 0x74, 0xec, 0x11,
-	0x53, 0x6d, 0x00, 0xff, 0x36, 0x5a, 0x00, 0x93, 0x19, 0xb4, 0x0c, 0xb9, 0x93, 0xf6, 0x69, 0x6d,
-	0x01, 0x01, 0x14, 0x0e, 0xda, 0xc7, 0xed, 0xd3, 0x76, 0x4d, 0x43, 0x25, 0xc8, 0xdf, 0x3d, 0x6e,
-	0xb7, 0xcc, 0xda, 0x22, 0x9f, 0x6f, 0x1d, 0x1c, 0xd4, 0x72, 0x7c, 0xde, 0x6c, 0xdf, 0xff, 0xe2,
-	0x49, 0xbb, 0xb6, 0x64, 0xfc, 0x91, 0x83, 0xbc, 0xb0, 0x84, 0x6e, 0x40, 0xb5, 0x4b, 0xa9, 0x43,
-	0xb0, 0xdb, 0x99, 0x2c, 0xa8, 0x78, 0xb8, 0x60, 0x56, 0x94, 0x38, 0x86, 0xd9, 0x2e, 0x23, 0x7d,
-	0xe2, 0x77, 0x26, 0x65, 0x38, 0xc7, 0x61, 0x4a, 0x2c, 0x61, 0xd7, 0xa1, 0x62, 0xd1, 0xb0, 0xeb,
-	0x10, 0x85, 0xe2, 0xeb, 0xd4, 0x0e, 0x17, 0xcc, 0xb2, 0x94, 0xc6, 0xa0, 0x80, 0x89, 0x03, 0x27,
-	0x41, 0x4b, 0xfc, 0x90, 0x70, 0x90, 0x94, 0x4a, 0x50, 0x0b, 0xca, 0xd8, 0xf7, 0xf1, 0x58, 0x61,
-	0xf2, 0x62, 0x9b, 0x67, 0x46, 0xab, 0xd9, 0xe2, 0xd8, 0xc3, 0x05, 0x13, 0x84, 0x52, 0x44, 0x51,
-	0x55, 0xe9, 0x42, 0x91, 0x14, 0x52, 0x99, 0x3a, 0x41, 0x22, 0x71, 0x7c, 0x3d, 0x4a, 0x45, 0x52,
-	0xdc, 0x06, 0x70, 0x43, 0xc7, 0x51, 0xfa, 0x45, 0x11, 0xb5, 0xb5, 0x0c, 0xfd, 0x07, 0xa1, 0xe3,
-	0x1c, 0x2e, 0x98, 0x25, 0x0e, 0x96, 0x9a, 0x6d, 0x58, 0x8d, 0x5f, 0x28, 0x4a, 0x7d, 0xf9, 0x45,
-	0x07, 0xf7, 0x70, 0xc1, 0x5c, 0x89, 0x95, 0x04, 0x4d, 0xe3, 0x0e, 0xe4, 0xc5, 0xd2, 0xd0, 0xbb,
-	0xa9, 0x83, 0x3b, 0xfb, 0xc4, 0x29, 0xdc, 0x7e, 0x05, 0x40, 0x7c, 0x89, 0x13, 0x67, 0xfc, 0xae,
-	0xc1, 0x6a, 0xaa, 0xad, 0x49, 0x15, 0x10, 0x2d, 0x5d, 0x40, 0xd2, 0x95, 0xea, 0x7f, 0x50, 0x8a,
-	0xfb, 0xa0, 0xa8, 0x50, 0xc5, 0x02, 0xf4, 0x1a, 0x54, 0xe3, 0x01, 0x3f, 0x98, 0x32, 0xac, 0xe6,
-	0xb4, 0x10, 0x21, 0x58, 0xf2, 0x30, 0x1b, 0xa8, 0xba, 0x23, 0xbe, 0x53, 0x99, 0xa1, 0xfe, 0x0a,
-	0x99, 0xc1, 0x78, 0x04, 0xcb, 0xc9, 0x02, 0x80, 0xbf, 0xa5, 0xbe, 0x5a, 0x87, 0x1c, 0x08, 0xa9,
-	0xed, 0x52, 0x5f, 0x95, 0x47, 0x39, 0xe0, 0x05, 0xc8, 0x27, 0x23, 0x5b, 0x54, 0x92, 0x9c, 0x98,
-	0x88, 0xc7, 0x37, 0x6b, 0xb0, 0xc4, 0xa3, 0x89, 0x8a, 0xb0, 0xf4, 0xe0, 0xf1, 0xf1, 0x71, 0x6d,
-	0x61, 0xef, 0xcf, 0x02, 0x14, 0x5b, 0x6a, 0x9b, 0xd1, 0x29, 0x54, 0xa7, 0x5e, 0x8d, 0xe8, 0x8d,
-	0x8c, 0x40, 0x64, 0xbd, 0x2b, 0x1b, 0x8d, 0xd9, 0xed, 0x31, 0x67, 0x9d, 0x7a, 0x34, 0x66, 0xb2,
-	0x66, 0x3d, 0x2b, 0x5f, 0xc4, 0x3a, 0xf5, 0xd0, 0xca, 0x64, 0xcd, 0x7a, 0x8a, 0xcd, 0x65, 0xed,
-	0x42, 0x3d, 0xeb, 0xa9, 0x84, 0x9a, 0x19, 0x3a, 0x73, 0xde, 0x54, 0x73, 0x6d, 0x7c, 0x03, 0xb5,
-	0xf4, 0x9b, 0x08, 0xdd, 0x9c, 0xcb, 0x3f, 0xf5, 0x70, 0x6a, 0x6c, 0xcd, 0xe6, 0x56, 0x6c, 0x8f,
-	0xa0, 0x92, 0x6c, 0xe3, 0xd1, 0xeb, 0x33, 0xc3, 0x38, 0xd5, 0x0e, 0x37, 0x66, 0xf7, 0xaf, 0x9c,
-	0x32, 0xd9, 0xa4, 0x67, 0x52, 0x66, 0x74, 0xf1, 0xf3, 0x28, 0x3f, 0x87, 0x52, 0xdc, 0x90, 0xa3,
-	0xeb, 0x59, 0x8b, 0x4a, 0xb5, 0xeb, 0xf3, 0xc8, 0x9e, 0x01, 0x7a, 0xbe, 0xad, 0x46, 0x6f, 0x67,
-	0xbd, 0x7f, 0x66, 0x75, 0xdf, 0x8d, 0xab, 0xcf, 0xdd, 0xcb, 0xf6, 0xd0, 0x63, 0x63, 0xf4, 0x15,
-	0xd4, 0xd2, 0xfd, 0x72, 0x66, 0xc0, 0x66, 0x34, 0xd5, 0x73, 0xdc, 0xde, 0xbf, 0xfa, 0xac, 0x9e,
-	0xf8, 0x55, 0xf4, 0x51, 0xf4, 0xdd, 0x2d, 0x08, 0x17, 0x6e, 0xfd, 0x1d, 0x00, 0x00, 0xff, 0xff,
-	0x95, 0xc8, 0x01, 0xb6, 0x49, 0x12, 0x00, 0x00,
+	// 2483 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x5a, 0x4b, 0x73, 0xdb, 0xc8,
+	0xf1, 0x17, 0x49, 0xbd, 0xd8, 0xa4, 0x24, 0x7a, 0x44, 0x4b, 0x10, 0x25, 0xeb, 0x01, 0x5b, 0xb6,
+	0x56, 0xfb, 0x5f, 0xca, 0x96, 0xeb, 0xbf, 0xb6, 0x77, 0x93, 0x83, 0x1e, 0xb4, 0xa5, 0x5d, 0x59,
+	0xf6, 0x42, 0x0f, 0x27, 0x9b, 0x2a, 0x73, 0x47, 0xc4, 0x88, 0x9a, 0x18, 0x04, 0xb0, 0xc0, 0x80,
+	0x0e, 0x73, 0xc8, 0x21, 0x95, 0xaa, 0x54, 0x6e, 0x39, 0xe4, 0x9c, 0x2f, 0x90, 0xca, 0x31, 0xd7,
+	0x54, 0xee, 0xa9, 0xdc, 0xf2, 0x4d, 0xf2, 0x05, 0x52, 0x98, 0x19, 0x80, 0x00, 0x05, 0x90, 0x52,
+	0xa2, 0x55, 0x6e, 0x40, 0xcf, 0x6f, 0xba, 0x7b, 0x7a, 0xfa, 0x31, 0x83, 0x06, 0x54, 0xb0, 0xa7,
+	0x53, 0x62, 0x36, 0xc8, 0x46, 0xfb, 0xc9, 0x46, 0xf0, 0x5c, 0xb5, 0x1d, 0x8b, 0x59, 0xe8, 0x8e,
+	0x63, 0xb5, 0x89, 0x53, 0x0d, 0xa9, 0xed, 0x27, 0x95, 0xa5, 0xa6, 0x65, 0x35, 0x0d, 0xb2, 0xc1,
+	0x01, 0x67, 0xde, 0xf9, 0x06, 0xa3, 0x2d, 0xe2, 0x32, 0xdc, 0xb2, 0xc5, 0x9c, 0xca, 0x7c, 0x2f,
+	0x80, 0xb4, 0x6c, 0xd6, 0x91, 0x83, 0x08, 0x7b, 0xec, 0x42, 0x08, 0x62, 0x17, 0x82, 0xa6, 0x9e,
+	0x40, 0x79, 0xc7, 0x21, 0x98, 0x91, 0xb7, 0x8e, 0x75, 0x4e, 0x0d, 0xa2, 0x91, 0xef, 0x3d, 0xe2,
+	0x32, 0xf4, 0x63, 0x28, 0xfa, 0xa8, 0x7a, 0xc3, 0x32, 0x19, 0xf9, 0x05, 0x53, 0x32, 0xcb, 0x99,
+	0xb5, 0xc2, 0x66, 0xa5, 0x1a, 0xe8, 0xc4, 0x2e, 0xaa, 0xed, 0x27, 0xd5, 0x2d, 0x8f, 0x5d, 0xec,
+	0x08, 0x84, 0x56, 0xc0, 0xdd, 0x17, 0x95, 0x41, 0x79, 0x97, 0x18, 0xe4, 0x86, 0xd9, 0xa2, 0x7b,
+	0x00, 0xb6, 0x60, 0x58, 0xa7, 0xba, 0x92, 0x5d, 0xce, 0xac, 0xe5, 0xb5, 0xbc, 0xa4, 0xec, 0xeb,
+	0xea, 0x9f, 0xb3, 0x50, 0x3e, 0xb1, 0x75, 0x7c, 0xbb, 0x62, 0xd1, 0x3b, 0x00, 0xcc, 0x98, 0x43,
+	0xcf, 0x3c, 0x46, 0x5c, 0x65, 0x64, 0x39, 0xb7, 0x56, 0xd8, 0x7c, 0x56, 0xbd, 0xb4, 0x7b, 0xd5,
+	0x24, 0xd5, 0xaa, 0x5b, 0xe1, 0xcc, 0x9a, 0xc9, 0x9c, 0x8e, 0x16, 0x61, 0x55, 0x79, 0x0f, 0x53,
+	0x3d, 0xc3, 0xa8, 0x04, 0xb9, 0x0f, 0xa4, 0xc3, 0x17, 0x90, 0xd7, 0xfc, 0x47, 0xf4, 0xff, 0x30,
+	0xd2, 0xc6, 0x86, 0x47, 0xb8, 0x5e, 0x85, 0xcd, 0xa5, 0x04, 0xc1, 0xa7, 0xfe, 0xb8, 0x90, 0xee,
+	0x6a, 0x02, 0xfd, 0x45, 0xf6, 0x79, 0x46, 0xfd, 0x63, 0x06, 0x16, 0x63, 0x4a, 0xed, 0xeb, 0xc4,
+	0x64, 0xf4, 0x9c, 0x12, 0xe7, 0x76, 0x2c, 0xb7, 0x08, 0x40, 0x43, 0x91, 0x4a, 0x8e, 0x0f, 0x47,
+	0x28, 0x6a, 0x07, 0xe6, 0x5f, 0x11, 0x26, 0x95, 0xdb, 0xee, 0xec, 0x92, 0x36, 0x6d, 0x90, 0x7d,
+	0xfd, 0x86, 0x94, 0x9b, 0x87, 0xbc, 0xce, 0x39, 0x76, 0x75, 0x1b, 0xd7, 0xa5, 0x08, 0xf5, 0x57,
+	0x70, 0x2f, 0x2a, 0xfa, 0xc6, 0x2d, 0x13, 0x5f, 0x7a, 0xf6, 0xd2, 0xd2, 0x7f, 0x02, 0xb3, 0x5d,
+	0xf9, 0x47, 0x8d, 0x0b, 0xd2, 0xc2, 0x37, 0x14, 0x9b, 0xff, 0xca, 0xc2, 0x98, 0xe4, 0x8b, 0x26,
+	0x21, 0x4b, 0x75, 0xe9, 0x4d, 0x59, 0xaa, 0xfb, 0xfb, 0x85, 0x1b, 0x0d, 0xcb, 0x33, 0x59, 0x60,
+	0x93, 0x11, 0x2d, 0x2f, 0x29, 0x83, 0xf7, 0x0b, 0x7d, 0x15, 0x8b, 0x84, 0x61, 0x1e, 0x09, 0xeb,
+	0x09, 0x0e, 0x29, 0xc5, 0xf7, 0x73, 0x7e, 0xf4, 0x02, 0xa0, 0xc1, 0x33, 0x93, 0x5e, 0xc7, 0x4c,
+	0x19, 0x91, 0x6b, 0x14, 0xf9, 0xad, 0x1a, 0xe4, 0xb7, 0xea, 0x71, 0x90, 0x00, 0xb5, 0xbc, 0x44,
+	0x6f, 0x31, 0x7f, 0xaa, 0xc7, 0xdd, 0x9a, 0x4f, 0x1d, 0x1d, 0x3c, 0x55, 0xa2, 0xb7, 0x58, 0xe5,
+	0xdd, 0x55, 0x42, 0xae, 0x1a, 0x0f, 0x39, 0x25, 0x2d, 0xe4, 0xa2, 0xb1, 0x76, 0x04, 0x13, 0xb1,
+	0xcd, 0x44, 0xdb, 0x31, 0x5b, 0x01, 0xb7, 0x95, 0x9a, 0xc0, 0x49, 0xc0, 0x43, 0xa5, 0xa2, 0x36,
+	0x52, 0x4d, 0x28, 0xbd, 0x22, 0x4c, 0x84, 0xc5, 0x6d, 0x04, 0xc5, 0xef, 0x33, 0x30, 0x2d, 0xca,
+	0xc5, 0x8d, 0xca, 0x1c, 0x90, 0x25, 0x62, 0x2a, 0xe5, 0x7a, 0x54, 0xfa, 0x47, 0x06, 0x16, 0x44,
+	0x0e, 0x13, 0x2a, 0xbd, 0xf5, 0xdc, 0x8b, 0x63, 0xeb, 0x03, 0x31, 0x6f, 0xc1, 0x1e, 0x68, 0x0d,
+	0x4a, 0x72, 0x90, 0xf9, 0x22, 0xeb, 0xbe, 0x9f, 0x08, 0x05, 0x27, 0x05, 0x9d, 0x6b, 0xf2, 0x35,
+	0xe9, 0xa0, 0x47, 0x30, 0x85, 0x6d, 0xb7, 0x4e, 0xcc, 0x36, 0x75, 0x2c, 0xb3, 0x45, 0x4c, 0xa6,
+	0x0c, 0x0b, 0x20, 0xb6, 0xdd, 0x5a, 0x97, 0xaa, 0xfe, 0x26, 0x03, 0x0f, 0xa3, 0xeb, 0x39, 0x31,
+	0x1d, 0xd2, 0xa4, 0x2e, 0x23, 0xce, 0x6d, 0xae, 0x4c, 0xfd, 0x75, 0x16, 0xe6, 0xa3, 0x6a, 0x1c,
+	0x58, 0x0d, 0xcc, 0xa8, 0x75, 0x2b, 0x56, 0xfd, 0x14, 0xee, 0x18, 0x52, 0x5c, 0x1d, 0x37, 0x1a,
+	0x9e, 0x83, 0x1b, 0xc2, 0xac, 0x23, 0x5a, 0x29, 0x18, 0xd8, 0x92, 0xf4, 0x18, 0xd8, 0xc0, 0x8c,
+	0x32, 0x4f, 0x27, 0xdc, 0xb4, 0x99, 0x2e, 0xf8, 0x40, 0xd2, 0xd1, 0x67, 0x80, 0xba, 0x60, 0xcb,
+	0x6c, 0x0a, 0xf4, 0x08, 0x47, 0x87, 0x6c, 0x0e, 0x82, 0x01, 0xf5, 0x6f, 0x19, 0x58, 0x8d, 0x1a,
+	0xe1, 0x15, 0xb1, 0xce, 0xfd, 0xb0, 0x7c, 0x6d, 0x99, 0x94, 0x59, 0x0e, 0x35, 0x9b, 0xb7, 0x61,
+	0x8e, 0x2f, 0x61, 0xcc, 0x77, 0x01, 0xcb, 0x74, 0x95, 0x1c, 0xcf, 0x12, 0x2b, 0x09, 0x59, 0x22,
+	0x50, 0x4d, 0xe3, 0x48, 0x2d, 0x98, 0xa1, 0xfe, 0x35, 0x03, 0x0f, 0xa2, 0x4b, 0xd8, 0xdf, 0x26,
+	0xb8, 0x61, 0x99, 0xb7, 0xbb, 0x82, 0x2f, 0x7a, 0x57, 0xb0, 0x9c, 0xb0, 0x02, 0xa9, 0x59, 0xef,
+	0x02, 0xbe, 0x87, 0x69, 0x71, 0x92, 0xbc, 0xbd, 0x2c, 0xf7, 0x87, 0x0c, 0xcc, 0x1e, 0x05, 0x69,
+	0xf5, 0x66, 0x4f, 0x92, 0x7d, 0xcd, 0x14, 0x4f, 0x83, 0xb9, 0xde, 0xd3, 0xed, 0x6f, 0x0b, 0x30,
+	0x1d, 0xdd, 0xca, 0xdb, 0x50, 0x29, 0x21, 0x6d, 0x41, 0x52, 0xda, 0x4a, 0xcc, 0x84, 0x85, 0xc4,
+	0x4c, 0x38, 0x07, 0xe3, 0xd8, 0xb6, 0xeb, 0x26, 0x6e, 0x11, 0xa5, 0xc8, 0x11, 0x63, 0xd8, 0xb6,
+	0x0f, 0x71, 0x8b, 0xa0, 0x25, 0x28, 0xf8, 0x43, 0x6d, 0xe2, 0xb8, 0xd4, 0x32, 0x95, 0x09, 0x71,
+	0xbe, 0xc0, 0xb6, 0x7d, 0x2a, 0x28, 0xbe, 0xae, 0x3e, 0xe0, 0xcc, 0xa3, 0x86, 0xae, 0x4c, 0x0a,
+	0x5d, 0xb1, 0x6d, 0x6f, 0xfb, 0xef, 0xe8, 0x3e, 0x4c, 0x04, 0x8c, 0x5d, 0x1b, 0x37, 0x88, 0x32,
+	0xc5, 0x01, 0x45, 0xc9, 0x9d, 0xd3, 0xd0, 0x06, 0x4c, 0x4b, 0x3d, 0x5b, 0xd8, 0xf4, 0xce, 0x71,
+	0x83, 0x79, 0x0e, 0x71, 0x94, 0x12, 0x87, 0x22, 0x31, 0xf4, 0x3a, 0x32, 0x82, 0x66, 0x61, 0xcc,
+	0x72, 0x85, 0xb6, 0x77, 0x38, 0x68, 0xd4, 0x72, 0xb9, 0xb2, 0x2f, 0x00, 0x2c, 0x37, 0xd4, 0x15,
+	0xf5, 0x18, 0x3d, 0x72, 0x12, 0x10, 0x08, 0x2d, 0x6f, 0xb9, 0xc1, 0x32, 0x56, 0xa0, 0x18, 0x28,
+	0x61, 0xe9, 0xc4, 0x50, 0xa6, 0x39, 0xe3, 0x82, 0x94, 0xee, 0x93, 0xd0, 0x29, 0xc0, 0xb9, 0x83,
+	0x5b, 0xe4, 0xa3, 0xe5, 0x7c, 0x70, 0x95, 0x32, 0x8f, 0x9a, 0xcf, 0x53, 0xef, 0x14, 0x31, 0x87,
+	0xa8, 0xbe, 0x0c, 0x27, 0xca, 0x53, 0x55, 0x97, 0x93, 0xbf, 0xa1, 0x7e, 0x9e, 0x33, 0x48, 0xdd,
+	0xc0, 0x66, 0xd3, 0xc3, 0x4d, 0xa2, 0xdc, 0x15, 0xdb, 0x24, 0xc8, 0x07, 0x92, 0xea, 0x5b, 0x53,
+	0x02, 0x45, 0x24, 0x2a, 0x33, 0xc2, 0x9a, 0x82, 0x28, 0xa2, 0x34, 0x02, 0x72, 0x1b, 0x0e, 0xb5,
+	0x99, 0x32, 0x1b, 0x05, 0x1d, 0x71, 0x1a, 0x7a, 0x08, 0x53, 0xd4, 0xad, 0x7f, 0xa4, 0xe7, 0xb4,
+	0x4e, 0x4c, 0x7c, 0x66, 0x10, 0x5d, 0x51, 0x96, 0x33, 0x6b, 0xe3, 0xda, 0x04, 0x75, 0xdf, 0xd1,
+	0x73, 0x5a, 0x13, 0x44, 0x54, 0x85, 0x69, 0xea, 0xd6, 0x1b, 0xc4, 0x30, 0x3c, 0x03, 0x3b, 0x21,
+	0x76, 0x8e, 0x63, 0xef, 0x50, 0x77, 0x47, 0x8e, 0x04, 0xf8, 0x15, 0x28, 0xba, 0x0d, 0x87, 0x10,
+	0xb3, 0xfe, 0x91, 0xea, 0xec, 0x42, 0xa9, 0xf0, 0x0a, 0x51, 0x10, 0xb4, 0x77, 0x3e, 0xc9, 0xd7,
+	0x4f, 0x42, 0x2e, 0x08, 0x6d, 0x5e, 0x30, 0x65, 0x9e, 0x63, 0xe4, 0xbc, 0x3d, 0x4e, 0xf3, 0xf9,
+	0x34, 0xb0, 0xe3, 0x50, 0xe2, 0x88, 0x6d, 0x5e, 0x10, 0xbb, 0x21, 0x69, 0x7c, 0xaf, 0xcb, 0x30,
+	0xe2, 0x60, 0x9d, 0x5a, 0xca, 0x3d, 0x3e, 0x26, 0x5e, 0x7c, 0x6f, 0xf4, 0xef, 0xdf, 0xf5, 0x5f,
+	0x5a, 0x26, 0x51, 0x16, 0x85, 0x37, 0xfa, 0x84, 0x6f, 0x2d, 0x93, 0xa0, 0x67, 0x30, 0x6e, 0x1b,
+	0x98, 0x9d, 0x5b, 0x4e, 0x4b, 0x59, 0x5a, 0xce, 0xac, 0x4d, 0x6e, 0xce, 0x27, 0x1d, 0x84, 0x25,
+	0x44, 0x0b, 0xc1, 0x68, 0x13, 0xee, 0x52, 0xb7, 0x7e, 0x86, 0x1b, 0x1f, 0x9a, 0x8e, 0xe5, 0x99,
+	0x7a, 0x68, 0x88, 0x65, 0x6e, 0x88, 0x69, 0xea, 0x6e, 0x87, 0x63, 0x81, 0x29, 0x76, 0x60, 0x91,
+	0xba, 0xf5, 0xb0, 0xb4, 0xb5, 0xc2, 0xec, 0x1e, 0x4e, 0x5e, 0xe1, 0x93, 0xe7, 0xa9, 0x1b, 0x14,
+	0xf2, 0x6e, 0x05, 0x08, 0x98, 0x3c, 0x86, 0xb2, 0x2f, 0xd8, 0xf0, 0x08, 0xb3, 0x2c, 0x76, 0x11,
+	0x4e, 0x55, 0xf9, 0x54, 0x44, 0xdd, 0xed, 0x60, 0x28, 0x98, 0xb1, 0x0a, 0x93, 0x58, 0x6f, 0x13,
+	0x87, 0x51, 0xd7, 0x97, 0x45, 0x75, 0xe5, 0x3e, 0xb7, 0xc2, 0x44, 0x84, 0xba, 0xaf, 0xf3, 0x4b,
+	0x86, 0xad, 0x3c, 0x90, 0x97, 0x0c, 0x1b, 0xe9, 0x30, 0x23, 0x7c, 0x2a, 0xaa, 0xa8, 0x1f, 0x09,
+	0xca, 0x2a, 0x37, 0x54, 0x35, 0xc1, 0x50, 0xc2, 0xc3, 0xab, 0xc2, 0xef, 0xba, 0xba, 0xfb, 0xc1,
+	0xa2, 0x95, 0x9d, 0x04, 0x6a, 0xe5, 0xa7, 0x30, 0xd5, 0x13, 0x08, 0x09, 0x27, 0xf9, 0xc7, 0xf1,
+	0x93, 0x7c, 0xbf, 0xf8, 0x8d, 0x9c, 0xe5, 0x7f, 0x57, 0x86, 0x51, 0xa1, 0xd0, 0xa5, 0x0b, 0xd4,
+	0xa0, 0x04, 0x1f, 0xb9, 0x5d, 0xe5, 0x7a, 0x6f, 0x57, 0xf1, 0xfc, 0x3f, 0xdc, 0x7b, 0x0c, 0xfe,
+	0x9f, 0x5c, 0x88, 0x7e, 0x88, 0x0a, 0xf0, 0x14, 0x66, 0x62, 0x48, 0xea, 0xd6, 0x71, 0x83, 0xd1,
+	0xb6, 0xa8, 0x07, 0xe3, 0xda, 0x74, 0x04, 0xbf, 0xef, 0x6e, 0xf1, 0x21, 0xf4, 0x0d, 0xcc, 0xc6,
+	0x26, 0x45, 0x4c, 0x31, 0x31, 0x70, 0x3d, 0xe5, 0x08, 0xc7, 0x9d, 0xd0, 0x2a, 0xbd, 0x2c, 0x23,
+	0x26, 0x9a, 0xbc, 0x16, 0xcb, 0x93, 0xd0, 0x5a, 0x3f, 0x83, 0x85, 0x38, 0xcb, 0xf0, 0xf4, 0x2e,
+	0xf8, 0x4e, 0x0d, 0xe4, 0x3b, 0x17, 0xe5, 0x1b, 0x99, 0xbd, 0xc5, 0x62, 0x95, 0xb3, 0xd4, 0xb7,
+	0x72, 0xde, 0xe9, 0x5f, 0x39, 0xd1, 0xa0, 0xca, 0x39, 0x7d, 0xf5, 0xca, 0x59, 0x4e, 0xad, 0x9c,
+	0xbd, 0x55, 0x6e, 0xf6, 0x72, 0x95, 0x8b, 0x14, 0xd7, 0xbb, 0x7d, 0x8a, 0xeb, 0xcc, 0x75, 0x8a,
+	0xeb, 0x7e, 0xac, 0x72, 0x2a, 0xbc, 0x72, 0x7e, 0x92, 0x9e, 0x51, 0xae, 0x59, 0x2c, 0xe7, 0xae,
+	0x56, 0x2c, 0x2b, 0x57, 0x29, 0x96, 0xf3, 0x57, 0x2b, 0x96, 0x0b, 0xd7, 0x28, 0x96, 0xf7, 0xae,
+	0x5a, 0x2c, 0x17, 0xaf, 0x50, 0x2c, 0x97, 0xae, 0x50, 0x2c, 0x97, 0xfb, 0x14, 0xcb, 0x95, 0xd4,
+	0x62, 0xa9, 0xf6, 0x29, 0x96, 0xf7, 0x6f, 0xa4, 0x58, 0x3e, 0xf8, 0x6f, 0x8a, 0xe5, 0xea, 0x7f,
+	0x5e, 0x2c, 0x1f, 0x5e, 0xa3, 0x58, 0x3e, 0x4a, 0x2f, 0x96, 0x6b, 0x61, 0xb1, 0x4c, 0xbc, 0x0c,
+	0x7f, 0x72, 0x9d, 0xcb, 0xf0, 0xfa, 0xb5, 0x2e, 0xc3, 0x9f, 0xa6, 0x5c, 0x86, 0x83, 0x60, 0xe0,
+	0x70, 0xe9, 0xe5, 0xff, 0xd7, 0x0d, 0x06, 0xf1, 0x6d, 0x20, 0xea, 0xe7, 0x1c, 0xd8, 0xa0, 0xac,
+	0xa3, 0x7c, 0xd6, 0xf5, 0x73, 0x9f, 0xb8, 0x43, 0x59, 0x27, 0xc6, 0xcd, 0x65, 0x0e, 0x21, 0x4c,
+	0xa9, 0xc6, 0xb9, 0x1d, 0x71, 0x6a, 0x9f, 0xc3, 0xc2, 0xc6, 0xcd, 0x1d, 0x16, 0x90, 0x01, 0xab,
+	0xf4, 0x8c, 0xdf, 0x3f, 0xa3, 0x62, 0xe4, 0x1d, 0x34, 0x5a, 0x18, 0x1e, 0x0f, 0x4c, 0xe0, 0x2b,
+	0x92, 0x51, 0xf4, 0x8a, 0xcd, 0xd9, 0x74, 0xab, 0xc4, 0x7b, 0xa8, 0xa4, 0x4b, 0x53, 0x9e, 0x5c,
+	0xf1, 0x8a, 0xac, 0xa4, 0x09, 0x42, 0x26, 0x3c, 0x6c, 0xca, 0xef, 0x01, 0x03, 0x96, 0xb3, 0x39,
+	0x70, 0x39, 0x6a, 0x33, 0xe1, 0xa3, 0x47, 0xcf, 0x7a, 0x30, 0xcc, 0xf7, 0x91, 0xa7, 0x3c, 0xbd,
+	0xea, 0x57, 0x8b, 0xb9, 0x54, 0x59, 0x3f, 0xe4, 0x69, 0xee, 0x47, 0x50, 0x4e, 0xf2, 0x14, 0x34,
+	0x01, 0xf9, 0x93, 0xc3, 0xdd, 0xda, 0xcb, 0xfd, 0xc3, 0xda, 0x6e, 0x69, 0x08, 0xe5, 0x61, 0x44,
+	0x7b, 0x73, 0x5a, 0xd3, 0x4a, 0x19, 0x04, 0x30, 0xfa, 0x6a, 0xff, 0xf5, 0xf6, 0xd6, 0x41, 0x29,
+	0xab, 0xbe, 0x81, 0x89, 0xd8, 0xb6, 0x20, 0x04, 0xc3, 0x9e, 0x17, 0x9e, 0x09, 0xf9, 0xb3, 0x9f,
+	0x12, 0x5b, 0xf8, 0xe7, 0x96, 0x23, 0xbf, 0xa8, 0x8b, 0x17, 0x4e, 0xa5, 0xa6, 0xe5, 0xc8, 0x93,
+	0xa0, 0x78, 0x51, 0x1d, 0x98, 0x8c, 0x9b, 0xe5, 0xd2, 0x19, 0xb3, 0x02, 0xe3, 0x61, 0x70, 0x67,
+	0x79, 0xb8, 0x86, 0xef, 0x68, 0x01, 0xf2, 0xdd, 0x58, 0xce, 0xf1, 0xc1, 0x2e, 0x01, 0xcd, 0xc0,
+	0xa8, 0x9f, 0x8d, 0x3d, 0x97, 0x9f, 0x2e, 0x47, 0x34, 0xf9, 0xa6, 0xbe, 0x84, 0x62, 0xb4, 0x47,
+	0x84, 0x3e, 0x87, 0x51, 0x6e, 0x1f, 0x57, 0xc9, 0xf0, 0xbd, 0x5b, 0xec, 0xdf, 0x54, 0xd2, 0x24,
+	0x5a, 0xfd, 0x4b, 0x06, 0x0a, 0x11, 0x3a, 0xfa, 0x0a, 0x0a, 0xc2, 0xd9, 0xea, 0xac, 0x63, 0x13,
+	0xbe, 0x84, 0xc9, 0xc4, 0x62, 0x1c, 0x99, 0x24, 0xaf, 0xb4, 0xc7, 0x1d, 0x9b, 0x68, 0xf2, 0xd4,
+	0xea, 0x3f, 0x5f, 0xf7, 0xa3, 0xbb, 0xba, 0x0e, 0xd0, 0xe5, 0x84, 0xc6, 0x20, 0x77, 0x54, 0x3b,
+	0x2e, 0x0d, 0xf9, 0x0f, 0x5b, 0xbb, 0xbb, 0xa5, 0x9c, 0xbf, 0x89, 0x5a, 0xed, 0xf5, 0x9b, 0xd3,
+	0x5a, 0x69, 0x58, 0xfd, 0x53, 0x0e, 0x46, 0xf8, 0x64, 0xb4, 0x0a, 0x13, 0x67, 0x96, 0x65, 0x10,
+	0x6c, 0xd6, 0x85, 0x34, 0x5f, 0xe7, 0xf1, 0xbd, 0x21, 0xad, 0x28, 0xc9, 0x21, 0x8c, 0x9a, 0x8c,
+	0x34, 0x89, 0x53, 0xef, 0x2a, 0x95, 0xf3, 0x61, 0x92, 0x2c, 0x60, 0xf7, 0xa1, 0xa8, 0x5b, 0xde,
+	0x99, 0x41, 0x24, 0x8a, 0x6f, 0xc8, 0xde, 0x90, 0x56, 0x10, 0xd4, 0x10, 0xe4, 0x32, 0x1e, 0x30,
+	0x02, 0xc4, 0x0f, 0xfe, 0x3e, 0x48, 0x50, 0x05, 0xe8, 0x18, 0x90, 0x04, 0x61, 0xc7, 0xc1, 0x1d,
+	0x09, 0x15, 0x97, 0x80, 0x07, 0x69, 0xa6, 0xa8, 0x1e, 0xf1, 0x29, 0x5b, 0xfe, 0x8c, 0xbd, 0x21,
+	0xad, 0xe4, 0x76, 0x5f, 0x05, 0xd7, 0xe7, 0x00, 0xa6, 0x67, 0x18, 0x92, 0xdb, 0x18, 0xdf, 0x9e,
+	0xd9, 0x04, 0x6e, 0x87, 0x9e, 0x61, 0xec, 0x0d, 0x69, 0x79, 0x1f, 0x2c, 0x66, 0xd6, 0x60, 0x2a,
+	0xec, 0x3d, 0xcb, 0xe9, 0xe3, 0x83, 0x72, 0xc9, 0xde, 0x90, 0x36, 0x19, 0x4e, 0xe2, 0x6c, 0x2a,
+	0xab, 0x50, 0x88, 0xe8, 0xe8, 0xfb, 0x67, 0xc4, 0xef, 0xf2, 0x81, 0x5f, 0x6d, 0x17, 0x01, 0xf8,
+	0x13, 0x77, 0x23, 0xf5, 0x9f, 0x19, 0x98, 0xea, 0xe9, 0x8a, 0xf4, 0x5c, 0xad, 0x32, 0xbd, 0x57,
+	0x2b, 0x11, 0x42, 0xd9, 0x30, 0x84, 0x16, 0x20, 0x1f, 0xb6, 0x51, 0x82, 0x2f, 0x6d, 0x21, 0x81,
+	0x97, 0xea, 0xe0, 0x45, 0x78, 0xee, 0xb0, 0x2c, 0xd5, 0x01, 0x95, 0xfb, 0x14, 0x82, 0x61, 0x1b,
+	0xb3, 0x0b, 0xbe, 0x0b, 0x79, 0x8d, 0x3f, 0xf7, 0x5c, 0xd2, 0xe0, 0x1a, 0x97, 0x34, 0xf5, 0x1b,
+	0x18, 0x0b, 0xce, 0xb0, 0x61, 0xbe, 0xc8, 0x24, 0xe6, 0x8b, 0x6c, 0x24, 0x5f, 0xf8, 0xd9, 0xc0,
+	0x21, 0x6d, 0xca, 0x0f, 0xca, 0x22, 0x91, 0x84, 0xef, 0xeb, 0x55, 0x18, 0x0f, 0x0e, 0x4d, 0xbd,
+	0xe9, 0x0c, 0x60, 0xf4, 0xf5, 0x9b, 0xed, 0xfd, 0x83, 0x5a, 0x29, 0xe3, 0xc7, 0xc4, 0xbb, 0xda,
+	0x76, 0x29, 0xbb, 0x5e, 0x82, 0x61, 0x7f, 0xab, 0xd1, 0x38, 0x0c, 0x1f, 0x9e, 0x1c, 0x1c, 0x94,
+	0x86, 0x36, 0xff, 0x5e, 0x84, 0xf1, 0x2d, 0xe9, 0x09, 0xe8, 0x18, 0x26, 0x62, 0x3f, 0x0b, 0xa0,
+	0x47, 0x09, 0xbe, 0x92, 0xf4, 0x3b, 0x41, 0xa5, 0x92, 0xde, 0x04, 0x44, 0x6f, 0x61, 0x22, 0xf6,
+	0xaf, 0x40, 0x22, 0xd7, 0xa4, 0xbf, 0x09, 0x2a, 0x33, 0x97, 0x0c, 0x5b, 0x6b, 0xd9, 0xac, 0xe3,
+	0x73, 0x8c, 0xb5, 0xb5, 0x13, 0x39, 0x26, 0x75, 0xe3, 0x53, 0x39, 0xea, 0x30, 0x9b, 0xd2, 0x28,
+	0x47, 0x4f, 0x06, 0xf1, 0xbe, 0xd4, 0x3a, 0x4e, 0x95, 0x72, 0x06, 0xe5, 0xa4, 0x76, 0x37, 0xaa,
+	0x26, 0x96, 0xce, 0xd4, 0xbe, 0x78, 0x5f, 0x6b, 0x9f, 0xc3, 0x4c, 0x72, 0x5f, 0x1b, 0x3d, 0x1e,
+	0x20, 0xe5, 0xf2, 0x3a, 0xfa, 0xc9, 0xf9, 0x8e, 0xb7, 0x26, 0xe3, 0x2d, 0xcf, 0xf5, 0xbe, 0x12,
+	0x62, 0x4d, 0xee, 0xca, 0x72, 0x3a, 0x6f, 0xc9, 0xed, 0x6b, 0xc8, 0x87, 0xcd, 0x4f, 0x74, 0x3f,
+	0x99, 0x75, 0xec, 0xc3, 0x68, 0x65, 0x2e, 0xf5, 0xac, 0x88, 0x0e, 0xa1, 0x18, 0x6d, 0x6c, 0xa2,
+	0x87, 0xa9, 0x9e, 0x1d, 0x67, 0x99, 0xb6, 0x95, 0x87, 0x50, 0x8c, 0x7e, 0x9a, 0x4d, 0xe4, 0x97,
+	0xf0, 0xed, 0x36, 0x95, 0xdf, 0x77, 0x70, 0x37, 0xb1, 0xcb, 0x89, 0x36, 0x06, 0x30, 0xee, 0xed,
+	0x1a, 0xa6, 0x4a, 0x60, 0xb0, 0x34, 0xa0, 0xef, 0x88, 0x5e, 0x0c, 0x90, 0x95, 0xde, 0xab, 0x4c,
+	0x95, 0xfa, 0x3e, 0xf8, 0x63, 0x27, 0xde, 0x66, 0x4c, 0x74, 0xf9, 0x3e, 0xfd, 0xc8, 0x54, 0xfe,
+	0x4e, 0xf0, 0x87, 0x4b, 0x5a, 0x07, 0x0f, 0x3d, 0x1f, 0x20, 0x29, 0xb5, 0xe9, 0x97, 0x2a, 0xd3,
+	0x86, 0x7b, 0x7d, 0x5b, 0x6e, 0xe8, 0xd9, 0x00, 0x91, 0x69, 0x4d, 0xba, 0x54, 0x89, 0xa7, 0x50,
+	0xea, 0x6d, 0x58, 0x25, 0x06, 0x5b, 0x4a, 0x57, 0xab, 0x9f, 0x17, 0x47, 0x9b, 0x6f, 0x89, 0x5e,
+	0x9c, 0xd0, 0x9d, 0x4b, 0xe3, 0xb7, 0x3d, 0xf3, 0x6d, 0x39, 0xf2, 0xc3, 0xdb, 0x97, 0xc1, 0xf3,
+	0xd9, 0x28, 0xc7, 0x3d, 0xfd, 0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x93, 0x0f, 0x91, 0xaa, 0x0f,
+	0x27, 0x00, 0x00,
 }

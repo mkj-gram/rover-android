@@ -3,7 +3,8 @@
 set -e
 
 run() {
-	go run ./audience/service/cmd/audience-serivce/main.go
+  go run ./audience/service/cmd/audience-service/main.go \
+    --mongo-dsn=${MONGO_DSN}
 }
 
 test() {
@@ -13,8 +14,7 @@ test() {
 
 bench() {
   go test -tags integration -bench . -run NONE -benchtime 10s \
-    ./audience/service/... \
-    -service.DSN=${DB_DSN}
+    ./audience/service/...
 }
 
 

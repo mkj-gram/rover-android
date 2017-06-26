@@ -1,0 +1,137 @@
+{
+  "_id": {"$oid": "dddddddddddddddddddddddd"},
+  "account_id": 1,
+  "identifier": "11111111-1111-1111-1111-dddddddddddd",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": null
+}
+
+{
+  "_id": {"$oid": "000000000000000000000a00"},
+  "account_id": 1,
+  "identifier": "11111111-1111-1111-1111-222222222222",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": null
+}
+{
+  "_id": {"$oid": "000000000000000000000aa0"},
+  "account_id": 5,
+  "identifier": "11111111-1111-1111-1111-111111111111",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": null
+}
+
+{
+  "_id": {"$oid": "000000000000000000000aa1"},
+  "account_id": 1,
+  "identifier": "a12abbc1-8935-407a-bf81-111111111111",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": null
+}
+
+{
+  "_id": {"$oid": "000000000000000000000aa2"},
+  "account_id": 1,
+  "identifier": "a12abbc1-8935-407a-bf81-3f77abaff9d0",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": null
+}
+
+{
+  "_id": { "$oid": "000000000000000000000aa3" },
+  "account_id": 5,
+  "identifier": "68ae1f81-3c2b-43fd-9e83-bb1bdf0525d4",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": null
+}
+
+{
+  "account_id": 5,
+  "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaaaa" },
+  "identifier": "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": {
+    "bool": true,
+    "string": "hello",
+    "integer": 1,
+    "double": 3.1415,
+    "array": ["hello", "world"],
+    "timestamp": { "$date": "2016-08-22T19:05:53.102Z" }
+  }
+}
+
+{
+  "account_id": 5,
+  "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaa00" },
+  "identifier": "78e19dbf-8c0b-47a5-b28f-333333333333",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": {
+    "bool": false
+  }
+}
+
+{
+  "account_id": 5,
+  "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaa01" },
+  "identifier": "78e19dbf-8c0b-47a5-b28f-444444444444",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": {
+    "arr": ["hello"],
+    "arr-add": ["adds"],
+    "arr-remove": ["keeps", "removes"],
+    "arr-add-remove": ["adds", "removes"]
+  }
+}
+
+{
+  "account_id": 6,
+  "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaaff" },
+  "identifier": "78e19dbf-8c0b-47a5-b28f-555555555555",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": {
+    "bool": true,
+
+    "string": "hello world",
+
+    "integer": {"$numberLong": "42"},
+
+    "double": 42.42,
+
+    "null": null,
+
+    "ts":         {"$date": "2016-08-22T19:05:53.102Z"},
+
+    "arr": ["hello"],
+    "arr-add": ["adds"],
+    "arr-remove": ["keeps", "removes"],
+    "arr-add-remove": ["adds", "removes"]
+  }
+}
+
+{
+  "account_id": 20,
+  "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaa20" },
+  "identifier": "78e19dbf-8c0b-47a5-b28f-666666666666",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": {
+    "bool": true,
+    "string": "a string",
+    "integer": {"$numberLong": "42"},
+    "double": 42.42,
+    "null": null,
+    "ts":  {"$date": "2016-08-22T19:05:53.102Z"},
+    "arr": ["hello", "world"]
+  }
+}
+

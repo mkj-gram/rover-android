@@ -1,0 +1,28 @@
+{"_id":{"$oid":"0000000000000000000000d0"},"device_id":"D00000000000000000000000","profile_id":{"$oid":"000000000000000000000aa2"},"account_id":1, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
+{"_id":{"$oid":"0000000000000000000000d2"},"device_id":"D00000000000000000000002","profile_id":{"$oid":"000000000000000000000aa2"},"account_id":1, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
+{"_id":{"$oid":"0000000000000000000000d3"},"device_id":"D00000000000000000000003","profile_id":{"$oid":"000000000000000000000aa3"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
+
+{"_id":{"$oid":"000000000000000000000DDD"},"device_id":"DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD","profile_id":{"$oid":"000000000000000000000add"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.497Z"}}
+{"_id":{"$oid":"000000000000000000000DD1"},"device_id":"DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1","profile_id":{"$oid":"000000000000000000000ad1"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.497Z"}}
+{"_id":{"$oid":"000000000000000000000DD2"},"device_id":"DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD2","profile_id":{"$oid":"000000000000000000000ad2"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.497Z"}}
+{"_id":{"$oid":"000000000000000000000DD3"},"device_id":"DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3","profile_id":{"$oid":"000000000000000000000ad3"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.497Z"}}
+{"_id":{"$oid":"000000000000000000000DD4"},"device_id":"DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD4","profile_id":{"$oid":"000000000000000000000ad4"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.497Z"}}
+{"_id":{"$oid":"000000000000000000000DD5"},"device_id":"DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD5","profile_id":{"$oid":"000000000000000000000ad5"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.497Z"}}
+{"_id":{"$oid":"000000000000000000000DD6"},"device_id":"DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD6","profile_id":{"$oid":"000000000000000000000ad6"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.497Z"}}
+
+
+{
+  "_id":{"$oid":"dddddddddddddddddddddddd"},
+  "device_id":"DDDDDDDD-DDDD-DDDD-DDDD-000000000000",
+  "profile_id":{"$oid":"000000000000000000000bbb"},
+  "account_id":5,
+  "created_at":{"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at":{"$date":"2017-06-14T15:44:18.497Z"},
+
+  "device_token_key": "registered",
+  "device_token_is_active": true,
+  "device_token_created_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "device_token_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "device_token_unregistered_at": null
+}
+

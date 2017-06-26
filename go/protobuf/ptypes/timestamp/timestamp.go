@@ -12,9 +12,14 @@ import (
 // Timestamp is an extension of the official timestamp.Timestamp
 // that enables DB mapping by implementing database/sql/driver.Valuer
 // and database/sql.Scanner interfaces
-type Timestamp struct {
-	timestamp.Timestamp
-}
+type Timestamp timestamp.Timestamp
+
+// Protobuf compliance
+func (m *Timestamp) Reset()                      { ((*timestamp.Timestamp)(m)).Reset() }
+func (m *Timestamp) String() string              { return ((*timestamp.Timestamp)(m)).String() }
+func (*Timestamp) ProtoMessage()                 {}
+func (m *Timestamp) Descriptor() ([]byte, []int) { return ((*timestamp.Timestamp)(m)).Descriptor() }
+func (m *Timestamp) XXX_WellKnownType() string   { return ((*timestamp.Timestamp)(m)).XXX_WellKnownType() }
 
 // Time converts Timestamp to time.Time unless there's an error
 func Time(ts *Timestamp) (time.Time, error) {
@@ -22,7 +27,7 @@ func Time(ts *Timestamp) (time.Time, error) {
 		return time.Time{}, fmt.Errorf("Time: nil ts")
 	}
 
-	return ptypes.Timestamp(&ts.Timestamp)
+	return ptypes.Timestamp((*timestamp.Timestamp)(ts))
 }
 
 // TimestampProto converts time.Time to *Timestamp unless an error
@@ -32,8 +37,10 @@ func TimestampProto(t time.Time) (*Timestamp, error) {
 		return nil, err
 	}
 
-	return &Timestamp{*ts}, nil
+	return (*Timestamp)(ts), nil
 }
+
+// DB interface
 
 // Value converts Time value into a value that DB undestands
 func (ts *Timestamp) Value() (driver.Value, error) {

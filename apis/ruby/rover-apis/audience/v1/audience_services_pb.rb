@@ -24,27 +24,33 @@ module Rover
           # CreateProfile creates a new empty profile under a given account.
           rpc :CreateProfile, CreateProfileRequest, Profile
           #  DeleteProfile deletes a profile from db and all segments
-          rpc :DeleteProfile, DeleteProfileRequest, Profile
+          rpc :DeleteProfile, DeleteProfileRequest, Google::Protobuf::Empty
           # UpdateProfile updates profile with provided subset of attributes
-          rpc :UpdateProfile, UpdateProfileRequest, Profile
+          rpc :UpdateProfile, UpdateProfileRequest, Google::Protobuf::Empty
+          rpc :UpdateProfileIdentifier, UpdateProfileIdentifierRequest, Google::Protobuf::Empty
           # GetProfileByDeviceId returns a profile which is associated to the device id
           rpc :GetProfileByDeviceId, GetProfileByDeviceIdRequest, Profile
+          rpc :GetProfileByIdentifier, GetProfileByIdentifierRequest, Profile
           # GetProfileSchema returns the currently tracked profiles schema by account id
           rpc :GetProfileSchema, GetProfileSchemaRequest, ProfileSchema
           #
           # Devices
           #
           #
-          # CreateDevice creates a an "empty" device under a given account.
-          rpc :CreateDevice, CreateDeviceRequest, Device
+          # GetDevice returns the device for a given device id
+          rpc :GetDevice, GetDeviceRequest, Device
+          rpc :CreateDevice, CreateDeviceRequest, Google::Protobuf::Empty
+          # Device Updates
+          rpc :UpdateDevice, UpdateDeviceRequest, Google::Protobuf::Empty
+          rpc :UpdateDevicePushToken, UpdateDevicePushTokenRequest, Google::Protobuf::Empty
+          rpc :UpdateDeviceUnregisterPushToken, UpdateDeviceUnregisterPushTokenRequest, Google::Protobuf::Empty
+          rpc :UpdateDeviceLocation, UpdateDeviceLocationRequest, Google::Protobuf::Empty
+          rpc :UpdateDeviceGeofenceMonitoring, UpdateDeviceGeofenceMonitoringRequest, Google::Protobuf::Empty
+          rpc :UpdateDeviceIBeaconMonitoring, UpdateDeviceIBeaconMonitoringRequest, Google::Protobuf::Empty
+          # SetDeviceProfile sets the profile the device belongs to
+          rpc :SetDeviceProfile, SetDeviceProfileRequest, Google::Protobuf::Empty
           # DeleteDevice deletes device from the database and removes it from any segments
-          rpc :DeleteDevice, DeleteDeviceRequest, Device
-          # PutDevice updates the device
-          rpc :PutDevice, PutDeviceRequest, Device
-          # SetDevicePushToken
-          rpc :SetDevicePushToken, SetDevicePushTokenRequest, Google::Protobuf::Empty
-          # PutDevice updates the device
-          rpc :SetDeviceProfile, SetDeviceProfileRequest, Device
+          rpc :DeleteDevice, DeleteDeviceRequest, Google::Protobuf::Empty
         end
 
         Stub = Service.rpc_stub_class

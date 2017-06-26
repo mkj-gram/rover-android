@@ -7,11 +7,16 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"time"
+
+	mgo "gopkg.in/mgo.v2"
 
 	"github.com/namsral/flag"
 
 	"github.com/roverplatform/rover/audience/service"
+	"github.com/roverplatform/rover/audience/service/store/mongo"
 	grpc_middleware "github.com/roverplatform/rover/go/grpc/middleware"
+	rlog "github.com/roverplatform/rover/go/log"
 
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	prom "github.com/prometheus/client_golang/prometheus"
@@ -37,10 +42,10 @@ var (
 	rpcAddr  = flag.String("rpc-addr", ":5100", "rpc address")
 	httpAddr = flag.String("http-addr", ":5080", "http address")
 
-	dbDSN    = flag.String("db-dsn", "", "database Data Source Name")
-	indexDSN = flag.String("index-dsn", "", "index Data Source Name")
+	mongoDSN = flag.String("mongo-dsn", "", "mongo Data Source Name")
+	// esDSN    = flag.String("elasticsearch-dsn", "", "elasticsearch Data Source Name")
 
-	gProjectId = flag.String("google-project-id", "", "google PROJECT_ID")
+	gProjectID = flag.String("google-project-id", "", "google PROJECT_ID")
 	gTraceKey  = flag.String("google-trace-key", "", "path to google trace service account key file")
 )
 
@@ -70,9 +75,9 @@ func main() {
 
 	var tc *trace.Client
 
-	if *gProjectId != "" && *gTraceKey != "" {
+	if *gProjectID != "" && *gTraceKey != "" {
 		var err error
-		tc, err = trace.NewClient(ctx, *gProjectId, option.WithServiceAccountFile(*gTraceKey))
+		tc, err = trace.NewClient(ctx, *gProjectID, option.WithServiceAccountFile(*gTraceKey))
 		if err != nil {
 			stderr.Fatalf("trace.NewClient: %v", err)
 		} else {
@@ -80,7 +85,7 @@ func main() {
 			unaryMiddleware = append(unaryMiddleware, UnaryTraceInterceptor(tc))
 		}
 
-		errClient, err := gerrors.NewClient(ctx, *gProjectId, "audience-service", "v1", true, option.WithServiceAccountFile(*gTraceKey))
+		errClient, err := gerrors.NewClient(ctx, *gProjectID, "audience-service", "v1", true, option.WithServiceAccountFile(*gTraceKey))
 		if err != nil {
 			stderr.Fatalf("errors.NewClient: %v", err)
 		} else {
@@ -113,16 +118,29 @@ func main() {
 		opts = append(opts, grpc.Creds(creds))
 	}
 
+	dbName, err := mongo.ParseDBName(*mongoDSN)
+	if err != nil {
+		stderr.Fatalln("url.Parse:", err)
+	}
+
+	sess, err := mgo.Dial(*mongoDSN)
+	if err != nil {
+		stderr.Fatalf("mgo.Dial: DSN=%q error=%q", *mongoDSN, err)
+	}
+
+	if err := mongo.EnsureIndexes(sess.DB(dbName)); err != nil {
+		stderr.Fatalln("mongo.EnsureIndexes:", err)
+	}
+
+	mongodb := mongo.NewDB(
+		sess.DB(dbName),
+		mongo.WithLogger(rlog.NewLog(rlog.Error)),
+		mongo.WithTimeFunc(time.Now),
+	)
+
 	grpcServer := grpc.NewServer(opts...)
 
-	service.Register(grpcServer, &service.Server{
-	// DB: pgdb
-	// Index:
-	})
-
-	var (
-		sigc = make(chan os.Signal)
-	)
+	service.Register(grpcServer, service.New(mongodb))
 
 	go func() {
 		stdout.Printf("proto=rpc address=%q", *rpcAddr)
@@ -137,8 +155,8 @@ func main() {
 		grpc_prometheus.EnableHandlingTimeHistogram()
 
 		http.Handle("/metrics", prom.Handler())
-		// http.Handle("/readiness", ping(db, true, tc))
-		// http.Handle("/liveness", ping(db, false, tc))
+		http.Handle("/readiness", ping(sess, true, tc))
+		http.Handle("/liveness", ping(sess, false, tc))
 
 		hsrv := http.Server{
 			Addr:     *httpAddr,
@@ -153,6 +171,7 @@ func main() {
 		}
 	}()
 
+	sigc := make(chan os.Signal)
 	signal.Notify(sigc, os.Interrupt)
 
 	select {
@@ -164,27 +183,27 @@ func main() {
 	stdout.Println("stopped")
 }
 
-// // for livelines we're "alway on": k8s shoudn't take pod down because db is down
-// func ping(db *sql.DB, readiness bool, tc *trace.Client) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//
-// 		if tc != nil {
-// 			span := tc.SpanFromRequest(r)
-// 			defer span.Finish()
-// 		}
-//
-// 		if err := db.PingContext(r.Context()); err != nil {
-// 			stderr.Println("db.Ping:", err)
-// 			if readiness {
-// 				http.Error(w, "db.Ping:"+err.Error(), http.StatusServiceUnavailable)
-// 				return
-// 			}
-// 		}
-//
-// 		w.WriteHeader(http.StatusOK)
-// 		w.Write([]byte("ok"))
-// 	})
-// }
+// for livelines we're "alway on": k8s shoudn't take pod down because db is down
+func ping(sess *mgo.Session, readiness bool, tc *trace.Client) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if tc != nil {
+			span := tc.SpanFromRequest(r)
+			defer span.Finish()
+		}
+
+		if err := sess.Ping(); err != nil {
+			stderr.Println("sess.Ping:", err)
+			if readiness {
+				http.Error(w, "sess.Ping:"+err.Error(), http.StatusServiceUnavailable)
+				return
+			}
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+}
 
 func UnaryTraceInterceptor(tc *trace.Client) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
