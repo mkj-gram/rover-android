@@ -59,6 +59,10 @@ Go `vendor`ed dependencies are managed with `govendor`. Install with `cd rover/ 
 
 ## protobuf
 
+### Style
+
+Avoid streaming rpc calls as this makes the retry logic on the client side much harder. Stick to a batch approach for reading and writing data
+
 ### Generation
 
 ```
