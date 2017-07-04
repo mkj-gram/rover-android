@@ -1,5 +1,7 @@
 const EmptyFileError = require('./lib/empty-file-error')
+const RetryableError = require('./lib/retryable-error')
 
 module.exports = {
-	EmptyFileError: EmptyFileError
+	EmptyFileError: EmptyFileError,
+	RetryableError: RetryableError
 }

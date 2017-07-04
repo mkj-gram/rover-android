@@ -23,6 +23,18 @@ const updateJobProgress = function(job, progress) {
     job.progress(progress)
 }
 
+const retryableError = function(err) {
+    if (!err) {
+        return false
+    }
+
+    if (err.code == 14 || err.code == 4 || err.code == 8 || err.code == 13) {
+        return true
+    }
+
+    return false
+}
+
 /*
     Job ->
     {
@@ -58,7 +70,12 @@ const loadStaticSegment = function(job, logger) {
 
         SegmentClient.getStaticSegment(getStaticSegmentRequest, function(err, staticSegment) {
             if (err) {
-                return reject(err)
+                if (retryableError(err)) {
+                    return reject(new Errors.RetryableError(err))
+                } else {
+                    return reject(err)
+                }
+                
             }
 
             const gcsFile = jobData.gcs_file
@@ -97,7 +114,12 @@ const loadStaticSegment = function(job, logger) {
                     if (err) {
                         callStreamActive = false
                         remoteReadStream.end()
-                        return reject(err)
+
+                        if (retryableError(err)) {
+                            return reject(new Errors.RetryableError(err))
+                        } else {
+                            return reject(err)
+                        }
                     }
                     
                     updateJobProgress(job, 100)
@@ -158,6 +180,50 @@ const init = function(context) {
     const queue = context.queues.staticSegment
     const Raven = context.raven
 
+    function work(job, logger, attempt) {
+        return loadStaticSegment(job, logger)
+        .timeout(JOB_TIMEOUT)
+        .then(() => {
+            logger.info("Completed")
+            return Promise.resolve()
+        })
+        .catch(Promise.TimeoutError, (err) => {
+            logger.error("timed out")
+            return Promise.reject(err)
+        })
+        .catch(Errors.EmptyFileError, (err) => {
+            logger.error(err)
+            return Promise.reject(err)
+        })
+        .catch(Errors.RetryableError, (err) => {
+            if (attempt > 5) {
+                // err.err is the original error
+                return Promise.reject(err.err)
+            } else {
+                logger.info("job failed retrying")
+                updateJobProgress(job, 0)
+                return Promise.delay(2000 * attempt).then(() => {
+                    return work(job, logger, attempt + 1)
+                })
+            }
+        })
+        .catch(err => {
+            /*
+                Bluebird bubbles up promise rejections. We only want to act on the first work request    
+             */
+            if (attempt == 1) {
+                if (Raven && !(err.hasOwnProperty('code') && err.hasOwnProperty('metadata'))) {
+                    // This is not a grpc error
+                    Raven.captureException(err);
+                }
+
+                logger.error("failed", err)
+            }
+            
+            return Promise.reject(err)
+        })
+    }
+
     queue.process(JOB_CONCURRENCY, function(job, done) {
         
 
@@ -165,28 +231,12 @@ const init = function(context) {
 
         logger.info("started")
 
-        loadStaticSegment(job, logger)
-        .timeout(JOB_TIMEOUT)
+        work(job, logger, 1)
         .then(() => {
-            logger.info("Completed")
             return done()
         })
-        .catch(Promise.TimeoutError, (err) => {
-            logger.error("timed out")
-            return done(err)
-        })
-        .catch(Errors.EmptyFileError, (err) => {
-            logger.error(err)
-            return done(err)
-        })
         .catch(err => {
-            if (Raven && !(err.hasOwnProperty('code') && err.hasOwnProperty('metadata'))) {
-                // This is not a grpc error
-                Raven.captureException(err);
-            }
-            logger.error("failed", err)
             return done(err)
-            
         })
     })
 }
