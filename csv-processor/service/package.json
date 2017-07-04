@@ -9,11 +9,12 @@
   "author": "Rover Labs Inc",
   "license": "ISC",
   "dependencies": {
-    "bull": "^2.2.6",
-    "@rover/apis": "../../apis/node/",
     "@rover-common/grpc-codes": "../../node/grpc-codes",
+    "@rover/apis": "../../apis/node/",
+    "bull": "^2.2.6",
     "confidence": "^3.0.2",
     "morgan": "^1.8.1",
+    "raven": "^2.1.0",
     "winston": "^2.3.1"
   }
 }

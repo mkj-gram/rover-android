@@ -11,6 +11,18 @@ const store = new Confidence.Store({
         production: process.env.PORT,
         $default: 5100
     },
+    raven: {
+        enabled: {
+            $filter: 'env',
+            production: process.env.RAVEN_ENABLED === 'true',
+            $default: false
+        },
+        dsn: {
+            $filter: 'env',
+            production: process.env.RAVEN_DSN,
+            $default: ''
+        }
+    },
     redis: {
         url: {
             $filter: 'env',
