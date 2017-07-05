@@ -5,13 +5,18 @@ import BarcodeBlockIcon from './BarcodeBlockIcon'
 import BarcodeBlockIconSmall from './BarcodeBlockIconSmall'
 import ButtonBlockIcon from './ButtonBlockIcon'
 import ButtonBlockIconSmall from './ButtonBlockIconSmall'
+import CalendarIconSmall from './CalendarIconSmall'
 import ClipboardIcon from './ClipboardIcon'
 import ColorPaletteIcon from './ColorPaletteIcon'
 import DefaultBlockIcon from './DefaultBlockIcon'
 import DefaultBlockIconSmall from './DefaultBlockIconSmall'
+import DeviceIconSmall from './DeviceIconSmall'
+import DonutChart from './DonutChart'
+import DownloadIcon from './DownloadIcon'
 import DuplicateIcon from './DuplicateIcon'
 import EditIcon from './DuplicateIcon'
 import ErrorIcon from './ErrorIcon'
+import FilterIconLarge from './FilterIconLarge'
 import GearIcon from './GearIcon'
 import HomeIcon from './HomeIcon'
 import ImageBlockIcon from './ImageBlockIcon'
@@ -21,6 +26,8 @@ import LayoutIcon from './LayoutIcon'
 import LinkIcon from './LinkIcon'
 import LockIcon from './LockIcon'
 import PartialLockIcon from './PartialLockIcon'
+import PencilEditIcon from './PencilEditIcon'
+import ProfileIcon from './ProfileIcon'
 import PreviewIcon from './PreviewIcon'
 import RefreshIcon from './RefreshIcon'
 import RefreshIconSmall from './RefreshIconSmall'
@@ -28,7 +35,9 @@ import RemoveIcon from './RemoveIcon'
 import ResetIcon from './ResetIcon'
 import RowIconSmall from './RowIconSmall'
 import ScreenIconSmall from './ScreenIconSmall'
+import SearchIcon from './SearchIcon'
 import StandPreviewIcon from './StandPreviewIcon'
+import TagIcon from './TagIcon'
 import TextBlockIcon from './TextBlockIcon'
 import TextBlockIconSmall from './TextBlockIconSmall'
 import TitleBarIconSmall from './TitleBarIconSmall'
@@ -39,6 +48,7 @@ import UnpublishedChangeIcon from './UnpublishedChangeIcon'
 import WebViewBlockIcon from './WebViewBlockIcon'
 import WebViewBlockIconSmall from './WebViewBlockIconSmall'
 import WidePreviewIcon from './WidePreviewIcon'
+import UploadIcon from './UploadIcon'
 
 // align
 import BottomAlignIcon from './align/BottomAlignIcon'
@@ -89,13 +99,18 @@ export {
     BarcodeBlockIconSmall,
     ButtonBlockIcon,
     ButtonBlockIconSmall,
+    CalendarIconSmall,
     ClipboardIcon,
     ColorPaletteIcon,
     DefaultBlockIcon,
     DefaultBlockIconSmall,
+    DeviceIconSmall,
+    DonutChart,
+    DownloadIcon,
     DuplicateIcon,
     EditIcon,
     ErrorIcon,
+    FilterIconLarge,
     HomeIcon,
     GearIcon,
     ImageBlockIcon,
@@ -105,14 +120,18 @@ export {
     LinkIcon,
     LockIcon,
     PartialLockIcon,
+    PencilEditIcon,
     PreviewIcon,
+    ProfileIcon,
     RefreshIcon,
     RefreshIconSmall,
     RemoveIcon,
     ResetIcon,
     RowIconSmall,
     ScreenIconSmall,
+    SearchIcon,
     StandPreviewIcon,
+    TagIcon,
     TextBlockIcon,
     TextBlockIconSmall,
     TitleBarIconSmall,
@@ -153,5 +172,6 @@ export {
     TextAlignCenterIcon,
     TextAlignLeftIcon,
     TextAlignRightIcon,
-    UnderlineIcon
+    UnderlineIcon,
+    UploadIcon
 }
