@@ -1,12 +1,12 @@
 import React from 'react'
 
 export default ({ primaryColor, accentColor, amountFilled, amountEmpty }) =>
-    <svg width="32px" height="32px" viewBox="0 0 32 32">
-        <circle cx="16" cy="16" r="5.09295817894" fill="#fff" />
+    <svg width="75px" height="75px" viewBox="0 0 32 32">
+        <circle cx="16" cy="16" r="5.0929624808" fill="#fff" />
         <circle
             cx="16"
             cy="16"
-            r="5.09295817894"
+            r="5.0929624808"
             fill="transparent"
             stroke={primaryColor}
             strokeWidth="3"
@@ -14,7 +14,7 @@ export default ({ primaryColor, accentColor, amountFilled, amountEmpty }) =>
         <circle
             cx="16"
             cy="16"
-            r="5.09295817894"
+            r="5.0929624808"
             fill="transparent"
             stroke={accentColor}
             strokeWidth="3"

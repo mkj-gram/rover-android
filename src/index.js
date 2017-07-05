@@ -8,6 +8,7 @@ import ButtonBlockIconSmall from './ButtonBlockIconSmall'
 import CalendarIconSmall from './CalendarIconSmall'
 import ClipboardIcon from './ClipboardIcon'
 import ColorPaletteIcon from './ColorPaletteIcon'
+import ColumnsIcon from './ColumnsIcon'
 import DefaultBlockIcon from './DefaultBlockIcon'
 import DefaultBlockIconSmall from './DefaultBlockIconSmall'
 import DeviceIconSmall from './DeviceIconSmall'
@@ -102,6 +103,7 @@ export {
     CalendarIconSmall,
     ClipboardIcon,
     ColorPaletteIcon,
+    ColumnsIcon,
     DefaultBlockIcon,
     DefaultBlockIconSmall,
     DeviceIconSmall,
