@@ -65,9 +65,11 @@ class AudienceDataGrid extends Component {
                 }
             ],
             rows: this.createRows(),
-            selectedIndexes: []
+            selectedIndexes: [],
+            isShiftKeyPressed: false,
+            isCommandKeyPressed: false
         }
-        
+
         this.onRowsSelected = this.onRowsSelected.bind(this)
         this.onRowsDeselected = this.onRowsDeselected.bind(this)
         this.rowGetter = this.rowGetter.bind(this)
@@ -80,24 +82,29 @@ class AudienceDataGrid extends Component {
                 city: `Toronto ${i}`,
                 region: 'Ontario',
                 last_seen: new Date(),
-                tags: ['Fishing', 'hunting', 'email subscriber', 'new customer'].join(", "),
+                tags: [
+                    'Fishing',
+                    'hunting',
+                    'email subscriber',
+                    'new customer'
+                ].join(', '),
                 location_permissions: 'false'
             })
         }
 
         return rows
     }
-    
+
     rowGetter(i) {
         return this.state.rows[i]
     }
-    
+
     renderCheckbox(props) {
         const { column, dependentValues, rowIdx } = props
         const { onCellChange, key } = column
         return (
-            <Checkbox 
-                isChecked={props.value} 
+            <Checkbox
+                isChecked={props.value}
                 label=""
                 primaryColor={purple}
                 isDisabled={false}
@@ -137,27 +144,91 @@ class AudienceDataGrid extends Component {
         })
         this.setState(reorderedColumns)
     }
-    
-    onRowsSelected(rows) { 
-        this.setState({ selectedIndexes: this.state.selectedIndexes.concat(rows.map(r => r.rowIdx))})
+
+    onRowsSelected(rows) {
+        this.setState({
+            selectedIndexes: this.state.selectedIndexes.concat(
+                rows.map(r => r.rowIdx)
+            )
+        })
     }
-    
+
     onRowsDeselected(rows) {
         let rowIndexes = rows.map(r => r.rowIdx)
-        this.setState({ selectedIndexes: this.state.selectedIndexes.filter(i => rowIndexes.indexOf(i) === -1 )})
+        this.setState({
+            selectedIndexes: this.state.selectedIndexes.filter(
+                i => rowIndexes.indexOf(i) === -1
+            )
+        })
     }
-    
+
+    onRowClick(rowIdx) {
+        const {
+            isCommandKeyPressed,
+            isShiftKeyPressed,
+            selectedIndexes
+        } = this.state
+
+        if (isShiftKeyPressed) {
+            const minIndex = Math.min(...selectedIndexes)
+            const maxIndex = Math.max(...selectedIndexes)
+            
+            const start = rowIdx > minIndex ? minIndex : rowIdx
+            const end = rowIdx < maxIndex ? maxIndex : rowIdx
+            const range = (start, end) =>
+                Array.from({ length: end - start + 1 }, (x, i) => i + start)
+            return this.setState({
+                selectedIndexes: range(start, end)
+            })
+        }
+        
+        if (isCommandKeyPressed) {
+            return this.setState({ selectedIndexes: selectedIndexes.concat(rowIdx) })
+        }
+
+        if (selectedIndexes.includes(rowIdx)) {
+            return this.setState({
+                selectedIndexes: selectedIndexes.filter(r => r !== rowIdx)
+            })
+        }
+        this.setState({ selectedIndexes: [rowIdx] })
+    }
+
+    onKeyDown(e) {
+        if (e.keyCode === 16) {
+            this.setState({ isShiftKeyPressed: true })
+        }
+        
+        if (e.keyCode === 91) {
+            this.setState({ isCommandKeyPressed: true })
+        }
+    }
+
+    onKeyUp(e) {
+        if (e.keyCode === 16) {
+            this.setState({ isShiftKeyPressed: false })
+        }
+        
+        if (e.keyCode === 91) {
+            this.setState({ isCommandKeyPressed: false })
+        }
+    }
+
     getGridHeight() {
-        // 
         return window.innerHeight - 130
     }
 
     render() {
         return (
-            <div ref={el => { this.parent = el }} style={{ flex: '1 1 100%', position: 'relative' }} className="rover-data-grid">
+            <div
+                ref={el => {
+                    this.parent = el
+                }}
+                style={{ flex: '1 1 100%', position: 'relative' }}
+                className="rover-data-grid"
+            >
                 <style type="text/css">
-                    {
-                        `
+                    {`
                             .rover-data-grid .react-grid-Container {
                                 margin-left: 1px;
                             }
@@ -174,6 +245,7 @@ class AudienceDataGrid extends Component {
                                 padding-top: 20px;
                                 border-right: 1px solid ${cloud};
                                 border-bottom: 1px solid ${cloud};
+                                cursor: default;
                             }
                             .rover-data-grid .react-grid-HeaderCell:hover {
                                 background-color: ${straw};
@@ -214,8 +286,7 @@ class AudienceDataGrid extends Component {
                             .rover-data-grid .react-grid-Canvas {
                                 height: 100% !important;
                             }
-                    `
-                    }
+                    `}
                 </style>
                 <DraggableContainer
                     onHeaderDrop={(source, target) =>
@@ -229,7 +300,7 @@ class AudienceDataGrid extends Component {
                         rowHeight={50}
                         minHeight={this.getGridHeight()}
                         rowSelection={{
-                            showCheckbox: true,
+                            showCheckbox: false,
                             enableShiftSelect: true,
                             onRowsSelected: this.onRowsSelected,
                             onRowsDeselected: this.onRowsDeselected,
@@ -238,7 +309,10 @@ class AudienceDataGrid extends Component {
                             }
                         }}
                         rowRenderer={CustomRowRenderer}
-                        rowActionsCell={this.renderCheckbox}
+                        onRowClick={rowIdx => this.onRowClick(rowIdx)}
+                        onGridKeyDown={e => this.onKeyDown(e)}
+                        onGridKeyUp={e => this.onKeyUp(e)}
+                        // rowActionsCell={this.renderCheckbox}
                     />
                 </DraggableContainer>
             </div>

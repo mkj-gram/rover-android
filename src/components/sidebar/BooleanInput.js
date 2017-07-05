@@ -26,6 +26,11 @@ class BooleanInput extends Component {
         const { value } = this.state
         return (
             <RadioButton
+                label={
+                    <span style={{ color: 'white' }}>
+                        {radioValue ? 'True' : 'False'}
+                    </span>
+                }
                 onChange={() => this.updateBooleanValue(radioValue, () => null)}
                 isChecked={value === radioValue}
                 primaryColor={lavender}
@@ -34,18 +39,17 @@ class BooleanInput extends Component {
                     borderColor: steel,
                     marginRight: 5
                 }}
-                labelStyle={{
-                    top: 2
-                }}
             />
         )
     }
 
     updateBooleanValue(value) {
         const { predicate, updateFn } = this.props
-        const { attribute } = predicate
+        const { attribute, category, type } = predicate
         updateFn({
-            attribute: attribute,
+            attribute,
+            category,
+            type,
             comparison: 'true',
             value: value
         })
@@ -53,8 +57,8 @@ class BooleanInput extends Component {
     }
 
     render() {
-        const { predicate, attributeType } = this.props
-        const { attribute } = predicate
+        const { predicate } = this.props
+        const { attribute, category } = predicate
         const radioFieldStyle = {
             display: 'flex',
             color: titanium,
@@ -66,13 +70,13 @@ class BooleanInput extends Component {
             <div style={{ ...text, ...light, color: silver }}>
                 <ModalInputPrompt
                     attribute={attribute}
-                    attributeType={attributeType}
+                    attributeType={category}
                 />
                 <div style={radioFieldStyle}>
-                    {this.renderRadioButton(true)} True
+                    {this.renderRadioButton(true)}
                 </div>
                 <div style={radioFieldStyle}>
-                    {this.renderRadioButton(false)} False
+                    {this.renderRadioButton(false)}
                 </div>
             </div>
         )
@@ -83,7 +87,8 @@ BooleanInput.propTypes = {
     predicate: PropTypes.shape({
         attribute: PropTypes.string.isRequired,
         value: PropTypes.bool.isRequired,
-        comparison: PropTypes.string.isRequired
+        comparison: PropTypes.string.isRequired,
+        category: PropTypes.string.isRequired
     }),
     updateFn: PropTypes.func.isRequired
 }
@@ -92,7 +97,8 @@ BooleanInput.defaultProps = {
     predicate: {
         attribute: '',
         value: false,
-        comparison: 'true'
+        comparison: 'true',
+        category: 'profile'
     },
     updateFn: () => null
 }

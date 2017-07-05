@@ -21,39 +21,57 @@ class NumericInput extends Component {
     updateComparison(comparison) {
         const { updateFn } = this.props
         const { predicate } = this.props
-        const { attribute } = predicate
-        const { value } = this.state
+        const { attribute, category, type } = predicate
+        let value = [0]
+        
+        if (comparison === 'in between') {
+            value = [0, 0]
+        }
+        
+        if (comparison === 'has any value' || comparison === 'is unknown') {
+            value = [null, null]
+        }
 
         updateFn({
             attribute,
             comparison,
+            category,
+            type,
             value
         })
 
-        this.setState({ comparison })
+        this.setState({ comparison, value })
     }
 
     updateValue(number, index) {
-        const { predicate } = this.props
-        const { attribute } = predicate
+        const { predicate, updateFn } = this.props
+        const { attribute, category, type } = predicate
         const { value, comparison } = this.state
-
+        
         let newValue = value
         newValue[index] = number
 
-        this.setState({ value: newValue })
+        updateFn({
+            attribute,
+            comparison,
+            category,
+            type,
+            value: newValue
+        })
+
+        this.setState({ newValue })
     }
 
     render() {
-        const { predicate, attributeType } = this.props
-        const { attribute } = predicate
+        const { predicate } = this.props
+        const { attribute, category } = predicate
         const { comparison, value } = this.state
 
         return (
-            <div style={{ ...text, color: silver }}>
+            <div style={{ ...text, color: silver, width: 210 }}>
                 <ModalInputPrompt
                     attribute={attribute}
-                    attributeType={attributeType}
+                    attributeType={category}
                 />
                 <div
                     style={{
@@ -125,7 +143,8 @@ NumericInput.propTypes = {
     predicate: PropTypes.shape({
         attribute: PropTypes.string.isRequired,
         value: PropTypes.arrayOf(PropTypes.number).isRequired,
-        comparison: PropTypes.string.isRequired
+        comparison: PropTypes.string.isRequired,
+        category: PropTypes.string.isRequired
     }),
     updateFn: PropTypes.func.isRequired
 }
@@ -134,7 +153,8 @@ NumericInput.defaultProps = {
     predicate: {
         attribute: '',
         value: [0],
-        comparison: 'is'
+        comparison: 'is',
+        category: 'device'
     },
     updateFn: () => null
 }
