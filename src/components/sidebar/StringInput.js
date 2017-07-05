@@ -1,7 +1,14 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import { light, Select, silver, steel, text, titanium } from '@rover/react-bootstrap'
+import {
+    light,
+    Select,
+    silver,
+    steel,
+    text,
+    titanium
+} from '@rover/react-bootstrap'
 
 import ModalInput from './ModalInput'
 import ModalInputPrompt from './ModalInputPrompt'
@@ -10,8 +17,7 @@ class StringInput extends Component {
     constructor(props) {
         super(props)
 
-        const { predicate } = this.props
-        const { value, comparison } = predicate
+        const { value, comparison } = this.props
         this.state = {
             value,
             comparison
@@ -19,41 +25,40 @@ class StringInput extends Component {
     }
 
     updateComparison(comparison) {
-        const { predicate, updateFn } = this.props
-        const { attribute, category, type } = predicate
+        const { attribute, category, type, index, updateFn } = this.props
         let { value } = this.state
-        
+
         if (comparison === 'is unknown') {
             value = ''
         }
-        
+
         updateFn({
             attribute,
             comparison,
             category,
             type,
+            index,
             value
         })
         this.setState({ comparison })
     }
 
     updateValue(value) {
-        const { predicate, updateFn } = this.props
-        const { attribute, category, type } = predicate
+        const { attribute, category, type, index, updateFn } = this.props
         const { comparison } = this.state
         updateFn({
             attribute,
             comparison,
             category,
             type,
+            index,
             value
         })
         this.setState({ value })
     }
 
     render() {
-        const { predicate } = this.props
-        const { attribute, category } = predicate
+        const { attribute, category } = this.props
         const { value, comparison } = this.state
         return (
             <div style={{ ...text, ...light, color: silver, width: 380 }}>
@@ -117,22 +122,20 @@ class StringInput extends Component {
 }
 
 StringInput.propTypes = {
-    predicate: PropTypes.shape({
-        attribute: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired,
-        comparison: PropTypes.string.isRequired,
-        category: PropTypes.string.isRequired
-    }),
+    attribute: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    comparison: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired
 }
 
 StringInput.defaultProps = {
-    predicate: {
-        attribute: '',
-        value: '',
-        comparison: 'is',
-        category: 'device'
-    },
+    attribute: '',
+    value: '',
+    comparison: 'is',
+    category: 'device',
+    index: 0,
     updateFn: () => null
 }
 

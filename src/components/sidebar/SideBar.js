@@ -23,6 +23,7 @@ import {
 
 import { DeviceIconSmall, ProfileIcon } from '@rover/react-icons'
 
+import AddFilterModal from './AddFilterModal'
 import BooleanInput from './BooleanInput'
 import DateInput from './DateInput'
 import NumericInput from './NumericInput'
@@ -37,124 +38,40 @@ class SideBar extends Component {
         super(props)
 
         this.state = {
-            currentAttribute: '',
+            currentAttribute: { attribute: '', index: null },
             currentPredicate: {},
-            query: [
-                {
-                    attribute: 'bluetooth-enabled',
-                    value: false,
-                    comparison: 'true',
-                    type: 'boolean',
-                    category: 'device'
-                },
-                {
-                    attribute: 'location-enabled',
-                    value: true,
-                    comparison: 'true',
-                    type: 'boolean',
-                    category: 'device'
-                },
-                {
-                    attribute: 'push-enabled',
-                    value: false,
-                    comparison: 'true',
-                    type: 'boolean',
-                    category: 'device'
-                },
-                {
-                    attribute: 'account-created',
-                    value: {
-                        start: moment('2017-06-12T15:17:30.756Z'),
-                        end: null
-                    },
-                    comparison: 'exactly',
-                    type: 'date',
-                    category: 'profile'
-                },
-                {
-                    attribute: 'rover-sdk',
-                    value: [12, 20, 1, 0, 1, 2],
-                    comparison: 'in between',
-                    type: 'version',
-                    category: 'device'
-                },
-                {
-                    attribute: 'first-name',
-                    value: 'Alex',
-                    comparison: 'starts with',
-                    type: 'string',
-                    category: 'profile'
-                },
-                {
-                    attribute: 'age',
-                    value: [5],
-                    comparison: 'is',
-                    type: 'number',
-                    category: 'profile'
-                },
-                {
-                    attribute: 'rover-sdk',
-                    value: [12, 20, 1, 0, 1, 2],
-                    comparison: 'in between',
-                    type: 'version',
-                    category: 'device'
-                },
-                {
-                    attribute: 'first-name',
-                    value: 'Alex',
-                    comparison: 'starts with',
-                    type: 'string',
-                    category: 'profile'
-                },
-                {
-                    attribute: 'age',
-                    value: [5],
-                    comparison: 'is',
-                    type: 'number',
-                    category: 'profile'
-                }
-            ]
+            isShowingAddFilterModal: false,
+            query: []
         }
-    }
 
-    getQueryPredicate(attribute) {
-        const { query } = this.state
-
-        return query.filter(obj => obj.attribute === attribute)[0]
+        this.setState = this.setState.bind(this)
     }
 
     updateQuery() {
         const { query, currentPredicate } = this.state
+        const { index, ...rest } = currentPredicate
 
-        const queryCopy = query
+        let newQuery = query
+        newQuery[index] = rest
 
-        if (
-            queryCopy.filter(
-                ({ attribute }) => attribute !== currentPredicate.attribute
-            ).length === 0
-        ) {
-            this.setState({ query: queryCopy.concat(currentPredicate) })
+        this.setState({
+            query: newQuery,
+            currentAttribute: { attribute: '', index: null }
+        })
+    }
 
-            return4
-        }
+    removePredicate(indexToDelete) {
+        const { query } = this.state
 
-        const newQuery = queryCopy.reduce((prev, curr) => {
-            if (curr.attribute === currentPredicate.attribute) {
-                return prev.concat(currentPredicate)
-            }
+        const newQuery = query.filter(
+            (predicate, index) => index !== indexToDelete
+        )
 
-            return prev.concat(curr)
-        }, [])
-
-        this.setState({ query: newQuery, currentAttribute: '' })
+        this.setState({ query: newQuery })
     }
 
     renderModalTitle(attribute) {
         const { query } = this.state
-        const title = attribute
-            .split('-')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')
 
         const category = query.filter(obj => obj.attribute === attribute)[0]
 
@@ -182,18 +99,26 @@ class SideBar extends Component {
                         marginRight: 5
                     }}
                 >
-                    {title}
+                    {attribute}
                 </span>
                 <span style={{ ...text, ...light, color: silver }}>filter</span>
             </div>
         )
     }
 
-    renderModalInput(attribute) {
-        const updateFn = currentPredicate => this.setState({ currentPredicate })
-        const predicate = this.getQueryPredicate(attribute)
+    renderModalInput(index) {
+        const { query } = this.state
+        const predicate = query[index]
+
+        if (!predicate) {
+            return
+        }
+
         const { type } = predicate
-        const props = { predicate, updateFn }
+
+        const updateFn = currentPredicate => this.setState({ currentPredicate })
+
+        const props = { ...predicate, updateFn, index }
 
         switch (type) {
             case 'boolean':
@@ -217,6 +142,9 @@ class SideBar extends Component {
     }
 
     renderAddFilterBar() {
+        const { isShowingAddFilterModal, query } = this.state
+        const addPredicateIndex = query.length
+
         const style = {
             height: 58,
             width: '100%',
@@ -241,20 +169,38 @@ class SideBar extends Component {
         return (
             <div style={style}>
                 <AddButton
+                    id="add-filter-button"
                     primaryColor={orchid}
-                    onClick={e => console.log('add button clicked')}
                     style={{ root: { marginLeft: 20 } }}
+                    onClick={() =>
+                        this.setState({ isShowingAddFilterModal: true })}
                 />
-                <div
+                <label
                     style={{
                         ...text,
                         fontSize: 15,
                         color: lavender,
                         fontWeight: 'normal'
                     }}
+                    htmlFor="add-filter-button"
                 >
                     Add Filter
-                </div>
+                </label>
+                {isShowingAddFilterModal &&
+                    <AddFilterModal
+                        onRequestClose={() =>
+                            this.setState({ isShowingAddFilterModal: false })}
+                        onSelect={predicate => {
+                            this.setState({
+                                query: query.concat(predicate),
+                                isShowingAddFilterModal: false,
+                                currentAttribute: {
+                                    attribute: predicate.attribute,
+                                    index: addPredicateIndex
+                                }
+                            })
+                        }}
+                    />}
                 <div style={{ marginLeft: 'auto', marginRight: 30 }}>
                     <Select
                         style={selectStyle}
@@ -343,50 +289,62 @@ class SideBar extends Component {
                 <ModalWithHeader
                     contentLabel="Query Builder"
                     backgroundColor={graphite}
-                    isOpen={currentAttribute !== ''}
-                    headerContent={this.renderModalTitle(currentAttribute)}
+                    isOpen={currentAttribute.attribute !== ''}
+                    headerContent={() => this.renderModalTitle(
+                        currentAttribute.attribute
+                    )}
                     successFn={() => this.updateQuery()}
                     successText="Add filter"
-                    cancelFn={() => this.setState({ currentAttribute: '' })}
+                    cancelFn={() => this.setState({ currentAttribute: {} })}
                     cancelText="Cancel"
                     primaryColor={violet}
                     secondaryColor={lavender}
                     hoverColor={orchid}
                 >
-                    {currentAttribute !== '' ?
-                        this.renderModalInput(currentAttribute) : <div/>}
+                    {currentAttribute.attribute !== ''
+                        ? this.renderModalInput(currentAttribute.index)
+                        : <div />}
                 </ModalWithHeader>
                 {this.renderAddFilterBar()}
-                {
-                    query.length > 0 ?
-                        <PredicateList
-                            query={query}
-                            viewModal={attribute =>
-                                this.setState({ currentAttribute: attribute })}
-                        />
-                        :
-                        <div
-                            style={{
-                                ...text,
-                                color: silver,
-                                margin: '30px auto',
-                                width: 210,
-                                height: '100%',
-                                textAlign: 'center'
-                            }}
-                        >
-                            <FunnelAnimation/>
-                            <div style={{ marginBottom: 30 }}>
-                                <span style={{ color: lavender, marginRight: 5, cursor: 'pointer' }}>
-                                    Add a filter
-                                </span>
-                                to start building segments based on your audience data
-                            </div>
-                            <div>
-                                When you're done with it, just <span style={{ color: 'white' }}>Save</span> it for later use
-                            </div>
-                        </div>
-                }
+                {query.length > 0
+                    ? <PredicateList
+                          query={query}
+                          removePredicate={index => this.removePredicate(index)}
+                          viewModal={(attribute, index) =>
+                              this.setState({
+                                  currentAttribute: { attribute, index }
+                              })}
+                      />
+                    : <div
+                          style={{
+                              ...text,
+                              color: silver,
+                              margin: '30px auto',
+                              width: 210,
+                              height: '100%',
+                              textAlign: 'center'
+                          }}
+                      >
+                          <FunnelAnimation />
+                          <div style={{ marginBottom: 30 }}>
+                              <span
+                                  style={{
+                                      color: lavender,
+                                      marginRight: 5,
+                                      cursor: 'pointer'
+                                  }}
+                              >
+                                  Add a filter
+                              </span>
+                              to start building segments based on your audience
+                              data
+                          </div>
+                          <div>
+                              When you're done with it, just{' '}
+                              <span style={{ color: 'white' }}>Save</span> it
+                              for later use
+                          </div>
+                      </div>}
                 {query.length > 0 && this.renderSaveBar()}
             </div>
         )

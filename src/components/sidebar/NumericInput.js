@@ -1,7 +1,14 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import { light, Select, silver, steel, text, titanium } from '@rover/react-bootstrap'
+import {
+    light,
+    Select,
+    silver,
+    steel,
+    text,
+    titanium
+} from '@rover/react-bootstrap'
 
 import ModalInput from './ModalInput'
 import ModalInputPrompt from './ModalInputPrompt'
@@ -10,8 +17,7 @@ class NumericInput extends Component {
     constructor(props) {
         super(props)
 
-        const { predicate } = this.props
-        const { value, comparison } = predicate
+        const { value, comparison } = this.props
         this.state = {
             value,
             comparison
@@ -19,15 +25,13 @@ class NumericInput extends Component {
     }
 
     updateComparison(comparison) {
-        const { updateFn } = this.props
-        const { predicate } = this.props
-        const { attribute, category, type } = predicate
+        const { attribute, category, type, index, updateFn } = this.props
         let value = [0]
-        
+
         if (comparison === 'in between') {
             value = [0, 0]
         }
-        
+
         if (comparison === 'has any value' || comparison === 'is unknown') {
             value = [null, null]
         }
@@ -37,25 +41,26 @@ class NumericInput extends Component {
             comparison,
             category,
             type,
+            index,
             value
         })
 
         this.setState({ comparison, value })
     }
 
-    updateValue(number, index) {
-        const { predicate, updateFn } = this.props
-        const { attribute, category, type } = predicate
+    updateValue(number, valueIndex) {
+        const { attribute, category, type, index, updateFn } = this.props
         const { value, comparison } = this.state
-        
+
         let newValue = value
-        newValue[index] = number
+        newValue[valueIndex] = number
 
         updateFn({
             attribute,
             comparison,
             category,
             type,
+            index,
             value: newValue
         })
 
@@ -63,12 +68,11 @@ class NumericInput extends Component {
     }
 
     render() {
-        const { predicate } = this.props
-        const { attribute, category } = predicate
+        const { attribute, category } = this.props
         const { comparison, value } = this.state
 
         return (
-            <div style={{ ...text, color: silver, width: 210 }}>
+            <div style={{ ...text, color: silver, width: 283 }}>
                 <ModalInputPrompt
                     attribute={attribute}
                     attributeType={category}
@@ -140,22 +144,20 @@ class NumericInput extends Component {
 }
 
 NumericInput.propTypes = {
-    predicate: PropTypes.shape({
-        attribute: PropTypes.string.isRequired,
-        value: PropTypes.arrayOf(PropTypes.number).isRequired,
-        comparison: PropTypes.string.isRequired,
-        category: PropTypes.string.isRequired
-    }),
+    attribute: PropTypes.string.isRequired,
+    value: PropTypes.arrayOf(PropTypes.number).isRequired,
+    comparison: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired
 }
 
 NumericInput.defaultProps = {
-    predicate: {
-        attribute: '',
-        value: [0],
-        comparison: 'is',
-        category: 'device'
-    },
+    attribute: '',
+    value: [0],
+    comparison: 'is',
+    category: 'device',
+    index: 0,
     updateFn: () => null
 }
 
