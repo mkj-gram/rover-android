@@ -1,7 +1,4 @@
-const storage = require('@google-cloud/storage');
-
-
-const Uploader = function(opts) {
+const Uploader = function(storage, opts) {
     const gcs = storage({
         projectId: opts.projectId,
         credentials: opts.credentials
@@ -11,7 +8,7 @@ const Uploader = function(opts) {
 }
 
 Uploader.prototype.upload = function(req, filename, callback) {
-
+    
     const file = this._bucket.file(filename)
     const remoteWriteStream = file.createWriteStream({ resumable: false })
 
