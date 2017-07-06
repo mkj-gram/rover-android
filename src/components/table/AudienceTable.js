@@ -12,11 +12,13 @@ class AudienceTable extends Component {
 				style={{
 					display: 'flex',
 					flexDirection: 'column',
-					flex: '1 1 100%'
+					flex: '1 1 100%',
+					position: 'relative'
 				}}
 			>
 				<TableMenuBar />
 				<AudienceDataGrid />
+				
 			</div>
 		)
 	}
