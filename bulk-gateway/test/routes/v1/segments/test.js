@@ -77,17 +77,24 @@ describe('segments', function() {
                 return this
             },
             send: function(json) {
-                expect(json).to.be.an('object')
-                expect(json.id).to.equal('1')
-                expect(json.type).to.equal("load-jobs")
 
-                let attributes = json.attributes
+               expect(json).to.be.an('object')
+                
+                let expected = {
+                    data: {
+                        id: '1',
+                        type: 'load-jobs',
+                        attributes: {
+                            progress: 100,
+                            format: 'csv',
+                            status: 'completed',
+                            'created-at': date.toISOString()
+                        }
+                    }
+                }
 
-                expect(attributes).to.be.an('object')
-                expect(attributes.progress).to.equal(100)
-                expect(attributes.format).to.equal("csv")
-                expect(attributes.status).to.equal("completed")
-                expect(attributes['created-at']).to.equal(date.toISOString())
+                expect(json).to.deep.equal(expected)
+                
                 return done()
             }
         }

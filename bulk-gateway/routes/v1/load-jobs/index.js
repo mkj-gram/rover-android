@@ -39,7 +39,9 @@ module.exports = function(CsvProcessorClient) {
 
             const loadJob = response.getJob()
 
-            const payload = Serializers.v1.serializeLoadJob(loadJob, 'csv')
+            const payload = {
+                data: Serializers.v1.serializeLoadJob(loadJob, 'csv')
+            }
 
             res.status(200)
             res.send(payload)
