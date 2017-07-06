@@ -18,6 +18,7 @@ import CustomRowRenderer from './CustomRowRenderer'
 import DateCellFormatter from './DateCellFormatter'
 import EmptyCellFormatter from './EmptyCellFormatter'
 import ListCellFormatter from './ListCellFormatter'
+import GridPagination from './GridPagination'
 
 class AudienceDataGrid extends Component {
     constructor(props) {
@@ -315,6 +316,7 @@ class AudienceDataGrid extends Component {
                         // rowActionsCell={this.renderCheckbox}
                     />
                 </DraggableContainer>
+                <GridPagination totalRows="77200" />
             </div>
         )
     }
