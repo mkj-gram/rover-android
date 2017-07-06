@@ -3,8 +3,6 @@ import React, { Component } from 'react'
 import AudienceDataGrid from './AudienceDataGrid'
 import TableMenuBar from './TableMenuBar'
 
-import { Checkbox } from '@rover/react-bootstrap'
-
 class AudienceTable extends Component {
 	render() {
 		return (

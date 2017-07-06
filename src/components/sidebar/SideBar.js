@@ -72,13 +72,13 @@ class SideBar extends Component {
 
     renderModalTitle(currentAttribute) {
         const { query } = this.state
-        
+
         if (query.length === 0) {
             return
         }
 
         const { attribute, index } = currentAttribute
-        
+
         if (attribute === '') {
             return
         }
@@ -220,8 +220,12 @@ class SideBar extends Component {
                         onFocus={onFocus}
                         onBlur={onBlur}
                     >
-                        <option value="all" label="Match all">all</option>
-                        <option value="any" label="Match any">any</option>
+                        <option value="all" label="Match all">
+                            all
+                        </option>
+                        <option value="any" label="Match any">
+                            any
+                        </option>
                     </Select>
                 </div>
             </div>
