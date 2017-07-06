@@ -1,24 +1,24 @@
 import React from 'react'
 
 export default ({ primaryColor, accentColor, amountFilled, amountEmpty }) =>
-    <svg width="75px" height="75px" viewBox="0 0 32 32">
-        <circle cx="16" cy="16" r="5.0929624808" fill="#fff" />
+    <svg width="40px" height="40px" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="9" fill="#fff" />
         <circle
-            cx="16"
-            cy="16"
-            r="5.0929624808"
+            cx="20"
+            cy="20"
+            r="15"
             fill="transparent"
             stroke={primaryColor}
-            strokeWidth="3"
+            strokeWidth="10"
         />
         <circle
-            cx="16"
-            cy="16"
-            r="5.0929624808"
+            cx="20"
+            cy="20"
+            r="15"
             fill="transparent"
             stroke={accentColor}
-            strokeWidth="3"
+            strokeWidth="10"
             strokeDasharray={`${amountFilled} ${amountEmpty}`}
-            strokeDashoffset="8"
+            strokeDashoffset="10"
         />
     </svg>
