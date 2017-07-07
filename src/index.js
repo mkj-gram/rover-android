@@ -25,6 +25,7 @@ import ImageBlockIconSmall from './ImageBlockIconSmall'
 import InsetInspectorBoxOutline from './InsetInspectorBoxOutline'
 import LayoutIcon from './LayoutIcon'
 import LinkIcon from './LinkIcon'
+import LocationIcon from './LocationIcon'
 import LockIcon from './LockIcon'
 import PartialLockIcon from './PartialLockIcon'
 import PencilEditIcon from './PencilEditIcon'
@@ -120,6 +121,7 @@ export {
     InsetInspectorBoxOutline,
     LayoutIcon,
     LinkIcon,
+    LocationIcon,
     LockIcon,
     PartialLockIcon,
     PencilEditIcon,
