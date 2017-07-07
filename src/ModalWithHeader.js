@@ -17,7 +17,9 @@ const ModalWithHeader = ({
     cancelText,
     primaryColor,
     hoverColor,
-    secondaryColor
+    secondaryColor,
+    modalFooterStyle,
+    modalChildrenStyle
 }) => {
     const headerStyle = {
         position: 'relative',
@@ -28,6 +30,17 @@ const ModalWithHeader = ({
         alignItems: 'center',
         paddingLeft: 20,
         ...modalHeaderStyle
+    }
+
+    const footerStyle = {
+        padding: 20,
+        paddingTop: 30,
+        ...modalFooterStyle
+    }
+
+    const childrenStyle = {
+        margin: '25px 20px 0px',
+        ...modalChildrenStyle
     }
 
     return (
@@ -50,10 +63,10 @@ const ModalWithHeader = ({
             <div style={headerStyle}>
                 {headerContent}
             </div>
-            <div style={{ margin: '25px 20px 0px' }}>
+            <div style={childrenStyle}>
                 {children}
             </div>
-            <div style={{ padding: 20, paddingTop: 30 }}>
+            <div style={footerStyle}>
                 <RoundedButton
                     type="primary"
                     onClick={successFn}
@@ -89,7 +102,9 @@ ModalWithHeader.propTypes = {
     cancelText: PropTypes.string,
     primaryColor: PropTypes.string.isRequired,
     hoverColor: PropTypes.string.isRequired,
-    secondaryColor: PropTypes.string.isRequired
+    secondaryColor: PropTypes.string.isRequired,
+    modalFooterStyle: PropTypes.object,
+    modalChildrenStyle: PropTypes.object
 }
 
 ModalWithHeader.defaultProps = {
