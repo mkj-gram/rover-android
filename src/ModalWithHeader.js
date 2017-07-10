@@ -19,7 +19,10 @@ const ModalWithHeader = ({
     hoverColor,
     secondaryColor,
     modalFooterStyle,
-    modalChildrenStyle
+    modalChildrenStyle,
+    modalContentStyle,
+    modalOverlayStyle,
+    bodyOpenClassName
 }) => {
     const headerStyle = {
         position: 'relative',
@@ -44,21 +47,27 @@ const ModalWithHeader = ({
     }
 
     return (
+
         <div id={contentLabel}>
         <Modal
             isOpen={isOpen}
             onRequestClose={cancelFn}
             contentLabel={contentLabel}
             style={{
+                overlay: {
+                    ...modalOverlayStyle
+                },
                 content: {
                     backgroundColor: backgroundColor,
                     padding: 0,
-                    width: 'auto'
+                    width: 'auto',
+                    ...modalContentStyle
                 }
             }}
             hoverStyle={{
                 backgroundColor: graphite,
             }}
+            bodyOpenClassName={bodyOpenClassName}
         >
             <div style={headerStyle}>
                 {headerContent}
@@ -80,7 +89,7 @@ const ModalWithHeader = ({
                         type="cancel"
                         onClick={cancelFn}
                         primaryColor={secondaryColor}
-                        hoverColor='white'
+                        hoverColor={hoverColor}
                         style={{ cursor: 'pointer' }}
                     >
                         {cancelText}
@@ -104,7 +113,10 @@ ModalWithHeader.propTypes = {
     hoverColor: PropTypes.string.isRequired,
     secondaryColor: PropTypes.string.isRequired,
     modalFooterStyle: PropTypes.object,
-    modalChildrenStyle: PropTypes.object
+    modalChildrenStyle: PropTypes.object,
+    modalContentStyle: PropTypes.object,
+    modalOverlayStyle: PropTypes.object,
+    bodyOpenClassName: PropTypes.string
 }
 
 ModalWithHeader.defaultProps = {

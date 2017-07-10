@@ -10,7 +10,8 @@ export default ({
     closeTimeoutMS,
     style = {},
     hoverStyle = null,
-    children
+    children,
+    bodyOpenClassName
 }) => {
 
     style = {
@@ -39,7 +40,9 @@ export default ({
             isOpen={isOpen}
             onAfterOpen={onAfterOpen} onRequestClose={onRequestClose} closeTimeoutMS={closeTimeoutMS}
             contentLabel="Rover Platform"
-            style={style}>
+            style={style}
+            bodyOpenClassName={bodyOpenClassName}
+        >
             <IconButton 
                 type={'close'} 
                 onClick={onRequestClose} 
