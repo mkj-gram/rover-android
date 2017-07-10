@@ -18,8 +18,13 @@ class BooleanInput extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            value: this.props.predicate.value
+            value: this.props.value
         }
+    }
+
+    componentDidMount() {
+        const { value } = this.state
+        this.updateBooleanValue(value)
     }
 
     renderRadioButton(radioValue) {
@@ -44,12 +49,12 @@ class BooleanInput extends Component {
     }
 
     updateBooleanValue(value) {
-        const { predicate, updateFn } = this.props
-        const { attribute, category, type } = predicate
+        const { attribute, category, type, updateFn, index } = this.props
         updateFn({
             attribute,
             category,
             type,
+            index,
             comparison: 'true',
             value: value
         })
@@ -57,8 +62,7 @@ class BooleanInput extends Component {
     }
 
     render() {
-        const { predicate } = this.props
-        const { attribute, category } = predicate
+        const { attribute, category } = this.props
         const radioFieldStyle = {
             display: 'flex',
             color: titanium,
@@ -84,23 +88,21 @@ class BooleanInput extends Component {
 }
 
 BooleanInput.propTypes = {
-    predicate: PropTypes.shape({
-        attribute: PropTypes.string.isRequired,
-        value: PropTypes.bool.isRequired,
-        comparison: PropTypes.string.isRequired,
-        category: PropTypes.string.isRequired
-    }),
-    updateFn: PropTypes.func.isRequired
+    attribute: PropTypes.string.isRequired,
+    value: PropTypes.bool.isRequired,
+    comparison: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    updateFn: PropTypes.func.isRequired,
+    index: PropTypes.number.isRequired
 }
 
 BooleanInput.defaultProps = {
-    predicate: {
-        attribute: '',
-        value: false,
-        comparison: 'true',
-        category: 'profile'
-    },
-    updateFn: () => null
+    attribute: '',
+    value: true,
+    comparison: 'true',
+    category: 'profile',
+    updateFn: () => null,
+    index: 0
 }
 
 export default BooleanInput

@@ -24,14 +24,18 @@ class DateInput extends Component {
     constructor(props) {
         super(props)
 
-        const { predicate } = this.props
-        const { value, comparison } = predicate
+        const { value, comparison } = this.props
         const { start, end } = value
         this.state = {
             start,
             end,
             comparison
         }
+    }
+
+    componentDidMount() {
+        const { value } = this.state
+        this.updateValue(value)
     }
 
     renderDatePicker() {
@@ -55,12 +59,14 @@ class DateInput extends Component {
     }
 
     renderCalendarInput(currentDate, selectFn = null) {
-        
-        const onSelect = selectFn || (date => this.updateValue({ start: moment(date) }))
-        
-        const onFocus = e => e.target.parentElement.parentElement.style.borderColor = silver
-        const onBlur = e => e.target.parentElement.parentElement.style.borderColor = steel
-        
+        const onSelect =
+            selectFn || (date => this.updateValue({ start: moment(date) }))
+
+        const onFocus = e =>
+            (e.target.parentElement.parentElement.style.borderColor = silver)
+        const onBlur = e =>
+            (e.target.parentElement.parentElement.style.borderColor = steel)
+
         return (
             <div
                 style={{
@@ -108,7 +114,13 @@ class DateInput extends Component {
         return (
             <div style={{ display: 'flex' }}>
                 {this.renderCalendarInput(start)}
-                <span style={{ fontStyle: 'italic', margin: '0px 10px', alignSelf: 'center' }}>
+                <span
+                    style={{
+                        fontStyle: 'italic',
+                        margin: '0px 10px',
+                        alignSelf: 'center'
+                    }}
+                >
                     and
                 </span>
                 {this.renderCalendarInput(end, endSelectFn)}
@@ -117,14 +129,16 @@ class DateInput extends Component {
     }
 
     renderRelativeDatePicker(start) {
-
         return (
             <div>
                 <ModalInput
                     type="number"
                     min={0}
                     value={moment().diff(start, 'd')}
-                    onChange={e => this.updateValue({ start: moment().subtract(e.target.value, 'days') })}
+                    onChange={e =>
+                        this.updateValue({
+                            start: moment().subtract(e.target.value, 'days')
+                        })}
                 />
                 <span style={{ fontStyle: 'italic' }}>days ago</span>
             </div>
@@ -132,33 +146,32 @@ class DateInput extends Component {
     }
 
     updateComparison(comparison) {
-        const { predicate, updateFn } = this.props
-        const { attribute, type, category } = predicate
+        const { attribute, type, category, index, updateFn } = this.props
         const start = moment()
         let end = {}
-        
+
         if (comparison === 'in between') {
             end = moment()
         }
-        
+
         const value = { start, end }
-        
+
         updateFn({
             attribute,
             comparison,
             type,
             category,
+            index,
             value
         })
-        
+
         this.setState({ comparison, start, end })
     }
-    
+
     updateValue(value) {
-        const { predicate, updateFn } = this.props
-        const { attribute, type, category } = predicate
+        const { attribute, type, category, index, updateFn } = this.props
         const { comparison, start, end } = this.state
-        
+
         const newValue = {
             start,
             end,
@@ -170,15 +183,15 @@ class DateInput extends Component {
             comparison,
             type,
             category,
+            index,
             value: newValue
         })
-        
+
         this.setState({ ...newValue })
     }
 
     render() {
-        const { predicate } = this.props
-        const { attribute, category } = predicate
+        const { attribute, category } = this.props
         const { value, comparison } = this.state
         return (
             <div style={{ ...text, ...light, color: silver, width: 444 }}>
@@ -234,30 +247,25 @@ class DateInput extends Component {
 }
 
 DateInput.propTypes = {
-    predicate: PropTypes.shape({
-        attribute: PropTypes.string.isRequired,
-        value: PropTypes.shape({
-            start: PropTypes.object,
-            end: PropTypes.object
-        }),
-        comparison: PropTypes.string.isRequired,
-        category: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired
-    }),
+    attribute: PropTypes.string.isRequired,
+    value: PropTypes.object,
+    comparison: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired
 }
 
 DateInput.defaultProps = {
-    predicate: {
-        attribute: '',
-        value: {
-            start: {},
-            end: {}
-        },
-        comparison: '',
-        category: 'device',
-        type: 'date'
+    attribute: '',
+    value: {
+        start: moment(),
+        end: {}
     },
+    comparison: 'exactly',
+    category: 'device',
+    type: 'date',
+    index: 0,
     updateFn: () => ''
 }
 

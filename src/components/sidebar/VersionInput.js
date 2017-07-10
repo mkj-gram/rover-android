@@ -17,29 +17,28 @@ class VersionInput extends Component {
     constructor(props) {
         super(props)
 
-        const { predicate } = this.props
-        const { value, comparison } = predicate
+        const { value, comparison } = this.props
         this.state = {
             value,
             comparison
         }
     }
 
-    updateVersion(version, index) {
-        const { predicate, updateFn } = this.props
-        const { attribute, category, type } = predicate
+    updateVersion(version, versionIndex) {
+        const { attribute, category, type, index, updateFn } = this.props
         const { value, comparison } = this.state
 
         const newValue = value
-            .slice(0, index)
+            .slice(0, versionIndex)
             .concat(version)
-            .concat(value.slice(index + 1))
+            .concat(value.slice(versionIndex + 1))
 
         updateFn({
             attribute,
             comparison,
             category,
             type,
+            index,
             value: newValue
         })
 
@@ -47,8 +46,7 @@ class VersionInput extends Component {
     }
 
     updateComparison(comparison) {
-        const { predicate, updateFn } = this.props
-        const { attribute, category, type } = predicate
+        const { attribute, category, type, index, updateFn } = this.props
         const { value } = this.state
 
         updateFn({
@@ -56,6 +54,7 @@ class VersionInput extends Component {
             comparison,
             value,
             category,
+            index,
             type
         })
 
@@ -75,8 +74,7 @@ class VersionInput extends Component {
     }
 
     render() {
-        const { predicate } = this.props
-        const { attribute, category } = predicate
+        const { attribute, category } = this.props
         const { value, comparison } = this.state
 
         return (
@@ -148,22 +146,20 @@ class VersionInput extends Component {
 }
 
 VersionInput.propTypes = {
-    predicate: PropTypes.shape({
-        attribute: PropTypes.string.isRequired,
-        value: PropTypes.arrayOf(PropTypes.number),
-        comparison: PropTypes.string.isRequired,
-        category: PropTypes.string.isRequired
-    }),
+    attribute: PropTypes.string.isRequired,
+    value: PropTypes.arrayOf(PropTypes.number),
+    comparison: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired
 }
 
 VersionInput.defaultProps = {
-    predicate: {
-        attribute: '',
-        value: [0, 0, 0, 0, 0, 0],
-        comparison: 'equal to',
-        category: 'device'
-    },
+    attribute: '',
+    value: [0, 0, 0, 0, 0, 0],
+    comparison: 'equal to',
+    category: 'device',
+    index: 0,
     updateFn: () => null
 }
 

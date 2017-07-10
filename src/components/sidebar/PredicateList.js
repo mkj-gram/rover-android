@@ -165,7 +165,7 @@ const renderNumericPredicate = (comparison, value) => {
     )
 }
 
-const PredicateList = ({ query, viewModal }) => {
+const PredicateList = ({ query, viewModal, removePredicate }) => {
     const predicateStyle = {
         width: 260,
         backgroundColor: ash,
@@ -206,7 +206,7 @@ const PredicateList = ({ query, viewModal }) => {
                             style={predicateStyle}
                             onMouseOver={onMouseOver}
                             onMouseLeave={onMouseLeave}
-                            onClick={() => viewModal(attribute)}
+                            onClick={() => viewModal(attribute, index)}
                         >
                             <div
                                 style={{
@@ -216,7 +216,9 @@ const PredicateList = ({ query, viewModal }) => {
                                     flexWrap: 'wrap'
                                 }}
                             >
-                                <div style={{ flex: 'none', marginRight: 5 }}>{attribute}:</div>
+                                <div style={{ flex: 'none', marginRight: 5 }}>
+                                    {attribute}:
+                                </div>
                                 <div style={{ flex: '1 1 auto' }}>
                                     {renderPredicate(value, comparison, type)}
                                 </div>
@@ -230,7 +232,7 @@ const PredicateList = ({ query, viewModal }) => {
                                 }}
                                 onClick={e => {
                                     e.stopPropagation()
-                                    console.log('remove query predicate')
+                                    removePredicate(index)
                                 }}
                                 onMouseOver={e => e.stopPropagation()}
                                 onMouseLeave={e => e.stopPropagation()}
