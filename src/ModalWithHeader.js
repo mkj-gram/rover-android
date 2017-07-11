@@ -22,7 +22,8 @@ const ModalWithHeader = ({
     modalChildrenStyle,
     modalContentStyle,
     modalOverlayStyle,
-    bodyOpenClassName
+    bodyOpenClassName,
+    hoverStyle
 }) => {
     const headerStyle = {
         position: 'relative',
@@ -66,6 +67,7 @@ const ModalWithHeader = ({
             }}
             hoverStyle={{
                 backgroundColor: graphite,
+                ...hoverStyle
             }}
             bodyOpenClassName={bodyOpenClassName}
         >
@@ -116,7 +118,8 @@ ModalWithHeader.propTypes = {
     modalChildrenStyle: PropTypes.object,
     modalContentStyle: PropTypes.object,
     modalOverlayStyle: PropTypes.object,
-    bodyOpenClassName: PropTypes.string
+    bodyOpenClassName: PropTypes.string,
+    hoverStyle: PropTypes.object
 }
 
 ModalWithHeader.defaultProps = {
