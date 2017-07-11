@@ -6,7 +6,7 @@ import {
     DownloadIcon,
     TagIcon
 } from '@rover/react-icons'
-import { mercury, straw, purple } from '@rover/react-bootstrap'
+import { mercury, straw, purple, silver } from '@rover/react-bootstrap'
 
 const overlayParent = {
     width: '36px',
@@ -58,7 +58,7 @@ class TableMenuBarIcon extends Component {
             hoverStyle[1] = purple
         } else {
             hoverStyle[0] = iconBackdrop
-            hoverStyle[1] = mercury
+            hoverStyle[1] = silver
         }
         return hoverStyle
     }
@@ -68,7 +68,10 @@ class TableMenuBarIcon extends Component {
             download: DownloadIcon({ fill: this.getHoverStyle()[1] }),
             donut: DonutChart({ fill: this.getHoverStyle()[1] }),
             tag: TagIcon({ fill: this.getHoverStyle()[1] }),
-            columns: ColumnsIcon({ fill: this.getHoverStyle()[1] })
+            columns: ColumnsIcon({
+                fill: this.getHoverStyle()[1],
+                style: { pointerEvents: 'none' }
+            })
         }
         return tableMenuIcons[val]
     }
