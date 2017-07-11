@@ -70,10 +70,20 @@ class SideBar extends Component {
         this.setState({ query: newQuery })
     }
 
-    renderModalTitle(attribute) {
+    renderModalTitle(currentAttribute) {
         const { query } = this.state
+        
+        if (query.length === 0) {
+            return
+        }
 
-        const category = query.filter(obj => obj.attribute === attribute)[0]
+        const { attribute, index } = currentAttribute
+        
+        if (attribute === '') {
+            return
+        }
+
+        const category = query[index].category
 
         const icon = category === 'profile' ? ProfileIcon : DeviceIconSmall
 
@@ -290,12 +300,11 @@ class SideBar extends Component {
                     contentLabel="Query Builder"
                     backgroundColor={graphite}
                     isOpen={currentAttribute.attribute !== ''}
-                    headerContent={() => this.renderModalTitle(
-                        currentAttribute.attribute
-                    )}
+                    headerContent={this.renderModalTitle(currentAttribute)}
                     successFn={() => this.updateQuery()}
                     successText="Add filter"
-                    cancelFn={() => this.setState({ currentAttribute: {} })}
+                    cancelFn={() =>
+                        this.setState({ currentAttribute: { attribute: '' } })}
                     cancelText="Cancel"
                     primaryColor={violet}
                     secondaryColor={lavender}

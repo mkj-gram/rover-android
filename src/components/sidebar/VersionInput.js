@@ -23,6 +23,11 @@ class VersionInput extends Component {
             comparison
         }
     }
+    
+    componentDidMount() {
+        const { comparison } = this.state
+        this.updateComparison(comparison)
+    }
 
     updateVersion(version, versionIndex) {
         const { attribute, category, type, index, updateFn } = this.props

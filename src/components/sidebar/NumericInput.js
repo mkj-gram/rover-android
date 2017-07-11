@@ -23,6 +23,11 @@ class NumericInput extends Component {
             comparison
         }
     }
+    
+    componentDidMount() {
+        const { value } = this.state
+        this.updateValue(value)
+    }
 
     updateComparison(comparison) {
         const { attribute, category, type, index, updateFn } = this.props
