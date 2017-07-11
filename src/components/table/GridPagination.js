@@ -6,7 +6,8 @@ import {
     silver,
     text,
     titanium,
-    semibold
+    semibold,
+    violet
 } from '@rover/react-bootstrap'
 
 const paginationContainer = {
@@ -54,7 +55,7 @@ class GridPagination extends Component {
         this.calculateRange = this.calculateRange.bind(this)
         this.handlePrevious = this.handlePrevious.bind(this)
         this.handleNext = this.handleNext.bind(this)
-        this.clickableColor = this.clickableColor.bind(this)
+        this.clickHoverColor = this.clickHoverColor.bind(this)
         this.compareValues = this.compareValues.bind(this)
     }
 
@@ -95,15 +96,17 @@ class GridPagination extends Component {
         }
     }
 
-    clickableColor(action) {
-        let color
+    clickHoverColor(action) {
+        let color, hover
         const { page, maxPage } = this.state
         if (action === 'next') {
             color = page < maxPage ? purple : silver
+            hover = page < maxPage ? violet : silver
         } else if (action === 'previous') {
             color = page > 0 ? purple : silver
+            hover = page > 0 ? violet : silver
         }
-        return color
+        return [color, hover]
     }
 
     render() {
@@ -120,19 +123,26 @@ class GridPagination extends Component {
                 <div style={middleLine} />
                 <RoundedButton
                     type="cancel"
-                    primaryColor={this.clickableColor('next')}
-                    style={{ padding: 0, marginRight: 10, marginLeft: 9 }}
-                    onClick={this.handleNext}
+                    primaryColor={this.clickHoverColor('previous')[0]}
+                    style={{
+                        padding: 0,
+                        marginRight: 10,
+                        marginLeft: 9,
+                        cursor: 'pointer'
+                    }}
+                    onClick={this.handlePrevious}
+                    hoverColor={this.clickHoverColor('previous')[1]}
                 >
-                    Next
+                    Previous
                 </RoundedButton>
                 <RoundedButton
                     type="cancel"
-                    primaryColor={this.clickableColor('previous')}
-                    style={{ padding: 0, marginRight: 21 }}
-                    onClick={this.handlePrevious}
+                    primaryColor={this.clickHoverColor('next')[0]}
+                    style={{ padding: 0, marginRight: 21, cursor: 'pointer' }}
+                    onClick={this.handleNext}
+                    hoverColor={this.clickHoverColor('next')[1]}
                 >
-                    Previous
+                    Next
                 </RoundedButton>
             </div>
         )
