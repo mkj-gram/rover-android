@@ -49,10 +49,14 @@ HealthCheckServer.prototype.start = function() {
     }
 }
 
-HealthCheckServer.prototype.close = function() {
+HealthCheckServer.prototype.close = function(callback) {
     if (this._serverIsListening) {
         this._serverIsListening = false
-        this._server.close()
+        this._server.close(function() {
+            if (typeof callback === 'function') {
+                return callback();
+            }
+        })
     }
 }
 
