@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+
 import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
 import { DraggableHeader } from 'react-data-grid-addons'
@@ -10,7 +11,8 @@ import {
     purple,
     offwhite,
     steel,
-    straw
+    straw,
+    Tooltip
 } from '@rover/react-bootstrap'
 
 import BooleanCellFormatter from './BooleanCellFormatter'
@@ -23,6 +25,9 @@ import GridPagination from './GridPagination'
 class AudienceDataGrid extends Component {
     constructor(props) {
         super(props)
+
+        this.handleCellEnter = this.handleCellEnter.bind(this)
+        this.handleCellLeave = this.handleCellLeave.bind(this)
 
         this.state = {
             columns: [
@@ -46,7 +51,12 @@ class AudienceDataGrid extends Component {
                     width: 200,
                     draggable: true,
                     resizable: true,
-                    formatter: DateCellFormatter
+                    formatter: (
+                        <DateCellFormatter
+                            handleCellEnter={this.handleCellEnter}
+                            handleCellLeave={this.handleCellLeave}
+                        />
+                    )
                 },
                 {
                     key: 'tags',
@@ -54,7 +64,12 @@ class AudienceDataGrid extends Component {
                     width: 280,
                     draggable: true,
                     resizable: true,
-                    formatter: ListCellFormatter
+                    formatter: (
+                        <ListCellFormatter
+                            handleCellEnter={this.handleCellEnter}
+                            handleCellLeave={this.handleCellLeave}
+                        />
+                    )
                 },
                 {
                     key: 'location_permissions',
@@ -68,12 +83,52 @@ class AudienceDataGrid extends Component {
             rows: this.createRows(),
             selectedIndexes: [],
             isShiftKeyPressed: false,
-            isCommandKeyPressed: false
+            isCommandKeyPressed: false,
+            toolTip: {
+                isModalShowing: false,
+                message: '',
+                coordinates: {
+                    x: 0,
+                    y: 0,
+                    divWidth: 0
+                }
+            }
         }
 
         this.onRowsSelected = this.onRowsSelected.bind(this)
         this.onRowsDeselected = this.onRowsDeselected.bind(this)
         this.rowGetter = this.rowGetter.bind(this)
+    }
+
+    handleCellEnter(e, message) {
+        const target = e.target.getBoundingClientRect()
+        this.setState({
+            toolTip: {
+                isModalShowing: !this.state.toolTip.isModalShowing,
+                message: message,
+                coordinates: {
+                    x: target.left - 300,
+                    y: target.top - 130 + target.height,
+                    divWidth: target.width
+                }
+            }
+        })
+    }
+
+    handleCellLeave() {
+        if (this.state.toolTip.isModalShowing) {
+            this.setState({
+                toolTip: {
+                    isModalShowing: false,
+                    message: '',
+                    coordinates: {
+                        x: 0,
+                        y: 0,
+                        divWidth: 0
+                    }
+                }
+            })
+        }
     }
 
     createRows() {
@@ -173,7 +228,7 @@ class AudienceDataGrid extends Component {
         if (isShiftKeyPressed) {
             const minIndex = Math.min(...selectedIndexes)
             const maxIndex = Math.max(...selectedIndexes)
-            
+
             const start = rowIdx > minIndex ? minIndex : rowIdx
             const end = rowIdx < maxIndex ? maxIndex : rowIdx
             const range = (start, end) =>
@@ -182,9 +237,11 @@ class AudienceDataGrid extends Component {
                 selectedIndexes: range(start, end)
             })
         }
-        
+
         if (isCommandKeyPressed) {
-            return this.setState({ selectedIndexes: selectedIndexes.concat(rowIdx) })
+            return this.setState({
+                selectedIndexes: selectedIndexes.concat(rowIdx)
+            })
         }
 
         if (selectedIndexes.includes(rowIdx)) {
@@ -199,7 +256,7 @@ class AudienceDataGrid extends Component {
         if (e.keyCode === 16) {
             this.setState({ isShiftKeyPressed: true })
         }
-        
+
         if (e.keyCode === 91) {
             this.setState({ isCommandKeyPressed: true })
         }
@@ -209,7 +266,7 @@ class AudienceDataGrid extends Component {
         if (e.keyCode === 16) {
             this.setState({ isShiftKeyPressed: false })
         }
-        
+
         if (e.keyCode === 91) {
             this.setState({ isCommandKeyPressed: false })
         }
@@ -220,6 +277,7 @@ class AudienceDataGrid extends Component {
     }
 
     render() {
+        const { isModalShowing, message, coordinates } = this.state.toolTip
         return (
             <div
                 ref={el => {
@@ -227,6 +285,7 @@ class AudienceDataGrid extends Component {
                 }}
                 style={{ flex: '1 1 100%', position: 'relative' }}
                 className="rover-data-grid"
+                id="audienceDataGrid"
             >
                 <style type="text/css">
                     {`
@@ -255,6 +314,10 @@ class AudienceDataGrid extends Component {
                                 border-bottom: 1px solid ${cloud};
                                 border-right: 1px solid ${cloud};
                                 padding-left: 20px;
+                            }
+
+                            .react-grid-Cell__value {
+                                display: inline-block;
                             }
                             
                             .rover-data-grid .react-grid-Cell:focus {
@@ -317,6 +380,8 @@ class AudienceDataGrid extends Component {
                     />
                 </DraggableContainer>
                 <GridPagination totalRows="77200" />
+                {isModalShowing &&
+                    <Tooltip message={message} coordinates={coordinates} />}
             </div>
         )
     }

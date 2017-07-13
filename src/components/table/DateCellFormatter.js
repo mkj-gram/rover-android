@@ -1,17 +1,16 @@
 import React, { Component } from 'react'
-import { purple, steel, Tooltip } from '@rover/react-bootstrap'
+import { purple, steel } from '@rover/react-bootstrap'
 
 class DateCellFormatter extends Component {
     constructor(props) {
         super(props)
 
-        this.state = { isModalShowing: false }
-        
-        this.handleClick = this.handleClick.bind(this)
-    }
-    
-    handleClick() {
-        this.setState({ isModalShowing: !this.state.isModalShowing })
+        this.state = {
+            isModalShowing: false,
+            onCell: false
+        }
+        this.handleMouseOver = this.handleMouseOver.bind(this)
+        this.handleMouseLeave = this.handleMouseLeave.bind(this)
     }
 
     getRelativeTime() {
@@ -22,36 +21,57 @@ class DateCellFormatter extends Component {
         if (secondsPast <= 86400) {
             return `${parseInt(secondsPast / 3600)} hours ago`
         }
-        
+
         if (secondsPast <= 604800) {
             return `${parseInt(secondsPast / 86400)} days ago`
         }
-        
+
         if (secondsPast <= 2628000) {
             return `${parseInt(secondsPast / 604800)} weeks ago`
         }
-        
+
         if (secondsPast <= 31536000) {
             return `${parseInt(secondsPast / 2628000)} months ago`
         }
-        
+
         if (secondsPast > 31536000) {
             return `${parseInt(secondsPast / 31536000)} years ago`
         }
     }
 
+    handleMouseOver(e) {
+        e.persist()
+        const { handleCellEnter, value } = this.props
+        this.setState({ onCell: true })
+
+        setTimeout(() => {
+            if (this.state.onCell) {
+                handleCellEnter(e, value.toDateString())
+                this.setState({
+                    isModalShowing: true
+                })
+            }
+        }, 300)
+    }
+
+    handleMouseLeave(e) {
+        const { handleCellLeave } = this.props
+        this.setState({ onCell: false, isModalShowing: false })
+        handleCellLeave()
+    }
+
     render() {
         const { isModalShowing } = this.state
-        const { value } = this.props
+
         return (
             <div
-                onClick={this.handleClick}
+                onMouseOver={this.handleMouseOver}
+                onMouseLeave={this.handleMouseLeave}
                 style={{
                     color: isModalShowing ? purple : steel,
                     position: 'relative'
                 }}
             >
-                {isModalShowing && <Tooltip message={value.toDateString()}/>}
                 {this.getRelativeTime()}
             </div>
         )

@@ -6,7 +6,7 @@ import {
     DownloadIcon,
     TagIcon
 } from '@rover/react-icons'
-import { mercury, straw, purple, silver } from '@rover/react-bootstrap'
+import { mercury, straw, purple, silver, Tooltip } from '@rover/react-bootstrap'
 
 const overlayParent = {
     width: '36px',
@@ -40,15 +40,60 @@ class TableMenuBarIcon extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            hover: false
+            hover: false,
+            toolTip: {
+                isModalShowing: false,
+                message: '',
+                coordinates: {
+                    x: 0,
+                    y: 0,
+                    divWidth: 0
+                }
+            }
         }
-        this.toggleHover = this.toggleHover.bind(this)
+        this.handleMouseOver = this.handleMouseOver.bind(this)
+        this.handleMouseLeave = this.handleMouseLeave.bind(this)
         this.getHoverStyle = this.getHoverStyle.bind(this)
         this.getTableMenuIcon = this.getTableMenuIcon.bind(this)
     }
 
-    toggleHover() {
-        this.setState({ ...this.state, hover: !this.state.hover })
+    handleMouseOver(e) {
+        e.persist()
+        this.setState({
+            hover: true
+        })
+        setTimeout(() => {
+            if (this.state.hover) {
+                const target = e.target.getBoundingClientRect()
+                this.setState({
+                    toolTip: {
+                        ...this.state.toolTip,
+                        isModalShowing: true,
+                        message: 'this is an icon tooltip message',
+                        coordinates: {
+                            x: target.left - 300,
+                            y: target.top + target.height - 60,
+                            divWidth: target.width
+                        }
+                    }
+                })
+            }
+        }, 300)
+    }
+
+    handleMouseLeave() {
+        this.setState({
+            hover: false,
+            toolTip: {
+                isModalShowing: false,
+                message: '',
+                coordinates: {
+                    x: 0,
+                    y: 0,
+                    divWidth: 0
+                }
+            }
+        })
     }
 
     getHoverStyle() {
@@ -66,7 +111,6 @@ class TableMenuBarIcon extends Component {
     getTableMenuIcon(val) {
         const tableMenuIcons = {
             download: DownloadIcon({ fill: this.getHoverStyle()[1] }),
-            donut: DonutChart({ fill: this.getHoverStyle()[1] }),
             tag: TagIcon({ fill: this.getHoverStyle()[1] }),
             columns: ColumnsIcon({
                 fill: this.getHoverStyle()[1],
@@ -77,13 +121,17 @@ class TableMenuBarIcon extends Component {
     }
 
     render() {
+        const { isModalShowing, message, coordinates } = this.state.toolTip
         return (
-            <div
-                style={this.getHoverStyle()[0]}
-                onMouseEnter={this.toggleHover}
-                onMouseLeave={this.toggleHover}
-            >
-                {this.getTableMenuIcon(this.props.val)}
+            <div style={this.getHoverStyle()[0]}>
+                <div
+                    onMouseOver={this.handleMouseOver}
+                    onMouseLeave={this.handleMouseLeave}
+                >
+                    {this.getTableMenuIcon(this.props.val)}
+                    {isModalShowing &&
+                        <Tooltip message={message} coordinates={coordinates} />}
+                </div>
             </div>
         )
     }
