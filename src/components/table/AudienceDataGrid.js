@@ -85,7 +85,7 @@ class AudienceDataGrid extends Component {
             isShiftKeyPressed: false,
             isCommandKeyPressed: false,
             toolTip: {
-                isModalShowing: false,
+                isTooltipShowing: false,
                 message: '',
                 coordinates: {
                     x: 0,
@@ -104,7 +104,7 @@ class AudienceDataGrid extends Component {
         const target = e.target.getBoundingClientRect()
         this.setState({
             toolTip: {
-                isModalShowing: !this.state.toolTip.isModalShowing,
+                isTooltipShowing: !this.state.toolTip.isTooltipShowing,
                 message: message,
                 coordinates: {
                     x: target.left - 300,
@@ -116,10 +116,10 @@ class AudienceDataGrid extends Component {
     }
 
     handleCellLeave() {
-        if (this.state.toolTip.isModalShowing) {
+        if (this.state.toolTip.isTooltipShowing) {
             this.setState({
                 toolTip: {
-                    isModalShowing: false,
+                    isTooltipShowing: false,
                     message: '',
                     coordinates: {
                         x: 0,
@@ -277,7 +277,7 @@ class AudienceDataGrid extends Component {
     }
 
     render() {
-        const { isModalShowing, message, coordinates } = this.state.toolTip
+        const { isTooltipShowing, message, coordinates } = this.state.toolTip
         return (
             <div
                 ref={el => {
@@ -380,7 +380,7 @@ class AudienceDataGrid extends Component {
                     />
                 </DraggableContainer>
                 <GridPagination totalRows="77200" />
-                {isModalShowing &&
+                {isTooltipShowing &&
                     <Tooltip message={message} coordinates={coordinates} />}
             </div>
         )

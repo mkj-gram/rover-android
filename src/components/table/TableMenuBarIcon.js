@@ -42,7 +42,7 @@ class TableMenuBarIcon extends Component {
         this.state = {
             hover: false,
             toolTip: {
-                isModalShowing: false,
+                isTooltipShowing: false,
                 message: '',
                 coordinates: {
                     x: 0,
@@ -68,7 +68,7 @@ class TableMenuBarIcon extends Component {
                 this.setState({
                     toolTip: {
                         ...this.state.toolTip,
-                        isModalShowing: true,
+                        isTooltipShowing: true,
                         message: 'this is an icon tooltip message',
                         coordinates: {
                             x: target.left - 300,
@@ -85,7 +85,7 @@ class TableMenuBarIcon extends Component {
         this.setState({
             hover: false,
             toolTip: {
-                isModalShowing: false,
+                isTooltipShowing: false,
                 message: '',
                 coordinates: {
                     x: 0,
@@ -121,7 +121,7 @@ class TableMenuBarIcon extends Component {
     }
 
     render() {
-        const { isModalShowing, message, coordinates } = this.state.toolTip
+        const { isTooltipShowing, message, coordinates } = this.state.toolTip
         return (
             <div style={this.getHoverStyle()[0]}>
                 <div
@@ -129,7 +129,7 @@ class TableMenuBarIcon extends Component {
                     onMouseLeave={this.handleMouseLeave}
                 >
                     {this.getTableMenuIcon(this.props.val)}
-                    {isModalShowing &&
+                    {isTooltipShowing &&
                         <Tooltip message={message} coordinates={coordinates} />}
                 </div>
             </div>

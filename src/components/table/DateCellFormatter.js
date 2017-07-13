@@ -6,7 +6,7 @@ class DateCellFormatter extends Component {
         super(props)
 
         this.state = {
-            isModalShowing: false,
+            isTooltipShowing: false,
             onCell: false
         }
         this.handleMouseOver = this.handleMouseOver.bind(this)
@@ -56,19 +56,19 @@ class DateCellFormatter extends Component {
 
     handleMouseLeave(e) {
         const { handleCellLeave } = this.props
-        this.setState({ onCell: false, isModalShowing: false })
+        this.setState({ onCell: false, isTooltipShowing: false })
         handleCellLeave()
     }
 
     render() {
-        const { isModalShowing } = this.state
+        const { isTooltipShowing } = this.state
 
         return (
             <div
                 onMouseOver={this.handleMouseOver}
                 onMouseLeave={this.handleMouseLeave}
                 style={{
-                    color: isModalShowing ? purple : steel,
+                    color: isTooltipShowing ? purple : steel,
                     position: 'relative'
                 }}
             >
