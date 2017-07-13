@@ -41,10 +41,13 @@ class SideBar extends Component {
             currentAttribute: { attribute: '', index: null },
             currentPredicate: {},
             isShowingAddFilterModal: false,
-            query: []
+            query: [],
+            modalCoordinates: [0, 0]
         }
 
         this.setState = this.setState.bind(this)
+        this.handleAddButton = this.handleAddButton.bind(this)
+        this.handleEditModal = this.handleEditModal.bind(this)
     }
 
     updateQuery() {
@@ -151,6 +154,27 @@ class SideBar extends Component {
         }
     }
 
+    handleAddButton() {
+        let { modalCoordinates, query } = this.state
+        
+        if (query.length === 0 ) {
+            const filterContainer = document.getElementById('filterContainer')
+            const { left, top } = filterContainer.getBoundingClientRect()
+            modalCoordinates[0] = left + 20
+            modalCoordinates[1] = top + 77
+        } else {
+            const predicateListId = document.getElementById('predicateList')
+            const lastPredicate = predicateListId.children[query.length - 1]
+            const { left, top } = lastPredicate.getBoundingClientRect()
+            modalCoordinates[0] = left
+            modalCoordinates[1] = top + lastPredicate.offsetHeight + 32
+        }
+        this.setState({
+            modalCoordinates: modalCoordinates,
+            isShowingAddFilterModal: true
+        })
+    }
+
     renderAddFilterBar() {
         const { isShowingAddFilterModal, query } = this.state
         const addPredicateIndex = query.length
@@ -177,13 +201,12 @@ class SideBar extends Component {
         const onBlur = e => (e.target.style.backgroundColor = slate)
 
         return (
-            <div style={style}>
+            <div style={style} id="filterContainer">
                 <AddButton
                     id="add-filter-button"
                     primaryColor={orchid}
                     style={{ root: { marginLeft: 20 } }}
-                    onClick={() =>
-                        this.setState({ isShowingAddFilterModal: true })}
+                    onClick={this.handleAddButton}
                 />
                 <label
                     style={{
@@ -210,7 +233,7 @@ class SideBar extends Component {
                                 }
                             })
                         }}
-                    />}
+                    />} 
                 <div style={{ marginLeft: 'auto', marginRight: 30 }}>
                     <Select
                         style={selectStyle}
@@ -288,6 +311,17 @@ class SideBar extends Component {
         )
     }
 
+    handleEditModal(attribute, index) {
+        const { left, top } = document
+            .getElementById('predicateList')
+            .children[index].getBoundingClientRect()
+
+        this.setState({
+            currentAttribute: { attribute, index },
+            modalCoordinates: [left, top]
+        })
+    }
+
     render() {
         const sideBarStyle = {
             height: '100%',
@@ -297,7 +331,12 @@ class SideBar extends Component {
             display: 'flex',
             flexDirection: 'column'
         }
-        const { currentAttribute, currentPredicate, query } = this.state
+        const {
+            currentAttribute,
+            currentPredicate,
+            query,
+            modalCoordinates
+        } = this.state
         return (
             <div style={sideBarStyle}>
                 <ModalWithHeader
@@ -313,6 +352,19 @@ class SideBar extends Component {
                     primaryColor={violet}
                     secondaryColor={lavender}
                     hoverColor={orchid}
+                    modalContentStyle={{
+                        bottom: null,
+                        padding: 0,
+                        right: null,
+                        top: modalCoordinates[1],
+                        left: modalCoordinates[0],
+                        transform: null
+                    }}
+                    modalOverlayStyle={{
+                        position: null,
+                        backgroundColor: null
+                    }}
+                    bodyOpenClassName="bodyClassName"
                 >
                     {currentAttribute.attribute !== ''
                         ? this.renderModalInput(currentAttribute.index)
@@ -324,9 +376,7 @@ class SideBar extends Component {
                           query={query}
                           removePredicate={index => this.removePredicate(index)}
                           viewModal={(attribute, index) =>
-                              this.setState({
-                                  currentAttribute: { attribute, index }
-                              })}
+                              this.handleEditModal(attribute, index)}
                       />
                     : <div
                           style={{

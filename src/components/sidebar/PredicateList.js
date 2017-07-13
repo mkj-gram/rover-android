@@ -198,7 +198,7 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
     }
 
     return (
-        <div style={listStyle}>
+        <div style={listStyle} id="predicateList">
             {query.map(({ attribute, value, comparison, type }, index) => {
                 return (
                     <div key={index}>
