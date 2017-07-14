@@ -1,0 +1,17 @@
+{
+  'extends': ['airbnb-standard'],
+   'rules': {
+    'semi': ['error', 'never'],
+    'jsx-quotes': ['off', 'prefer-single'],
+    'react/jsx-boolean-value': ['error', 'never'],
+    'react/jsx-filename-extension': ['off', { extensions: ['.jsx'] }],
+    'indent': 0,
+    'space-before-function-paren': ['error', 'never'],
+    'react/sort-comp': ['off', {}],
+    'consistent-return': 'off',
+    'react/jsx-indent': ['off', 2],
+    'react/jsx-indent-props': ['off', 2],
+    'react/jsx-closing-bracket-location': ['off', 'line-aligned'],
+    'class-methods-use-this': 'off'
+  }
+}
