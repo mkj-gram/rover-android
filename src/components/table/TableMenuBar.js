@@ -1,12 +1,7 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-
-import TableMenuBarIcon from './TableMenuBarIcon'
-import ColumnDisplayContainer from './ColumnDisplayContainer'
 
 import {
     cloud,
-    mercury,
     purple,
     RoundedButton,
     semibold,
@@ -15,11 +10,12 @@ import {
     TextField,
     titanium,
     graphite,
-    steel,
     ash
 } from '@rover/react-bootstrap'
-
 import { SearchIcon, DonutChart } from '@rover/react-icons'
+
+import TableMenuBarIcon from './TableMenuBarIcon'
+import ColumnDisplayContainer from './ColumnDisplayContainer'
 
 const tableMenuBarStyle = {
     flex: '0 0 auto',
@@ -84,38 +80,60 @@ class TableMenuBar extends Component {
         this.triggerColumnsMenu = this.triggerColumnsMenu.bind(this)
         this.showChecked = this.showChecked.bind(this)
         this.updateChecked = this.updateChecked.bind(this)
+
+        this.handleOutsideClick = this.handleOutsideClick.bind(this)
+    }
+
+    componentDidUpdate() {
+        if (document.querySelector('div[aria-label="Rover Platform"]')) {
+            document
+                .getElementById('root')
+                .addEventListener('click', this.handleOutsideClick)
+        }
     }
 
     handleSearch(e) {
         this.setState({ searchVal: e.target.value })
     }
 
-    triggerColumnsMenu(e) {
-        const xCoord = e.clientX - e.nativeEvent.offsetX
-        const yCoord =
-            e.clientY -
-            e.nativeEvent.offsetY +
-            this.refs.columnsIcon.offsetHeight
+    handleOutsideClick(e) {
+        this.setState({
+            showColumnsMenu: false,
+            categories: {
+                Device: [],
+                Location: [],
+                Profile: []
+            }
+        })
+        document
+            .getElementById('root')
+            .removeEventListener('click', this.handleOutsideClick)
+    }
+
+    triggerColumnsMenu() {
+        const { top, left } = document
+            .getElementById('columnsIcon')
+            .getBoundingClientRect()
 
         this.setState({
             showColumnsMenu: !this.state.showColumnsMenu,
             pageClickLocation: {
-                x: xCoord - 10,
-                y: yCoord + 10
+                x: left - 10,
+                y: top + 40
             }
         })
     }
 
     showChecked(category, item) {
         const { categories } = this.state
-        return categories[category].indexOf(item) != -1
+        return categories[category].indexOf(item) !== -1
     }
 
     updateChecked(category, item) {
-        let { categories } = this.state
+        const { categories } = this.state
         const index = categories[category].indexOf(item)
 
-        if (index != -1) {
+        if (index !== -1) {
             categories[category].splice(index, 1)
         } else {
             categories[category].push(item)
@@ -135,6 +153,7 @@ class TableMenuBar extends Component {
                     triggerColumnsMenu={this.triggerColumnsMenu}
                     pageClickLocation={pageClickLocation}
                 />
+
                 <div style={tableMenuBarLeft}>
                     <div style={tableMenuDonutIconStyle}>
                         <DonutChart
@@ -184,7 +203,7 @@ class TableMenuBar extends Component {
                     <div
                         style={{ marginRight: '11px', height: '100%' }}
                         onClick={e => this.triggerColumnsMenu(e)}
-                        ref="columnsIcon"
+                        id="columnsIcon"
                     >
                         <TableMenuBarIcon val="columns" />
                     </div>

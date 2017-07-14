@@ -7,7 +7,8 @@ import {
     RoundedButton,
     text,
     silver,
-    light
+    light,
+    violet
 } from '@rover/react-bootstrap'
 
 import { DeviceIconSmall, LocationIcon, ProfileIcon } from '@rover/react-icons'
@@ -33,8 +34,14 @@ class ColumnDisplay extends Component {
                     <RoundedButton
                         type="cancel"
                         primaryColor={purple}
+                        hoverColor={violet}
                         onClick={this.triggerShowHide}
-                        style={{ padding: 0, lineHeight: 0, display: false }}
+                        style={{
+                            cursor: 'pointer',
+                            padding: 0,
+                            lineHeight: 0,
+                            display: false
+                        }}
                     >
                         + {remaining} more
                     </RoundedButton>
@@ -79,7 +86,7 @@ class ColumnDisplay extends Component {
                     </div>
                 </div>
                 {items.slice(0, size).map((item, index) =>
-                    <div style={{ paddingBottom: 17 }} key={index}>
+                    (<div style={{ paddingBottom: 17 }} key={index}>
                         <Checkbox
                             isChecked={showChecked(category, item)}
                             label={item}
@@ -97,7 +104,7 @@ class ColumnDisplay extends Component {
                                 ...light
                             }}
                         />
-                    </div>
+                    </div>)
                 )}
                 {this.showMore(remaining)}
             </div>

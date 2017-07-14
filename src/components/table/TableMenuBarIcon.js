@@ -1,18 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import {
-    DonutChart,
-    ColumnsIcon,
-    DownloadIcon,
-    TagIcon
-} from '@rover/react-icons'
-import { mercury, straw, purple, silver, Tooltip } from '@rover/react-bootstrap'
-
-const overlayParent = {
-    width: '36px',
-    height: '30px',
-    position: 'relative'
-}
+import { ColumnsIcon, DownloadIcon, TagIcon } from '@rover/react-icons'
+import { purple, silver, Tooltip, offwhite } from '@rover/react-bootstrap'
 
 const iconBackdropHover = {
     flex: '0 0 auto',
@@ -21,8 +10,8 @@ const iconBackdropHover = {
     alignItems: 'center',
     height: '30px',
     width: '36px',
-    backgroundColor: straw,
-    boxShadow: `0px 3px ${mercury}`
+    backgroundColor: offwhite,
+    boxShadow: 'rgba(0, 0, 0,0.05) 0px 3px'
 }
 
 const iconBackdrop = {
@@ -33,7 +22,7 @@ const iconBackdrop = {
     height: '30px',
     width: '36px',
     backgroundColor: 'white',
-    boxShadow: `0px 3px ${mercury}`
+    boxShadow: 'rgba(0, 0, 0,0.05) 0px 3px'
 }
 
 class TableMenuBarIcon extends Component {
@@ -97,7 +86,7 @@ class TableMenuBarIcon extends Component {
     }
 
     getHoverStyle() {
-        let hoverStyle = []
+        const hoverStyle = []
         if (this.state.hover) {
             hoverStyle[0] = iconBackdropHover
             hoverStyle[1] = purple
@@ -135,6 +124,14 @@ class TableMenuBarIcon extends Component {
             </div>
         )
     }
+}
+
+TableMenuBarIcon.propTypes = {
+    val: PropTypes.string.isRequired
+}
+
+TableMenuBarIcon.defaultProps = {
+    val: ''
 }
 
 export default TableMenuBarIcon
