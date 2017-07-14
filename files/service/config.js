@@ -29,8 +29,8 @@ const store = new Confidence.Store({
     http: {
         port: {
             $filter: 'env',
-            production: parseInt(process.env.PORT) || 8080,
-            $default: parseInt(process.env.PORT) || 8080
+            production: parseInt(process.env.HTTP_PORT) || 8080,
+            $default: parseInt(process.env.HTTP_PORT) || 8080
         }
     },
     raven: {
