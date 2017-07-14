@@ -5,9 +5,16 @@ const grpc = require('grpc')
 const squel = require('squel').useFlavour('postgres')
 const crypto = require('crypto')
 
-function serializeArrayForPostgres(input) {
+function serializeArrayForPostgres(input, width) {
     
     function serialize(array) {
+        
+        // Ensure the array is always expanded to the full width
+        if (array.length < width) {
+            let previousWidth = array.length
+            array.length = width
+            array.fill('', previousWidth, width)
+        }
 
         let formatted = array.reduce(function(builder, value, index) {
             if (typeof value === 'string') {
@@ -295,7 +302,7 @@ module.exports = function(PGClient, StorageClient) {
                 .set('num_columns', numColumns)
                 .set('filename', filename)
                 .set('generated_filename', generatedFileName)
-                .set('samples', serializeArrayForPostgres(samples))
+                .set('samples', serializeArrayForPostgres(samples, numColumns))
                 .set('updated_at', currentTime)
                 .set('created_at', currentTime)
                 .returning('*')
