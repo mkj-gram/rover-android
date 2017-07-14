@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package rover.files.v1;
+
+option go_package = "files/v1;files";
+
+import "google/protobuf/timestamp.proto";
+import "auth/v1/auth.proto";
+
+message CsvFile {
+
+    // Subtype to allow for representation of 2D arrays
+    message Sample {
+        repeated string data = 1;
+    }
+
+    int32 id = 1;
+    int32 account_id = 2;
+
+    string filename = 3;
+
+    sint32 num_rows = 4;
+    sint64 file_size = 5;
+
+    repeated Sample samples = 6;
+
+    google.protobuf.Timestamp created_at = 7;
+}
+
+message GetCsvFileRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+    int32 csv_file_id = 2;
+}
+
+message GetCsvFileResponse {
+    CsvFile csv_file = 1;
+}
+
+message ListCsvFilesRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    string order_by = 2;
+
+    int32 page_size = 3;
+
+    string page_token = 4;
+}
+
+message ListCsvFilesResponse {
+    repeated CsvFile csv_files = 1;
+
+    string next_page_token = 2;
+}
+
+message DeleteCsvFileRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    int32 csv_file_id = 2;
+}
+
+message DeleteCsvFileResponse {
+    // Empty
+}
+
+message UploadCsvFileRequest {
+    
+    message Meta {
+        rover.auth.v1.AuthContext auth_context = 1;
+    }
+
+    message Chunk {
+        bytes data = 1;
+    }
+
+    oneof value {
+        Meta meta = 1;
+        Chunk chunk = 2;
+    }
+}
+
+message UploadCsvFileResponse {
+    CsvFile csv_file = 1;
+}
+
+
+service Files {
+
+    rpc ListCsvFiles(ListCsvFilesRequest) returns (ListCsvFilesResponse) {};
+    rpc GetCsvFile(GetCsvFileRequest) returns (GetCsvFileResponse) {};
+    rpc DeleteCsvFile(DeleteCsvFileRequest) returns (DeleteCsvFileResponse) {};
+
+    rpc UploadCsvFile(stream UploadCsvFileRequest) returns (UploadCsvFileResponse) {};
+    
+}

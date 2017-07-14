@@ -62,6 +62,28 @@ function traverse(currentpath, dir) {
 
 const CommonModels = Object.assign({}, require('google-protobuf/google/protobuf/timestamp_pb.js'))
 
-const definitions = Object.assign({ Models: CommonModels }, traverse(__dirname, __dirname))
+const HelperMethods = {
+    timestampToProto: function(timestamp) {
+        if (timestamp instanceof Date) {
+            let proto = new CommonModels.Timestamp()
+            let unixTime = timestamp.getTime()
+            proto.setSeconds(Math.floor(unixTime / 1000 ))
+            proto.setNanos(((unixTime % 1000) * 1000000))
+
+            return proto
+        }
+
+        return undefined
+    },
+    timestampFromProto: function(timestamp) {
+        if (timestamp instanceof CommonModels.Timestamp) {
+            let milliseconds = timestamp.getSeconds() * 1000 + timestamp.getNanos() / (1000 * 1000)
+            return new Date(milliseconds)
+        }
+
+        return undefined
+    }
+}
+const definitions = Object.assign({ Models: CommonModels, Helpers: HelperMethods }, traverse(__dirname, __dirname))
 
 module.exports = definitions
