@@ -11,9 +11,10 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :account_id, :int32, 2
     optional :filename, :string, 3
     optional :num_rows, :sint32, 4
-    optional :file_size, :sint64, 5
-    repeated :samples, :message, 6, "rover.files.v1.CsvFile.Sample"
-    optional :created_at, :message, 7, "google.protobuf.Timestamp"
+    optional :num_columns, :sint32, 5
+    optional :file_size, :sint64, 6
+    repeated :samples, :message, 7, "rover.files.v1.CsvFile.Sample"
+    optional :created_at, :message, 8, "google.protobuf.Timestamp"
   end
   add_message "rover.files.v1.CsvFile.Sample" do
     repeated :data, :string, 1

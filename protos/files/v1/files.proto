@@ -20,11 +20,13 @@ message CsvFile {
     string filename = 3;
 
     sint32 num_rows = 4;
-    sint64 file_size = 5;
+    sint32 num_columns = 5;
+    
+    sint64 file_size = 6;
 
-    repeated Sample samples = 6;
+    repeated Sample samples = 7;
 
-    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp created_at = 8;
 }
 
 message GetCsvFileRequest {

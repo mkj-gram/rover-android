@@ -12,6 +12,7 @@ CREATE TABLE csv_files (
     generated_filename TEXT NOT NULL,
     file_size BIGINT NOT NULL,
     num_rows INTEGER NOT NULL,
+    num_columns INTEGER NOT NULL,
     samples TEXT[][],
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL

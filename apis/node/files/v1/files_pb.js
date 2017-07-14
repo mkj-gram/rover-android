@@ -46,7 +46,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.rover.files.v1.CsvFile.repeatedFields_ = [6];
+proto.rover.files.v1.CsvFile.repeatedFields_ = [7];
 
 
 
@@ -80,7 +80,8 @@ proto.rover.files.v1.CsvFile.toObject = function(includeInstance, msg) {
     accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     filename: jspb.Message.getFieldWithDefault(msg, 3, ""),
     numRows: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    fileSize: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    numColumns: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    fileSize: jspb.Message.getFieldWithDefault(msg, 6, 0),
     samplesList: jspb.Message.toObjectList(msg.getSamplesList(),
     proto.rover.files.v1.CsvFile.Sample.toObject, includeInstance),
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
@@ -137,15 +138,19 @@ proto.rover.files.v1.CsvFile.deserializeBinaryFromReader = function(msg, reader)
       msg.setNumRows(value);
       break;
     case 5:
+      var value = /** @type {number} */ (reader.readSint32());
+      msg.setNumColumns(value);
+      break;
+    case 6:
       var value = /** @type {number} */ (reader.readSint64());
       msg.setFileSize(value);
       break;
-    case 6:
+    case 7:
       var value = new proto.rover.files.v1.CsvFile.Sample;
       reader.readMessage(value,proto.rover.files.v1.CsvFile.Sample.deserializeBinaryFromReader);
       msg.addSamples(value);
       break;
-    case 7:
+    case 8:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setCreatedAt(value);
@@ -206,17 +211,24 @@ proto.rover.files.v1.CsvFile.serializeBinaryToWriter = function(message, writer)
       f
     );
   }
+  f = message.getNumColumns();
+  if (f !== 0) {
+    writer.writeSint32(
+      5,
+      f
+    );
+  }
   f = message.getFileSize();
   if (f !== 0) {
     writer.writeSint64(
-      5,
+      6,
       f
     );
   }
   f = message.getSamplesList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      6,
+      7,
       f,
       proto.rover.files.v1.CsvFile.Sample.serializeBinaryToWriter
     );
@@ -224,7 +236,7 @@ proto.rover.files.v1.CsvFile.serializeBinaryToWriter = function(message, writer)
   f = message.getCreatedAt();
   if (f != null) {
     writer.writeMessage(
-      7,
+      8,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -456,35 +468,50 @@ proto.rover.files.v1.CsvFile.prototype.setNumRows = function(value) {
 
 
 /**
- * optional sint64 file_size = 5;
+ * optional sint32 num_columns = 5;
  * @return {number}
  */
-proto.rover.files.v1.CsvFile.prototype.getFileSize = function() {
+proto.rover.files.v1.CsvFile.prototype.getNumColumns = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
 
 /** @param {number} value */
-proto.rover.files.v1.CsvFile.prototype.setFileSize = function(value) {
+proto.rover.files.v1.CsvFile.prototype.setNumColumns = function(value) {
   jspb.Message.setField(this, 5, value);
 };
 
 
 /**
- * repeated Sample samples = 6;
+ * optional sint64 file_size = 6;
+ * @return {number}
+ */
+proto.rover.files.v1.CsvFile.prototype.getFileSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.files.v1.CsvFile.prototype.setFileSize = function(value) {
+  jspb.Message.setField(this, 6, value);
+};
+
+
+/**
+ * repeated Sample samples = 7;
  * If you change this array by adding, removing or replacing elements, or if you
  * replace the array itself, then you must call the setter to update it.
  * @return {!Array.<!proto.rover.files.v1.CsvFile.Sample>}
  */
 proto.rover.files.v1.CsvFile.prototype.getSamplesList = function() {
   return /** @type{!Array.<!proto.rover.files.v1.CsvFile.Sample>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.rover.files.v1.CsvFile.Sample, 6));
+    jspb.Message.getRepeatedWrapperField(this, proto.rover.files.v1.CsvFile.Sample, 7));
 };
 
 
 /** @param {!Array.<!proto.rover.files.v1.CsvFile.Sample>} value */
 proto.rover.files.v1.CsvFile.prototype.setSamplesList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 6, value);
+  jspb.Message.setRepeatedWrapperField(this, 7, value);
 };
 
 
@@ -494,7 +521,7 @@ proto.rover.files.v1.CsvFile.prototype.setSamplesList = function(value) {
  * @return {!proto.rover.files.v1.CsvFile.Sample}
  */
 proto.rover.files.v1.CsvFile.prototype.addSamples = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 6, opt_value, proto.rover.files.v1.CsvFile.Sample, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 7, opt_value, proto.rover.files.v1.CsvFile.Sample, opt_index);
 };
 
 
@@ -504,18 +531,18 @@ proto.rover.files.v1.CsvFile.prototype.clearSamplesList = function() {
 
 
 /**
- * optional google.protobuf.Timestamp created_at = 7;
+ * optional google.protobuf.Timestamp created_at = 8;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.files.v1.CsvFile.prototype.getCreatedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.files.v1.CsvFile.prototype.setCreatedAt = function(value) {
-  jspb.Message.setWrapperField(this, 7, value);
+  jspb.Message.setWrapperField(this, 8, value);
 };
 
 
@@ -529,7 +556,7 @@ proto.rover.files.v1.CsvFile.prototype.clearCreatedAt = function() {
  * @return {!boolean}
  */
 proto.rover.files.v1.CsvFile.prototype.hasCreatedAt = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 8) != null;
 };
 
 

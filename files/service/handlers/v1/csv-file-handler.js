@@ -71,6 +71,7 @@ module.exports = function(PGClient, StorageClient) {
         proto.setAccountId(csv_file.account_id)
         proto.setFilename(csv_file.filename)
         proto.setNumRows(csv_file.num_rows)
+        proto.setNumColumns(csv_file.num_columns)
         proto.setFileSize(csv_file.file_size)
         // samples is of type TEXT[][]
         if (csv_file.samples && csv_file.samples.length > 0) {
@@ -241,7 +242,6 @@ module.exports = function(PGClient, StorageClient) {
             let destroy = squel.delete()
                                 .from("csv_files")
                                 .where("csv_files.id = ?", csvFileId)
-                                .limit(1)
                                 .toParam()
 
             let text = destroy.text
@@ -275,6 +275,7 @@ module.exports = function(PGClient, StorageClient) {
          */
         let meta = null;
         let numRows = 0
+        let numColumns = 0
         let samples = []
         let fileSize = 0
         let streamCancelled = false
@@ -291,6 +292,7 @@ module.exports = function(PGClient, StorageClient) {
                 .set('account_id', meta.getAuthContext().getAccountId())
                 .set('file_size', fileSize)
                 .set('num_rows', numRows)
+                .set('num_columns', numColumns)
                 .set('filename', filename)
                 .set('generated_filename', generatedFileName)
                 .set('samples', serializeArrayForPostgres(samples))
@@ -312,8 +314,6 @@ module.exports = function(PGClient, StorageClient) {
 
                 let csv_file = result.rows[0]
                 response.setCsvFile(csvFileToProto(csv_file))
-                
-                console.log(response.toObject())
 
                 return callback(null, response)
             })
@@ -349,6 +349,10 @@ module.exports = function(PGClient, StorageClient) {
         .on('data', function(data) {
             numRows += 1
 
+            if (data.length > numColumns) {
+                numColumns = data.length
+            }
+
             if (samples.length < 100) {
                 samples.push(data)
             }
@@ -356,7 +360,6 @@ module.exports = function(PGClient, StorageClient) {
             csvWriteStream.write(data)
         })
         .on('end', function() {
-            console.log("csv read ended?")
             csvWriteStream.end()
         })
         .on('error', function(err) {
