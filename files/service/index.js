@@ -53,7 +53,7 @@ tasks.push(function(cb) {
     }
 
     if (Config.get('/storage/credentials/key_file')) {
-        config.key_file = Config.get('/storage/credentials/key_file') 
+        config.keyFilename = Config.get('/storage/credentials/key_file') 
     } else if(Config.get('/storage/credentials/json')) {
         config.credentials = Config.get('/storage/credentials/json')
     } else {
