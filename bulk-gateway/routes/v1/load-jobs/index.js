@@ -1,6 +1,6 @@
 const RoverApis = require('@rover/apis')
 const Router = require('express').Router
-const Helpers = require('../helpers')
+const Helpers = require('../../helpers')
 
 const Serializers = require ('../../../lib/serializers')
 

@@ -9,3 +9,11 @@ exports.loggableError = function(err) {
 
     return (status != 401 && status != 403 && status != 404)
 }
+
+exports.authenticated = function(req, res, next) {
+    if (req.authContext == undefined || req.authContext == null) {
+        return next({ status: 401 })
+    }
+
+    return next()
+}

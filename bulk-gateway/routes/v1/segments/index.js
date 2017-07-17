@@ -2,7 +2,7 @@ const crypto = require('crypto')
 const Router = require('express').Router
 
 const RoverApis = require('@rover/apis')
-const Helpers = require('../helpers')
+const Helpers = require('../../helpers')
 const Serializers = require ('../../../lib/serializers')
 
 

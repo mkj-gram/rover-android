@@ -13,6 +13,7 @@
     "@rover-common/grpc-codes": "../node/grpc-codes",
     "@rover/auth-client": "../auth/clients/node",
     "@rover/csv-processor-client": "../csv-processor/clients/node",
+    "@rover/files-client": "../files/clients/node",
     "async": "^2.1.5",
     "confidence": "^3.0.2",
     "cors": "^2.8.3",

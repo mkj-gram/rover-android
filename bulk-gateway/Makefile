@@ -4,7 +4,4 @@ test:
 		--reporter $(REPORTER) \
 		--ui tdd
 
-nope:
-	echo -n $(TEST_FILES)
-
-.PHONY: test nope
+.PHONY: test

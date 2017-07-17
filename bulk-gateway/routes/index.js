@@ -98,6 +98,7 @@ module.exports = function(callback) {
         Setup Clients
     */
     const CsvProcessorClient = require("@rover/csv-processor-client").v1.Client()
+    const FilesClient = require("@rover/files-client").v1.Client()
 
     const Uploader = require('../lib/uploader')
     const UploaderClient = new Uploader(
@@ -123,6 +124,7 @@ module.exports = function(callback) {
 
         router.use('/bulk/', require('./v1')(CsvProcessorClient, UploaderClient))
         router.use('/bulk/v1/', require('./v1')(CsvProcessorClient, UploaderClient))
+        router.use('/bulk/v2/', require('./v2')(CsvProcessorClient, FilesClient))
 
         router.use(errorHandler)
 
