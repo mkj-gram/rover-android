@@ -1,7 +1,5 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-
-import ColumnDisplay from './ColumnDisplay'
 
 import {
     purple,
@@ -13,6 +11,8 @@ import {
     ModalWithHeader,
     mercury
 } from '@rover/react-bootstrap'
+
+import ColumnDisplay from './ColumnDisplay'
 
 const modalContainer = {
     display: 'flex',
@@ -31,114 +31,110 @@ const segmentLine = {
     flex: '0 0 auto'
 }
 
-class ColumnDisplayContainer extends Component {
-    render() {
-        const tempCategories = {
-            Device: [
-                'OS',
-                'Hardware',
-                'Bluetooth Enabled',
-                'Location Enabled',
-                'OS version',
-                'Push Enabled',
-                'Carrier',
-                'Timezone',
-                'SDK Version'
-            ],
-            Location: [
-                'Location',
-                'Latitude',
-                'Longitude',
-                'City',
-                'Region',
-                'Country',
-                'Language',
-                'Last Seen',
-                'Created at',
-                'Tags',
-                'Custom Attribute'
-            ],
-            Profile: ['Gender', 'Age', 'Height', 'Race']
-        }
-
-        const {
-            showColumnsMenu,
-            updateChecked,
-            showChecked,
-            triggerColumnsMenu,
-            pageClickLocation
-        } = this.props
-
-        return (
-            <ModalWithHeader
-                contentLabel="Column Builder"
-                backgroundColor="white"
-                isOpen={showColumnsMenu}
-                headerContent="Display these columns"
-                successFn={triggerColumnsMenu}
-                successText="Update"
-                cancelFn={triggerColumnsMenu}
-                cancelText="Cancel"
-                primaryColor={purple}
-                secondaryColor={purple}
-                modalHeaderStyle={{
-                    backgroundColor: cloud,
-                    ...text,
-                    ...semibold
-                }}
-                modalFooterStyle={{
-                    borderTop: `2px solid ${titanium}`,
-                    padding: 0,
-                    paddingTop: 20,
-                    paddingLeft: 20,
-                    height: 80
-                }}
-                modalChildrenStyle={{
-                    margin: 0,
-                    marginTop: 20,
-                    marginLeft: 20
-                }}
-                hoverColor={violet}
-                modalContentStyle={{
-                    bottom: null,
-                    padding: 0,
-                    right: null,
-                    top: pageClickLocation.y,
-                    left: pageClickLocation.x,
-                    transform: null
-                }}
-                modalOverlayStyle={{
-                    position: null,
-                    backgroundColor: null
-                }}
-                bodyOpenClassName="bodyClassName"
-                hoverStyle={{backgroundColor: titanium}}
-            >
-                <div style={modalContainer}>
-                    <ColumnDisplay
-                        category="Device"
-                        items={tempCategories['Device']}
-                        updateChecked={updateChecked}
-                        showChecked={showChecked}
-                    />
-                    <div style={segmentLine} />
-                    <ColumnDisplay
-                        category="Location"
-                        items={tempCategories['Location']}
-                        updateChecked={updateChecked}
-                        showChecked={showChecked}
-                    />
-                    <div style={segmentLine} />
-                    <ColumnDisplay
-                        category="Profile"
-                        items={tempCategories['Profile']}
-                        updateChecked={updateChecked}
-                        showChecked={showChecked}
-                    />
-                </div>
-            </ModalWithHeader>
-        )
+const ColumnDisplayContainer = ({
+    updateChecked,
+    showChecked,
+    triggerColumnsMenu,
+    pageClickLocation,
+    showColumnsMenu
+}) => {
+    const tempCategories = {
+        Device: [
+            'OS',
+            'Hardware',
+            'Bluetooth Enabled',
+            'Location Enabled',
+            'OS version',
+            'Push Enabled',
+            'Carrier',
+            'Timezone',
+            'SDK Version'
+        ],
+        Location: [
+            'Location',
+            'Latitude',
+            'Longitude',
+            'City',
+            'Region',
+            'Country',
+            'Language',
+            'Last Seen',
+            'Created at',
+            'Tags',
+            'Custom Attribute'
+        ],
+        Profile: ['Gender', 'Age', 'Height', 'Race']
     }
+
+    return (
+        <ModalWithHeader
+            contentLabel="Column Builder"
+            backgroundColor="white"
+            isOpen={showColumnsMenu}
+            headerContent="Display these columns"
+            successFn={triggerColumnsMenu}
+            successText="Update"
+            cancelFn={triggerColumnsMenu}
+            cancelText="Cancel"
+            primaryColor={purple}
+            secondaryColor={purple}
+            modalHeaderStyle={{
+                backgroundColor: cloud,
+                ...text,
+                ...semibold
+            }}
+            modalFooterStyle={{
+                borderTop: `2px solid ${titanium}`,
+                padding: 0,
+                paddingTop: 20,
+                paddingLeft: 20,
+                height: 80
+            }}
+            modalChildrenStyle={{
+                margin: 0,
+                marginTop: 20,
+                marginLeft: 20
+            }}
+            hoverColor={violet}
+            modalContentStyle={{
+                bottom: null,
+                padding: 0,
+                right: null,
+                top: pageClickLocation.y,
+                left: pageClickLocation.x,
+                transform: null
+            }}
+            modalOverlayStyle={{
+                height: '100%',
+                weight: '100%'
+            }}
+            bodyOpenClassName="bodyClassName"
+            hoverStyle={{ backgroundColor: titanium }}
+        >
+            <div style={modalContainer}>
+                <ColumnDisplay
+                    category="Device"
+                    items={tempCategories.Device}
+                    updateChecked={updateChecked}
+                    showChecked={showChecked}
+                />
+                <div style={segmentLine} />
+                <ColumnDisplay
+                    category="Location"
+                    items={tempCategories.Location}
+                    updateChecked={updateChecked}
+                    showChecked={showChecked}
+                />
+                <div style={segmentLine} />
+                <ColumnDisplay
+                    category="Profile"
+                    items={tempCategories.Profile}
+                    updateChecked={updateChecked}
+                    showChecked={showChecked}
+                />
+            </div>
+        </ModalWithHeader>
+    )
 }
 
 ColumnDisplayContainer.propTypes = {

@@ -361,8 +361,8 @@ class SideBar extends Component {
                         transform: null
                     }}
                     modalOverlayStyle={{
-                        position: null,
-                        backgroundColor: null
+                        height: '100%',
+                        width: '100%'
                     }}
                     bodyOpenClassName="bodyClassName"
                 >
