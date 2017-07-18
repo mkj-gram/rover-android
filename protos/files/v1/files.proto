@@ -64,6 +64,17 @@ message DeleteCsvFileResponse {
     // Empty
 }
 
+message ReadCsvFileRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    int32 csv_file_id = 2;
+}
+
+message ReadCsvFileResponse {
+    // Line represents a single csv line
+    repeated string lines = 1;
+}
+
 message UploadCsvFileRequest {
     
     message Meta {
@@ -92,5 +103,6 @@ service Files {
     rpc DeleteCsvFile(DeleteCsvFileRequest) returns (DeleteCsvFileResponse) {};
 
     rpc UploadCsvFile(stream UploadCsvFileRequest) returns (UploadCsvFileResponse) {};
+    rpc ReadCsvFile(ReadCsvFileRequest) returns (stream ReadCsvFileResponse) {};
     
 }

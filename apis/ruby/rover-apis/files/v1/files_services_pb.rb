@@ -20,6 +20,7 @@ module Rover
           rpc :GetCsvFile, GetCsvFileRequest, GetCsvFileResponse
           rpc :DeleteCsvFile, DeleteCsvFileRequest, DeleteCsvFileResponse
           rpc :UploadCsvFile, stream(UploadCsvFileRequest), UploadCsvFileResponse
+          rpc :ReadCsvFile, ReadCsvFileRequest, stream(ReadCsvFileResponse)
         end
 
         Stub = Service.rpc_stub_class

@@ -42,6 +42,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.files.v1.DeleteCsvFileResponse" do
   end
+  add_message "rover.files.v1.ReadCsvFileRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :csv_file_id, :int32, 2
+  end
+  add_message "rover.files.v1.ReadCsvFileResponse" do
+    repeated :lines, :string, 1
+  end
   add_message "rover.files.v1.UploadCsvFileRequest" do
     oneof :value do
       optional :meta, :message, 1, "rover.files.v1.UploadCsvFileRequest.Meta"
@@ -70,6 +77,8 @@ module Rover
       ListCsvFilesResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.files.v1.ListCsvFilesResponse").msgclass
       DeleteCsvFileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.files.v1.DeleteCsvFileRequest").msgclass
       DeleteCsvFileResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.files.v1.DeleteCsvFileResponse").msgclass
+      ReadCsvFileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.files.v1.ReadCsvFileRequest").msgclass
+      ReadCsvFileResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.files.v1.ReadCsvFileResponse").msgclass
       UploadCsvFileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.files.v1.UploadCsvFileRequest").msgclass
       UploadCsvFileRequest::Meta = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.files.v1.UploadCsvFileRequest.Meta").msgclass
       UploadCsvFileRequest::Chunk = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.files.v1.UploadCsvFileRequest.Chunk").msgclass

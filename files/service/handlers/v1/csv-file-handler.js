@@ -422,6 +422,62 @@ module.exports = function(PGClient, StorageClient) {
         })
     }
 
+    /**
+     * handler for ReadCsvFile rpc call
+     * @param  {Object}   call      ReadCsvFileRequest grpc input
+     * @param  {Function} callback 
+    */
+   
+    handlers.readCsvFile = function(call, callback) {
+        const req = call.request
+        const res = call
+
+        if (!hasAccess(req.getAuthContext())) {
+            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Forbidden" })
+        }
+
+        let csvFileId = req.getCsvFileId()
+
+        if (csvFileId == 0) {
+            return callback({ code: grpc.status.NOT_FOUND, message: "Not Found" })
+        }
+
+        getCsvFile(csvFileId, function(err, csvFile) {
+            if (err) {
+                return callback(err)
+            }
+
+            if (!csvFile) {
+                return callback({ code: grpc.status.NOT_FOUND, message: "Not Found" })
+            }
+
+            if (csvFile.account_id !== req.getAuthContext().getAccountId()) {
+                return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+            }
+
+            let remoteFileStream = StorageClient.CsvFileBucket.file(csvFile.generated_filename).createReadStream()
+
+            // start reading and parsing the csv lines 
+            let csvReadStream = csv()
+            .on('data', function(data) {
+                let response = new RoverApis.files.v1.Models.ReadCsvFileResponse()
+                response.setLinesList(data)
+                res.write(response)
+            })
+            .on('end', function() {
+                res.end()
+            })
+            .on('error', function(err) {
+                remoteFileStream.unpipe(csvReadStream)
+                remoteFileStream.destroy(err)
+                return callback(err)
+            })
+
+            remoteFileStream.pipe(csvReadStream)
+        
+        })
+    }
+
 
     return handlers
 }

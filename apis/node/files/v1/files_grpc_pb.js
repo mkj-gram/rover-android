@@ -72,6 +72,28 @@ function deserialize_rover_files_v1_ListCsvFilesResponse(buffer_arg) {
   return files_v1_files_pb.ListCsvFilesResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_files_v1_ReadCsvFileRequest(arg) {
+  if (!(arg instanceof files_v1_files_pb.ReadCsvFileRequest)) {
+    throw new Error('Expected argument of type rover.files.v1.ReadCsvFileRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_files_v1_ReadCsvFileRequest(buffer_arg) {
+  return files_v1_files_pb.ReadCsvFileRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_files_v1_ReadCsvFileResponse(arg) {
+  if (!(arg instanceof files_v1_files_pb.ReadCsvFileResponse)) {
+    throw new Error('Expected argument of type rover.files.v1.ReadCsvFileResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_files_v1_ReadCsvFileResponse(buffer_arg) {
+  return files_v1_files_pb.ReadCsvFileResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_files_v1_UploadCsvFileRequest(arg) {
   if (!(arg instanceof files_v1_files_pb.UploadCsvFileRequest)) {
     throw new Error('Expected argument of type rover.files.v1.UploadCsvFileRequest');
@@ -139,6 +161,17 @@ var FilesService = exports.FilesService = {
     requestDeserialize: deserialize_rover_files_v1_UploadCsvFileRequest,
     responseSerialize: serialize_rover_files_v1_UploadCsvFileResponse,
     responseDeserialize: deserialize_rover_files_v1_UploadCsvFileResponse,
+  },
+  readCsvFile: {
+    path: '/rover.files.v1.Files/ReadCsvFile',
+    requestStream: false,
+    responseStream: true,
+    requestType: files_v1_files_pb.ReadCsvFileRequest,
+    responseType: files_v1_files_pb.ReadCsvFileResponse,
+    requestSerialize: serialize_rover_files_v1_ReadCsvFileRequest,
+    requestDeserialize: deserialize_rover_files_v1_ReadCsvFileRequest,
+    responseSerialize: serialize_rover_files_v1_ReadCsvFileResponse,
+    responseDeserialize: deserialize_rover_files_v1_ReadCsvFileResponse,
   },
 };
 
