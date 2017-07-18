@@ -7,9 +7,9 @@ function HealthCheckServer(/* hostname?: string, port: int */) {
 
     if (typeof arguments[0] === 'string') {
         this._host = arguments[0]
-        this._port = parseInt(porarguments[1]) || 8080
+        this._port = parseInt(arguments[1]) || 8080
     } else {
-        this._host = "localhost"
+        this._host = "0.0.0.0"
         this._port = parseInt(arguments[0]) || 8080
     }
 
