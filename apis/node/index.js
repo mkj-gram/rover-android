@@ -27,7 +27,18 @@ function traverse(currentpath, dir) {
     var glob = {}
 
     directories.forEach(directory => {
-        glob[directory] = traverse(path.join(currentpath, directory), directory)
+        let subGlob = traverse(path.join(currentpath, directory), directory)
+        let formattedDirectory = directory.replace(/-/, '_')
+
+        glob[directory] = subGlob
+
+        /*
+            Cleaner access of modules while preserving old style
+            eg. RoverApis['csv-processor'] and RoverApis.csv_processor now exit    
+        */
+        if (formattedDirectory != directory) {
+            glob[formattedDirectory] = subGlob
+        }
     })
 
     if (dir == ".") {

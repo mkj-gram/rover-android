@@ -215,7 +215,9 @@ const getLoadJob = function(call, callback) {
                 return callback({ code: grpcCodes.status.NOT_FOUND, message: "LoadJob Not Found"})
             }
 
-            if (job.opts.account_id != AuthContext.getAccountId()) {
+            let jobAccountId = job.opts.account_id !== undefined ? job.opts.account_id : job.data.auth_context.account_id
+            
+            if ( jobAccountId != AuthContext.getAccountId()) {
                 return callback(permissionDeniedGrpcStatus)
             }
 

@@ -8,6 +8,7 @@ module.exports = function(CsvProcessorClient, FilesClient) {
 	const router = Router()
 	
 	router.use(require('./csv-files')(FilesClient))
+	router.use(require('./load-jobs')(CsvProcessorClient))
 	
 	return router
 }

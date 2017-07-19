@@ -87,8 +87,18 @@ module.exports = function(callback) {
 
         console.error(err)
 
-        res.writeHead(err.status || 500)
-        res.end()
+        res.status(err.status || 500)
+
+        let response = {
+            status: err.status
+        }
+        // This is an error we most likey constructed so we can pass it back to the client
+        if (typeof err === 'object' && err.message) {
+            response.message = err.message   
+        }
+
+        res.send(response)
+
     }
 
 
