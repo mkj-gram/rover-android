@@ -9,7 +9,7 @@ const store = new Confidence.Store({
     port: {
         $filter: 'env',
         production: process.env.PORT,
-        $default: 5100
+        $default: process.env.PORT || 5100
     },
     redis: {
         url: {
