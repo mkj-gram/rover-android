@@ -1,24 +1,20 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import moment from 'moment'
+
 import {
     AddButton,
     ash,
     ModalWithHeader,
     graphite,
-    onyx,
     RoundedButton,
     text,
     light,
-    bold,
     steel,
     silver,
     violet,
     lavender,
     orchid,
     Select,
-    slate,
-    RadioButton
+    slate
 } from '@rover/react-bootstrap'
 
 import { DeviceIconSmall, ProfileIcon } from '@rover/react-icons'
@@ -30,8 +26,9 @@ import NumericInput from './NumericInput'
 import StringInput from './StringInput'
 import VersionInput from './VersionInput'
 import FunnelAnimation from './FunnelAnimation'
-
 import PredicateList from './PredicateList'
+
+import SegmentsContainer from './SegmentsContainer'
 
 class SideBar extends Component {
     constructor(props) {
@@ -42,19 +39,23 @@ class SideBar extends Component {
             currentPredicate: {},
             isShowingAddFilterModal: false,
             query: [],
-            modalCoordinates: [0, 0]
+            modalCoordinates: [0, 0],
+            showSegmentSelection: false,
+            showSegmentSave: false
         }
 
         this.setState = this.setState.bind(this)
         this.handleAddButton = this.handleAddButton.bind(this)
         this.handleEditModal = this.handleEditModal.bind(this)
+
+        this.handleSegmentAction = this.handleSegmentAction.bind(this)
     }
 
     updateQuery() {
         const { query, currentPredicate } = this.state
         const { index, ...rest } = currentPredicate
 
-        let newQuery = query
+        const newQuery = query
         newQuery[index] = rest
 
         this.setState({
@@ -136,28 +137,22 @@ class SideBar extends Component {
         switch (type) {
             case 'boolean':
                 return <BooleanInput {...props} />
-                break
             case 'date':
                 return <DateInput {...props} />
-                break
             case 'version':
                 return <VersionInput {...props} />
-                break
             case 'string':
                 return <StringInput {...props} />
-                break
             case 'number':
                 return <NumericInput {...props} />
-                break
             default:
-                return
         }
     }
 
     handleAddButton() {
-        let { modalCoordinates, query } = this.state
-        
-        if (query.length === 0 ) {
+        const { modalCoordinates, query } = this.state
+
+        if (query.length === 0) {
             const filterContainer = document.getElementById('filterContainer')
             const { left, top } = filterContainer.getBoundingClientRect()
             modalCoordinates[0] = left + 20
@@ -170,7 +165,7 @@ class SideBar extends Component {
             modalCoordinates[1] = top + lastPredicate.offsetHeight + 32
         }
         this.setState({
-            modalCoordinates: modalCoordinates,
+            modalCoordinates,
             isShowingAddFilterModal: true
         })
     }
@@ -223,7 +218,7 @@ class SideBar extends Component {
                     <AddFilterModal
                         onRequestClose={() =>
                             this.setState({ isShowingAddFilterModal: false })}
-                        onSelect={predicate => {
+                        onSelect={(predicate) => {
                             this.setState({
                                 query: query.concat(predicate),
                                 isShowingAddFilterModal: false,
@@ -233,7 +228,7 @@ class SideBar extends Component {
                                 }
                             })
                         }}
-                    />} 
+                    />}
                 <div style={{ marginLeft: 'auto', marginRight: 30 }}>
                     <Select
                         style={selectStyle}
@@ -267,7 +262,7 @@ class SideBar extends Component {
         }
 
         return (
-            <div style={style}>
+            <div style={style} id="saveBar">
                 <RoundedButton
                     type="primary"
                     primaryColor={violet}
@@ -276,6 +271,7 @@ class SideBar extends Component {
                         width: 88,
                         marginRight: 5
                     }}
+                    onClick={() => this.handleSegmentAction('save')}
                 >
                     Save
                 </RoundedButton>
@@ -283,6 +279,7 @@ class SideBar extends Component {
                     type="primary"
                     primaryColor={graphite}
                     hoverColor={ash}
+                    onClick={() => this.handleSegmentAction('selection')}
                     style={{
                         width: 160,
                         marginLeft: 5,
@@ -322,6 +319,18 @@ class SideBar extends Component {
         })
     }
 
+    handleSegmentAction(val) {
+        if (val === 'selection') {
+            this.setState({
+                showSegmentSelection: !this.state.showSegmentSelection
+            })
+        } else {
+            this.setState({
+                showSegmentSave: !this.state.showSegmentSave
+            })
+        }
+    }
+
     render() {
         const sideBarStyle = {
             height: '100%',
@@ -331,12 +340,8 @@ class SideBar extends Component {
             display: 'flex',
             flexDirection: 'column'
         }
-        const {
-            currentAttribute,
-            currentPredicate,
-            query,
-            modalCoordinates
-        } = this.state
+        const { currentAttribute, query, modalCoordinates } = this.state
+
         return (
             <div style={sideBarStyle}>
                 <ModalWithHeader
@@ -359,10 +364,6 @@ class SideBar extends Component {
                         top: modalCoordinates[1],
                         left: modalCoordinates[0],
                         transform: null
-                    }}
-                    modalOverlayStyle={{
-                        height: '100%',
-                        width: '100%'
                     }}
                     bodyOpenClassName="bodyClassName"
                 >
@@ -403,12 +404,18 @@ class SideBar extends Component {
                               data
                           </div>
                           <div>
-                              When you're done with it, just{' '}
+                              When you&apos;re done with it, just{' '}
                               <span style={{ color: 'white' }}>Save</span> it
                               for later use
                           </div>
                       </div>}
-                {query.length > 0 && this.renderSaveBar()}
+                {this.renderSaveBar()}
+                <SegmentsContainer
+                    query={query}
+                    showSegmentSelection={this.state.showSegmentSelection}
+                    showSegmentSave={this.state.showSegmentSave}
+                    handleSegmentAction={this.handleSegmentAction}
+                />
             </div>
         )
     }
