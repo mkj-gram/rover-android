@@ -104,10 +104,6 @@ const ColumnDisplayContainer = ({
                 left: pageClickLocation.x,
                 transform: null
             }}
-            modalOverlayStyle={{
-                height: '100%',
-                weight: '100%'
-            }}
             bodyOpenClassName="bodyClassName"
             hoverStyle={{ backgroundColor: titanium }}
         >

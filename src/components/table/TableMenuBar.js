@@ -80,34 +80,10 @@ class TableMenuBar extends Component {
         this.triggerColumnsMenu = this.triggerColumnsMenu.bind(this)
         this.showChecked = this.showChecked.bind(this)
         this.updateChecked = this.updateChecked.bind(this)
-
-        this.handleOutsideClick = this.handleOutsideClick.bind(this)
-    }
-
-    componentDidUpdate() {
-        if (document.querySelector('div[aria-label="Rover Platform"]')) {
-            document
-                .getElementById('root')
-                .addEventListener('click', this.handleOutsideClick)
-        }
     }
 
     handleSearch(e) {
         this.setState({ searchVal: e.target.value })
-    }
-
-    handleOutsideClick(e) {
-        this.setState({
-            showColumnsMenu: false,
-            categories: {
-                Device: [],
-                Location: [],
-                Profile: []
-            }
-        })
-        document
-            .getElementById('root')
-            .removeEventListener('click', this.handleOutsideClick)
     }
 
     triggerColumnsMenu() {
