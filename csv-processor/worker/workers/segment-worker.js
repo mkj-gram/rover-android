@@ -61,6 +61,8 @@ const loadStaticSegmentWithCsvFile = function(job, logger) {
     */
     return new Promise((resolve, reject) => {
 
+        logger.info("Worker function started with input: ", job.data)
+
         let jobAuthContext = job.data.auth_context
         let jobArguments = job.data.arguments
 
@@ -78,10 +80,14 @@ const loadStaticSegmentWithCsvFile = function(job, logger) {
         request.setAuthContext(authContext)
         request.setCsvFileId(csvFileId)
 
+        logger.info("Retrieving CsvFile")
+
         FilesClient.getCsvFile(request, function(err, reply) {
             if (err) {
                 return reject(err)
             }
+
+            logger.info("CsvFile retrieved")
 
             let csvFile = reply.getCsvFile()
             var rowsProcessed = 0
@@ -96,8 +102,10 @@ const loadStaticSegmentWithCsvFile = function(job, logger) {
             request.setAuthContext(authContext)
             request.setCsvFileId(csvFileId)
 
+            logger.info("Csv read stream opened")
             let csvFileReadStream = FilesClient.readCsvFile(request)
 
+            logger.info("Segment write stream opened")
             const updateStaticSegmentWriteStream = SegmentClient.updateStaticSegmentPushIds(meta, function(err, res) {
 
                 if (err) {
