@@ -11,9 +11,11 @@
   "dependencies": {
     "@google-cloud/storage": "^1.0.0",
     "@rover/segment-client": "../../segment/clients/node",
+    "@rover/files-client": "../../files/clients/node",
     "bull": "^2.2.6",
     "confidence": "^3.0.2",
     "fast-csv": "^2.4.0",
-    "raven": "^2.1.0"
+    "raven": "^2.1.0",
+    "through2": "^2.0.3"
   }
 }

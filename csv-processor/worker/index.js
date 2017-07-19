@@ -68,10 +68,12 @@ const queueOpts = {
 }
 
 const staticSegmentQueue = Queue('static-segments', opts);
+const loadJobQueue = Queue('load-jobs', opts)
 
 const context = {
     queues: {
-        staticSegment: staticSegmentQueue
+        staticSegment: staticSegmentQueue,
+        loadJob: loadJobQueue
     }
 }
 
@@ -99,5 +101,5 @@ process.on('uncaughtException', function (err) {
 
 
 console.log("Initializing workers...")
-Workers.init(context)
+Workers(context)
 console.log("Done")

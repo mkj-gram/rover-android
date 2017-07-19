@@ -84,6 +84,54 @@ const buildLoadJobProto = function({ id, account_id, type, status, progress, cre
     return proto
 }
 
+/**
+ * Creates a new job of type load-static-segment-with-csv
+ * @param  {Object}   call     grpc call
+ * @param  {Function} callback 
+ */
+const createSegmentLoadJobWithCsvFile = function(call, callback) {
+    const request = call.request
+    const queue = this.queues.loadJob
+    const AuthContext = request.getAuthContext()
+    const segmentLoadJobConfig = request.getSegmentLoadJobWithCsvFileConfig()
+
+    let jobData = {
+        type: JobType.SEGMENT_WITH_CSV_FILE,
+        auth_context: {
+            account_id: AuthContext.getAccountId(),
+            user_id: AuthContext.getUserId(),
+            scopes: AuthContext.getPermissionScopesList()
+        },
+        arguments: {
+            account_id: segmentLoadJobConfig.getAccountId(),
+            static_segment_id: segmentLoadJobConfig.getStaticSegmentId(),
+            csv_file_id: segmentLoadJobConfig.getCsvFileId()
+        }  
+    }
+
+    console.info(jobData)
+    
+    queue.add(jobData)
+        .then(function(job) {
+            let reply = new CsvProcessor.v1.Models.CreateLoadJobReply()
+
+            const loadJob = buildLoadJobProto({
+                id: job.jobId,
+                account_id: segmentLoadJobConfig.getAccountId(),
+                type: JobType.SEGMENT_WITH_CSV_FILE,
+                status: getJobStatus("waiting"),
+                progress: 0,
+                created_at: new Date(job.timestamp)
+            })
+
+            reply.setJob(loadJob)
+
+            return callback(null, reply)
+        })
+        .catch(function(err) {
+            return callback(err)
+        })
+}
 
 /**
  * Creates a new kue job of type load-static-segment with the segment config passed in from caller
@@ -207,6 +255,9 @@ const createLoadJob = function(call, callback) {
     switch(jobType) {
         case CsvProcessor.v1.Models.JobType.SEGMENT:
             return createSegmentLoadJob.bind(this)(call, callback)
+            break
+        case CsvProcessor.v1.Models.JobType.SEGMENT_WITH_CSV_FILE:
+            return createSegmentLoadJobWithCsvFile.bind(this)(call, callback)
             break
         default:
             return callback({message: "Unknown job type", status: grpcCodes.status.INVALID_ARGUMENT })

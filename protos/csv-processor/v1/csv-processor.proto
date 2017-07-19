@@ -9,6 +9,7 @@ import "auth/v1/auth.proto";
 
 enum JobType {
     SEGMENT = 0;
+    SEGMENT_WITH_CSV_FILE = 1;
 }
 
 enum JobStatus {
@@ -46,6 +47,12 @@ message SegmentLoadJobConfig {
     GCSObject csv = 3;
 }
 
+message SegmentLoadJobWithCsvFileConfig {
+    int32 account_id = 1;
+    int32 static_segment_id = 2;
+    int32 csv_file_id = 3;
+}
+
 message GetLoadJobRequest {
     rover.auth.v1.AuthContext auth_context = 1;
 
@@ -64,6 +71,7 @@ message CreateLoadJobRequest {
 
     oneof job_config {
         SegmentLoadJobConfig segment_load_job_config = 3;
+        SegmentLoadJobWithCsvFileConfig segment_load_job_with_csv_file_config = 4;
     }
 
 }

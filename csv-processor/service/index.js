@@ -54,10 +54,12 @@ var opts = {
 }
 
 var staticSegmentQueue = Queue('static-segments', opts);
+var loadJobQueue = Queue('load-jobs', opts)
 
 const context = {
     queues: {
-        staticSegment: staticSegmentQueue
+        staticSegment: staticSegmentQueue,
+        loadJob: loadJobQueue
     }
 }
 

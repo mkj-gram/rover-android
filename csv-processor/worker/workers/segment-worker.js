@@ -8,8 +8,11 @@ const Segment = RoverApis.segment
 const grpc = require('grpc')
 const PrefixedLogger = require('../lib/prefixed-logger')
 const Errors = require('../lib/errors')
+const JobTypes = RoverApis['csv-processor'].v1.Models.JobType
+const through = require('through2')
 
 let SegmentClient = require("@rover/segment-client").v1.Client()
+let FilesClient = require("@rover/files-client").v1.Client()
 
 const gcs = storage({
     projectId: Config.get('/storage/project_id'),
@@ -19,7 +22,8 @@ const gcs = storage({
 const JOB_TIMEOUT = Config.get('/job/timeout')
 const JOB_CONCURRENCY = Config.get('/job/concurrency')
 
-const updateJobProgress = function(job, progress) {
+const updateJobProgress = function(job, logger, progress) {
+    logger.info("progress=" + progress)
     job.progress(progress)
 }
 
@@ -35,11 +39,127 @@ const retryableError = function(err) {
     return false
 }
 
+const getFirstDefined = function (/* ...input */) {
+    for(index in arguments) {
+        let arg = arguments[index]
+        if (arg !== undefined) {
+            return arg
+        }
+    }
+
+    return undefined
+}
+
+const loadStaticSegmentWithCsvFile = function(job, logger) {
+    /*
+        Job -> 
+        {
+            account_id: 1,
+            static_segment_id: 123,
+            csv_file_id: 12
+        }
+    */
+    return new Promise((resolve, reject) => {
+
+        let jobAuthContext = job.data.auth_context
+        let jobArguments = job.data.arguments
+
+        let accountId = jobArguments.account_id
+        let staticSegmentId = jobArguments.static_segment_id
+        let csvFileId = jobArguments.csv_file_id
+
+        let request = new RoverApis.files.v1.Models.GetCsvFileRequest()
+        let authContext = new RoverApis.auth.v1.Models.AuthContext()
+
+        authContext.setAccountId(jobAuthContext.account_id)
+        authContext.setUserId(jobAuthContext.user_id)
+        authContext.setPermissionScopesList(jobAuthContext.scopes)
+
+        request.setAuthContext(authContext)
+        request.setCsvFileId(csvFileId)
+
+        FilesClient.getCsvFile(request, function(err, reply) {
+            if (err) {
+                return reject(err)
+            }
+
+            let csvFile = reply.getCsvFile()
+            var rowsProcessed = 0
+            var totalRows = csvFile.getNumRows()
+
+            var meta = new grpc.Metadata()
+            meta.add('account_id', `${accountId}`)
+            meta.add('static_segment_id', `${staticSegmentId}`)
+
+            // csv-file exists lets read it
+            let request = new RoverApis.files.v1.Models.ReadCsvFileRequest()
+            request.setAuthContext(authContext)
+            request.setCsvFileId(csvFileId)
+
+            let csvFileReadStream = FilesClient.readCsvFile(request)
+
+            const updateStaticSegmentWriteStream = SegmentClient.updateStaticSegmentPushIds(meta, function(err, res) {
+
+                if (err) {
+                    csvFileReadStream.cancel()
+
+                    if (retryableError(err)) {
+                        return reject(new Errors.RetryableError(err))
+                    } else {
+                        return reject(err)
+                    }
+                }
+                
+
+                updateJobProgress(job, logger, 100)
+
+                logger.info("Segment Updated: ", res.getSegment().toObject())
+
+                return resolve()
+            })
+
+            let currentProgress = 0
+
+            csvFileReadStream
+                .on('error', function(err) {
+                    if (csvFileReadStream.cancelled === false) {
+                        return reject(err)
+                    }
+                })
+                .pipe(through({ objectMode: true }, function (chunk, encoding, callback) {
+                    // this refers to the wrapper through transform stream
+                    // chunk is RoverApis.files.v1.ReadCsvFileResponse()
+                    
+                    const pushId = new RoverApis.segment.v1.Models.PushId()
+                    pushId.setId(chunk.getLinesList()[0])
+                    pushId.setType(Segment.v1.Models.PushIdType.ALIAS)
+                    this.push(pushId) 
+
+                    rowsProcessed += 1
+
+                    const newProgress = Math.min(Math.floor(((rowsProcessed / totalRows) * 100)), 99)
+
+                    if (newProgress > currentProgress) {
+                        currentProgress = newProgress
+                        updateJobProgress(job, logger, currentProgress)
+                    }
+
+                    callback()
+                    
+                }))
+                .pipe(updateStaticSegmentWriteStream)
+                .on('error', function(err) {
+                    return reject(err)
+                })
+        })
+    })
+}
+
 /*
     Job ->
     {
         account_id: 1,
-        segemt_id: 123,
+        segment_id: 123,
         gcs_file: {
             project_id: "hello",
             bucket: "bulk-services",
@@ -122,7 +242,7 @@ const loadStaticSegment = function(job, logger) {
                         }
                     }
                     
-                    updateJobProgress(job, 100)
+                    updateJobProgress(job, logger, 100)
 
                     logger.info("Segment Updated: ", res.getSegment().toObject())
 
@@ -141,7 +261,7 @@ const loadStaticSegment = function(job, logger) {
                     }
                 }).on('end', function() {
                     if (callStreamActive) {
-                        updateJobProgress(job, 90)
+                        updateJobProgress(job, logger, 90)
                         call.end()
                     }
                 }).on('error', function(err) {
@@ -163,7 +283,7 @@ const loadStaticSegment = function(job, logger) {
                     const progress = Math.floor(Math.min(((totalBytesProcessed / fileSize) * 100)))
                     // We update progress up to 90% since the last 10% is waiting for the grpc call to finish
                     if (callStreamActive) {
-                        updateJobProgress(job, Math.min(progress, 90))
+                        updateJobProgress(job, logger, Math.min(progress, 90))
                     }
                     
                     totalBytesProcessed += bytesRead
@@ -175,13 +295,18 @@ const loadStaticSegment = function(job, logger) {
     })
 }
 
-const init = function(context) {
+module.exports = function(context) {
 
-    const queue = context.queues.staticSegment
+    const jobFunctions = {}
+    jobFunctions[JobTypes.SEGMENT] = loadStaticSegment
+    jobFunctions[JobTypes.SEGMENT_WITH_CSV_FILE] = loadStaticSegmentWithCsvFile
+
+    console.info("Work map initialized", jobFunctions)
+    
     const Raven = context.raven
 
-    function work(job, logger, attempt) {
-        return loadStaticSegment(job, logger)
+    function work(jobFunction, job, logger, attempt) {
+        return jobFunction(job, logger)
         .timeout(JOB_TIMEOUT)
         .then(() => {
             logger.info("Completed")
@@ -200,10 +325,10 @@ const init = function(context) {
                 // err.err is the original error
                 return Promise.reject(err.err)
             } else {
-                logger.info("job failed retrying")
-                updateJobProgress(job, 0)
+                logger.info("job failed retrying", err)
+                updateJobProgress(job, logger, 0)
                 return Promise.delay(2000 * attempt).then(() => {
-                    return work(job, logger, attempt + 1)
+                    return work(jobFunction, job, logger, attempt + 1)
                 })
             }
         })
@@ -216,31 +341,53 @@ const init = function(context) {
                     // This is not a grpc error
                     Raven.captureException(err);
                 }
-
+                
                 logger.error("failed", err)
             }
             
+            
+
             return Promise.reject(err)
         })
     }
 
-    queue.process(JOB_CONCURRENCY, function(job, done) {
-        
+    let queues = [context.queues.staticSegment, context.queues.loadJob]
 
-        const logger = new PrefixedLogger("JOB " + job.jobId)
+    queues.forEach(queue => {
+        queue.process(JOB_CONCURRENCY, function(job, done) {
 
-        logger.info("started")
+            const logger = new PrefixedLogger(queue.name + " job:" + job.jobId)
 
-        work(job, logger, 1)
-        .then(() => {
-            return done()
-        })
-        .catch(err => {
-            return done(err)
+            const jobType = getFirstDefined(job.opts.type, job.data.type)
+
+            const workFunction = jobFunctions[jobType]
+
+            if (!workFunction) {
+                
+                if (job.data) {
+                    logger.debug(job.data)
+                }
+
+                if (job.opts) {
+                    logger.debug(job.opts)
+                }
+
+                let error = new Error("No matching job function for: " + jobType)
+                logger.error(error)
+                return done(error)
+            }
+            
+            logger.info("started")
+
+            work(workFunction, job, logger, 1)
+            .then(() => {
+                return done()
+            })
+            .catch(err => {
+                logger.error("finished in failed state")
+                return done(err)
+            })
         })
     })
-}
-
-module.exports = {
-    init: init
+    
 }
