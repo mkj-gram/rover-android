@@ -428,31 +428,31 @@ module.exports = function(PGClient, StorageClient) {
      * @param  {Function} callback 
     */
    
-    handlers.readCsvFile = function(call, callback) {
+    handlers.readCsvFile = function(call) {
         const req = call.request
         const res = call
 
         if (!hasAccess(req.getAuthContext())) {
-            return callback({ code: grpc.status.PERMISSION_DENIED, message: "Forbidden" })
+            return res.emit('error', { code: grpc.status.PERMISSION_DENIED, message: "Forbidden" })
         }
 
         let csvFileId = req.getCsvFileId()
 
         if (csvFileId == 0) {
-            return callback({ code: grpc.status.NOT_FOUND, message: "Not Found" })
+            return res.emit('error', { code: grpc.status.NOT_FOUND, message: "Not Found" })
         }
 
         getCsvFile(csvFileId, function(err, csvFile) {
             if (err) {
-                return callback(err)
+                return res.emit('error', err)
             }
 
             if (!csvFile) {
-                return callback({ code: grpc.status.NOT_FOUND, message: "Not Found" })
+                return res.emit('error', { code: grpc.status.NOT_FOUND, message: "Not Found" })
             }
 
             if (csvFile.account_id !== req.getAuthContext().getAccountId()) {
-                return callback({ code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
+                return res.emit('error', { code: grpc.status.PERMISSION_DENIED, message: "Permission Denied" })
             }
 
             let remoteFileStream = StorageClient.CsvFileBucket.file(csvFile.generated_filename).createReadStream()
@@ -470,7 +470,7 @@ module.exports = function(PGClient, StorageClient) {
             .on('error', function(err) {
                 remoteFileStream.unpipe(csvReadStream)
                 remoteFileStream.destroy(err)
-                return callback(err)
+                return res.emit('error', err)
             })
 
             remoteFileStream.pipe(csvReadStream)
