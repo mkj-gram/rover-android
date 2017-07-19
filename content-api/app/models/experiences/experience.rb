@@ -233,6 +233,9 @@ module Experiences
             end
 
             def find(id)
+                if id.is_a?(String) && !BSON::ObjectId.legal?(id)
+                    return nil
+                end
                 id = BSON::ObjectId(id) if id.is_a?(String)
                 doc = mongo[collection_name].find(_id: id).first
                 return nil if doc.nil?
