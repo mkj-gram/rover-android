@@ -205,7 +205,7 @@ class TableMenuBar extends Component {
                         onClick={e => this.triggerColumnsMenu(e)}
                         id="columnsIcon"
                     >
-                        <TableMenuBarIcon val="columns" />
+                        <TableMenuBarIcon val="columns" showToolTip={!showColumnsMenu} />
                     </div>
                     <div style={{ marginRight: '5px' }}>
                         <SearchIcon fill={silver} />
