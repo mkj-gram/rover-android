@@ -57,6 +57,13 @@ message GetLoadJobRequest {
     rover.auth.v1.AuthContext auth_context = 1;
 
     int32 load_job_id = 2;
+
+    /*
+        0 -> static-segments (default)
+        1 -> static-segments
+        2 -> load-jobs  
+    */
+   int32 queue_version = 3;
 }
 
 message GetLoadJobReply {

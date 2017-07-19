@@ -986,7 +986,8 @@ proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.toObject = function(opt
 proto.rover.csv_processor.v1.GetLoadJobRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    loadJobId: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    loadJobId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    queueVersion: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -1032,6 +1033,10 @@ proto.rover.csv_processor.v1.GetLoadJobRequest.deserializeBinaryFromReader = fun
       var value = /** @type {number} */ (reader.readInt32());
       msg.setLoadJobId(value);
       break;
+    case 3:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setQueueVersion(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1072,6 +1077,13 @@ proto.rover.csv_processor.v1.GetLoadJobRequest.serializeBinaryToWriter = functio
   if (f !== 0) {
     writer.writeInt32(
       2,
+      f
+    );
+  }
+  f = message.getQueueVersion();
+  if (f !== 0) {
+    writer.writeInt32(
+      3,
       f
     );
   }
@@ -1120,6 +1132,21 @@ proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.getLoadJobId = function
 /** @param {number} value */
 proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.setLoadJobId = function(value) {
   jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional int32 queue_version = 3;
+ * @return {number}
+ */
+proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.getQueueVersion = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.csv_processor.v1.GetLoadJobRequest.prototype.setQueueVersion = function(value) {
+  jspb.Message.setField(this, 3, value);
 };
 
 

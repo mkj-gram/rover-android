@@ -188,16 +188,25 @@ const createSegmentLoadJob = function(call, callback) {
  */
 const getLoadJob = function(call, callback) {
 
-    const queue = this.queues.staticSegment
+    const req = call.request
 
-    const loadJobQuery = call.request
-    const loadJobId = loadJobQuery.getLoadJobId()
+    const loadJobId = req.getLoadJobId()
+    const queueVersion = req.getQueueVersion()
 
-    const AuthContext = call.request.getAuthContext()
+    const AuthContext = req.getAuthContext()
 
     if (!hasAccess(AuthContext)) {
         return callback(permissionDeniedGrpcStatus)
     }
+
+    let queue;
+
+    if (queueVersion == 2) {
+        queue = this.queues.loadJob
+    } else {
+        queue = this.queues.staticSegment
+    }
+
 
     queue.getJob(loadJobId.toString())
         .then(function(job) {

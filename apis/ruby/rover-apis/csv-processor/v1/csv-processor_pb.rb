@@ -33,6 +33,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.csv_processor.v1.GetLoadJobRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :load_job_id, :int32, 2
+    optional :queue_version, :int32, 3
   end
   add_message "rover.csv_processor.v1.GetLoadJobReply" do
     optional :job, :message, 1, "rover.csv_processor.v1.LoadJob"
