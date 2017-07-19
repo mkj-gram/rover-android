@@ -57,6 +57,11 @@ module.exports = function(callback) {
     router.use(AuthMiddleware)
 
     /*
+        Add JSON Body Parser    
+    */
+    router.use(require('body-parser').json())
+
+    /*
         Remove X-Powered-By header
     */
     
@@ -92,8 +97,9 @@ module.exports = function(callback) {
         let response = {
             status: err.status
         }
+        
         // This is an error we most likey constructed so we can pass it back to the client
-        if (typeof err === 'object' && err.message) {
+        if (typeof err === 'object' && !(err instanceof Error) && err.message) {
             response.message = err.message   
         }
 
@@ -109,6 +115,7 @@ module.exports = function(callback) {
     */
     const CsvProcessorClient = require("@rover/csv-processor-client").v1.Client()
     const FilesClient = require("@rover/files-client").v1.Client()
+    const SegmentClient = require("@rover/segment-client").v1.Client()
 
     const Uploader = require('../lib/uploader')
     const UploaderClient = new Uploader(
@@ -134,7 +141,7 @@ module.exports = function(callback) {
 
         router.use('/bulk/', require('./v1')(CsvProcessorClient, UploaderClient))
         router.use('/bulk/v1/', require('./v1')(CsvProcessorClient, UploaderClient))
-        router.use('/bulk/v2/', require('./v2')(CsvProcessorClient, FilesClient))
+        router.use('/bulk/v2/', require('./v2')(CsvProcessorClient, FilesClient, SegmentClient))
 
         router.use(errorHandler)
 
