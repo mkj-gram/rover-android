@@ -206,7 +206,7 @@ class SegmentCell extends Component {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            paddingTop: 6
+                            marginTop: 6
                         }}
                     >
                         <PencilEditIcon
