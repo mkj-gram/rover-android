@@ -24,32 +24,30 @@ class DateInput extends Component {
     constructor(props) {
         super(props)
 
-        const { value, comparison } = this.props
-        const { start, end } = value
+        const { dateValue, dateComparison } = this.props
+        const { start, end } = dateValue
         this.state = {
-            start,
-            end,
-            comparison
+            start: moment(start),
+            end: moment(end),
+            dateComparison
         }
     }
 
     componentDidMount() {
-        const { value } = this.state
-        this.updateValue(value)
+        const { dateValue } = this.state
+        this.updateValue(dateValue)
     }
 
     renderDatePicker() {
-        const { start, end, comparison } = this.state
+        const { start, end, dateComparison } = this.state
 
-        switch (comparison) {
+        switch (dateComparison) {
             case 'in between':
                 return this.renderInBetweenCalendarInput(start, end)
-                break
             case 'after':
             case 'on':
             case 'before':
                 return this.renderCalendarInput(start)
-                break
             case 'more than':
             case 'exactly':
             case 'less than':
@@ -145,46 +143,50 @@ class DateInput extends Component {
         )
     }
 
-    updateComparison(comparison) {
-        const { attribute, type, category, index, updateFn } = this.props
+    updateComparison(dateComparison) {
+        const { attribute, category, __typename, index, updateFn } = this.props
         const start = moment()
         let end = {}
 
-        if (comparison === 'in between') {
+        if (dateComparison === 'in between') {
             end = moment()
         }
 
-        const value = { start, end }
-
         updateFn({
             attribute,
-            comparison,
-            type,
+            dateComparison,
             category,
+            __typename,
             index,
-            value
+            dateValue: {
+                start: start.toISOString(),
+                end: moment.isMoment(end) ? end.toISOString() : end
+            }
         })
 
-        this.setState({ comparison, start, end })
+        this.setState({ dateComparison, start, end })
     }
 
-    updateValue(value) {
-        const { attribute, type, category, index, updateFn } = this.props
-        const { comparison, start, end } = this.state
+    updateValue(dateValue) {
+        const { attribute, category, __typename, index, updateFn } = this.props
+        const { dateComparison, start, end } = this.state
 
         const newValue = {
             start,
             end,
-            ...value
+            ...dateValue
         }
 
         updateFn({
             attribute,
-            comparison,
-            type,
+            dateComparison,
             category,
+            __typename,
             index,
-            value: newValue
+            dateValue: {
+                start: newValue.start.toISOString(),
+                end: moment.isMoment(newValue.end) ? newValue.end.toISOString() : newValue.end
+            }
         })
 
         this.setState({ ...newValue })
@@ -192,7 +194,7 @@ class DateInput extends Component {
 
     render() {
         const { attribute, category } = this.props
-        const { value, comparison } = this.state
+        const { dateComparison } = this.state
         return (
             <div style={{ ...text, ...light, color: silver, width: 444 }}>
                 <ModalInputPrompt
@@ -220,11 +222,10 @@ class DateInput extends Component {
                             borderTop: 'none',
                             borderRight: 'none',
                             borderLeft: 'none',
-                            borderRadius: 0,
                             paddingLeft: 5
                         }}
                         isDisabled={false}
-                        value={comparison}
+                        value={dateComparison}
                         onChange={e => this.updateComparison(e.target.value)}
                     >
                         <optgroup label="Relative">
@@ -248,23 +249,22 @@ class DateInput extends Component {
 
 DateInput.propTypes = {
     attribute: PropTypes.string.isRequired,
-    value: PropTypes.object,
-    comparison: PropTypes.string.isRequired,
+    dateValue: PropTypes.object.isRequired,
+    dateComparison: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
-    updateFn: PropTypes.func.isRequired
+    updateFn: PropTypes.func.isRequired,
+    __typename: PropTypes.string.isRequired
 }
 
 DateInput.defaultProps = {
     attribute: '',
-    value: {
+    dateValue: {
         start: moment(),
         end: {}
     },
-    comparison: 'exactly',
+    dateComparison: 'exactly',
     category: 'device',
-    type: 'date',
     index: 0,
     updateFn: () => ''
 }

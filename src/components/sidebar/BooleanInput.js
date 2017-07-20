@@ -18,17 +18,17 @@ class BooleanInput extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            value: this.props.value
+            booleanValue: this.props.booleanValue
         }
     }
 
     componentDidMount() {
-        const { value } = this.state
-        this.updateBooleanValue(value)
+        const { booleanValue } = this.state
+        this.updateBooleanValue(booleanValue)
     }
 
     renderRadioButton(radioValue) {
-        const { value } = this.state
+        const { booleanValue } = this.state
         return (
             <RadioButton
                 label={
@@ -37,7 +37,7 @@ class BooleanInput extends Component {
                     </span>
                 }
                 onChange={() => this.updateBooleanValue(radioValue, () => null)}
-                isChecked={value === radioValue}
+                isChecked={booleanValue === radioValue}
                 primaryColor={lavender}
                 style={{
                     backgroundColor: graphite,
@@ -48,17 +48,17 @@ class BooleanInput extends Component {
         )
     }
 
-    updateBooleanValue(value) {
-        const { attribute, category, type, updateFn, index } = this.props
+    updateBooleanValue(booleanValue) {
+        const { attribute, category, updateFn, index, __typename } = this.props
         updateFn({
             attribute,
             category,
-            type,
             index,
-            comparison: 'true',
-            value: value
+            booleanComparison: 'true',
+            booleanValue,
+            __typename
         })
-        this.setState({ value })
+        this.setState({ booleanValue })
     }
 
     render() {
@@ -89,20 +89,21 @@ class BooleanInput extends Component {
 
 BooleanInput.propTypes = {
     attribute: PropTypes.string.isRequired,
-    value: PropTypes.bool.isRequired,
-    comparison: PropTypes.string.isRequired,
+    booleanValue: PropTypes.bool.isRequired,
     category: PropTypes.string.isRequired,
     updateFn: PropTypes.func.isRequired,
-    index: PropTypes.number.isRequired
+    index: PropTypes.number.isRequired,
+    __typename: PropTypes.string.isRequired
 }
 
 BooleanInput.defaultProps = {
     attribute: '',
-    value: true,
-    comparison: 'true',
+    booleanValue: true,
+    booleanComparison: 'true',
     category: 'profile',
     updateFn: () => null,
-    index: 0
+    index: 0,
+    __typename: 'BooleanPredicate'
 }
 
 export default BooleanInput

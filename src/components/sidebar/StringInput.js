@@ -5,7 +5,6 @@ import {
     light,
     Select,
     silver,
-    steel,
     text,
     titanium
 } from '@rover/react-bootstrap'
@@ -17,54 +16,54 @@ class StringInput extends Component {
     constructor(props) {
         super(props)
 
-        const { value, comparison } = this.props
+        const { stringValue, stringComparison } = this.props
         this.state = {
-            value,
-            comparison
+            stringValue,
+            stringComparison
         }
     }
-    
+
     componentDidMount() {
-        const { value } = this.state
-        this.updateValue(value)
+        const { stringValue } = this.state
+        this.updateValue(stringValue)
     }
 
-    updateComparison(comparison) {
-        const { attribute, category, type, index, updateFn } = this.props
-        let { value } = this.state
+    updateComparison(stringComparison) {
+        const { attribute, category, __typename, index, updateFn } = this.props
+        let { stringValue } = this.state
 
-        if (comparison === 'is unknown') {
-            value = ''
+        if (stringComparison === 'is unknown') {
+            stringValue = ''
         }
 
         updateFn({
             attribute,
-            comparison,
+            stringComparison,
             category,
-            type,
+            __typename,
             index,
-            value
+            stringValue
         })
-        this.setState({ comparison })
+        this.setState({ stringComparison })
     }
 
-    updateValue(value) {
-        const { attribute, category, type, index, updateFn } = this.props
-        const { comparison } = this.state
+    updateValue(stringValue) {
+        const { attribute, category, __typename, index, updateFn } = this.props
+        const { stringComparison } = this.state
         updateFn({
             attribute,
-            comparison,
+            stringComparison,
             category,
-            type,
+            __typename,
             index,
-            value
+            stringValue
         })
-        this.setState({ value })
+        this.setState({ stringValue })
     }
 
     render() {
         const { attribute, category } = this.props
-        const { value, comparison } = this.state
+        const { stringValue, stringComparison } = this.state
         return (
             <div style={{ ...text, ...light, color: silver, width: 380 }}>
                 <ModalInputPrompt
@@ -87,7 +86,6 @@ class StringInput extends Component {
                             marginRight: 20,
                             borderColor: silver,
                             focusedBorderColor: silver,
-                            borderRadius: 0,
                             borderStyle: 'solid',
                             borderWidth: '1px',
                             borderTop: 'none',
@@ -97,7 +95,7 @@ class StringInput extends Component {
                             paddingLeft: 5
                         }}
                         isDisabled={false}
-                        value={comparison}
+                        value={stringComparison}
                         onChange={e => this.updateComparison(e.target.value)}
                     >
                         <option value="is">Is</option>
@@ -110,10 +108,10 @@ class StringInput extends Component {
                         <option value="is unknown">Is unknown</option>
                     </Select>
 
-                    {comparison !== 'is unknown' &&
+                    {stringComparison !== 'is unknown' &&
                         <ModalInput
                             type="text"
-                            value={value}
+                            value={stringValue}
                             style={{
                                 width: 200,
                                 textAlign: 'left'
@@ -128,17 +126,18 @@ class StringInput extends Component {
 
 StringInput.propTypes = {
     attribute: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    comparison: PropTypes.string.isRequired,
+    stringValue: PropTypes.string.isRequired,
+    stringComparison: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
-    updateFn: PropTypes.func.isRequired
+    updateFn: PropTypes.func.isRequired,
+    __typename: PropTypes.string.isRequired
 }
 
 StringInput.defaultProps = {
     attribute: '',
-    value: '',
-    comparison: 'is',
+    stringValue: '',
+    stringComparison: 'is',
     category: 'device',
     index: 0,
     updateFn: () => null

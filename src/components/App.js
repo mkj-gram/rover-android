@@ -2,22 +2,25 @@ import React from 'react'
 import { unselectable } from '@rover/react-bootstrap'
 
 import MainNav from './MainNav'
-import SideBar from './sidebar/Sidebar'
-import AudienceTable from './table/AudienceTable'
+import AppQueryRenderer from './AppQueryRenderer'
 
-const App = () => (
-    <div style={{ ...unselectable, height: '100%', widht: '100%', display: 'flex', flexDirection: 'column' }}>
+const App = () =>
+    (<div
+        style={{
+            ...unselectable,
+            height: '100%',
+            widht: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+        }}
+    >
         <MainNav
             name="Alex Graham"
             isGimbalEnabled={false}
             isXenioEnabled={false}
             onRequestSignOut={() => null}
         />
-        <div style={{ display: 'flex', flex: '1 1 100%' }}>
-            <SideBar />
-            <AudienceTable />
-        </div>
-    </div>
-)
+        <AppQueryRenderer />
+    </div>)
 
 export default App

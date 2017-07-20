@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-
+import PropTypes from 'prop-types'
+import { createFragmentContainer, graphql } from 'react-relay'
 import {
     AddButton,
     ash,
@@ -39,9 +40,9 @@ class SideBar extends Component {
             currentPredicate: {},
             isShowingAddFilterModal: false,
             query: [],
+            queryCondition: 'all',
             modalCoordinates: [0, 0],
-            showSegmentSelection: false,
-            showSegmentSave: false
+            isViewingDynamicSegment: true
         }
 
         this.setState = this.setState.bind(this)
@@ -49,6 +50,7 @@ class SideBar extends Component {
         this.handleEditModal = this.handleEditModal.bind(this)
 
         this.handleSegmentAction = this.handleSegmentAction.bind(this)
+        this.viewDynamicSegment = this.viewDynamicSegment.bind(this)
     }
 
     updateQuery() {
@@ -60,7 +62,8 @@ class SideBar extends Component {
 
         this.setState({
             query: newQuery,
-            currentAttribute: { attribute: '', index: null }
+            currentAttribute: { attribute: '', index: null },
+            isViewingDynamicSegment: false
         })
     }
 
@@ -72,6 +75,20 @@ class SideBar extends Component {
         )
 
         this.setState({ query: newQuery })
+    }
+
+    viewDynamicSegment() {
+        const { data } = this.props
+        const { dynamicSegment } = data
+        const { predicates } = dynamicSegment[0]
+        const { condition, device, profile } = predicates
+
+        const query = device.map(d => ({ ...d, category: 'device' })).concat(profile.map(p => ({ ...p, category: 'profile' })))
+
+        this.setState({
+            query,
+            queryCondition: condition
+        })
     }
 
     renderModalTitle(currentAttribute) {
@@ -128,22 +145,22 @@ class SideBar extends Component {
             return
         }
 
-        const { type } = predicate
+        const { __typename } = predicate
 
         const updateFn = currentPredicate => this.setState({ currentPredicate })
 
         const props = { ...predicate, updateFn, index }
 
-        switch (type) {
-            case 'boolean':
+        switch (__typename) {
+            case 'BooleanPredicate':
                 return <BooleanInput {...props} />
-            case 'date':
+            case 'DatePredicate':
                 return <DateInput {...props} />
-            case 'version':
+            case 'VersionPredicate':
                 return <VersionInput {...props} />
-            case 'string':
+            case 'StringPredicate':
                 return <StringInput {...props} />
-            case 'number':
+            case 'NumberPredicate':
                 return <NumericInput {...props} />
             default:
         }
@@ -173,6 +190,8 @@ class SideBar extends Component {
     renderAddFilterBar() {
         const { isShowingAddFilterModal, query } = this.state
         const addPredicateIndex = query.length
+
+        const { data } = this.props
 
         const style = {
             height: 58,
@@ -216,6 +235,7 @@ class SideBar extends Component {
                 </label>
                 {isShowingAddFilterModal &&
                     <AddFilterModal
+                        schema={data.segmentSchema}
                         onRequestClose={() =>
                             this.setState({ isShowingAddFilterModal: false })}
                         onSelect={(predicate) => {
@@ -341,7 +361,6 @@ class SideBar extends Component {
             flexDirection: 'column'
         }
         const { currentAttribute, query, modalCoordinates } = this.state
-
         return (
             <div style={sideBarStyle}>
                 <ModalWithHeader
@@ -421,4 +440,101 @@ class SideBar extends Component {
     }
 }
 
-export default SideBar
+SideBar.propTypes = {
+    data: PropTypes.object.isRequired
+}
+
+export default createFragmentContainer(
+    SideBar,
+    graphql`
+        fragment SideBar on Query {
+            dynamicSegment(
+                segmentId: "1a2b3c"
+                paginationKey: "testpaginationkey"
+            ) {
+                segmentId
+                name
+                predicates {
+                    condition
+                    device {
+                        ... on Predicate {
+                            __typename
+                            attribute
+                            ... on StringPredicate {
+                                stringValue
+                                stringComparison
+                            }
+                            ... on VersionPredicate {
+                                versionValue
+                                versionComparison
+                            }
+                            ... on DatePredicate {
+                                dateValue {
+                                    start
+                                    end
+                                }
+                                dateComparison
+                            }
+                            ... on BooleanPredicate {
+                                booleanValue
+                                booleanComparison
+                            }
+                            ... on NumberPredicate {
+                                numberValue
+                                numberComparison
+                            }
+                            ... on GeofencePredicate {
+                                geofenceValue {
+                                    latitude
+                                    longitude
+                                    radius
+                                }
+                                geofenceComparison
+                            }
+                        }
+                    }
+                    profile {
+                        ... on Predicate {
+                            __typename
+                            attribute
+                            ... on StringPredicate {
+                                stringValue
+                                stringComparison
+                            }
+                            ... on VersionPredicate {
+                                versionValue
+                                versionComparison
+                            }
+                            ... on DatePredicate {
+                                dateValue {
+                                    start
+                                    end
+                                }
+                                dateComparison
+                            }
+                            ... on BooleanPredicate {
+                                booleanValue
+                                booleanComparison
+                            }
+                            ... on NumberPredicate {
+                                numberValue
+                                numberComparison
+                            }
+                            ... on GeofencePredicate {
+                                geofenceValue {
+                                    latitude
+                                    longitude
+                                    radius
+                                }
+                                geofenceComparison
+                            }
+                        }
+                    }
+                }
+            }
+            segmentSchema {
+                ...AddFilterModal_schema
+            }
+        }
+    `
+)

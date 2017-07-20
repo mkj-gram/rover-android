@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { createFragmentContainer, graphql } from 'react-relay'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 
@@ -20,84 +21,39 @@ class AddFilterModal extends Component {
         super(props)
         this.state = {
             search: '',
-            filterList: [
-                {
-                    attribute: 'bluetooth-enabled',
-                    type: 'boolean',
-                    category: 'device'
-                },
-                {
-                    attribute: 'location-enabled',
-                    type: 'boolean',
-                    category: 'device'
-                },
-                {
-                    attribute: 'push-enabled',
-                    type: 'boolean',
-                    category: 'device'
-                },
-                {
-                    attribute: 'rover-sdk',
-                    type: 'version',
-                    category: 'device'
-                },
-                {
-                    attribute: 'first-name',
-                    type: 'string',
-                    category: 'profile'
-                },
-                {
-                    attribute: 'age',
-                    type: 'number',
-                    category: 'profile'
-                },
-                {
-                    attribute: 'rover-sdk',
-                    type: 'version',
-                    category: 'device'
-                },
-                {
-                    attribute: 'first-name',
-                    type: 'string',
-                    category: 'profile'
-                },
-                {
-                    attribute: 'age',
-                    type: 'number',
-                    category: 'profile'
-                },
-                {
-                    attribute: 'account-created',
-                    type: 'date',
-                    category: 'profile'
-                }
-            ]
+            filterList: this.buildFilterList()
         }
+    }
+
+    buildFilterList() {
+        const { schema } = this.props
+        const { deviceSchema, profileSchema } = schema
+
+        const devices = deviceSchema.map(device => ({ category: 'device', ...device }))
+        const profiles = profileSchema.map(profile => ({ category: 'profile', ...profile }))
+
+        return devices.concat(profiles)
     }
 
     getFilterDefault(type) {
         switch (type) {
             case 'string':
                 return { comparison: 'is', value: '' }
-                break
             case 'boolean':
                 return { comparison: 'true', value: true }
-                break
             case 'number':
                 return { comparison: 'is', value: [0] }
-                break
             case 'date':
                 return {
                     comparison: 'exactly',
                     value: { start: moment(), end: {} }
                 }
-                break
             case 'version':
                 return {
                     comparison: 'equal to',
                     value: [0, 0, 0, 0, 0, 0]
                 }
-                break
+            default:
         }
     }
 
@@ -123,6 +79,7 @@ class AddFilterModal extends Component {
                     />
                 )
             }
+            return null
         })
     }
 
@@ -191,4 +148,24 @@ class AddFilterModal extends Component {
     }
 }
 
-export default AddFilterModal
+AddFilterModal.propTypes = {
+    onSelect: PropTypes.func.isRequired,
+    onRequestClose: PropTypes.func.isRequired,
+    schema: PropTypes.object.isRequired
+}
+
+export default createFragmentContainer(
+    AddFilterModal,
+    graphql`
+        fragment AddFilterModal_schema on SegmentSchema {
+            deviceSchema {
+              attribute
+              type
+            }
+            profileSchema {
+              attribute
+              type
+            }
+        }
+    `
+)

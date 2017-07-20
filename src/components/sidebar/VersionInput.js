@@ -5,7 +5,6 @@ import {
     light,
     Select,
     silver,
-    steel,
     text,
     titanium
 } from '@rover/react-bootstrap'
@@ -17,53 +16,61 @@ class VersionInput extends Component {
     constructor(props) {
         super(props)
 
-        const { value, comparison } = this.props
+        const { versionValue, versionComparison } = this.props
         this.state = {
-            value,
-            comparison
+            versionValue,
+            versionComparison
         }
     }
-    
+
     componentDidMount() {
-        const { comparison } = this.state
-        this.updateComparison(comparison)
+        const { versionComparison } = this.state
+        this.updateComparison(versionComparison)
     }
 
     updateVersion(version, versionIndex) {
-        const { attribute, category, type, index, updateFn } = this.props
-        const { value, comparison } = this.state
+        const { attribute, category, __typename, index, updateFn } = this.props
+        const { versionValue, versionComparison } = this.state
 
-        const newValue = value
+        const newValue = versionValue
             .slice(0, versionIndex)
             .concat(version)
-            .concat(value.slice(versionIndex + 1))
+            .concat(versionValue.slice(versionIndex + 1))
 
         updateFn({
             attribute,
-            comparison,
+            versionComparison,
             category,
-            type,
+            __typename,
             index,
-            value: newValue
+            versionValue: newValue
         })
 
-        this.setState({ value: newValue })
+        this.setState({ versionValue: newValue })
     }
 
-    updateComparison(comparison) {
-        const { attribute, category, type, index, updateFn } = this.props
-        const { value } = this.state
+    updateComparison(versionComparison) {
+        const { attribute, category, __typename, index, updateFn } = this.props
+        const { versionValue } = this.state
+
+        let newVersionValue
+
+        if (versionComparison === 'in between') {
+            newVersionValue = Object.assign([], ...versionValue, { 3: 0, 4: 0, 5: 0 })
+        } else {
+            newVersionValue = versionValue.slice(0, 3)
+        }
 
         updateFn({
             attribute,
-            comparison,
-            value,
+            versionComparison,
+            versionValue: newVersionValue,
             category,
-            index,
-            type
+            __typename,
+            index
         })
 
-        this.setState({ comparison })
+        this.setState({ versionComparison, versionValue: newVersionValue })
     }
 
     renderNumberInput(value, index) {
@@ -73,14 +80,14 @@ class VersionInput extends Component {
                 min={0}
                 value={value}
                 onChange={e =>
-                    this.updateVersion(parseInt(e.target.value), index)}
+                    this.updateVersion(parseInt(e.target.value, 10), index)}
             />
         )
     }
 
     render() {
         const { attribute, category } = this.props
-        const { value, comparison } = this.state
+        const { versionValue, versionComparison } = this.state
 
         return (
             <div style={{ ...text, ...light, color: silver, width: 495 }}>
@@ -104,7 +111,6 @@ class VersionInput extends Component {
                             marginRight: 20,
                             borderColor: silver,
                             focusedBorderColor: silver,
-                            borderRadius: 0,
                             borderStyle: 'solid',
                             borderWidth: '1px',
                             borderTop: 'none',
@@ -114,7 +120,7 @@ class VersionInput extends Component {
                             paddingLeft: 5
                         }}
                         isDisabled={false}
-                        value={comparison}
+                        value={versionComparison}
                         onChange={e => this.updateComparison(e.target.value)}
                     >
                         <option value="equals">Equal to</option>
@@ -125,23 +131,23 @@ class VersionInput extends Component {
                         <option value="is unknown">Unknown</option>
                     </Select>
 
-                    {comparison !== 'is unknown' &&
-                        value.slice(0, 3).map((val, index) =>
-                            <div key={index}>
+                    {versionComparison !== 'is unknown' &&
+                        versionValue.slice(0, 3).map((val, index) =>
+                            (<div key={index}>
                                 {this.renderNumberInput(val, index)}
                                 {index < 2 && '.'}
-                            </div>
+                            </div>)
                         )}
-                    {comparison === 'in between' &&
+                    {versionComparison === 'in between' &&
                         <div
                             style={{ display: 'flex', alignItems: 'baseline' }}
                         >
                             <span style={{ fontStyle: 'italic' }}>and</span>
-                            {value.slice(3).map((val, index) =>
-                                <div key={index}>
+                            {versionValue.slice(3).map((val, index) =>
+                                (<div key={index}>
                                     {this.renderNumberInput(val, index + 3)}
                                     {index < 2 && '.'}
-                                </div>
+                                </div>)
                             )}
                         </div>}
                 </div>
@@ -152,17 +158,18 @@ class VersionInput extends Component {
 
 VersionInput.propTypes = {
     attribute: PropTypes.string.isRequired,
-    value: PropTypes.arrayOf(PropTypes.number),
-    comparison: PropTypes.string.isRequired,
+    versionValue: PropTypes.arrayOf(PropTypes.number),
+    versionComparison: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
-    updateFn: PropTypes.func.isRequired
+    updateFn: PropTypes.func.isRequired,
+    __typename: PropTypes.string.isRequired
 }
 
 VersionInput.defaultProps = {
     attribute: '',
-    value: [0, 0, 0, 0, 0, 0],
-    comparison: 'equal to',
+    versionValue: [0, 0, 0, 0, 0, 0],
+    versionComparison: 'equal to',
     category: 'device',
     index: 0,
     updateFn: () => null
