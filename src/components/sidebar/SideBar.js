@@ -454,6 +454,8 @@ export default createFragmentContainer(
             ) {
                 segmentId
                 name
+                totalSize
+                segmentSize
                 predicates {
                     condition
                     device {

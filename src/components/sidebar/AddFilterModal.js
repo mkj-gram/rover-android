@@ -160,11 +160,11 @@ export default createFragmentContainer(
         fragment AddFilterModal_schema on SegmentSchema {
             deviceSchema {
               attribute
-              type
+              __typename: type
             }
             profileSchema {
               attribute
-              type
+              __typename: type
             }
         }
     `

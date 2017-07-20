@@ -97,7 +97,7 @@ const renderDatePredicate = ({ dateComparison, dateValue }) => {
     }
 }
 
-const renderVersionPredicate = ({ versionComparison, versionValue }) => {
+const renderVersionPredicate = ({ versionComparison, versionValue = [0, 0, 0] }) => {
     if (versionComparison === 'is unknown') {
         return renderPredicateComparison(versionComparison)
     }
@@ -185,11 +185,11 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
         flexWrap: 'wrap'
     }
 
-    const onMouseOver = e => {
+    const onMouseOver = (e) => {
         e.target.style.backgroundColor = steel
         e.target.children[1].style.fill = silver
     }
-    const onMouseLeave = e => {
+    const onMouseLeave = (e) => {
         e.target.style.backgroundColor = ash
         e.target.children[1].style.fill = 'transparent'
     }
@@ -227,7 +227,7 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
                                     top: 11,
                                     right: 9
                                 }}
-                                onClick={e => {
+                                onClick={(e) => {
                                     e.stopPropagation()
                                     removePredicate(index)
                                 }}
@@ -257,7 +257,7 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
 }
 
 PredicateList.propTypes = {
-    query: PropTypes.object.isRequired,
+    query: PropTypes.array.isRequired,
     viewModal: PropTypes.func.isRequired,
     removePredicate: PropTypes.func.isRequired
 }

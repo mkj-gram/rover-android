@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash b0266399ab50c8857d1c3d14ad0e4d4e
+ * @relayHash d907160ea0659b5ceec65773b457f574
  */
 
 /* eslint-disable */
@@ -110,11 +110,11 @@ fragment SideBar on Query {
 fragment AddFilterModal_schema on SegmentSchema {
   deviceSchema {
     attribute
-    type
+    __typename: type
   }
   profileSchema {
     attribute
-    type
+    __typename: type
   }
 }
 */
@@ -601,7 +601,7 @@ const batch /*: ConcreteBatch*/ = {
               },
               {
                 "kind": "ScalarField",
-                "alias": null,
+                "alias": "__typename",
                 "args": null,
                 "name": "type",
                 "storageKey": null
@@ -626,7 +626,7 @@ const batch /*: ConcreteBatch*/ = {
               },
               {
                 "kind": "ScalarField",
-                "alias": null,
+                "alias": "__typename",
                 "args": null,
                 "name": "type",
                 "storageKey": null
@@ -639,7 +639,7 @@ const batch /*: ConcreteBatch*/ = {
       }
     ]
   },
-  "text": "query AppQueryRendererQuery {\n  ...SideBar\n}\n\nfragment SideBar on Query {\n  dynamicSegment(segmentId: \"1a2b3c\", paginationKey: \"testpaginationkey\") {\n    segmentId\n    name\n    predicates {\n      condition\n      device {\n        __typename\n        ... on Predicate {\n          __typename\n          attribute\n          ... on StringPredicate {\n            stringValue\n            stringComparison\n          }\n          ... on VersionPredicate {\n            versionValue\n            versionComparison\n          }\n          ... on DatePredicate {\n            dateValue {\n              start\n              end\n            }\n            dateComparison\n          }\n          ... on BooleanPredicate {\n            booleanValue\n            booleanComparison\n          }\n          ... on NumberPredicate {\n            numberValue\n            numberComparison\n          }\n          ... on GeofencePredicate {\n            geofenceValue {\n              latitude\n              longitude\n              radius\n            }\n            geofenceComparison\n          }\n        }\n      }\n      profile {\n        __typename\n        ... on Predicate {\n          __typename\n          attribute\n          ... on StringPredicate {\n            stringValue\n            stringComparison\n          }\n          ... on VersionPredicate {\n            versionValue\n            versionComparison\n          }\n          ... on DatePredicate {\n            dateValue {\n              start\n              end\n            }\n            dateComparison\n          }\n          ... on BooleanPredicate {\n            booleanValue\n            booleanComparison\n          }\n          ... on NumberPredicate {\n            numberValue\n            numberComparison\n          }\n          ... on GeofencePredicate {\n            geofenceValue {\n              latitude\n              longitude\n              radius\n            }\n            geofenceComparison\n          }\n        }\n      }\n    }\n  }\n  segmentSchema {\n    ...AddFilterModal_schema\n  }\n}\n\nfragment AddFilterModal_schema on SegmentSchema {\n  deviceSchema {\n    attribute\n    type\n  }\n  profileSchema {\n    attribute\n    type\n  }\n}\n"
+  "text": "query AppQueryRendererQuery {\n  ...SideBar\n}\n\nfragment SideBar on Query {\n  dynamicSegment(segmentId: \"1a2b3c\", paginationKey: \"testpaginationkey\") {\n    segmentId\n    name\n    predicates {\n      condition\n      device {\n        __typename\n        ... on Predicate {\n          __typename\n          attribute\n          ... on StringPredicate {\n            stringValue\n            stringComparison\n          }\n          ... on VersionPredicate {\n            versionValue\n            versionComparison\n          }\n          ... on DatePredicate {\n            dateValue {\n              start\n              end\n            }\n            dateComparison\n          }\n          ... on BooleanPredicate {\n            booleanValue\n            booleanComparison\n          }\n          ... on NumberPredicate {\n            numberValue\n            numberComparison\n          }\n          ... on GeofencePredicate {\n            geofenceValue {\n              latitude\n              longitude\n              radius\n            }\n            geofenceComparison\n          }\n        }\n      }\n      profile {\n        __typename\n        ... on Predicate {\n          __typename\n          attribute\n          ... on StringPredicate {\n            stringValue\n            stringComparison\n          }\n          ... on VersionPredicate {\n            versionValue\n            versionComparison\n          }\n          ... on DatePredicate {\n            dateValue {\n              start\n              end\n            }\n            dateComparison\n          }\n          ... on BooleanPredicate {\n            booleanValue\n            booleanComparison\n          }\n          ... on NumberPredicate {\n            numberValue\n            numberComparison\n          }\n          ... on GeofencePredicate {\n            geofenceValue {\n              latitude\n              longitude\n              radius\n            }\n            geofenceComparison\n          }\n        }\n      }\n    }\n  }\n  segmentSchema {\n    ...AddFilterModal_schema\n  }\n}\n\nfragment AddFilterModal_schema on SegmentSchema {\n  deviceSchema {\n    attribute\n    __typename: type\n  }\n  profileSchema {\n    attribute\n    __typename: type\n  }\n}\n"
 };
 
 module.exports = batch;
