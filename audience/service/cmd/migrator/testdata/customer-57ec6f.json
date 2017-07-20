@@ -1,0 +1,126 @@
+{
+  "_id": {
+    "$oid": "57ec6f434794ea0035dddc31"
+  },
+  "account_id": {"$numberLong": 30},
+  "age": {"$numberLong": 10},
+  "created_at": {
+    "$date": "2016-09-29T01:32:51.052Z"
+  },
+  "devices": [
+    {
+      "_id": "9B48E7E3-1992-4F8A-A47A-434B522384B5",
+      "aid": "8BC1242B-3FE3-49D1-80CF-3BE9469CEC30",
+      "app_identifier": "com.yinzcam.testnavtest",
+      "background_enabled": true,
+      "beacon_regions_monitoring": [],
+      "beacon_regions_monitoring_updated_at": null,
+      "bluetooth_enabled": true,
+      "carrier": "verizon",
+      "created_at": null,
+      "development": false,
+      "geofence_regions_monitoring": [],
+      "geofence_regions_monitoring_updated_at": null,
+      "gimbal_mode": null,
+      "ip": "108.39.156.65",
+      "locale_lang": "en",
+      "locale_region": "us",
+      "location": null,
+      "location_monitoring_enabled": false,
+      "manufacturer": "Apple",
+      "model": "iPhone5,3",
+      "notifications_enabled": true,
+      "os_name": "iOS",
+      "os_version": "10.3.2",
+      "platform": "iOS",
+      "sdk_version": "1.6.2",
+      "time_zone": "America/New_York",
+      "token": "EF20600869F5065CEFF36871BCBE0461BD5C9A2B44E207765114A3E35009C99C",
+      "updated_at": {
+        "$date": "2016-09-29T01:32:51.062Z"
+      }
+    },
+    {
+      "_id": "A6DEE670-F245-44DB-94B6-87E00D0DED5B",
+      "aid": "37F012EF-2024-490B-8D7F-8070FBDE50C2",
+      "app_identifier": "com.torontomapleleafs.MapleLeafs",
+      "background_enabled": true,
+      "beacon_regions_monitoring": [
+        {
+          "major_number": null,
+          "minor_number": null,
+          "uuid": "B1BF7EFA-BA25-41DB-87CC-54C1461305A0"
+        },
+        {
+          "major_number": null,
+          "minor_number": null,
+          "uuid": "B435CE53-9EC2-4B20-99D1-070FEF1CDA2E"
+        }
+      ],
+      "beacon_regions_monitoring_updated_at": {
+        "$date": "2016-10-15T00:03:19.171Z"
+      },
+      "bluetooth_enabled": false,
+      "carrier": "telus",
+      "created_at": null,
+      "development": false,
+      "geofence_regions_monitoring": [
+        {
+          "id": "33.531937:-112.261187:50",
+          "latitude": 33.531937,
+          "longitude": -112.261187,
+          "radius": {"$numberLong": 50}
+        },
+        {
+          "id": "39.969408:-83.005884:50",
+          "latitude": 39.969408,
+          "longitude": -83.005884,
+          "radius": {"$numberLong":50}
+        }
+      ],
+      "geofence_regions_monitoring_updated_at": {
+        "$date": "2016-10-15T00:03:19.171Z"
+      },
+      "gimbal_mode": null,
+      "locale_lang": "en",
+      "locale_region": "ca",
+      "location": {
+        "accuracy": {"$numberLong": 65},
+        "latitude": 54.52263462912342,
+        "longitude": -128.6036643460808,
+        "timestamp": {
+          "$date": "2016-10-15T00:03:19.170Z"
+        }
+      },
+      "location_monitoring_enabled": true,
+      "manufacturer": "Apple",
+      "model": "iPhone4,1",
+      "ip": "1.2.3.4",
+      "notifications_enabled": true,
+      "os_name": "iOS",
+      "os_version": "9.3.1",
+      "platform": "iOS",
+      "remote_notifications_enabled": null,
+      "sdk_version": "1.0.0",
+      "time_zone": "America/Vancouver",
+      "token": "34adf34614e18dfc6e6bc593e41e309cacc42ce26a13cb3aee328bf554a32547",
+      "updated_at": {
+        "$date": "2016-10-02T23:29:08.035Z"
+      }
+    }
+  ],
+  "document_bucket": 2,
+  "email": "email@example.com",
+  "first_name": "first name",
+  "gender": "undefined",
+  "inbox_updated_at": {
+    "$date": "2016-09-29T01:32:51.047Z"
+  },
+  "last_name": "last name",
+  "phone_number": "911",
+  "tags": ["hello", "world"],
+  "traits": {},
+  "updated_at": {
+    "$date": "2017-05-25T23:48:57.069Z"
+  }
+}
