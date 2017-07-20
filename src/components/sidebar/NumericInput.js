@@ -2,10 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 import {
-    light,
     Select,
     silver,
-    steel,
     text,
     titanium
 } from '@rover/react-bootstrap'
@@ -17,64 +15,63 @@ class NumericInput extends Component {
     constructor(props) {
         super(props)
 
-        const { value, comparison } = this.props
+        const { numberValue, numberComparison } = this.props
         this.state = {
-            value,
-            comparison
+            numberValue,
+            numberComparison
         }
     }
-    
+
     componentDidMount() {
-        const { value } = this.state
-        this.updateValue(value)
+        const { numberValue } = this.state
+        this.updateValue(numberValue, 0)
     }
 
-    updateComparison(comparison) {
-        const { attribute, category, type, index, updateFn } = this.props
-        let value = [0]
+    updateComparison(numberComparison) {
+        const { attribute, category, __typename, index, updateFn } = this.props
+        let numberValue = [0]
 
-        if (comparison === 'in between') {
-            value = [0, 0]
+        if (numberComparison === 'in between') {
+            numberValue = [0, 0]
         }
 
-        if (comparison === 'has any value' || comparison === 'is unknown') {
-            value = [null, null]
+        if (numberComparison === 'has any value' || numberComparison === 'is unknown') {
+            numberValue = [null, null]
         }
 
         updateFn({
             attribute,
-            comparison,
+            numberComparison,
             category,
-            type,
             index,
-            value
+            numberValue,
+            __typename
         })
 
-        this.setState({ comparison, value })
+        this.setState({ numberComparison, numberValue })
     }
 
     updateValue(number, valueIndex) {
-        const { attribute, category, type, index, updateFn } = this.props
-        const { value, comparison } = this.state
+        const { attribute, category, __typename, index, updateFn } = this.props
+        const { numberValue, numberComparison } = this.state
 
-        let newValue = value
-        newValue[valueIndex] = number
+        const newValue = Object.assign([], ...numberValue, { [valueIndex]: number })
 
         updateFn({
             attribute,
-            comparison,
+            numberComparison,
             category,
-            type,
             index,
-            value: newValue
+            numberValue: newValue,
+            __typename
         })
 
-        this.setState({ newValue })
+        this.setState({ numberValue: newValue })
     }
 
     render() {
         const { attribute, category } = this.props
-        const { comparison, value } = this.state
+        const { numberComparison, numberValue } = this.state
 
         return (
             <div style={{ ...text, color: silver, width: 283 }}>
@@ -98,7 +95,6 @@ class NumericInput extends Component {
                             marginRight: 20,
                             borderColor: silver,
                             focusedBorderColor: silver,
-                            borderRadius: 0,
                             borderStyle: 'solid',
                             borderWidth: '1px',
                             borderTop: 'none',
@@ -108,7 +104,7 @@ class NumericInput extends Component {
                             paddingLeft: 5
                         }}
                         isDisabled={false}
-                        value={comparison}
+                        value={numberComparison}
                         onChange={e => this.updateComparison(e.target.value)}
                     >
                         <option value="is">Is</option>
@@ -119,25 +115,25 @@ class NumericInput extends Component {
                         <option value="is unknown">Is unknown</option>
                         <option value="has any value">Has any value</option>
                     </Select>
-                    {comparison !== 'is unknown' &&
-                        comparison !== 'has any value' &&
+                    {numberComparison !== 'is unknown' &&
+                        numberComparison !== 'has any value' &&
                         <ModalInput
                             type="number"
                             min={0}
-                            value={value[0]}
+                            value={numberValue[0]}
                             onChange={e =>
-                                this.updateValue(parseInt(e.target.value), 0)}
+                                this.updateValue(parseInt(e.target.value, 10), 0)}
                         />}
-                    {comparison === 'in between' &&
+                    {numberComparison === 'in between' &&
                         <div>
                             <span style={{ fontStyle: 'italic' }}>and</span>
                             <ModalInput
                                 type="number"
                                 min={0}
-                                value={value[1]}
+                                value={numberValue[1]}
                                 onChange={e =>
                                     this.updateValue(
-                                        parseInt(e.target.value),
+                                        parseInt(e.target.value, 10),
                                         1
                                     )}
                             />
@@ -150,17 +146,18 @@ class NumericInput extends Component {
 
 NumericInput.propTypes = {
     attribute: PropTypes.string.isRequired,
-    value: PropTypes.arrayOf(PropTypes.number).isRequired,
-    comparison: PropTypes.string.isRequired,
+    numberValue: PropTypes.arrayOf(PropTypes.number).isRequired,
+    numberComparison: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
-    updateFn: PropTypes.func.isRequired
+    updateFn: PropTypes.func.isRequired,
+    __typename: PropTypes.string.isRequired
 }
 
 NumericInput.defaultProps = {
     attribute: '',
-    value: [0],
-    comparison: 'is',
+    numberValue: [0],
+    numberComparison: 'is',
     category: 'device',
     index: 0,
     updateFn: () => null

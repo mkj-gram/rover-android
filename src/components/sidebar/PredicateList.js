@@ -1,4 +1,6 @@
+/* eslint react/prop-types: "off" */
 import React from 'react'
+import PropTypes from 'prop-types'
 import moment from 'moment'
 
 import { ash, lavender, silver, steel, text } from '@rover/react-bootstrap'
@@ -27,23 +29,19 @@ const predicateValueStyle = {
     color: lavender
 }
 
-const renderPredicate = (value, comparison, type) => {
-    switch (type) {
-        case 'boolean':
-            return renderBooleanPredicate(comparison, value)
-            break
-        case 'string':
-            return renderStringPredicate(comparison, value)
-            break
-        case 'date':
-            return renderDatePredicate(comparison, value)
-            break
-        case 'version':
-            return renderVersionPredicate(comparison, value)
-            break
-        case 'number':
-            return renderNumericPredicate(comparison, value)
-            break
+const renderPredicate = ({ __typename, ...rest }) => {
+    switch (__typename) {
+        case 'BooleanPredicate':
+            return renderBooleanPredicate(rest)
+        case 'StringPredicate':
+            return renderStringPredicate(rest)
+        case 'DatePredicate':
+            return renderDatePredicate(rest)
+        case 'VersionPredicate':
+            return renderVersionPredicate(rest)
+        case 'NumberPredicate':
+            return renderNumericPredicate(rest)
+        default:
     }
 }
 
@@ -53,65 +51,65 @@ const renderPredicateComparison = comparison =>
 const renderPredicateValue = value =>
     <span style={predicateValueStyle}>{value}</span>
 
-const renderBooleanPredicate = (comparison, value) =>
-    <div>
-        {renderPredicateValue(value ? 'ON' : 'OFF')}
-    </div>
-const renderStringPredicate = (comparison, value) =>
-    <div>
-        {renderPredicateComparison(comparison)}
-        {renderPredicateValue(value)}
-    </div>
+const renderBooleanPredicate = ({ booleanValue }) =>
+    (<div>
+        {renderPredicateValue(booleanValue ? 'ON' : 'OFF')}
+    </div>)
+const renderStringPredicate = ({ stringComparison, stringValue }) =>
+    (<div>
+        {renderPredicateComparison(stringComparison)}
+        {renderPredicateValue(stringValue)}
+    </div>)
 
-const renderDatePredicate = (comparison, value) => {
-    if (['exactly', 'less than', 'more than'].includes(comparison)) {
+const renderDatePredicate = ({ dateComparison, dateValue }) => {
+    if (['exactly', 'less than', 'more than'].includes(dateComparison)) {
         return (
             <div>
-                {renderPredicateComparison(comparison)}
-                {renderPredicateValue(moment().diff(value.start, 'd'))}
+                {renderPredicateComparison(dateComparison)}
+                {renderPredicateValue(moment().diff(dateValue.start, 'd'))}
                 {renderPredicateComparison('days ago')}
             </div>
         )
     }
 
-    if (['after', 'on', 'before'].includes(comparison)) {
+    if (['after', 'on', 'before'].includes(dateComparison)) {
         return (
             <div>
-                {renderPredicateComparison(comparison)}
+                {renderPredicateComparison(dateComparison)}
                 {renderPredicateValue(
-                    moment(value.start).format('MMM Do, YYYY')
+                    moment(dateValue.start).format('MMM Do, YYYY')
                 )}
             </div>
         )
     }
 
-    if (comparison === 'in between') {
+    if (dateComparison === 'in between') {
         return (
             <div>
                 {renderPredicateComparison('between')}
                 {renderPredicateValue(
-                    moment(value.start).format('MMM Do, YYYY')
+                    moment(dateValue.start).format('MMM Do, YYYY')
                 )}
                 {renderPredicateComparison('and')}
-                {renderPredicateValue(moment(value.end).format('MMM Do, YYYY'))}
+                {renderPredicateValue(moment(dateValue.end).format('MMM Do, YYYY'))}
             </div>
         )
     }
 }
 
-const renderVersionPredicate = (comparison, value) => {
-    if (comparison === 'is unknown') {
-        return renderPredicateComparison(comparison)
+const renderVersionPredicate = ({ versionComparison, versionValue }) => {
+    if (versionComparison === 'is unknown') {
+        return renderPredicateComparison(versionComparison)
     }
 
-    if (comparison === 'in between') {
-        const firstValue = value
+    if (versionComparison === 'in between') {
+        const firstValue = versionValue
             .slice(0, 3)
             .map((num, index) =>
                 <span key={index}>{num}{index < 2 && '.'}</span>
             )
 
-        const secondValue = value
+        const secondValue = versionValue
             .slice(3)
             .map((num, index) =>
                 <span key={index}>{num}{index < 2 && '.'}</span>
@@ -129,9 +127,9 @@ const renderVersionPredicate = (comparison, value) => {
 
     return (
         <div>
-            {renderPredicateComparison(comparison)}
+            {renderPredicateComparison(versionComparison)}
             {renderPredicateValue(
-                value
+                versionValue
                     .slice(0, 3)
                     .map((num, index) =>
                         <span key={index}>{num}{index < 2 && '.'}</span>
@@ -141,26 +139,26 @@ const renderVersionPredicate = (comparison, value) => {
     )
 }
 
-const renderNumericPredicate = (comparison, value) => {
-    if (comparison === 'has any value' || comparison === 'is unknown') {
-        return renderPredicateComparison(comparison)
+const renderNumericPredicate = ({ numberComparison, numberValue }) => {
+    if (numberComparison === 'has any value' || numberComparison === 'is unknown') {
+        return renderPredicateComparison(numberComparison)
     }
 
-    if (comparison === 'in between') {
+    if (numberComparison === 'in between') {
         return (
             <div>
                 {renderPredicateComparison('between')}
-                {renderPredicateValue(value[0])}
+                {renderPredicateValue(numberValue[0])}
                 {renderPredicateComparison('and')}
-                {renderPredicateValue(value[1])}
+                {renderPredicateValue(numberValue[1])}
             </div>
         )
     }
 
     return (
         <div>
-            {renderPredicateComparison(comparison)}
-            {renderPredicateValue(value)}
+            {renderPredicateComparison(numberComparison)}
+            {renderPredicateValue(numberValue)}
         </div>
     )
 }
@@ -184,7 +182,6 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
         fontSize: 12,
         color: steel,
         position: 'relative',
-        display: 'flex',
         flexWrap: 'wrap'
     }
 
@@ -199,8 +196,8 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
 
     return (
         <div style={listStyle} id="predicateList">
-            {query.map(({ attribute, value, comparison, type }, index) => {
-                return (
+            {query.map(({ attribute, ...rest }, index) =>
+                (
                     <div key={index}>
                         <div
                             style={predicateStyle}
@@ -220,7 +217,7 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
                                     {attribute}:
                                 </div>
                                 <div style={{ flex: '1 1 auto' }}>
-                                    {renderPredicate(value, comparison, type)}
+                                    {renderPredicate(rest)}
                                 </div>
                             </div>
                             <RemoveIcon
@@ -254,9 +251,15 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
                             </div>}
                     </div>
                 )
-            })}
+            )}
         </div>
     )
+}
+
+PredicateList.propTypes = {
+    query: PropTypes.object.isRequired,
+    viewModal: PropTypes.func.isRequired,
+    removePredicate: PropTypes.func.isRequired
 }
 
 export default PredicateList
