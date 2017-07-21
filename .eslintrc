@@ -18,6 +18,7 @@
         'jsx-a11y/no-static-element-interactions': ['off', {}],
         'react/no-did-mount-set-state': 'off',
         'react/no-children-prop': 'off',
-        'no-confusing-arrow': 'off'
+        'no-confusing-arrow': 'off',
+        'no-plusplus': 'off'
     }
 }

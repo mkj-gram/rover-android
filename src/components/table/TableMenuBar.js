@@ -150,10 +150,10 @@ class TableMenuBar extends Component {
                                 color: graphite
                             }}
                         >
-                            45,251
+                            {this.props.segmentSize}
                         </div>
                         <div style={{ ...text, fontSize: 13, color: silver }}>
-                            of 77,231 total devices
+                            of {this.props.totalSize} total devices
                         </div>
                     </div>
 
