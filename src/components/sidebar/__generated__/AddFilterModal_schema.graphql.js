@@ -11,11 +11,11 @@ import type {ConcreteFragment} from 'relay-runtime';
 export type AddFilterModal_schema = {|
   +deviceSchema: $ReadOnlyArray<?{|
     +attribute: string;
-    +type: string;
+    +__typename: string;
   |}>;
   +profileSchema: $ReadOnlyArray<?{|
     +attribute: string;
-    +type: string;
+    +__typename: string;
   |}>;
 |};
 */
@@ -44,7 +44,7 @@ const fragment /*: ConcreteFragment*/ = {
         },
         {
           "kind": "ScalarField",
-          "alias": null,
+          "alias": "__typename",
           "args": null,
           "name": "type",
           "storageKey": null
@@ -69,7 +69,7 @@ const fragment /*: ConcreteFragment*/ = {
         },
         {
           "kind": "ScalarField",
-          "alias": null,
+          "alias": "__typename",
           "args": null,
           "name": "type",
           "storageKey": null

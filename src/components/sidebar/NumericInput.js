@@ -55,8 +55,7 @@ class NumericInput extends Component {
         const { attribute, category, __typename, index, updateFn } = this.props
         const { numberValue, numberComparison } = this.state
 
-        const newValue = Object.assign([], ...numberValue, { [valueIndex]: number })
-
+        const newValue = numberValue.map((num, i) => i === valueIndex ? number : num)
         updateFn({
             attribute,
             numberComparison,

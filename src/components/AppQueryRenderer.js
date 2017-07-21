@@ -12,16 +12,16 @@ const AppQueryRendererQuery = graphql`
 `
 
 const AppQueryRenderer = () =>
-    <QueryRenderer
+    (<QueryRenderer
         environment={environment}
         query={AppQueryRendererQuery}
         render={({ error, props }) =>
             error
                 ? <div>Error</div>
                 : <div style={{ display: 'flex', flex: '1 1 100%' }}>
-                      <SideBar data={props} />
+                     {props && <SideBar data={props} />}
                       <AudienceTable />
                   </div>}
-    />
+    />)
 
 export default AppQueryRenderer

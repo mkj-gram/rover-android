@@ -56,7 +56,7 @@ class VersionInput extends Component {
         let newVersionValue
 
         if (versionComparison === 'in between') {
-            newVersionValue = Object.assign([], ...versionValue, { 3: 0, 4: 0, 5: 0 })
+            newVersionValue = versionValue.slice(0, 3).concat([0, 0, 0])
         } else {
             newVersionValue = versionValue.slice(0, 3)
         }
