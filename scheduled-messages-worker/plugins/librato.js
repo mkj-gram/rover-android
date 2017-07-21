@@ -12,8 +12,16 @@ module.exports.register = function(server, opts, next) {
     librato.configure({ email: Config.get('/librato/email'), token: Config.get('/librato/token'), prefix: Config.get('/librato/prefix')});
     librato.start();
 
+    librato.on('error', function(err) {
+        console.error("Librato Error", err)
+    })
+
     highResolutionLibrato.configure({ email: Config.get('/librato/email'), token: Config.get('/librato/token'), prefix: Config.get('/librato/prefix'), period: 2500});
     highResolutionLibrato.start();
+
+    highResolutionLibrato.on('error', function(err) {
+        console.error("Librato Error", err)
+    })
 
     server.plugins.librato = {};
     server.plugins.librato.client = librato;
