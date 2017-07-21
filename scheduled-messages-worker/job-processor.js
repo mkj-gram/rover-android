@@ -52,30 +52,6 @@ const parseCustomer = (customer) => {
     }
 }
 
-const roverApnsProductionClient = new apn.Provider({
-    pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/rover-cert.p12')),
-    passphrase: 'password',
-    production: true
-});
-
-const roverApnsDevelopmentClient = new apn.Provider({
-    pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/rover-cert.p12')),
-    passphrase: 'password',
-    production: false
-});
-
-const roverDebugApnsProductionClient = new apn.Provider({
-    pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.debug.p12')),
-    passphrase: null,
-    production: true
-});
-
-const roverDebugApnsDevelopmentClient = new apn.Provider({
-    pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.debug.p12')),
-    passphrase: null,
-    production: false
-});
-
 const roverInboxApnsProductionClient = new apn.Provider({
     pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.inbox.p12')),
     passphrase: null,
