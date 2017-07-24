@@ -259,7 +259,7 @@ type GetLoadJobRequest struct {
 	LoadJobId   int32                      `protobuf:"varint,2,opt,name=load_job_id,json=loadJobId" json:"load_job_id,omitempty"`
 	//
 	// 0 -> static-segments (default)
-	// 1 -> static-segment
+	// 1 -> static-segments
 	// 2 -> load-jobs
 	QueueVersion int32 `protobuf:"varint,3,opt,name=queue_version,json=queueVersion" json:"queue_version,omitempty"`
 }

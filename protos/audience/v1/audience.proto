@@ -48,6 +48,9 @@ service Audience {
   rpc UpdateDeviceGeofenceMonitoring(UpdateDeviceGeofenceMonitoringRequest) returns (google.protobuf.Empty);
   rpc UpdateDeviceIBeaconMonitoring(UpdateDeviceIBeaconMonitoringRequest) returns (google.protobuf.Empty);
 
+  // Lists
+  rpc ListDevicesByProfileId(ListDevicesByProfileIdRequest) returns (ListDevicesByProfileIdResponse);
+
   // SetDeviceProfile sets the profile the device belongs to
   rpc SetDeviceProfile(SetDeviceProfileRequest) returns (google.protobuf.Empty);
 
@@ -190,6 +193,15 @@ message SetDeviceProfileRequest {
 
   string device_id = 2;
   string profile_id = 3;
+}
+
+message ListDevicesByProfileIdRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string profile_id = 2;
+}
+
+message ListDevicesByProfileIdResponse {
+  repeated Device devices = 1;
 }
 
 // Every event comes with DeviceContext populated

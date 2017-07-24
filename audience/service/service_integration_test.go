@@ -61,6 +61,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("UpdateDeviceIBeaconMonitoring", testAudienceService_UpdateDeviceIBeaconMonitoring)
 	t.Run("DeleteDevice", testAudienceService_DeleteDevice)
 	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfile)
+	t.Run("ListDevicesByProfileId", testAudienceService_ListDevicesByProfileId)
 }
 
 func testAudienceService_CreateProfile(t *testing.T) {
@@ -2758,6 +2759,112 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 					t.Errorf("After:\n%v", difff(diff))
 				}
+			}
+		})
+	}
+}
+
+func testAudienceService_ListDevicesByProfileId(t *testing.T) {
+	var (
+		ctx = context.TODO()
+		// createdAt = protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z"))
+
+		mongodb = dialMongo(t, *tMongoDSN)
+		db      = mongo.NewDB(mongodb,
+			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+		)
+		svc = service.New(db)
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	tcases := []struct {
+		name string
+		req  *audience.ListDevicesByProfileIdRequest
+
+		exp    *audience.ListDevicesByProfileIdResponse
+		expErr error
+	}{
+		{
+			name: "error: validation: blank id",
+			req: &audience.ListDevicesByProfileIdRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileId:   "",
+			},
+
+			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: ProfileId: blank"),
+		},
+		{
+			name: "error: not found: profile",
+			req: &audience.ListDevicesByProfileIdRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileId:   "000000000000000000000000",
+			},
+
+			expErr: grpc.Errorf(codes.NotFound, "db.ListDevicesByProfileId: profileExists: not found"),
+		},
+
+		{
+			name: "profiles with no devices",
+			req: &audience.ListDevicesByProfileIdRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileId:   "d0000000000000000000000d",
+			},
+
+			expErr: nil,
+			exp:    &audience.ListDevicesByProfileIdResponse{nil},
+		},
+
+		{
+			name: "wrong account",
+			req: &audience.ListDevicesByProfileIdRequest{
+				AuthContext: &auth.AuthContext{AccountId: 100},
+				ProfileId:   "000000000000000000000bb2",
+			},
+
+			expErr: nil,
+			exp:    &audience.ListDevicesByProfileIdResponse{nil},
+		},
+
+		{
+			name: "finds devices",
+			req: &audience.ListDevicesByProfileIdRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileId:   "000000000000000000000bb2",
+			},
+
+			expErr: nil,
+
+			exp: &audience.ListDevicesByProfileIdResponse{
+				[]*audience.Device{
+					{
+						AccountId: 1,
+						Id:        "d00000000000000000000bb0",
+						DeviceId:  "d-bb0",
+						ProfileId: "000000000000000000000bb2",
+						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					},
+					{
+						AccountId: 1,
+						Id:        "d00000000000000000000bb2",
+						DeviceId:  "d-bb2",
+						ProfileId: "000000000000000000000bb2",
+						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, gotErr := client.ListDevicesByProfileId(ctx, tc.req)
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
 			}
 		})
 	}

@@ -1,4 +1,22 @@
 {
+  "_id": {"$oid": "000000000000000000000bb2"},
+  "account_id": 1,
+  "identifier": "00000000-0000-0000-0000-000000000bb2",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": null
+}
+
+{
+  "_id": {"$oid": "d0000000000000000000000d"},
+  "account_id": 1,
+  "identifier": "d0000000-0000-0000-0000-000000000000",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": null
+}
+
+{
   "_id": {"$oid": "dddddddddddddddddddddddd"},
   "account_id": 1,
   "identifier": "11111111-1111-1111-1111-dddddddddddd",

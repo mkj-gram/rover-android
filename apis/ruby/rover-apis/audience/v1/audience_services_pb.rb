@@ -47,6 +47,8 @@ module Rover
           rpc :UpdateDeviceLocation, UpdateDeviceLocationRequest, Google::Protobuf::Empty
           rpc :UpdateDeviceGeofenceMonitoring, UpdateDeviceGeofenceMonitoringRequest, Google::Protobuf::Empty
           rpc :UpdateDeviceIBeaconMonitoring, UpdateDeviceIBeaconMonitoringRequest, Google::Protobuf::Empty
+          # Lists
+          rpc :ListDevicesByProfileId, ListDevicesByProfileIdRequest, ListDevicesByProfileIdResponse
           # SetDeviceProfile sets the profile the device belongs to
           rpc :SetDeviceProfile, SetDeviceProfileRequest, Google::Protobuf::Empty
           # DeleteDevice deletes device from the database and removes it from any segments

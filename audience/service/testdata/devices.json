@@ -26,3 +26,7 @@
   "device_token_unregistered_at": null
 }
 
+
+
+{"_id":{"$oid":"d00000000000000000000bb0"},"device_id":"d-bb0","profile_id":{"$oid":"000000000000000000000bb2"},"account_id":1, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
+{"_id":{"$oid":"d00000000000000000000bb2"},"device_id":"d-bb2","profile_id":{"$oid":"000000000000000000000bb2"},"account_id":1, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}

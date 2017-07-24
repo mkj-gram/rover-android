@@ -117,6 +117,28 @@ function deserialize_rover_audience_v1_GetProfileSchemaRequest(buffer_arg) {
   return audience_v1_audience_pb.GetProfileSchemaRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_ListDevicesByProfileIdRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.ListDevicesByProfileIdRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.ListDevicesByProfileIdRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_ListDevicesByProfileIdRequest(buffer_arg) {
+  return audience_v1_audience_pb.ListDevicesByProfileIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_ListDevicesByProfileIdResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.ListDevicesByProfileIdResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.ListDevicesByProfileIdResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_ListDevicesByProfileIdResponse(buffer_arg) {
+  return audience_v1_audience_pb.ListDevicesByProfileIdResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_Profile(arg) {
   if (!(arg instanceof audience_v1_audience_pb.Profile)) {
     throw new Error('Expected argument of type rover.audience.v1.Profile');
@@ -420,6 +442,18 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_UpdateDeviceIBeaconMonitoringRequest,
     responseSerialize: serialize_google_protobuf_Empty,
     responseDeserialize: deserialize_google_protobuf_Empty,
+  },
+  // Lists
+  listDevicesByProfileId: {
+    path: '/rover.audience.v1.Audience/ListDevicesByProfileId',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.ListDevicesByProfileIdRequest,
+    responseType: audience_v1_audience_pb.ListDevicesByProfileIdResponse,
+    requestSerialize: serialize_rover_audience_v1_ListDevicesByProfileIdRequest,
+    requestDeserialize: deserialize_rover_audience_v1_ListDevicesByProfileIdRequest,
+    responseSerialize: serialize_rover_audience_v1_ListDevicesByProfileIdResponse,
+    responseDeserialize: deserialize_rover_audience_v1_ListDevicesByProfileIdResponse,
   },
   // SetDeviceProfile sets the profile the device belongs to
   setDeviceProfile: {

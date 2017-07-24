@@ -595,7 +595,7 @@ func (s *devicesStore) SetDeviceProfile(ctx context.Context, r *audience.SetDevi
 	if err != nil {
 		err = &ErrorInvalidArgument{
 			ArgumentName: "ProfileId",
-			Value:        r.GetProfileId(),
+			Value:        profile_id,
 			error:        err,
 		}
 		return wrapError(err, "StringToObjectID: ProfileId")
@@ -620,4 +620,43 @@ func (s *devicesStore) SetDeviceProfile(ctx context.Context, r *audience.SetDevi
 	}
 
 	return nil
+}
+
+func (s *devicesStore) ListDevicesByProfileId(ctx context.Context, r *audience.ListDevicesByProfileIdRequest) ([]*audience.Device, error) {
+	var (
+		account_id = r.GetAuthContext().GetAccountId()
+		profile_id = r.GetProfileId()
+	)
+
+	pid, err := StringToObjectID(profile_id)
+	if err != nil {
+		err = &ErrorInvalidArgument{
+			error:        err,
+			ArgumentName: "ProfileId",
+			Value:        profile_id,
+		}
+		return nil, wrapError(err, "StringToObjectID: ProfileId")
+	}
+
+	if err := s.profileExists(ctx, pid.Hex()); err != nil {
+		return nil, errors.Wrap(err, "profileExists")
+	}
+
+	var (
+		devices []Device
+		Q       = bson.M{"account_id": account_id, "profile_id": pid}
+	)
+
+	if err := s.devices.Find(Q).All(&devices); err != nil {
+		return nil, wrapError(err, "devices.Find")
+	}
+
+	var protoDevices = make([]*audience.Device, len(devices))
+
+	for i := range devices {
+		protoDevices[i] = new(audience.Device)
+		devices[i].toProto(protoDevices[i])
+	}
+
+	return protoDevices, nil
 }

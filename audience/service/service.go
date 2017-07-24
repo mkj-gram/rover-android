@@ -48,8 +48,10 @@ type (
 		UpdateDeviceIBeaconMonitoring(context.Context, *audience.UpdateDeviceIBeaconMonitoringRequest) error
 		UpdateDeviceGeofenceMonitoring(context.Context, *audience.UpdateDeviceGeofenceMonitoringRequest) error
 
-		DeleteDevice(context.Context, *audience.DeleteDeviceRequest) error
 		SetDeviceProfile(context.Context, *audience.SetDeviceProfileRequest) error
+		DeleteDevice(context.Context, *audience.DeleteDeviceRequest) error
+
+		ListDevicesByProfileId(context.Context, *audience.ListDevicesByProfileIdRequest) ([]*audience.Device, error)
 	}
 
 	// Option is a Server option type
@@ -170,6 +172,18 @@ func (s *Server) UpdateDeviceIBeaconMonitoring(ctx context.Context, r *audience.
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceIBeaconMonitoring: %v", err)
 	}
 	return emptyResp, nil
+}
+
+func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDevicesByProfileIdRequest) (*audience.ListDevicesByProfileIdResponse, error) {
+	if err := validateID(r.GetProfileId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
+	}
+
+	devices, err := s.db.ListDevicesByProfileId(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileId: %v", err)
+	}
+	return &audience.ListDevicesByProfileIdResponse{devices}, nil
 }
 
 // Profiles
