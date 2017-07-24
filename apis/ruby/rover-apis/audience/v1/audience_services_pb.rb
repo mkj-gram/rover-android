@@ -39,6 +39,7 @@ module Rover
           #
           # GetDevice returns the device for a given device id
           rpc :GetDevice, GetDeviceRequest, Device
+          rpc :GetDeviceByPushToken, GetDeviceByPushTokenRequest, Device
           rpc :CreateDevice, CreateDeviceRequest, Google::Protobuf::Empty
           # Device Updates
           rpc :UpdateDevice, UpdateDeviceRequest, Google::Protobuf::Empty

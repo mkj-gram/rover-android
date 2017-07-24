@@ -73,6 +73,17 @@ function deserialize_rover_audience_v1_Device(buffer_arg) {
   return audience_v1_audience_pb.Device.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_GetDeviceByPushTokenRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetDeviceByPushTokenRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetDeviceByPushTokenRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetDeviceByPushTokenRequest(buffer_arg) {
+  return audience_v1_audience_pb.GetDeviceByPushTokenRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_GetDeviceRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.GetDeviceRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.GetDeviceRequest');
@@ -362,6 +373,17 @@ var AudienceService = exports.AudienceService = {
     responseType: audience_v1_audience_pb.Device,
     requestSerialize: serialize_rover_audience_v1_GetDeviceRequest,
     requestDeserialize: deserialize_rover_audience_v1_GetDeviceRequest,
+    responseSerialize: serialize_rover_audience_v1_Device,
+    responseDeserialize: deserialize_rover_audience_v1_Device,
+  },
+  getDeviceByPushToken: {
+    path: '/rover.audience.v1.Audience/GetDeviceByPushToken',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.GetDeviceByPushTokenRequest,
+    responseType: audience_v1_audience_pb.Device,
+    requestSerialize: serialize_rover_audience_v1_GetDeviceByPushTokenRequest,
+    requestDeserialize: deserialize_rover_audience_v1_GetDeviceByPushTokenRequest,
     responseSerialize: serialize_rover_audience_v1_Device,
     responseDeserialize: deserialize_rover_audience_v1_Device,
   },

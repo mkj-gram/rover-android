@@ -284,6 +284,27 @@ func (s *devicesStore) GetDevice(ctx context.Context, r *audience.GetDeviceReque
 	return &proto, nil
 }
 
+func (s *devicesStore) GetDeviceByPushToken(ctx context.Context, r *audience.GetDeviceByPushTokenRequest) (*audience.Device, error) {
+	var (
+		device_token_key = r.GetDeviceTokenKey()
+		account_id       = r.GetAuthContext().GetAccountId()
+
+		d Device
+		Q = bson.M{"device_token_key": device_token_key, "account_id": account_id}
+	)
+
+	if err := s.devices.Find(Q).One(&d); err != nil {
+		return nil, wrapError(err, "devices.Find")
+	}
+
+	var proto audience.Device
+	if err := d.toProto(&proto); err != nil {
+		return nil, wrapError(err, "device.toProto")
+	}
+
+	return &proto, nil
+}
+
 func (s *devicesStore) profileExists(ctx context.Context, profile_id string) error {
 
 	profile_oid, err := StringToObjectID(profile_id)

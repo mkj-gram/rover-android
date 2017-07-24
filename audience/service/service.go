@@ -40,7 +40,10 @@ type (
 
 		// Devices
 		GetDevice(context.Context, *audience.GetDeviceRequest) (*audience.Device, error)
+		GetDeviceByPushToken(context.Context, *audience.GetDeviceByPushTokenRequest) (*audience.Device, error)
+
 		CreateDevice(context.Context, *audience.CreateDeviceRequest) error
+
 		UpdateDevice(context.Context, *audience.UpdateDeviceRequest) error
 		UpdateDevicePushToken(context.Context, *audience.UpdateDevicePushTokenRequest) error
 		UpdateDeviceUnregisterPushToken(context.Context, *audience.UpdateDeviceUnregisterPushTokenRequest) error
@@ -82,6 +85,20 @@ func (s *Server) GetDevice(ctx context.Context, r *audience.GetDeviceRequest) (*
 	d, err := s.db.GetDevice(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDevice: %v", err)
+	}
+
+	return d, nil
+}
+
+// GetDeviceByPushToken implements the corresponding rpc
+func (s *Server) GetDeviceByPushToken(ctx context.Context, r *audience.GetDeviceByPushTokenRequest) (*audience.Device, error) {
+	if err := validateID(r.GetDeviceTokenKey()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceTokenKey: %v", err)
+	}
+
+	d, err := s.db.GetDeviceByPushToken(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceByPushToken: %v", err)
 	}
 
 	return d, nil

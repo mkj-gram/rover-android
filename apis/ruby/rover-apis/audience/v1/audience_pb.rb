@@ -50,6 +50,10 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
   end
+  add_message "rover.audience.v1.GetDeviceByPushTokenRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :device_token_key, :string, 2
+  end
   add_message "rover.audience.v1.CreateDeviceRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :profile_id, :string, 2
@@ -258,6 +262,7 @@ module Rover
       Profile = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Profile").msgclass
       ProfileSchema = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ProfileSchema").msgclass
       GetDeviceRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetDeviceRequest").msgclass
+      GetDeviceByPushTokenRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetDeviceByPushTokenRequest").msgclass
       CreateDeviceRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.CreateDeviceRequest").msgclass
       UpdateDevicePushTokenRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDevicePushTokenRequest").msgclass
       UpdateDeviceUnregisterPushTokenRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceUnregisterPushTokenRequest").msgclass

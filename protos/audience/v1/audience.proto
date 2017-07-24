@@ -37,6 +37,7 @@ service Audience {
 
   // GetDevice returns the device for a given device id
   rpc GetDevice(GetDeviceRequest) returns (Device);
+  rpc GetDeviceByPushToken(GetDeviceByPushTokenRequest) returns (Device);
 
   rpc CreateDevice(CreateDeviceRequest) returns (google.protobuf.Empty);
 
@@ -134,6 +135,12 @@ message GetDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
 
   string device_id = 2;
+}
+
+message GetDeviceByPushTokenRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string device_token_key = 2;
 }
 
 message CreateDeviceRequest {

@@ -52,6 +52,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("GetProfileSchema", testAudienceService_GetProfilesSchema)
 
 	t.Run("GetDevice", testAudienceService_GetDevice)
+	t.Run("GetDeviceByPushToken", testAudienceService_GetDeviceByPushToken)
 	t.Run("CreateDevice", testAudienceService_CreateDevice)
 	t.Run("UpdateDevice", testAudienceService_UpdateDevice)
 	t.Run("UpdateDevicePushToken", testAudienceService_UpdateDevicePushToken)
@@ -1583,6 +1584,94 @@ func testAudienceService_GetDevice(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 			got, gotErr := client.GetDevice(ctx, tc.req)
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func testAudienceService_GetDeviceByPushToken(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		mongodb = dialMongo(t, *tMongoDSN)
+		db      = mongo.NewDB(mongodb,
+			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+		)
+		svc = service.New(db)
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	tcases := []struct {
+		name string
+		req  *audience.GetDeviceByPushTokenRequest
+
+		exp    *audience.Device
+		expErr error
+	}{
+		{
+			name: "error: validation: blank id",
+			req: &audience.GetDeviceByPushTokenRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 0},
+				DeviceTokenKey: "",
+			},
+
+			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceTokenKey: blank"),
+		},
+
+		{
+			name: "error: not found",
+			req: &audience.GetDeviceByPushTokenRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 1},
+				DeviceTokenKey: "doesntexists",
+			},
+
+			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceByPushToken: devices.Find: not found"),
+		},
+
+		{
+			name: "error: account: invalid",
+			req: &audience.GetDeviceByPushTokenRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 100},
+				DeviceTokenKey: "token:bbbbbbbbbbbbbbbbbbbbbbbb",
+			},
+
+			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceByPushToken: devices.Find: not found"),
+		},
+
+		{
+			name: "finds device",
+			req: &audience.GetDeviceByPushTokenRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 1},
+				DeviceTokenKey: "token:bbbbbbbbbbbbbbbbbbbbbbbb",
+			},
+
+			expErr: nil,
+
+			exp: &audience.Device{
+				Id:        "bbbbbbbbbbbbbbbbbbbbbbbb",
+				DeviceId:  "BBBBBBBB",
+				AccountId: 1,
+				ProfileId: "bbbbbbbbbbbbbbbbbbbbbbbb",
+
+				CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+				UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+
+				DeviceTokenKey:       "token:bbbbbbbbbbbbbbbbbbbbbbbb",
+				DeviceTokenIsActive:  true,
+				DeviceTokenCreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+				DeviceTokenUpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, gotErr := client.GetDeviceByPushToken(ctx, tc.req)
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}
