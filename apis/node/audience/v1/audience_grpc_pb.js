@@ -150,6 +150,28 @@ function deserialize_rover_audience_v1_ListDevicesByProfileIdResponse(buffer_arg
   return audience_v1_audience_pb.ListDevicesByProfileIdResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_ListProfilesByIdsRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.ListProfilesByIdsRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.ListProfilesByIdsRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_ListProfilesByIdsRequest(buffer_arg) {
+  return audience_v1_audience_pb.ListProfilesByIdsRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_ListProfilesByIdsResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.ListProfilesByIdsResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.ListProfilesByIdsResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_ListProfilesByIdsResponse(buffer_arg) {
+  return audience_v1_audience_pb.ListProfilesByIdsResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_Profile(arg) {
   if (!(arg instanceof audience_v1_audience_pb.Profile)) {
     throw new Error('Expected argument of type rover.audience.v1.Profile');
@@ -347,6 +369,17 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_GetProfileByIdentifierRequest,
     responseSerialize: serialize_rover_audience_v1_Profile,
     responseDeserialize: deserialize_rover_audience_v1_Profile,
+  },
+  listProfilesByIds: {
+    path: '/rover.audience.v1.Audience/ListProfilesByIds',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.ListProfilesByIdsRequest,
+    responseType: audience_v1_audience_pb.ListProfilesByIdsResponse,
+    requestSerialize: serialize_rover_audience_v1_ListProfilesByIdsRequest,
+    requestDeserialize: deserialize_rover_audience_v1_ListProfilesByIdsRequest,
+    responseSerialize: serialize_rover_audience_v1_ListProfilesByIdsResponse,
+    responseDeserialize: deserialize_rover_audience_v1_ListProfilesByIdsResponse,
   },
   // GetProfileSchema returns the currently tracked profiles schema by account id
   getProfileSchema: {

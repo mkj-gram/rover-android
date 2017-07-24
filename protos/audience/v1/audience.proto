@@ -28,6 +28,8 @@ service Audience {
   rpc GetProfileByDeviceId(GetProfileByDeviceIdRequest) returns (Profile);
   rpc GetProfileByIdentifier(GetProfileByIdentifierRequest) returns (Profile);
 
+  rpc ListProfilesByIds(ListProfilesByIdsRequest) returns (ListProfilesByIdsResponse);
+
   // GetProfileSchema returns the currently tracked profiles schema by account id
   rpc GetProfileSchema(GetProfileSchemaRequest) returns (ProfileSchema);
 
@@ -98,6 +100,16 @@ message GetProfileByDeviceIdRequest {
 message GetProfileByIdentifierRequest {
   auth.v1.AuthContext auth_context = 1;
   string identifier = 2;
+}
+
+message ListProfilesByIdsRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  repeated string profile_ids = 2;
+}
+
+message ListProfilesByIdsResponse {
+  repeated Profile profiles = 2;
 }
 
 message GetProfileSchemaRequest {

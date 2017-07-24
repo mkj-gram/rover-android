@@ -32,10 +32,16 @@ type (
 		// Profiles
 		CreateProfile(context.Context, *audience.CreateProfileRequest) (*audience.Profile, error)
 		DeleteProfile(context.Context, *audience.DeleteProfileRequest) error
+
 		UpdateProfile(context.Context, *audience.UpdateProfileRequest) error
 		UpdateProfileIdentifier(context.Context, *audience.UpdateProfileIdentifierRequest) error
+
 		GetProfileByDeviceId(context.Context, *audience.GetProfileByDeviceIdRequest) (*audience.Profile, error)
 		GetProfileByIdentifier(context.Context, *audience.GetProfileByIdentifierRequest) (*audience.Profile, error)
+
+		ListProfilesByIds(context.Context, *audience.ListProfilesByIdsRequest) ([]*audience.Profile, error)
+
+		// Profiles Schema
 		GetProfileSchema(context.Context, *audience.GetProfileSchemaRequest) (*audience.ProfileSchema, error)
 
 		// Devices
@@ -256,6 +262,16 @@ func (s *Server) GetProfileSchema(ctx context.Context, r *audience.GetProfileSch
 	}
 
 	return p, nil
+}
+
+// ListProfilesByIdsRequest implements the corresponding rpc
+func (s *Server) ListProfilesByIds(ctx context.Context, r *audience.ListProfilesByIdsRequest) (*audience.ListProfilesByIdsResponse, error) {
+	ps, err := s.db.ListProfilesByIds(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListProfilesByIds: %v", err)
+	}
+
+	return &audience.ListProfilesByIdsResponse{ps}, nil
 }
 
 // UpdateProfile implements the corresponding rpc

@@ -281,6 +281,46 @@ func (s *profilesStore) GetProfileByIdentifier(ctx context.Context, r *audience.
 	return &proto, nil
 }
 
+func (s *profilesStore) ListProfilesByIds(ctx context.Context, r *audience.ListProfilesByIdsRequest) ([]*audience.Profile, error) {
+	var (
+		account_id  = r.GetAuthContext().GetAccountId()
+		profile_ids = r.GetProfileIds()
+
+		profile_oids = make([]bson.ObjectId, len(profile_ids))
+	)
+
+	for i := range profile_ids {
+		poid, err := StringToObjectID(profile_ids[i])
+		if err != nil {
+			err = ErrorInvalidArgument{
+				error:        err,
+				ArgumentName: "ProfileId",
+				Value:        profile_ids[i],
+			}
+			return nil, wrapError(err, "StringToObjectID")
+		}
+		profile_oids[i] = poid
+	}
+
+	var (
+		profiles []Profile
+
+		Q = bson.M{"account_id": account_id, "_id": bson.M{"$in": profile_oids}}
+	)
+
+	if err := s.profiles.Find(Q).Sort("_id").All(&profiles); err != nil {
+		return nil, wrapError(err, "profiles.Find")
+	}
+
+	var protoProfiles = make([]*audience.Profile, len(profiles))
+	for i := range profiles {
+		protoProfiles[i] = new(audience.Profile)
+		profiles[i].toProto(protoProfiles[i])
+	}
+
+	return protoProfiles, nil
+}
+
 func (s *profilesStore) GetProfileSchema(ctx context.Context, r *audience.GetProfileSchemaRequest) (*audience.ProfileSchema, error) {
 	var (
 		account_id = r.GetAuthContext().GetAccountId()

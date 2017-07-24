@@ -43,14 +43,20 @@ func TestAudienceService(t *testing.T) {
 	loadFixture(t, profiles, "testdata/profiles.json")
 	loadFixture(t, profiles_schemas, "testdata/profiles_schemas.json")
 
+	// Profiles
 	t.Run("CreateProfile", testAudienceService_CreateProfile)
 	t.Run("DeleteProfile", testAudienceService_DeleteProfile)
 	t.Run("UpdateProfile", testAudienceService_UpdateProfile)
 	t.Run("UpdateProfileIdentifier", testAudienceService_UpdateProfileIdentifier)
 	t.Run("GetProfileByDeviceId", testAudienceService_GetProfileByDeviceId)
 	t.Run("GetProfileByIdentifier", testAudienceService_GetProfileByIdentifier)
+
+	t.Run("ListProfilesByIds", testAudienceService_ListProfilesByIds)
+
+	// Profile Schema
 	t.Run("GetProfileSchema", testAudienceService_GetProfilesSchema)
 
+	// Devices
 	t.Run("GetDevice", testAudienceService_GetDevice)
 	t.Run("GetDeviceByPushToken", testAudienceService_GetDeviceByPushToken)
 	t.Run("CreateDevice", testAudienceService_CreateDevice)
@@ -1243,6 +1249,103 @@ func testAudienceService_GetProfileByIdentifier(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			got, gotErr := client.GetProfileByIdentifier(ctx, tc.req)
+
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func testAudienceService_ListProfilesByIds(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		db = mongo.NewDB(
+			dialMongo(t, *tMongoDSN),
+		)
+
+		svc = service.New(db)
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	tcases := []struct {
+		name string
+		req  *audience.ListProfilesByIdsRequest
+
+		exp    *audience.ListProfilesByIdsResponse
+		expErr error
+	}{
+		{
+			name: "error: invalid profile id",
+
+			req: &audience.ListProfilesByIdsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 100},
+				ProfileIds: []string{
+					"hello world",
+				},
+			},
+
+			expErr: grpc.Errorf(codes.InvalidArgument, "db.ListProfilesByIds: StringToObjectID: bson.IsObjectIdHex: false"),
+		},
+		{
+			name: "no profiles in account",
+
+			req: &audience.ListProfilesByIdsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 100},
+				ProfileIds: []string{
+					"000000000000000000000aa0",
+					"000000000000000000000aa2",
+				},
+			},
+
+			exp: &audience.ListProfilesByIdsResponse{
+				Profiles: nil,
+			},
+		},
+		{
+			name: "lists profiles",
+
+			req: &audience.ListProfilesByIdsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileIds: []string{
+					"000000000000000000000aa2",
+					"000000000000000000000aa1",
+				},
+			},
+
+			exp: &audience.ListProfilesByIdsResponse{
+				Profiles: []*audience.Profile{
+					{
+						AccountId: 1,
+
+						Id:         "000000000000000000000aa1",
+						Identifier: "a12abbc1-8935-407a-bf81-111111111111",
+						Attributes: nil,
+						CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+						UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					},
+					{
+						AccountId: 1,
+
+						Id:         "000000000000000000000aa2",
+						Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
+						Attributes: nil,
+						CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+						UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			got, gotErr := client.ListProfilesByIds(ctx, tc.req)
 
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))

@@ -32,6 +32,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :identifier, :string, 2
   end
+  add_message "rover.audience.v1.ListProfilesByIdsRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    repeated :profile_ids, :string, 2
+  end
+  add_message "rover.audience.v1.ListProfilesByIdsResponse" do
+    repeated :profiles, :message, 2, "rover.audience.v1.Profile"
+  end
   add_message "rover.audience.v1.GetProfileSchemaRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
   end
@@ -258,6 +265,8 @@ module Rover
       UpdateProfileIdentifierRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateProfileIdentifierRequest").msgclass
       GetProfileByDeviceIdRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileByDeviceIdRequest").msgclass
       GetProfileByIdentifierRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileByIdentifierRequest").msgclass
+      ListProfilesByIdsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListProfilesByIdsRequest").msgclass
+      ListProfilesByIdsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListProfilesByIdsResponse").msgclass
       GetProfileSchemaRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileSchemaRequest").msgclass
       Profile = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Profile").msgclass
       ProfileSchema = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ProfileSchema").msgclass

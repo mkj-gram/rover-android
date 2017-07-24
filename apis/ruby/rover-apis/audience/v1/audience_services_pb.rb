@@ -31,6 +31,7 @@ module Rover
           # GetProfileByDeviceId returns a profile which is associated to the device id
           rpc :GetProfileByDeviceId, GetProfileByDeviceIdRequest, Profile
           rpc :GetProfileByIdentifier, GetProfileByIdentifierRequest, Profile
+          rpc :ListProfilesByIds, ListProfilesByIdsRequest, ListProfilesByIdsResponse
           # GetProfileSchema returns the currently tracked profiles schema by account id
           rpc :GetProfileSchema, GetProfileSchemaRequest, ProfileSchema
           #
