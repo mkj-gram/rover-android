@@ -5,7 +5,6 @@ package rover.audience.v1;
 option go_package = "audience/v1;audience";
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 
 import "auth/v1/auth.proto";
 
@@ -17,49 +16,48 @@ service Audience {
   //
 
   // CreateProfile creates a new empty profile under a given account.
-  rpc CreateProfile(CreateProfileRequest) returns (Profile);
+  rpc CreateProfile(CreateProfileRequest) returns (CreateProfileResponse);
   //  DeleteProfile deletes a profile from db and all segments
-  rpc DeleteProfile(DeleteProfileRequest) returns (google.protobuf.Empty);
+  rpc DeleteProfile(DeleteProfileRequest) returns (DeleteProfileResponse);
   // UpdateProfile updates profile with provided subset of attributes
-  rpc UpdateProfile(UpdateProfileRequest) returns (google.protobuf.Empty);
-  rpc UpdateProfileIdentifier(UpdateProfileIdentifierRequest) returns (google.protobuf.Empty);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc UpdateProfileIdentifier(UpdateProfileIdentifierRequest) returns (UpdateProfileIdentifierResponse);
 
   // GetProfileByDeviceId returns a profile which is associated to the device id
-  rpc GetProfileByDeviceId(GetProfileByDeviceIdRequest) returns (Profile);
-  rpc GetProfileByIdentifier(GetProfileByIdentifierRequest) returns (Profile);
+  rpc GetProfileByDeviceId(GetProfileByDeviceIdRequest) returns (GetProfileByDeviceIdResponse);
+  rpc GetProfileByIdentifier(GetProfileByIdentifierRequest) returns (GetProfileByIdentifierResponse);
 
   rpc ListProfilesByIds(ListProfilesByIdsRequest) returns (ListProfilesByIdsResponse);
 
   // GetProfileSchema returns the currently tracked profiles schema by account id
-  rpc GetProfileSchema(GetProfileSchemaRequest) returns (ProfileSchema);
+  rpc GetProfileSchema(GetProfileSchemaRequest) returns (GetProfileSchemaResponse);
 
   //
   // Devices
   //
 
   // GetDevice returns the device for a given device id
-  rpc GetDevice(GetDeviceRequest) returns (Device);
-  rpc GetDeviceByPushToken(GetDeviceByPushTokenRequest) returns (Device);
+  rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
+  rpc GetDeviceByPushToken(GetDeviceByPushTokenRequest) returns (GetDeviceByPushTokenResponse);
 
-  rpc CreateDevice(CreateDeviceRequest) returns (google.protobuf.Empty);
+  rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
 
   // Device Updates
-  rpc UpdateDevice(UpdateDeviceRequest) returns (google.protobuf.Empty);
-  rpc UpdateDevicePushToken(UpdateDevicePushTokenRequest) returns (google.protobuf.Empty);
-  rpc UpdateDeviceUnregisterPushToken(UpdateDeviceUnregisterPushTokenRequest) returns (google.protobuf.Empty);
-  rpc UpdateDeviceLocation(UpdateDeviceLocationRequest) returns (google.protobuf.Empty);
-  rpc UpdateDeviceGeofenceMonitoring(UpdateDeviceGeofenceMonitoringRequest) returns (google.protobuf.Empty);
-  rpc UpdateDeviceIBeaconMonitoring(UpdateDeviceIBeaconMonitoringRequest) returns (google.protobuf.Empty);
+  rpc UpdateDevice(UpdateDeviceRequest) returns (UpdateDeviceResponse);
+  rpc UpdateDevicePushToken(UpdateDevicePushTokenRequest) returns (UpdateDevicePushTokenResponse);
+  rpc UpdateDeviceUnregisterPushToken(UpdateDeviceUnregisterPushTokenRequest) returns (UpdateDeviceUnregisterPushTokenResponse);
+  rpc UpdateDeviceLocation(UpdateDeviceLocationRequest) returns (UpdateDeviceLocationResponse);
+  rpc UpdateDeviceGeofenceMonitoring(UpdateDeviceGeofenceMonitoringRequest) returns (UpdateDeviceGeofenceMonitoringResponse);
+  rpc UpdateDeviceIBeaconMonitoring(UpdateDeviceIBeaconMonitoringRequest) returns (UpdateDeviceIBeaconMonitoringResponse);
 
   // Lists
   rpc ListDevicesByProfileId(ListDevicesByProfileIdRequest) returns (ListDevicesByProfileIdResponse);
 
   // SetDeviceProfile sets the profile the device belongs to
-  rpc SetDeviceProfile(SetDeviceProfileRequest) returns (google.protobuf.Empty);
+  rpc SetDeviceProfile(SetDeviceProfileRequest) returns (SetDeviceProfileResponse);
 
   // DeleteDevice deletes device from the database and removes it from any segments
-  rpc DeleteDevice(DeleteDeviceRequest) returns (google.protobuf.Empty);
-
+  rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
 }
 
 
@@ -70,19 +68,25 @@ service Audience {
 message CreateProfileRequest {
   auth.v1.AuthContext auth_context = 1;
 }
+message CreateProfileResponse {
+  Profile profile = 1;
+}
+
 
 message DeleteProfileRequest {
   auth.v1.AuthContext auth_context = 1;
   string profile_id = 2;
 }
+message DeleteProfileResponse {}
+
 
 message UpdateProfileRequest {
   auth.v1.AuthContext auth_context = 1;
-
   string profile_id = 2;
-
   map<string, ValueUpdates> attributes = 5;
 }
+message UpdateProfileResponse {}
+
 
 message UpdateProfileIdentifierRequest {
   auth.v1.AuthContext auth_context = 1;
@@ -91,29 +95,42 @@ message UpdateProfileIdentifierRequest {
   // the identifier value to set the identifier to
   string identifier = 3;
 }
+message UpdateProfileIdentifierResponse {}
+
 
 message GetProfileByDeviceIdRequest {
   auth.v1.AuthContext auth_context = 1;
   string device_id = 2;
 }
+message GetProfileByDeviceIdResponse {
+  Profile profile = 1;
+}
+
 
 message GetProfileByIdentifierRequest {
   auth.v1.AuthContext auth_context = 1;
   string identifier = 2;
 }
+message GetProfileByIdentifierResponse {
+  Profile profile = 1;
+}
+
 
 message ListProfilesByIdsRequest {
   auth.v1.AuthContext auth_context = 1;
 
   repeated string profile_ids = 2;
 }
-
 message ListProfilesByIdsResponse {
   repeated Profile profiles = 2;
 }
 
+
 message GetProfileSchemaRequest {
   auth.v1.AuthContext auth_context = 1;
+}
+message GetProfileSchemaResponse {
+  ProfileSchema schema = 1;
 }
 
 
@@ -145,21 +162,28 @@ message ProfileSchema {
 
 message GetDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
-
   string device_id = 2;
 }
+message GetDeviceResponse {
+  Device device = 1;
+}
+
 
 message GetDeviceByPushTokenRequest {
   auth.v1.AuthContext auth_context = 1;
-
   string device_token_key = 2;
 }
+message GetDeviceByPushTokenResponse {
+  Device device = 1;
+}
+
 
 message CreateDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
   string profile_id                = 2;
   string device_id                 = 3;
 }
+message CreateDeviceResponse {}
 
 message UpdateDevicePushTokenRequest {
   auth.v1.AuthContext auth_context = 1;
@@ -169,11 +193,13 @@ message UpdateDevicePushTokenRequest {
   string device_token_key = 3;
   string aps_environment  = 4;
 }
+message UpdateDevicePushTokenResponse {}
 
 message UpdateDeviceUnregisterPushTokenRequest {
   auth.v1.AuthContext auth_context = 1;
   string device_id        = 2;
 }
+message UpdateDeviceUnregisterPushTokenResponse {}
 
 message UpdateDeviceLocationRequest {
   auth.v1.AuthContext auth_context = 1;
@@ -184,6 +210,7 @@ message UpdateDeviceLocationRequest {
   double location_latitude            = 4;
   double location_longitude           = 5;
 }
+message UpdateDeviceLocationResponse {}
 
 message UpdateDeviceGeofenceMonitoringRequest {
   auth.v1.AuthContext auth_context = 1;
@@ -192,20 +219,23 @@ message UpdateDeviceGeofenceMonitoringRequest {
 
   repeated GeofenceRegion regions = 3;
 }
+message UpdateDeviceGeofenceMonitoringResponse {}
+
 
 message UpdateDeviceIBeaconMonitoringRequest {
   auth.v1.AuthContext auth_context = 1;
-
   string device_id = 2;
-
   repeated IBeaconRegion regions = 3;
 }
+message UpdateDeviceIBeaconMonitoringResponse {}
+
 
 message DeleteDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
-
   string device_id = 2;
 }
+message DeleteDeviceResponse {}
+
 
 message SetDeviceProfileRequest {
   auth.v1.AuthContext auth_context = 1;
@@ -213,15 +243,17 @@ message SetDeviceProfileRequest {
   string device_id = 2;
   string profile_id = 3;
 }
+message SetDeviceProfileResponse {}
+
 
 message ListDevicesByProfileIdRequest {
   auth.v1.AuthContext auth_context = 1;
   string profile_id = 2;
 }
-
 message ListDevicesByProfileIdResponse {
   repeated Device devices = 1;
 }
+
 
 // Every event comes with DeviceContext populated
 message UpdateDeviceRequest {
@@ -259,6 +291,7 @@ message UpdateDeviceRequest {
 
   Device.RegionMonitoringMode region_monitoring_mode = 37;
 }
+message UpdateDeviceResponse { }
 
 
 // Devices represent a single device that the Rover sdk is installed on. The

@@ -5,7 +5,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 )
@@ -16,9 +15,6 @@ var _ audience.AudienceServer = (*Server)(nil)
 var (
 	// Register provides a convenient wrapper around generated function
 	Register = audience.RegisterAudienceServer
-
-	// singleton, reused for RPCs with no return value
-	emptyResp = new(empty.Empty)
 )
 
 type (
@@ -83,7 +79,7 @@ func New(db DB, options ...Option) *Server {
 // Devices
 
 // GetDevice implements the corresponding rpc
-func (s *Server) GetDevice(ctx context.Context, r *audience.GetDeviceRequest) (*audience.Device, error) {
+func (s *Server) GetDevice(ctx context.Context, r *audience.GetDeviceRequest) (*audience.GetDeviceResponse, error) {
 	if err := validateID(r.GetDeviceId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
 	}
@@ -93,11 +89,11 @@ func (s *Server) GetDevice(ctx context.Context, r *audience.GetDeviceRequest) (*
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDevice: %v", err)
 	}
 
-	return d, nil
+	return &audience.GetDeviceResponse{d}, nil
 }
 
 // GetDeviceByPushToken implements the corresponding rpc
-func (s *Server) GetDeviceByPushToken(ctx context.Context, r *audience.GetDeviceByPushTokenRequest) (*audience.Device, error) {
+func (s *Server) GetDeviceByPushToken(ctx context.Context, r *audience.GetDeviceByPushTokenRequest) (*audience.GetDeviceByPushTokenResponse, error) {
 	if err := validateID(r.GetDeviceTokenKey()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceTokenKey: %v", err)
 	}
@@ -107,11 +103,11 @@ func (s *Server) GetDeviceByPushToken(ctx context.Context, r *audience.GetDevice
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceByPushToken: %v", err)
 	}
 
-	return d, nil
+	return &audience.GetDeviceByPushTokenResponse{d}, nil
 }
 
 // CreateDevice implements the corresponding rpc
-func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceRequest) (*empty.Empty, error) {
+func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceRequest) (*audience.CreateDeviceResponse, error) {
 	if err := validateID(r.GetDeviceId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
 	}
@@ -119,19 +115,19 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 	if err := s.db.CreateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.CreateDeviceResponse{}, nil
 }
 
 // UpdateDevice implements the corresponding rpc
-func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceRequest) (*empty.Empty, error) {
+func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceRequest) (*audience.UpdateDeviceResponse, error) {
 	if err := s.db.UpdateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevice: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.UpdateDeviceResponse{}, nil
 }
 
 // DeleteDevice implements the corresponding rpc
-func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceRequest) (*empty.Empty, error) {
+func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceRequest) (*audience.DeleteDeviceResponse, error) {
 	if r.GetDeviceId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "db.DeleteDevice: Id: invalid")
 	}
@@ -139,11 +135,11 @@ func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceReque
 	if err := s.db.DeleteDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteDevice: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.DeleteDeviceResponse{}, nil
 }
 
 // SetDeviceProfile implements the corresponding rpc
-func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProfileRequest) (*empty.Empty, error) {
+func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProfileRequest) (*audience.SetDeviceProfileResponse, error) {
 	if err := validateID(r.GetDeviceId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
 	}
@@ -154,47 +150,47 @@ func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProf
 	if err := s.db.SetDeviceProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.SetDeviceProfile: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.SetDeviceProfileResponse{}, nil
 }
 
 // UpdateDevicePushToken implements the corresponding rpc
-func (s *Server) UpdateDevicePushToken(ctx context.Context, r *audience.UpdateDevicePushTokenRequest) (*empty.Empty, error) {
+func (s *Server) UpdateDevicePushToken(ctx context.Context, r *audience.UpdateDevicePushTokenRequest) (*audience.UpdateDevicePushTokenResponse, error) {
 	if err := s.db.UpdateDevicePushToken(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevicePushToken: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.UpdateDevicePushTokenResponse{}, nil
 }
 
 // UpdateDeviceUnregisterPushToken implements the corresponding rpc
-func (s *Server) UpdateDeviceUnregisterPushToken(ctx context.Context, r *audience.UpdateDeviceUnregisterPushTokenRequest) (*empty.Empty, error) {
+func (s *Server) UpdateDeviceUnregisterPushToken(ctx context.Context, r *audience.UpdateDeviceUnregisterPushTokenRequest) (*audience.UpdateDeviceUnregisterPushTokenResponse, error) {
 	if err := s.db.UpdateDeviceUnregisterPushToken(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceUnregisterPushToken: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.UpdateDeviceUnregisterPushTokenResponse{}, nil
 }
 
 // UpdateDeviceLocation implements the corresponding rpc
-func (s *Server) UpdateDeviceLocation(ctx context.Context, r *audience.UpdateDeviceLocationRequest) (*empty.Empty, error) {
+func (s *Server) UpdateDeviceLocation(ctx context.Context, r *audience.UpdateDeviceLocationRequest) (*audience.UpdateDeviceLocationResponse, error) {
 	if err := s.db.UpdateDeviceLocation(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceLocation: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.UpdateDeviceLocationResponse{}, nil
 }
 
 // UpdateDeviceGeofenceMonitoring implements the corresponding rpc
-func (s *Server) UpdateDeviceGeofenceMonitoring(ctx context.Context, r *audience.UpdateDeviceGeofenceMonitoringRequest) (*empty.Empty, error) {
+func (s *Server) UpdateDeviceGeofenceMonitoring(ctx context.Context, r *audience.UpdateDeviceGeofenceMonitoringRequest) (*audience.UpdateDeviceGeofenceMonitoringResponse, error) {
 	if err := s.db.UpdateDeviceGeofenceMonitoring(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceGeofenceMonitoring: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.UpdateDeviceGeofenceMonitoringResponse{}, nil
 }
 
 // UpdateDeviceIBeaconMonitoring implements the corresponding rpc
-func (s *Server) UpdateDeviceIBeaconMonitoring(ctx context.Context, r *audience.UpdateDeviceIBeaconMonitoringRequest) (*empty.Empty, error) {
+func (s *Server) UpdateDeviceIBeaconMonitoring(ctx context.Context, r *audience.UpdateDeviceIBeaconMonitoringRequest) (*audience.UpdateDeviceIBeaconMonitoringResponse, error) {
 	if err := s.db.UpdateDeviceIBeaconMonitoring(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceIBeaconMonitoring: %v", err)
 	}
-	return emptyResp, nil
+	return &audience.UpdateDeviceIBeaconMonitoringResponse{}, nil
 }
 
 func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDevicesByProfileIdRequest) (*audience.ListDevicesByProfileIdResponse, error) {
@@ -212,56 +208,56 @@ func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDev
 // Profiles
 
 // CreateProfile implements the corresponding rpc
-func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileRequest) (*audience.Profile, error) {
+func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileRequest) (*audience.CreateProfileResponse, error) {
 	if r.GetAuthContext().GetAccountId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "AccountId: unset")
 	}
 
-	ap, err := s.db.CreateProfile(ctx, r)
+	p, err := s.db.CreateProfile(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateProfile: %v", err)
 	}
 
-	return ap, nil
+	return &audience.CreateProfileResponse{p}, nil
 }
 
 // DeleteProfile implements the corresponding rpc
-func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileRequest) (*empty.Empty, error) {
+func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileRequest) (*audience.DeleteProfileResponse, error) {
 	if err := s.db.DeleteProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteProfile: %v", err)
 	}
 
-	return emptyResp, nil
+	return &audience.DeleteProfileResponse{}, nil
 }
 
 // GetProfileByDeviceId implements the corresponding rpc
-func (s *Server) GetProfileByDeviceId(ctx context.Context, r *audience.GetProfileByDeviceIdRequest) (*audience.Profile, error) {
+func (s *Server) GetProfileByDeviceId(ctx context.Context, r *audience.GetProfileByDeviceIdRequest) (*audience.GetProfileByDeviceIdResponse, error) {
 	p, err := s.db.GetProfileByDeviceId(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfileByDeviceId: %v", err)
 	}
 
-	return p, nil
+	return &audience.GetProfileByDeviceIdResponse{p}, nil
 }
 
 // GetProfileByIdentifier implements the corresponding rpc
-func (s *Server) GetProfileByIdentifier(ctx context.Context, r *audience.GetProfileByIdentifierRequest) (*audience.Profile, error) {
+func (s *Server) GetProfileByIdentifier(ctx context.Context, r *audience.GetProfileByIdentifierRequest) (*audience.GetProfileByIdentifierResponse, error) {
 	p, err := s.db.GetProfileByIdentifier(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfileByIdentifier: %v", err)
 	}
 
-	return p, nil
+	return &audience.GetProfileByIdentifierResponse{p}, nil
 }
 
 // GetProfileSchema implements the corresponding rpc
-func (s *Server) GetProfileSchema(ctx context.Context, r *audience.GetProfileSchemaRequest) (*audience.ProfileSchema, error) {
+func (s *Server) GetProfileSchema(ctx context.Context, r *audience.GetProfileSchemaRequest) (*audience.GetProfileSchemaResponse, error) {
 	p, err := s.db.GetProfileSchema(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfileSchema: %v", err)
 	}
 
-	return p, nil
+	return &audience.GetProfileSchemaResponse{p}, nil
 }
 
 // ListProfilesByIdsRequest implements the corresponding rpc
@@ -275,7 +271,7 @@ func (s *Server) ListProfilesByIds(ctx context.Context, r *audience.ListProfiles
 }
 
 // UpdateProfile implements the corresponding rpc
-func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileRequest) (*empty.Empty, error) {
+func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileRequest) (*audience.UpdateProfileResponse, error) {
 	if err := validateID(r.GetProfileId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
 	}
@@ -288,11 +284,11 @@ func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileReq
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfile: %v", err)
 	}
 
-	return emptyResp, nil
+	return &audience.UpdateProfileResponse{}, nil
 }
 
 // UpdateProfileIdentifier implements the corresponding rpc
-func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.UpdateProfileIdentifierRequest) (*empty.Empty, error) {
+func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.UpdateProfileIdentifierRequest) (*audience.UpdateProfileIdentifierResponse, error) {
 	if err := validateID(r.GetProfileId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
 	}
@@ -301,7 +297,7 @@ func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.Update
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfileIdentifier: %v", err)
 	}
 
-	return emptyResp, nil
+	return &audience.UpdateProfileIdentifierResponse{}, nil
 }
 
 // Validations

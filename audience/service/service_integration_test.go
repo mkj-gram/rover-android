@@ -94,10 +94,10 @@ func testAudienceService_CreateProfile(t *testing.T) {
 	tcases := []struct {
 		name string
 
-		exp    *audience.Profile
-		expErr error
-
 		req *audience.CreateProfileRequest
+
+		exp    *audience.CreateProfileResponse
+		expErr error
 	}{
 		{
 			name: "error: requires account id to be set",
@@ -116,13 +116,15 @@ func testAudienceService_CreateProfile(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 1},
 			},
 
-			exp: &audience.Profile{
-				Id:         "0194fdc2fa2ffcc041d3ff12",
-				AccountId:  1,
-				Attributes: nil,
-				Identifier: "",
-				CreatedAt:  protoTs(t, parseTime(t, "2016-11-11T00:00:00.111Z")),
-				UpdatedAt:  protoTs(t, parseTime(t, "2016-11-11T00:00:00.111Z")),
+			exp: &audience.CreateProfileResponse{
+				&audience.Profile{
+					Id:         "0194fdc2fa2ffcc041d3ff12",
+					AccountId:  1,
+					Attributes: nil,
+					Identifier: "",
+					CreatedAt:  protoTs(t, parseTime(t, "2016-11-11T00:00:00.111Z")),
+					UpdatedAt:  protoTs(t, parseTime(t, "2016-11-11T00:00:00.111Z")),
+				},
 			},
 		},
 	}
@@ -1128,7 +1130,7 @@ func testAudienceService_GetProfileByDeviceId(t *testing.T) {
 		name string
 		req  *audience.GetProfileByDeviceIdRequest
 
-		exp    *audience.Profile
+		exp    *audience.GetProfileByDeviceIdResponse
 		expErr error
 	}{
 		{
@@ -1155,14 +1157,16 @@ func testAudienceService_GetProfileByDeviceId(t *testing.T) {
 				DeviceId: "D00000000000000000000002",
 			},
 
-			exp: &audience.Profile{
-				AccountId: 1,
+			exp: &audience.GetProfileByDeviceIdResponse{
+				&audience.Profile{
+					AccountId: 1,
 
-				Id:         "000000000000000000000aa2",
-				Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
-				Attributes: nil,
-				CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
-				UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					Id:         "000000000000000000000aa2",
+					Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
+					Attributes: nil,
+					CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+				},
 			},
 		},
 	}
@@ -1170,7 +1174,7 @@ func testAudienceService_GetProfileByDeviceId(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			got, gotErr := client.GetProfileByDeviceId(ctx, tc.req)
+			var got, gotErr = client.GetProfileByDeviceId(ctx, tc.req)
 
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
@@ -1198,8 +1202,8 @@ func testAudienceService_GetProfileByIdentifier(t *testing.T) {
 		name string
 		req  *audience.GetProfileByIdentifierRequest
 
-		exp    *audience.Profile
 		expErr error
+		exp    *audience.GetProfileByIdentifierResponse
 	}{
 		{
 			name: "error: not found: no such identifier",
@@ -1233,14 +1237,16 @@ func testAudienceService_GetProfileByIdentifier(t *testing.T) {
 				Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
 			},
 
-			exp: &audience.Profile{
-				AccountId: 1,
+			exp: &audience.GetProfileByIdentifierResponse{
+				&audience.Profile{
+					AccountId: 1,
 
-				Id:         "000000000000000000000aa2",
-				Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
-				Attributes: nil,
-				CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
-				UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					Id:         "000000000000000000000aa2",
+					Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
+					Attributes: nil,
+					CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+				},
 			},
 		},
 	}
@@ -1372,7 +1378,7 @@ func testAudienceService_GetProfilesSchema(t *testing.T) {
 		name string
 		req  *audience.GetProfileSchemaRequest
 
-		exp    *audience.ProfileSchema
+		exp    *audience.GetProfileSchemaResponse
 		expErr error
 	}{
 		{
@@ -1383,8 +1389,10 @@ func testAudienceService_GetProfilesSchema(t *testing.T) {
 				},
 			},
 
-			exp: &audience.ProfileSchema{
-				Attributes: nil,
+			exp: &audience.GetProfileSchemaResponse{
+				&audience.ProfileSchema{
+					Attributes: nil,
+				},
 			},
 		},
 		{
@@ -1393,21 +1401,23 @@ func testAudienceService_GetProfilesSchema(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 100},
 			},
 
-			exp: &audience.ProfileSchema{
-				Attributes: []*audience.SchemaAttribute{
-					{
-						Id:            "000000000000000000000f02",
-						AccountId:     100,
-						Attribute:     "name",
-						AttributeType: "string",
-						CreatedAt:     protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					},
-					{
-						Id:            "000000000000000000000f03",
-						AccountId:     100,
-						Attribute:     "created_at",
-						AttributeType: "timestamp",
-						CreatedAt:     protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+			exp: &audience.GetProfileSchemaResponse{
+				&audience.ProfileSchema{
+					Attributes: []*audience.SchemaAttribute{
+						{
+							Id:            "000000000000000000000f02",
+							AccountId:     100,
+							Attribute:     "name",
+							AttributeType: "string",
+							CreatedAt:     protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						},
+						{
+							Id:            "000000000000000000000f03",
+							AccountId:     100,
+							Attribute:     "created_at",
+							AttributeType: "timestamp",
+							CreatedAt:     protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						},
 					},
 				},
 			},
@@ -1572,7 +1582,7 @@ func testAudienceService_GetDevice(t *testing.T) {
 		name string
 		req  *audience.GetDeviceRequest
 
-		exp    *audience.Device
+		exp    *audience.GetDeviceResponse
 		expErr error
 	}{
 		{
@@ -1613,71 +1623,73 @@ func testAudienceService_GetDevice(t *testing.T) {
 
 			expErr: nil,
 
-			exp: &audience.Device{
-				Id:        "59713dbd4dd7a7932aa66453",
-				DeviceId:  "adevice00",
-				AccountId: 1,
-				ProfileId: "00000000000000000000aaa2",
+			exp: &audience.GetDeviceResponse{
+				&audience.Device{
+					Id:        "59713dbd4dd7a7932aa66453",
+					DeviceId:  "adevice00",
+					AccountId: 1,
+					ProfileId: "00000000000000000000aaa2",
 
-				CreatedAt: createdAt,
-				UpdatedAt: createdAt,
+					CreatedAt: createdAt,
+					UpdatedAt: createdAt,
 
-				AppBuild:           "23",
-				AppName:            "Air Miles",
-				AppNamespace:       "com.airmiles",
-				AppVersion:         "1.0",
-				CarrierName:        "rogers",
-				DeviceManufacturer: "Apple",
+					AppBuild:           "23",
+					AppName:            "Air Miles",
+					AppNamespace:       "com.airmiles",
+					AppVersion:         "1.0",
+					CarrierName:        "rogers",
+					DeviceManufacturer: "Apple",
 
-				DeviceTokenKey:       "abc",
-				DeviceTokenIsActive:  true,
-				DeviceTokenCreatedAt: createdAt,
-				DeviceTokenUpdatedAt: createdAt,
-				ApsEnvironment:       "development",
+					DeviceTokenKey:       "abc",
+					DeviceTokenIsActive:  true,
+					DeviceTokenCreatedAt: createdAt,
+					DeviceTokenUpdatedAt: createdAt,
+					ApsEnvironment:       "development",
 
-				Frameworks: map[string]*audience.Version{
-					"RoverEvents": {Major: 1, Minor: 2, Revision: 2},
-					"RoverPush":   {Major: 1, Minor: 0, Revision: 3},
-				},
-				IsCellularEnabled: true,
-				IsWifiEnabled:     true,
-				LocaleLanguage:    "en",
-				LocaleRegion:      "us",
-				LocaleScript:      "zz",
-				DeviceModel:       "iPhone7,2",
-				OsName:            "iOS",
-				OsVersion:         &audience.Version{1, 2, 3},
-				Radio:             "LTE",
-				ScreenHeight:      720,
-				ScreenWidth:       1080,
-				TimeZone:          "America/Toronto",
-				Platform:          audience.Platform_WEB,
+					Frameworks: map[string]*audience.Version{
+						"RoverEvents": {Major: 1, Minor: 2, Revision: 2},
+						"RoverPush":   {Major: 1, Minor: 0, Revision: 3},
+					},
+					IsCellularEnabled: true,
+					IsWifiEnabled:     true,
+					LocaleLanguage:    "en",
+					LocaleRegion:      "us",
+					LocaleScript:      "zz",
+					DeviceModel:       "iPhone7,2",
+					OsName:            "iOS",
+					OsVersion:         &audience.Version{1, 2, 3},
+					Radio:             "LTE",
+					ScreenHeight:      720,
+					ScreenWidth:       1080,
+					TimeZone:          "America/Toronto",
+					Platform:          audience.Platform_WEB,
 
-				IsBackgroundEnabled:         true,
-				IsBluetoothEnabled:          true,
-				IsLocationMonitoringEnabled: true,
+					IsBackgroundEnabled:         true,
+					IsBluetoothEnabled:          true,
+					IsLocationMonitoringEnabled: true,
 
-				LocationAccuracy:  65,
-				LocationLatitude:  22.00101,
-				LocationLongitude: -32.1231,
-				LocationRegion:    "Canada",
-				LocationCity:      "Toronto",
-				LocationStreet:    "55 Adelaide Street East",
+					LocationAccuracy:  65,
+					LocationLatitude:  22.00101,
+					LocationLongitude: -32.1231,
+					LocationRegion:    "Canada",
+					LocationCity:      "Toronto",
+					LocationStreet:    "55 Adelaide Street East",
 
-				RegionMonitoringMode: audience.Device_GIMBAL,
+					RegionMonitoringMode: audience.Device_GIMBAL,
 
-				IbeaconMonitoringRegionsUpdatedAt: createdAt,
-				IbeaconMonitoringRegions: []*audience.IBeaconRegion{
-					{"1h1h1", 1, 2},
-					{"0001", 3, 4},
-				},
+					IbeaconMonitoringRegionsUpdatedAt: createdAt,
+					IbeaconMonitoringRegions: []*audience.IBeaconRegion{
+						{"1h1h1", 1, 2},
+						{"0001", 3, 4},
+					},
 
-				GeofenceMonitoringRegionsUpdatedAt: createdAt,
-				GeofenceMonitoringRegions: []*audience.GeofenceRegion{
-					{
-						Id:       "37.331701:-122.030847:50",
-						Latitude: 37.331701, Longitude: -122.030847,
-						Radius: 50,
+					GeofenceMonitoringRegionsUpdatedAt: createdAt,
+					GeofenceMonitoringRegions: []*audience.GeofenceRegion{
+						{
+							Id:       "37.331701:-122.030847:50",
+							Latitude: 37.331701, Longitude: -122.030847,
+							Radius: 50,
+						},
 					},
 				},
 			},
@@ -1713,7 +1725,7 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 		name string
 		req  *audience.GetDeviceByPushTokenRequest
 
-		exp    *audience.Device
+		exp    *audience.GetDeviceByPushTokenResponse
 		expErr error
 	}{
 		{
@@ -1755,19 +1767,21 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 
 			expErr: nil,
 
-			exp: &audience.Device{
-				Id:        "bbbbbbbbbbbbbbbbbbbbbbbb",
-				DeviceId:  "BBBBBBBB",
-				AccountId: 1,
-				ProfileId: "bbbbbbbbbbbbbbbbbbbbbbbb",
+			exp: &audience.GetDeviceByPushTokenResponse{
+				&audience.Device{
+					Id:        "bbbbbbbbbbbbbbbbbbbbbbbb",
+					DeviceId:  "BBBBBBBB",
+					AccountId: 1,
+					ProfileId: "bbbbbbbbbbbbbbbbbbbbbbbb",
 
-				CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
-				UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 
-				DeviceTokenKey:       "token:bbbbbbbbbbbbbbbbbbbbbbbb",
-				DeviceTokenIsActive:  true,
-				DeviceTokenCreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-				DeviceTokenUpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					DeviceTokenKey:       "token:bbbbbbbbbbbbbbbbbbbbbbbb",
+					DeviceTokenIsActive:  true,
+					DeviceTokenCreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					DeviceTokenUpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+				},
 			},
 		},
 	}
@@ -1807,7 +1821,6 @@ func testAudienceService_CreateDevice(t *testing.T) {
 		req  *audience.CreateDeviceRequest
 
 		expErr error
-		exp    *audience.Device
 
 		before, after *expect
 	}

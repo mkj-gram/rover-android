@@ -22,39 +22,39 @@ module Rover
           #
           #
           # CreateProfile creates a new empty profile under a given account.
-          rpc :CreateProfile, CreateProfileRequest, Profile
+          rpc :CreateProfile, CreateProfileRequest, CreateProfileResponse
           #  DeleteProfile deletes a profile from db and all segments
-          rpc :DeleteProfile, DeleteProfileRequest, Google::Protobuf::Empty
+          rpc :DeleteProfile, DeleteProfileRequest, DeleteProfileResponse
           # UpdateProfile updates profile with provided subset of attributes
-          rpc :UpdateProfile, UpdateProfileRequest, Google::Protobuf::Empty
-          rpc :UpdateProfileIdentifier, UpdateProfileIdentifierRequest, Google::Protobuf::Empty
+          rpc :UpdateProfile, UpdateProfileRequest, UpdateProfileResponse
+          rpc :UpdateProfileIdentifier, UpdateProfileIdentifierRequest, UpdateProfileIdentifierResponse
           # GetProfileByDeviceId returns a profile which is associated to the device id
-          rpc :GetProfileByDeviceId, GetProfileByDeviceIdRequest, Profile
-          rpc :GetProfileByIdentifier, GetProfileByIdentifierRequest, Profile
+          rpc :GetProfileByDeviceId, GetProfileByDeviceIdRequest, GetProfileByDeviceIdResponse
+          rpc :GetProfileByIdentifier, GetProfileByIdentifierRequest, GetProfileByIdentifierResponse
           rpc :ListProfilesByIds, ListProfilesByIdsRequest, ListProfilesByIdsResponse
           # GetProfileSchema returns the currently tracked profiles schema by account id
-          rpc :GetProfileSchema, GetProfileSchemaRequest, ProfileSchema
+          rpc :GetProfileSchema, GetProfileSchemaRequest, GetProfileSchemaResponse
           #
           # Devices
           #
           #
           # GetDevice returns the device for a given device id
-          rpc :GetDevice, GetDeviceRequest, Device
-          rpc :GetDeviceByPushToken, GetDeviceByPushTokenRequest, Device
-          rpc :CreateDevice, CreateDeviceRequest, Google::Protobuf::Empty
+          rpc :GetDevice, GetDeviceRequest, GetDeviceResponse
+          rpc :GetDeviceByPushToken, GetDeviceByPushTokenRequest, GetDeviceByPushTokenResponse
+          rpc :CreateDevice, CreateDeviceRequest, CreateDeviceResponse
           # Device Updates
-          rpc :UpdateDevice, UpdateDeviceRequest, Google::Protobuf::Empty
-          rpc :UpdateDevicePushToken, UpdateDevicePushTokenRequest, Google::Protobuf::Empty
-          rpc :UpdateDeviceUnregisterPushToken, UpdateDeviceUnregisterPushTokenRequest, Google::Protobuf::Empty
-          rpc :UpdateDeviceLocation, UpdateDeviceLocationRequest, Google::Protobuf::Empty
-          rpc :UpdateDeviceGeofenceMonitoring, UpdateDeviceGeofenceMonitoringRequest, Google::Protobuf::Empty
-          rpc :UpdateDeviceIBeaconMonitoring, UpdateDeviceIBeaconMonitoringRequest, Google::Protobuf::Empty
+          rpc :UpdateDevice, UpdateDeviceRequest, UpdateDeviceResponse
+          rpc :UpdateDevicePushToken, UpdateDevicePushTokenRequest, UpdateDevicePushTokenResponse
+          rpc :UpdateDeviceUnregisterPushToken, UpdateDeviceUnregisterPushTokenRequest, UpdateDeviceUnregisterPushTokenResponse
+          rpc :UpdateDeviceLocation, UpdateDeviceLocationRequest, UpdateDeviceLocationResponse
+          rpc :UpdateDeviceGeofenceMonitoring, UpdateDeviceGeofenceMonitoringRequest, UpdateDeviceGeofenceMonitoringResponse
+          rpc :UpdateDeviceIBeaconMonitoring, UpdateDeviceIBeaconMonitoringRequest, UpdateDeviceIBeaconMonitoringResponse
           # Lists
           rpc :ListDevicesByProfileId, ListDevicesByProfileIdRequest, ListDevicesByProfileIdResponse
           # SetDeviceProfile sets the profile the device belongs to
-          rpc :SetDeviceProfile, SetDeviceProfileRequest, Google::Protobuf::Empty
+          rpc :SetDeviceProfile, SetDeviceProfileRequest, SetDeviceProfileResponse
           # DeleteDevice deletes device from the database and removes it from any segments
-          rpc :DeleteDevice, DeleteDeviceRequest, Google::Protobuf::Empty
+          rpc :DeleteDevice, DeleteDeviceRequest, DeleteDeviceResponse
         end
 
         Stub = Service.rpc_stub_class
