@@ -56,6 +56,7 @@ class V1::AccountsController < V1::ApplicationController
             "web-token" => web_token,
             "sdk-token" => sdk_token,
             "server-token" => server_token,
+            "token" => server_token,
           )
         end
 

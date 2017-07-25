@@ -51,7 +51,6 @@ describe "/v1/account", :type => :request do
       expect(json).to have_key(:data)
       expect(json[:data]).to have_key(:attributes)
       expect(json[:data][:attributes]).to have_key(:token)
-      expect(json[:data][:attributes][:token]).to eq(account.token)
       # because ember uses - as its seperator the json we parse looks like :"" in ruby hashes
       expect(json[:data][:attributes][:"share-key"]).to eq(account.share_key)
       expect(json[:data][:attributes][:title]).to eq(account.title)
@@ -60,6 +59,7 @@ describe "/v1/account", :type => :request do
         :"web-token" => "webtoken",
         :"sdk-token" => "sdktoken",
         :"server-token" => "servertoken",
+        :"token" => "servertoken",
       })
     end
   end
