@@ -52,6 +52,7 @@ service Audience {
 
   // Lists
   rpc ListDevicesByProfileId(ListDevicesByProfileIdRequest) returns (ListDevicesByProfileIdResponse);
+  rpc ListDevicesByProfileIdentifier(ListDevicesByProfileIdentifierRequest) returns (ListDevicesByProfileIdentifierResponse);
 
   // SetDeviceProfile sets the profile the device belongs to
   rpc SetDeviceProfile(SetDeviceProfileRequest) returns (SetDeviceProfileResponse);
@@ -251,6 +252,15 @@ message ListDevicesByProfileIdRequest {
   string profile_id = 2;
 }
 message ListDevicesByProfileIdResponse {
+  repeated Device devices = 1;
+}
+
+
+message ListDevicesByProfileIdentifierRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string identifier = 2;
+}
+message ListDevicesByProfileIdentifierResponse {
   repeated Device devices = 1;
 }
 

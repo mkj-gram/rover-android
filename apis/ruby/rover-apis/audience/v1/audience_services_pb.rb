@@ -51,6 +51,7 @@ module Rover
           rpc :UpdateDeviceIBeaconMonitoring, UpdateDeviceIBeaconMonitoringRequest, UpdateDeviceIBeaconMonitoringResponse
           # Lists
           rpc :ListDevicesByProfileId, ListDevicesByProfileIdRequest, ListDevicesByProfileIdResponse
+          rpc :ListDevicesByProfileIdentifier, ListDevicesByProfileIdentifierRequest, ListDevicesByProfileIdentifierResponse
           # SetDeviceProfile sets the profile the device belongs to
           rpc :SetDeviceProfile, SetDeviceProfileRequest, SetDeviceProfileResponse
           # DeleteDevice deletes device from the database and removes it from any segments

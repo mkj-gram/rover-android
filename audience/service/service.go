@@ -57,6 +57,7 @@ type (
 		DeleteDevice(context.Context, *audience.DeleteDeviceRequest) error
 
 		ListDevicesByProfileId(context.Context, *audience.ListDevicesByProfileIdRequest) ([]*audience.Device, error)
+		ListDevicesByProfileIdentifier(context.Context, *audience.ListDevicesByProfileIdentifierRequest) ([]*audience.Device, error)
 	}
 
 	// Option is a Server option type
@@ -203,6 +204,18 @@ func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDev
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileId: %v", err)
 	}
 	return &audience.ListDevicesByProfileIdResponse{devices}, nil
+}
+
+func (s *Server) ListDevicesByProfileIdentifier(ctx context.Context, r *audience.ListDevicesByProfileIdentifierRequest) (*audience.ListDevicesByProfileIdentifierResponse, error) {
+	if err := validateID(r.GetIdentifier()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: Identifier: %v", err)
+	}
+
+	devices, err := s.db.ListDevicesByProfileIdentifier(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileIdentifier: %v", err)
+	}
+	return &audience.ListDevicesByProfileIdentifierResponse{devices}, nil
 }
 
 // Profiles

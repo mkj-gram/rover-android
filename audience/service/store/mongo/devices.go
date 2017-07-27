@@ -681,3 +681,35 @@ func (s *devicesStore) ListDevicesByProfileId(ctx context.Context, r *audience.L
 
 	return protoDevices, nil
 }
+
+func (s *devicesStore) ListDevicesByProfileIdentifier(ctx context.Context, r *audience.ListDevicesByProfileIdentifierRequest) ([]*audience.Device, error) {
+	var (
+		account_id = r.GetAuthContext().GetAccountId()
+		identifier = r.GetIdentifier()
+
+		pQ      = bson.M{"account_id": account_id, "identifier": identifier}
+		profile = bson.M{}
+	)
+
+	if err := s.profiles.Find(pQ).One(&profile); err != nil {
+		return nil, wrapError(err, "profiles.Find")
+	}
+
+	var (
+		devices []Device
+		dQ      = bson.M{"account_id": account_id, "profile_id": profile["_id"]}
+	)
+
+	if err := s.devices.Find(dQ).All(&devices); err != nil {
+		return nil, wrapError(err, "devices.Find")
+	}
+
+	var protoDevices = make([]*audience.Device, len(devices))
+
+	for i := range devices {
+		protoDevices[i] = new(audience.Device)
+		devices[i].toProto(protoDevices[i])
+	}
+
+	return protoDevices, nil
+}

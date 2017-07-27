@@ -69,6 +69,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("DeleteDevice", testAudienceService_DeleteDevice)
 	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfile)
 	t.Run("ListDevicesByProfileId", testAudienceService_ListDevicesByProfileId)
+	t.Run("ListDevicesByProfileIdentifier", testAudienceService_ListDevicesByProfileIdentifier)
 }
 
 func testAudienceService_CreateProfile(t *testing.T) {
@@ -3068,6 +3069,112 @@ func testAudienceService_ListDevicesByProfileId(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 			got, gotErr := client.ListDevicesByProfileId(ctx, tc.req)
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func testAudienceService_ListDevicesByProfileIdentifier(t *testing.T) {
+	var (
+		ctx = context.TODO()
+		// createdAt = protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z"))
+
+		mongodb = dialMongo(t, *tMongoDSN)
+		db      = mongo.NewDB(mongodb,
+			mongo.WithLogger(log.NewLog(log.Debug)),
+			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+		)
+		svc = service.New(db)
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	tcases := []struct {
+		name string
+		req  *audience.ListDevicesByProfileIdentifierRequest
+
+		exp    *audience.ListDevicesByProfileIdentifierResponse
+		expErr error
+	}{
+		{
+			name: "error: validation: blank id",
+			req: &audience.ListDevicesByProfileIdentifierRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Identifier:  "",
+			},
+
+			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: Identifier: blank"),
+		},
+		{
+			name: "error: not found: profile",
+			req: &audience.ListDevicesByProfileIdentifierRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Identifier:  "00000000-0000-0000-0000-000000000zzz",
+			},
+
+			expErr: grpc.Errorf(codes.NotFound, "db.ListDevicesByProfileIdentifier: profiles.Find: not found"),
+		},
+
+		{
+			name: "profiles with no devices",
+			req: &audience.ListDevicesByProfileIdentifierRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Identifier:  "11111111-1111-1111-1111-222222222222",
+			},
+
+			expErr: nil,
+			exp:    &audience.ListDevicesByProfileIdentifierResponse{nil},
+		},
+
+		{
+			name: "wrong account",
+			req: &audience.ListDevicesByProfileIdentifierRequest{
+				AuthContext: &auth.AuthContext{AccountId: 100},
+				Identifier:  "00000000-0000-0000-0000-000000000bb2",
+			},
+
+			expErr: grpc.Errorf(codes.NotFound, "db.ListDevicesByProfileIdentifier: profiles.Find: not found"),
+		},
+
+		{
+			name: "finds devices",
+			req: &audience.ListDevicesByProfileIdentifierRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Identifier:  "00000000-0000-0000-0000-000000000bb2",
+			},
+
+			expErr: nil,
+
+			exp: &audience.ListDevicesByProfileIdentifierResponse{
+				[]*audience.Device{
+					{
+						AccountId: 1,
+						Id:        "d00000000000000000000bb0",
+						DeviceId:  "d-bb0",
+						ProfileId: "000000000000000000000bb2",
+						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					},
+					{
+						AccountId: 1,
+						Id:        "d00000000000000000000bb2",
+						DeviceId:  "d-bb2",
+						ProfileId: "000000000000000000000bb2",
+						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, gotErr := client.ListDevicesByProfileIdentifier(ctx, tc.req)
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}
