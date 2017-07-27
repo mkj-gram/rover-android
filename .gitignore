@@ -8,3 +8,8 @@ dist
 .DS_Store
 npm-debug.log
 yarn.lock
+
+
+src/components/__generated__/
+src/components/sidebar/__generated__/
+src/components/table/__generated__/

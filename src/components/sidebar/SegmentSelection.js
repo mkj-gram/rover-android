@@ -1,72 +1,100 @@
-import React from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import { Modal, graphite, text, regular, steel } from '@rover/react-bootstrap'
+import {
+    Modal,
+    graphite,
+    text,
+    regular,
+    ash
+} from '@rover/react-bootstrap'
 
 import SegmentCell from './SegmentCell'
 
-const SegmentSelection = ({
-    isOpen,
-    onRequestClose,
-    modalCoordinates,
-    segments,
-    removeSegmentCell,
-    updateSegmentCell
-}) =>
-    (<Modal
-        isOpen={isOpen}
-        onRequestClose={() => onRequestClose('selection')}
-        style={{
-            content: {
-                top: null,
-                right: null,
-                left: modalCoordinates[0] + 25,
-                bottom: modalCoordinates[1],
-                transform: null,
-                backgroundColor: graphite,
-                padding: 0,
-                width: 'auto',
-                overflow: 'hidden'
-            }
-        }}
-        bodyOpenClassName="SegmentSelections"
-        hoverStyle={{
-            backgroundColor: steel
-        }}
-    >
-        <div
-            style={{
-                ...text,
-                ...regular,
-                fontSize: 16,
-                color: 'white',
-                marginTop: 27,
-                marginBottom: 15,
-                display: 'flex',
-                justifyContent: 'center'
-            }}
-        >
-            Select a segment
-        </div>
-        <div
-            style={{
-                height: 380,
-                width: 250,
-                overflow: 'auto'
-            }}
-        >
-            {segments.map((segment, index) =>
-                (<SegmentCell
-                    segment={segment.name}
-                    key={index}
-                    index={index}
-                    removeSegmentCell={removeSegmentCell}
-                    updateSegmentCell={updateSegmentCell}
-                />)
-            )}
-        </div>
-    </Modal>
-    )
+class SegmentSelection extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            currentSegment: null
+        }
+        this.currentEditSegment = this.currentEditSegment.bind(this)
+    }
+
+    currentEditSegment(currentSegment) {
+        this.setState({ currentSegment })
+    }
+
+    render() {
+        const {
+            isOpen,
+            onRequestClose,
+            modalCoordinates,
+            segments,
+            removeSegmentCell,
+            updateSegmentCell
+        } = this.props
+
+        const { currentSegment } = this.state
+
+        return (
+            <Modal
+                isOpen={isOpen}
+                onRequestClose={() => onRequestClose('selection')}
+                style={{
+                    content: {
+                        top: null,
+                        right: null,
+                        left: modalCoordinates[0] + 25,
+                        bottom: modalCoordinates[1],
+                        transform: null,
+                        backgroundColor: graphite,
+                        padding: 0,
+                        width: 'auto',
+                        overflow: 'hidden'
+                    }
+                }}
+                bodyOpenClassName="SegmentSelections"
+                hoverStyle={{
+                    backgroundColor: ash
+                }}
+            >
+                <div
+                    style={{
+                        ...text,
+                        ...regular,
+                        fontSize: 16,
+                        color: 'white',
+                        marginTop: 27,
+                        marginBottom: 15,
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}
+                >
+                    Select a segment
+                </div>
+                <div
+                    style={{
+                        height: 380,
+                        width: 250,
+                        overflow: 'auto'
+                    }}
+                >
+                    {segments.map((segment, index) =>
+                        (<SegmentCell
+                            segment={segment.name}
+                            key={index}
+                            index={index}
+                            removeSegmentCell={removeSegmentCell}
+                            updateSegmentCell={updateSegmentCell}
+                            currentEditSegment={this.currentEditSegment}
+                            currentSegment={currentSegment}
+                        />)
+                    )}
+                </div>
+            </Modal>
+        )
+    }
+}
 
 SegmentSelection.propTypes = {
     isOpen: PropTypes.bool.isRequired,
