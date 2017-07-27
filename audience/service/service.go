@@ -129,8 +129,8 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 
 // DeleteDevice implements the corresponding rpc
 func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceRequest) (*audience.DeleteDeviceResponse, error) {
-	if r.GetDeviceId() == "" {
-		return nil, status.Error(codes.InvalidArgument, "db.DeleteDevice: Id: invalid")
+	if err := validateID(r.GetDeviceId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
 	}
 
 	if err := s.db.DeleteDevice(ctx, r); err != nil {

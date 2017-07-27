@@ -2892,7 +2892,7 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 				DeviceId: "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.DeleteDevice: Id: invalid"),
+			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
 		},
 
 		{
