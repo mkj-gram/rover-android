@@ -14,7 +14,7 @@ import (
 	"github.com/namsral/flag"
 
 	"github.com/roverplatform/rover/audience/service"
-	"github.com/roverplatform/rover/audience/service/store/mongo"
+	"github.com/roverplatform/rover/audience/service/mongodb"
 	grpc_middleware "github.com/roverplatform/rover/go/grpc/middleware"
 	rlog "github.com/roverplatform/rover/go/log"
 
@@ -118,7 +118,7 @@ func main() {
 		opts = append(opts, grpc.Creds(creds))
 	}
 
-	dbName, err := mongo.ParseDBName(*mongoDSN)
+	dbName, err := mongodb.ParseDBName(*mongoDSN)
 	if err != nil {
 		stderr.Fatalln("url.Parse:", err)
 	}
@@ -128,19 +128,18 @@ func main() {
 		stderr.Fatalf("mgo.Dial: DSN=%q error=%q", *mongoDSN, err)
 	}
 
-	if err := mongo.EnsureIndexes(sess.DB(dbName)); err != nil {
-		stderr.Fatalln("mongo.EnsureIndexes:", err)
+	if err := mongodb.EnsureIndexes(sess.DB(dbName)); err != nil {
+		stderr.Fatalln("mongodb.EnsureIndexes:", err)
 	}
 
-	mongodb := mongo.NewDB(
-		sess.DB(dbName),
-		mongo.WithLogger(rlog.NewLog(rlog.Error)),
-		mongo.WithTimeFunc(time.Now),
+	db := mongodb.New(sess.DB(dbName),
+		mongodb.WithLogger(rlog.NewLog(rlog.Error)),
+		mongodb.WithTimeFunc(time.Now),
 	)
 
 	grpcServer := grpc.NewServer(opts...)
 
-	service.Register(grpcServer, service.New(mongodb))
+	service.Register(grpcServer, service.New(db))
 
 	go func() {
 		stdout.Printf("proto=rpc address=%q", *rpcAddr)

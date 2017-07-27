@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/audience/v1"
+	"github.com/roverplatform/rover/audience/service/mongodb"
 )
 
 // ensure the interface is implemented
@@ -20,44 +21,7 @@ var (
 type (
 	// Server implements the audience service grpc interface
 	Server struct {
-		db DB
-	}
-
-	// DB interface the service is expecting
-	DB interface {
-		// Profiles
-		CreateProfile(context.Context, *audience.CreateProfileRequest) (*audience.Profile, error)
-		DeleteProfile(context.Context, *audience.DeleteProfileRequest) error
-
-		UpdateProfile(context.Context, *audience.UpdateProfileRequest) error
-		UpdateProfileIdentifier(context.Context, *audience.UpdateProfileIdentifierRequest) error
-
-		GetProfileByDeviceId(context.Context, *audience.GetProfileByDeviceIdRequest) (*audience.Profile, error)
-		GetProfileByIdentifier(context.Context, *audience.GetProfileByIdentifierRequest) (*audience.Profile, error)
-
-		ListProfilesByIds(context.Context, *audience.ListProfilesByIdsRequest) ([]*audience.Profile, error)
-
-		// Profiles Schema
-		GetProfileSchema(context.Context, *audience.GetProfileSchemaRequest) (*audience.ProfileSchema, error)
-
-		// Devices
-		GetDevice(context.Context, *audience.GetDeviceRequest) (*audience.Device, error)
-		GetDeviceByPushToken(context.Context, *audience.GetDeviceByPushTokenRequest) (*audience.Device, error)
-
-		CreateDevice(context.Context, *audience.CreateDeviceRequest) error
-
-		UpdateDevice(context.Context, *audience.UpdateDeviceRequest) error
-		UpdateDevicePushToken(context.Context, *audience.UpdateDevicePushTokenRequest) error
-		UpdateDeviceUnregisterPushToken(context.Context, *audience.UpdateDeviceUnregisterPushTokenRequest) error
-		UpdateDeviceLocation(context.Context, *audience.UpdateDeviceLocationRequest) error
-		UpdateDeviceIBeaconMonitoring(context.Context, *audience.UpdateDeviceIBeaconMonitoringRequest) error
-		UpdateDeviceGeofenceMonitoring(context.Context, *audience.UpdateDeviceGeofenceMonitoringRequest) error
-
-		SetDeviceProfile(context.Context, *audience.SetDeviceProfileRequest) error
-		DeleteDevice(context.Context, *audience.DeleteDeviceRequest) error
-
-		ListDevicesByProfileId(context.Context, *audience.ListDevicesByProfileIdRequest) ([]*audience.Device, error)
-		ListDevicesByProfileIdentifier(context.Context, *audience.ListDevicesByProfileIdentifierRequest) ([]*audience.Device, error)
+		db *mongodb.DB
 	}
 
 	// Option is a Server option type
@@ -65,7 +29,7 @@ type (
 )
 
 // New creates new Server instance with all the options provided
-func New(db DB, options ...Option) *Server {
+func New(db *mongodb.DB, options ...Option) *Server {
 	srv := &Server{
 		db: db,
 	}

@@ -12,7 +12,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/go-test/deep"
-	"github.com/roverplatform/rover/audience/service/store/mongo"
+	"github.com/roverplatform/rover/audience/service/mongodb"
 )
 
 func TestConversion_Device(t *testing.T) {
@@ -299,7 +299,7 @@ func open(t *testing.T, path string) io.Reader {
 
 func read(t *testing.T, r io.Reader) map[string]interface{} {
 	var (
-		d   = mongo.NewJSONBSONDecoder(r)
+		d   = mongodb.NewJSONBSONDecoder(r)
 		doc = make(map[string]interface{})
 	)
 

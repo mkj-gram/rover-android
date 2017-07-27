@@ -14,7 +14,7 @@ import (
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/roverplatform/rover/audience/service/store/mongo"
+	"github.com/roverplatform/rover/audience/service/mongodb"
 )
 
 type Stats struct {
@@ -88,7 +88,7 @@ func main() {
 		srcIter = customersColl.Find(bson.M{}).Iter()
 	)
 
-	if err := mongo.EnsureIndexes(destDb); err != nil {
+	if err := mongodb.EnsureIndexes(destDb); err != nil {
 		stderr.Fatalln("destDB:", err)
 	}
 

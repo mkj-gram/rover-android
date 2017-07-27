@@ -1,4 +1,4 @@
-package mongo
+package mongodb
 
 import (
 	"time"
@@ -30,7 +30,7 @@ type (
 	}
 )
 
-func NewDB(db *mgo.Database, options ...Option) *DB {
+func New(db *mgo.Database, options ...Option) *DB {
 	ms := &mongoStore{
 		db: db,
 

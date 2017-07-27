@@ -1,4 +1,4 @@
-package mongo_test
+package mongodb_test
 
 import (
 	"io"
@@ -10,25 +10,25 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/go-test/deep"
-	"github.com/roverplatform/rover/audience/service/store/mongo"
+	"github.com/roverplatform/rover/audience/service/mongodb"
 )
 
 func TestProfile_UnmarshalBSON(t *testing.T) {
 
-	f, err := os.Open("../../testdata/profile-00.bson.json")
+	f, err := os.Open("../testdata/profile-00.bson.json")
 	if err != nil {
 		t.Fatal("open:", err)
 	}
 
 	var (
-		dec = mongo.NewJSONBSONDecoder(f)
+		dec = mongodb.NewJSONBSONDecoder(f)
 
 		utcTs, _ = time.Parse(time.RFC3339Nano, "2016-08-22T19:05:53.102Z")
 		ts       = utcTs.In(time.Local)
 
-		got mongo.Profile
+		got mongodb.Profile
 
-		exp = mongo.Profile{
+		exp = mongodb.Profile{
 			Id:         bson.ObjectIdHex("aaaaaaaaaaaaaaaaaaaaaaaa"),
 			AccountId:  5,
 			Identifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",

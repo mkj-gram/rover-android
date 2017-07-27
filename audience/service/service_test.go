@@ -23,7 +23,7 @@ import (
 
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
 	audience_service "github.com/roverplatform/rover/audience/service"
-	"github.com/roverplatform/rover/audience/service/store/mongo"
+	"github.com/roverplatform/rover/audience/service/mongodb"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 
 	mgo "gopkg.in/mgo.v2"
@@ -90,7 +90,7 @@ func dialMongo(t *testing.T, dsn string) *mgo.Database {
 		t.Fatalf("dialMongo: %v", err)
 	}
 
-	dbName, err := mongo.ParseDBName(dsn)
+	dbName, err := mongodb.ParseDBName(dsn)
 	if err != nil {
 		t.Fatal("url.Parse:", err)
 	}
@@ -101,7 +101,7 @@ func dialMongo(t *testing.T, dsn string) *mgo.Database {
 func decodeBSON(r io.Reader) ([]interface{}, error) {
 	var (
 		docs []interface{}
-		dec  = mongo.NewJSONBSONDecoder(r)
+		dec  = mongodb.NewJSONBSONDecoder(r)
 	)
 
 	for {

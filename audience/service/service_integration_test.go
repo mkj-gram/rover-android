@@ -15,7 +15,7 @@ import (
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
 	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/audience/service"
-	mongo "github.com/roverplatform/rover/audience/service/store/mongo"
+	"github.com/roverplatform/rover/audience/service/mongodb"
 	"github.com/roverplatform/rover/go/log"
 )
 
@@ -24,16 +24,16 @@ var _ = log.Debug
 func TestAudienceService(t *testing.T) {
 
 	var (
-		db = dialMongo(t, *tMongoDSN)
+		mdb = dialMongo(t, *tMongoDSN)
 
-		profiles         = db.C("profiles")
-		devices          = db.C("devices")
-		profiles_schemas = db.C("profiles_schemas")
+		profiles         = mdb.C("profiles")
+		devices          = mdb.C("devices")
+		profiles_schemas = mdb.C("profiles_schemas")
 	)
 
 	truncateColl(t, profiles, devices, profiles_schemas)
 
-	if err := mongo.EnsureIndexes(db); err != nil {
+	if err := mongodb.EnsureIndexes(mdb); err != nil {
 		t.Fatalf("EnsureIndexes: %v", err)
 	}
 
@@ -80,9 +80,9 @@ func testAudienceService_CreateProfile(t *testing.T) {
 		createdAt = parseTime(t, "2016-11-11T00:00:00.111Z")
 		timeNow   = func() time.Time { return createdAt }
 
-		db = mongo.NewDB(dialMongo(t, *tMongoDSN),
-			mongo.WithObjectIDFunc(objectId),
-			mongo.WithTimeFunc(timeNow),
+		db = mongodb.New(dialMongo(t, *tMongoDSN),
+			mongodb.WithObjectIDFunc(objectId),
+			mongodb.WithTimeFunc(timeNow),
 		)
 
 		svc = service.New(db)
@@ -146,7 +146,7 @@ func testAudienceService_DeleteProfile(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
-		db = mongo.NewDB(
+		db = mongodb.New(
 			dialMongo(t, *tMongoDSN),
 		)
 
@@ -251,10 +251,10 @@ func testAudienceService_UpdateProfileIdentifier(t *testing.T) {
 		createdAt = parseTime(t, "2016-08-22T19:05:53.102Z")
 		updatedAt = time.Now().Truncate(time.Millisecond)
 
-		db = mongo.NewDB(
+		db = mongodb.New(
 			dialMongo(t, *tMongoDSN),
-			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -380,10 +380,10 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 		updatedAt = parseTime(t, "2016-08-22T19:05:53.102Z")
 		aTime     = protoTs(t, updatedAt)
 
-		db = mongo.NewDB(
+		db = mongodb.New(
 			dialMongo(t, *tMongoDSN),
-			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -1116,7 +1116,7 @@ func testAudienceService_GetProfileByDeviceId(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
-		db = mongo.NewDB(
+		db = mongodb.New(
 			dialMongo(t, *tMongoDSN),
 		)
 
@@ -1188,7 +1188,7 @@ func testAudienceService_GetProfileByIdentifier(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
-		db = mongo.NewDB(
+		db = mongodb.New(
 			dialMongo(t, *tMongoDSN),
 		)
 
@@ -1268,7 +1268,7 @@ func testAudienceService_ListProfilesByIds(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
-		db = mongo.NewDB(
+		db = mongodb.New(
 			dialMongo(t, *tMongoDSN),
 		)
 
@@ -1365,7 +1365,7 @@ func testAudienceService_GetProfilesSchema(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
-		db = mongo.NewDB(
+		db = mongodb.New(
 			dialMongo(t, *tMongoDSN),
 		)
 
@@ -1441,10 +1441,10 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 
 		updatedAt = time.Now().Truncate(time.Millisecond)
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(
-			mongodb,
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -1566,9 +1566,9 @@ func testAudienceService_GetDevice(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(mongodb,
-			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(mdb,
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
 		)
 		svc = service.New(db)
 
@@ -1711,9 +1711,9 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(mongodb,
-			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(mdb,
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
 		)
 		svc = service.New(db)
 
@@ -1803,11 +1803,11 @@ func testAudienceService_CreateDevice(t *testing.T) {
 
 		createdAt = time.Now().Truncate(time.Millisecond)
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(
-			mongodb,
-			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
-			mongo.WithTimeFunc(func() time.Time { return createdAt }),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+			mongodb.WithTimeFunc(func() time.Time { return createdAt }),
 		)
 
 		svc = service.New(db)
@@ -1935,11 +1935,11 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 
 		updatedAt = time.Now().Truncate(time.Millisecond)
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(
-			mongodb,
-			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -2214,10 +2214,10 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 
 		updatedAt = time.Now().Truncate(time.Millisecond)
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(
-			mongodb,
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -2414,10 +2414,10 @@ func testAudienceService_UpdateDeviceUnregisterPushToken(t *testing.T) {
 
 		updatedAt = time.Now().Truncate(time.Millisecond)
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(
-			mongodb,
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -2526,10 +2526,10 @@ func testAudienceService_UpdateDeviceLocation(t *testing.T) {
 
 		updatedAt = time.Now().Truncate(time.Millisecond)
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(
-			mongodb,
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -2635,10 +2635,10 @@ func testAudienceService_UpdateDeviceGeofenceMonitoring(t *testing.T) {
 
 		updatedAt = time.Now().Truncate(time.Millisecond)
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(
-			mongodb,
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -2750,10 +2750,10 @@ func testAudienceService_UpdateDeviceIBeaconMonitoring(t *testing.T) {
 
 		updatedAt = time.Now().Truncate(time.Millisecond)
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(
-			mongodb,
-			mongo.WithTimeFunc(func() time.Time { return updatedAt }),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
 		svc = service.New(db)
@@ -2864,7 +2864,7 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
-		db = mongo.NewDB(dialMongo(t, *tMongoDSN))
+		db = mongodb.New(dialMongo(t, *tMongoDSN))
 
 		svc = service.New(db)
 
@@ -2975,9 +2975,9 @@ func testAudienceService_ListDevicesByProfileId(t *testing.T) {
 		ctx = context.TODO()
 		// createdAt = protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z"))
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(mongodb,
-			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(mdb,
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
 		)
 		svc = service.New(db)
 
@@ -3081,10 +3081,10 @@ func testAudienceService_ListDevicesByProfileIdentifier(t *testing.T) {
 		ctx = context.TODO()
 		// createdAt = protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z"))
 
-		mongodb = dialMongo(t, *tMongoDSN)
-		db      = mongo.NewDB(mongodb,
-			mongo.WithLogger(log.NewLog(log.Debug)),
-			mongo.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(mdb,
+			mongodb.WithLogger(log.NewLog(log.Debug)),
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
 		)
 		svc = service.New(db)
 
