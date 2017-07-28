@@ -190,6 +190,12 @@ func (s *Server) ListDevicesByProfileIdentifier(ctx context.Context, r *audience
 	return &audience.ListDevicesByProfileIdentifierResponse{devices}, nil
 }
 
+func (s *Server) GetDeviceSchema(ctx context.Context, r *audience.GetDeviceSchemaRequest) (*audience.GetDeviceSchemaResponse, error) {
+	return &audience.GetDeviceSchemaResponse{
+		Attributes: hardcodedDeviceSchema(r.GetAuthContext().GetAccountId()),
+	}, nil
+}
+
 // Profiles
 
 // GetProfile implements the corresponding rpc

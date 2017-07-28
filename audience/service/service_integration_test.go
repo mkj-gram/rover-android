@@ -58,6 +58,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("GetProfileSchema", testAudienceService_GetProfilesSchema)
 
 	// Devices
+	t.Run("GetDeviceSchema", testAudienceService_GetDeviceSchema)
 	t.Run("GetDevice", testAudienceService_GetDevice)
 	t.Run("GetDeviceByPushToken", testAudienceService_GetDeviceByPushToken)
 	t.Run("CreateDevice", testAudienceService_CreateDevice)
@@ -73,6 +74,8 @@ func TestAudienceService(t *testing.T) {
 	t.Run("DeleteDevice", testAudienceService_DeleteDevice)
 	t.Run("ListDevicesByProfileId", testAudienceService_ListDevicesByProfileId)
 	t.Run("ListDevicesByProfileIdentifier", testAudienceService_ListDevicesByProfileIdentifier)
+
+	t.Run("GetDeviceSchema", testAudienceService_GetDeviceSchema)
 }
 
 func testAudienceService_CreateProfile(t *testing.T) {
@@ -3407,6 +3410,46 @@ func testAudienceService_ListDevicesByProfileIdentifier(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 			got, gotErr := client.ListDevicesByProfileIdentifier(ctx, tc.req)
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func testAudienceService_GetDeviceSchema(t *testing.T) {
+	var (
+		ctx              = context.TODO()
+		mdb              = dialMongo(t, *tMongoDSN)
+		svc              = service.New(mongodb.New(mdb))
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	t.Skip("TODO: once stable")
+
+	tcases := []struct {
+		name string
+		req  *audience.GetDeviceSchemaRequest
+
+		expErr error
+		exp    *audience.GetDeviceSchemaResponse
+	}{
+		{
+			name: "gets schema",
+			req: &audience.GetDeviceSchemaRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+			},
+
+			expErr: nil,
+			exp:    &audience.GetDeviceSchemaResponse{},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, gotErr := client.GetDeviceSchema(ctx, tc.req)
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}

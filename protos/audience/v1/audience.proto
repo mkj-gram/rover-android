@@ -63,6 +63,8 @@ service Audience {
   // DeleteDevice deletes device from the database and removes it from any segments
   rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
 
+  // GetDeviceSchema returns description of device attributes
+  rpc GetDeviceSchema(GetDeviceSchemaRequest) returns (GetDeviceSchemaResponse);
 
   //
   // DynamicSegments
@@ -305,6 +307,13 @@ message ListDevicesByProfileIdentifierResponse {
   repeated Device devices = 1;
 }
 
+
+message GetDeviceSchemaRequest {
+  auth.v1.AuthContext auth_context = 1;
+}
+message GetDeviceSchemaResponse {
+  repeated SchemaAttribute attributes = 1;
+}
 
 // Every event comes with DeviceContext populated
 message UpdateDeviceRequest {
@@ -556,17 +565,17 @@ message SchemaAttribute {
   int32 account_id = 1;
   // attribute id
   string id = 2;
-  // attribute name
+  // attribute key
   string attribute = 3;
+  // attribute label
+  string label = 4;
   // attribute type descriptor, ie string/array[string]
   // see Value for all possible types
-  string attribute_type = 4;
-
+  string attribute_type = 5;
   // attribute path if nested
-  string path = 5;
-
+  string path = 6;
   // attribute creation time
-  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp created_at = 7;
 }
 
 
@@ -589,7 +598,6 @@ enum Null {
   // Null value.
   NULL = 0;
 }
-
 
 
 //
@@ -803,4 +811,3 @@ message Predicate {
     GeofencePredicate geofence_predicate = 6;
   }
 }
-

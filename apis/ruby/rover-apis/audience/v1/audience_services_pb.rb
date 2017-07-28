@@ -59,6 +59,8 @@ module Rover
           rpc :SetDeviceProfile, SetDeviceProfileRequest, SetDeviceProfileResponse
           # DeleteDevice deletes device from the database and removes it from any segments
           rpc :DeleteDevice, DeleteDeviceRequest, DeleteDeviceResponse
+          # GetDeviceSchema returns description of device attributes
+          rpc :GetDeviceSchema, GetDeviceSchemaRequest, GetDeviceSchemaResponse
           #
           # DynamicSegments
           #

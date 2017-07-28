@@ -182,6 +182,28 @@ function deserialize_rover_audience_v1_GetDeviceResponse(buffer_arg) {
   return audience_v1_audience_pb.GetDeviceResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_GetDeviceSchemaRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetDeviceSchemaRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetDeviceSchemaRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetDeviceSchemaRequest(buffer_arg) {
+  return audience_v1_audience_pb.GetDeviceSchemaRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_GetDeviceSchemaResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetDeviceSchemaResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetDeviceSchemaResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetDeviceSchemaResponse(buffer_arg) {
+  return audience_v1_audience_pb.GetDeviceSchemaResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_GetDynamicSegmentByIdRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.GetDynamicSegmentByIdRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.GetDynamicSegmentByIdRequest');
@@ -918,6 +940,18 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_DeleteDeviceRequest,
     responseSerialize: serialize_rover_audience_v1_DeleteDeviceResponse,
     responseDeserialize: deserialize_rover_audience_v1_DeleteDeviceResponse,
+  },
+  // GetDeviceSchema returns description of device attributes
+  getDeviceSchema: {
+    path: '/rover.audience.v1.Audience/GetDeviceSchema',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.GetDeviceSchemaRequest,
+    responseType: audience_v1_audience_pb.GetDeviceSchemaResponse,
+    requestSerialize: serialize_rover_audience_v1_GetDeviceSchemaRequest,
+    requestDeserialize: deserialize_rover_audience_v1_GetDeviceSchemaRequest,
+    responseSerialize: serialize_rover_audience_v1_GetDeviceSchemaResponse,
+    responseDeserialize: deserialize_rover_audience_v1_GetDeviceSchemaResponse,
   },
   //
   // DynamicSegments

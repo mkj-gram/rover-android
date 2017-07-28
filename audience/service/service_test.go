@@ -231,7 +231,7 @@ func diffCmd(exp, got string) (string, error) {
 	return string(data), nil
 }
 
-func NewServer(rpcAddr string, svc *audience_service.Server) (net.Listener, error) {
+func newServer(rpcAddr string, svc *audience_service.Server) (net.Listener, error) {
 	lis, err := net.Listen("tcp", rpcAddr)
 	if err != nil {
 		return nil, err
@@ -246,27 +246,17 @@ func NewServer(rpcAddr string, svc *audience_service.Server) (net.Listener, erro
 	return lis, nil
 }
 
-func NewClient(rpcAddr string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(rpcAddr, grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-
-	return conn, nil
-}
-
 func NewSeviceClient(t *testing.T, rpcAddr string, svc *audience_service.Server) (audience.AudienceClient, func()) {
-
-	lis, err := NewServer(rpcAddr, svc)
+	lis, err := newServer(rpcAddr, svc)
 	if err != nil {
-		t.Fatal("NewServer:", err)
+		t.Fatal("newServer:", err)
 	}
 
 	time.Sleep(10 * time.Millisecond)
 
-	conn, err := NewClient(lis.Addr().String())
+	conn, err := grpc.Dial(lis.Addr().String(), grpc.WithInsecure())
 	if err != nil {
-		t.Fatal("NewClient:", err)
+		t.Fatal("grpc.dial:", err)
 	}
 
 	client := audience.NewAudienceClient(conn)

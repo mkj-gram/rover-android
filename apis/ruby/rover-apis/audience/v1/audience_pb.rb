@@ -169,6 +169,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.ListDevicesByProfileIdentifierResponse" do
     repeated :devices, :message, 1, "rover.audience.v1.Device"
   end
+  add_message "rover.audience.v1.GetDeviceSchemaRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+  end
+  add_message "rover.audience.v1.GetDeviceSchemaResponse" do
+    repeated :attributes, :message, 1, "rover.audience.v1.SchemaAttribute"
+  end
   add_message "rover.audience.v1.UpdateDeviceRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
@@ -300,9 +306,10 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :account_id, :int32, 1
     optional :id, :string, 2
     optional :attribute, :string, 3
-    optional :attribute_type, :string, 4
-    optional :path, :string, 5
-    optional :created_at, :message, 10, "google.protobuf.Timestamp"
+    optional :label, :string, 4
+    optional :attribute_type, :string, 5
+    optional :path, :string, 6
+    optional :created_at, :message, 7, "google.protobuf.Timestamp"
   end
   add_message "rover.audience.v1.Version" do
     optional :major, :int32, 1
@@ -527,6 +534,8 @@ module Rover
       ListDevicesByProfileIdResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDevicesByProfileIdResponse").msgclass
       ListDevicesByProfileIdentifierRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDevicesByProfileIdentifierRequest").msgclass
       ListDevicesByProfileIdentifierResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDevicesByProfileIdentifierResponse").msgclass
+      GetDeviceSchemaRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetDeviceSchemaRequest").msgclass
+      GetDeviceSchemaResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetDeviceSchemaResponse").msgclass
       UpdateDeviceRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceRequest").msgclass
       UpdateDeviceResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceResponse").msgclass
       Device = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Device").msgclass
