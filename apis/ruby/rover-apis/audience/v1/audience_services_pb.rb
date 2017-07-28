@@ -57,6 +57,20 @@ module Rover
           rpc :SetDeviceProfile, SetDeviceProfileRequest, SetDeviceProfileResponse
           # DeleteDevice deletes device from the database and removes it from any segments
           rpc :DeleteDevice, DeleteDeviceRequest, DeleteDeviceResponse
+          #
+          # Segments
+          #
+          #
+          # CreateSegment creates a new static segment by account_id and a title
+          rpc :CreateSegment, CreateSegmentRequest, CreateSegmentResponse
+          # GetSegmentById returns a single static segment by id
+          rpc :GetSegmentById, GetSegmentByIdRequest, GetSegmentByIdResponse
+          rpc :UpdateSegmentTitle, UpdateSegmentTitleRequest, UpdateSegmentTitleResponse
+          rpc :UpdateSegmentPredicates, UpdateSegmentPredicatesRequest, UpdateSegmentPredicatesResponse
+          # DeleteSegmentById deletes a segment given an id
+          rpc :DeleteSegmentById, DeleteSegmentByIdRequest, DeleteSegmentByIdResponse
+          # ListSegments returns a list of static segments by account_id.
+          rpc :ListSegments, ListSegmentsRequest, ListSegmentsResponse
         end
 
         Stub = Service.rpc_stub_class

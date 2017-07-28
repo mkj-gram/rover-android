@@ -60,6 +60,26 @@ service Audience {
 
   // DeleteDevice deletes device from the database and removes it from any segments
   rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
+
+
+  //
+  // Segments
+  //
+
+  // CreateSegment creates a new static segment by account_id and a title
+  rpc CreateSegment(CreateSegmentRequest) returns (CreateSegmentResponse);
+
+  // GetSegmentById returns a single static segment by id
+  rpc GetSegmentById(GetSegmentByIdRequest) returns (GetSegmentByIdResponse);
+
+  rpc UpdateSegmentTitle(UpdateSegmentTitleRequest) returns (UpdateSegmentTitleResponse);
+  rpc UpdateSegmentPredicates(UpdateSegmentPredicatesRequest) returns (UpdateSegmentPredicatesResponse);
+
+  // DeleteSegmentById deletes a segment given an id
+  rpc DeleteSegmentById(DeleteSegmentByIdRequest) returns (DeleteSegmentByIdResponse);
+
+  // ListSegments returns a list of static segments by account_id.
+  rpc ListSegments(ListSegmentsRequest) returns(ListSegmentsResponse);
 }
 
 
@@ -559,3 +579,77 @@ enum Null {
 }
 
 
+
+//
+// Segments
+//
+
+message CreateSegmentRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string title = 2;
+}
+message CreateSegmentResponse {
+  Segment segment = 1;
+}
+
+
+message GetSegmentByIdRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string segment_id = 2;
+}
+message GetSegmentByIdResponse {
+  Segment segment = 1;
+}
+
+message UpdateSegmentTitleRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string segment_id = 2;
+
+  string title = 3;
+}
+message UpdateSegmentTitleResponse {}
+
+
+message UpdateSegmentPredicatesRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string segment_id = 2;
+
+  repeated Predicate predicates = 3;
+}
+message UpdateSegmentPredicatesResponse {}
+
+
+message DeleteSegmentByIdRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string segment_id = 2;
+}
+message DeleteSegmentByIdResponse { }
+
+
+message ListSegmentsRequest {
+  auth.v1.AuthContext auth_context = 1;
+}
+message ListSegmentsResponse {
+  repeated Segment segments = 1;
+}
+
+message Segment {
+  string id = 1;
+  int32 account_id = 2;
+
+  // Setment title
+  string title = 3;
+
+  // number of entries in the segment
+  int64 segment_size = 4;
+
+  // predicates
+  repeated Predicate predicates = 5;
+
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message Predicate {
+  // TODO
+}
