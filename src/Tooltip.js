@@ -14,10 +14,10 @@ class Tooltip extends Component {
 
     componentDidMount() {
         const { coordinates } = this.props
+
         const d1 = coordinates.divWidth
         const d2 = document.getElementById('toolTip').getBoundingClientRect()
             .width
-
         this.setState({
             triPosition: (d2 - 11.31) / 2,
             shift: (d1 - d2) / 2
@@ -25,24 +25,28 @@ class Tooltip extends Component {
     }
 
     render() {
-        const { message, coordinates } = this.props
-        let position
-        if (
-            document.getElementsByClassName('react-grid-Grid')[0].clientHeight -
-                coordinates.y <=
-            35
-        ) {
-            position = 'top'
+        const { message, coordinates, backgroundColor, stylePosition, position } = this.props
+        let pos
+        if (position !== null) {
+            pos = position
         } else {
-            position = 'bottom'
+            if (
+                document.getElementsByClassName('react-grid-Grid')[0].clientHeight -
+                    coordinates.y <=
+                35
+            ) {
+                pos = 'top'
+            } else {
+                pos = 'bottom'
+            }
         }
 
         let res
-        if (position === 'top') {
+        if (pos === 'top') {
             res = (
                 <div
                     style={{
-                        position: 'absolute',
+                        position: stylePosition,
                         top: coordinates.y - 34 - 16,
                         left: coordinates.x + this.state.shift,
                         zIndex: 20
@@ -51,7 +55,7 @@ class Tooltip extends Component {
                     <div
                         id="toolTip"
                         style={{
-                            background: graphite,
+                            background: backgroundColor,
                             borderRadius: 3,
                             color: 'white',
                             fontSize: 12,
@@ -65,7 +69,7 @@ class Tooltip extends Component {
                             style={{
                                 height: 8,
                                 width: 8,
-                                backgroundColor: graphite,
+                                backgroundColor: backgroundColor,
                                 transform: 'rotate(45deg)',
                                 position: 'relative',
                                 left: this.state.triPosition,
@@ -80,7 +84,7 @@ class Tooltip extends Component {
             res = (
                 <div
                     style={{
-                        position: 'absolute',
+                        position: stylePosition,
                         top: coordinates.y,
                         left: coordinates.x + this.state.shift,
                         zIndex: 20
@@ -90,7 +94,7 @@ class Tooltip extends Component {
                         style={{
                             height: 8,
                             width: 8,
-                            backgroundColor: graphite,
+                            backgroundColor: backgroundColor,
                             transform: 'rotate(45deg)',
                             position: 'relative',
                             left: this.state.triPosition,
@@ -100,7 +104,7 @@ class Tooltip extends Component {
                     <div
                         id="toolTip"
                         style={{
-                            background: graphite,
+                            background: backgroundColor,
                             borderRadius: 3,
                             color: 'white',
                             fontSize: 12,
@@ -121,7 +125,10 @@ class Tooltip extends Component {
 
 Tooltip.propTypes = {
     message: PropTypes.string.isRequired,
-    coordinates: PropTypes.object.isRequired
+    coordinates: PropTypes.object.isRequired,
+    stylePosition: PropTypes.string,
+    backgroundColor: PropTypes.string,
+    position: PropTypes.string,
 }
 
 Tooltip.defaultProps = {
@@ -130,7 +137,10 @@ Tooltip.defaultProps = {
         x: 0,
         y: 0,
         divWidth: 0
-    }
+    },
+    stylePosition: 'absolute',
+    backgroundColor: graphite,
+    position: null
 }
 
 export default Tooltip

@@ -23,7 +23,8 @@ const ModalWithHeader = ({
     modalContentStyle,
     modalOverlayStyle,
     bodyOpenClassName,
-    hoverStyle
+    hoverStyle,
+    cancelTextHoverColor
 }) => {
     const headerStyle = {
         position: 'relative',
@@ -91,7 +92,7 @@ const ModalWithHeader = ({
                         type="cancel"
                         onClick={cancelFn}
                         primaryColor={secondaryColor}
-                        hoverColor={hoverColor}
+                        hoverColor={cancelTextHoverColor}
                         style={{ cursor: 'pointer' }}
                     >
                         {cancelText}
@@ -119,7 +120,9 @@ ModalWithHeader.propTypes = {
     modalContentStyle: PropTypes.object,
     modalOverlayStyle: PropTypes.object,
     bodyOpenClassName: PropTypes.string,
-    hoverStyle: PropTypes.object
+    hoverStyle: PropTypes.object,
+    cancelTextHoverColor: PropTypes.string,
+    isOpen: PropTypes.bool.isRequired
 }
 
 ModalWithHeader.defaultProps = {
@@ -129,7 +132,9 @@ ModalWithHeader.defaultProps = {
     successText: '',
     primaryColor: purple,
     hoverColor: orchid,
-    secondaryColor: 'white'
+    secondaryColor: 'white',
+    cancelTextHoverColor: 'white',
+    isOpen: false
 }
 
 export default ModalWithHeader
