@@ -222,7 +222,7 @@ func (s *profilesStore) GetProfileByDeviceId(ctx context.Context, r *audience.Ge
 		account_id = r.GetAuthContext().GetAccountId()
 		device_id  = r.GetDeviceId()
 
-		d Device
+		d bson.M
 
 		dq = bson.M{
 			"device_id":  device_id,
@@ -230,8 +230,7 @@ func (s *profilesStore) GetProfileByDeviceId(ctx context.Context, r *audience.Ge
 		}
 	)
 
-	// TODO: select only profile_id
-	if err := s.devices.Find(dq).One(&d); err != nil {
+	if err := s.devices.Find(dq).Select(bson.M{"profile_id": 1}).One(&d); err != nil {
 		return nil, wrapError(err, "devices.Find")
 	}
 
@@ -239,7 +238,7 @@ func (s *profilesStore) GetProfileByDeviceId(ctx context.Context, r *audience.Ge
 		p Profile
 
 		pq = bson.M{
-			"_id":        d.ProfileId,
+			"_id":        d["profile_id"],
 			"account_id": account_id,
 		}
 	)

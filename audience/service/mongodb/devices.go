@@ -92,7 +92,6 @@ func (d *Device) fromProto(proto *audience.Device) error {
 
 	d.DeviceTokenUpdatedAt, _ = protoToTime(proto.DeviceTokenUpdatedAt)
 	d.DeviceTokenCreatedAt, _ = protoToTime(proto.DeviceTokenCreatedAt)
-	// TODO: handle nulls
 	d.DeviceTokenUnregisteredAt, _ = protoToTime(proto.DeviceTokenUnregisteredAt)
 
 	d.AppName = proto.AppName
@@ -691,7 +690,7 @@ func (s *devicesStore) ListDevicesByProfileIdentifier(ctx context.Context, r *au
 		profile = bson.M{}
 	)
 
-	if err := s.profiles.Find(pQ).One(&profile); err != nil {
+	if err := s.profiles.Find(pQ).Select(bson.M{"_id": 1}).One(&profile); err != nil {
 		return nil, wrapError(err, "profiles.Find")
 	}
 
