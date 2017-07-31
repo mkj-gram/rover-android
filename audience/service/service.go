@@ -287,6 +287,40 @@ func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.Update
 	return &audience.UpdateProfileIdentifierResponse{}, nil
 }
 
+//
+// DynamicSegments
+//
+
+// CreateDynamicSegment implements the corresponding rpc
+func (s *Server) CreateDynamicSegment(ctx context.Context, r *audience.CreateDynamicSegmentRequest) (*audience.CreateDynamicSegmentResponse, error) {
+	return &audience.CreateDynamicSegmentResponse{}, status.Error(codes.Unimplemented, "TODO:")
+}
+
+// GetDynamicSegmentById implements the corresponding rpc
+func (s *Server) GetDynamicSegmentById(ctx context.Context, r *audience.GetDynamicSegmentByIdRequest) (*audience.GetDynamicSegmentByIdResponse, error) {
+	return &audience.GetDynamicSegmentByIdResponse{}, status.Error(codes.Unimplemented, "TODO:")
+}
+
+// UpdateDynamicSegmentTitle implements the corresponding rpc
+func (s *Server) UpdateDynamicSegmentTitle(ctx context.Context, r *audience.UpdateDynamicSegmentTitleRequest) (*audience.UpdateDynamicSegmentTitleResponse, error) {
+	return &audience.UpdateDynamicSegmentTitleResponse{}, status.Error(codes.Unimplemented, "TODO:")
+}
+
+// UpdateDynamicSegmentPredicates implements the corresponding rpc
+func (s *Server) UpdateDynamicSegmentPredicates(ctx context.Context, r *audience.UpdateDynamicSegmentPredicatesRequest) (*audience.UpdateDynamicSegmentPredicatesResponse, error) {
+	return &audience.UpdateDynamicSegmentPredicatesResponse{}, status.Error(codes.Unimplemented, "TODO:")
+}
+
+// ArchiveDynamicSegmentById implements the corresponding rpc
+func (s *Server) ArchiveDynamicSegmentById(ctx context.Context, r *audience.ArchiveDynamicSegmentByIdRequest) (*audience.ArchiveDynamicSegmentByIdResponse, error) {
+	return &audience.ArchiveDynamicSegmentByIdResponse{}, status.Error(codes.Unimplemented, "TODO:")
+}
+
+// ListDynamicSegments implements the corresponding rpc
+func (s *Server) ListDynamicSegments(ctx context.Context, r *audience.ListDynamicSegmentsRequest) (*audience.ListDynamicSegmentsResponse, error) {
+	return &audience.ListDynamicSegmentsResponse{}, status.Error(codes.Unimplemented, "TODO:")
+}
+
 // Validations
 
 func validateID(id string) error {
