@@ -41,7 +41,8 @@ class SegmentCell extends Component {
             },
             isEdittingName: false,
             segmentName: '',
-            isDeleteModalShowing: false
+            isDeleteModalShowing: false,
+            disableCheckmark: false
         }
         this.onCellHover = this.onCellHover.bind(this)
         this.onMouseClickEdit = this.onMouseClickEdit.bind(this)
@@ -58,15 +59,24 @@ class SegmentCell extends Component {
             this
         )
         this.deleteTextContent = this.deleteTextContent.bind(this)
+        this.handleSegmentCellClick = this.handleSegmentCellClick.bind(this)
     }
 
     onCellHover(val) {
-        this.setState({ showIcons: val })
+        if (val === false) {
+            this.setState({
+                hoverOverIcon: '',
+                showIcons: val
+            })
+        } else {
+            this.setState({ showIcons: val })
+        }
     }
 
     onMouseClickEdit() {
-        const { segment } = this.props
+        const { segment, index, currentEditSegment } = this.props
 
+        currentEditSegment(index)
         this.setState({
             isEdittingName: true,
             segmentName: segment
@@ -80,6 +90,7 @@ class SegmentCell extends Component {
         this.setState({
             hoverOverIcon: name
         })
+
         setTimeout(() => {
             if (
                 this.state.hoverOverIcon === name &&
@@ -92,7 +103,7 @@ class SegmentCell extends Component {
                         message: name,
                         coordinates: {
                             x: t.left,
-                            y: t.top + 12,
+                            y: t.top + 28,
                             divWidth: t.width
                         }
                     }
@@ -118,16 +129,17 @@ class SegmentCell extends Component {
 
     handleRename(e) {
         this.setState({
+            disableCheckmark: e.target.value.length === 0,
             segmentName: e.target.value
         })
     }
 
     setSegmentName() {
         const { isEdittingName, segmentName } = this.state
-        const { segment } = this.props
+        const { segment, currentSegment, index } = this.props
         let name
 
-        if (isEdittingName) {
+        if (isEdittingName && currentSegment === index) {
             name = (
                 <TextField
                     placeholder={segment}
@@ -140,6 +152,7 @@ class SegmentCell extends Component {
                         borderColor: silver
                     }}
                     onChange={this.handleRename}
+                    autoFocus={true}
                 />
             )
         } else {
@@ -180,9 +193,19 @@ class SegmentCell extends Component {
         })
     }
 
+    getIconFill(name) {
+        let fill
+        if (this.state.hoverOverIcon === name) {
+            fill = 'white'
+        } else {
+            fill = silver
+        }
+        return fill
+    }
+
     displayIcons() {
         const { showIcons, isEdittingName } = this.state
-        const { index } = this.props
+        const { index, currentSegment } = this.props
         let icons
 
         if (showIcons) {
@@ -205,12 +228,11 @@ class SegmentCell extends Component {
                             marginRight: 9,
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            marginTop: 6
+                            justifyContent: 'center'
                         }}
                     >
                         <PencilEditIcon
-                            fill={silver}
+                            fill={this.getIconFill('rename')}
                             style={{ pointerEvents: 'none' }}
                         />
                     </div>
@@ -228,7 +250,7 @@ class SegmentCell extends Component {
                         onClick={() => this.onMouseClickDelete(index)}
                     >
                         <TrashIcon
-                            fill={silver}
+                            fill={this.getIconFill('trash')}
                             style={{ pointerEvents: 'none' }}
                         />
                     </div>
@@ -236,7 +258,7 @@ class SegmentCell extends Component {
             )
         }
 
-        if (isEdittingName) {
+        if (isEdittingName && currentSegment === index) {
             icons = (
                 <div
                     style={{
@@ -247,21 +269,42 @@ class SegmentCell extends Component {
                     }}
                 >
                     <div style={{ marginRight: 4, marginTop: 2 }}>
-                        <div
-                            onClick={() => this.handleEditSave()}
-                            style={{
-                                height: 20,
-                                width: 20,
-                                backgroundColor: violet,
-                                borderRadius: 4,
-                                display: 'flex',
-                                flex: 'none',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <CheckmarkIcon fill="white" />
-                        </div>
+                        {this.state.disableCheckmark
+                            ? <div
+                                  style={{
+                                      height: 20,
+                                      width: 20,
+                                      background: '#6F6F6F',
+                                      borderRadius: 4,
+                                      display: 'flex',
+                                      flex: 'none',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                  }}
+                              >
+                                  
+                                  <CheckmarkIcon fill={steel} style={{ pointerEvents: 'none' }}/>
+                              </div>
+                            : <div
+                                  onClick={() => this.handleEditSave()}
+                                  style={{
+                                      height: 20,
+                                      width: 20,
+                                      backgroundColor: violet,
+                                      borderRadius: 4,
+                                      display: 'flex',
+                                      flex: 'none',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                  }}
+                                  onMouseOver={e =>
+                                      (e.target.style.backgroundColor =
+                                          '#AE83FF')}
+                                  onMouseLeave={e =>
+                                      (e.target.style.backgroundColor = violet)}
+                              >
+                                  <CheckmarkIcon fill="white" style={{ pointerEvents: 'none' }} />
+                              </div>}
                     </div>
                     <div style={{ marginRight: 19, marginTop: 2 }}>
                         <div
@@ -276,8 +319,12 @@ class SegmentCell extends Component {
                                 alignItems: 'center',
                                 justifyContent: 'center'
                             }}
+                            onMouseOver={e =>
+                                (e.target.style.backgroundColor = '#818181')}
+                            onMouseLeave={e =>
+                                (e.target.style.backgroundColor = silver)}
                         >
-                            <CancelIcon fill="white" />
+                            <CancelIcon fill="white" style={{ pointerEvents: 'none' }}/>
                         </div>
                     </div>
                 </div>
@@ -340,6 +387,17 @@ class SegmentCell extends Component {
         )
     }
 
+    handleSegmentCellClick() {
+        const { currentEditSegment, index } = this.props
+        currentEditSegment(index)
+        if (this.state.isEdittingName) {
+            this.setState({
+                isEdittingName: false,
+                disableCheckmark: false
+            })
+        }
+    }
+
     render() {
         const { showIcons, isEdittingName } = this.state
         const { isToolTipShowing, message, coordinates } = this.state.toolTip
@@ -356,10 +414,11 @@ class SegmentCell extends Component {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        backgroundColor: (showIcons) ? ash : graphite
+                        backgroundColor: showIcons ? ash : graphite
                     }}
                     onMouseOver={() => this.onCellHover(true)}
                     onMouseLeave={() => this.onCellHover(false)}
+                    onClick={() => this.handleSegmentCellClick()}
                 >
                     {this.setSegmentName()}
                     {this.displayIcons()}
@@ -383,7 +442,8 @@ SegmentCell.propTypes = {
     segment: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     removeSegmentCell: PropTypes.func.isRequired,
-    updateSegmentCell: PropTypes.func.isRequired
+    updateSegmentCell: PropTypes.func.isRequired,
+    currentEditSegment: PropTypes.func
 }
 
 SegmentCell.defaultProps = {

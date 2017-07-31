@@ -106,6 +106,7 @@ const ColumnDisplayContainer = ({
             }}
             bodyOpenClassName="bodyClassName"
             hoverStyle={{ backgroundColor: titanium }}
+            cancelTextHoverColor={violet}
         >
             <div style={modalContainer}>
                 <ColumnDisplay

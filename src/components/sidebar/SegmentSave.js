@@ -79,7 +79,7 @@ class SegmentSave extends Component {
     segmentUpdate() {
         const { segment } = this.props
         return (
-            <div style={{ height: 189, width: 217 }}>
+            <div style={{ width: 217 }}>
                 <div style={{ ...text, color: silver }}>
                     Would you like to...
                 </div>
@@ -103,7 +103,9 @@ class SegmentSave extends Component {
     renderRadioButton(action, val = null) {
         let buttonText
         if (action === 'create') {
-            buttonText = <span style={{ color: 'white' }}>Create a new segment</span>
+            buttonText = (
+                <span style={{ color: 'white' }}>Create a new segment</span>
+            )
         } else {
             buttonText = (
                 <span style={{ color: 'white' }}>

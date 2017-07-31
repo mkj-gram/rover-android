@@ -14,6 +14,7 @@ let canvas,
 class FunnelAnimation extends Component {
     constructor(props) {
         super(props)
+        this.handleModalOpen = this.handleModalOpen.bind(this)
     }
 
     componentDidMount() {
@@ -80,12 +81,18 @@ class FunnelAnimation extends Component {
         fnStartAnimation()
     }
 
+    handleModalOpen() {
+        if (!this.props.isModalOpen) {
+            return graphite
+        }
+    }
+
     render() {
         return (
             <div
                 id="animation_container"
                 style={{
-                    backgroundColor: graphite,
+                    backgroundColor: this.handleModalOpen(),
                     width: 180,
                     height: 200,
                     margin: '0 auto'
@@ -98,7 +105,7 @@ class FunnelAnimation extends Component {
                     style={{
                         position: 'absolute',
                         display: 'block',
-                        backgroundColor: graphite
+                        backgroundColor: this.handleModalOpen()
                     }}
                 />
                 <div

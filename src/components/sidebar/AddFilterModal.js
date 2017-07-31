@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
 import { createFragmentContainer, graphql } from 'react-relay'
 import PropTypes from 'prop-types'
 import moment from 'moment'
@@ -23,14 +24,36 @@ class AddFilterModal extends Component {
             search: '',
             filterList: this.buildFilterList()
         }
+        this.handleClickOutside = this.handleClickOutside.bind(this)
+    }
+
+    componentDidMount() {
+        document.addEventListener('click', this.handleClickOutside, true)
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('click', this.handleClickOutside, true)
+    }
+
+    handleClickOutside(e) {
+        const domNode = ReactDOM.findDOMNode(this)
+        if (e && (!domNode || !domNode.contains(e.target))) {
+            this.props.onRequestClose()
+        }
     }
 
     buildFilterList() {
         const { schema } = this.props
         const { deviceSchema, profileSchema } = schema
 
-        const devices = deviceSchema.map(device => ({ category: 'device', ...device }))
-        const profiles = profileSchema.map(profile => ({ category: 'profile', ...profile }))
+        const devices = deviceSchema.map(device => ({
+            category: 'device',
+            ...device
+        }))
+        const profiles = profileSchema.map(profile => ({
+            category: 'profile',
+            ...profile
+        }))
 
         return devices.concat(profiles)
     }
@@ -86,7 +109,7 @@ class AddFilterModal extends Component {
     render() {
         const style = {
             position: 'absolute',
-            top: 75,
+            top: 17,
             left: 20,
             height: 350,
             width: 230,
@@ -98,7 +121,7 @@ class AddFilterModal extends Component {
 
         const { onRequestClose } = this.props
         return (
-            <div style={style}>
+            <div style={style} onClick={() => this.handleClickOutside()}>
                 <IconButton
                     type={'close'}
                     onClick={onRequestClose}
@@ -159,12 +182,12 @@ export default createFragmentContainer(
     graphql`
         fragment AddFilterModal_schema on SegmentSchema {
             deviceSchema {
-              attribute
-              __typename: type
+                attribute
+                __typename: type
             }
             profileSchema {
-              attribute
-              __typename: type
+                attribute
+                __typename: type
             }
         }
     `

@@ -51,6 +51,7 @@ class SideBar extends Component {
 
         this.handleSegmentAction = this.handleSegmentAction.bind(this)
         this.viewDynamicSegment = this.viewDynamicSegment.bind(this)
+        this.handleModalOpen = this.handleModalOpen.bind(this)
     }
 
     updateQuery() {
@@ -83,7 +84,9 @@ class SideBar extends Component {
         const { predicates } = dynamicSegment[0]
         const { condition, device, profile } = predicates
 
-        const query = device.map(d => ({ ...d, category: 'device' })).concat(profile.map(p => ({ ...p, category: 'profile' })))
+        const query = device
+            .map(d => ({ ...d, category: 'device' }))
+            .concat(profile.map(p => ({ ...p, category: 'profile' })))
 
         this.setState({
             query,
@@ -351,6 +354,31 @@ class SideBar extends Component {
         }
     }
 
+    handleModalOpen() {
+        const {
+            isShowingAddFilterModal,
+            showSegmentSelection,
+            showSegmentSave
+        } = this.state
+        if (
+            isShowingAddFilterModal ||
+            showSegmentSelection ||
+            showSegmentSave
+        ) {
+            return (
+                <div
+                    style={{
+                        height: '100%',
+                        width: 300,
+                        flex: '0 0 auto',
+                        background: 'rgba(0,0,0,0.3)',
+                        position: 'absolute'
+                    }}
+                />
+            )
+        }
+    }
+
     render() {
         const sideBarStyle = {
             height: '100%',
@@ -358,11 +386,21 @@ class SideBar extends Component {
             flex: '0 0 auto',
             backgroundColor: graphite,
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            position: 'relative'
         }
-        const { currentAttribute, query, modalCoordinates } = this.state
+        const {
+            currentAttribute,
+            query,
+            modalCoordinates,
+            isShowingAddFilterModal,
+            showSegmentSelection,
+            showSegmentSave
+        } = this.state
         return (
             <div style={sideBarStyle}>
+                {this.handleModalOpen()}
+
                 <ModalWithHeader
                     contentLabel="Query Builder"
                     backgroundColor={graphite}
@@ -408,7 +446,13 @@ class SideBar extends Component {
                               textAlign: 'center'
                           }}
                       >
-                          <FunnelAnimation />
+                          <FunnelAnimation
+                              isModalOpen={
+                                  isShowingAddFilterModal ||
+                                  showSegmentSelection ||
+                                  showSegmentSave
+                              }
+                          />
                           <div style={{ marginBottom: 30 }}>
                               <span
                                   style={{
@@ -454,8 +498,6 @@ export default createFragmentContainer(
             ) {
                 segmentId
                 name
-                totalSize
-                segmentSize
                 predicates {
                     condition
                     device {
