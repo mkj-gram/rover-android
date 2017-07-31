@@ -106,6 +106,7 @@ class BaseProcessor {
 
         this._rawInput = internals.underscoreKeys(args.event.attributes)
 
+        this._rawInput['timestamp'] = eventTimestamp
     }
 
     _getTriggerArguments() {

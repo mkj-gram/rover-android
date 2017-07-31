@@ -938,7 +938,7 @@ internals.parseDevicePayload = function(id, payload) {
 internals.parseEventPayload = function(payload, callback) {
 
     const eventAttributes = {
-        timestamp: payload.timestamp
+        timestamp: payload.timestamp || payload.time
     }
 
     if (payload.name) {
@@ -956,6 +956,7 @@ internals.parseEventPayload = function(payload, callback) {
         delete attributes["user"]
         delete attributes["device"]
         delete attributes["timestamp"]
+        delete attributes["time"]
         delete attributes["name"]
 
         eventAttributes.attributes = attributes;
