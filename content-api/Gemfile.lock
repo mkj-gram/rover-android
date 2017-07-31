@@ -238,7 +238,7 @@ GEM
     public_suffix (2.0.5)
     puma (3.4.0)
     rack (1.6.4)
-    rack-cors (0.4.0)
+    rack-cors (1.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.5)
@@ -385,7 +385,7 @@ DEPENDENCIES
   postgres_ext (~> 3.0)
   pry (~> 0.10.4)
   puma (~> 3.4)
-  rack-cors (~> 0.4.0)
+  rack-cors (~> 1.0, >= 1.0.1)
   rails (= 4.2.5)
   rails-api
   redis (~> 3.2, >= 3.2.2)
