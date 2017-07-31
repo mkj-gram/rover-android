@@ -14207,11 +14207,11 @@ proto.rover.audience.v1.Segment.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     accountId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    title: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    segmentSize: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    predicates: (f = msg.getPredicates()) && proto.rover.audience.v1.PredicateAggregate.toObject(includeInstance, f),
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
+    updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    title: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    segmentSize: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    predicates: (f = msg.getPredicates()) && proto.rover.audience.v1.PredicateAggregate.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -14257,27 +14257,27 @@ proto.rover.audience.v1.Segment.deserializeBinaryFromReader = function(msg, read
       msg.setAccountId(value);
       break;
     case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setTitle(value);
-      break;
-    case 4:
-      var value = /** @type {number} */ (reader.readInt64());
-      msg.setSegmentSize(value);
-      break;
-    case 5:
-      var value = new proto.rover.audience.v1.PredicateAggregate;
-      reader.readMessage(value,proto.rover.audience.v1.PredicateAggregate.deserializeBinaryFromReader);
-      msg.setPredicates(value);
-      break;
-    case 6:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setCreatedAt(value);
       break;
-    case 7:
+    case 4:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setUpdatedAt(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setTitle(value);
+      break;
+    case 6:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setSegmentSize(value);
+      break;
+    case 7:
+      var value = new proto.rover.audience.v1.PredicateAggregate;
+      reader.readMessage(value,proto.rover.audience.v1.PredicateAggregate.deserializeBinaryFromReader);
+      msg.setPredicates(value);
       break;
     default:
       reader.skipField();
@@ -14321,32 +14321,10 @@ proto.rover.audience.v1.Segment.serializeBinaryToWriter = function(message, writ
       f
     );
   }
-  f = message.getTitle();
-  if (f.length > 0) {
-    writer.writeString(
-      3,
-      f
-    );
-  }
-  f = message.getSegmentSize();
-  if (f !== 0) {
-    writer.writeInt64(
-      4,
-      f
-    );
-  }
-  f = message.getPredicates();
-  if (f != null) {
-    writer.writeMessage(
-      5,
-      f,
-      proto.rover.audience.v1.PredicateAggregate.serializeBinaryToWriter
-    );
-  }
   f = message.getCreatedAt();
   if (f != null) {
     writer.writeMessage(
-      6,
+      3,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -14354,9 +14332,31 @@ proto.rover.audience.v1.Segment.serializeBinaryToWriter = function(message, writ
   f = message.getUpdatedAt();
   if (f != null) {
     writer.writeMessage(
-      7,
+      4,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getTitle();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
+  f = message.getSegmentSize();
+  if (f !== 0) {
+    writer.writeInt64(
+      6,
+      f
+    );
+  }
+  f = message.getPredicates();
+  if (f != null) {
+    writer.writeMessage(
+      7,
+      f,
+      proto.rover.audience.v1.PredicateAggregate.serializeBinaryToWriter
     );
   }
 };
@@ -14393,78 +14393,18 @@ proto.rover.audience.v1.Segment.prototype.setAccountId = function(value) {
 
 
 /**
- * optional string title = 3;
- * @return {string}
- */
-proto.rover.audience.v1.Segment.prototype.getTitle = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/** @param {string} value */
-proto.rover.audience.v1.Segment.prototype.setTitle = function(value) {
-  jspb.Message.setField(this, 3, value);
-};
-
-
-/**
- * optional int64 segment_size = 4;
- * @return {number}
- */
-proto.rover.audience.v1.Segment.prototype.getSegmentSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
-};
-
-
-/** @param {number} value */
-proto.rover.audience.v1.Segment.prototype.setSegmentSize = function(value) {
-  jspb.Message.setField(this, 4, value);
-};
-
-
-/**
- * optional PredicateAggregate predicates = 5;
- * @return {?proto.rover.audience.v1.PredicateAggregate}
- */
-proto.rover.audience.v1.Segment.prototype.getPredicates = function() {
-  return /** @type{?proto.rover.audience.v1.PredicateAggregate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.PredicateAggregate, 5));
-};
-
-
-/** @param {?proto.rover.audience.v1.PredicateAggregate|undefined} value */
-proto.rover.audience.v1.Segment.prototype.setPredicates = function(value) {
-  jspb.Message.setWrapperField(this, 5, value);
-};
-
-
-proto.rover.audience.v1.Segment.prototype.clearPredicates = function() {
-  this.setPredicates(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.rover.audience.v1.Segment.prototype.hasPredicates = function() {
-  return jspb.Message.getField(this, 5) != null;
-};
-
-
-/**
- * optional google.protobuf.Timestamp created_at = 6;
+ * optional google.protobuf.Timestamp created_at = 3;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.audience.v1.Segment.prototype.getCreatedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.audience.v1.Segment.prototype.setCreatedAt = function(value) {
-  jspb.Message.setWrapperField(this, 6, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -14478,23 +14418,23 @@ proto.rover.audience.v1.Segment.prototype.clearCreatedAt = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Segment.prototype.hasCreatedAt = function() {
-  return jspb.Message.getField(this, 6) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp updated_at = 7;
+ * optional google.protobuf.Timestamp updated_at = 4;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.audience.v1.Segment.prototype.getUpdatedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.audience.v1.Segment.prototype.setUpdatedAt = function(value) {
-  jspb.Message.setWrapperField(this, 7, value);
+  jspb.Message.setWrapperField(this, 4, value);
 };
 
 
@@ -14508,6 +14448,66 @@ proto.rover.audience.v1.Segment.prototype.clearUpdatedAt = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Segment.prototype.hasUpdatedAt = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional string title = 5;
+ * @return {string}
+ */
+proto.rover.audience.v1.Segment.prototype.getTitle = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Segment.prototype.setTitle = function(value) {
+  jspb.Message.setField(this, 5, value);
+};
+
+
+/**
+ * optional int64 segment_size = 6;
+ * @return {number}
+ */
+proto.rover.audience.v1.Segment.prototype.getSegmentSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.Segment.prototype.setSegmentSize = function(value) {
+  jspb.Message.setField(this, 6, value);
+};
+
+
+/**
+ * optional PredicateAggregate predicates = 7;
+ * @return {?proto.rover.audience.v1.PredicateAggregate}
+ */
+proto.rover.audience.v1.Segment.prototype.getPredicates = function() {
+  return /** @type{?proto.rover.audience.v1.PredicateAggregate} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.PredicateAggregate, 7));
+};
+
+
+/** @param {?proto.rover.audience.v1.PredicateAggregate|undefined} value */
+proto.rover.audience.v1.Segment.prototype.setPredicates = function(value) {
+  jspb.Message.setWrapperField(this, 7, value);
+};
+
+
+proto.rover.audience.v1.Segment.prototype.clearPredicates = function() {
+  this.setPredicates(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Segment.prototype.hasPredicates = function() {
   return jspb.Message.getField(this, 7) != null;
 };
 

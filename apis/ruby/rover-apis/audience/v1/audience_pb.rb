@@ -344,11 +344,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.Segment" do
     optional :id, :string, 1
     optional :account_id, :int32, 2
-    optional :title, :string, 3
-    optional :segment_size, :int64, 4
-    optional :predicates, :message, 5, "rover.audience.v1.PredicateAggregate"
-    optional :created_at, :message, 6, "google.protobuf.Timestamp"
-    optional :updated_at, :message, 7, "google.protobuf.Timestamp"
+    optional :created_at, :message, 3, "google.protobuf.Timestamp"
+    optional :updated_at, :message, 4, "google.protobuf.Timestamp"
+    optional :title, :string, 5
+    optional :segment_size, :int64, 6
+    optional :predicates, :message, 7, "rover.audience.v1.PredicateAggregate"
   end
   add_message "rover.audience.v1.StringPredicate" do
     optional :op, :enum, 1, "rover.audience.v1.StringPredicate.Op"
