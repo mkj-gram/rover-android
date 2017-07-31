@@ -656,17 +656,17 @@ message StringPredicate {
   string value    = 2;
 
   enum Op {
-    UNSET        = 0;
-    SET          = 1;
+    IS_UNSET        = 0;
+    IS_SET          = 1;
 
-    EQUAL        = 2;
-    NOT_EQUAL    = 3;
+    IS_EQUAL        = 2;
+    IS_NOT_EQUAL    = 3;
 
     STARTS_WITH  = 4;
     ENDS_WITH    = 5;
 
     CONTAINS     = 6;
-    NOT_CONTAINS = 7;
+    DOES_NOT_CONTAIN = 7;
   }
 }
 
@@ -675,10 +675,10 @@ message BoolPredicate {
   bool value = 2;
 
   enum Op {
-    UNSET    = 0;
-    SET      = 1;
+    IS_UNSET    = 0;
+    IS_SET      = 1;
 
-    EQUALS   = 2;
+    IS_EQUAL   = 2;
   }
 }
 
@@ -689,16 +689,16 @@ message NumberPredicate {
   int64 value2 = 3;
 
   enum Op {
-    UNSET        = 0;
-    SET          = 1;
+    IS_UNSET        = 0;
+    IS_SET          = 1;
 
-    EQUAL        = 2;
-    NOT_EQUAL    = 3;
+    IS_EQUAL        = 2;
+    IS_NOT_EQUAL    = 3;
 
-    GREATER_THAN = 4;
-    LESS_THAN    = 5;
+    IS_GREATER_THAN = 4;
+    IS_LESS_THAN    = 5;
 
-    BETWEEN      = 6;
+    IS_BETWEEN      = 6;
   }
 }
 
@@ -708,20 +708,20 @@ message DatePredicate {
   google.protobuf.Timestamp value2 = 3;
 
   enum Op {
-    UNSET        = 0;
-    SET          = 1;
+    IS_UNSET        = 0;
+    IS_SET          = 1;
 
-    EQUAL        = 2;
-    NOT_EQUAL    = 3;
+    IS_EQUAL        = 2;
+    IS_NOT_EQUAL    = 3;
 
-    GREATER_THAN = 4;
-    LESS_THAN    = 5;
+    IS_GREATER_THAN = 4;
+    IS_LESS_THAN    = 5;
 
-    BETWEEN      = 6;
+    IS_BETWEEN      = 6;
 
-    AFTER        = 7;
-    BEFORE       = 8;
-    ON           = 9;
+    IS_AFTER        = 7;
+    IS_BEFORE       = 8;
+    IS_ON           = 9;
   }
 }
 
@@ -731,11 +731,11 @@ message GeofencePredicate {
   Location value = 2;
 
   enum Op {
-    UNSET   = 0;
-    SET     = 1;
+    IS_UNSET   = 0;
+    IS_SET     = 1;
 
-    OUTSIDE = 2;
-    WITHIN  = 3;
+    IS_OUTSIDE = 2;
+    IS_WITHIN  = 3;
   }
 }
 
@@ -745,19 +745,19 @@ message VersionPredicate {
   Version value2 = 3;
 
   enum Op {
-    UNSET                 = 0;
-    SET                   = 1;
+    IS_UNSET                 = 0;
+    IS_SET                   = 1;
 
-    EQUAL                 = 2;
-    NOT_EQUAL             = 3;
+    IS_EQUAL                 = 2;
+    IS_NOT_EQUAL             = 3;
 
-    GREATER_THAN          = 4;
-    LESS_THAN             = 5;
+    IS_GREATER_THAN          = 4;
+    IS_LESS_THAN             = 5;
 
-    BETWEEN               = 6;
+    IS_BETWEEN               = 6;
 
-    GREATER_THAN_OR_EQUAL = 7;
-    LESS_THAN_OR_EQUAL    = 8;
+    IS_GREATER_THAN_OR_EQUAL = 7;
+    IS_LESS_THAN_OR_EQUAL    = 8;
   }
 }
 
