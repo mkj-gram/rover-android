@@ -6,6 +6,28 @@ var audience_v1_audience_pb = require('../../audience/v1/audience_pb.js');
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 
+function serialize_rover_audience_v1_ArchiveDynamicSegmentByIdRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.ArchiveDynamicSegmentByIdRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.ArchiveDynamicSegmentByIdRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_ArchiveDynamicSegmentByIdRequest(buffer_arg) {
+  return audience_v1_audience_pb.ArchiveDynamicSegmentByIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_ArchiveDynamicSegmentByIdResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.ArchiveDynamicSegmentByIdResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.ArchiveDynamicSegmentByIdResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_ArchiveDynamicSegmentByIdResponse(buffer_arg) {
+  return audience_v1_audience_pb.ArchiveDynamicSegmentByIdResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_CreateDeviceRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.CreateDeviceRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.CreateDeviceRequest');
@@ -92,28 +114,6 @@ function serialize_rover_audience_v1_DeleteDeviceResponse(arg) {
 
 function deserialize_rover_audience_v1_DeleteDeviceResponse(buffer_arg) {
   return audience_v1_audience_pb.DeleteDeviceResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_audience_v1_DeleteDynamicSegmentByIdRequest(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.DeleteDynamicSegmentByIdRequest)) {
-    throw new Error('Expected argument of type rover.audience.v1.DeleteDynamicSegmentByIdRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_DeleteDynamicSegmentByIdRequest(buffer_arg) {
-  return audience_v1_audience_pb.DeleteDynamicSegmentByIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_audience_v1_DeleteDynamicSegmentByIdResponse(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.DeleteDynamicSegmentByIdResponse)) {
-    throw new Error('Expected argument of type rover.audience.v1.DeleteDynamicSegmentByIdResponse');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_DeleteDynamicSegmentByIdResponse(buffer_arg) {
-  return audience_v1_audience_pb.DeleteDynamicSegmentByIdResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_rover_audience_v1_DeleteProfileRequest(arg) {
@@ -935,17 +935,17 @@ var AudienceService = exports.AudienceService = {
     responseSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
     responseDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
   },
-  // DeleteDynamicSegmentById deletes a segment given an id
-  deleteDynamicSegmentById: {
-    path: '/rover.audience.v1.Audience/DeleteDynamicSegmentById',
+  // ArchiveDynamicSegmentById archive a segment given an id
+  archiveDynamicSegmentById: {
+    path: '/rover.audience.v1.Audience/ArchiveDynamicSegmentById',
     requestStream: false,
     responseStream: false,
-    requestType: audience_v1_audience_pb.DeleteDynamicSegmentByIdRequest,
-    responseType: audience_v1_audience_pb.DeleteDynamicSegmentByIdResponse,
-    requestSerialize: serialize_rover_audience_v1_DeleteDynamicSegmentByIdRequest,
-    requestDeserialize: deserialize_rover_audience_v1_DeleteDynamicSegmentByIdRequest,
-    responseSerialize: serialize_rover_audience_v1_DeleteDynamicSegmentByIdResponse,
-    responseDeserialize: deserialize_rover_audience_v1_DeleteDynamicSegmentByIdResponse,
+    requestType: audience_v1_audience_pb.ArchiveDynamicSegmentByIdRequest,
+    responseType: audience_v1_audience_pb.ArchiveDynamicSegmentByIdResponse,
+    requestSerialize: serialize_rover_audience_v1_ArchiveDynamicSegmentByIdRequest,
+    requestDeserialize: deserialize_rover_audience_v1_ArchiveDynamicSegmentByIdRequest,
+    responseSerialize: serialize_rover_audience_v1_ArchiveDynamicSegmentByIdResponse,
+    responseDeserialize: deserialize_rover_audience_v1_ArchiveDynamicSegmentByIdResponse,
   },
   // ListDynamicSegments returns a list of static segments by account_id.
   listDynamicSegments: {

@@ -11,6 +11,8 @@ var global = Function('return this')();
 
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
+goog.exportSymbol('proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.BoolPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.BoolPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.CreateDeviceRequest', null, global);
@@ -23,8 +25,6 @@ goog.exportSymbol('proto.rover.audience.v1.DatePredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DatePredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DeleteDeviceRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DeleteDeviceResponse', null, global);
-goog.exportSymbol('proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest', null, global);
-goog.exportSymbol('proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DeleteProfileRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DeleteProfileResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Device', null, global);
@@ -13547,12 +13547,12 @@ proto.rover.audience.v1.UpdateDynamicSegmentPredicatesResponse.serializeBinaryTo
  * @extends {jspb.Message}
  * @constructor
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest = function(opt_data) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest, jspb.Message);
+goog.inherits(proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.displayName = 'proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest';
+  proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.displayName = 'proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest';
 }
 
 
@@ -13567,8 +13567,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.toObject(opt_includeInstance, this);
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -13577,10 +13577,10 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.toObject = fun
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest} msg The msg instance to transform.
+ * @param {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest} msg The msg instance to transform.
  * @return {!Object}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.toObject = function(includeInstance, msg) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     segmentId: jspb.Message.getFieldWithDefault(msg, 2, "")
@@ -13597,23 +13597,23 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.toObject = function(incl
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest}
+ * @return {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.deserializeBinary = function(bytes) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest;
-  return proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest;
+  return proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest} msg The message object to deserialize into.
+ * @param {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest}
+ * @return {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -13642,9 +13642,9 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.deserializeBinaryFromRea
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.serializeBinary = function() {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.serializeBinaryToWriter(this, writer);
+  proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -13652,10 +13652,10 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.serializeBinar
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest} message
+ * @param {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest} message
  * @param {!jspb.BinaryWriter} writer
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.serializeBinaryToWriter = function(message, writer) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getAuthContext();
   if (f != null) {
@@ -13679,19 +13679,19 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.serializeBinaryToWriter 
  * optional rover.auth.v1.AuthContext auth_context = 1;
  * @return {?proto.rover.auth.v1.AuthContext}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.getAuthContext = function() {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.prototype.getAuthContext = function() {
   return /** @type{?proto.rover.auth.v1.AuthContext} */ (
     jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
 };
 
 
 /** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.setAuthContext = function(value) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.prototype.setAuthContext = function(value) {
   jspb.Message.setWrapperField(this, 1, value);
 };
 
 
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.clearAuthContext = function() {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.prototype.clearAuthContext = function() {
   this.setAuthContext(undefined);
 };
 
@@ -13700,7 +13700,7 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.clearAuthConte
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.hasAuthContext = function() {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.prototype.hasAuthContext = function() {
   return jspb.Message.getField(this, 1) != null;
 };
 
@@ -13709,13 +13709,13 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.hasAuthContext
  * optional string segment_id = 2;
  * @return {string}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.getSegmentId = function() {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.prototype.getSegmentId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.setSegmentId = function(value) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdRequest.prototype.setSegmentId = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
@@ -13731,12 +13731,12 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdRequest.prototype.setSegmentId =
  * @extends {jspb.Message}
  * @constructor
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse = function(opt_data) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse, jspb.Message);
+goog.inherits(proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.displayName = 'proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse';
+  proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.displayName = 'proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse';
 }
 
 
@@ -13751,8 +13751,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.toObject(opt_includeInstance, this);
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.toObject(opt_includeInstance, this);
 };
 
 
@@ -13761,10 +13761,10 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.prototype.toObject = fu
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse} msg The msg instance to transform.
+ * @param {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse} msg The msg instance to transform.
  * @return {!Object}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.toObject = function(includeInstance, msg) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
 
   };
@@ -13780,23 +13780,23 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.toObject = function(inc
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse}
+ * @return {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.deserializeBinary = function(bytes) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse;
-  return proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse;
+  return proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse} msg The message object to deserialize into.
+ * @param {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse}
+ * @return {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.deserializeBinaryFromReader = function(msg, reader) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -13816,9 +13816,9 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.deserializeBinaryFromRe
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.prototype.serializeBinary = function() {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.serializeBinaryToWriter(this, writer);
+  proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -13826,10 +13826,10 @@ proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.prototype.serializeBina
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse} message
+ * @param {!proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse} message
  * @param {!jspb.BinaryWriter} writer
  */
-proto.rover.audience.v1.DeleteDynamicSegmentByIdResponse.serializeBinaryToWriter = function(message, writer) {
+proto.rover.audience.v1.ArchiveDynamicSegmentByIdResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
 };
 
@@ -14210,7 +14210,8 @@ proto.rover.audience.v1.DynamicSegment.toObject = function(includeInstance, msg)
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     title: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    segmentSize: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    isArchived: jspb.Message.getFieldWithDefault(msg, 6, false),
+    segmentSize: jspb.Message.getFieldWithDefault(msg, 7, 0),
     predicates: (f = msg.getPredicates()) && proto.rover.audience.v1.PredicateAggregate.toObject(includeInstance, f)
   };
 
@@ -14271,10 +14272,14 @@ proto.rover.audience.v1.DynamicSegment.deserializeBinaryFromReader = function(ms
       msg.setTitle(value);
       break;
     case 6:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsArchived(value);
+      break;
+    case 7:
       var value = /** @type {number} */ (reader.readInt64());
       msg.setSegmentSize(value);
       break;
-    case 7:
+    case 8:
       var value = new proto.rover.audience.v1.PredicateAggregate;
       reader.readMessage(value,proto.rover.audience.v1.PredicateAggregate.deserializeBinaryFromReader);
       msg.setPredicates(value);
@@ -14344,17 +14349,24 @@ proto.rover.audience.v1.DynamicSegment.serializeBinaryToWriter = function(messag
       f
     );
   }
+  f = message.getIsArchived();
+  if (f) {
+    writer.writeBool(
+      6,
+      f
+    );
+  }
   f = message.getSegmentSize();
   if (f !== 0) {
     writer.writeInt64(
-      6,
+      7,
       f
     );
   }
   f = message.getPredicates();
   if (f != null) {
     writer.writeMessage(
-      7,
+      8,
       f,
       proto.rover.audience.v1.PredicateAggregate.serializeBinaryToWriter
     );
@@ -14468,33 +14480,50 @@ proto.rover.audience.v1.DynamicSegment.prototype.setTitle = function(value) {
 
 
 /**
- * optional int64 segment_size = 6;
- * @return {number}
+ * optional bool is_archived = 6;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
  */
-proto.rover.audience.v1.DynamicSegment.prototype.getSegmentSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+proto.rover.audience.v1.DynamicSegment.prototype.getIsArchived = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 6, false));
 };
 
 
-/** @param {number} value */
-proto.rover.audience.v1.DynamicSegment.prototype.setSegmentSize = function(value) {
+/** @param {boolean} value */
+proto.rover.audience.v1.DynamicSegment.prototype.setIsArchived = function(value) {
   jspb.Message.setField(this, 6, value);
 };
 
 
 /**
- * optional PredicateAggregate predicates = 7;
+ * optional int64 segment_size = 7;
+ * @return {number}
+ */
+proto.rover.audience.v1.DynamicSegment.prototype.getSegmentSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.DynamicSegment.prototype.setSegmentSize = function(value) {
+  jspb.Message.setField(this, 7, value);
+};
+
+
+/**
+ * optional PredicateAggregate predicates = 8;
  * @return {?proto.rover.audience.v1.PredicateAggregate}
  */
 proto.rover.audience.v1.DynamicSegment.prototype.getPredicates = function() {
   return /** @type{?proto.rover.audience.v1.PredicateAggregate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.PredicateAggregate, 7));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.PredicateAggregate, 8));
 };
 
 
 /** @param {?proto.rover.audience.v1.PredicateAggregate|undefined} value */
 proto.rover.audience.v1.DynamicSegment.prototype.setPredicates = function(value) {
-  jspb.Message.setWrapperField(this, 7, value);
+  jspb.Message.setWrapperField(this, 8, value);
 };
 
 
@@ -14508,7 +14537,7 @@ proto.rover.audience.v1.DynamicSegment.prototype.clearPredicates = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.DynamicSegment.prototype.hasPredicates = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 8) != null;
 };
 
 

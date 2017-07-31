@@ -67,8 +67,8 @@ module Rover
           rpc :GetDynamicSegmentById, GetDynamicSegmentByIdRequest, GetDynamicSegmentByIdResponse
           rpc :UpdateDynamicSegmentTitle, UpdateDynamicSegmentTitleRequest, UpdateDynamicSegmentTitleResponse
           rpc :UpdateDynamicSegmentPredicates, UpdateDynamicSegmentPredicatesRequest, UpdateDynamicSegmentPredicatesResponse
-          # DeleteDynamicSegmentById deletes a segment given an id
-          rpc :DeleteDynamicSegmentById, DeleteDynamicSegmentByIdRequest, DeleteDynamicSegmentByIdResponse
+          # ArchiveDynamicSegmentById archive a segment given an id
+          rpc :ArchiveDynamicSegmentById, ArchiveDynamicSegmentByIdRequest, ArchiveDynamicSegmentByIdResponse
           # ListDynamicSegments returns a list of static segments by account_id.
           rpc :ListDynamicSegments, ListDynamicSegmentsRequest, ListDynamicSegmentsResponse
         end

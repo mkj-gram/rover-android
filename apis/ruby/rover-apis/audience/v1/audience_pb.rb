@@ -329,11 +329,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.UpdateDynamicSegmentPredicatesResponse" do
   end
-  add_message "rover.audience.v1.DeleteDynamicSegmentByIdRequest" do
+  add_message "rover.audience.v1.ArchiveDynamicSegmentByIdRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :segment_id, :string, 2
   end
-  add_message "rover.audience.v1.DeleteDynamicSegmentByIdResponse" do
+  add_message "rover.audience.v1.ArchiveDynamicSegmentByIdResponse" do
   end
   add_message "rover.audience.v1.ListDynamicSegmentsRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
@@ -347,8 +347,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :created_at, :message, 3, "google.protobuf.Timestamp"
     optional :updated_at, :message, 4, "google.protobuf.Timestamp"
     optional :title, :string, 5
-    optional :segment_size, :int64, 6
-    optional :predicates, :message, 7, "rover.audience.v1.PredicateAggregate"
+    optional :is_archived, :bool, 6
+    optional :segment_size, :int64, 7
+    optional :predicates, :message, 8, "rover.audience.v1.PredicateAggregate"
   end
   add_message "rover.audience.v1.StringPredicate" do
     optional :op, :enum, 1, "rover.audience.v1.StringPredicate.Op"
@@ -531,8 +532,8 @@ module Rover
       UpdateDynamicSegmentTitleResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDynamicSegmentTitleResponse").msgclass
       UpdateDynamicSegmentPredicatesRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDynamicSegmentPredicatesRequest").msgclass
       UpdateDynamicSegmentPredicatesResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDynamicSegmentPredicatesResponse").msgclass
-      DeleteDynamicSegmentByIdRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteDynamicSegmentByIdRequest").msgclass
-      DeleteDynamicSegmentByIdResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteDynamicSegmentByIdResponse").msgclass
+      ArchiveDynamicSegmentByIdRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ArchiveDynamicSegmentByIdRequest").msgclass
+      ArchiveDynamicSegmentByIdResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ArchiveDynamicSegmentByIdResponse").msgclass
       ListDynamicSegmentsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDynamicSegmentsRequest").msgclass
       ListDynamicSegmentsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDynamicSegmentsResponse").msgclass
       DynamicSegment = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DynamicSegment").msgclass

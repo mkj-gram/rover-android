@@ -75,8 +75,8 @@ service Audience {
   rpc UpdateDynamicSegmentTitle(UpdateDynamicSegmentTitleRequest) returns (UpdateDynamicSegmentTitleResponse);
   rpc UpdateDynamicSegmentPredicates(UpdateDynamicSegmentPredicatesRequest) returns (UpdateDynamicSegmentPredicatesResponse);
 
-  // DeleteDynamicSegmentById deletes a segment given an id
-  rpc DeleteDynamicSegmentById(DeleteDynamicSegmentByIdRequest) returns (DeleteDynamicSegmentByIdResponse);
+  // ArchiveDynamicSegmentById archive a segment given an id
+  rpc ArchiveDynamicSegmentById(ArchiveDynamicSegmentByIdRequest) returns (ArchiveDynamicSegmentByIdResponse);
 
   // ListDynamicSegments returns a list of static segments by account_id.
   rpc ListDynamicSegments(ListDynamicSegmentsRequest) returns(ListDynamicSegmentsResponse);
@@ -619,11 +619,11 @@ message UpdateDynamicSegmentPredicatesRequest {
 message UpdateDynamicSegmentPredicatesResponse {}
 
 
-message DeleteDynamicSegmentByIdRequest {
+message ArchiveDynamicSegmentByIdRequest {
   auth.v1.AuthContext auth_context = 1;
   string segment_id = 2;
 }
-message DeleteDynamicSegmentByIdResponse { }
+message ArchiveDynamicSegmentByIdResponse { }
 
 
 message ListDynamicSegmentsRequest {
@@ -642,12 +642,10 @@ message DynamicSegment {
 
   // Setment title
   string title                         = 5;
-
+  bool is_archived                     = 6;
   // number of entries in the segment
-  int64 segment_size                   = 6;
-
-  PredicateAggregate predicates        = 7;
-
+  int64 segment_size                   = 7;
+  PredicateAggregate predicates        = 8;
 }
 
 
