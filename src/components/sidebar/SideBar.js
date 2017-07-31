@@ -191,7 +191,7 @@ class SideBar extends Component {
     }
 
     renderAddFilterBar() {
-        const { isShowingAddFilterModal, query } = this.state
+        const { isShowingAddFilterModal, query, queryCondition } = this.state
         const addPredicateIndex = query.length
 
         const { data } = this.props
@@ -206,16 +206,39 @@ class SideBar extends Component {
             flex: 'none'
         }
 
-        const selectStyle = {
-            backgroundColor: slate,
-            border: 'none',
-            borderRadius: 3,
-            width: 95,
-            height: 30
+        const selectContainerStyle = {
+            marginLeft: 'auto',
+            marginRight: 30,
+            display: 'flex',
+            alignItems: 'center',
+            height: 27,
+            padding: '0 15px',
+            borderRadius: 3
         }
 
-        const onFocus = e => (e.target.style.backgroundColor = graphite)
-        const onBlur = e => (e.target.style.backgroundColor = slate)
+        const selectStyle = {
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: 3,
+            width: 36,
+            height: 21,
+            color: lavender,
+            fontSize: 12,
+            padding: '1px 0 3px 0'
+        }
+
+        const matchStyle = {
+            ...text,
+            color: silver,
+            fontSize: 12,
+            fontWeight: 600,
+            marginRight: 3
+        }
+
+        const onFocus = e =>
+            (e.target.parentElement.style.backgroundColor = graphite)
+        const onSelect = e =>
+            (e.target.parentElement.style.backgroundColor = slate)
 
         return (
             <div style={style} id="filterContainer">
@@ -252,19 +275,22 @@ class SideBar extends Component {
                             })
                         }}
                     />}
-                <div style={{ marginLeft: 'auto', marginRight: 30 }}>
+                <div style={selectContainerStyle}>
+                    <span style={matchStyle}>MATCH</span>
                     <Select
                         style={selectStyle}
                         isDisabled={false}
-                        value={'all'}
-                        onChange={e => console.log(e.target.value)}
+                        value={queryCondition}
+                        onChange={(e) => {
+                            onSelect(e)
+                            this.setState({ queryCondition: e.target.value })
+                        }}
                         onFocus={onFocus}
-                        onBlur={onBlur}
                     >
-                        <option value="all" label="Match all">
+                        <option value="all" label="ALL">
                             all
                         </option>
-                        <option value="any" label="Match any">
+                        <option value="any" label="ANY">
                             any
                         </option>
                     </Select>
@@ -392,6 +418,7 @@ class SideBar extends Component {
         const {
             currentAttribute,
             query,
+            queryCondition,
             modalCoordinates,
             isShowingAddFilterModal,
             showSegmentSelection,
@@ -432,6 +459,7 @@ class SideBar extends Component {
                 {query.length > 0
                     ? <PredicateList
                           query={query}
+                          queryCondition={queryCondition}
                           removePredicate={index => this.removePredicate(index)}
                           viewModal={(attribute, index) =>
                               this.handleEditModal(attribute, index)}

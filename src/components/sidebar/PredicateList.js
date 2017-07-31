@@ -163,7 +163,7 @@ const renderNumericPredicate = ({ numberComparison, numberValue }) => {
     )
 }
 
-const PredicateList = ({ query, viewModal, removePredicate }) => {
+const PredicateList = ({ query, queryCondition, viewModal, removePredicate }) => {
     const predicateStyle = {
         width: 260,
         backgroundColor: ash,
@@ -247,7 +247,7 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
                                         position: 'absolute'
                                     }}
                                 />
-                                AND
+                                {queryCondition === 'all' ? 'AND' : 'OR'}
                             </div>}
                     </div>
                 )
@@ -258,6 +258,7 @@ const PredicateList = ({ query, viewModal, removePredicate }) => {
 
 PredicateList.propTypes = {
     query: PropTypes.array.isRequired,
+    queryCondition: PropTypes.string.isRequired,
     viewModal: PropTypes.func.isRequired,
     removePredicate: PropTypes.func.isRequired
 }
