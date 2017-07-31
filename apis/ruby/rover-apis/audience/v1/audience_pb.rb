@@ -445,7 +445,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :ALL, 1
   end
   add_message "rover.audience.v1.Predicate" do
-    oneof :type do
+    oneof :value do
       optional :string_predicate, :message, 1, "rover.audience.v1.StringPredicate"
       optional :bool_predicate, :message, 2, "rover.audience.v1.BoolPredicate"
       optional :number_predicate, :message, 3, "rover.audience.v1.NumberPredicate"

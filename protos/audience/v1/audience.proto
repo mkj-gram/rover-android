@@ -777,7 +777,7 @@ message PredicateAggregate {
 }
 
 message Predicate {
-  oneof type {
+  oneof value {
     StringPredicate   string_predicate   = 1;
     BoolPredicate     bool_predicate     = 2;
     NumberPredicate   number_predicate   = 3;

@@ -16216,8 +16216,8 @@ proto.rover.audience.v1.Predicate.oneofGroups_ = [[1,2,3,4,5,6]];
 /**
  * @enum {number}
  */
-proto.rover.audience.v1.Predicate.TypeCase = {
-  TYPE_NOT_SET: 0,
+proto.rover.audience.v1.Predicate.ValueCase = {
+  VALUE_NOT_SET: 0,
   STRING_PREDICATE: 1,
   BOOL_PREDICATE: 2,
   NUMBER_PREDICATE: 3,
@@ -16227,10 +16227,10 @@ proto.rover.audience.v1.Predicate.TypeCase = {
 };
 
 /**
- * @return {proto.rover.audience.v1.Predicate.TypeCase}
+ * @return {proto.rover.audience.v1.Predicate.ValueCase}
  */
-proto.rover.audience.v1.Predicate.prototype.getTypeCase = function() {
-  return /** @type {proto.rover.audience.v1.Predicate.TypeCase} */(jspb.Message.computeOneofCase(this, proto.rover.audience.v1.Predicate.oneofGroups_[0]));
+proto.rover.audience.v1.Predicate.prototype.getValueCase = function() {
+  return /** @type {proto.rover.audience.v1.Predicate.ValueCase} */(jspb.Message.computeOneofCase(this, proto.rover.audience.v1.Predicate.oneofGroups_[0]));
 };
 
 
