@@ -614,7 +614,7 @@ message UpdateSegmentPredicatesRequest {
   auth.v1.AuthContext auth_context = 1;
   string segment_id = 2;
 
-  repeated Predicate predicates = 3;
+  PredicateAggregate predicates = 3;
 }
 message UpdateSegmentPredicatesResponse {}
 
@@ -643,13 +643,147 @@ message Segment {
   // number of entries in the segment
   int64 segment_size = 4;
 
-  // predicates
-  repeated Predicate predicates = 5;
+  PredicateAggregate predicates = 5;
 
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
 }
 
+
+message StringPredicate {
+  Op op           = 1;
+  string value    = 2;
+
+  enum Op {
+    UNSET        = 0;
+    SET          = 1;
+
+    EQUAL        = 2;
+    NOT_EQUAL    = 3;
+
+    STARTS_WITH   = 4;
+    ENDS_WITH     = 5;
+
+    CONTAINS      = 6;
+    NOT_CONTAINS  = 7;
+  }
+}
+
+message BoolPredicate {
+  Op op      = 1;
+  bool value = 2;
+
+  enum Op {
+    UNSET    = 0;
+    SET      = 1;
+
+    EQUALS   = 2;
+  }
+}
+
+message NumberPredicate {
+  Op op          = 1;
+
+  int64 value    = 2;
+  int64 value2   = 3;
+
+  enum Op {
+    UNSET        = 0;
+    SET          = 1;
+
+    EQUAL        = 2;
+    NOT_EQUAL    = 3;
+
+    GREATER_THAN = 4;
+    LESS_THAN    = 5;
+
+    BETWEEN      = 6;
+  }
+}
+
+message DatePredicate {
+  Op op = 1;
+  google.protobuf.Timestamp value = 2;
+  google.protobuf.Timestamp value2 = 3;
+
+  enum Op {
+    UNSET        = 0;
+    SET          = 1;
+
+    EQUAL        = 2;
+    NOT_EQUAL    = 3;
+
+    GREATER_THAN = 4;
+    LESS_THAN    = 5;
+
+    BETWEEN      = 6;
+
+    AFTER        = 7;
+    BEFORE       = 8;
+    ON           = 9;
+  }
+}
+
+message GeofencePredicate {
+  Op op = 1;
+
+  Location value = 2;
+
+  enum Op {
+    UNSET        = 0;
+    SET          = 1;
+
+    OUTSIDE      = 2;
+    WITHIN       = 3;
+  }
+}
+
+message VersionPredicate {
+  Op op = 1;
+  Version value = 2;
+  Version value2 = 3;
+
+  enum Op {
+    UNSET        = 0;
+    SET          = 1;
+
+    EQUAL        = 2;
+    NOT_EQUAL    = 3;
+
+    GREATER_THAN = 4;
+    LESS_THAN    = 5;
+
+    BETWEEN      = 6;
+
+    GREATER_THAN_OR_EQUAL = 7;
+    LESS_THAN_OR_EQUAL    = 8;
+  }
+}
+
+message PredicateAggregate {
+  enum Condition {
+    ANY = 0;
+    ALL = 1;
+  }
+
+  Condition condition = 1;
+
+  repeated Predicate predicates = 2;
+}
+
 message Predicate {
-  // TODO
+  oneof type {
+    StringPredicate   stringp   = 1;
+    BoolPredicate     boolp     = 2;
+    NumberPredicate   numberp   = 3;
+    DatePredicate     datep     = 4;
+    VersionPredicate  versionp  = 5;
+    GeofencePredicate geofencep = 6;
+  }
+}
+
+message Location {
+  double longitude = 1;
+  double latitude = 2;
+  int32 radius = 3;
 }

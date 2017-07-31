@@ -325,7 +325,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.UpdateSegmentPredicatesRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :segment_id, :string, 2
-    repeated :predicates, :message, 3, "rover.audience.v1.Predicate"
+    optional :predicates, :message, 3, "rover.audience.v1.PredicateAggregate"
   end
   add_message "rover.audience.v1.UpdateSegmentPredicatesResponse" do
   end
@@ -346,11 +346,112 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :account_id, :int32, 2
     optional :title, :string, 3
     optional :segment_size, :int64, 4
-    repeated :predicates, :message, 5, "rover.audience.v1.Predicate"
+    optional :predicates, :message, 5, "rover.audience.v1.PredicateAggregate"
     optional :created_at, :message, 6, "google.protobuf.Timestamp"
     optional :updated_at, :message, 7, "google.protobuf.Timestamp"
   end
+  add_message "rover.audience.v1.StringPredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.StringPredicate.Op"
+    optional :value, :string, 2
+  end
+  add_enum "rover.audience.v1.StringPredicate.Op" do
+    value :UNSET, 0
+    value :SET, 1
+    value :EQUAL, 2
+    value :NOT_EQUAL, 3
+    value :STARTS_WITH, 4
+    value :ENDS_WITH, 5
+    value :CONTAINS, 6
+    value :NOT_CONTAINS, 7
+  end
+  add_message "rover.audience.v1.BoolPredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.BoolPredicate.Op"
+    optional :value, :bool, 2
+  end
+  add_enum "rover.audience.v1.BoolPredicate.Op" do
+    value :UNSET, 0
+    value :SET, 1
+    value :EQUALS, 2
+  end
+  add_message "rover.audience.v1.NumberPredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.NumberPredicate.Op"
+    optional :value, :int64, 2
+    optional :value2, :int64, 3
+  end
+  add_enum "rover.audience.v1.NumberPredicate.Op" do
+    value :UNSET, 0
+    value :SET, 1
+    value :EQUAL, 2
+    value :NOT_EQUAL, 3
+    value :GREATER_THAN, 4
+    value :LESS_THAN, 5
+    value :BETWEEN, 6
+  end
+  add_message "rover.audience.v1.DatePredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.DatePredicate.Op"
+    optional :value, :message, 2, "google.protobuf.Timestamp"
+    optional :value2, :message, 3, "google.protobuf.Timestamp"
+  end
+  add_enum "rover.audience.v1.DatePredicate.Op" do
+    value :UNSET, 0
+    value :SET, 1
+    value :EQUAL, 2
+    value :NOT_EQUAL, 3
+    value :GREATER_THAN, 4
+    value :LESS_THAN, 5
+    value :BETWEEN, 6
+    value :AFTER, 7
+    value :BEFORE, 8
+    value :ON, 9
+  end
+  add_message "rover.audience.v1.GeofencePredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.GeofencePredicate.Op"
+    optional :value, :message, 2, "rover.audience.v1.Location"
+  end
+  add_enum "rover.audience.v1.GeofencePredicate.Op" do
+    value :UNSET, 0
+    value :SET, 1
+    value :OUTSIDE, 2
+    value :WITHIN, 3
+  end
+  add_message "rover.audience.v1.VersionPredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.VersionPredicate.Op"
+    optional :value, :message, 2, "rover.audience.v1.Version"
+    optional :value2, :message, 3, "rover.audience.v1.Version"
+  end
+  add_enum "rover.audience.v1.VersionPredicate.Op" do
+    value :UNSET, 0
+    value :SET, 1
+    value :EQUAL, 2
+    value :NOT_EQUAL, 3
+    value :GREATER_THAN, 4
+    value :LESS_THAN, 5
+    value :BETWEEN, 6
+    value :GREATER_THAN_OR_EQUAL, 7
+    value :LESS_THAN_OR_EQUAL, 8
+  end
+  add_message "rover.audience.v1.PredicateAggregate" do
+    optional :condition, :enum, 1, "rover.audience.v1.PredicateAggregate.Condition"
+    repeated :predicates, :message, 2, "rover.audience.v1.Predicate"
+  end
+  add_enum "rover.audience.v1.PredicateAggregate.Condition" do
+    value :ANY, 0
+    value :ALL, 1
+  end
   add_message "rover.audience.v1.Predicate" do
+    oneof :type do
+      optional :stringp, :message, 1, "rover.audience.v1.StringPredicate"
+      optional :boolp, :message, 2, "rover.audience.v1.BoolPredicate"
+      optional :numberp, :message, 3, "rover.audience.v1.NumberPredicate"
+      optional :datep, :message, 4, "rover.audience.v1.DatePredicate"
+      optional :versionp, :message, 5, "rover.audience.v1.VersionPredicate"
+      optional :geofencep, :message, 6, "rover.audience.v1.GeofencePredicate"
+    end
+  end
+  add_message "rover.audience.v1.Location" do
+    optional :longitude, :double, 1
+    optional :latitude, :double, 2
+    optional :radius, :int32, 3
   end
   add_enum "rover.audience.v1.Platform" do
     value :UNDEFINED, 0
@@ -435,7 +536,22 @@ module Rover
       ListSegmentsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListSegmentsRequest").msgclass
       ListSegmentsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListSegmentsResponse").msgclass
       Segment = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Segment").msgclass
+      StringPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.StringPredicate").msgclass
+      StringPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.StringPredicate.Op").enummodule
+      BoolPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.BoolPredicate").msgclass
+      BoolPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.BoolPredicate.Op").enummodule
+      NumberPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.NumberPredicate").msgclass
+      NumberPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.NumberPredicate.Op").enummodule
+      DatePredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DatePredicate").msgclass
+      DatePredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DatePredicate.Op").enummodule
+      GeofencePredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofencePredicate").msgclass
+      GeofencePredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofencePredicate.Op").enummodule
+      VersionPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.VersionPredicate").msgclass
+      VersionPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.VersionPredicate.Op").enummodule
+      PredicateAggregate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PredicateAggregate").msgclass
+      PredicateAggregate::Condition = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PredicateAggregate.Condition").enummodule
       Predicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate").msgclass
+      Location = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Location").msgclass
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").enummodule
       Null = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Null").enummodule
     end
