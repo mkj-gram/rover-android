@@ -63,23 +63,23 @@ service Audience {
 
 
   //
-  // Segments
+  // DynamicSegments
   //
 
-  // CreateSegment creates a new static segment by account_id and a title
-  rpc CreateSegment(CreateSegmentRequest) returns (CreateSegmentResponse);
+  // CreateDynamicSegment creates a new static segment by account_id and a title
+  rpc CreateDynamicSegment(CreateDynamicSegmentRequest) returns (CreateDynamicSegmentResponse);
 
-  // GetSegmentById returns a single static segment by id
-  rpc GetSegmentById(GetSegmentByIdRequest) returns (GetSegmentByIdResponse);
+  // GetDynamicSegmentById returns a single static segment by id
+  rpc GetDynamicSegmentById(GetDynamicSegmentByIdRequest) returns (GetDynamicSegmentByIdResponse);
 
-  rpc UpdateSegmentTitle(UpdateSegmentTitleRequest) returns (UpdateSegmentTitleResponse);
-  rpc UpdateSegmentPredicates(UpdateSegmentPredicatesRequest) returns (UpdateSegmentPredicatesResponse);
+  rpc UpdateDynamicSegmentTitle(UpdateDynamicSegmentTitleRequest) returns (UpdateDynamicSegmentTitleResponse);
+  rpc UpdateDynamicSegmentPredicates(UpdateDynamicSegmentPredicatesRequest) returns (UpdateDynamicSegmentPredicatesResponse);
 
-  // DeleteSegmentById deletes a segment given an id
-  rpc DeleteSegmentById(DeleteSegmentByIdRequest) returns (DeleteSegmentByIdResponse);
+  // DeleteDynamicSegmentById deletes a segment given an id
+  rpc DeleteDynamicSegmentById(DeleteDynamicSegmentByIdRequest) returns (DeleteDynamicSegmentByIdResponse);
 
-  // ListSegments returns a list of static segments by account_id.
-  rpc ListSegments(ListSegmentsRequest) returns(ListSegmentsResponse);
+  // ListDynamicSegments returns a list of static segments by account_id.
+  rpc ListDynamicSegments(ListDynamicSegmentsRequest) returns(ListDynamicSegmentsResponse);
 }
 
 
@@ -581,59 +581,59 @@ enum Null {
 
 
 //
-// Segments
+// DynamicSegments
 //
 
-message CreateSegmentRequest {
+message CreateDynamicSegmentRequest {
   auth.v1.AuthContext auth_context = 1;
   string title = 2;
 }
-message CreateSegmentResponse {
-  Segment segment = 1;
+message CreateDynamicSegmentResponse {
+  DynamicSegment segment = 1;
 }
 
 
-message GetSegmentByIdRequest {
+message GetDynamicSegmentByIdRequest {
   auth.v1.AuthContext auth_context = 1;
   string segment_id = 2;
 }
-message GetSegmentByIdResponse {
-  Segment segment = 1;
+message GetDynamicSegmentByIdResponse {
+  DynamicSegment segment = 1;
 }
 
-message UpdateSegmentTitleRequest {
+message UpdateDynamicSegmentTitleRequest {
   auth.v1.AuthContext auth_context = 1;
   string segment_id = 2;
 
   string title = 3;
 }
-message UpdateSegmentTitleResponse {}
+message UpdateDynamicSegmentTitleResponse {}
 
 
-message UpdateSegmentPredicatesRequest {
+message UpdateDynamicSegmentPredicatesRequest {
   auth.v1.AuthContext auth_context = 1;
   string segment_id = 2;
 
   PredicateAggregate predicates = 3;
 }
-message UpdateSegmentPredicatesResponse {}
+message UpdateDynamicSegmentPredicatesResponse {}
 
 
-message DeleteSegmentByIdRequest {
+message DeleteDynamicSegmentByIdRequest {
   auth.v1.AuthContext auth_context = 1;
   string segment_id = 2;
 }
-message DeleteSegmentByIdResponse { }
+message DeleteDynamicSegmentByIdResponse { }
 
 
-message ListSegmentsRequest {
+message ListDynamicSegmentsRequest {
   auth.v1.AuthContext auth_context = 1;
 }
-message ListSegmentsResponse {
-  repeated Segment segments = 1;
+message ListDynamicSegmentsResponse {
+  repeated DynamicSegment segments = 1;
 }
 
-message Segment {
+message DynamicSegment {
   string id                            = 1;
   int32 account_id                     = 2;
 
