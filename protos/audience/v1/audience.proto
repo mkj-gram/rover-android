@@ -727,8 +727,14 @@ message DatePredicate {
 
 message GeofencePredicate {
   Op op          = 1;
-
   Location value = 2;
+
+
+  message Location {
+    double longitude = 1;
+    double latitude  = 2;
+    int32  radius    = 3;
+  }
 
   enum Op {
     IS_UNSET   = 0;
@@ -774,17 +780,12 @@ message PredicateAggregate {
 
 message Predicate {
   oneof type {
-    StringPredicate   stringp   = 1;
-    BoolPredicate     boolp     = 2;
-    NumberPredicate   numberp   = 3;
-    DatePredicate     datep     = 4;
-    VersionPredicate  versionp  = 5;
-    GeofencePredicate geofencep = 6;
+    StringPredicate   string_predicate   = 1;
+    BoolPredicate     bool_predicate     = 2;
+    NumberPredicate   number_predicate   = 3;
+    DatePredicate     date_predicate     = 4;
+    VersionPredicate  version_predicate  = 5;
+    GeofencePredicate geofence_predicate = 6;
   }
 }
 
-message Location {
-  double longitude = 1;
-  double latitude  = 2;
-  int32 radius     = 3;
-}
