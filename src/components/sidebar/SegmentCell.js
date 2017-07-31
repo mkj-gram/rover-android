@@ -79,7 +79,7 @@ class SegmentCell extends Component {
         currentEditSegment(index)
         this.setState({
             isEdittingName: true,
-            segmentName: segment
+            segmentName: segment.name
         })
     }
 
@@ -142,7 +142,7 @@ class SegmentCell extends Component {
         if (isEdittingName && currentSegment === index) {
             name = (
                 <TextField
-                    placeholder={segment}
+                    placeholder={segment.name}
                     value={segmentName}
                     style={{
                         width: 150,
@@ -167,8 +167,9 @@ class SegmentCell extends Component {
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
                     }}
+                    id='segmentName'
                 >
-                    {segment}
+                    {segment.name}
                 </div>
             )
         }
@@ -219,7 +220,7 @@ class SegmentCell extends Component {
                     }}
                 >
                     <div
-                        onClick={() => this.onMouseClickEdit(index)}
+                        onClick={() => this.onMouseClickEdit()}
                         id="rename"
                         onMouseOver={e => this.handleMouseOverIcon(e, 'rename')}
                         onMouseLeave={this.handleMouseLeaveIcon}
@@ -340,8 +341,9 @@ class SegmentCell extends Component {
     }
 
     handleDelete(val) {
+        const { removeSegmentCell, index } = this.props
         if (val) {
-            this.props.removeSegmentCell(this.props.index)
+            removeSegmentCell(index)
         }
         this.setState({
             isDeleteModalShowing: false
@@ -382,19 +384,16 @@ class SegmentCell extends Component {
         const { segment } = this.props
         return (
             <div style={{ ...text, ...regular, color: 'white', fontSize: 16 }}>
-                <span style={{ ...bold }}>{segment}</span> will be deleted
+                <span style={{ ...bold }}>{segment.name}</span> will be deleted
             </div>
         )
     }
 
-    handleSegmentCellClick() {
-        const { currentEditSegment, index } = this.props
-        currentEditSegment(index)
-        if (this.state.isEdittingName) {
-            this.setState({
-                isEdittingName: false,
-                disableCheckmark: false
-            })
+    handleSegmentCellClick(e) {
+        if (e.target.id === 'segmentCell' || e.target.id === 'segmentName') {
+            const { getSegmentId, segment, onRequestClose } = this.props
+            getSegmentId(segment.segmentId)
+            onRequestClose('selection')
         }
     }
 
@@ -418,7 +417,8 @@ class SegmentCell extends Component {
                     }}
                     onMouseOver={() => this.onCellHover(true)}
                     onMouseLeave={() => this.onCellHover(false)}
-                    onClick={() => this.handleSegmentCellClick()}
+                    onClick={e => this.handleSegmentCellClick(e)}
+                    id='segmentCell'
                 >
                     {this.setSegmentName()}
                     {this.displayIcons()}
@@ -439,18 +439,25 @@ class SegmentCell extends Component {
 }
 
 SegmentCell.propTypes = {
-    segment: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     removeSegmentCell: PropTypes.func.isRequired,
     updateSegmentCell: PropTypes.func.isRequired,
-    currentEditSegment: PropTypes.func
+    currentEditSegment: PropTypes.func,
+    getSegmentId: PropTypes.func.isRequired,
+    segment: PropTypes.object.isRequired,
+    onRequestClose: PropTypes.func.isRequired
 }
 
 SegmentCell.defaultProps = {
     updateSegmentCell: () => null,
     removeSegmentCell: () => null,
     index: 0,
-    segment: ''
+    segment: {
+        name: '',
+        segmentId: ''
+    },
+    getSegmentId: () => null,
+    onRequestClose: () => null
 }
 
 export default SegmentCell

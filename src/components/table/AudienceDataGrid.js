@@ -1,98 +1,29 @@
 import React, { Component } from 'react'
-
 import PropTypes from 'prop-types'
-import ReactDataGrid from 'react-data-grid'
-import { DraggableHeader } from 'react-data-grid-addons'
-const { DraggableContainer } = DraggableHeader
-
 import {
     Checkbox,
     cloud,
     purple,
     offwhite,
     steel,
-    straw,
-    Tooltip
+    straw
 } from '@rover/react-bootstrap'
 
-import BooleanCellFormatter from './BooleanCellFormatter'
+import ReactDataGrid from 'react-data-grid'
+
+import { DraggableHeader } from 'react-data-grid-addons'
 import CustomRowRenderer from './CustomRowRenderer'
-import DateCellFormatter from './DateCellFormatter'
-import EmptyCellFormatter from './EmptyCellFormatter'
-import ListCellFormatter from './ListCellFormatter'
 import GridPagination from './GridPagination'
+
+const { DraggableContainer } = DraggableHeader
 
 class AudienceDataGrid extends Component {
     constructor(props) {
         super(props)
-
-        this.handleCellEnter = this.handleCellEnter.bind(this)
-        this.handleCellLeave = this.handleCellLeave.bind(this)
-
         this.state = {
-            columns: [
-                {
-                    key: 'city',
-                    name: 'City',
-                    width: 200,
-                    draggable: true,
-                    resizable: true
-                },
-                {
-                    key: 'region',
-                    name: 'Region',
-                    width: 200,
-                    draggable: true,
-                    resizable: true
-                },
-                {
-                    key: 'last_seen',
-                    name: 'Last Seen',
-                    width: 200,
-                    draggable: true,
-                    resizable: true,
-                    formatter: (
-                        <DateCellFormatter
-                            handleCellEnter={this.handleCellEnter}
-                            handleCellLeave={this.handleCellLeave}
-                        />
-                    )
-                },
-                {
-                    key: 'tags',
-                    name: 'Tags',
-                    width: 280,
-                    draggable: true,
-                    resizable: true,
-                    formatter: (
-                        <ListCellFormatter
-                            handleCellEnter={this.handleCellEnter}
-                            handleCellLeave={this.handleCellLeave}
-                        />
-                    )
-                },
-                {
-                    key: 'location_permissions',
-                    name: 'Location Permissions',
-                    draggable: true,
-                    resizable: true,
-                    formatter: BooleanCellFormatter,
-                    width: 200
-                }
-            ],
-            rows: this.createRows(),
             selectedIndexes: [],
             isShiftKeyPressed: false,
-            isCommandKeyPressed: false,
-            toolTip: {
-                isTooltipShowing: false,
-                message: '',
-                coordinates: {
-                    x: 0,
-                    y: 0,
-                    divWidth: 0
-                }
-            }
+            isCommandKeyPressed: false
         }
 
         this.onRowsSelected = this.onRowsSelected.bind(this)
@@ -100,59 +31,8 @@ class AudienceDataGrid extends Component {
         this.rowGetter = this.rowGetter.bind(this)
     }
 
-    handleCellEnter(e, message) {
-        const target = e.target.getBoundingClientRect()
-        this.setState({
-            toolTip: {
-                isTooltipShowing: !this.state.toolTip.isTooltipShowing,
-                message: message,
-                coordinates: {
-                    x: target.left - 300,
-                    y: target.top - 130 + target.height,
-                    divWidth: target.width
-                }
-            }
-        })
-    }
-
-    handleCellLeave() {
-        if (this.state.toolTip.isTooltipShowing) {
-            this.setState({
-                toolTip: {
-                    isTooltipShowing: false,
-                    message: '',
-                    coordinates: {
-                        x: 0,
-                        y: 0,
-                        divWidth: 0
-                    }
-                }
-            })
-        }
-    }
-
-    createRows() {
-        let rows = []
-        for (let i = 1; i < 51; i++) {
-            rows.push({
-                city: `Toronto ${i}`,
-                region: 'Ontario',
-                last_seen: new Date(),
-                tags: [
-                    'Fishing',
-                    'hunting',
-                    'email subscriber',
-                    'new customer'
-                ].join(', '),
-                location_permissions: 'false'
-            })
-        }
-
-        return rows
-    }
-
     rowGetter(i) {
-        return this.state.rows[i]
+        return this.props.rows[i]
     }
 
     renderCheckbox(props) {
@@ -178,11 +58,11 @@ class AudienceDataGrid extends Component {
     }
 
     onHeaderDrop(source, target) {
-        const stateCopy = Object.assign({}, this.state)
-        const columnSourceIndex = this.state.columns.findIndex(
+        const stateCopy = Object.assign({}, this.props)
+        const columnSourceIndex = this.props.columns.findIndex(
             i => i.key === source
         )
-        const columnTargetIndex = this.state.columns.findIndex(
+        const columnTargetIndex = this.props.columns.findIndex(
             i => i.key === target
         )
 
@@ -192,13 +72,13 @@ class AudienceDataGrid extends Component {
             stateCopy.columns.splice(columnSourceIndex, 1)[0]
         )
 
-        const emptyColumns = Object.assign({}, this.state, { columns: [] })
-        this.setState(emptyColumns)
+        const emptyColumns = Object.assign({}, this.props, { columns: [] })
+        this.props.updateDragColumns(emptyColumns)
 
-        const reorderedColumns = Object.assign({}, this.state, {
+        const reorderedColumns = Object.assign({}, this.props, {
             columns: stateCopy.columns
         })
-        this.setState(reorderedColumns)
+        this.props.updateDragColumns(reorderedColumns)
     }
 
     onRowsSelected(rows) {
@@ -210,7 +90,7 @@ class AudienceDataGrid extends Component {
     }
 
     onRowsDeselected(rows) {
-        let rowIndexes = rows.map(r => r.rowIdx)
+        const rowIndexes = rows.map(r => r.rowIdx)
         this.setState({
             selectedIndexes: this.state.selectedIndexes.filter(
                 i => rowIndexes.indexOf(i) === -1
@@ -277,10 +157,9 @@ class AudienceDataGrid extends Component {
     }
 
     render() {
-        const { isTooltipShowing, message, coordinates } = this.state.toolTip
         return (
             <div
-                ref={el => {
+                ref={(el) => {
                     this.parent = el
                 }}
                 style={{ flex: '1 1 100%', position: 'relative' }}
@@ -358,9 +237,9 @@ class AudienceDataGrid extends Component {
                 >
                     <ReactDataGrid
                         rowKey="id"
-                        columns={this.state.columns}
+                        columns={this.props.columns}
                         rowGetter={this.rowGetter}
-                        rowsCount={this.state.rows.length}
+                        rowsCount={this.props.rows.length}
                         rowHeight={50}
                         minHeight={this.getGridHeight()}
                         rowSelection={{
@@ -379,12 +258,17 @@ class AudienceDataGrid extends Component {
                         // rowActionsCell={this.renderCheckbox}
                     />
                 </DraggableContainer>
-                <GridPagination totalRows="77200" />
-                {isTooltipShowing &&
-                    <Tooltip message={message} coordinates={coordinates} />}
+                <GridPagination totalRows={this.props.segmentSize} />
             </div>
         )
     }
+}
+
+AudienceDataGrid.propTypes = {
+    rows: PropTypes.array.isRequired,
+    columns: PropTypes.array.isRequired,
+    updateDragColumns: PropTypes.func.isRequired,
+    segmentSize: PropTypes.number.isRequired
 }
 
 export default AudienceDataGrid

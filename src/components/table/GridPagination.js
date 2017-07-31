@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import {
     mercury,
     RoundedButton,
@@ -47,7 +48,7 @@ class GridPagination extends Component {
             page: 0,
             maxPage:
                 props.totalRows > 50
-                    ? props.totalRows % 50 != 0
+                    ? props.totalRows % 50 !== 0
                       ? Math.floor(props.totalRows / 50)
                       : Math.floor(props.totalRows / 50) - 1
                     : 0
@@ -59,8 +60,17 @@ class GridPagination extends Component {
         this.compareValues = this.compareValues.bind(this)
     }
 
+    componentWillReceiveProps(nextProps) {
+        const maxPage = nextProps.totalRows > 50
+                    ? nextProps.totalRows % 50 !== 0
+                      ? Math.floor(nextProps.totalRows / 50)
+                      : Math.floor(nextProps.totalRows / 50) - 1
+                    : 0
+        this.setState({ maxPage })
+    }
+
     compareValues(a, b, c) {
-        return a == b && b == c && c == a
+        return a === b && b === c && c === a
     }
 
     calculateRange() {
@@ -68,7 +78,7 @@ class GridPagination extends Component {
         const { totalRows } = this.props
         const { page } = this.state
 
-        if (totalRows == 0) {
+        if (totalRows === 0) {
             min = 0
             max = 0
         } else {
@@ -111,7 +121,6 @@ class GridPagination extends Component {
 
     render() {
         const { totalRows } = this.props
-
         return (
             <div style={paginationContainer}>
                 <div style={paginationRows}>
@@ -147,6 +156,10 @@ class GridPagination extends Component {
             </div>
         )
     }
+}
+
+GridPagination.propTypes = {
+    totalRows: PropTypes.number.isRequired
 }
 
 export default GridPagination

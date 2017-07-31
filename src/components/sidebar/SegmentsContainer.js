@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-
+import { createFragmentContainer, graphql } from 'react-relay'
 import SegmentSelection from './SegmentSelection'
 import SegmentSave from './SegmentSave'
 
@@ -8,60 +8,8 @@ class SegmentsContainer extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            segmentCoords: [0, 0],
-            segments: [
-                {
-                    name:
-                        'If I was a long segment then A long segment name looks like this',
-                    segmentId: 0
-                },
-                {
-                    name: 'Android 2 Users',
-                    segmentId: 1
-                },
-                {
-                    name: 'IOS 11 Users',
-                    segmentId: 2
-                },
-                {
-                    name: 'Android 2 Users',
-                    segmentId: 3
-                },
-                {
-                    name: 'IOS 10 Users',
-                    segmentId: 4
-                },
-                {
-                    name: 'IOS 6 Users',
-                    segmentId: 5
-                },
-                {
-                    name: 'IOS 7 Users',
-                    segmentId: 6
-                },
-                {
-                    name: 'IOS 8 Users',
-                    segmentId: 7
-                },
-                {
-                    name: 'IOS 9 Users',
-                    segmentId: 8
-                },
-                {
-                    name: 'IOS 10 Users',
-                    segmentId: 9
-                },
-                {
-                    name: 'IOS 11 Users',
-                    segmentId: 10
-                },
-                {
-                    name: 'IOS 12 Users',
-                    segmentId: 11
-                }
-            ]
+            segmentCoords: [0, 0]
         }
-
         this.removeSegmentCell = this.removeSegmentCell.bind(this)
         this.updateSegmentCell = this.updateSegmentCell.bind(this)
         this.getCurrentSegment = this.getCurrentSegment.bind(this)
@@ -77,7 +25,9 @@ class SegmentsContainer extends Component {
     }
 
     removeSegmentCell(index) {
-        const { segments } = this.state
+        // Need to update with mutation
+
+        const { segments } = this.props
         segments.splice(index, 1)
         this.setState({
             segments
@@ -85,7 +35,10 @@ class SegmentsContainer extends Component {
     }
 
     updateSegmentCell(index, value) {
-        const { segments } = this.state
+        /*
+         * Need to do a mutation to actually update segment name
+         */
+        const segments = JSON.parse(JSON.stringify(this.props.segments))
         segments[index].name = value.length !== 0 ? value : `No Name ${index}`
         this.setState({
             segments
@@ -93,16 +46,22 @@ class SegmentsContainer extends Component {
     }
 
     getCurrentSegment() {
-        const { segments } = this.state
-
         // Update when using real data
+        const { segments } = this.props
+
         return segments[1]
     }
 
     render() {
-        const { showSegmentSelection, showSegmentSave, query, handleSegmentAction } = this.props
-        const { segmentCoords, segments } = this.state
-
+        const {
+            showSegmentSelection,
+            showSegmentSave,
+            query,
+            handleSegmentAction,
+            segments,
+            getSegmentId
+        } = this.props
+        const { segmentCoords } = this.state
         return (
             <div>
                 <SegmentSelection
@@ -112,6 +71,7 @@ class SegmentsContainer extends Component {
                     segments={segments}
                     removeSegmentCell={this.removeSegmentCell}
                     updateSegmentCell={this.updateSegmentCell}
+                    getSegmentId={getSegmentId}
                 />
                 <SegmentSave
                     isOpen={showSegmentSave}
@@ -129,14 +89,27 @@ SegmentsContainer.propTypes = {
     query: PropTypes.array.isRequired,
     showSegmentSave: PropTypes.bool.isRequired,
     showSegmentSelection: PropTypes.bool.isRequired,
-    handleSegmentAction: PropTypes.func.isRequired
+    handleSegmentAction: PropTypes.func.isRequired,
+    getSegmentId: PropTypes.func.isRequired,
+    segments: PropTypes.array.isRequired
 }
 
 SegmentsContainer.defaultProps = {
     query: [],
     showSegmentSave: false,
     showSegmentSelection: false,
-    handleSegmentAction: () => null
+    handleSegmentAction: () => null,
+    getSegmentId: () => null,
+    segments: []
 }
 
-export default SegmentsContainer
+export default createFragmentContainer(
+    SegmentsContainer,
+    graphql`
+        fragment SegmentsContainer_segments on DynamicSegment
+            @relay(plural: true) {
+            name
+            segmentId
+        }
+    `
+)

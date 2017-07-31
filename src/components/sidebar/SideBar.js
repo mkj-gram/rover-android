@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { createFragmentContainer, graphql } from 'react-relay'
+import { graphql, createRefetchContainer } from 'react-relay'
 import {
     AddButton,
     ash,
@@ -34,7 +34,6 @@ import SegmentsContainer from './SegmentsContainer'
 class SideBar extends Component {
     constructor(props) {
         super(props)
-
         this.state = {
             currentAttribute: { attribute: '', index: null },
             currentPredicate: {},
@@ -42,7 +41,8 @@ class SideBar extends Component {
             query: [],
             queryCondition: 'all',
             modalCoordinates: [0, 0],
-            isViewingDynamicSegment: true
+            isViewingDynamicSegment: true,
+            segmentId: ''
         }
 
         this.setState = this.setState.bind(this)
@@ -54,13 +54,40 @@ class SideBar extends Component {
         this.handleModalOpen = this.handleModalOpen.bind(this)
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (this.state.segmentId !== nextProps.segmentId) {
+            const { relay } = this.props
+            const refetchVariables = fragmentVariables => ({
+                segmentId: nextProps.segmentId
+            })
+            relay.refetch(refetchVariables, null)
+
+            this.setState({ segmentId: nextProps.segmentId })
+        } else if (nextProps.data.sbDynamicSegment !== null) {
+            this.viewDynamicSegment(nextProps.data)
+        }
+    }
+
+    viewDynamicSegment(data) {
+        const { sbDynamicSegment } = data
+        const { predicates } = sbDynamicSegment[0]
+        const { condition, device, profile } = predicates
+
+        const query = device.map(d => ({ ...d, category: 'device' })).concat(profile.map(p => ({ ...p, category: 'profile' })))
+        this.setState({
+            query,
+            queryCondition: condition
+        })
+    }
+
     updateQuery() {
-        const { query, currentPredicate } = this.state
+        const { query, currentPredicate, queryCondition } = this.state
         const { index, ...rest } = currentPredicate
 
         const newQuery = query
         newQuery[index] = rest
 
+        this.props.updateQuery(newQuery, queryCondition)
         this.setState({
             query: newQuery,
             currentAttribute: { attribute: '', index: null },
@@ -69,29 +96,14 @@ class SideBar extends Component {
     }
 
     removePredicate(indexToDelete) {
-        const { query } = this.state
+        const { query, queryCondition } = this.state
 
         const newQuery = query.filter(
             (predicate, index) => index !== indexToDelete
         )
 
+        this.props.updateQuery(newQuery, queryCondition)
         this.setState({ query: newQuery })
-    }
-
-    viewDynamicSegment() {
-        const { data } = this.props
-        const { dynamicSegment } = data
-        const { predicates } = dynamicSegment[0]
-        const { condition, device, profile } = predicates
-
-        const query = device
-            .map(d => ({ ...d, category: 'device' }))
-            .concat(profile.map(p => ({ ...p, category: 'profile' })))
-
-        this.setState({
-            query,
-            queryCondition: condition
-        })
     }
 
     renderModalTitle(currentAttribute) {
@@ -349,7 +361,7 @@ class SideBar extends Component {
                             pointerEvents: 'none'
                         }}
                     >
-                        16
+                        {this.props.data.segmentsContainer.length}
                     </div>
                     My Segments
                 </RoundedButton>
@@ -424,6 +436,7 @@ class SideBar extends Component {
             showSegmentSelection,
             showSegmentSave
         } = this.state
+
         return (
             <div style={sideBarStyle}>
                 {this.handleModalOpen()}
@@ -506,6 +519,8 @@ class SideBar extends Component {
                     showSegmentSelection={this.state.showSegmentSelection}
                     showSegmentSave={this.state.showSegmentSave}
                     handleSegmentAction={this.handleSegmentAction}
+                    segments={this.props.data.segmentsContainer}
+                    getSegmentId={this.props.getSegmentId}
                 />
             </div>
         )
@@ -513,17 +528,28 @@ class SideBar extends Component {
 }
 
 SideBar.propTypes = {
-    data: PropTypes.object.isRequired
+    data: PropTypes.object.isRequired,
+    relay: PropTypes.object.isRequired,
+    getSegmentId: PropTypes.func.isRequired,
+    segmentId: PropTypes.string,
+    updateQuery: PropTypes.func.isRequired
 }
 
-export default createFragmentContainer(
+SideBar.defaultProps = {
+    segmentId: ''
+}
+
+export default createRefetchContainer(
     SideBar,
-    graphql`
-        fragment SideBar on Query {
-            dynamicSegment(
-                segmentId: "1a2b3c"
+    graphql.experimental`
+        fragment SideBar on Query
+        @argumentDefinitions(
+            segmentId: {type: "ID", defaultValue: ""}
+        ) {
+             sbDynamicSegment: dynamicSegment(
+                segmentId: $segmentId,
                 paginationKey: "testpaginationkey"
-            ) {
+            ){
                 segmentId
                 name
                 predicates {
@@ -607,6 +633,16 @@ export default createFragmentContainer(
             segmentSchema {
                 ...AddFilterModal_schema
             }
+
+            segmentsContainer: dynamicSegment {
+                ...SegmentsContainer_segments
+            }
+        }
+    `
+    ,
+    graphql.experimental`
+        query SideBarRefetchQuery($segmentId: ID){     
+            ...SideBar @arguments(segmentId: $segmentId)
         }
     `
 )

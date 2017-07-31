@@ -16,7 +16,7 @@ class DateCellFormatter extends Component {
     getRelativeTime() {
         const { value } = this.props
         const now = new Date()
-        const secondsPast = (now.getTime() - value.getTime()) / 1000
+        const secondsPast = (now.getTime() - new Date(value).getTime()) / 1000
 
         if (secondsPast <= 86400) {
             return `${parseInt(secondsPast / 3600)} hours ago`
@@ -40,13 +40,14 @@ class DateCellFormatter extends Component {
     }
 
     handleMouseOver(e) {
+
         e.persist()
         const { handleCellEnter, value } = this.props
         this.setState({ onCell: true })
 
         setTimeout(() => {
             if (this.state.onCell) {
-                handleCellEnter(e, value.toDateString())
+                handleCellEnter(e, new Date(value).toDateString())
                 this.setState({
                     isModalShowing: true
                 })
@@ -62,7 +63,6 @@ class DateCellFormatter extends Component {
 
     render() {
         const { isTooltipShowing } = this.state
-
         return (
             <div
                 onMouseOver={this.handleMouseOver}

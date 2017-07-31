@@ -31,7 +31,8 @@ class SegmentSelection extends Component {
             modalCoordinates,
             segments,
             removeSegmentCell,
-            updateSegmentCell
+            updateSegmentCell,
+            getSegmentId
         } = this.props
 
         const { currentSegment } = this.state
@@ -81,13 +82,15 @@ class SegmentSelection extends Component {
                 >
                     {segments.map((segment, index) =>
                         (<SegmentCell
-                            segment={segment.name}
+                            segment={segment}
                             key={index}
                             index={index}
                             removeSegmentCell={removeSegmentCell}
                             updateSegmentCell={updateSegmentCell}
                             currentEditSegment={this.currentEditSegment}
                             currentSegment={currentSegment}
+                            getSegmentId={getSegmentId}
+                            onRequestClose={onRequestClose}
                         />)
                     )}
                 </div>
@@ -100,9 +103,10 @@ SegmentSelection.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onRequestClose: PropTypes.func.isRequired,
     modalCoordinates: PropTypes.array.isRequired,
-    segments: PropTypes.array.isRequired,
+    segments: PropTypes.array,
     removeSegmentCell: PropTypes.func.isRequired,
-    updateSegmentCell: PropTypes.func.isRequired
+    updateSegmentCell: PropTypes.func.isRequired,
+    getSegmentId: PropTypes.func.isRequired
 }
 
 SegmentSelection.defaultProps = {
@@ -111,7 +115,8 @@ SegmentSelection.defaultProps = {
     modalCoordinates: [0, 0],
     segments: [],
     removeSegmentCell: () => null,
-    updateSegmentCell: () => null
+    updateSegmentCell: () => null,
+    getSegmentId: () => null
 }
 
 export default SegmentSelection
