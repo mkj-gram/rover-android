@@ -859,8 +859,8 @@ type Query {
   ): Node
   experience(id: ID!): Experience
   editableExperience(id: ID!): EditableExperience
-  dynamicSegment(segmentId: ID, paginationKey: String): [DynamicSegment]
-  segmentFromPredicates(predicates: String!, paginationKey: String!): SegmentData
+  dynamicSegment(segmentId: ID, pageNumber: Int, pageSize: Int): [DynamicSegment]
+  segmentFromPredicates(predicates: String!, pageNumber: Int, pageSize: Int): SegmentData
   segmentSchema: SegmentSchema
   sync: SyncResult
 }
@@ -955,7 +955,6 @@ type SegmentData {
   profiles: [JSON!]!
   segmentSize: Int!
   totalSize: Int!
-  nextPageKey: String!
 }
 
 # Schema of available predicate attributes
