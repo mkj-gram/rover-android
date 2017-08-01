@@ -14588,7 +14588,8 @@ proto.rover.audience.v1.StringPredicate.prototype.toObject = function(opt_includ
 proto.rover.audience.v1.StringPredicate.toObject = function(includeInstance, msg) {
   var f, obj = {
     op: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    value: jspb.Message.getFieldWithDefault(msg, 2, "")
+    attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    value: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -14631,6 +14632,10 @@ proto.rover.audience.v1.StringPredicate.deserializeBinaryFromReader = function(m
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
+      msg.setAttributeName(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
       msg.setValue(value);
       break;
     default:
@@ -14668,10 +14673,17 @@ proto.rover.audience.v1.StringPredicate.serializeBinaryToWriter = function(messa
       f
     );
   }
-  f = message.getValue();
+  f = message.getAttributeName();
   if (f.length > 0) {
     writer.writeString(
       2,
+      f
+    );
+  }
+  f = message.getValue();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
       f
     );
   }
@@ -14708,17 +14720,32 @@ proto.rover.audience.v1.StringPredicate.prototype.setOp = function(value) {
 
 
 /**
- * optional string value = 2;
+ * optional string attribute_name = 2;
  * @return {string}
  */
-proto.rover.audience.v1.StringPredicate.prototype.getValue = function() {
+proto.rover.audience.v1.StringPredicate.prototype.getAttributeName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.StringPredicate.prototype.setValue = function(value) {
+proto.rover.audience.v1.StringPredicate.prototype.setAttributeName = function(value) {
   jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional string value = 3;
+ * @return {string}
+ */
+proto.rover.audience.v1.StringPredicate.prototype.getValue = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.StringPredicate.prototype.setValue = function(value) {
+  jspb.Message.setField(this, 3, value);
 };
 
 
@@ -14769,7 +14796,8 @@ proto.rover.audience.v1.BoolPredicate.prototype.toObject = function(opt_includeI
 proto.rover.audience.v1.BoolPredicate.toObject = function(includeInstance, msg) {
   var f, obj = {
     op: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    value: jspb.Message.getFieldWithDefault(msg, 2, false)
+    attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    value: jspb.Message.getFieldWithDefault(msg, 3, false)
   };
 
   if (includeInstance) {
@@ -14811,6 +14839,10 @@ proto.rover.audience.v1.BoolPredicate.deserializeBinaryFromReader = function(msg
       msg.setOp(value);
       break;
     case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAttributeName(value);
+      break;
+    case 3:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setValue(value);
       break;
@@ -14849,10 +14881,17 @@ proto.rover.audience.v1.BoolPredicate.serializeBinaryToWriter = function(message
       f
     );
   }
+  f = message.getAttributeName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
   f = message.getValue();
   if (f) {
     writer.writeBool(
-      2,
+      3,
       f
     );
   }
@@ -14884,19 +14923,34 @@ proto.rover.audience.v1.BoolPredicate.prototype.setOp = function(value) {
 
 
 /**
- * optional bool value = 2;
+ * optional string attribute_name = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.BoolPredicate.prototype.getAttributeName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.BoolPredicate.prototype.setAttributeName = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional bool value = 3;
  * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
 proto.rover.audience.v1.BoolPredicate.prototype.getValue = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 2, false));
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 3, false));
 };
 
 
 /** @param {boolean} value */
 proto.rover.audience.v1.BoolPredicate.prototype.setValue = function(value) {
-  jspb.Message.setField(this, 2, value);
+  jspb.Message.setField(this, 3, value);
 };
 
 
@@ -14947,8 +15001,9 @@ proto.rover.audience.v1.NumberPredicate.prototype.toObject = function(opt_includ
 proto.rover.audience.v1.NumberPredicate.toObject = function(includeInstance, msg) {
   var f, obj = {
     op: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    value: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    value2: jspb.Message.getFieldWithDefault(msg, 3, 0)
+    attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    value: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    value2: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
   if (includeInstance) {
@@ -14990,10 +15045,14 @@ proto.rover.audience.v1.NumberPredicate.deserializeBinaryFromReader = function(m
       msg.setOp(value);
       break;
     case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAttributeName(value);
+      break;
+    case 3:
       var value = /** @type {number} */ (reader.readInt64());
       msg.setValue(value);
       break;
-    case 3:
+    case 4:
       var value = /** @type {number} */ (reader.readInt64());
       msg.setValue2(value);
       break;
@@ -15032,17 +15091,24 @@ proto.rover.audience.v1.NumberPredicate.serializeBinaryToWriter = function(messa
       f
     );
   }
+  f = message.getAttributeName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
   f = message.getValue();
   if (f !== 0) {
     writer.writeInt64(
-      2,
+      3,
       f
     );
   }
   f = message.getValue2();
   if (f !== 0) {
     writer.writeInt64(
-      3,
+      4,
       f
     );
   }
@@ -15078,32 +15144,47 @@ proto.rover.audience.v1.NumberPredicate.prototype.setOp = function(value) {
 
 
 /**
- * optional int64 value = 2;
- * @return {number}
+ * optional string attribute_name = 2;
+ * @return {string}
  */
-proto.rover.audience.v1.NumberPredicate.prototype.getValue = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+proto.rover.audience.v1.NumberPredicate.prototype.getAttributeName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
-/** @param {number} value */
-proto.rover.audience.v1.NumberPredicate.prototype.setValue = function(value) {
+/** @param {string} value */
+proto.rover.audience.v1.NumberPredicate.prototype.setAttributeName = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional int64 value2 = 3;
+ * optional int64 value = 3;
  * @return {number}
  */
-proto.rover.audience.v1.NumberPredicate.prototype.getValue2 = function() {
+proto.rover.audience.v1.NumberPredicate.prototype.getValue = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
 /** @param {number} value */
-proto.rover.audience.v1.NumberPredicate.prototype.setValue2 = function(value) {
+proto.rover.audience.v1.NumberPredicate.prototype.setValue = function(value) {
   jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional int64 value2 = 4;
+ * @return {number}
+ */
+proto.rover.audience.v1.NumberPredicate.prototype.getValue2 = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.NumberPredicate.prototype.setValue2 = function(value) {
+  jspb.Message.setField(this, 4, value);
 };
 
 
@@ -15154,6 +15235,7 @@ proto.rover.audience.v1.DatePredicate.prototype.toObject = function(opt_includeI
 proto.rover.audience.v1.DatePredicate.toObject = function(includeInstance, msg) {
   var f, obj = {
     op: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
     value: (f = msg.getValue()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     value2: (f = msg.getValue2()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
@@ -15197,11 +15279,15 @@ proto.rover.audience.v1.DatePredicate.deserializeBinaryFromReader = function(msg
       msg.setOp(value);
       break;
     case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAttributeName(value);
+      break;
+    case 3:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setValue(value);
       break;
-    case 3:
+    case 4:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setValue2(value);
@@ -15241,10 +15327,17 @@ proto.rover.audience.v1.DatePredicate.serializeBinaryToWriter = function(message
       f
     );
   }
+  f = message.getAttributeName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
   f = message.getValue();
   if (f != null) {
     writer.writeMessage(
-      2,
+      3,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -15252,7 +15345,7 @@ proto.rover.audience.v1.DatePredicate.serializeBinaryToWriter = function(message
   f = message.getValue2();
   if (f != null) {
     writer.writeMessage(
-      3,
+      4,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -15292,18 +15385,33 @@ proto.rover.audience.v1.DatePredicate.prototype.setOp = function(value) {
 
 
 /**
- * optional google.protobuf.Timestamp value = 2;
+ * optional string attribute_name = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.DatePredicate.prototype.getAttributeName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.DatePredicate.prototype.setAttributeName = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp value = 3;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.audience.v1.DatePredicate.prototype.getValue = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 2));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.audience.v1.DatePredicate.prototype.setValue = function(value) {
-  jspb.Message.setWrapperField(this, 2, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -15317,23 +15425,23 @@ proto.rover.audience.v1.DatePredicate.prototype.clearValue = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.DatePredicate.prototype.hasValue = function() {
-  return jspb.Message.getField(this, 2) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp value2 = 3;
+ * optional google.protobuf.Timestamp value2 = 4;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.audience.v1.DatePredicate.prototype.getValue2 = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 3));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 4));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.audience.v1.DatePredicate.prototype.setValue2 = function(value) {
-  jspb.Message.setWrapperField(this, 3, value);
+  jspb.Message.setWrapperField(this, 4, value);
 };
 
 
@@ -15347,7 +15455,7 @@ proto.rover.audience.v1.DatePredicate.prototype.clearValue2 = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.DatePredicate.prototype.hasValue2 = function() {
-  return jspb.Message.getField(this, 3) != null;
+  return jspb.Message.getField(this, 4) != null;
 };
 
 
@@ -15398,6 +15506,7 @@ proto.rover.audience.v1.GeofencePredicate.prototype.toObject = function(opt_incl
 proto.rover.audience.v1.GeofencePredicate.toObject = function(includeInstance, msg) {
   var f, obj = {
     op: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
     value: (f = msg.getValue()) && proto.rover.audience.v1.GeofencePredicate.Location.toObject(includeInstance, f)
   };
 
@@ -15440,6 +15549,10 @@ proto.rover.audience.v1.GeofencePredicate.deserializeBinaryFromReader = function
       msg.setOp(value);
       break;
     case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAttributeName(value);
+      break;
+    case 3:
       var value = new proto.rover.audience.v1.GeofencePredicate.Location;
       reader.readMessage(value,proto.rover.audience.v1.GeofencePredicate.Location.deserializeBinaryFromReader);
       msg.setValue(value);
@@ -15479,10 +15592,17 @@ proto.rover.audience.v1.GeofencePredicate.serializeBinaryToWriter = function(mes
       f
     );
   }
+  f = message.getAttributeName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
   f = message.getValue();
   if (f != null) {
     writer.writeMessage(
-      2,
+      3,
       f,
       proto.rover.audience.v1.GeofencePredicate.Location.serializeBinaryToWriter
     );
@@ -15710,18 +15830,33 @@ proto.rover.audience.v1.GeofencePredicate.prototype.setOp = function(value) {
 
 
 /**
- * optional Location value = 2;
+ * optional string attribute_name = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.GeofencePredicate.prototype.getAttributeName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.GeofencePredicate.prototype.setAttributeName = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional Location value = 3;
  * @return {?proto.rover.audience.v1.GeofencePredicate.Location}
  */
 proto.rover.audience.v1.GeofencePredicate.prototype.getValue = function() {
   return /** @type{?proto.rover.audience.v1.GeofencePredicate.Location} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.GeofencePredicate.Location, 2));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.GeofencePredicate.Location, 3));
 };
 
 
 /** @param {?proto.rover.audience.v1.GeofencePredicate.Location|undefined} value */
 proto.rover.audience.v1.GeofencePredicate.prototype.setValue = function(value) {
-  jspb.Message.setWrapperField(this, 2, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -15735,7 +15870,7 @@ proto.rover.audience.v1.GeofencePredicate.prototype.clearValue = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.GeofencePredicate.prototype.hasValue = function() {
-  return jspb.Message.getField(this, 2) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
@@ -15786,6 +15921,7 @@ proto.rover.audience.v1.VersionPredicate.prototype.toObject = function(opt_inclu
 proto.rover.audience.v1.VersionPredicate.toObject = function(includeInstance, msg) {
   var f, obj = {
     op: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
     value: (f = msg.getValue()) && proto.rover.audience.v1.Version.toObject(includeInstance, f),
     value2: (f = msg.getValue2()) && proto.rover.audience.v1.Version.toObject(includeInstance, f)
   };
@@ -15829,11 +15965,15 @@ proto.rover.audience.v1.VersionPredicate.deserializeBinaryFromReader = function(
       msg.setOp(value);
       break;
     case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAttributeName(value);
+      break;
+    case 3:
       var value = new proto.rover.audience.v1.Version;
       reader.readMessage(value,proto.rover.audience.v1.Version.deserializeBinaryFromReader);
       msg.setValue(value);
       break;
-    case 3:
+    case 4:
       var value = new proto.rover.audience.v1.Version;
       reader.readMessage(value,proto.rover.audience.v1.Version.deserializeBinaryFromReader);
       msg.setValue2(value);
@@ -15873,10 +16013,17 @@ proto.rover.audience.v1.VersionPredicate.serializeBinaryToWriter = function(mess
       f
     );
   }
+  f = message.getAttributeName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
   f = message.getValue();
   if (f != null) {
     writer.writeMessage(
-      2,
+      3,
       f,
       proto.rover.audience.v1.Version.serializeBinaryToWriter
     );
@@ -15884,7 +16031,7 @@ proto.rover.audience.v1.VersionPredicate.serializeBinaryToWriter = function(mess
   f = message.getValue2();
   if (f != null) {
     writer.writeMessage(
-      3,
+      4,
       f,
       proto.rover.audience.v1.Version.serializeBinaryToWriter
     );
@@ -15923,18 +16070,33 @@ proto.rover.audience.v1.VersionPredicate.prototype.setOp = function(value) {
 
 
 /**
- * optional Version value = 2;
+ * optional string attribute_name = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.VersionPredicate.prototype.getAttributeName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.VersionPredicate.prototype.setAttributeName = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional Version value = 3;
  * @return {?proto.rover.audience.v1.Version}
  */
 proto.rover.audience.v1.VersionPredicate.prototype.getValue = function() {
   return /** @type{?proto.rover.audience.v1.Version} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Version, 2));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Version, 3));
 };
 
 
 /** @param {?proto.rover.audience.v1.Version|undefined} value */
 proto.rover.audience.v1.VersionPredicate.prototype.setValue = function(value) {
-  jspb.Message.setWrapperField(this, 2, value);
+  jspb.Message.setWrapperField(this, 3, value);
 };
 
 
@@ -15948,23 +16110,23 @@ proto.rover.audience.v1.VersionPredicate.prototype.clearValue = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.VersionPredicate.prototype.hasValue = function() {
-  return jspb.Message.getField(this, 2) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * optional Version value2 = 3;
+ * optional Version value2 = 4;
  * @return {?proto.rover.audience.v1.Version}
  */
 proto.rover.audience.v1.VersionPredicate.prototype.getValue2 = function() {
   return /** @type{?proto.rover.audience.v1.Version} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Version, 3));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Version, 4));
 };
 
 
 /** @param {?proto.rover.audience.v1.Version|undefined} value */
 proto.rover.audience.v1.VersionPredicate.prototype.setValue2 = function(value) {
-  jspb.Message.setWrapperField(this, 3, value);
+  jspb.Message.setWrapperField(this, 4, value);
 };
 
 
@@ -15978,7 +16140,7 @@ proto.rover.audience.v1.VersionPredicate.prototype.clearValue2 = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.VersionPredicate.prototype.hasValue2 = function() {
-  return jspb.Message.getField(this, 3) != null;
+  return jspb.Message.getField(this, 4) != null;
 };
 
 

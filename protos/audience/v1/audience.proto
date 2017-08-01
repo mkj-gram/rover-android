@@ -650,8 +650,9 @@ message DynamicSegment {
 
 
 message StringPredicate {
-  Op op           = 1;
-  string value    = 2;
+  Op op                 = 1;
+  string attribute_name = 2;
+  string value          = 3;
 
   enum Op {
     IS_UNSET        = 0;
@@ -669,8 +670,9 @@ message StringPredicate {
 }
 
 message BoolPredicate {
-  Op op      = 1;
-  bool value = 2;
+  Op op                 = 1;
+  string attribute_name = 2;
+  bool value            = 3;
 
   enum Op {
     IS_UNSET    = 0;
@@ -681,10 +683,10 @@ message BoolPredicate {
 }
 
 message NumberPredicate {
-  Op op        = 1;
-
-  int64 value  = 2;
-  int64 value2 = 3;
+  Op op                 = 1;
+  string attribute_name = 2;
+  int64 value           = 3;
+  int64 value2          = 4;
 
   enum Op {
     IS_UNSET        = 0;
@@ -702,8 +704,9 @@ message NumberPredicate {
 
 message DatePredicate {
   Op op                            = 1;
-  google.protobuf.Timestamp value  = 2;
-  google.protobuf.Timestamp value2 = 3;
+  string attribute_name            = 2;
+  google.protobuf.Timestamp value  = 3;
+  google.protobuf.Timestamp value2 = 4;
 
   enum Op {
     IS_UNSET        = 0;
@@ -724,8 +727,9 @@ message DatePredicate {
 }
 
 message GeofencePredicate {
-  Op op          = 1;
-  Location value = 2;
+  Op op                 = 1;
+  string attribute_name = 2;
+  Location value        = 3;
 
 
   message Location {
@@ -744,9 +748,10 @@ message GeofencePredicate {
 }
 
 message VersionPredicate {
-  Op op          = 1;
-  Version value  = 2;
-  Version value2 = 3;
+  Op op                 = 1;
+  string attribute_name = 2;
+  Version value         = 3;
+  Version value2        = 4;
 
   enum Op {
     IS_UNSET                 = 0;

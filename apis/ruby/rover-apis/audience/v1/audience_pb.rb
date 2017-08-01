@@ -353,7 +353,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.StringPredicate" do
     optional :op, :enum, 1, "rover.audience.v1.StringPredicate.Op"
-    optional :value, :string, 2
+    optional :attribute_name, :string, 2
+    optional :value, :string, 3
   end
   add_enum "rover.audience.v1.StringPredicate.Op" do
     value :IS_UNSET, 0
@@ -367,7 +368,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.BoolPredicate" do
     optional :op, :enum, 1, "rover.audience.v1.BoolPredicate.Op"
-    optional :value, :bool, 2
+    optional :attribute_name, :string, 2
+    optional :value, :bool, 3
   end
   add_enum "rover.audience.v1.BoolPredicate.Op" do
     value :IS_UNSET, 0
@@ -376,8 +378,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.NumberPredicate" do
     optional :op, :enum, 1, "rover.audience.v1.NumberPredicate.Op"
-    optional :value, :int64, 2
-    optional :value2, :int64, 3
+    optional :attribute_name, :string, 2
+    optional :value, :int64, 3
+    optional :value2, :int64, 4
   end
   add_enum "rover.audience.v1.NumberPredicate.Op" do
     value :IS_UNSET, 0
@@ -390,8 +393,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.DatePredicate" do
     optional :op, :enum, 1, "rover.audience.v1.DatePredicate.Op"
-    optional :value, :message, 2, "google.protobuf.Timestamp"
-    optional :value2, :message, 3, "google.protobuf.Timestamp"
+    optional :attribute_name, :string, 2
+    optional :value, :message, 3, "google.protobuf.Timestamp"
+    optional :value2, :message, 4, "google.protobuf.Timestamp"
   end
   add_enum "rover.audience.v1.DatePredicate.Op" do
     value :IS_UNSET, 0
@@ -407,7 +411,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.GeofencePredicate" do
     optional :op, :enum, 1, "rover.audience.v1.GeofencePredicate.Op"
-    optional :value, :message, 2, "rover.audience.v1.GeofencePredicate.Location"
+    optional :attribute_name, :string, 2
+    optional :value, :message, 3, "rover.audience.v1.GeofencePredicate.Location"
   end
   add_message "rover.audience.v1.GeofencePredicate.Location" do
     optional :longitude, :double, 1
@@ -422,8 +427,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.VersionPredicate" do
     optional :op, :enum, 1, "rover.audience.v1.VersionPredicate.Op"
-    optional :value, :message, 2, "rover.audience.v1.Version"
-    optional :value2, :message, 3, "rover.audience.v1.Version"
+    optional :attribute_name, :string, 2
+    optional :value, :message, 3, "rover.audience.v1.Version"
+    optional :value2, :message, 4, "rover.audience.v1.Version"
   end
   add_enum "rover.audience.v1.VersionPredicate.Op" do
     value :IS_UNSET, 0
