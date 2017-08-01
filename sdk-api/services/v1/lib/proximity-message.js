@@ -145,11 +145,11 @@ internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConf
             [place.id], // $7
             place.tags || [] // $8
         ];
-
-        logger.debug(BEACON_TRIGGERED_QUERIES[currentDayName].text, values)
-
+        
         let currentDayName = internals.getDay(timestamp);
         
+        logger.debug(BEACON_TRIGGERED_QUERIES[currentDayName].text, values)
+
         client.query({
             text: BEACON_TRIGGERED_QUERIES[currentDayName].text,
             name: BEACON_TRIGGERED_QUERIES[currentDayName].name,
