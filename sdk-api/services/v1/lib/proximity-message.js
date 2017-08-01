@@ -132,7 +132,7 @@ internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConf
 
     postgres.connect((err, client, done) => {
         if (err) {
-            callback(err);
+            return callback(err);
         }
 
         var values = [
@@ -146,7 +146,7 @@ internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConf
             place.tags || [] // $8
         ];
 
-        logger.debug(values);
+        logger.debug(BEACON_TRIGGERED_QUERIES[currentDayName].text, values)
 
         let currentDayName = internals.getDay(timestamp);
         
@@ -172,6 +172,7 @@ internals.beaconTriggered = function(accountId, triggerId, timestamp, beaconConf
 internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, callback) {
     const server = this;
     const postgres = server.connections.postgres.client;
+    const logger = server.plugins.logger.logger;
 
     if (util.isNullOrUndefined(place)) {
         return callback(null, []);
@@ -179,7 +180,7 @@ internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, c
 
     postgres.connect((err, client, done) => {
         if (err) {
-            callback(err);
+            return callback(err);
         }
 
         let values = [
@@ -192,6 +193,8 @@ internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, c
         ];
 
         let currentDayName = internals.getDay(timestamp);
+
+        logger.debug(GEOFENCE_TRIGGERED_QUERIES[currentDayName].text, values)
 
         client.query({
             text: GEOFENCE_TRIGGERED_QUERIES[currentDayName].text,
@@ -214,6 +217,7 @@ internals.geofenceTriggered = function(accountId, triggerId, timestamp, place, c
 internals.gimbalPlaceTriggered = function(accountId, triggerId, timestamp, gimbalPlace, callback) {
     const server = this;
     const postgres = server.connections.postgres.client;
+    const logger = server.plugins.logger.logger;
 
     if (util.isNullOrUndefined(gimbalPlace)) {
         return callback(null, []);
@@ -221,7 +225,7 @@ internals.gimbalPlaceTriggered = function(accountId, triggerId, timestamp, gimba
 
     postgres.connect((err, client, done) => {
         if (err) {
-            callback(err);
+            return callback(err);
         }
 
         let values = [
@@ -234,6 +238,8 @@ internals.gimbalPlaceTriggered = function(accountId, triggerId, timestamp, gimba
 
         let currentDayName = internals.getDay(timestamp);
         
+        logger.debug(GIMBAL_PLACE_TRIGGERED_QUERIES[currentDayName].text, values)
+
         client.query({
             text: GIMBAL_PLACE_TRIGGERED_QUERIES[currentDayName].text,
             name: GIMBAL_PLACE_TRIGGERED_QUERIES[currentDayName].name,
@@ -270,7 +276,7 @@ internals.xenioZoneTriggered = function(accountId, triggerId, timestamp, xenioZo
 
     postgres.connect((err, client, done) => {
         if (err) {
-            callback(err);
+            return callback(err);
         }
 
         var values = [
@@ -286,6 +292,8 @@ internals.xenioZoneTriggered = function(accountId, triggerId, timestamp, xenioZo
 
         let currentDayName = internals.getDay(timestamp);
         
+        logger.debug(XENIO_ZONE_TRIGGERED_QUERIES[currentDayName].text, values)
+
         client.query({
             text: XENIO_ZONE_TRIGGERED_QUERIES[currentDayName].text,
             name: XENIO_ZONE_TRIGGERED_QUERIES[currentDayName].name,
@@ -308,14 +316,15 @@ internals.xenioZoneTriggered = function(accountId, triggerId, timestamp, xenioZo
 internals.xenioPlaceTriggered = function(accountId, triggerId, timestamp, xenioPlace, callback) {
     const server = this;
     const postgres = server.connections.postgres.client;
-
+    const logger = server.plugins.logger.logger;
+    
     if (util.isNullOrUndefined(xenioPlace)) {
         return callback(null, []);
     }
 
     postgres.connect((err, client, done) => {
         if (err) {
-            callback(err);
+            return callback(err);
         }
 
         let values = [
@@ -328,6 +337,8 @@ internals.xenioPlaceTriggered = function(accountId, triggerId, timestamp, xenioP
         ];
 
         let currentDayName = internals.getDay(timestamp);
+
+        logger.debug(XENIO_PLACE_TRIGGERED_QUERIES[currentDayName].text, values)
 
         client.query({
             text: XENIO_PLACE_TRIGGERED_QUERIES[currentDayName].text,

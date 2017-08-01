@@ -42,7 +42,7 @@ internals.underscoreKeys = function(object) {
 }
 
 internals.parseGenerationTime = function(timestamp) {
-    let generationTime = moment(timestamp);
+    let generationTime = moment.parseZone(timestamp);
 
     if (generationTime.isValid()) {
         return generationTime
@@ -92,9 +92,9 @@ class BaseProcessor {
         delete args.event.attributes['object']
         delete args.event.attributes['action']
         
-        let eventTimestamp = args.event.timestamp || args.event.time;
+        this._rawEventTimestamp = args.event.timestamp || args.event.time;
 
-        this._generationTime = internals.parseGenerationTime(eventTimestamp);
+        this._generationTime = internals.parseGenerationTime(this._rawEventTimestamp);
 
         delete args.event.attributes['time']
         delete args.event.attributes['timestamp']
@@ -105,8 +105,6 @@ class BaseProcessor {
        
 
         this._rawInput = internals.underscoreKeys(args.event.attributes)
-
-        this._rawInput['timestamp'] = eventTimestamp
     }
 
     _getTriggerArguments() {
@@ -114,11 +112,11 @@ class BaseProcessor {
     }
 
     utcUnixTimestamp() {
-        return this._generationTime.utc().unix();
+        return moment(this._generationTime).utc().unix();
     }
 
     unixTimestamp() {
-        return this._generationTime.unix();
+        return moment(this._generationTime).unix();
     }
 
     getTransactionName() {
