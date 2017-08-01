@@ -660,6 +660,8 @@ internals.processEvent = function(request, reply, customer) {
         eventCallbackCount += 1
 
         if (err) {
+            logger.error("Event Processing Error:", err)
+            
             const status = err.status || 500
             let message = "unknown"
 
