@@ -48,9 +48,24 @@ class EventProcessor {
         Object.assign(this._processor, attributes);
     }
     
-    process(callback) {
+    process(cb) {
 
         const processorName = this._processor.constructor.name;
+        const startTime = Date.now()
+        const eventName = this._processor._eventName
+        const eventTimestamp = this._processor._rawEventTimestamp
+
+        function callback(err, updatedCustomer, updatedDevice, eventResponse) {
+            const runTime = Date.now() - startTime
+            // Processed: "geofence enter" status=error runTime=23ms
+            let status = "ok"
+            if (err) {
+                status = "error"
+            }
+
+            logger.info(`eventName=${eventName} eventTimestamp=${eventTimestamp} status=${status} runTime=${runTime}ms`)
+            return cb(err, updatedCustomer, updatedDevice, eventResponse)
+        }
 
         if (this._processor.valid() == false) {
             logger.error(this._processor._validationError);
