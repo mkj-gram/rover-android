@@ -14,17 +14,10 @@ class AudienceTable extends Component {
         super(props)
 
         this.state = {
-            selectedColumns: {
-                devices: {
-                    'deviceId': 'StringPredicate',
-                    'deviceOS': 'StringPredicate',
-                    'deviceOSVersion': 'VersionPredicate',
-                    'model': 'StringPredicate',
-                    'appVersion': 'StringPredicate'
-                },
-                profiles: {
-                    'firstName': 'StringPredicate'
-                }
+            selectedColumns: {},
+            allColumns: {
+                devices: {},
+                profiles: {}
             },
             segmentId: '',
             predicates: '[]',
@@ -43,7 +36,9 @@ class AudienceTable extends Component {
                     y: 0,
                     divWidth: 0
                 }
-            }
+            },
+            devices: [],
+            profiles: []
         }
 
         this.createRowsAndColumns = this.createRowsAndColumns.bind(this)
@@ -54,6 +49,9 @@ class AudienceTable extends Component {
         this.handleCellEnter = this.handleCellEnter.bind(this)
         this.handleCellLeave = this.handleCellLeave.bind(this)
         this.getFormat = this.getFormat.bind(this)
+        this.getAllColumns = this.getAllColumns.bind(this)
+        this.updateChecked = this.updateChecked.bind(this)
+        this.getSetCachedColumns = this.getSetCachedColumns.bind(this)
     }
 
     componentDidMount() {
@@ -65,12 +63,73 @@ class AudienceTable extends Component {
             segmentSize,
             totalSize
         } = data.adgSegmentsFromPredicates
-        this.createRowsAndColumns(
-            deviceSchema.concat(profileSchema),
-            devices,
-            profiles
+
+        this.getSetCachedColumns()
+
+        this.getAllColumns(deviceSchema, profileSchema)
+        this.createRowsAndColumns(devices, profiles)
+        this.setState({ segmentSize, totalSize, devices, profiles })
+    }
+
+    getSetCachedColumns() {
+        // HardCoded default selected Columns
+        let selectedColumns = {
+            deviceId: 'StringPredicate',
+            deviceOS: 'StringPredicate',
+            deviceOSVersion: 'VersionPredicate',
+            model: 'StringPredicate',
+            appVersion: 'StringPredicate',
+            firstName: 'StringPredicate'
+        }
+
+        const cachedSelectedColumns = JSON.parse(
+            localStorage.getItem('selectedColumns')
         )
-        this.setState({ segmentSize, totalSize })
+
+        if (!cachedSelectedColumns) {
+            localStorage.setItem(
+                'selectedColumns',
+                JSON.stringify(selectedColumns)
+            )
+        }
+    }
+
+    getAllColumns(deviceSchema, profileSchema) {
+        const devices = {}
+        const profiles = {}
+        deviceSchema.map(device => {
+            devices[device.attribute] = device.type
+        })
+        profileSchema.map(profile => {
+            profiles[profile.attribute] = profile.type
+        })
+        this.setState({ allColumns: { devices, profiles } })
+    }
+
+    updateChecked(category, item) {
+        const { allColumns } = this.state
+        let cachedSelectedColumns = JSON.parse(
+            localStorage.getItem('selectedColumns')
+        )
+
+        if (item in cachedSelectedColumns) {
+            delete cachedSelectedColumns[item]
+        } else {
+            let property = {
+                [item]: allColumns[category][item]
+            }
+            cachedSelectedColumns = Object.assign(
+                {},
+                property,
+                cachedSelectedColumns
+            )
+        }
+        localStorage.setItem(
+            'selectedColumns',
+            JSON.stringify(cachedSelectedColumns)
+        )
+
+        this.createRowsAndColumns(this.state.devices, this.state.profiles)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -173,8 +232,8 @@ class AudienceTable extends Component {
         }
     }
 
-    createRowsAndColumns(attributes, devices, profiles) {
-        const columns = this.getSelectedColumns(attributes)
+    createRowsAndColumns(devices, profiles) {
+        const columns = this.getSelectedColumns()
         const rows = this.getSelectedRows(profiles, devices)
 
         this.setState({
@@ -204,54 +263,46 @@ class AudienceTable extends Component {
         }
     }
 
-    getSelectedColumns(attributes) {
+    getSelectedColumns() {
         const columns = []
-        const { selectedColumns } = this.state
-
-        attributes.map(elem => {
-            let attr = elem.attribute
-
-            if (
-                Object.keys(selectedColumns.devices).includes(attr)|| 
-                Object.keys(selectedColumns.profiles).includes(attr)
-            ) {
-                columns.push({
-                    key: attr,
-                    name: attr,
-                    width: 200,
-                    draggable: true,
-                    resizable: true,
-                    formatter: this.getFormat(elem.type)
-                })
-            }
+        const selectedColumns = JSON.parse(localStorage.selectedColumns)
+        Object.keys(selectedColumns).map(attr => {
+            columns.push({
+                key: attr,
+                name: attr,
+                width: 200,
+                draggable: true,
+                resizable: true,
+                formatter: this.getFormat(selectedColumns.attr)
+            })
         })
-  
         return columns
     }
 
-
-
     getSelectedRows(profiles, devices) {
-        const {
-            devices: selectedDevices,
-            profiles: selectedProfiles
-        } = this.state.selectedColumns
+        const selectedColumns = JSON.parse(
+            localStorage.getItem('selectedColumns')
+        )
 
         const concatData = devices.map(device => {
             const { profileId } = device
             if (profileId) {
                 return {
                     ...device,
-                    ...profiles.filter((profile) => profile.profileId === profileId)[0]
+                    ...profiles.filter(
+                        profile => profile.profileId === profileId
+                    )[0]
                 }
             }
         })
-
-        let rows = concatData.map(data => {
-            let row = {}
+        const rows = concatData.map(data => {
+            const row = {}
             for (let key in data) {
-                if (key in selectedDevices || key in selectedProfiles) {
-                    row[key] = this.formatRowData(data[key], selectedDevices[key] || selectedProfiles[key])
+                if (key in selectedColumns) {
+                    row[key] = this.formatRowData(
+                        data[key],
+                        selectedColumns[key]
+                    )
                 }
             }
             return row
@@ -261,7 +312,7 @@ class AudienceTable extends Component {
     }
 
     formatRowData(data, type) {
-         /*
+        /*
          * ToDo: Parsed 'location' attributeType
          */
         let ret = data
@@ -273,6 +324,20 @@ class AudienceTable extends Component {
 
     updateDragColumns(dragState) {
         const { columns, rows } = dragState
+        const selectedColumns = JSON.parse(
+            localStorage.getItem('selectedColumns')
+        )
+        if (Object.keys(columns).length > 0) {
+            let rearrangeColumns = {}
+            columns.map(attr => {
+                rearrangeColumns[attr.name] = selectedColumns[attr.name]
+            })
+            localStorage.setItem(
+                'selectedColumns',
+                JSON.stringify(rearrangeColumns)
+            )
+        }
+        
         this.setState({ columns, rows })
     }
 
@@ -288,7 +353,12 @@ class AudienceTable extends Component {
                     position: 'relative'
                 }}
             >
-                <TableMenuBar segmentSize={segmentSize} totalSize={totalSize} />
+                <TableMenuBar
+                    segmentSize={segmentSize}
+                    totalSize={totalSize}
+                    allColumns={this.state.allColumns}
+                    updateChecked={this.updateChecked}
+                />
                 <AudienceDataGrid
                     segmentSize={segmentSize}
                     columns={columns}

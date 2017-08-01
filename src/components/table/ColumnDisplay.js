@@ -11,7 +11,7 @@ import {
     violet
 } from '@rover/react-bootstrap'
 
-import { DeviceIconSmall, LocationIcon, ProfileIcon } from '@rover/react-icons'
+import { DeviceIconSmall, ProfileIcon } from '@rover/react-icons'
 
 class ColumnDisplay extends Component {
     constructor(props) {
@@ -58,9 +58,8 @@ class ColumnDisplay extends Component {
         const remaining = items.length - size
 
         const icon = {
-            Device: DeviceIconSmall({ style: { fill: silver } }),
-            Location: LocationIcon({ fill: silver }),
-            Profile: ProfileIcon({ fill: silver })
+            devices: DeviceIconSmall({ style: { fill: silver } }),
+            profiles: ProfileIcon({ fill: silver })
         }
 
         return (

@@ -36,37 +36,9 @@ const ColumnDisplayContainer = ({
     showChecked,
     triggerColumnsMenu,
     pageClickLocation,
-    showColumnsMenu
-}) => {
-    const tempCategories = {
-        Device: [
-            'OS',
-            'Hardware',
-            'Bluetooth Enabled',
-            'Location Enabled',
-            'OS version',
-            'Push Enabled',
-            'Carrier',
-            'Timezone',
-            'SDK Version'
-        ],
-        Location: [
-            'Location',
-            'Latitude',
-            'Longitude',
-            'City',
-            'Region',
-            'Country',
-            'Language',
-            'Last Seen',
-            'Created at',
-            'Tags',
-            'Custom Attribute'
-        ],
-        Profile: ['Gender', 'Age', 'Height', 'Race']
-    }
-
-    return (
+    showColumnsMenu,
+    allColumns
+}) => (
         <ModalWithHeader
             contentLabel="Column Builder"
             backgroundColor="white"
@@ -110,36 +82,29 @@ const ColumnDisplayContainer = ({
         >
             <div style={modalContainer}>
                 <ColumnDisplay
-                    category="Device"
-                    items={tempCategories.Device}
+                    category="devices"
+                    items={Object.keys(allColumns.devices)}
                     updateChecked={updateChecked}
                     showChecked={showChecked}
                 />
                 <div style={segmentLine} />
                 <ColumnDisplay
-                    category="Location"
-                    items={tempCategories.Location}
-                    updateChecked={updateChecked}
-                    showChecked={showChecked}
-                />
-                <div style={segmentLine} />
-                <ColumnDisplay
-                    category="Profile"
-                    items={tempCategories.Profile}
+                    category="profiles"
+                    items={Object.keys(allColumns.profiles)}
                     updateChecked={updateChecked}
                     showChecked={showChecked}
                 />
             </div>
         </ModalWithHeader>
     )
-}
 
 ColumnDisplayContainer.propTypes = {
     showColumnsMenu: PropTypes.bool.isRequired,
     updateChecked: PropTypes.func.isRequired,
     showChecked: PropTypes.func.isRequired,
     triggerColumnsMenu: PropTypes.func.isRequired,
-    pageClickLocation: PropTypes.object.isRequired
+    pageClickLocation: PropTypes.object.isRequired,
+    allColumns: PropTypes.object.isRequired
 }
 
 ColumnDisplayContainer.defaultProps = {
@@ -150,7 +115,8 @@ ColumnDisplayContainer.defaultProps = {
     pageClickLocation: {
         x: 0,
         y: 0
-    }
+    },
+    allColumns: {}
 }
 
 export default ColumnDisplayContainer
