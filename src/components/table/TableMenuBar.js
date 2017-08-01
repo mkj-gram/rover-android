@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
 import {
     cloud,
@@ -66,11 +67,6 @@ class TableMenuBar extends Component {
         this.state = {
             searchVal: '',
             showColumnsMenu: false,
-            categories: {
-                Device: [],
-                Location: [],
-                Profile: []
-            },
             pageClickLocation: {
                 x: 0,
                 y: 0
@@ -79,7 +75,6 @@ class TableMenuBar extends Component {
         this.handleSearch = this.handleSearch.bind(this)
         this.triggerColumnsMenu = this.triggerColumnsMenu.bind(this)
         this.showChecked = this.showChecked.bind(this)
-        this.updateChecked = this.updateChecked.bind(this)
     }
 
     handleSearch(e) {
@@ -101,33 +96,23 @@ class TableMenuBar extends Component {
     }
 
     showChecked(category, item) {
-        const { categories } = this.state
-        return categories[category].indexOf(item) !== -1
-    }
-
-    updateChecked(category, item) {
-        const { categories } = this.state
-        const index = categories[category].indexOf(item)
-
-        if (index !== -1) {
-            categories[category].splice(index, 1)
-        } else {
-            categories[category].push(item)
-        }
-        this.setState({ categories })
+        const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns'))
+        return (item in selectedColumns)
     }
 
     render() {
         const { showColumnsMenu, pageClickLocation } = this.state
+        const { updateChecked, allColumns, segmentSize, totalSize } = this.props
 
         return (
             <div style={tableMenuBarStyle}>
                 <ColumnDisplayContainer
                     showColumnsMenu={showColumnsMenu}
-                    updateChecked={this.updateChecked}
+                    updateChecked={updateChecked}
                     showChecked={this.showChecked}
                     triggerColumnsMenu={this.triggerColumnsMenu}
                     pageClickLocation={pageClickLocation}
+                    allColumns={allColumns}
                 />
 
                 <div style={tableMenuBarLeft}>
@@ -150,10 +135,10 @@ class TableMenuBar extends Component {
                                 color: graphite
                             }}
                         >
-                            {this.props.segmentSize}
+                            {segmentSize}
                         </div>
                         <div style={{ ...text, fontSize: 13, color: silver }}>
-                            of {this.props.totalSize} total devices
+                            of {totalSize} total devices
                         </div>
                     </div>
 
@@ -203,6 +188,20 @@ class TableMenuBar extends Component {
             </div>
         )
     }
+}
+
+TableMenuBar.propTypes = {
+    updateChecked: PropTypes.func.isRequired,
+    allColumns: PropTypes.object.isRequired,
+    segmentSize: PropTypes.number.isRequired,
+    totalSize: PropTypes.number.isRequired
+}
+
+TableMenuBar.defaultProps = {
+    updateChecked: () => null,
+    allColumns: {},
+    segmentSize: 0,
+    totalSize: 0
 }
 
 export default TableMenuBar
