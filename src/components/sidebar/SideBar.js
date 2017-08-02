@@ -23,6 +23,7 @@ import { DeviceIconSmall, ProfileIcon } from '@rover/react-icons'
 import AddFilterModal from './AddFilterModal'
 import BooleanInput from './BooleanInput'
 import DateInput from './DateInput'
+import GeofenceInput from './GeofenceInput'
 import NumericInput from './NumericInput'
 import StringInput from './StringInput'
 import VersionInput from './VersionInput'
@@ -177,6 +178,8 @@ class SideBar extends Component {
                 return <StringInput {...props} />
             case 'NumberPredicate':
                 return <NumericInput {...props} />
+            case 'GeofencePredicate':
+                return <GeofenceInput {...props} />
             default:
         }
     }

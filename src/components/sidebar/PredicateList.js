@@ -7,6 +7,8 @@ import { ash, lavender, silver, steel, text } from '@rover/react-bootstrap'
 
 import { RemoveIcon } from '@rover/react-icons'
 
+import GeofencePredicateListElement from './GeofencePredicateListElement'
+
 const listStyle = {
     padding: 20,
     fontFamily: 'Source Sans Pro',
@@ -41,6 +43,8 @@ const renderPredicate = ({ __typename, ...rest }) => {
             return renderVersionPredicate(rest)
         case 'NumberPredicate':
             return renderNumericPredicate(rest)
+        case 'GeofencePredicate':
+            return renderGeofencePredicate(rest)
         default:
     }
 }
@@ -162,6 +166,14 @@ const renderNumericPredicate = ({ numberComparison, numberValue }) => {
         </div>
     )
 }
+
+const renderGeofencePredicate = ({ geofenceValue }) => (
+    <GeofencePredicateListElement
+        {...geofenceValue}
+        renderPredicateComparison={renderPredicateComparison}
+        renderPredicateValue={renderPredicateValue}
+    />
+)
 
 const PredicateList = ({ query, queryCondition, viewModal, removePredicate }) => {
     const predicateStyle = {

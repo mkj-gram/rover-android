@@ -1,7 +1,8 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { silver, steel, titanium } from '@rover/react-bootstrap'
 
-const ModalInput = props => {
+const ModalInput = (props) => {
     const { style } = props
     const inputStyle = {
         backgroundColor: 'transparent',
@@ -32,6 +33,14 @@ const ModalInput = props => {
             onBlur={onBlur}
         />
     )
+}
+
+ModalInput.propTypes = {
+    style: PropTypes.object
+}
+
+ModalInput.defaultProps = {
+    style: {}
 }
 
 export default ModalInput
