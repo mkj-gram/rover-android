@@ -103,7 +103,8 @@ internals.minutesSinceMidnight = function(timestamp) {
 };
 
 internals.beginningOfDayAsUnixTimestamp = function(timestamp) {
-    return moment(timestamp).startOf('day').unix();
+    // Drop timezone information
+    return  moment.utc(timestamp).add(timestamp.utcOffset(), 'm').startOf('day').unix()
 };
 
 internals.getDay = function(timestamp) {
