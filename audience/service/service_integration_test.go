@@ -789,7 +789,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 						"arr":            audience.StringArrayVal("hello"),
 						"arr-set":        audience.StringArrayVal("hello", "world"),
-						"arr-add":        audience.StringArrayVal("adds", "another"),
+						"arr-add":        audience.StringArrayVal("adds", "added"),
 						"arr-remove":     audience.StringArrayVal("keeps"),
 						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
 					},
@@ -1722,11 +1722,11 @@ func testAudienceService_GetDevice(t *testing.T) {
 					CarrierName:        "rogers",
 					DeviceManufacturer: "Apple",
 
-					DeviceTokenKey:       "abc",
-					DeviceTokenIsActive:  true,
-					DeviceTokenCreatedAt: createdAt,
-					DeviceTokenUpdatedAt: createdAt,
-					ApsEnvironment:       "development",
+					PushTokenKey:       "abc",
+					PushTokenIsActive:  true,
+					PushTokenCreatedAt: createdAt,
+					PushTokenUpdatedAt: createdAt,
+					PushEnvironment:    "development",
 
 					Frameworks: map[string]*audience.Version{
 						"RoverEvents": {Major: 1, Minor: 2, Revision: 2},
@@ -1813,18 +1813,18 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 		{
 			name: "error: validation: blank id",
 			req: &audience.GetDeviceByPushTokenRequest{
-				AuthContext:    &auth.AuthContext{AccountId: 0},
-				DeviceTokenKey: "",
+				AuthContext:  &auth.AuthContext{AccountId: 0},
+				PushTokenKey: "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceTokenKey: blank"),
+			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: PushTokenKey: blank"),
 		},
 
 		{
 			name: "error: not found",
 			req: &audience.GetDeviceByPushTokenRequest{
-				AuthContext:    &auth.AuthContext{AccountId: 1},
-				DeviceTokenKey: "doesntexists",
+				AuthContext:  &auth.AuthContext{AccountId: 1},
+				PushTokenKey: "doesntexists",
 			},
 
 			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceByPushToken: devices.Find: not found"),
@@ -1833,8 +1833,8 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 		{
 			name: "error: account: invalid",
 			req: &audience.GetDeviceByPushTokenRequest{
-				AuthContext:    &auth.AuthContext{AccountId: 100},
-				DeviceTokenKey: "token:bbbbbbbbbbbbbbbbbbbbbbbb",
+				AuthContext:  &auth.AuthContext{AccountId: 100},
+				PushTokenKey: "token:bbbbbbbbbbbbbbbbbbbbbbbb",
 			},
 
 			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceByPushToken: devices.Find: not found"),
@@ -1843,8 +1843,8 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 		{
 			name: "finds device",
 			req: &audience.GetDeviceByPushTokenRequest{
-				AuthContext:    &auth.AuthContext{AccountId: 1},
-				DeviceTokenKey: "token:bbbbbbbbbbbbbbbbbbbbbbbb",
+				AuthContext:  &auth.AuthContext{AccountId: 1},
+				PushTokenKey: "token:bbbbbbbbbbbbbbbbbbbbbbbb",
 			},
 
 			expErr: nil,
@@ -1859,10 +1859,10 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 
-					DeviceTokenKey:       "token:bbbbbbbbbbbbbbbbbbbbbbbb",
-					DeviceTokenIsActive:  true,
-					DeviceTokenCreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					DeviceTokenUpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					PushTokenKey:       "token:bbbbbbbbbbbbbbbbbbbbbbbb",
+					PushTokenIsActive:  true,
+					PushTokenCreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					PushTokenUpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 				},
 			},
 		},
@@ -2074,8 +2074,8 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
 
 				AppName:            "rover",
-				ApsEnvironment:     "development",
-				DeviceTokenKey:     "000000000000000000000000000000000000000000",
+				PushEnvironment:    "development",
+				PushTokenKey:       "000000000000000000000000000000000000000000",
 				AppVersion:         "1.0",
 				AppBuild:           "52",
 				AppNamespace:       "io.rover",
@@ -2132,13 +2132,13 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
-					DeviceTokenKey:       "000000000000000000000000000000000000000000",
-					DeviceTokenIsActive:  true,
-					DeviceTokenUpdatedAt: protoTs(t, updatedAt),
-					DeviceTokenCreatedAt: protoTs(t, updatedAt),
+					PushTokenKey:       "000000000000000000000000000000000000000000",
+					PushTokenIsActive:  true,
+					PushTokenUpdatedAt: protoTs(t, updatedAt),
+					PushTokenCreatedAt: protoTs(t, updatedAt),
 
 					AppName:            "rover",
-					ApsEnvironment:     "development",
+					PushEnvironment:    "development",
 					AppVersion:         "1.0",
 					AppBuild:           "52",
 					AppNamespace:       "io.rover",
@@ -2180,10 +2180,10 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 
 				DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
 
-				DeviceTokenKey: "",
+				PushTokenKey: "",
 
 				AppName:            "rover",
-				ApsEnvironment:     "development",
+				PushEnvironment:    "development",
 				AppVersion:         "1.0",
 				AppBuild:           "52",
 				AppNamespace:       "io.rover",
@@ -2225,14 +2225,14 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
-					DeviceTokenKey:            "",
-					DeviceTokenCreatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUpdatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUnregisteredAt: protoTs(t, updatedAt),
-					DeviceTokenIsActive:       false,
+					PushTokenKey:            "",
+					PushTokenCreatedAt:      protoTs(t, updatedAt),
+					PushTokenUpdatedAt:      protoTs(t, updatedAt),
+					PushTokenUnregisteredAt: protoTs(t, updatedAt),
+					PushTokenIsActive:       false,
 
 					AppName:            "rover",
-					ApsEnvironment:     "development",
+					PushEnvironment:    "development",
 					AppVersion:         "1.0",
 					AppBuild:           "52",
 					AppNamespace:       "io.rover",
@@ -2485,8 +2485,8 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 			req: &audience.UpdateDevicePushTokenRequest{
 				AuthContext: &auth.AuthContext{AccountId: 5},
 
-				DeviceId:       "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
-				DeviceTokenKey: "1234567890",
+				DeviceId:     "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
+				PushTokenKey: "1234567890",
 			},
 
 			expErr: nil,
@@ -2513,11 +2513,11 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
-					DeviceTokenKey:            "1234567890",
-					DeviceTokenIsActive:       true,
-					DeviceTokenUpdatedAt:      protoTs(t, updatedAt),
-					DeviceTokenCreatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUnregisteredAt: nil,
+					PushTokenKey:            "1234567890",
+					PushTokenIsActive:       true,
+					PushTokenUpdatedAt:      protoTs(t, updatedAt),
+					PushTokenCreatedAt:      protoTs(t, updatedAt),
+					PushTokenUnregisteredAt: nil,
 				},
 			},
 		},
@@ -2531,7 +2531,7 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 
 				DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
 
-				DeviceTokenKey: "",
+				PushTokenKey: "",
 			},
 
 			expErr: nil,
@@ -2546,11 +2546,11 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
-					DeviceTokenKey:            "",
-					DeviceTokenCreatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUpdatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUnregisteredAt: protoTs(t, updatedAt),
-					DeviceTokenIsActive:       false,
+					PushTokenKey:            "",
+					PushTokenCreatedAt:      protoTs(t, updatedAt),
+					PushTokenUpdatedAt:      protoTs(t, updatedAt),
+					PushTokenUnregisteredAt: protoTs(t, updatedAt),
+					PushTokenIsActive:       false,
 				},
 			},
 		},
@@ -2561,7 +2561,7 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 5},
 				DeviceId:    "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
 
-				DeviceTokenKey: "0123456789",
+				PushTokenKey: "0123456789",
 			},
 
 			expErr: nil,
@@ -2576,11 +2576,11 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
-					DeviceTokenKey:            "0123456789",
-					DeviceTokenCreatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUpdatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUnregisteredAt: nil,
-					DeviceTokenIsActive:       true,
+					PushTokenKey:            "0123456789",
+					PushTokenCreatedAt:      protoTs(t, updatedAt),
+					PushTokenUpdatedAt:      protoTs(t, updatedAt),
+					PushTokenUnregisteredAt: nil,
+					PushTokenIsActive:       true,
 				},
 			},
 		},
@@ -2591,7 +2591,7 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 5},
 				DeviceId:    "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
 
-				DeviceTokenKey: "0123456789abcdef",
+				PushTokenKey: "0123456789abcdef",
 			},
 
 			expErr: nil,
@@ -2606,11 +2606,11 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
-					DeviceTokenKey:            "0123456789abcdef",
-					DeviceTokenCreatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUpdatedAt:      protoTs(t, updatedAt),
-					DeviceTokenIsActive:       true,
-					DeviceTokenUnregisteredAt: nil,
+					PushTokenKey:            "0123456789abcdef",
+					PushTokenCreatedAt:      protoTs(t, updatedAt),
+					PushTokenUpdatedAt:      protoTs(t, updatedAt),
+					PushTokenIsActive:       true,
+					PushTokenUnregisteredAt: nil,
 				},
 			},
 		},
@@ -2700,11 +2700,11 @@ func testAudienceService_UpdateDeviceUnregisterPushToken(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 
-					DeviceTokenKey:            "registered",
-					DeviceTokenIsActive:       true,
-					DeviceTokenUpdatedAt:      protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					DeviceTokenCreatedAt:      protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					DeviceTokenUnregisteredAt: nil,
+					PushTokenKey:            "registered",
+					PushTokenIsActive:       true,
+					PushTokenUpdatedAt:      protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					PushTokenCreatedAt:      protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					PushTokenUnregisteredAt: nil,
 				},
 			},
 
@@ -2718,11 +2718,11 @@ func testAudienceService_UpdateDeviceUnregisterPushToken(t *testing.T) {
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
-					DeviceTokenKey:            "registered",
-					DeviceTokenIsActive:       false,
-					DeviceTokenCreatedAt:      protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					DeviceTokenUpdatedAt:      protoTs(t, updatedAt),
-					DeviceTokenUnregisteredAt: protoTs(t, updatedAt),
+					PushTokenKey:            "registered",
+					PushTokenIsActive:       false,
+					PushTokenCreatedAt:      protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					PushTokenUpdatedAt:      protoTs(t, updatedAt),
+					PushTokenUnregisteredAt: protoTs(t, updatedAt),
 				},
 			},
 		},

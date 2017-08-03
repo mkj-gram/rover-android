@@ -86,7 +86,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.GetDeviceByPushTokenRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :device_token_key, :string, 2
+    optional :push_token_key, :string, 2
   end
   add_message "rover.audience.v1.GetDeviceByPushTokenResponse" do
     optional :device, :message, 1, "rover.audience.v1.Device"
@@ -101,8 +101,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.UpdateDevicePushTokenRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
-    optional :device_token_key, :string, 3
-    optional :aps_environment, :string, 4
+    optional :push_token_key, :string, 3
+    optional :push_environment, :string, 4
   end
   add_message "rover.audience.v1.UpdateDevicePushTokenResponse" do
   end
@@ -172,8 +172,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.UpdateDeviceRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
-    optional :aps_environment, :string, 10
-    optional :device_token_key, :string, 11
+    optional :push_environment, :string, 10
+    optional :push_token_key, :string, 11
     optional :app_name, :string, 12
     optional :app_version, :string, 13
     optional :app_build, :string, 14
@@ -211,12 +211,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :created_at, :message, 5, "google.protobuf.Timestamp"
     optional :updated_at, :message, 6, "google.protobuf.Timestamp"
     optional :is_test_device, :bool, 7
-    optional :aps_environment, :string, 10
-    optional :device_token_key, :string, 11
-    optional :device_token_is_active, :bool, 12
-    optional :device_token_created_at, :message, 13, "google.protobuf.Timestamp"
-    optional :device_token_updated_at, :message, 14, "google.protobuf.Timestamp"
-    optional :device_token_unregistered_at, :message, 15, "google.protobuf.Timestamp"
+    optional :push_environment, :string, 10
+    optional :push_token_key, :string, 11
+    optional :push_token_is_active, :bool, 12
+    optional :push_token_created_at, :message, 13, "google.protobuf.Timestamp"
+    optional :push_token_updated_at, :message, 14, "google.protobuf.Timestamp"
+    optional :push_token_unregistered_at, :message, 15, "google.protobuf.Timestamp"
     optional :app_name, :string, 16
     optional :app_version, :string, 17
     optional :app_build, :string, 18

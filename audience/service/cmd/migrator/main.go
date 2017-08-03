@@ -393,7 +393,7 @@ func toDevice(oldDevice map[string]interface{}, customer map[string]interface{})
 	m["app_namespace"] = od["app_identifier"]
 
 	m["advertising_id"] = od["aid"]
-	m["device_token_key"] = od["token"]
+	m["push_token_key"] = od["token"]
 
 	m["is_background_enabled"] = od["background_enabled"]
 	m["is_bluetooth_enabled"] = od["bluetooth_enabled"]
@@ -404,12 +404,12 @@ func toDevice(oldDevice map[string]interface{}, customer map[string]interface{})
 	if os_name, ok := od["os_name"].(string); ok {
 		switch os_name {
 		case "Android":
-			m["aps_environment"] = "production"
+			m["push_environment"] = "production"
 		case "iOS":
 			if v, ok := od["development"].(bool); ok && v == true {
-				m["aps_environment"] = "development"
+				m["push_environment"] = "development"
 			} else {
-				m["aps_environment"] = "production"
+				m["push_environment"] = "production"
 			}
 		default:
 			// log?
@@ -454,7 +454,7 @@ func toDevice(oldDevice map[string]interface{}, customer map[string]interface{})
 
 	if val, ok := od["sdk_version"].(string); ok {
 		m["frameworks"] = map[string]interface{}{
-			"Rover": toVersion(val),
+			"io.rover.Rover": toVersion(val),
 		}
 	}
 

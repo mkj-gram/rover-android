@@ -59,8 +59,8 @@ func (s *Server) GetDevice(ctx context.Context, r *audience.GetDeviceRequest) (*
 
 // GetDeviceByPushToken implements the corresponding rpc
 func (s *Server) GetDeviceByPushToken(ctx context.Context, r *audience.GetDeviceByPushTokenRequest) (*audience.GetDeviceByPushTokenResponse, error) {
-	if err := validateID(r.GetDeviceTokenKey()); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceTokenKey: %v", err)
+	if err := validateID(r.GetPushTokenKey()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: PushTokenKey: %v", err)
 	}
 
 	d, err := s.db.GetDeviceByPushToken(ctx, r)

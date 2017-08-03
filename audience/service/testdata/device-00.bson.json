@@ -13,13 +13,13 @@
   "created_at": { "$date": "2017-06-14T15:44:18.496Z" },
   "updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
 
-  "aps_environment": "development",
+  "push_environment": "development",
 
-  "device_token_key": "abc",
-  "device_token_is_active": true,
-  "device_token_created_at": { "$date": "2017-06-14T15:44:18.496Z" },
-  "device_token_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
-  "device_token_unregistered_at": null,
+  "push_token_key": "abc",
+  "push_token_is_active": true,
+  "push_token_created_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "push_token_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "push_token_unregistered_at": null,
 
   "frameworks": {
     "RoverEvents": { "major": 1, "minor": 2, "revision": 2 },

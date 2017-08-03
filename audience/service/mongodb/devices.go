@@ -29,13 +29,13 @@ type Device struct {
 	UpdatedAt *time.Time    `bson:"updated_at"`
 
 	IsTestDevice bool `bson:"is_test_device,omitempty"`
+	PushEnvironment         string     `bson:"push_environment,omitempty"`
+	PushTokenKey            string     `bson:"push_token_key,omitempty"`
+	PushTokenIsActive       bool       `bson:"push_token_is_active"`
+	PushTokenCreatedAt      *time.Time `bson:"push_token_created_at,omitempty"`
+	PushTokenUpdatedAt      *time.Time `bson:"push_token_updated_at,omitempty"`
+	PushTokenUnregisteredAt *time.Time `bson:"push_token_unregistered_at,omitempty"`
 
-	ApsEnvironment            string     `bson:"aps_environment,omitempty"`
-	DeviceTokenKey            string     `bson:"device_token_key,omitempty"`
-	DeviceTokenIsActive       bool       `bson:"device_token_is_active"`
-	DeviceTokenCreatedAt      *time.Time `bson:"device_token_created_at,omitempty"`
-	DeviceTokenUpdatedAt      *time.Time `bson:"device_token_updated_at,omitempty"`
-	DeviceTokenUnregisteredAt *time.Time `bson:"device_token_unregistered_at,omitempty"`
 
 	AppName                     string              `bson:"app_name,omitempty"`
 	AppVersion                  string              `bson:"app_version,omitempty"`
@@ -89,14 +89,14 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.UpdatedAt, _ = protoToTime(proto.UpdatedAt)
 
 	d.IsTestDevice = proto.IsTestDevice
+	d.PushTokenKey = proto.PushTokenKey
+	d.PushEnvironment = proto.PushEnvironment
+	d.PushTokenIsActive = proto.PushTokenIsActive
 
-	d.DeviceTokenKey = proto.DeviceTokenKey
-	d.ApsEnvironment = proto.ApsEnvironment
-	d.DeviceTokenIsActive = proto.DeviceTokenIsActive
 
-	d.DeviceTokenUpdatedAt, _ = protoToTime(proto.DeviceTokenUpdatedAt)
-	d.DeviceTokenCreatedAt, _ = protoToTime(proto.DeviceTokenCreatedAt)
-	d.DeviceTokenUnregisteredAt, _ = protoToTime(proto.DeviceTokenUnregisteredAt)
+	d.PushTokenUpdatedAt, _ = protoToTime(proto.PushTokenUpdatedAt)
+	d.PushTokenCreatedAt, _ = protoToTime(proto.PushTokenCreatedAt)
+	d.PushTokenUnregisteredAt, _ = protoToTime(proto.PushTokenUnregisteredAt)
 
 	d.AppName = proto.AppName
 	d.AppVersion = proto.AppVersion
@@ -160,9 +160,9 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.UpdatedAt, _ = timeToProto(d.UpdatedAt)
 
 	proto.IsTestDevice = d.IsTestDevice
+	proto.PushEnvironment = d.PushEnvironment
+	proto.PushTokenKey = d.PushTokenKey
 
-	proto.ApsEnvironment = d.ApsEnvironment
-	proto.DeviceTokenKey = d.DeviceTokenKey
 
 	proto.AppName = d.AppName
 	proto.AppVersion = d.AppVersion
@@ -203,11 +203,11 @@ func (d *Device) toProto(proto *audience.Device) error {
 
 	proto.Ip = d.Ip
 
-	proto.DeviceTokenIsActive = d.DeviceTokenIsActive
-	proto.DeviceTokenUpdatedAt, _ = timeToProto(d.DeviceTokenUpdatedAt)
-	proto.DeviceTokenCreatedAt, _ = timeToProto(d.DeviceTokenCreatedAt)
+	proto.PushTokenIsActive = d.PushTokenIsActive
+	proto.PushTokenUpdatedAt, _ = timeToProto(d.PushTokenUpdatedAt)
+	proto.PushTokenCreatedAt, _ = timeToProto(d.PushTokenCreatedAt)
 
-	proto.DeviceTokenUnregisteredAt, _ = timeToProto(d.DeviceTokenUnregisteredAt)
+	proto.PushTokenUnregisteredAt, _ = timeToProto(d.PushTokenUnregisteredAt)
 
 	proto.LocationAccuracy = d.LocationAccuracy
 	proto.LocationLongitude = d.LocationLongitude
@@ -296,11 +296,11 @@ func (s *devicesStore) GetDevice(ctx context.Context, r *audience.GetDeviceReque
 
 func (s *devicesStore) GetDeviceByPushToken(ctx context.Context, r *audience.GetDeviceByPushTokenRequest) (*audience.Device, error) {
 	var (
-		device_token_key = r.GetDeviceTokenKey()
-		account_id       = r.GetAuthContext().GetAccountId()
+		push_token_key = r.GetPushTokenKey()
+		account_id     = r.GetAuthContext().GetAccountId()
 
 		d Device
-		Q = bson.M{"device_token_key": device_token_key, "account_id": account_id}
+		Q = bson.M{"push_token_key": push_token_key, "account_id": account_id}
 	)
 
 	if err := s.devices.Find(Q).One(&d); err != nil {
@@ -394,25 +394,25 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 
 	var update = bson.M{}
 
-	if device.DeviceTokenKey != r.DeviceTokenKey {
-		if device.DeviceTokenKey == "" {
-			update["device_token_created_at"] = now
-			update["device_token_unregistered_at"] = nil
-			update["device_token_is_active"] = true
-		} else if r.DeviceTokenKey == "" {
-			update["device_token_is_active"] = false
-			update["device_token_unregistered_at"] = now
+	if device.PushTokenKey != r.PushTokenKey {
+		if device.PushTokenKey == "" {
+			update["push_token_created_at"] = now
+			update["push_token_unregistered_at"] = nil
+			update["push_token_is_active"] = true
+		} else if r.PushTokenKey == "" {
+			update["push_token_is_active"] = false
+			update["push_token_unregistered_at"] = now
 		}
 
-		update["device_token_updated_at"] = now
+		update["push_token_updated_at"] = now
 	}
 
 	update["updated_at"] = now
 
-	update["aps_environment"] = r.ApsEnvironment
-	update["device_token_key"] = r.DeviceTokenKey
-	if r.DeviceTokenKey == "" {
-		update["device_token_key"] = nil
+	update["push_environment"] = r.PushEnvironment
+	update["push_token_key"] = r.PushTokenKey
+	if r.PushTokenKey == "" {
+		update["push_token_key"] = nil
 	}
 	update["app_name"] = r.AppName
 	update["app_version"] = r.AppVersion
@@ -468,10 +468,10 @@ func (s *devicesStore) UpdateDeviceUnregisterPushToken(ctx context.Context, r *a
 
 		selector = bson.M{"device_id": device_id, "account_id": account_id}
 		update   = bson.M{
-			"device_token_is_active":       false,
-			"device_token_unregistered_at": now,
-			"device_token_updated_at":      now,
-			"updated_at":                   now,
+			"push_token_is_active":       false,
+			"push_token_unregistered_at": now,
+			"push_token_updated_at":      now,
+			"updated_at":                 now,
 		}
 	)
 
@@ -523,20 +523,20 @@ func (s *devicesStore) UpdateDevicePushToken(ctx context.Context, r *audience.Up
 
 	var update = bson.M{}
 
-	if device.DeviceTokenKey != r.DeviceTokenKey {
-		if device.DeviceTokenKey == "" {
-			update["device_token_created_at"] = now
-			update["device_token_unregistered_at"] = nil
-			update["device_token_is_active"] = true
-		} else if r.DeviceTokenKey == "" {
-			update["device_token_is_active"] = false
-			update["device_token_unregistered_at"] = now
+	if device.PushTokenKey != r.PushTokenKey {
+		if device.PushTokenKey == "" {
+			update["push_token_created_at"] = now
+			update["push_token_unregistered_at"] = nil
+			update["push_token_is_active"] = true
+		} else if r.PushTokenKey == "" {
+			update["push_token_is_active"] = false
+			update["push_token_unregistered_at"] = now
 		}
-		update["device_token_updated_at"] = now
+		update["push_token_updated_at"] = now
 	}
 
-	update["device_token_key"] = r.DeviceTokenKey
-	update["aps_environment"] = r.ApsEnvironment
+	update["push_token_key"] = r.PushTokenKey
+	update["push_environment"] = r.PushEnvironment
 	update["updated_at"] = now
 
 	err = s.devices.Update(bson.M{
@@ -661,7 +661,7 @@ func (s *devicesStore) SetDeviceProfile(ctx context.Context, r *audience.SetDevi
 	}
 
 	if err := s.profileExists(ctx, pid.Hex()); err != nil {
-		return errors.Wrap(err, "profileExists")
+		return wrapError(err, "profileExists")
 	}
 
 	err = s.devices.Update(
@@ -698,7 +698,7 @@ func (s *devicesStore) ListDevicesByProfileId(ctx context.Context, r *audience.L
 	}
 
 	if err := s.profileExists(ctx, pid.Hex()); err != nil {
-		return nil, errors.Wrap(err, "profileExists")
+		return nil, wrapError(err, "profileExists")
 	}
 
 	var (

@@ -205,7 +205,7 @@ message GetDeviceResponse {
 
 message GetDeviceByPushTokenRequest {
   auth.v1.AuthContext auth_context = 1;
-  string device_token_key = 2;
+  string push_token_key = 2;
 }
 message GetDeviceByPushTokenResponse {
   Device device = 1;
@@ -224,8 +224,8 @@ message UpdateDevicePushTokenRequest {
 
   string device_id        = 2;
 
-  string device_token_key = 3;
-  string aps_environment  = 4;
+  string push_token_key = 3;
+  string push_environment  = 4;
 }
 message UpdateDevicePushTokenResponse {}
 
@@ -312,8 +312,8 @@ message UpdateDeviceRequest {
 
   string device_id = 2;
 
-  string aps_environment              = 10;
-  string device_token_key             = 11;
+  string push_environment              = 10;
+  string push_token_key             = 11;
   string app_name                     = 12;
   string app_version                  = 13;
   string app_build                    = 14;
@@ -374,15 +374,15 @@ message Device {
   // A string equal to either "development" or "production" which indicates the
   // envrionment the app was built on and used by the server to determine which
   // APNS API to use.
-  string aps_environment = 10;
+  string push_environment = 10;
 
   // the token key value
-  string device_token_key             = 11;
+  string push_token_key             = 11;
 
-  bool device_token_is_active       = 12;
-  google.protobuf.Timestamp device_token_created_at = 13;
-  google.protobuf.Timestamp device_token_updated_at = 14;
-  google.protobuf.Timestamp device_token_unregistered_at = 15;
+  bool push_token_is_active       = 12;
+  google.protobuf.Timestamp push_token_created_at = 13;
+  google.protobuf.Timestamp push_token_updated_at = 14;
+  google.protobuf.Timestamp push_token_unregistered_at = 15;
 
 
   // The name of the application. E.g. "Air Miles"

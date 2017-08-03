@@ -3944,7 +3944,7 @@ proto.rover.audience.v1.GetDeviceByPushTokenRequest.prototype.toObject = functio
 proto.rover.audience.v1.GetDeviceByPushTokenRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    deviceTokenKey: jspb.Message.getFieldWithDefault(msg, 2, "")
+    pushTokenKey: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -3988,7 +3988,7 @@ proto.rover.audience.v1.GetDeviceByPushTokenRequest.deserializeBinaryFromReader 
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setDeviceTokenKey(value);
+      msg.setPushTokenKey(value);
       break;
     default:
       reader.skipField();
@@ -4026,7 +4026,7 @@ proto.rover.audience.v1.GetDeviceByPushTokenRequest.serializeBinaryToWriter = fu
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getDeviceTokenKey();
+  f = message.getPushTokenKey();
   if (f.length > 0) {
     writer.writeString(
       2,
@@ -4067,16 +4067,16 @@ proto.rover.audience.v1.GetDeviceByPushTokenRequest.prototype.hasAuthContext = f
 
 
 /**
- * optional string device_token_key = 2;
+ * optional string push_token_key = 2;
  * @return {string}
  */
-proto.rover.audience.v1.GetDeviceByPushTokenRequest.prototype.getDeviceTokenKey = function() {
+proto.rover.audience.v1.GetDeviceByPushTokenRequest.prototype.getPushTokenKey = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.GetDeviceByPushTokenRequest.prototype.setDeviceTokenKey = function(value) {
+proto.rover.audience.v1.GetDeviceByPushTokenRequest.prototype.setPushTokenKey = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
@@ -4611,8 +4611,8 @@ proto.rover.audience.v1.UpdateDevicePushTokenRequest.toObject = function(include
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    deviceTokenKey: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    apsEnvironment: jspb.Message.getFieldWithDefault(msg, 4, "")
+    pushTokenKey: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    pushEnvironment: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -4660,11 +4660,11 @@ proto.rover.audience.v1.UpdateDevicePushTokenRequest.deserializeBinaryFromReader
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
-      msg.setDeviceTokenKey(value);
+      msg.setPushTokenKey(value);
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setApsEnvironment(value);
+      msg.setPushEnvironment(value);
       break;
     default:
       reader.skipField();
@@ -4709,14 +4709,14 @@ proto.rover.audience.v1.UpdateDevicePushTokenRequest.serializeBinaryToWriter = f
       f
     );
   }
-  f = message.getDeviceTokenKey();
+  f = message.getPushTokenKey();
   if (f.length > 0) {
     writer.writeString(
       3,
       f
     );
   }
-  f = message.getApsEnvironment();
+  f = message.getPushEnvironment();
   if (f.length > 0) {
     writer.writeString(
       4,
@@ -4772,31 +4772,31 @@ proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setDeviceId = fun
 
 
 /**
- * optional string device_token_key = 3;
+ * optional string push_token_key = 3;
  * @return {string}
  */
-proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.getDeviceTokenKey = function() {
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.getPushTokenKey = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setDeviceTokenKey = function(value) {
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setPushTokenKey = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional string aps_environment = 4;
+ * optional string push_environment = 4;
  * @return {string}
  */
-proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.getApsEnvironment = function() {
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.getPushEnvironment = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setApsEnvironment = function(value) {
+proto.rover.audience.v1.UpdateDevicePushTokenRequest.prototype.setPushEnvironment = function(value) {
   jspb.Message.setField(this, 4, value);
 };
 
@@ -8000,8 +8000,8 @@ proto.rover.audience.v1.UpdateDeviceRequest.toObject = function(includeInstance,
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    apsEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    deviceTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    pushEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    pushTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
     appName: jspb.Message.getFieldWithDefault(msg, 12, ""),
     appVersion: jspb.Message.getFieldWithDefault(msg, 13, ""),
     appBuild: jspb.Message.getFieldWithDefault(msg, 14, ""),
@@ -8075,11 +8075,11 @@ proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader = functi
       break;
     case 10:
       var value = /** @type {string} */ (reader.readString());
-      msg.setApsEnvironment(value);
+      msg.setPushEnvironment(value);
       break;
     case 11:
       var value = /** @type {string} */ (reader.readString());
-      msg.setDeviceTokenKey(value);
+      msg.setPushTokenKey(value);
       break;
     case 12:
       var value = /** @type {string} */ (reader.readString());
@@ -8231,14 +8231,14 @@ proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter = function(m
       f
     );
   }
-  f = message.getApsEnvironment();
+  f = message.getPushEnvironment();
   if (f.length > 0) {
     writer.writeString(
       10,
       f
     );
   }
-  f = message.getDeviceTokenKey();
+  f = message.getPushTokenKey();
   if (f.length > 0) {
     writer.writeString(
       11,
@@ -8474,31 +8474,31 @@ proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceId = function(val
 
 
 /**
- * optional string aps_environment = 10;
+ * optional string push_environment = 10;
  * @return {string}
  */
-proto.rover.audience.v1.UpdateDeviceRequest.prototype.getApsEnvironment = function() {
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getPushEnvironment = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.UpdateDeviceRequest.prototype.setApsEnvironment = function(value) {
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setPushEnvironment = function(value) {
   jspb.Message.setField(this, 10, value);
 };
 
 
 /**
- * optional string device_token_key = 11;
+ * optional string push_token_key = 11;
  * @return {string}
  */
-proto.rover.audience.v1.UpdateDeviceRequest.prototype.getDeviceTokenKey = function() {
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getPushTokenKey = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceTokenKey = function(value) {
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setPushTokenKey = function(value) {
   jspb.Message.setField(this, 11, value);
 };
 
@@ -9095,12 +9095,12 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     isTestDevice: jspb.Message.getFieldWithDefault(msg, 7, false),
-    apsEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    deviceTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    deviceTokenIsActive: jspb.Message.getFieldWithDefault(msg, 12, false),
-    deviceTokenCreatedAt: (f = msg.getDeviceTokenCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    deviceTokenUpdatedAt: (f = msg.getDeviceTokenUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    deviceTokenUnregisteredAt: (f = msg.getDeviceTokenUnregisteredAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    pushEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    pushTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    pushTokenIsActive: jspb.Message.getFieldWithDefault(msg, 12, false),
+    pushTokenCreatedAt: (f = msg.getPushTokenCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    pushTokenUpdatedAt: (f = msg.getPushTokenUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    pushTokenUnregisteredAt: (f = msg.getPushTokenUnregisteredAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     appName: jspb.Message.getFieldWithDefault(msg, 16, ""),
     appVersion: jspb.Message.getFieldWithDefault(msg, 17, ""),
     appBuild: jspb.Message.getFieldWithDefault(msg, 18, ""),
@@ -9207,30 +9207,30 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
       break;
     case 10:
       var value = /** @type {string} */ (reader.readString());
-      msg.setApsEnvironment(value);
+      msg.setPushEnvironment(value);
       break;
     case 11:
       var value = /** @type {string} */ (reader.readString());
-      msg.setDeviceTokenKey(value);
+      msg.setPushTokenKey(value);
       break;
     case 12:
       var value = /** @type {boolean} */ (reader.readBool());
-      msg.setDeviceTokenIsActive(value);
+      msg.setPushTokenIsActive(value);
       break;
     case 13:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
-      msg.setDeviceTokenCreatedAt(value);
+      msg.setPushTokenCreatedAt(value);
       break;
     case 14:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
-      msg.setDeviceTokenUpdatedAt(value);
+      msg.setPushTokenUpdatedAt(value);
       break;
     case 15:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
-      msg.setDeviceTokenUnregisteredAt(value);
+      msg.setPushTokenUnregisteredAt(value);
       break;
     case 16:
       var value = /** @type {string} */ (reader.readString());
@@ -9462,28 +9462,28 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
       f
     );
   }
-  f = message.getApsEnvironment();
+  f = message.getPushEnvironment();
   if (f.length > 0) {
     writer.writeString(
       10,
       f
     );
   }
-  f = message.getDeviceTokenKey();
+  f = message.getPushTokenKey();
   if (f.length > 0) {
     writer.writeString(
       11,
       f
     );
   }
-  f = message.getDeviceTokenIsActive();
+  f = message.getPushTokenIsActive();
   if (f) {
     writer.writeBool(
       12,
       f
     );
   }
-  f = message.getDeviceTokenCreatedAt();
+  f = message.getPushTokenCreatedAt();
   if (f != null) {
     writer.writeMessage(
       13,
@@ -9491,7 +9491,7 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getDeviceTokenUpdatedAt();
+  f = message.getPushTokenUpdatedAt();
   if (f != null) {
     writer.writeMessage(
       14,
@@ -9499,7 +9499,7 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getDeviceTokenUnregisteredAt();
+  f = message.getPushTokenUnregisteredAt();
   if (f != null) {
     writer.writeMessage(
       15,
@@ -9911,70 +9911,70 @@ proto.rover.audience.v1.Device.prototype.setIsTestDevice = function(value) {
 
 
 /**
- * optional string aps_environment = 10;
+ * optional string push_environment = 10;
  * @return {string}
  */
-proto.rover.audience.v1.Device.prototype.getApsEnvironment = function() {
+proto.rover.audience.v1.Device.prototype.getPushEnvironment = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setApsEnvironment = function(value) {
+proto.rover.audience.v1.Device.prototype.setPushEnvironment = function(value) {
   jspb.Message.setField(this, 10, value);
 };
 
 
 /**
- * optional string device_token_key = 11;
+ * optional string push_token_key = 11;
  * @return {string}
  */
-proto.rover.audience.v1.Device.prototype.getDeviceTokenKey = function() {
+proto.rover.audience.v1.Device.prototype.getPushTokenKey = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setDeviceTokenKey = function(value) {
+proto.rover.audience.v1.Device.prototype.setPushTokenKey = function(value) {
   jspb.Message.setField(this, 11, value);
 };
 
 
 /**
- * optional bool device_token_is_active = 12;
+ * optional bool push_token_is_active = 12;
  * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
-proto.rover.audience.v1.Device.prototype.getDeviceTokenIsActive = function() {
+proto.rover.audience.v1.Device.prototype.getPushTokenIsActive = function() {
   return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 12, false));
 };
 
 
 /** @param {boolean} value */
-proto.rover.audience.v1.Device.prototype.setDeviceTokenIsActive = function(value) {
+proto.rover.audience.v1.Device.prototype.setPushTokenIsActive = function(value) {
   jspb.Message.setField(this, 12, value);
 };
 
 
 /**
- * optional google.protobuf.Timestamp device_token_created_at = 13;
+ * optional google.protobuf.Timestamp push_token_created_at = 13;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.rover.audience.v1.Device.prototype.getDeviceTokenCreatedAt = function() {
+proto.rover.audience.v1.Device.prototype.getPushTokenCreatedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 13));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.rover.audience.v1.Device.prototype.setDeviceTokenCreatedAt = function(value) {
+proto.rover.audience.v1.Device.prototype.setPushTokenCreatedAt = function(value) {
   jspb.Message.setWrapperField(this, 13, value);
 };
 
 
-proto.rover.audience.v1.Device.prototype.clearDeviceTokenCreatedAt = function() {
-  this.setDeviceTokenCreatedAt(undefined);
+proto.rover.audience.v1.Device.prototype.clearPushTokenCreatedAt = function() {
+  this.setPushTokenCreatedAt(undefined);
 };
 
 
@@ -9982,29 +9982,29 @@ proto.rover.audience.v1.Device.prototype.clearDeviceTokenCreatedAt = function() 
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.audience.v1.Device.prototype.hasDeviceTokenCreatedAt = function() {
+proto.rover.audience.v1.Device.prototype.hasPushTokenCreatedAt = function() {
   return jspb.Message.getField(this, 13) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp device_token_updated_at = 14;
+ * optional google.protobuf.Timestamp push_token_updated_at = 14;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.rover.audience.v1.Device.prototype.getDeviceTokenUpdatedAt = function() {
+proto.rover.audience.v1.Device.prototype.getPushTokenUpdatedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 14));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.rover.audience.v1.Device.prototype.setDeviceTokenUpdatedAt = function(value) {
+proto.rover.audience.v1.Device.prototype.setPushTokenUpdatedAt = function(value) {
   jspb.Message.setWrapperField(this, 14, value);
 };
 
 
-proto.rover.audience.v1.Device.prototype.clearDeviceTokenUpdatedAt = function() {
-  this.setDeviceTokenUpdatedAt(undefined);
+proto.rover.audience.v1.Device.prototype.clearPushTokenUpdatedAt = function() {
+  this.setPushTokenUpdatedAt(undefined);
 };
 
 
@@ -10012,29 +10012,29 @@ proto.rover.audience.v1.Device.prototype.clearDeviceTokenUpdatedAt = function() 
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.audience.v1.Device.prototype.hasDeviceTokenUpdatedAt = function() {
+proto.rover.audience.v1.Device.prototype.hasPushTokenUpdatedAt = function() {
   return jspb.Message.getField(this, 14) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp device_token_unregistered_at = 15;
+ * optional google.protobuf.Timestamp push_token_unregistered_at = 15;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.rover.audience.v1.Device.prototype.getDeviceTokenUnregisteredAt = function() {
+proto.rover.audience.v1.Device.prototype.getPushTokenUnregisteredAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 15));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
-proto.rover.audience.v1.Device.prototype.setDeviceTokenUnregisteredAt = function(value) {
+proto.rover.audience.v1.Device.prototype.setPushTokenUnregisteredAt = function(value) {
   jspb.Message.setWrapperField(this, 15, value);
 };
 
 
-proto.rover.audience.v1.Device.prototype.clearDeviceTokenUnregisteredAt = function() {
-  this.setDeviceTokenUnregisteredAt(undefined);
+proto.rover.audience.v1.Device.prototype.clearPushTokenUnregisteredAt = function() {
+  this.setPushTokenUnregisteredAt(undefined);
 };
 
 
@@ -10042,7 +10042,7 @@ proto.rover.audience.v1.Device.prototype.clearDeviceTokenUnregisteredAt = functi
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.audience.v1.Device.prototype.hasDeviceTokenUnregisteredAt = function() {
+proto.rover.audience.v1.Device.prototype.hasPushTokenUnregisteredAt = function() {
   return jspb.Message.getField(this, 15) != null;
 };
 

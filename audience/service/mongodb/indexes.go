@@ -44,10 +44,10 @@ func EnsureIndexes(db *mgo.Database) error {
 		{
 			db.C("devices"),
 			mgo.Index{
-				Key:    []string{"device_token_key", "account_id"},
+				Key:    []string{"push_token_key", "account_id"},
 				Unique: true,
 				PartialFilterExpression: bson.M{
-					"device_token_key": bson.M{"$exists": true, "$type": "string"},
+					"push_token_key": bson.M{"$exists": true, "$type": "string"},
 				},
 			},
 		},

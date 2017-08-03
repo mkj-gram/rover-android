@@ -45,8 +45,8 @@ func TestConversion_Device(t *testing.T) {
 					"is_bluetooth_enabled":  true,
 
 					"os_name":          "iOS",
-					"aps_environment":  "production",
-					"device_token_key": "EF20600869F5065CEFF36871BCBE0461BD5C9A2B44E207765114A3E35009C99C",
+					"push_environment": "production",
+					"push_token_key":   "EF20600869F5065CEFF36871BCBE0461BD5C9A2B44E207765114A3E35009C99C",
 
 					"carrier_name":           "verizon",
 					"region_monitoring_mode": "ROVER",
@@ -63,7 +63,7 @@ func TestConversion_Device(t *testing.T) {
 					"platform":   "MOBILE",
 
 					"frameworks": map[string]interface{}{
-						"Rover": map[string]interface{}{"major": 1, "minor": 6, "revision": 2},
+						"io.rover.Rover": map[string]interface{}{"major": 1, "minor": 6, "revision": 2},
 					},
 					"time_zone": "America/New_York",
 
@@ -91,8 +91,8 @@ func TestConversion_Device(t *testing.T) {
 
 					"os_name":          "iOS",
 					"os_version":       map[string]interface{}{"major": 9, "minor": 3, "revision": 1},
-					"aps_environment":  "production",
-					"device_token_key": "34adf34614e18dfc6e6bc593e41e309cacc42ce26a13cb3aee328bf554a32547",
+					"push_environment": "production",
+					"push_token_key":   "34adf34614e18dfc6e6bc593e41e309cacc42ce26a13cb3aee328bf554a32547",
 
 					"carrier_name":           "telus",
 					"region_monitoring_mode": "ROVER",
@@ -112,7 +112,7 @@ func TestConversion_Device(t *testing.T) {
 					"platform": "MOBILE",
 
 					"frameworks": map[string]interface{}{
-						"Rover": map[string]interface{}{"major": 1, "minor": 0, "revision": 0},
+						"io.rover.Rover": map[string]interface{}{"major": 1, "minor": 0, "revision": 0},
 					},
 					"time_zone": "America/Vancouver",
 
