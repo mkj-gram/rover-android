@@ -184,6 +184,16 @@ func (s *Server) ListDevicesByProfileIdentifier(ctx context.Context, r *audience
 
 // Profiles
 
+// GetProfile implements the corresponding rpc
+func (s *Server) GetProfile(ctx context.Context, r *audience.GetProfileRequest) (*audience.GetProfileResponse, error) {
+	p, err := s.db.GetProfile(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfile: %v", err)
+	}
+
+	return &audience.GetProfileResponse{p}, nil
+}
+
 // CreateProfile implements the corresponding rpc
 func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileRequest) (*audience.CreateProfileResponse, error) {
 	if r.GetAuthContext().GetAccountId() == 0 {

@@ -190,6 +190,41 @@ func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreatePro
 	return &proto, nil
 }
 
+// GetProfile returns a account profile given the ids
+func (s *profilesStore) GetProfile(ctx context.Context, r *audience.GetProfileRequest) (*audience.Profile, error) {
+
+	profile_oid, err := StringToObjectID(r.GetProfileId())
+	if err != nil {
+		err = ErrorInvalidArgument{
+			error:        err,
+			ArgumentName: "ProfileId",
+			Value:        r.GetProfileId(),
+		}
+		return nil, wrapError(err, "StringToObjectID")
+	}
+
+	var (
+		account_id = r.GetAuthContext().GetAccountId()
+
+		p Profile
+		Q = bson.M{
+			"_id":        profile_oid,
+			"account_id": account_id,
+		}
+	)
+
+	if err := s.profiles.Find(Q).One(&p); err != nil {
+		return nil, wrapError(err, "profiles.Find")
+	}
+
+	var pp audience.Profile
+	if err := p.toProto(&pp); err != nil {
+		return nil, wrapError(err, "profile.toProto")
+	}
+
+	return &pp, nil
+}
+
 func (s *profilesStore) DeleteProfile(ctx context.Context, r *audience.DeleteProfileRequest) error {
 	var (
 		account_id = r.GetAuthContext().GetAccountId()

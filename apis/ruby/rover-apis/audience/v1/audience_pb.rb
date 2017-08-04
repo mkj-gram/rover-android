@@ -6,6 +6,13 @@ require 'google/protobuf'
 require 'google/protobuf/timestamp_pb'
 require 'auth/v1/auth_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
+  add_message "rover.audience.v1.GetProfileRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :profile_id, :string, 2
+  end
+  add_message "rover.audience.v1.GetProfileResponse" do
+    optional :profile, :message, 1, "rover.audience.v1.Profile"
+  end
   add_message "rover.audience.v1.CreateProfileRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
   end
@@ -307,6 +314,8 @@ end
 module Rover
   module Audience
     module V1
+      GetProfileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileRequest").msgclass
+      GetProfileResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileResponse").msgclass
       CreateProfileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.CreateProfileRequest").msgclass
       CreateProfileResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.CreateProfileResponse").msgclass
       DeleteProfileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteProfileRequest").msgclass

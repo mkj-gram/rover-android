@@ -16,6 +16,7 @@ service Audience {
   //
 
   // CreateProfile creates a new empty profile under a given account.
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
   rpc CreateProfile(CreateProfileRequest) returns (CreateProfileResponse);
   //  DeleteProfile deletes a profile from db and all segments
   rpc DeleteProfile(DeleteProfileRequest) returns (DeleteProfileResponse);
@@ -65,6 +66,16 @@ service Audience {
 //
 // Profile
 //
+
+
+message GetProfileRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string profile_id = 2;
+}
+message GetProfileResponse {
+  Profile profile = 1;
+}
+
 
 message CreateProfileRequest {
   auth.v1.AuthContext auth_context = 1;

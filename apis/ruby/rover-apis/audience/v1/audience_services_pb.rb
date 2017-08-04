@@ -22,6 +22,7 @@ module Rover
           #
           #
           # CreateProfile creates a new empty profile under a given account.
+          rpc :GetProfile, GetProfileRequest, GetProfileResponse
           rpc :CreateProfile, CreateProfileRequest, CreateProfileResponse
           #  DeleteProfile deletes a profile from db and all segments
           rpc :DeleteProfile, DeleteProfileRequest, DeleteProfileResponse

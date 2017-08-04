@@ -182,6 +182,28 @@ function deserialize_rover_audience_v1_GetProfileByIdentifierResponse(buffer_arg
   return audience_v1_audience_pb.GetProfileByIdentifierResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_GetProfileRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetProfileRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetProfileRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetProfileRequest(buffer_arg) {
+  return audience_v1_audience_pb.GetProfileRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_GetProfileResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetProfileResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetProfileResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetProfileResponse(buffer_arg) {
+  return audience_v1_audience_pb.GetProfileResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_GetProfileSchemaRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.GetProfileSchemaRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.GetProfileSchemaRequest');
@@ -476,6 +498,17 @@ var AudienceService = exports.AudienceService = {
   //
   //
   // CreateProfile creates a new empty profile under a given account.
+  getProfile: {
+    path: '/rover.audience.v1.Audience/GetProfile',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.GetProfileRequest,
+    responseType: audience_v1_audience_pb.GetProfileResponse,
+    requestSerialize: serialize_rover_audience_v1_GetProfileRequest,
+    requestDeserialize: deserialize_rover_audience_v1_GetProfileRequest,
+    responseSerialize: serialize_rover_audience_v1_GetProfileResponse,
+    responseDeserialize: deserialize_rover_audience_v1_GetProfileResponse,
+  },
   createProfile: {
     path: '/rover.audience.v1.Audience/CreateProfile',
     requestStream: false,

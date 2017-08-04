@@ -48,6 +48,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("DeleteProfile", testAudienceService_DeleteProfile)
 	t.Run("UpdateProfile", testAudienceService_UpdateProfile)
 	t.Run("UpdateProfileIdentifier", testAudienceService_UpdateProfileIdentifier)
+	t.Run("GetProfile", testAudienceService_GetProfile)
 	t.Run("GetProfileByDeviceId", testAudienceService_GetProfileByDeviceId)
 	t.Run("GetProfileByIdentifier", testAudienceService_GetProfileByIdentifier)
 
@@ -1176,6 +1177,84 @@ func testAudienceService_GetProfileByDeviceId(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			var got, gotErr = client.GetProfileByDeviceId(ctx, tc.req)
+
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func testAudienceService_GetProfile(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		db = mongodb.New(
+			dialMongo(t, *tMongoDSN),
+		)
+
+		svc = service.New(db)
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	tcases := []struct {
+		name string
+		req  *audience.GetProfileRequest
+
+		exp    *audience.GetProfileResponse
+		expErr error
+	}{
+		{
+			name: "error: not found ",
+
+			expErr: grpc.Errorf(codes.NotFound, "db.GetProfile: profiles.Find: not found"),
+
+			req: &audience.GetProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileId:   "000000000000000000000000",
+			},
+		},
+
+		{
+			name: "error: invalid: profile id",
+
+			expErr: grpc.Errorf(codes.InvalidArgument, "db.GetProfile: StringToObjectID: bson.IsObjectIdHex: false"),
+
+			req: &audience.GetProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileId:   "invalidid",
+			},
+		},
+
+		{
+			name: "finds profile",
+
+			req: &audience.GetProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileId:   "000000000000000000000aa2",
+			},
+
+			exp: &audience.GetProfileResponse{
+				&audience.Profile{
+					AccountId: 1,
+
+					Id:         "000000000000000000000aa2",
+					Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
+					Attributes: nil,
+					CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			var got, gotErr = client.GetProfile(ctx, tc.req)
 
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
