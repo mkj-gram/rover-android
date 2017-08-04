@@ -43,7 +43,9 @@ class SideBar extends Component {
             queryCondition: 'all',
             modalCoordinates: [0, 0],
             isViewingDynamicSegment: true,
-            segmentId: ''
+            segmentId: '',
+            saveStates: {},
+            sbDynamicSegment: []
         }
 
         this.setState = this.setState.bind(this)
@@ -56,15 +58,17 @@ class SideBar extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.state.segmentId !== nextProps.segmentId) {
+        const {segmentId, sbDynamicSegment} = this.state
+
+        if (segmentId !== nextProps.segment.segmentId) {
             const { relay } = this.props
             const refetchVariables = fragmentVariables => ({
-                segmentId: nextProps.segmentId
+                segmentId: nextProps.segment.segmentId
             })
             relay.refetch(refetchVariables, null)
 
-            this.setState({ segmentId: nextProps.segmentId })
-        } else if (nextProps.data.sbDynamicSegment !== null) {
+            this.setState({ segmentId: nextProps.segment.segmentId })
+        } else if (nextProps.data.sbDynamicSegment[0] !== null && JSON.stringify(nextProps.data.sbDynamicSegment) !== JSON.stringify(sbDynamicSegment)) {
             this.viewDynamicSegment(nextProps.data)
         }
     }
@@ -77,7 +81,8 @@ class SideBar extends Component {
         const query = device.map(d => ({ ...d, category: 'device' })).concat(profile.map(p => ({ ...p, category: 'profile' })))
         this.setState({
             query,
-            queryCondition: condition
+            queryCondition: condition,
+            sbDynamicSegment: sbDynamicSegment
         })
     }
 
@@ -324,9 +329,12 @@ class SideBar extends Component {
             justifyContent: 'center',
             flex: 'none'
         }
+        const {showSaveButton} = this.props.saveStates
 
         return (
             <div style={style} id="saveBar">
+
+            {showSaveButton ? (
                 <RoundedButton
                     type="primary"
                     primaryColor={violet}
@@ -339,6 +347,20 @@ class SideBar extends Component {
                 >
                     Save
                 </RoundedButton>
+            ): (
+                <RoundedButton
+                    type="primary"
+                    primaryColor={silver}
+                    
+                    style={{
+                        width: 88,
+                        marginRight: 5
+                    }}
+                 
+                >
+                    Save
+                </RoundedButton>
+            )}
                 <RoundedButton
                     type="primary"
                     primaryColor={graphite}
@@ -523,7 +545,9 @@ class SideBar extends Component {
                     showSegmentSave={this.state.showSegmentSave}
                     handleSegmentAction={this.handleSegmentAction}
                     segments={this.props.data.segmentsContainer}
-                    getSegmentId={this.props.getSegmentId}
+                    getSegment={this.props.getSegment}
+                    segment={this.props.segment}
+                    saveStates={this.props.saveStates}
                 />
             </div>
         )
@@ -533,13 +557,13 @@ class SideBar extends Component {
 SideBar.propTypes = {
     data: PropTypes.object.isRequired,
     relay: PropTypes.object.isRequired,
-    getSegmentId: PropTypes.func.isRequired,
-    segmentId: PropTypes.string,
+    getSegment: PropTypes.func.isRequired,
+    segment: PropTypes.object,
     updateQuery: PropTypes.func.isRequired
 }
 
 SideBar.defaultProps = {
-    segmentId: ''
+    segment: {}
 }
 
 export default createRefetchContainer(

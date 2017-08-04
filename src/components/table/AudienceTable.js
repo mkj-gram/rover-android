@@ -142,6 +142,8 @@ class AudienceTable extends Component {
                     group,
                     refetched: true
                 })
+                
+                this.props.setSaveState({isSegmentUpdate: (this.state.segmentId !== ''), showSaveButton: true})
             } else if (nextProps.context === 'segments') {
                 this.setState({
                     segmentId: nextProps.segmentId,
@@ -149,6 +151,7 @@ class AudienceTable extends Component {
                     group,
                     refetched: true
                 })
+                this.props.setSaveState( {isSegmentUpdate: false, showSaveButton: false})
             }
         } else {
             console.log(`Error: ${error}`)
@@ -234,7 +237,6 @@ class AudienceTable extends Component {
                 renderRefetch: null,
                 refetched: false
             })
-
 
             }
         }

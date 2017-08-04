@@ -391,8 +391,8 @@ class SegmentCell extends Component {
 
     handleSegmentCellClick(e) {
         if (e.target.id === 'segmentCell' || e.target.id === 'segmentName') {
-            const { getSegmentId, segment, onRequestClose } = this.props
-            getSegmentId(segment.segmentId)
+            const { getSegment, segment, onRequestClose } = this.props
+            getSegment(segment)
             onRequestClose('selection')
         }
     }
@@ -443,7 +443,7 @@ SegmentCell.propTypes = {
     removeSegmentCell: PropTypes.func.isRequired,
     updateSegmentCell: PropTypes.func.isRequired,
     currentEditSegment: PropTypes.func,
-    getSegmentId: PropTypes.func.isRequired,
+    getSegment: PropTypes.func.isRequired,
     segment: PropTypes.object.isRequired,
     onRequestClose: PropTypes.func.isRequired
 }
@@ -456,7 +456,7 @@ SegmentCell.defaultProps = {
         name: '',
         segmentId: ''
     },
-    getSegmentId: () => null,
+    getSegment: () => null,
     onRequestClose: () => null
 }
 

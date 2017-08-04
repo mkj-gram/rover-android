@@ -7,21 +7,29 @@ class Audience extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            segmentId: '',
+            segment: {
+                segmentId: '',
+                name: ''
+            },
             predicates: '[]',
             pageNumber: 0,
             resetPagination: false,
-            context: 'predicates'
+            context: 'predicates',
+            saveStates: {
+                isSegmentUpdate: false,
+                showSaveButton: true
+            }
         }
-        this.getSegmentId = this.getSegmentId.bind(this)
+        this.getSegment = this.getSegment.bind(this)
         this.updateQuery = this.updateQuery.bind(this)
         this.formatQuery = this.formatQuery.bind(this)
         this.updatePageNumber = this.updatePageNumber.bind(this)
+        this.setSaveState = this.setSaveState.bind(this)
     }
 
-    getSegmentId(segmentId) {
+    getSegment(segment) {
         this.setState({
-            segmentId,
+            segment,
             resetPagination: true,
             pageNumber: 0,
             context: 'segments'
@@ -36,6 +44,10 @@ class Audience extends Component {
             pageNumber: 0,
             context: 'predicates'
         })
+    }
+
+    setSaveState(saveStates) {
+        this.setState({saveStates})
     }
 
     formatQuery(rawQuery, condition) {
@@ -62,25 +74,27 @@ class Audience extends Component {
     }
 
     render() {
-        const { segmentId, predicates, pageNumber, resetPagination } = this.state
+        const { segment, predicates, pageNumber, resetPagination, saveStates } = this.state
         const { data } = this.props
 
         return (
             <div style={{ display: 'flex', flex: '1 1 100%' }}>
                 <SideBar
                     data={data}
-                    segmentId={segmentId}
-                    getSegmentId={this.getSegmentId}
+                    segment={segment}
+                    getSegment={this.getSegment}
                     updateQuery={this.updateQuery}
+                    saveStates={saveStates}
                 />
                 <AudienceTable
                     data={data}
-                    segmentId={segmentId}
+                    segmentId={segment.segmentId}
                     predicates={predicates}
                     pageNumber={pageNumber}
                     context={this.state.context}
                     updatePageNumber={this.updatePageNumber}
                     resetPagination={resetPagination}
+                    setSaveState={this.setSaveState}
                 />
             </div>
         )

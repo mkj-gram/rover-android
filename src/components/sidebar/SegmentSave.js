@@ -19,7 +19,6 @@ class SegmentSave extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            isSegmentUpdate: true,
             query: [],
             segmentName: '',
             segmentSaveValue: 'update',
@@ -153,8 +152,9 @@ class SegmentSave extends Component {
     }
 
     render() {
-        const { isOpen, modalCoordinates } = this.props
-        const { isSegmentUpdate, segmentSaveValue } = this.state
+        const { isOpen, modalCoordinates, saveStates } = this.props
+        const { segmentSaveValue } = this.state
+        const { isSegmentUpdate } = saveStates
 
         let modal
 

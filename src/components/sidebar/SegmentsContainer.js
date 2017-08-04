@@ -12,7 +12,6 @@ class SegmentsContainer extends Component {
         }
         this.removeSegmentCell = this.removeSegmentCell.bind(this)
         this.updateSegmentCell = this.updateSegmentCell.bind(this)
-        this.getCurrentSegment = this.getCurrentSegment.bind(this)
     }
 
     componentDidMount() {
@@ -45,13 +44,6 @@ class SegmentsContainer extends Component {
         })
     }
 
-    getCurrentSegment() {
-        // Update when using real data
-        const { segments } = this.props
-
-        return segments[1]
-    }
-
     render() {
         const {
             showSegmentSelection,
@@ -59,9 +51,11 @@ class SegmentsContainer extends Component {
             query,
             handleSegmentAction,
             segments,
-            getSegmentId
+            getSegment,
+            segment
         } = this.props
         const { segmentCoords } = this.state
+
         return (
             <div>
                 <SegmentSelection
@@ -71,14 +65,15 @@ class SegmentsContainer extends Component {
                     segments={segments}
                     removeSegmentCell={this.removeSegmentCell}
                     updateSegmentCell={this.updateSegmentCell}
-                    getSegmentId={getSegmentId}
+                    getSegment={getSegment}
                 />
                 <SegmentSave
                     isOpen={showSegmentSave}
                     onRequestClose={handleSegmentAction}
                     modalCoordinates={segmentCoords}
                     query={query}
-                    segment={this.getCurrentSegment()}
+                    segment={segment}
+                    saveStates={this.props.saveStates}
                 />
             </div>
         )
@@ -91,7 +86,8 @@ SegmentsContainer.propTypes = {
     showSegmentSelection: PropTypes.bool.isRequired,
     handleSegmentAction: PropTypes.func.isRequired,
     getSegmentId: PropTypes.func.isRequired,
-    segments: PropTypes.array.isRequired
+    segments: PropTypes.array.isRequired,
+    segment: PropTypes.object.isRequired
 }
 
 SegmentsContainer.defaultProps = {
@@ -100,7 +96,8 @@ SegmentsContainer.defaultProps = {
     showSegmentSelection: false,
     handleSegmentAction: () => null,
     getSegmentId: () => null,
-    segments: []
+    segments: [],
+    segment: {}
 }
 
 export default createFragmentContainer(
