@@ -61,12 +61,18 @@ class GridPagination extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const maxPage = nextProps.totalRows > 50
-                    ? nextProps.totalRows % 50 !== 0
-                      ? Math.floor(nextProps.totalRows / 50)
-                      : Math.floor(nextProps.totalRows / 50) - 1
-                    : 0
-        this.setState({ maxPage })
+        const maxPage =
+            nextProps.totalRows > 50
+                ? nextProps.totalRows % 50 !== 0
+                  ? Math.floor(nextProps.totalRows / 50)
+                  : Math.floor(nextProps.totalRows / 50) - 1
+                : 0
+
+        if (nextProps.resetPagination) {
+            this.setState({ maxPage, page: 0 })
+        } else {
+            this.setState({ maxPage })
+        }
     }
 
     compareValues(a, b, c) {
@@ -95,6 +101,7 @@ class GridPagination extends Component {
     handlePrevious() {
         const { page } = this.state
         if (page - 1 >= 0) {
+            this.props.updatePageNumber(page - 1)
             this.setState({ ...this.state, page: page - 1 })
         }
     }
@@ -102,6 +109,7 @@ class GridPagination extends Component {
     handleNext() {
         const { page, maxPage } = this.state
         if (page + 1 <= maxPage) {
+            this.props.updatePageNumber(page + 1)
             this.setState({ ...this.state, page: page + 1 })
         }
     }
@@ -159,7 +167,9 @@ class GridPagination extends Component {
 }
 
 GridPagination.propTypes = {
-    totalRows: PropTypes.number.isRequired
+    totalRows: PropTypes.number.isRequired,
+    resetPagination: PropTypes.bool.isRequired,
+    updatePageNumber: PropTypes.func.isRequired
 }
 
 export default GridPagination

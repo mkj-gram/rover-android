@@ -550,8 +550,7 @@ export default createRefetchContainer(
             segmentId: {type: "ID", defaultValue: ""}
         ) {
              sbDynamicSegment: dynamicSegment(
-                segmentId: $segmentId,
-                paginationKey: "testpaginationkey"
+                segmentId: $segmentId
             ){
                 segmentId
                 name

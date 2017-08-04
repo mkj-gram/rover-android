@@ -258,7 +258,11 @@ class AudienceDataGrid extends Component {
                         // rowActionsCell={this.renderCheckbox}
                     />
                 </DraggableContainer>
-                <GridPagination totalRows={this.props.segmentSize} />
+                <GridPagination
+                    totalRows={this.props.segmentSize}
+                    updatePageNumber={this.props.updatePageNumber}
+                    resetPagination={this.props.resetPagination}
+                />
             </div>
         )
     }
@@ -268,7 +272,9 @@ AudienceDataGrid.propTypes = {
     rows: PropTypes.array.isRequired,
     columns: PropTypes.array.isRequired,
     updateDragColumns: PropTypes.func.isRequired,
-    segmentSize: PropTypes.number.isRequired
+    segmentSize: PropTypes.number.isRequired,
+    resetPagination: PropTypes.bool.isRequired,
+    updatePageNumber: PropTypes.func.isRequired
 }
 
 export default AudienceDataGrid
