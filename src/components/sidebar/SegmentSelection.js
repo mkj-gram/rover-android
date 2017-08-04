@@ -32,7 +32,7 @@ class SegmentSelection extends Component {
             segments,
             removeSegmentCell,
             updateSegmentCell,
-            getSegmentId
+            getSegment
         } = this.props
 
         const { currentSegment } = this.state
@@ -89,7 +89,7 @@ class SegmentSelection extends Component {
                             updateSegmentCell={updateSegmentCell}
                             currentEditSegment={this.currentEditSegment}
                             currentSegment={currentSegment}
-                            getSegmentId={getSegmentId}
+                            getSegment={getSegment}
                             onRequestClose={onRequestClose}
                         />)
                     )}
@@ -106,7 +106,7 @@ SegmentSelection.propTypes = {
     segments: PropTypes.array,
     removeSegmentCell: PropTypes.func.isRequired,
     updateSegmentCell: PropTypes.func.isRequired,
-    getSegmentId: PropTypes.func.isRequired
+    getSegment: PropTypes.func.isRequired
 }
 
 SegmentSelection.defaultProps = {
@@ -116,7 +116,7 @@ SegmentSelection.defaultProps = {
     segments: [],
     removeSegmentCell: () => null,
     updateSegmentCell: () => null,
-    getSegmentId: () => null
+    getSegment: () => null
 }
 
 export default SegmentSelection
