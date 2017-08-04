@@ -18,6 +18,15 @@ import RectangleBlock from './experiences/RectangleBlock'
 import TextBlock from './experiences/TextBlock'
 import WebViewBlock from './experiences/WebViewBlock'
 
+import {
+    BooleanPredicate,
+    DatePredicate,
+    GeofencePredicate,
+    NumberPredicate,
+    StringPredicate,
+    VersionPredicate,
+} from './segments/Predicate'
+
 const schema = new GraphQLSchema({
     query: Query.type,
     mutation: Mutation.type,
@@ -35,7 +44,14 @@ const schema = new GraphQLSchema({
             OpenUrlAction.type,
             RectangleBlock.type,
     		TextBlock.type,
-    		WebViewBlock.type]
+    		WebViewBlock.type,
+            BooleanPredicate,
+            DatePredicate,
+            GeofencePredicate,
+            NumberPredicate,
+            StringPredicate,
+            VersionPredicate
+        ]
 })
 
 export default schema
