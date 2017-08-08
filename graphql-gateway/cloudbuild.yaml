@@ -3,12 +3,12 @@ steps:
   args: ['install']
   dir: 'graphql-gateway'
   env:
-    - 'NPM-TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+    - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
 - name: 'gcr.io/rover-production/npm:7.5.0'
   args: ['run', 'build']
   dir: 'graphql-gateway'
   env:
-    - 'NPM-TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+    - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=grc.io/$PROJECT_ID/graphql-gateway:$REVISION_ID', 'graphql-gateway']
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID', 'graphql-gateway']
 images: ['gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID']
