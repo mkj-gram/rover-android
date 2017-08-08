@@ -37,6 +37,10 @@ const SegmentSchemaQuery = {
                 }, {
                     attribute: 'lastSeen',
                     attributeType: 'DatePredicate'
+                },
+                {
+                    attribute: 'last known location',
+                    attributeType: 'GeofencePredicate'
                 }
             ],
             profileSchema: [
