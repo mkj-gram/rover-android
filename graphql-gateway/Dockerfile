@@ -7,4 +7,4 @@ ADD ./node_modules/ /opt/graphql-gateway/node_modules/
 
 EXPOSE 80
 
-CMD node dist/server
+CMD node dist
