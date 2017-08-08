@@ -8,4 +8,6 @@ node-phone-simulator/dist
 newrelic_agent.log
 node-phone-simulator/public/app.js
 node-phone-simulator/.env
+graphql-gateway/src/.env
+graphql-gateway/dist/
 
