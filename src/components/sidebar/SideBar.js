@@ -238,7 +238,8 @@ class SideBar extends Component {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            flex: 'none'
+            flex: 'none',
+            position: 'relative'
         }
 
         const selectContainerStyle = {
@@ -277,8 +278,29 @@ class SideBar extends Component {
             e.target.parentElement.style.backgroundColor = slate
         }
 
+        const renderArrow = () => (
+            <svg
+                width="6"
+                height="20"
+                viewBox="0 0 6 20"
+                style={{
+                    left: 300,
+                    position: 'absolute',
+                    zIndex: 1
+                }}
+            >
+                <polygon
+                    fill={slate}
+                    fillRule="evenodd"
+                    points="300 84 305.799 93.731 300 103.462"
+                    transform="translate(-300 -84)"
+                />
+            </svg>
+        )
+
         return (
             <div style={style} id="filterContainer">
+                {renderArrow()}
                 <div
                     onClick={this.handleAddButton}
                     style={{
