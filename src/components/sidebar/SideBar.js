@@ -93,13 +93,15 @@ class SideBar extends Component {
     }
 
     updateQuery() {
+        const { updateQuery } = this.props
         const { query, currentPredicate, queryCondition } = this.state
         const { index, ...rest } = currentPredicate
 
         const newQuery = query
         newQuery[index] = rest
 
-        this.props.updateQuery(newQuery, queryCondition)
+        updateQuery(newQuery, queryCondition)
+
         this.setState({
             query: newQuery,
             currentAttribute: { attribute: '', index: null },
@@ -270,28 +272,36 @@ class SideBar extends Component {
 
         const onFocus = e =>
             (e.target.parentElement.style.backgroundColor = graphite)
-        const onSelect = e =>
-            (e.target.parentElement.style.backgroundColor = slate)
+        const onSelect = (e) => {
+            e.target.blur()
+            e.target.parentElement.style.backgroundColor = slate
+        }
 
         return (
             <div style={style} id="filterContainer">
-                <AddButton
-                    id="add-filter-button"
-                    primaryColor={orchid}
-                    style={{ root: { marginLeft: 20 } }}
+                <div
                     onClick={this.handleAddButton}
-                />
-                <label
                     style={{
-                        ...text,
-                        fontSize: 15,
-                        color: lavender,
-                        fontWeight: 'normal'
+                        display: 'flex',
+                        alignItems: 'center'
                     }}
-                    htmlFor="add-filter-button"
                 >
-                    Add Filter
-                </label>
+                    <AddButton
+                        id="add-filter-button"
+                        primaryColor={orchid}
+                        style={{ root: { marginLeft: 20 } }}
+                    />
+                    <div
+                        style={{
+                            ...text,
+                            fontSize: 15,
+                            color: lavender,
+                            fontWeight: 'normal'
+                        }}
+                    >
+                        Add Filter
+                    </div>
+                </div>
                 {isShowingAddFilterModal &&
                     <AddFilterModal
                         schema={data.segmentSchema}
@@ -309,8 +319,9 @@ class SideBar extends Component {
                         }}
                     />}
                 <div style={selectContainerStyle}>
-                    <span style={matchStyle}>MATCH</span>
+                    <label style={matchStyle} htmlFor='any-all-select'>MATCH</label>
                     <Select
+                        id='any-all-select'
                         style={selectStyle}
                         isDisabled={false}
                         value={queryCondition}
@@ -320,11 +331,11 @@ class SideBar extends Component {
                         }}
                         onFocus={onFocus}
                     >
-                        <option value="all" label="ALL">
-                            all
+                        <option value="all">
+                            ALL
                         </option>
-                        <option value="any" label="ANY">
-                            any
+                        <option value="any">
+                            ANY
                         </option>
                     </Select>
                 </div>
@@ -534,6 +545,7 @@ class SideBar extends Component {
                                       marginRight: 5,
                                       cursor: 'pointer'
                                   }}
+                                  onClick={this.handleAddButton}
                               >
                                   Add a filter
                               </span>
