@@ -58,7 +58,7 @@ class SideBar extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const {segmentId, sbDynamicSegment} = this.state
+        const { segmentId, sbDynamicSegment } = this.state
 
         if (segmentId !== nextProps.segment.segmentId) {
             const { relay } = this.props
@@ -68,7 +68,11 @@ class SideBar extends Component {
             relay.refetch(refetchVariables, null)
 
             this.setState({ segmentId: nextProps.segment.segmentId })
-        } else if (nextProps.data.sbDynamicSegment[0] !== null && JSON.stringify(nextProps.data.sbDynamicSegment) !== JSON.stringify(sbDynamicSegment)) {
+        } else if (
+            nextProps.data.sbDynamicSegment[0] !== null &&
+            JSON.stringify(nextProps.data.sbDynamicSegment) !==
+                JSON.stringify(sbDynamicSegment)
+        ) {
             this.viewDynamicSegment(nextProps.data)
         }
     }
@@ -78,11 +82,13 @@ class SideBar extends Component {
         const { predicates } = sbDynamicSegment[0]
         const { condition, device, profile } = predicates
 
-        const query = device.map(d => ({ ...d, category: 'device' })).concat(profile.map(p => ({ ...p, category: 'profile' })))
+        const query = device
+            .map(d => ({ ...d, category: 'device' }))
+            .concat(profile.map(p => ({ ...p, category: 'profile' })))
         this.setState({
             query,
             queryCondition: condition,
-            sbDynamicSegment: sbDynamicSegment
+            sbDynamicSegment
         })
     }
 
@@ -197,6 +203,13 @@ class SideBar extends Component {
             const { left, top } = filterContainer.getBoundingClientRect()
             modalCoordinates[0] = left + 20
             modalCoordinates[1] = top + 77
+        } else if (query.length > 6) {
+            const predicateListId = document.getElementById('predicateList')
+            predicateListId.scrollTop = predicateListId.scrollHeight
+            const lastPredicate = predicateListId.children[query.length - 1]
+            const { left } = lastPredicate.getBoundingClientRect()
+            modalCoordinates[0] = left
+            modalCoordinates[1] = 'calc(50% + 32px)'
         } else {
             const predicateListId = document.getElementById('predicateList')
             const lastPredicate = predicateListId.children[query.length - 1]
@@ -329,38 +342,33 @@ class SideBar extends Component {
             justifyContent: 'center',
             flex: 'none'
         }
-        const {showSaveButton} = this.props.saveStates
+        const { showSaveButton } = this.props.saveStates
 
         return (
             <div style={style} id="saveBar">
-
-            {showSaveButton ? (
-                <RoundedButton
-                    type="primary"
-                    primaryColor={violet}
-                    hoverColor={orchid}
-                    style={{
-                        width: 88,
-                        marginRight: 5
-                    }}
-                    onClick={() => this.handleSegmentAction('save')}
-                >
-                    Save
-                </RoundedButton>
-            ): (
-                <RoundedButton
-                    type="primary"
-                    primaryColor={silver}
-                    
-                    style={{
-                        width: 88,
-                        marginRight: 5
-                    }}
-                 
-                >
-                    Save
-                </RoundedButton>
-            )}
+                {showSaveButton
+                    ? <RoundedButton
+                          type="primary"
+                          primaryColor={violet}
+                          hoverColor={orchid}
+                          style={{
+                              width: 88,
+                              marginRight: 5
+                          }}
+                          onClick={() => this.handleSegmentAction('save')}
+                      >
+                          Save
+                      </RoundedButton>
+                    : <RoundedButton
+                          type="primary"
+                          primaryColor={silver}
+                          style={{
+                              width: 88,
+                              marginRight: 5
+                          }}
+                      >
+                          Save
+                      </RoundedButton>}
                 <RoundedButton
                     type="primary"
                     primaryColor={graphite}
@@ -570,12 +578,8 @@ export default createRefetchContainer(
     SideBar,
     graphql.experimental`
         fragment SideBar on Query
-        @argumentDefinitions(
-            segmentId: {type: "ID", defaultValue: ""}
-        ) {
-             sbDynamicSegment: dynamicSegment(
-                segmentId: $segmentId
-            ){
+            @argumentDefinitions(segmentId: { type: "ID", defaultValue: "" }) {
+            sbDynamicSegment: dynamicSegment(segmentId: $segmentId) {
                 segmentId
                 name
                 predicates {
@@ -659,15 +663,13 @@ export default createRefetchContainer(
             segmentSchema {
                 ...AddFilterModal_schema
             }
-
             segmentsContainer: dynamicSegment {
                 ...SegmentsContainer_segments
             }
         }
-    `
-    ,
+    `,
     graphql.experimental`
-        query SideBarRefetchQuery($segmentId: ID){     
+        query SideBarRefetchQuery($segmentId: ID) {
             ...SideBar @arguments(segmentId: $segmentId)
         }
     `

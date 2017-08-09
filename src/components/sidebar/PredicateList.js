@@ -264,6 +264,7 @@ const PredicateList = ({ query, queryCondition, viewModal, removePredicate }) =>
                     </div>
                 )
             )}
+            <div style={{ height: `${(window.innerHeight - 193) / 2}px` }} />
         </div>
     )
 }
