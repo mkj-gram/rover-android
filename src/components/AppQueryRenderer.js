@@ -3,6 +3,7 @@ import { QueryRenderer, graphql } from 'react-relay'
 import environment from '../relay/Environment'
 
 import Audience from './Audience'
+import Skeleton from './Skeleton'
 
 const AppQueryRendererQuery = graphql`
     query AppQueryRendererQuery {
@@ -25,7 +26,7 @@ const AppQueryRenderer = () =>
                     <Audience data={props} />
                 )
             }
-            return <div>Loading</div>
+            return <Skeleton />
         }}
     />)
 

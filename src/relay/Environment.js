@@ -7,19 +7,17 @@ const {
 
 const store = new Store(new RecordSource())
 
-const network = Network.create((operation, variables) => {
-    return fetch('http://localhost:4000/graphql', {
+const network = Network.create((operation, variables) => fetch('https://api.staging.rover.io/graphql', {
         method: 'POST',
         headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             query: operation.text,
             variables
-        }),
-    }).then(response => response.json())
-})
+        })
+    }).then(response => response.json()))
 
 const environment = new Environment({
     network,
