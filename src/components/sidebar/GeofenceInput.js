@@ -27,7 +27,8 @@ const placeInputStyle = {
     boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
     fontSize: `14px`,
     outline: `none`,
-    textOverflow: `ellipses`
+    textOverflow: `ellipses`,
+    cursor: 'text'
 }
 
 const RenderMap = withGoogleMap((props) => {
@@ -170,7 +171,9 @@ class GeofenceInput extends Component {
                 <ModalInputPrompt
                     attribute={attribute}
                     attributeType={category}
+                    style={{ display: 'inline' }}
                 />
+                <div style={{ display: 'inline' }}> within</div>
                 <RenderMap
                     containerElement={
                         <div
@@ -206,6 +209,7 @@ class GeofenceInput extends Component {
                             width: 60
                         }}
                         min={50}
+                        max={99999}
                         value={radius}
                         onChange={e =>
                             this.handleRadiusChange(
@@ -251,7 +255,7 @@ class GeofenceInput extends Component {
                     </style>
                     <Slider
                         min={50}
-                        max={99999}
+                        max={500}
                         value={radius}
                         orientation="horizontal"
                         onChange={this.handleRadiusChange}
