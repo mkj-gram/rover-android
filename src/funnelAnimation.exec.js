@@ -1,3 +1,4 @@
+/* eslint-disable */
 (function (lib, img, cjs, ss, an) {
 
 var p; // shortcut to reference prototypes
@@ -25,7 +26,6 @@ function getMCSymbolPrototype(symbol, nominalBounds, frameBounds) {
 
 
 (lib.triangle = function(mode,startPosition,loop) {
-	
 	this.initialize(mode,startPosition,loop,{});
 
 	// Layer 1
@@ -170,15 +170,46 @@ p.nominalBounds = new cjs.Rectangle(-45.2,-58.2,17.8,17.8);
 
 // stage content:
 (lib.funnelanimation = function(mode,startPosition,loop) {
-	this.initialize(mode,startPosition,loop,{});
+	this.initialize(mode,startPosition,loop,{stop:19,restart:20});
 
 	// timeline functions:
 	this.frame_19 = function() {
-		this.stop()
+		/* Stop a Movie Clip
+		Stops the specified movie clip on stage.
+		
+		Instructions:
+		1. Use this code for movie clips that are currently playing.
+		*/
+		
+		this.stopClips = function (){
+			this.ob4.stop();
+			this.ob3.stop();
+			this.ob2.stop();
+			this.ob1.stop();
+			this.funnel.stop();
+		}
+		
+		this.playClips = function (){
+			this.ob4.play();
+			this.ob3.play();
+			this.ob2.play();
+			this.ob1.play();
+			this.funnel.play();
+		}
+		
+		
+		
+		this.stopClips();
+		this.stop();
+		
+		canvasTimeline = this;
+	}
+	this.frame_20 = function() {
+		this.playClips();
 	}
 
 	// actions tween:
-	this.timeline.addTween(cjs.Tween.get(this).wait(19).call(this.frame_19).wait(1));
+	this.timeline.addTween(cjs.Tween.get(this).wait(19).call(this.frame_19).wait(1).call(this.frame_20).wait(9));
 
 	// Layer 7 (mask)
 	var mask = new cjs.Shape();
@@ -187,66 +218,66 @@ p.nominalBounds = new cjs.Rectangle(-45.2,-58.2,17.8,17.8);
 	mask.setTransform(90,57.8);
 
 	// circle
-	this.instance = new lib.circleanimation();
-	this.instance.parent = this;
-	this.instance.setTransform(60.2,87.8,1,1,0,0,0,7.5,7.5);
-	this.instance._off = true;
+	this.ob4 = new lib.circleanimation();
+	this.ob4.parent = this;
+	this.ob4.setTransform(60.2,88.8,1,1,0,0,0,7.5,7.5);
+	this.ob4._off = true;
 
-	var maskedShapeInstanceList = [this.instance];
+	var maskedShapeInstanceList = [this.ob4];
 
 	for(var shapedInstanceItr = 0; shapedInstanceItr < maskedShapeInstanceList.length; shapedInstanceItr++) {
 		maskedShapeInstanceList[shapedInstanceItr].mask = mask;
 	}
 
-	this.timeline.addTween(cjs.Tween.get(this.instance).wait(4).to({_off:false},0).wait(16));
+	this.timeline.addTween(cjs.Tween.get(this.ob4).wait(4).to({_off:false},0).wait(25));
 
 	// cross
-	this.instance_1 = new lib.crossanimation();
-	this.instance_1.parent = this;
-	this.instance_1.setTransform(144,21.2,1,1,0,0,0,6,6);
+	this.ob3 = new lib.crossanimation();
+	this.ob3.parent = this;
+	this.ob3.setTransform(144,21.2,1,1,0,0,0,6,6);
 
-	var maskedShapeInstanceList = [this.instance_1];
+	var maskedShapeInstanceList = [this.ob3];
 
 	for(var shapedInstanceItr = 0; shapedInstanceItr < maskedShapeInstanceList.length; shapedInstanceItr++) {
 		maskedShapeInstanceList[shapedInstanceItr].mask = mask;
 	}
 
-	this.timeline.addTween(cjs.Tween.get(this.instance_1).wait(20));
+	this.timeline.addTween(cjs.Tween.get(this.ob3).wait(29));
 
 	// Layer 6
-	this.instance_2 = new lib.triangleanimation();
-	this.instance_2.parent = this;
-	this.instance_2.setTransform(117.7,13.7,1,1,0,0,0,8,6.8);
-	this.instance_2._off = true;
+	this.ob2 = new lib.triangleanimation();
+	this.ob2.parent = this;
+	this.ob2.setTransform(117.7,13.7,1,1,0,0,0,8,6.8);
+	this.ob2._off = true;
 
-	var maskedShapeInstanceList = [this.instance_2];
+	var maskedShapeInstanceList = [this.ob2];
 
 	for(var shapedInstanceItr = 0; shapedInstanceItr < maskedShapeInstanceList.length; shapedInstanceItr++) {
 		maskedShapeInstanceList[shapedInstanceItr].mask = mask;
 	}
 
-	this.timeline.addTween(cjs.Tween.get(this.instance_2).wait(9).to({_off:false},0).wait(11));
+	this.timeline.addTween(cjs.Tween.get(this.ob2).wait(9).to({_off:false},0).wait(20));
 
 	// Layer 3
-	this.instance_3 = new lib.squareanimation();
-	this.instance_3.parent = this;
-	this.instance_3.setTransform(86.1,36.8,1,1,0,0,0,6.1,6.1);
-	this.instance_3._off = true;
+	this.ob1 = new lib.squareanimation();
+	this.ob1.parent = this;
+	this.ob1.setTransform(86.1,36.8,1,1,0,0,0,6.1,6.1);
+	this.ob1._off = true;
 
-	var maskedShapeInstanceList = [this.instance_3];
+	var maskedShapeInstanceList = [this.ob1];
 
 	for(var shapedInstanceItr = 0; shapedInstanceItr < maskedShapeInstanceList.length; shapedInstanceItr++) {
 		maskedShapeInstanceList[shapedInstanceItr].mask = mask;
 	}
 
-	this.timeline.addTween(cjs.Tween.get(this.instance_3).wait(14).to({_off:false},0).wait(6));
+	this.timeline.addTween(cjs.Tween.get(this.ob1).wait(14).to({_off:false},0).wait(15));
 
 	// Funnel
-	this.instance_4 = new lib.funnelanimation_1();
-	this.instance_4.parent = this;
-	this.instance_4.setTransform(86.8,148.5,1,1,0,0,0,38.9,34);
+	this.funnel = new lib.funnelanimation_1();
+	this.funnel.parent = this;
+	this.funnel.setTransform(86.8,148.5,1,1,0,0,0,38.9,34);
 
-	this.timeline.addTween(cjs.Tween.get(this.instance_4).wait(20));
+	this.timeline.addTween(cjs.Tween.get(this.funnel).wait(29));
 
 }).prototype = p = new cjs.MovieClip();
 p.nominalBounds = new cjs.Rectangle(135.9,116.5,111.7,168.1);
