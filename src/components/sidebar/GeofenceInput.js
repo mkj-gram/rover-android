@@ -86,11 +86,12 @@ class GeofenceInput extends Component {
     constructor(props) {
         super(props)
         const { geofenceComparison, geofenceValue } = this.props
-        const { latitude, longitude, radius } = geofenceValue
+        const { latitude, longitude, name, radius } = geofenceValue
 
         this.state = {
             bounds: null,
             center: new google.maps.LatLng(latitude, longitude),
+            name,
             radius,
             zoom: Math.round(23 - Math.log(radius) / Math.LN2),
             geofenceComparison
@@ -132,7 +133,9 @@ class GeofenceInput extends Component {
 
         const mapCenter = places.map(({ geometry }) => geometry.location)
 
-        this.setState({ center: mapCenter[0] }, this.updateValue)
+        const name = places[0].name
+
+        this.setState({ center: mapCenter[0], name }, this.updateValue)
     }
 
     handleRadiusChange(radius) {
@@ -146,7 +149,7 @@ class GeofenceInput extends Component {
 
     updateValue() {
         const { attribute, category, __typename, index, updateFn } = this.props
-        const { geofenceComparison, center, radius } = this.state
+        const { geofenceComparison, center, name, radius } = this.state
         const { lat, lng } = center
 
         updateFn({
@@ -157,7 +160,8 @@ class GeofenceInput extends Component {
             geofenceValue: {
                 latitude: lat(),
                 longitude: lng(),
-                radius
+                radius,
+                name
             },
             __typename
         })
@@ -280,7 +284,8 @@ GeofenceInput.defaultProps = {
     geofenceValue: {
         latitude: 43.650678,
         longitude: -79.375814,
-        radius: 100
+        radius: 100,
+        name: 'Toronto'
     },
     geofenceComparison: 'IS_WITHIN'
 }

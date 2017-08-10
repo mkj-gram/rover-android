@@ -654,6 +654,7 @@ type GeofenceValue {
   latitude: Float!
   longitude: Float!
   radius: Int!
+  name: String!
 }
 
 # A button action that navigates to a new screen
@@ -777,6 +778,15 @@ type Mutation {
   changeCampaignScheduleData(input: ChangeCampaignScheduleDataInput!): ChangeCampaignScheduleDataPayload
   changeCampaignAudienceData(input: ChangeCampaignAudienceDataInput!): ChangeCampaignAudienceDataPayload
   changeCampaignFrequencyLimit(input: ChangeCampaignFrequencyLimitInput!): ChangeCampaignFrequencyLimitPayload
+
+  # Create a new segment
+  createSegment(segment: SegmentInput): DynamicSegment
+
+  # Update a segment
+  updateSegment(segment: SegmentInput): DynamicSegment
+
+  # archive a segment
+  archiveSegment(segment: SegmentInput): String
 }
 
 # An object with an ID
@@ -955,6 +965,12 @@ type SegmentData {
   profiles: [JSON!]!
   segmentSize: Int!
   totalSize: Int!
+}
+
+input SegmentInput {
+  id: String
+  name: String
+  predicates: JSON
 }
 
 # Schema of available predicate attributes

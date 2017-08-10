@@ -650,6 +650,7 @@ export default createRefetchContainer(
                                     latitude
                                     longitude
                                     radius
+                                    name
                                 }
                                 geofenceComparison
                             }
@@ -687,6 +688,7 @@ export default createRefetchContainer(
                                     latitude
                                     longitude
                                     radius
+                                    name
                                 }
                                 geofenceComparison
                             }
