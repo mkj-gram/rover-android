@@ -22,7 +22,7 @@ class AudienceTable extends Component {
             segmentId: '',
             predicates: '[]',
             formattedData: {},
-            renderRefetch: null,
+            renderFetchEnabled: null,
             columns: [],
             rows: [],
             segmentSize: 0,
@@ -39,7 +39,7 @@ class AudienceTable extends Component {
             profiles: [],
             group: 0,
             refetched: false,
-            selectedColumns: {}
+            adgDynamicSegment: []
         }
 
         this.createRowsAndColumns = this.createRowsAndColumns.bind(this)
@@ -54,6 +54,9 @@ class AudienceTable extends Component {
         this.updateChecked = this.updateChecked.bind(this)
         this.getSetCachedColumns = this.getSetCachedColumns.bind(this)
         this.refetchCallback = this.refetchCallback.bind(this)
+        this.updateDynamicSegments = this.updateDynamicSegments.bind(this)
+        this.renderFetch = this.renderFetch.bind(this)
+        this.fetchData = this.fetchData.bind(this)
     }
 
     componentDidMount() {
@@ -90,7 +93,7 @@ class AudienceTable extends Component {
 
         if (!cachedSelectedColumns) {
             this.setState({
-                selectedColumns: selectedColumns
+                selectedColumns
             })
             localStorage.setItem(
                 'selectedColumns',
@@ -106,6 +109,7 @@ class AudienceTable extends Component {
     getAllColumns(deviceSchema, profileSchema) {
         const devices = {}
         const profiles = {}
+
         deviceSchema.map(device => (
             devices[device.attribute] = device.type
         ))
@@ -148,124 +152,157 @@ class AudienceTable extends Component {
 
     refetchCallback(error, nextProps) {
         const group = Math.floor(nextProps.pageNumber / 3) * 3
+        const { setSaveState } = this.props
+
         if (!error) {
             if (nextProps.context === 'predicates') {
                 this.setState({
                     predicates: nextProps.predicates,
-                    renderRefetch: true,
+                    renderFetchEnabled: true,
                     group,
                     refetched: true
                 })
 
-                this.props.setSaveState({
+                const predicates = JSON.parse(nextProps.predicates)
+
+                setSaveState({
                     isSegmentUpdate: this.state.segmentId !== '',
-                    showSaveButton: true
+                    showSaveButton:
+                        (predicates.devices.length !== 0 ||
+                        predicates.profiles.length !== 0)
                 })
             } else if (nextProps.context === 'segments') {
                 this.setState({
                     segmentId: nextProps.segmentId,
-                    renderRefetch: false,
+                    renderFetchEnabled: false,
                     group,
                     refetched: true
                 })
-
-                this.props.setSaveState({
+                setSaveState({
                     isSegmentUpdate: false,
                     showSaveButton: false
                 })
             }
         } else {
-            throw new Error(error)
+            console.log(`Error: ${error}`)
+        }
+    }
+
+    fetchData(nextProps) {
+        const { relay } = this.props
+        let refetchVariables
+        if (
+            nextProps.context === 'predicates' &&
+            JSON.stringify(this.props.predicates) !==
+                JSON.stringify(nextProps.predicates)
+        ) {
+            refetchVariables = fragmentVariables => ({
+                includeSegmentsFromPredicates: true,
+                includeDynamicSegment: false,
+                predicates: nextProps.predicates,
+                segmentId: '',
+                pageNumber: Math.floor(nextProps.pageNumber / 3)
+            })
+            relay.refetch(
+                refetchVariables,
+                null,
+                error => this.refetchCallback(error, nextProps),
+                { force: true }
+            )
+        } else if (nextProps.context === 'segments') {
+            refetchVariables = fragmentVariables => ({
+                includeSegmentsFromPredicates: false,
+                includeDynamicSegment: true,
+                segmentId: nextProps.segmentId,
+                predicates: '[]',
+                pageNumber: Math.floor(nextProps.pageNumber / 3)
+            })
+            relay.refetch(
+                refetchVariables,
+                null,
+                error => this.refetchCallback(error, nextProps),
+                { force: true }
+            )
         }
     }
 
     componentWillReceiveProps(nextProps) {
         const {
             refetched,
-            renderRefetch
+            renderFetchEnabled
         } = this.state
-        const { relay } = this.props
-        let refetchVariables
 
-        if (nextProps.resetPagination) {
-            this.setState({ group: 0 })
-        }
+        if (nextProps.refetchData && !nextProps.reset) {
+            if (nextProps.resetPagination) {
+                this.setState({ group: 0 })
+            }
 
-        if (!refetched) {
-            if (
-                nextProps.pageNumber >= this.state.group &&
-                nextProps.pageNumber < this.state.group + 3 &&
-                !nextProps.resetPagination
-            ) {
-                this.setState({
-                    rows: this.getSelectedRows(
-                        this.state.profiles,
-                        this.state.devices,
-                        nextProps.pageNumber
-                    )
-                })
-            } else if (nextProps.context === 'predicates') {
-                    refetchVariables = fragmentVariables => ({
-                        includeSegmentsFromPredicates: true,
-                        includeDynamicSegment: false,
-                        predicates: nextProps.predicates,
-                        segmentId: '',
-                        pageNumber: Math.floor(nextProps.pageNumber / 3)
+            if (!refetched) {
+                if (
+                    nextProps.pageNumber >= this.state.group &&
+                    nextProps.pageNumber < this.state.group + 3 &&
+                    !nextProps.resetPagination
+                ) {
+                    this.setState({
+                        rows: this.getSelectedRows(
+                            this.state.profiles,
+                            this.state.devices,
+                            nextProps.pageNumber
+                        )
                     })
-                    relay.refetch(
-                        refetchVariables,
-                        null,
-                        error => this.refetchCallback(error, nextProps),
-                        { force: true }
-                    )
-                } else if (nextProps.context === 'segments') {
-                    refetchVariables = fragmentVariables => ({
-                        includeSegmentsFromPredicates: false,
-                        includeDynamicSegment: true,
-                        segmentId: nextProps.segmentId,
-                        predicates: '[]',
-                        pageNumber: Math.floor(nextProps.pageNumber / 3)
-                    })
-                    relay.refetch(
-                        refetchVariables,
-                        null,
-                        error => this.refetchCallback(error, nextProps),
-                        { force: true }
-                    )
+                } else {
+                    this.fetchData(nextProps)
                 }
-        } else if (renderRefetch !== null) {
-            let devices,
+            } else if (renderFetchEnabled !== null) {
+                this.renderFetch(nextProps)
+            }
+        } else {
+            this.updateDynamicSegments(nextProps.segmentId)
+
+            if (nextProps.reset) {
+                this.fetchData(nextProps)
+                if (renderFetchEnabled !== null) {
+                    this.renderFetch(nextProps)
+                }
+            }
+        }
+    }
+
+      renderFetch(nextProps) {
+        let devices, profiles, segmentSize, totalSize
+        const { renderFetchEnabled } = this.state
+
+        if (renderFetchEnabled) {
+            ;({
+                devices,
                 profiles,
                 segmentSize,
                 totalSize
-            if (renderRefetch) {
-                ;({
-                    devices,
-                    profiles,
-                    segmentSize,
-                    totalSize } = nextProps.data.adgSegmentsFromPredicates)
-            } else {
-                ;({
-                    devices,
-                    profiles,
-                    segmentSize,
-                    totalSize } = nextProps.data.adgDynamicSegment[0].data)
-            }
-
-            this.setState({
-                rows: this.getSelectedRows(
-                    profiles,
-                    devices,
-                    nextProps.pageNumber
-                ),
-                segmentSize,
-                totalSize,
-                profiles,
+            } = nextProps.data.adgSegmentsFromPredicates)
+        } else {
+            ;({
                 devices,
-                renderRefetch: null,
-                refetched: false
-            })
+                profiles,
+                segmentSize,
+                totalSize
+            } = nextProps.data.adgDynamicSegment[0].data)
         }
+
+        this.setState({
+            rows: this.getSelectedRows(profiles, devices, nextProps.pageNumber),
+            segmentSize,
+            totalSize,
+            profiles,
+            devices,
+            renderFetchEnabled: null,
+            refetched: false
+        })
+    }
+
+    updateDynamicSegments(segmentId) {
+        this.setState({
+            segmentId
+        })
     }
 
     getSelectedRows(profiles, devices, pageNum = 0) {
@@ -368,7 +405,8 @@ class AudienceTable extends Component {
     getSelectedColumns() {
         const columns = []
         const selectedColumns = JSON.parse(localStorage.selectedColumns)
-        Object.keys(selectedColumns).map(attr => (
+
+        Object.keys(selectedColumns).map((attr) => {
             columns.push({
                 key: attr,
                 name: attr,
@@ -377,7 +415,7 @@ class AudienceTable extends Component {
                 resizable: true,
                 formatter: this.getFormat(selectedColumns[attr])
             })
-        ))
+        })
         return columns
     }
 
@@ -399,9 +437,9 @@ class AudienceTable extends Component {
         )
         if (Object.keys(columns).length > 0) {
             const rearrangeColumns = {}
-            columns.map(attr => (
+            columns.map((attr) => {
                 rearrangeColumns[attr.name] = selectedColumns[attr.name]
-            ))
+            })
             localStorage.setItem(
                 'selectedColumns',
                 JSON.stringify(rearrangeColumns)
@@ -461,7 +499,9 @@ AudienceTable.propTypes = {
     pageNumber: PropTypes.number.isRequired,
     context: PropTypes.string.isRequired,
     updatePageNumber: PropTypes.func.isRequired,
-    setSaveState: PropTypes.func.isRequired
+    setSaveState: PropTypes.func.isRequired,
+    refetchData: PropTypes.bool.isRequired,
+    reset: PropTypes.bool.isRequired
 }
 
 export default createRefetchContainer(

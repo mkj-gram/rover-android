@@ -259,7 +259,7 @@ const PredicateList = ({ query, queryCondition, viewModal, removePredicate }) =>
                                         position: 'absolute'
                                     }}
                                 />
-                                {queryCondition === 'all' ? 'AND' : 'OR'}
+                                {queryCondition === 'ALL' ? 'AND' : 'OR'}
                             </div>}
                     </div>
                 )

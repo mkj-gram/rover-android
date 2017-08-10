@@ -15,11 +15,13 @@ import {
     steel
 } from '@rover/react-bootstrap'
 
+import CreateSegmentMutation from '../../mutations/CreateSegmentMutation'
+import UpdateSegmentMutation from '../../mutations/UpdateSegmentMutation'
+
 class SegmentSave extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            query: [],
             segmentName: '',
             segmentSaveValue: 'update',
             createNewSegment: false
@@ -30,6 +32,16 @@ class SegmentSave extends Component {
         this.segmentUpdate = this.segmentUpdate.bind(this)
         this.handleUpdate = this.handleUpdate.bind(this)
         this.updateSegmentSaveValue = this.updateSegmentSaveValue.bind(this)
+    }
+
+    componentWillReceiveProps(nextProp) {
+        if (nextProp.reset) {
+            this.setState({
+                segmentName: '',
+                segmentSaveValue: 'update',
+                createNewSegment: false
+            })
+        }
     }
 
     segmentNameInput() {
@@ -61,17 +73,19 @@ class SegmentSave extends Component {
     }
 
     handleSave(val) {
+        const { setSegment, queryCondition } = this.props
         if (val) {
             // Write query + name to DB
-            this.setState({
-                query: this.props.query,
-                segmentName: ''
-            })
-        } else {
-            this.setState({
-                segmentName: ''
-            })
+            CreateSegmentMutation(
+                this.state.segmentName,
+                JSON.stringify(this.props.query),
+                setSegment,
+                queryCondition.toLowerCase()
+            )
         }
+        this.setState({
+            segmentName: ''
+        })
         this.props.onRequestClose('save')
     }
 
@@ -130,24 +144,30 @@ class SegmentSave extends Component {
 
     handleUpdate(val) {
         const { segmentSaveValue } = this.state
+        const { setSegment, queryCondition } = this.props
         if (val) {
             if (segmentSaveValue === 'create') {
-                // create new segment
+                CreateSegmentMutation(
+                    this.state.segmentName,
+                    JSON.stringify(this.props.query),
+                    setSegment,
+                    queryCondition.toLowerCase()
+                )
             } else {
-                // update saved segment
+                UpdateSegmentMutation(
+                    this.props.segment.segmentId,
+                    null,
+                    JSON.stringify(this.props.query),
+                    setSegment,
+                    queryCondition.toLowerCase()
+                )
             }
-
-            this.setState({
-                query: this.props.query,
-                segmentName: '',
-                segmentSaveValue: 'update'
-            })
-        } else {
-            this.setState({
-                segmentName: '',
-                segmentSaveValue: 'update'
-            })
         }
+        this.setState({
+            segmentName: '',
+            segmentSaveValue: 'update',
+            createNewSegment: false
+        })
         this.props.onRequestClose('save')
     }
 
@@ -241,7 +261,10 @@ SegmentSave.propTypes = {
     onRequestClose: PropTypes.func.isRequired,
     modalCoordinates: PropTypes.array.isRequired,
     query: PropTypes.array.isRequired,
-    segment: PropTypes.object.isRequired
+    segment: PropTypes.object.isRequired,
+    setSegment: PropTypes.func.isRequired,
+    saveStates: PropTypes.object.isRequired,
+    queryCondition: PropTypes.string.isRequired
 }
 
 SegmentSave.defaultProps = {
@@ -249,7 +272,10 @@ SegmentSave.defaultProps = {
     onRequestClose: () => null,
     modalCoordinates: [0, 0],
     query: [],
-    segment: {}
+    segment: {},
+    setSegment: () => null,
+    saveStates: {},
+    queryCondition: 'ALL'
 }
 
 export default SegmentSave
