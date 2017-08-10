@@ -135,6 +135,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.UpdateDeviceIBeaconMonitoringResponse" do
   end
+  add_message "rover.audience.v1.UpdateDeviceTestPropertyRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :device_id, :string, 2
+    optional :is_test_device, :bool, 3
+  end
+  add_message "rover.audience.v1.UpdateDeviceTestPropertyResponse" do
+  end
   add_message "rover.audience.v1.DeleteDeviceRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
@@ -203,6 +210,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :profile_id, :string, 4
     optional :created_at, :message, 5, "google.protobuf.Timestamp"
     optional :updated_at, :message, 6, "google.protobuf.Timestamp"
+    optional :is_test_device, :bool, 7
     optional :aps_environment, :string, 10
     optional :device_token_key, :string, 11
     optional :device_token_is_active, :bool, 12
@@ -509,6 +517,8 @@ module Rover
       UpdateDeviceGeofenceMonitoringResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceGeofenceMonitoringResponse").msgclass
       UpdateDeviceIBeaconMonitoringRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest").msgclass
       UpdateDeviceIBeaconMonitoringResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceIBeaconMonitoringResponse").msgclass
+      UpdateDeviceTestPropertyRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceTestPropertyRequest").msgclass
+      UpdateDeviceTestPropertyResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceTestPropertyResponse").msgclass
       DeleteDeviceRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteDeviceRequest").msgclass
       DeleteDeviceResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteDeviceResponse").msgclass
       SetDeviceProfileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.SetDeviceProfileRequest").msgclass

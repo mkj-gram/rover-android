@@ -91,6 +91,14 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 	return &audience.UpdateDeviceResponse{}, nil
 }
 
+// UpdateDevice implements the corresponding rpc
+func (s *Server) UpdateDeviceTestProperty(ctx context.Context, r *audience.UpdateDeviceTestPropertyRequest) (*audience.UpdateDeviceTestPropertyResponse, error) {
+	if err := s.db.UpdateDeviceTestProperty(ctx, r); err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceTestProperty: %v", err)
+	}
+	return &audience.UpdateDeviceTestPropertyResponse{}, nil
+}
+
 // DeleteDevice implements the corresponding rpc
 func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceRequest) (*audience.DeleteDeviceResponse, error) {
 	if err := validateID(r.GetDeviceId()); err != nil {

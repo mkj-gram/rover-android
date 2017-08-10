@@ -28,6 +28,8 @@ type Device struct {
 	CreatedAt *time.Time    `bson:"created_at"`
 	UpdatedAt *time.Time    `bson:"updated_at"`
 
+	IsTestDevice bool `bson:"is_test_device,omitempty"`
+
 	ApsEnvironment            string     `bson:"aps_environment,omitempty"`
 	DeviceTokenKey            string     `bson:"device_token_key,omitempty"`
 	DeviceTokenIsActive       bool       `bson:"device_token_is_active"`
@@ -85,6 +87,8 @@ func (d *Device) fromProto(proto *audience.Device) error {
 
 	d.CreatedAt, _ = protoToTime(proto.CreatedAt)
 	d.UpdatedAt, _ = protoToTime(proto.UpdatedAt)
+
+	d.IsTestDevice = proto.IsTestDevice
 
 	d.DeviceTokenKey = proto.DeviceTokenKey
 	d.ApsEnvironment = proto.ApsEnvironment
@@ -154,6 +158,8 @@ func (d *Device) toProto(proto *audience.Device) error {
 
 	proto.CreatedAt, _ = timeToProto(d.CreatedAt)
 	proto.UpdatedAt, _ = timeToProto(d.UpdatedAt)
+
+	proto.IsTestDevice = d.IsTestDevice
 
 	proto.ApsEnvironment = d.ApsEnvironment
 	proto.DeviceTokenKey = d.DeviceTokenKey
@@ -455,6 +461,28 @@ func (s *devicesStore) UpdateDeviceUnregisterPushToken(ctx context.Context, r *a
 			"device_token_unregistered_at": now,
 			"device_token_updated_at":      now,
 			"updated_at":                   now,
+		}
+	)
+
+	if err := s.devices.Update(selector, bson.M{"$set": update}); err != nil {
+		return wrapError(err, "devices.Update")
+	}
+
+	return nil
+}
+
+func (s *devicesStore) UpdateDeviceTestProperty(ctx context.Context, r *audience.UpdateDeviceTestPropertyRequest) error {
+	var (
+		now = s.timeNow()
+
+		account_id   = r.GetAuthContext().GetAccountId()
+		device_id    = r.GetDeviceId()
+		isTestDevice = r.GetIsTestDevice()
+
+		selector = bson.M{"device_id": device_id, "account_id": account_id}
+		update   = bson.M{
+			"is_test_device": isTestDevice,
+			"updated_at":     now,
 		}
 	)
 

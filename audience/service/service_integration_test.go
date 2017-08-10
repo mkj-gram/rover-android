@@ -67,8 +67,10 @@ func TestAudienceService(t *testing.T) {
 	t.Run("UpdateDeviceLocation", testAudienceService_UpdateDeviceLocation)
 	t.Run("UpdateDeviceGeofenceMonitoring", testAudienceService_UpdateDeviceGeofenceMonitoring)
 	t.Run("UpdateDeviceIBeaconMonitoring", testAudienceService_UpdateDeviceIBeaconMonitoring)
-	t.Run("DeleteDevice", testAudienceService_DeleteDevice)
+	t.Run("UpdateDeviceTestProperty", testAudienceService_UpdateDeviceTestProperty)
+
 	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfile)
+	t.Run("DeleteDevice", testAudienceService_DeleteDevice)
 	t.Run("ListDevicesByProfileId", testAudienceService_ListDevicesByProfileId)
 	t.Run("ListDevicesByProfileIdentifier", testAudienceService_ListDevicesByProfileIdentifier)
 }
@@ -2273,6 +2275,157 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 			}
 
 			var _, gotErr = client.UpdateDevice(ctx, tc.req)
+			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+
+			if tc.after != nil {
+				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
+				if diff := Diff(tc.after.exp, got, tc.after.expErr, gotErr); diff != nil {
+					t.Errorf("After:\n%v", difff(diff))
+				}
+			}
+		})
+	}
+}
+
+func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		updatedAt = time.Now().Truncate(time.Millisecond)
+
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
+		)
+
+		svc = service.New(db)
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	type tCase struct {
+		name string
+		req  *audience.UpdateDeviceTestPropertyRequest
+
+		expErr error
+
+		before, after *expect
+	}
+
+	tcases := []tCase{
+		{
+			name: "error: device_id: unset",
+			req: &audience.UpdateDeviceTestPropertyRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				DeviceId:    "000000000000000000000000",
+			},
+
+			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceTestProperty: devices.Update: not found"),
+		},
+
+		{
+			name: "error: wrong account",
+			req: &audience.UpdateDeviceTestPropertyRequest{
+				AuthContext: &auth.AuthContext{AccountId: 100},
+				DeviceId:    "000000000000000000000dd4",
+			},
+
+			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceTestProperty: devices.Update: not found"),
+		},
+
+		{
+			name: "updates device",
+			req: &audience.UpdateDeviceTestPropertyRequest{
+				AuthContext:  &auth.AuthContext{AccountId: 5},
+				DeviceId:     "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
+				IsTestDevice: true,
+			},
+
+			before: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					AccountId:    5,
+					IsTestDevice: false,
+
+					Id:        "000000000000000000000dd7",
+					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
+					ProfileId: "000000000000000000000ad6",
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+				},
+			},
+
+			after: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					AccountId:    5,
+					IsTestDevice: true,
+
+					Id:        "000000000000000000000dd7",
+					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
+					ProfileId: "000000000000000000000ad6",
+
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, updatedAt),
+				},
+			},
+		},
+
+		{
+			name: "updates device toggles back",
+			req: &audience.UpdateDeviceTestPropertyRequest{
+				AuthContext:  &auth.AuthContext{AccountId: 5},
+				DeviceId:     "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
+				IsTestDevice: false,
+			},
+
+			before: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					AccountId:    5,
+					IsTestDevice: true,
+
+					Id:        "000000000000000000000dd7",
+					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
+					ProfileId: "000000000000000000000ad6",
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, updatedAt),
+				},
+			},
+
+			after: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					AccountId:    5,
+					IsTestDevice: false,
+
+					Id:        "000000000000000000000dd7",
+					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
+					ProfileId: "000000000000000000000ad6",
+
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, updatedAt),
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.before != nil {
+				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
+				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
+					t.Errorf("Before:\n%v", difff(diff))
+				}
+			}
+
+			var _, gotErr = client.UpdateDeviceTestProperty(ctx, tc.req)
 			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}
