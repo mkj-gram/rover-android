@@ -109,7 +109,7 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	if len(proto.Frameworks) > 0 {
 		d.Frameworks = make(map[string]*Version)
 		for k, v := range proto.Frameworks {
-			d.Frameworks[k] = (*Version)(v)
+			d.Frameworks[escape(k, InvalidKeyKeyChars)] = (*Version)(v)
 		}
 	}
 	d.LocaleLanguage = proto.LocaleLanguage
@@ -175,7 +175,12 @@ func (d *Device) toProto(proto *audience.Device) error {
 	if len(d.Frameworks) > 0 {
 		proto.Frameworks = make(map[string]*audience.Version)
 		for k, v := range d.Frameworks {
-			proto.Frameworks[k] = (*audience.Version)(v)
+			// TODO: how to handle those?
+			if k, err := unescape(k); err != nil {
+				errorf("error reading key: %s: %v", k, err)
+			} else {
+				proto.Frameworks[k] = (*audience.Version)(v)
+			}
 		}
 	}
 	proto.LocaleLanguage = d.LocaleLanguage
@@ -417,7 +422,6 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 	update["device_model"] = r.DeviceModel
 	update["os_name"] = r.OsName
 	update["os_version"] = r.OsVersion
-	update["frameworks"] = r.Frameworks
 	update["locale_language"] = r.LocaleLanguage
 	update["locale_region"] = r.LocaleRegion
 	update["locale_script"] = r.LocaleScript
@@ -434,6 +438,13 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 	update["is_bluetooth_enabled"] = r.IsBluetoothEnabled
 	update["advertising_id"] = r.AdvertisingId
 	update["ip"] = r.Ip
+
+	frameworks := bson.M{}
+	for k, v := range r.Frameworks {
+		frameworks[escape(k, InvalidKeyKeyChars)] = v
+	}
+
+	update["frameworks"] = frameworks
 
 	update["region_monitoring_mode"] = r.RegionMonitoringMode.String()
 

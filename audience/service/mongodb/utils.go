@@ -4,10 +4,14 @@ import (
 	"encoding/json"
 	"io"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"gopkg.in/mgo.v2/bson"
 )
+
+// string of chars that make an invalid mongo key
+const InvalidKeyKeyChars = "."
 
 func ParseDBName(dsn string) (string, error) {
 	u, err := url.Parse(dsn)
@@ -71,4 +75,114 @@ func (d *JSONBSONDecoder) Decode(doc interface{}) error {
 
 	// now parse the bytes into the object
 	return bson.Unmarshal(data, doc)
+}
+
+func escape(s string, encode string) string {
+	var (
+		shouldEscape = make(map[byte]bool)
+		hexCount     = 0
+	)
+
+	shouldEscape['%'] = true
+	for i := 0; i < len(encode); i++ {
+		shouldEscape[encode[i]] = true
+	}
+
+	for i := 0; i < len(s); i++ {
+		if _, ok := shouldEscape[s[i]]; ok {
+			hexCount++
+		}
+	}
+
+	if hexCount == 0 {
+		return s
+	}
+
+	t := make([]byte, len(s)+2*hexCount)
+	j := 0
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if _, ok := shouldEscape[c]; ok {
+			t[j] = '%'
+			t[j+1] = "0123456789ABCDEF"[c>>4]
+			t[j+2] = "0123456789ABCDEF"[c&15]
+			j += 3
+			continue
+		}
+		t[j] = s[i]
+		j++
+	}
+	return string(t)
+}
+
+type EscapeError string
+
+func (e EscapeError) Error() string {
+	return "invalid escape " + strconv.Quote(string(e))
+}
+
+func unescape(s string) (string, error) {
+	// Count %, check that they're well-formed.
+	n := 0
+	for i := 0; i < len(s); {
+		switch s[i] {
+		case '%':
+			n++
+			if i+2 >= len(s) || !ishex(s[i+1]) || !ishex(s[i+2]) {
+				s = s[i:]
+				if len(s) > 3 {
+					s = s[:3]
+				}
+				return "", EscapeError(s)
+			}
+			// v := unhex(s[i+1])<<4 | unhex(s[i+2])
+			i += 3
+		default:
+			i++
+		}
+	}
+
+	if n == 0 {
+		return s, nil
+	}
+
+	t := make([]byte, len(s)-2*n)
+	j := 0
+	for i := 0; i < len(s); {
+		switch s[i] {
+		case '%':
+			t[j] = unhex(s[i+1])<<4 | unhex(s[i+2])
+			j++
+			i += 3
+		default:
+			t[j] = s[i]
+			j++
+			i++
+		}
+	}
+	return string(t), nil
+}
+
+func ishex(c byte) bool {
+	switch {
+	case '0' <= c && c <= '9':
+		return true
+	case 'a' <= c && c <= 'f':
+		return true
+	case 'A' <= c && c <= 'F':
+		return true
+	}
+	return false
+}
+
+func unhex(c byte) byte {
+	switch {
+	case '0' <= c && c <= '9':
+		return c - '0'
+	case 'a' <= c && c <= 'f':
+		return c - 'a' + 10
+	case 'A' <= c && c <= 'F':
+		return c - 'A' + 10
+	}
+	return 0
 }

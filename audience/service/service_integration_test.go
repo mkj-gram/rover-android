@@ -2084,8 +2084,8 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				OsVersion:          &audience.Version{1, 0, 0},
 				DeviceModel:        "iPhone7,2",
 				Frameworks: map[string]*audience.Version{
-					"RoverEvents": &audience.Version{1, 2, 3},
-					"RoverPush":   &audience.Version{1, 2, 3},
+					"io.rover.Rover":     &audience.Version{1, 2, 3},
+					"io.rover.RoverPush": &audience.Version{1, 2, 3},
 				},
 				LocaleLanguage:              "en",
 				LocaleRegion:                "us",
@@ -2147,8 +2147,8 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					OsVersion:          &audience.Version{1, 0, 0},
 					DeviceModel:        "iPhone7,2",
 					Frameworks: map[string]*audience.Version{
-						"RoverEvents": &audience.Version{1, 2, 3},
-						"RoverPush":   &audience.Version{1, 2, 3},
+						"io.rover.Rover":     &audience.Version{1, 2, 3},
+						"io.rover.RoverPush": &audience.Version{1, 2, 3},
 					},
 					LocaleLanguage:              "en",
 					LocaleRegion:                "us",
