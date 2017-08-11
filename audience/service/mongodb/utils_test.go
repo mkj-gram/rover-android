@@ -4,6 +4,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/pkg/errors"
+
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -99,5 +102,70 @@ func Test_EscapeUnescape(t *testing.T) {
 				}
 			})
 		}
+	}
+}
+
+func TestParseURL(t *testing.T) {
+
+	tcases := []struct {
+		in     string
+		exp    *mgo.DialInfo
+		expErr error
+	}{
+		{
+			in: "mongodb://user:pass@hello:1234/dbname?ssl=false",
+			exp: &mgo.DialInfo{
+				Addrs:    []string{"hello:1234"},
+				Database: "dbname",
+				Username: "user",
+				Password: "pass",
+			},
+		},
+
+		// { TODO: functions aren't comparable
+		// 	in: "mongodb://user:pass@hello:1234/dbname?ssl=require",
+		// 	exp: &mgo.DialInfo{
+		// 		Addrs:    []string{"hello:1234"},
+		// 		Database: "dbname",
+		// 		Username: "user",
+		// 		Password: "pass",
+		// 	},
+		// },
+
+		{
+			in:     "mongodb://user:pass@hello:1234/dbname?ssl=verify-ca&sslrootcert=/path/to/file",
+			expErr: errors.Errorf("readFile: open /path/to/file: no such file or directory"),
+
+			exp: &mgo.DialInfo{
+				Addrs:    []string{"hello:1234"},
+				Database: "dbname",
+				Username: "user",
+				Password: "pass",
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run("", func(t *testing.T) {
+			var (
+				exp, expErr = tc.exp, tc.expErr
+				got, gotErr = ParseURL(tc.in)
+			)
+
+			if exp, got := expErr, gotErr; exp != nil || got != nil {
+				if !(exp == nil && got == nil) {
+					if exp.Error() != got.Error() {
+						t.Errorf("\nExp: %q\nGot: %q", exp, got)
+					}
+					return
+				}
+				t.Errorf("\nExp: %q\nGot: %q", exp, got)
+				return
+			}
+
+			if !reflect.DeepEqual(exp, got) {
+				t.Errorf("\nExp: %v\nGot: %v", exp, got)
+			}
+		})
 	}
 }

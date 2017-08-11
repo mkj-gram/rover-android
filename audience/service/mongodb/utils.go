@@ -1,14 +1,81 @@
 package mongodb
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"io"
+	"io/ioutil"
+	"net"
+	"net/url"
 
+	"github.com/pkg/errors"
+
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // string of chars that make an invalid mongo key
 const InvalidKeyChars = "."
+
+// ParseURL implements some additional SSL related options
+// follows Postgres convention https://www.postgresql.org/docs/9.1/static/libpq-connect.html#LIBPQ-CONNECT-SSLMODE
+// The additional options are removed and passed on to mgo.ParseURL
+func ParseURL(dsn string) (*mgo.DialInfo, error) {
+	u, err := url.Parse(dsn)
+	if err != nil {
+		return nil, wrapError(err, "url.Parse")
+	}
+
+	var (
+		query = u.Query()
+
+		ssl         = query.Get("ssl")
+		sslRootCert = query.Get("sslrootcert")
+	)
+
+	// strip custom options
+	for _, k := range []string{"ssl", "sslrootcert"} {
+		query.Del(k)
+	}
+	u.RawQuery = query.Encode()
+
+	dialInfo, err := mgo.ParseURL(u.String())
+	if err != nil {
+		return nil, wrapError(err, "mgo.ParseURL")
+	}
+
+	if ssl == "" || ssl == "false" || ssl == "disable" {
+		return dialInfo, nil
+	}
+
+	var (
+		tlsConfig = &tls.Config{}
+	)
+
+	dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
+		conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
+		return conn, err
+	}
+
+	// TODO: how about default validation without custom certificate?
+	switch ssl {
+	case "verify-ca", "verify-full":
+		ca, err := ioutil.ReadFile(sslRootCert)
+		if err != nil {
+			return nil, wrapError(err, "readFile")
+		}
+		tlsConfig.RootCAs = x509.NewCertPool()
+		tlsConfig.RootCAs.AppendCertsFromPEM(ca)
+
+	case "true", "require":
+		tlsConfig.InsecureSkipVerify = true
+	default:
+		return nil, wrapError(errors.Errorf("unknown option: %q", ssl), "parse")
+	}
+
+	return dialInfo, nil
+}
 
 func StringToObjectID(str string) (bson.ObjectId, error) {
 	if !bson.IsObjectIdHex(str) {

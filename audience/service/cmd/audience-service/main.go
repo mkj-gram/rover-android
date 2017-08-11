@@ -36,14 +36,14 @@ import (
 var (
 	// NOTE: environment variables are just UPPERCASED_NAMES of the flag names
 	// ie: TLS, KEY_FILE, DB_DSN, etc
-	tls      = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
-	certFile = flag.String("cert-file", "cert.pem", "The TLS cert file")
-	keyFile  = flag.String("key-file", "server.key", "The TLS key file")
+	serviceTLS = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
+	certFile   = flag.String("cert-file", "cert.pem", "The TLS cert file")
+	keyFile    = flag.String("key-file", "server.key", "The TLS key file")
+
 	rpcAddr  = flag.String("rpc-addr", ":5100", "rpc address")
 	httpAddr = flag.String("http-addr", ":5080", "http address")
 
 	mongoDSN = flag.String("mongo-dsn", "", "mongo Data Source Name")
-	// esDSN    = flag.String("elasticsearch-dsn", "", "elasticsearch Data Source Name")
 
 	gProjectID = flag.String("google-project-id", "", "google PROJECT_ID")
 	gTraceKey  = flag.String("google-trace-key", "", "path to google trace service account key file")
@@ -110,7 +110,7 @@ func main() {
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 	}
 
-	if *tls {
+	if *serviceTLS {
 		creds, err := credentials.NewServerTLSFromFile(*certFile, *keyFile)
 		if err != nil {
 			stderr.Fatalf("credentials.NewServerTLSFromFile: %v", err)
@@ -118,21 +118,13 @@ func main() {
 		opts = append(opts, grpc.Creds(creds))
 	}
 
-	mongoInfo, err := mgo.ParseURL(*mongoDSN)
-	if err != nil {
-		stderr.Fatalln("mgo.ParseURL:", err)
-	}
+	sess, mongoInfo := dialMongo(*mongoDSN)
 
-	sess, err := mgo.DialWithInfo(mongoInfo)
-	if err != nil {
-		stderr.Fatalf("mgo.Dial: DSN=%q error=%q", *mongoDSN, err)
-	}
-
-	if err := mongodb.EnsureIndexes(sess.DB(dbName)); err != nil {
+	if err := mongodb.EnsureIndexes(sess.DB(mongoInfo.Database)); err != nil {
 		stderr.Fatalln("mongodb.EnsureIndexes:", err)
 	}
 
-	db := mongodb.New(sess.DB(dbName),
+	db := mongodb.New(sess.DB(mongoInfo.Database),
 		mongodb.WithLogger(rlog.NewLog(rlog.Error)),
 		mongodb.WithTimeFunc(time.Now),
 	)
@@ -217,4 +209,18 @@ func UnaryPanicInterceptor(ec *gerrors.Client) grpc.UnaryServerInterceptor {
 		defer ec.Catch(ctx, gerrors.Repanic(false))
 		return handler(ctx, req)
 	}
+}
+
+func dialMongo(dsn string) (*mgo.Session, *mgo.DialInfo) {
+	dialInfo, err := mongodb.ParseURL(dsn)
+	if err != nil {
+		stderr.Fatalln("mongodb:", err)
+	}
+
+	sess, err := mgo.DialWithInfo(dialInfo)
+	if err != nil {
+		stderr.Fatalf("mgo.Dial: DSN=%q error=%q", dsn, err)
+	}
+
+	return sess, dialInfo
 }
