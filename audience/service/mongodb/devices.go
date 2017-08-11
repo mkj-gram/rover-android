@@ -109,7 +109,7 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	if len(proto.Frameworks) > 0 {
 		d.Frameworks = make(map[string]*Version)
 		for k, v := range proto.Frameworks {
-			d.Frameworks[escape(k, InvalidKeyKeyChars)] = (*Version)(v)
+			d.Frameworks[escape(k, InvalidKeyChars)] = (*Version)(v)
 		}
 	}
 	d.LocaleLanguage = proto.LocaleLanguage
@@ -175,9 +175,9 @@ func (d *Device) toProto(proto *audience.Device) error {
 	if len(d.Frameworks) > 0 {
 		proto.Frameworks = make(map[string]*audience.Version)
 		for k, v := range d.Frameworks {
-			// TODO: how to handle those?
 			if k, err := unescape(k); err != nil {
-				errorf("error reading key: %s: %v", k, err)
+				// TODO: log the error
+				// errorf("error reading key: %s: %v", k, err)
 			} else {
 				proto.Frameworks[k] = (*audience.Version)(v)
 			}
@@ -441,7 +441,7 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 
 	frameworks := bson.M{}
 	for k, v := range r.Frameworks {
-		frameworks[escape(k, InvalidKeyKeyChars)] = v
+		frameworks[escape(k, InvalidKeyChars)] = v
 	}
 
 	update["frameworks"] = frameworks

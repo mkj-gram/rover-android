@@ -58,9 +58,11 @@ func Test_EscapeUnescape(t *testing.T) {
 		expErr error
 	}{
 		{3, "+ ", "+ ", nil},
-		{3, "with % and .", "with %25 and %2E", nil},
+		{3, "with % and . and $", "with %25 and %2E and %24", nil},
+		{3, "io.rover.Rover", "io%2Erover%2ERover", nil},
 		{3, "nothing to encode", "nothing to encode", nil},
 		{2, "", "invalid escape %zz", EscapeError("%zz")},
+		{2, "io.rover.Rover", "io.rover.Rover", nil},
 		{2, "\x001", "%001", nil},
 	}
 

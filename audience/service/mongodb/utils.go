@@ -11,7 +11,7 @@ import (
 )
 
 // string of chars that make an invalid mongo key
-const InvalidKeyKeyChars = "."
+const InvalidKeyChars = "."
 
 func ParseDBName(dsn string) (string, error) {
 	u, err := url.Parse(dsn)
@@ -135,7 +135,6 @@ func unescape(s string) (string, error) {
 				}
 				return "", EscapeError(s)
 			}
-			// v := unhex(s[i+1])<<4 | unhex(s[i+2])
 			i += 3
 		default:
 			i++
