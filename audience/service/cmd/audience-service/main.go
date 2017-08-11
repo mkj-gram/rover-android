@@ -120,10 +120,6 @@ func main() {
 
 	sess, mongoInfo := dialMongo(*mongoDSN)
 
-	if err := mongodb.EnsureIndexes(sess.DB(mongoInfo.Database)); err != nil {
-		stderr.Fatalln("mongodb.EnsureIndexes:", err)
-	}
-
 	db := mongodb.New(sess.DB(mongoInfo.Database),
 		mongodb.WithLogger(rlog.NewLog(rlog.Error)),
 		mongodb.WithTimeFunc(time.Now),
