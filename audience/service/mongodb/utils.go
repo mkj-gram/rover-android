@@ -3,24 +3,12 @@ package mongodb
 import (
 	"encoding/json"
 	"io"
-	"net/url"
-	"strconv"
-	"strings"
 
 	"gopkg.in/mgo.v2/bson"
 )
 
 // string of chars that make an invalid mongo key
 const InvalidKeyChars = "."
-
-func ParseDBName(dsn string) (string, error) {
-	u, err := url.Parse(dsn)
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimLeft(u.Path, "/"), nil
-}
 
 func StringToObjectID(str string) (bson.ObjectId, error) {
 	if !bson.IsObjectIdHex(str) {

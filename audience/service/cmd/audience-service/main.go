@@ -118,12 +118,12 @@ func main() {
 		opts = append(opts, grpc.Creds(creds))
 	}
 
-	dbName, err := mongodb.ParseDBName(*mongoDSN)
+	mongoInfo, err := mgo.ParseURL(*mongoDSN)
 	if err != nil {
-		stderr.Fatalln("url.Parse:", err)
+		stderr.Fatalln("mgo.ParseURL:", err)
 	}
 
-	sess, err := mgo.Dial(*mongoDSN)
+	sess, err := mgo.DialWithInfo(mongoInfo)
 	if err != nil {
 		stderr.Fatalf("mgo.Dial: DSN=%q error=%q", *mongoDSN, err)
 	}

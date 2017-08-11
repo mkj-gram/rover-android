@@ -85,17 +85,17 @@ func tNewObjectIdFunc(t *testing.T, seed int64) func() bson.ObjectId {
 }
 
 func dialMongo(t *testing.T, dsn string) *mgo.Database {
-	sess, err := mgo.Dial(dsn)
-	if err != nil {
-		t.Fatalf("dialMongo: %v", err)
-	}
-
-	dbName, err := mongodb.ParseDBName(dsn)
+	info, err := mgo.ParseURL(dsn)
 	if err != nil {
 		t.Fatal("url.Parse:", err)
 	}
 
-	return sess.DB(dbName)
+	sess, err := mgo.DialWithInfo(info)
+	if err != nil {
+		t.Fatalf("dialMongo: %v", err)
+	}
+
+	return sess.DB(info.Database)
 }
 
 func decodeBSON(r io.Reader) ([]interface{}, error) {
