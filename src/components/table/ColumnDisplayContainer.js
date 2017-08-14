@@ -8,8 +8,9 @@ import {
     text,
     semibold,
     titanium,
-    ModalWithHeader,
-    mercury
+    Modal,
+    mercury,
+    graphite
 } from '@rover/react-bootstrap'
 
 import ColumnDisplay from './ColumnDisplay'
@@ -39,46 +40,49 @@ const ColumnDisplayContainer = ({
     showColumnsMenu,
     allColumns
 }) => (
-        <ModalWithHeader
-            contentLabel="Column Builder"
-            backgroundColor="white"
-            isOpen={showColumnsMenu}
-            headerContent="Display these columns"
-            successFn={triggerColumnsMenu}
-            successText="Update"
-            cancelFn={triggerColumnsMenu}
-            cancelText="Cancel"
-            primaryColor={purple}
-            secondaryColor={purple}
-            modalHeaderStyle={{
-                backgroundColor: cloud,
-                ...text,
-                ...semibold
-            }}
-            modalFooterStyle={{
-                borderTop: `2px solid ${titanium}`,
+    <Modal
+        isOpen={showColumnsMenu}
+        onRequestClose={triggerColumnsMenu}
+        contentLabel="Column Builder"
+        style={{
+            content: {
+                backgroundColor: 'white',
                 padding: 0,
-                paddingTop: 20,
-                paddingLeft: 20,
-                height: 80
-            }}
-            modalChildrenStyle={{
-                margin: 0,
-                marginTop: 20,
-                marginLeft: 20
-            }}
-            hoverColor={violet}
-            modalContentStyle={{
+                width: 'auto',
                 bottom: null,
                 padding: 0,
                 right: null,
                 top: pageClickLocation.y,
                 left: pageClickLocation.x,
                 transform: null
+            }
+        }}
+        hoverStyle={{
+            backgroundColor: titanium
+        }}
+        bodyOpenClassName="bodyClassName"
+    >
+        <div
+            style={{
+                position: 'relative',
+                width: '100%',
+                height: 50,
+                display: 'flex',
+                alignItems: 'center',
+                paddingLeft: 20,
+                backgroundColor: cloud,
+                ...text,
+                ...semibold
             }}
-            bodyOpenClassName="bodyClassName"
-            hoverStyle={{ backgroundColor: titanium }}
-            cancelTextHoverColor={violet}
+        >
+            Display these columns
+        </div>
+        <div
+            style={{
+                margin: 0,
+                marginTop: 20,
+                marginLeft: 20
+            }}
         >
             <div style={modalContainer}>
                 <ColumnDisplay
@@ -95,8 +99,9 @@ const ColumnDisplayContainer = ({
                     showChecked={showChecked}
                 />
             </div>
-        </ModalWithHeader>
-    )
+        </div>
+    </Modal>
+)
 
 ColumnDisplayContainer.propTypes = {
     showColumnsMenu: PropTypes.bool.isRequired,
