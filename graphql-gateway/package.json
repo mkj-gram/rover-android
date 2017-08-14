@@ -6,6 +6,8 @@
     "serve": "node dist"
   },
   "dependencies": {
+    "@rover/apis": "../apis/node",
+    "@rover/auth-client": "../auth/clients/node",
     "babel-cli": "^6.22.2",
     "babel-preset-latest": "^6.22.0",
     "cors": "^2.8.3",

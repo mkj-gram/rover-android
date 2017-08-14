@@ -46,13 +46,10 @@ const Middleware = function(client, opts = {}) {
                 }
             }
 
-            req.authContext = {
-                account_id: AuthContext.getAccountId(),
-                user_id: AuthContext.getUserId() || undefined, // user_id of 0 should be treated as missing
-                scopes: AuthContext.getPermissionScopesList()
-            }
-
             req._authContext = AuthContext
+            req.auth = {
+                context: AuthContext
+            }
 
             return next()
         }

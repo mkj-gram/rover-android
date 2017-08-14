@@ -95,7 +95,8 @@ const DynamicSegmentQuery = {
                                 geofenceValue: {
                                     latitude: 43.651018,
                                     longitude: -79.375593,
-                                    radius: 100
+                                    radius: 100,
+                                    name: 'Toronto'
                                 },
                                 geofenceComparison: 'is within'
                             }
@@ -150,7 +151,8 @@ const DynamicSegmentQuery = {
                                 geofenceValue: {
                                     latitude: 43.651018,
                                     longitude: -79.375593,
-                                    radius: 100
+                                    radius: 100,
+                                    name: 'Toronto'
                                 },
                                 geofenceComparison: 'is within'
                             }
@@ -205,7 +207,8 @@ const DynamicSegmentQuery = {
                                 geofenceValue: {
                                     latitude: 43.651018,
                                     longitude: -79.375593,
-                                    radius: 100
+                                    radius: 100,
+                                    name: 'Toronto'
                                 },
                                 geofenceComparison: 'is within'
                             }
@@ -242,7 +245,8 @@ const DynamicSegmentQuery = {
                                 geofenceValue: {
                                     latitude: 43.651018,
                                     longitude: -79.375593,
-                                    radius: 100
+                                    radius: 100,
+                                    name: 'Toronto'
                                 },
                                 geofenceComparison: 'is within'
                             }

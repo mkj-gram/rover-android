@@ -169,6 +169,10 @@ const GeofenceValue = new GraphQLObjectType({
         radius: {
             type: new GraphQLNonNull(GraphQLInt),
             resolve: value => value.radius
+        },
+        name: {
+            type: new GraphQLNonNull(GraphQLString),
+            resolve: value => value.name
         }
     })
 })

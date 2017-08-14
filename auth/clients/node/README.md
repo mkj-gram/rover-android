@@ -67,14 +67,10 @@ app.use('/graphql', cors(), AuthMiddleware, graphqlHTTP(req => ({
 ```javascript
 app.get('/users', AuthMiddleware, (req, res) => {
 	/* If we were successfuly authenticated */
-	req.authContext -> {
-		account_id: 1,
-		user_id: 3, // can be undefined
-		scopes: ["sdk", "web", "server", "admin"]
-	}
+	req.auth.context -> AuthContext
 
 	/* else */
-	req.authContext -> undefined
+	req.auth -> undefined
 })
 ```
 

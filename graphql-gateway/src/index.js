@@ -6,24 +6,35 @@ import morgan from 'morgan'
 
 import schema from './schema'
 
+import RoverApis from '@rover/apis'
+import Auth from '@rover/auth-client'
+
 dotenv.config()
 
+const authClient = Auth.v1.Client()
+const authMiddleware = Auth.v1.Middleware(authClient)
 
 const app = express()
 
 app.set('port', (process.env.PORT || 80))
 
+app.use(authMiddleware)
 app.use(morgan('tiny'))
 
-app.use('/graphql', cors(), graphqlHTTP(req => ({
+app.use('/graphql', cors(), authMiddleware, graphqlHTTP(req => ({
     schema,
     graphiql: true,
     context: { 
-        accountToken: req.headers['x-rover-account-token'] || req.query.accountToken,
+        authContext: req.auth && req.auth.context,
         deviceId: req.headers['x-rover-device-id'],
-        profileId: req.headers['x-rover-profile-id']
+        profileId: req.headers['x-rover-profile-id'],
     }
 })))
+
+app.use(function (err, req, res, next) {
+  console.error(err)
+  res.status(500).send('Something broke!')
+})
 
 app.listen(app.get('port'))
 console.log('Running a GraphQL API server at localhost:4000/graphql')
