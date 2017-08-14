@@ -30,15 +30,19 @@ type Stats struct {
 
 var (
 	srcDSN    = flag.String("src-dsn", "", "source mongo DSN")
-	destDSN   = flag.String("dest-dsn", "", "source mongo DSN")
-	batchSize = flag.Int("batchSize", 100, "batch size")
+	destDSN   = flag.String("dest-dsn", "", "dest mongo DSN")
+	batchSize = flag.Int("batchSize", 10000, "batch size")
+
+	ensureIndex = flag.Bool("ensure-index", false, "ensure required indexes in dest DB")
+
+	accountIds = flag.String("account-ids", "", "comma separated list of account ids to scope data migration to")
 
 	timeNow  (func() time.Time)
 	objectID (func() bson.ObjectId)
 	sortKeys bool
 
 	stdout = log.New(os.Stdout, "", log.Ltime)
-	stderr = log.New(os.Stderr, "Err: ", log.Ltime|log.Lshortfile)
+	stderr = log.New(os.Stderr, "error: ", log.Ltime|log.Lshortfile)
 
 	schemaCache = map[string]bool{}
 )
@@ -50,6 +54,22 @@ func main() {
 	if *srcDSN == "" || *destDSN == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
+	}
+
+	// ensure index and exit
+	// needs to be run after the migration
+	if *ensureIndex {
+		destSess, err := mgo.Dial(*destDSN)
+		if err != nil {
+			stderr.Fatalln("dest:", err)
+		}
+
+		if err := mongodb.EnsureIndexes(destSess.DB(dbName(*destDSN))); err != nil {
+			stderr.Fatalln("destDB:", err)
+		}
+
+		stdout.Println("Done")
+		os.Exit(0)
 	}
 
 	timeNow = time.Now
@@ -85,12 +105,29 @@ func main() {
 		devicesColl         = destDb.C("devices")
 		profilesSchemasColl = destDb.C("profiles_schemas")
 
-		srcIter = customersColl.Find(bson.M{}).Iter()
+		srcQ bson.M
 	)
 
-	if err := mongodb.EnsureIndexes(destDb); err != nil {
-		stderr.Fatalln("destDB:", err)
+	if *accountIds != "" {
+		var acctIds []int
+
+		for _, str := range strings.Split(*accountIds, ",") {
+			id, err := strconv.Atoi(str)
+			if err != nil {
+				stderr.Fatalln(err)
+			}
+
+			acctIds = append(acctIds, id)
+		}
+
+		srcQ = bson.M{
+			"account_id": bson.M{"$in": acctIds},
+		}
 	}
+
+	stdout.Println("Query:", srcQ)
+
+	srcIter := customersColl.Find(srcQ).Iter()
 
 	for !srcIter.Done() {
 		var data map[string]interface{}
