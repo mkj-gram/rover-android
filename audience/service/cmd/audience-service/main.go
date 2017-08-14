@@ -119,6 +119,9 @@ func main() {
 	}
 
 	sess, mongoInfo := dialMongo(*mongoDSN)
+	if err := sess.Ping(); err != nil {
+		stderr.Println("sess.Ping:", err)
+	}
 
 	db := mongodb.New(sess.DB(mongoInfo.Database),
 		mongodb.WithLogger(rlog.NewLog(rlog.Error)),
