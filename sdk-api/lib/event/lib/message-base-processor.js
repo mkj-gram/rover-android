@@ -48,7 +48,7 @@ class MessageBaseProcessor extends BaseProcessor {
 
                 if (message) {
 
-                    if (util.isString(message.customer_id) && message.customer_id === this._customer._id.toString() || message.customer_id instanceof ObjectId && message.customer_id.equals(this._customer._id)) {
+                    if (util.isString(message.customer_id) && message.customer_id === this._customer.id || message.customer_id instanceof ObjectId && message.customer_id.equals(this._customer.id)) {
                         this._message = message;
                         return callback();
                     } else {

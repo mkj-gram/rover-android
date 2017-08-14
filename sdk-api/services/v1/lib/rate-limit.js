@@ -7,11 +7,11 @@ const keyPrefix = 'msgrl_';
 const internals = {};
 
 internals.getMessageRateLimitKey = function(customer, messageTemplate) {
-    return `${keyPrefix}${customer._id.toString()}:${messageTemplate.id}`;
+    return `${keyPrefix}${customer.id}:${messageTemplate.id}`;
 };
 
 internals.getGlobalRateLimitKey = function(customer) {
-    return `${keyPrefix}${customer._id.toString()}`
+    return `${keyPrefix}${customer.id.toString()}`
 };
 
 

@@ -119,12 +119,9 @@ class GeofenceRegionBaseProcessor extends BaseProcessor {
             let place = this._place;
 
             if (place && place.radius <= 250) {
-                this._device.location = {
-                    latitude: place.latitude,
-                    longitude: place.longitude,
-                    accuracy: place.radius,
-                    timestamp: moment.utc(new Date()).toDate()
-                }
+                this._device.location_accuracy = place.radius
+                this._device.location_longitude = place.longitude
+                this._device.location_latitude = place.latitude
             }
 
             return next();

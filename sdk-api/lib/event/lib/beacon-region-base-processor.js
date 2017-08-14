@@ -98,9 +98,6 @@ class BeaconRegionBaseProcessor extends BaseProcessor {
     }
 
     getMessages(callback) {
-        logger.debug("Getting messages for raw input: " + util.inspect(this._rawInput, true, null, false));
-        // grabs messages from db
-        // filters them if they have shit
         let methods = this._server.methods;
 
         methods.proximityMessage.beaconTriggered(this._account.id, this._eventId, this._generationTime, this._beaconConfiguration, this._place, (err, messages) => {
@@ -209,12 +206,9 @@ class BeaconRegionBaseProcessor extends BaseProcessor {
             }
             // Only if the place exists
             if (place.radius <= 250 && util.isNullOrUndefined(device.location) || ( device.location && ( device.location.latitude != place.latitude || device.location.longitude != place.longitude ))) {
-                this._device.location = {
-                    latitude: place.latitude,
-                    longitude: place.longitude,
-                    accuracy: place.radius,
-                    timestamp: moment.utc(new Date()).toDate()
-                }
+                this._device.location_accuracy = place.radius
+                this._device.location_longitude = place.longitude
+                this._device.location_latitude = place.latitude
             }
 
             return next();

@@ -20,10 +20,10 @@ const InboxMessageMatcher = new RegExp("^\/v1\/inbox\/+messages\/+([a-f0-9]{24})
 const InboxMessageMatcher2 = new RegExp("^\/v1\/inbox\/+([a-f0-9]{24})$");
 const InboxMatcher = new RegExp("^\/v1\/inbox$", 'i');
 
-const InboxController = require('./controllers/v1/inbox');
-const InboxMessagesController = require('./controllers/v1/inbox-message');
-const InboxLandingPageController = require('./controllers/v1/inbox-landing-page');
-const EventsController = require('./controllers/v1/event');
+const InboxController = require('./controllers/v1/inbox')()
+const InboxMessagesController = require('./controllers/v1/inbox-message')()
+const InboxLandingPageController = require('./controllers/v1/inbox-landing-page')()
+const EventsController = require('./controllers/v1/event')();
 
 const unauthenticatedResponse = function(req, res) {
     res.writeHead(401, {
@@ -68,6 +68,7 @@ const route = function(req, res) {
 
     req.server = server;
 
+    console.log(method, url)
     if (method == httpMethods.GET) {
         RoverApiAuth.authenticate(req, (authenticated) => {
             if (!authenticated) {

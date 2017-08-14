@@ -124,7 +124,16 @@ class BaseProcessor {
     }
 
     valid() {
-        return [this._generationTime, this._eventName].every(required => !util.isNullOrUndefined(required));
+        if (util.isNullOrUndefined(this._generationTime)) {
+             this._validationError = "Event generation time was not provided"
+             return false
+        }
+        if (util.isNullOrUndefined(this._eventName)) {
+            this._validationError = "Event type is missing"
+            return false
+        }
+
+        return true
     }
 
     shouldProcessEvent(callback) {
@@ -189,8 +198,28 @@ class BaseProcessor {
                 return resolve(null);
             }
 
+            function convertToOldDeviceAttributes(device) {
+                return {
+                    token: device.device_token_key,
+                    locale_lang: device.locale_language,
+                    locale_region: device.locale_region,
+                    time_zone: device.time_zone,
+                    sdk_version: device.sdk_version,
+                    platform: device.platform,
+                    os_name: device.os_name,
+                    model: device.device_model,
+                    manufacturer: device.device_manufacturer,
+                    carrier: device.carrier_name,
+                    background_enabled: device.is_background_enabled,
+                    location_monitoring_enabled: device.is_location_monitoring_enabled,
+                    bluetooth_enabled: device.is_bluetooth_enabled,
+                    development: device.aps_environment,
+                    aid: device.advertising_id
+                }
+            }
+             
             let segment = new SegmentFilter(customerSegment.filters);
-            segment.withinSegment(this._customer, this._device, (failure) => {
+            segment.withinSegment(this._customer, convertToOldDeviceAttributes(this._device), (failure) => {
                 if (failure) {
                     return resolve(null);
                 }
@@ -275,6 +304,7 @@ class BaseProcessor {
     }
 
     deliverMessages(messageTemplates, callback) {
+
         if (util.isNullOrUndefined(messageTemplates) || messageTemplates.length == 0) {
             return callback(null, []);
         }
@@ -291,7 +321,7 @@ class BaseProcessor {
         let messages = messageTemplates.map((messageTemplate) => {
             let message = {
                 _id: new ObjectId(),
-                customer_id: this._customer._id,
+                customer_id: this._customer.id,
                 message_template_id: messageTemplate.id,
                 read: false,
                 viewed: false,
@@ -308,9 +338,6 @@ class BaseProcessor {
 
         let accountLimits = this._account.message_limits || [];
 
-
-        
-
         methods.message.bulkInsert(messages, (err, insertedMessages) => {
             if (err) {
                 logger.error(err);
@@ -318,6 +345,7 @@ class BaseProcessor {
             }
 
             let messageTemplateIndex = underscore.indexBy(messageTemplates, 'id');
+            
             let serializedMessages = insertedMessages.map(message => {
                 let template = messageTemplateIndex[message.message_template_id.toString()];
                 return internals.fillMessage(message, template);
@@ -325,7 +353,9 @@ class BaseProcessor {
 
             if (!util.isNullOrUndefined(this._device.token) && this._device.token !== "") {
                 let pushPayload = {
+                    // TODO conver to oldschool style so we don't have to touch ruby
                     customer: this._customer,
+                    device: this._device,
                     serialized_messages: serializedMessages,
                     device_ids_filter: [ this._device._id ],
                     trigger_event_id: this._eventId,
@@ -335,7 +365,7 @@ class BaseProcessor {
                 rabbitMQChannel.publish(BACKGROUND_JOBS_EXCHANGE, MESSAGE_NOTIFICATIONS_ROUTING_KEY, new Buffer(JSON.stringify(pushPayload)));
             }
 
-            let inboxMessages = insertedMessages.filter(message => { return message.saved_to_inbox == true });
+            let inboxMessages = serializedMessages.filter(message => { return message.saved_to_inbox == true });
 
             let messageTemplateStatPromises = messageTemplates.map(messageTemplate => new Promise((resolve, reject) => {
                 methods.messageTemplateStats.update(messageTemplate.id, { "$inc": { "total_delivered": 1 }}, (err, response) => {
@@ -380,7 +410,7 @@ class BaseProcessor {
                 return new Promise((resolve, reject) => {
                     methods.inbox.addMessage(this._customer, message, (err, success) => {
                         if (err) {
-                            logger.error(err);
+                            logger.error("methods.inbox.addMessage", err);
                             return resolve();
                         }
 
@@ -394,21 +424,27 @@ class BaseProcessor {
                 });
             });
             
+
             Promise.all(messageEventPromises.concat(rateLimitPromises).concat(messageTemplateStatPromises)).then(() => {
-                methods.customer.update(this._customer._id, { "$set": { "inbox_updated_at": moment.utc(new Date).toDate() }}, (err) => {
-                    if (err) {
-                        logger.error(err);
-                    }
-                    return callback()
-                });
-            }).catch(err => {
-                logger.error(err);
                 return callback()
-            });
+            }).catch(err => {
+                logger.error(err)
+                return callback()
+            })
+
         });
     }
 
     toRecord() {
+        function getCustomerRecord(customer) {
+            let record = {}
+            Object.assign(record, customer)
+            record.account_id = undefined
+            record.created_at = undefined
+            record.updated_at = undefined
+            return record
+        }
+
         let event = {
             event_name: this._eventName,
             event: {
@@ -418,50 +454,46 @@ class BaseProcessor {
                 attributes: this._rawInput,
                 errors: this._errors
             },
-            customer: {
-                id: this._customer._id.toString(),
-                identifier: this._customer.identifier,
-                first_name: this._customer.first_name,
-                last_name: this._customer.last_name,
-                email: this._customer.email,
-                age: this._customer.age,
-                gender: this._customer.gender,
-                phone_number: this._customer.phone_number,
-                tags: this._customer.tags
-            }
+            customer: getCustomerRecord(this._customer)
         };
+
+        function flattenVersion(v) {
+            if (v === null || v === undefined) {
+                return null
+            }
+            return `${v.major}.${v.minor}.${v.revision}`
+        }
 
         if (this._device) {
             let deviceEventAttributes = {
                 device: {
-                    id: this._device._id,
-                    token: this._device.token,
-                    locale_lang: this._device.locale_lang,
+                    id: this._device.id,
+                    token: this._device.device_token_key,
+                    locale_lang: this._device.locale_language,
                     locale_region: this._device.locale_region,
                     time_zone: this._device.time_zone,
-                    sdk_version: this._device.sdk_version,
+                    sdk_version: flattenVersion(this._device.sdk_version),
                     platform: this._device.platform,
                     os_name: this._device.os_name,
-                    os_version: this._device.os_version,
-                    model: this._device.model,
-                    manufacturer: this._device.manufacturer,
-                    carrier: this._device.carrier,
-                    app_identifier: this._device.app_identifier,
-                    background_enabled: this._device.background_enabled,
-                    notifications_enabled: this._device.notifications_enabled,
-                    bluetooth_enabled: this._device.bluetooth_enabled,
-                    location_monitoring_enabled: this._device.location_monitoring_enabled,
-                    aid: this._device.aid,
+                    os_version: flattenVersion(this._device.os_version),
+                    model: this._device.device_model,
+                    manufacturer: this._device.device_manufacturer,
+                    carrier: this._device.carrier_name,
+                    app_identifier: this._device.app_namespace,
+                    background_enabled: this._device.is_background_enabled,
+                    notifications_enabled: this._device.device_token_is_active,
+                    bluetooth_enabled: this._device.is_bluetooth_enabled,
+                    location_monitoring_enabled: this._device.is_location_monitoring_enabled,
+                    aid: this._device.advertising_id,
                     ip: this._device.ip
                 }
             }
 
-            if (util.isObject(this._device.location)) {
-                let location = this._device.location
+            if (this._device.location_latitude && this._device.location_longitude) {
                 deviceEventAttributes.device["location"] = {
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    accuracy: Math.floor(location.accuracy)
+                    latitude: this._device.location_latitude,
+                    longitude: this._device.location_longitude,
+                    accuracy: Math.floor(this._device.location_accuracy)
                 }
             }
 

@@ -23,6 +23,8 @@ class ElasticsearchQueue {
                 body: body
             }
         }
+
+        console.log(JSON.stringify(this._queue))
     }
 
     delete({ index, type, id, version }) {
@@ -79,6 +81,8 @@ class ElasticsearchQueue {
         }
 
         logger.info("Flushing queue: " + ops + " items");
+        
+        console.log(JSON.stringify(bulk))
         
         this._client.bulk({ body: bulk }, (err, response) => {
             if (err) {

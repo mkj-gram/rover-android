@@ -53,6 +53,18 @@ tasks.push(function(callback) {
     });
 });
 
+tasks.push(function(callback)  {
+    let audience = require('./connections/audience')
+    audience.register(server, {}, (err) => {
+        if (err) {
+            return callback(err)
+        }
+
+        Logger.info("Audience Client initialized")
+        return callback()
+    })
+})
+
 
 const postgresConnectionOptions = {
     host: Config.get('/postgres/host'),

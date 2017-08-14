@@ -20,6 +20,9 @@ const XenioZoneService = require('./lib/xenio-zone');
 const XenioPlaceService = require('./lib/xenio-place');
 const StaticSegmentService = require('./lib/static-segments');
 
+const ProfileService = require('./lib/profile')
+const DeviceService = require('./lib/device')
+
 module.exports.register = function(server, options, next) {
     server.methods.customer = {};
     server.methods.inbox = {};
@@ -40,9 +43,9 @@ module.exports.register = function(server, options, next) {
     server.methods.xenioZone = {};
     server.methods.xenioPlace = {};
     server.methods.staticSegment = {};
-
-    server.methods.customer.find = CustomerService.find.bind(server);
-    server.methods.customer.findByQuery = CustomerService.findByQuery.bind(server);
+    
+    server.methods.customer.findByIdentifier = CustomerService.findByIdentifier.bind(server);
+    server.methods.customer.findByDeviceId = CustomerService.findByDeviceId.bind(server);
     server.methods.customer.update = CustomerService.update.bind(server);
     server.methods.customer.updateByDevice = CustomerService.updateByDevice.bind(server);
     server.methods.customer.create = CustomerService.create.bind(server);
@@ -58,6 +61,8 @@ module.exports.register = function(server, options, next) {
     server.methods.inbox.find = InboxService.find.bind(server);
     server.methods.inbox.addMessage = InboxService.addMessage.bind(server);
     server.methods.inbox.deleteMessage = InboxService.deleteMessage.bind(server);
+    server.methods.inbox.getLastModifiedAt = InboxService.getLastModifiedAt.bind(server)
+    server.methods.inbox.updateLastModifiedAt = InboxService.updateLastModifiedAt.bind(server)
 
     server.methods.message.find = MessageService.find.bind(server);
     server.methods.message.findAll = MessageService.findAll.bind(server);
@@ -111,6 +116,8 @@ module.exports.register = function(server, options, next) {
 
     server.methods.staticSegment.withinSegment = StaticSegmentService.withinSegment.bind(server);
 
+    server.methods.profile = ProfileService(server.connections.audience.client, server.plugins.logger.logger, server.connections.elasticsearch.queue)
+    server.methods.device = DeviceService(server.connections.audience.client, server.plugins.logger.logger)
     next();
 };
 

@@ -64,13 +64,10 @@ class EventProcessor {
             }
 
             logger.info(`eventName=${eventName} eventTimestamp=${eventTimestamp} status=${status} runTime=${runTime}ms`)
-            return cb(err, updatedCustomer, updatedDevice, eventResponse)
+            return cb(err, updatedDevice, eventResponse)
         }
 
         if (this._processor.valid() == false) {
-            logger.error(this._processor._validationError);
-            logger.error(this._processor._rawInput);
-
             return callback({ status: 400 , message: this._processor._validationError});
         }
 

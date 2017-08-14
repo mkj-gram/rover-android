@@ -1,165 +1,14 @@
-'use strict';
-const util = require('util');
-const moment = require('moment');
-const AllowedScopes = ['sdk'];
-var dasherize = require('dasherize');
-const underscore = require('underscore');
-const internals = {};
+const util = require('util')
+const moment = require('moment')
+const AllowedScopes = ['sdk']
+var dasherize = require('dasherize')
+const underscore = require('underscore')
 
 const emptyInboxResponse = JSON.stringify({ data: [], meta: { 'unread-messages-count': 0 } });
 const emptyInboxContentLength = Buffer.byteLength(emptyInboxResponse, "utf-8");
 
-internals.getLastModifiedAt = function(customer) {
-    if (util.isNullOrUndefined(customer.inbox_updated_at)) {
-        return undefined;
-    } else {
-        return moment(customer.inbox_updated_at).toDate().toUTCString();
-    }
-}
 
-internals.isStale = function(request, lastModified) {
-    if (util.isNullOrUndefined(lastModified)) {
-        return true
-    } else {
-        lastModified = moment(lastModified).toDate().toUTCString();
-    }
-    let ifModifiedSince = request.headers['if-modified-since'];
-    return ifModifiedSince !== lastModified;
-};
-
-// GET /v1/inbox
-internals.get = function(request, reply) {
-
-    const currentScopes = request.auth.context.scopes;
-    
-    if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
-        reply.writeHead(403, {
-            'Content-Type': 'application/json'
-        });
-        reply.write(JSON.stringify({ status: 403, error: "Insufficient permissions" }));
-        return reply.end();
-    }
-
-    // grab the current user
-    const methods = request.server.methods;
-    const logger = request.server.plugins.logger.logger;
-
-    methods.application.getCurrentCustomer(request, (err, customer) => {
-        if (err) {
-            reply.writeHead(422, {
-                'Content-Type': 'application/json'
-            });
-            reply.write(JSON.stringify({ errors: [ { message: "Customer doesn't exist" }]}));
-            return reply.end();
-        }
-
-        if (util.isNullOrUndefined(customer)) {
-            reply.writeHead(404, {
-                'Content-Type': 'application/json'
-            });
-            reply.write(JSON.stringify({ errors: [ { message: "You must create and submit an event before loading the inbox" }]}));
-            return reply.end();
-        }
-
-
-        if (internals.isStale(request, customer.inbox_updated_at)) {
-            methods.inbox.find(customer, {}, (err, messageIds) => {
-                if (err) {
-                    reply.writeHead(500, {
-                        'Content-Type': 'application/json'   
-                    });
-                    reply.write(JSON.stringify(err));
-                    return reply.end();
-                }
-
-                
-                if (messageIds.length == 0) {
-                    reply.writeHead(200, {
-                        'Content-Type': 'application/json',
-                        'Connection': 'keep-alive',
-                        'Content-Length': emptyInboxContentLength
-                    });
-                    reply.write(emptyInboxResponse);
-                    return reply.end();
-                }
-
-                methods.message.findAll(messageIds, {}, (err, messages) => {
-                    if (err) {
-                        return reply({ status: 500, error: err });
-                    }
-
-                    let templateIds = Array.from(new Set(messages.map(message => message.message_template_id)));
-                    
-                    methods.messageTemplate.findAll(templateIds, { useCache: true }, (err, templates) => {
-                        if (err) {
-                            return reply({ status: 500, error: err });
-                        }
-
-                        let templateIndex = underscore.indexBy(templates, 'id');
-
-                        const data = messages.map(message => {
-                            let template = templateIndex[message.message_template_id];
-                            return internals.serialize(message, template);
-                        });
-
-                        data.reverse();
-
-                        let unreadMessageCount = 0;
-                        for ( var i = 0; i < messages.length ; i++ ) {
-                            if (messages[i].read == false) {
-                                unreadMessageCount++;
-                            }
-                        }
-
-                        let response = JSON.stringify({
-                            data: data,
-                            meta: {
-                                'unread-messages-count': unreadMessageCount
-                            }
-                        });
-
-                        let headers = {
-                            'Content-Type': 'application/json',
-                            'Connection': 'keep-alive',
-                            'Cache-Control': 'max-age=0, private, must-revalidate',
-                            'Content-Length': Buffer.byteLength(response, "utf-8")
-                        }
-
-                        let lastModifiedAt = internals.getLastModifiedAt(customer);
-                        if (!util.isNullOrUndefined(lastModifiedAt)) {
-                            util._extend(headers, {
-                                'Last-Modified': lastModifiedAt
-                            });
-                        }
-                        reply.writeHead(200, headers);
-                        reply.write(response);
-                        return reply.end();
-
-                    });
-                });
-            });
-        } else {
-
-            let headers = {
-                'Cache-Control': 'max-age=0, private, must-revalidate',
-                'Connection': 'keep-alive',
-                'Content-Length': 0
-            }
-
-            let lastModifiedAt = internals.getLastModifiedAt(customer);
-            if (!util.isNullOrUndefined(lastModifiedAt)) {
-                util._extend(headers, {
-                    'Last-Modified': lastModifiedAt
-                });
-            }
-
-            reply.writeHead(304, headers);
-            return reply.end();
-        }        
-    });
-};
-
-internals.serialize = function(message, template) {
+function serializeMessage(message, template) {
     return {
         id: message._id.toString(),
         type: 'messages',
@@ -179,9 +28,145 @@ internals.serialize = function(message, template) {
             'timestamp': moment.utc(message.timestamp).toISOString()
         }
     }
-};
+}
+
+module.exports = function() {
+    const handlers = {}
+
+    function writeReplyError(reply, status, message) {
+        reply.writeHead(status || 500, {
+            'Content-Type': 'application/json'
+        })
+        reply.write(JSON.stringify(message))
+        reply.end()
+    }
+
+    function isStale(request, lastModified) {
+        if (lastModified === null || lastModified === undefined) {
+            return true
+        } else {
+            lastModified = moment(lastModified).toDate().toUTCString();
+        }
+        let ifModifiedSince = request.headers['if-modified-since'];
+        return ifModifiedSince !== lastModified;
+    }
+
+    handlers.get = function(request, reply) {
+        const currentScopes = request.auth.context.scopes
+        if (!currentScopes.some(scope => AllowedScopes.includes(scope))) {
+            return writeReplyError(reply, 403, { status: 403, error: "Permission Denied" })
+        }
+
+        const methods = request.server.methods
+        const logger = request.server.plugins.logger.logger
+
+        methods.application.getCurrentProfile(request, function(err, profile) {
+            if (err) {
+                logger.error(err)
+                return writeReplyError(reply, 500, { status: 500, error: "Failed to get current profile" })
+            }
+
+            if (profile === null || profile === undefined) {
+                return writeReplyError(reply, 404, { status: 404, error: "Profile not found"})
+            }
+
+            methods.inbox.getLastModifiedAt(profile, function(err, inboxUpdatedAt) {
+                if (err) {
+                    logger.error(err)
+                    // its fine if we get an error we will just treat the request as non stale
+                }
+                
+                if (!isStale(request, inboxUpdatedAt)) {
+                    let headers = {
+                        'Cache-Control': 'max-age=0, private, must-revalidate',
+                        'Connection': 'keep-alive',
+                        'Content-Length': 0
+                    }
+
+                    if (inboxUpdatedAt !== null && inboxUpdatedAt !== undefined) {
+                        headers['Last-Modified'] = moment(inboxUpdatedAt).toDate().toUTCString()
+                    }
+
+                    reply.writeHead(304, headers);
+                    return reply.end();
+                }
+
+                methods.inbox.find(profile, function(err, messageIds) {
+                    if (err) {
+                        logger.error(err)
+                        return writeReplyError(reply, 500, { status: 500, error: "Failed to get messages from inbox" })
+                    }
+
+                    if (messageIds.length === 0) {
+                        reply.writeHead(200, {
+                            'Content-Type': 'application/json',
+                            'Connection': 'keep-alive',
+                            'Content-Length': emptyInboxContentLength
+                        })
+                        reply.write(emptyInboxResponse)
+                        return reply.end()
+                    }
+
+                    methods.message.findAll(messageIds, {}, function(err, messages) {
+                        if (err) {
+                            logger.error(err)
+                            return writeReplyError(reply, 500, { status: 500, error: "Failed to get messages from inbox" })
+                        }
+
+                        let templateIds = Array.from(new Set(messages.map(message => message.message_template_id)))
+
+                        methods.messageTemplate.findAll(templateIds, { useCache: true }, (err, templates) => {
+                            if (err) {
+                                return writeReplyError(reply, 500, { status: 500, error: "Failed to get message templates from messages" })
+                            }
+
+                            let templateIndex = underscore.indexBy(templates, 'id');
+
+                            const data = messages.map(message => {
+                                let template = templateIndex[message.message_template_id];
+                                return serializeMessage(message, template);
+                            });
+
+                            data.reverse();
+
+                            let unreadMessageCount = 0;
+                            for ( var i = 0; i < messages.length ; i++ ) {
+                                if (messages[i].read == false) {
+                                    unreadMessageCount++;
+                                }
+                            }
+
+                            let response = JSON.stringify({
+                                data: data,
+                                meta: {
+                                    'unread-messages-count': unreadMessageCount
+                                }
+                            })
+
+                            let headers = {
+                                'Content-Type': 'application/json',
+                                'Connection': 'keep-alive',
+                                'Cache-Control': 'max-age=0, private, must-revalidate',
+                                'Content-Length': Buffer.byteLength(response, "utf-8")
+                            }
+
+                            if (inboxUpdatedAt !== null && inboxUpdatedAt !== undefined) {
+                                headers['Last-Modified'] = moment(inboxUpdatedAt).toDate().toUTCString()
+                            }
+
+                            reply.writeHead(200, headers);
+                            reply.write(response);
+                            return reply.end();
+
+                        });
+                    })
+                })
+
+            })
+        })
+
+    }
 
 
-module.exports = {
-    get: internals.get
+    return handlers
 }

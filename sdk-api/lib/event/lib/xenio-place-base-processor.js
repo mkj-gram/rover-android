@@ -44,8 +44,6 @@ class XenioPlaceBaseProcessor extends BaseProcessor {
     }
 
     getMessages(callback) {
-        logger.debug("Getting messages for raw input: " + util.inspect(this._rawInput, true, null, false));
-
         let methods = this._server.methods;
 
         methods.proximityMessage.xenioPlaceTriggered(this._account.id, this._eventId, this._generationTime, this._xenioPlace, (err, messages) => {

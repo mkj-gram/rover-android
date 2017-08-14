@@ -39,9 +39,6 @@ class GimbalPlaceBaseProcessor extends BaseProcessor {
     }
 
     getMessages(callback) {
-        logger.debug("Getting messages for raw input: " + util.inspect(this._rawInput, true, null, false));
-        // grabs messages from db
-        // filters them if they have shit
         let methods = this._server.methods;
 
         methods.proximityMessage.gimbalPlaceTriggered(this._account.id, this._eventId, this._generationTime, this._gimbalPlace, (err, messages) => {

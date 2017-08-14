@@ -38,7 +38,7 @@ class LocationBaseProcessor extends BaseProcessor {
         this._latitude = args.event.attributes.latitude;
         this._accuracy = parseInt(args.event.attributes.accuracy || args.event.attributes.radius) || null;
 
-        if (this._device.platform == IOS_DEVICE_PLATFORM) {
+        if (this._device.os_name == "iOS") {
             this._regionLimit = 20;
         } else {
             this._regionLimit = 100;
@@ -85,7 +85,9 @@ class LocationBaseProcessor extends BaseProcessor {
 
     process(callback) {
 
-        this._device.location = this._location;
+        this._device.location_accuracy = this._location.accuracy
+        this._device.location_longitude = this._location.longitude
+        this._device.location_latitude = this._location.latitude
 
         this._getBeaconRegions((err, beaconRegions) => {
             if (err) {
@@ -94,11 +96,10 @@ class LocationBaseProcessor extends BaseProcessor {
 
             this._beaconRegionsMonitoring = beaconRegions;
 
-            if (!_.isEqual(this._device.beacon_regions_monitoring, this._beaconRegionsMonitoring)) {
-                    this._beaconRegionsChanged = true;
-                    this._device.beacon_regions_monitoring = this._beaconRegionsMonitoring;
-                    this._device.beacon_regions_monitoring_updated_at = moment.utc(new Date()).toDate();
-                }
+            if (!_.isEqual(this._device.ibeacon_monitoring_regions, this._beaconRegionsMonitoring)) {
+                this._beaconRegionsChanged = true;
+                this._device.ibeacon_monitoring_regions = this._beaconRegionsMonitoring;
+            }
                 
 
             this._getGeofenceRegions(this._regionLimit - this._beaconRegionsMonitoring.length, (err, geofenceRegions) => {
@@ -108,10 +109,9 @@ class LocationBaseProcessor extends BaseProcessor {
 
                 this._geofenceRegionsMonitoring = geofenceRegions;
 
-                if (!_.isEqual(this._device.geofence_regions_monitoring, this._geofenceRegionsMonitoring)) {
+                if (!_.isEqual(this._device.geofence_monitoring_regions, this._geofenceRegionsMonitoring)) {
                     this._geofenceRegionsChanged = true;
-                    this._device.geofence_regions_monitoring = this._geofenceRegionsMonitoring;
-                    this._device.geofence_regions_monitoring_updated_at = moment.utc(new Date()).toDate();
+                    this._device.geofence_monitoring_regions = this._geofenceRegionsMonitoring;
                 }
 
 
@@ -122,15 +122,12 @@ class LocationBaseProcessor extends BaseProcessor {
 
     shouldProcessEvent(callback) {
 
-        if (this._device.gimbal_mode == true) {
-            return callback(false);
-        }
-
-        if (this._device.location) {
-            let distance = internals.getDistance(this._device.location, this._location);
+        if (this._device.location_longitude !== 0 && this._device.location_latitude !== 0 && this._device.location_longitude !== null && this._device.location_latitude !== null) {
+            let distance = internals.getDistance({ latitude: this._device.location_latitude , longitude: this._device.location_longitude }, this._location);
             let shouldProcess = this._device.os_name == "iOS" || distance > 5000 || (distance >= 50 && this._location.accuracy <= 200)
             return callback(shouldProcess);
-        } else if (util.isNullOrUndefined(this._device.location)) {
+        } else if ((this._device.location_longitude === 0 && this._device.location_latitude === 0) || (this._device.location_longitude === null && this._device.location_latitude === null)) {
+            // Always process events from devices which don't currently have a location
             return callback(true);
         }
         
@@ -142,9 +139,7 @@ class LocationBaseProcessor extends BaseProcessor {
 
         let included = [];
 
-        // optimization
-        // don't render out regions the device is already monitoring
-        if (this._beaconRegionsMonitoring /*&& this._beaconRegionsChanged == true*/ ) {
+        if (this._beaconRegionsMonitoring) {
             let beaconRegionsResponse =  this._beaconRegionsMonitoring.map((beaconRegion) => {
                 return {
                     type: 'ibeacon-regions',
@@ -160,7 +155,7 @@ class LocationBaseProcessor extends BaseProcessor {
             included = included.concat(beaconRegionsResponse);
         }
 
-        if (this._geofenceRegionsMonitoring /*&& this._geofenceRegionsChanged == true*/) {
+        if (this._geofenceRegionsMonitoring) {
             let geofenceRegionsResponse = this._geofenceRegionsMonitoring.map((geofenceRegion) => {
                 return {
                     type: 'geofence-regions',
@@ -191,27 +186,19 @@ class LocationBaseProcessor extends BaseProcessor {
         const device = this._device;
         const account = this._account;
 
-        if (util.isNullOrUndefined(device.beacon_regions_monitoring_updated_at) || account.beacon_configurations_updated_at > device.beacon_regions_monitoring_updated_at) {
+        if (util.isNullOrUndefined(device.ibeacon_monitoring_regions_updated_at) || account.beacon_configurations_updated_at > device.ibeacon_monitoring_regions_updated_at) {
             this._iBeaconWildcardRegions((err, regions) => {
                 if (err) {
                     return callback(err);
                 }
 
-                let beaconRegions = regions.map(region => {
-                    return {
-                        uuid: region.uuid,
-                        major_number: region['major-number'],
-                        minor_number: region['minor-number']
-                    }
-                });
+                regions.sort((regionA, regionB) => regionA.uuid > regionB.uuid);
 
-                beaconRegions.sort((regionA, regionB) => regionA.uuid > regionB.uuid);
-
-                return callback(null, beaconRegions);
+                return callback(null, regions);
             });
         } else {
             // Regions haven't updated so use the cached version
-            return callback(null, device.beacon_regions_monitoring || []);
+            return callback(null,  this._device.ibeacon_monitoring_regions || []);
         }
     }
 
@@ -226,7 +213,7 @@ class LocationBaseProcessor extends BaseProcessor {
         let shouldReloadGeofences = false;
 
         if (account.places_count <= limit) {
-            if (util.isNullOrUndefined(device.geofence_regions_monitoring_updated_at) || account.places_updated_at > device.geofence_regions_monitoring_updated_at) {
+            if (util.isNullOrUndefined(device.geofence_monitoring_regions_updated_at) || account.places_updated_at > device.geofence_monitoring_regions_updated_at) {
                 shouldReloadGeofences = true;
             }
         } else {
@@ -253,12 +240,12 @@ class LocationBaseProcessor extends BaseProcessor {
                 return callback(null, geofenceRegions);
             });
         } else {
-            return callback(null, device.geofence_regions_monitoring);
+            return callback(null, device.geofence_monitoring_regions);
         }
     }
 
     _iBeaconWildcardRegions(callback) {
-        if (this._device.platform != IOS_DEVICE_PLATFORM) {
+        if (this._device.os_name != IOS_DEVICE_PLATFORM) {
             return callback(null, []);
         }
 
@@ -273,7 +260,7 @@ class LocationBaseProcessor extends BaseProcessor {
 
             let uuids = activeUUIDs.configuration_uuids;
             let beaconRegions = uuids.map((uuid) => {
-                return { uuid: uuid, 'major-number': null, 'minor-number': null }
+                return { uuid: uuid, 'major': null, 'minor': null }
             });
 
             return callback(null, beaconRegions);
