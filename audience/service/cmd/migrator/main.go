@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"sort"
 	"strconv"
@@ -51,20 +50,12 @@ func main() {
 
 	flag.Parse()
 
-	if *srcDSN == "" || *destDSN == "" {
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
-
 	// ensure index and exit
 	// needs to be run after the migration
 	if *ensureIndex {
-		destSess, err := mgo.Dial(*destDSN)
-		if err != nil {
-			stderr.Fatalln("dest:", err)
-		}
+		destSess, destInfo := dialMongo(*destDSN)
 
-		if err := mongodb.EnsureIndexes(destSess.DB(dbName(*destDSN))); err != nil {
+		if err := mongodb.EnsureIndexes(destSess.DB(destInfo.Database)); err != nil {
 			stderr.Fatalln("destDB:", err)
 		}
 
@@ -72,26 +63,24 @@ func main() {
 		os.Exit(0)
 	}
 
+	if *srcDSN == "" || *destDSN == "" {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
 	timeNow = time.Now
 	objectID = bson.NewObjectId
-
-	srcSess, err := mgo.Dial(*srcDSN)
-	if err != nil {
-		stderr.Fatalln("src:", err)
-	}
-
-	destSess, err := mgo.Dial(*destDSN)
-	if err != nil {
-		stderr.Fatalln("dest:", err)
-	}
 
 	var (
 		started  = time.Now()
 		lastTime = started
 		now      time.Time
 
-		srcDb  = srcSess.DB(dbName(*srcDSN))
-		destDb = destSess.DB(dbName(*destDSN))
+		srcSess, srcInfo   = dialMongo(*srcDSN)
+		destSess, destInfo = dialMongo(*destDSN)
+
+		srcDb  = srcSess.DB(srcInfo.Database)
+		destDb = destSess.DB(destInfo.Database)
 
 		profiles_batch         = make([]interface{}, 0, *batchSize)
 		devices_batch          = make([]interface{}, 0, *batchSize)
@@ -196,15 +185,6 @@ func bulkInsert(stats *Stats, coll *mgo.Collection, batch ...interface{}) {
 			}
 		}
 	}
-}
-
-func dbName(dsn string) string {
-	u, err := url.Parse(dsn)
-	if err != nil {
-		stderr.Panicln("url.Parse:", err)
-	}
-
-	return strings.TrimLeft(u.Path, "/")
 }
 
 // 7820052 "_id"
@@ -542,4 +522,18 @@ func majmin(val interface{}) int {
 	default:
 		return 0
 	}
+}
+
+func dialMongo(dsn string) (*mgo.Session, *mgo.DialInfo) {
+	dialInfo, err := mongodb.ParseURL(dsn)
+	if err != nil {
+		stderr.Fatalln("mongodb:", err)
+	}
+
+	sess, err := mgo.DialWithInfo(dialInfo)
+	if err != nil {
+		stderr.Fatalf("mgo.Dial: DSN=%q error=%q", dsn, err)
+	}
+
+	return sess, dialInfo
 }
