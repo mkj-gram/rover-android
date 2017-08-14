@@ -101,9 +101,9 @@ function parseDevicePayload(request) {
 
         let parts = string.split('.')
         let version = {
-            major: parseInt(parts[0]),
-            minor: parseInt(parts[1]),
-            revision: parseInt(parts[2])
+            major: parseInt(parts[0]) || 0,
+            minor: parseInt(parts[1]) || 0,
+            revision: parseInt(parts[2]) || 0
         }
 
         return version
@@ -111,22 +111,22 @@ function parseDevicePayload(request) {
 
     let context = {
         push_environment: input.development === true ? "development" : "production",
-        push_token: input.token || "",
-        app_namespace: input['app-identifier'] || "",
-        device_manufacturer: input.manufacturer || "",
-        os_name: input['os-name'] || "",
+        push_token: String(input.token || ""),
+        app_namespace: String(input['app-identifier'] || ""),
+        device_manufacturer: String(input.manufacturer || ""),
+        os_name: String(input['os-name'] || ""),
         os_version: parseVersion(input['os-version']),
-        device_model: input.model || "",
+        device_model: String(input.model || ""),
         sdk_version: parseVersion(input['sdk-version']),
-        locale_language: (input['locale-lang'] || "").toLowerCase(),
-        locale_script: (input['locale-script'] || "").toLowerCase(),
-        carrier_name: (input['carrier'] || "").toLowerCase(),
-        platform: input['platform'] || input['os-name'],
-        time_zone: input['time-zone'] || "",
-        is_background_enabled: input['background-enabled'] || false,
-        is_location_monitoring_enabled: input['location-monitoring-enabled'] || false,
-        is_bluetooth_enabled: input['bluetooth-enabled'] || false,
-        advertising_id: input.aid || ""
+        locale_language: String((input['locale-lang'] || "")).toLowerCase(),
+        locale_script: String((input['locale-script'] || "")).toLowerCase(),
+        carrier_name: String((input['carrier'] || "")).toLowerCase(),
+        platform: String(input['platform'] || input['os-name']),
+        time_zone: String(input['time-zone'] || ""),
+        is_background_enabled: input['background-enabled'] === true ? true : false,
+        is_location_monitoring_enabled: input['location-monitoring-enabled'] === true ? true : false,
+        is_bluetooth_enabled: input['bluetooth-enabled'] === true ? true : false,
+        advertising_id: String(input.aid || "")
     }
 
     const localeRegion = (input['locale-region'] || "").toLowerCase()
