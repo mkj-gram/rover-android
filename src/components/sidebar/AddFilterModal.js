@@ -10,7 +10,8 @@ import {
     IconButton,
     lavender,
     silver,
-    TextField
+    TextField,
+    text
 } from '@rover/react-bootstrap'
 
 import { SearchIcon } from '@rover/react-icons'
@@ -22,9 +23,11 @@ class AddFilterModal extends Component {
         super(props)
         this.state = {
             search: '',
-            filterList: this.buildFilterList()
+            filterList: this.buildFilterList(),
+            onFocus: false
         }
         this.handleClickOutside = this.handleClickOutside.bind(this)
+        this.handleTextFieldEvent = this.handleTextFieldEvent.bind(this)
     }
 
     componentDidMount() {
@@ -106,12 +109,18 @@ class AddFilterModal extends Component {
         })
     }
 
+    handleTextFieldEvent(val) {
+        this.setState({
+            onFocus: val === 'focus'
+        })
+    }
+
     render() {
         const style = {
             position: 'absolute',
             top: 17,
             left: 20,
-            height: 350,
+            height: 380,
             width: 230,
             backgroundColor: graphite,
             borderRadius: 3,
@@ -119,42 +128,91 @@ class AddFilterModal extends Component {
             zIndex: 1
         }
 
+        const { onFocus, search } = this.state
         const { onRequestClose } = this.props
+
         return (
             <div style={style} onClick={() => this.handleClickOutside()}>
-                <IconButton
-                    type={'close'}
-                    onClick={onRequestClose}
+                <div
                     style={{
-                        position: 'absolute',
-                        top: 5,
-                        right: 5,
-                        zIndex: 1,
-                        cursor: 'pointer'
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        height: 35
                     }}
-                    hoverStyle={{ color: lavender, backgroundColor: graphite }}
-                />
-                <SearchIcon
-                    fill="white"
+                >
+                    <IconButton
+                        type={'close'}
+                        onClick={onRequestClose}
+                        style={{
+                            cursor: 'pointer',
+                            margin: '10px 10px 3px 0px'
+                        }}
+                        hoverStyle={{
+                            color: lavender,
+                            backgroundColor: graphite
+                        }}
+                    />
+                </div>
+
+                <div
                     style={{
-                        position: 'absolute',
-                        top: 25,
-                        left: 16
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        height: 40,
+                        backgroundColor: `${onFocus ? ash : ''}`
                     }}
-                />
-                <TextField
-                    onChange={e => this.setState({ search: e.target.value })}
-                    style={{
-                        color: silver,
-                        borderColor: ash,
-                        focus: {
-                            borderColor: ash
-                        },
-                        marginTop: 19,
-                        padding: '3px 40px'
-                    }}
-                    placeholder="Search Filters"
-                />
+                >
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <div
+                            style={{
+                                margin: '5px 9px 0px 18px'
+                            }}
+                        >
+                            <SearchIcon fill={onFocus ? 'white' : silver} />
+                        </div>
+                        <TextField
+                            onChange={e =>
+                                this.setState({ search: e.target.value })}
+                            style={{
+                                color: 'white',
+                                borderColor: graphite,
+                                focus: {
+                                    borderColor: ash
+                                }
+                            }}
+                            placeholder="Search Filters"
+                            onFocus={() => this.handleTextFieldEvent('focus')}
+                            onBlur={() => this.handleTextFieldEvent('blur')}
+                            value={this.state.search}
+                            id="textField"
+                        />
+                    </div>
+                    {search.length > 0 &&
+                        <div
+                            style={{
+                                ...text,
+                                color: lavender,
+                                fontSize: 12,
+                                marginRight: 20
+                            }}
+                            onClick={() => {
+                                this.setState({
+                                    search: ''
+                                })
+                                document.getElementById('textField').focus()
+                                this.handleTextFieldEvent('focus')
+                            }}
+                        >
+                            clear
+                        </div>}
+                </div>
                 <div
                     style={{
                         display: 'flex',
