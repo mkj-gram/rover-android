@@ -157,11 +157,6 @@ class SendMessageNotificationWorker
             end
         end
 
-
-        expired_tokens = responses.select{ |response| response.invalid_token? }.map{ |response| response.notification.token }
-
-        CustomerDeviceHelper.remove_tokens(expired_tokens)
-
         MetricsClient.aggregate("apns.notifications.sent" => { value: responses.size })
         MetricsClient.aggregate("apns.notifications.sent.time" => { value: (duration/responses.size.to_f).round(1) })
         Rails.logger.info(responses)
@@ -178,7 +173,6 @@ class SendMessageNotificationWorker
 
         notifications = FcmHelper.messages_to_notifications(android_messages_by_token)
 
-        expired_tokens = []
         duration = 0.0
         PushConnectionCache.with_fcm_connection(customer.account_id) do |connection_context|
             return if connection_context.nil? || connection_context[:connection].nil?
@@ -211,9 +205,6 @@ class SendMessageNotificationWorker
                     event.raw_input = nil
                     event.save
                 else
-                    if response[:error] == INVALID_REGISTRATION || response[:error] == NOT_REGISTERED
-                        expired_tokens.push(response[:token])
-                    end
                     input.merge!(errors: [ response[:error] ])
                     event = Events::Pipeline.build("notification", "failed", input, extra)
                     event.raw_input = nil
@@ -224,8 +215,6 @@ class SendMessageNotificationWorker
 
             duration = (Time.zone.now - start_time) * 1000.0
         end
-
-        CustomerDeviceHelper.remove_tokens(expired_tokens)
 
         MetricsClient.aggregate("fcm.notifications.sent" => { value: android_devices.size })
         MetricsClient.aggregate("fcm.notifications.sent.time" => { value: (duration/android_devices.size.to_f).round(1) })
