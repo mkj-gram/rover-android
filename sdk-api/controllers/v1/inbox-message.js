@@ -76,7 +76,7 @@ module.exports = function() {
                     return callback({ status: 404, message: "Message not found" })
                 }
 
-                if (message.customer_id !== profile.id) {
+                if (String(message.customer_id) !== profile.id) {
                     return callback({ status: 403, message: "Permission Denied" })
                 }
 
