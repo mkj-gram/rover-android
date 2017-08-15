@@ -52,6 +52,9 @@ class SegmentSelection extends Component {
                         padding: 0,
                         width: 'auto',
                         overflow: 'hidden'
+                    }, 
+                    overlay: {
+                        zIndex: 2
                     }
                 }}
                 bodyOpenClassName="SegmentSelections"

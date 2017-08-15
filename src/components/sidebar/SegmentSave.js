@@ -193,6 +193,9 @@ class SegmentSave extends Component {
                     hoverStyle={{
                         backgroundColor: steel
                     }}
+                    modalOverlayStyle={{
+                        zIndex: 2
+                    }}
                 />
             )
         } else {
@@ -222,6 +225,9 @@ class SegmentSave extends Component {
                     }}
                     hoverStyle={{
                         backgroundColor: steel
+                    }}
+                    modalOverlayStyle={{
+                        zIndex: 2
                     }}
                 />
             )

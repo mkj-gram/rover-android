@@ -476,7 +476,8 @@ class SideBar extends Component {
                         width: 300,
                         flex: '0 0 auto',
                         background: 'rgba(0,0,0,0.3)',
-                        position: 'absolute'
+                        position: 'absolute',
+                        zIndex: 1
                     }}
                 />
             )
