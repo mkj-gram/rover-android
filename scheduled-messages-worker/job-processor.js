@@ -304,7 +304,7 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
                 manufacturer: device.device_manufacturer,
                 carrier: device.carrier_name,
                 background_enabled: device.is_background_enabled,
-                notifications_enabled: device.device_token_is_active,
+                notifications_enabled: device.push_token_is_active,
                 location_monitoring_enabled: device.is_location_monitoring_enabled,
                 bluetooth_enabled: device.is_bluetooth_enabled,
                 development: device.push_environment === "development",
