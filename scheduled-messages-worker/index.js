@@ -110,6 +110,17 @@ tasks.push(function(callback) {
 });
 
 tasks.push(function(callback) {
+    let audience = require('./connections/audience')
+    audience.register(server, {}, (err) => {
+        if (err) {
+            return callback(err)
+        }
+        Logger.info("Audience Client initialized!")
+        return callback()
+    })
+})
+
+tasks.push(function(callback) {
     let services = require('./services/v1');
     services.register(server, {}, (err) => {
         if (err) {

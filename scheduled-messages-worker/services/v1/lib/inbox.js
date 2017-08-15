@@ -2,53 +2,32 @@
 const util = require('util');
 const keyPrefix = 'inbox_';
 const internals = {};
+const moment = require('moment')
 
 
-internals.find = function(customer, args, callback) {
-    const server = this;
-    const redis = server.connections.redis.client;
-    const inboxKey = internals.getInboxKey(customer._id.toString());
-
-    redis.lrange(inboxKey, 0, -1, (err, response) => {
-        if (err) {
-            return callback(err, null);
-        }
-
-        return callback(null, response);
-    });
-};
-
-internals.addMessage = function(customer, message, callback) {
+internals.updateManyCacheKeys = function(customerIds, time, callback) {
     const server = this;
     const redis = server.connections.redis.client;
     const logger = server.plugins.logger.logger;
-    const inboxKey = internals.getInboxKey(customer._id.toString());
 
-    logger.debug('Service: [inbox.addMessage] ' + util.format("Key: %s %j", inboxKey, message));
-    redis.lpush(inboxKey, message._id.toString(), (err, response) => {
+    const ids = customerIds.map(id => String(id))
+    const unixTime = moment.utc(time).unix()
+
+    let batch = redis.batch()
+
+    ids.forEach(id => {
+        const key = internals.getInboxUpdatedAtKey(id)
+        batch.set(key, unixTime)
+    })
+
+    batch.exec(function(err, replies) {
         if (err) {
-            return callback(err, null);
+            return callback(err)
         }
 
-        return callback(null, response);
-    });
-};
-
-internals.deleteMessage = function(customer, messageId, callback) {
-    const server = this;
-    const redis = server.connections.redis.client;
-    const logger = server.plugins.logger.logger;
-    const inboxKey = internals.getInboxKey(customer._id.toString());
-    
-    logger.debug('Service: [inbox.deleteMessage] ' + util.format("Key: %s %s", inboxKey, messageId));
-    redis.lrem(inboxKey, 1, messageId, (err, response) => {
-        if (err) {
-            return callback(err, null);
-        }
-
-        return callback(null, response);
-    });
-};
+        return callback()
+    })
+}
 
 
 // @private
@@ -56,9 +35,11 @@ internals.getInboxKey = (customerId) => {
     return keyPrefix + customerId
 };
 
+internals.getInboxUpdatedAtKey = (customerId) => {
+    return internals.getInboxKey(customerId).concat("_updated_at")
+}
+
 
 module.exports = {
-    find: internals.find,
-    addMessage: internals.addMessage,
-    deleteMessage: internals.deleteMessage
+   updateManyCacheKeys: internals.updateManyCacheKeys
 }

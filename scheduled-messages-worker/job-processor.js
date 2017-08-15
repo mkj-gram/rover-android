@@ -284,6 +284,67 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
         return Promise.resolve([]);
     }
 
+    function profileToCustomer(profile, devices) {
+        function getDocumentBucket(id) {
+            return ((parseInt(id, 16) % 5) + 1)
+        }
+
+        function deviceToDoc(device) {
+            const doc =  {
+                _id: device.id,
+                token: device.push_token,
+                locale_lang: device.locale_language,
+                locale_region: device.locale_region,
+                time_zone: device.time_zone,
+                app_identifier: device.app_namespace,
+                platform: device.platform,
+                os_name: device.os_name,
+                os_version: device.os_version,
+                model: device.device_model,
+                manufacturer: device.device_manufacturer,
+                carrier: device.carrier_name,
+                background_enabled: device.is_background_enabled,
+                notifications_enabled: device.device_token_is_active,
+                location_monitoring_enabled: device.is_location_monitoring_enabled,
+                bluetooth_enabled: device.is_bluetooth_enabled,
+                development: device.push_environment === "development",
+                test_device: device.is_test_device || false
+            }
+
+            if (device.location_longitude !== 0 && device.location_latitude !== 0 && device.location_longitude !== null && device.location_latitude !== null) {
+                doc.location = {
+                    lat: device.location_latitude,
+                    lon: device.location_longitude
+                }
+            }
+
+            if (device.sdk_version) {
+                doc.sdk_version = device.sdk_version
+            }
+
+            return doc
+        }
+
+        const customer = {
+            _id: profile.id,
+            account_id: profile.account_id,
+            identifier: profile.identifier,
+            first_name: profile['first-name'],
+            last_name: profile['last-name'],
+            email: profile.email,
+            phone_number: profile['phone-number'],
+            age: profile.age,
+            gender: profile.gender,
+            tags: profile.tags || [],
+            traits: {},
+            document_bucket: getDocumentBucket(profile.id),
+            devices: (devices || []).map(deviceToDoc)
+
+        }
+
+        return customer
+    }
+
     return new Promise((resolve, reject) => {
         
         this._debug("Reading customer identifiers");
@@ -292,17 +353,31 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
         let logger = this._server.plugins.logger.logger;
         let accountId = this._context.account.id;
 
-        methods.customer.findAllByIdentifier(accountId, identifiers, (err, customers) => {
+        methods.profile.findAllByIdentifiers(accountId, identifiers, (err, profiles) => {
             if (err) {
-                return reject(new JobError("failed to read customers from mongo", true));
+                return reject(new JobError("failed to read profiles from audience service", true))
             }
 
-            this._debug("Finished reading customers")
+            this._debug("Finished reading profiles")
 
-            let parsedCustomers = customers.map(parseCustomer);
+            // now we need to get all of their devices and map them back to old school style yall
+            
+            const profileIds = profiles.map(profile => profile.id)
 
-            return resolve(parsedCustomers);
-        });
+            methods.device.findAllByProfileIds(accountId, profileIds, (err, deviceIndex) => {
+                if (err) {
+                    return reject(new JobError("failed to read devices from audience service", true))
+                }
+
+                this._debug("Finished reading devices")
+
+                let customers = profiles.map(profile => {
+                    return profileToCustomer(profile, deviceIndex[profile.id])
+                })
+
+                return resolve(customers)
+            })
+        })
     });
 
 };
@@ -451,31 +526,6 @@ JobProcessor.prototype._queueNextJob = function(response) {
     this.updateState(JOB_STATE._queueNextJob);
 
     return Promise.resolve();
-};
-
-JobProcessor.prototype._getCustomersFromMongo = function() {
-    if (util.isNullOrUndefined(this._customerIds) || util.isArray(this._customerIds) && this._customerIds.length == 0) {
-        this._customers = [];
-        return Promise.resolve();
-    }
-
-    return new Promise((resolve, reject) => {
-        let methods = this._server.methods;
-        let logger = this._server.plugins.logger.logger;
-        let startTime = Date.now();
-
-        methods.customer.findAll(this._customerIds, (err, customers) => {
-            if (err) {
-                return reject(new JobError("failed to read customers from mongo", true));
-            }
-            let totalTime = Date.now() - startTime;
-            logger.debug("_getCustomersFromMongo: " + totalTime +  "ms");
-            this._customers = customers;
-            this.updateState(JOB_STATE._getCustomersFromMongo);
-
-            return resolve();
-        });
-    });
 };
 
 JobProcessor.prototype._filterCustomersBySegment = function() {
@@ -756,15 +806,13 @@ JobProcessor.prototype._updateCustomerInboxCacheKey = function() {
             return resolve();
         }
 
-        methods.customer.updateMany(customerIds, { "$set": { "inbox_updated_at": currentTime }}, (err, response) => {
+        methods.inbox.updateManyCacheKeys(customerIds, currentTime, (err) => {
             if (err) {
-                return reject(new JobError(err.message, false));
+                return reject(new JobError(err.message, false))
             }
 
-            this._debug("Finished updating inbox cache keys");
-            this.updateState(JOB_STATE._updateCustomerInboxCacheKey);
-            return resolve();
-        });
+            return resolve()
+        })
     });
 };
 
@@ -871,14 +919,6 @@ JobProcessor.prototype._sendNotifications = function() {
         pushPromises.push(this._sendIOSNotifications(iosCustomerDevelopmentClient, topic, iosCustomerDevelopmentMessages))
     }
 
-    if (iosRoverProductionMessages.length > 0)
-        pushPromises.push(this._sendIOSNotifications(roverApnsProductionClient, 'io.rover.Rover', iosRoverProductionMessages));
-    if (iosRoverDevelopmentMessages.length > 0)
-        pushPromises.push(this._sendIOSNotifications(roverApnsDevelopmentClient, 'io.rover.Rover', iosRoverDevelopmentMessages));
-    if (iosRoverDebugProductionMessages.length > 0)
-        pushPromises.push(this._sendIOSNotifications(roverDebugApnsProductionClient, 'io.rover.debug', iosRoverDebugProductionMessages));
-    if (iosRoverDebugDevelopmentMessages.length > 0)
-        pushPromises.push(this._sendIOSNotifications(roverDebugApnsDevelopmentClient, 'io.rover.debug', iosRoverDebugDevelopmentMessages));
     if (iosRoverInboxProductionMessages.length > 0)
         pushPromises.push(this._sendIOSNotifications(roverInboxApnsProductionClient, 'io.rover.Inbox', iosRoverInboxProductionMessages));
     if (iosRoverInboxDevelopmentMessages.length > 0)
@@ -1356,24 +1396,11 @@ JobProcessor.prototype._generateMessage = function(customer, timestamp) {
 };
 
 JobProcessor.prototype._removeTokenFromDevice = function(customer, device, callback) {
+    // Now an NO-OP
     
-    let methods = this._server.methods;
-
-    methods.customer.updateByDevice(customer._id, device._id, { "$unset": { "devices.$.token": "" }}, (err, response) => {
-        if (err) {
-            return callback(err);
-        }
-
-        device.token = undefined;
-
-        methods.customer.index(customer, (err, response) => {
-            if (err) {
-                return callback(err);
-            }
-
-            return callback();
-        });
-    });
+    process.setImmediate(function() {
+        return callback()   
+    })
 };
 
 JobProcessor.prototype.cleanup = function() {
