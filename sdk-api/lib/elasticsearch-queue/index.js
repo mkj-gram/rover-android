@@ -85,7 +85,12 @@ class ElasticsearchQueue {
                 logger.error(err);
             }
 
-            logger.info("Bulk request finished", response);
+            if (response.errors === true) {
+                logger.info("Bulk request finished with errors", JSON.stringify(response))
+            } else {
+                logger.info("Bulk request finished", { took: response.took, errors: response.errors });
+            }
+            
 
             if (util.isFunction(callback)) {
                 return callback();

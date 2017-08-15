@@ -433,6 +433,7 @@ module.exports = function() {
                 // Server doesn't send us back what the new profile looks like?
                 // We do an in memory update
                 Object.assign(profile, attributeUpdates)
+                profile.updated_at = new Date()
 
                 let args = {
                     server: request.server,
