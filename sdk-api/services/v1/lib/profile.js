@@ -117,6 +117,7 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
 
         function deviceToDoc(device) {
             const doc =  {
+                token: device.push_token,
                 locale_lang: device.locale_language,
                 locale_region: device.locale_region,
                 time_zone: device.time_zone,
