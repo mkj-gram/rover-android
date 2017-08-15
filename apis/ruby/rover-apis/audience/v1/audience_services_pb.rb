@@ -33,6 +33,7 @@ module Rover
           rpc :GetProfileByDeviceId, GetProfileByDeviceIdRequest, GetProfileByDeviceIdResponse
           rpc :GetProfileByIdentifier, GetProfileByIdentifierRequest, GetProfileByIdentifierResponse
           rpc :ListProfilesByIds, ListProfilesByIdsRequest, ListProfilesByIdsResponse
+          rpc :ListProfilesByIdentifiers, ListProfilesByIdentifiersRequest, ListProfilesByIdentifiersResponse
           # GetProfileSchema returns the currently tracked profiles schema by account id
           rpc :GetProfileSchema, GetProfileSchemaRequest, GetProfileSchemaResponse
           #

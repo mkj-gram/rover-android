@@ -271,6 +271,16 @@ func (s *Server) ListProfilesByIds(ctx context.Context, r *audience.ListProfiles
 	return &audience.ListProfilesByIdsResponse{ps}, nil
 }
 
+// ListProfilesByIdentifiersRequest implements the corresponding rpc
+func (s *Server) ListProfilesByIdentifiers(ctx context.Context, r *audience.ListProfilesByIdentifiersRequest) (*audience.ListProfilesByIdentifiersResponse, error) {
+	ps, err := s.db.ListProfilesByIdentifiers(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListProfilesByIdentifiers: %v", err)
+	}
+
+	return &audience.ListProfilesByIdentifiersResponse{ps}, nil
+}
+
 // UpdateProfile implements the corresponding rpc
 func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileRequest) (*audience.UpdateProfileResponse, error) {
 	if err := validateID(r.GetProfileId()); err != nil {

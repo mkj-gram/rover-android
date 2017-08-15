@@ -53,6 +53,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("GetProfileByIdentifier", testAudienceService_GetProfileByIdentifier)
 
 	t.Run("ListProfilesByIds", testAudienceService_ListProfilesByIds)
+	t.Run("ListProfilesByIdentifiers", testAudienceService_ListProfilesByIdentifiers)
 
 	// Profile Schema
 	t.Run("GetProfileSchema", testAudienceService_GetProfilesSchema)
@@ -1437,6 +1438,91 @@ func testAudienceService_ListProfilesByIds(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			got, gotErr := client.ListProfilesByIds(ctx, tc.req)
+
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func testAudienceService_ListProfilesByIdentifiers(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		db = mongodb.New(
+			dialMongo(t, *tMongoDSN),
+		)
+
+		svc = service.New(db)
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	tcases := []struct {
+		name string
+		req  *audience.ListProfilesByIdentifiersRequest
+
+		exp    *audience.ListProfilesByIdentifiersResponse
+		expErr error
+	}{
+		{
+			name: "no profiles in account",
+
+			req: &audience.ListProfilesByIdentifiersRequest{
+				AuthContext: &auth.AuthContext{AccountId: 100},
+				ProfileIdentifiers: []string{
+					"zzzz",
+					"xxxx",
+				},
+			},
+
+			exp: &audience.ListProfilesByIdentifiersResponse{
+				Profiles: nil,
+			},
+		},
+		{
+			name: "lists profiles",
+
+			req: &audience.ListProfilesByIdentifiersRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				ProfileIdentifiers: []string{
+					"a12abbc1-8935-407a-bf81-111111111111",
+					"a12abbc1-8935-407a-bf81-3f77abaff9d0",
+				},
+			},
+
+			exp: &audience.ListProfilesByIdentifiersResponse{
+				Profiles: []*audience.Profile{
+					{
+						AccountId: 1,
+
+						Id:         "000000000000000000000aa1",
+						Identifier: "a12abbc1-8935-407a-bf81-111111111111",
+						Attributes: nil,
+						CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+						UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					},
+					{
+						AccountId: 1,
+
+						Id:         "000000000000000000000aa2",
+						Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
+						Attributes: nil,
+						CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+						UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			got, gotErr := client.ListProfilesByIdentifiers(ctx, tc.req)
 
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))

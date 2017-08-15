@@ -355,6 +355,31 @@ func (s *profilesStore) ListProfilesByIds(ctx context.Context, r *audience.ListP
 	return protoProfiles, nil
 }
 
+func (s *profilesStore) ListProfilesByIdentifiers(ctx context.Context, r *audience.ListProfilesByIdentifiersRequest) ([]*audience.Profile, error) {
+	var (
+		account_id          = r.GetAuthContext().GetAccountId()
+		profile_identifiers = r.GetProfileIdentifiers()
+	)
+
+	var (
+		profiles []Profile
+
+		Q = bson.M{"account_id": account_id, "identifier": bson.M{"$in": profile_identifiers}}
+	)
+
+	if err := s.profiles.Find(Q).Sort("_id").All(&profiles); err != nil {
+		return nil, wrapError(err, "profiles.Find")
+	}
+
+	var protoProfiles = make([]*audience.Profile, len(profiles))
+	for i := range profiles {
+		protoProfiles[i] = new(audience.Profile)
+		profiles[i].toProto(protoProfiles[i])
+	}
+
+	return protoProfiles, nil
+}
+
 func (s *profilesStore) GetProfileSchema(ctx context.Context, r *audience.GetProfileSchemaRequest) (*audience.ProfileSchema, error) {
 	var (
 		account_id = r.GetAuthContext().GetAccountId()
