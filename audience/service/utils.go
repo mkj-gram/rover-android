@@ -6,11 +6,13 @@ func hardcodedDeviceSchema(acctID int32) []*audience.SchemaAttribute {
 	return []*audience.SchemaAttribute{
 		{AccountId: acctID, AttributeType: "timestamp", Attribute: "created_at", Label: "Created At", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "timestamp", Attribute: "updated_at", Label: "Updated At", Id: "", Path: ""},
-		{AccountId: acctID, AttributeType: "timestamp", Attribute: "device_token_updated_at", Label: "Device Token Updated At", Id: "", Path: ""},
-		{AccountId: acctID, AttributeType: "timestamp", Attribute: "device_token_unregistered_at", Label: "Device Token Unregistered At", Id: "", Path: ""},
-		{AccountId: acctID, AttributeType: "string", Attribute: "aps_environment", Label: "Aps Environment", Id: "", Path: ""},
-		{AccountId: acctID, AttributeType: "string", Attribute: "device_token_key", Label: "Device Token", Id: "", Path: ""},
-		{AccountId: acctID, AttributeType: "bool", Attribute: "device_token_is_active", Label: "Device Token Is Active", Id: "", Path: ""},
+
+		{AccountId: acctID, AttributeType: "timestamp", Attribute: "push_token_updated_at", Label: "Push Token Updated At", Id: "", Path: ""},
+		{AccountId: acctID, AttributeType: "timestamp", Attribute: "push_token_unregistered_at", Label: "Push Token Unregistered At", Id: "", Path: ""},
+		{AccountId: acctID, AttributeType: "string", Attribute: "push_environment", Label: "Pushvironment", Id: "", Path: ""},
+		{AccountId: acctID, AttributeType: "string", Attribute: "push_token_key", Label: "Push Token", Id: "", Path: ""},
+		{AccountId: acctID, AttributeType: "bool", Attribute: "push_token_is_active", Label: "Push Token Is Active", Id: "", Path: ""},
+
 		{AccountId: acctID, AttributeType: "string", Attribute: "app_name", Label: "App Name", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "string", Attribute: "app_version", Label: "App Version", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "string", Attribute: "app_build", Label: "App Build", Id: "", Path: ""},
