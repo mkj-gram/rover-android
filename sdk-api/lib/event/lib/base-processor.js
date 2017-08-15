@@ -73,6 +73,51 @@ internals.fillMessage = function(message, template) {
     }
 };
 
+internals.convertToOldDeviceAttributes = function(device) {
+    
+    function flattenVersion(version) {
+        if (version.major !== null && version.minor !== null && version.revision !== null) {
+            return `${version.major}.${version.minor}.${version.revision}`
+        }
+        
+        return null
+    }
+
+    const oldDevice = {
+        _id: device.id,
+        token: device.push_token,
+        locale_lang: device.locale_language,
+        locale_region: device.locale_region,
+        time_zone: device.time_zone,
+        sdk_version: flattenVersion(device.sdk_version),
+        app_identifier: device.app_namespace,
+        platform: device.platform,
+        os_name: device.os_name,
+        os_version: flattenVersion(device.os_version),
+        model: device.device_model,
+        manufacturer: device.device_manufacturer,
+        carrier: device.carrier_name,
+        background_enabled: device.is_background_enabled,
+        notifications_enabled: device.push_token_is_active,
+        location_monitoring_enabled: device.is_location_monitoring_enabled,
+        bluetooth_enabled: device.is_bluetooth_enabled,
+        development: device.push_environment === "development",
+        test_device: device.is_test_device || false,
+        aid: device.advertising_id,
+        ip: device.ip
+    }
+
+    if (device.location_longitude !== null && device.location_latitude !== null) {
+        oldDevice["location"] = {
+            longitude: device.location_longitude,
+            latitude: device.location_latitude,
+            accuracy: device.location_accuracy
+        }
+    }
+
+    return oldDevice
+}
+
 
 class BaseProcessor {
 
@@ -197,29 +242,9 @@ class BaseProcessor {
                 logger.error(err);
                 return resolve(null);
             }
-
-            function convertToOldDeviceAttributes(device) {
-                return {
-                    token: device.device_token_key,
-                    locale_lang: device.locale_language,
-                    locale_region: device.locale_region,
-                    time_zone: device.time_zone,
-                    sdk_version: device.sdk_version,
-                    platform: device.platform,
-                    os_name: device.os_name,
-                    model: device.device_model,
-                    manufacturer: device.device_manufacturer,
-                    carrier: device.carrier_name,
-                    background_enabled: device.is_background_enabled,
-                    location_monitoring_enabled: device.is_location_monitoring_enabled,
-                    bluetooth_enabled: device.is_bluetooth_enabled,
-                    development: device.aps_environment,
-                    aid: device.advertising_id
-                }
-            }
              
             let segment = new SegmentFilter(customerSegment.filters);
-            segment.withinSegment(this._customer, convertToOldDeviceAttributes(this._device), (failure) => {
+            segment.withinSegment(this._customer, internals.convertToOldDeviceAttributes(this._device), (failure) => {
                 if (failure) {
                     return resolve(null);
                 }
@@ -351,13 +376,21 @@ class BaseProcessor {
                 return internals.fillMessage(message, template);
             });
 
-            if (!util.isNullOrUndefined(this._device.token) && this._device.token !== "") {
+            if (!util.isNullOrUndefined(this._device.push_token) && this._device.push_token !== "") {
+                const profile = this._customer
+                const device = this._device
+
                 let pushPayload = {
-                    // TODO conver to oldschool style so we don't have to touch ruby
-                    customer: this._customer,
-                    device: this._device,
+                    customer: {
+                        _id: profile.id,
+                        account_id: profile.account_id,
+                        identifier: profile.identifier,
+                        traits: {},
+                        tags: profile.tags,
+                        devices: [internals.convertToOldDeviceAttributes(device)]
+                    },
                     serialized_messages: serializedMessages,
-                    device_ids_filter: [ this._device._id ],
+                    device_ids_filter: [ device.id ],
                     trigger_event_id: this._eventId,
                     trigger_arguments: triggerArgs
                 };
@@ -468,7 +501,7 @@ class BaseProcessor {
             let deviceEventAttributes = {
                 device: {
                     id: this._device.id,
-                    token: this._device.device_token_key,
+                    token: this._device.push_token,
                     locale_lang: this._device.locale_language,
                     locale_region: this._device.locale_region,
                     time_zone: this._device.time_zone,
@@ -481,7 +514,7 @@ class BaseProcessor {
                     carrier: this._device.carrier_name,
                     app_identifier: this._device.app_namespace,
                     background_enabled: this._device.is_background_enabled,
-                    notifications_enabled: this._device.device_token_is_active,
+                    notifications_enabled: this._device.push_token_is_active,
                     bluetooth_enabled: this._device.is_bluetooth_enabled,
                     location_monitoring_enabled: this._device.is_location_monitoring_enabled,
                     aid: this._device.advertising_id,
