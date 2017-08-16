@@ -1,0 +1,11 @@
+{
+  "name": "@rover-common/grpc-promisify",
+  "version": "1.0.0",
+  "description": "Promisify GRPC Client methods",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Rover",
+  "license": "ISC"
+}
