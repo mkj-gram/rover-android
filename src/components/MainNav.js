@@ -1,18 +1,19 @@
-import React from "react"
+import React from 'react'
+import PropTypes from 'prop-types'
 
 import {
     AccountMenu,
     AppSwitcher,
     NavBar,
     subtleShadow
-} from "@rover/react-bootstrap"
+} from '@rover/react-bootstrap'
 
-import { CustomersIcon } from "@rover/react-icons"
+import { AudiencesIcon } from '@rover/react-icons'
 
 const style = {
     ...subtleShadow,
-    background: "white",
-    position: "relative",
+    background: 'white',
+    position: 'relative',
     left: {
         paddingLeft: 14
     },
@@ -26,21 +27,29 @@ const MainNav = ({
     isGimbalEnabled,
     isXenioEnabled,
     onRequestSignOut = () => null
-}) => (
-    <NavBar style={style}>
+}) =>
+    (<NavBar style={style}>
         <AppSwitcher
-            active={"audience"}
+            active={'audience'}
             isGimbalEnabled={false}
             isXenioEnabled={false}
         >
-            <CustomersIcon size={32} />
+            <AudiencesIcon />
             Audience
         </AppSwitcher>
 
         <div />
 
-        <AccountMenu onRequestSignOut={onRequestSignOut}>{name}</AccountMenu>
-    </NavBar>
-)
+        <AccountMenu onRequestSignOut={onRequestSignOut}>
+            {name}
+        </AccountMenu>
+    </NavBar>)
+
+MainNav.propTypes = {
+    name: PropTypes.string.isRequired,
+    isGimbalEnabled: PropTypes.bool.isRequired,
+    isXenioEnabled: PropTypes.bool.isRequired,
+    onRequestSignOut: PropTypes.func.isRequired
+}
 
 export default MainNav
