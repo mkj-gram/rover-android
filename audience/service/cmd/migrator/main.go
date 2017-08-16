@@ -34,7 +34,8 @@ var (
 
 	ensureIndex = flag.Bool("ensure-index", false, "ensure required indexes in dest DB")
 
-	accountIds = flag.String("account-ids", "", "comma separated list of account ids to scope data migration to")
+	accountIds        = flag.String("account-ids", "", "comma separated list of account ids to scope data migration to")
+	excludeAccountIds = flag.String("exclude-account-ids", "", "comma separated list of account ids to exclude from migration")
 
 	timeNow  (func() time.Time)
 	objectID (func() bson.ObjectId)
@@ -111,6 +112,23 @@ func main() {
 
 		srcQ = bson.M{
 			"account_id": bson.M{"$in": acctIds},
+		}
+	}
+
+	if *excludeAccountIds != "" {
+		var acctIds []int
+		for _, str := range strings.Split(*excludeAccountIds, ",") {
+			id, err := strconv.Atoi(str)
+			if err != nil {
+				stderr.Fatalln(err)
+			}
+
+			acctIds = append(acctIds, id)
+		}
+
+		// overrides we don't need anything fancy
+		srcQ = bson.M{
+			"account_id": bson.M{"$nin": acctIds},
 		}
 	}
 
