@@ -522,12 +522,17 @@ module.exports = function() {
                             }
 
                             methods.profile.findById(accountId, oldDevice.profile_id, function(err, oldProfile) {
-
                                 if (oldProfile.identifier === null) {
                                     methods.profile.delete(accountId, oldProfile.id, function(err) {
+                                        if (err) {
+                                            // For some reason we weren't able to delete the old profile
+                                            // just reindex it with 0 devices
+                                            profilesNeedReindexing.push(oldProfile)
+                                        }
                                         return done(err)
                                     })
                                 } else {
+                                    // This was an identified profile we should just reindex the new state
                                     profilesNeedReindexing.push(oldProfile)
                                     return done()
                                 }

@@ -17,7 +17,7 @@ class ElasticsearchQueue {
     }
 
     index({ index, type, id, body, version }) {
-        if (util.isNullOrUndefined(this._queue[id]) || this._queue[id] && version > this._queue[id].index._version) {
+        if (util.isNullOrUndefined(this._queue[id]) || this._queue[id] && this._queue[id].index && this._queue[id].delete === undefined && version > this._queue[id].index._version) {
             this._queue[id] = {
                 index: { _index: index, _type: type, _id: id, _version: version, _version_type: 'external' },
                 body: body
@@ -27,7 +27,7 @@ class ElasticsearchQueue {
 
     delete({ index, type, id, version }) {
         this._queue[id] = {
-            delete: { _index: index, _type: type, _id: id, _version: version, _version_type: 'external' }
+            delete: { _index: index, _type: type, _id: id }
         }
     }
 

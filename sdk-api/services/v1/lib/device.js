@@ -381,7 +381,7 @@ module.exports = function(AudienceClient, logger) {
 				return callback(err)
 			}
 
-			let index = results.filter(result => result !== null).reduce(function(accumulator, result) {
+			let index = results.filter(result => result !== undefined).reduce(function(accumulator, result) {
 
 				result.forEach(function(result) {
 					if (accumulator[result.profile_id] === undefined) {

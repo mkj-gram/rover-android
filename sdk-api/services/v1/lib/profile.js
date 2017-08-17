@@ -102,8 +102,7 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
         elasticsearchQueue.delete({
             index: getIndexForAccount(accountId),
             type: 'customer',
-            id: profileId,
-            version: moment.utc(new Date()).valueOf()
+            id: profileId
         })
     }
 
