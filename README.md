@@ -8,7 +8,20 @@ Customer Segmentation and Analytics
 npm install
 ```
 
+### Updating Local Schema
+
+```
+npm Schema
+```
+
 ### Running Development Environment
+
+#### Compile and watch relay queries
+```
+npm relay
+```
+
+#### Webpack development server
 
 ```
 npm start
