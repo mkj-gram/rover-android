@@ -81,6 +81,13 @@ func main() {
 		if err != nil {
 			stderr.Fatalf("trace.NewClient: %v", err)
 		} else {
+			// sample every 1000' req not exceeding 5/sec
+			p, err := trace.NewLimitedSampler(0.001, 5)
+			if err != nil {
+				stderr.Fatalln("trace:", err)
+			}
+
+			tc.SetSamplingPolicy(p)
 			stdout.Println("google.tracing=on")
 			unaryMiddleware = append(unaryMiddleware, UnaryTraceInterceptor(tc))
 		}
@@ -122,6 +129,9 @@ func main() {
 	if err := sess.Ping(); err != nil {
 		stderr.Println("sess.Ping:", err)
 	}
+	defer sess.Close()
+
+	// sess.SetSocketTimeout(10 * time.Second)
 
 	db := mongodb.New(sess.DB(mongoInfo.Database),
 		mongodb.WithLogger(rlog.NewLog(rlog.Error)),
@@ -176,18 +186,18 @@ func main() {
 // for livelines we're "alway on": k8s shoudn't take pod down because db is down
 func ping(sess *mgo.Session, readiness bool, tc *trace.Client) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		if tc != nil {
 			span := tc.SpanFromRequest(r)
 			defer span.Finish()
 		}
 
-		if err := sess.Ping(); err != nil {
+		nsess := sess.Copy()
+		defer nsess.Close()
+
+		if err := nsess.Ping(); err != nil {
 			stderr.Println("sess.Ping:", err)
-			if readiness {
-				http.Error(w, "sess.Ping:"+err.Error(), http.StatusServiceUnavailable)
-				return
-			}
+			http.Error(w, "sess.Ping:"+err.Error(), http.StatusServiceUnavailable)
+			return
 		}
 
 		w.WriteHeader(http.StatusOK)

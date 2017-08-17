@@ -84,7 +84,7 @@ func tNewObjectIdFunc(t *testing.T, seed int64) func() bson.ObjectId {
 	}
 }
 
-func dialMongo(t *testing.T, dsn string) *mgo.Database {
+func dialMongo(t testing.TB, dsn string) *mgo.Database {
 	info, err := mgo.ParseURL(dsn)
 	if err != nil {
 		t.Fatal("url.Parse:", err)
@@ -246,7 +246,7 @@ func newServer(rpcAddr string, svc *audience_service.Server) (net.Listener, erro
 	return lis, nil
 }
 
-func NewSeviceClient(t *testing.T, rpcAddr string, svc *audience_service.Server) (audience.AudienceClient, func()) {
+func NewSeviceClient(t testing.TB, rpcAddr string, svc *audience_service.Server) (audience.AudienceClient, func()) {
 	lis, err := newServer(rpcAddr, svc)
 	if err != nil {
 		t.Fatal("newServer:", err)

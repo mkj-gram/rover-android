@@ -28,14 +28,13 @@ type Device struct {
 	CreatedAt *time.Time    `bson:"created_at"`
 	UpdatedAt *time.Time    `bson:"updated_at"`
 
-	IsTestDevice bool `bson:"is_test_device,omitempty"`
+	IsTestDevice            bool       `bson:"is_test_device,omitempty"`
 	PushEnvironment         string     `bson:"push_environment,omitempty"`
 	PushTokenKey            string     `bson:"push_token_key,omitempty"`
 	PushTokenIsActive       bool       `bson:"push_token_is_active"`
 	PushTokenCreatedAt      *time.Time `bson:"push_token_created_at,omitempty"`
 	PushTokenUpdatedAt      *time.Time `bson:"push_token_updated_at,omitempty"`
 	PushTokenUnregisteredAt *time.Time `bson:"push_token_unregistered_at,omitempty"`
-
 
 	AppName                     string              `bson:"app_name,omitempty"`
 	AppVersion                  string              `bson:"app_version,omitempty"`
@@ -92,7 +91,6 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.PushTokenKey = proto.PushTokenKey
 	d.PushEnvironment = proto.PushEnvironment
 	d.PushTokenIsActive = proto.PushTokenIsActive
-
 
 	d.PushTokenUpdatedAt, _ = protoToTime(proto.PushTokenUpdatedAt)
 	d.PushTokenCreatedAt, _ = protoToTime(proto.PushTokenCreatedAt)
@@ -162,7 +160,6 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.IsTestDevice = d.IsTestDevice
 	proto.PushEnvironment = d.PushEnvironment
 	proto.PushTokenKey = d.PushTokenKey
-
 
 	proto.AppName = d.AppName
 	proto.AppVersion = d.AppVersion
@@ -258,7 +255,7 @@ func (s *devicesStore) FindDeviceById(ctx context.Context, id string) (*audience
 	var (
 		d Device
 
-		Q = s.devices.Find(bson.M{"device_id": id})
+		Q = s.devices().Find(bson.M{"device_id": id})
 	)
 
 	if err := Q.One(&d); err != nil {
@@ -282,7 +279,7 @@ func (s *devicesStore) GetDevice(ctx context.Context, r *audience.GetDeviceReque
 		Q = bson.M{"device_id": device_id, "account_id": account_id}
 	)
 
-	if err := s.devices.Find(Q).One(&d); err != nil {
+	if err := s.devices().Find(Q).One(&d); err != nil {
 		return nil, wrapError(err, "devices.Find")
 	}
 
@@ -303,7 +300,7 @@ func (s *devicesStore) GetDeviceByPushToken(ctx context.Context, r *audience.Get
 		Q = bson.M{"push_token_key": push_token_key, "account_id": account_id}
 	)
 
-	if err := s.devices.Find(Q).One(&d); err != nil {
+	if err := s.devices().Find(Q).One(&d); err != nil {
 		return nil, wrapError(err, "devices.Find")
 	}
 
@@ -329,7 +326,7 @@ func (s *devicesStore) profileExists(ctx context.Context, profile_id string) err
 
 	// ensure the profile exists
 	// `Count` is used to avoid allocating a profile value
-	n, err := s.profiles.Find(bson.M{"_id": profile_oid}).Count()
+	n, err := s.profiles().Find(bson.M{"_id": profile_oid}).Count()
 	if err != nil {
 		return wrapError(err, "profiles.Find")
 	}
@@ -368,7 +365,7 @@ func (s *devicesStore) CreateDevice(ctx context.Context, r *audience.CreateDevic
 		UpdatedAt: &now,
 	}
 
-	if err := s.devices.Insert(device); err != nil {
+	if err := s.devices().Insert(device); err != nil {
 		return wrapError(err, "devices.Insert")
 	}
 
@@ -387,7 +384,7 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 		device Device
 		Q      = bson.M{"account_id": account_id, "device_id": device_id}
 	)
-	err := s.devices.Find(Q).One(&device)
+	err := s.devices().Find(Q).One(&device)
 	if err != nil {
 		return wrapError(err, "devices.Find")
 	}
@@ -448,7 +445,7 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 
 	update["region_monitoring_mode"] = r.RegionMonitoringMode.String()
 
-	err = s.devices.Update(bson.M{
+	err = s.devices().Update(bson.M{
 		"device_id":  device_id,
 		"account_id": account_id,
 	}, bson.M{"$set": update})
@@ -475,7 +472,7 @@ func (s *devicesStore) UpdateDeviceUnregisterPushToken(ctx context.Context, r *a
 		}
 	)
 
-	if err := s.devices.Update(selector, bson.M{"$set": update}); err != nil {
+	if err := s.devices().Update(selector, bson.M{"$set": update}); err != nil {
 		return wrapError(err, "devices.Update")
 	}
 
@@ -497,7 +494,7 @@ func (s *devicesStore) UpdateDeviceTestProperty(ctx context.Context, r *audience
 		}
 	)
 
-	if err := s.devices.Update(selector, bson.M{"$set": update}); err != nil {
+	if err := s.devices().Update(selector, bson.M{"$set": update}); err != nil {
 		return wrapError(err, "devices.Update")
 	}
 
@@ -516,7 +513,7 @@ func (s *devicesStore) UpdateDevicePushToken(ctx context.Context, r *audience.Up
 		device Device
 		Q      = bson.M{"account_id": account_id, "device_id": device_id}
 	)
-	err := s.devices.Find(Q).One(&device)
+	err := s.devices().Find(Q).One(&device)
 	if err != nil {
 		return wrapError(err, "devices.Find")
 	}
@@ -539,7 +536,7 @@ func (s *devicesStore) UpdateDevicePushToken(ctx context.Context, r *audience.Up
 	update["push_environment"] = r.PushEnvironment
 	update["updated_at"] = now
 
-	err = s.devices.Update(bson.M{
+	err = s.devices().Update(bson.M{
 		"device_id":  device_id,
 		"account_id": account_id,
 	}, bson.M{"$set": update})
@@ -566,7 +563,7 @@ func (s *devicesStore) UpdateDeviceLocation(ctx context.Context, r *audience.Upd
 		"location_longitude": r.LocationLongitude,
 	}
 
-	err := s.devices.Update(bson.M{
+	err := s.devices().Update(bson.M{
 		"device_id":  device_id,
 		"account_id": account_id,
 	}, bson.M{"$set": update})
@@ -591,7 +588,7 @@ func (s *devicesStore) UpdateDeviceGeofenceMonitoring(ctx context.Context, r *au
 		"geofence_monitoring_regions":            r.Regions,
 	}
 
-	err := s.devices.Update(bson.M{
+	err := s.devices().Update(bson.M{
 		"device_id":  device_id,
 		"account_id": account_id,
 	}, bson.M{"$set": update})
@@ -616,7 +613,7 @@ func (s *devicesStore) UpdateDeviceIBeaconMonitoring(ctx context.Context, r *aud
 		"ibeacon_monitoring_regions":            r.Regions,
 	}
 
-	err := s.devices.Update(bson.M{
+	err := s.devices().Update(bson.M{
 		"device_id":  device_id,
 		"account_id": account_id,
 	}, bson.M{"$set": update})
@@ -635,7 +632,7 @@ func (s *devicesStore) DeleteDevice(ctx context.Context, r *audience.DeleteDevic
 		rq = bson.M{"device_id": device_id, "account_id": account_id}
 	)
 
-	if err := s.devices.Remove(rq); err != nil {
+	if err := s.devices().Remove(rq); err != nil {
 		return wrapError(err, "devices.Remove")
 	}
 
@@ -664,7 +661,7 @@ func (s *devicesStore) SetDeviceProfile(ctx context.Context, r *audience.SetDevi
 		return wrapError(err, "profileExists")
 	}
 
-	err = s.devices.Update(
+	err = s.devices().Update(
 		bson.M{
 			"device_id":  device_id,
 			"account_id": account_id,
@@ -706,7 +703,7 @@ func (s *devicesStore) ListDevicesByProfileId(ctx context.Context, r *audience.L
 		Q       = bson.M{"account_id": account_id, "profile_id": pid}
 	)
 
-	if err := s.devices.Find(Q).All(&devices); err != nil {
+	if err := s.devices().Find(Q).All(&devices); err != nil {
 		return nil, wrapError(err, "devices.Find")
 	}
 
@@ -729,7 +726,7 @@ func (s *devicesStore) ListDevicesByProfileIdentifier(ctx context.Context, r *au
 		profile = bson.M{}
 	)
 
-	if err := s.profiles.Find(pQ).Select(bson.M{"_id": 1}).One(&profile); err != nil {
+	if err := s.profiles().Find(pQ).Select(bson.M{"_id": 1}).One(&profile); err != nil {
 		return nil, wrapError(err, "profiles.Find")
 	}
 
@@ -738,7 +735,7 @@ func (s *devicesStore) ListDevicesByProfileIdentifier(ctx context.Context, r *au
 		dQ      = bson.M{"account_id": account_id, "profile_id": profile["_id"]}
 	)
 
-	if err := s.devices.Find(dQ).All(&devices); err != nil {
+	if err := s.devices().Find(dQ).All(&devices); err != nil {
 		return nil, wrapError(err, "devices.Find")
 	}
 

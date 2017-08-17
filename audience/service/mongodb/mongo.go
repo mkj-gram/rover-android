@@ -11,6 +11,8 @@ import (
 
 type (
 	DB struct {
+		store *mongoStore
+
 		*profilesStore
 		*devicesStore
 	}
@@ -18,25 +20,19 @@ type (
 	Option func(s *mongoStore)
 
 	mongoStore struct {
-		db *mgo.Database
+		dbName string
+		sess   *mgo.Session
 
 		log         log.Interface
 		newObjectId func() bson.ObjectId
 		timeNow     func() time.Time
-
-		profiles         *mgo.Collection
-		devices          *mgo.Collection
-		profiles_schemas *mgo.Collection
 	}
 )
 
 func New(db *mgo.Database, options ...Option) *DB {
 	ms := &mongoStore{
-		db: db,
-
-		profiles:         db.C("profiles"),
-		profiles_schemas: db.C("profiles_schemas"),
-		devices:          db.C("devices"),
+		sess:   db.Session,
+		dbName: db.Name,
 	}
 
 	for _, op := range options {
@@ -56,6 +52,33 @@ func New(db *mgo.Database, options ...Option) *DB {
 	}
 
 	return &DB{
+		store: ms,
+
+		profilesStore: &profilesStore{ms},
+		devicesStore:  &devicesStore{ms},
+	}
+}
+
+func (db *DB) Close() {
+	db.store.sess.Close()
+}
+
+// make sure to close
+func (db *DB) Copy() *DB {
+	sess := db.store.sess.Copy()
+
+	ms := &mongoStore{
+		sess:   sess,
+		dbName: db.store.dbName,
+
+		log:         db.store.log,
+		timeNow:     db.store.timeNow,
+		newObjectId: db.store.newObjectId,
+	}
+
+	return &DB{
+		store: ms,
+
 		profilesStore: &profilesStore{ms},
 		devicesStore:  &devicesStore{ms},
 	}
@@ -77,4 +100,16 @@ func WithLogger(l log.Interface) Option {
 	return func(s *mongoStore) {
 		s.log = l
 	}
+}
+
+func (ds *mongoStore) devices() *mgo.Collection {
+	return ds.sess.DB(ds.dbName).C("devices")
+}
+
+func (ds *mongoStore) profiles() *mgo.Collection {
+	return ds.sess.DB(ds.dbName).C("profiles")
+}
+
+func (ds *mongoStore) profiles_schemas() *mgo.Collection {
+	return ds.sess.DB(ds.dbName).C("profiles_schemas")
 }

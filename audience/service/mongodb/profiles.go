@@ -151,7 +151,7 @@ func (s *profilesStore) FindProfileById(ctx context.Context, id string) (*audien
 
 	var pf Profile
 
-	if err := s.profiles.FindId(pid).One(&pf); err != nil {
+	if err := s.profiles().FindId(pid).One(&pf); err != nil {
 		return nil, wrapError(err, "profiles.FindId")
 	}
 
@@ -178,7 +178,7 @@ func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreatePro
 		}
 	)
 
-	if err := s.profiles.Insert(p); err != nil {
+	if err := s.profiles().Insert(p); err != nil {
 		return nil, wrapError(err, "profiles.Insert")
 	}
 
@@ -213,7 +213,7 @@ func (s *profilesStore) GetProfile(ctx context.Context, r *audience.GetProfileRe
 		}
 	)
 
-	if err := s.profiles.Find(Q).One(&p); err != nil {
+	if err := s.profiles().Find(Q).One(&p); err != nil {
 		return nil, wrapError(err, "profiles.Find")
 	}
 
@@ -245,7 +245,7 @@ func (s *profilesStore) DeleteProfile(ctx context.Context, r *audience.DeletePro
 		"account_id": account_id,
 	}
 
-	if err := s.profiles.Remove(Q); err != nil {
+	if err := s.profiles().Remove(Q); err != nil {
 		return wrapError(err, "profiles.Remove")
 	}
 
@@ -265,7 +265,7 @@ func (s *profilesStore) GetProfileByDeviceId(ctx context.Context, r *audience.Ge
 		}
 	)
 
-	if err := s.devices.Find(dq).Select(bson.M{"profile_id": 1}).One(&d); err != nil {
+	if err := s.devices().Find(dq).Select(bson.M{"profile_id": 1}).One(&d); err != nil {
 		return nil, wrapError(err, "devices.Find")
 	}
 
@@ -278,7 +278,7 @@ func (s *profilesStore) GetProfileByDeviceId(ctx context.Context, r *audience.Ge
 		}
 	)
 
-	if err := s.profiles.Find(pq).One(&p); err != nil {
+	if err := s.profiles().Find(pq).One(&p); err != nil {
 		return nil, wrapError(err, "profiles.Find")
 	}
 
@@ -303,7 +303,7 @@ func (s *profilesStore) GetProfileByIdentifier(ctx context.Context, r *audience.
 		}
 	)
 
-	if err := s.profiles.Find(Q).One(&p); err != nil {
+	if err := s.profiles().Find(Q).One(&p); err != nil {
 		return nil, wrapError(err, "profiles.Find")
 	}
 
@@ -342,7 +342,7 @@ func (s *profilesStore) ListProfilesByIds(ctx context.Context, r *audience.ListP
 		Q = bson.M{"account_id": account_id, "_id": bson.M{"$in": profile_oids}}
 	)
 
-	if err := s.profiles.Find(Q).Sort("_id").All(&profiles); err != nil {
+	if err := s.profiles().Find(Q).Sort("_id").All(&profiles); err != nil {
 		return nil, wrapError(err, "profiles.Find")
 	}
 
@@ -367,7 +367,7 @@ func (s *profilesStore) ListProfilesByIdentifiers(ctx context.Context, r *audien
 		Q = bson.M{"account_id": account_id, "identifier": bson.M{"$in": profile_identifiers}}
 	)
 
-	if err := s.profiles.Find(Q).Sort("_id").All(&profiles); err != nil {
+	if err := s.profiles().Find(Q).Sort("_id").All(&profiles); err != nil {
 		return nil, wrapError(err, "profiles.Find")
 	}
 
@@ -403,7 +403,7 @@ func (s *profilesStore) getProfileSchema(ctx context.Context, account_id int32) 
 		schema ProfileSchema
 	)
 
-	iter := s.profiles_schemas.
+	iter := s.profiles_schemas().
 		Find(bson.M{"account_id": account_id}).
 		Sort("_id").
 		Iter()
@@ -441,7 +441,7 @@ func (s *profilesStore) UpdateProfileIdentifier(ctx context.Context, r *audience
 		}
 	)
 
-	err := s.profiles.Update(bson.M{
+	err := s.profiles().Update(bson.M{
 		"_id":        bson.ObjectIdHex(profile_id),
 		"account_id": account_id,
 	}, bson.M{"$set": update})
@@ -471,7 +471,7 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 		p Profile
 	)
 
-	err := s.profiles.Find(bson.M{
+	err := s.profiles().Find(bson.M{
 		"_id":        bson.ObjectIdHex(profile_id),
 		"account_id": account_id,
 	}).One(&p)
@@ -528,7 +528,7 @@ func (s *profilesStore) updateSchema(ctx context.Context, schemaUpdate *ProfileS
 		insert[i] = schemaUpdate.Attributes[i]
 	}
 
-	return wrapError(s.profiles_schemas.Insert(insert...), "profiles_schemas.Insert")
+	return wrapError(s.profiles_schemas().Insert(insert...), "profiles_schemas.Insert")
 }
 
 // validateProfileAttributes returns an error if an attrUpdates doesn't validate against existing attribute schema.
@@ -697,7 +697,7 @@ func (s *profilesStore) updateProfileAttributes(ctx context.Context, profile_id 
 
 	s.log.Debugf("profile.Update: Bson: profile_id=%s: %+v", profile_id, update)
 
-	if err := s.profiles.UpdateId(bson.ObjectIdHex(profile_id), update); err != nil {
+	if err := s.profiles().UpdateId(bson.ObjectIdHex(profile_id), update); err != nil {
 		return wrapError(err, "profiles.UpdateId")
 	}
 
