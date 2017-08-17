@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react'
 import { graphite } from '@rover/react-bootstrap'
 
@@ -87,6 +88,14 @@ class FunnelAnimation extends Component {
         }
     }
 
+    handleOnMouseOver() {
+        canvasTimeline.gotoAndStop("restart")
+    }
+
+    handleOnMouseOut() {
+        canvasTimeline.gotoAndStop("stop")
+    }
+
     render() {
         return (
             <div
@@ -97,6 +106,8 @@ class FunnelAnimation extends Component {
                     height: 200,
                     margin: '0 auto'
                 }}
+                onMouseOver={this.handleOnMouseOver}
+                onMouseOut={this.handleOnMouseOut}
             >
                 <canvas
                     id="canvas"
