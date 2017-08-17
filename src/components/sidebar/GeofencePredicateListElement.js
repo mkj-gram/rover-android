@@ -15,10 +15,15 @@ const GeofencePredicateListElement = ({
     </div>)
 
 GeofencePredicateListElement.propTypes = {
-    radius: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
+    radius: PropTypes.number,
+    name: PropTypes.string,
     renderPredicateComparison: PropTypes.func.isRequired,
     renderPredicateValue: PropTypes.func.isRequired
+}
+
+GeofencePredicateListElement.defaultProps = {
+    radius: 50,
+    name: ''
 }
 
 export default GeofencePredicateListElement
