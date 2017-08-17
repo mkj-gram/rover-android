@@ -92,6 +92,10 @@ function parseProfilePayload(request) {
 
 
 function parseDevicePayload(request) {
+    if (request.payload.data.attributes.device === undefined || request.payload.data.attributes.device === null) {
+        return null
+    }
+
     const input = request.payload.data.attributes.device || {}
     
     function parseVersion(string) {
@@ -487,6 +491,11 @@ module.exports = function() {
             // if there is no differences in context then we don't need to update
             let needsUpdate = false
             let tasks = []
+
+            if (deviceContext === null) {
+                logger.debug("Device: " + device.id + " did not provide a context")
+                return callback(null, device)
+            }
 
             Object.keys(deviceContext).forEach(key => {
                 if (deviceContext[key] !== undefined && !lodash.isEqual(deviceContext[key], device[key])) {
