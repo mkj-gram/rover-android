@@ -224,6 +224,7 @@ class AudienceDataGrid extends Component {
 
                             .rover-data-grid .react-grid-Grid {
                                 min-height: 100% !important;
+                                border: none !important;
                             }
 
                             .rover-data-grid .react-grid-Canvas {

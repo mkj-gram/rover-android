@@ -74,7 +74,7 @@ class AudienceTable extends Component {
 
     getSetCachedColumns() {
         // HardCoded default selected Columns
-        let selectedColumns = {
+        const selectedColumns = {
             deviceId: 'StringPredicate',
             deviceOS: 'StringPredicate',
             deviceOSVersion: 'VersionPredicate',
@@ -98,12 +98,12 @@ class AudienceTable extends Component {
     getAllColumns(deviceSchema, profileSchema) {
         const devices = {}
         const profiles = {}
-        deviceSchema.map(device => {
+        deviceSchema.map(device => (
             devices[device.attribute] = device.type
-        })
-        profileSchema.map(profile => {
+        ))
+        profileSchema.map(profile => (
             profiles[profile.attribute] = profile.type
-        })
+        ))
         this.setState({ allColumns: { devices, profiles } })
     }
 
@@ -116,7 +116,7 @@ class AudienceTable extends Component {
         if (item in cachedSelectedColumns) {
             delete cachedSelectedColumns[item]
         } else {
-            let property = {
+            const property = {
                 [item]: allColumns[category][item]
             }
             cachedSelectedColumns = Object.assign(
@@ -142,8 +142,8 @@ class AudienceTable extends Component {
                     group,
                     refetched: true
                 })
-                
-                this.props.setSaveState({isSegmentUpdate: (this.state.segmentId !== ''), showSaveButton: true})
+
+                this.props.setSaveState({ isSegmentUpdate: (this.state.segmentId !== ''), showSaveButton: true })
             } else if (nextProps.context === 'segments') {
                 this.setState({
                     segmentId: nextProps.segmentId,
@@ -151,17 +151,15 @@ class AudienceTable extends Component {
                     group,
                     refetched: true
                 })
-                this.props.setSaveState( {isSegmentUpdate: false, showSaveButton: false})
+                this.props.setSaveState({ isSegmentUpdate: false, showSaveButton: false })
             }
         } else {
-            console.log(`Error: ${error}`)
+            throw new Error(error)
         }
     }
 
     componentWillReceiveProps(nextProps) {
         const {
-            renderSegmentsFromPredicates,
-            renderDynamicPredicates,
             refetched,
             renderRefetch
         } = this.state
@@ -185,8 +183,7 @@ class AudienceTable extends Component {
                         nextProps.pageNumber
                     )
                 })
-            } else {
-                if (nextProps.context === 'predicates') {
+            } else if (nextProps.context === 'predicates') {
                     refetchVariables = fragmentVariables => ({
                         includeSegmentsFromPredicates: true,
                         includeDynamicSegment: false,
@@ -215,13 +212,23 @@ class AudienceTable extends Component {
                         { force: true }
                     )
                 }
-            }
         } else if (renderRefetch !== null) {
-            let devices, profiles, segmentSize, totalSize
+            let devices,
+                profiles,
+                segmentSize,
+                totalSize
             if (renderRefetch) {
-                ({devices, profiles, segmentSize, totalSize} = nextProps.data.adgSegmentsFromPredicates)
+                ({
+                    devices,
+                    profiles,
+                    segmentSize,
+                    totalSize } = nextProps.data.adgSegmentsFromPredicates)
             } else {
-                ({devices, profiles, segmentSize, totalSize} = nextProps.data.adgDynamicSegment[0].data)
+                ({
+                    devices,
+                    profiles,
+                    segmentSize,
+                    totalSize } = nextProps.data.adgDynamicSegment[0].data)
             }
 
             this.setState({
@@ -237,7 +244,6 @@ class AudienceTable extends Component {
                 renderRefetch: null,
                 refetched: false
             })
-
             }
         }
 
@@ -246,7 +252,7 @@ class AudienceTable extends Component {
             localStorage.getItem('selectedColumns')
         )
 
-        const concatData = devices.map(device => {
+        const concatData = devices.map((device) => {
             const { profileId } = device
             if (profileId) {
                 return {
@@ -256,10 +262,11 @@ class AudienceTable extends Component {
                     )[0]
                 }
             }
+            return {}
         })
-        const rows = concatData.map(data => {
+        const rows = concatData.map((data) => {
             const row = {}
-            Object.keys(data).forEach(key => {
+            Object.keys(data).forEach((key) => {
                 if (key in selectedColumns) {
                     row[key] = this.formatRowData(
                         data[key],
@@ -340,16 +347,16 @@ class AudienceTable extends Component {
     getSelectedColumns() {
         const columns = []
         const selectedColumns = JSON.parse(localStorage.selectedColumns)
-        Object.keys(selectedColumns).map(attr => {
+        Object.keys(selectedColumns).map(attr => (
             columns.push({
                 key: attr,
                 name: attr,
                 width: 200,
                 draggable: true,
                 resizable: true,
-                formatter: this.getFormat(selectedColumns.attr)
+                formatter: this.getFormat(selectedColumns[attr])
             })
-        })
+        ))
         return columns
     }
 
@@ -370,16 +377,16 @@ class AudienceTable extends Component {
             localStorage.getItem('selectedColumns')
         )
         if (Object.keys(columns).length > 0) {
-            let rearrangeColumns = {}
-            columns.map(attr => {
+            const rearrangeColumns = {}
+            columns.map(attr => (
                 rearrangeColumns[attr.name] = selectedColumns[attr.name]
-            })
+            ))
             localStorage.setItem(
                 'selectedColumns',
                 JSON.stringify(rearrangeColumns)
             )
         }
-        
+
         this.setState({ columns, rows })
     }
 
@@ -425,7 +432,8 @@ AudienceTable.propTypes = {
     resetPagination: PropTypes.bool.isRequired,
     pageNumber: PropTypes.number.isRequired,
     context: PropTypes.string.isRequired,
-    updatePageNumber: PropTypes.func.isRequired
+    updatePageNumber: PropTypes.func.isRequired,
+    setSaveState: PropTypes.func.isRequired
 }
 
 export default createRefetchContainer(

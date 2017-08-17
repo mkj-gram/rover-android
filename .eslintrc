@@ -20,5 +20,9 @@
         'react/no-children-prop': 'off',
         'no-confusing-arrow': 'off',
         'no-plusplus': 'off'
+    },
+    'globals': {
+        'localStorage': true,
+        'google': true
     }
 }
