@@ -177,6 +177,10 @@ message GetProfileSchemaRequest {
 message GetProfileSchemaResponse {
   ProfileSchema schema = 1;
 }
+// ProfileSchema describes profiles' schema with the collection of SchemaAttribute descriptors
+message ProfileSchema {
+  repeated SchemaAttribute attributes = 10;
+}
 
 
 // Profile represents a variable set of a user attributes that customer pushes to Rover.
@@ -195,11 +199,6 @@ message Profile {
   google.protobuf.Timestamp updated_at = 6;
 }
 
-
-// ProfileSchema describes profiles' schema with the collection of SchemaAttribute descriptors
-message ProfileSchema {
-  repeated SchemaAttribute attributes = 10;
-}
 
 //
 // Device
@@ -321,6 +320,9 @@ message GetDeviceSchemaRequest {
   auth.v1.AuthContext auth_context = 1;
 }
 message GetDeviceSchemaResponse {
+  DeviceSchema schema =1;
+}
+message DeviceSchema {
   repeated SchemaAttribute attributes = 1;
 }
 
