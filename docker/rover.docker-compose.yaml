@@ -26,11 +26,9 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   content-api:
+    links: [postgres, mongo]
     image: ruby:2.3.3
     command: ./docker/content-api/cmd _bundle migrate # test
-    links:
-      - postgres
-      - mongo
     volumes:
       - ../../rover:/rover
       - cachefs:/cachefs/
@@ -47,6 +45,7 @@ services:
 
 
   auth-service:
+    links: [postgres]
     image: golang:1.8-alpine
     command: ./docker/auth-service/cmd test run
     volumes:
@@ -55,10 +54,9 @@ services:
     environment:
       CGO_ENABLED: 0
       DB_DSN: "postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable"
-    links:
-      - postgres
 
   audience-service:
+    links: [mongo]
     image: golang:1.8-alpine
     command: ./docker/audience-service/cmd test run
     volumes:
@@ -67,6 +65,3 @@ services:
     environment:
       CGO_ENABLED: 0
       MONGO_DSN: "mongodb://mongo:27017/audience_service_test"
-    # links:
-      # - postgres
-
