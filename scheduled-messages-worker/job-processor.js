@@ -1397,8 +1397,7 @@ JobProcessor.prototype._generateMessage = function(customer, timestamp) {
 
 JobProcessor.prototype._removeTokenFromDevice = function(customer, device, callback) {
     // Now an NO-OP
-    
-    process.setImmediate(function() {
+    setImmediate(function() {
         return callback()   
     })
 };
