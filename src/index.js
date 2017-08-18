@@ -66,6 +66,7 @@ import TopAlignIcon from './align/TopAlignIcon'
 
 // images
 import AnalyticsIcon from './images/app-icons/AnalyticsIcon'
+import AudiencesIcon from './images/app-icons/AudiencesIcon'
 import CustomersIcon from './images/app-icons/CustomersIcon'
 import ExperiencesIcon from './images/app-icons/ExperiencesIcon'
 import GimbalIcon from './images/app-icons/GimbalIcon'
@@ -159,6 +160,7 @@ export {
     RightAlignIcon,
     TopAlignIcon,
     AnalyticsIcon,
+    AudiencesIcon,
     CustomersIcon,
     ExperiencesIcon,
     GimbalIcon,
