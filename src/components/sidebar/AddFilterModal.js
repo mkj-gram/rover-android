@@ -131,6 +131,8 @@ class AddFilterModal extends Component {
         const { onFocus, search } = this.state
         const { onRequestClose } = this.props
 
+        const placeholderStyle = "color: rgba(255, 255, 255, 0.5);"
+
         return (
             <div style={style} onClick={() => this.handleClickOutside()}>
                 <div
@@ -141,6 +143,7 @@ class AddFilterModal extends Component {
                         height: 35
                     }}
                 >
+               
                     <IconButton
                         type={'close'}
                         onClick={onRequestClose}
@@ -191,7 +194,8 @@ class AddFilterModal extends Component {
                             onFocus={() => this.handleTextFieldEvent('focus')}
                             onBlur={() => this.handleTextFieldEvent('blur')}
                             value={this.state.search}
-                            id="textField"
+                            id="searchFiltertextField"
+                            placeholderStyle={placeholderStyle}
                         />
                     </div>
                     {search.length > 0 &&
@@ -206,7 +210,7 @@ class AddFilterModal extends Component {
                                 this.setState({
                                     search: ''
                                 })
-                                document.getElementById('textField').focus()
+                                document.getElementById('searchFiltertextField').focus()
                                 this.handleTextFieldEvent('focus')
                             }}
                         >
