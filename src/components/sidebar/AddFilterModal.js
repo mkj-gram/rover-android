@@ -24,10 +24,18 @@ class AddFilterModal extends Component {
         this.state = {
             search: '',
             filterList: this.buildFilterList(),
-            onFocus: false
+            onFocus: false,
+            clearColor: lavender
         }
         this.handleClickOutside = this.handleClickOutside.bind(this)
         this.handleTextFieldEvent = this.handleTextFieldEvent.bind(this)
+        this.onHover = this.onHover.bind(this)
+    }
+
+    onHover(val) {
+        this.setState({
+            clearColor: val ? 'white' : lavender
+        })
     }
 
     componentDidMount() {
@@ -128,10 +136,10 @@ class AddFilterModal extends Component {
             zIndex: 1
         }
 
-        const { onFocus, search } = this.state
+        const { onFocus, search, clearColor } = this.state
         const { onRequestClose } = this.props
 
-        const placeholderStyle = "color: rgba(255, 255, 255, 0.5);"
+        const placeholderStyle = 'color: rgba(255, 255, 255, 0.5);'
 
         return (
             <div style={style} onClick={() => this.handleClickOutside()}>
@@ -143,7 +151,6 @@ class AddFilterModal extends Component {
                         height: 35
                     }}
                 >
-               
                     <IconButton
                         type={'close'}
                         onClick={onRequestClose}
@@ -202,17 +209,23 @@ class AddFilterModal extends Component {
                         <div
                             style={{
                                 ...text,
-                                color: lavender,
+                                color: clearColor,
                                 fontSize: 12,
-                                marginRight: 20
+                                marginRight: 20,
+                                cursor: 'pointer'
                             }}
                             onClick={() => {
                                 this.setState({
-                                    search: ''
+                                    search: '',
+                                    clearColor: lavender
                                 })
-                                document.getElementById('searchFiltertextField').focus()
+                                document
+                                    .getElementById('searchFiltertextField')
+                                    .focus()
                                 this.handleTextFieldEvent('focus')
                             }}
+                            onMouseOver={() => this.onHover(true)}
+                            onMouseLeave={() => this.onHover(false)}
                         >
                             clear
                         </div>}
