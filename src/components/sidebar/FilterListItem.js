@@ -17,7 +17,7 @@ const listItemStyle = {
     ...light,
     width: '100%',
     height: 40,
-    borderBottom: `1px solid ${ash}`,
+    borderTop: `1px solid ${ash}`,
     color: lavender,
     fontSize: 15,
     display: 'flex',
