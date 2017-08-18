@@ -4,10 +4,13 @@ package service_test
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/pkg/errors"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -29,13 +32,28 @@ func TestAudienceService(t *testing.T) {
 		profiles         = mdb.C("profiles")
 		devices          = mdb.C("devices")
 		profiles_schemas = mdb.C("profiles_schemas")
+		system_profile   = mdb.C("system.profile")
+		res              bson.M
 	)
 
 	truncateColl(t, profiles, devices, profiles_schemas)
 
+	profile := func(level int) {
+		if err := mdb.Run(bson.M{"profile": level}, &res); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// turn off profiling to truncate collection
+	profile(0)
+	truncateColl(t, system_profile)
+
 	if err := mongodb.EnsureIndexes(mdb); err != nil {
 		t.Fatalf("EnsureIndexes: %v", err)
 	}
+
+	// turn profiling for all queries
+	profile(2)
 
 	loadFixture(t, devices, "testdata/devices.json")
 	loadFixture(t, devices, "testdata/device-00.bson.json")
@@ -77,6 +95,30 @@ func TestAudienceService(t *testing.T) {
 	t.Run("ListDevicesByProfileIdentifier", testAudienceService_ListDevicesByProfileIdentifier)
 
 	t.Run("GetDeviceSchema", testAudienceService_GetDeviceSchema)
+
+	t.Run("EnsureIndexes", func(t *testing.T) {
+		var (
+			res []bson.M
+			Q   = bson.M{
+				"op":          bson.M{"$in": []string{"query", "update"}},
+				"planSummary": bson.M{"$nin": []bson.RegEx{{Pattern: `IXSCAN`}, {Pattern: `IDHACK`}}},
+				"ns":          bson.M{"$nin": []bson.RegEx{{Pattern: `system.profile`}}},
+			}
+		)
+
+		if err := system_profile.Find(Q).All(&res); err != nil {
+			t.Error("system.profile:", err)
+		}
+
+		if len(res) > 0 {
+			data, err := json.MarshalIndent(res, " ", "  ")
+			if err != nil {
+				t.Errorf("unexpected:%v", err)
+			}
+
+			t.Errorf("non-optimized queries:%s", data)
+		}
+	})
 }
 
 func testAudienceService_CreateProfile(t *testing.T) {
