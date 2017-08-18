@@ -300,7 +300,10 @@ func (s *devicesStore) GetDeviceByPushToken(ctx context.Context, r *audience.Get
 		Q = bson.M{"push_token_key": push_token_key, "account_id": account_id}
 	)
 
-	if err := s.devices().Find(Q).One(&d); err != nil {
+	// TODO: fix the index
+	// Hint is used to explicitly hint mongo to use existing index over those keys
+	// apparently partial filter expression with "$type" confuses mongo to not use the index
+	if err := s.devices().Find(Q).Hint("push_token_key", "account_id").One(&d); err != nil {
 		return nil, wrapError(err, "devices.Find")
 	}
 
