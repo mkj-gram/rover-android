@@ -96,8 +96,10 @@ class TableMenuBar extends Component {
     }
 
     showChecked(category, item) {
-        const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns'))
-        return (item in selectedColumns)
+        const selectedColumns = JSON.parse(
+            localStorage.getItem('selectedColumns')
+        )
+        return item in selectedColumns
     }
 
     render() {
@@ -118,8 +120,10 @@ class TableMenuBar extends Component {
                 <div style={tableMenuBarLeft}>
                     <div style={tableMenuDonutIconStyle}>
                         <DonutChart
-                            amountFilled={60}
-                            amountEmpty={20}
+                            amountFilled={segmentSize / totalSize * 80}
+                            amountEmpty={
+                                (totalSize - segmentSize) / totalSize * 80
+                            }
                             primaryColor={silver}
                             accentColor={purple}
                         />
@@ -166,7 +170,10 @@ class TableMenuBar extends Component {
                         onClick={e => this.triggerColumnsMenu(e)}
                         id="columnsIcon"
                     >
-                        <TableMenuBarIcon val="columns" showToolTip={!showColumnsMenu} />
+                        <TableMenuBarIcon
+                            val="columns"
+                            showToolTip={!showColumnsMenu}
+                        />
                     </div>
                     <div style={{ marginRight: '5px' }}>
                         <SearchIcon fill={silver} />
