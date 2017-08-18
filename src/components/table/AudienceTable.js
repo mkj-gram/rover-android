@@ -38,7 +38,8 @@ class AudienceTable extends Component {
             },
             profiles: [],
             group: 0,
-            refetched: false
+            refetched: false,
+            selectedColumns: {}
         }
 
         this.createRowsAndColumns = this.createRowsAndColumns.bind(this)
@@ -88,10 +89,17 @@ class AudienceTable extends Component {
         )
 
         if (!cachedSelectedColumns) {
+            this.setState({
+                selectedColumns: selectedColumns
+            })
             localStorage.setItem(
                 'selectedColumns',
                 JSON.stringify(selectedColumns)
             )
+        } else {
+            this.setState({
+                selectedColumns: cachedSelectedColumns
+            })
         }
     }
 
@@ -125,10 +133,16 @@ class AudienceTable extends Component {
                 cachedSelectedColumns
             )
         }
+
+        this.setState({
+            selectedColumns: cachedSelectedColumns
+        })
+
         localStorage.setItem(
             'selectedColumns',
             JSON.stringify(cachedSelectedColumns)
         )
+
         this.createRowsAndColumns(this.state.devices, this.state.profiles)
     }
 
@@ -143,7 +157,10 @@ class AudienceTable extends Component {
                     refetched: true
                 })
 
-                this.props.setSaveState({ isSegmentUpdate: (this.state.segmentId !== ''), showSaveButton: true })
+                this.props.setSaveState({
+                    isSegmentUpdate: this.state.segmentId !== '',
+                    showSaveButton: true
+                })
             } else if (nextProps.context === 'segments') {
                 this.setState({
                     segmentId: nextProps.segmentId,
@@ -151,7 +168,11 @@ class AudienceTable extends Component {
                     group,
                     refetched: true
                 })
-                this.props.setSaveState({ isSegmentUpdate: false, showSaveButton: false })
+
+                this.props.setSaveState({
+                    isSegmentUpdate: false,
+                    showSaveButton: false
+                })
             }
         } else {
             throw new Error(error)
@@ -218,13 +239,13 @@ class AudienceTable extends Component {
                 segmentSize,
                 totalSize
             if (renderRefetch) {
-                ({
+                ;({
                     devices,
                     profiles,
                     segmentSize,
                     totalSize } = nextProps.data.adgSegmentsFromPredicates)
             } else {
-                ({
+                ;({
                     devices,
                     profiles,
                     segmentSize,
@@ -244,8 +265,8 @@ class AudienceTable extends Component {
                 renderRefetch: null,
                 refetched: false
             })
-            }
         }
+    }
 
     getSelectedRows(profiles, devices, pageNum = 0) {
         const selectedColumns = JSON.parse(
@@ -391,7 +412,13 @@ class AudienceTable extends Component {
     }
 
     render() {
-        const { columns, rows, segmentSize, totalSize } = this.state
+        const {
+            columns,
+            rows,
+            segmentSize,
+            totalSize,
+            selectedColumns
+        } = this.state
         const { isTooltipShowing, message, coordinates } = this.state.toolTip
 
         return (
@@ -408,6 +435,7 @@ class AudienceTable extends Component {
                     totalSize={totalSize}
                     allColumns={this.state.allColumns}
                     updateChecked={this.updateChecked}
+                    selectedColumns={selectedColumns}
                 />
                 <AudienceDataGrid
                     segmentSize={segmentSize}

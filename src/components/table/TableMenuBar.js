@@ -95,11 +95,8 @@ class TableMenuBar extends Component {
         })
     }
 
-    showChecked(category, item) {
-        const selectedColumns = JSON.parse(
-            localStorage.getItem('selectedColumns')
-        )
-        return item in selectedColumns
+    showChecked(item) {
+        return (item in this.props.selectedColumns)
     }
 
     render() {

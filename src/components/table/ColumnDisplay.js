@@ -87,7 +87,7 @@ class ColumnDisplay extends Component {
                 {items.slice(0, size).map((item, index) =>
                     (<div style={{ paddingBottom: 17 }} key={index}>
                         <Checkbox
-                            isChecked={showChecked(category, item)}
+                            isChecked={showChecked(item)}
                             label={item}
                             primaryColor={purple}
                             isDisabled={false}
