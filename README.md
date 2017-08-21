@@ -11,7 +11,7 @@ npm install
 ### Updating Local Schema
 
 ```
-npm Schema
+NODE_ENV=${ production || staging || development } npm run schema
 ```
 
 ### Running Development Environment
@@ -24,5 +24,5 @@ npm relay
 #### Webpack development server
 
 ```
-npm start
+NODE_ENV=${ production || staging || development } npm start
 ```

@@ -8,7 +8,13 @@ const {
 
 const store = new Store(new RecordSource())
 
-const network = Network.create((operation, variables) => fetch('https://api.staging.rover.io/graphql', {
+const uri = {
+    'production': 'https://api.rover.io/graphql',
+    'staging': 'https://api.staging.rover.io/graphql',
+    'development': 'http://localhost:4000/graphql'
+}
+
+const network = Network.create((operation, variables) => fetch(uri[process.env.NODE_ENV], {
         method: 'POST',
         headers: {
             Accept: 'application/json',
