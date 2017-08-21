@@ -31,7 +31,8 @@ import (
 )
 
 var (
-	tMongoDSN = flag.String("test.mongo.DSN", "mongodb://mongo:27017/audience_service_test", "mongodb to connect to")
+	tMongoDSN        = flag.String("test.mongo.DSN", "mongodb://mongo:27017/audience_service_test", "mongodb to connect to")
+	tGSvcAcctKeyPath = flag.String("test.google-service-acct-key-path", "", "google service acct key file")
 )
 
 type (
@@ -42,6 +43,7 @@ type (
 )
 
 func init() {
+	// increase deep diff depth
 	deep.MaxDepth = 50
 }
 
@@ -235,25 +237,25 @@ func diffCmd(exp, got string) (string, error) {
 	return string(data), nil
 }
 
-func newServer(rpcAddr string, svc *audience_service.Server) (net.Listener, error) {
+func NewServer(rpcAddr string, srv audience.AudienceServer) (net.Listener, error) {
 	lis, err := net.Listen("tcp", rpcAddr)
 	if err != nil {
 		return nil, err
 	}
 
-	srv := grpc.NewServer()
+	grpcSrv := grpc.NewServer()
 
-	audience_service.Register(srv, svc)
+	audience_service.Register(grpcSrv, srv)
 
-	go srv.Serve(lis)
+	go grpcSrv.Serve(lis)
 
 	return lis, nil
 }
 
-func NewSeviceClient(t testing.TB, rpcAddr string, svc *audience_service.Server) (audience.AudienceClient, func()) {
-	lis, err := newServer(rpcAddr, svc)
+func NewSeviceClient(t testing.TB, rpcAddr string, srv audience.AudienceServer) (audience.AudienceClient, func()) {
+	lis, err := NewServer(rpcAddr, srv)
 	if err != nil {
-		t.Fatal("newServer:", err)
+		t.Fatal("NewServer:", err)
 	}
 
 	time.Sleep(10 * time.Millisecond)

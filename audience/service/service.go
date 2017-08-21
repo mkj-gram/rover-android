@@ -21,15 +21,22 @@ var (
 )
 
 type (
+
 	// Server implements the audience service grpc interface
 	Server struct {
-		db *mongodb.DB
+		db     *mongodb.DB
+		notify *serviceNotify
 	}
 )
 
 // New creates new Server instance with all the options provided
-func New(db *mongodb.DB) *Server {
-	return &Server{db: db}
+func New(db *mongodb.DB, notifier Notifier) *Server {
+	return &Server{
+		db: db,
+		notify: &serviceNotify{
+			Notifier: notifier,
+		},
+	}
 }
 
 //
@@ -108,6 +115,11 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 	if err := db.CreateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice: %v", err)
 	}
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceCreated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
 
 	return &audience.CreateDeviceResponse{}, nil
 }
@@ -120,6 +132,12 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 	if err := db.UpdateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevice: %v", err)
 	}
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
 	return &audience.UpdateDeviceResponse{}, nil
 }
 
@@ -131,6 +149,12 @@ func (s *Server) UpdateDeviceTestProperty(ctx context.Context, r *audience.Updat
 	if err := db.UpdateDeviceTestProperty(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceTestProperty: %v", err)
 	}
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
 	return &audience.UpdateDeviceTestPropertyResponse{}, nil
 }
 
@@ -142,9 +166,16 @@ func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceReque
 	db := s.db.Copy()
 	defer db.Close()
 
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+
 	if err := db.DeleteDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteDevice: %v", err)
 	}
+
+	s.notify.deviceDeleted(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
 
 	return &audience.DeleteDeviceResponse{}, nil
 }
@@ -161,9 +192,17 @@ func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProf
 	db := s.db.Copy()
 	defer db.Close()
 
+	oldProfileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+
 	if err := db.SetDeviceProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.SetDeviceProfile: %v", err)
 	}
+
+	s.notify.deviceProfileUpdated(ctx, r.AuthContext.AccountId, oldProfileId, r.ProfileId, r.DeviceId)
+
 	return &audience.SetDeviceProfileResponse{}, nil
 }
 
@@ -175,6 +214,13 @@ func (s *Server) UpdateDevicePushToken(ctx context.Context, r *audience.UpdateDe
 	if err := db.UpdateDevicePushToken(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevicePushToken: %v", err)
 	}
+
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
 	return &audience.UpdateDevicePushTokenResponse{}, nil
 }
 
@@ -186,6 +232,13 @@ func (s *Server) UpdateDeviceUnregisterPushToken(ctx context.Context, r *audienc
 	if err := db.UpdateDeviceUnregisterPushToken(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceUnregisterPushToken: %v", err)
 	}
+
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
 	return &audience.UpdateDeviceUnregisterPushTokenResponse{}, nil
 }
 
@@ -197,6 +250,13 @@ func (s *Server) UpdateDeviceLocation(ctx context.Context, r *audience.UpdateDev
 	if err := db.UpdateDeviceLocation(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceLocation: %v", err)
 	}
+
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
 	return &audience.UpdateDeviceLocationResponse{}, nil
 }
 
@@ -208,6 +268,12 @@ func (s *Server) UpdateDeviceGeofenceMonitoring(ctx context.Context, r *audience
 	if err := db.UpdateDeviceGeofenceMonitoring(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceGeofenceMonitoring: %v", err)
 	}
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
 	return &audience.UpdateDeviceGeofenceMonitoringResponse{}, nil
 }
 
@@ -219,6 +285,12 @@ func (s *Server) UpdateDeviceIBeaconMonitoring(ctx context.Context, r *audience.
 	if err := db.UpdateDeviceIBeaconMonitoring(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceIBeaconMonitoring: %v", err)
 	}
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
 	return &audience.UpdateDeviceIBeaconMonitoringResponse{}, nil
 }
 
@@ -234,6 +306,7 @@ func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDev
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileId: %v", err)
 	}
+
 	return &audience.ListDevicesByProfileIdResponse{devices}, nil
 }
 
@@ -296,6 +369,7 @@ func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileReq
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateProfile: %v", err)
 	}
+	s.notify.profileCreated(ctx, r.AuthContext.AccountId, p.GetId())
 
 	return &audience.CreateProfileResponse{p}, nil
 }
@@ -308,6 +382,7 @@ func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileReq
 	if err := db.DeleteProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteProfile: %v", err)
 	}
+	s.notify.profileDeleted(ctx, r.AuthContext.AccountId, r.ProfileId)
 
 	return &audience.DeleteProfileResponse{}, nil
 }
@@ -390,8 +465,14 @@ func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileReq
 	db := s.db.Copy()
 	defer db.Close()
 
-	if err := db.UpdateProfile(ctx, r); err != nil {
+	schemaUpdated, err := db.UpdateProfile(ctx, r)
+	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfile: %v", err)
+	}
+
+	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId)
+	if schemaUpdated {
+		s.notify.schemaUpdated(ctx, r.AuthContext.AccountId, r.ProfileId)
 	}
 
 	return &audience.UpdateProfileResponse{}, nil
@@ -409,6 +490,7 @@ func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.Update
 	if err := db.UpdateProfileIdentifier(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfileIdentifier: %v", err)
 	}
+	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId)
 
 	return &audience.UpdateProfileIdentifierResponse{}, nil
 }

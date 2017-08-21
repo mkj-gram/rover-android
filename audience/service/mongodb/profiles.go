@@ -462,7 +462,7 @@ func (s *profilesStore) UpdateProfileIdentifier(ctx context.Context, r *audience
 // 6. update attributes
 // 7. update schema
 //
-func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdateProfileRequest) error {
+func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdateProfileRequest) (bool, error) {
 	var (
 		profile_id  = r.GetProfileId()
 		account_id  = r.GetAuthContext().GetAccountId()
@@ -477,41 +477,40 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 	}).One(&p)
 
 	if err != nil {
-		return wrapError(err, "profiles.Find")
+		return false, wrapError(err, "profiles.Find")
 	}
 
 	// schema is a bag of `SchemaAttribute`s
 	schema, err := s.getProfileSchema(ctx, account_id)
 	if err != nil {
-		return wrapError(err, "getProfileSchema")
+		return false, wrapError(err, "getProfileSchema")
 	}
 
 	// at this point update either get accepted or rejected if there's
 	// an attribute that doesn't match the schema.
 	schemaLess, err := s.validateProfileAttributes(schema, attrUpdates)
 	if err != nil {
-		return wrapError(err, "SchemaValidation")
+		return false, wrapError(err, "SchemaValidation")
 	}
 
 	// now for all the schemaLess attributes create the corresponding schema
 	if len(schemaLess) > 0 {
 		schemaUpdate, err := s.generateProfileSchema(ctx, account_id, attrUpdates, schemaLess)
 		if err != nil {
-			return wrapError(err, "generateProfileSchema")
+			return false, wrapError(err, "generateProfileSchema")
 		}
 
 		if err := s.updateSchema(ctx, schemaUpdate); err != nil {
-			return wrapError(err, "updateSchema")
+			return false, wrapError(err, "updateSchema")
 		}
 	}
 
 	//`schemaLess` contains names of the attributes that do not have schema defined yet
-	// but before updating the attribute schema let's persist the the profile attributes updates first
 	if err := s.updateProfileAttributes(ctx, p.Id.Hex(), attrUpdates); err != nil {
-		return wrapError(err, "updateProfileAttributes")
+		return false, wrapError(err, "updateProfileAttributes")
 	}
 
-	return nil
+	return len(schemaLess) > 0, nil
 }
 
 // updateSchema inserts provided SchemaAttributes into the DB

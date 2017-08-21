@@ -32,7 +32,7 @@ func testAudienceService_GetDevicesTotalCount(t *testing.T) {
 			mongodb.WithTimeFunc(timeNow),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -94,7 +94,7 @@ func testAudienceService_GetProfilesTotalCount(t *testing.T) {
 			mongodb.WithTimeFunc(timeNow),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)

@@ -101,10 +101,11 @@ func TestAudienceService(t *testing.T) {
 	t.Run("UpdateDeviceIBeaconMonitoring", testAudienceService_UpdateDeviceIBeaconMonitoring)
 	t.Run("UpdateDeviceTestProperty", testAudienceService_UpdateDeviceTestProperty)
 
-	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfile)
 	t.Run("DeleteDevice", testAudienceService_DeleteDevice)
 	t.Run("ListDevicesByProfileId", testAudienceService_ListDevicesByProfileId)
 	t.Run("ListDevicesByProfileIdentifier", testAudienceService_ListDevicesByProfileIdentifier)
+
+	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfile)
 
 	t.Run("GetDeviceSchema", testAudienceService_GetDeviceSchema)
 
@@ -117,10 +118,12 @@ func TestAudienceService(t *testing.T) {
 	t.Run("UpdateDynamicSegmentPredicates", testAudienceService_UpdateDynamicSegmentPredicates)
 
 	t.Run("ListDynamicSegments", testAudienceService_ListDynamicSegments)
-	
+
 	// CounterCaches
 	t.Run("GetDevicesTotalCount", testAudienceService_GetDevicesTotalCount)
 	t.Run("GetProfilesTotalCount", testAudienceService_GetProfilesTotalCount)
+
+	t.Run("EnsureNotifications", testAudienceServiceNotifications)
 
 	// NOTE: must run last
 	t.Run("EnsureIndexes", func(t *testing.T) {
@@ -162,7 +165,7 @@ func testAudienceService_CreateProfile(t *testing.T) {
 			mongodb.WithTimeFunc(timeNow),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -227,7 +230,7 @@ func testAudienceService_DeleteProfile(t *testing.T) {
 			dialMongo(t, *tMongoDSN),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -334,7 +337,7 @@ func testAudienceService_UpdateProfileIdentifier(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -463,7 +466,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -1220,7 +1223,7 @@ func testAudienceService_GetProfileByDeviceId(t *testing.T) {
 			dialMongo(t, *tMongoDSN),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -1292,7 +1295,7 @@ func testAudienceService_GetProfile(t *testing.T) {
 			dialMongo(t, *tMongoDSN),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -1370,7 +1373,7 @@ func testAudienceService_GetProfileByIdentifier(t *testing.T) {
 			dialMongo(t, *tMongoDSN),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -1450,7 +1453,7 @@ func testAudienceService_ListProfilesByIds(t *testing.T) {
 			dialMongo(t, *tMongoDSN),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -1547,7 +1550,7 @@ func testAudienceService_ListProfilesByIdentifiers(t *testing.T) {
 			dialMongo(t, *tMongoDSN),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -1632,7 +1635,7 @@ func testAudienceService_GetProfilesSchema(t *testing.T) {
 			dialMongo(t, *tMongoDSN),
 		)
 
-		svc              = service.New(db)
+		svc              = service.New(db, logNotifier(t))
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
 
@@ -1712,7 +1715,7 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -1730,14 +1733,12 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 		{
 			name: "error: invalid profile_id",
 			req: &audience.SetDeviceProfileRequest{
-				AuthContext: &auth.AuthContext{
-					AccountId: 1,
-				},
-				DeviceId:  "invalid",
-				ProfileId: "invalid",
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				DeviceId:    "invalid",
+				ProfileId:   "invalid",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.SetDeviceProfile: StringToObjectID: ProfileId: bson.IsObjectIdHex: false"),
+			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceProfileIdById: devices.FindId: not found"),
 		},
 
 		{
@@ -1761,7 +1762,7 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 				ProfileId:   "000000000000000000000000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.SetDeviceProfile: profileExists: not found"),
+			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceProfileIdById: devices.FindId: not found"),
 		},
 
 		{
@@ -1835,7 +1836,7 @@ func testAudienceService_GetDevice(t *testing.T) {
 		db  = mongodb.New(mdb,
 			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
 		)
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		createdAt = protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z"))
 
@@ -1980,7 +1981,7 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 		db  = mongodb.New(mdb,
 			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
 		)
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -2075,7 +2076,7 @@ func testAudienceService_CreateDevice(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return createdAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -2207,7 +2208,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -2486,7 +2487,7 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -2636,7 +2637,7 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -2836,7 +2837,7 @@ func testAudienceService_UpdateDeviceUnregisterPushToken(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -2948,7 +2949,7 @@ func testAudienceService_UpdateDeviceLocation(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -3057,7 +3058,7 @@ func testAudienceService_UpdateDeviceGeofenceMonitoring(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -3172,7 +3173,7 @@ func testAudienceService_UpdateDeviceIBeaconMonitoring(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -3282,7 +3283,7 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 
 		db = mongodb.New(dialMongo(t, *tMongoDSN))
 
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -3320,7 +3321,7 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 				DeviceId: "000000000000000000000000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.DeleteDevice: devices.Remove: not found"),
+			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceProfileIdById: devices.FindId: not found"),
 		},
 
 		{
@@ -3330,7 +3331,7 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 				DeviceId:    "00000000-0000-0000-0000-000000000000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.DeleteDevice: devices.Remove: not found"),
+			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceProfileIdById: devices.FindId: not found"),
 		},
 
 		{
@@ -3395,7 +3396,7 @@ func testAudienceService_ListDevicesByProfileId(t *testing.T) {
 		db  = mongodb.New(mdb,
 			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
 		)
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -3502,7 +3503,7 @@ func testAudienceService_ListDevicesByProfileIdentifier(t *testing.T) {
 			mongodb.WithLogger(log.NewLog(log.Debug)),
 			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
 		)
-		svc = service.New(db)
+		svc = service.New(db, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -3602,7 +3603,8 @@ func testAudienceService_GetDeviceSchema(t *testing.T) {
 	var (
 		ctx              = context.TODO()
 		mdb              = dialMongo(t, *tMongoDSN)
-		svc              = service.New(mongodb.New(mdb))
+		db               = mongodb.New(mdb)
+		svc              = service.New(db, logNotifier(t))
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
 

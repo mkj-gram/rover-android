@@ -7,6 +7,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
@@ -15,6 +16,8 @@ import (
 
 	"github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/mongodb"
+	spubsub "github.com/roverplatform/rover/audience/service/pubsub"
+
 	grpc_middleware "github.com/roverplatform/rover/go/grpc/middleware"
 	grpc_newrelic "github.com/roverplatform/rover/go/grpc/middleware/newrelic"
 	rlog "github.com/roverplatform/rover/go/log"
@@ -31,6 +34,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 
 	gerrors "cloud.google.com/go/errors"
+	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/trace"
 	"github.com/newrelic/go-agent"
 )
@@ -41,26 +45,39 @@ const (
 
 var (
 	// NOTE: environment variables are just UPPERCASED_NAMES of the flag names
-	// ie: TLS, KEY_FILE, DB_DSN, etc
+	// ie: TLS, KEY_FILE, MONGO_DSN, etc
+
+	// TLS
 	serviceTLS = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
 	certFile   = flag.String("cert-file", "cert.pem", "The TLS cert file")
 	keyFile    = flag.String("key-file", "server.key", "The TLS key file")
 
+	//  network
 	rpcAddr  = flag.String("rpc-addr", ":5100", "rpc address")
 	httpAddr = flag.String("http-addr", ":5080", "http address")
 
+	// MongoDB
 	mongoDSN = flag.String("mongo-dsn", "", "mongo Data Source Name")
 
-	gProjectID = flag.String("google-project-id", "", "google PROJECT_ID")
-	gTraceKey  = flag.String("google-trace-key", "", "path to google trace service account key file")
+	// GCP Cloud
+	gcpProjectID      = flag.String("gcp-project-id", "", "GCP PROJECT_ID")
+	gcpSvcAcctKeyPath = flag.String("gcp-service-account-key-path", "", "path to service GCP's account key")
 
+	// GCP PubSub
+	topicName = flag.String("pubsub-topic-name", "audience-service-updates", "pubsub's topic name to push updates to")
+	NWorkers  = flag.Int("pubsub-nworkers", 10, "number of pubsub's push workers")
+
+	// NewRelic
 	newRelicKey = flag.String("newrelic-key", "", "New Relic licence key")
 )
 
 var (
+	// Logs
 	stderr  = log.New(os.Stderr, "error: ", 0)
 	stdout  = log.New(os.Stdout, "", 0)
 	grpcLog = log.New(os.Stdout, "grpclog: ", 0)
+
+	roverLog = rlog.NewLog(rlog.Info)
 )
 
 func main() {
@@ -71,21 +88,26 @@ func main() {
 	// do not timestamp log entries: GKE does it
 	grpclog.SetLogger(grpcLog)
 
-	var ctx, cancelFn = context.WithCancel(context.Background())
-	defer cancelFn()
-
 	lis, err := net.Listen("tcp", *rpcAddr)
 	if err != nil {
 		stderr.Fatalf("net.Listen: %v", err)
 	}
 
-	var unaryMiddleware []grpc.UnaryServerInterceptor
+	var (
+		pubWg           sync.WaitGroup
+		unaryMiddleware []grpc.UnaryServerInterceptor
+		tc              *trace.Client
 
-	var tc *trace.Client
+		notifier service.Notifier
 
-	if *gProjectID != "" && *gTraceKey != "" {
+		ctx, cancelFn = context.WithCancel(context.Background())
+	)
+
+	defer cancelFn()
+
+	if *gcpProjectID != "" && *gcpSvcAcctKeyPath != "" {
 		var err error
-		tc, err = trace.NewClient(ctx, *gProjectID, option.WithServiceAccountFile(*gTraceKey))
+		tc, err = trace.NewClient(ctx, *gcpProjectID, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
 		if err != nil {
 			stderr.Fatalf("trace.NewClient: %v", err)
 		} else {
@@ -96,21 +118,73 @@ func main() {
 			}
 
 			tc.SetSamplingPolicy(p)
-			stdout.Println("google.tracing=on")
+			stdout.Println("gcp.tracing=on")
 			unaryMiddleware = append(unaryMiddleware, UnaryTraceInterceptor(tc))
 		}
 
-		errClient, err := gerrors.NewClient(ctx, *gProjectID, "audience-service", "v1", true, option.WithServiceAccountFile(*gTraceKey))
+		errClient, err := gerrors.NewClient(ctx, *gcpProjectID, "audience-service", "v1", true, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
 		if err != nil {
 			stderr.Fatalf("errors.NewClient: %v", err)
 		} else {
-			stdout.Println("google.errors=on")
+			stdout.Println("gcp.errors=on")
 			unaryMiddleware = append(unaryMiddleware, UnaryPanicInterceptor(errClient))
 		}
 
+		pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+		if err != nil {
+			log.Fatalf("pubsub.NewClient: %v", err)
+		} else {
+			stdout.Println("gcp.pubsub=on")
+		}
+
+		topic := pubsubClient.Topic(*topicName)
+		defer topic.Stop()
+		defer pubsubClient.Close()
+
+		topic.PublishSettings = pubsub.PublishSettings{
+			Timeout:        60 * time.Second,
+			DelayThreshold: 500 * time.Millisecond,
+			CountThreshold: 100,
+			ByteThreshold:  1e6,
+			// defaults to number of cores
+			// NumGoroutines:  10,
+		}
+
+		_notifier := &spubsub.Notifier{
+			Batchc:        make(chan service.Message),
+			Pubc:          make(chan []service.Message),
+			FlushInterval: 100 * time.Millisecond,
+			BatchSize:     100,
+			NWorkers:      10,
+			Log:           roverLog,
+		}
+		notifier = _notifier
+
+		var publisher spubsub.Publisher = spubsub.TopicPublisher(topic)
+
+		publisher = func(pub spubsub.Publisher) spubsub.PublisherFunc {
+			return spubsub.PublisherFunc(func(ctx context.Context, msgs []service.Message) (string, error) {
+				span := tc.NewSpan("audience-service/push/" + topic.String())
+				id, err := pub.Publish(ctx, msgs)
+				span.Finish()
+				if err != nil {
+					errClient.Reportf(ctx, nil, "pubsub: %v", err)
+				}
+				return id, err
+			})
+		}(publisher)
+
+		go _notifier.Listen(ctx)
+
+		go func() {
+			_notifier.Publish(ctx, publisher)
+			stdout.Println("notifier: publish: exited")
+		}()
+
 	} else {
-		stdout.Println("google.errors=off")
-		stdout.Println("google.tracing=off")
+		stdout.Println("gcp.errors=off")
+		stdout.Println("gcp.tracing=off")
+		stdout.Println("gcp.pubsub=off")
 
 		unaryMiddleware = []grpc.UnaryServerInterceptor{
 			grpc_prometheus.UnaryServerInterceptor,
@@ -118,6 +192,11 @@ func main() {
 			grpc_middleware.UnaryLogger,
 		}
 
+		// development mode just logs notifications
+		notifier = service.FuncNotifier(func(ctx context.Context, msg service.Message) error {
+			stdout.Printf("%+v\n", msg)
+			return nil
+		})
 	}
 
 	if *newRelicKey != "" {
@@ -135,7 +214,7 @@ func main() {
 		stdout.Println("newrelic=off")
 	}
 
-	var opts = []grpc.ServerOption{
+	var grpcServerOpts = []grpc.ServerOption{
 		grpc.UnaryInterceptor(grpc_middleware.UnaryChain(unaryMiddleware...)),
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 	}
@@ -145,7 +224,7 @@ func main() {
 		if err != nil {
 			stderr.Fatalf("credentials.NewServerTLSFromFile: %v", err)
 		}
-		opts = append(opts, grpc.Creds(creds))
+		grpcServerOpts = append(grpcServerOpts, grpc.Creds(creds))
 	}
 
 	sess, mongoInfo := dialMongo(*mongoDSN)
@@ -163,14 +242,17 @@ func main() {
 
 	// sess.SetSocketTimeout(10 * time.Second)
 
-	db := mongodb.New(sess.DB(mongoInfo.Database),
-		mongodb.WithLogger(rlog.NewLog(rlog.Error)),
-		mongodb.WithTimeFunc(time.Now),
+	var (
+		db = mongodb.New(sess.DB(mongoInfo.Database),
+			mongodb.WithLogger(roverLog),
+			mongodb.WithTimeFunc(time.Now))
+
+		grpcServer = grpc.NewServer(grpcServerOpts...)
+
+		audienceService = service.New(db, notifier)
 	)
 
-	grpcServer := grpc.NewServer(opts...)
-
-	service.Register(grpcServer, service.New(db))
+	service.Register(grpcServer, audienceService)
 
 	go func() {
 		stdout.Printf("proto=rpc address=%q", *rpcAddr)
@@ -210,10 +292,11 @@ func main() {
 	}
 
 	grpcServer.GracefulStop()
+	stdout.Println("waiting for publisher")
+	pubWg.Wait()
 	stdout.Println("stopped")
 }
 
-// for livelines we're "alway on": k8s shoudn't take pod down because db is down
 func ping(sess *mgo.Session, readiness bool, tc *trace.Client) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if tc != nil {
