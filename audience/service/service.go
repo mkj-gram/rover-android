@@ -94,6 +94,7 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceRequest) (*audience.UpdateDeviceResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevice: %v", err)
 	}
@@ -104,6 +105,7 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 func (s *Server) UpdateDeviceTestProperty(ctx context.Context, r *audience.UpdateDeviceTestPropertyRequest) (*audience.UpdateDeviceTestPropertyResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateDeviceTestProperty(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceTestProperty: %v", err)
 	}
@@ -132,6 +134,7 @@ func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProf
 	if err := validateID(r.GetProfileId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
 	}
+
 	db := s.db.Copy()
 	defer db.Close()
 
@@ -145,6 +148,7 @@ func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProf
 func (s *Server) UpdateDevicePushToken(ctx context.Context, r *audience.UpdateDevicePushTokenRequest) (*audience.UpdateDevicePushTokenResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateDevicePushToken(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevicePushToken: %v", err)
 	}
@@ -155,6 +159,7 @@ func (s *Server) UpdateDevicePushToken(ctx context.Context, r *audience.UpdateDe
 func (s *Server) UpdateDeviceUnregisterPushToken(ctx context.Context, r *audience.UpdateDeviceUnregisterPushTokenRequest) (*audience.UpdateDeviceUnregisterPushTokenResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateDeviceUnregisterPushToken(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceUnregisterPushToken: %v", err)
 	}
@@ -165,6 +170,7 @@ func (s *Server) UpdateDeviceUnregisterPushToken(ctx context.Context, r *audienc
 func (s *Server) UpdateDeviceLocation(ctx context.Context, r *audience.UpdateDeviceLocationRequest) (*audience.UpdateDeviceLocationResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateDeviceLocation(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceLocation: %v", err)
 	}
@@ -175,6 +181,7 @@ func (s *Server) UpdateDeviceLocation(ctx context.Context, r *audience.UpdateDev
 func (s *Server) UpdateDeviceGeofenceMonitoring(ctx context.Context, r *audience.UpdateDeviceGeofenceMonitoringRequest) (*audience.UpdateDeviceGeofenceMonitoringResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateDeviceGeofenceMonitoring(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceGeofenceMonitoring: %v", err)
 	}
@@ -185,6 +192,7 @@ func (s *Server) UpdateDeviceGeofenceMonitoring(ctx context.Context, r *audience
 func (s *Server) UpdateDeviceIBeaconMonitoring(ctx context.Context, r *audience.UpdateDeviceIBeaconMonitoringRequest) (*audience.UpdateDeviceIBeaconMonitoringResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateDeviceIBeaconMonitoring(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceIBeaconMonitoring: %v", err)
 	}
@@ -198,6 +206,7 @@ func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDev
 
 	db := s.db.Copy()
 	defer db.Close()
+
 	devices, err := db.ListDevicesByProfileId(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileId: %v", err)
@@ -212,6 +221,7 @@ func (s *Server) ListDevicesByProfileIdentifier(ctx context.Context, r *audience
 
 	db := s.db.Copy()
 	defer db.Close()
+
 	devices, err := db.ListDevicesByProfileIdentifier(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileIdentifier: %v", err)
@@ -233,6 +243,7 @@ func (s *Server) GetDeviceSchema(ctx context.Context, r *audience.GetDeviceSchem
 func (s *Server) GetProfile(ctx context.Context, r *audience.GetProfileRequest) (*audience.GetProfileResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	p, err := db.GetProfile(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfile: %v", err)
@@ -249,6 +260,7 @@ func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileReq
 
 	db := s.db.Copy()
 	defer db.Close()
+
 	p, err := db.CreateProfile(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateProfile: %v", err)
@@ -261,6 +273,7 @@ func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileReq
 func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileRequest) (*audience.DeleteProfileResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.DeleteProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteProfile: %v", err)
 	}
@@ -272,6 +285,7 @@ func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileReq
 func (s *Server) GetProfileByDeviceId(ctx context.Context, r *audience.GetProfileByDeviceIdRequest) (*audience.GetProfileByDeviceIdResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	p, err := db.GetProfileByDeviceId(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfileByDeviceId: %v", err)
@@ -284,6 +298,7 @@ func (s *Server) GetProfileByDeviceId(ctx context.Context, r *audience.GetProfil
 func (s *Server) GetProfileByIdentifier(ctx context.Context, r *audience.GetProfileByIdentifierRequest) (*audience.GetProfileByIdentifierResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	p, err := db.GetProfileByIdentifier(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfileByIdentifier: %v", err)
@@ -296,6 +311,7 @@ func (s *Server) GetProfileByIdentifier(ctx context.Context, r *audience.GetProf
 func (s *Server) GetProfileSchema(ctx context.Context, r *audience.GetProfileSchemaRequest) (*audience.GetProfileSchemaResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	p, err := db.GetProfileSchema(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfileSchema: %v", err)
@@ -308,6 +324,7 @@ func (s *Server) GetProfileSchema(ctx context.Context, r *audience.GetProfileSch
 func (s *Server) ListProfilesByIds(ctx context.Context, r *audience.ListProfilesByIdsRequest) (*audience.ListProfilesByIdsResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	ps, err := db.ListProfilesByIds(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListProfilesByIds: %v", err)
@@ -320,6 +337,7 @@ func (s *Server) ListProfilesByIds(ctx context.Context, r *audience.ListProfiles
 func (s *Server) ListProfilesByIdentifiers(ctx context.Context, r *audience.ListProfilesByIdentifiersRequest) (*audience.ListProfilesByIdentifiersResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
 	ps, err := db.ListProfilesByIdentifiers(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListProfilesByIdentifiers: %v", err)
@@ -340,6 +358,7 @@ func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileReq
 
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfile: %v", err)
 	}
@@ -355,6 +374,7 @@ func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.Update
 
 	db := s.db.Copy()
 	defer db.Close()
+
 	if err := db.UpdateProfileIdentifier(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfileIdentifier: %v", err)
 	}
@@ -368,32 +388,95 @@ func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.Update
 
 // CreateDynamicSegment implements the corresponding rpc
 func (s *Server) CreateDynamicSegment(ctx context.Context, r *audience.CreateDynamicSegmentRequest) (*audience.CreateDynamicSegmentResponse, error) {
-	return &audience.CreateDynamicSegmentResponse{}, status.Error(codes.Unimplemented, "TODO:")
+	db := s.db.Copy()
+	defer db.Close()
+
+	ds, err := db.CreateDynamicSegment(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDynamicSegment: %v", err)
+	}
+
+	return &audience.CreateDynamicSegmentResponse{
+		Segment: ds,
+	}, nil
 }
 
 // GetDynamicSegmentById implements the corresponding rpc
 func (s *Server) GetDynamicSegmentById(ctx context.Context, r *audience.GetDynamicSegmentByIdRequest) (*audience.GetDynamicSegmentByIdResponse, error) {
-	return &audience.GetDynamicSegmentByIdResponse{}, status.Error(codes.Unimplemented, "TODO:")
+	if err := validateID(r.GetSegmentId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: SegmentId: %v", err)
+	}
+	db := s.db.Copy()
+	defer db.Close()
+
+	ds, err := db.GetDynamicSegmentById(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDynamicSegmentById: %v", err)
+	}
+
+	return &audience.GetDynamicSegmentByIdResponse{
+		Segment: ds,
+	}, nil
 }
 
 // UpdateDynamicSegmentTitle implements the corresponding rpc
 func (s *Server) UpdateDynamicSegmentTitle(ctx context.Context, r *audience.UpdateDynamicSegmentTitleRequest) (*audience.UpdateDynamicSegmentTitleResponse, error) {
-	return &audience.UpdateDynamicSegmentTitleResponse{}, status.Error(codes.Unimplemented, "TODO:")
+	if err := validateID(r.GetSegmentId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: SegmentId: %v", err)
+	}
+	db := s.db.Copy()
+	defer db.Close()
+
+	if err := db.UpdateDynamicSegmentTitle(ctx, r); err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDynamicSegmentTitle: %v", err)
+	}
+
+	return &audience.UpdateDynamicSegmentTitleResponse{}, nil
 }
 
 // UpdateDynamicSegmentPredicates implements the corresponding rpc
 func (s *Server) UpdateDynamicSegmentPredicates(ctx context.Context, r *audience.UpdateDynamicSegmentPredicatesRequest) (*audience.UpdateDynamicSegmentPredicatesResponse, error) {
-	return &audience.UpdateDynamicSegmentPredicatesResponse{}, status.Error(codes.Unimplemented, "TODO:")
+	if err := validateID(r.GetSegmentId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: SegmentId: %v", err)
+	}
+
+	db := s.db.Copy()
+	defer db.Close()
+
+	if err := db.UpdateDynamicSegmentPredicates(ctx, r); err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDynamicSegmentPredicates: %v", err)
+	}
+
+	return &audience.UpdateDynamicSegmentPredicatesResponse{}, nil
 }
 
-// ArchiveDynamicSegmentById implements the corresponding rpc
-func (s *Server) ArchiveDynamicSegmentById(ctx context.Context, r *audience.ArchiveDynamicSegmentByIdRequest) (*audience.ArchiveDynamicSegmentByIdResponse, error) {
-	return &audience.ArchiveDynamicSegmentByIdResponse{}, status.Error(codes.Unimplemented, "TODO:")
+// UpdateDynamicSegmentArchiveStatus implements the corresponding rpc
+func (s *Server) UpdateDynamicSegmentArchiveStatus(ctx context.Context, r *audience.UpdateDynamicSegmentArchiveStatusRequest) (*audience.UpdateDynamicSegmentArchiveStatusResponse, error) {
+	if err := validateID(r.GetSegmentId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: SegmentId: %v", err)
+	}
+	db := s.db.Copy()
+	defer db.Close()
+
+	if err := db.UpdateDynamicSegmentArchiveStatus(ctx, r); err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDynamicSegmentArchiveStatus: %v", err)
+	}
+
+	return &audience.UpdateDynamicSegmentArchiveStatusResponse{}, nil
 }
 
 // ListDynamicSegments implements the corresponding rpc
 func (s *Server) ListDynamicSegments(ctx context.Context, r *audience.ListDynamicSegmentsRequest) (*audience.ListDynamicSegmentsResponse, error) {
-	return &audience.ListDynamicSegmentsResponse{}, status.Error(codes.Unimplemented, "TODO:")
+	db := s.db.Copy()
+	defer db.Close()
+
+	dss, err := db.ListDynamicSegments(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDynamicSegments: %v", err)
+	}
+	return &audience.ListDynamicSegmentsResponse{
+		Segments: dss,
+	}, nil
 }
 
 // Validations

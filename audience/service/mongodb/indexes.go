@@ -33,6 +33,7 @@ func EnsureIndexes(db *mgo.Database) error {
 				},
 			},
 		},
+
 		/// Devices
 		{
 			db.C("devices"),
@@ -55,6 +56,15 @@ func EnsureIndexes(db *mgo.Database) error {
 			db.C("devices"),
 			mgo.Index{
 				Key:    []string{"profile_id"},
+				Unique: false,
+			},
+		},
+
+		// dynamic_segments
+		{
+			db.C("dynamic_segments"),
+			mgo.Index{
+				Key:    []string{"account_id"},
 				Unique: false,
 			},
 		},

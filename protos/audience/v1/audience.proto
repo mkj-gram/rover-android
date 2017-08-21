@@ -71,20 +71,19 @@ service Audience {
   // DynamicSegments
   //
 
+  // GetDynamicSegmentById returns a single static segment by id
+  rpc GetDynamicSegmentById(GetDynamicSegmentByIdRequest) returns (GetDynamicSegmentByIdResponse);
+  // ListDynamicSegments returns a list of static segments by account_id.
+  rpc ListDynamicSegments(ListDynamicSegmentsRequest) returns(ListDynamicSegmentsResponse);
+
   // CreateDynamicSegment creates a new static segment by account_id and a title
   rpc CreateDynamicSegment(CreateDynamicSegmentRequest) returns (CreateDynamicSegmentResponse);
 
-  // GetDynamicSegmentById returns a single static segment by id
-  rpc GetDynamicSegmentById(GetDynamicSegmentByIdRequest) returns (GetDynamicSegmentByIdResponse);
-
+  // Updates
   rpc UpdateDynamicSegmentTitle(UpdateDynamicSegmentTitleRequest) returns (UpdateDynamicSegmentTitleResponse);
+  rpc UpdateDynamicSegmentArchiveStatus(UpdateDynamicSegmentArchiveStatusRequest) returns (UpdateDynamicSegmentArchiveStatusResponse);
   rpc UpdateDynamicSegmentPredicates(UpdateDynamicSegmentPredicatesRequest) returns (UpdateDynamicSegmentPredicatesResponse);
 
-  // ArchiveDynamicSegmentById archive a segment given an id
-  rpc ArchiveDynamicSegmentById(ArchiveDynamicSegmentByIdRequest) returns (ArchiveDynamicSegmentByIdResponse);
-
-  // ListDynamicSegments returns a list of static segments by account_id.
-  rpc ListDynamicSegments(ListDynamicSegmentsRequest) returns(ListDynamicSegmentsResponse);
 }
 
 
@@ -618,6 +617,8 @@ enum Null {
 message CreateDynamicSegmentRequest {
   auth.v1.AuthContext auth_context = 1;
   string title = 2;
+
+  PredicateAggregate predicate_aggregate = 3;
 }
 message CreateDynamicSegmentResponse {
   DynamicSegment segment = 1;
@@ -645,16 +646,18 @@ message UpdateDynamicSegmentPredicatesRequest {
   auth.v1.AuthContext auth_context = 1;
   string segment_id = 2;
 
-  PredicateAggregate predicates = 3;
+  PredicateAggregate predicate_aggregate = 3;
 }
 message UpdateDynamicSegmentPredicatesResponse {}
 
 
-message ArchiveDynamicSegmentByIdRequest {
+message UpdateDynamicSegmentArchiveStatusRequest {
   auth.v1.AuthContext auth_context = 1;
   string segment_id = 2;
+
+  bool archived = 3;
 }
-message ArchiveDynamicSegmentByIdResponse { }
+message UpdateDynamicSegmentArchiveStatusResponse { }
 
 
 message ListDynamicSegmentsRequest {
@@ -676,7 +679,7 @@ message DynamicSegment {
   bool is_archived                     = 6;
   // number of entries in the segment
   int64 segment_size                   = 7;
-  PredicateAggregate predicates        = 8;
+  PredicateAggregate predicate_aggregate = 8;
 }
 
 

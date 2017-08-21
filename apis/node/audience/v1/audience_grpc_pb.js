@@ -6,28 +6,6 @@ var audience_v1_audience_pb = require('../../audience/v1/audience_pb.js');
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 
-function serialize_rover_audience_v1_ArchiveDynamicSegmentByIdRequest(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.ArchiveDynamicSegmentByIdRequest)) {
-    throw new Error('Expected argument of type rover.audience.v1.ArchiveDynamicSegmentByIdRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_ArchiveDynamicSegmentByIdRequest(buffer_arg) {
-  return audience_v1_audience_pb.ArchiveDynamicSegmentByIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_audience_v1_ArchiveDynamicSegmentByIdResponse(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.ArchiveDynamicSegmentByIdResponse)) {
-    throw new Error('Expected argument of type rover.audience.v1.ArchiveDynamicSegmentByIdResponse');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_ArchiveDynamicSegmentByIdResponse(buffer_arg) {
-  return audience_v1_audience_pb.ArchiveDynamicSegmentByIdResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_rover_audience_v1_CreateDeviceRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.CreateDeviceRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.CreateDeviceRequest');
@@ -600,6 +578,28 @@ function deserialize_rover_audience_v1_UpdateDeviceUnregisterPushTokenResponse(b
   return audience_v1_audience_pb.UpdateDeviceUnregisterPushTokenResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_UpdateDynamicSegmentArchiveStatusRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.UpdateDynamicSegmentArchiveStatusRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.UpdateDynamicSegmentArchiveStatusRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_UpdateDynamicSegmentArchiveStatusRequest(buffer_arg) {
+  return audience_v1_audience_pb.UpdateDynamicSegmentArchiveStatusRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_UpdateDynamicSegmentArchiveStatusResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.UpdateDynamicSegmentArchiveStatusResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.UpdateDynamicSegmentArchiveStatusResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_UpdateDynamicSegmentArchiveStatusResponse(buffer_arg) {
+  return audience_v1_audience_pb.UpdateDynamicSegmentArchiveStatusResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_UpdateDynamicSegmentPredicatesRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.UpdateDynamicSegmentPredicatesRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.UpdateDynamicSegmentPredicatesRequest');
@@ -990,18 +990,6 @@ var AudienceService = exports.AudienceService = {
   // DynamicSegments
   //
   //
-  // CreateDynamicSegment creates a new static segment by account_id and a title
-  createDynamicSegment: {
-    path: '/rover.audience.v1.Audience/CreateDynamicSegment',
-    requestStream: false,
-    responseStream: false,
-    requestType: audience_v1_audience_pb.CreateDynamicSegmentRequest,
-    responseType: audience_v1_audience_pb.CreateDynamicSegmentResponse,
-    requestSerialize: serialize_rover_audience_v1_CreateDynamicSegmentRequest,
-    requestDeserialize: deserialize_rover_audience_v1_CreateDynamicSegmentRequest,
-    responseSerialize: serialize_rover_audience_v1_CreateDynamicSegmentResponse,
-    responseDeserialize: deserialize_rover_audience_v1_CreateDynamicSegmentResponse,
-  },
   // GetDynamicSegmentById returns a single static segment by id
   getDynamicSegmentById: {
     path: '/rover.audience.v1.Audience/GetDynamicSegmentById',
@@ -1014,40 +1002,6 @@ var AudienceService = exports.AudienceService = {
     responseSerialize: serialize_rover_audience_v1_GetDynamicSegmentByIdResponse,
     responseDeserialize: deserialize_rover_audience_v1_GetDynamicSegmentByIdResponse,
   },
-  updateDynamicSegmentTitle: {
-    path: '/rover.audience.v1.Audience/UpdateDynamicSegmentTitle',
-    requestStream: false,
-    responseStream: false,
-    requestType: audience_v1_audience_pb.UpdateDynamicSegmentTitleRequest,
-    responseType: audience_v1_audience_pb.UpdateDynamicSegmentTitleResponse,
-    requestSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentTitleRequest,
-    requestDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentTitleRequest,
-    responseSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentTitleResponse,
-    responseDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentTitleResponse,
-  },
-  updateDynamicSegmentPredicates: {
-    path: '/rover.audience.v1.Audience/UpdateDynamicSegmentPredicates',
-    requestStream: false,
-    responseStream: false,
-    requestType: audience_v1_audience_pb.UpdateDynamicSegmentPredicatesRequest,
-    responseType: audience_v1_audience_pb.UpdateDynamicSegmentPredicatesResponse,
-    requestSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentPredicatesRequest,
-    requestDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesRequest,
-    responseSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
-    responseDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
-  },
-  // ArchiveDynamicSegmentById archive a segment given an id
-  archiveDynamicSegmentById: {
-    path: '/rover.audience.v1.Audience/ArchiveDynamicSegmentById',
-    requestStream: false,
-    responseStream: false,
-    requestType: audience_v1_audience_pb.ArchiveDynamicSegmentByIdRequest,
-    responseType: audience_v1_audience_pb.ArchiveDynamicSegmentByIdResponse,
-    requestSerialize: serialize_rover_audience_v1_ArchiveDynamicSegmentByIdRequest,
-    requestDeserialize: deserialize_rover_audience_v1_ArchiveDynamicSegmentByIdRequest,
-    responseSerialize: serialize_rover_audience_v1_ArchiveDynamicSegmentByIdResponse,
-    responseDeserialize: deserialize_rover_audience_v1_ArchiveDynamicSegmentByIdResponse,
-  },
   // ListDynamicSegments returns a list of static segments by account_id.
   listDynamicSegments: {
     path: '/rover.audience.v1.Audience/ListDynamicSegments',
@@ -1059,6 +1013,52 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_ListDynamicSegmentsRequest,
     responseSerialize: serialize_rover_audience_v1_ListDynamicSegmentsResponse,
     responseDeserialize: deserialize_rover_audience_v1_ListDynamicSegmentsResponse,
+  },
+  // CreateDynamicSegment creates a new static segment by account_id and a title
+  createDynamicSegment: {
+    path: '/rover.audience.v1.Audience/CreateDynamicSegment',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.CreateDynamicSegmentRequest,
+    responseType: audience_v1_audience_pb.CreateDynamicSegmentResponse,
+    requestSerialize: serialize_rover_audience_v1_CreateDynamicSegmentRequest,
+    requestDeserialize: deserialize_rover_audience_v1_CreateDynamicSegmentRequest,
+    responseSerialize: serialize_rover_audience_v1_CreateDynamicSegmentResponse,
+    responseDeserialize: deserialize_rover_audience_v1_CreateDynamicSegmentResponse,
+  },
+  // Updates
+  updateDynamicSegmentTitle: {
+    path: '/rover.audience.v1.Audience/UpdateDynamicSegmentTitle',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.UpdateDynamicSegmentTitleRequest,
+    responseType: audience_v1_audience_pb.UpdateDynamicSegmentTitleResponse,
+    requestSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentTitleRequest,
+    requestDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentTitleRequest,
+    responseSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentTitleResponse,
+    responseDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentTitleResponse,
+  },
+  updateDynamicSegmentArchiveStatus: {
+    path: '/rover.audience.v1.Audience/UpdateDynamicSegmentArchiveStatus',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.UpdateDynamicSegmentArchiveStatusRequest,
+    responseType: audience_v1_audience_pb.UpdateDynamicSegmentArchiveStatusResponse,
+    requestSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentArchiveStatusRequest,
+    requestDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentArchiveStatusRequest,
+    responseSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentArchiveStatusResponse,
+    responseDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentArchiveStatusResponse,
+  },
+  updateDynamicSegmentPredicates: {
+    path: '/rover.audience.v1.Audience/UpdateDynamicSegmentPredicates',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.UpdateDynamicSegmentPredicatesRequest,
+    responseType: audience_v1_audience_pb.UpdateDynamicSegmentPredicatesResponse,
+    requestSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentPredicatesRequest,
+    requestDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesRequest,
+    responseSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
+    responseDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
   },
 };
 

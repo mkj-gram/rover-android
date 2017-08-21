@@ -15,6 +15,7 @@ type (
 
 		*profilesStore
 		*devicesStore
+		*dynamicSegmentsStore
 	}
 
 	Option func(s *mongoStore)
@@ -54,8 +55,9 @@ func New(db *mgo.Database, options ...Option) *DB {
 	return &DB{
 		store: ms,
 
-		profilesStore: &profilesStore{ms},
-		devicesStore:  &devicesStore{ms},
+		profilesStore:        &profilesStore{ms},
+		devicesStore:         &devicesStore{ms},
+		dynamicSegmentsStore: &dynamicSegmentsStore{ms},
 	}
 }
 
@@ -79,8 +81,9 @@ func (db *DB) Copy() *DB {
 	return &DB{
 		store: ms,
 
-		profilesStore: &profilesStore{ms},
-		devicesStore:  &devicesStore{ms},
+		profilesStore:        &profilesStore{ms},
+		devicesStore:         &devicesStore{ms},
+		dynamicSegmentsStore: &dynamicSegmentsStore{ms},
 	}
 }
 
@@ -112,4 +115,8 @@ func (ds *mongoStore) profiles() *mgo.Collection {
 
 func (ds *mongoStore) profiles_schemas() *mgo.Collection {
 	return ds.sess.DB(ds.dbName).C("profiles_schemas")
+}
+
+func (ds *mongoStore) dynamic_segments() *mgo.Collection {
+	return ds.sess.DB(ds.dbName).C("dynamic_segments")
 }

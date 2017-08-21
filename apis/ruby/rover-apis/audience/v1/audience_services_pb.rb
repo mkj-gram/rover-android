@@ -66,16 +66,16 @@ module Rover
           # DynamicSegments
           #
           #
-          # CreateDynamicSegment creates a new static segment by account_id and a title
-          rpc :CreateDynamicSegment, CreateDynamicSegmentRequest, CreateDynamicSegmentResponse
           # GetDynamicSegmentById returns a single static segment by id
           rpc :GetDynamicSegmentById, GetDynamicSegmentByIdRequest, GetDynamicSegmentByIdResponse
-          rpc :UpdateDynamicSegmentTitle, UpdateDynamicSegmentTitleRequest, UpdateDynamicSegmentTitleResponse
-          rpc :UpdateDynamicSegmentPredicates, UpdateDynamicSegmentPredicatesRequest, UpdateDynamicSegmentPredicatesResponse
-          # ArchiveDynamicSegmentById archive a segment given an id
-          rpc :ArchiveDynamicSegmentById, ArchiveDynamicSegmentByIdRequest, ArchiveDynamicSegmentByIdResponse
           # ListDynamicSegments returns a list of static segments by account_id.
           rpc :ListDynamicSegments, ListDynamicSegmentsRequest, ListDynamicSegmentsResponse
+          # CreateDynamicSegment creates a new static segment by account_id and a title
+          rpc :CreateDynamicSegment, CreateDynamicSegmentRequest, CreateDynamicSegmentResponse
+          # Updates
+          rpc :UpdateDynamicSegmentTitle, UpdateDynamicSegmentTitleRequest, UpdateDynamicSegmentTitleResponse
+          rpc :UpdateDynamicSegmentArchiveStatus, UpdateDynamicSegmentArchiveStatusRequest, UpdateDynamicSegmentArchiveStatusResponse
+          rpc :UpdateDynamicSegmentPredicates, UpdateDynamicSegmentPredicatesRequest, UpdateDynamicSegmentPredicatesResponse
         end
 
         Stub = Service.rpc_stub_class

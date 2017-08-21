@@ -1,0 +1,99 @@
+{
+  "_id":{"$oid":"000000000000000000000001"},
+  "account_id":1,
+  "title":"a title",
+  "is_archived": false,
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at": {"$date":"2017-06-14T15:44:18.497Z"}
+}
+
+{
+  "_id":{"$oid":"000000000000000000000002"},
+  "account_id":1,
+  "title":"a segment",
+  "is_archived": true,
+  "segment_size": 9001,
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at": {"$date":"2017-06-14T15:44:18.497Z"}
+}
+
+{
+  "_id":{"$oid":"000000000000000000000003"},
+  "account_id":1,
+  "title":"a title",
+  "is_archived": false,
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at": {"$date":"2017-06-14T15:44:18.497Z"}
+}
+
+{
+  "_id":{"$oid":"000000000000000000000004"},
+  "account_id":1,
+  "title":"with predicates",
+  "is_archived": false,
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at": {"$date":"2017-06-14T15:44:18.497Z"}
+}
+
+{
+  "_id":{"$oid":"000000000000000000000010"},
+  "account_id":2,
+  "title":"a segment",
+  "is_archived": true,
+  "segment_size": 9001,
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at": {"$date":"2017-06-14T15:44:18.497Z"}
+}
+
+{
+  "_id":{"$oid":"000000000000000000000011"},
+  "account_id":2,
+  "title":"a title",
+  "is_archived": false,
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at": {"$date":"2017-06-14T15:44:18.497Z"}
+}
+
+
+{
+  "_id":{"$oid":"000000000000000000000020"},
+  "account_id":1,
+  "title":"zero value predicates",
+  "is_archived": false,
+  "segment_size": 9001,
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at": {"$date":"2017-06-14T15:44:18.497Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      {"type": "bool"},
+      {"type": "string"},
+      {"type": "number"},
+      {"type": "date"},
+      {"type": "version"},
+      {"type": "geofence"}
+    ]
+  }
+}
+
+
+{
+  "_id":{"$oid":"000000000000000000000021"},
+  "account_id":1,
+  "title":"with predicates",
+  "is_archived": false,
+  "segment_size": 9001,
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"},
+  "updated_at": {"$date":"2017-06-14T15:44:18.497Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      { "type": "bool",  "attribute_name" : "is_bluetooth_enabled", "op" : 2, "value" : true },
+      { "type": "string", "attribute_name" : "first_name", "op" : 2, "value" : "hello world" }, 
+      { "type": "number", "attribute_name" : "age", "op" : 6, "value" : {"$numberLong": 20}, "value2" : {"$numberLong": 40} },
+      { "type": "version", "op" : 6, "value" : { "major" : 1, "minor" : 2, "revision": 3 }, "value2" : { "major" : 2, "minor" : 3, "revision" : 4 }, "attribute_name" : "age" },
+      { "type": "date", "value" : {"$date":"2017-06-14T15:44:18.496Z"}, "value2" : {"$date":"2017-06-14T15:44:18.497Z"}, "attribute_name" : "created_at", "op" : 6 },
+      { "type": "geofence", "attribute_name" : "location", "op" : 1, "value" : { "longitude" : 2, "latitude" : 1, "radius" : 3 } } 
+    ]
+  }
+}

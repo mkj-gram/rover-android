@@ -32,13 +32,16 @@ func TestAudienceService(t *testing.T) {
 		profiles         = mdb.C("profiles")
 		devices          = mdb.C("devices")
 		profiles_schemas = mdb.C("profiles_schemas")
-		system_profile   = mdb.C("system.profile")
-		res              bson.M
+
+		dynamic_segments = mdb.C("dynamic_segments")
+
+		system_profile = mdb.C("system.profile")
 	)
 
-	truncateColl(t, profiles, devices, profiles_schemas)
+	truncateColl(t, profiles, devices, profiles_schemas, dynamic_segments)
 
 	profile := func(level int) {
+		var res bson.M
 		if err := mdb.Run(bson.M{"profile": level}, &res); err != nil {
 			t.Fatal(err)
 		}
@@ -47,19 +50,19 @@ func TestAudienceService(t *testing.T) {
 	// turn off profiling to truncate collection
 	profile(0)
 	truncateColl(t, system_profile)
+	// turn profiling for all queries
+	profile(2)
 
 	if err := mongodb.EnsureIndexes(mdb); err != nil {
 		t.Fatalf("EnsureIndexes: %v", err)
 	}
-
-	// turn profiling for all queries
-	profile(2)
 
 	loadFixture(t, devices, "testdata/devices.json")
 	loadFixture(t, devices, "testdata/device-00.bson.json")
 
 	loadFixture(t, profiles, "testdata/profiles.json")
 	loadFixture(t, profiles_schemas, "testdata/profiles_schemas.json")
+	loadFixture(t, dynamic_segments, "testdata/dynamic_segments.json")
 
 	// Profiles
 	t.Run("CreateProfile", testAudienceService_CreateProfile)
@@ -96,11 +99,22 @@ func TestAudienceService(t *testing.T) {
 
 	t.Run("GetDeviceSchema", testAudienceService_GetDeviceSchema)
 
+	// Dynamic Segments
+	t.Run("CreateDynamicSegment", testAudienceService_CreateDynamicSegment)
+	t.Run("GetDynamicSegmentById", testAudienceService_GetDynamicSegmentById)
+
+	t.Run("UpdateDynamicSegmentTitle", testAudienceService_UpdateDynamicSegmentTitle)
+	t.Run("UpdateDynamicSegmentArchiveStatus", testAudienceService_UpdateDynamicSegmentArchiveStatus)
+	t.Run("UpdateDynamicSegmentPredicates", testAudienceService_UpdateDynamicSegmentPredicates)
+
+	t.Run("ListDynamicSegments", testAudienceService_ListDynamicSegments)
+
+	// NOTE: must run last
 	t.Run("EnsureIndexes", func(t *testing.T) {
 		var (
 			res []bson.M
 			Q   = bson.M{
-				"op":          bson.M{"$in": []string{"query", "update"}},
+				"op":          bson.M{"$in": []string{"query", "update", "remove"}},
 				"planSummary": bson.M{"$nin": []bson.RegEx{{Pattern: `IXSCAN`}, {Pattern: `IDHACK`}}},
 				"ns":          bson.M{"$nin": []bson.RegEx{{Pattern: `system.profile`}}},
 			}
@@ -119,6 +133,7 @@ func TestAudienceService(t *testing.T) {
 			t.Errorf("non-optimized queries:%s", data)
 		}
 	})
+
 }
 
 func testAudienceService_CreateProfile(t *testing.T) {

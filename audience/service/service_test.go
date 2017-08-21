@@ -41,6 +41,10 @@ type (
 	}
 )
 
+func init() {
+	deep.MaxDepth = 50
+}
+
 func truncateColl(t *testing.T, colls ...*mgo.Collection) {
 	for _, coll := range colls {
 		if err := coll.DropCollection(); err != nil {
