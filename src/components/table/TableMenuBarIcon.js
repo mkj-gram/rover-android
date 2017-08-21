@@ -47,6 +47,12 @@ class TableMenuBarIcon extends Component {
     }
 
     handleMouseOver(e) {
+        const message = {
+            columns: 'Manage Columns',
+            tag: 'Manage Tags',
+            download: 'Manage Downloads'
+        }
+
         e.persist()
         this.setState({
             hover: true
@@ -58,7 +64,7 @@ class TableMenuBarIcon extends Component {
                     toolTip: {
                         ...this.state.toolTip,
                         isTooltipShowing: true,
-                        message: 'this is an icon tooltip message',
+                        message: message[this.props.val],
                         coordinates: {
                             x: target.left - 300,
                             y: target.top + target.height - 60,
