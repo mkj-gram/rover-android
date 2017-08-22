@@ -4,7 +4,7 @@ import { graphql, createRefetchContainer } from 'react-relay'
 import { Tooltip } from '@rover/react-bootstrap'
 
 import AudienceDataGrid from './AudienceDataGrid'
-import TableMenuBar from './TableMenuBar'
+import TableMenuBarAlpha from './TableMenuBarAlpha'
 
 import DateCellFormatter from './DateCellFormatter'
 import BooleanCellFormatter from './BooleanCellFormatter'
@@ -430,7 +430,7 @@ class AudienceTable extends Component {
                     position: 'relative'
                 }}
             >
-                <TableMenuBar
+                <TableMenuBarAlpha
                     segmentSize={segmentSize}
                     totalSize={totalSize}
                     allColumns={this.state.allColumns}
