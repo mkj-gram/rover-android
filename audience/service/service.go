@@ -230,8 +230,16 @@ func (s *Server) ListDevicesByProfileIdentifier(ctx context.Context, r *audience
 }
 
 func (s *Server) GetDeviceSchema(ctx context.Context, r *audience.GetDeviceSchemaRequest) (*audience.GetDeviceSchemaResponse, error) {
+	if r.GetAuthContext() == nil {
+		return &audience.GetDeviceSchemaResponse{
+			Schema: &audience.DeviceSchema{
+				Attributes: nil,
+			},
+		}, nil
+	}
+
 	return &audience.GetDeviceSchemaResponse{
-		&audience.DeviceSchema{
+		Schema: &audience.DeviceSchema{
 			Attributes: hardcodedDeviceSchema(r.GetAuthContext().GetAccountId()),
 		},
 	}, nil

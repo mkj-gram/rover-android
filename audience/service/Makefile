@@ -7,7 +7,7 @@ MONGO_DSN ?= 'mongodb://mongo:27017/audience_service_test'
 ROVER ?= github.com/roverplatform/rover
 
 test:
-	${RUN} go test -tags integration -v ${ROVER}/audience/service/...
+	${RUN} go test -tags integration ${ROVER}/audience/service/...
 
 run:
 	${RUN} go run ./audience/service/cmd/audience-service/main.go --mongo-dsn=$(MONGO_DSN)
