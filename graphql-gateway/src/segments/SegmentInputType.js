@@ -7,7 +7,8 @@ const SegmentInputType = new GraphQLInputObjectType({
     fields: {
         id: { type: GraphQLString },
         name: { type: GraphQLString },
-        predicates: { type: GraphQLJSON }
+        predicates: { type: GraphQLJSON },
+        queryCondition: { type: GraphQLString }
     }
 })
 
