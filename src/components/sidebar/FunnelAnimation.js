@@ -89,11 +89,17 @@ class FunnelAnimation extends Component {
     }
 
     handleOnMouseOver() {
-        canvasTimeline.gotoAndStop("restart")
+        try {
+            canvasTimeline.gotoAndStop("restart")
+        } catch (err) {
+        }
     }
 
     handleOnMouseOut() {
-        canvasTimeline.gotoAndStop("stop")
+        try {
+            canvasTimeline.gotoAndStop("stop")
+        } catch (err) {
+        }
     }
 
     render() {
