@@ -9,6 +9,8 @@ import schema from './schema'
 import RoverApis from '@rover/apis'
 import Auth from '@rover/auth-client'
 
+import 'babel-polyfill'
+
 dotenv.config()
 
 const authClient = Auth.v1.Client()
