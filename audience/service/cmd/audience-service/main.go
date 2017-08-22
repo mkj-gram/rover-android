@@ -16,6 +16,7 @@ import (
 	"github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/mongodb"
 	grpc_middleware "github.com/roverplatform/rover/go/grpc/middleware"
+	grpc_newrelic "github.com/roverplatform/rover/go/grpc/middleware/newrelic"
 	rlog "github.com/roverplatform/rover/go/log"
 
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -31,6 +32,11 @@ import (
 
 	gerrors "cloud.google.com/go/errors"
 	"cloud.google.com/go/trace"
+	"github.com/newrelic/go-agent"
+)
+
+const (
+	newrelicAppName = "Audience Service"
 )
 
 var (
@@ -47,6 +53,8 @@ var (
 
 	gProjectID = flag.String("google-project-id", "", "google PROJECT_ID")
 	gTraceKey  = flag.String("google-trace-key", "", "path to google trace service account key file")
+
+	newRelicKey = flag.String("newrelic-key", "", "New Relic licence key")
 )
 
 var (
@@ -110,6 +118,21 @@ func main() {
 			grpc_middleware.UnaryLogger,
 		}
 
+	}
+
+	if *newRelicKey != "" {
+		config := newrelic.NewConfig(newrelicAppName, *newRelicKey)
+		app, err := newrelic.NewApplication(config)
+		if err != nil {
+			stderr.Fatalf("Failed to initialize New Relic: %v", err)
+		}
+
+		newrelicMiddleware := grpc_newrelic.UnaryServerInterceptor(app)
+		unaryMiddleware = append(unaryMiddleware, newrelicMiddleware)
+
+		stdout.Println("newrelic=on")
+	} else {
+		stdout.Println("newrelic=off")
 	}
 
 	var opts = []grpc.ServerOption{
