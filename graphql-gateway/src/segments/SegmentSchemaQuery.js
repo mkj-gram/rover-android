@@ -37,7 +37,8 @@ const SegmentSchemaQuery = {
             }
         
             return response.getSchema().getAttributesList().map(schema => ({
-                attribute: schema.getLabel(),
+                attribute: schema.getAttribute(),
+                label: schema.getLabel(),
                 attributeType: attributeTypeMap[schema.getAttributeType()]
             }))
         }
@@ -55,6 +56,7 @@ const SegmentSchemaQuery = {
             }
             return response.getSchema().getAttributesList().map(schema => ({
                 attribute: schema.getAttribute(),
+                label: schema.getLabel(),
                 attributeType: attributeTypeMap[schema.getAttributeType()]
             }))
         }
