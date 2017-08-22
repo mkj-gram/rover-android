@@ -24,6 +24,14 @@ class SegmentSelection extends Component {
         this.setState({ currentSegment })
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.reset) {
+            this.setState({
+                currentSegment: null
+            })
+        }
+    }
+
     render() {
         const {
             isOpen,
@@ -52,7 +60,7 @@ class SegmentSelection extends Component {
                         padding: 0,
                         width: 'auto',
                         overflow: 'hidden'
-                    }, 
+                    },
                     overlay: {
                         zIndex: 2
                     }
@@ -109,7 +117,8 @@ SegmentSelection.propTypes = {
     segments: PropTypes.array,
     removeSegmentCell: PropTypes.func.isRequired,
     updateSegmentCell: PropTypes.func.isRequired,
-    getSegment: PropTypes.func.isRequired
+    getSegment: PropTypes.func.isRequired,
+    reset: PropTypes.bool.isRequired
 }
 
 SegmentSelection.defaultProps = {
@@ -119,7 +128,8 @@ SegmentSelection.defaultProps = {
     segments: [],
     removeSegmentCell: () => null,
     updateSegmentCell: () => null,
-    getSegment: () => null
+    getSegment: () => null,
+    reset: false
 }
 
 export default SegmentSelection

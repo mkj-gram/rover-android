@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { createFragmentContainer, graphql } from 'react-relay'
 import SegmentSelection from './SegmentSelection'
 import SegmentSave from './SegmentSave'
+import UpdateSegmentMutation from '../../mutations/UpdateSegmentMutation'
+import ArchiveSegmentMutation from '../../mutations/ArchiveSegmentMutation'
 
 class SegmentsContainer extends Component {
     constructor(props) {
@@ -24,21 +26,25 @@ class SegmentsContainer extends Component {
     }
 
     removeSegmentCell(index) {
-        // Need to update with mutation
-
-        const { segments } = this.props
-        segments.splice(index, 1)
+        const { segments, archiveSegment } = this.props
+        ArchiveSegmentMutation(segments[index].segmentId, archiveSegment)
         this.setState({
             segments
         })
     }
 
     updateSegmentCell(index, value) {
-        /*
-         * Need to do a mutation to actually update segment name
-         */
         const segments = JSON.parse(JSON.stringify(this.props.segments))
         segments[index].name = value.length !== 0 ? value : `No Name ${index}`
+
+        UpdateSegmentMutation(
+            segments[index].segmentId,
+            segments[index].name,
+            null,
+            null,
+            null
+        )
+        this.props.updateSegmentName(segments[index])
         this.setState({
             segments
         })
@@ -52,7 +58,11 @@ class SegmentsContainer extends Component {
             handleSegmentAction,
             segments,
             getSegment,
-            segment
+            segment,
+            saveStates,
+            setSegment,
+            reset,
+            queryCondition
         } = this.props
         const { segmentCoords } = this.state
 
@@ -66,6 +76,7 @@ class SegmentsContainer extends Component {
                     removeSegmentCell={this.removeSegmentCell}
                     updateSegmentCell={this.updateSegmentCell}
                     getSegment={getSegment}
+                    reset={this.props.reset}
                 />
                 <SegmentSave
                     isOpen={showSegmentSave}
@@ -73,7 +84,10 @@ class SegmentsContainer extends Component {
                     modalCoordinates={segmentCoords}
                     query={query}
                     segment={segment}
-                    saveStates={this.props.saveStates}
+                    saveStates={saveStates}
+                    setSegment={setSegment}
+                    reset={reset}
+                    queryCondition={queryCondition}
                 />
             </div>
         )
@@ -85,9 +99,15 @@ SegmentsContainer.propTypes = {
     showSegmentSave: PropTypes.bool.isRequired,
     showSegmentSelection: PropTypes.bool.isRequired,
     handleSegmentAction: PropTypes.func.isRequired,
-    getSegmentId: PropTypes.func.isRequired,
     segments: PropTypes.array.isRequired,
-    segment: PropTypes.object.isRequired
+    segment: PropTypes.object.isRequired,
+    archiveSegment: PropTypes.func.isRequired,
+    updateSegmentName: PropTypes.func.isRequired,
+    getSegment: PropTypes.func.isRequired,
+    reset: PropTypes.bool.isRequired,
+    setSegment: PropTypes.func.isRequired,
+    saveStates: PropTypes.object.isRequired,
+    queryCondition: PropTypes.string.isRequired
 }
 
 SegmentsContainer.defaultProps = {
@@ -95,9 +115,15 @@ SegmentsContainer.defaultProps = {
     showSegmentSave: false,
     showSegmentSelection: false,
     handleSegmentAction: () => null,
-    getSegmentId: () => null,
     segments: [],
-    segment: {}
+    segment: {},
+    archiveSegment: () => null,
+    updateSegmentName: () => null,
+    getSegment: () => null,
+    reset: false,
+    setSegment: () => null,
+    saveStates: {},
+    queryCondition: 'ALL'
 }
 
 export default createFragmentContainer(

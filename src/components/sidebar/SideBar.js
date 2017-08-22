@@ -40,12 +40,12 @@ class SideBar extends Component {
             currentPredicate: {},
             isShowingAddFilterModal: false,
             query: [],
-            queryCondition: 'all',
             modalCoordinates: [0, 0],
             isViewingDynamicSegment: true,
             segmentId: '',
             saveStates: {},
-            sbDynamicSegment: []
+            sbDynamicSegment: [],
+            segmentIdRefetch: false
         }
 
         this.setState = this.setState.bind(this)
@@ -60,20 +60,51 @@ class SideBar extends Component {
     componentWillReceiveProps(nextProps) {
         const { segmentId, sbDynamicSegment } = this.state
 
-        if (segmentId !== nextProps.segment.segmentId) {
-            const { relay } = this.props
-            const refetchVariables = fragmentVariables => ({
-                segmentId: nextProps.segment.segmentId
-            })
-            relay.refetch(refetchVariables, null)
+        if (nextProps.refetchData) {
+            if (
+                segmentId !== nextProps.segment.segmentId ||
+                (nextProps.segmentIdRefetch && this.state.segmentIdRefetch)
+            ) {
+                const { relay } = this.props
+                const refetchVariables = fragmentVariables => ({
+                    segmentId: nextProps.segment.segmentId
+                })
+                relay.refetch(refetchVariables, null)
 
-            this.setState({ segmentId: nextProps.segment.segmentId })
-        } else if (
-            nextProps.data.sbDynamicSegment[0] !== null &&
-            JSON.stringify(nextProps.data.sbDynamicSegment) !==
-                JSON.stringify(sbDynamicSegment)
-        ) {
-            this.viewDynamicSegment(nextProps.data)
+                this.setState({
+                    segmentId: nextProps.segment.segmentId,
+                    segmentIdRefetch: false
+                })
+            } else if (
+                nextProps.data.sbDynamicSegment[0] !== null &&
+                (JSON.stringify(nextProps.data.sbDynamicSegment) !==
+                    JSON.stringify(sbDynamicSegment) ||
+                    nextProps.segmentIdRefetch)
+            ) {
+                this.viewDynamicSegment(nextProps.data)
+            }
+        } else {
+            this.setState({
+                segmentId: nextProps.segment.segmentId,
+                segmentIdRefetch: true,
+                sbDynamicSegment: []
+            })
+        }
+
+        if (nextProps.reset) {
+            this.setState({
+                currentAttribute: { attribute: '', index: null },
+                currentPredicate: {},
+                isShowingAddFilterModal: false,
+                query: [],
+                modalCoordinates: [0, 0],
+                isViewingDynamicSegment: true,
+                segmentId: '',
+                saveStates: {},
+                sbDynamicSegment: [],
+                refetchData: false,
+                segmentIdRefetch: false
+            })
         }
     }
 
@@ -85,16 +116,18 @@ class SideBar extends Component {
         const query = device
             .map(d => ({ ...d, category: 'device' }))
             .concat(profile.map(p => ({ ...p, category: 'profile' })))
+
+        this.props.setQueryCondition(condition, true, query)
+
         this.setState({
             query,
-            queryCondition: condition,
             sbDynamicSegment
         })
     }
 
     updateQuery() {
-        const { updateQuery } = this.props
-        const { query, currentPredicate, queryCondition } = this.state
+        const { updateQuery, queryCondition } = this.props
+        const { query, currentPredicate } = this.state
         const { index, ...rest } = currentPredicate
 
         const newQuery = query
@@ -110,7 +143,8 @@ class SideBar extends Component {
     }
 
     removePredicate(indexToDelete) {
-        const { query, queryCondition } = this.state
+        const { query } = this.state
+        const { queryCondition } = this.props
 
         const newQuery = query.filter(
             (predicate, index) => index !== indexToDelete
@@ -127,13 +161,11 @@ class SideBar extends Component {
             return
         }
 
-        const { attribute, index } = currentAttribute
+        const { attribute, index, category } = currentAttribute
 
         if (attribute === '') {
             return
         }
-
-        const category = query[index].category
 
         const icon = category === 'profile' ? ProfileIcon : DeviceIconSmall
 
@@ -226,10 +258,11 @@ class SideBar extends Component {
     }
 
     renderAddFilterBar() {
-        const { isShowingAddFilterModal, query, queryCondition } = this.state
+        const { isShowingAddFilterModal, query } = this.state
+
         const addPredicateIndex = query.length
 
-        const { data } = this.props
+        const { data, queryCondition } = this.props
 
         const style = {
             height: 58,
@@ -335,7 +368,8 @@ class SideBar extends Component {
                                 isShowingAddFilterModal: false,
                                 currentAttribute: {
                                     attribute: predicate.attribute,
-                                    index: addPredicateIndex
+                                    index: addPredicateIndex,
+                                    category: predicate.category
                                 }
                             })
                         }}
@@ -349,14 +383,14 @@ class SideBar extends Component {
                         value={queryCondition}
                         onChange={(e) => {
                             onSelect(e)
-                            this.setState({ queryCondition: e.target.value })
+                            this.props.setQueryCondition(e.target.value, false, query)
                         }}
                         onFocus={onFocus}
                     >
-                        <option value="all">
+                        <option value="ALL">
                             ALL
                         </option>
-                        <option value="any">
+                        <option value="ANY">
                             ANY
                         </option>
                     </Select>
@@ -497,12 +531,23 @@ class SideBar extends Component {
         const {
             currentAttribute,
             query,
-            queryCondition,
             modalCoordinates,
             isShowingAddFilterModal,
             showSegmentSelection,
             showSegmentSave
         } = this.state
+
+        const {
+            data,
+            getSegment,
+            segment,
+            saveStates,
+            setSegment,
+            updateSegmentName,
+            archiveSegment,
+            reset,
+            queryCondition
+        } = this.props
 
         return (
             <div style={sideBarStyle}>
@@ -584,13 +629,18 @@ class SideBar extends Component {
                 {this.renderSaveBar()}
                 <SegmentsContainer
                     query={query}
-                    showSegmentSelection={this.state.showSegmentSelection}
-                    showSegmentSave={this.state.showSegmentSave}
+                    showSegmentSelection={showSegmentSelection}
+                    showSegmentSave={showSegmentSave}
                     handleSegmentAction={this.handleSegmentAction}
-                    segments={this.props.data.segmentsContainer}
-                    getSegment={this.props.getSegment}
-                    segment={this.props.segment}
-                    saveStates={this.props.saveStates}
+                    segments={data.segmentsContainer}
+                    getSegment={getSegment}
+                    segment={segment}
+                    saveStates={saveStates}
+                    setSegment={setSegment}
+                    updateSegmentName={updateSegmentName}
+                    archiveSegment={archiveSegment}
+                    reset={reset}
+                    queryCondition={queryCondition}
                 />
             </div>
         )
@@ -602,11 +652,21 @@ SideBar.propTypes = {
     relay: PropTypes.object.isRequired,
     getSegment: PropTypes.func.isRequired,
     segment: PropTypes.object,
-    updateQuery: PropTypes.func.isRequired
+    updateQuery: PropTypes.func.isRequired,
+    refetchData: PropTypes.bool.isRequired,
+    segmentIdRefetch: PropTypes.bool,
+    reset: PropTypes.bool.isRequired,
+    saveStates: PropTypes.object.isRequired,
+    setSegment: PropTypes.func.isRequired,
+    updateSegmentName: PropTypes.func.isRequired,
+    archiveSegment: PropTypes.func.isRequired,
+    setQueryCondition: PropTypes.func.isRequired,
+    queryCondition: PropTypes.string.isRequired
 }
 
 SideBar.defaultProps = {
-    segment: {}
+    segment: {},
+    segmentIdRefetch: false
 }
 
 export default createRefetchContainer(

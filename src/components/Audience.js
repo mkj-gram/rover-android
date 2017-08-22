@@ -11,20 +11,50 @@ class Audience extends Component {
                 segmentId: '',
                 name: ''
             },
-            predicates: '[]',
+            predicates: '{"profiles":[],"devices":[],"condition":"ALL"}',
             pageNumber: 0,
             resetPagination: false,
             context: 'predicates',
             saveStates: {
                 isSegmentUpdate: false,
-                showSaveButton: true
-            }
+                showSaveButton: false
+            },
+            refetchData: true,
+            reset: false,
+            queryCondition: 'ALL'
         }
         this.getSegment = this.getSegment.bind(this)
         this.updateQuery = this.updateQuery.bind(this)
         this.formatQuery = this.formatQuery.bind(this)
         this.updatePageNumber = this.updatePageNumber.bind(this)
         this.setSaveState = this.setSaveState.bind(this)
+        this.setSegment = this.setSegment.bind(this)
+        this.updateSegmentName = this.updateSegmentName.bind(this)
+        this.archiveSegment = this.archiveSegment.bind(this)
+        this.setQueryCondition = this.setQueryCondition.bind(this)
+    }
+
+    setQueryCondition(queryCondition, initial = false, query = null) {
+        if (initial) {
+            this.setState({
+                queryCondition,
+                segmentIdRefetch: false,
+                predicates: this.formatQuery(query, queryCondition)
+            })
+        } else {
+            const pred = JSON.parse(this.state.predicates)
+
+            this.setState({
+                queryCondition,
+                segmentIdRefetch: false,
+                refetchData: (pred.profiles.length !== 0 || pred.devices.length !== 0),
+                predicates: this.formatQuery(query, queryCondition),
+                resetPagination: true,
+                pageNumber: 0,
+                context: 'predicates',
+                reset: false
+            })
+        }
     }
 
     getSegment(segment) {
@@ -32,7 +62,10 @@ class Audience extends Component {
             segment,
             resetPagination: true,
             pageNumber: 0,
-            context: 'segments'
+            context: 'segments',
+            refetchData: true,
+            segmentIdRefetch: true,
+            reset: false
         })
     }
 
@@ -42,24 +75,28 @@ class Audience extends Component {
             predicates,
             resetPagination: true,
             pageNumber: 0,
-            context: 'predicates'
+            context: 'predicates',
+            refetchData: true,
+            segmentIdRefetch: false,
+            reset: false
         })
     }
 
     setSaveState(saveStates) {
-        this.setState({saveStates})
+        this.setState({ saveStates })
     }
 
     formatQuery(rawQuery, condition) {
         const profiles = []
         const devices = []
-        for (const i in rawQuery) {
-            if (rawQuery[i].category === 'profile') {
-                profiles.push(rawQuery[i])
+        rawQuery.forEach((query) => {
+            if (query.category === 'profile') {
+                profiles.push(query)
             } else {
-                devices.push(rawQuery[i])
+                devices.push(query)
             }
-        }
+        })
+
         const val = {
             profiles,
             devices,
@@ -69,12 +106,61 @@ class Audience extends Component {
         return JSON.stringify(val)
     }
 
+    updateSegmentName(segment) {
+        if (segment.segmentId === this.state.segment.segmentId) {
+            this.setState({
+                segment
+            })
+        }
+    }
+
+    archiveSegment(id) {
+        if (this.state.segment.segmentId === id) {
+            this.setState({
+                segment: {
+                    segmentId: '',
+                    name: ''
+                },
+                predicates: '{"profiles":[],"devices":[],"condition":"ANY"}',
+                pageNumber: 0,
+                resetPagination: true,
+                context: 'predicates',
+                saveStates: {
+                    isSegmentUpdate: false,
+                    showSaveButton: false
+                },
+                refetchData: true,
+                reset: true
+            })
+        }
+    }
+
     updatePageNumber(pageNumber) {
         this.setState({ pageNumber, resetPagination: false })
     }
 
+    setSegment(segment) {
+        this.setState({
+            segment,
+            context: 'segments',
+            refetchData: false,
+            saveStates: {
+                isSegmentUpdate: false,
+                showSaveButton: false
+            },
+            reset: false
+        })
+    }
+
     render() {
-        const { segment, predicates, pageNumber, resetPagination, saveStates } = this.state
+        const {
+            segment,
+            predicates,
+            pageNumber,
+            resetPagination,
+            saveStates,
+            refetchData
+        } = this.state
         const { data } = this.props
 
         return (
@@ -85,6 +171,14 @@ class Audience extends Component {
                     getSegment={this.getSegment}
                     updateQuery={this.updateQuery}
                     saveStates={saveStates}
+                    refetchData={refetchData}
+                    setSegment={this.setSegment}
+                    segmentIdRefetch={this.state.segmentIdRefetch}
+                    updateSegmentName={this.updateSegmentName}
+                    archiveSegment={this.archiveSegment}
+                    reset={this.state.reset}
+                    setQueryCondition={this.setQueryCondition}
+                    queryCondition={this.state.queryCondition}
                 />
                 <AudienceTable
                     data={data}
@@ -95,6 +189,8 @@ class Audience extends Component {
                     updatePageNumber={this.updatePageNumber}
                     resetPagination={resetPagination}
                     setSaveState={this.setSaveState}
+                    refetchData={refetchData}
+                    reset={this.state.reset}
                 />
             </div>
         )

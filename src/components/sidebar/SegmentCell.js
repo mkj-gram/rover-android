@@ -283,8 +283,7 @@ class SegmentCell extends Component {
                                       justifyContent: 'center'
                                   }}
                               >
-                                  
-                                  <CheckmarkIcon fill={steel} style={{ pointerEvents: 'none' }}/>
+                                <CheckmarkIcon fill={steel} style={{ pointerEvents: 'none' }}/>
                               </div>
                             : <div
                                   onClick={() => this.handleEditSave()}
@@ -374,6 +373,9 @@ class SegmentCell extends Component {
                     bodyOpenClassName="bodyClassName"
                     hoverStyle={{
                         backgroundColor: steel
+                    }}
+                    modalOverlayStyle={{
+                        zIndex: 2
                     }}
                 />
             )
