@@ -9,7 +9,7 @@ func hardcodedDeviceSchema(acctID int32) []*audience.SchemaAttribute {
 
 		{AccountId: acctID, AttributeType: "timestamp", Attribute: "push_token_updated_at", Label: "Push Token Updated At", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "timestamp", Attribute: "push_token_unregistered_at", Label: "Push Token Unregistered At", Id: "", Path: ""},
-		{AccountId: acctID, AttributeType: "string", Attribute: "push_environment", Label: "Pushvironment", Id: "", Path: ""},
+		{AccountId: acctID, AttributeType: "string", Attribute: "push_environment", Label: "Push Environment", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "string", Attribute: "push_token_key", Label: "Push Token", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "bool", Attribute: "push_token_is_active", Label: "Push Token Is Active", Id: "", Path: ""},
 
