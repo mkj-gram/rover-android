@@ -1,62 +1,66 @@
+import RoverApis from '@rover/apis'
+import Audience from '@rover/audience-client'
+import promisify from '@rover-common/grpc-promisify'
+
 import SegmentSchema from './SegmentSchema'
+
+const audienceClient = Audience.v1.Client()
+promisify(audienceClient)
+
+const attributeTypeMap = {
+    bool: 'BooleanPredicate',
+    geopoint: 'GeofencePredicate',
+    integer: 'NumberPredicate',
+    int32: 'NumberPredicate',
+    double: 'NumberPredicate',
+    string: 'StringPredicate',
+    timestamp: 'DatePredicate',
+    version: 'VersionPredicate',
+    'array[string]': 'StringPredicate'
+}
 
 const SegmentSchemaQuery = {
     type: SegmentSchema,
     args: {},
-    resolve(_, {}) {
-
-        /*
-         *  attribute: 'Bluetooth Enabled' -->  attribute: 'bluetoothEnabled',
-         *  Need another field in deviceSchema to match key val of attributes from profiles + devices objects
-         */
+    resolve: async (_, {}, { authContext }) => {
+        const getDeviceSchemaFromGrpc = async () => {
+            const request = new RoverApis.audience.v1.Models
+                .GetDeviceSchemaRequest()
+            request.setAuthContext(authContext)
+        
+            let response
+        
+            try {
+                response = await audienceClient.getDeviceSchema(request)
+            } catch (e) {
+                throw new Error(e)
+            }
+        
+            return response.getSchema().getAttributesList().map(schema => ({
+                attribute: schema.getLabel(),
+                attributeType: attributeTypeMap[schema.getAttributeType()]
+            }))
+        }
+        
+        const getProfileSchemaFromGrpc = async () => {
+            const request = new RoverApis.audience.v1.Models
+                .GetProfileSchemaRequest()
+            request.setAuthContext(authContext)
+            let response
+        
+            try {
+                response = await audienceClient.getProfileSchema(request)
+            } catch (e) {
+                throw new Error(e)
+            }
+            return response.getSchema().getAttributesList().map(schema => ({
+                attribute: schema.getAttribute(),
+                attributeType: attributeTypeMap[schema.getAttributeType()]
+            }))
+        }
         return {
-            deviceSchema: [
-                {
-                    attribute: 'deviceId',
-                    attributeType: 'StringPredicate'
-                },
-                {
-                    attribute: 'deviceOS',
-                    attributeType: 'StringPredicate'
-                },
-                {
-                    attribute: 'deviceOSVersion',
-                    attributeType: 'VersionPredicate'
-                },
-                {
-                    attribute: 'model',
-                    attributeType: 'StringPredicate'
-                },
-                {
-                    attribute: 'appVersion',
-                    attributeType: 'StringPredicate'
-                },
-                {
-                    attribute: 'carrier',
-                    attributeType: 'StringPredicate'
-                }, {
-                    attribute: 'lastSeen',
-                    attributeType: 'DatePredicate'
-                },
-                {
-                    attribute: 'last known location',
-                    attributeType: 'GeofencePredicate'
-                }
-            ],
-            profileSchema: [
-                {
-                    attribute: 'firstName',
-                    attributeType: 'StringPredicate'
-                },
-                {
-                    attribute: 'age',
-                    attributeType: 'NumberPredicate'
-                },
-                {
-                    attribute: 'Account Created',
-                    attributeType: 'DatePredicate'
-                },
-            ]
+            deviceSchema: await getDeviceSchemaFromGrpc(),
+            profileSchema: await getProfileSchemaFromGrpc()
         }
     }
 }
