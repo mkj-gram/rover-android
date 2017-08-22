@@ -111,6 +111,7 @@ type SchemaAttribute struct {
 	AccountId     int32         `bson:"account_id"`
 	Attribute     string        `bson:"attribute"`
 	AttributeType string        `bson:"attribute_type"`
+	Label         string        `bson:"label"`
 	CreatedAt     time.Time     `bson:"created_at"`
 }
 
@@ -125,6 +126,7 @@ func (p *SchemaAttribute) fromProto(proto *audience.SchemaAttribute) error {
 	p.AccountId = proto.AccountId
 	p.Attribute = proto.Attribute
 	p.AttributeType = proto.AttributeType
+	p.Label = proto.Label
 
 	p.CreatedAt, _ = timestamp.Time(proto.CreatedAt)
 
@@ -136,6 +138,10 @@ func (p *SchemaAttribute) toProto(proto *audience.SchemaAttribute) error {
 	proto.AccountId = p.AccountId
 	proto.Attribute = p.Attribute
 	proto.AttributeType = p.AttributeType
+	proto.Label = p.Label
+	if p.Label == "" {
+		proto.Label = p.Attribute
+	}
 
 	proto.CreatedAt, _ = timestamp.TimestampProto(p.CreatedAt)
 
