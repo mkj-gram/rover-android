@@ -28,7 +28,7 @@ const store = new Confidence.Store({
 });
 
 const criteria = {
-    env: process.env.APP_ENVIRONMENT || "development"
+    env: process.env.APP_ENVIRONMENT || process.env.NODE_ENV || "development"
 };
 
 
