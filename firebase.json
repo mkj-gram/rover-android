@@ -1,10 +1,15 @@
 {
   "hosting": {
-    "public": "dist/audience",
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/index.html"
+        "source": "/audiences/",
+        "destination": "/audiences/index.html"
       }
     ]
   }
