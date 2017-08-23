@@ -14,11 +14,19 @@ const uri = {
     'development': 'http://localhost:4000/graphql'
 }
 
+const getToken = () => {
+    const session = JSON.parse(
+        localStorage.getItem('ember_simple_auth:session')
+    )
+    return session ? session.authenticated.token : null
+}
+
 const network = Network.create((operation, variables) => fetch(uri[process.env.NODE_ENV], {
         method: 'POST',
         headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer: ${getToken()}`
         },
         body: JSON.stringify({
             query: operation.text,
