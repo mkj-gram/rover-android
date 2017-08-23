@@ -116,6 +116,7 @@ class Audience extends Component {
 
     archiveSegment(id) {
         if (this.state.segment.segmentId === id) {
+
             this.setState({
                 segment: {
                     segmentId: '',
@@ -129,7 +130,7 @@ class Audience extends Component {
                     isSegmentUpdate: false,
                     showSaveButton: false
                 },
-                refetchData: true,
+                refetchData: false,
                 reset: true
             })
         }
