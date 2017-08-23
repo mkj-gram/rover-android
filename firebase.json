@@ -8,8 +8,8 @@
     ],
     "rewrites": [
       {
-        "source": "/audiences/",
-        "destination": "/audiences/index.html"
+        "source": "/audience/",
+        "destination": "/audience/index.html"
       }
     ]
   }
