@@ -40,14 +40,12 @@ const Button = ({
             anchorStyle.color = 'white'
     }
 
-    if (isDisabled) {
-        switch (type) {
-            case 'cancel':
-                anchorStyle.color = silver
-                break
-            default:
-                anchorStyle.backgroundColor = cloud
-                anchorStyle.color = silver
+     if (isDisabled) {
+        const { disabledTextColor, disabledBackgroundColor, ...rest } = anchorStyle
+        anchorStyle = {
+            ...rest,
+            color: disabledTextColor,
+            backgroundColor: disabledBackgroundColor
         }
     }
 
@@ -109,7 +107,9 @@ Button.defaultStyles = {
         lineHeight: '40px',
         outline: 'none',
         padding: '0 20px',
-        textAlign: 'center'
+        textAlign: 'center',
+        disabledBackgroundColor: 'red',
+        disabledTextColor: 'blue'
     },
     loadingIndicator: {
         borderRadius: '50%',

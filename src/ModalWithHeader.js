@@ -24,7 +24,9 @@ const ModalWithHeader = ({
     modalOverlayStyle,
     bodyOpenClassName,
     hoverStyle,
-    cancelTextHoverColor
+    cancelTextHoverColor,
+    successButtonIsDisabled,
+    buttonStyle
 }) => {
     const headerStyle = {
         position: 'relative',
@@ -84,6 +86,8 @@ const ModalWithHeader = ({
                     onClick={successFn}
                     primaryColor={primaryColor}
                     hoverColor={hoverColor}
+                    isDisabled={successButtonIsDisabled}
+                    style={buttonStyle}
                 >
                     {successText}
                 </RoundedButton>
