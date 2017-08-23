@@ -192,9 +192,10 @@ class AudienceTable extends Component {
         const { relay } = this.props
         let refetchVariables
         if (
-            nextProps.context === 'predicates' &&
+            nextProps.context === 'predicates' && (
             JSON.stringify(this.props.predicates) !==
-                JSON.stringify(nextProps.predicates)
+                JSON.stringify(nextProps.predicates) || !(nextProps.pageNumber >= this.state.group &&
+                    nextProps.pageNumber < this.state.group + 3) )
         ) {
             refetchVariables = fragmentVariables => ({
                 includeSegmentsFromPredicates: true,
@@ -217,6 +218,7 @@ class AudienceTable extends Component {
                 predicates: '[]',
                 pageNumber: Math.floor(nextProps.pageNumber / 3)
             })
+
             relay.refetch(
                 refetchVariables,
                 null,
