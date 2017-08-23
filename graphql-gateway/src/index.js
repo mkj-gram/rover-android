@@ -27,6 +27,8 @@ app.get('/healthcheck', (req, res) => {
     return res.status(200).end()
 })
 
+app.disable('x-powered-by')
+
 app.use('/graphql', cors(), authMiddleware, graphqlHTTP(req => ({
     schema,
     graphiql: true,
