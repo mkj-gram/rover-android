@@ -45,7 +45,8 @@ class SideBar extends Component {
             segmentId: '',
             saveStates: {},
             sbDynamicSegment: [],
-            segmentIdRefetch: false
+            segmentIdRefetch: false,
+            isFilterModalSuccessDisabled: false
         }
 
         this.setState = this.setState.bind(this)
@@ -55,6 +56,11 @@ class SideBar extends Component {
         this.handleSegmentAction = this.handleSegmentAction.bind(this)
         this.viewDynamicSegment = this.viewDynamicSegment.bind(this)
         this.handleModalOpen = this.handleModalOpen.bind(this)
+        this.removeNullPredicate = this.removeNullPredicate.bind(this)
+        this.getPredicateKeywords = this.getPredicateKeywords.bind(this)
+        this.shouldDisableFilterModalSuccessButton = this.shouldDisableFilterModalSuccessButton.bind(
+            this
+        )
     }
 
     componentWillReceiveProps(nextProps) {
@@ -208,7 +214,14 @@ class SideBar extends Component {
 
         const { __typename } = predicate
 
-        const updateFn = currentPredicate => this.setState({ currentPredicate })
+        const updateFn = currentPredicate => {
+            this.setState({
+                currentPredicate,
+                isFilterModalSuccessDisabled: this.shouldDisableFilterModalSuccessButton(
+                    currentPredicate
+                )
+            })
+        }
 
         const props = { ...predicate, updateFn, index }
 
@@ -306,12 +319,12 @@ class SideBar extends Component {
 
         const onFocus = e =>
             (e.target.parentElement.style.backgroundColor = graphite)
-        const onSelect = (e) => {
+        const onSelect = e => {
             e.target.blur()
             e.target.parentElement.style.backgroundColor = slate
         }
 
-        const renderArrow = () => (
+        const renderArrow = () =>
             <svg
                 width="6"
                 height="20"
@@ -329,7 +342,6 @@ class SideBar extends Component {
                     transform="translate(-300 -84)"
                 />
             </svg>
-        )
 
         return (
             <div style={style} id="filterContainer">
@@ -362,7 +374,7 @@ class SideBar extends Component {
                         schema={data.segmentSchema}
                         onRequestClose={() =>
                             this.setState({ isShowingAddFilterModal: false })}
-                        onSelect={(predicate) => {
+                        onSelect={predicate => {
                             this.setState({
                                 query: query.concat(predicate),
                                 isShowingAddFilterModal: false,
@@ -375,24 +387,26 @@ class SideBar extends Component {
                         }}
                     />}
                 <div style={selectContainerStyle}>
-                    <label style={matchStyle} htmlFor='any-all-select'>MATCH</label>
+                    <label style={matchStyle} htmlFor="any-all-select">
+                        MATCH
+                    </label>
                     <Select
-                        id='any-all-select'
+                        id="any-all-select"
                         style={selectStyle}
                         isDisabled={false}
                         value={queryCondition}
-                        onChange={(e) => {
+                        onChange={e => {
                             onSelect(e)
-                            this.props.setQueryCondition(e.target.value, false, query)
+                            this.props.setQueryCondition(
+                                e.target.value,
+                                false,
+                                query
+                            )
                         }}
                         onFocus={onFocus}
                     >
-                        <option value="ALL">
-                            ALL
-                        </option>
-                        <option value="ANY">
-                            ANY
-                        </option>
+                        <option value="ALL">ALL</option>
+                        <option value="ANY">ANY</option>
                     </Select>
                 </div>
             </div>
@@ -518,6 +532,37 @@ class SideBar extends Component {
         }
     }
 
+    getPredicateKeywords(currentPredicate = null) {
+        const { query } = this.state
+        const elem = currentPredicate || query[query.length - 1]
+        const typename = elem.__typename
+        const value =
+            typename.slice(0, typename.indexOf('Predicate')).toLowerCase() +
+            'Value'
+
+        return { elem, value }
+    }
+
+    removeNullPredicate() {
+        const { elem, value } = this.getPredicateKeywords()
+        const { query } = this.state
+
+        if (!elem.hasOwnProperty(value)) {
+            query.splice(-1, 1)
+            this.setState({
+                query,
+                currentAttribute: { attribute: '' }
+            })
+        } else {
+            this.setState({ currentAttribute: { attribute: '' } })
+        }
+    }
+
+    shouldDisableFilterModalSuccessButton(currentPredicate) {
+        const { value } = this.getPredicateKeywords(currentPredicate)
+        return currentPredicate[value].length === 0
+    }
+
     render() {
         const sideBarStyle = {
             height: '100%',
@@ -552,7 +597,6 @@ class SideBar extends Component {
         return (
             <div style={sideBarStyle}>
                 {this.handleModalOpen()}
-
                 <ModalWithHeader
                     contentLabel="Query Builder"
                     backgroundColor={graphite}
@@ -560,8 +604,7 @@ class SideBar extends Component {
                     headerContent={this.renderModalTitle(currentAttribute)}
                     successFn={() => this.updateQuery()}
                     successText="Add filter"
-                    cancelFn={() =>
-                        this.setState({ currentAttribute: { attribute: '' } })}
+                    cancelFn={() => this.removeNullPredicate()}
                     cancelText="Cancel"
                     primaryColor={violet}
                     secondaryColor={lavender}
@@ -574,7 +617,10 @@ class SideBar extends Component {
                         left: modalCoordinates[0],
                         transform: null
                     }}
+                    isDisabled={this.state.isFilterModalSuccessDisabled}
                     bodyOpenClassName="bodyClassName"
+                    disabledBackgroundColor={steel}
+                    disabledTextColor={silver}
                 >
                     {currentAttribute.attribute !== ''
                         ? this.renderModalInput(currentAttribute.index)
