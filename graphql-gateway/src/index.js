@@ -23,6 +23,10 @@ app.set('port', (process.env.PORT || 80))
 app.use(authMiddleware)
 app.use(morgan('tiny'))
 
+app.get('/healthcheck', (req, res) => {
+    return res.status(200).end()
+})
+
 app.use('/graphql', cors(), authMiddleware, graphqlHTTP(req => ({
     schema,
     graphiql: true,
