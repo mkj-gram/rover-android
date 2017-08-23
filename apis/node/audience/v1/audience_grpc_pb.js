@@ -182,6 +182,28 @@ function deserialize_rover_audience_v1_GetDeviceSchemaResponse(buffer_arg) {
   return audience_v1_audience_pb.GetDeviceSchemaResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_GetDevicesTotalCountRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetDevicesTotalCountRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetDevicesTotalCountRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetDevicesTotalCountRequest(buffer_arg) {
+  return audience_v1_audience_pb.GetDevicesTotalCountRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_GetDevicesTotalCountResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetDevicesTotalCountResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetDevicesTotalCountResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetDevicesTotalCountResponse(buffer_arg) {
+  return audience_v1_audience_pb.GetDevicesTotalCountResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_GetDynamicSegmentByIdRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.GetDynamicSegmentByIdRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.GetDynamicSegmentByIdRequest');
@@ -290,6 +312,28 @@ function serialize_rover_audience_v1_GetProfileSchemaResponse(arg) {
 
 function deserialize_rover_audience_v1_GetProfileSchemaResponse(buffer_arg) {
   return audience_v1_audience_pb.GetProfileSchemaResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_GetProfilesTotalCountRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetProfilesTotalCountRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetProfilesTotalCountRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetProfilesTotalCountRequest(buffer_arg) {
+  return audience_v1_audience_pb.GetProfilesTotalCountRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_GetProfilesTotalCountResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetProfilesTotalCountResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetProfilesTotalCountResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetProfilesTotalCountResponse(buffer_arg) {
+  return audience_v1_audience_pb.GetProfilesTotalCountResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_rover_audience_v1_ListDevicesByProfileIdRequest(arg) {
@@ -1059,6 +1103,31 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesRequest,
     responseSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
     responseDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
+  },
+  //
+  // CounterCaches
+  //
+  getProfilesTotalCount: {
+    path: '/rover.audience.v1.Audience/GetProfilesTotalCount',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.GetProfilesTotalCountRequest,
+    responseType: audience_v1_audience_pb.GetProfilesTotalCountResponse,
+    requestSerialize: serialize_rover_audience_v1_GetProfilesTotalCountRequest,
+    requestDeserialize: deserialize_rover_audience_v1_GetProfilesTotalCountRequest,
+    responseSerialize: serialize_rover_audience_v1_GetProfilesTotalCountResponse,
+    responseDeserialize: deserialize_rover_audience_v1_GetProfilesTotalCountResponse,
+  },
+  getDevicesTotalCount: {
+    path: '/rover.audience.v1.Audience/GetDevicesTotalCount',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.GetDevicesTotalCountRequest,
+    responseType: audience_v1_audience_pb.GetDevicesTotalCountResponse,
+    requestSerialize: serialize_rover_audience_v1_GetDevicesTotalCountRequest,
+    requestDeserialize: deserialize_rover_audience_v1_GetDevicesTotalCountRequest,
+    responseSerialize: serialize_rover_audience_v1_GetDevicesTotalCountResponse,
+    responseDeserialize: deserialize_rover_audience_v1_GetDevicesTotalCountResponse,
   },
 };
 

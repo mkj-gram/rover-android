@@ -326,6 +326,18 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :minor, :int32, 2
     optional :revision, :int32, 3
   end
+  add_message "rover.audience.v1.GetProfilesTotalCountRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+  end
+  add_message "rover.audience.v1.GetProfilesTotalCountResponse" do
+    optional :total, :int64, 1
+  end
+  add_message "rover.audience.v1.GetDevicesTotalCountRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+  end
+  add_message "rover.audience.v1.GetDevicesTotalCountResponse" do
+    optional :total, :int64, 1
+  end
   add_message "rover.audience.v1.CreateDynamicSegmentRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :title, :string, 2
@@ -564,6 +576,10 @@ module Rover
       Value::StringArray = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Value.StringArray").msgclass
       SchemaAttribute = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.SchemaAttribute").msgclass
       Version = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Version").msgclass
+      GetProfilesTotalCountRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfilesTotalCountRequest").msgclass
+      GetProfilesTotalCountResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfilesTotalCountResponse").msgclass
+      GetDevicesTotalCountRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetDevicesTotalCountRequest").msgclass
+      GetDevicesTotalCountResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetDevicesTotalCountResponse").msgclass
       CreateDynamicSegmentRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.CreateDynamicSegmentRequest").msgclass
       CreateDynamicSegmentResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.CreateDynamicSegmentResponse").msgclass
       GetDynamicSegmentByIdRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetDynamicSegmentByIdRequest").msgclass

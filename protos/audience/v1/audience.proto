@@ -84,6 +84,11 @@ service Audience {
   rpc UpdateDynamicSegmentArchiveStatus(UpdateDynamicSegmentArchiveStatusRequest) returns (UpdateDynamicSegmentArchiveStatusResponse);
   rpc UpdateDynamicSegmentPredicates(UpdateDynamicSegmentPredicatesRequest) returns (UpdateDynamicSegmentPredicatesResponse);
 
+  //
+  // CounterCaches
+  //
+  rpc GetProfilesTotalCount(GetProfilesTotalCountRequest) returns (GetProfilesTotalCountResponse);
+  rpc GetDevicesTotalCount(GetDevicesTotalCountRequest) returns (GetDevicesTotalCountResponse);
 }
 
 
@@ -609,6 +614,24 @@ enum Null {
   NULL = 0;
 }
 
+
+//
+// CounterCaches
+//
+
+message GetProfilesTotalCountRequest {
+  auth.v1.AuthContext auth_context = 1;
+}
+message GetProfilesTotalCountResponse {
+  int64 total = 1;
+}
+
+message GetDevicesTotalCountRequest {
+  auth.v1.AuthContext auth_context = 1;
+}
+message GetDevicesTotalCountResponse {
+  int64 total = 1;
+}
 
 //
 // DynamicSegments

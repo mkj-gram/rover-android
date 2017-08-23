@@ -16,6 +16,9 @@ type (
 		*profilesStore
 		*devicesStore
 		*dynamicSegmentsStore
+
+		*devicesCounterCaches
+		*profilesCounterCaches
 	}
 
 	Option func(s *mongoStore)
@@ -31,8 +34,9 @@ type (
 )
 
 func New(db *mgo.Database, options ...Option) *DB {
+	sess := db.Session
 	ms := &mongoStore{
-		sess:   db.Session,
+		sess:   sess,
 		dbName: db.Name,
 	}
 
@@ -58,6 +62,9 @@ func New(db *mgo.Database, options ...Option) *DB {
 		profilesStore:        &profilesStore{ms},
 		devicesStore:         &devicesStore{ms},
 		dynamicSegmentsStore: &dynamicSegmentsStore{ms},
+
+		devicesCounterCaches:  &devicesCounterCaches{ms},
+		profilesCounterCaches: &profilesCounterCaches{ms},
 	}
 }
 
@@ -84,6 +91,9 @@ func (db *DB) Copy() *DB {
 		profilesStore:        &profilesStore{ms},
 		devicesStore:         &devicesStore{ms},
 		dynamicSegmentsStore: &dynamicSegmentsStore{ms},
+
+		devicesCounterCaches:  &devicesCounterCaches{ms},
+		profilesCounterCaches: &profilesCounterCaches{ms},
 	}
 }
 
@@ -119,4 +129,12 @@ func (ds *mongoStore) profiles_schemas() *mgo.Collection {
 
 func (ds *mongoStore) dynamic_segments() *mgo.Collection {
 	return ds.sess.DB(ds.dbName).C("dynamic_segments")
+}
+
+func (ds *mongoStore) profiles_counts() *mgo.Collection {
+	return ds.sess.DB(ds.dbName).C("profiles_counts")
+}
+
+func (ds *mongoStore) devices_counts() *mgo.Collection {
+	return ds.sess.DB(ds.dbName).C("devices_counts")
 }

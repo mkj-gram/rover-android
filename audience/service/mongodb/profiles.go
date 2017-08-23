@@ -171,13 +171,13 @@ func (s *profilesStore) FindProfileById(ctx context.Context, id string) (*audien
 
 // CreateProfile creates an empty Profile for the account
 func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreateProfileRequest) (*audience.Profile, error) {
-
 	var (
-		now = s.timeNow()
+		account_id = r.GetAuthContext().GetAccountId()
+		now        = s.timeNow()
 
 		p = Profile{
 			Id:         s.newObjectId(),
-			AccountId:  r.GetAuthContext().GetAccountId(),
+			AccountId:  account_id,
 			Attributes: nil,
 			CreatedAt:  &now,
 			UpdatedAt:  &now,
@@ -186,6 +186,11 @@ func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreatePro
 
 	if err := s.profiles().Insert(p); err != nil {
 		return nil, wrapError(err, "profiles.Insert")
+	}
+
+	c := IntCounter{s.profiles_counts()}
+	if err := c.Add(account_id, 1); err != nil {
+		errorf("counter_cache: profiles: %v", err)
 	}
 
 	var proto audience.Profile
@@ -253,6 +258,11 @@ func (s *profilesStore) DeleteProfile(ctx context.Context, r *audience.DeletePro
 
 	if err := s.profiles().Remove(Q); err != nil {
 		return wrapError(err, "profiles.Remove")
+	}
+
+	c := IntCounter{s.profiles_counts()}
+	if err := c.Sub(account_id, 1); err != nil {
+		errorf("counter_cache: profiles: %v", err)
 	}
 
 	return nil
@@ -419,7 +429,7 @@ func (s *profilesStore) getProfileSchema(ctx context.Context, account_id int32) 
 
 		if !iter.Next(&sa) {
 			if err := iter.Err(); err != nil {
-				s.log.Debugf("iter.Next: %s", err)
+				debugf("iter.Next: %s", err)
 			}
 			continue
 		}
@@ -562,7 +572,7 @@ func (s *profilesStore) validateProfileAttributes(schema *ProfileSchema, attrUpd
 		}
 
 		if len(updates.GetValues()) == 0 {
-			s.log.Errorf("ValueUpdate: %q: empty", aname)
+			errorf("ValueUpdate: %q: empty", aname)
 			continue
 		}
 
@@ -608,7 +618,7 @@ func (s *profilesStore) generateProfileSchema(ctx context.Context, account_id in
 		var attrName, valueUpdates = schemaLess[i], attrs[schemaLess[i]]
 
 		if len(valueUpdates.GetValues()) == 0 {
-			s.log.Errorf("ValueUpdates: %q: empty", attrName)
+			errorf("ValueUpdates: %q: empty", attrName)
 			continue
 		}
 
@@ -619,7 +629,7 @@ func (s *profilesStore) generateProfileSchema(ctx context.Context, account_id in
 
 		attrType, err := audience.ValueUpdateToTypeName(valueUpdate)
 		if err != nil {
-			s.log.Errorf("ValueUpdateToTypeName: %s=%v: %v", attrName, valueUpdate, err)
+			errorf("ValueUpdateToTypeName: %s=%v: %v", attrName, valueUpdate, err)
 			continue
 		}
 
@@ -643,7 +653,7 @@ func (s *profilesStore) generateProfileSchema(ctx context.Context, account_id in
 }
 
 func (s *profilesStore) updateProfileAttributes(ctx context.Context, profile_id string, attrs map[string]*audience.ValueUpdates) (err error) {
-	s.log.Debugf("profiles.UpdateAttributes : %s: %#v", profile_id, attrs)
+	debugf("profiles.UpdateAttributes : %s: %#v", profile_id, attrs)
 	// TODO:
 	// mongo doesn't allow pulls/pushes in same update
 	// but our model does allow
@@ -697,11 +707,11 @@ func (s *profilesStore) updateProfileAttributes(ctx context.Context, profile_id 
 	}
 
 	if len(update) == 0 {
-		s.log.Debugf("profile.Update: empty: skipping update: profile_id=%s", profile_id)
+		debugf("profile.Update: empty: skipping update: profile_id=%s", profile_id)
 		return nil
 	}
 
-	s.log.Debugf("profile.Update: Bson: profile_id=%s: %+v", profile_id, update)
+	debugf("profile.Update: Bson: profile_id=%s: %+v", profile_id, update)
 
 	if err := s.profiles().UpdateId(bson.ObjectIdHex(profile_id), update); err != nil {
 		return wrapError(err, "profiles.UpdateId")

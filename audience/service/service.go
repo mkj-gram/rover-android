@@ -11,9 +11,10 @@ import (
 )
 
 // ensure the interface is implemented
-var _ audience.AudienceServer = (*Server)(nil)
 
 var (
+	_ audience.AudienceServer = (*Server)(nil)
+
 	// Register provides a convenient wrapper around generated function
 	Register = audience.RegisterAudienceServer
 )
@@ -23,25 +24,44 @@ type (
 	Server struct {
 		db *mongodb.DB
 	}
-
-	// Option is a Server option type
-	Option func(s *Server)
 )
 
 // New creates new Server instance with all the options provided
-func New(db *mongodb.DB, options ...Option) *Server {
-	srv := &Server{
-		db: db,
-	}
-
-	for _, opt := range options {
-		opt(srv)
-	}
-
-	return srv
+func New(db *mongodb.DB) *Server {
+	return &Server{db: db}
 }
 
+//
+// Counter Caches
+//
+
+// GetDevicesTotalCount implements the corresponding rpc
+func (s *Server) GetDevicesTotalCount(ctx context.Context, r *audience.GetDevicesTotalCountRequest) (*audience.GetDevicesTotalCountResponse, error) {
+	db := s.db.Copy()
+	defer db.Close()
+
+	val, err := db.GetDevicesTotalCount(ctx, r.GetAuthContext().GetAccountId())
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDevicesTotalCount: %v", err)
+	}
+	return &audience.GetDevicesTotalCountResponse{val}, nil
+}
+
+// GetProfilesTotalCount implements the corresponding rpc
+func (s *Server) GetProfilesTotalCount(ctx context.Context, r *audience.GetProfilesTotalCountRequest) (*audience.GetProfilesTotalCountResponse, error) {
+	db := s.db.Copy()
+	defer db.Close()
+
+	val, err := db.GetProfilesTotalCount(ctx, r.GetAuthContext().GetAccountId())
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfilesTotalCount: %v", err)
+	}
+	return &audience.GetProfilesTotalCountResponse{val}, nil
+}
+
+//
 // Devices
+//
 
 // GetDevice implements the corresponding rpc
 func (s *Server) GetDevice(ctx context.Context, r *audience.GetDeviceRequest) (*audience.GetDeviceResponse, error) {
@@ -87,6 +107,7 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 	if err := db.CreateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice: %v", err)
 	}
+
 	return &audience.CreateDeviceResponse{}, nil
 }
 
@@ -123,6 +144,7 @@ func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceReque
 	if err := db.DeleteDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteDevice: %v", err)
 	}
+
 	return &audience.DeleteDeviceResponse{}, nil
 }
 

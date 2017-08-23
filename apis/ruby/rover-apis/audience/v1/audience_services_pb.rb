@@ -76,6 +76,11 @@ module Rover
           rpc :UpdateDynamicSegmentTitle, UpdateDynamicSegmentTitleRequest, UpdateDynamicSegmentTitleResponse
           rpc :UpdateDynamicSegmentArchiveStatus, UpdateDynamicSegmentArchiveStatusRequest, UpdateDynamicSegmentArchiveStatusResponse
           rpc :UpdateDynamicSegmentPredicates, UpdateDynamicSegmentPredicatesRequest, UpdateDynamicSegmentPredicatesResponse
+          #
+          # CounterCaches
+          #
+          rpc :GetProfilesTotalCount, GetProfilesTotalCountRequest, GetProfilesTotalCountResponse
+          rpc :GetDevicesTotalCount, GetDevicesTotalCountRequest, GetDevicesTotalCountResponse
         end
 
         Stub = Service.rpc_stub_class
