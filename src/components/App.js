@@ -15,12 +15,13 @@ class App extends Component {
     }
 
     componentWillMount() {
-        window.addEventListener('storage', event => {
+        const storageKey = 'ember_simple_auth:session'
+        window.addEventListener('storage', (event) => {
             if (event.key === storageKey && !this.getToken()) {
                  window.location.replace('/auth/sign-in')
             }
         })
- 
+
         if (this.getToken()) {
             this.setState({
                 name: JSON.parse(localStorage.getItem('ajs_user_traits')).name
