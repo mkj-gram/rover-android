@@ -617,10 +617,12 @@ class SideBar extends Component {
                         left: modalCoordinates[0],
                         transform: null
                     }}
-                    isDisabled={this.state.isFilterModalSuccessDisabled}
+                    successButtonIsDisabled={this.state.isFilterModalSuccessDisabled}
                     bodyOpenClassName="bodyClassName"
-                    disabledBackgroundColor={steel}
-                    disabledTextColor={silver}
+                    buttonStyle={{
+                        disabledBackgroundColor: steel,
+                        disabledTextColor: silver
+                    }}
                 >
                     {currentAttribute.attribute !== ''
                         ? this.renderModalInput(currentAttribute.index)
