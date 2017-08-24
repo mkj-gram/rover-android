@@ -51,7 +51,7 @@ module.exports = function() {
                     return writeReplyError(404, { status: 404, error: "Message not found" })
                 }
 
-                if (profile.id !== message.customer_id) {
+                if (profile.id !== String(message.customer_id)) {
                     return writeReplyError(403, { status: 403, error: "Permission Denied" })
                 }
 
