@@ -427,29 +427,21 @@ class SideBar extends Component {
 
         return (
             <div style={style} id="saveBar">
-                {showSaveButton
-                    ? <RoundedButton
-                          type="primary"
-                          primaryColor={violet}
-                          hoverColor={orchid}
-                          style={{
-                              width: 88,
-                              marginRight: 5
-                          }}
-                          onClick={() => this.handleSegmentAction('save')}
-                      >
-                          Save
-                      </RoundedButton>
-                    : <RoundedButton
-                          type="primary"
-                          primaryColor={silver}
-                          style={{
-                              width: 88,
-                              marginRight: 5
-                          }}
-                      >
-                          Save
-                      </RoundedButton>}
+                <RoundedButton
+                    type="primary"
+                    primaryColor={violet}
+                    hoverColor={orchid}
+                    onClick={() => this.handleSegmentAction('save')}
+                    isDisabled={!showSaveButton}
+                    style={{
+                        width: 88,
+                        marginRight: 5,
+                        disabledTextColor: steel,
+                        disabledBackgroundColor: graphite
+                    }}
+                >
+                    Save
+                </RoundedButton>
                 <RoundedButton
                     type="primary"
                     primaryColor={graphite}
