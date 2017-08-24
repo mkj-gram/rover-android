@@ -47,7 +47,8 @@ let mockPredicateData = {
                         geofenceValue: {
                             latitude: 43.651018,
                             longitude: -79.375593,
-                            radius: 100
+                            radius: 100,
+                            name: 'geo1'
                         },
                         geofenceComparison: 'is within'
                     }
@@ -104,7 +105,8 @@ let mockPredicateData = {
                         geofenceValue: {
                             latitude: 43.651018,
                             longitude: -79.375593,
-                            radius: 100
+                            radius: 100,
+                            name: 'geo2'
                         },
                         geofenceComparison: 'is within'
                     }
@@ -161,7 +163,8 @@ let mockPredicateData = {
                         geofenceValue: {
                             latitude: 43.651018,
                             longitude: -79.375593,
-                            radius: 100
+                            radius: 100,
+                            name: 'geo3'
                         },
                         geofenceComparison: 'is within'
                     }
@@ -200,7 +203,8 @@ let mockPredicateData = {
                         geofenceValue: {
                             latitude: 43.651018,
                             longitude: -79.375593,
-                            radius: 100
+                            radius: 100,
+                            name: 'geo4'
                         },
                         geofenceComparison: 'is within'
                     }
@@ -314,10 +318,12 @@ export function addSegment(name, segmentId, predicates, queryCondition) {
     })
 }
 
-export function getSegment(segmentId) {
+export function getSegment(segmentId, pageNumber, pageSize) {
     if (!segmentId) {
         return mockPredicateNullSegment
     }
 
+    mockPredicateData[segmentId][0].pageNumber = pageNumber
+    mockPredicateData[segmentId][0].pageSize = pageSize
     return mockPredicateData[segmentId]
 }

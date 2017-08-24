@@ -18,7 +18,7 @@ const DynamicSegmentQuery = {
         }
     },
     resolve(_, { segmentId, pageNumber, pageSize }) {
-        return getSegment(segmentId)
+        return getSegment(segmentId, pageNumber, pageSize)
     }
 }
 
