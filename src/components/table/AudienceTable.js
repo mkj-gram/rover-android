@@ -428,6 +428,8 @@ class AudienceTable extends Component {
         let ret = data
         if (type === 'VersionPredicate') {
             ret = Object.values(data).join('.')
+        } else if (type === 'GeofencePredicate') {
+            ret = data.name
         }
         return ret
     }
