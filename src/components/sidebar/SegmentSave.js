@@ -216,6 +216,14 @@ class SegmentSave extends Component {
                     modalOverlayStyle={{
                         zIndex: 2
                     }}
+                    successButtonIsDisabled={
+                        this.state.segmentName.length === 0 &&
+                        segmentSaveValue !== 'update'
+                    }
+                    buttonStyle={{
+                        disabledBackgroundColor: steel,
+                        disabledTextColor: silver
+                    }}
                 />
             )
         } else {
@@ -248,6 +256,13 @@ class SegmentSave extends Component {
                     }}
                     modalOverlayStyle={{
                         zIndex: 2
+                    }}
+                    successButtonIsDisabled={
+                        this.state.segmentName.length === 0
+                    }
+                    buttonStyle={{
+                        disabledBackgroundColor: steel,
+                        disabledTextColor: silver
                     }}
                 />
             )
