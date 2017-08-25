@@ -138,7 +138,6 @@ class SideBar extends Component {
 
         const newQuery = query
         newQuery[index] = rest
-
         updateQuery(newQuery, queryCondition)
 
         this.setState({
@@ -238,6 +237,8 @@ class SideBar extends Component {
                 return <NumericInput {...props} />
             case 'GeofencePredicate':
                 return <GeofenceInput {...props} />
+            case 'FloatPredicate':
+                return <NumericInput {...props} float={true} />
             default:
         }
     }
@@ -609,7 +610,9 @@ class SideBar extends Component {
                         left: modalCoordinates[0],
                         transform: null
                     }}
-                    successButtonIsDisabled={this.state.isFilterModalSuccessDisabled}
+                    successButtonIsDisabled={
+                        this.state.isFilterModalSuccessDisabled
+                    }
                     bodyOpenClassName="bodyClassName"
                     buttonStyle={{
                         disabledBackgroundColor: steel,

@@ -1,12 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import {
-    Select,
-    silver,
-    text,
-    titanium
-} from '@rover/react-bootstrap'
+import { Select, silver, text, titanium } from '@rover/react-bootstrap'
 
 import ModalInput from './ModalInput'
 import ModalInputPrompt from './ModalInputPrompt'
@@ -28,42 +23,84 @@ class NumericInput extends Component {
     }
 
     updateComparison(numberComparison) {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const {
+            attribute,
+            category,
+            __typename,
+            index,
+            updateFn,
+            float
+        } = this.props
         let numberValue = [0]
 
         if (numberComparison === 'in between') {
             numberValue = [0, 0]
         }
 
-        if (numberComparison === 'has any value' || numberComparison === 'is unknown') {
+        if (
+            numberComparison === 'has any value' ||
+            numberComparison === 'is unknown'
+        ) {
             numberValue = [null, null]
         }
 
-        updateFn({
-            attribute,
-            numberComparison,
-            category,
-            index,
-            numberValue,
-            __typename
-        })
+        if (float) {
+            updateFn({
+                attribute,
+                floatComparison: numberComparison,
+                category,
+                index,
+                floatValue: numberValue,
+                __typename
+            })
+        } else {
+            updateFn({
+                attribute,
+                numberComparison,
+                category,
+                index,
+                numberValue,
+                __typename
+            })
+        }
 
         this.setState({ numberComparison, numberValue })
     }
 
     updateValue(number, valueIndex) {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const {
+            attribute,
+            category,
+            __typename,
+            index,
+            updateFn,
+            float
+        } = this.props
         const { numberValue, numberComparison } = this.state
 
-        const newValue = numberValue.map((num, i) => i === valueIndex ? number : num)
-        updateFn({
-            attribute,
-            numberComparison,
-            category,
-            index,
-            numberValue: newValue,
-            __typename
-        })
+        const newValue = numberValue.map(
+            (num, i) => (i === valueIndex ? number : num)
+        )
+
+        if (float) {
+            updateFn({
+                attribute,
+                floatComparison: numberComparison,
+                category,
+                index,
+                floatValue: newValue,
+                __typename
+            })
+        } else {
+            updateFn({
+                attribute,
+                numberComparison,
+                category,
+                index,
+                numberValue: newValue,
+                __typename
+            })
+        }
 
         this.setState({ numberValue: newValue })
     }
@@ -120,8 +157,13 @@ class NumericInput extends Component {
                             type="number"
                             min={0}
                             value={numberValue[0]}
-                            onChange={e =>
-                                this.updateValue(parseInt(e.target.value, 10), 0)}
+                            step={this.props.float ? 0.1 : 1}
+                            onChange={e => {
+                                const parsedValue = this.props.float
+                                    ? parseFloat(e.target.value)
+                                    : parseInt(e.target.value, 10)
+                                this.updateValue(parsedValue, 0)
+                            }}
                         />}
                     {numberComparison === 'in between' &&
                         <div>
@@ -130,11 +172,13 @@ class NumericInput extends Component {
                                 type="number"
                                 min={0}
                                 value={numberValue[1]}
-                                onChange={e =>
-                                    this.updateValue(
-                                        parseInt(e.target.value, 10),
-                                        1
-                                    )}
+                                step={this.props.float ? 0.1 : 1}
+                                onChange={e => {
+                                    const parsedValue = this.props.float
+                                        ? parseFloat(e.target.value)
+                                        : parseInt(e.target.value, 10)
+                                    this.updateValue(parsedValue, 1)
+                                }}
                             />
                         </div>}
                 </div>
@@ -150,7 +194,8 @@ NumericInput.propTypes = {
     category: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
-    __typename: PropTypes.string.isRequired
+    __typename: PropTypes.string.isRequired,
+    float: PropTypes.bool
 }
 
 NumericInput.defaultProps = {
@@ -159,7 +204,8 @@ NumericInput.defaultProps = {
     numberComparison: 'is',
     category: 'device',
     index: 0,
-    updateFn: () => null
+    updateFn: () => null,
+    float: false
 }
 
 export default NumericInput
