@@ -30,7 +30,8 @@ module CustomerFilter
                 "background_enabled" => :boolean,
                 "notifications_enabled" => :boolean,
                 "bluetooth_enabled" => :boolean,
-                "location_monitoring_enabled" => :boolean
+                "location_monitoring_enabled" => :boolean,
+                "is_test_device" => :boolean
             }
 
             def model_name

@@ -308,7 +308,7 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
                 location_monitoring_enabled: device.is_location_monitoring_enabled,
                 bluetooth_enabled: device.is_bluetooth_enabled,
                 development: device.push_environment === "development",
-                test_device: device.is_test_device || false
+                is_test_device: device.is_test_device || false
             }
 
             if (device.location_longitude !== 0 && device.location_latitude !== 0 && device.location_longitude !== null && device.location_latitude !== null) {
