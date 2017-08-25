@@ -107,7 +107,8 @@ class Popover extends Component {
         }
 
         return (
-            <TetherComponent ref={e => this.tetherComponent = e} attachment={attachment} targetAttachment={targetAttachment} offset={offset} targetOffset={targetOffset}>
+
+            <TetherComponent ref={e => this.tetherComponent = e} attachment={attachment} targetAttachment={targetAttachment} offset={offset} targetOffset={targetOffset} style={{zIndex: 2}}>
                 {children[0]}
                 {contentElement}
             </TetherComponent>
