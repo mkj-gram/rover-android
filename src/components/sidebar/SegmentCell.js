@@ -283,7 +283,7 @@ class SegmentCell extends Component {
                                       justifyContent: 'center'
                                   }}
                               >
-                                <CheckmarkIcon fill={steel} style={{ pointerEvents: 'none' }}/>
+                                <CheckmarkIcon fill={steel} style={{ pointerEvents: 'none' }} />
                               </div>
                             : <div
                                   onClick={() => this.handleEditSave()}
@@ -312,7 +312,7 @@ class SegmentCell extends Component {
                             style={{
                                 height: 20,
                                 width: 20,
-                                backgroundColor: silver,
+                                backgroundColor: steel,
                                 borderRadius: 4,
                                 display: 'flex',
                                 flex: 'none',
@@ -320,11 +320,11 @@ class SegmentCell extends Component {
                                 justifyContent: 'center'
                             }}
                             onMouseOver={e =>
-                                (e.target.style.backgroundColor = '#818181')}
-                            onMouseLeave={e =>
                                 (e.target.style.backgroundColor = silver)}
+                            onMouseLeave={e =>
+                                (e.target.style.backgroundColor = steel)}
                         >
-                            <CancelIcon fill="white" style={{ pointerEvents: 'none' }}/>
+                            <CancelIcon fill="white" style={{ pointerEvents: 'none' }} />
                         </div>
                     </div>
                 </div>
