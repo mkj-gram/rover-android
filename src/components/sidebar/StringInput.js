@@ -69,6 +69,7 @@ class StringInput extends Component {
                 <ModalInputPrompt
                     attributeType={category}
                     attribute={attribute}
+                    includeIs={false}
                 />
                 <div
                     style={{

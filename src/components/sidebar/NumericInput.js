@@ -114,6 +114,7 @@ class NumericInput extends Component {
                 <ModalInputPrompt
                     attribute={attribute}
                     attributeType={category}
+                    includeIs={false}
                 />
                 <div
                     style={{
