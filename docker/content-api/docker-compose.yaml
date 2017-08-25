@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+
+  content-api:
+    image: ruby:2.3.3
+    links: [postgres, mongo, auth-service, elasticsearch]
+    ports: [5000]
+    command: ./docker/content-api/cmd _bundle migrate # test
+    volumes:
+      - ../../rover:/rover
+      - cachefs:/cachefs/
+    working_dir: /rover/content-api
+    environment:
+      AUTH_V1_SERVICE_HOST: auth-service
+      MONGODB_URI: mongodb://mongo:27017/rover-local
+      ELASTICSEARCH_URLS: elasticsearch:9200
+      POSTGRESQL_DB_HOST: postgres
+      BUNDLE_PATH: /cachefs/content-api.bundle
+      RACK_ENV: development
+      WEB_CONCURRENCY: 1
+      MAX_THREADS: 1
+

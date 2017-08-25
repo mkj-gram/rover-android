@@ -8,16 +8,19 @@ services:
 
   mongo:
     image: mongo
+    ports: [27017]
     volumes:
       - ../../rover:/rover
 
   elasticsearch:
     image: elasticsearch:2.4
+    ports: [9200, 9300]
     volumes:
       - ../../rover:/rover
 
   postgres:
     image: rover/postgres
+    ports: [5432]
     build:
       context: ../../rover
       dockerfile: ./docker/vendor/postgres/Dockerfile
@@ -25,28 +28,10 @@ services:
       - ../../rover:/rover
       - pgdata:/var/lib/postgresql/data
 
-  content-api:
-    links: [postgres, mongo]
-    image: ruby:2.3.3
-    command: ./docker/content-api/cmd _bundle migrate # test
-    volumes:
-      - ../../rover:/rover
-      - cachefs:/cachefs/
-    working_dir: /rover
-    environment:
-      BUNDLE_PATH: /cachefs/content-api.bundle
-      RACK_ENV: development
-      MONGODB_URI: mongodb://mongo:27017/rover-local
-      ELASTICSEARCH_URLS: elasticsearch:9200
-      WEB_CONCURRENCY: 1
-      MAX_THREADS: 1
-      POSTGRESQL_DB_HOST: postgres
-      AUTH_V1_SERVICE_HOST: auth-service
-
-
   auth-service:
-    links: [postgres]
     image: golang:1.8-alpine
+    links: [postgres]
+    ports: [5100, 5080]
     command: ./docker/auth-service/cmd test run
     volumes:
       - ../../rover:/go/src/github.com/roverplatform/rover
@@ -56,8 +41,9 @@ services:
       DB_DSN: "postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable"
 
   audience-service:
-    links: [mongo]
     image: golang:1.8-alpine
+    links: [mongo]
+    ports: [5100, 5080]
     command: ./docker/audience-service/cmd test run
     volumes:
       - ../../rover:/go/src/github.com/roverplatform/rover
