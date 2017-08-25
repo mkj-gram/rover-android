@@ -46,7 +46,11 @@ class SideBar extends Component {
             saveStates: {},
             sbDynamicSegment: [],
             segmentIdRefetch: false,
-            isFilterModalSuccessDisabled: false
+            isFilterModalSuccessDisabled: false,
+            addFilter: {
+                button: violet,
+                text: lavender
+            }
         }
 
         this.setState = this.setState.bind(this)
@@ -61,6 +65,7 @@ class SideBar extends Component {
         this.shouldDisableFilterModalSuccessButton = this.shouldDisableFilterModalSuccessButton.bind(
             this
         )
+        this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -271,6 +276,24 @@ class SideBar extends Component {
         })
     }
 
+    updateAddFilterColors(val) {
+        if (val === 'over') {
+            this.setState({
+                addFilter: {
+                    button: orchid,
+                    text: 'white'
+                }
+            })
+        } else if (val === 'leave') {
+            this.setState({
+                addFilter: {
+                    button: violet,
+                    text: lavender
+                }
+            })
+        }
+    }
+
     renderAddFilterBar() {
         const { isShowingAddFilterModal, query } = this.state
 
@@ -353,17 +376,19 @@ class SideBar extends Component {
                         display: 'flex',
                         alignItems: 'center'
                     }}
+                    onMouseOver={() => this.updateAddFilterColors('over')}
+                    onMouseLeave={() => this.updateAddFilterColors('leave')}
                 >
                     <AddButton
                         id="add-filter-button"
-                        primaryColor={orchid}
+                        primaryColor={this.state.addFilter.button}
                         style={{ root: { marginLeft: 20 } }}
                     />
                     <div
                         style={{
                             ...text,
                             fontSize: 15,
-                            color: lavender,
+                            color: this.state.addFilter.text,
                             fontWeight: 'normal'
                         }}
                     >
