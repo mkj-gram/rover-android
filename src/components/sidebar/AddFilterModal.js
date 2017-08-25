@@ -159,8 +159,7 @@ class AddFilterModal extends Component {
                             margin: '10px 10px 3px 0px'
                         }}
                         hoverStyle={{
-                            color: lavender,
-                            backgroundColor: graphite
+                            backgroundColor: ash
                         }}
                     />
                 </div>
