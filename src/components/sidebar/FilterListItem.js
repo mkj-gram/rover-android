@@ -52,7 +52,15 @@ const FilterListItem = ({ filter, onSelect }) =>
         onClick={() => onSelect(filter)}
     >
         {getIcon(filter.category)}
-        <span style={{ marginLeft: 10, pointerEvents: 'none' }}>
+        <span
+            style={{
+                marginLeft: 10,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+            }}
+        >
             {filter.attribute}
         </span>
     </div>

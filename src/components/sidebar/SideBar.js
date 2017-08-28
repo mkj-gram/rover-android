@@ -46,7 +46,12 @@ class SideBar extends Component {
             saveStates: {},
             sbDynamicSegment: [],
             segmentIdRefetch: false,
-            isFilterModalSuccessDisabled: false
+            isFilterModalSuccessDisabled: false,
+            addFilter: {
+                button: violet,
+                text: lavender
+            },
+            matchConditionBackgroundColor: ''
         }
 
         this.setState = this.setState.bind(this)
@@ -61,6 +66,8 @@ class SideBar extends Component {
         this.shouldDisableFilterModalSuccessButton = this.shouldDisableFilterModalSuccessButton.bind(
             this
         )
+        this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
+        this.handleMatchConditionHover = this.handleMatchConditionHover.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -138,7 +145,6 @@ class SideBar extends Component {
 
         const newQuery = query
         newQuery[index] = rest
-
         updateQuery(newQuery, queryCondition)
 
         this.setState({
@@ -238,6 +244,8 @@ class SideBar extends Component {
                 return <NumericInput {...props} />
             case 'GeofencePredicate':
                 return <GeofenceInput {...props} />
+            case 'FloatPredicate':
+                return <NumericInput {...props} float={true} />
             default:
         }
     }
@@ -270,8 +278,38 @@ class SideBar extends Component {
         })
     }
 
+    updateAddFilterColors(val) {
+        if (val === 'over') {
+            this.setState({
+                addFilter: {
+                    button: orchid,
+                    text: 'white'
+                }
+            })
+        } else if (val === 'leave') {
+            this.setState({
+                addFilter: {
+                    button: violet,
+                    text: lavender
+                }
+            })
+        }
+    }
+
+    handleMatchConditionHover(val) {
+        if (val === 'over') {
+            this.setState({
+                matchConditionBackgroundColor: graphite
+            })
+        } else if (val === 'leave') {
+            this.setState({
+                matchConditionBackgroundColor: ''
+            })
+        }
+    }
+
     renderAddFilterBar() {
-        const { isShowingAddFilterModal, query } = this.state
+        const { isShowingAddFilterModal, query, matchConditionBackgroundColor } = this.state
 
         const addPredicateIndex = query.length
 
@@ -295,7 +333,8 @@ class SideBar extends Component {
             alignItems: 'center',
             height: 27,
             padding: '0 15px',
-            borderRadius: 3
+            borderRadius: 3,
+            backgroundColor: matchConditionBackgroundColor
         }
 
         const selectStyle = {
@@ -352,17 +391,19 @@ class SideBar extends Component {
                         display: 'flex',
                         alignItems: 'center'
                     }}
+                    onMouseOver={() => this.updateAddFilterColors('over')}
+                    onMouseLeave={() => this.updateAddFilterColors('leave')}
                 >
                     <AddButton
                         id="add-filter-button"
-                        primaryColor={orchid}
+                        primaryColor={this.state.addFilter.button}
                         style={{ root: { marginLeft: 20 } }}
                     />
                     <div
                         style={{
                             ...text,
                             fontSize: 15,
-                            color: lavender,
+                            color: this.state.addFilter.text,
                             fontWeight: 'normal'
                         }}
                     >
@@ -386,7 +427,11 @@ class SideBar extends Component {
                             })
                         }}
                     />}
-                <div style={selectContainerStyle}>
+                <div
+                    style={selectContainerStyle}
+                    onMouseOver={() => this.handleMatchConditionHover('over')}
+                    onMouseLeave={() => this.handleMatchConditionHover('leave')}
+                >
                     <label style={matchStyle} htmlFor="any-all-select">
                         MATCH
                     </label>
@@ -427,29 +472,21 @@ class SideBar extends Component {
 
         return (
             <div style={style} id="saveBar">
-                {showSaveButton
-                    ? <RoundedButton
-                          type="primary"
-                          primaryColor={violet}
-                          hoverColor={orchid}
-                          style={{
-                              width: 88,
-                              marginRight: 5
-                          }}
-                          onClick={() => this.handleSegmentAction('save')}
-                      >
-                          Save
-                      </RoundedButton>
-                    : <RoundedButton
-                          type="primary"
-                          primaryColor={silver}
-                          style={{
-                              width: 88,
-                              marginRight: 5
-                          }}
-                      >
-                          Save
-                      </RoundedButton>}
+                <RoundedButton
+                    type="primary"
+                    primaryColor={violet}
+                    hoverColor={orchid}
+                    onClick={() => this.handleSegmentAction('save')}
+                    isDisabled={!showSaveButton}
+                    style={{
+                        width: 88,
+                        marginRight: 5,
+                        disabledTextColor: steel,
+                        disabledBackgroundColor: graphite
+                    }}
+                >
+                    Save
+                </RoundedButton>
                 <RoundedButton
                     type="primary"
                     primaryColor={graphite}
@@ -617,7 +654,9 @@ class SideBar extends Component {
                         left: modalCoordinates[0],
                         transform: null
                     }}
-                    successButtonIsDisabled={this.state.isFilterModalSuccessDisabled}
+                    successButtonIsDisabled={
+                        this.state.isFilterModalSuccessDisabled
+                    }
                     bodyOpenClassName="bodyClassName"
                     buttonStyle={{
                         disabledBackgroundColor: steel,

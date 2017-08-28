@@ -45,6 +45,8 @@ const renderPredicate = ({ __typename, ...rest }) => {
             return renderNumericPredicate(rest)
         case 'GeofencePredicate':
             return renderGeofencePredicate(rest)
+        case 'FloatPredicate':
+            return renderNumericPredicate(rest)
         default:
     }
 }
@@ -143,26 +145,35 @@ const renderVersionPredicate = ({ versionComparison, versionValue = [0, 0, 0] })
     )
 }
 
-const renderNumericPredicate = ({ numberComparison, numberValue }) => {
-    if (numberComparison === 'has any value' || numberComparison === 'is unknown') {
-        return renderPredicateComparison(numberComparison)
+const renderNumericPredicate = ({ numberComparison, numberValue, floatComparison, floatValue }) => {
+    let comparison, value
+    if (numberComparison === undefined && numberValue === undefined) {
+        comparison = floatComparison
+        value = floatValue
+    } else if (floatComparison === undefined && floatValue === undefined) {
+        comparison = numberComparison
+        value = numberValue
     }
 
-    if (numberComparison === 'in between') {
+    if (comparison === 'has any value' || comparison === 'is unknown') {
+        return renderPredicateComparison(comparison)
+    }
+
+    if (comparison === 'in between') {
         return (
             <div>
                 {renderPredicateComparison('between')}
-                {renderPredicateValue(numberValue[0])}
+                {renderPredicateValue(value[0])}
                 {renderPredicateComparison('and')}
-                {renderPredicateValue(numberValue[1])}
+                {renderPredicateValue(value[1])}
             </div>
         )
     }
 
     return (
         <div>
-            {renderPredicateComparison(numberComparison)}
-            {renderPredicateValue(numberValue)}
+            {renderPredicateComparison(comparison)}
+            {renderPredicateValue(value)}
         </div>
     )
 }
