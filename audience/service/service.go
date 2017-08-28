@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/audience/v1"
+	"github.com/roverplatform/rover/audience/service/mockdata"
 	"github.com/roverplatform/rover/audience/service/mongodb"
 )
 
@@ -507,6 +508,35 @@ func (s *Server) ListDynamicSegments(ctx context.Context, r *audience.ListDynami
 	return &audience.ListDynamicSegmentsResponse{
 		Segments: dss,
 	}, nil
+}
+
+func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience.QueryResponse, error) {
+
+	// TODO: remove mock data and convert predicates to elasticsearch queries
+
+	if r.AuthContext == nil {
+		return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
+	}
+
+	// Pick from our list of mock data
+	switch typ := r.GetIterator().(type) {
+	case *audience.QueryRequest_CursorIterator_:
+		return s.queryWithCursorIterator(ctx, r)
+	case *audience.QueryRequest_PageIterator_:
+		return s.queryWithPageIterator(ctx, r)
+	default:
+		return nil, status.Errorf(codes.InvalidArgument, "Got type %T", typ)
+
+	}
+
+}
+
+func (s *Server) queryWithCursorIterator(ctx context.Context, r *audience.QueryRequest) (*audience.QueryResponse, error) {
+	return mockdata.Generate(r.GetAuthContext().GetAccountId(), 100), nil
+}
+
+func (s *Server) queryWithPageIterator(ctx context.Context, r *audience.QueryRequest) (*audience.QueryResponse, error) {
+	return mockdata.Generate(r.GetAuthContext().GetAccountId(), r.GetPageIterator().GetSize()), nil
 }
 
 // Validations

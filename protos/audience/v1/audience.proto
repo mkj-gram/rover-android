@@ -89,6 +89,10 @@ service Audience {
   //
   rpc GetProfilesTotalCount(GetProfilesTotalCountRequest) returns (GetProfilesTotalCountResponse);
   rpc GetDevicesTotalCount(GetDevicesTotalCountRequest) returns (GetDevicesTotalCountResponse);
+
+
+  rpc Query(QueryRequest) returns (QueryResponse);
+
 }
 
 
@@ -848,4 +852,35 @@ message Predicate {
     VersionPredicate  version_predicate  = 5;
     GeofencePredicate geofence_predicate = 6;
   }
+}
+
+
+message QueryRequest {
+  rover.auth.v1.AuthContext auth_context = 1;
+  PredicateAggregate predicate_aggregate = 2;
+
+  message PageIterator {
+    int32 page = 1;
+    int32 size = 2;
+  }
+
+  message CursorIterator {
+    string id = 1;
+  }
+
+  oneof iterator {
+    PageIterator page_iterator = 3;
+    CursorIterator cursor_iterator = 4;
+  }
+}
+
+message QueryResponse {
+  int64 total_size = 1;
+
+  repeated Profile profiles = 2;
+  repeated Device devices = 3;
+
+  // optional
+  
+  string cursor_id = 9;
 }

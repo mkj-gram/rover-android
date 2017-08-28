@@ -446,6 +446,28 @@ function deserialize_rover_audience_v1_ListProfilesByIdsResponse(buffer_arg) {
   return audience_v1_audience_pb.ListProfilesByIdsResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_QueryRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.QueryRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.QueryRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_QueryRequest(buffer_arg) {
+  return audience_v1_audience_pb.QueryRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_QueryResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.QueryResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.QueryResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_QueryResponse(buffer_arg) {
+  return audience_v1_audience_pb.QueryResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_SetDeviceProfileRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.SetDeviceProfileRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.SetDeviceProfileRequest');
@@ -1128,6 +1150,17 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_GetDevicesTotalCountRequest,
     responseSerialize: serialize_rover_audience_v1_GetDevicesTotalCountResponse,
     responseDeserialize: deserialize_rover_audience_v1_GetDevicesTotalCountResponse,
+  },
+  query: {
+    path: '/rover.audience.v1.Audience/Query',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.QueryRequest,
+    responseType: audience_v1_audience_pb.QueryResponse,
+    requestSerialize: serialize_rover_audience_v1_QueryRequest,
+    requestDeserialize: deserialize_rover_audience_v1_QueryRequest,
+    responseSerialize: serialize_rover_audience_v1_QueryResponse,
+    responseDeserialize: deserialize_rover_audience_v1_QueryResponse,
   },
 };
 

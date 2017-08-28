@@ -500,6 +500,27 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :geofence_predicate, :message, 6, "rover.audience.v1.GeofencePredicate"
     end
   end
+  add_message "rover.audience.v1.QueryRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :predicate_aggregate, :message, 2, "rover.audience.v1.PredicateAggregate"
+    oneof :iterator do
+      optional :page_iterator, :message, 3, "rover.audience.v1.QueryRequest.PageIterator"
+      optional :cursor_iterator, :message, 4, "rover.audience.v1.QueryRequest.CursorIterator"
+    end
+  end
+  add_message "rover.audience.v1.QueryRequest.PageIterator" do
+    optional :page, :int32, 1
+    optional :size, :int32, 2
+  end
+  add_message "rover.audience.v1.QueryRequest.CursorIterator" do
+    optional :id, :string, 1
+  end
+  add_message "rover.audience.v1.QueryResponse" do
+    optional :total_size, :int64, 1
+    repeated :profiles, :message, 2, "rover.audience.v1.Profile"
+    repeated :devices, :message, 3, "rover.audience.v1.Device"
+    optional :cursor_id, :string, 9
+  end
   add_enum "rover.audience.v1.Platform" do
     value :UNDEFINED, 0
     value :MOBILE, 1
@@ -610,6 +631,10 @@ module Rover
       PredicateAggregate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PredicateAggregate").msgclass
       PredicateAggregate::Condition = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PredicateAggregate.Condition").enummodule
       Predicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate").msgclass
+      QueryRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest").msgclass
+      QueryRequest::PageIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.PageIterator").msgclass
+      QueryRequest::CursorIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.CursorIterator").msgclass
+      QueryResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryResponse").msgclass
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").enummodule
       Null = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Null").enummodule
     end
