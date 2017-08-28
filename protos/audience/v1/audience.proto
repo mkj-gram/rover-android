@@ -763,6 +763,26 @@ message NumberPredicate {
   }
 }
 
+message DoublePredicate {
+  Op op                 = 1;
+  string attribute_name = 2;
+  double value          = 3;
+  double value2         = 4;
+
+  enum Op {
+    IS_UNSET        = 0;
+    IS_SET          = 1;
+
+    IS_EQUAL        = 2;
+    IS_NOT_EQUAL    = 3;
+
+    IS_GREATER_THAN = 4;
+    IS_LESS_THAN    = 5;
+
+    IS_BETWEEN      = 6;
+  }
+}
+
 message DatePredicate {
   Op op                            = 1;
   string attribute_name            = 2;
@@ -859,6 +879,7 @@ message Predicate {
     DatePredicate     date_predicate     = 5;
     VersionPredicate  version_predicate  = 6;
     GeofencePredicate geofence_predicate = 7;
+    DoublePredicate   double_predicate   = 8;
   }
 }
 

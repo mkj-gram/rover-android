@@ -28,6 +28,8 @@ goog.exportSymbol('proto.rover.audience.v1.DeleteProfileResponse', null, global)
 goog.exportSymbol('proto.rover.audience.v1.Device', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Device.RegionMonitoringMode', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DeviceSchema', null, global);
+goog.exportSymbol('proto.rover.audience.v1.DoublePredicate', null, global);
+goog.exportSymbol('proto.rover.audience.v1.DoublePredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.DynamicSegment', null, global);
 goog.exportSymbol('proto.rover.audience.v1.GeofencePredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.GeofencePredicate.Location', null, global);
@@ -17122,6 +17124,240 @@ proto.rover.audience.v1.NumberPredicate.prototype.setValue2 = function(value) {
  * @extends {jspb.Message}
  * @constructor
  */
+proto.rover.audience.v1.DoublePredicate = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.DoublePredicate, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.DoublePredicate.displayName = 'proto.rover.audience.v1.DoublePredicate';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.DoublePredicate.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.DoublePredicate.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.DoublePredicate} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.DoublePredicate.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    op: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    value: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
+    value2: +jspb.Message.getFieldWithDefault(msg, 4, 0.0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.DoublePredicate}
+ */
+proto.rover.audience.v1.DoublePredicate.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.DoublePredicate;
+  return proto.rover.audience.v1.DoublePredicate.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.DoublePredicate} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.DoublePredicate}
+ */
+proto.rover.audience.v1.DoublePredicate.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {!proto.rover.audience.v1.DoublePredicate.Op} */ (reader.readEnum());
+      msg.setOp(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAttributeName(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setValue(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setValue2(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.DoublePredicate.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.DoublePredicate.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.DoublePredicate} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.DoublePredicate.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getOp();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      1,
+      f
+    );
+  }
+  f = message.getAttributeName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getValue();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      3,
+      f
+    );
+  }
+  f = message.getValue2();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      4,
+      f
+    );
+  }
+};
+
+
+/**
+ * @enum {number}
+ */
+proto.rover.audience.v1.DoublePredicate.Op = {
+  IS_UNSET: 0,
+  IS_SET: 1,
+  IS_EQUAL: 2,
+  IS_NOT_EQUAL: 3,
+  IS_GREATER_THAN: 4,
+  IS_LESS_THAN: 5,
+  IS_BETWEEN: 6
+};
+
+/**
+ * optional Op op = 1;
+ * @return {!proto.rover.audience.v1.DoublePredicate.Op}
+ */
+proto.rover.audience.v1.DoublePredicate.prototype.getOp = function() {
+  return /** @type {!proto.rover.audience.v1.DoublePredicate.Op} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.DoublePredicate.Op} value */
+proto.rover.audience.v1.DoublePredicate.prototype.setOp = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional string attribute_name = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.DoublePredicate.prototype.getAttributeName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.DoublePredicate.prototype.setAttributeName = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional double value = 3;
+ * @return {number}
+ */
+proto.rover.audience.v1.DoublePredicate.prototype.getValue = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 3, 0.0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.DoublePredicate.prototype.setValue = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional double value2 = 4;
+ * @return {number}
+ */
+proto.rover.audience.v1.DoublePredicate.prototype.getValue2 = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 4, 0.0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.DoublePredicate.prototype.setValue2 = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.rover.audience.v1.DatePredicate = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
@@ -18323,7 +18559,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.rover.audience.v1.Predicate.oneofGroups_ = [[2,3,4,5,6,7]];
+proto.rover.audience.v1.Predicate.oneofGroups_ = [[2,3,4,5,6,7,8]];
 
 /**
  * @enum {number}
@@ -18335,7 +18571,8 @@ proto.rover.audience.v1.Predicate.ValueCase = {
   NUMBER_PREDICATE: 4,
   DATE_PREDICATE: 5,
   VERSION_PREDICATE: 6,
-  GEOFENCE_PREDICATE: 7
+  GEOFENCE_PREDICATE: 7,
+  DOUBLE_PREDICATE: 8
 };
 
 /**
@@ -18379,7 +18616,8 @@ proto.rover.audience.v1.Predicate.toObject = function(includeInstance, msg) {
     numberPredicate: (f = msg.getNumberPredicate()) && proto.rover.audience.v1.NumberPredicate.toObject(includeInstance, f),
     datePredicate: (f = msg.getDatePredicate()) && proto.rover.audience.v1.DatePredicate.toObject(includeInstance, f),
     versionPredicate: (f = msg.getVersionPredicate()) && proto.rover.audience.v1.VersionPredicate.toObject(includeInstance, f),
-    geofencePredicate: (f = msg.getGeofencePredicate()) && proto.rover.audience.v1.GeofencePredicate.toObject(includeInstance, f)
+    geofencePredicate: (f = msg.getGeofencePredicate()) && proto.rover.audience.v1.GeofencePredicate.toObject(includeInstance, f),
+    doublePredicate: (f = msg.getDoublePredicate()) && proto.rover.audience.v1.DoublePredicate.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -18449,6 +18687,11 @@ proto.rover.audience.v1.Predicate.deserializeBinaryFromReader = function(msg, re
       var value = new proto.rover.audience.v1.GeofencePredicate;
       reader.readMessage(value,proto.rover.audience.v1.GeofencePredicate.deserializeBinaryFromReader);
       msg.setGeofencePredicate(value);
+      break;
+    case 8:
+      var value = new proto.rover.audience.v1.DoublePredicate;
+      reader.readMessage(value,proto.rover.audience.v1.DoublePredicate.deserializeBinaryFromReader);
+      msg.setDoublePredicate(value);
       break;
     default:
       reader.skipField();
@@ -18531,6 +18774,14 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
       7,
       f,
       proto.rover.audience.v1.GeofencePredicate.serializeBinaryToWriter
+    );
+  }
+  f = message.getDoublePredicate();
+  if (f != null) {
+    writer.writeMessage(
+      8,
+      f,
+      proto.rover.audience.v1.DoublePredicate.serializeBinaryToWriter
     );
   }
 };
@@ -18736,6 +18987,36 @@ proto.rover.audience.v1.Predicate.prototype.clearGeofencePredicate = function() 
  */
 proto.rover.audience.v1.Predicate.prototype.hasGeofencePredicate = function() {
   return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional DoublePredicate double_predicate = 8;
+ * @return {?proto.rover.audience.v1.DoublePredicate}
+ */
+proto.rover.audience.v1.Predicate.prototype.getDoublePredicate = function() {
+  return /** @type{?proto.rover.audience.v1.DoublePredicate} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.DoublePredicate, 8));
+};
+
+
+/** @param {?proto.rover.audience.v1.DoublePredicate|undefined} value */
+proto.rover.audience.v1.Predicate.prototype.setDoublePredicate = function(value) {
+  jspb.Message.setOneofWrapperField(this, 8, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
+};
+
+
+proto.rover.audience.v1.Predicate.prototype.clearDoublePredicate = function() {
+  this.setDoublePredicate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Predicate.prototype.hasDoublePredicate = function() {
+  return jspb.Message.getField(this, 8) != null;
 };
 
 

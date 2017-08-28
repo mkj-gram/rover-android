@@ -430,6 +430,21 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :IS_LESS_THAN, 5
     value :IS_BETWEEN, 6
   end
+  add_message "rover.audience.v1.DoublePredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.DoublePredicate.Op"
+    optional :attribute_name, :string, 2
+    optional :value, :double, 3
+    optional :value2, :double, 4
+  end
+  add_enum "rover.audience.v1.DoublePredicate.Op" do
+    value :IS_UNSET, 0
+    value :IS_SET, 1
+    value :IS_EQUAL, 2
+    value :IS_NOT_EQUAL, 3
+    value :IS_GREATER_THAN, 4
+    value :IS_LESS_THAN, 5
+    value :IS_BETWEEN, 6
+  end
   add_message "rover.audience.v1.DatePredicate" do
     optional :op, :enum, 1, "rover.audience.v1.DatePredicate.Op"
     optional :attribute_name, :string, 2
@@ -499,6 +514,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :date_predicate, :message, 5, "rover.audience.v1.DatePredicate"
       optional :version_predicate, :message, 6, "rover.audience.v1.VersionPredicate"
       optional :geofence_predicate, :message, 7, "rover.audience.v1.GeofencePredicate"
+      optional :double_predicate, :message, 8, "rover.audience.v1.DoublePredicate"
     end
   end
   add_enum "rover.audience.v1.Predicate.Model" do
@@ -626,6 +642,8 @@ module Rover
       BoolPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.BoolPredicate.Op").enummodule
       NumberPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.NumberPredicate").msgclass
       NumberPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.NumberPredicate.Op").enummodule
+      DoublePredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DoublePredicate").msgclass
+      DoublePredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DoublePredicate.Op").enummodule
       DatePredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DatePredicate").msgclass
       DatePredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DatePredicate.Op").enummodule
       GeofencePredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofencePredicate").msgclass

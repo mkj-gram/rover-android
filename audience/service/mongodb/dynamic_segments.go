@@ -268,6 +268,7 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 				"op":             pp.Op,
 				"value":          pp.Value,
 			}
+
 		case *audience.Predicate_StringPredicate:
 			pp := val.StringPredicate
 			predicates[i]["predicate"] = bson.M{
@@ -286,6 +287,7 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 				"value":          pp.Value,
 				"value2":         pp.Value2,
 			}
+
 		case *audience.Predicate_DatePredicate:
 			pp := val.DatePredicate
 			t1, _ := protoToTime(pp.Value)
@@ -316,6 +318,17 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 				"op":             pp.Op,
 				"value":          pp.Value,
 			}
+
+		case *audience.Predicate_DoublePredicate:
+			pp := val.DoublePredicate
+			predicates[i]["predicate"] = bson.M{
+				"type":           "double",
+				"attribute_name": pp.AttributeName,
+				"op":             pp.Op,
+				"value":          pp.Value,
+				"value2":         pp.Value2,
+			}
+
 		default:
 			errorf("predicateAggregate: GetBSON: unknown type: %T", val)
 		}
@@ -484,6 +497,19 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			if v, ok := vloc["radius"].(int); ok {
 				pp.Value.Radius = int32(v)
 			}
+
+		case "double":
+			var pp audience.DoublePredicate
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_DoublePredicate{&pp}})
+
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := pdef["op"].(int); ok {
+				pp.Op = audience.DoublePredicate_Op(v)
+			} else {
+				// TODO: log
+			}
+			pp.Value, _ = pdef["value"].(float64)
+			pp.Value2, _ = pdef["value2"].(float64)
 
 		default:
 			errorf("unknown predicate type: %q", ptype)

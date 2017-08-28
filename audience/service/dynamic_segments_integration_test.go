@@ -55,6 +55,12 @@ func predicateAggregate(t *testing.T) []*audience.Predicate {
 			Op:            audience.GeofencePredicate_IS_SET,
 			Value:         &audience.GeofencePredicate_Location{Latitude: 43.650673, Longitude: -79.378519, Radius: 250, Name: "McDonald's On Yonge St"},
 		}}},
+		{Model: audience.Predicate_DEVICE, Value: &audience.Predicate_DoublePredicate{&audience.DoublePredicate{
+			AttributeName: "temperature",
+			Op:            audience.DoublePredicate_IS_BETWEEN,
+			Value:         32.12,
+			Value2:        88.231,
+		}}},
 	}
 
 }
