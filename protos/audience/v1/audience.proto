@@ -844,13 +844,21 @@ message PredicateAggregate {
 }
 
 message Predicate {
+
+  enum Model {
+    PROFILE = 0;
+    DEVICE  = 1;
+  }
+
+  Model model = 1;
+
   oneof value {
-    StringPredicate   string_predicate   = 1;
-    BoolPredicate     bool_predicate     = 2;
-    NumberPredicate   number_predicate   = 3;
-    DatePredicate     date_predicate     = 4;
-    VersionPredicate  version_predicate  = 5;
-    GeofencePredicate geofence_predicate = 6;
+    StringPredicate   string_predicate   = 2;
+    BoolPredicate     bool_predicate     = 3;
+    NumberPredicate   number_predicate   = 4;
+    DatePredicate     date_predicate     = 5;
+    VersionPredicate  version_predicate  = 6;
+    GeofencePredicate geofence_predicate = 7;
   }
 }
 

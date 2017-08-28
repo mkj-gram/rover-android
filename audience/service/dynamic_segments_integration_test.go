@@ -23,34 +23,34 @@ var (
 
 func predicateAggregate(t *testing.T) []*audience.Predicate {
 	return []*audience.Predicate{
-		{&audience.Predicate_BoolPredicate{&audience.BoolPredicate{
+		{Model: audience.Predicate_DEVICE, Value: &audience.Predicate_BoolPredicate{&audience.BoolPredicate{
 			AttributeName: "is_bluetooth_enabled",
 			Op:            audience.BoolPredicate_IS_EQUAL,
 			Value:         true,
 		}}},
-		{&audience.Predicate_StringPredicate{&audience.StringPredicate{
+		{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_StringPredicate{&audience.StringPredicate{
 			AttributeName: "first_name",
 			Op:            audience.StringPredicate_IS_EQUAL,
 			Value:         "hello world",
 		}}},
-		{&audience.Predicate_NumberPredicate{&audience.NumberPredicate{
+		{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_NumberPredicate{&audience.NumberPredicate{
 			AttributeName: "age",
 			Op:            audience.NumberPredicate_IS_BETWEEN,
 			Value:         20, Value2: 40,
 		}}},
-		{&audience.Predicate_VersionPredicate{&audience.VersionPredicate{
+		{Model: audience.Predicate_DEVICE, Value: &audience.Predicate_VersionPredicate{&audience.VersionPredicate{
 			AttributeName: "age",
 			Op:            audience.VersionPredicate_IS_BETWEEN,
 			Value:         &audience.Version{1, 2, 3},
 			Value2:        &audience.Version{2, 3, 4},
 		}}},
-		{&audience.Predicate_DatePredicate{&audience.DatePredicate{
+		{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_DatePredicate{&audience.DatePredicate{
 			AttributeName: "created_at",
 			Op:            audience.DatePredicate_IS_BETWEEN,
 			Value:         protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 			Value2:        protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 		}}},
-		{&audience.Predicate_GeofencePredicate{&audience.GeofencePredicate{
+		{Model: audience.Predicate_DEVICE, Value: &audience.Predicate_GeofencePredicate{&audience.GeofencePredicate{
 			AttributeName: "location",
 			Op:            audience.GeofencePredicate_IS_SET,
 			Value:         &audience.GeofencePredicate_Location{Latitude: 43.650673, Longitude: -79.378519, Radius: 250, Name: "McDonald's On Yonge St"},
@@ -252,12 +252,12 @@ func testAudienceService_GetDynamicSegmentById(t *testing.T) {
 					PredicateAggregate: &audience.PredicateAggregate{
 						Condition: audience.PredicateAggregate_ALL,
 						Predicates: []*audience.Predicate{
-							{&audience.Predicate_BoolPredicate{&audience.BoolPredicate{}}},
-							{&audience.Predicate_StringPredicate{&audience.StringPredicate{}}},
-							{&audience.Predicate_NumberPredicate{&audience.NumberPredicate{}}},
-							{&audience.Predicate_DatePredicate{&audience.DatePredicate{}}},
-							{&audience.Predicate_VersionPredicate{&audience.VersionPredicate{}}},
-							{&audience.Predicate_GeofencePredicate{&audience.GeofencePredicate{}}},
+							{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_BoolPredicate{&audience.BoolPredicate{}}},
+							{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_StringPredicate{&audience.StringPredicate{}}},
+							{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_NumberPredicate{&audience.NumberPredicate{}}},
+							{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_DatePredicate{&audience.DatePredicate{}}},
+							{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_VersionPredicate{&audience.VersionPredicate{}}},
+							{Model: audience.Predicate_PROFILE, Value: &audience.Predicate_GeofencePredicate{&audience.GeofencePredicate{}}},
 						},
 					},
 				},

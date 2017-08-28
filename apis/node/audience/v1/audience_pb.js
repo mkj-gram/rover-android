@@ -69,6 +69,7 @@ goog.exportSymbol('proto.rover.audience.v1.NumberPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.NumberPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Platform', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Predicate', null, global);
+goog.exportSymbol('proto.rover.audience.v1.Predicate.Model', null, global);
 goog.exportSymbol('proto.rover.audience.v1.PredicateAggregate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.PredicateAggregate.Condition', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Profile', null, global);
@@ -18322,19 +18323,19 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.rover.audience.v1.Predicate.oneofGroups_ = [[1,2,3,4,5,6]];
+proto.rover.audience.v1.Predicate.oneofGroups_ = [[2,3,4,5,6,7]];
 
 /**
  * @enum {number}
  */
 proto.rover.audience.v1.Predicate.ValueCase = {
   VALUE_NOT_SET: 0,
-  STRING_PREDICATE: 1,
-  BOOL_PREDICATE: 2,
-  NUMBER_PREDICATE: 3,
-  DATE_PREDICATE: 4,
-  VERSION_PREDICATE: 5,
-  GEOFENCE_PREDICATE: 6
+  STRING_PREDICATE: 2,
+  BOOL_PREDICATE: 3,
+  NUMBER_PREDICATE: 4,
+  DATE_PREDICATE: 5,
+  VERSION_PREDICATE: 6,
+  GEOFENCE_PREDICATE: 7
 };
 
 /**
@@ -18372,6 +18373,7 @@ proto.rover.audience.v1.Predicate.prototype.toObject = function(opt_includeInsta
  */
 proto.rover.audience.v1.Predicate.toObject = function(includeInstance, msg) {
   var f, obj = {
+    model: jspb.Message.getFieldWithDefault(msg, 1, 0),
     stringPredicate: (f = msg.getStringPredicate()) && proto.rover.audience.v1.StringPredicate.toObject(includeInstance, f),
     boolPredicate: (f = msg.getBoolPredicate()) && proto.rover.audience.v1.BoolPredicate.toObject(includeInstance, f),
     numberPredicate: (f = msg.getNumberPredicate()) && proto.rover.audience.v1.NumberPredicate.toObject(includeInstance, f),
@@ -18415,31 +18417,35 @@ proto.rover.audience.v1.Predicate.deserializeBinaryFromReader = function(msg, re
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = /** @type {!proto.rover.audience.v1.Predicate.Model} */ (reader.readEnum());
+      msg.setModel(value);
+      break;
+    case 2:
       var value = new proto.rover.audience.v1.StringPredicate;
       reader.readMessage(value,proto.rover.audience.v1.StringPredicate.deserializeBinaryFromReader);
       msg.setStringPredicate(value);
       break;
-    case 2:
+    case 3:
       var value = new proto.rover.audience.v1.BoolPredicate;
       reader.readMessage(value,proto.rover.audience.v1.BoolPredicate.deserializeBinaryFromReader);
       msg.setBoolPredicate(value);
       break;
-    case 3:
+    case 4:
       var value = new proto.rover.audience.v1.NumberPredicate;
       reader.readMessage(value,proto.rover.audience.v1.NumberPredicate.deserializeBinaryFromReader);
       msg.setNumberPredicate(value);
       break;
-    case 4:
+    case 5:
       var value = new proto.rover.audience.v1.DatePredicate;
       reader.readMessage(value,proto.rover.audience.v1.DatePredicate.deserializeBinaryFromReader);
       msg.setDatePredicate(value);
       break;
-    case 5:
+    case 6:
       var value = new proto.rover.audience.v1.VersionPredicate;
       reader.readMessage(value,proto.rover.audience.v1.VersionPredicate.deserializeBinaryFromReader);
       msg.setVersionPredicate(value);
       break;
-    case 6:
+    case 7:
       var value = new proto.rover.audience.v1.GeofencePredicate;
       reader.readMessage(value,proto.rover.audience.v1.GeofencePredicate.deserializeBinaryFromReader);
       msg.setGeofencePredicate(value);
@@ -18472,10 +18478,17 @@ proto.rover.audience.v1.Predicate.prototype.serializeBinary = function() {
  */
 proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getModel();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      1,
+      f
+    );
+  }
   f = message.getStringPredicate();
   if (f != null) {
     writer.writeMessage(
-      1,
+      2,
       f,
       proto.rover.audience.v1.StringPredicate.serializeBinaryToWriter
     );
@@ -18483,7 +18496,7 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
   f = message.getBoolPredicate();
   if (f != null) {
     writer.writeMessage(
-      2,
+      3,
       f,
       proto.rover.audience.v1.BoolPredicate.serializeBinaryToWriter
     );
@@ -18491,7 +18504,7 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
   f = message.getNumberPredicate();
   if (f != null) {
     writer.writeMessage(
-      3,
+      4,
       f,
       proto.rover.audience.v1.NumberPredicate.serializeBinaryToWriter
     );
@@ -18499,7 +18512,7 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
   f = message.getDatePredicate();
   if (f != null) {
     writer.writeMessage(
-      4,
+      5,
       f,
       proto.rover.audience.v1.DatePredicate.serializeBinaryToWriter
     );
@@ -18507,7 +18520,7 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
   f = message.getVersionPredicate();
   if (f != null) {
     writer.writeMessage(
-      5,
+      6,
       f,
       proto.rover.audience.v1.VersionPredicate.serializeBinaryToWriter
     );
@@ -18515,7 +18528,7 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
   f = message.getGeofencePredicate();
   if (f != null) {
     writer.writeMessage(
-      6,
+      7,
       f,
       proto.rover.audience.v1.GeofencePredicate.serializeBinaryToWriter
     );
@@ -18524,18 +18537,41 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
 
 
 /**
- * optional StringPredicate string_predicate = 1;
+ * @enum {number}
+ */
+proto.rover.audience.v1.Predicate.Model = {
+  PROFILE: 0,
+  DEVICE: 1
+};
+
+/**
+ * optional Model model = 1;
+ * @return {!proto.rover.audience.v1.Predicate.Model}
+ */
+proto.rover.audience.v1.Predicate.prototype.getModel = function() {
+  return /** @type {!proto.rover.audience.v1.Predicate.Model} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.Predicate.Model} value */
+proto.rover.audience.v1.Predicate.prototype.setModel = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional StringPredicate string_predicate = 2;
  * @return {?proto.rover.audience.v1.StringPredicate}
  */
 proto.rover.audience.v1.Predicate.prototype.getStringPredicate = function() {
   return /** @type{?proto.rover.audience.v1.StringPredicate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.StringPredicate, 1));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.StringPredicate, 2));
 };
 
 
 /** @param {?proto.rover.audience.v1.StringPredicate|undefined} value */
 proto.rover.audience.v1.Predicate.prototype.setStringPredicate = function(value) {
-  jspb.Message.setOneofWrapperField(this, 1, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 2, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
 };
 
 
@@ -18549,23 +18585,23 @@ proto.rover.audience.v1.Predicate.prototype.clearStringPredicate = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Predicate.prototype.hasStringPredicate = function() {
-  return jspb.Message.getField(this, 1) != null;
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
 /**
- * optional BoolPredicate bool_predicate = 2;
+ * optional BoolPredicate bool_predicate = 3;
  * @return {?proto.rover.audience.v1.BoolPredicate}
  */
 proto.rover.audience.v1.Predicate.prototype.getBoolPredicate = function() {
   return /** @type{?proto.rover.audience.v1.BoolPredicate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.BoolPredicate, 2));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.BoolPredicate, 3));
 };
 
 
 /** @param {?proto.rover.audience.v1.BoolPredicate|undefined} value */
 proto.rover.audience.v1.Predicate.prototype.setBoolPredicate = function(value) {
-  jspb.Message.setOneofWrapperField(this, 2, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 3, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
 };
 
 
@@ -18579,23 +18615,23 @@ proto.rover.audience.v1.Predicate.prototype.clearBoolPredicate = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Predicate.prototype.hasBoolPredicate = function() {
-  return jspb.Message.getField(this, 2) != null;
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * optional NumberPredicate number_predicate = 3;
+ * optional NumberPredicate number_predicate = 4;
  * @return {?proto.rover.audience.v1.NumberPredicate}
  */
 proto.rover.audience.v1.Predicate.prototype.getNumberPredicate = function() {
   return /** @type{?proto.rover.audience.v1.NumberPredicate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.NumberPredicate, 3));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.NumberPredicate, 4));
 };
 
 
 /** @param {?proto.rover.audience.v1.NumberPredicate|undefined} value */
 proto.rover.audience.v1.Predicate.prototype.setNumberPredicate = function(value) {
-  jspb.Message.setOneofWrapperField(this, 3, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 4, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
 };
 
 
@@ -18609,23 +18645,23 @@ proto.rover.audience.v1.Predicate.prototype.clearNumberPredicate = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Predicate.prototype.hasNumberPredicate = function() {
-  return jspb.Message.getField(this, 3) != null;
+  return jspb.Message.getField(this, 4) != null;
 };
 
 
 /**
- * optional DatePredicate date_predicate = 4;
+ * optional DatePredicate date_predicate = 5;
  * @return {?proto.rover.audience.v1.DatePredicate}
  */
 proto.rover.audience.v1.Predicate.prototype.getDatePredicate = function() {
   return /** @type{?proto.rover.audience.v1.DatePredicate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.DatePredicate, 4));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.DatePredicate, 5));
 };
 
 
 /** @param {?proto.rover.audience.v1.DatePredicate|undefined} value */
 proto.rover.audience.v1.Predicate.prototype.setDatePredicate = function(value) {
-  jspb.Message.setOneofWrapperField(this, 4, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 5, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
 };
 
 
@@ -18639,23 +18675,23 @@ proto.rover.audience.v1.Predicate.prototype.clearDatePredicate = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Predicate.prototype.hasDatePredicate = function() {
-  return jspb.Message.getField(this, 4) != null;
+  return jspb.Message.getField(this, 5) != null;
 };
 
 
 /**
- * optional VersionPredicate version_predicate = 5;
+ * optional VersionPredicate version_predicate = 6;
  * @return {?proto.rover.audience.v1.VersionPredicate}
  */
 proto.rover.audience.v1.Predicate.prototype.getVersionPredicate = function() {
   return /** @type{?proto.rover.audience.v1.VersionPredicate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.VersionPredicate, 5));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.VersionPredicate, 6));
 };
 
 
 /** @param {?proto.rover.audience.v1.VersionPredicate|undefined} value */
 proto.rover.audience.v1.Predicate.prototype.setVersionPredicate = function(value) {
-  jspb.Message.setOneofWrapperField(this, 5, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 6, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
 };
 
 
@@ -18669,23 +18705,23 @@ proto.rover.audience.v1.Predicate.prototype.clearVersionPredicate = function() {
  * @return {!boolean}
  */
 proto.rover.audience.v1.Predicate.prototype.hasVersionPredicate = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 6) != null;
 };
 
 
 /**
- * optional GeofencePredicate geofence_predicate = 6;
+ * optional GeofencePredicate geofence_predicate = 7;
  * @return {?proto.rover.audience.v1.GeofencePredicate}
  */
 proto.rover.audience.v1.Predicate.prototype.getGeofencePredicate = function() {
   return /** @type{?proto.rover.audience.v1.GeofencePredicate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.GeofencePredicate, 6));
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.GeofencePredicate, 7));
 };
 
 
 /** @param {?proto.rover.audience.v1.GeofencePredicate|undefined} value */
 proto.rover.audience.v1.Predicate.prototype.setGeofencePredicate = function(value) {
-  jspb.Message.setOneofWrapperField(this, 6, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 7, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
 };
 
 
@@ -18699,7 +18735,7 @@ proto.rover.audience.v1.Predicate.prototype.clearGeofencePredicate = function() 
  * @return {!boolean}
  */
 proto.rover.audience.v1.Predicate.prototype.hasGeofencePredicate = function() {
-  return jspb.Message.getField(this, 6) != null;
+  return jspb.Message.getField(this, 7) != null;
 };
 
 

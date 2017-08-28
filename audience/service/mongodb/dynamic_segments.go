@@ -252,12 +252,17 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 	)
 
 	for i := range pa.Predicates {
+
+		predicates[i] = bson.M{
+			"model": pa.Predicates[i].GetModel().String(),
+		}
+
 		switch val := pa.Predicates[i].Value.(type) {
 		case nil:
 			// noop
 		case *audience.Predicate_BoolPredicate:
 			pp := val.BoolPredicate
-			predicates[i] = bson.M{
+			predicates[i]["predicate"] = bson.M{
 				"type":           "bool",
 				"attribute_name": pp.AttributeName,
 				"op":             pp.Op,
@@ -265,15 +270,16 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 			}
 		case *audience.Predicate_StringPredicate:
 			pp := val.StringPredicate
-			predicates[i] = bson.M{
+			predicates[i]["predicate"] = bson.M{
 				"type":           "string",
 				"attribute_name": pp.AttributeName,
 				"op":             pp.Op,
 				"value":          pp.Value,
 			}
+
 		case *audience.Predicate_NumberPredicate:
 			pp := val.NumberPredicate
-			predicates[i] = bson.M{
+			predicates[i]["predicate"] = bson.M{
 				"type":           "number",
 				"attribute_name": pp.AttributeName,
 				"op":             pp.Op,
@@ -284,16 +290,17 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 			pp := val.DatePredicate
 			t1, _ := protoToTime(pp.Value)
 			t2, _ := protoToTime(pp.Value2)
-			predicates[i] = bson.M{
+			predicates[i]["predicate"] = bson.M{
 				"type":           "date",
 				"attribute_name": pp.AttributeName,
 				"op":             pp.Op,
 				"value":          t1,
 				"value2":         t2,
 			}
+
 		case *audience.Predicate_VersionPredicate:
 			pp := val.VersionPredicate
-			predicates[i] = bson.M{
+			predicates[i]["predicate"] = bson.M{
 				"type":           "version",
 				"attribute_name": pp.AttributeName,
 				"op":             pp.Op,
@@ -303,7 +310,7 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 
 		case *audience.Predicate_GeofencePredicate:
 			pp := val.GeofencePredicate
-			predicates[i] = bson.M{
+			predicates[i]["predicate"] = bson.M{
 				"type":           "geofence",
 				"attribute_name": pp.AttributeName,
 				"op":             pp.Op,
@@ -350,73 +357,86 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			continue
 		}
 
-		ptype, ok := pdoc["type"].(string)
+		pdef, ok := pdoc["predicate"].(bson.M)
+		if !ok {
+			errorf("predicate definition is not defined", p)
+		}
+
+		ptype, ok := pdef["type"].(string)
 		if !ok {
 			errorf("predicate type attribute is not a string", p)
 			continue
 		}
 
+		pmodel, ok := pdoc["model"].(string)
+		if !ok {
+			errorf("predicate model is not a string", p)
+			continue
+		}
+
+		model := audience.Predicate_Model(audience.Predicate_Model_value[pmodel])
+
 		switch ptype {
 		case "bool":
 			var pp audience.BoolPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{&audience.Predicate_BoolPredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_BoolPredicate{&pp}})
 
-			pp.AttributeName, _ = pdoc["attribute_name"].(string)
-			if v, ok := pdoc["op"].(int); ok {
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := pdef["op"].(int); ok {
 				pp.Op = audience.BoolPredicate_Op(v)
 			} else {
 				// TODO: log
 			}
-			pp.Value, _ = pdoc["value"].(bool)
+			pp.Value, _ = pdef["value"].(bool)
 
 		case "string":
 			var pp audience.StringPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{&audience.Predicate_StringPredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_StringPredicate{&pp}})
 
-			pp.AttributeName, _ = pdoc["attribute_name"].(string)
-			if v, ok := pdoc["op"].(int); ok {
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := pdef["op"].(int); ok {
 				pp.Op = audience.StringPredicate_Op(v)
 			} else {
 				// TODO: log
 			}
-			pp.Value, _ = pdoc["value"].(string)
+			pp.Value, _ = pdef["value"].(string)
 
 		case "number":
 			var pp audience.NumberPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{&audience.Predicate_NumberPredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_NumberPredicate{&pp}})
 
-			pp.AttributeName, _ = pdoc["attribute_name"].(string)
-			if v, ok := pdoc["op"].(int); ok {
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := pdef["op"].(int); ok {
 				pp.Op = audience.NumberPredicate_Op(v)
 			} else {
 				// TODO: log
 			}
-			pp.Value, _ = pdoc["value"].(int64)
-			pp.Value2, _ = pdoc["value2"].(int64)
+			pp.Value, _ = pdef["value"].(int64)
+			pp.Value2, _ = pdef["value2"].(int64)
 
 		case "date":
 			var pp audience.DatePredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{&audience.Predicate_DatePredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_DatePredicate{&pp}})
 
-			pp.AttributeName, _ = pdoc["attribute_name"].(string)
-			if v, ok := pdoc["op"].(int); ok {
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := pdef["op"].(int); ok {
 				pp.Op = audience.DatePredicate_Op(v)
 			} else {
 				// TODO: log
 			}
 
-			if val, ok := pdoc["value"].(time.Time); ok {
+			if val, ok := pdef["value"].(time.Time); ok {
 				pp.Value, _ = timeToProto(&val)
 			}
-			if val, ok := pdoc["value2"].(time.Time); ok {
+			if val, ok := pdef["value2"].(time.Time); ok {
 				pp.Value2, _ = timeToProto(&val)
 			}
 		case "version":
 			var pp audience.VersionPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{&audience.Predicate_VersionPredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_VersionPredicate{&pp}})
 
-			pp.AttributeName, _ = pdoc["attribute_name"].(string)
-			if v, ok := pdoc["op"].(int); ok {
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := pdef["op"].(int); ok {
 				pp.Op = audience.VersionPredicate_Op(v)
 			} else {
 				// TODO: log
@@ -439,20 +459,20 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 				}
 				return &ver
 			}
-			pp.Value = toVersion(pdoc, "value")
-			pp.Value2 = toVersion(pdoc, "value2")
+			pp.Value = toVersion(pdef, "value")
+			pp.Value2 = toVersion(pdef, "value2")
 
 		case "geofence":
 			var pp audience.GeofencePredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{&audience.Predicate_GeofencePredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_GeofencePredicate{&pp}})
 
-			pp.AttributeName, _ = pdoc["attribute_name"].(string)
-			if v, ok := pdoc["op"].(int); ok {
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := pdef["op"].(int); ok {
 				pp.Op = audience.GeofencePredicate_Op(v)
 			} else {
 				// TODO: log
 			}
-			vloc, ok := pdoc["value"].(bson.M)
+			vloc, ok := pdef["value"].(bson.M)
 			if !ok {
 				// TODO: log
 				continue
