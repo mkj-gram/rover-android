@@ -8,7 +8,8 @@
     "start": "webpack-dev-server -d --hot --inline --port 9001",
     "build": "rm -rf ./dist && webpack --config webpack.config.js",
     "relay": "relay-compiler --src ./src --schema ./src/relay/schema.graphql --watch",
-    "schema": "bash runSchema.sh"
+    "schema": "bash runSchema.sh",
+    "deploy_build": "NODE_ENV=$NODE_ENV npm run schema && NODE_ENV=$NODE_ENV npm run build"
   },
   "author": "Rover.io",
   "license": "ISC",
@@ -32,6 +33,7 @@
   "dependencies": {
     "@rover/react-bootstrap": "^1.0.0",
     "@rover/react-icons": "^1.1.0",
+    "copy-webpack-plugin": "3.0.1",
     "html-webpack-plugin": "^2.30.1",
     "moment": "^2.18.1",
     "normalize.css": "^7.0.0",
