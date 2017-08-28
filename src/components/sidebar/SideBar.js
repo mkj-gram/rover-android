@@ -50,7 +50,8 @@ class SideBar extends Component {
             addFilter: {
                 button: violet,
                 text: lavender
-            }
+            },
+            matchConditionBackgroundColor: ''
         }
 
         this.setState = this.setState.bind(this)
@@ -66,6 +67,7 @@ class SideBar extends Component {
             this
         )
         this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
+        this.handleMatchConditionHover = this.handleMatchConditionHover.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -294,8 +296,20 @@ class SideBar extends Component {
         }
     }
 
+    handleMatchConditionHover(val) {
+        if (val === 'over') {
+            this.setState({
+                matchConditionBackgroundColor: graphite
+            })
+        } else if (val === 'leave') {
+            this.setState({
+                matchConditionBackgroundColor: ''
+            })
+        }
+    }
+
     renderAddFilterBar() {
-        const { isShowingAddFilterModal, query } = this.state
+        const { isShowingAddFilterModal, query, matchConditionBackgroundColor } = this.state
 
         const addPredicateIndex = query.length
 
@@ -319,7 +333,8 @@ class SideBar extends Component {
             alignItems: 'center',
             height: 27,
             padding: '0 15px',
-            borderRadius: 3
+            borderRadius: 3,
+            backgroundColor: matchConditionBackgroundColor
         }
 
         const selectStyle = {
@@ -412,7 +427,11 @@ class SideBar extends Component {
                             })
                         }}
                     />}
-                <div style={selectContainerStyle}>
+                <div
+                    style={selectContainerStyle}
+                    onMouseOver={() => this.handleMatchConditionHover('over')}
+                    onMouseLeave={() => this.handleMatchConditionHover('leave')}
+                >
                     <label style={matchStyle} htmlFor="any-all-select">
                         MATCH
                     </label>
