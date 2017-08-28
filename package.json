@@ -9,7 +9,7 @@
     "build": "rm -rf ./dist && webpack --config webpack.config.js",
     "relay": "relay-compiler --src ./src --schema ./src/relay/schema.graphql --watch",
     "schema": "bash runSchema.sh",
-    "deploy_build": "NODE_ENV=$NODE_ENV npm run schema && NODE_ENV=$NODE_ENV npm run build"
+    "deploy_build": "npm run schema && npm run relay && npm run build"
   },
   "author": "Rover.io",
   "license": "ISC",
