@@ -460,6 +460,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pp.Value = &audience.GeofencePredicate_Location{}
 			pp.Value.Latitude, _ = vloc["latitude"].(float64)
 			pp.Value.Longitude, _ = vloc["longitude"].(float64)
+			pp.Value.Name, _ = vloc["name"].(string)
 			if v, ok := vloc["radius"].(int); ok {
 				pp.Value.Radius = int32(v)
 			}

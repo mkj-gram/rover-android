@@ -17586,7 +17586,8 @@ proto.rover.audience.v1.GeofencePredicate.Location.toObject = function(includeIn
   var f, obj = {
     longitude: +jspb.Message.getFieldWithDefault(msg, 1, 0.0),
     latitude: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
-    radius: jspb.Message.getFieldWithDefault(msg, 3, 0)
+    radius: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    name: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -17634,6 +17635,10 @@ proto.rover.audience.v1.GeofencePredicate.Location.deserializeBinaryFromReader =
     case 3:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setRadius(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
       break;
     default:
       reader.skipField();
@@ -17684,6 +17689,13 @@ proto.rover.audience.v1.GeofencePredicate.Location.serializeBinaryToWriter = fun
       f
     );
   }
+  f = message.getName();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
 };
 
 
@@ -17729,6 +17741,21 @@ proto.rover.audience.v1.GeofencePredicate.Location.prototype.getRadius = functio
 /** @param {number} value */
 proto.rover.audience.v1.GeofencePredicate.Location.prototype.setRadius = function(value) {
   jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional string name = 4;
+ * @return {string}
+ */
+proto.rover.audience.v1.GeofencePredicate.Location.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.GeofencePredicate.Location.prototype.setName = function(value) {
+  jspb.Message.setField(this, 4, value);
 };
 
 

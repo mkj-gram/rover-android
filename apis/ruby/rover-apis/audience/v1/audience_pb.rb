@@ -457,6 +457,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :longitude, :double, 1
     optional :latitude, :double, 2
     optional :radius, :int32, 3
+    optional :name, :string, 4
   end
   add_enum "rover.audience.v1.GeofencePredicate.Op" do
     value :IS_UNSET, 0

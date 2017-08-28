@@ -53,7 +53,7 @@ func predicateAggregate(t *testing.T) []*audience.Predicate {
 		{&audience.Predicate_GeofencePredicate{&audience.GeofencePredicate{
 			AttributeName: "location",
 			Op:            audience.GeofencePredicate_IS_SET,
-			Value:         &audience.GeofencePredicate_Location{Latitude: 1, Longitude: 2, Radius: 3},
+			Value:         &audience.GeofencePredicate_Location{Latitude: 43.650673, Longitude: -79.378519, Radius: 250, Name: "McDonald's On Yonge St"},
 		}}},
 	}
 
