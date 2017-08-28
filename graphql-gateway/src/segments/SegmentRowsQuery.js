@@ -61,7 +61,8 @@ function createRecords(records, segmentSize, page) {
                 longitude: '79.3832',
                 city: 'Toronto',
                 region: 'Ontario',
-                country: 'Canada'
+                country: 'Canada',
+                name: 'Rover HQ'
             },
             language: 'EN',
             lastSeen: new Date().toISOString(),

@@ -12,7 +12,7 @@ const attributeTypeMap = {
     geopoint: 'GeofencePredicate',
     integer: 'NumberPredicate',
     int32: 'NumberPredicate',
-    double: 'NumberPredicate',
+    double: 'FloatPredicate',
     string: 'StringPredicate',
     timestamp: 'DatePredicate',
     version: 'VersionPredicate',
