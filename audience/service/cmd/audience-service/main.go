@@ -154,6 +154,13 @@ func main() {
 	}
 	defer sess.Close()
 
+	// In practice, the Monotonic mode is obtained by performing initial reads on a
+	// unique connection to an arbitrary secondary, if one is available, and once the
+	// first write happens, the session connection is switched over to the primary
+	// server. This manages to distribute some of the reading load with secondaries,
+	// while maintaining some useful guarantees.
+	sess.SetMode(mgo.Monotonic, false)
+
 	// sess.SetSocketTimeout(10 * time.Second)
 
 	db := mongodb.New(sess.DB(mongoInfo.Database),
