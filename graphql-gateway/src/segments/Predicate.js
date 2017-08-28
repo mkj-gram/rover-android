@@ -82,6 +82,26 @@ export const NumberPredicate = new GraphQLObjectType({
     isTypeOf: predicate => !!predicate.numberComparison
 })
 
+export const FloatPredicate = new GraphQLObjectType({
+    name: 'FloatPredicate',
+    interfaces: [Predicate],
+    fields: () => ({
+        attribute: {
+            type: new GraphQLNonNull(GraphQLString),
+            resolve: predicate => predicate.attribute
+        },
+        floatValue: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLFloat))),
+            resolve: predicate => predicate.floatValue
+        },
+        floatComparison: {
+            type: new GraphQLNonNull(GraphQLString),
+            resolve: predicate => predicate.floatComparison
+        }
+    }),
+    isTypeOf: predicate => !!predicate.floatValue
+})
+
 export const DatePredicate = new GraphQLObjectType({
     name: 'DatePredicate',
     interfaces: [Predicate],
