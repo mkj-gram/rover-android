@@ -10,7 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// UnaryPanicRecovery defines grpc.UnaryServerInterceptor to recover from panics
+// UnaryLogger simple logger middleware
+// Deprecated: use UnaryLog
 func UnaryLogger(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	from := time.Now()
 
@@ -28,4 +29,30 @@ func UnaryLogger(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 
 	return resp, err
+}
+
+type logger interface {
+	Printf(string, ...interface{})
+}
+
+// UnaryLog simple logger middleware
+func UnaryLog(l logger) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+		from := time.Now()
+
+		resp, err = handler(ctx, req)
+
+		dur := time.Now().Sub(from)
+		if err != nil {
+			if err, ok := status.FromError(err); ok {
+				l.Printf("rpc=%s dur=%s status=%s error=%q", info.FullMethod, dur, err.Code().String(), err.Message())
+			} else if err != nil {
+				l.Printf("rpc=%s dur=%s status=Error error=%q", info.FullMethod, dur, err)
+			}
+		} else {
+			l.Printf("rpc=%s dur=%s status=OK", info.FullMethod, dur)
+		}
+
+		return resp, err
+	}
 }

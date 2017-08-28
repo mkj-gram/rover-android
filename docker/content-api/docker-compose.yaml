@@ -2,9 +2,16 @@ version: "3"
 
 services:
 
+
+  elastic2:
+    image: elasticsearch:2.4
+    ports: [9200, 9300]
+    volumes:
+      - ../../rover:/rover
+
   content-api:
     image: ruby:2.3.3
-    links: [postgres, mongo, auth-service, elasticsearch]
+    links: [postgres, mongo, auth-service, elastic2]
     ports: [5000]
     command: ./docker/content-api/cmd _bundle migrate # test
     volumes:
@@ -14,7 +21,7 @@ services:
     environment:
       AUTH_V1_SERVICE_HOST: auth-service
       MONGODB_URI: mongodb://mongo:27017/rover-local
-      ELASTICSEARCH_URLS: elasticsearch:9200
+      ELASTICSEARCH_URLS: elastic2:9200
       POSTGRESQL_DB_HOST: postgres
       BUNDLE_PATH: /cachefs/content-api.bundle
       RACK_ENV: development

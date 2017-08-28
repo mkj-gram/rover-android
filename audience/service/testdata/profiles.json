@@ -111,6 +111,23 @@
 }
 
 {
+  "account_id": 1,
+  "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaa99" },
+  "identifier": "78e19dbf-8c0b-47a5-b28f-444444444444",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": {
+    "bool": true,
+    "string": "hello world",
+    "integer": {"$numberLong": "42"},
+    "double": 42.42,
+    "null": null,
+    "ts":   {"$date": "2016-08-22T19:05:53.102Z"},
+    "arr": ["hello"]
+  }
+}
+
+{
   "account_id": 6,
   "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaaff" },
   "identifier": "78e19dbf-8c0b-47a5-b28f-555555555555",

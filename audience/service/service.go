@@ -115,11 +115,7 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 	if err := db.CreateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice: %v", err)
 	}
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceCreated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+	s.notify.deviceCreated(ctx, r.AuthContext.AccountId, r.ProfileId, r.DeviceId)
 
 	return &audience.CreateDeviceResponse{}, nil
 }
@@ -129,6 +125,7 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 	db := s.db.Copy()
 	defer db.Close()
 
+	// TODO: use find and modify to avoid DB 2 calls
 	if err := db.UpdateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevice: %v", err)
 	}
@@ -472,7 +469,7 @@ func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileReq
 
 	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId)
 	if schemaUpdated {
-		s.notify.schemaUpdated(ctx, r.AuthContext.AccountId, r.ProfileId)
+		s.notify.schemaUpdated(ctx, r.AuthContext.AccountId)
 	}
 
 	return &audience.UpdateProfileResponse{}, nil

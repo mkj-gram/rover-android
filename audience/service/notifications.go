@@ -100,11 +100,10 @@ func (n *serviceNotify) deviceProfileUpdated(ctx context.Context, acctId int32, 
 	})
 }
 
-func (n *serviceNotify) schemaUpdated(ctx context.Context, acctId int32, id string) {
+func (n *serviceNotify) schemaUpdated(ctx context.Context, acctId int32) {
 	m := Message{
 		"event":      "updated",
 		"model":      "profileSchema",
-		"profile_id": id,
 		"account_id": strconv.Itoa(int(acctId)),
 	}
 

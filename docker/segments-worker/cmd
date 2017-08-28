@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -e
+
+run() {
+  go run ./audience/service/cmd/segments-worker/main.go \
+    --mongo-dsn=${MONGO_DSN}
+}
+
+test() {
+  go test -tags integration \
+    github.com/roverplatform/rover/audience/service/...
+}
+
+bench() {
+  go test -tags integration -bench . -run NONE -benchtime 10s \
+    ./audience/service/...
+}
+
+
+for cmd in $*; do
+  $cmd
+done

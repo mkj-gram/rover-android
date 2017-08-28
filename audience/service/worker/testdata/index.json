@@ -1,0 +1,8 @@
+{"index": {"_index": "test_account_1", "_type": "profile", "_id": "000000000000000000000aa1"}}
+{"account_id": "1"}
+{"index": {"_index": "test_account_1", "_type": "profile", "_id": "000000000000000000000aa2"}}
+{"account_id": "1"}
+{"index": {"_index": "test_account_1", "_type": "device", "_id": "D00000000000000000000000", "_parent": "000000000000000000000aa1"}}
+{"profile_id": "000000000000000000000aa1"}
+{"index": {"_index": "test_account_1", "_type": "device", "_id": "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD", "_parent": "000000000000000000000add"}}
+{"profile_id": "000000000000000000000add"}

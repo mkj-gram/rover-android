@@ -65,7 +65,7 @@ func testAudienceService_GetDevicesTotalCount(t *testing.T) {
 
 			exp: &audience.GetDevicesTotalCountResponse{
 				// this test is probably fragile
-				Total: 7,
+				Total: 8,
 			},
 		},
 	}
@@ -126,7 +126,7 @@ func testAudienceService_GetProfilesTotalCount(t *testing.T) {
 			},
 
 			exp: &audience.GetProfilesTotalCountResponse{
-				Total: 6,
+				Total: 7,
 			},
 		},
 	}

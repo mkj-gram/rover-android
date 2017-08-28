@@ -50,7 +50,7 @@ func (n *Notifier) Listen(ctx context.Context) {
 			case n.Pubc <- msgs:
 				msgs = msgs[:0]
 			default:
-				n.Log.Errorf("notify: listen: failed to submit batch: %+v", msgs)
+				n.Log.Errorf("notify: listen: failed to submit batch")
 			}
 		}
 	)

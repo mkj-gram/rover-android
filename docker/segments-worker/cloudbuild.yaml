@@ -1,0 +1,14 @@
+steps:
+- name: 'gcr.io/cloud-builders/go:alpine'
+  env:
+    - PROJECT_ROOT=github.com/roverplatform/rover
+  args:
+    - install
+    - github.com/roverplatform/rover/audience/service/cmd/segments-worker
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - build
+    - --tag=gcr.io/$PROJECT_ID/segments-worker:$REVISION_ID
+    - -f=./docker/segments-worker/Dockerfile
+    - .
+images: ['gcr.io/$PROJECT_ID/segments-worker:$REVISION_ID']
