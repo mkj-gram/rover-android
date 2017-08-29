@@ -51,15 +51,26 @@ class ColumnDisplay extends Component {
     }
 
     render() {
-        const { category, items, showChecked, updateChecked } = this.props
+        const {
+            category,
+            items,
+            showChecked,
+            updateChecked,
+            devices
+        } = this.props
+        const itemKeys = Object.keys(items)
         const { showAll } = this.state
 
-        const size = showAll ? items.length : 5
-        const remaining = items.length - size
+        const size = showAll ? itemKeys.length : 5
+        const remaining = itemKeys.length - size
 
         const icon = {
             devices: DeviceIconSmall({ style: { fill: silver } }),
-            profiles: ProfileIcon({ fill: silver })
+            profiles: ProfileIcon({ fill: silver }),
+            pushTokens: DeviceIconSmall({ style: { fill: silver } }),
+            os: DeviceIconSmall({ style: { fill: silver } }),
+            location: DeviceIconSmall({ style: { fill: silver } }),
+            noGroup: DeviceIconSmall({ style: { fill: silver } })
         }
 
         return (
@@ -84,14 +95,19 @@ class ColumnDisplay extends Component {
                         {category}
                     </div>
                 </div>
-                {items.slice(0, size).map((item, index) =>
-                    (<div style={{ paddingBottom: 17 }} key={index}>
+                {itemKeys.slice(0, size).map((item, index) =>
+                    <div style={{ paddingBottom: 17 }} key={index}>
                         <Checkbox
                             isChecked={showChecked(item)}
-                            label={item}
+                            label={items[item].label}
                             primaryColor={purple}
                             isDisabled={false}
-                            onChange={e => updateChecked(category, item)}
+                            onChange={e =>
+                                updateChecked(
+                                    category,
+                                    item,
+                                    devices !== undefined
+                                )}
                             style={{
                                 height: 16,
                                 width: 16,
@@ -103,7 +119,7 @@ class ColumnDisplay extends Component {
                                 ...light
                             }}
                         />
-                    </div>)
+                    </div>
                 )}
                 {this.showMore(remaining)}
             </div>
@@ -113,16 +129,18 @@ class ColumnDisplay extends Component {
 
 ColumnDisplay.propTypes = {
     category: PropTypes.string.isRequired,
-    items: PropTypes.array.isRequired,
+    items: PropTypes.object.isRequired,
     updateChecked: PropTypes.func.isRequired,
-    showChecked: PropTypes.func.isRequired
+    showChecked: PropTypes.func.isRequired,
+    devices: PropTypes.bool
 }
 
 ColumnDisplay.defaultProps = {
     category: '',
-    items: [],
+    items: {},
     updateChecked: () => null,
-    showChecked: () => null
+    showChecked: () => null,
+    devices: undefined
 }
 
 export default ColumnDisplay

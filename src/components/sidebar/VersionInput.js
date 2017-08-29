@@ -1,13 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import {
-    light,
-    Select,
-    silver,
-    text,
-    titanium
-} from '@rover/react-bootstrap'
+import { light, Select, silver, text, titanium } from '@rover/react-bootstrap'
 
 import ModalInput from './ModalInput'
 import ModalInputPrompt from './ModalInputPrompt'
@@ -29,7 +23,14 @@ class VersionInput extends Component {
     }
 
     updateVersion(version, versionIndex) {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const {
+            attribute,
+            category,
+            __typename,
+            index,
+            updateFn,
+            label
+        } = this.props
         const { versionValue, versionComparison } = this.state
 
         const newValue = versionValue
@@ -43,14 +44,22 @@ class VersionInput extends Component {
             category,
             __typename,
             index,
-            versionValue: newValue
+            versionValue: newValue,
+            label
         })
 
         this.setState({ versionValue: newValue })
     }
 
     updateComparison(versionComparison) {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const {
+            attribute,
+            category,
+            __typename,
+            index,
+            updateFn,
+            label
+        } = this.props
         const { versionValue } = this.state
 
         let newVersionValue
@@ -67,7 +76,8 @@ class VersionInput extends Component {
             versionValue: newVersionValue,
             category,
             __typename,
-            index
+            index,
+            label
         })
 
         this.setState({ versionComparison, versionValue: newVersionValue })
@@ -86,15 +96,12 @@ class VersionInput extends Component {
     }
 
     render() {
-        const { attribute, category } = this.props
+        const { category, label } = this.props
         const { versionValue, versionComparison } = this.state
 
         return (
             <div style={{ ...text, ...light, color: silver, width: 495 }}>
-                <ModalInputPrompt
-                    attributeType={category}
-                    attribute={attribute}
-                />
+                <ModalInputPrompt attributeType={category} label={label} />
                 <div
                     style={{
                         display: 'flex',
@@ -133,10 +140,10 @@ class VersionInput extends Component {
 
                     {versionComparison !== 'is unknown' &&
                         versionValue.slice(0, 3).map((val, index) =>
-                            (<div key={index}>
+                            <div key={index}>
                                 {this.renderNumberInput(val, index)}
                                 {index < 2 && '.'}
-                            </div>)
+                            </div>
                         )}
                     {versionComparison === 'in between' &&
                         <div
@@ -144,10 +151,10 @@ class VersionInput extends Component {
                         >
                             <span style={{ fontStyle: 'italic' }}>and</span>
                             {versionValue.slice(3).map((val, index) =>
-                                (<div key={index}>
+                                <div key={index}>
                                     {this.renderNumberInput(val, index + 3)}
                                     {index < 2 && '.'}
-                                </div>)
+                                </div>
                             )}
                         </div>}
                 </div>
@@ -163,7 +170,8 @@ VersionInput.propTypes = {
     category: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
-    __typename: PropTypes.string.isRequired
+    __typename: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired
 }
 
 VersionInput.defaultProps = {
@@ -172,7 +180,8 @@ VersionInput.defaultProps = {
     versionComparison: 'equal to',
     category: 'device',
     index: 0,
-    updateFn: () => null
+    updateFn: () => null,
+    label: ''
 }
 
 export default VersionInput

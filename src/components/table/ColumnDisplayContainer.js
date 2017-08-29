@@ -2,17 +2,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {
-    purple,
-    violet,
     cloud,
     text,
     semibold,
     titanium,
     Modal,
-    mercury,
-    graphite
+    mercury
 } from '@rover/react-bootstrap'
 
+import {getDeviceSchemaColumns} from '../deviceSchema'
 import ColumnDisplay from './ColumnDisplay'
 
 const modalContainer = {
@@ -32,6 +30,8 @@ const segmentLine = {
     flex: '0 0 auto'
 }
 
+const deviceColumns = getDeviceSchemaColumns()
+
 const ColumnDisplayContainer = ({
     updateChecked,
     showChecked,
@@ -50,7 +50,6 @@ const ColumnDisplayContainer = ({
                 padding: 0,
                 width: 'auto',
                 bottom: null,
-                padding: 0,
                 right: null,
                 top: pageClickLocation.y,
                 left: pageClickLocation.x,
@@ -77,6 +76,7 @@ const ColumnDisplayContainer = ({
         >
             Display these columns
         </div>
+
         <div
             style={{
                 margin: 0,
@@ -85,16 +85,22 @@ const ColumnDisplayContainer = ({
             }}
         >
             <div style={modalContainer}>
+            {Object.keys(deviceColumns).map(group => (
+                <div key={group}>
                 <ColumnDisplay
-                    category="devices"
-                    items={Object.keys(allColumns.devices)}
+                    category={group}
+                    items={deviceColumns[group]}
                     updateChecked={updateChecked}
                     showChecked={showChecked}
+                    devices={true}
                 />
                 <div style={segmentLine} />
+                </div>
+                )
+            )}
                 <ColumnDisplay
                     category="profiles"
-                    items={Object.keys(allColumns.profiles)}
+                    items={allColumns.profiles}
                     updateChecked={updateChecked}
                     showChecked={showChecked}
                 />

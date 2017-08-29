@@ -29,7 +29,8 @@ class NumericInput extends Component {
             __typename,
             index,
             updateFn,
-            float
+            float,
+            label
         } = this.props
         let numberValue = [0]
 
@@ -51,7 +52,8 @@ class NumericInput extends Component {
                 category,
                 index,
                 floatValue: numberValue,
-                __typename
+                __typename,
+                label
             })
         } else {
             updateFn({
@@ -60,7 +62,8 @@ class NumericInput extends Component {
                 category,
                 index,
                 numberValue,
-                __typename
+                __typename,
+                label
             })
         }
 
@@ -74,7 +77,8 @@ class NumericInput extends Component {
             __typename,
             index,
             updateFn,
-            float
+            float,
+            label
         } = this.props
         const { numberValue, numberComparison } = this.state
 
@@ -89,7 +93,8 @@ class NumericInput extends Component {
                 category,
                 index,
                 floatValue: newValue,
-                __typename
+                __typename,
+                label
             })
         } else {
             updateFn({
@@ -98,7 +103,8 @@ class NumericInput extends Component {
                 category,
                 index,
                 numberValue: newValue,
-                __typename
+                __typename,
+                label
             })
         }
 
@@ -106,15 +112,15 @@ class NumericInput extends Component {
     }
 
     render() {
-        const { attribute, category } = this.props
+        const { attribute, category, label } = this.props
         const { numberComparison, numberValue } = this.state
 
         return (
             <div style={{ ...text, color: silver, width: 283 }}>
                 <ModalInputPrompt
-                    attribute={attribute}
                     attributeType={category}
                     includeIs={false}
+                    label={label}
                 />
                 <div
                     style={{
@@ -196,7 +202,8 @@ NumericInput.propTypes = {
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     __typename: PropTypes.string.isRequired,
-    float: PropTypes.bool
+    float: PropTypes.bool,
+    label: PropTypes.string.isRequired
 }
 
 NumericInput.defaultProps = {
@@ -206,7 +213,8 @@ NumericInput.defaultProps = {
     category: 'device',
     index: 0,
     updateFn: () => null,
-    float: false
+    float: false,
+    label: ''
 }
 
 export default NumericInput
