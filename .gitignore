@@ -11,3 +11,4 @@ node-phone-simulator/.env
 graphql-gateway/src/.env
 graphql-gateway/dist/
 
+.idea
