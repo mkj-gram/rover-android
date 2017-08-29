@@ -83,9 +83,13 @@ function parseProfilePayload(request) {
         profile["identifier"] = null
     }
 
-    if (profile['tags'] === null) {
+    if (profile['tags'] === null || profile['tags'] === undefined) {
         profile['tags'] = []
     }
+
+    profile['tags'].forEach(tag => {
+        profile[tag] = true
+    })
 
     return profile
 }
@@ -158,6 +162,11 @@ function parseDevicePayload(request) {
 // the missing attributes in the payload equal to deleting them. Can only be set to null
 function profileDifferences(currentProfile, newProfile) {
     let attributeUpdated = {}
+
+    let tagsRemoved = lodash.difference(currentProfile.tags, newProfile.tags)
+    tagsRemoved.forEach(tag => {
+        attributeUpdated[tag] = false
+    })
 
     // Compare all attributes except for id, identifier, account_id
     Object.keys(currentProfile).forEach(key => {
