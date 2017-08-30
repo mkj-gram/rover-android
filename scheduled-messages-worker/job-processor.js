@@ -94,8 +94,15 @@ function JobProcessor(jobId, server, context, previousState) {
     this._createdAt = Date.now();
     this._startedProcessingAt = Date.now();
     this._updatedStateAt = Date.now();
+
+    // Notification Stats about the job
     this._notificationsSent = 0;
     this._notificationsFailed = 0;
+    this._notifications_attempted = 0;
+    this._notifications_delivered = 0;
+    this._notifications_unreachable = 0;
+    this._notifications_invalid = 0;
+
     this._debug = require('debug')('job:' + this._id);
     this._debug.log = console.info.bind(console);
     this._debug("Initialized");
@@ -135,6 +142,15 @@ JobProcessor.prototype.getErrorContext = function() {
         static_segment_id: this._context.staticSegmentId
     }  
 };
+
+JobProcessor.prototype.getCurrentPushStats = function() {
+    return {
+        _notifications_attempted: this._notifications_attempted,
+        _notifications_delivered: this._notifications_delivered,
+        _notifications_unreachable: this._notifications_unreachable,
+        _notifications_invalid: this._notifications_invalid
+    }
+}
 
 JobProcessor.prototype.shutdown = function() {
     this._shouldProcess = false;
@@ -896,6 +912,9 @@ JobProcessor.prototype._sendNotifications = function() {
             let androidClient = fcm.Sender(apiKey);
             pushPromises.push(this._sendAndroidNotifications(androidClient, androidMessages));  
         }
+    } else {
+        this._notifications_attempted += (androidMessages || []).length
+        this._notifications_invalid += (androidMessages || []).length
     }
 
     if (!util.isNullOrUndefined(this._context.platformCredentials) && !util.isNullOrUndefined(this._context.platformCredentials.apns) && !util.isNullOrUndefined(this._context.platformCredentials.apns.certificate)) {
@@ -917,6 +936,9 @@ JobProcessor.prototype._sendNotifications = function() {
         });
 
         pushPromises.push(this._sendIOSNotifications(iosCustomerDevelopmentClient, topic, iosCustomerDevelopmentMessages))
+    } else {
+        this._notifications_attempted += (iosCustomerProductionMessages || []).length + (iosCustomerDevelopmentMessages || []).length   
+        this._notifications_invalid += (iosCustomerProductionMessages || []).length + (iosCustomerDevelopmentMessages || []).length   
     }
 
     if (iosRoverInboxProductionMessages.length > 0)
@@ -977,6 +999,7 @@ JobProcessor.prototype._sendAndroidXMPPNotifications = function(client, androidM
         client.connect(err => {
             if (err) {
                 logger.error(err);
+                self._notifications_invalid += 1
                 // We don't want others to cancel
                 return resolve();
             }
@@ -988,6 +1011,9 @@ JobProcessor.prototype._sendAndroidXMPPNotifications = function(client, androidM
                 });
 
                 return new Promise((resolve, reject) => {
+                    
+                    self._notifications_attempted += 1
+
                     client.send(notification, message.device.token, function(err, response) {
                         if (err) {
                             return resolve({ failed: message, error: err.toString() });
@@ -996,31 +1022,16 @@ JobProcessor.prototype._sendAndroidXMPPNotifications = function(client, androidM
                         if (response.error) {
                             librato.measure("fcm.notifications.failed", 1, { source: LIBRATO_SOURCE });
                             let errorMessage = response.description || response.error;
-                            if (errorMessage == "BAD_REGISTRATION" || errorMessage == "DEVICE_UNREGISTERED") {
-                                self._removeTokenFromDevice(message.customer, message.device, (err) => {
-                                    if (err) {
-                                        console.warn(err);
-                                    }
-
-                                    return resolve({ failed: message, error: errorMessage });
-                                });
+                            if (errorMessage == "DEVICE_UNREGISTERED") {
+                                self._notifications_unreachable += 1
                             } else {
-                                return resolve({ failed: message, error: errorMessage });
+                                self._notifications_invalid += 1
                             }
-                        } else if (response.registration_id) {
-                            librato.measure("fcm.notifications.sent", 1, { source: LIBRATO_SOURCE });
-                            // The token has changed for some reason we weren't in sync
-                            // remove the token from this device
-                            
-                            self._removeTokenFromDevice(message.customer, message.device, (err) => {
-                                if (err) {
-                                    console.warn(err);
-                                }
 
-                                return resolve({ sent: message });
-                            });
+                            return resolve({ failed: message, error: errorMessage })
                         } else {
                             librato.measure("fcm.notifications.sent", 1, { source: LIBRATO_SOURCE });
+                            self._notifications_delivered += 1
                             return resolve({ sent: message });
                         }
                     });
@@ -1064,7 +1075,7 @@ JobProcessor.prototype._sendAndroidXMPPNotifications = function(client, androidM
                 });
 
                 xmppDebug("Finished capturing notification(sent/failed) events");
-
+                xmppDebug(self.getCurrentPushStats())
                 librato.measure("fcm.notifications.sent.time", totalTime / androidMessages.length, { source: LIBRATO_SOURCE });
 
                 return resolve();
@@ -1116,6 +1127,8 @@ JobProcessor.prototype._sendAndroidNotifications = function(client, androidMessa
         }
     }
 
+    let self = this;
+
     return Promise.map(androidMessages, (message) => {
         let notification = new fcm.Message({
            data: { message: util._extend(serializedMessageTemplate, { id: message.message._id.toString() }), _rover: true }
@@ -1126,8 +1139,8 @@ JobProcessor.prototype._sendAndroidNotifications = function(client, androidMessa
             /*
                 { multicast_id: 8496848195191901000, success: 0, failure: 1, canonical_ids: 0, results: [ { error: 'NotRegistered' } ] }
              */
-
-            let self = this;
+            
+            self._notifications_attempted += 1
 
             client.send(notification, { to: message.device.token }, function(err, response) {
                 if (err) {
@@ -1138,33 +1151,16 @@ JobProcessor.prototype._sendAndroidNotifications = function(client, androidMessa
                     librato.measure("fcm.notifications.failed", 1, { source: LIBRATO_SOURCE });
                     let errorMessage = util.isArray(response.results) && !util.isNullOrUndefined(response.results[0].error) ? response.results[0].error : "Unknown";
                     
-                    if (errorMessage == "InvalidRegistration" || errorMessage == "NotRegistered") {
-                        self._removeTokenFromDevice(message.customer, message.device, (err) => {
-                            if (err) {
-                                console.warn(err);
-                            }
-
-                            return resolve({ failed: message, error: errorMessage });
-                        });
+                    if (errorMessage == "NotRegistered") {
+                        self._notifications_unreachable += 1
                     } else {
-                        return resolve({ failed: message, error: errorMessage });
+                        self._notifications_invalid += 1
                     }
 
-                } else if (response.canonical_ids == 1) {
-                     librato.measure("fcm.notifications.sent", 1, { source: LIBRATO_SOURCE });
-                    // The token has changed for some reason we weren't in sync
-                    // remove the token from this device
-                    
-                    self._removeTokenFromDevice(message.customer, message.device, (err) => {
-                        if (err) {
-                            console.warn(err);
-                        }
-
-                        return resolve({ sent: message });
-                    });
-
+                    return resolve({ failed: message, error: errorMessage });
                 } else {
                     librato.measure("fcm.notifications.sent", 1, { source: LIBRATO_SOURCE });
+                    self._notifications_delivered += 1
                     return resolve({ sent: message });
                 }
             });
@@ -1206,7 +1202,7 @@ JobProcessor.prototype._sendAndroidNotifications = function(client, androidMessa
         });
 
         fcmHttpDebug("Finished capturing notification(sent/failed) events");
-
+        fcmHttpDebug(self.getCurrentPushStats())
         librato.measure("fcm.notifications.sent.time", totalTime / androidMessages.length, { source: LIBRATO_SOURCE });
 
         return Promise.resolve();
@@ -1248,6 +1244,8 @@ JobProcessor.prototype._sendIOSNotifications = function(client, topic, iosMessag
         }
     }
 
+    let self = this
+
     return Promise.map(iosMessages, (message) => {
 
         let notification = new apn.Notification({
@@ -1261,35 +1259,36 @@ JobProcessor.prototype._sendIOSNotifications = function(client, topic, iosMessag
 
         notification.topic = topic;
 
+        self._notifications_attempted += 1
+
         return client.send(notification, message.device.token).then(result => {
 
             if (util.isNullOrUndefined(result)) {
                 librato.measure("apns.notifications.failed", 1, { source: LIBRATO_SOURCE });
+                self._notifications_invalid += 1
                 return Promise.resolve({ failed: message, error: "unknown"});
             } else if (util.isArray(result.sent) && result.sent.length > 0) {
                 librato.measure("apns.notifications.sent", 1, { source: LIBRATO_SOURCE });
+                self._notifications_delivered += 1
                 return Promise.resolve({ sent: message });
             } else if (util.isArray(result.failed) && result.failed.length > 0) {
                 librato.measure("apns.notifications.failed", 1, { source: LIBRATO_SOURCE });
                 let error = (util.isNullOrUndefined(result.failed[0]) || util.isNullOrUndefined(result.failed[0].response) || util.isNullOrUndefined(result.failed[0].response.reason)) ? "unknown" : result.failed[0].response.reason;
-                if (error == "Unregistered" || error == "BadDeviceToken" || error == "DeviceTokenNotForTopic") {
-                    this._removeTokenFromDevice(message.customer, message.device, (err) => {
-                        if (err) {
-                            console.warn(err);
-                        }
-
-                        return Promise.resolve({ failed: message, error: error });
-                    });
+                if (error == "Unregistered") {
+                   self._notifications_unreachable += 1
                 } else {
-                    return Promise.resolve({ failed: message, error: error });
+                    self._notifications_invalid += 1    
                 }
-                
+
+                return Promise.resolve({ failed: message, error: error });
             } else {
+                self._notifications_invalid += 1 
                 return Promise.resolve({});
             }
         })
         .catch(err => {
             console.warn(err);
+            self._notifications_invalid += 1
             return Promise.resolve({});
         });
 
@@ -1331,6 +1330,7 @@ JobProcessor.prototype._sendIOSNotifications = function(client, topic, iosMessag
         });
 
         apnsDebug("Finished capturing notification(sent/failed) events");
+        apnsDebug(self.getCurrentPushStats())
 
         librato.measure("apns.notifications.sent.time", totalTime / iosMessages.length, { source: LIBRATO_SOURCE });
         
@@ -1360,6 +1360,10 @@ JobProcessor.prototype._updateStats = function(first_argument) {
     counterUpdates["total_notifications_failed"] = this._notificationsFailed;
     counterUpdates["total_delivered"] = totalDelivered;
     counterUpdates["total_audience_size"] = this._customers.length;
+    counterUpdates["notifications_attempted"] = this._notifications_attempted;
+    counterUpdates["notifications_delivered"] = this._notifications_delivered;
+    counterUpdates["notifications_unreachable"] = this._notifications_unreachable;
+    counterUpdates["notifications_invalid"] = this._notifications_invalid;
 
     let methods = this._server.methods;
 
