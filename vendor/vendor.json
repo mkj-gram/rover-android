@@ -745,6 +745,24 @@
 			"path": "gopkg.in/mgo.v2/internal/scram",
 			"revision": "3f83fa5005286a7fe593b055f0d7771a7dce4655",
 			"revisionTime": "2016-08-18T02:01:20Z"
+		},
+		{
+			"checksumSHA1": "RvHYKdDVR02c1e2aiRimDzdahsI=",
+			"path": "gopkg.in/olivere/elastic.v5",
+			"revision": "edbef41beaacc2ee95e61af8faff04e67c01e268",
+			"revisionTime": "2017-08-01T07:38:22Z"
+		},
+		{
+			"checksumSHA1": "Z/5tTcmNfSOHMkcLDkxN93PQ410=",
+			"path": "gopkg.in/olivere/elastic.v5/config",
+			"revision": "edbef41beaacc2ee95e61af8faff04e67c01e268",
+			"revisionTime": "2017-08-01T07:38:22Z"
+		},
+		{
+			"checksumSHA1": "pCApZfp2CeDnWbNVsyzNO62ZUXA=",
+			"path": "gopkg.in/olivere/elastic.v5/uritemplates",
+			"revision": "edbef41beaacc2ee95e61af8faff04e67c01e268",
+			"revisionTime": "2017-08-01T07:38:22Z"
 		}
 	],
 	"rootPath": "github.com/roverplatform/rover"
