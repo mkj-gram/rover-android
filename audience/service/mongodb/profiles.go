@@ -419,30 +419,14 @@ func (s *profilesStore) getProfileSchema(ctx context.Context, account_id int32) 
 		schema ProfileSchema
 	)
 
-	iter := s.profiles_schemas().
+	err := s.profiles_schemas().
 		Find(bson.M{"account_id": account_id}).
 		Sort("_id").
-		Iter()
+		All(&schema.Attributes)
 
-	for !iter.Done() {
-		var sa SchemaAttribute
-
-		if !iter.Next(&sa) {
-			if err := iter.Err(); err != nil {
-				debugf("iter.Next: %s", err)
-			}
-			continue
-		}
-
-		schema.Attributes = append(schema.Attributes, &sa)
-	}
-
-	if err := iter.Close(); err != nil {
-		return nil, wrapError(err, "iter.Close")
-	}
-
-	return &schema, nil
+	return &schema, wrapError(err, "profile_schemas.Find")
 }
+
 func (s *profilesStore) UpdateProfileIdentifier(ctx context.Context, r *audience.UpdateProfileIdentifierRequest) error {
 	var (
 		account_id = r.GetAuthContext().GetAccountId()
