@@ -501,7 +501,7 @@ module.exports = function() {
             let needsUpdate = false
             let tasks = []
 
-            if (deviceContext === null) {
+            if (deviceContext === null || deviceContext === undefined) {
                 logger.debug("Device: " + device.id + " did not provide a context")
                 return callback(null, device)
             }
