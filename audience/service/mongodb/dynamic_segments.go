@@ -219,6 +219,13 @@ func (s *dynamicSegmentsStore) ListDynamicSegments(ctx context.Context, r *audie
 		}
 	)
 
+	switch r.GetArchivedStatus() {
+	case audience.ListDynamicSegmentsRequest_ARCHIVED:
+		Q["is_archived"] =  true
+	case audience.ListDynamicSegmentsRequest_UNARCHIVED:
+		Q["is_archived"] = false
+	}
+
 	if err := s.dynamic_segments().Find(Q).All(&dss); err != nil {
 		return nil, wrapError(err, "dynamic_segments.Find")
 	}

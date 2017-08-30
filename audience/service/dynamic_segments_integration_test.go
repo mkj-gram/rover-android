@@ -660,11 +660,33 @@ func testAudienceService_ListDynamicSegments(t *testing.T) {
 				Segments: nil,
 			},
 		},
-
 		{
-			name: "lists the segments",
+			name: "defaults to list only unarchived segments",
 			req: &audience.ListDynamicSegmentsRequest{
 				AuthContext: &auth.AuthContext{AccountId: 2},
+			},
+
+			expErr: nil,
+			exp: &audience.ListDynamicSegmentsResponse{
+				Segments: []*audience.DynamicSegment{
+					{
+						Id:          "000000000000000000000011",
+						AccountId:   2,
+						Title:       "a title",
+						IsArchived:  false,
+						SegmentSize: 0,
+
+						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+					},
+				},
+			},
+		},
+		{
+			name: "lists all the segments",
+			req: &audience.ListDynamicSegmentsRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 2},
+				ArchivedStatus: audience.ListDynamicSegmentsRequest_ALL,
 			},
 
 			expErr: nil,
@@ -680,6 +702,52 @@ func testAudienceService_ListDynamicSegments(t *testing.T) {
 						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 					},
+					{
+						Id:          "000000000000000000000011",
+						AccountId:   2,
+						Title:       "a title",
+						IsArchived:  false,
+						SegmentSize: 0,
+
+						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+					},
+				},
+			},
+		},
+		{
+			name: "lists only archived segments",
+			req: &audience.ListDynamicSegmentsRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 2},
+				ArchivedStatus: audience.ListDynamicSegmentsRequest_ARCHIVED,
+			},
+
+			expErr: nil,
+			exp: &audience.ListDynamicSegmentsResponse{
+				Segments: []*audience.DynamicSegment{
+					{
+						Id:          "000000000000000000000010",
+						AccountId:   2,
+						Title:       "a segment",
+						IsArchived:  true,
+						SegmentSize: 9001,
+
+						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+					},
+				},
+			},
+		},
+		{
+			name: "lists only unarchived segments",
+			req: &audience.ListDynamicSegmentsRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 2},
+				ArchivedStatus: audience.ListDynamicSegmentsRequest_UNARCHIVED,
+			},
+
+			expErr: nil,
+			exp: &audience.ListDynamicSegmentsResponse{
+				Segments: []*audience.DynamicSegment{
 					{
 						Id:          "000000000000000000000011",
 						AccountId:   2,

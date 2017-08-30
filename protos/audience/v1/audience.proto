@@ -689,7 +689,16 @@ message UpdateDynamicSegmentArchiveStatusResponse { }
 
 message ListDynamicSegmentsRequest {
   auth.v1.AuthContext auth_context = 1;
+
+  enum ArchivedStatus {
+    UNARCHIVED = 0;
+    ARCHIVED = 1;
+    ALL = 2;
+  }
+
+  ArchivedStatus archived_status = 2;
 }
+
 message ListDynamicSegmentsResponse {
   repeated DynamicSegment segments = 1;
 }

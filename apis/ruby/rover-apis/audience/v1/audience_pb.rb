@@ -376,6 +376,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.ListDynamicSegmentsRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :archived_status, :enum, 2, "rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus"
+  end
+  add_enum "rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus" do
+    value :UNARCHIVED, 0
+    value :ARCHIVED, 1
+    value :ALL, 2
   end
   add_message "rover.audience.v1.ListDynamicSegmentsResponse" do
     repeated :segments, :message, 1, "rover.audience.v1.DynamicSegment"
@@ -634,6 +640,7 @@ module Rover
       UpdateDynamicSegmentArchiveStatusRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDynamicSegmentArchiveStatusRequest").msgclass
       UpdateDynamicSegmentArchiveStatusResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDynamicSegmentArchiveStatusResponse").msgclass
       ListDynamicSegmentsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDynamicSegmentsRequest").msgclass
+      ListDynamicSegmentsRequest::ArchivedStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus").enummodule
       ListDynamicSegmentsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDynamicSegmentsResponse").msgclass
       DynamicSegment = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DynamicSegment").msgclass
       StringPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.StringPredicate").msgclass

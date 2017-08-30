@@ -61,6 +61,7 @@ goog.exportSymbol('proto.rover.audience.v1.ListDevicesByProfileIdResponse', null
 goog.exportSymbol('proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ListDevicesByProfileIdentifierResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ListDynamicSegmentsRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ListDynamicSegmentsResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ListProfilesByIdentifiersRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ListProfilesByIdentifiersResponse', null, global);
@@ -15805,7 +15806,8 @@ proto.rover.audience.v1.ListDynamicSegmentsRequest.prototype.toObject = function
  */
 proto.rover.audience.v1.ListDynamicSegmentsRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f)
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    archivedStatus: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -15847,6 +15849,10 @@ proto.rover.audience.v1.ListDynamicSegmentsRequest.deserializeBinaryFromReader =
       reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
       msg.setAuthContext(value);
       break;
+    case 2:
+      var value = /** @type {!proto.rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus} */ (reader.readEnum());
+      msg.setArchivedStatus(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -15883,8 +15889,24 @@ proto.rover.audience.v1.ListDynamicSegmentsRequest.serializeBinaryToWriter = fun
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
+  f = message.getArchivedStatus();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      2,
+      f
+    );
+  }
 };
 
+
+/**
+ * @enum {number}
+ */
+proto.rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus = {
+  UNARCHIVED: 0,
+  ARCHIVED: 1,
+  ALL: 2
+};
 
 /**
  * optional rover.auth.v1.AuthContext auth_context = 1;
@@ -15913,6 +15935,21 @@ proto.rover.audience.v1.ListDynamicSegmentsRequest.prototype.clearAuthContext = 
  */
 proto.rover.audience.v1.ListDynamicSegmentsRequest.prototype.hasAuthContext = function() {
   return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional ArchivedStatus archived_status = 2;
+ * @return {!proto.rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus}
+ */
+proto.rover.audience.v1.ListDynamicSegmentsRequest.prototype.getArchivedStatus = function() {
+  return /** @type {!proto.rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.ListDynamicSegmentsRequest.ArchivedStatus} value */
+proto.rover.audience.v1.ListDynamicSegmentsRequest.prototype.setArchivedStatus = function(value) {
+  jspb.Message.setField(this, 2, value);
 };
 
 
