@@ -1,0 +1,6 @@
+production:
+  enabled: <%= ENV['IMGIX_ENABLED'] === 'false' ? false : true %>
+
+
+development:
+  enabled: <%= ENV['IMGIX_ENABLED'] === 'false' ? false : true %>

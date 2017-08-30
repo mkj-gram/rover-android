@@ -6,6 +6,8 @@ class V1::ImagesController < V1::ApplicationController
     
     SUPPORTED_CONTENT_TYPES = ["image/png", "image/jpeg", "image/jpg"].freeze
 
+    IMGIX_ENABLED = Rails.configuration.imgix["enabled"]
+
     def create
         if params.has_key?(:image) && params[:image].is_a?(ActionDispatch::Http::UploadedFile)
 
@@ -50,10 +52,16 @@ class V1::ImagesController < V1::ApplicationController
                     use_accelerate_endpoint: false,
                 }
             )
-            s3url = URI(resp.public_url)
-            url = URI("https://images-rover-io.imgix.net")
-            url.path = s3url.path.gsub(/images.rover.io\//, '')
-            render json: { "image-url" => url.to_s }
+
+            image_url = URI(resp.public_url)
+
+            if IMGIX_ENABLED
+                imgix_url = URI("https://images-rover-io.imgix.net")
+                imgix_url.path = image_url.path.gsub(/images.rover.io\//, '')
+                image_url = imgix_url
+            end
+            
+            render json: { "image-url" => image_url.to_s }
         else
             head :bad_request
         end

@@ -24,6 +24,7 @@ module RailsApi
         config.sentry = Rails.application.config_for(:sentry)
         config.simulator = Rails.application.config_for(:simulator)
         config.xenio =  Rails.application.config_for(:xenio)
+        config.imgix = Rails.application.config_for(:imgix)
 
         # Autoload our libraries
         config.autoload_paths << Rails.root.join('lib')
