@@ -5,7 +5,7 @@ test:
 	${RUN} bash -c "npm install && npm test"
 
 run:
-	${RUN} bash -c "npm install && ./node_modules/nodemon/bin/nodemon.js index.js"
+	${RUN} bash -c "npm install --dev && ./node_modules/nodemon/bin/nodemon.js index.js"
 
 shell:
 	${RUN} bash

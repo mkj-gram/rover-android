@@ -1,30 +1,15 @@
 const express = require('express')
 const router = express.Router()
 
+const Helpers = require('../helpers')
 const RoverApis = require("@rover/apis")
 const SegmentClient = require("@rover/segment-client").v1.Client()
-
-
-function makeError(status, message) {
-    const error = new Error(message)
-    error.status = status
-    return error
-}
-
-
-function mustAuthenticate(req, res, next) {
-    if (req.authContext == null || req.authContext == undefined) {
-        return next(makeError(401, "Unauthorized"))
-    }
-
-    return next()
-}
 
 /*
     We force all routes inside this router to be authenticated. If we can't authenticate with auth
     we just throw and Unauthorized error which will be picked up by the main router's error logic
  */
-router.use(mustAuthenticate)
+router.use(Helpers.mustAuthenticate)
 
 /* 
     ROUTE: /v1/static-segments
@@ -56,7 +41,7 @@ router.get('/', function(req, res, next) {
 
     const request = new RoverApis.segment.v1.Models.ListStaticSegmentRequest()
 
-    request.setAuthContext(req._authContext)
+    request.setAuthContext(req.auth.context)
 
     if (req.query.sort) {
         request.setOrderBy(req.query.sort)
@@ -96,7 +81,7 @@ router.get('/:id', function(req, res, next) {
 
     const request = new RoverApis.segment.v1.Models.GetStaticSegmentRequest()
 
-    request.setAuthContext(req._authContext)
+    request.setAuthContext(req.auth.context)
     request.setId(id)
 
     SegmentClient.getStaticSegment(request, function(err, response) {
@@ -152,7 +137,7 @@ router.post('/', function(req, res, next) {
     const request = new RoverApis.segment.v1.Models.CreateStaticSegmentRequest()
 
     
-    request.setAuthContext(req._authContext)
+    request.setAuthContext(req.auth.context)
     request.setTitle(body.data.attributes.name)
 
     SegmentClient.createStaticSegment(request, function(err, response) {
@@ -181,7 +166,7 @@ router.delete('/:id', function(req, res, next) {
 
     const request = new RoverApis.segment.v1.Models.DeleteStaticSegmentRequest()
 
-    request.setAuthContext(req._authContext)
+    request.setAuthContext(req.auth.context)
     request.setId(id)
 
     SegmentClient.deleteStaticSegment(request, function(err, response) {

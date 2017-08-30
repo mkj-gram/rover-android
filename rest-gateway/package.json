@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@rover-common/grpc-codes": "../node/grpc-codes",
+    "@rover/audience-client": "../audience/clients/node",
     "@rover/auth-client": "../auth/clients/node",
     "@rover/segment-client": "../segment/clients/node",
     "body-parser": "^1.17.2",

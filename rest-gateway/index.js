@@ -29,8 +29,10 @@ app.disable('x-powered-by');
 
 /* Load Controllers */
 
+const dynamicSegmentController = require('./routes/dynamic-segments')
 const staticSegmentController = require('./routes/static-segments')
 
+app.use('/v1/dynamic-segments', dynamicSegmentController)
 app.use('/v1/static-segments', staticSegmentController)
 
 /* Add healthcheck endpoint for kubernetes */
