@@ -103,6 +103,7 @@ union BlockAction = GoToScreenAction | OpenUrlAction
 
 type BooleanPredicate implements Predicate {
   attribute: String!
+  category: String!
   booleanValue: Boolean!
   booleanComparison: String!
 }
@@ -314,6 +315,7 @@ scalar Date
 
 type DatePredicate implements Predicate {
   attribute: String!
+  category: String!
   dateValue: DateValue!
   dateComparison: String!
 }
@@ -338,8 +340,8 @@ enum DeliveryEnumType {
 type DynamicSegment {
   segmentId: ID!
   name: String!
-  data: SegmentData!
-  predicates: PredicateAggregate!
+  data: SegmentData
+  predicates: PredicateAggregate
 }
 
 # A barcode block that includes fields related to authoring/editing
@@ -645,6 +647,7 @@ input GeofenceInput {
 
 type GeofencePredicate implements Predicate {
   attribute: String!
+  category: String!
   geofenceValue: GeofenceValue!
   geofenceComparison: String!
 }
@@ -782,8 +785,11 @@ type Mutation {
   # Create a new segment
   createSegment(segment: SegmentInput): DynamicSegment
 
-  # Update a segment
-  updateSegment(segment: SegmentInput): DynamicSegment
+  # Update a segment name
+  updateSegmentName(segment: SegmentInput): DynamicSegment
+
+  # Update segment predicates
+  updateDynamicSegmentPredicates(segment: SegmentInput): DynamicSegment
 
   # archive a segment
   archiveSegment(segment: SegmentInput): String
@@ -797,6 +803,7 @@ interface Node {
 
 type NumberPredicate implements Predicate {
   attribute: String!
+  category: String!
   numberValue: [Int!]!
   numberComparison: String!
 }
@@ -838,12 +845,12 @@ enum Position {
 # Search predicate for building Segments
 interface Predicate {
   attribute: String!
+  category: String!
 }
 
 # Object containing list of device predicates and list of profile predicates
 type PredicateAggregate {
-  device: [Predicate]!
-  profile: [Predicate]!
+  predicateList: [Predicate]!
   condition: condition!
 }
 
@@ -987,6 +994,7 @@ enum StatusBarStyle {
 
 type StringPredicate implements Predicate {
   attribute: String!
+  category: String!
   stringValue: String!
   stringComparison: String!
 }
@@ -1043,6 +1051,7 @@ enum Unit {
 
 type VersionPredicate implements Predicate {
   attribute: String!
+  category: String!
   versionValue: [Int!]!
   versionComparison: String!
 }

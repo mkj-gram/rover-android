@@ -16,7 +16,7 @@ import {
 } from '@rover/react-bootstrap'
 
 import CreateSegmentMutation from '../../mutations/CreateSegmentMutation'
-import UpdateSegmentMutation from '../../mutations/UpdateSegmentMutation'
+import UpdateSegmentPredicatesMutation from '../../mutations/UpdateSegmentPredicatesMutation'
 
 class SegmentSave extends Component {
     constructor(props) {
@@ -151,15 +151,14 @@ class SegmentSave extends Component {
                     this.state.segmentName,
                     JSON.stringify(this.props.query),
                     setSegment,
-                    queryCondition.toLowerCase()
+                    queryCondition.toUpperCase()
                 )
             } else {
-                UpdateSegmentMutation(
+                UpdateSegmentPredicatesMutation(
                     this.props.segment.segmentId,
-                    null,
                     JSON.stringify(this.props.query),
                     setSegment,
-                    queryCondition.toLowerCase()
+                    queryCondition.toUpperCase()
                 )
             }
         }

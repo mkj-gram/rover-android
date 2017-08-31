@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 9e99d43461bd3c36813eb10e4970356d
+ * @relayHash 61c5890ef8fa30eeab1788f1e8a721be
  */
 
 /* eslint-disable */
@@ -9,7 +9,7 @@
 
 /*::
 import type {ConcreteBatch} from 'relay-runtime';
-export type UpdateSegmentMutationVariables = {|
+export type UpdateSegmentPredicatesMutationVariables = {|
   segment?: ?{
     id?: ?string;
     name?: ?string;
@@ -18,8 +18,8 @@ export type UpdateSegmentMutationVariables = {|
   };
 |};
 
-export type UpdateSegmentMutationResponse = {|
-  +updateSegment: ?{|
+export type UpdateSegmentPredicatesMutationResponse = {|
+  +updateDynamicSegmentPredicates: ?{|
     +segmentId: string;
     +name: string;
   |};
@@ -28,10 +28,10 @@ export type UpdateSegmentMutationResponse = {|
 
 
 /*
-mutation UpdateSegmentMutation(
+mutation UpdateSegmentPredicatesMutation(
   $segment: SegmentInput
 ) {
-  updateSegment(segment: $segment) {
+  updateDynamicSegmentPredicates(segment: $segment) {
     segmentId
     name
   }
@@ -50,7 +50,7 @@ const batch /*: ConcreteBatch*/ = {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "UpdateSegmentMutation",
+    "name": "UpdateSegmentPredicatesMutation",
     "selections": [
       {
         "kind": "LinkedField",
@@ -64,7 +64,7 @@ const batch /*: ConcreteBatch*/ = {
           }
         ],
         "concreteType": "DynamicSegment",
-        "name": "updateSegment",
+        "name": "updateDynamicSegmentPredicates",
         "plural": false,
         "selections": [
           {
@@ -90,7 +90,7 @@ const batch /*: ConcreteBatch*/ = {
   "id": null,
   "kind": "Batch",
   "metadata": {},
-  "name": "UpdateSegmentMutation",
+  "name": "UpdateSegmentPredicatesMutation",
   "query": {
     "argumentDefinitions": [
       {
@@ -101,7 +101,7 @@ const batch /*: ConcreteBatch*/ = {
       }
     ],
     "kind": "Root",
-    "name": "UpdateSegmentMutation",
+    "name": "UpdateSegmentPredicatesMutation",
     "operation": "mutation",
     "selections": [
       {
@@ -116,7 +116,7 @@ const batch /*: ConcreteBatch*/ = {
           }
         ],
         "concreteType": "DynamicSegment",
-        "name": "updateSegment",
+        "name": "updateDynamicSegmentPredicates",
         "plural": false,
         "selections": [
           {
@@ -138,7 +138,7 @@ const batch /*: ConcreteBatch*/ = {
       }
     ]
   },
-  "text": "mutation UpdateSegmentMutation(\n  $segment: SegmentInput\n) {\n  updateSegment(segment: $segment) {\n    segmentId\n    name\n  }\n}\n"
+  "text": "mutation UpdateSegmentPredicatesMutation(\n  $segment: SegmentInput\n) {\n  updateDynamicSegmentPredicates(segment: $segment) {\n    segmentId\n    name\n  }\n}\n"
 };
 
 module.exports = batch;

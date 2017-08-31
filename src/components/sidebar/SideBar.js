@@ -1,3 +1,5 @@
+//* eslint-disable no-underscore-dangle */
+/* eslint-disable no-prototype-builtins */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { graphql, createRefetchContainer } from 'react-relay'
@@ -63,7 +65,8 @@ class SideBar extends Component {
         this.handleModalOpen = this.handleModalOpen.bind(this)
         this.removeNullPredicate = this.removeNullPredicate.bind(this)
         this.getPredicateKeywords = this.getPredicateKeywords.bind(this)
-        this.shouldDisableFilterModalSuccessButton = this.shouldDisableFilterModalSuccessButton.bind(
+        this.shouldDisableFilterModalSuccessButton =
+         this.shouldDisableFilterModalSuccessButton.bind(
             this
         )
         this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
@@ -89,7 +92,7 @@ class SideBar extends Component {
                     segmentIdRefetch: false
                 })
             } else if (
-                nextProps.data.sbDynamicSegment[0] !== null &&
+                nextProps.data.sbDynamicSegment && nextProps.data.sbDynamicSegment[0] &&
                 (JSON.stringify(nextProps.data.sbDynamicSegment) !==
                     JSON.stringify(sbDynamicSegment) ||
                     nextProps.segmentIdRefetch)
@@ -124,11 +127,9 @@ class SideBar extends Component {
     viewDynamicSegment(data) {
         const { sbDynamicSegment } = data
         const { predicates } = sbDynamicSegment[0]
-        const { condition, device, profile } = predicates
+        const { condition, predicateList } = predicates
 
-        const query = device
-            .map(d => ({ ...d, category: 'device' }))
-            .concat(profile.map(p => ({ ...p, category: 'profile' })))
+        const query = predicateList.map(d => ({ ...d, category: 'device' }))
 
         this.props.setQueryCondition(condition, true, query)
 
@@ -173,7 +174,7 @@ class SideBar extends Component {
             return
         }
 
-        const { attribute, index, category } = currentAttribute
+        const { attribute, category } = currentAttribute
 
         if (attribute === '') {
             return
@@ -220,7 +221,7 @@ class SideBar extends Component {
 
         const { __typename } = predicate
 
-        const updateFn = currentPredicate => {
+        const updateFn = (currentPredicate) => {
             this.setState({
                 currentPredicate,
                 isFilterModalSuccessDisabled: this.shouldDisableFilterModalSuccessButton(
@@ -245,7 +246,7 @@ class SideBar extends Component {
             case 'GeofencePredicate':
                 return <GeofenceInput {...props} />
             case 'FloatPredicate':
-                return <NumericInput {...props} float={true} />
+                return <NumericInput {...props} float />
             default:
         }
     }
@@ -358,13 +359,13 @@ class SideBar extends Component {
 
         const onFocus = e =>
             (e.target.parentElement.style.backgroundColor = graphite)
-        const onSelect = e => {
+        const onSelect = (e) => {
             e.target.blur()
             e.target.parentElement.style.backgroundColor = slate
         }
 
         const renderArrow = () =>
-            <svg
+            (<svg
                 width="6"
                 height="20"
                 viewBox="0 0 6 20"
@@ -380,7 +381,7 @@ class SideBar extends Component {
                     points="300 84 305.799 93.731 300 103.462"
                     transform="translate(-300 -84)"
                 />
-            </svg>
+            </svg>)
 
         return (
             <div style={style} id="filterContainer">
@@ -415,7 +416,7 @@ class SideBar extends Component {
                         schema={data.segmentSchema}
                         onRequestClose={() =>
                             this.setState({ isShowingAddFilterModal: false })}
-                        onSelect={predicate => {
+                        onSelect={(predicate) => {
                             this.setState({
                                 query: query.concat(predicate),
                                 isShowingAddFilterModal: false,
@@ -440,7 +441,7 @@ class SideBar extends Component {
                         style={selectStyle}
                         isDisabled={false}
                         value={queryCondition}
-                        onChange={e => {
+                        onChange={(e) => {
                             onSelect(e)
                             this.props.setQueryCondition(
                                 e.target.value,
@@ -574,8 +575,8 @@ class SideBar extends Component {
         const elem = currentPredicate || query[query.length - 1]
         const typename = elem.__typename
         const value =
-            typename.slice(0, typename.indexOf('Predicate')).toLowerCase() +
-            'Value'
+            `${typename.slice(0, typename.indexOf('Predicate')).toLowerCase()
+            }Value`
 
         return { elem, value }
     }
@@ -766,48 +767,11 @@ export default createRefetchContainer(
                 name
                 predicates {
                     condition
-                    device {
+                    predicateList {
                         ... on Predicate {
                             __typename
                             attribute
-                            ... on StringPredicate {
-                                stringValue
-                                stringComparison
-                            }
-                            ... on VersionPredicate {
-                                versionValue
-                                versionComparison
-                            }
-                            ... on DatePredicate {
-                                dateValue {
-                                    start
-                                    end
-                                }
-                                dateComparison
-                            }
-                            ... on BooleanPredicate {
-                                booleanValue
-                                booleanComparison
-                            }
-                            ... on NumberPredicate {
-                                numberValue
-                                numberComparison
-                            }
-                            ... on GeofencePredicate {
-                                geofenceValue {
-                                    latitude
-                                    longitude
-                                    radius
-                                    name
-                                }
-                                geofenceComparison
-                            }
-                        }
-                    }
-                    profile {
-                        ... on Predicate {
-                            __typename
-                            attribute
+                            category
                             ... on StringPredicate {
                                 stringValue
                                 stringComparison
