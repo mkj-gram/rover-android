@@ -83,11 +83,22 @@ function createRecords(records, segmentSize, page) {
             propensities: ['fishing', 'food']
         })
     }
+    const dataGridRows = devices.map((device) => {
+        const { profileId } = device
+        if (profileId) {
+            return {
+                ...device,
+                ...profiles.filter(
+                    profile => profile.profileId === profileId
+                )[0]
+            }
+        }
+        return {}
+    })
     return {
         segmentSize: segmentSize,
         totalSize: 1000,
-        devices: devices,
-        profiles: profiles
+        dataGridRows
     }
 }
 

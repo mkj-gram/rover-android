@@ -44,3 +44,18 @@
   "push_token_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
   "push_token_unregistered_at": null
 }
+
+{
+  "_id":{"$oid":"bbbbbbbbbbbbbbbbbbbbbbbc"},
+  "device_id":"BBBBBBBBc",
+  "profile_id":{"$oid":"bbbbbbbbbbbbbbbbbbbbbbbb"},
+  "account_id":20,
+  "created_at":{"$date":"2017-06-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-06-14T15:44:18.497Z"},
+
+  "push_token_key": "token:bbbbbbbbbbbbbbbbbbbbbbbb",
+  "push_token_is_active": true,
+  "push_token_created_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "push_token_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "push_token_unregistered_at": null
+}

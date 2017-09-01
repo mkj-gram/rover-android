@@ -68,10 +68,20 @@ func Generate(accountId int32, size int32) *audience.QueryResponse {
 		}
 		d.LocaleLanguage = "en"
 		d.LocaleRegion = "us"
+		d.LocaleScript ="Hans"
 		d.CarrierName = "rogers"
 		d.TimeZone = "America/Toronto"
 		d.Platform = audience.Platform_MOBILE
-
+		d.IsWifiEnabled = true
+		d.IsCellularEnabled = false
+		d.ScreenWidth = 320
+		d.ScreenHeight = 480
+		d.Radio = "LTE"
+		d.IsBluetoothEnabled = true
+		d.AdvertisingId = "13F56082-25AC-47F2-A553-8C1C96468C5D"
+		d.Ip = "206.248.180.234"
+		d.LocationLatitude = 43.6414
+		d.LocationLongitude = -79.3894
 	}
 
 	return &audience.QueryResponse{
