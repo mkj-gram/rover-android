@@ -11,7 +11,7 @@ class Audience extends Component {
                 segmentId: '',
                 name: ''
             },
-            predicates: '{"profiles":[],"devices":[],"condition":"ALL"}',
+            predicates: '[]',
             pageNumber: 0,
             resetPagination: false,
             context: 'predicates',
@@ -20,6 +20,7 @@ class Audience extends Component {
                 showSaveButton: false
             },
             refetchData: true,
+            refetchSideBar: true,
             reset: false,
             queryCondition: 'ALL'
         }
@@ -47,7 +48,8 @@ class Audience extends Component {
             this.setState({
                 queryCondition,
                 segmentIdRefetch: false,
-                refetchData: (pred.profiles.length !== 0 || pred.devices.length !== 0),
+                refetchData: (pred.query && pred.query.length !== 0),
+                refetchSideBar: false,
                 predicates: this.formatQuery(query, queryCondition),
                 resetPagination: true,
                 pageNumber: 0,
@@ -64,6 +66,7 @@ class Audience extends Component {
             pageNumber: 0,
             context: 'segments',
             refetchData: true,
+            refetchSideBar: true,
             segmentIdRefetch: true,
             reset: false
         })
@@ -77,6 +80,7 @@ class Audience extends Component {
             pageNumber: 0,
             context: 'predicates',
             refetchData: true,
+            refetchSideBar: false,
             segmentIdRefetch: false,
             reset: false
         })
@@ -86,20 +90,9 @@ class Audience extends Component {
         this.setState({ saveStates })
     }
 
-    formatQuery(rawQuery, condition) {
-        const profiles = []
-        const devices = []
-        rawQuery.forEach((query) => {
-            if (query.category === 'profile') {
-                profiles.push(query)
-            } else {
-                devices.push(query)
-            }
-        })
-
+    formatQuery(query, condition) {
         const val = {
-            profiles,
-            devices,
+            query,
             condition
         }
 
@@ -122,7 +115,7 @@ class Audience extends Component {
                     segmentId: '',
                     name: ''
                 },
-                predicates: '{"profiles":[],"devices":[],"condition":"ANY"}',
+                predicates: '[]',
                 pageNumber: 0,
                 resetPagination: true,
                 context: 'predicates',
@@ -131,6 +124,7 @@ class Audience extends Component {
                     showSaveButton: false
                 },
                 refetchData: false,
+                refetchSideBar: false,
                 reset: true
             })
         }
@@ -145,6 +139,7 @@ class Audience extends Component {
             segment,
             context: 'segments',
             refetchData: false,
+            refetchSideBar: false,
             saveStates: {
                 isSegmentUpdate: false,
                 showSaveButton: false
@@ -172,7 +167,7 @@ class Audience extends Component {
                     getSegment={this.getSegment}
                     updateQuery={this.updateQuery}
                     saveStates={saveStates}
-                    refetchData={refetchData}
+                    refetchData={this.state.refetchSideBar}
                     setSegment={this.setSegment}
                     segmentIdRefetch={this.state.segmentIdRefetch}
                     updateSegmentName={this.updateSegmentName}

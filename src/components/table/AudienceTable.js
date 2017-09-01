@@ -21,7 +21,6 @@ class AudienceTable extends Component {
             },
             segmentId: '',
             predicates: '[]',
-            formattedData: {},
             renderFetchEnabled: null,
             columns: [],
             rows: [],
@@ -36,7 +35,7 @@ class AudienceTable extends Component {
                     divWidth: 0
                 }
             },
-            profiles: [],
+            dataGridRows: [],
             group: 0,
             refetched: false,
             adgDynamicSegment: []
@@ -53,7 +52,7 @@ class AudienceTable extends Component {
         this.getAllColumns = this.getAllColumns.bind(this)
         this.updateChecked = this.updateChecked.bind(this)
         this.getSetCachedColumns = this.getSetCachedColumns.bind(this)
-        this.refetchCallback = this.refetchCallback.bind(this)
+        this.updateContextData = this.updateContextData.bind(this)
         this.updateDynamicSegments = this.updateDynamicSegments.bind(this)
         this.renderFetch = this.renderFetch.bind(this)
         this.fetchData = this.fetchData.bind(this)
@@ -63,8 +62,7 @@ class AudienceTable extends Component {
         const { data } = this.props
         const { deviceSchema, profileSchema } = data.adgSegmentSchema
         const {
-            devices,
-            profiles,
+            dataGridRows,
             segmentSize,
             totalSize
         } = data.adgSegmentsFromPredicates
@@ -72,19 +70,20 @@ class AudienceTable extends Component {
         this.getSetCachedColumns()
 
         this.getAllColumns(deviceSchema, profileSchema)
-        this.createRowsAndColumns(devices, profiles)
-        this.setState({ segmentSize, totalSize, devices, profiles })
+        this.createRowsAndColumns(dataGridRows)
+        this.setState({ segmentSize, totalSize, dataGridRows })
     }
 
     getSetCachedColumns() {
         // HardCoded default selected Columns
         const selectedColumns = {
-            deviceId: 'StringPredicate',
-            deviceOS: 'StringPredicate',
-            deviceOSVersion: 'VersionPredicate',
-            model: 'StringPredicate',
-            appVersion: 'StringPredicate',
-            firstName: 'StringPredicate'
+            device_id: 'StringPredicate',
+            device_manufacturer: 'StringPredicate',
+            os_version: 'VersionPredicate',
+            device_model: 'StringPredicate',
+            sdk_version: 'VersionPredicate',
+            app_version: 'StringPredicate',
+            profile_id: 'StringPredicate'
         }
 
         const cachedSelectedColumns = JSON.parse(
@@ -147,67 +146,32 @@ class AudienceTable extends Component {
             JSON.stringify(cachedSelectedColumns)
         )
 
-        this.createRowsAndColumns(this.state.devices, this.state.profiles)
-    }
-
-    refetchCallback(error, nextProps) {
-        const group = Math.floor(nextProps.pageNumber / 3) * 3
-        const { setSaveState } = this.props
-
-        if (!error) {
-            if (nextProps.context === 'predicates') {
-                this.setState({
-                    predicates: nextProps.predicates,
-                    renderFetchEnabled: true,
-                    group,
-                    refetched: true
-                })
-
-                const predicates = JSON.parse(nextProps.predicates)
-
-                setSaveState({
-                    isSegmentUpdate: this.state.segmentId !== '',
-                    showSaveButton:
-                        (predicates.devices.length !== 0 ||
-                        predicates.profiles.length !== 0)
-                })
-            } else if (nextProps.context === 'segments') {
-                this.setState({
-                    segmentId: nextProps.segmentId,
-                    renderFetchEnabled: false,
-                    group,
-                    refetched: true
-                })
-                setSaveState({
-                    isSegmentUpdate: false,
-                    showSaveButton: false
-                })
-            }
-        } else {
-            console.log(`Error: ${error}`)
-        }
+        this.createRowsAndColumns(this.state.dataGridRows)
     }
 
     fetchData(nextProps) {
         const { relay } = this.props
         let refetchVariables
+
         if (
             nextProps.context === 'predicates' && (
             JSON.stringify(this.props.predicates) !==
                 JSON.stringify(nextProps.predicates) || !(nextProps.pageNumber >= this.state.group &&
                     nextProps.pageNumber < this.state.group + 3) )
         ) {
+            const predicates = JSON.parse(nextProps.predicates)
             refetchVariables = fragmentVariables => ({
                 includeSegmentsFromPredicates: true,
                 includeDynamicSegment: false,
-                predicates: nextProps.predicates,
+                predicates: JSON.stringify(predicates.query) || '[]',
                 segmentId: '',
-                pageNumber: Math.floor(nextProps.pageNumber / 3)
+                pageNumber: Math.floor(nextProps.pageNumber / 3),
+                condition: predicates.condition
             })
             relay.refetch(
                 refetchVariables,
                 null,
-                error => this.refetchCallback(error, nextProps),
+                error => { (error !== undefined) ? console.log(`Error: ${error}`) : ''},
                 { force: true }
             )
         } else if (nextProps.context === 'segments') {
@@ -216,13 +180,14 @@ class AudienceTable extends Component {
                 includeDynamicSegment: true,
                 segmentId: nextProps.segmentId,
                 predicates: '[]',
-                pageNumber: Math.floor(nextProps.pageNumber / 3)
+                pageNumber: Math.floor(nextProps.pageNumber / 3),
+                condition: 'ANY'
             })
 
             relay.refetch(
                 refetchVariables,
                 null,
-                error => this.refetchCallback(error, nextProps),
+                error => { (error !== undefined) ? console.log(`Error: ${error}`) : ''},
                 { force: true }
             )
         }
@@ -238,7 +203,6 @@ class AudienceTable extends Component {
             if (nextProps.resetPagination) {
                 this.setState({ group: 0 })
             }
-
             if (!refetched) {
                 if (
                     nextProps.pageNumber >= this.state.group &&
@@ -247,15 +211,17 @@ class AudienceTable extends Component {
                 ) {
                     this.setState({
                         rows: this.getSelectedRows(
-                            this.state.profiles,
-                            this.state.devices,
+                            this.state.dataGridRows,
                             nextProps.pageNumber
                         )
                     })
                 } else {
-                    this.fetchData(nextProps)
+                    this.setState({
+                        refetched: true
+                    }, this.fetchData(nextProps))
                 }
-            } else if (renderFetchEnabled !== null) {
+            } else if (renderFetchEnabled === null) {
+                this.updateContextData(nextProps)
                 this.renderFetch(nextProps)
             }
         } else {
@@ -270,32 +236,53 @@ class AudienceTable extends Component {
         }
     }
 
-      renderFetch(nextProps) {
-        let devices, profiles, segmentSize, totalSize
-        const { renderFetchEnabled } = this.state
+    updateContextData(nextProps) {
+        const { setSaveState } = this.props
+        const group = Math.floor(nextProps.pageNumber / 3) * 3
+        if (nextProps.context === 'predicates') {
+            this.setState({
+                predicates: nextProps.predicates,
+                renderFetchEnabled: true,
+                group,
+                refetched: true
+            })
 
-        if (renderFetchEnabled) {
-            ;({
-                devices,
-                profiles,
-                segmentSize,
-                totalSize
-            } = nextProps.data.adgSegmentsFromPredicates)
+            const predicates = JSON.parse(nextProps.predicates)
+
+            setSaveState({
+                isSegmentUpdate: this.state.segmentId !== '',
+                showSaveButton:
+                    (predicates.query && predicates.query.length !== 0)
+            })
+        } else if (nextProps.context === 'segments') {
+            this.setState({
+                segmentId: nextProps.segmentId,
+                renderFetchEnabled: false,
+                group,
+                refetched: true
+            })
+            setSaveState({
+                isSegmentUpdate: false,
+                showSaveButton: false
+            })
+        }
+    }
+
+    renderFetch(nextProps) {
+        const { renderFetchEnabled } = this.state
+        let dataSource
+        if (nextProps.data.adgDynamicSegment && nextProps.data.adgDynamicSegment[0].data) {
+            dataSource = nextProps.data.adgDynamicSegment[0].data
         } else {
-            ;({
-                devices,
-                profiles,
-                segmentSize,
-                totalSize
-            } = nextProps.data.adgDynamicSegment[0].data)
+            dataSource = nextProps.data.adgSegmentsFromPredicates
         }
 
+        const { dataGridRows, segmentSize, totalSize } = dataSource
         this.setState({
-            rows: this.getSelectedRows(profiles, devices, nextProps.pageNumber),
+            rows: this.getSelectedRows(dataGridRows, nextProps.pageNumber),
             segmentSize,
             totalSize,
-            profiles,
-            devices,
+            dataGridRows,
             renderFetchEnabled: null,
             refetched: false
         })
@@ -307,30 +294,18 @@ class AudienceTable extends Component {
         })
     }
 
-    getSelectedRows(profiles, devices, pageNum = 0) {
+    getSelectedRows(dataGridRows, pageNum = 0) {
         const selectedColumns = JSON.parse(
             localStorage.getItem('selectedColumns')
         )
-
-        const concatData = devices.map((device) => {
-            const { profileId } = device
-            if (profileId) {
-                return {
-                    ...device,
-                    ...profiles.filter(
-                        profile => profile.profileId === profileId
-                    )[0]
-                }
-            }
-            return {}
-        })
-        const rows = concatData.map((data) => {
-            const row = {}
-            Object.keys(data).forEach((key) => {
-                if (key in selectedColumns) {
-                    row[key] = this.formatRowData(
-                        data[key],
-                        selectedColumns[key]
+         
+        const rows = dataGridRows.map(data => {
+            let row = {}
+            data.forEach(property => {
+                if (property.attribute in selectedColumns) {
+                    row[property.attribute] = this.formatRowData(
+                        property.value,
+                        selectedColumns[property.attribute]
                     )
                 }
             })
@@ -373,9 +348,9 @@ class AudienceTable extends Component {
         }
     }
 
-    createRowsAndColumns(devices, profiles) {
+    createRowsAndColumns(dataGridRows) {
         const columns = this.getSelectedColumns()
-        const rows = this.getSelectedRows(profiles, devices)
+        const rows = this.getSelectedRows(dataGridRows)
 
         this.setState({
             columns,
@@ -519,8 +494,9 @@ export default createRefetchContainer(
                     defaultValue: true
                 }
                 predicates: { type: "String!", defaultValue: "[]" }
-                includeDynamicSegment: { type: "Boolean!", defaultValue: true }
+                includeDynamicSegment: { type: "Boolean!", defaultValue: false }
                 pageNumber: { type: "Int", defaultValue: 0 }
+                condition: { type: "String", defaultValue: "ANY" }
             ) {
             adgDynamicSegment: dynamicSegment(
                 segmentId: $segmentId
@@ -533,8 +509,7 @@ export default createRefetchContainer(
                     data {
                         segmentSize
                         totalSize
-                        devices
-                        profiles
+                        dataGridRows
                     }
                 }
             }
@@ -556,13 +531,13 @@ export default createRefetchContainer(
                 predicates: $predicates
                 pageNumber: $pageNumber
                 pageSize: 150
+                condition: $condition       
             ) {
                 ... on SegmentData
                     @include(if: $includeSegmentsFromPredicates) {
                     segmentSize
                     totalSize
-                    devices
-                    profiles
+                    dataGridRows
                 }
             }
         }
@@ -574,6 +549,7 @@ export default createRefetchContainer(
             $predicates: String!
             $includeDynamicSegment: Boolean!
             $pageNumber: Int
+            $condition: String
         ) {
             ...AudienceTable
                 @arguments(
@@ -582,6 +558,7 @@ export default createRefetchContainer(
                     predicates: $predicates
                     includeDynamicSegment: $includeDynamicSegment
                     pageNumber: $pageNumber
+                    condition: $condition
                 )
         }
     `
