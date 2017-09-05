@@ -7,7 +7,7 @@ volumes:
 services:
 
   mongo:
-    image: mongo
+    image: mongo:3.4.4
     ports: [27017]
     volumes:
       - ../../rover:/rover
@@ -29,7 +29,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   auth-service:
-    image: golang:1.8-alpine
+    image: golang:1.9-alpine
     links: [postgres]
     ports: [5100, 5080]
     command: ./docker/auth-service/cmd test run
@@ -41,7 +41,7 @@ services:
       DB_DSN: "postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable"
 
   audience-service:
-    image: golang:1.8-alpine
+    image: golang:1.9-alpine
     links: [mongo]
     ports: [5100, 5080]
     command: ./docker/audience-service/cmd test run
