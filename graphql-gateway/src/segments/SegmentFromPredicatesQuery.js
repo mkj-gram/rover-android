@@ -5,7 +5,7 @@ import { getSegmentPageByPredicates } from './SegmentRowsQuery'
 
 import { audienceClient } from '../grpcClients'
 import { buildPredicateAggregate, profileFromProto, deviceFromProto } from '../grpc/grpc-helpers'
-import promisify from '../../../node/grpc-promisify'
+import promisify from '@rover-common/grpc-promisify'
 
 
 promisify(audienceClient)
