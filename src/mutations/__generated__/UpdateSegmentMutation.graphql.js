@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 1fdd260485549809199c84b2e1151018
+ * @relayHash 9e99d43461bd3c36813eb10e4970356d
  */
 
 /* eslint-disable */
@@ -14,6 +14,7 @@ export type UpdateSegmentMutationVariables = {|
     id?: ?string;
     name?: ?string;
     predicates?: ?any;
+    queryCondition?: ?string;
   };
 |};
 

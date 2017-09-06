@@ -870,7 +870,7 @@ type Query {
   experience(id: ID!): Experience
   editableExperience(id: ID!): EditableExperience
   dynamicSegment(segmentId: ID, pageNumber: Int, pageSize: Int): [DynamicSegment]
-  segmentFromPredicates(predicates: String!, pageNumber: Int, pageSize: Int): SegmentData
+  segmentFromPredicates(predicates: String!, pageNumber: Int, pageSize: Int, condition: String): SegmentData
   segmentSchema: SegmentSchema
   sync: SyncResult
 }
@@ -935,6 +935,7 @@ input ScheduleInput {
 # Name and Type of attribute available in SegmentSchema
 type SchemaAttribute {
   attribute: String!
+  label: String!
   type: String!
 }
 
@@ -961,8 +962,7 @@ type Screen implements HasBackground {
 
 # Payload from a segment page
 type SegmentData {
-  devices: [JSON!]!
-  profiles: [JSON!]!
+  dataGridRows: [JSON!]!
   segmentSize: Int!
   totalSize: Int!
 }
@@ -971,6 +971,7 @@ input SegmentInput {
   id: String
   name: String
   predicates: JSON
+  queryCondition: String
 }
 
 # Schema of available predicate attributes

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 922bb2fbedd58157b95e191c6b5f0e6f
+ * @relayHash ae8ed2c20ec8dc47a974f28cb378f617
  */
 
 /* eslint-disable */
@@ -14,6 +14,7 @@ export type ArchiveSegmentMutationVariables = {|
     id?: ?string;
     name?: ?string;
     predicates?: ?any;
+    queryCondition?: ?string;
   };
 |};
 
