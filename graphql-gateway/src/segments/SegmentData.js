@@ -12,13 +12,9 @@ const SegmentData = new GraphQLObjectType({
     name: 'SegmentData',
     description: 'Payload from a segment page',
     fields: () => ({
-        devices: {
+        dataGridRows: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLJSON))),
-            resolve: data => data.devices
-        },
-        profiles: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLJSON))),
-            resolve: data => data.profiles
+            resolve: data => data.dataGridRows
         },
         segmentSize: {
             type: new GraphQLNonNull(GraphQLInt),
