@@ -10,17 +10,20 @@ let mockPredicateData = {
                     {
                         attribute: 'hardware',
                         stringValue: 'iPhone 3G',
-                        stringComparison: 'is'
+                        stringComparison: 'is',
+                        model: 'device'
                     },
                     {
                         attribute: 'SDKVersion',
                         versionValue: [4, 0, 0],
-                        versionComparison: 'greater than or equal'
+                        versionComparison: 'greater than or equal',
+                        model: 'device'
                     },
                     {
                         attribute: 'bluetoothOn',
                         booleanValue: false,
-                        booleanComparison: 'false'
+                        booleanComparison: 'false',
+                        model: 'device'
                     },
                     {
                         attribute: 'lastSeen',
@@ -28,19 +31,22 @@ let mockPredicateData = {
                             start: new Date().toISOString(),
                             end: new Date().toISOString()
                         },
-                        dateComparison: 'before'
+                        dateComparison: 'before',
+                        model: 'device'
                     }
                 ],
                 profile: [
                     {
                         attribute: 'age',
                         numberValue: [20],
-                        numberComparison: 'less than'
+                        numberComparison: 'less than',
+                        model: 'profile'
                     },
                     {
                         attribute: 'first name',
                         stringValue: 'Alex',
-                        stringComparison: 'is'
+                        stringComparison: 'is',
+                        model: 'profile'
                     },
                     {
                         attribute: 'last location',
@@ -50,7 +56,8 @@ let mockPredicateData = {
                             radius: 100,
                             name: 'geo1'
                         },
-                        geofenceComparison: 'is within'
+                        geofenceComparison: 'is within',
+                        model: 'profile'
                     }
                 ],
                 condition: 'any'
@@ -68,17 +75,20 @@ let mockPredicateData = {
                     {
                         attribute: 'hardware',
                         stringValue: 'iPhone 4',
-                        stringComparison: 'is'
+                        stringComparison: 'is',
+                        model: 'device'
                     },
                     {
                         attribute: 'SDKVersion',
                         versionValue: [2, 0, 0],
-                        versionComparison: 'greater than or equal'
+                        versionComparison: 'greater than or equal',
+                        model: 'device'
                     },
                     {
                         attribute: 'bluetoothOn',
                         booleanValue: true,
-                        booleanComparison: 'true'
+                        booleanComparison: 'true',
+                        model: 'device'
                     },
                     {
                         attribute: 'lastSeen',
@@ -86,19 +96,22 @@ let mockPredicateData = {
                             start: new Date().toISOString(),
                             end: new Date().toISOString()
                         },
-                        dateComparison: 'before'
+                        dateComparison: 'before',
+                        model: 'device'
                     }
                 ],
                 profile: [
                     {
                         attribute: 'age',
                         numberValue: [32],
-                        numberComparison: 'less than'
+                        numberComparison: 'less than',
+                        model: 'profile'
                     },
                     {
                         attribute: 'first name',
                         stringValue: 'Will',
-                        stringComparison: 'is'
+                        stringComparison: 'is',
+                        model: 'profile'
                     },
                     {
                         attribute: 'last location',
@@ -108,7 +121,8 @@ let mockPredicateData = {
                             radius: 100,
                             name: 'geo2'
                         },
-                        geofenceComparison: 'is within'
+                        geofenceComparison: 'is within',
+                        model: 'profile'
                     }
                 ],
                 condition: 'any'
@@ -325,5 +339,6 @@ export function getSegment(segmentId, pageNumber, pageSize) {
 
     mockPredicateData[segmentId][0].pageNumber = pageNumber
     mockPredicateData[segmentId][0].pageSize = pageSize
+    mockPredicateData[segmentId][0].predicates.predicateList = mockPredicateData[segmentId][0].predicates.device.concat(mockPredicateData[segmentId][0].predicates.profile)
     return mockPredicateData[segmentId]
 }

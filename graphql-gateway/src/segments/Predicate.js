@@ -16,8 +16,10 @@ const Predicate = new GraphQLInterfaceType({
     description: 'Search predicate for building Segments',
     fields: () => ({
         attribute: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: predicate => predicate.attribute
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        category: {
+            type: new GraphQLNonNull(GraphQLString)
         }
     })
 })
@@ -27,8 +29,10 @@ export const StringPredicate = new GraphQLObjectType({
     interfaces: [Predicate],
     fields: () => ({
         attribute: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: predicate => predicate.attribute
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        category: {
+            type: new GraphQLNonNull(GraphQLString)
         },
         stringValue: {
             type: new GraphQLNonNull(GraphQLString),
@@ -47,8 +51,10 @@ export const BooleanPredicate = new GraphQLObjectType({
     interfaces: [Predicate],
     fields: () => ({
         attribute: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: predicate => predicate.attribute
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        category: {
+            type: new GraphQLNonNull(GraphQLString)
         },
         booleanValue: {
             type: new GraphQLNonNull(GraphQLBoolean),
@@ -67,8 +73,10 @@ export const NumberPredicate = new GraphQLObjectType({
     interfaces: [Predicate],
     fields: () => ({
         attribute: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: predicate => predicate.attribute
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        category: {
+            type: new GraphQLNonNull(GraphQLString)
         },
         numberValue: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLInt))),
@@ -87,8 +95,10 @@ export const FloatPredicate = new GraphQLObjectType({
     interfaces: [Predicate],
     fields: () => ({
         attribute: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: predicate => predicate.attribute
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        category: {
+            type: new GraphQLNonNull(GraphQLString)
         },
         floatValue: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLFloat))),
@@ -107,8 +117,10 @@ export const DatePredicate = new GraphQLObjectType({
     interfaces: [Predicate],
     fields: () => ({
         attribute: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: predicate => predicate.attribute
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        category: {
+            type: new GraphQLNonNull(GraphQLString)
         },
         dateValue: {
             type: new GraphQLNonNull(DateValue),
@@ -139,8 +151,10 @@ export const VersionPredicate = new GraphQLObjectType({
     interfaces: [Predicate],
     fields: () => ({
         attribute: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: predicate => predicate.attribute
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        category: {
+            type: new GraphQLNonNull(GraphQLString)
         },
         versionValue: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLInt))),
@@ -159,8 +173,10 @@ export const GeofencePredicate = new GraphQLObjectType({
     interfaces: [Predicate],
     fields: () => ({
         attribute: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: predicate => predicate.attribute
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        category: {
+            type: new GraphQLNonNull(GraphQLString)
         },
         geofenceValue: {
             type: new GraphQLNonNull(GeofenceValue),

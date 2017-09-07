@@ -162,7 +162,6 @@ export const getSegmentPageByPredicates = (
     pageSize
 ) => {
     let ret
-
     if (
         predicates.length == 0 ||
         (predicates['profiles'] &&

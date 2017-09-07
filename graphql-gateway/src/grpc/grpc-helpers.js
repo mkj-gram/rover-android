@@ -224,23 +224,30 @@ export const buildVersionPredicate = ({
         default:
             comparison = 1
     }
+
     const versionPredicate = new RoverApis.audience.v1.Models.VersionPredicate()
     versionPredicate.setOp(comparison)
     versionPredicate.setAttributeName(attribute)
+
     const value = new RoverApis.audience.v1.Models.Version()
     const value2 = new RoverApis.audience.v1.Models.Version()
+
     value.setMajor(versionValue[0][0])
     value.setMinor(versionValue[0][1])
     value.setRevision(versionValue[0][2])
+
     if (versionValue[1]) {
         value2.setMajor(versionValue[1][0])
         value2.setMinor(versionValue[1][1])
         value2.setRevision(versionValue[1][2])
     }
+
     versionPredicate.setValue(value)
     versionPredicate.setValue2(value2)
+
     return versionPredicate
 }
+
 export const buildGeofencePredicate = ({
     attribute,
     geofenceComparison,
@@ -248,16 +255,9 @@ export const buildGeofencePredicate = ({
 }) => {
     // IS_SET                   = 1;
     //
-    // IS_EQUAL                 = 2;
-    // IS_NOT_EQUAL             = 3;
-    //
-    // IS_GREATER_THAN          = 4;
-    // IS_LESS_THAN             = 5;
-    //
-    // IS_BETWEEN               = 6;
-    //
-    // IS_GREATER_THAN_OR_EQUAL = 7;
-    // IS_LESS_THAN_OR_EQUAL    = 8;
+    // IS_OUTSIDE                 = 2;
+    // IS_WITHIN             = 3;
+    
     let comparison
     switch (geofenceComparison) {
         case 'is unset':

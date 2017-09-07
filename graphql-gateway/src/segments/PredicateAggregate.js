@@ -5,13 +5,8 @@ const PredicateAggregate = new GraphQLObjectType({
     name: 'PredicateAggregate',
     description: 'Object containing list of device predicates and list of profile predicates',
     fields: () => ({
-        device: {
-            type: new GraphQLNonNull(new GraphQLList(Predicate)),
-            resolve: ({ device }) => device
-        },
-        profile: {
-            type: new GraphQLNonNull(new GraphQLList(Predicate)),
-            resolve: ({ profile }) => profile
+        predicateList: {
+            type: new GraphQLNonNull(new GraphQLList(Predicate))
         },
         condition: {
             type: new GraphQLNonNull(new GraphQLEnumType({
@@ -19,14 +14,13 @@ const PredicateAggregate = new GraphQLObjectType({
                                 name: 'condition',
                                 values: {
                                     ANY: {
-                                        value: 'any'
+                                        value: 'ANY'
                                     },
                                     ALL: {
-                                        value: 'all'
+                                        value: 'ALL'
                                     }
                                 }
-                            })),
-            resolve: ({ condition }) => condition
+                            }))
         }
     })
 })

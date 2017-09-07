@@ -8,12 +8,12 @@ import schema from './schema'
 
 import RoverApis from '@rover/apis'
 import Auth from '@rover/auth-client'
+import { authClient } from './grpcClients'
 
 import 'babel-polyfill'
 
 dotenv.config()
 
-const authClient = Auth.v1.Client()
 const authMiddleware = Auth.v1.Middleware(authClient)
 
 const app = express()
@@ -36,6 +36,14 @@ app.use('/graphql', cors(), authMiddleware, graphqlHTTP(req => ({
         authContext: req.auth && req.auth.context,
         deviceId: req.headers['x-rover-device-id'],
         profileId: req.headers['x-rover-profile-id'],
+    },
+    formatError: (error) => {
+        return {
+            message: error.message,
+            locations: error.locations,
+            stack: error.stack,
+            path: error.path
+        }
     }
 })))
 
