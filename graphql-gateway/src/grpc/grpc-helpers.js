@@ -428,7 +428,11 @@ export const deviceFromProto = (devices, d) => {
         device_id: d.getDeviceId(),
         is_test_device: d.getIsTestDevice(),
         platform: d.getPlatform(),
-        profile_id: d.getProfileId()
+        profile_id: d.getProfileId(),
+        push_token_is_active: d.getPushTokenIsActive(),
+        region_monitoring_mode: d.getRegionMonitoringMode(),
+        is_background_enabled: d.getIsBackgroundEnabled(),
+        is_location_monitoring_enabled: d.getIsLocationMonitoringEnabled()
     }
 
     devices[d.getProfileId()] = Object.keys(props).map(p => {

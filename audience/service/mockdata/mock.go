@@ -82,6 +82,10 @@ func Generate(accountId int32, size int32) *audience.QueryResponse {
 		d.Ip = "206.248.180.234"
 		d.LocationLatitude = 43.6414
 		d.LocationLongitude = -79.3894
+		d.PushTokenIsActive = false
+		d.RegionMonitoringMode = 2
+		d.IsBackgroundEnabled = true
+		d.IsLocationMonitoringEnabled = false
 	}
 
 	return &audience.QueryResponse{
