@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { createFragmentContainer, graphql } from 'react-relay'
 import SegmentSelection from './SegmentSelection'
 import SegmentSave from './SegmentSave'
-import UpdateSegmentMutation from '../../mutations/UpdateSegmentMutation'
+import UpdateSegmentNameMutation from '../../mutations/UpdateSegmentNameMutation'
 import ArchiveSegmentMutation from '../../mutations/ArchiveSegmentMutation'
 
 class SegmentsContainer extends Component {
@@ -37,7 +37,7 @@ class SegmentsContainer extends Component {
         const segments = JSON.parse(JSON.stringify(this.props.segments))
         segments[index].name = value.length !== 0 ? value : `No Name ${index}`
 
-        UpdateSegmentMutation(
+        UpdateSegmentNameMutation(
             segments[index].segmentId,
             segments[index].name,
             null,
