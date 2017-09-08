@@ -240,7 +240,7 @@ export const getDeviceLabel = (attribute) => {
     if (obj) {
         return obj.label
     } else {
-        return property.attribute
+        return attribute
     }
   
 }
