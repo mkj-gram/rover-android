@@ -8,14 +8,6 @@ export const getDeviceSchema = () => [
             filter: true
         },
         {
-            attribute: 'push_token_is_active',
-            label: 'push_token_is_active',  // Need label
-            __typename: 'BooleanPredicate',
-            group: null,
-            display: false,
-            filter: true
-        },
-        {
             attribute: 'app_version',
             label: 'App Version',
             __typename: 'StringPredicate',
@@ -128,22 +120,6 @@ export const getDeviceSchema = () => [
             filter: true
         },
         {
-            attribute: 'is_background_enabled', 
-            label: 'is_background_enabled', // Need label
-            __typename: 'BooleanPredicate',
-            group: null,
-            display: false,
-            filter: true
-        },
-        {
-            attribute: 'is_location_monitoring_enabled', 
-            label: 'is_location_monitoring_enabled', // Need label
-            __typename: 'BooleanPredicate',
-            group: null,
-            display: false,
-            filter: true
-        },
-        {
             attribute: 'is_bluetooth_enabled',
             label: 'Bluetooth', 
             __typename: 'BooleanPredicate',
@@ -221,14 +197,6 @@ export const getDeviceSchema = () => [
             __typename: 'StringPredicate',
             group: null,
             display: true,
-            filter: true
-        },
-        {
-            attribute: 'region_monitoring_mode',
-            label: 'region_monitoring_mode', // Need label
-            __typename: 'StringPredicate',
-            group: null,
-            display: false,
             filter: true
         }
         // {
