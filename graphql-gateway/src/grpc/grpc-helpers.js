@@ -128,6 +128,56 @@ export const buildNumberPredicate = ({
     numberPredicate.setValue2(numberValue[1])
     return numberPredicate
 }
+
+export const buildFloatPredicate = ({
+    attribute,
+    floatComparison,
+    floatValue
+}) => {
+    // IS_UNSET        = 0;
+    // IS_SET          = 1;
+    //
+    // IS_EQUAL        = 2;
+    // IS_NOT_EQUAL    = 3;
+    //
+    // IS_GREATER_THAN = 4;
+    // IS_LESS_THAN    = 5;
+    //
+    // IS_BETWEEN      = 6;
+    let comparison
+    switch (floatComparison) {
+        case 'is unset':
+            comparison = 0
+            break
+        case 'is set':
+            comparison = 1
+            break
+        case 'is equal':
+            comparison = 2
+            break
+        case 'is not equal':
+            comparison = 3
+            break
+        case 'is greater than':
+            comparison = 4
+            break
+        case 'is less than':
+            comparison = 5
+            break
+        case 'is between':
+            comparison = 6
+            break
+        default:
+            comparison = 1
+    }
+    const floatPredicate = new RoverApis.audience.v1.Models.DoublePredicate()
+    floatPredicate.setAttributeName(attribute)
+    floatPredicate.setOp(comparison)
+    floatPredicate.setValue(floatValue[0])
+    floatPredicate.setValue2(floatValue[1])
+    return floatPredicate
+}
+
 export const buildDatePredicate = ({
     attribute,
     dateComparison,
@@ -309,6 +359,9 @@ export const buildPredicates = (predicates) => {
                 break
             case 'NumberPredicate':
                 pred.setNumberPredicate(buildNumberPredicate(predicate))
+                break
+            case 'FloatPredicate':
+                pred.setDoublePredicate(buildFloatPredicate(predicate))
                 break
             case 'DatePredicate':
                 pred.setDatePredicate(buildDatePredicate(predicate))
