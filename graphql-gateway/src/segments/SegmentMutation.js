@@ -1,5 +1,5 @@
 import RoverApis from '@rover/apis'
-import promisify from '../../../node/grpc-promisify'
+import promisify from '@rover-common/grpc-promisify'
 import { audienceClient } from '../grpcClients'
 promisify(audienceClient)
 
