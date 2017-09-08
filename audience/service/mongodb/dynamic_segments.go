@@ -221,7 +221,7 @@ func (s *dynamicSegmentsStore) ListDynamicSegments(ctx context.Context, r *audie
 
 	switch r.GetArchivedStatus() {
 	case audience.ListDynamicSegmentsRequest_ARCHIVED:
-		Q["is_archived"] =  true
+		Q["is_archived"] = true
 	case audience.ListDynamicSegmentsRequest_UNARCHIVED:
 		Q["is_archived"] = false
 	}
@@ -261,7 +261,7 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 	for i := range pa.Predicates {
 
 		predicates[i] = bson.M{
-			"model": pa.Predicates[i].GetModel().String(),
+			"selector": pa.Predicates[i].GetSelector().String(),
 		}
 
 		switch val := pa.Predicates[i].Value.(type) {
@@ -388,18 +388,18 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			continue
 		}
 
-		pmodel, ok := pdoc["model"].(string)
+		pselector, ok := pdoc["selector"].(string)
 		if !ok {
-			errorf("predicate model is not a string", p)
+			errorf("predicate selector is not a string", p)
 			continue
 		}
 
-		model := audience.Predicate_Model(audience.Predicate_Model_value[pmodel])
+		selector := audience.Predicate_Selector(audience.Predicate_Selector_value[pselector])
 
 		switch ptype {
 		case "bool":
 			var pp audience.BoolPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_BoolPredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_BoolPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
 			if v, ok := pdef["op"].(int); ok {
@@ -411,7 +411,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 
 		case "string":
 			var pp audience.StringPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_StringPredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_StringPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
 			if v, ok := pdef["op"].(int); ok {
@@ -423,7 +423,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 
 		case "number":
 			var pp audience.NumberPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_NumberPredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_NumberPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
 			if v, ok := pdef["op"].(int); ok {
@@ -436,7 +436,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 
 		case "date":
 			var pp audience.DatePredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_DatePredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_DatePredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
 			if v, ok := pdef["op"].(int); ok {
@@ -453,7 +453,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			}
 		case "version":
 			var pp audience.VersionPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_VersionPredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_VersionPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
 			if v, ok := pdef["op"].(int); ok {
@@ -484,7 +484,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 
 		case "geofence":
 			var pp audience.GeofencePredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_GeofencePredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_GeofencePredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
 			if v, ok := pdef["op"].(int); ok {
@@ -507,7 +507,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 
 		case "double":
 			var pp audience.DoublePredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{Model: model, Value: &audience.Predicate_DoublePredicate{&pp}})
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_DoublePredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
 			if v, ok := pdef["op"].(int); ok {

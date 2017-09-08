@@ -512,7 +512,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :ALL, 1
   end
   add_message "rover.audience.v1.Predicate" do
-    optional :model, :enum, 1, "rover.audience.v1.Predicate.Model"
+    optional :selector, :enum, 1, "rover.audience.v1.Predicate.Selector"
     oneof :value do
       optional :string_predicate, :message, 2, "rover.audience.v1.StringPredicate"
       optional :bool_predicate, :message, 3, "rover.audience.v1.BoolPredicate"
@@ -523,9 +523,10 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :double_predicate, :message, 8, "rover.audience.v1.DoublePredicate"
     end
   end
-  add_enum "rover.audience.v1.Predicate.Model" do
-    value :PROFILE, 0
+  add_enum "rover.audience.v1.Predicate.Selector" do
+    value :CUSTOM_PROFILE, 0
     value :DEVICE, 1
+    value :ROVER_PROFILE, 2
   end
   add_message "rover.audience.v1.QueryRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
@@ -661,7 +662,7 @@ module Rover
       PredicateAggregate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PredicateAggregate").msgclass
       PredicateAggregate::Condition = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PredicateAggregate.Condition").enummodule
       Predicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate").msgclass
-      Predicate::Model = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate.Model").enummodule
+      Predicate::Selector = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate.Selector").enummodule
       QueryRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest").msgclass
       QueryRequest::PageIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.PageIterator").msgclass
       QueryRequest::CursorIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.CursorIterator").msgclass

@@ -874,12 +874,16 @@ message PredicateAggregate {
 
 message Predicate {
 
-  enum Model {
-    PROFILE = 0;
+  enum Selector {
+    // Custom properties set by clients
+    CUSTOM_PROFILE = 0;
+    // All Device properties which are currently only set by Rover
     DEVICE  = 1;
+    // Properties set by Rover and can not be changed from outside our systems
+    ROVER_PROFILE = 2;
   }
 
-  Model model = 1;
+  Selector selector = 1;
 
   oneof value {
     StringPredicate   string_predicate   = 2;

@@ -72,7 +72,7 @@ goog.exportSymbol('proto.rover.audience.v1.NumberPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.NumberPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Platform', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Predicate', null, global);
-goog.exportSymbol('proto.rover.audience.v1.Predicate.Model', null, global);
+goog.exportSymbol('proto.rover.audience.v1.Predicate.Selector', null, global);
 goog.exportSymbol('proto.rover.audience.v1.PredicateAggregate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.PredicateAggregate.Condition', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Profile', null, global);
@@ -18647,7 +18647,7 @@ proto.rover.audience.v1.Predicate.prototype.toObject = function(opt_includeInsta
  */
 proto.rover.audience.v1.Predicate.toObject = function(includeInstance, msg) {
   var f, obj = {
-    model: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    selector: jspb.Message.getFieldWithDefault(msg, 1, 0),
     stringPredicate: (f = msg.getStringPredicate()) && proto.rover.audience.v1.StringPredicate.toObject(includeInstance, f),
     boolPredicate: (f = msg.getBoolPredicate()) && proto.rover.audience.v1.BoolPredicate.toObject(includeInstance, f),
     numberPredicate: (f = msg.getNumberPredicate()) && proto.rover.audience.v1.NumberPredicate.toObject(includeInstance, f),
@@ -18692,8 +18692,8 @@ proto.rover.audience.v1.Predicate.deserializeBinaryFromReader = function(msg, re
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!proto.rover.audience.v1.Predicate.Model} */ (reader.readEnum());
-      msg.setModel(value);
+      var value = /** @type {!proto.rover.audience.v1.Predicate.Selector} */ (reader.readEnum());
+      msg.setSelector(value);
       break;
     case 2:
       var value = new proto.rover.audience.v1.StringPredicate;
@@ -18758,7 +18758,7 @@ proto.rover.audience.v1.Predicate.prototype.serializeBinary = function() {
  */
 proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getModel();
+  f = message.getSelector();
   if (f !== 0.0) {
     writer.writeEnum(
       1,
@@ -18827,22 +18827,23 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
 /**
  * @enum {number}
  */
-proto.rover.audience.v1.Predicate.Model = {
-  PROFILE: 0,
-  DEVICE: 1
+proto.rover.audience.v1.Predicate.Selector = {
+  CUSTOM_PROFILE: 0,
+  DEVICE: 1,
+  ROVER_PROFILE: 2
 };
 
 /**
- * optional Model model = 1;
- * @return {!proto.rover.audience.v1.Predicate.Model}
+ * optional Selector selector = 1;
+ * @return {!proto.rover.audience.v1.Predicate.Selector}
  */
-proto.rover.audience.v1.Predicate.prototype.getModel = function() {
-  return /** @type {!proto.rover.audience.v1.Predicate.Model} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.rover.audience.v1.Predicate.prototype.getSelector = function() {
+  return /** @type {!proto.rover.audience.v1.Predicate.Selector} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {!proto.rover.audience.v1.Predicate.Model} value */
-proto.rover.audience.v1.Predicate.prototype.setModel = function(value) {
+/** @param {!proto.rover.audience.v1.Predicate.Selector} value */
+proto.rover.audience.v1.Predicate.prototype.setSelector = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
