@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-import { createFragmentContainer, graphql } from 'react-relay'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 
@@ -17,6 +16,7 @@ import {
 import { SearchIcon } from '@rover/react-icons'
 
 import FilterListItem from './FilterListItem'
+import { getDeviceSchema } from '../deviceSchema'
 
 class AddFilterModal extends Component {
     constructor(props) {
@@ -55,12 +55,15 @@ class AddFilterModal extends Component {
 
     buildFilterList() {
         const { schema } = this.props
-        const { deviceSchema, profileSchema } = schema
+        const { profileSchema } = schema
 
-        const devices = deviceSchema.map(device => ({
+        const devices = getDeviceSchema().map(device => ({
             category: 'device',
             ...device
-        }))
+        })).filter(device => {
+            return device.filter !== false
+        })
+
         const profiles = profileSchema.map(profile => ({
             category: 'profile',
             ...profile
@@ -96,9 +99,9 @@ class AddFilterModal extends Component {
         const { onSelect } = this.props
 
         return this.state.filterList.map((filter, index) => {
-            const { attribute } = filter
+            const { label } = filter
             if (
-                attribute.toLowerCase().includes(search.toLowerCase()) ||
+                label.toLowerCase().includes(search.toLowerCase()) ||
                 search === ''
             ) {
                 const filterWithDefaults = {
@@ -251,18 +254,4 @@ AddFilterModal.propTypes = {
     schema: PropTypes.object.isRequired
 }
 
-export default createFragmentContainer(
-    AddFilterModal,
-    graphql`
-        fragment AddFilterModal_schema on SegmentSchema {
-            deviceSchema {
-                attribute
-                __typename: type
-            }
-            profileSchema {
-                attribute
-                __typename: type
-            }
-        }
-    `
-)
+export default AddFilterModal

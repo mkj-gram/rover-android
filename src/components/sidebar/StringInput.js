@@ -1,13 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import {
-    light,
-    Select,
-    silver,
-    text,
-    titanium
-} from '@rover/react-bootstrap'
+import { light, Select, silver, text, titanium } from '@rover/react-bootstrap'
 
 import ModalInput from './ModalInput'
 import ModalInputPrompt from './ModalInputPrompt'
@@ -29,7 +23,14 @@ class StringInput extends Component {
     }
 
     updateComparison(stringComparison) {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const {
+            attribute,
+            category,
+            __typename,
+            index,
+            updateFn,
+            label
+        } = this.props
         let { stringValue } = this.state
 
         if (stringComparison === 'is unknown') {
@@ -42,13 +43,21 @@ class StringInput extends Component {
             category,
             __typename,
             index,
-            stringValue
+            stringValue,
+            label
         })
         this.setState({ stringComparison })
     }
 
     updateValue(stringValue) {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const {
+            attribute,
+            category,
+            __typename,
+            index,
+            updateFn,
+            label
+        } = this.props
         const { stringComparison } = this.state
         updateFn({
             attribute,
@@ -56,20 +65,22 @@ class StringInput extends Component {
             category,
             __typename,
             index,
-            stringValue
+            stringValue,
+            label
         })
         this.setState({ stringValue })
     }
 
     render() {
-        const { attribute, category } = this.props
+        const { category, label } = this.props
         const { stringValue, stringComparison } = this.state
+
         return (
             <div style={{ ...text, ...light, color: silver, width: 380 }}>
                 <ModalInputPrompt
                     attributeType={category}
-                    attribute={attribute}
                     includeIs={false}
+                    label={label}
                 />
                 <div
                     style={{
@@ -132,7 +143,8 @@ StringInput.propTypes = {
     category: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
-    __typename: PropTypes.string.isRequired
+    __typename: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired
 }
 
 StringInput.defaultProps = {
@@ -141,7 +153,8 @@ StringInput.defaultProps = {
     stringComparison: 'is',
     category: 'device',
     index: 0,
-    updateFn: () => null
+    updateFn: () => null,
+    label: ''
 }
 
 export default StringInput

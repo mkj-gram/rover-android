@@ -148,7 +148,7 @@ class GeofenceInput extends Component {
     }
 
     updateValue() {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const { attribute, category, __typename, index, updateFn, label } = this.props
         const { geofenceComparison, center, name, radius } = this.state
         const { lat, lng } = center
 
@@ -163,17 +163,18 @@ class GeofenceInput extends Component {
                 radius,
                 name
             },
-            __typename
+            __typename,
+            label
         })
     }
 
     render() {
-        const { attribute, category } = this.props
+        const { category, label } = this.props
         const { bounds, center, radius, zoom } = this.state
         return (
             <div style={{ ...text, color: silver }}>
                 <ModalInputPrompt
-                    attribute={attribute}
+                    label={label}
                     attributeType={category}
                     style={{ display: 'inline' }}
                 />
@@ -277,7 +278,8 @@ GeofenceInput.propTypes = {
     category: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
-    __typename: PropTypes.string.isRequired
+    __typename: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired
 }
 
 GeofenceInput.defaultProps = {
@@ -287,7 +289,8 @@ GeofenceInput.defaultProps = {
         radius: 100,
         name: 'Toronto'
     },
-    geofenceComparison: 'IS_WITHIN'
+    geofenceComparison: 'IS_WITHIN',
+    label: ''
 }
 
 export default GeofenceInput

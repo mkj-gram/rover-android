@@ -52,20 +52,24 @@ const renderPredicate = ({ __typename, ...rest }) => {
 }
 
 const renderPredicateComparison = comparison =>
-    <span style={predicateComparisonStyle}>{comparison}</span>
+    <span style={predicateComparisonStyle}>
+        {comparison}
+    </span>
 
 const renderPredicateValue = value =>
-    <span style={predicateValueStyle}>{value}</span>
+    <span style={predicateValueStyle}>
+        {value}
+    </span>
 
 const renderBooleanPredicate = ({ booleanValue }) =>
-    (<div>
+    <div>
         {renderPredicateValue(booleanValue ? 'ON' : 'OFF')}
-    </div>)
+    </div>
 const renderStringPredicate = ({ stringComparison, stringValue }) =>
-    (<div>
+    <div>
         {renderPredicateComparison(stringComparison)}
         {renderPredicateValue(stringValue)}
-    </div>)
+    </div>
 
 const renderDatePredicate = ({ dateComparison, dateValue }) => {
     if (['exactly', 'less than', 'more than'].includes(dateComparison)) {
@@ -97,29 +101,36 @@ const renderDatePredicate = ({ dateComparison, dateValue }) => {
                     moment(dateValue.start).format('MMM Do, YYYY')
                 )}
                 {renderPredicateComparison('and')}
-                {renderPredicateValue(moment(dateValue.end).format('MMM Do, YYYY'))}
+                {renderPredicateValue(
+                    moment(dateValue.end).format('MMM Do, YYYY')
+                )}
             </div>
         )
     }
 }
 
-const renderVersionPredicate = ({ versionComparison, versionValue = [0, 0, 0] }) => {
+const renderVersionPredicate = ({
+    versionComparison,
+    versionValue = [0, 0, 0]
+}) => {
     if (versionComparison === 'is unknown') {
         return renderPredicateComparison(versionComparison)
     }
 
     if (versionComparison === 'in between') {
-        const firstValue = versionValue
-            .slice(0, 3)
-            .map((num, index) =>
-                <span key={index}>{num}{index < 2 && '.'}</span>
-            )
+        const firstValue = versionValue.slice(0, 3).map((num, index) =>
+            <span key={index}>
+                {num}
+                {index < 2 && '.'}
+            </span>
+        )
 
-        const secondValue = versionValue
-            .slice(3)
-            .map((num, index) =>
-                <span key={index}>{num}{index < 2 && '.'}</span>
-            )
+        const secondValue = versionValue.slice(3).map((num, index) =>
+            <span key={index}>
+                {num}
+                {index < 2 && '.'}
+            </span>
+        )
 
         return (
             <div>
@@ -135,17 +146,23 @@ const renderVersionPredicate = ({ versionComparison, versionValue = [0, 0, 0] })
         <div>
             {renderPredicateComparison(versionComparison)}
             {renderPredicateValue(
-                versionValue
-                    .slice(0, 3)
-                    .map((num, index) =>
-                        <span key={index}>{num}{index < 2 && '.'}</span>
-                    )
+                versionValue.slice(0, 3).map((num, index) =>
+                    <span key={index}>
+                        {num}
+                        {index < 2 && '.'}
+                    </span>
+                )
             )}
         </div>
     )
 }
 
-const renderNumericPredicate = ({ numberComparison, numberValue, floatComparison, floatValue }) => {
+const renderNumericPredicate = ({
+    numberComparison,
+    numberValue,
+    floatComparison,
+    floatValue
+}) => {
     let comparison, value
     if (numberComparison === undefined && numberValue === undefined) {
         comparison = floatComparison
@@ -178,15 +195,19 @@ const renderNumericPredicate = ({ numberComparison, numberValue, floatComparison
     )
 }
 
-const renderGeofencePredicate = ({ geofenceValue }) => (
+const renderGeofencePredicate = ({ geofenceValue }) =>
     <GeofencePredicateListElement
         {...geofenceValue}
         renderPredicateComparison={renderPredicateComparison}
         renderPredicateValue={renderPredicateValue}
     />
-)
 
-const PredicateList = ({ query, queryCondition, viewModal, removePredicate }) => {
+const PredicateList = ({
+    query,
+    queryCondition,
+    viewModal,
+    removePredicate
+}) => {
     const predicateStyle = {
         width: 260,
         backgroundColor: ash,
@@ -208,72 +229,70 @@ const PredicateList = ({ query, queryCondition, viewModal, removePredicate }) =>
         flexWrap: 'wrap'
     }
 
-    const onMouseOver = (e) => {
+    const onMouseOver = e => {
         e.target.style.backgroundColor = steel
         e.target.children[1].style.fill = silver
     }
-    const onMouseLeave = (e) => {
+    const onMouseLeave = e => {
         e.target.style.backgroundColor = ash
         e.target.children[1].style.fill = 'transparent'
     }
 
     return (
         <div style={listStyle} id="predicateList">
-            {query.map(({ attribute, ...rest }, index) =>
-                (
-                    <div key={index}>
+            {query.map(({ attribute, label, ...rest }, index) =>
+                <div key={index}>
+                    <div
+                        style={predicateStyle}
+                        onMouseOver={onMouseOver}
+                        onMouseLeave={onMouseLeave}
+                        onClick={() => viewModal(attribute, index, label)}
+                    >
                         <div
-                            style={predicateStyle}
-                            onMouseOver={onMouseOver}
-                            onMouseLeave={onMouseLeave}
-                            onClick={() => viewModal(attribute, index)}
+                            style={{
+                                pointerEvents: 'none',
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                                flexWrap: 'wrap'
+                            }}
                         >
+                            <div style={{ flex: 'none', marginRight: 5 }}>
+                                {label}:
+                            </div>
+                            <div style={{ flex: '1 1 auto' }}>
+                                {renderPredicate(rest)}
+                            </div>
+                        </div>
+                        <RemoveIcon
+                            style={{
+                                fill: 'transparent',
+                                position: 'absolute',
+                                top: 11,
+                                right: 9
+                            }}
+                            onClick={e => {
+                                e.stopPropagation()
+                                removePredicate(index)
+                            }}
+                            onMouseOver={e => e.stopPropagation()}
+                            onMouseLeave={e => e.stopPropagation()}
+                        />
+                    </div>
+                    {index < query.length - 1 &&
+                        <div style={separatorStyle}>
                             <div
                                 style={{
-                                    pointerEvents: 'none',
-                                    display: 'flex',
-                                    justifyContent: 'flex-start',
-                                    flexWrap: 'wrap'
+                                    flex: 'none',
+                                    height: 32,
+                                    width: 3,
+                                    left: 17,
+                                    backgroundColor: ash,
+                                    position: 'absolute'
                                 }}
-                            >
-                                <div style={{ flex: 'none', marginRight: 5 }}>
-                                    {attribute}:
-                                </div>
-                                <div style={{ flex: '1 1 auto' }}>
-                                    {renderPredicate(rest)}
-                                </div>
-                            </div>
-                            <RemoveIcon
-                                style={{
-                                    fill: 'transparent',
-                                    position: 'absolute',
-                                    top: 11,
-                                    right: 9
-                                }}
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    removePredicate(index)
-                                }}
-                                onMouseOver={e => e.stopPropagation()}
-                                onMouseLeave={e => e.stopPropagation()}
                             />
-                        </div>
-                        {index < query.length - 1 &&
-                            <div style={separatorStyle}>
-                                <div
-                                    style={{
-                                        flex: 'none',
-                                        height: 32,
-                                        width: 3,
-                                        left: 17,
-                                        backgroundColor: ash,
-                                        position: 'absolute'
-                                    }}
-                                />
-                                {queryCondition === 'ALL' ? 'AND' : 'OR'}
-                            </div>}
-                    </div>
-                )
+                            {queryCondition === 'ALL' ? 'AND' : 'OR'}
+                        </div>}
+                </div>
             )}
             <div style={{ height: `${(window.innerHeight - 193) / 2}px` }} />
         </div>

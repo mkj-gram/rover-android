@@ -8,6 +8,7 @@ import TableMenuBarAlpha from './TableMenuBarAlpha'
 
 import DateCellFormatter from './DateCellFormatter'
 import BooleanCellFormatter from './BooleanCellFormatter'
+import { getDeviceSchema } from '../deviceSchema'
 
 class AudienceTable extends Component {
     constructor(props) {
@@ -60,7 +61,10 @@ class AudienceTable extends Component {
 
     componentDidMount() {
         const { data } = this.props
-        const { deviceSchema, profileSchema } = data.adgSegmentSchema
+
+        const { profileSchema } = data.adgSegmentSchema
+        const deviceSchema = getDeviceSchema()
+
         const {
             dataGridRows,
             segmentSize,
@@ -68,7 +72,6 @@ class AudienceTable extends Component {
         } = data.adgSegmentsFromPredicates
 
         this.getSetCachedColumns()
-
         this.getAllColumns(deviceSchema, profileSchema)
         this.createRowsAndColumns(dataGridRows)
         this.setState({ segmentSize, totalSize, dataGridRows })
@@ -77,13 +80,22 @@ class AudienceTable extends Component {
     getSetCachedColumns() {
         // HardCoded default selected Columns
         const selectedColumns = {
-            device_id: 'StringPredicate',
-            device_manufacturer: 'StringPredicate',
-            os_version: 'VersionPredicate',
-            device_model: 'StringPredicate',
-            sdk_version: 'VersionPredicate',
-            app_version: 'StringPredicate',
-            profile_id: 'StringPredicate'
+            device_id: {
+                __typename: 'StringPredicate',
+                label: 'Device ID'
+            },
+            os_version: {
+                __typename: 'VersionPredicate',
+                label: 'OS Version'
+            },
+            app_version: {
+                __typename: 'StringPredicate',
+                label: 'App Version'
+            },
+            'first-name': {
+                __typename: 'StringPredicate',
+                label: 'First Name'
+            }
         }
 
         const cachedSelectedColumns = JSON.parse(
@@ -109,24 +121,47 @@ class AudienceTable extends Component {
         const devices = {}
         const profiles = {}
 
-        deviceSchema.map(device => (devices[device.attribute] = device.type))
+        deviceSchema.map(
+            device =>
+                (devices[device.attribute] = {
+                    __typename: device.__typename,
+                    label: device.label,
+                    group: device.group
+                })
+        )
         profileSchema.map(
-            profile => (profiles[profile.attribute] = profile.type)
+            profile =>
+                (profiles[profile.attribute] = {
+                    __typename: profile.__typename,
+                    label: profile.label
+                })
         )
         this.setState({ allColumns: { devices, profiles } })
     }
 
-    updateChecked(category, item) {
+    updateChecked(category, item, devices = false) {
         const { allColumns } = this.state
         let cachedSelectedColumns = JSON.parse(
             localStorage.getItem('selectedColumns')
         )
+        let values
 
         if (item in cachedSelectedColumns) {
             delete cachedSelectedColumns[item]
         } else {
+            if (devices) {
+                values = {
+                    __typename: allColumns.devices[item].__typename,
+                    label: allColumns.devices[item].label
+                }
+            } else {
+                values = {
+                    __typename: allColumns[category][item].__typename,
+                    label: allColumns[category][item].label
+                }
+            }
             const property = {
-                [item]: allColumns[category][item]
+                [item]: values
             }
             cachedSelectedColumns = Object.assign(
                 {},
@@ -146,6 +181,8 @@ class AudienceTable extends Component {
 
         this.createRowsAndColumns(this.state.dataGridRows)
     }
+
+    
 
     fetchData(nextProps) {
         const { relay } = this.props
@@ -200,6 +237,7 @@ class AudienceTable extends Component {
 
     componentWillReceiveProps(nextProps) {
         const { refetched, renderFetchEnabled } = this.state
+
         if (nextProps.refetchData && !nextProps.reset) {
             if (nextProps.resetPagination) {
                 this.setState({ group: 0 })
@@ -311,7 +349,7 @@ class AudienceTable extends Component {
                 if (property.attribute in selectedColumns) {
                     row[property.attribute] = this.formatRowData(
                         property.value,
-                        selectedColumns[property.attribute]
+                        selectedColumns[property.attribute].__typename
                     )
                 }
             })
@@ -319,7 +357,6 @@ class AudienceTable extends Component {
         })
 
         const startRow = pageNum % 3 * 50
-
         return rows.slice(startRow, startRow + 50)
     }
 
@@ -390,11 +427,11 @@ class AudienceTable extends Component {
 
         const columns = Object.keys(selectedColumns).map(attr => ({
             key: attr,
-            name: attr,
+            name: selectedColumns[attr].label,
             width: 200,
             draggable: true,
             resizable: true,
-            formatter: this.getFormat(selectedColumns[attr])
+            formatter: this.getFormat(selectedColumns[attr].__typename)
         }))
         return columns
     }
@@ -404,6 +441,7 @@ class AudienceTable extends Component {
          * ToDo: Parsed 'location' attributeType
          */
         let ret = data
+
         if (type === 'VersionPredicate') {
             ret = Object.values(data).join('.')
         } else if (type === 'GeofencePredicate') {
@@ -439,6 +477,7 @@ class AudienceTable extends Component {
             totalSize,
             selectedColumns
         } = this.state
+
         const { isTooltipShowing, message, coordinates } = this.state.toolTip
 
         return (
@@ -482,7 +521,7 @@ AudienceTable.propTypes = {
     context: PropTypes.string.isRequired,
     updatePageNumber: PropTypes.func.isRequired,
     setSaveState: PropTypes.func.isRequired,
-    refetchData: PropTypes.bool.isRequired,
+    refetchData: PropTypes.bool,
     reset: PropTypes.bool.isRequired
 }
 
@@ -520,13 +559,15 @@ export default createRefetchContainer(
                 deviceSchema {
                     ... on SchemaAttribute {
                         attribute
-                        type
+                        __typename: type
+                        label
                     }
                 }
                 profileSchema {
                     ... on SchemaAttribute {
                         attribute
-                        type
+                        __typename: type
+                        label
                     }
                 }
             }

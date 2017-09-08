@@ -61,7 +61,7 @@ const FilterListItem = ({ filter, onSelect }) =>
                 whiteSpace: 'nowrap'
             }}
         >
-            {filter.attribute}
+            {filter.label}
         </span>
     </div>
 

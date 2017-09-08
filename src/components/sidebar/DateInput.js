@@ -144,7 +144,14 @@ class DateInput extends Component {
     }
 
     updateComparison(dateComparison) {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const {
+            attribute,
+            category,
+            __typename,
+            index,
+            updateFn,
+            label
+        } = this.props
         const start = moment()
         let end = {}
 
@@ -161,14 +168,22 @@ class DateInput extends Component {
             dateValue: {
                 start: start.toISOString(),
                 end: moment.isMoment(end) ? end.toISOString() : end
-            }
+            },
+            label
         })
 
         this.setState({ dateComparison, start, end })
     }
 
     updateValue(dateValue) {
-        const { attribute, category, __typename, index, updateFn } = this.props
+        const {
+            attribute,
+            category,
+            __typename,
+            index,
+            updateFn,
+            label
+        } = this.props
         const { dateComparison, start, end } = this.state
 
         const newValue = {
@@ -185,22 +200,22 @@ class DateInput extends Component {
             index,
             dateValue: {
                 start: newValue.start.toISOString(),
-                end: moment.isMoment(newValue.end) ? newValue.end.toISOString() : newValue.end
-            }
+                end: moment.isMoment(newValue.end)
+                    ? newValue.end.toISOString()
+                    : newValue.end
+            },
+            label
         })
 
         this.setState({ ...newValue })
     }
 
     render() {
-        const { attribute, category } = this.props
+        const { category, label } = this.props
         const { dateComparison } = this.state
         return (
             <div style={{ ...text, ...light, color: silver, width: 444 }}>
-                <ModalInputPrompt
-                    attribute={attribute}
-                    attributeType={category}
-                />
+                <ModalInputPrompt attributeType={category} label={label} />
                 <div
                     style={{
                         display: 'flex',
@@ -254,7 +269,8 @@ DateInput.propTypes = {
     category: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
-    __typename: PropTypes.string.isRequired
+    __typename: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired
 }
 
 DateInput.defaultProps = {
@@ -266,7 +282,8 @@ DateInput.defaultProps = {
     dateComparison: 'exactly',
     category: 'device',
     index: 0,
-    updateFn: () => ''
+    updateFn: () => '',
+    label: ''
 }
 
 export default DateInput

@@ -34,6 +34,8 @@ import PredicateList from './PredicateList'
 
 import SegmentsContainer from './SegmentsContainer'
 
+import { getDeviceLabel } from '../deviceSchema'
+
 class SideBar extends Component {
     constructor(props) {
         super(props)
@@ -70,7 +72,10 @@ class SideBar extends Component {
             this
         )
         this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
-        this.handleMatchConditionHover = this.handleMatchConditionHover.bind(this)
+        this.handleMatchConditionHover = this.handleMatchConditionHover.bind(
+            this
+        )
+        this.getProfileLabel = this.getProfileLabel.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -92,7 +97,7 @@ class SideBar extends Component {
                     segmentIdRefetch: false
                 })
             } else if (
-                nextProps.data.sbDynamicSegment && nextProps.data.sbDynamicSegment[0] &&
+                nextProps.data.sbDynamicSegment && nextProps.data.sbDynamicSegment[0] && nextProps.data.sbDynamicSegment[0].predicates &&
                 (JSON.stringify(nextProps.data.sbDynamicSegment) !==
                     JSON.stringify(sbDynamicSegment) ||
                     nextProps.segmentIdRefetch)
@@ -129,7 +134,10 @@ class SideBar extends Component {
         const { predicates } = sbDynamicSegment[0]
         const { condition, predicateList } = predicates
 
-        const query = predicateList.map(d => ({ ...d, category: 'device' }))
+        // ToDo: This will need to be updated when we have categories,
+        // Use this.getProfileLabel() for category: 'profile'
+        // Use getDeviceLabel() for category: 'device'
+        const query = predicateList.map(d => ({ ...d, category: 'device', label: getDeviceLabel(d.attribute) }))
 
         this.props.setQueryCondition(condition, true, query)
 
@@ -137,6 +145,16 @@ class SideBar extends Component {
             query,
             sbDynamicSegment
         })
+    }
+
+    getProfileLabel(attribute) {
+        const findLabel = (property) => {
+            return property.attribute === attribute
+        }
+        const property = this.props.data.segmentSchema.profileSchema.find(findLabel)
+
+        return property.label
+
     }
 
     updateQuery() {
@@ -174,7 +192,7 @@ class SideBar extends Component {
             return
         }
 
-        const { attribute, category } = currentAttribute
+        const { attribute, category, label } = currentAttribute
 
         if (attribute === '') {
             return
@@ -204,7 +222,7 @@ class SideBar extends Component {
                         marginRight: 5
                     }}
                 >
-                    {attribute}
+                    {label}
                 </span>
                 <span style={{ ...text, ...light, color: silver }}>filter</span>
             </div>
@@ -310,7 +328,11 @@ class SideBar extends Component {
     }
 
     renderAddFilterBar() {
-        const { isShowingAddFilterModal, query, matchConditionBackgroundColor } = this.state
+        const {
+            isShowingAddFilterModal,
+            query,
+            matchConditionBackgroundColor
+        } = this.state
 
         const addPredicateIndex = query.length
 
@@ -423,7 +445,8 @@ class SideBar extends Component {
                                 currentAttribute: {
                                     attribute: predicate.attribute,
                                     index: addPredicateIndex,
-                                    category: predicate.category
+                                    category: predicate.category,
+                                    label: predicate.label
                                 }
                             })
                         }}
@@ -521,13 +544,13 @@ class SideBar extends Component {
         )
     }
 
-    handleEditModal(attribute, index) {
+    handleEditModal(attribute, index, label) {
         const { left, top } = document
             .getElementById('predicateList')
             .children[index].getBoundingClientRect()
 
         this.setState({
-            currentAttribute: { attribute, index },
+            currentAttribute: { attribute, index, label },
             modalCoordinates: [left, top]
         })
     }
@@ -674,8 +697,8 @@ class SideBar extends Component {
                           query={query}
                           queryCondition={queryCondition}
                           removePredicate={index => this.removePredicate(index)}
-                          viewModal={(attribute, index) =>
-                              this.handleEditModal(attribute, index)}
+                          viewModal={(attribute, index, label) =>
+                              this.handleEditModal(attribute, index, label)}
                       />
                     : <div
                           style={{
@@ -809,7 +832,16 @@ export default createRefetchContainer(
                 }
             }
             segmentSchema {
-                ...AddFilterModal_schema
+                deviceSchema {
+                    attribute
+                    __typename: type
+                    label
+                }
+                profileSchema {
+                    attribute
+                    __typename: type
+                    label
+                }
             }
             segmentsContainer: dynamicSegment {
                 ...SegmentsContainer_segments
