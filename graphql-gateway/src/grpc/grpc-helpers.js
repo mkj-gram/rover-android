@@ -278,11 +278,11 @@ export const buildGeofencePredicate = ({
     const geofencePredicate = new RoverApis.audience.v1.Models
         .GeofencePredicate()
     const value = new RoverApis.audience.v1.Models.GeofencePredicate.Location()
-    // TODO: add location name
-    const { longitude, latitude, radius } = geofenceValue
+    const { longitude, latitude, radius, name } = geofenceValue
     value.setLongitude(longitude)
     value.setLatitude(latitude)
     value.setRadius(radius)
+    value.setName(name)
     geofencePredicate.setAttributeName(attribute)
     geofencePredicate.setOp(comparison)
     geofencePredicate.setValue(value)
