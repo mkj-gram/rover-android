@@ -11,6 +11,8 @@ var global = Function('return this')();
 
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
+goog.exportSymbol('proto.rover.audience.v1.ArrayStringPredicate', null, global);
+goog.exportSymbol('proto.rover.audience.v1.ArrayStringPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.BoolPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.BoolPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.CreateDeviceRequest', null, global);
@@ -18378,6 +18380,235 @@ proto.rover.audience.v1.VersionPredicate.prototype.hasValue2 = function() {
  * @extends {jspb.Message}
  * @constructor
  */
+proto.rover.audience.v1.ArrayStringPredicate = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.ArrayStringPredicate.repeatedFields_, null);
+};
+goog.inherits(proto.rover.audience.v1.ArrayStringPredicate, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.ArrayStringPredicate.displayName = 'proto.rover.audience.v1.ArrayStringPredicate';
+}
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.rover.audience.v1.ArrayStringPredicate.repeatedFields_ = [3];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.ArrayStringPredicate.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.ArrayStringPredicate} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    op: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    valueList: jspb.Message.getField(msg, 3)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.ArrayStringPredicate}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.ArrayStringPredicate;
+  return proto.rover.audience.v1.ArrayStringPredicate.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.ArrayStringPredicate} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.ArrayStringPredicate}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {!proto.rover.audience.v1.ArrayStringPredicate.Op} */ (reader.readEnum());
+      msg.setOp(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAttributeName(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addValue(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.ArrayStringPredicate.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.ArrayStringPredicate} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.ArrayStringPredicate.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getOp();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      1,
+      f
+    );
+  }
+  f = message.getAttributeName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getValueList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      3,
+      f
+    );
+  }
+};
+
+
+/**
+ * @enum {number}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.Op = {
+  IS_UNSET: 0,
+  IS_SET: 1,
+  CONTAINS_ANY: 2,
+  DOES_NOT_CONTAIN_ANY: 3,
+  CONTAINS_ALL: 4,
+  DOES_NOT_CONTAIN_ALL: 5
+};
+
+/**
+ * optional Op op = 1;
+ * @return {!proto.rover.audience.v1.ArrayStringPredicate.Op}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.getOp = function() {
+  return /** @type {!proto.rover.audience.v1.ArrayStringPredicate.Op} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {!proto.rover.audience.v1.ArrayStringPredicate.Op} value */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.setOp = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional string attribute_name = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.getAttributeName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.setAttributeName = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * repeated string value = 3;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<string>}
+ */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.getValueList = function() {
+  return /** @type {!Array.<string>} */ (jspb.Message.getField(this, 3));
+};
+
+
+/** @param {!Array.<string>} value */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.setValueList = function(value) {
+  jspb.Message.setField(this, 3, value || []);
+};
+
+
+/**
+ * @param {!string} value
+ * @param {number=} opt_index
+ */
+proto.rover.audience.v1.ArrayStringPredicate.prototype.addValue = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 3, value, opt_index);
+};
+
+
+proto.rover.audience.v1.ArrayStringPredicate.prototype.clearValueList = function() {
+  this.setValueList([]);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.rover.audience.v1.PredicateAggregate = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.PredicateAggregate.repeatedFields_, null);
 };
@@ -18596,7 +18827,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.rover.audience.v1.Predicate.oneofGroups_ = [[2,3,4,5,6,7,8]];
+proto.rover.audience.v1.Predicate.oneofGroups_ = [[2,3,4,5,6,7,8,9]];
 
 /**
  * @enum {number}
@@ -18609,7 +18840,8 @@ proto.rover.audience.v1.Predicate.ValueCase = {
   DATE_PREDICATE: 5,
   VERSION_PREDICATE: 6,
   GEOFENCE_PREDICATE: 7,
-  DOUBLE_PREDICATE: 8
+  DOUBLE_PREDICATE: 8,
+  ARRAY_STRING_PREDICATE: 9
 };
 
 /**
@@ -18654,7 +18886,8 @@ proto.rover.audience.v1.Predicate.toObject = function(includeInstance, msg) {
     datePredicate: (f = msg.getDatePredicate()) && proto.rover.audience.v1.DatePredicate.toObject(includeInstance, f),
     versionPredicate: (f = msg.getVersionPredicate()) && proto.rover.audience.v1.VersionPredicate.toObject(includeInstance, f),
     geofencePredicate: (f = msg.getGeofencePredicate()) && proto.rover.audience.v1.GeofencePredicate.toObject(includeInstance, f),
-    doublePredicate: (f = msg.getDoublePredicate()) && proto.rover.audience.v1.DoublePredicate.toObject(includeInstance, f)
+    doublePredicate: (f = msg.getDoublePredicate()) && proto.rover.audience.v1.DoublePredicate.toObject(includeInstance, f),
+    arrayStringPredicate: (f = msg.getArrayStringPredicate()) && proto.rover.audience.v1.ArrayStringPredicate.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -18729,6 +18962,11 @@ proto.rover.audience.v1.Predicate.deserializeBinaryFromReader = function(msg, re
       var value = new proto.rover.audience.v1.DoublePredicate;
       reader.readMessage(value,proto.rover.audience.v1.DoublePredicate.deserializeBinaryFromReader);
       msg.setDoublePredicate(value);
+      break;
+    case 9:
+      var value = new proto.rover.audience.v1.ArrayStringPredicate;
+      reader.readMessage(value,proto.rover.audience.v1.ArrayStringPredicate.deserializeBinaryFromReader);
+      msg.setArrayStringPredicate(value);
       break;
     default:
       reader.skipField();
@@ -18819,6 +19057,14 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
       8,
       f,
       proto.rover.audience.v1.DoublePredicate.serializeBinaryToWriter
+    );
+  }
+  f = message.getArrayStringPredicate();
+  if (f != null) {
+    writer.writeMessage(
+      9,
+      f,
+      proto.rover.audience.v1.ArrayStringPredicate.serializeBinaryToWriter
     );
   }
 };
@@ -19055,6 +19301,36 @@ proto.rover.audience.v1.Predicate.prototype.clearDoublePredicate = function() {
  */
 proto.rover.audience.v1.Predicate.prototype.hasDoublePredicate = function() {
   return jspb.Message.getField(this, 8) != null;
+};
+
+
+/**
+ * optional ArrayStringPredicate array_string_predicate = 9;
+ * @return {?proto.rover.audience.v1.ArrayStringPredicate}
+ */
+proto.rover.audience.v1.Predicate.prototype.getArrayStringPredicate = function() {
+  return /** @type{?proto.rover.audience.v1.ArrayStringPredicate} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.ArrayStringPredicate, 9));
+};
+
+
+/** @param {?proto.rover.audience.v1.ArrayStringPredicate|undefined} value */
+proto.rover.audience.v1.Predicate.prototype.setArrayStringPredicate = function(value) {
+  jspb.Message.setOneofWrapperField(this, 9, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
+};
+
+
+proto.rover.audience.v1.Predicate.prototype.clearArrayStringPredicate = function() {
+  this.setArrayStringPredicate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Predicate.prototype.hasArrayStringPredicate = function() {
+  return jspb.Message.getField(this, 9) != null;
 };
 
 

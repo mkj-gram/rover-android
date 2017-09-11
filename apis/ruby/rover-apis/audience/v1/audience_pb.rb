@@ -503,6 +503,19 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :IS_GREATER_THAN_OR_EQUAL, 7
     value :IS_LESS_THAN_OR_EQUAL, 8
   end
+  add_message "rover.audience.v1.ArrayStringPredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.ArrayStringPredicate.Op"
+    optional :attribute_name, :string, 2
+    repeated :value, :string, 3
+  end
+  add_enum "rover.audience.v1.ArrayStringPredicate.Op" do
+    value :IS_UNSET, 0
+    value :IS_SET, 1
+    value :CONTAINS_ANY, 2
+    value :DOES_NOT_CONTAIN_ANY, 3
+    value :CONTAINS_ALL, 4
+    value :DOES_NOT_CONTAIN_ALL, 5
+  end
   add_message "rover.audience.v1.PredicateAggregate" do
     optional :condition, :enum, 1, "rover.audience.v1.PredicateAggregate.Condition"
     repeated :predicates, :message, 2, "rover.audience.v1.Predicate"
@@ -521,6 +534,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :version_predicate, :message, 6, "rover.audience.v1.VersionPredicate"
       optional :geofence_predicate, :message, 7, "rover.audience.v1.GeofencePredicate"
       optional :double_predicate, :message, 8, "rover.audience.v1.DoublePredicate"
+      optional :array_string_predicate, :message, 9, "rover.audience.v1.ArrayStringPredicate"
     end
   end
   add_enum "rover.audience.v1.Predicate.Selector" do
@@ -659,6 +673,8 @@ module Rover
       GeofencePredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofencePredicate.Op").enummodule
       VersionPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.VersionPredicate").msgclass
       VersionPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.VersionPredicate.Op").enummodule
+      ArrayStringPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ArrayStringPredicate").msgclass
+      ArrayStringPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ArrayStringPredicate.Op").enummodule
       PredicateAggregate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PredicateAggregate").msgclass
       PredicateAggregate::Condition = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PredicateAggregate.Condition").enummodule
       Predicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate").msgclass

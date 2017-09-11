@@ -61,6 +61,11 @@ func predicateAggregate(t *testing.T) []*audience.Predicate {
 			Value:         32.12,
 			Value2:        88.231,
 		}}},
+		{Selector: audience.Predicate_ROVER_PROFILE, Value: &audience.Predicate_ArrayStringPredicate{&audience.ArrayStringPredicate{
+			AttributeName: "tags",
+			Op:            audience.ArrayStringPredicate_CONTAINS_ALL,
+			Value:         []string{"test"},
+		}}},
 	}
 
 }
@@ -264,6 +269,7 @@ func testAudienceService_GetDynamicSegmentById(t *testing.T) {
 							{Selector: audience.Predicate_CUSTOM_PROFILE, Value: &audience.Predicate_DatePredicate{&audience.DatePredicate{}}},
 							{Selector: audience.Predicate_CUSTOM_PROFILE, Value: &audience.Predicate_VersionPredicate{&audience.VersionPredicate{}}},
 							{Selector: audience.Predicate_CUSTOM_PROFILE, Value: &audience.Predicate_GeofencePredicate{&audience.GeofencePredicate{}}},
+							{Selector: audience.Predicate_CUSTOM_PROFILE, Value: &audience.Predicate_ArrayStringPredicate{&audience.ArrayStringPredicate{}}},
 						},
 					},
 				},

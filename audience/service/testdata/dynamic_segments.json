@@ -71,7 +71,8 @@
       {"selector": "CUSTOM_PROFILE", "predicate": {"type": "number"}},
       {"selector": "CUSTOM_PROFILE", "predicate": {"type": "date"}},
       {"selector": "CUSTOM_PROFILE", "predicate": {"type": "version"}},
-      {"selector": "CUSTOM_PROFILE", "predicate": {"type": "geofence"}}
+      {"selector": "CUSTOM_PROFILE", "predicate": {"type": "geofence"}},
+      {"selector": "CUSTOM_PROFILE", "predicate": {"type": "array[string]"}}
     ]
   }
 }
@@ -90,6 +91,7 @@
     "predicates": [
       {"selector": "DEVICE", "predicate":{ "type": "bool",  "attribute_name" : "is_bluetooth_enabled", "op" : 2, "value" : true }},
       {"selector": "CUSTOM_PROFILE", "predicate":{ "type": "string", "attribute_name" : "first_name", "op" : 2, "value" : "hello world" }},
+      {"selector": "CUSTOM_PROFILE", "predicate":{ "type": "array[string]", "attribute_name" : "tags", "op" : 2, "value" : ["test"] }},
       {"selector": "CUSTOM_PROFILE", "predicate":{ "type": "number", "attribute_name" : "age", "op" : 6, "value" : {"$numberLong": 20}, "value2" : {"$numberLong": 40} }},
       {"selector": "DEVICE", "predicate":{ "type": "version", "op" : 6, "value" : { "major" : 1, "minor" : 2, "revision": 3 }, "value2" : { "major" : 2, "minor" : 3, "revision" : 4 }, "attribute_name" : "age" }},
       {"selector": "ROVER_PROFILE", "predicate":{ "type": "date", "value" : {"$date":"2017-06-14T15:44:18.496Z"}, "value2" : {"$date":"2017-06-14T15:44:18.497Z"}, "attribute_name" : "created_at", "op" : 6 }},

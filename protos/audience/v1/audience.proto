@@ -861,6 +861,24 @@ message VersionPredicate {
   }
 }
 
+message ArrayStringPredicate {
+  Op op                   = 1;
+  string attribute_name   = 2;
+  repeated string value   = 3;
+
+  enum Op {
+    IS_UNSET                 = 0;
+    IS_SET                   = 1;
+
+    CONTAINS_ANY             = 2;
+    DOES_NOT_CONTAIN_ANY     = 3;
+
+    CONTAINS_ALL            = 4;
+    DOES_NOT_CONTAIN_ALL    = 5;
+  }
+
+}
+
 message PredicateAggregate {
   enum Condition {
     ANY = 0;
@@ -886,13 +904,14 @@ message Predicate {
   Selector selector = 1;
 
   oneof value {
-    StringPredicate   string_predicate   = 2;
-    BoolPredicate     bool_predicate     = 3;
-    NumberPredicate   number_predicate   = 4;
-    DatePredicate     date_predicate     = 5;
-    VersionPredicate  version_predicate  = 6;
-    GeofencePredicate geofence_predicate = 7;
-    DoublePredicate   double_predicate   = 8;
+    StringPredicate   string_predicate          = 2;
+    BoolPredicate     bool_predicate            = 3;
+    NumberPredicate   number_predicate          = 4;
+    DatePredicate     date_predicate            = 5;
+    VersionPredicate  version_predicate         = 6;
+    GeofencePredicate geofence_predicate        = 7;
+    DoublePredicate   double_predicate          = 8;
+    ArrayStringPredicate array_string_predicate = 9;
   }
 }
 

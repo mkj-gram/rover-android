@@ -336,6 +336,15 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 				"value2":         pp.Value2,
 			}
 
+		case *audience.Predicate_ArrayStringPredicate:
+			pp := val.ArrayStringPredicate
+			predicates[i]["predicate"] = bson.M{
+				"type":           "array[string]",
+				"attribute_name": pp.AttributeName,
+				"op":             pp.Op,
+				"value":          pp.Value,
+			}
+
 		default:
 			errorf("predicateAggregate: GetBSON: unknown type: %T", val)
 		}
@@ -517,6 +526,27 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			}
 			pp.Value, _ = pdef["value"].(float64)
 			pp.Value2, _ = pdef["value2"].(float64)
+
+		case "array[string]":
+			var pp audience.ArrayStringPredicate
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_ArrayStringPredicate{&pp}})
+
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := pdef["op"].(int); ok {
+				pp.Op = audience.ArrayStringPredicate_Op(v)
+			} else {
+				// TODO: log
+			}
+			val, _ := pdef["value"].([]interface{})
+
+			pp.Value = make([]string, len(val))
+			for i, v := range val {
+				if vstring, ok := v.(string); ok {
+					pp.Value[i] = vstring
+				} else {
+					// TODO: log
+				}
+			}
 
 		default:
 			errorf("unknown predicate type: %q", ptype)
