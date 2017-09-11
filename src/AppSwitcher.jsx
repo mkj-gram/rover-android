@@ -167,10 +167,10 @@ class AppSwitcher extends Component {
                             <Anchor href="/experiences/" target="_blank" onClick={this.hidePopover} style={labelStyle}>Experiences</Anchor>
                         </div>
                         <div style={listItemStyle}>
-                            <Anchor href="/customers/" target="_blank" onClick={this.hidePopover} style={active === 'customers' ? activeIconLinkStyle : iconLinkStyle}>
+                            <Anchor href="/audience/" target="_blank" onClick={this.hidePopover} style={active === 'audience' ? activeIconLinkStyle : iconLinkStyle}>
                                 <CustomersIcon style={iconStyle}/>
                             </Anchor>
-                            <Anchor href="/customers/" target="_blank" onClick={this.hidePopover} style={labelStyle}>Customers</Anchor>
+                            <Anchor href="/audience/" target="_blank" onClick={this.hidePopover} style={labelStyle}>Audience</Anchor>
                         </div>
                         <div style={listItemStyle}>
                             <Anchor href="/settings/" target="_blank" onClick={this.hidePopover} style={active === 'settings' ? activeIconLinkStyle : iconLinkStyle}>
