@@ -51,7 +51,7 @@ class BooleanInput extends Component {
     updateBooleanValue(booleanValue) {
         const {
             attribute,
-            category,
+            selector,
             updateFn,
             index,
             __typename,
@@ -59,7 +59,7 @@ class BooleanInput extends Component {
         } = this.props
         updateFn({
             attribute,
-            category,
+            selector,
             index,
             booleanComparison: 'true',
             booleanValue,
@@ -70,7 +70,7 @@ class BooleanInput extends Component {
     }
 
     render() {
-        const { label, category } = this.props
+        const { label, selector } = this.props
         const radioFieldStyle = {
             display: 'flex',
             color: titanium,
@@ -80,7 +80,7 @@ class BooleanInput extends Component {
         }
         return (
             <div style={{ ...text, ...light, color: silver }}>
-                <ModalInputPrompt label={label} attributeType={category} />
+                <ModalInputPrompt label={label} selector={selector} />
                 <div style={radioFieldStyle}>
                     {this.renderRadioButton(true)}
                 </div>
@@ -95,7 +95,7 @@ class BooleanInput extends Component {
 BooleanInput.propTypes = {
     attribute: PropTypes.string.isRequired,
     booleanValue: PropTypes.bool.isRequired,
-    category: PropTypes.string.isRequired,
+    selector: PropTypes.string.isRequired,
     updateFn: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
     __typename: PropTypes.string.isRequired,
@@ -106,7 +106,7 @@ BooleanInput.defaultProps = {
     attribute: '',
     booleanValue: true,
     booleanComparison: 'true',
-    category: 'profile',
+    selector: 'DEVICE',
     updateFn: () => null,
     index: 0,
     __typename: 'BooleanPredicate',

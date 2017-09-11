@@ -29,10 +29,10 @@ const listItemStyle = {
 
 const getIcon = type => {
     switch (type) {
-        case 'profile':
+        case 'CUSTOM_PROFILE':
+        case 'ROVER_PROFILE':
             return <ProfileIcon fill={silver} />
-            break
-        case 'device':
+        case 'DEVICE':
             return <DeviceIconSmall style={{ fill: silver }} />
         case 'location':
             return <LocationIcon fill={silver} />
@@ -51,7 +51,7 @@ const FilterListItem = ({ filter, onSelect }) =>
         onMouseOut={onMouseOut}
         onClick={() => onSelect(filter)}
     >
-        {getIcon(filter.category)}
+        {getIcon(filter.selector)}
         <span
             style={{
                 marginLeft: 10,

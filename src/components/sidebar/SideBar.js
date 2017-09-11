@@ -35,7 +35,7 @@ import StringArrayInput from './StringArrayInput'
 
 import SegmentsContainer from './SegmentsContainer'
 
-import { getDeviceLabel } from '../deviceSchema'
+import { getDeviceLabel } from '../../localSchemas/deviceSchema'
 
 class SideBar extends Component {
     constructor(props) {
@@ -136,11 +136,7 @@ class SideBar extends Component {
         // ToDo: This will need to be updated when we have categories,
         // Use this.getProfileLabel() for category: 'profile'
         // Use getDeviceLabel() for category: 'device'
-        const query = predicateList.map(d => ({
-            ...d,
-            category: 'device',
-            label: getDeviceLabel(d.attribute)
-        }))
+        const query = predicateList.map(d => ({ ...d, selector: d.selector, label: getDeviceLabel(d.attribute) }))
 
         this.props.setQueryCondition(condition, true, query)
 
@@ -194,13 +190,13 @@ class SideBar extends Component {
             return
         }
 
-        const { attribute, category, label } = currentAttribute
+        const { attribute, selector, label } = currentAttribute
 
         if (attribute === '') {
             return
         }
 
-        const icon = category === 'profile' ? ProfileIcon : DeviceIconSmall
+        const icon = selector === 'DEVICE' ? DeviceIconSmall : ProfileIcon
 
         return (
             <div
@@ -429,7 +425,7 @@ class SideBar extends Component {
                                 currentAttribute: {
                                     attribute: predicate.attribute,
                                     index: addPredicateIndex,
-                                    category: predicate.category,
+                                    selector: predicate.selector,
                                     label: predicate.label
                                 }
                             })
@@ -780,7 +776,7 @@ export default createRefetchContainer(
                         ... on Predicate {
                             __typename
                             attribute
-                            category
+                            selector
                             ... on StringPredicate {
                                 stringValue
                                 stringComparison
@@ -813,20 +809,20 @@ export default createRefetchContainer(
                                 }
                                 geofenceComparison
                             }
+                            ... on StringArrayPredicate {
+                                stringArrayValue,
+                                stringArrayComparison
+                            }
                         }
                     }
                 }
             }
             segmentSchema {
-                deviceSchema {
-                    attribute
-                    __typename: type
-                    label
-                }
                 profileSchema {
                     attribute
                     __typename: type
                     label
+                    selector
                 }
             }
             segmentsContainer: dynamicSegment {

@@ -52,7 +52,7 @@ class ColumnDisplay extends Component {
 
     render() {
         const {
-            category,
+            selector,
             items,
             showChecked,
             updateChecked,
@@ -80,7 +80,7 @@ class ColumnDisplay extends Component {
                         display: 'flex'
                     }}
                 >
-                    {icon[category]}
+                    {icon[selector]}
                     <div
                         style={{
                             marginLeft: 16,
@@ -89,7 +89,7 @@ class ColumnDisplay extends Component {
                             fontSize: 13
                         }}
                     >
-                        {category}
+                        {selector}
                     </div>
                 </div>
                 {itemKeys.slice(0, size).map((item, index) =>
@@ -101,7 +101,7 @@ class ColumnDisplay extends Component {
                             isDisabled={false}
                             onChange={e =>
                                 updateChecked(
-                                    category,
+                                    selector,
                                     item,
                                     devices !== undefined
                                 )}
@@ -125,7 +125,7 @@ class ColumnDisplay extends Component {
 }
 
 ColumnDisplay.propTypes = {
-    category: PropTypes.string.isRequired,
+    selector: PropTypes.string.isRequired,
     items: PropTypes.object.isRequired,
     updateChecked: PropTypes.func.isRequired,
     showChecked: PropTypes.func.isRequired,
@@ -133,7 +133,7 @@ ColumnDisplay.propTypes = {
 }
 
 ColumnDisplay.defaultProps = {
-    category: '',
+    selector: '',
     items: {},
     updateChecked: () => null,
     showChecked: () => null,

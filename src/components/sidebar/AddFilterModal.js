@@ -16,7 +16,8 @@ import {
 import { SearchIcon } from '@rover/react-icons'
 
 import FilterListItem from './FilterListItem'
-import { getDeviceSchema } from '../deviceSchema'
+import { getDeviceSchema } from '../../localSchemas/deviceSchema'
+import roverProfileSchema from '../../localSchemas/roverProfileSchema'
 
 class AddFilterModal extends Component {
     constructor(props) {
@@ -58,16 +59,21 @@ class AddFilterModal extends Component {
         const { profileSchema } = schema
 
         const devices = getDeviceSchema().map(device => ({
-            category: 'device',
+            selector: 'DEVICE',
             ...device
-        })).filter(device => {
-            return device.filter !== false
-        })
+        })).filter((device) => device.filter !== false)
 
-        const profiles = profileSchema.map(profile => ({
-            category: 'profile',
+        const customProfiles = profileSchema.map(profile => ({
+            selector: 'CUSTOM_PROFILE',
             ...profile
         }))
+
+        const roverProfiles = roverProfileSchema().map(profile => ({
+            selector: 'ROVER_PROFILE',
+            ...profile
+        }))
+
+        const profiles = roverProfiles.concat(customProfiles)
 
         return devices.concat(profiles)
     }
