@@ -545,6 +545,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.QueryRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :predicate_aggregate, :message, 2, "rover.audience.v1.PredicateAggregate"
+    optional :time_zone_offset, :message, 5, "rover.audience.v1.QueryRequest.TimeZoneOffset"
     oneof :iterator do
       optional :page_iterator, :message, 3, "rover.audience.v1.QueryRequest.PageIterator"
       optional :cursor_iterator, :message, 4, "rover.audience.v1.QueryRequest.CursorIterator"
@@ -556,6 +557,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.QueryRequest.CursorIterator" do
     optional :id, :string, 1
+  end
+  add_message "rover.audience.v1.QueryRequest.TimeZoneOffset" do
+    optional :minutes, :int64, 1
   end
   add_message "rover.audience.v1.QueryResponse" do
     optional :total_size, :int64, 1
@@ -682,6 +686,7 @@ module Rover
       QueryRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest").msgclass
       QueryRequest::PageIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.PageIterator").msgclass
       QueryRequest::CursorIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.CursorIterator").msgclass
+      QueryRequest::TimeZoneOffset = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.TimeZoneOffset").msgclass
       QueryResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryResponse").msgclass
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").enummodule
       Null = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Null").enummodule
