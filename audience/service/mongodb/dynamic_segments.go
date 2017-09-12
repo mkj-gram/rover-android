@@ -336,8 +336,8 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 				"value2":         pp.Value2,
 			}
 
-		case *audience.Predicate_ArrayStringPredicate:
-			pp := val.ArrayStringPredicate
+		case *audience.Predicate_StringArrayPredicate:
+			pp := val.StringArrayPredicate
 			predicates[i]["predicate"] = bson.M{
 				"type":           "array[string]",
 				"attribute_name": pp.AttributeName,
@@ -528,12 +528,12 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pp.Value2, _ = pdef["value2"].(float64)
 
 		case "array[string]":
-			var pp audience.ArrayStringPredicate
-			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_ArrayStringPredicate{&pp}})
+			var pp audience.StringArrayPredicate
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_StringArrayPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
 			if v, ok := pdef["op"].(int); ok {
-				pp.Op = audience.ArrayStringPredicate_Op(v)
+				pp.Op = audience.StringArrayPredicate_Op(v)
 			} else {
 				// TODO: log
 			}

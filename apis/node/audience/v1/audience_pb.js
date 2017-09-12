@@ -11,8 +11,6 @@ var global = Function('return this')();
 
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
-goog.exportSymbol('proto.rover.audience.v1.ArrayStringPredicate', null, global);
-goog.exportSymbol('proto.rover.audience.v1.ArrayStringPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.BoolPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.BoolPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.CreateDeviceRequest', null, global);
@@ -86,6 +84,8 @@ goog.exportSymbol('proto.rover.audience.v1.QueryResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.SchemaAttribute', null, global);
 goog.exportSymbol('proto.rover.audience.v1.SetDeviceProfileRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.SetDeviceProfileResponse', null, global);
+goog.exportSymbol('proto.rover.audience.v1.StringArrayPredicate', null, global);
+goog.exportSymbol('proto.rover.audience.v1.StringArrayPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.StringPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.StringPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest', null, global);
@@ -18380,19 +18380,19 @@ proto.rover.audience.v1.VersionPredicate.prototype.hasValue2 = function() {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.rover.audience.v1.ArrayStringPredicate = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.ArrayStringPredicate.repeatedFields_, null);
+proto.rover.audience.v1.StringArrayPredicate = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.StringArrayPredicate.repeatedFields_, null);
 };
-goog.inherits(proto.rover.audience.v1.ArrayStringPredicate, jspb.Message);
+goog.inherits(proto.rover.audience.v1.StringArrayPredicate, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.ArrayStringPredicate.displayName = 'proto.rover.audience.v1.ArrayStringPredicate';
+  proto.rover.audience.v1.StringArrayPredicate.displayName = 'proto.rover.audience.v1.StringArrayPredicate';
 }
 /**
  * List of repeated fields within this message type.
  * @private {!Array<number>}
  * @const
  */
-proto.rover.audience.v1.ArrayStringPredicate.repeatedFields_ = [3];
+proto.rover.audience.v1.StringArrayPredicate.repeatedFields_ = [3];
 
 
 
@@ -18407,8 +18407,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.ArrayStringPredicate.toObject(opt_includeInstance, this);
+proto.rover.audience.v1.StringArrayPredicate.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.StringArrayPredicate.toObject(opt_includeInstance, this);
 };
 
 
@@ -18417,10 +18417,10 @@ proto.rover.audience.v1.ArrayStringPredicate.prototype.toObject = function(opt_i
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.ArrayStringPredicate} msg The msg instance to transform.
+ * @param {!proto.rover.audience.v1.StringArrayPredicate} msg The msg instance to transform.
  * @return {!Object}
  */
-proto.rover.audience.v1.ArrayStringPredicate.toObject = function(includeInstance, msg) {
+proto.rover.audience.v1.StringArrayPredicate.toObject = function(includeInstance, msg) {
   var f, obj = {
     op: jspb.Message.getFieldWithDefault(msg, 1, 0),
     attributeName: jspb.Message.getFieldWithDefault(msg, 2, ""),
@@ -18438,23 +18438,23 @@ proto.rover.audience.v1.ArrayStringPredicate.toObject = function(includeInstance
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.ArrayStringPredicate}
+ * @return {!proto.rover.audience.v1.StringArrayPredicate}
  */
-proto.rover.audience.v1.ArrayStringPredicate.deserializeBinary = function(bytes) {
+proto.rover.audience.v1.StringArrayPredicate.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.ArrayStringPredicate;
-  return proto.rover.audience.v1.ArrayStringPredicate.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.rover.audience.v1.StringArrayPredicate;
+  return proto.rover.audience.v1.StringArrayPredicate.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.rover.audience.v1.ArrayStringPredicate} msg The message object to deserialize into.
+ * @param {!proto.rover.audience.v1.StringArrayPredicate} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.ArrayStringPredicate}
+ * @return {!proto.rover.audience.v1.StringArrayPredicate}
  */
-proto.rover.audience.v1.ArrayStringPredicate.deserializeBinaryFromReader = function(msg, reader) {
+proto.rover.audience.v1.StringArrayPredicate.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -18462,7 +18462,7 @@ proto.rover.audience.v1.ArrayStringPredicate.deserializeBinaryFromReader = funct
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!proto.rover.audience.v1.ArrayStringPredicate.Op} */ (reader.readEnum());
+      var value = /** @type {!proto.rover.audience.v1.StringArrayPredicate.Op} */ (reader.readEnum());
       msg.setOp(value);
       break;
     case 2:
@@ -18486,9 +18486,9 @@ proto.rover.audience.v1.ArrayStringPredicate.deserializeBinaryFromReader = funct
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.serializeBinary = function() {
+proto.rover.audience.v1.StringArrayPredicate.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.ArrayStringPredicate.serializeBinaryToWriter(this, writer);
+  proto.rover.audience.v1.StringArrayPredicate.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -18496,10 +18496,10 @@ proto.rover.audience.v1.ArrayStringPredicate.prototype.serializeBinary = functio
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.ArrayStringPredicate} message
+ * @param {!proto.rover.audience.v1.StringArrayPredicate} message
  * @param {!jspb.BinaryWriter} writer
  */
-proto.rover.audience.v1.ArrayStringPredicate.serializeBinaryToWriter = function(message, writer) {
+proto.rover.audience.v1.StringArrayPredicate.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getOp();
   if (f !== 0.0) {
@@ -18528,7 +18528,7 @@ proto.rover.audience.v1.ArrayStringPredicate.serializeBinaryToWriter = function(
 /**
  * @enum {number}
  */
-proto.rover.audience.v1.ArrayStringPredicate.Op = {
+proto.rover.audience.v1.StringArrayPredicate.Op = {
   IS_UNSET: 0,
   IS_SET: 1,
   CONTAINS_ANY: 2,
@@ -18539,15 +18539,15 @@ proto.rover.audience.v1.ArrayStringPredicate.Op = {
 
 /**
  * optional Op op = 1;
- * @return {!proto.rover.audience.v1.ArrayStringPredicate.Op}
+ * @return {!proto.rover.audience.v1.StringArrayPredicate.Op}
  */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.getOp = function() {
-  return /** @type {!proto.rover.audience.v1.ArrayStringPredicate.Op} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.rover.audience.v1.StringArrayPredicate.prototype.getOp = function() {
+  return /** @type {!proto.rover.audience.v1.StringArrayPredicate.Op} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/** @param {!proto.rover.audience.v1.ArrayStringPredicate.Op} value */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.setOp = function(value) {
+/** @param {!proto.rover.audience.v1.StringArrayPredicate.Op} value */
+proto.rover.audience.v1.StringArrayPredicate.prototype.setOp = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
@@ -18556,13 +18556,13 @@ proto.rover.audience.v1.ArrayStringPredicate.prototype.setOp = function(value) {
  * optional string attribute_name = 2;
  * @return {string}
  */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.getAttributeName = function() {
+proto.rover.audience.v1.StringArrayPredicate.prototype.getAttributeName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.setAttributeName = function(value) {
+proto.rover.audience.v1.StringArrayPredicate.prototype.setAttributeName = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
@@ -18573,13 +18573,13 @@ proto.rover.audience.v1.ArrayStringPredicate.prototype.setAttributeName = functi
  * replace the array itself, then you must call the setter to update it.
  * @return {!Array.<string>}
  */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.getValueList = function() {
+proto.rover.audience.v1.StringArrayPredicate.prototype.getValueList = function() {
   return /** @type {!Array.<string>} */ (jspb.Message.getField(this, 3));
 };
 
 
 /** @param {!Array.<string>} value */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.setValueList = function(value) {
+proto.rover.audience.v1.StringArrayPredicate.prototype.setValueList = function(value) {
   jspb.Message.setField(this, 3, value || []);
 };
 
@@ -18588,12 +18588,12 @@ proto.rover.audience.v1.ArrayStringPredicate.prototype.setValueList = function(v
  * @param {!string} value
  * @param {number=} opt_index
  */
-proto.rover.audience.v1.ArrayStringPredicate.prototype.addValue = function(value, opt_index) {
+proto.rover.audience.v1.StringArrayPredicate.prototype.addValue = function(value, opt_index) {
   jspb.Message.addToRepeatedField(this, 3, value, opt_index);
 };
 
 
-proto.rover.audience.v1.ArrayStringPredicate.prototype.clearValueList = function() {
+proto.rover.audience.v1.StringArrayPredicate.prototype.clearValueList = function() {
   this.setValueList([]);
 };
 
@@ -18841,7 +18841,7 @@ proto.rover.audience.v1.Predicate.ValueCase = {
   VERSION_PREDICATE: 6,
   GEOFENCE_PREDICATE: 7,
   DOUBLE_PREDICATE: 8,
-  ARRAY_STRING_PREDICATE: 9
+  STRING_ARRAY_PREDICATE: 9
 };
 
 /**
@@ -18887,7 +18887,7 @@ proto.rover.audience.v1.Predicate.toObject = function(includeInstance, msg) {
     versionPredicate: (f = msg.getVersionPredicate()) && proto.rover.audience.v1.VersionPredicate.toObject(includeInstance, f),
     geofencePredicate: (f = msg.getGeofencePredicate()) && proto.rover.audience.v1.GeofencePredicate.toObject(includeInstance, f),
     doublePredicate: (f = msg.getDoublePredicate()) && proto.rover.audience.v1.DoublePredicate.toObject(includeInstance, f),
-    arrayStringPredicate: (f = msg.getArrayStringPredicate()) && proto.rover.audience.v1.ArrayStringPredicate.toObject(includeInstance, f)
+    stringArrayPredicate: (f = msg.getStringArrayPredicate()) && proto.rover.audience.v1.StringArrayPredicate.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -18964,9 +18964,9 @@ proto.rover.audience.v1.Predicate.deserializeBinaryFromReader = function(msg, re
       msg.setDoublePredicate(value);
       break;
     case 9:
-      var value = new proto.rover.audience.v1.ArrayStringPredicate;
-      reader.readMessage(value,proto.rover.audience.v1.ArrayStringPredicate.deserializeBinaryFromReader);
-      msg.setArrayStringPredicate(value);
+      var value = new proto.rover.audience.v1.StringArrayPredicate;
+      reader.readMessage(value,proto.rover.audience.v1.StringArrayPredicate.deserializeBinaryFromReader);
+      msg.setStringArrayPredicate(value);
       break;
     default:
       reader.skipField();
@@ -19059,12 +19059,12 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
       proto.rover.audience.v1.DoublePredicate.serializeBinaryToWriter
     );
   }
-  f = message.getArrayStringPredicate();
+  f = message.getStringArrayPredicate();
   if (f != null) {
     writer.writeMessage(
       9,
       f,
-      proto.rover.audience.v1.ArrayStringPredicate.serializeBinaryToWriter
+      proto.rover.audience.v1.StringArrayPredicate.serializeBinaryToWriter
     );
   }
 };
@@ -19305,23 +19305,23 @@ proto.rover.audience.v1.Predicate.prototype.hasDoublePredicate = function() {
 
 
 /**
- * optional ArrayStringPredicate array_string_predicate = 9;
- * @return {?proto.rover.audience.v1.ArrayStringPredicate}
+ * optional StringArrayPredicate string_array_predicate = 9;
+ * @return {?proto.rover.audience.v1.StringArrayPredicate}
  */
-proto.rover.audience.v1.Predicate.prototype.getArrayStringPredicate = function() {
-  return /** @type{?proto.rover.audience.v1.ArrayStringPredicate} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.ArrayStringPredicate, 9));
+proto.rover.audience.v1.Predicate.prototype.getStringArrayPredicate = function() {
+  return /** @type{?proto.rover.audience.v1.StringArrayPredicate} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.StringArrayPredicate, 9));
 };
 
 
-/** @param {?proto.rover.audience.v1.ArrayStringPredicate|undefined} value */
-proto.rover.audience.v1.Predicate.prototype.setArrayStringPredicate = function(value) {
+/** @param {?proto.rover.audience.v1.StringArrayPredicate|undefined} value */
+proto.rover.audience.v1.Predicate.prototype.setStringArrayPredicate = function(value) {
   jspb.Message.setOneofWrapperField(this, 9, proto.rover.audience.v1.Predicate.oneofGroups_[0], value);
 };
 
 
-proto.rover.audience.v1.Predicate.prototype.clearArrayStringPredicate = function() {
-  this.setArrayStringPredicate(undefined);
+proto.rover.audience.v1.Predicate.prototype.clearStringArrayPredicate = function() {
+  this.setStringArrayPredicate(undefined);
 };
 
 
@@ -19329,7 +19329,7 @@ proto.rover.audience.v1.Predicate.prototype.clearArrayStringPredicate = function
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.audience.v1.Predicate.prototype.hasArrayStringPredicate = function() {
+proto.rover.audience.v1.Predicate.prototype.hasStringArrayPredicate = function() {
   return jspb.Message.getField(this, 9) != null;
 };
 
