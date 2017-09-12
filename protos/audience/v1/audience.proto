@@ -861,7 +861,7 @@ message VersionPredicate {
   }
 }
 
-message ArrayStringPredicate {
+message StringArrayPredicate {
   Op op                   = 1;
   string attribute_name   = 2;
   repeated string value   = 3;
@@ -911,7 +911,7 @@ message Predicate {
     VersionPredicate  version_predicate         = 6;
     GeofencePredicate geofence_predicate        = 7;
     DoublePredicate   double_predicate          = 8;
-    ArrayStringPredicate array_string_predicate = 9;
+    StringArrayPredicate string_array_predicate = 9;
   }
 }
 
