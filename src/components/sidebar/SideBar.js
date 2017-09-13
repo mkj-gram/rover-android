@@ -31,6 +31,7 @@ import StringInput from './StringInput'
 import VersionInput from './VersionInput'
 import FunnelAnimation from './FunnelAnimation'
 import PredicateList from './PredicateList'
+import StringArrayInput from './StringArrayInput'
 
 import SegmentsContainer from './SegmentsContainer'
 
@@ -67,8 +68,7 @@ class SideBar extends Component {
         this.handleModalOpen = this.handleModalOpen.bind(this)
         this.removeNullPredicate = this.removeNullPredicate.bind(this)
         this.getPredicateKeywords = this.getPredicateKeywords.bind(this)
-        this.shouldDisableFilterModalSuccessButton =
-         this.shouldDisableFilterModalSuccessButton.bind(
+        this.shouldDisableFilterModalSuccessButton = this.shouldDisableFilterModalSuccessButton.bind(
             this
         )
         this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
@@ -97,7 +97,9 @@ class SideBar extends Component {
                     segmentIdRefetch: false
                 })
             } else if (
-                nextProps.data.sbDynamicSegment && nextProps.data.sbDynamicSegment[0] && nextProps.data.sbDynamicSegment[0].predicates &&
+                nextProps.data.sbDynamicSegment &&
+                nextProps.data.sbDynamicSegment[0] &&
+                nextProps.data.sbDynamicSegment[0].predicates &&
                 (JSON.stringify(nextProps.data.sbDynamicSegment) !==
                     JSON.stringify(sbDynamicSegment) ||
                     nextProps.segmentIdRefetch)
@@ -137,7 +139,11 @@ class SideBar extends Component {
         // ToDo: This will need to be updated when we have categories,
         // Use this.getProfileLabel() for category: 'profile'
         // Use getDeviceLabel() for category: 'device'
-        const query = predicateList.map(d => ({ ...d, category: 'device', label: getDeviceLabel(d.attribute) }))
+        const query = predicateList.map(d => ({
+            ...d,
+            category: 'device',
+            label: getDeviceLabel(d.attribute)
+        }))
 
         this.props.setQueryCondition(condition, true, query)
 
@@ -148,13 +154,14 @@ class SideBar extends Component {
     }
 
     getProfileLabel(attribute) {
-        const findLabel = (property) => {
+        const findLabel = property => {
             return property.attribute === attribute
         }
-        const property = this.props.data.segmentSchema.profileSchema.find(findLabel)
+        const property = this.props.data.segmentSchema.profileSchema.find(
+            findLabel
+        )
 
         return property.label
-
     }
 
     updateQuery() {
@@ -239,7 +246,7 @@ class SideBar extends Component {
 
         const { __typename } = predicate
 
-        const updateFn = (currentPredicate) => {
+        const updateFn = currentPredicate => {
             this.setState({
                 currentPredicate,
                 isFilterModalSuccessDisabled: this.shouldDisableFilterModalSuccessButton(
@@ -265,6 +272,8 @@ class SideBar extends Component {
                 return <GeofenceInput {...props} />
             case 'FloatPredicate':
                 return <NumericInput {...props} float />
+            case 'StringArrayPredicate':
+                return <StringArrayInput {...props} />
             default:
         }
     }
@@ -381,13 +390,13 @@ class SideBar extends Component {
 
         const onFocus = e =>
             (e.target.parentElement.style.backgroundColor = graphite)
-        const onSelect = (e) => {
+        const onSelect = e => {
             e.target.blur()
             e.target.parentElement.style.backgroundColor = slate
         }
 
-        const renderArrow = () =>
-            (<svg
+        const renderArrow = () => (
+            <svg
                 width="6"
                 height="20"
                 viewBox="0 0 6 20"
@@ -403,7 +412,8 @@ class SideBar extends Component {
                     points="300 84 305.799 93.731 300 103.462"
                     transform="translate(-300 -84)"
                 />
-            </svg>)
+            </svg>
+        )
 
         return (
             <div style={style} id="filterContainer">
@@ -433,12 +443,12 @@ class SideBar extends Component {
                         Add Filter
                     </div>
                 </div>
-                {isShowingAddFilterModal &&
+                {isShowingAddFilterModal && (
                     <AddFilterModal
                         schema={data.segmentSchema}
                         onRequestClose={() =>
                             this.setState({ isShowingAddFilterModal: false })}
-                        onSelect={(predicate) => {
+                        onSelect={predicate => {
                             this.setState({
                                 query: query.concat(predicate),
                                 isShowingAddFilterModal: false,
@@ -450,7 +460,8 @@ class SideBar extends Component {
                                 }
                             })
                         }}
-                    />}
+                    />
+                )}
                 <div
                     style={selectContainerStyle}
                     onMouseOver={() => this.handleMatchConditionHover('over')}
@@ -464,7 +475,7 @@ class SideBar extends Component {
                         style={selectStyle}
                         isDisabled={false}
                         value={queryCondition}
-                        onChange={(e) => {
+                        onChange={e => {
                             onSelect(e)
                             this.props.setQueryCondition(
                                 e.target.value,
@@ -597,10 +608,12 @@ class SideBar extends Component {
         const { query } = this.state
         const elem = currentPredicate || query[query.length - 1]
         const typename = elem.__typename
-        const value =
-            `${typename.slice(0, typename.indexOf('Predicate')).toLowerCase()
-            }Value`
-
+        let value = `${typename
+            .slice(0, typename.indexOf('Predicate'))
+            .toLowerCase()}Value`
+        if (value === 'stringarrayValue') {
+            value = 'stringArrayValue'
+        }
         return { elem, value }
     }
 
@@ -687,56 +700,60 @@ class SideBar extends Component {
                         disabledTextColor: silver
                     }}
                 >
-                    {currentAttribute.attribute !== ''
-                        ? this.renderModalInput(currentAttribute.index)
-                        : <div />}
+                    {currentAttribute.attribute !== '' ? (
+                        this.renderModalInput(currentAttribute.index)
+                    ) : (
+                        <div />
+                    )}
                 </ModalWithHeader>
                 {this.renderAddFilterBar()}
-                {query.length > 0
-                    ? <PredicateList
-                          query={query}
-                          queryCondition={queryCondition}
-                          removePredicate={index => this.removePredicate(index)}
-                          viewModal={(attribute, index, label) =>
-                              this.handleEditModal(attribute, index, label)}
-                      />
-                    : <div
-                          style={{
-                              ...text,
-                              color: silver,
-                              margin: '30px auto',
-                              width: 210,
-                              height: '100%',
-                              textAlign: 'center'
-                          }}
-                      >
-                          <FunnelAnimation
-                              isModalOpen={
-                                  isShowingAddFilterModal ||
-                                  showSegmentSelection ||
-                                  showSegmentSave
-                              }
-                          />
-                          <div style={{ marginBottom: 30 }}>
-                              <span
-                                  style={{
-                                      color: lavender,
-                                      marginRight: 5,
-                                      cursor: 'pointer'
-                                  }}
-                                  onClick={this.handleAddButton}
-                              >
-                                  Add a filter
-                              </span>
-                              to start building segments based on your audience
-                              data
-                          </div>
-                          <div>
-                              When you&apos;re done with it, just{' '}
-                              <span style={{ color: 'white' }}>Save</span> it
-                              for later use
-                          </div>
-                      </div>}
+                {query.length > 0 ? (
+                    <PredicateList
+                        query={query}
+                        queryCondition={queryCondition}
+                        removePredicate={index => this.removePredicate(index)}
+                        viewModal={(attribute, index, label) =>
+                            this.handleEditModal(attribute, index, label)}
+                    />
+                ) : (
+                    <div
+                        style={{
+                            ...text,
+                            color: silver,
+                            margin: '30px auto',
+                            width: 210,
+                            height: '100%',
+                            textAlign: 'center'
+                        }}
+                    >
+                        <FunnelAnimation
+                            isModalOpen={
+                                isShowingAddFilterModal ||
+                                showSegmentSelection ||
+                                showSegmentSave
+                            }
+                        />
+                        <div style={{ marginBottom: 30 }}>
+                            <span
+                                style={{
+                                    color: lavender,
+                                    marginRight: 5,
+                                    cursor: 'pointer'
+                                }}
+                                onClick={this.handleAddButton}
+                            >
+                                Add a filter
+                            </span>
+                            to start building segments based on your audience
+                            data
+                        </div>
+                        <div>
+                            When you&apos;re done with it, just{' '}
+                            <span style={{ color: 'white' }}>Save</span> it for
+                            later use
+                        </div>
+                    </div>
+                )}
                 {this.renderSaveBar()}
                 <SegmentsContainer
                     query={query}

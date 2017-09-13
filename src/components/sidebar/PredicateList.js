@@ -47,29 +47,90 @@ const renderPredicate = ({ __typename, ...rest }) => {
             return renderGeofencePredicate(rest)
         case 'FloatPredicate':
             return renderNumericPredicate(rest)
+        case 'StringArrayPredicate':
+            return renderStringArrayPredicate(rest)
         default:
     }
 }
 
-const renderPredicateComparison = comparison =>
-    <span style={predicateComparisonStyle}>
-        {comparison}
-    </span>
+const renderStringArrayPredicate = ({
+    stringArrayValue,
+    stringArrayComparison
+}) => {
+    if (
+        [
+            'contains any',
+            'does not contain any',
+            'contains all',
+            'does not contain all'
+        ].includes(stringArrayComparison)
+    ) {
+        return (
+            <div
+                style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    ...text,
+                    fontSize: 12
+                }}
+            >
+                {stringArrayValue.map((value, index) => (
+                    <span
+                        style={{
+                            ...text,
+                            fontSize: 14,
+                            color: lavender,
+                            marginTop: 9
+                        }}
+                        key={index}
+                    >
+                        {' '}
+                        {value}
+                        <span
+                            style={{
+                                ...text,
+                                fontSize: 10,
+                                color: silver,
+                                marginRight: 8,
+                                marginLeft: 8,
+                                marginBottm: 2
+                            }}
+                        >
+                            {stringArrayValue.length !==
+                            index + 1 ? stringArrayComparison.includes(
+                                'all'
+                            ) ? (
+                                'AND'
+                            ) : (
+                                'OR'
+                            ) : (
+                                ''
+                            )}
+                        </span>
+                    </span>
+                ))}
+            </div>
+        )
+    }
+}
 
-const renderPredicateValue = value =>
-    <span style={predicateValueStyle}>
-        {value}
-    </span>
+const renderPredicateComparison = comparison => (
+    <span style={predicateComparisonStyle}>{comparison}</span>
+)
 
-const renderBooleanPredicate = ({ booleanValue }) =>
-    <div>
-        {renderPredicateValue(booleanValue ? 'ON' : 'OFF')}
-    </div>
-const renderStringPredicate = ({ stringComparison, stringValue }) =>
+const renderPredicateValue = value => (
+    <span style={predicateValueStyle}>{value}</span>
+)
+
+const renderBooleanPredicate = ({ booleanValue }) => (
+    <div>{renderPredicateValue(booleanValue ? 'ON' : 'OFF')}</div>
+)
+const renderStringPredicate = ({ stringComparison, stringValue }) => (
     <div>
         {renderPredicateComparison(stringComparison)}
         {renderPredicateValue(stringValue)}
     </div>
+)
 
 const renderDatePredicate = ({ dateComparison, dateValue }) => {
     if (['exactly', 'less than', 'more than'].includes(dateComparison)) {
@@ -118,19 +179,19 @@ const renderVersionPredicate = ({
     }
 
     if (versionComparison === 'in between') {
-        const firstValue = versionValue.slice(0, 3).map((num, index) =>
+        const firstValue = versionValue.slice(0, 3).map((num, index) => (
             <span key={index}>
                 {num}
                 {index < 2 && '.'}
             </span>
-        )
+        ))
 
-        const secondValue = versionValue.slice(3).map((num, index) =>
+        const secondValue = versionValue.slice(3).map((num, index) => (
             <span key={index}>
                 {num}
                 {index < 2 && '.'}
             </span>
-        )
+        ))
 
         return (
             <div>
@@ -146,12 +207,12 @@ const renderVersionPredicate = ({
         <div>
             {renderPredicateComparison(versionComparison)}
             {renderPredicateValue(
-                versionValue.slice(0, 3).map((num, index) =>
+                versionValue.slice(0, 3).map((num, index) => (
                     <span key={index}>
                         {num}
                         {index < 2 && '.'}
                     </span>
-                )
+                ))
             )}
         </div>
     )
@@ -195,12 +256,34 @@ const renderNumericPredicate = ({
     )
 }
 
-const renderGeofencePredicate = ({ geofenceValue }) =>
+const getFlexDirection = ({ __typename }) => {
+    return __typename === 'StringArrayPredicate' ? 'column' : 'row'
+}
+
+const renderGeofencePredicate = ({ geofenceValue }) => (
     <GeofencePredicateListElement
         {...geofenceValue}
         renderPredicateComparison={renderPredicateComparison}
         renderPredicateValue={renderPredicateValue}
     />
+)
+
+const renderLabel = (label, rest) => {
+    let text
+
+    if (
+        rest.__typename === 'StringArrayPredicate' &&
+        rest.hasOwnProperty('stringArrayComparison')
+    ) {
+        text = rest.stringArrayComparison.includes('does not')
+            ? 'Is Not Tagged'
+            : 'Is Tagged'
+    } else {
+        text = label
+    }
+
+    return text
+}
 
 const PredicateList = ({
     query,
@@ -240,7 +323,7 @@ const PredicateList = ({
 
     return (
         <div style={listStyle} id="predicateList">
-            {query.map(({ attribute, label, ...rest }, index) =>
+            {query.map(({ attribute, label, ...rest }, index) => (
                 <div key={index}>
                     <div
                         style={predicateStyle}
@@ -253,11 +336,12 @@ const PredicateList = ({
                                 pointerEvents: 'none',
                                 display: 'flex',
                                 justifyContent: 'flex-start',
-                                flexWrap: 'wrap'
+                                flexWrap: 'wrap',
+                                flexDirection: getFlexDirection(rest)
                             }}
                         >
                             <div style={{ flex: 'none', marginRight: 5 }}>
-                                {label}:
+                                {renderLabel(label, rest)}:
                             </div>
                             <div style={{ flex: '1 1 auto' }}>
                                 {renderPredicate(rest)}
@@ -278,7 +362,7 @@ const PredicateList = ({
                             onMouseLeave={e => e.stopPropagation()}
                         />
                     </div>
-                    {index < query.length - 1 &&
+                    {index < query.length - 1 && (
                         <div style={separatorStyle}>
                             <div
                                 style={{
@@ -291,9 +375,10 @@ const PredicateList = ({
                                 }}
                             />
                             {queryCondition === 'ALL' ? 'AND' : 'OR'}
-                        </div>}
+                        </div>
+                    )}
                 </div>
-            )}
+            ))}
             <div style={{ height: `${(window.innerHeight - 193) / 2}px` }} />
         </div>
     )

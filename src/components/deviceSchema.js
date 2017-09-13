@@ -1,5 +1,13 @@
 export const getDeviceSchema = () => [
         {
+            attribute: 'tags',
+            label: 'Tags',
+            __typename: 'StringArrayPredicate',
+            group: null,
+            display: true,
+            filter: true
+        },
+        {
             attribute: 'created_at',
             label: 'First Seen',
             __typename: 'DatePredicate',
@@ -105,7 +113,7 @@ export const getDeviceSchema = () => [
         },
         {
             attribute: 'radio',
-            label: 'Radio', // Need label
+            label: 'Radio',
             __typename: 'StringPredicate',
             group: null,
             display: true,
@@ -115,7 +123,7 @@ export const getDeviceSchema = () => [
             attribute: 'time_zone',
             label: 'Time Zone',
             __typename: 'StringPredicate',
-            group: null,
+            group: 'location',
             display: true,
             filter: true
         },
@@ -155,7 +163,7 @@ export const getDeviceSchema = () => [
             attribute: 'location_latitude',
             label: 'Latitude', 
             __typename: 'FloatPredicate',
-            group: null,
+            group: 'location',
             display: true,
             filter: true
         },
@@ -163,7 +171,7 @@ export const getDeviceSchema = () => [
             attribute: 'location_longitude',
             label: 'Longitude', 
             __typename: 'FloatPredicate',
-            group: null,
+            group: 'location',
             display: true,
             filter: true
         },
@@ -198,7 +206,7 @@ export const getDeviceSchema = () => [
             group: null,
             display: true,
             filter: true
-        }
+        },
         // {
         //     attribute: 'is_test_device',
         //     label: 'is_test_device',   // Update when working on test device Milestone
@@ -209,7 +217,7 @@ export const getDeviceSchema = () => [
         // },
     ]
 
-const getDeviceSchemaGroups = () => ['location', 'os', 'pushToken'] // ToDo: Update List
+const getDeviceSchemaGroups = () => ['location']
 
 export const getDeviceSchemaColumns = () => {
     const columns = {
