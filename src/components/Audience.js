@@ -48,7 +48,7 @@ class Audience extends Component {
             this.setState({
                 queryCondition,
                 segmentIdRefetch: false,
-                refetchData: (pred.query && pred.query.length !== 0),
+                refetchData: pred.query && pred.query.length !== 0,
                 refetchSideBar: false,
                 predicates: this.formatQuery(query, queryCondition),
                 resetPagination: true,
@@ -109,7 +109,6 @@ class Audience extends Component {
 
     archiveSegment(id) {
         if (this.state.segment.segmentId === id) {
-
             this.setState({
                 segment: {
                     segmentId: '',
@@ -158,7 +157,6 @@ class Audience extends Component {
             refetchData
         } = this.state
         const { data } = this.props
-
         return (
             <div style={{ display: 'flex', flex: '1 1 100%' }}>
                 <SideBar
