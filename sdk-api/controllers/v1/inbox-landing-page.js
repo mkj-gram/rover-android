@@ -1,5 +1,5 @@
 const dasherize = require('dasherize')
-const AllowedScopes = ['sdk']
+const AllowedScopes = ['sdk', 'server']
 
 module.exports = function() {
     const handlers = {}

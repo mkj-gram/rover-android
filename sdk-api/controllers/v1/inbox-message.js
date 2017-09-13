@@ -2,7 +2,7 @@ const dasherize = require('dasherize')
 const Joi = require('joi')
 const moment = require('moment')
 
-const AllowedScopes = ['sdk']
+const AllowedScopes = ['sdk', 'server']
 
 const updateSchema = Joi.object().required().keys({
     data: Joi.object().required().keys({

@@ -1,6 +1,6 @@
 const util = require('util')
 const moment = require('moment')
-const AllowedScopes = ['sdk']
+const AllowedScopes = ['sdk', 'server']
 var dasherize = require('dasherize')
 const underscore = require('underscore')
 
