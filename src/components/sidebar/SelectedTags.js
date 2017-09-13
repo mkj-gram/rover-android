@@ -89,7 +89,7 @@ class SelectedTags extends Component {
                             alignContent: 'flex-start',
                             flexWrap: 'wrap',
                             width: 370,
-                            height: 108,
+                            height: 107,
                             overflow: 'auto',
                             overflowX: 'hidden',
                             flex: '1 1'
