@@ -8,7 +8,6 @@ import { unselectable } from '../styles/typography'
 const { Component } = React
 
 class TextField extends Component {
-
     constructor(props) {
         super(props)
 
@@ -21,8 +20,22 @@ class TextField extends Component {
         this.onChange = this.onChange.bind(this)
     }
 
+    focusTextInput() {
+        this.input.focus()
+    }
+
     render() {
-        const { label, disabled, style, onFocus, onBlur, onChange, id, placeholderStyle, ...rest } = this.props
+        const {
+            label,
+            disabled,
+            style,
+            onFocus,
+            onBlur,
+            onChange,
+            id,
+            placeholderStyle,
+            ...rest
+        } = this.props
         const { isFocused, isPresent } = this.state
 
         let {
@@ -88,13 +101,23 @@ class TextField extends Component {
         const input = (
             <div>
                 <style type="text/css">
-                {`
+                    {`
                     #${id}::-webkit-input-placeholder {
                         ${placeholderStyle}
                     }
                 `}
                 </style>
-                <input ref={e => this.input = e} disabled={disabled} style={inputStyle} onFocus={this.onFocus} onBlur={this.onBlur} onChange={this.onChange} id={id} {...rest}/>
+
+                <input
+                    ref={e => (this.input = e)}
+                    disabled={disabled}
+                    style={inputStyle}
+                    onFocus={this.onFocus}
+                    onBlur={this.onBlur}
+                    onChange={this.onChange}
+                    id={id}
+                    {...rest}
+                />
             </div>
         )
 
@@ -114,7 +137,7 @@ class TextField extends Component {
         this.setState({
             isFocused: true
         })
-        
+
         this.props.onFocus(event)
     }
 

@@ -12,6 +12,7 @@ import ModalWithHeader from './ModalWithHeader'
 import NavBar from './NavBar'
 import NewButton from './NewButton'
 import NewPopover from './NewPopover'
+import Pill from './Pill'
 import Popover from './Popover'
 import PrimaryNavigator from './PrimaryNavigator'
 import ProgressBar from './ProgressBar'
@@ -100,6 +101,7 @@ export {
     NavBar,
     NewButton,
     NewPopover,
+    Pill,
     Popover,
     PrimaryNavigator,
     ProgressBar,
