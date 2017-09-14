@@ -48,7 +48,8 @@ class SegmentSave extends Component {
         return (
             <div>
                 <div style={{ ...text, color: silver, marginBottom: 20 }}>
-                    {' '}Give this segment a name
+                    {' '}
+                    Give this segment a name
                 </div>
                 <TextField
                     placeholder=""
@@ -121,8 +122,31 @@ class SegmentSave extends Component {
             )
         } else {
             buttonText = (
-                <span style={{ color: 'white' }}>
-                    Update <span style={{ ...bold }}>{val}</span> segment{' '}
+                <span
+                    style={{
+                        color: 'white',
+                        display: 'inline-block',
+                        position: 'relative',
+                        top: -2
+                    }}
+                >
+                    Update{' '}
+                    <span
+                        style={{
+                            ...bold,
+                            minWidth: 0,
+                            maxWidth: 82,
+                            display: 'inline-block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            position: 'relative',
+                            top: 3
+                        }}
+                    >
+                        {val}
+                    </span>{' '}
+                    segment{' '}
                 </span>
             )
         }
@@ -189,9 +213,11 @@ class SegmentSave extends Component {
                     children={this.segmentUpdate()}
                     successFn={() => this.handleUpdate(true)}
                     successText={
-                        segmentSaveValue === 'update'
-                            ? 'Update Segment'
-                            : 'Create Segment'
+                        segmentSaveValue === 'update' ? (
+                            'Update Segment'
+                        ) : (
+                            'Create Segment'
+                        )
                     }
                     cancelFn={() => this.handleUpdate()}
                     cancelText="Cancel"

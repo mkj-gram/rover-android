@@ -84,7 +84,7 @@ class AddTag extends Component {
 
     render() {
         const { top, left, addFilter } = this.state
-        const { text } = this.props
+
         return (
             <div
                 style={{
@@ -129,7 +129,7 @@ class AddTag extends Component {
                         whiteSpace: 'nowrap'
                     }}
                 >
-                    Add tag "{text}
+                    Add tag "{this.props.text}
                 </div>
                 <span style={{marginRight: 32}}>"</span>
             </div>
