@@ -7,6 +7,9 @@ test:
 run:
 	${RUN} bash -c "npm install && npm start"
 
+clean_run:
+	${RUN} bash -c "rm -rf node_modules/@rover && npm install && npm start"
+
 shell:
 	${RUN} bash
 
