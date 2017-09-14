@@ -56,7 +56,7 @@ class SideBar extends Component {
                 button: violet,
                 text: lavender
             },
-            matchConditionBackgroundColor: ''
+            matchConditionColor: graphite
         }
 
         this.setState = this.setState.bind(this)
@@ -72,9 +72,6 @@ class SideBar extends Component {
             this
         )
         this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
-        this.handleMatchConditionHover = this.handleMatchConditionHover.bind(
-            this
-        )
         this.getProfileLabel = this.getProfileLabel.bind(this)
     }
 
@@ -154,9 +151,7 @@ class SideBar extends Component {
     }
 
     getProfileLabel(attribute) {
-        const findLabel = property => {
-            return property.attribute === attribute
-        }
+        const findLabel = property => property.attribute === attribute
         const property = this.props.data.segmentSchema.profileSchema.find(
             findLabel
         )
@@ -246,7 +241,7 @@ class SideBar extends Component {
 
         const { __typename } = predicate
 
-        const updateFn = currentPredicate => {
+        const updateFn = (currentPredicate) => {
             this.setState({
                 currentPredicate,
                 isFilterModalSuccessDisabled: this.shouldDisableFilterModalSuccessButton(
@@ -324,23 +319,11 @@ class SideBar extends Component {
         }
     }
 
-    handleMatchConditionHover(val) {
-        if (val === 'over') {
-            this.setState({
-                matchConditionBackgroundColor: graphite
-            })
-        } else if (val === 'leave') {
-            this.setState({
-                matchConditionBackgroundColor: ''
-            })
-        }
-    }
-
     renderAddFilterBar() {
         const {
             isShowingAddFilterModal,
-            query,
-            matchConditionBackgroundColor
+            matchConditionColor,
+            query
         } = this.state
 
         const addPredicateIndex = query.length
@@ -364,20 +347,18 @@ class SideBar extends Component {
             display: 'flex',
             alignItems: 'center',
             height: 27,
-            padding: '0 15px',
-            borderRadius: 3,
-            backgroundColor: matchConditionBackgroundColor
+            padding: '0 15px'
         }
 
         const selectStyle = {
             backgroundColor: 'transparent',
             border: 'none',
-            borderRadius: 3,
             width: 36,
             height: 21,
             color: lavender,
             fontSize: 12,
-            padding: '1px 0 3px 0'
+            padding: '1px 0 3px',
+            margin: '0 auto'
         }
 
         const matchStyle = {
@@ -386,13 +367,6 @@ class SideBar extends Component {
             fontSize: 12,
             fontWeight: 600,
             marginRight: 3
-        }
-
-        const onFocus = e =>
-            (e.target.parentElement.style.backgroundColor = graphite)
-        const onSelect = e => {
-            e.target.blur()
-            e.target.parentElement.style.backgroundColor = slate
         }
 
         const renderArrow = () => (
@@ -448,7 +422,7 @@ class SideBar extends Component {
                         schema={data.segmentSchema}
                         onRequestClose={() =>
                             this.setState({ isShowingAddFilterModal: false })}
-                        onSelect={predicate => {
+                        onSelect={(predicate) => {
                             this.setState({
                                 query: query.concat(predicate),
                                 isShowingAddFilterModal: false,
@@ -464,30 +438,31 @@ class SideBar extends Component {
                 )}
                 <div
                     style={selectContainerStyle}
-                    onMouseOver={() => this.handleMatchConditionHover('over')}
-                    onMouseLeave={() => this.handleMatchConditionHover('leave')}
+                    onMouseOver={() => this.setState({ matchConditionColor: ash })}
+                    onMouseLeave={() => this.setState({ matchConditionColor: graphite })}
                 >
-                    <label style={matchStyle} htmlFor="any-all-select">
-                        MATCH
-                    </label>
-                    <Select
-                        id="any-all-select"
-                        style={selectStyle}
-                        isDisabled={false}
-                        value={queryCondition}
-                        onChange={e => {
-                            onSelect(e)
-                            this.props.setQueryCondition(
-                                e.target.value,
-                                false,
-                                query
-                            )
-                        }}
-                        onFocus={onFocus}
-                    >
-                        <option value="ALL">ALL</option>
-                        <option value="ANY">ANY</option>
-                    </Select>
+                    <div style={matchStyle}>
+                        MATCH:
+                    </div>
+                    <div style={{ backgroundColor: matchConditionColor, width: 50, borderRadius: 3, marginLeft: 5 }}>
+                        <Select
+                            id="any-all-select"
+                            name="any-all-select"
+                            style={selectStyle}
+                            isDisabled={false}
+                            value={queryCondition}
+                            onChange={(e) => {
+                                this.props.setQueryCondition(
+                                    e.target.value,
+                                    false,
+                                    query
+                                )
+                            }}
+                        >
+                            <option value="ALL">ALL</option>
+                            <option value="ANY">ANY</option>
+                        </Select>
+                    </div>
                 </div>
             </div>
         )
