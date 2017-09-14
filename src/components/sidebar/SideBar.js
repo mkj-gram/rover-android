@@ -653,7 +653,8 @@ class SideBar extends Component {
             modalCoordinates,
             isShowingAddFilterModal,
             showSegmentSelection,
-            showSegmentSave
+            showSegmentSave,
+            currentPredicate
         } = this.state
 
         const {
@@ -689,7 +690,12 @@ class SideBar extends Component {
                         right: null,
                         top: modalCoordinates[1],
                         left: modalCoordinates[0],
-                        transform: null
+                        transform: null,
+                        overflow:
+                            currentPredicate.__typename ===
+                            'StringArrayPredicate'
+                                ? 'visible'
+                                : 'auto'
                     }}
                     successButtonIsDisabled={
                         this.state.isFilterModalSuccessDisabled

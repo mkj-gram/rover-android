@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
 
 import { TextField, silver, graphite, ash, steel, Pill } from '@rover/react-bootstrap'
 import AddTag from './AddTag'
@@ -16,6 +15,14 @@ class SelectedTags extends Component {
         this.handleTextChange = this.handleTextChange.bind(this)
         this.handleKeyPress = this.handleKeyPress.bind(this)
         this.reset = this.reset.bind(this)
+    }
+
+    componentDidUpdate() {
+        this.textFieldScroll.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    componentDidMount() {
+        this.textInput.focusTextInput()
     }
 
     handleTextChange(e) {
@@ -63,11 +70,6 @@ class SelectedTags extends Component {
         })
     }
 
-    componentDidUpdate() {
-        const node = ReactDOM.findDOMNode(this.textFieldScroll)
-        node.scrollIntoView({ behavior: 'smooth' })
-    }
-
     render() {
         return (
             <div
@@ -89,7 +91,8 @@ class SelectedTags extends Component {
                             alignContent: 'flex-start',
                             flexWrap: 'wrap',
                             width: 370,
-                            height: 107,
+                            minHeight: 36,
+                            maxHeight: 107,
                             overflow: 'auto',
                             overflowX: 'hidden',
                             flex: '1 1'
@@ -127,7 +130,7 @@ class SelectedTags extends Component {
                                 onChange={this.handleTextChange}
                                 onKeyPress={this.handleKeyPress}
                                 onKeyDown={this.handleKeyPress}
-                                forceAutoFocus={true}
+                                ref={(input) => { this.textInput = input }}
                             />
                         </div>
                     </div>
@@ -136,6 +139,9 @@ class SelectedTags extends Component {
                             text={this.state.text}
                             updateTags={this.props.updateTags}
                             reset={this.reset}
+                            textInput={this.textInput}
+                            tags={this.props.tags}
+                            textScrollElem={this.textFieldScroll}
                         />
                     )}
                 </div>

@@ -26,9 +26,10 @@ class AddTag extends Component {
         }
         this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
         this.handleOnClick = this.handleOnClick.bind(this)
+        this.calculateTagPosition = this.calculateTagPosition.bind(this)
     }
 
-    componentDidMount() {
+    calculateTagPosition() {
         let { left, top } = document
             .getElementById('reactPillTextField')
             .getBoundingClientRect()
@@ -40,8 +41,19 @@ class AddTag extends Component {
         let topContainer = container.top
         this.setState({
             top: top - topContainer + 110,
-            left: left - 20 + 145 >= 420 ? 272 : left - 20
+            left: left - 20
         })
+    }
+
+    componentDidMount() {
+        this.calculateTagPosition()
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.tags.length !== this.props.tags.length) {
+            this.props.textScrollElem.scrollIntoView({ behavior: 'smooth' })
+            this.calculateTagPosition()
+        }
     }
 
     updateAddFilterColors(val) {
@@ -67,6 +79,7 @@ class AddTag extends Component {
     handleOnClick() {
         this.props.updateTags(this.props.text, 'add', null)
         this.props.reset()
+        this.props.textInput.focusTextInput()
     }
 
     render() {
@@ -78,7 +91,8 @@ class AddTag extends Component {
                     position: 'absolute',
                     top: top,
                     left: left,
-                    width: 145,
+                    minWidth: 145,
+                    maxWidth: 250,
                     height: 45,
                     borderStyle: 'solid',
                     borderWidth: '1px',
@@ -115,8 +129,9 @@ class AddTag extends Component {
                         whiteSpace: 'nowrap'
                     }}
                 >
-                    Add tag "{text}"
+                    Add tag "{text}
                 </div>
+                <span style={{marginRight: 32}}>"</span>
             </div>
         )
     }
