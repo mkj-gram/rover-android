@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { graphql, createRefetchContainer } from 'react-relay'
+import funnel from '../../../public/funnel.png'
 import {
     AddButton,
     ash,
@@ -29,7 +30,6 @@ import GeofenceInput from './GeofenceInput'
 import NumericInput from './NumericInput'
 import StringInput from './StringInput'
 import VersionInput from './VersionInput'
-import FunnelAnimation from './FunnelAnimation'
 import PredicateList from './PredicateList'
 import StringArrayInput from './StringArrayInput'
 
@@ -701,20 +701,14 @@ class SideBar extends Component {
                         style={{
                             ...text,
                             color: silver,
-                            margin: '30px auto',
+                            margin: '55px auto',
                             width: 210,
                             height: '100%',
                             textAlign: 'center'
                         }}
                     >
-                        <FunnelAnimation
-                            isModalOpen={
-                                isShowingAddFilterModal ||
-                                showSegmentSelection ||
-                                showSegmentSave
-                            }
-                        />
-                        <div style={{ marginBottom: 30 }}>
+                        <img src={funnel} alt="" style={{ width: 80, marginBottom: 28 }} />
+                        <div style={{ fontSize: 16, lineHeight: '22px', fontWeight: 300 }}>
                             <span
                                 style={{
                                     color: lavender,
@@ -725,13 +719,7 @@ class SideBar extends Component {
                             >
                                 Add a filter
                             </span>
-                            to start building segments based on your audience
-                            data
-                        </div>
-                        <div>
-                            When you&apos;re done with it, just{' '}
-                            <span style={{ color: 'white' }}>Save</span> it for
-                            later use
+                                to start building audience segments
                         </div>
                     </div>
                 )}
