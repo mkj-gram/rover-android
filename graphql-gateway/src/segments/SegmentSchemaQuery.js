@@ -16,7 +16,7 @@ const attributeTypeMap = {
     string: 'StringPredicate',
     timestamp: 'DatePredicate',
     version: 'VersionPredicate',
-    'array[string]': 'StringPredicate'
+    'array[string]': 'StringArrayPredicate'
 }
 
 const SegmentSchemaQuery = {
@@ -57,7 +57,8 @@ const SegmentSchemaQuery = {
             return response.getSchema().getAttributesList().map(schema => ({
                 attribute: schema.getAttribute(),
                 label: schema.getLabel(),
-                attributeType: attributeTypeMap[schema.getAttributeType()]
+                attributeType: attributeTypeMap[schema.getAttributeType()],
+                selector: 'CUSTOM_PROFILE'
             }))
         }
         return {

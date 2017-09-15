@@ -346,6 +346,7 @@ export const buildPredicateAggregate = (queryCondition, predicates) => {
     predicateAggregate.setPredicatesList(buildPredicates(predicates))
     return predicateAggregate
 }
+const getPredicateSelector = string => RoverApis.audience.v1.Models.Predicate.Selector[string]
 export const buildPredicates = (predicates) => {
     const parsedPredicates = JSON.parse(predicates)
     const predicateList = parsedPredicates.map(predicate => {
@@ -373,7 +374,7 @@ export const buildPredicates = (predicates) => {
                 pred.setGeofencePredicate(buildGeofencePredicate(predicate))
                 break
         }
-        pred.setModel(1)
+        pred.setSelector(getPredicateSelector(predicate.selector))
         return pred
     })
     return predicateList
@@ -423,7 +424,7 @@ const getRoverProfileValues = (id, p) => {
     Object.keys(props).forEach(property => {
         rover_profiles.push({
             attribute: property,
-            category: 'rover_profile',
+            selector: 'ROVER_PROFILE',
             value: props[property]
         })
     })
@@ -437,7 +438,7 @@ const getCustomProfileValues = (p) => {
     attributes.keys().arr_.forEach(key => {
         custom_profiles.push({
             attribute: key,
-            category: 'custom_profile',
+            selector: 'CUSTOM_PROFILE',
             value: valueFromProto(attributes.get(key))
         })
     })
@@ -491,7 +492,7 @@ export const deviceFromProto = (devices, d) => {
     devices[d.getProfileId()] = Object.keys(props).map(p => {
         return {
             attribute: p,
-            category: 'device',
+            selector: 'DEVICE',
             value: props[p]
         }
     })

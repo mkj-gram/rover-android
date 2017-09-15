@@ -18,7 +18,7 @@ const Predicate = new GraphQLInterfaceType({
         attribute: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        category: {
+        selector: {
             type: new GraphQLNonNull(GraphQLString)
         }
     })
@@ -31,7 +31,7 @@ export const StringPredicate = new GraphQLObjectType({
         attribute: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        category: {
+        selector: {
             type: new GraphQLNonNull(GraphQLString)
         },
         stringValue: {
@@ -53,7 +53,7 @@ export const BooleanPredicate = new GraphQLObjectType({
         attribute: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        category: {
+        selector: {
             type: new GraphQLNonNull(GraphQLString)
         },
         booleanValue: {
@@ -75,7 +75,7 @@ export const NumberPredicate = new GraphQLObjectType({
         attribute: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        category: {
+        selector: {
             type: new GraphQLNonNull(GraphQLString)
         },
         numberValue: {
@@ -97,7 +97,7 @@ export const FloatPredicate = new GraphQLObjectType({
         attribute: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        category: {
+        selector: {
             type: new GraphQLNonNull(GraphQLString)
         },
         floatValue: {
@@ -119,7 +119,7 @@ export const DatePredicate = new GraphQLObjectType({
         attribute: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        category: {
+        selector: {
             type: new GraphQLNonNull(GraphQLString)
         },
         dateValue: {
@@ -153,7 +153,7 @@ export const VersionPredicate = new GraphQLObjectType({
         attribute: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        category: {
+        selector: {
             type: new GraphQLNonNull(GraphQLString)
         },
         versionValue: {
@@ -175,7 +175,7 @@ export const GeofencePredicate = new GraphQLObjectType({
         attribute: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        category: {
+        selector: {
             type: new GraphQLNonNull(GraphQLString)
         },
         geofenceValue: {

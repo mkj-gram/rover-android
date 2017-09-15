@@ -9,6 +9,16 @@ import { getSegmentPageById } from './SegmentRowsQuery'
 
 import { getSegment } from './mockSegments'
 
+const getSelectorName = selector => {
+   const selectEnum = {
+       0: 'CUSTOM_PROFILE',
+       1: 'DEVICE',
+       2: 'ROVER_PROFILE'
+   }
+
+   return selectEnum[selector]
+}
+
 const DynamicSegmentQuery = {
     type: new GraphQLList(DynamicSegment),
     args: {
@@ -47,7 +57,7 @@ const DynamicSegmentQuery = {
             const response = await audienceClient.getDynamicSegmentById(request)
 
             const segment = response.getSegment()
-
+            
             const unpackStringPredicate = predicate => {
                 // IS_UNSET        = 0;
                 // IS_SET          = 1;
@@ -74,9 +84,9 @@ const DynamicSegmentQuery = {
                 const pred = predicate.getStringPredicate()
                 return {
                     attribute: pred.getAttributeName(),
-                    category: predicate.getModel(),
+                    selector: getSelectorName(predicate.getSelector()),
                     stringComparison: stringComparisons[pred.getOp()],
-                    stringValue: pred.getValue()
+                    stringValue: pred.getValue(),
                 }
             }
             
@@ -94,7 +104,7 @@ const DynamicSegmentQuery = {
                 const pred = predicate.getBoolPredicate()
                 return {
                     attribute: pred.getAttributeName(),
-                    category: predicate.getModel(),
+                    selector: getSelectorName(predicate.getSelector()),
                     booleanComparison: boolComparisons[pred.getOp()],
                     booleanValue: pred.getValue()
                 }
@@ -124,7 +134,7 @@ const DynamicSegmentQuery = {
                 const pred = predicate.getNumberPredicate()
                 return {
                     attribute: pred.getAttributeName(),
-                    category: predicate.getModel(),
+                    selector: getSelectorName(predicate.getSelector()),
                     numberComparison: numberComparisons[pred.getOp()],
                     numberValue: [pred.getValue(), pred.getValue2()]
                 }
@@ -154,7 +164,7 @@ const DynamicSegmentQuery = {
                 const pred = predicate.getDoublePredicate()
                 return {
                     attribute: pred.getAttributeName(),
-                    category: predicate.getModel(),
+                    selector: getSelectorName(predicate.getSelector()),
                     numberComparison: doubleComparisons[pred.getOp()],
                     numberValue: [pred.getValue(), pred.getValue2()]
                 }
@@ -191,7 +201,7 @@ const DynamicSegmentQuery = {
                 const pred = predicate.getDatePredicate()
                 return {
                     attribute: pred.getAttributeName(),
-                    category: predicate.getModel(),
+                    selector: getSelectorName(predicate.getSelector()),
                     dateComparison: dateComparisons[pred.getOp()],
                     dateValue: {
                         start: RoverApis.Helpers.timestampFromProto(pred.getValue()),
@@ -218,7 +228,7 @@ const DynamicSegmentQuery = {
                 const predLocation = pred.getValue()
                 return {
                     attribute: pred.getAttributeName(),
-                    category: predicate.getModel(),
+                    selector: getSelectorName(predicate.getSelector()),
                     geofenceComparison: geofenceComparisons[pred.getOp()],
                     geofenceValue: {
                         longitude: predLocation.getLongitude(),
@@ -262,7 +272,7 @@ const DynamicSegmentQuery = {
                 
                 return {
                     attribute: pred.getAttributeName(),
-                    category: predicate.getModel(),
+                    selector: getSelectorName(predicate.getSelector()),
                     versionComparison: versionComparisons[pred.getOp()],
                     versionValue: [
                         value.getMajor(),

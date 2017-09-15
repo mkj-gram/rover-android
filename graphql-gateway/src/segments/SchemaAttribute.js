@@ -17,6 +17,9 @@ const SchemaAttribute = new GraphQLObjectType({
         type: {
             type: new GraphQLNonNull(GraphQLString),
             resolve: ({ attributeType }) => attributeType
+        },
+        selector: {
+            type: new GraphQLNonNull(GraphQLString),
         }
     })
 })
