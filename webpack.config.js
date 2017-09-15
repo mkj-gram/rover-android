@@ -13,10 +13,6 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.exec\.js$/,
-                loader: 'script-loader'
-            },
-            {
                 test: /\.(js|jsx)$/,
                 loader: 'babel-loader',
                 exclude: [/node_modules/, /\.exec\.js$/]
@@ -24,6 +20,10 @@ module.exports = {
             {
                 test: /\.css$/,
                 loaders: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.png$/,
+                loader: 'file-loader'
             }
         ]
     },
