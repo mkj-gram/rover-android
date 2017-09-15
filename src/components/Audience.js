@@ -157,6 +157,7 @@ class Audience extends Component {
             refetchData
         } = this.state
         const { data } = this.props
+
         return (
             <div style={{ display: 'flex', flex: '1 1 100%' }}>
                 <SideBar
