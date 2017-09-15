@@ -34,23 +34,20 @@ const Middleware = function(client, opts = {}) {
 
         request.setLastSeenIp(ip)
 
+        const getError = function(err) {
+            return (err) ? new Error(err.message) : null
+        }
+        
         /*
             return function since authenticateToken and authenticateUserSession have the same response
          */
         const returnContext = function(err, AuthContext) {
-            if (err) {
-                if (err.code && err.code === grpc.status.NOT_FOUND) {
-                    return next({ code: grpc.status.UNAUTHENTICATED, message: "Permission Denied" })
-                } else {
-                    return next(err)    
-                }
+            req.auth = {
+                context: AuthContext,
+                error: getError(err)
             }
 
             req._authContext = AuthContext
-            req.auth = {
-                context: AuthContext
-            }
-
             return next()
         }
 
@@ -67,19 +64,17 @@ const Middleware = function(client, opts = {}) {
             try {
                 jwt = jwtDecode(key)
             } catch(e) {
-                return next({ code: grpc.status.INVALID_ARGUMENT, message: "Invalid JWT token" })
+                return returnContext(e, null)
             }
 
             if (jwt.jti) {
                 request.setKey(jwt.jti)
                 return client.authenticateUserSession(request, returnContext)
             } else {
-                return next({ code: grpc.status.INVALID_ARGUMENT, message: "Invalid JWT token" })
+                return returnContext({message: 'JWT token is missing jti'}, null)
             }
-           
-
         } else {
-            return next()
+            return returnContext({message: 'Unable to determine authentication type'}, null)
         }
     }
 }
