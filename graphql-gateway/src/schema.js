@@ -23,6 +23,7 @@ import {
     DatePredicate,
     GeofencePredicate,
     NumberPredicate,
+    StringArrayPredicate,
     StringPredicate,
     VersionPredicate,
 } from './segments/Predicate'
@@ -50,6 +51,7 @@ const schema = new GraphQLSchema({
             GeofencePredicate,
             NumberPredicate,
             StringPredicate,
+            StringArrayPredicate,
             VersionPredicate
         ]
 })

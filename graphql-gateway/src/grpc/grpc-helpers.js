@@ -338,6 +338,49 @@ export const buildGeofencePredicate = ({
     geofencePredicate.setValue(value)
     return geofencePredicate
 }
+
+export const buildStringArrayPredicate = ({
+    attribute,
+    stringArrayComparison,
+    stringArrayValue
+}) => {
+    // IS_UNSET                 = 0;
+    // IS_SET                   = 1;
+
+    // CONTAINS_ANY             = 2;
+    // DOES_NOT_CONTAIN_ANY     = 3;
+
+    // CONTAINS_ALL            = 4;
+    // DOES_NOT_CONTAIN_ALL    = 5;
+    let comparison
+    switch (stringArrayComparison) {
+        case 'is unset':
+            comparison = 0
+            break
+        case 'is set':
+            comparison = 1
+            break
+        case 'contains any':
+            comparison = 2
+            break
+        case 'does not contain any':
+            comparison = 3
+            break
+        case 'contains all':
+            comparison = 4
+            break
+        case 'does not contain all':
+            comaparison = 5
+            break
+        default:
+            comparison = 1
+    }
+    const stringArrayPredicate = new RoverApis.audience.v1.Models.StringArrayPredicate()
+    stringArrayPredicate.setAttributeName(attribute)
+    stringArrayPredicate.setOp(comparison)
+    stringArrayPredicate.setValue(stringArrayValue)
+    return stringArrayPredicate
+}
 export const buildPredicateAggregate = (queryCondition, predicates) => {
     const predicateAggregate = new RoverApis.audience.v1.Models
         .PredicateAggregate()
@@ -373,6 +416,8 @@ export const buildPredicates = (predicates) => {
             case 'GeofencePredicate':
                 pred.setGeofencePredicate(buildGeofencePredicate(predicate))
                 break
+            case 'StringArrayPredicate':
+                pred.setStringArrayPredicate(buildStringArrayPredicate(predicate))
         }
         pred.setSelector(getPredicateSelector(predicate.selector))
         return pred

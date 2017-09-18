@@ -213,4 +213,25 @@ const GeofenceValue = new GraphQLObjectType({
     })
 })
 
+export const StringArrayPredicate = new GraphQLObjectType({
+    name: 'StringArrayPredicate',
+    description: 'Array of tags predicate',
+    interfaces: [Predicate],
+    fields: () => ({
+        attribute: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        selector: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        stringArrayComparison: {
+            type: new GraphQLNonNull(GraphQLString),
+        },
+        stringArrayValue: {
+            type: new GraphQLNonNull(new GraphQLList(GraphQLString))
+        }
+    }),
+    isTypeOf: predicate => !!predicate.stringArrayComparison
+})
+
 export default Predicate

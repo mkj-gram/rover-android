@@ -285,6 +285,32 @@ const DynamicSegmentQuery = {
                 }
             }
 
+            const unpackStringArrayPredicate = predicate => {
+                // IS_UNSET                 = 0;
+                // IS_SET                   = 1;
+            
+                // CONTAINS_ANY             = 2;
+                // DOES_NOT_CONTAIN_ANY     = 3;
+            
+                // CONTAINS_ALL            = 4;
+                // DOES_NOT_CONTAIN_ALL    = 5;
+                const stringArrayComparisons = {
+                    0: 'is unset',
+                    1: 'is set',
+                    2: 'contains any',
+                    3: 'does not contain any',
+                    4: 'contains all',
+                    5: 'does not contain all'
+                }
+                const pred = predicate.getStringArrayPredicate()
+                return {
+                    attribute: pred.getAttributeName(),
+                    selector: predicate.getSelector(),
+                    stringArrayComparison: stringArrayComparisons[pred.getOp()],
+                    stringArrayValue: pred.getValueList()
+                }
+            }
+
             const predicateList = segment.getPredicateAggregate().getPredicatesList().map(predicate => {
                 switch (predicate.getValueCase()) {
                     case 2:
@@ -307,6 +333,9 @@ const DynamicSegmentQuery = {
                         break
                     case 8:
                         return unpackFloatPredicate(predicate)
+                        break
+                    case 9:
+                        return unpackStringArrayPredicate(predicate)
                         break
                 }
             })
