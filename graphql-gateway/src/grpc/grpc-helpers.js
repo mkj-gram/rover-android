@@ -370,7 +370,7 @@ export const buildStringArrayPredicate = ({
             comparison = 4
             break
         case 'does not contain all':
-            comaparison = 5
+            comparison = 5
             break
         default:
             comparison = 1
@@ -378,7 +378,7 @@ export const buildStringArrayPredicate = ({
     const stringArrayPredicate = new RoverApis.audience.v1.Models.StringArrayPredicate()
     stringArrayPredicate.setAttributeName(attribute)
     stringArrayPredicate.setOp(comparison)
-    stringArrayPredicate.setValue(stringArrayValue)
+    stringArrayPredicate.setValueList(stringArrayValue)
     return stringArrayPredicate
 }
 export const buildPredicateAggregate = (queryCondition, predicates) => {

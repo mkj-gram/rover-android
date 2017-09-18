@@ -305,7 +305,7 @@ const DynamicSegmentQuery = {
                 const pred = predicate.getStringArrayPredicate()
                 return {
                     attribute: pred.getAttributeName(),
-                    selector: predicate.getSelector(),
+                    selector: getSelectorName(predicate.getSelector()),
                     stringArrayComparison: stringArrayComparisons[pred.getOp()],
                     stringArrayValue: pred.getValueList()
                 }
