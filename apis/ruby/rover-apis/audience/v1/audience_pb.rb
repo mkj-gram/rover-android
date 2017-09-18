@@ -557,6 +557,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.QueryRequest.CursorIterator" do
     optional :id, :string, 1
+    optional :batch_size, :int64, 2
   end
   add_message "rover.audience.v1.QueryRequest.TimeZoneOffset" do
     optional :minutes, :int64, 1

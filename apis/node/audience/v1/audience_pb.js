@@ -19757,7 +19757,8 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.toObject = functio
  */
 proto.rover.audience.v1.QueryRequest.CursorIterator.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    batchSize: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -19798,6 +19799,10 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.deserializeBinaryFromReader 
       var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setBatchSize(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -19833,6 +19838,13 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.serializeBinaryToWriter = fu
       f
     );
   }
+  f = message.getBatchSize();
+  if (f !== 0) {
+    writer.writeInt64(
+      2,
+      f
+    );
+  }
 };
 
 
@@ -19848,6 +19860,21 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.getId = function()
 /** @param {string} value */
 proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.setId = function(value) {
   jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional int64 batch_size = 2;
+ * @return {number}
+ */
+proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.getBatchSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.setBatchSize = function(value) {
+  jspb.Message.setField(this, 2, value);
 };
 
 

@@ -927,6 +927,7 @@ message QueryRequest {
 
   message CursorIterator {
     string id = 1;
+    int64 batch_size = 2;
   }
 
   message TimeZoneOffset {
