@@ -929,10 +929,19 @@ message QueryRequest {
     string id = 1;
   }
 
+  message TimeZoneOffset {
+    int64 minutes = 1;
+  }
+
   oneof iterator {
     PageIterator page_iterator = 3;
     CursorIterator cursor_iterator = 4;
   }
+
+  // Optional
+  TimeZoneOffset time_zone_offset = 5;
+
+  
 }
 
 message QueryResponse {
