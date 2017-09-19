@@ -329,7 +329,6 @@ func TestWorker(t *testing.T) {
 							"locale_region":                  "",
 							"locale_script":                  "",
 
-							"location":           M{"lat": 0.0, "lon": 0.0},
 							"location_latitude":  0.0,
 							"location_longitude": 0.0,
 
@@ -460,7 +459,6 @@ func TestWorker(t *testing.T) {
 							"locale_region":                  "",
 							"locale_script":                  "",
 
-							"location":           M{"lat": 0.0, "lon": 0.0},
 							"location_latitude":  0.0,
 							"location_longitude": 0.0,
 
@@ -472,6 +470,91 @@ func TestWorker(t *testing.T) {
 							"os_version":                 nil,
 							"platform":                   "",
 							"profile_id":                 "000000000000000000000aa2",
+							"push_environment":           "",
+							"push_token_created_at":      nil,
+							"push_token_is_active":       false,
+							"push_token_key":             "",
+							"push_token_unregistered_at": nil,
+							"push_token_updated_at":      nil,
+							"radio":                      "",
+							"screen_height":              0.0,
+							"screen_width":               0.0,
+							"time_zone":                  "",
+							"updated_at":                 "2017-06-14T15:44:18Z",
+						},
+					},
+				},
+			},
+
+			exp: &expect{},
+		},
+
+		{
+			desc: "device gets indexed with location",
+
+			req: &pubsub.Message{
+				Data: toJSON(t, []service.Message{
+					{
+						"account_id": "1",
+						"event":      "updated",
+						"model":      "device",
+						"profile_id": "bbbbbbbbbbbbbbbbbbbbbbbb",
+						"device_id":  "AAAAABBBBBBCCCCCCC",
+					},
+				}),
+			},
+
+			before: &expect{
+				path: "/test_account_1/device/AAAAABBBBBBCCCCCCC?parent=bbbbbbbbbbbbbbbbbbbbbbbb",
+				err:  &es5.Error{Status: 404},
+			},
+
+			after: &expect{
+				path: "/test_account_1/device/AAAAABBBBBBCCCCCCC?parent=bbbbbbbbbbbbbbbbbbbbbbbb",
+				val: response{
+					Code: 200,
+					Body: M{
+						"_index":   "test_account_1",
+						"_type":    "device",
+						"_id":      "AAAAABBBBBBCCCCCCC",
+						"_version": 1.0,
+						"_routing": "bbbbbbbbbbbbbbbbbbbbbbbb",
+						"_parent":  "bbbbbbbbbbbbbbbbbbbbbbbb",
+						"found":    true,
+						"_source": M{
+							"account_id":                     1.0,
+							"advertising_id":                 "",
+							"app_build":                      "",
+							"app_name":                       "",
+							"app_namespace":                  "",
+							"app_version":                    "",
+							"carrier_name":                   "",
+							"created_at":                     "2017-06-14T15:44:18Z",
+							"device_id":                      "AAAAABBBBBBCCCCCCC",
+							"device_manufacturer":            "",
+							"device_model":                   "",
+							"is_background_enabled":          false,
+							"is_bluetooth_enabled":           false,
+							"is_cellular_enabled":            false,
+							"is_location_monitoring_enabled": false,
+							"is_test_device":                 false,
+							"is_wifi_enabled":                false,
+							"locale_language":                "",
+							"locale_region":                  "",
+							"locale_script":                  "",
+
+							"location":           M{"lat": 23.23, "lon": -83.2923},
+							"location_latitude":  23.23,
+							"location_longitude": -83.2923,
+
+							"location_accuracy":          0.0,
+							"location_city":              "",
+							"location_region":            "",
+							"location_street":            "",
+							"os_name":                    "",
+							"os_version":                 nil,
+							"platform":                   "",
+							"profile_id":                 "bbbbbbbbbbbbbbbbbbbbbbbb",
 							"push_environment":           "",
 							"push_token_created_at":      nil,
 							"push_token_is_active":       false,
@@ -549,7 +632,6 @@ func TestWorker(t *testing.T) {
 							"locale_region":                  "",
 							"locale_script":                  "",
 
-							"location":           M{"lat": 0.0, "lon": 0.0},
 							"location_latitude":  0.0,
 							"location_longitude": 0.0,
 

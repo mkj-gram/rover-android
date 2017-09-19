@@ -93,9 +93,6 @@ func DeviceDoc(d *mongodb.Device) M {
 
 		"advertising_id": d.AdvertisingId,
 
-		// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html
-		"location": M{"lat": d.LocationLatitude, "lon": d.LocationLongitude},
-
 		"location_latitude":  d.LocationLatitude,
 		"location_longitude": d.LocationLongitude,
 
@@ -114,6 +111,11 @@ func DeviceDoc(d *mongodb.Device) M {
 		// google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
 		// repeated GeofenceRegion geofence_monitoring_regions = 51;
 
+	}
+
+	if d.LocationLongitude != float64(0) && d.LocationLatitude != float64(0) {
+		// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html
+		m["location"] = M{"lat": d.LocationLatitude, "lon": d.LocationLongitude}
 	}
 
 	// NOTE: key is encoded as dots aren't allowed in mongo map keys

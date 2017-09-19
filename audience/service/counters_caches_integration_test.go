@@ -65,7 +65,7 @@ func testAudienceService_GetDevicesTotalCount(t *testing.T) {
 
 			exp: &audience.GetDevicesTotalCountResponse{
 				// this test is probably fragile
-				Total: 8,
+				Total: 9,
 			},
 		},
 	}
