@@ -2,21 +2,23 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const ModalInputPrompt = ({
-    attributeType,
+    selector,
     style,
     includeIs,
     label,
     includeHas
 }) => (
     <div style={style}>
-        {`Include ${attributeType} where ${label}`}
+        {`Include ${getSelector(selector)} where ${label}`}
         {includeIs ? ' is' : ''}
         {includeHas ? ' has' : ''}
     </div>
 )
 
+const getSelector = selector => selector === 'DEVICE' ? 'devices' : 'profiles'
+
 ModalInputPrompt.propTypes = {
-    attributeType: PropTypes.string.isRequired,
+    selector: PropTypes.string.isRequired,
     style: PropTypes.object,
     includeIs: PropTypes.bool,
     label: PropTypes.string.isRequired

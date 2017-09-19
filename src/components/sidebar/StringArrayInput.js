@@ -37,7 +37,7 @@ class StringArrayInput extends Component {
     updateValue(stringArrayComparison, stringArrayValue) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -46,7 +46,7 @@ class StringArrayInput extends Component {
         updateFn({
             attribute,
             stringArrayComparison,
-            category,
+            selector,
             __typename,
             index,
             stringArrayValue,
@@ -75,7 +75,7 @@ class StringArrayInput extends Component {
     }
 
     render() {
-        const { category, label } = this.props
+        const { selector, label } = this.props
         const { stringArrayComparison } = this.state
         return (
             <div
@@ -133,11 +133,19 @@ class StringArrayInput extends Component {
     }
 }
 
+StringArrayInput.propTypes = {
+    attribute: PropTypes.string.isRequired,
+    stringArrayValue: PropTypes.arrayOf(PropTypes.string),
+    stringArrayComparison: PropTypes.string,
+    selector: PropTypes.string,
+    label: PropTypes.string.isRequired
+}
+
 StringArrayInput.defaultProps = {
     attribute: '',
     stringArrayValue: [],
     stringArrayComparison: 'contains all',
-    category: 'device',
+    selector: 'CUSTOM_PROFILE',
     index: 0,
     label: ''
 }

@@ -10,7 +10,7 @@ import {
     mercury
 } from '@rover/react-bootstrap'
 
-import {getDeviceSchemaColumns} from '../deviceSchema'
+import { getDeviceSchemaColumns } from '../../localSchemas/deviceSchema'
 import ColumnDisplay from './ColumnDisplay'
 
 const modalContainer = {
@@ -88,18 +88,18 @@ const ColumnDisplayContainer = ({
             {Object.keys(deviceColumns).map(group => (
                 <div key={group}>
                 <ColumnDisplay
-                    category={group}
+                    selector={group}
                     items={deviceColumns[group]}
                     updateChecked={updateChecked}
                     showChecked={showChecked}
-                    devices={true}
+                    devices
                 />
                 <div style={segmentLine} />
                 </div>
                 )
             )}
                 <ColumnDisplay
-                    category="profiles"
+                    selector="profiles"
                     items={allColumns.profiles}
                     updateChecked={updateChecked}
                     showChecked={showChecked}

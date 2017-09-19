@@ -146,7 +146,7 @@ class DateInput extends Component {
     updateComparison(dateComparison) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -162,7 +162,7 @@ class DateInput extends Component {
         updateFn({
             attribute,
             dateComparison,
-            category,
+            selector,
             __typename,
             index,
             dateValue: {
@@ -178,7 +178,7 @@ class DateInput extends Component {
     updateValue(dateValue) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -195,7 +195,7 @@ class DateInput extends Component {
         updateFn({
             attribute,
             dateComparison,
-            category,
+            selector,
             __typename,
             index,
             dateValue: {
@@ -211,11 +211,11 @@ class DateInput extends Component {
     }
 
     render() {
-        const { category, label } = this.props
+        const { selector, label } = this.props
         const { dateComparison } = this.state
         return (
             <div style={{ ...text, ...light, color: silver, width: 444 }}>
-                <ModalInputPrompt attributeType={category} label={label} />
+                <ModalInputPrompt selector={selector} label={label} />
                 <div
                     style={{
                         display: 'flex',
@@ -266,7 +266,7 @@ DateInput.propTypes = {
     attribute: PropTypes.string.isRequired,
     dateValue: PropTypes.object.isRequired,
     dateComparison: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
+    selector: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     __typename: PropTypes.string.isRequired,
@@ -280,7 +280,7 @@ DateInput.defaultProps = {
         end: {}
     },
     dateComparison: 'exactly',
-    category: 'device',
+    selector: 'DEVICE',
     index: 0,
     updateFn: () => '',
     label: ''

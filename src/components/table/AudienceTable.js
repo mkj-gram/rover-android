@@ -8,7 +8,8 @@ import TableMenuBarAlpha from './TableMenuBarAlpha'
 
 import DateCellFormatter from './DateCellFormatter'
 import BooleanCellFormatter from './BooleanCellFormatter'
-import { getDeviceSchema } from '../deviceSchema'
+import { getDeviceSchema } from '../../localSchemas/deviceSchema'
+import roverProfileSchema from '../../localSchemas/roverProfileSchema'
 
 class AudienceTable extends Component {
     constructor(props) {
@@ -82,19 +83,23 @@ class AudienceTable extends Component {
         const selectedColumns = {
             device_id: {
                 __typename: 'StringPredicate',
-                label: 'Device ID'
+                label: 'Device ID',
+                selector: 'DEVICE'
             },
             os_version: {
                 __typename: 'VersionPredicate',
-                label: 'OS Version'
+                label: 'OS Version',
+                selector: 'DEVICE'
             },
             app_version: {
                 __typename: 'StringPredicate',
-                label: 'App Version'
+                label: 'App Version',
+                selector: 'DEVICE'
             },
             'first-name': {
                 __typename: 'StringPredicate',
-                label: 'First Name'
+                label: 'First Name',
+                selector: 'DEVICE'
             }
         }
 
@@ -119,27 +124,44 @@ class AudienceTable extends Component {
 
     getAllColumns(deviceSchema, profileSchema) {
         const devices = {}
-        const profiles = {}
+        const customProfiles = {}
+        const roverProfiles = {}
 
         deviceSchema.map(
             device =>
                 (devices[device.attribute] = {
                     __typename: device.__typename,
                     label: device.label,
-                    group: device.group
+                    group: device.group,
+                    selector: 'DEVICE'
                 })
         )
         profileSchema.map(
             profile =>
-                (profiles[profile.attribute] = {
+                (customProfiles[profile.attribute] = {
                     __typename: profile.__typename,
-                    label: profile.label
+                    label: profile.label,
+                    selector: 'CUSTOM_PROFILE'
                 })
         )
+        roverProfileSchema().map(
+            profile =>
+            (roverProfiles[profile.attribute] = {
+                __typename: profile.__typename,
+                label: profile.label,
+                selector: 'ROVER_PROFILE'
+            })
+        )
+
+        const profiles = {
+            ...customProfiles,
+            ...roverProfiles
+        }
+
         this.setState({ allColumns: { devices, profiles } })
     }
 
-    updateChecked(category, item, devices = false) {
+    updateChecked(selector, item, devices = false) {
         const { allColumns } = this.state
         let cachedSelectedColumns = JSON.parse(
             localStorage.getItem('selectedColumns')
@@ -152,12 +174,14 @@ class AudienceTable extends Component {
             if (devices) {
                 values = {
                     __typename: allColumns.devices[item].__typename,
-                    label: allColumns.devices[item].label
+                    label: allColumns.devices[item].label,
+                    selector: allColumns.devices[item].selector
                 }
             } else {
                 values = {
-                    __typename: allColumns[category][item].__typename,
-                    label: allColumns[category][item].label
+                    __typename: allColumns[selector][item].__typename,
+                    label: allColumns[selector][item].label,
+                    selector: allColumns[selector][item].selector
                 }
             }
             const property = {
@@ -181,8 +205,6 @@ class AudienceTable extends Component {
 
         this.createRowsAndColumns(this.state.dataGridRows)
     }
-
-    
 
     fetchData(nextProps) {
         const { relay } = this.props
@@ -347,7 +369,7 @@ class AudienceTable extends Component {
             const row = {}
             data.forEach((property) => {
                 if (property.attribute in selectedColumns) {
-                    row[property.attribute] = this.formatRowData(
+                    row[`${property.attribute}_${property.selector}`] = this.formatRowData(
                         property.value,
                         selectedColumns[property.attribute].__typename
                     )
@@ -426,7 +448,7 @@ class AudienceTable extends Component {
         const selectedColumns = JSON.parse(localStorage.selectedColumns)
 
         const columns = Object.keys(selectedColumns).map(attr => ({
-            key: attr,
+            key: `${attr}_${selectedColumns[attr].selector}`,
             name: selectedColumns[attr].label,
             width: 200,
             draggable: true,

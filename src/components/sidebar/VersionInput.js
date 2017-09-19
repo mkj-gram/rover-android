@@ -25,7 +25,7 @@ class VersionInput extends Component {
     updateVersion(version, versionIndex) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -41,7 +41,7 @@ class VersionInput extends Component {
         updateFn({
             attribute,
             versionComparison,
-            category,
+            selector,
             __typename,
             index,
             versionValue: newValue,
@@ -54,7 +54,7 @@ class VersionInput extends Component {
     updateComparison(versionComparison) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -74,7 +74,7 @@ class VersionInput extends Component {
             attribute,
             versionComparison,
             versionValue: newVersionValue,
-            category,
+            selector,
             __typename,
             index,
             label
@@ -96,12 +96,12 @@ class VersionInput extends Component {
     }
 
     render() {
-        const { category, label } = this.props
+        const { selector, label } = this.props
         const { versionValue, versionComparison } = this.state
 
         return (
             <div style={{ ...text, ...light, color: silver, width: 495 }}>
-                <ModalInputPrompt attributeType={category} label={label} />
+                <ModalInputPrompt selector={selector} label={label} />
                 <div
                     style={{
                         display: 'flex',
@@ -167,7 +167,7 @@ VersionInput.propTypes = {
     attribute: PropTypes.string.isRequired,
     versionValue: PropTypes.arrayOf(PropTypes.number),
     versionComparison: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
+    selector: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     __typename: PropTypes.string.isRequired,
@@ -178,7 +178,7 @@ VersionInput.defaultProps = {
     attribute: '',
     versionValue: [0, 0, 0, 0, 0, 0],
     versionComparison: 'equal to',
-    category: 'device',
+    selector: 'DEVICE',
     index: 0,
     updateFn: () => null,
     label: ''

@@ -25,7 +25,7 @@ class StringInput extends Component {
     updateComparison(stringComparison) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -40,7 +40,7 @@ class StringInput extends Component {
         updateFn({
             attribute,
             stringComparison,
-            category,
+            selector,
             __typename,
             index,
             stringValue,
@@ -52,7 +52,7 @@ class StringInput extends Component {
     updateValue(stringValue) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -62,7 +62,7 @@ class StringInput extends Component {
         updateFn({
             attribute,
             stringComparison,
-            category,
+            selector,
             __typename,
             index,
             stringValue,
@@ -72,13 +72,13 @@ class StringInput extends Component {
     }
 
     render() {
-        const { category, label } = this.props
+        const { selector, label } = this.props
         const { stringValue, stringComparison } = this.state
 
         return (
             <div style={{ ...text, ...light, color: silver, width: 380 }}>
                 <ModalInputPrompt
-                    attributeType={category}
+                    selector={selector}
                     includeIs={false}
                     label={label}
                 />
@@ -140,7 +140,7 @@ StringInput.propTypes = {
     attribute: PropTypes.string.isRequired,
     stringValue: PropTypes.string.isRequired,
     stringComparison: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
+    selector: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     __typename: PropTypes.string.isRequired,
@@ -151,7 +151,7 @@ StringInput.defaultProps = {
     attribute: '',
     stringValue: '',
     stringComparison: 'is',
-    category: 'device',
+    selector: 'DEVICE',
     index: 0,
     updateFn: () => null,
     label: ''

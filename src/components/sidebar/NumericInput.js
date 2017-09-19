@@ -25,7 +25,7 @@ class NumericInput extends Component {
     updateComparison(numberComparison) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -49,7 +49,7 @@ class NumericInput extends Component {
             updateFn({
                 attribute,
                 floatComparison: numberComparison,
-                category,
+                selector,
                 index,
                 floatValue: numberValue,
                 __typename,
@@ -59,7 +59,7 @@ class NumericInput extends Component {
             updateFn({
                 attribute,
                 numberComparison,
-                category,
+                selector,
                 index,
                 numberValue,
                 __typename,
@@ -73,7 +73,7 @@ class NumericInput extends Component {
     updateValue(number, valueIndex) {
         const {
             attribute,
-            category,
+            selector,
             __typename,
             index,
             updateFn,
@@ -90,7 +90,7 @@ class NumericInput extends Component {
             updateFn({
                 attribute,
                 floatComparison: numberComparison,
-                category,
+                selector,
                 index,
                 floatValue: newValue,
                 __typename,
@@ -100,7 +100,7 @@ class NumericInput extends Component {
             updateFn({
                 attribute,
                 numberComparison,
-                category,
+                selector,
                 index,
                 numberValue: newValue,
                 __typename,
@@ -112,13 +112,13 @@ class NumericInput extends Component {
     }
 
     render() {
-        const { attribute, category, label } = this.props
+        const { attribute, selector, label } = this.props
         const { numberComparison, numberValue } = this.state
 
         return (
             <div style={{ ...text, color: silver, width: 283 }}>
                 <ModalInputPrompt
-                    attributeType={category}
+                    selector={selector}
                     includeIs={false}
                     label={label}
                 />
@@ -198,7 +198,7 @@ NumericInput.propTypes = {
     attribute: PropTypes.string.isRequired,
     numberValue: PropTypes.arrayOf(PropTypes.number).isRequired,
     numberComparison: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
+    selector: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     __typename: PropTypes.string.isRequired,
@@ -210,7 +210,7 @@ NumericInput.defaultProps = {
     attribute: '',
     numberValue: [0],
     numberComparison: 'is',
-    category: 'device',
+    selector: 'DEVICE',
     index: 0,
     updateFn: () => null,
     float: false,
