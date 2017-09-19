@@ -289,7 +289,7 @@ GeofenceInput.defaultProps = {
         radius: 100,
         name: 'Toronto'
     },
-    geofenceComparison: 'IS_WITHIN',
+    geofenceComparison: 'is within',
     label: '',
     selector: 'DEVICE'
 }

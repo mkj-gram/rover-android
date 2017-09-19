@@ -42,15 +42,15 @@ class DateInput extends Component {
         const { start, end, dateComparison } = this.state
 
         switch (dateComparison) {
-            case 'in between':
+            case 'is between':
                 return this.renderInBetweenCalendarInput(start, end)
-            case 'after':
-            case 'on':
-            case 'before':
+            case 'is after':
+            case 'is on':
+            case 'is before':
                 return this.renderCalendarInput(start)
-            case 'more than':
-            case 'exactly':
-            case 'less than':
+            case 'is greater than':
+            case 'is equal':
+            case 'is less than':
             default:
                 return this.renderRelativeDatePicker(start)
         }
@@ -64,7 +64,6 @@ class DateInput extends Component {
             (e.target.parentElement.parentElement.style.borderColor = silver)
         const onBlur = e =>
             (e.target.parentElement.parentElement.style.borderColor = steel)
-
         return (
             <div
                 style={{
@@ -153,11 +152,7 @@ class DateInput extends Component {
             label
         } = this.props
         const start = moment()
-        let end = {}
-
-        if (dateComparison === 'in between') {
-            end = moment()
-        }
+        const end = moment()
 
         updateFn({
             attribute,
@@ -244,15 +239,15 @@ class DateInput extends Component {
                         onChange={e => this.updateComparison(e.target.value)}
                     >
                         <optgroup label="Relative">
-                            <option value="more than">More than</option>
-                            <option value="exactly">Exactly</option>
-                            <option value="less than">Less than</option>
+                            <option value="is greater than">More than</option>
+                            <option value="is equal">Exactly</option>
+                            <option value="is less than">Less than</option>
                         </optgroup>
                         <optgroup label="Absolute">
-                            <option value="after">After</option>
-                            <option value="on">On</option>
-                            <option value="before">Before</option>
-                            <option value="in between">In Between</option>
+                            <option value="is after">After</option>
+                            <option value="is on">On</option>
+                            <option value="is before">Before</option>
+                            <option value="is between">In Between</option>
                         </optgroup>
                     </Select>
                     {this.renderDatePicker()}
@@ -265,7 +260,7 @@ class DateInput extends Component {
 DateInput.propTypes = {
     attribute: PropTypes.string.isRequired,
     dateValue: PropTypes.object.isRequired,
-    dateComparison: PropTypes.string.isRequired,
+    dateComparison: PropTypes.string,
     selector: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
@@ -276,10 +271,10 @@ DateInput.propTypes = {
 DateInput.defaultProps = {
     attribute: '',
     dateValue: {
-        start: moment(),
-        end: {}
+        start: moment().toISOString(),
+        end: moment().toISOString()
     },
-    dateComparison: 'exactly',
+    dateComparison: 'is equal',
     selector: 'DEVICE',
     index: 0,
     updateFn: () => '',

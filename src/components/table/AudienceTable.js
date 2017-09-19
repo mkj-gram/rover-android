@@ -228,6 +228,7 @@ class AudienceTable extends Component {
                 pageNumber: Math.floor(nextProps.pageNumber / 3),
                 condition: predicates.condition
             })
+            this.setState({ refetched: true })
             relay.refetch(
                 refetchVariables,
                 null,
@@ -245,6 +246,7 @@ class AudienceTable extends Component {
                 pageNumber: Math.floor(nextProps.pageNumber / 3),
                 condition: 'ANY'
             })
+            this.setState({ refetched: true })
 
             relay.refetch(
                 refetchVariables,
@@ -277,12 +279,7 @@ class AudienceTable extends Component {
                         )
                     })
                 } else {
-                    this.setState(
-                        {
-                            refetched: true
-                        },
-                        this.fetchData(nextProps)
-                    )
+                    this.fetchData(nextProps)
                 }
             } else if (renderFetchEnabled === null) {
                 this.updateContextData(nextProps)

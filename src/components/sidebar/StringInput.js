@@ -117,7 +117,6 @@ class StringInput extends Component {
                         <option value="does not contain">
                             Does not contain
                         </option>
-                        <option value="is unknown">Is unknown</option>
                     </Select>
 
                     {stringComparison !== 'is unknown' &&

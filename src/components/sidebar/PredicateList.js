@@ -133,7 +133,7 @@ const renderStringPredicate = ({ stringComparison, stringValue }) => (
 )
 
 const renderDatePredicate = ({ dateComparison, dateValue }) => {
-    if (['exactly', 'less than', 'more than'].includes(dateComparison)) {
+    if (['is equal', 'is less than', 'is greater than'].includes(dateComparison)) {
         return (
             <div>
                 {renderPredicateComparison(dateComparison)}
@@ -143,7 +143,7 @@ const renderDatePredicate = ({ dateComparison, dateValue }) => {
         )
     }
 
-    if (['after', 'on', 'before'].includes(dateComparison)) {
+    if (['is after', 'is on', 'is before'].includes(dateComparison)) {
         return (
             <div>
                 {renderPredicateComparison(dateComparison)}
@@ -154,7 +154,7 @@ const renderDatePredicate = ({ dateComparison, dateValue }) => {
         )
     }
 
-    if (dateComparison === 'in between') {
+    if (dateComparison === 'is between') {
         return (
             <div>
                 {renderPredicateComparison('between')}
@@ -178,7 +178,7 @@ const renderVersionPredicate = ({
         return renderPredicateComparison(versionComparison)
     }
 
-    if (versionComparison === 'in between') {
+    if (versionComparison === 'is between') {
         const firstValue = versionValue.slice(0, 3).map((num, index) => (
             <span key={index}>
                 {num}
@@ -237,7 +237,7 @@ const renderNumericPredicate = ({
         return renderPredicateComparison(comparison)
     }
 
-    if (comparison === 'in between') {
+    if (comparison === 'is between') {
         return (
             <div>
                 {renderPredicateComparison('between')}
