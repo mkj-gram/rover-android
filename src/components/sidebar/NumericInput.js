@@ -150,29 +150,25 @@ class NumericInput extends Component {
                         value={numberComparison}
                         onChange={e => this.updateComparison(e.target.value)}
                     >
-                        <option value="is">Is</option>
-                        <option value="is not">Is not</option>
-                        <option value="greater than">Greater than</option>
-                        <option value="less than">Less than</option>
-                        <option value="in between">In between</option>
-                        <option value="is unknown">Is unknown</option>
-                        <option value="has any value">Has any value</option>
+                        <option value="is equal">Is</option>
+                        <option value="is not equal">Is not</option>
+                        <option value="is greater than">Greater than</option>
+                        <option value="is less than">Less than</option>
+                        <option value="is between">In between</option>
                     </Select>
-                    {numberComparison !== 'is unknown' &&
-                        numberComparison !== 'has any value' &&
-                        <ModalInput
-                            type="number"
-                            min={0}
-                            value={numberValue[0]}
-                            step={this.props.float ? 0.1 : 1}
-                            onChange={e => {
-                                const parsedValue = this.props.float
-                                    ? parseFloat(e.target.value)
-                                    : parseInt(e.target.value, 10)
-                                this.updateValue(parsedValue, 0)
-                            }}
-                        />}
-                    {numberComparison === 'in between' &&
+                    <ModalInput
+                        type="number"
+                        min={0}
+                        value={numberValue[0]}
+                        step={this.props.float ? 0.1 : 1}
+                        onChange={e => {
+                            const parsedValue = this.props.float
+                                ? parseFloat(e.target.value)
+                                : parseInt(e.target.value, 10)
+                            this.updateValue(parsedValue, 0)
+                        }}
+                    />
+                    {numberComparison === 'is between' &&
                         <div>
                             <span style={{ fontStyle: 'italic' }}>and</span>
                             <ModalInput

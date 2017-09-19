@@ -130,22 +130,20 @@ class VersionInput extends Component {
                         value={versionComparison}
                         onChange={e => this.updateComparison(e.target.value)}
                     >
-                        <option value="equals">Equal to</option>
-                        <option value="does not equal">Not equal to</option>
-                        <option value="less than">Less than</option>
-                        <option value="greater than">Greater than</option>
-                        <option value="in between">In between</option>
-                        <option value="is unknown">Unknown</option>
+                        <option value="is equal">Equal to</option>
+                        <option value="is not equal">Not equal to</option>
+                        <option value="is less than">Less than</option>
+                        <option value="is greater than">Greater than</option>
+                        <option value="is between">In between</option>
                     </Select>
 
-                    {versionComparison !== 'is unknown' &&
-                        versionValue.slice(0, 3).map((val, index) =>
-                            <div key={index}>
-                                {this.renderNumberInput(val, index)}
-                                {index < 2 && '.'}
-                            </div>
-                        )}
-                    {versionComparison === 'in between' &&
+                    {versionValue.slice(0, 3).map((val, index) =>
+                        <div key={index}>
+                            {this.renderNumberInput(val, index)}
+                            {index < 2 && '.'}
+                        </div>
+                    )}
+                    {versionComparison === 'is between' &&
                         <div
                             style={{ display: 'flex', alignItems: 'baseline' }}
                         >
@@ -177,7 +175,7 @@ VersionInput.propTypes = {
 VersionInput.defaultProps = {
     attribute: '',
     versionValue: [0, 0, 0, 0, 0, 0],
-    versionComparison: 'equal to',
+    versionComparison: 'is equal',
     selector: 'DEVICE',
     index: 0,
     updateFn: () => null,
