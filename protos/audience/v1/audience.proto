@@ -925,9 +925,43 @@ message QueryRequest {
     int32 size = 2;
   }
 
-  message CursorIterator {
-    string id = 1;
-    int64 batch_size = 2;
+
+  message ScrollIterator {
+
+    // Indicates that the client wishes to start a parallel scroll. This works by creating 
+    // breaking up the return set into max_streams and opening a scroll iterator for each subset of data
+    message StartParallelScroll {
+      // Maximum number of streams to split the result set into
+      int32 max_streams = 1;
+      // Which subset will the scroll iterator be targeting
+      int32 stream_id   = 2;
+      // The size of the batch that is returned. This value is respected in Next
+      int32 batch_size  = 3;
+    }
+
+    // Simple scroll iterator which opens 1 stream
+    message StartScroll {
+      int32 batch_size = 1;
+    }
+
+    // Grab the next batch in the scroll
+    message Next {
+      string scroll_id = 1;
+    }
+
+    // Signals that the scroll is no longer in use and that the service should free up resources it has allocated for the stream
+    message Clear {
+      string scroll_id = 1;
+    }
+
+    // The operation or command to execute for the scroll iterator
+    oneof operation {
+      StartParallelScroll start_parallel_scroll = 1;
+      StartScroll start_scroll                  = 2;
+      Clear clear                               = 3;
+      Next next                                 = 4;
+    }
+
   }
 
   message TimeZoneOffset {
@@ -936,7 +970,7 @@ message QueryRequest {
 
   oneof iterator {
     PageIterator page_iterator = 3;
-    CursorIterator cursor_iterator = 4;
+    ScrollIterator scroll_iterator = 4;
   }
 
   // Optional

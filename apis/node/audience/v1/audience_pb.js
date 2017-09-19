@@ -78,8 +78,12 @@ goog.exportSymbol('proto.rover.audience.v1.PredicateAggregate.Condition', null, 
 goog.exportSymbol('proto.rover.audience.v1.Profile', null, global);
 goog.exportSymbol('proto.rover.audience.v1.ProfileSchema', null, global);
 goog.exportSymbol('proto.rover.audience.v1.QueryRequest', null, global);
-goog.exportSymbol('proto.rover.audience.v1.QueryRequest.CursorIterator', null, global);
 goog.exportSymbol('proto.rover.audience.v1.QueryRequest.PageIterator', null, global);
+goog.exportSymbol('proto.rover.audience.v1.QueryRequest.ScrollIterator', null, global);
+goog.exportSymbol('proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear', null, global);
+goog.exportSymbol('proto.rover.audience.v1.QueryRequest.ScrollIterator.Next', null, global);
+goog.exportSymbol('proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll', null, global);
+goog.exportSymbol('proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll', null, global);
 goog.exportSymbol('proto.rover.audience.v1.QueryRequest.TimeZoneOffset', null, global);
 goog.exportSymbol('proto.rover.audience.v1.QueryResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.SchemaAttribute', null, global);
@@ -19369,7 +19373,7 @@ proto.rover.audience.v1.QueryRequest.oneofGroups_ = [[3,4]];
 proto.rover.audience.v1.QueryRequest.IteratorCase = {
   ITERATOR_NOT_SET: 0,
   PAGE_ITERATOR: 3,
-  CURSOR_ITERATOR: 4
+  SCROLL_ITERATOR: 4
 };
 
 /**
@@ -19410,7 +19414,7 @@ proto.rover.audience.v1.QueryRequest.toObject = function(includeInstance, msg) {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     predicateAggregate: (f = msg.getPredicateAggregate()) && proto.rover.audience.v1.PredicateAggregate.toObject(includeInstance, f),
     pageIterator: (f = msg.getPageIterator()) && proto.rover.audience.v1.QueryRequest.PageIterator.toObject(includeInstance, f),
-    cursorIterator: (f = msg.getCursorIterator()) && proto.rover.audience.v1.QueryRequest.CursorIterator.toObject(includeInstance, f),
+    scrollIterator: (f = msg.getScrollIterator()) && proto.rover.audience.v1.QueryRequest.ScrollIterator.toObject(includeInstance, f),
     timeZoneOffset: (f = msg.getTimeZoneOffset()) && proto.rover.audience.v1.QueryRequest.TimeZoneOffset.toObject(includeInstance, f)
   };
 
@@ -19464,9 +19468,9 @@ proto.rover.audience.v1.QueryRequest.deserializeBinaryFromReader = function(msg,
       msg.setPageIterator(value);
       break;
     case 4:
-      var value = new proto.rover.audience.v1.QueryRequest.CursorIterator;
-      reader.readMessage(value,proto.rover.audience.v1.QueryRequest.CursorIterator.deserializeBinaryFromReader);
-      msg.setCursorIterator(value);
+      var value = new proto.rover.audience.v1.QueryRequest.ScrollIterator;
+      reader.readMessage(value,proto.rover.audience.v1.QueryRequest.ScrollIterator.deserializeBinaryFromReader);
+      msg.setScrollIterator(value);
       break;
     case 5:
       var value = new proto.rover.audience.v1.QueryRequest.TimeZoneOffset;
@@ -19525,12 +19529,12 @@ proto.rover.audience.v1.QueryRequest.serializeBinaryToWriter = function(message,
       proto.rover.audience.v1.QueryRequest.PageIterator.serializeBinaryToWriter
     );
   }
-  f = message.getCursorIterator();
+  f = message.getScrollIterator();
   if (f != null) {
     writer.writeMessage(
       4,
       f,
-      proto.rover.audience.v1.QueryRequest.CursorIterator.serializeBinaryToWriter
+      proto.rover.audience.v1.QueryRequest.ScrollIterator.serializeBinaryToWriter
     );
   }
   f = message.getTimeZoneOffset();
@@ -19722,12 +19726,209 @@ proto.rover.audience.v1.QueryRequest.PageIterator.prototype.setSize = function(v
  * @extends {jspb.Message}
  * @constructor
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator = function(opt_data) {
+proto.rover.audience.v1.QueryRequest.ScrollIterator = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.rover.audience.v1.QueryRequest.ScrollIterator.oneofGroups_);
+};
+goog.inherits(proto.rover.audience.v1.QueryRequest.ScrollIterator, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.displayName = 'proto.rover.audience.v1.QueryRequest.ScrollIterator';
+}
+/**
+ * Oneof group definitions for this message. Each group defines the field
+ * numbers belonging to that group. When of these fields' value is set, all
+ * other fields in the group are cleared. During deserialization, if multiple
+ * fields are encountered for a group, only the last value seen will be kept.
+ * @private {!Array<!Array<number>>}
+ * @const
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.oneofGroups_ = [[1,2,3,4]];
+
+/**
+ * @enum {number}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.OperationCase = {
+  OPERATION_NOT_SET: 0,
+  START_PARALLEL_SCROLL: 1,
+  START_SCROLL: 2,
+  CLEAR: 3,
+  NEXT: 4
+};
+
+/**
+ * @return {proto.rover.audience.v1.QueryRequest.ScrollIterator.OperationCase}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.getOperationCase = function() {
+  return /** @type {proto.rover.audience.v1.QueryRequest.ScrollIterator.OperationCase} */(jspb.Message.computeOneofCase(this, proto.rover.audience.v1.QueryRequest.ScrollIterator.oneofGroups_[0]));
+};
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    startParallelScroll: (f = msg.getStartParallelScroll()) && proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.toObject(includeInstance, f),
+    startScroll: (f = msg.getStartScroll()) && proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.toObject(includeInstance, f),
+    clear: (f = msg.getClear()) && proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.toObject(includeInstance, f),
+    next: (f = msg.getNext()) && proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.toObject(includeInstance, f)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.QueryRequest.ScrollIterator;
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll;
+      reader.readMessage(value,proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.deserializeBinaryFromReader);
+      msg.setStartParallelScroll(value);
+      break;
+    case 2:
+      var value = new proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll;
+      reader.readMessage(value,proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.deserializeBinaryFromReader);
+      msg.setStartScroll(value);
+      break;
+    case 3:
+      var value = new proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear;
+      reader.readMessage(value,proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.deserializeBinaryFromReader);
+      msg.setClear(value);
+      break;
+    case 4:
+      var value = new proto.rover.audience.v1.QueryRequest.ScrollIterator.Next;
+      reader.readMessage(value,proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.deserializeBinaryFromReader);
+      msg.setNext(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getStartParallelScroll();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.serializeBinaryToWriter
+    );
+  }
+  f = message.getStartScroll();
+  if (f != null) {
+    writer.writeMessage(
+      2,
+      f,
+      proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.serializeBinaryToWriter
+    );
+  }
+  f = message.getClear();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.serializeBinaryToWriter
+    );
+  }
+  f = message.getNext();
+  if (f != null) {
+    writer.writeMessage(
+      4,
+      f,
+      proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.serializeBinaryToWriter
+    );
+  }
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.rover.audience.v1.QueryRequest.CursorIterator, jspb.Message);
+goog.inherits(proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.QueryRequest.CursorIterator.displayName = 'proto.rover.audience.v1.QueryRequest.CursorIterator';
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.displayName = 'proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll';
 }
 
 
@@ -19742,8 +19943,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     for transitional soy proto support: http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.QueryRequest.CursorIterator.toObject(opt_includeInstance, this);
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.toObject(opt_includeInstance, this);
 };
 
 
@@ -19752,13 +19953,14 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.toObject = functio
  * @param {boolean|undefined} includeInstance Whether to include the JSPB
  *     instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.QueryRequest.CursorIterator} msg The msg instance to transform.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll} msg The msg instance to transform.
  * @return {!Object}
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator.toObject = function(includeInstance, msg) {
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    batchSize: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    maxStreams: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    streamId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    batchSize: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -19772,23 +19974,23 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.toObject = function(includeI
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.QueryRequest.CursorIterator}
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll}
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator.deserializeBinary = function(bytes) {
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.QueryRequest.CursorIterator;
-  return proto.rover.audience.v1.QueryRequest.CursorIterator.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll;
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.rover.audience.v1.QueryRequest.CursorIterator} msg The message object to deserialize into.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.QueryRequest.CursorIterator}
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll}
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator.deserializeBinaryFromReader = function(msg, reader) {
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -19796,11 +19998,15 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.deserializeBinaryFromReader 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setId(value);
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setMaxStreams(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setStreamId(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readInt32());
       msg.setBatchSize(value);
       break;
     default:
@@ -19816,9 +20022,9 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.deserializeBinaryFromReader 
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.serializeBinary = function() {
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.QueryRequest.CursorIterator.serializeBinaryToWriter(this, writer);
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -19826,22 +20032,479 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.serializeBinary = 
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.QueryRequest.CursorIterator} message
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll} message
  * @param {!jspb.BinaryWriter} writer
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator.serializeBinaryToWriter = function(message, writer) {
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getId();
+  f = message.getMaxStreams();
+  if (f !== 0) {
+    writer.writeInt32(
+      1,
+      f
+    );
+  }
+  f = message.getStreamId();
+  if (f !== 0) {
+    writer.writeInt32(
+      2,
+      f
+    );
+  }
+  f = message.getBatchSize();
+  if (f !== 0) {
+    writer.writeInt32(
+      3,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional int32 max_streams = 1;
+ * @return {number}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.prototype.getMaxStreams = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.prototype.setMaxStreams = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional int32 stream_id = 2;
+ * @return {number}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.prototype.getStreamId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.prototype.setStreamId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional int32 batch_size = 3;
+ * @return {number}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.prototype.getBatchSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll.prototype.setBatchSize = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.displayName = 'proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    batchSize: jspb.Message.getFieldWithDefault(msg, 1, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll;
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setBatchSize(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getBatchSize();
+  if (f !== 0) {
+    writer.writeInt32(
+      1,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional int32 batch_size = 1;
+ * @return {number}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.prototype.getBatchSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll.prototype.setBatchSize = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.QueryRequest.ScrollIterator.Next, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.displayName = 'proto.rover.audience.v1.QueryRequest.ScrollIterator.Next';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Next} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    scrollId: jspb.Message.getFieldWithDefault(msg, 1, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Next}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.QueryRequest.ScrollIterator.Next;
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Next} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Next}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setScrollId(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Next} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getScrollId();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = message.getBatchSize();
-  if (f !== 0) {
-    writer.writeInt64(
-      2,
+};
+
+
+/**
+ * optional string scroll_id = 1;
+ * @return {string}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.prototype.getScrollId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Next.prototype.setScrollId = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.displayName = 'proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    scrollId: jspb.Message.getFieldWithDefault(msg, 1, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear;
+  return proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setScrollId(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getScrollId();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
       f
     );
   }
@@ -19849,32 +20512,137 @@ proto.rover.audience.v1.QueryRequest.CursorIterator.serializeBinaryToWriter = fu
 
 
 /**
- * optional string id = 1;
+ * optional string scroll_id = 1;
  * @return {string}
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.getId = function() {
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.prototype.getScrollId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.setId = function(value) {
+proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear.prototype.setScrollId = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 
 
 /**
- * optional int64 batch_size = 2;
- * @return {number}
+ * optional StartParallelScroll start_parallel_scroll = 1;
+ * @return {?proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll}
  */
-proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.getBatchSize = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.getStartParallelScroll = function() {
+  return /** @type{?proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll, 1));
 };
 
 
-/** @param {number} value */
-proto.rover.audience.v1.QueryRequest.CursorIterator.prototype.setBatchSize = function(value) {
-  jspb.Message.setField(this, 2, value);
+/** @param {?proto.rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll|undefined} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.setStartParallelScroll = function(value) {
+  jspb.Message.setOneofWrapperField(this, 1, proto.rover.audience.v1.QueryRequest.ScrollIterator.oneofGroups_[0], value);
+};
+
+
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.clearStartParallelScroll = function() {
+  this.setStartParallelScroll(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.hasStartParallelScroll = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional StartScroll start_scroll = 2;
+ * @return {?proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.getStartScroll = function() {
+  return /** @type{?proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll, 2));
+};
+
+
+/** @param {?proto.rover.audience.v1.QueryRequest.ScrollIterator.StartScroll|undefined} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.setStartScroll = function(value) {
+  jspb.Message.setOneofWrapperField(this, 2, proto.rover.audience.v1.QueryRequest.ScrollIterator.oneofGroups_[0], value);
+};
+
+
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.clearStartScroll = function() {
+  this.setStartScroll(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.hasStartScroll = function() {
+  return jspb.Message.getField(this, 2) != null;
+};
+
+
+/**
+ * optional Clear clear = 3;
+ * @return {?proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.getClear = function() {
+  return /** @type{?proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear, 3));
+};
+
+
+/** @param {?proto.rover.audience.v1.QueryRequest.ScrollIterator.Clear|undefined} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.setClear = function(value) {
+  jspb.Message.setOneofWrapperField(this, 3, proto.rover.audience.v1.QueryRequest.ScrollIterator.oneofGroups_[0], value);
+};
+
+
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.clearClear = function() {
+  this.setClear(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.hasClear = function() {
+  return jspb.Message.getField(this, 3) != null;
+};
+
+
+/**
+ * optional Next next = 4;
+ * @return {?proto.rover.audience.v1.QueryRequest.ScrollIterator.Next}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.getNext = function() {
+  return /** @type{?proto.rover.audience.v1.QueryRequest.ScrollIterator.Next} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.QueryRequest.ScrollIterator.Next, 4));
+};
+
+
+/** @param {?proto.rover.audience.v1.QueryRequest.ScrollIterator.Next|undefined} value */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.setNext = function(value) {
+  jspb.Message.setOneofWrapperField(this, 4, proto.rover.audience.v1.QueryRequest.ScrollIterator.oneofGroups_[0], value);
+};
+
+
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.clearNext = function() {
+  this.setNext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.QueryRequest.ScrollIterator.prototype.hasNext = function() {
+  return jspb.Message.getField(this, 4) != null;
 };
 
 
@@ -20109,23 +20877,23 @@ proto.rover.audience.v1.QueryRequest.prototype.hasPageIterator = function() {
 
 
 /**
- * optional CursorIterator cursor_iterator = 4;
- * @return {?proto.rover.audience.v1.QueryRequest.CursorIterator}
+ * optional ScrollIterator scroll_iterator = 4;
+ * @return {?proto.rover.audience.v1.QueryRequest.ScrollIterator}
  */
-proto.rover.audience.v1.QueryRequest.prototype.getCursorIterator = function() {
-  return /** @type{?proto.rover.audience.v1.QueryRequest.CursorIterator} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.QueryRequest.CursorIterator, 4));
+proto.rover.audience.v1.QueryRequest.prototype.getScrollIterator = function() {
+  return /** @type{?proto.rover.audience.v1.QueryRequest.ScrollIterator} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.QueryRequest.ScrollIterator, 4));
 };
 
 
-/** @param {?proto.rover.audience.v1.QueryRequest.CursorIterator|undefined} value */
-proto.rover.audience.v1.QueryRequest.prototype.setCursorIterator = function(value) {
+/** @param {?proto.rover.audience.v1.QueryRequest.ScrollIterator|undefined} value */
+proto.rover.audience.v1.QueryRequest.prototype.setScrollIterator = function(value) {
   jspb.Message.setOneofWrapperField(this, 4, proto.rover.audience.v1.QueryRequest.oneofGroups_[0], value);
 };
 
 
-proto.rover.audience.v1.QueryRequest.prototype.clearCursorIterator = function() {
-  this.setCursorIterator(undefined);
+proto.rover.audience.v1.QueryRequest.prototype.clearScrollIterator = function() {
+  this.setScrollIterator(undefined);
 };
 
 
@@ -20133,7 +20901,7 @@ proto.rover.audience.v1.QueryRequest.prototype.clearCursorIterator = function() 
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.audience.v1.QueryRequest.prototype.hasCursorIterator = function() {
+proto.rover.audience.v1.QueryRequest.prototype.hasScrollIterator = function() {
   return jspb.Message.getField(this, 4) != null;
 };
 
