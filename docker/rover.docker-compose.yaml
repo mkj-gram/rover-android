@@ -63,7 +63,7 @@ services:
 
   audience-service:
     image: golang:1.9-alpine
-    links: [mongo]
+    links: [mongo, elastic5]
     ports: [5100, 5080]
     command: ./docker/audience-service/cmd test run
     volumes:
