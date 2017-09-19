@@ -548,16 +548,34 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :time_zone_offset, :message, 5, "rover.audience.v1.QueryRequest.TimeZoneOffset"
     oneof :iterator do
       optional :page_iterator, :message, 3, "rover.audience.v1.QueryRequest.PageIterator"
-      optional :cursor_iterator, :message, 4, "rover.audience.v1.QueryRequest.CursorIterator"
+      optional :scroll_iterator, :message, 4, "rover.audience.v1.QueryRequest.ScrollIterator"
     end
   end
   add_message "rover.audience.v1.QueryRequest.PageIterator" do
     optional :page, :int32, 1
     optional :size, :int32, 2
   end
-  add_message "rover.audience.v1.QueryRequest.CursorIterator" do
-    optional :id, :string, 1
-    optional :batch_size, :int64, 2
+  add_message "rover.audience.v1.QueryRequest.ScrollIterator" do
+    oneof :operation do
+      optional :start_parallel_scroll, :message, 1, "rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll"
+      optional :start_scroll, :message, 2, "rover.audience.v1.QueryRequest.ScrollIterator.StartScroll"
+      optional :clear, :message, 3, "rover.audience.v1.QueryRequest.ScrollIterator.Clear"
+      optional :next, :message, 4, "rover.audience.v1.QueryRequest.ScrollIterator.Next"
+    end
+  end
+  add_message "rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll" do
+    optional :max_streams, :int32, 1
+    optional :stream_id, :int32, 2
+    optional :batch_size, :int32, 3
+  end
+  add_message "rover.audience.v1.QueryRequest.ScrollIterator.StartScroll" do
+    optional :batch_size, :int32, 1
+  end
+  add_message "rover.audience.v1.QueryRequest.ScrollIterator.Next" do
+    optional :scroll_id, :string, 1
+  end
+  add_message "rover.audience.v1.QueryRequest.ScrollIterator.Clear" do
+    optional :scroll_id, :string, 1
   end
   add_message "rover.audience.v1.QueryRequest.TimeZoneOffset" do
     optional :minutes, :int64, 1
@@ -686,7 +704,11 @@ module Rover
       Predicate::Selector = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate.Selector").enummodule
       QueryRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest").msgclass
       QueryRequest::PageIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.PageIterator").msgclass
-      QueryRequest::CursorIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.CursorIterator").msgclass
+      QueryRequest::ScrollIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.ScrollIterator").msgclass
+      QueryRequest::ScrollIterator::StartParallelScroll = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll").msgclass
+      QueryRequest::ScrollIterator::StartScroll = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.ScrollIterator.StartScroll").msgclass
+      QueryRequest::ScrollIterator::Next = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.ScrollIterator.Next").msgclass
+      QueryRequest::ScrollIterator::Clear = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.ScrollIterator.Clear").msgclass
       QueryRequest::TimeZoneOffset = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.TimeZoneOffset").msgclass
       QueryResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryResponse").msgclass
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").enummodule
