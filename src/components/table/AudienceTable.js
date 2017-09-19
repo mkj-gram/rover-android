@@ -8,6 +8,8 @@ import TableMenuBarAlpha from './TableMenuBarAlpha'
 
 import DateCellFormatter from './DateCellFormatter'
 import BooleanCellFormatter from './BooleanCellFormatter'
+import ListCellFormatter from './ListCellFormatter'
+
 import { getDeviceSchema } from '../../localSchemas/deviceSchema'
 import roverProfileSchema from '../../localSchemas/roverProfileSchema'
 
@@ -35,7 +37,8 @@ class AudienceTable extends Component {
                     x: 0,
                     y: 0,
                     divWidth: 0
-                }
+                },
+                listView: false
             },
             dataGridRows: [],
             group: 0,
@@ -98,7 +101,7 @@ class AudienceTable extends Component {
             'first-name': {
                 __typename: 'StringPredicate',
                 label: 'First Name',
-                selector: 'DEVICE'
+                selector: 'CUSTOM_PROFILE'
             }
         }
 
@@ -246,7 +249,6 @@ class AudienceTable extends Component {
                 condition: 'ANY'
             })
             this.setState({ refetched: true })
-
             relay.refetch(
                 refetchVariables,
                 null,
@@ -346,7 +348,7 @@ class AudienceTable extends Component {
         return rows.slice(startRow, startRow + 50)
     }
 
-    handleCellEnter(e, message) {
+    handleCellEnter(e, message, listView=false) {
         const target = e.target.getBoundingClientRect()
         this.setState({
             toolTip: {
@@ -356,12 +358,13 @@ class AudienceTable extends Component {
                     x: target.left - 300,
                     y: target.top - 60 + target.height,
                     divWidth: target.width
-                }
+                },
+                listView
             }
         })
     }
 
-    handleCellLeave() {
+    handleCellLeave(listView=false) {
         if (this.state.toolTip.isTooltipShowing) {
             this.setState({
                 toolTip: {
@@ -372,7 +375,8 @@ class AudienceTable extends Component {
                         y: 0,
                         divWidth: 0
                     }
-                }
+                },
+                listView
             })
         }
     }
@@ -404,6 +408,13 @@ class AudienceTable extends Component {
                 )
             case 'BooleanPredicate':
                 return <BooleanCellFormatter />
+            case 'StringArrayPredicate':
+                return (
+                    <ListCellFormatter
+                        handleCellEnter={this.handleCellEnter}
+                        handleCellLeave={this.handleCellLeave}
+                    />
+                )
             default:
         }
     }
@@ -414,11 +425,12 @@ class AudienceTable extends Component {
         const columns = Object.keys(selectedColumns).map(attr => ({
             key: `${attr}_${selectedColumns[attr].selector}`,
             name: selectedColumns[attr].label,
-            width: 200,
+            width: (selectedColumns[attr].__typename === 'StringArrayPredicate') ? 285 : 200,
             draggable: true,
             resizable: true,
             formatter: this.getFormat(selectedColumns[attr].__typename)
         }))
+
         return columns
     }
 
@@ -432,7 +444,10 @@ class AudienceTable extends Component {
             ret = Object.values(data).join('.')
         } else if (type === 'GeofencePredicate') {
             ret = data.name
+        } else if (type === 'StringArrayPredicate') {
+            ret = data.join(", ")
         }
+
         return ret
     }
 
@@ -464,8 +479,7 @@ class AudienceTable extends Component {
             selectedColumns
         } = this.state
 
-        const { isTooltipShowing, message, coordinates } = this.state.toolTip
-
+        const { isTooltipShowing, message, coordinates, listView } = this.state.toolTip
         return (
             <div
                 style={{
@@ -491,7 +505,7 @@ class AudienceTable extends Component {
                     resetPagination={this.props.resetPagination}
                 />
                 {isTooltipShowing &&
-                    <Tooltip message={message} coordinates={coordinates} />}
+                    <Tooltip message={message} coordinates={coordinates} listView={listView} />}
             </div>
         )
     }
