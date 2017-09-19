@@ -925,9 +925,34 @@ message QueryRequest {
     int32 size = 2;
   }
 
-  message CursorIterator {
-    string id = 1;
-    int64 batch_size = 2;
+  message ScrollIterator {
+
+    message StartParallelScroll {
+      int32 max_streams = 1;
+      int32 stream_id   = 2;
+      int32 batch_size  = 3;
+    }
+
+    message StartScroll {
+      int32 batch_size = 1;
+    }
+
+    message Next {
+      string scroll_id = 1;
+    }
+
+    // Signals that the scroll is no longer in use
+    message Clear {
+      string scroll_id = 1;
+    }
+
+    oneof operation {
+      StartParallelScroll start_parallel_scroll = 1;
+      StartScroll start_scroll                  = 2;
+      Clear clear                               = 3;
+      Next next                                 = 4;
+    }
+
   }
 
   message TimeZoneOffset {
@@ -936,7 +961,7 @@ message QueryRequest {
 
   oneof iterator {
     PageIterator page_iterator = 3;
-    CursorIterator cursor_iterator = 4;
+    ScrollIterator scroll_iterator = 4;
   }
 
   // Optional
