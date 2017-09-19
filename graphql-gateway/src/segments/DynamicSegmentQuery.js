@@ -99,7 +99,7 @@ const DynamicSegmentQuery = {
                 const boolComparisons = {
                     0: 'is unset',
                     1: 'is set',
-                    2: 'true'
+                    2: 'is equal'
                 }
                 const pred = predicate.getBoolPredicate()
                 return {
@@ -125,11 +125,11 @@ const DynamicSegmentQuery = {
                 const numberComparisons = {
                     0: 'is unset',
                     1: 'is set',
-                    2: 'is',
-                    3: 'is not',
-                    4: 'greater than',
-                    5: 'less than',
-                    6: 'in between'
+                    2: 'is equal',
+                    3: 'is not equal',
+                    4: 'is greater than',
+                    5: 'is less than',
+                    6: 'is between'
                 }
                 const pred = predicate.getNumberPredicate()
                 return {
@@ -155,11 +155,11 @@ const DynamicSegmentQuery = {
                 const doubleComparisons = {
                     0: 'is unset',
                     1: 'is set',
-                    2: 'is',
-                    3: 'is not',
-                    4: 'greater than',
-                    5: 'less than',
-                    6: 'in between'
+                    2: 'is equal',
+                    3: 'is not equal',
+                    4: 'is greater than',
+                    5: 'is less than',
+                    6: 'is between'
                 }
                 const pred = predicate.getDoublePredicate()
                 return {
@@ -189,14 +189,14 @@ const DynamicSegmentQuery = {
                 const dateComparisons = {
                     0: 'is unset',
                     1: 'is set',
-                    2: 'exactly',
-                    3: 'not exactly',
-                    4: 'more than',
-                    5: 'less than',
-                    6: 'in between',
-                    7: 'after',
-                    8: 'before',
-                    9: 'on'
+                    2: 'is equal',
+                    3: 'is not equal',
+                    4: 'is greater than',
+                    5: 'is less than',
+                    6: 'is between',
+                    7: 'is after',
+                    8: 'is before',
+                    9: 'is on'
                 }
                 const pred = predicate.getDatePredicate()
                 return {
@@ -220,8 +220,8 @@ const DynamicSegmentQuery = {
                 const geofenceComparisons = {
                     0: 'is unset',
                     1: 'is set',
-                    2: 'is within',
-                    3: 'is outside'
+                    2: 'is outside',
+                    3: 'is within'
                 }
                 
                 const pred = predicate.getGeofencePredicate()
@@ -257,19 +257,18 @@ const DynamicSegmentQuery = {
                 const versionComparisons = {
                     0: 'is unset',
                     1: 'is set',
-                    2: 'equals',
-                    3: 'does not equal',
-                    4: 'greater than',
-                    5: 'less than',
-                    6: 'in between',
-                    7: 'greater than or equal',
-                    8: 'less than or equal'
+                    2: 'is equal',
+                    3: 'is not equal',
+                    4: 'is greater than',
+                    5: 'is less than',
+                    6: 'is between',
+                    7: 'is greater than or equal',
+                    8: 'is less than or equal'
                 }
                 
                 const pred = predicate.getVersionPredicate()
                 const value = pred.getValue()
                 const value2 = pred.getValue2()
-                
                 return {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),

@@ -219,6 +219,15 @@ export const buildDatePredicate = ({
         case 'is between':
             comparison = 6
             break
+        case 'is after':
+            comparison = 7
+            break
+        case 'is before':
+            comparison = 8
+            break
+        case 'is on':
+            comparison = 9
+            break
         default:
             comparison = 1
     }
@@ -282,15 +291,13 @@ export const buildVersionPredicate = ({
     const value = new RoverApis.audience.v1.Models.Version()
     const value2 = new RoverApis.audience.v1.Models.Version()
 
-    value.setMajor(versionValue[0][0])
-    value.setMinor(versionValue[0][1])
-    value.setRevision(versionValue[0][2])
+    value.setMajor(versionValue[0])
+    value.setMinor(versionValue[1])
+    value.setRevision(versionValue[2])
 
-    if (versionValue[1]) {
-        value2.setMajor(versionValue[1][0])
-        value2.setMinor(versionValue[1][1])
-        value2.setRevision(versionValue[1][2])
-    }
+    value2.setMajor(versionValue[3])
+    value2.setMinor(versionValue[4])
+    value2.setRevision(versionValue[5])
 
     versionPredicate.setValue(value)
     versionPredicate.setValue2(value2)
