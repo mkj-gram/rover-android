@@ -61,7 +61,7 @@ class BooleanInput extends Component {
             attribute,
             selector,
             index,
-            booleanComparison: 'true',
+            booleanComparison: 'is equal',
             booleanValue,
             __typename,
             label
@@ -105,7 +105,7 @@ BooleanInput.propTypes = {
 BooleanInput.defaultProps = {
     attribute: '',
     booleanValue: true,
-    booleanComparison: 'true',
+    booleanComparison: 'is equal',
     selector: 'DEVICE',
     updateFn: () => null,
     index: 0,
