@@ -1,9 +1,5 @@
 {
   segmentSchema {
-    deviceSchema {
-      attribute
-      type
-    }
     profileSchema {
       attribute
       type

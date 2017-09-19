@@ -1,11 +1,12 @@
 {
-  dynamicSegment(segmentId: "1a2b3c", paginationKey: "testpaginationkey") {
+  dynamicSegment(segmentId: "59b7ffc48105f200010e33ae", pageSize: 2, pageNumber: 1) {
     name
     segmentId
     predicates {
       condition
-      device {
+      predicateList {
         ... on Predicate {
+          __typename
           attribute
           ... on StringPredicate {
             stringValue
@@ -16,7 +17,10 @@
             versionComparison
           }
           ... on DatePredicate {
-            dateValue
+            dateValue {
+              start
+              end
+            }
             dateComparison
           }
           ... on BooleanPredicate {
@@ -31,53 +35,23 @@
             geofenceValue {
               latitude
               longitude
+              name
               radius
             }
             geofenceComparison
           }
-        }
-      }
-      profile {
-        ... on Predicate {
-          attribute
-          ... on StringPredicate {
-            stringValue
-            stringComparison
-          }
-          ... on VersionPredicate {
-            versionValue
-            versionComparison
-          }
-          ... on DatePredicate {
-            dateValue
-            dateComparison
-          }
-          ... on BooleanPredicate {
-            booleanValue
-            booleanComparison
-          }
-          ... on NumberPredicate {
-            numberValue
-            numberComparison
-          }
-          ... on GeofencePredicate {
-            geofenceValue {
-              latitude
-              longitude
-              radius
-            }
-            geofenceComparison
+          ... on StringArrayPredicate {
+            stringArrayValue
+            stringArrayComparison
           }
         }
       }
     }
-
-    data {
+      data {
       ... on SegmentData {
         segmentSize
         totalSize
-    		profiles
-        devices
+        dataGridRows
       }
     }
   }
