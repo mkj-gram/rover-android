@@ -205,7 +205,7 @@ NumericInput.propTypes = {
 NumericInput.defaultProps = {
     attribute: '',
     numberValue: [0],
-    numberComparison: 'is',
+    numberComparison: 'is equal',
     selector: 'DEVICE',
     index: 0,
     updateFn: () => null,

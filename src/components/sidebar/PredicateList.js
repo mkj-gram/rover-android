@@ -122,6 +122,10 @@ const renderPredicateValue = value => (
     <span style={predicateValueStyle}>{value}</span>
 )
 
+const renderPredicateArrayValue = (value, index) => (
+    <span style={predicateValueStyle}>{value}</span>
+)
+
 const renderBooleanPredicate = ({ booleanValue }) => (
     <div>{renderPredicateValue(booleanValue ? 'ON' : 'OFF')}</div>
 )
@@ -247,11 +251,10 @@ const renderNumericPredicate = ({
             </div>
         )
     }
-
     return (
         <div>
             {renderPredicateComparison(comparison)}
-            {renderPredicateValue(value)}
+            {renderPredicateValue(value && value[0])}
         </div>
     )
 }
