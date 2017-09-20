@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import { graphite } from './styles/colors'
+import { graphite, text } from './styles/colors'
 
 class Tooltip extends Component {
     constructor(props) {
@@ -10,6 +10,7 @@ class Tooltip extends Component {
             triPosition: 0,
             shift: 0
         }
+        this.displayMessage = this.displayMessage.bind(this)
     }
 
     componentDidMount() {
@@ -24,8 +25,63 @@ class Tooltip extends Component {
         })
     }
 
+    displayMessage(message) {
+        if (this.props.listView) {
+            return (
+                <div style={{
+                    display:'flex',
+                    flexDirection: 'column',
+                    borderRadius: 3,
+                    background: this.props.backgroundColor,
+                    padding: 5
+                }}
+                id="toolTip"
+                >
+                {this.props.message.map(msg => 
+                    <div
+                        key={msg}
+                        style={{
+                            ...text,
+                            background: this.props.backgroundColor,
+                            color: 'white',
+                            fontSize: 14,
+                            borderRadius: 3,
+                            fontFamily: 'Source Sans Pro',
+                            padding: '7px 12px 7px 12px',
+                            whiteSpace: 'nowrap',
+                            
+                        }}
+                    >   
+                        {msg}
+                    </div>
+                )}
+                </div>
+            )
+           
+        } else {
+            return (
+                <div
+                id="toolTip"
+                style={{
+                    background: this.props.backgroundColor,
+                    borderRadius: 3,
+                    color: 'white',
+                    fontSize: 12,
+                    fontFamily: 'Source Sans Pro',
+                    padding: '7px 12px 7px 12px',
+                    textAlign: 'center',
+                    whiteSpace: 'nowrap',
+                    
+                }}
+            >   
+                {this.props.message}
+            </div>
+            )
+        }
+    }
+
     render() {
-        const { message, coordinates, backgroundColor, stylePosition, position } = this.props
+        const { message, coordinates, backgroundColor, stylePosition, position, listView } = this.props
         let pos
         if (position !== null) {
             pos = position
@@ -42,7 +98,7 @@ class Tooltip extends Component {
         }
 
         let res
-        if (pos === 'top') {
+        if (pos === 'top' && this.props.listView !== true) {
             res = (
                 <div
                     style={{
@@ -101,21 +157,7 @@ class Tooltip extends Component {
                             top: 5.655
                         }}
                     />
-                    <div
-                        id="toolTip"
-                        style={{
-                            background: backgroundColor,
-                            borderRadius: 3,
-                            color: 'white',
-                            fontSize: 12,
-                            fontFamily: 'Source Sans Pro',
-                            padding: '7px 12px 7px 12px',
-                            textAlign: 'center',
-                            whiteSpace: 'nowrap'
-                        }}
-                    >
-                        {message}
-                    </div>
+                    {this.displayMessage()}
                 </div>
             )
         }
@@ -124,7 +166,6 @@ class Tooltip extends Component {
 }
 
 Tooltip.propTypes = {
-    message: PropTypes.string.isRequired,
     coordinates: PropTypes.object.isRequired,
     stylePosition: PropTypes.string,
     backgroundColor: PropTypes.string,
@@ -132,7 +173,6 @@ Tooltip.propTypes = {
 }
 
 Tooltip.defaultProps = {
-    message: '',
     coordinates: {
         x: 0,
         y: 0,
