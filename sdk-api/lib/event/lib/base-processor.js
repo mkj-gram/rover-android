@@ -211,7 +211,8 @@ class BaseProcessor {
     filterMessages(messageTemplates, callback) {
         messageTemplates = (messageTemplates || []).filter(template => {
             
-            if (template.save_to_inbox == false && util.isNullOrUndefined(this._device.token)) {
+            // If this message is not saved to inbox and the device isn't push enabled ski it
+            if (template.save_to_inbox == false && this._device.push_token === "") {
                 return false;
             }
 
