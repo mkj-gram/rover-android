@@ -73,6 +73,7 @@ class SideBar extends Component {
         )
         this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
         this.getProfileLabel = this.getProfileLabel.bind(this)
+        this.clearQuery = this.clearQuery.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -181,6 +182,10 @@ class SideBar extends Component {
 
         this.props.updateQuery(newQuery, queryCondition)
         this.setState({ query: newQuery })
+    }
+
+    clearQuery() {
+        this.setState({ query: [] })
     }
 
     renderModalTitle(currentAttribute) {
@@ -686,6 +691,7 @@ class SideBar extends Component {
                 {this.renderAddFilterBar()}
                 {query.length > 0 ? (
                     <PredicateList
+                        clearQuery={this.clearQuery}
                         query={query}
                         queryCondition={queryCondition}
                         removePredicate={index => this.removePredicate(index)}
