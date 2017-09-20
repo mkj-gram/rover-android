@@ -224,8 +224,7 @@ const renderNumericPredicate = ({
     floatComparison,
     floatValue
 }) => {
-    let comparison, 
-value
+    let comparison, value
     if (numberComparison === undefined && numberValue === undefined) {
         comparison = floatComparison
         value = floatValue
