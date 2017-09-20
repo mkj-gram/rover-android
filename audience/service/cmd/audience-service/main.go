@@ -152,6 +152,13 @@ func main() {
 		} else {
 			stdout.Println("gcp.tracing=on")
 			unaryMiddleware = append(unaryMiddleware, traceUnaryInterceptor(tc))
+
+			policy, err := trace.NewLimitedSampler(0.1, 100)
+			if err != nil {
+				stderr.Fatalf("trace.NewLimitedSampler: %v", err)
+			}
+
+			tc.SetSamplingPolicy(policy)
 		}
 
 		//
