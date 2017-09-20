@@ -209,6 +209,7 @@ class AudienceTable extends Component {
     fetchData(nextProps) {
         const { relay } = this.props
         let refetchVariables
+        this.renderFetch(nextProps)
 
         if (
             nextProps.context === 'predicates' &&
