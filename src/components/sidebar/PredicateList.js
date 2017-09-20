@@ -122,10 +122,6 @@ const renderPredicateValue = value => (
     <span style={predicateValueStyle}>{value}</span>
 )
 
-const renderPredicateArrayValue = (value, index) => (
-    <span style={predicateValueStyle}>{value}</span>
-)
-
 const renderBooleanPredicate = ({ booleanValue }) => (
     <div>{renderPredicateValue(booleanValue ? 'ON' : 'OFF')}</div>
 )
@@ -228,7 +224,8 @@ const renderNumericPredicate = ({
     floatComparison,
     floatValue
 }) => {
-    let comparison, value
+    let comparison, 
+value
     if (numberComparison === undefined && numberValue === undefined) {
         comparison = floatComparison
         value = floatValue
@@ -259,9 +256,7 @@ const renderNumericPredicate = ({
     )
 }
 
-const getFlexDirection = ({ __typename }) => {
-    return __typename === 'StringArrayPredicate' ? 'column' : 'row'
-}
+const getFlexDirection = ({ __typename }) => __typename === 'StringArrayPredicate' ? 'column' : 'row'
 
 const renderGeofencePredicate = ({ geofenceValue }) => (
     <GeofencePredicateListElement
@@ -272,23 +267,24 @@ const renderGeofencePredicate = ({ geofenceValue }) => (
 )
 
 const renderLabel = (label, rest) => {
-    let text
+    let textToRender
 
     if (
         rest.__typename === 'StringArrayPredicate' &&
         rest.hasOwnProperty('stringArrayComparison')
     ) {
-        text = rest.stringArrayComparison.includes('does not')
+        textToRender = rest.stringArrayComparison.includes('does not')
             ? 'Is Not Tagged'
             : 'Is Tagged'
     } else {
-        text = label
+        textToRender = label
     }
 
-    return text
+    return textToRender
 }
 
 const PredicateList = ({
+    clearQuery,
     query,
     queryCondition,
     viewModal,
@@ -315,11 +311,29 @@ const PredicateList = ({
         flexWrap: 'wrap'
     }
 
-    const onMouseOver = e => {
+    const clearAllStyle = {
+        position: 'absolute',
+        right: 40,
+        marginTop: 10,
+        ...text,
+        fontSize: 12,
+        color: lavender,
+        cursor: 'default'
+    }
+
+    const onHoverClearAll = (e) => {
+        e.target.style.color = 'white'
+    }
+
+    const onLeaveClearAll = (e) => {
+        e.target.style.color = lavender
+    }
+
+    const onMouseOver = (e) => {
         e.target.style.backgroundColor = steel
         e.target.children[1].style.fill = silver
     }
-    const onMouseLeave = e => {
+    const onMouseLeave = (e) => {
         e.target.style.backgroundColor = ash
         e.target.children[1].style.fill = 'transparent'
     }
@@ -357,7 +371,7 @@ const PredicateList = ({
                                 top: 11,
                                 right: 9
                             }}
-                            onClick={e => {
+                            onClick={(e) => {
                                 e.stopPropagation()
                                 removePredicate(index)
                             }}
@@ -380,6 +394,16 @@ const PredicateList = ({
                             {queryCondition === 'ALL' ? 'AND' : 'OR'}
                         </div>
                     )}
+                    {query.length > 1 && index === query.length - 1 && (
+                        <div
+                            style={clearAllStyle}
+                            onClick={clearQuery}
+                            onMouseOver={onHoverClearAll}
+                            onMouseOut={onLeaveClearAll}
+                        >
+                            Clear All
+                        </div>
+                    )}
                 </div>
             ))}
             <div style={{ height: `${(window.innerHeight - 193) / 2}px` }} />
@@ -388,6 +412,7 @@ const PredicateList = ({
 }
 
 PredicateList.propTypes = {
+    clearQuery: PropTypes.func.isRequired,
     query: PropTypes.array.isRequired,
     queryCondition: PropTypes.string.isRequired,
     viewModal: PropTypes.func.isRequired,
