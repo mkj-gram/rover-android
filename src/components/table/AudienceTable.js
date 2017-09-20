@@ -54,7 +54,6 @@ class AudienceTable extends Component {
         this.getAllColumns = this.getAllColumns.bind(this)
         this.updateChecked = this.updateChecked.bind(this)
         this.getSetCachedColumns = this.getSetCachedColumns.bind(this)
-        this.updateContextData = this.updateContextData.bind(this)
         this.updateDynamicSegments = this.updateDynamicSegments.bind(this)
         this.renderFetch = this.renderFetch.bind(this)
         this.fetchData = this.fetchData.bind(this)
@@ -209,7 +208,6 @@ class AudienceTable extends Component {
     fetchData(nextProps) {
         const { relay } = this.props
         let refetchVariables
-        this.renderFetch(nextProps)
 
         if (
             nextProps.context === 'predicates' &&
@@ -283,7 +281,6 @@ class AudienceTable extends Component {
                     this.fetchData(nextProps)
                 }
             } else if (renderFetchEnabled === null) {
-                this.updateContextData(nextProps)
                 this.renderFetch(nextProps)
             }
         } else {
@@ -294,38 +291,6 @@ class AudienceTable extends Component {
                     this.renderFetch(nextProps)
                 }
             }
-        }
-    }
-
-    updateContextData(nextProps) {
-        const { setSaveState } = this.props
-        const group = Math.floor(nextProps.pageNumber / 3) * 3
-        if (nextProps.context === 'predicates') {
-            this.setState({
-                predicates: nextProps.predicates,
-                renderFetchEnabled: true,
-                group,
-                refetched: true
-            })
-
-            const predicates = JSON.parse(nextProps.predicates)
-
-            setSaveState({
-                isSegmentUpdate: this.state.segmentId !== '',
-                showSaveButton:
-                    predicates.query && predicates.query.length !== 0
-            })
-        } else if (nextProps.context === 'segments') {
-            this.setState({
-                segmentId: nextProps.segmentId,
-                renderFetchEnabled: false,
-                group,
-                refetched: true
-            })
-            setSaveState({
-                isSegmentUpdate: false,
-                showSaveButton: false
-            })
         }
     }
 
@@ -348,7 +313,8 @@ class AudienceTable extends Component {
             totalSize,
             dataGridRows,
             renderFetchEnabled: null,
-            refetched: false
+            refetched: false,
+            group: Math.floor(nextProps.pageNumber / 3) * 3
         })
     }
 
@@ -564,8 +530,8 @@ export default createRefetchContainer(
                 segmentId: $segmentId
                 pageNumber: $pageNumber
                 pageSize: 150
-            ) {
-                ... on DynamicSegment @include(if: $includeDynamicSegment) {
+            ) @include(if: $includeDynamicSegment) {
+                ... on DynamicSegment  {
                     name
                     segmentId
                     data {
@@ -596,9 +562,8 @@ export default createRefetchContainer(
                 pageNumber: $pageNumber
                 pageSize: 150
                 condition: $condition
-            ) {
-                ... on SegmentData
-                    @include(if: $includeSegmentsFromPredicates) {
+            ) @include(if: $includeSegmentsFromPredicates) {
+                ... on SegmentData {
                     segmentSize
                     totalSize
                     dataGridRows
