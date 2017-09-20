@@ -19,7 +19,7 @@ class NumericInput extends Component {
 
     componentDidMount() {
         const { numberValue } = this.state
-        this.updateValue(numberValue, 0)
+        this.updateValue(numberValue[0], 0)
     }
 
     updateComparison(numberComparison) {
@@ -34,7 +34,7 @@ class NumericInput extends Component {
         } = this.props
         let numberValue = [0]
 
-        if (numberComparison === 'in between') {
+        if (numberComparison === 'is between') {
             numberValue = [0, 0]
         }
 
@@ -205,7 +205,7 @@ NumericInput.propTypes = {
 NumericInput.defaultProps = {
     attribute: '',
     numberValue: [0],
-    numberComparison: 'is',
+    numberComparison: 'is equal',
     selector: 'DEVICE',
     index: 0,
     updateFn: () => null,
