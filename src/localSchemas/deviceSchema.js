@@ -1,13 +1,5 @@
 export const getDeviceSchema = () => [
         {
-            attribute: 'tags',
-            label: 'Tags',
-            __typename: 'StringArrayPredicate',
-            group: null,
-            display: true,
-            filter: true
-        },
-        {
             attribute: 'created_at',
             label: 'First Seen',
             __typename: 'DatePredicate',

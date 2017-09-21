@@ -1,13 +1,19 @@
 import React, { Component } from 'react'
+import { text, purple } from '@rover/react-bootstrap'
 
 class ListCellFormatter extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            onCell: false
+            onCell: false,
+            totalWidth: 0,
+            value: '',
+            remaining: []
         }
+
         this.handleMouseOver = this.handleMouseOver.bind(this)
         this.handleMouseLeave = this.handleMouseLeave.bind(this)
+        this.calcLayout = this.calcLayout.bind(this)
     }
 
     handleMouseOver(e) {
@@ -17,7 +23,7 @@ class ListCellFormatter extends Component {
         this.setState({ onCell: true })
         setTimeout(() => {
             if (this.state.onCell) {
-                handleCellEnter(e, 'This is a tooltip for tags')
+                handleCellEnter(e, this.state.remaining, true)
             }
         }, 300)
     }
@@ -28,20 +34,80 @@ class ListCellFormatter extends Component {
         handleCellLeave()
     }
 
+    getExcess(totalWidth) {
+        let remainingWidth = totalWidth - 70
+        let newStr = ''
+        let remaining = []
+        this.props.value.split(',').forEach(val => {
+            if (
+                (newStr.length + val.length) * 6 <= remainingWidth &&
+                remaining.length === 0
+            ) {
+                newStr += `${val},`
+            } else {
+                remaining.push(val.trim())
+            }
+        })
+
+        this.setState({
+            value: newStr,
+            remaining
+        })
+    }
+
+    calcLayout() {
+        let stringPixelLength = this.props.value.length * 6
+        let totalWidth = document.getElementById('listCellElement')
+            .parentElement.parentElement.parentElement.parentElement
+            .parentElement.offsetWidth
+
+        if (stringPixelLength >= totalWidth - 25) {
+            this.getExcess(totalWidth)
+        } else {
+            this.setState({
+                value: this.props.value,
+                remaining: []
+            })
+        }
+    }
+
+    componentDidMount() {
+        this.calcLayout()
+    }
+
+    componentWillReceiveProps() {
+        this.calcLayout()
+    }
+
     render() {
-        const { value } = this.props
         return (
             <div
                 style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    width: 240
+                    display: 'flex'
                 }}
-                onMouseOver={this.handleMouseOver}
-                onMouseLeave={this.handleMouseLeave}
             >
-                {value}
+                <div
+                    id="listCellElement"
+                    style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}
+                >
+                    {this.state.value}
+                </div>
+                {this.state.remaining.length > 0 && (
+                    <div
+                        style={{
+                            ...text,
+                            color: purple
+                        }}
+                        onMouseOver={this.handleMouseOver}
+                        onMouseLeave={this.handleMouseLeave}
+                    >
+                        + {this.state.remaining.length} more
+                    </div>
+                )}
             </div>
         )
     }
