@@ -174,6 +174,8 @@ class Audience extends Component {
                     reset={this.state.reset}
                     setQueryCondition={this.setQueryCondition}
                     queryCondition={this.state.queryCondition}
+                    context={this.state.context}
+                    predicates={this.state.predicates}
                 />
                 <AudienceTable
                     data={data}

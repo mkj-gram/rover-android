@@ -48,7 +48,10 @@ class SideBar extends Component {
             modalCoordinates: [0, 0],
             isViewingDynamicSegment: true,
             segmentId: '',
-            saveStates: {},
+            saveStates: {
+                isSegmentUpdate: false,
+                showSaveButton: false
+            },
             sbDynamicSegment: [],
             segmentIdRefetch: false,
             isFilterModalSuccessDisabled: false,
@@ -112,6 +115,23 @@ class SideBar extends Component {
             })
         }
 
+        if (nextProps.context === 'predicates') {
+            let query = JSON.parse(nextProps.predicates).query
+            this.setState({
+                saveStates: {
+                    isSegmentUpdate: this.state.segmentId !== '',
+                    showSaveButton: query && query.length > 0
+                }
+            })
+        } else if (nextProps.context === 'segments') {
+            this.setState({
+                saveStates: {
+                    isSegmentUpdate: false,
+                    showSaveButton: false
+                }
+            })
+        }
+
         if (nextProps.reset) {
             this.setState({
                 currentAttribute: { attribute: '', index: null },
@@ -121,7 +141,10 @@ class SideBar extends Component {
                 modalCoordinates: [0, 0],
                 isViewingDynamicSegment: true,
                 segmentId: '',
-                saveStates: {},
+                saveStates: {
+                    isSegmentUpdate: false,
+                    showSaveButton: false
+                },
                 sbDynamicSegment: [],
                 refetchData: false,
                 segmentIdRefetch: false
@@ -479,7 +502,7 @@ class SideBar extends Component {
             justifyContent: 'center',
             flex: 'none'
         }
-        const { showSaveButton } = this.props.saveStates
+        const { showSaveButton } = this.state.saveStates
 
         return (
             <div style={style} id="saveBar">
@@ -630,14 +653,14 @@ class SideBar extends Component {
             isShowingAddFilterModal,
             showSegmentSelection,
             showSegmentSave,
-            currentPredicate
+            currentPredicate,
+            saveStates
         } = this.state
 
         const {
             data,
             getSegment,
             segment,
-            saveStates,
             setSegment,
             updateSegmentName,
             archiveSegment,

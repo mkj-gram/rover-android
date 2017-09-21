@@ -103,7 +103,7 @@ union BlockAction = GoToScreenAction | OpenUrlAction
 
 type BooleanPredicate implements Predicate {
   attribute: String!
-  category: String!
+  selector: String!
   booleanValue: Boolean!
   booleanComparison: String!
 }
@@ -315,7 +315,7 @@ scalar Date
 
 type DatePredicate implements Predicate {
   attribute: String!
-  category: String!
+  selector: String!
   dateValue: DateValue!
   dateComparison: String!
 }
@@ -647,7 +647,7 @@ input GeofenceInput {
 
 type GeofencePredicate implements Predicate {
   attribute: String!
-  category: String!
+  selector: String!
   geofenceValue: GeofenceValue!
   geofenceComparison: String!
 }
@@ -803,7 +803,7 @@ interface Node {
 
 type NumberPredicate implements Predicate {
   attribute: String!
-  category: String!
+  selector: String!
   numberValue: [Int!]!
   numberComparison: String!
 }
@@ -845,7 +845,7 @@ enum Position {
 # Search predicate for building Segments
 interface Predicate {
   attribute: String!
-  category: String!
+  selector: String!
 }
 
 # Object containing list of device predicates and list of profile predicates
@@ -944,6 +944,7 @@ type SchemaAttribute {
   attribute: String!
   label: String!
   type: String!
+  selector: String!
 }
 
 # A screen that contains only the publicly accessible fields
@@ -992,9 +993,17 @@ enum StatusBarStyle {
   LIGHT
 }
 
+# Array of tags predicate
+type StringArrayPredicate implements Predicate {
+  attribute: String!
+  selector: String!
+  stringArrayComparison: String!
+  stringArrayValue: [String]!
+}
+
 type StringPredicate implements Predicate {
   attribute: String!
-  category: String!
+  selector: String!
   stringValue: String!
   stringComparison: String!
 }
@@ -1051,7 +1060,7 @@ enum Unit {
 
 type VersionPredicate implements Predicate {
   attribute: String!
-  category: String!
+  selector: String!
   versionValue: [Int!]!
   versionComparison: String!
 }
