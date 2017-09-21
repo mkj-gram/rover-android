@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { graphql, createRefetchContainer } from 'react-relay'
 import { Tooltip } from '@rover/react-bootstrap'
 
 import AudienceDataGrid from './AudienceDataGrid'
@@ -12,6 +11,8 @@ import ListCellFormatter from './ListCellFormatter'
 
 import { getDeviceSchema } from '../../localSchemas/deviceSchema'
 import roverProfileSchema from '../../localSchemas/roverProfileSchema'
+
+import SkeletonTableGrid from './SkeletonTableGrid'
 
 class AudienceTable extends Component {
     constructor(props) {
@@ -60,24 +61,32 @@ class AudienceTable extends Component {
         this.updateDynamicSegments = this.updateDynamicSegments.bind(this)
         this.renderFetch = this.renderFetch.bind(this)
         this.fetchData = this.fetchData.bind(this)
+        this.renderDataGrid = this.renderDataGrid.bind(this)
     }
 
     componentDidMount() {
-        const { data } = this.props
+        if (this.props.data) {
+            const { data } = this.props
+            const { profileSchema } = data.adgSegmentSchema
+            const deviceSchema = getDeviceSchema()
 
-        const { profileSchema } = data.adgSegmentSchema
-        const deviceSchema = getDeviceSchema()
+            const {
+                dataGridRows,
+                segmentSize,
+                totalSize
+            } = data.adgSegmentsFromPredicates
 
-        const {
-            dataGridRows,
-            segmentSize,
-            totalSize
-        } = data.adgSegmentsFromPredicates
+            this.getSetCachedColumns()
+            this.getAllColumns(deviceSchema, profileSchema)
+            this.createRowsAndColumns(dataGridRows)
+            this.setState({ segmentSize, totalSize, dataGridRows })
+        } else {
+            this.getSetCachedColumns()
 
-        this.getSetCachedColumns()
-        this.getAllColumns(deviceSchema, profileSchema)
-        this.createRowsAndColumns(dataGridRows)
-        this.setState({ segmentSize, totalSize, dataGridRows })
+            const columns = this.getSelectedColumns()
+
+            this.setState({ columns })
+        }
     }
 
     getSetCachedColumns() {
@@ -148,11 +157,11 @@ class AudienceTable extends Component {
         )
         roverProfileSchema().map(
             profile =>
-            (roverProfiles[profile.attribute] = {
-                __typename: profile.__typename,
-                label: profile.label,
-                selector: 'ROVER_PROFILE'
-            })
+                (roverProfiles[profile.attribute] = {
+                    __typename: profile.__typename,
+                    label: profile.label,
+                    selector: 'ROVER_PROFILE'
+                })
         )
 
         const profiles = {
@@ -234,7 +243,7 @@ class AudienceTable extends Component {
             relay.refetch(
                 refetchVariables,
                 null,
-                (error) => {
+                error => {
                     error !== undefined ? console.log(`Error: ${error}`) : ''
                 },
                 { force: true }
@@ -252,7 +261,7 @@ class AudienceTable extends Component {
             relay.refetch(
                 refetchVariables,
                 null,
-                (error) => {
+                error => {
                     error !== undefined ? console.log(`Error: ${error}`) : ''
                 },
                 { force: true }
@@ -331,11 +340,13 @@ class AudienceTable extends Component {
             localStorage.getItem('selectedColumns')
         )
 
-        const rows = dataGridRows.map((data) => {
+        const rows = dataGridRows.map(data => {
             const row = {}
-            data.forEach((property) => {
+            data.forEach(property => {
                 if (property.attribute in selectedColumns) {
-                    row[`${property.attribute}_${property.selector}`] = this.formatRowData(
+                    row[
+                        `${property.attribute}_${property.selector}`
+                    ] = this.formatRowData(
                         property.value,
                         selectedColumns[property.attribute].__typename
                     )
@@ -344,7 +355,7 @@ class AudienceTable extends Component {
             return row
         })
 
-        const startRow = pageNum % 3 * 50
+        const startRow = (pageNum % 3) * 50
         return rows.slice(startRow, startRow + 50)
     }
 
@@ -458,7 +469,7 @@ class AudienceTable extends Component {
         )
         if (Object.keys(columns).length > 0) {
             const rearrangeColumns = {}
-            columns.forEach((attr) => {
+            columns.forEach(attr => {
                 rearrangeColumns[attr.name] = selectedColumns[attr.name]
             })
             localStorage.setItem(
@@ -470,14 +481,27 @@ class AudienceTable extends Component {
         this.setState({ columns, rows })
     }
 
+    renderDataGrid() {
+        const { skeleton, updatePageNumber, resetPagination } = this.props
+        const { selectedColumns, segmentSize, columns, rows } = this.state
+
+        if (skeleton) {
+            return <SkeletonTableGrid selectedColumns={selectedColumns} />
+        }
+        return (
+            <AudienceDataGrid
+                segmentSize={segmentSize}
+                columns={columns}
+                rows={rows}
+                updateDragColumns={this.updateDragColumns}
+                updatePageNumber={updatePageNumber}
+                resetPagination={resetPagination}
+            />
+        )
+    }
+
     render() {
-        const {
-            columns,
-            rows,
-            segmentSize,
-            totalSize,
-            selectedColumns
-        } = this.state
+        const { columns, segmentSize, totalSize, selectedColumns } = this.state
 
         const { isTooltipShowing, message, coordinates, listView } = this.state.toolTip
         return (
@@ -496,24 +520,19 @@ class AudienceTable extends Component {
                     updateChecked={this.updateChecked}
                     selectedColumns={selectedColumns}
                 />
-                <AudienceDataGrid
-                    segmentSize={segmentSize}
-                    columns={columns}
-                    rows={rows}
-                    updateDragColumns={this.updateDragColumns}
-                    updatePageNumber={this.props.updatePageNumber}
-                    resetPagination={this.props.resetPagination}
-                />
-                {isTooltipShowing &&
-                    <Tooltip message={message} coordinates={coordinates} listView={listView} />}
+
+                {columns.length > 0 && this.renderDataGrid()}
+                {isTooltipShowing && (
+                    <Tooltip message={message} coordinates={coordinates} listView={listView} />
+                )}
             </div>
         )
     }
 }
 
 AudienceTable.propTypes = {
-    data: PropTypes.object.isRequired,
-    relay: PropTypes.object.isRequired,
+    data: PropTypes.object,
+    relay: PropTypes.object,
     segmentId: PropTypes.string.isRequired,
     predicates: PropTypes.string.isRequired,
     resetPagination: PropTypes.bool.isRequired,
@@ -522,87 +541,19 @@ AudienceTable.propTypes = {
     updatePageNumber: PropTypes.func.isRequired,
     setSaveState: PropTypes.func.isRequired,
     refetchData: PropTypes.bool,
-    reset: PropTypes.bool.isRequired
+    reset: PropTypes.bool.isRequired,
+    skeleton: PropTypes.bool
 }
 
-export default createRefetchContainer(
-    AudienceTable,
-    graphql.experimental`
-        fragment AudienceTable on Query
-            @argumentDefinitions(
-                segmentId: { type: "ID", defaultValue: "" }
-                includeSegmentsFromPredicates: {
-                    type: "Boolean!"
-                    defaultValue: true
-                }
-                predicates: { type: "String!", defaultValue: "[]" }
-                includeDynamicSegment: { type: "Boolean!", defaultValue: false }
-                pageNumber: { type: "Int", defaultValue: 0 }
-                condition: { type: "String", defaultValue: "ANY" }
-            ) {
-            adgDynamicSegment: dynamicSegment(
-                segmentId: $segmentId
-                pageNumber: $pageNumber
-                pageSize: 150
-            ) @include(if: $includeDynamicSegment) {
-                ... on DynamicSegment  {
-                    name
-                    segmentId
-                    data {
-                        segmentSize
-                        totalSize
-                        dataGridRows
-                    }
-                }
-            }
-            adgSegmentSchema: segmentSchema {
-                deviceSchema {
-                    ... on SchemaAttribute {
-                        attribute
-                        __typename: type
-                        label
-                    }
-                }
-                profileSchema {
-                    ... on SchemaAttribute {
-                        attribute
-                        __typename: type
-                        label
-                    }
-                }
-            }
-            adgSegmentsFromPredicates: segmentFromPredicates(
-                predicates: $predicates
-                pageNumber: $pageNumber
-                pageSize: 150
-                condition: $condition
-            ) @include(if: $includeSegmentsFromPredicates) {
-                ... on SegmentData {
-                    segmentSize
-                    totalSize
-                    dataGridRows
-                }
-            }
-        }
-    `,
-    graphql.experimental`
-        query AudienceTableRefetchQuery(
-            $segmentId: ID
-            $includeSegmentsFromPredicates: Boolean!
-            $predicates: String!
-            $includeDynamicSegment: Boolean!
-            $pageNumber: Int
-            $condition: String
-        ) {
-            ...AudienceTable
-                @arguments(
-                    segmentId: $segmentId
-                    includeSegmentsFromPredicates: $includeSegmentsFromPredicates
-                    predicates: $predicates
-                    includeDynamicSegment: $includeDynamicSegment
-                    pageNumber: $pageNumber
-                    condition: $condition
-                )
-        }
-    `
-)
+AudienceTable.defaultProps = {
+    segmentId: '',
+    predicates: '[]',
+    resetPagination: false,
+    pageNumber: 0,
+    context: 'predicates',
+    updatePageNumber: () => null,
+    setSaveState: () => null,
+    reset: false
+}
+
+export default AudienceTable

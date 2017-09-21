@@ -551,8 +551,8 @@ class SideBar extends Component {
                             lineHeight: '22px',
                             pointerEvents: 'none'
                         }}
-                    >
-                        {this.props.data.segmentsContainer.length}
+                    >   
+                        {this.props.data && this.props.data.segmentsContainer.length}
                     </div>
                     My Segments
                 </RoundedButton>
@@ -673,7 +673,7 @@ class SideBar extends Component {
             reset,
             queryCondition
         } = this.props
-
+       
         return (
             <div style={sideBarStyle}>
                 {this.handleModalOpen()}
@@ -755,7 +755,7 @@ class SideBar extends Component {
                     </div>
                 )}
                 {this.renderSaveBar()}
-                <SegmentsContainer
+                {data && <SegmentsContainer
                     query={query}
                     showSegmentSelection={showSegmentSelection}
                     showSegmentSave={showSegmentSave}
@@ -769,14 +769,14 @@ class SideBar extends Component {
                     archiveSegment={archiveSegment}
                     reset={reset}
                     queryCondition={queryCondition}
-                />
+                />}
             </div>
         )
     }
 }
 
 SideBar.propTypes = {
-    data: PropTypes.object.isRequired,
+    data: PropTypes.object,
     relay: PropTypes.object.isRequired,
     getSegment: PropTypes.func.isRequired,
     segment: PropTypes.object,
@@ -794,80 +794,21 @@ SideBar.propTypes = {
 
 SideBar.defaultProps = {
     segment: {},
-    segmentIdRefetch: false
+    segmentIdRefetch: false,
+    relay: {},
+    getSegment: () => null,
+    updateQuery: () => null,
+    saveStates: {
+        isSegmentUpdate: false,
+        showSaveButton: false
+    },
+    refetchData: false,
+    reset: false,
+    setSegment: () => null,
+    updateSegmentName: () => null,
+    archiveSegment: () => null,
+    setQueryCondition: () => null,
+    queryCondition: 'ALL'
 }
 
-export default createRefetchContainer(
-    SideBar,
-    graphql.experimental`
-        fragment SideBar on Query
-            @argumentDefinitions(segmentId: { type: "ID", defaultValue: "" }) {
-            sbDynamicSegment: dynamicSegment(segmentId: $segmentId) {
-                segmentId
-                name
-                predicates {
-                    condition
-                    predicateList {
-                        ... on Predicate {
-                            __typename
-                            attribute
-                            selector
-                            ... on StringPredicate {
-                                stringValue
-                                stringComparison
-                            }
-                            ... on VersionPredicate {
-                                versionValue
-                                versionComparison
-                            }
-                            ... on DatePredicate {
-                                dateValue {
-                                    start
-                                    end
-                                }
-                                dateComparison
-                            }
-                            ... on BooleanPredicate {
-                                booleanValue
-                                booleanComparison
-                            }
-                            ... on NumberPredicate {
-                                numberValue
-                                numberComparison
-                            }
-                            ... on GeofencePredicate {
-                                geofenceValue {
-                                    latitude
-                                    longitude
-                                    radius
-                                    name
-                                }
-                                geofenceComparison
-                            }
-                            ... on StringArrayPredicate {
-                                stringArrayValue,
-                                stringArrayComparison
-                            }
-                        }
-                    }
-                }
-            }
-            segmentSchema {
-                profileSchema {
-                    attribute
-                    __typename: type
-                    label
-                    selector
-                }
-            }
-            segmentsContainer: dynamicSegment {
-                ...SegmentsContainer_segments
-            }
-        }
-    `,
-    graphql.experimental`
-        query SideBarRefetchQuery($segmentId: ID) {
-            ...SideBar @arguments(segmentId: $segmentId)
-        }
-    `
-)
+export default SideBar

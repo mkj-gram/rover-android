@@ -7,13 +7,13 @@ import Skeleton from './Skeleton'
 
 const AppQueryRendererQuery = graphql`
     query AppQueryRendererQuery {
-        ...SideBar
-        ...AudienceTable
+        ...SideBarRefetchContainer
+        ...AudienceTableRefetchContainer
     }
 `
 
-const AppQueryRenderer = () =>
-    (<QueryRenderer
+const AppQueryRenderer = () => (
+    <QueryRenderer
         environment={environment}
         query={AppQueryRendererQuery}
         render={({ error, props = {} }) => {
@@ -22,12 +22,11 @@ const AppQueryRenderer = () =>
                 return <div>error</div>
             }
             if (props) {
-                return (
-                    <Audience data={props} />
-                )
+                return <Audience data={props} />
             }
             return <Skeleton />
         }}
-    />)
+    />
+)
 
 export default AppQueryRenderer
