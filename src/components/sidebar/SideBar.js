@@ -208,7 +208,13 @@ class SideBar extends Component {
     }
 
     clearQuery() {
-        this.setState({ query: [] })
+        this.setState({
+            query: [],
+            saveStates: {
+                isSegmentUpdate: false,
+                showSaveButton: false
+            },
+        })
     }
 
     renderModalTitle(currentAttribute) {
