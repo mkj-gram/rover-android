@@ -87,6 +87,8 @@ const DynamicSegmentQuery = {
                     selector: getSelectorName(predicate.getSelector()),
                     stringComparison: stringComparisons[pred.getOp()],
                     stringValue: pred.getValue(),
+                    // include __typename field expected by DynamicSegment
+                    __typename: 'StringPredicate'
                 }
             }
             
@@ -106,7 +108,8 @@ const DynamicSegmentQuery = {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),
                     booleanComparison: boolComparisons[pred.getOp()],
-                    booleanValue: pred.getValue()
+                    booleanValue: pred.getValue(),
+                    __typename: 'BooleanPredicate'
                 }
             }
             
@@ -136,7 +139,8 @@ const DynamicSegmentQuery = {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),
                     numberComparison: numberComparisons[pred.getOp()],
-                    numberValue: [pred.getValue(), pred.getValue2()]
+                    numberValue: [pred.getValue(), pred.getValue2()],
+                    __typename: 'NumberPredicate'
                 }
             }
             
@@ -166,7 +170,8 @@ const DynamicSegmentQuery = {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),
                     numberComparison: doubleComparisons[pred.getOp()],
-                    numberValue: [pred.getValue(), pred.getValue2()]
+                    numberValue: [pred.getValue(), pred.getValue2()],
+                    __typename: 'FloatPredicate'
                 }
             }
             
@@ -206,7 +211,8 @@ const DynamicSegmentQuery = {
                     dateValue: {
                         start: RoverApis.Helpers.timestampFromProto(pred.getValue()),
                         end: RoverApis.Helpers.timestampFromProto(pred.getValue2())
-                    }
+                    },
+                    __typename: 'DatePredicate'
                 }
             }
             
@@ -235,7 +241,8 @@ const DynamicSegmentQuery = {
                         latitude: predLocation.getLatitude(),
                         radius: predLocation.getRadius(),
                         name: predLocation.getName(),
-                    }
+                    },
+                    __typename: 'GeofencePredicate'
                 }
             }
             
@@ -280,7 +287,8 @@ const DynamicSegmentQuery = {
                         value2.getMajor(),
                         value2.getMinor(),
                         value2.getRevision()
-                    ]
+                    ],
+                    __typename: 'VersionPredicate'
                 }
             }
 
@@ -306,7 +314,8 @@ const DynamicSegmentQuery = {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),
                     stringArrayComparison: stringArrayComparisons[pred.getOp()],
-                    stringArrayValue: pred.getValueList()
+                    stringArrayValue: pred.getValueList(),
+                    __typename: 'StringArrayPredicate'
                 }
             }
 

@@ -47,6 +47,8 @@ const DynamicSegment = new GraphQLObjectType({
                 request.setAuthContext(authContext)
                 request.setPageIterator(pageIterator)
 
+                // predicates should include field __typename, required by buildPredicateAggregate 
+                // until DynamicSegments are no longer using Query API
                 const predicateAggregate = buildPredicateAggregate(
                     condition,
                     predicates.replace(/'/g, `"`)
