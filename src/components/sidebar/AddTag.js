@@ -51,7 +51,7 @@ class AddTag extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.tags.length !== this.props.tags.length) {
-            this.props.textScrollElem.scrollIntoView({ behavior: 'smooth' })
+            this.props.textScrollElem.scrollIntoView()
             this.calculateTagPosition()
         }
     }

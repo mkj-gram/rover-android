@@ -81,7 +81,7 @@ class SegmentSave extends Component {
                 this.state.segmentName,
                 JSON.stringify(this.props.query),
                 setSegment,
-                queryCondition.toLowerCase()
+                queryCondition
             )
         }
         this.setState({
@@ -175,14 +175,14 @@ class SegmentSave extends Component {
                     this.state.segmentName,
                     JSON.stringify(this.props.query),
                     setSegment,
-                    queryCondition.toUpperCase()
+                    queryCondition
                 )
             } else {
                 UpdateSegmentPredicatesMutation(
                     this.props.segment.segmentId,
                     JSON.stringify(this.props.query),
                     setSegment,
-                    queryCondition.toUpperCase()
+                    queryCondition
                 )
             }
         }

@@ -18,7 +18,7 @@ class SelectedTags extends Component {
     }
 
     componentDidUpdate() {
-        this.textFieldScroll.scrollIntoView({ behavior: 'smooth' })
+        this.textFieldScroll.scrollIntoView()
     }
 
     componentDidMount() {
@@ -125,7 +125,8 @@ class SelectedTags extends Component {
                                     focus: {
                                         borderColor: graphite
                                     },
-                                    marginTop: 6
+                                    marginTop: 6,
+                                    marginBottom: 5
                                 }}
                                 onChange={this.handleTextChange}
                                 onKeyPress={this.handleKeyPress}

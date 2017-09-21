@@ -8,6 +8,7 @@ import TableMenuBarAlpha from './TableMenuBarAlpha'
 import DateCellFormatter from './DateCellFormatter'
 import BooleanCellFormatter from './BooleanCellFormatter'
 import ListCellFormatter from './ListCellFormatter'
+import StringCellFormatter from './StringCellFormatter'
 
 import { getDeviceSchema } from '../../localSchemas/deviceSchema'
 import roverProfileSchema from '../../localSchemas/roverProfileSchema'
@@ -427,6 +428,7 @@ class AudienceTable extends Component {
                     />
                 )
             default:
+                return <StringCellFormatter />
         }
     }
 
