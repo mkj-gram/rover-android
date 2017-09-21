@@ -599,8 +599,8 @@ func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience
 
 	// Pick from our list of mock data
 	switch typ := r.GetIterator().(type) {
-	case *audience.QueryRequest_CursorIterator_:
-		return s.queryWithCursorIterator(ctx, r)
+	// case *audience.QueryRequest_CursorIterator_:
+	// 	return s.queryWithCursorIterator(ctx, r)
 	case *audience.QueryRequest_PageIterator_:
 		return s.queryWithPageIterator(ctx, r)
 	default:
