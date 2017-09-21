@@ -20692,7 +20692,7 @@ proto.rover.audience.v1.QueryRequest.TimeZoneOffset.prototype.toObject = functio
  */
 proto.rover.audience.v1.QueryRequest.TimeZoneOffset.toObject = function(includeInstance, msg) {
   var f, obj = {
-    minutes: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    seconds: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -20730,8 +20730,8 @@ proto.rover.audience.v1.QueryRequest.TimeZoneOffset.deserializeBinaryFromReader 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt64());
-      msg.setMinutes(value);
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setSeconds(value);
       break;
     default:
       reader.skipField();
@@ -20761,9 +20761,9 @@ proto.rover.audience.v1.QueryRequest.TimeZoneOffset.prototype.serializeBinary = 
  */
 proto.rover.audience.v1.QueryRequest.TimeZoneOffset.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getMinutes();
+  f = message.getSeconds();
   if (f !== 0) {
-    writer.writeInt64(
+    writer.writeInt32(
       1,
       f
     );
@@ -20772,16 +20772,16 @@ proto.rover.audience.v1.QueryRequest.TimeZoneOffset.serializeBinaryToWriter = fu
 
 
 /**
- * optional int64 minutes = 1;
+ * optional int32 seconds = 1;
  * @return {number}
  */
-proto.rover.audience.v1.QueryRequest.TimeZoneOffset.prototype.getMinutes = function() {
+proto.rover.audience.v1.QueryRequest.TimeZoneOffset.prototype.getSeconds = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
 /** @param {number} value */
-proto.rover.audience.v1.QueryRequest.TimeZoneOffset.prototype.setMinutes = function(value) {
+proto.rover.audience.v1.QueryRequest.TimeZoneOffset.prototype.setSeconds = function(value) {
   jspb.Message.setField(this, 1, value);
 };
 

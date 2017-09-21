@@ -578,7 +578,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :scroll_id, :string, 1
   end
   add_message "rover.audience.v1.QueryRequest.TimeZoneOffset" do
-    optional :minutes, :int64, 1
+    optional :seconds, :int32, 1
   end
   add_message "rover.audience.v1.QueryResponse" do
     optional :total_size, :int64, 1

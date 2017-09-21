@@ -965,7 +965,7 @@ message QueryRequest {
   }
 
   message TimeZoneOffset {
-    int64 minutes = 1;
+    int32 seconds = 1;
   }
 
   oneof iterator {
