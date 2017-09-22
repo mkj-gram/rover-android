@@ -75,7 +75,7 @@ class AddFilterModal extends Component {
 
         const profiles = roverProfiles.concat(customProfiles)
 
-        return devices.concat(profiles)
+        return devices.concat(profiles).filter((filter) => filter.__typename !== 'DatePredicate')
     }
 
     getFilterDefault(type) {

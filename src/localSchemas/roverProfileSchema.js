@@ -1,11 +1,5 @@
 export default () => [
         {
-            attribute: 'account_id',
-            label: 'Account ID',
-            __typename: 'StringPredicate',
-            group: null
-        },
-        {
             attribute: 'identifier',
             label: 'Identifier',
             __typename: 'StringPredicate',

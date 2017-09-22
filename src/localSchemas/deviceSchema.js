@@ -5,7 +5,7 @@ export const getDeviceSchema = () => [
             __typename: 'DatePredicate',
             group: null,
             display: true,
-            filter: true
+            filter: false
         },
         {
             attribute: 'app_version',
