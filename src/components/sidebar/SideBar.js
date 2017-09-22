@@ -209,7 +209,7 @@ class SideBar extends Component {
     }
 
     clearQuery() {
-        this.props.updateQuery([], 'ALL')
+        this.props.setQueryCondition('ALL', false, [])
         this.setState({
             query: [],
             saveStates: {
