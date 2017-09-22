@@ -24,6 +24,12 @@ type nopIndex struct{}
 func (i *nopIndex) Query(context.Context, *audience.QueryRequest) (*audience.QueryResponse, error) {
 	return nil, nil
 }
+func (i *nopIndex) GetDeviceTotalCount(context.Context, int) (int64, error) {
+	return 0, nil
+}
+func (i *nopIndex) GetProfileTotalCount(context.Context, int) (int64, error) {
+	return 0, nil
+}
 
 func testAudienceService_GetDevicesTotalCount(t *testing.T) {
 	var (

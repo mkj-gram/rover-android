@@ -30,6 +30,8 @@ type (
 
 	Index interface {
 		Query(context.Context, *audience.QueryRequest) (*audience.QueryResponse, error)
+		GetProfileTotalCount(context.Context, int) (int64, error)
+		GetDeviceTotalCount(context.Context, int) (int64, error)
 	}
 )
 
@@ -42,34 +44,6 @@ func New(db *mongodb.DB, index Index, notifier Notifier) *Server {
 			Notifier: notifier,
 		},
 	}
-}
-
-//
-// Counter Caches
-//
-
-// GetDevicesTotalCount implements the corresponding rpc
-func (s *Server) GetDevicesTotalCount(ctx context.Context, r *audience.GetDevicesTotalCountRequest) (*audience.GetDevicesTotalCountResponse, error) {
-	db := s.db.Copy()
-	defer db.Close()
-
-	val, err := db.GetDevicesTotalCount(ctx, r.GetAuthContext().GetAccountId())
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDevicesTotalCount: %v", err)
-	}
-	return &audience.GetDevicesTotalCountResponse{val}, nil
-}
-
-// GetProfilesTotalCount implements the corresponding rpc
-func (s *Server) GetProfilesTotalCount(ctx context.Context, r *audience.GetProfilesTotalCountRequest) (*audience.GetProfilesTotalCountResponse, error) {
-	db := s.db.Copy()
-	defer db.Close()
-
-	val, err := db.GetProfilesTotalCount(ctx, r.GetAuthContext().GetAccountId())
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfilesTotalCount: %v", err)
-	}
-	return &audience.GetProfilesTotalCountResponse{val}, nil
 }
 
 //
@@ -500,6 +474,24 @@ func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.Update
 //
 // DynamicSegments
 //
+
+// GetDevicesTotalCount implements the corresponding rpc
+func (s *Server) GetDevicesTotalCount(ctx context.Context, r *audience.GetDevicesTotalCountRequest) (*audience.GetDevicesTotalCountResponse, error) {
+	count, err := s.index.GetDeviceTotalCount(ctx, int(r.GetAuthContext().GetAccountId()))
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "index.GetDevicesTotalCount: %v", err)
+	}
+	return &audience.GetDevicesTotalCountResponse{count}, nil
+}
+
+// GetProfilesTotalCount implements the corresponding rpc
+func (s *Server) GetProfilesTotalCount(ctx context.Context, r *audience.GetProfilesTotalCountRequest) (*audience.GetProfilesTotalCountResponse, error) {
+	count, err := s.index.GetProfileTotalCount(ctx, int(r.GetAuthContext().GetAccountId()))
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "index.GetDevicesTotalCount: %v", err)
+	}
+	return &audience.GetProfilesTotalCountResponse{count}, nil
+}
 
 // CreateDynamicSegment implements the corresponding rpc
 func (s *Server) CreateDynamicSegment(ctx context.Context, r *audience.CreateDynamicSegmentRequest) (*audience.CreateDynamicSegmentResponse, error) {

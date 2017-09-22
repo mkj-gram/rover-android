@@ -25,6 +25,34 @@ type (
 	}
 )
 
+func (q *Index) GetDeviceTotalCount(ctx context.Context, accountId int) (int64, error) {
+	var (
+		indexName = q.IndexName(strconv.Itoa(int(accountId)))
+		Q         = q.Client.Count(indexName).Type("device")
+	)
+
+	count, err := Q.Do(ctx)
+	if err != nil {
+		return 0, errors.Wrap(err, "Count")
+	}
+
+	return count, nil
+}
+
+func (q *Index) GetProfileTotalCount(ctx context.Context, accountId int) (int64, error) {
+	var (
+		indexName = q.IndexName(strconv.Itoa(int(accountId)))
+		Q         = q.Client.Count(indexName).Type("profile")
+	)
+
+	count, err := Q.Do(ctx)
+	if err != nil {
+		return 0, errors.Wrap(err, "Count")
+	}
+
+	return count, nil
+}
+
 func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.QueryResponse, error) {
 	var (
 		indexName = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
