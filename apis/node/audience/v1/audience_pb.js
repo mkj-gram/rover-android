@@ -20994,7 +20994,7 @@ proto.rover.audience.v1.QueryResponse.toObject = function(includeInstance, msg) 
     proto.rover.audience.v1.Profile.toObject, includeInstance),
     devicesList: jspb.Message.toObjectList(msg.getDevicesList(),
     proto.rover.audience.v1.Device.toObject, includeInstance),
-    cursorId: jspb.Message.getFieldWithDefault(msg, 9, "")
+    scrollId: jspb.Message.getFieldWithDefault(msg, 9, "")
   };
 
   if (includeInstance) {
@@ -21047,7 +21047,7 @@ proto.rover.audience.v1.QueryResponse.deserializeBinaryFromReader = function(msg
       break;
     case 9:
       var value = /** @type {string} */ (reader.readString());
-      msg.setCursorId(value);
+      msg.setScrollId(value);
       break;
     default:
       reader.skipField();
@@ -21100,7 +21100,7 @@ proto.rover.audience.v1.QueryResponse.serializeBinaryToWriter = function(message
       proto.rover.audience.v1.Device.serializeBinaryToWriter
     );
   }
-  f = message.getCursorId();
+  f = message.getScrollId();
   if (f.length > 0) {
     writer.writeString(
       9,
@@ -21192,16 +21192,16 @@ proto.rover.audience.v1.QueryResponse.prototype.clearDevicesList = function() {
 
 
 /**
- * optional string cursor_id = 9;
+ * optional string scroll_id = 9;
  * @return {string}
  */
-proto.rover.audience.v1.QueryResponse.prototype.getCursorId = function() {
+proto.rover.audience.v1.QueryResponse.prototype.getScrollId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.QueryResponse.prototype.setCursorId = function(value) {
+proto.rover.audience.v1.QueryResponse.prototype.setScrollId = function(value) {
   jspb.Message.setField(this, 9, value);
 };
 
