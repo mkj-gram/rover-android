@@ -986,6 +986,6 @@ message QueryResponse {
   repeated Device devices = 3;
 
   // optional
-  
-  string cursor_id = 9;
+  // Used in ScrollIterator.Next to grab the next batch in the scroll
+  string scroll_id = 9;
 }
