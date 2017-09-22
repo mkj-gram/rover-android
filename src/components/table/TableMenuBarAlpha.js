@@ -83,8 +83,13 @@ class TableMenuBarAlpha extends Component {
         })
     }
 
-    showChecked(item) {
-        return (item in this.props.selectedColumns)
+    showChecked(item, info) {    
+        const { selectedColumns } = this.props
+        if (!info.hasOwnProperty('selector')) {
+            return (`${item}_DEVICE` in selectedColumns)
+        } else if (['CUSTOM_PROFILE','ROVER_PROFILE'].includes(info.selector)) {
+            return (`${item}_${info.selector}` in selectedColumns)
+        }
     }
 
     render() {
