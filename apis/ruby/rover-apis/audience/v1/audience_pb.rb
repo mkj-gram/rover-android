@@ -584,7 +584,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :total_size, :int64, 1
     repeated :profiles, :message, 2, "rover.audience.v1.Profile"
     repeated :devices, :message, 3, "rover.audience.v1.Device"
-    optional :cursor_id, :string, 9
+    optional :scroll_id, :string, 9
   end
   add_enum "rover.audience.v1.Platform" do
     value :UNDEFINED, 0
