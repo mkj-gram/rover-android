@@ -76,7 +76,7 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
     }
 
 
-    function profileFromProto(p) {
+    methods.fromProto = function(p) {
         let profile = {}
         profile.id = p.getId()
         profile.account_id = p.getAccountId()
@@ -107,7 +107,7 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
             let profileProtos = reply.getProfilesList()
         
 
-            let profiles = profileProtos.map(profileFromProto)
+            let profiles = profileProtos.map(methods.fromProto)
 
             return callback(null, profiles)
         })

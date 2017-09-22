@@ -54,7 +54,7 @@ class ScheduledMessageJobMasterWorker
 
                     msg = {
                         message_template_id: message_template.id,
-                        time_zone_offset: hour
+                        time_zone_offset: hour.hours.to_i
                     }
                     ScheduledMessageJobWorker.perform_async(msg, local_delay)
                 end

@@ -28,6 +28,9 @@ const INBOX_LIMIT = 150;
 const LIBRATO_SOURCE = 'scheduled-messages-worker';
 const APNS_CONCURRENCY = Config.get('/worker/apns_concurrency');
 
+/* 
+    Private Helpers
+*/
 const isEmptyObject = (obj) => {
     return !Object.keys(obj).length;
 };
@@ -63,6 +66,68 @@ const roverInboxApnsDevelopmentClient = new apn.Provider({
     passphrase: null,
     production: false
 });
+
+
+function profileToCustomer(profile, devices) {
+    function getDocumentBucket(id) {
+        return ((parseInt(id, 16) % 5) + 1)
+    }
+
+    function deviceToDoc(device) {
+        const doc =  {
+            _id: device.id,
+            token: device.push_token,
+            locale_lang: device.locale_language,
+            locale_region: device.locale_region,
+            time_zone: device.time_zone,
+            app_identifier: device.app_namespace,
+            platform: device.platform,
+            os_name: device.os_name,
+            os_version: device.os_version,
+            model: device.device_model,
+            manufacturer: device.device_manufacturer,
+            carrier: device.carrier_name,
+            background_enabled: device.is_background_enabled,
+            notifications_enabled: device.push_token_is_active,
+            location_monitoring_enabled: device.is_location_monitoring_enabled,
+            bluetooth_enabled: device.is_bluetooth_enabled,
+            development: device.push_environment === "development",
+            is_test_device: device.is_test_device || false
+        }
+
+        if (device.location_longitude !== 0 && device.location_latitude !== 0 && device.location_longitude !== null && device.location_latitude !== null) {
+            doc.location = {
+                lat: device.location_latitude,
+                lon: device.location_longitude
+            }
+        }
+
+        if (device.sdk_version) {
+            doc.sdk_version = device.sdk_version
+        }
+
+        return doc
+    }
+
+    const customer = {
+        _id: profile.id,
+        account_id: profile.account_id,
+        identifier: profile.identifier,
+        first_name: profile['first-name'],
+        last_name: profile['last-name'],
+        email: profile.email,
+        phone_number: profile['phone-number'],
+        age: profile.age,
+        gender: profile.gender,
+        tags: profile.tags || [],
+        traits: {},
+        document_bucket: getDocumentBucket(profile.id),
+        devices: (devices || []).map(deviceToDoc)
+
+    }
+
+    return customer
+}
 
 const JOB_STATE = {
     _getSegment: 1,
@@ -174,7 +239,7 @@ JobProcessor.prototype.process = function(done) {
             .then(response => this._queueNextJob(response))
 
     } else {
-        job = job.then(() => this._getSegmentFromElasticsearch())
+        job = job.then(() => this._getSegmentFromQueryApi())
             .then(response => this._queueNextJob(response))
             .then(() => this._filterCustomersBySegment())
     }
@@ -237,15 +302,15 @@ JobProcessor.prototype._getSegmentFromService = function() {
             const operation = retry.operation({
                 retries: 5,
                 factor: 2,
-                minTimeout: 1 * 1000,
-                maxTimeout: 60 * 1000,
+                minTimeout: 10 * 1000,
+                maxTimeout: 120 * 1000,
                 randomize: false,
             });
 
             operation.attempt(function(current) {
                 // 20 second timeout
                 const deadline = new Date(Date.now() + 20 * 1000)
-
+                
                 SegmentClient.getStaticSegmentPushIds(request, { deadline: deadline }, function(err, response) {
                     /* Check if we should retry */
                     if (operation.retry(err)) {
@@ -300,67 +365,6 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
         return Promise.resolve([]);
     }
 
-    function profileToCustomer(profile, devices) {
-        function getDocumentBucket(id) {
-            return ((parseInt(id, 16) % 5) + 1)
-        }
-
-        function deviceToDoc(device) {
-            const doc =  {
-                _id: device.id,
-                token: device.push_token,
-                locale_lang: device.locale_language,
-                locale_region: device.locale_region,
-                time_zone: device.time_zone,
-                app_identifier: device.app_namespace,
-                platform: device.platform,
-                os_name: device.os_name,
-                os_version: device.os_version,
-                model: device.device_model,
-                manufacturer: device.device_manufacturer,
-                carrier: device.carrier_name,
-                background_enabled: device.is_background_enabled,
-                notifications_enabled: device.push_token_is_active,
-                location_monitoring_enabled: device.is_location_monitoring_enabled,
-                bluetooth_enabled: device.is_bluetooth_enabled,
-                development: device.push_environment === "development",
-                is_test_device: device.is_test_device || false
-            }
-
-            if (device.location_longitude !== 0 && device.location_latitude !== 0 && device.location_longitude !== null && device.location_latitude !== null) {
-                doc.location = {
-                    lat: device.location_latitude,
-                    lon: device.location_longitude
-                }
-            }
-
-            if (device.sdk_version) {
-                doc.sdk_version = device.sdk_version
-            }
-
-            return doc
-        }
-
-        const customer = {
-            _id: profile.id,
-            account_id: profile.account_id,
-            identifier: profile.identifier,
-            first_name: profile['first-name'],
-            last_name: profile['last-name'],
-            email: profile.email,
-            phone_number: profile['phone-number'],
-            age: profile.age,
-            gender: profile.gender,
-            tags: profile.tags || [],
-            traits: {},
-            document_bucket: getDocumentBucket(profile.id),
-            devices: (devices || []).map(deviceToDoc)
-
-        }
-
-        return customer
-    }
-
     return new Promise((resolve, reject) => {
         
         this._debug("Reading customer identifiers");
@@ -397,6 +401,285 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
     });
 
 };
+
+function segmentToPredicates(segment) {
+    if (util.isNullOrUndefined(segment)) {
+        return []
+    }
+
+    let filters = segment.filters
+    if (util.isNullOrUndefined(filters)) {
+        return []
+    }
+
+    let predicates = []
+
+    filters.forEach(filter => {
+        if (filter.model == "device") {
+            let predicate = new RoverApis.audience.v1.Models.Predicate()
+            predicate.setSelector(RoverApis.audience.v1.Models.Predicate.Selector.DEVICE)
+
+            switch (filter.attribute) {
+                case "locale-lang": {
+                    // {method: "in", value: ["agq", "af"]}
+                    // type is string
+
+                    let stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
+                    stringPredicate.setOp(RoverApis.audience.v1.Models.StringPredicate.Op.IS_EQUAL)
+                    stringPredicate.setAttributeName("locale_language")
+                    stringPredicate.setValue(filter.comparer.value[0])
+
+                    predicate.setStringPredicate(stringPredicate)
+                    predicates.push(predicate)
+
+                    break;
+                }
+                case "location": {
+                    // {method: "geofence", longitude: -79.3758138, latitude: 43.6506783, radius: 400}
+                    let geofencePredicate = new RoverApis.audience.v1.Models.GeofencePredicate()
+                    geofencePredicate.setOp(RoverApis.audience.v1.Models.GeofencePredicate.Op.IS_WITHIN)
+                    geofencePredicate.setAttributeName("location")
+
+                    let location = new RoverApis.audience.v1.Models.GeofencePredicate.Location()
+                    location.setLatitude(filter.comparer.latitude)
+                    location.setLongitude(filter.comparer.longitude)
+                    location.setRadius(filter.comparer.radius)
+
+                    geofencePredicate.setValue(location)
+
+                    predicate.setGeofencePredicate(geofencePredicate)
+                    predicates.push(predicate)
+                    break;
+                    
+                }
+                case "os-name": {
+
+                    let stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
+                    stringPredicate.setOp(RoverApis.audience.v1.Models.StringPredicate.Op.IS_EQUAL)
+                    stringPredicate.setAttributeName("os_name")
+                    stringPredicate.setValue(filter.comparer.value)
+
+                    predicate.setStringPredicate(stringPredicate)
+                    predicates.push(predicate)
+
+                    break;
+                    // {method: "equal", value: "iOS"}
+                }
+                case "bluetooth-enabled": {
+                    let boolPredicate = new RoverApis.audience.v1.Models.BoolPredicate()
+                    boolPredicate.setOp(RoverApis.audience.v1.Models.BoolPredicate.Op.IS_EQUAL)
+                    boolPredicate.setAttributeName("is_bluetooth_enabled")
+                    boolPredicate.setValue(filter.comparer.value)
+
+                    predicate.setBoolPredicate(boolPredicate)
+                    predicates.push(predicate)
+
+                    break;
+                    // {method: "equal", value: true}
+                }
+                case "sdk-version": {
+                    // {method: "exists", value: null}
+                    // {method: "does_not_exist", value: null}
+                    let versionPredicate = new RoverApis.audience.v1.Models.VersionPredicate()
+                    if (filter.comparer.method === "exists") {
+                        versionPredicate.setOp(RoverApis.audience.v1.Models.BoolPredicate.Op.IS_SET)
+                    } else {
+                        versionPredicate.setOp(RoverApis.audience.v1.Models.BoolPredicate.Op.IS_UNSET)
+                    }
+                    
+                    versionPredicate.setAttributeName("sdk_version")
+
+                    predicate.setVersionPredicate(versionPredicate)
+                    predicates.push(predicate)
+                    break;
+                  
+                }
+                default: {
+                    console.warn("Received filter with unknown attribute: ", filter.attribute)
+                }
+            }
+
+        } else if(filter.model === "customer") {
+            let predicate = new RoverApis.audience.v1.Models.Predicate()
+            predicate.setSelector(RoverApis.audience.v1.Models.Predicate.Selector.CUSTOM_PROFILE)
+
+            switch(filter.attribute) {
+                case "gender": {
+                    // {method: "equal", value: "male"}
+                    let stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
+                    stringPredicate.setOp(RoverApis.audience.v1.Models.StringPredicate.Op.IS_EQUAL)
+                    stringPredicate.setAttributeName("gender")
+                    stringPredicate.setValue(filter.comparer.value)
+
+                    predicate.setStringPredicate(stringPredicate)
+                    predicates.push(predicate)
+
+                    break;
+                    
+                }
+                case "age": {
+                    // Always a range
+                    // // {method: "range", from: 13, to: null}
+                    let numberPredicate = new RoverApis.audience.v1.Models.NumberPredicate()
+                    numberPredicate.setAttributeName("age")
+                    numberPredicate.setValue(filter.comparer.value || filter.comparer.from)
+
+                    if (!util.isNullOrUndefined(filter.comparer.to)) {
+                        numberPredicate.setOp(RoverApis.audience.v1.Models.NumberPredicate.Op.IS_BETWEEN)
+                        numberPredicate.setValue2(filter.comparer.to)
+                    } else {
+                        numberPredicate.setOp(RoverApis.audience.v1.Models.NumberPredicate.Op.IS_GREATER_THAN)
+                    }
+
+                    predicate.setNumberPredicate(numberPredicate)
+                    predicates.push(predicate)
+
+                    break;
+                    
+                }
+                case "tags": {
+                    // {method: "does_not_contain", value: "nope"}
+                    // {method: "contains", value: "hello"}
+                    let stringArrayPredicate = new RoverApis.audience.v1.Models.StringArrayPredicate()
+                    stringArrayPredicate.setAttributeName("tags")
+                    stringArrayPredicate.setValueList([filter.comparer.value])
+
+                    if (filter.comparer.method === "does_not_contain") {
+                        stringArrayPredicate.setOp(RoverApis.audience.v1.Models.StringArrayPredicate.Op.DOES_NOT_CONTAIN_ALL)
+                    } else {
+                        // assume contains
+                        stringArrayPredicate.setOp(RoverApis.audience.v1.Models.StringArrayPredicate.Op.CONTAINS_ALL)
+                    }
+
+                    predicate.setStringArrayPredicate(stringArrayPredicate)
+                    predicates.push(predicate)
+                   
+                    break;
+                }
+            }
+        } else {
+            console.warn("Received unknown model", filter.model)
+        }
+    })
+
+    return predicates
+}
+
+
+
+JobProcessor.prototype._getSegmentFromQueryApi = function() {
+    return new Promise((resolve, reject) => {
+        this._debug("Reading batch from audience service")
+
+        let self = this
+        let methods = this._server.methods;
+        let segment = this._context.segment
+        let scrollId = this._context.scrollId;
+        let streamId = this._context.streamId;
+        let timeZoneOffset = this._context.timeZoneOffset;
+        
+        // New client for each job as this helps load balance the connections
+        let audienceClient = require("@rover/audience-client").v1.Client()
+
+        let queryRequest = new RoverApis.audience.v1.Models.QueryRequest()
+        let authContext = new RoverApis.auth.v1.Models.AuthContext()
+
+        authContext.setAccountId(this._context.account.id)
+        authContext.setPermissionScopesList(["internal", "app:smw"])
+        queryRequest.setAuthContext(authContext)
+
+        if (timeZoneOffset !== null && timeZoneOffset !== undefined) {
+            let timeZoneSettings = new RoverApis.audience.v1.Models.QueryRequest.TimeZoneOffset()
+            timeZoneSettings.setSeconds(timeZoneOffset)
+
+            // Tell the query api that we are only interested in devices who are currently in the following time zone offset
+            queryRequest.setTimeZoneOffset(timeZoneSettings)
+        }
+
+        let iterator = new RoverApis.audience.v1.Models.QueryRequest.ScrollIterator()
+
+        if (util.isNullOrUndefined(scrollId)) {
+            let pscroll = new RoverApis.audience.v1.Models.QueryRequest.ScrollIterator.StartParallelScroll()
+            pscroll.setMaxStreams(5)
+            pscroll.setStreamId(streamId)
+            pscroll.setBatchSize(BATCH_SIZE)
+
+            iterator.setStartParallelScroll(pscroll)
+        } else {
+            let next = new RoverApis.audience.v1.Models.QueryRequest.ScrollIterator.Next()
+            next.setScrollId(scrollId)
+
+            iterator.setNext(next)
+        }
+
+        queryRequest.setScrollIterator(iterator)
+
+        if (!util.isNullOrUndefined(segment)) {
+            let predicates = segmentToPredicates(segment)
+            let aggregate = new RoverApis.audience.v1.Models.PredicateAggregate()
+            aggregate.setCondition(RoverApis.audience.v1.Models.PredicateAggregate.Condition.ALL)
+            aggregate.setPredicatesList(predicates)
+
+            queryRequest.setPredicateAggregate(aggregate)
+        }
+
+        const readbatch = function(request, callback) {
+
+            const operation = retry.operation({
+                retries: 5,
+                factor: 2,
+                minTimeout: 1 * 1000,
+                maxTimeout: 60 * 1000,
+                randomize: false,
+            });
+
+            operation.attempt(function(current) {
+                // 20 second timeout
+                const deadline = new Date(Date.now() + 30 * 1000)
+
+                self._debug("Sending request: ", JSON.stringify(request.toObject()))
+
+                audienceClient.query(request, { deadline: deadline }, function(err, response) {
+                    /* Check if we should retry */
+                    if (operation.retry(err)) {
+                        self._debug("Operation failed retrying, err: ", err)
+                        return;
+                    }
+
+                    if (err) {
+                        return callback(err)
+                    }
+
+                    return callback(null, response)
+                })
+            })
+        }
+
+        readbatch(queryRequest, function(err, response) {
+            if (err) {
+                return reject(err)
+            }
+
+            let profiles = response.getProfilesList().map(methods.profile.fromProto)
+            let devices = response.getDevicesList().map(methods.device.fromProto)
+
+            var devicesIndex = devices.reduce(function(index, device) {
+                index[device.profile_id] = device
+                return index
+            }, {})
+
+            let customers = profiles.map(profile => {
+                return profileToCustomer(profile, [devicesIndex[profile.id]])
+            })
+
+            self._customers = customers
+
+            return resolve(response)
+        })
+
+    })
+}
+
 
 JobProcessor.prototype._getSegmentFromElasticsearch = function() {
     return new Promise((resolve, reject) => {
@@ -505,6 +788,9 @@ JobProcessor.prototype._queueNextJob = function(response) {
 
     if (response instanceof RoverApis.segment.v1.Models.GetStaticSegmentPushIdsReply) {
         queueMore = response.getFinished() == false
+    } else if(response instanceof RoverApis.audience.v1.Models.QueryResponse) {
+        // If the number of devices that were returned are less than the batch size we know there isn't anymore
+        queueMore = !(response.getDevicesList().length < BATCH_SIZE)
     } else {
         queueMore = this._customers.length >= BATCH_SIZE
     }
@@ -517,6 +803,8 @@ JobProcessor.prototype._queueNextJob = function(response) {
             account: this._context.account,
             query: this._context.query,
             segment: this._context.segment,
+            stream_id: this._context.streamId,
+            time_zone_offset: this._context.timeZoneOffset,
             static_segment_id: this._context.staticSegmentId,
             platform_credentials: this._context.platformCredentials,
             static_segment_id: this._context.staticSegmentId,
@@ -525,6 +813,8 @@ JobProcessor.prototype._queueNextJob = function(response) {
 
         if (response instanceof RoverApis.segment.v1.Models.GetStaticSegmentPushIdsReply) {
             nextJobArguments["next_cursor"] = response.getNextCursor()
+        } else if(response instanceof RoverApis.audience.v1.Models.QueryResponse) {
+            nextJobArguments["scroll_id"] = response.getScrollId()
         } else {
             let newOffset = this._context.offset + response.hits.hits.length;
             nextJobArguments["scroll_id"] = response._scroll_id
@@ -1368,7 +1658,7 @@ JobProcessor.prototype._updateStats = function(first_argument) {
     let methods = this._server.methods;
 
     return new Promise((resolve, reject) => {
-        methods.messageTemplateStats.update(messageTemplateId, { "$inc": counterUpdates }, (err, respone) => {
+        methods.messageTemplateStats.update(messageTemplateId, { "$inc": counterUpdates }, (err, response) => {
             if (err) {
                 this._debug("Failed updating message stats");
                 return reject(new JobError(err.message, false));

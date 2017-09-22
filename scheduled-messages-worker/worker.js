@@ -82,6 +82,8 @@ Worker.prototype.work = function(msg) {
         staticSegmentId: args.static_segment_id,
         nextCursor: args.next_cursor,
         scrollId: args.scroll_id,
+        streamId: args.stream_id,
+        timeZoneOffset: args.time_zone_offset,
         offset: args.offset,
         platformCredentials: args.platform_credentials,
         segment: args.segment,

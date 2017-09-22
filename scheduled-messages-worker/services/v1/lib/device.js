@@ -90,7 +90,7 @@ module.exports = function(AudienceClient, logger) {
 		return region
 	}
 
-	function deviceFromProto(dp) {
+	methods.fromProto = function(dp) {
 		let device = {}
 		device.id = dp.getDeviceId()
 		device.account_id = dp.getAccountId()
@@ -160,7 +160,7 @@ module.exports = function(AudienceClient, logger) {
 						return done()
 					}
 
-					let devices = reply.getDevicesList().map(d => deviceFromProto(d))
+					let devices = reply.getDevicesList().map(d => methods.fromProto(d))
 
 					return done(null, devices)
 				})
