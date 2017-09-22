@@ -2,10 +2,6 @@ package elastic
 
 import "github.com/roverplatform/rover/audience/service/mongodb"
 
-type (
-	M = map[string]interface{}
-)
-
 func DeviceMapping() M {
 	return M{
 		"device": M{
