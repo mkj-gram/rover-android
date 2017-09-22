@@ -56,8 +56,9 @@ class ListCellFormatter extends Component {
     }
 
     calcLayout() {
+        const id = `listCellElement_${this.props.column.key}`
         let stringPixelLength = this.props.value.length * 6
-        let totalWidth = document.getElementById('listCellElement')
+        let totalWidth = document.getElementById(id)
             .parentElement.parentElement.parentElement.parentElement
             .parentElement.offsetWidth
 
@@ -80,6 +81,7 @@ class ListCellFormatter extends Component {
     }
 
     render() {
+        const id = `listCellElement_${this.props.column.key}`
         return (
             <div
                 style={{
@@ -87,7 +89,7 @@ class ListCellFormatter extends Component {
                 }}
             >
                 <div
-                    id="listCellElement"
+                    id={id}
                     style={{
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',

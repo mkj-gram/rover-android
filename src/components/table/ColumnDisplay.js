@@ -59,6 +59,7 @@ class ColumnDisplay extends Component {
             devices
         } = this.props
         const itemKeys = Object.keys(items)
+
         const { showAll } = this.state
 
         const size = showAll ? itemKeys.length : 5
@@ -95,13 +96,14 @@ class ColumnDisplay extends Component {
                 {itemKeys.slice(0, size).map((item, index) =>
                     <div style={{ paddingBottom: 17 }} key={index}>
                         <Checkbox
-                            isChecked={showChecked(item)}
+                            isChecked={showChecked(item, items[item])}
                             label={items[item].label}
                             primaryColor={purple}
                             isDisabled={false}
                             onChange={e =>
                                 updateChecked(
                                     selector,
+                                    items[item],
                                     item,
                                     devices !== undefined
                                 )}

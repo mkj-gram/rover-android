@@ -93,25 +93,20 @@ class AudienceTable extends Component {
     getSetCachedColumns() {
         // HardCoded default selected Columns
         const selectedColumns = {
-            device_id: {
+            device_id_DEVICE: {
                 __typename: 'StringPredicate',
                 label: 'Device ID',
                 selector: 'DEVICE'
             },
-            os_version: {
+            os_version_DEVICE: {
                 __typename: 'VersionPredicate',
                 label: 'OS Version',
                 selector: 'DEVICE'
             },
-            app_version: {
+            app_version_DEVICE: {
                 __typename: 'StringPredicate',
                 label: 'App Version',
                 selector: 'DEVICE'
-            },
-            'first-name': {
-                __typename: 'StringPredicate',
-                label: 'First Name',
-                selector: 'CUSTOM_PROFILE'
             }
         }
 
@@ -119,7 +114,11 @@ class AudienceTable extends Component {
             localStorage.getItem('selectedColumns')
         )
 
-        if (!cachedSelectedColumns) {
+        const hasSelector = (elem, index, array) => {
+            return cachedSelectedColumns && Object.keys(cachedSelectedColumns)[0].includes(elem)
+        }
+
+        if (!cachedSelectedColumns || !['_DEVICE','_CUSTOM_PROFILE','_ROVER_PROFILE'].some(hasSelector))  {
             this.setState({
                 selectedColumns
             })
@@ -173,15 +172,18 @@ class AudienceTable extends Component {
         this.setState({ allColumns: { devices, profiles } })
     }
 
-    updateChecked(selector, item, devices = false) {
+    updateChecked(selector, info, item, devices = false) {
         const { allColumns } = this.state
         let cachedSelectedColumns = JSON.parse(
             localStorage.getItem('selectedColumns')
         )
         let values
+        let compareItem = devices
+            ? `${item}_DEVICE`
+            : `${item}_${info.selector}`
 
-        if (item in cachedSelectedColumns) {
-            delete cachedSelectedColumns[item]
+        if (compareItem in cachedSelectedColumns) {
+            delete cachedSelectedColumns[compareItem]
         } else {
             if (devices) {
                 values = {
@@ -196,8 +198,9 @@ class AudienceTable extends Component {
                     selector: allColumns[selector][item].selector
                 }
             }
+
             const property = {
-                [item]: values
+                [`${item}_${values.selector}`]: values
             }
             cachedSelectedColumns = Object.assign(
                 {},
@@ -344,12 +347,11 @@ class AudienceTable extends Component {
         const rows = dataGridRows.map(data => {
             const row = {}
             data.forEach(property => {
-                if (property.attribute in selectedColumns) {
-                    row[
-                        `${property.attribute}_${property.selector}`
-                    ] = this.formatRowData(
+                const key = `${property.attribute}_${property.selector}`
+                if (key in selectedColumns) {
+                    row[key] = this.formatRowData(
                         property.value,
-                        selectedColumns[property.attribute].__typename
+                        selectedColumns[key].__typename
                     )
                 }
             })
@@ -360,7 +362,7 @@ class AudienceTable extends Component {
         return rows.slice(startRow, startRow + 50)
     }
 
-    handleCellEnter(e, message, listView=false) {
+    handleCellEnter(e, message, listView = false) {
         const target = e.target.getBoundingClientRect()
         this.setState({
             toolTip: {
@@ -376,7 +378,7 @@ class AudienceTable extends Component {
         })
     }
 
-    handleCellLeave(listView=false) {
+    handleCellLeave(listView = false) {
         if (this.state.toolTip.isTooltipShowing) {
             this.setState({
                 toolTip: {
@@ -436,9 +438,12 @@ class AudienceTable extends Component {
         const selectedColumns = JSON.parse(localStorage.selectedColumns)
 
         const columns = Object.keys(selectedColumns).map(attr => ({
-            key: `${attr}_${selectedColumns[attr].selector}`,
+            key: attr,
             name: selectedColumns[attr].label,
-            width: (selectedColumns[attr].__typename === 'StringArrayPredicate') ? 285 : 200,
+            width:
+                selectedColumns[attr].__typename === 'StringArrayPredicate'
+                    ? 285
+                    : 200,
             draggable: true,
             resizable: true,
             formatter: this.getFormat(selectedColumns[attr].__typename)
@@ -458,7 +463,7 @@ class AudienceTable extends Component {
         } else if (type === 'GeofencePredicate') {
             ret = data.name
         } else if (type === 'StringArrayPredicate') {
-            ret = data.join(", ")
+            ret = data.join(', ')
         }
 
         return ret
@@ -471,8 +476,9 @@ class AudienceTable extends Component {
         )
         if (Object.keys(columns).length > 0) {
             const rearrangeColumns = {}
+
             columns.forEach(attr => {
-                rearrangeColumns[attr.name] = selectedColumns[attr.name]
+                rearrangeColumns[attr.key] = selectedColumns[attr.key]
             })
             localStorage.setItem(
                 'selectedColumns',
@@ -490,6 +496,7 @@ class AudienceTable extends Component {
         if (skeleton) {
             return <SkeletonTableGrid selectedColumns={selectedColumns} />
         }
+
         return (
             <AudienceDataGrid
                 segmentSize={segmentSize}
@@ -505,7 +512,12 @@ class AudienceTable extends Component {
     render() {
         const { columns, segmentSize, totalSize, selectedColumns } = this.state
 
-        const { isTooltipShowing, message, coordinates, listView } = this.state.toolTip
+        const {
+            isTooltipShowing,
+            message,
+            coordinates,
+            listView
+        } = this.state.toolTip
         return (
             <div
                 style={{
@@ -525,7 +537,11 @@ class AudienceTable extends Component {
 
                 {columns.length > 0 && this.renderDataGrid()}
                 {isTooltipShowing && (
-                    <Tooltip message={message} coordinates={coordinates} listView={listView} />
+                    <Tooltip
+                        message={message}
+                        coordinates={coordinates}
+                        listView={listView}
+                    />
                 )}
             </div>
         )
