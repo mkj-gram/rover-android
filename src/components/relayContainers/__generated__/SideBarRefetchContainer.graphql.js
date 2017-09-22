@@ -38,6 +38,8 @@ export type SideBarRefetchContainer = {|
           +name: string;
         |};
         +geofenceComparison?: string;
+        +stringArrayValue?: $ReadOnlyArray<?string>;
+        +stringArrayComparison?: string;
       |}>;
     |};
   |}>;
@@ -143,6 +145,26 @@ const fragment /*: ConcreteFragment*/ = {
                   "args": null,
                   "name": "selector",
                   "storageKey": null
+                },
+                {
+                  "kind": "InlineFragment",
+                  "type": "StringArrayPredicate",
+                  "selections": [
+                    {
+                      "kind": "ScalarField",
+                      "alias": null,
+                      "args": null,
+                      "name": "stringArrayValue",
+                      "storageKey": null
+                    },
+                    {
+                      "kind": "ScalarField",
+                      "alias": null,
+                      "args": null,
+                      "name": "stringArrayComparison",
+                      "storageKey": null
+                    }
+                  ]
                 },
                 {
                   "kind": "InlineFragment",

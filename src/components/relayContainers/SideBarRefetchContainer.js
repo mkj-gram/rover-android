@@ -48,6 +48,10 @@ export default createRefetchContainer(
                                 }
                                 geofenceComparison
                             }
+                            ... on StringArrayPredicate {
+                                stringArrayValue
+                                stringArrayComparison
+                            }
                         }
                     }
                 }
