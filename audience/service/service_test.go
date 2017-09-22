@@ -1,30 +1,23 @@
 package service_test
 
 import (
-	"bytes"
 	"encoding/hex"
-	"encoding/json"
-	"fmt"
+	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net"
 	"os"
-	"os/exec"
-	"reflect"
-	"strings"
 	"testing"
 	"time"
 
 	"google.golang.org/grpc"
 
-	"github.com/go-test/deep"
 	"github.com/namsral/flag"
 
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
 	audience_service "github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/mongodb"
-	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
+	rtesting "github.com/roverplatform/rover/go/testing"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -35,17 +28,17 @@ var (
 	tGSvcAcctKeyPath = flag.String("test.google-service-acct-key-path", "", "google service acct key file")
 )
 
+var (
+	Diff  = rtesting.Diff
+	difff = rtesting.Difff
+)
+
 type (
 	expect struct {
 		expErr error
 		exp    interface{}
 	}
 )
-
-func init() {
-	// increase deep diff depth
-	deep.MaxDepth = 50
-}
 
 func truncateColl(t *testing.T, colls ...*mgo.Collection) {
 	for _, coll := range colls {
@@ -90,7 +83,27 @@ func tNewObjectIdFunc(t *testing.T, seed int64) func() bson.ObjectId {
 	}
 }
 
+func parseTime(t *testing.T, str string) time.Time {
+	t.Helper()
+	ts, err := time.Parse(time.RFC3339Nano, str)
+	if err != nil {
+		t.Fatal("parseTime:", err)
+	}
+
+	return ts
+}
+
+func protoTs(t *testing.T, ti time.Time) *timestamp.Timestamp {
+	t.Helper()
+	ts, err := timestamp.TimestampProto(ti)
+	if err != nil {
+		t.Fatal("protoTs:", err)
+	}
+	return ts
+}
+
 func dialMongo(t testing.TB, dsn string) *mgo.Database {
+	t.Helper()
 	info, err := mgo.ParseURL(dsn)
 	if err != nil {
 		t.Fatal("url.Parse:", err)
@@ -122,119 +135,6 @@ func decodeBSON(r io.Reader) ([]interface{}, error) {
 
 		docs = append(docs, doc)
 	}
-}
-
-func parseTime(t *testing.T, str string) time.Time {
-	ts, err := time.Parse(time.RFC3339Nano, str)
-	if err != nil {
-		t.Fatal("parseTime:", err)
-	}
-
-	return ts
-}
-
-func protoTs(t *testing.T, ti time.Time) *timestamp.Timestamp {
-	ts, err := timestamp.TimestampProto(ti)
-	if err != nil {
-		t.Fatal("protoTs:", err)
-	}
-	return ts
-}
-
-func difff(diff []string) string {
-	return strings.Join(diff, "\n")
-}
-
-func Diff(exp, got interface{}, expErr, gotErr error) []string {
-	diffFn := deepDiff
-	if os.Getenv("JSONDIFF") != "" {
-		diffFn = jsonDiff
-	}
-	return diffFn(exp, got, expErr, gotErr)
-}
-
-func deepDiff(exp, got interface{}, expErr, gotErr error) []string {
-	// if an error case
-	if expErr != nil || gotErr != nil {
-		return deep.Equal(expErr, gotErr)
-	}
-
-	return deep.Equal(exp, got)
-}
-
-func jsonDiff(exp, got interface{}, expErr, gotErr error) []string {
-	// if an error case
-	if expErr != nil || gotErr != nil {
-		if !reflect.DeepEqual(expErr, gotErr) {
-			return []string{
-				fmt.Sprintf("%+v", expErr),
-				fmt.Sprintf("%+v", gotErr),
-			}
-		}
-
-		// error case skip the rest
-		return nil
-	}
-
-	jsonStr := func(v interface{}) string {
-		b, err := json.Marshal(v)
-		if err != nil {
-			panic(err)
-		}
-
-		var out bytes.Buffer
-		json.Indent(&out, b, "", "  ")
-		return out.String()
-	}
-
-	_ = jsonStr
-
-	diffstr, err := diffCmd(jsonStr(exp), jsonStr(got))
-	if err != nil {
-		panic(err)
-	}
-
-	if !reflect.DeepEqual(exp, got) {
-		// var diff, err := json.Marsha
-		return []string{
-			diffstr,
-			// jsonStr(exp),
-			// jsonStr(got),
-		}
-	}
-
-	return nil
-}
-
-func diffCmd(exp, got string) (string, error) {
-	fa, err := ioutil.TempFile("", "exp")
-	if err != nil {
-		return "", err
-	}
-	defer fa.Close()
-
-	fb, err := ioutil.TempFile("", "got")
-	if err != nil {
-		return "", err
-	}
-	defer fb.Close()
-
-	if _, err := fa.WriteString(exp + "\n"); err != nil {
-		return "", err
-	}
-	if _, err := fb.WriteString(got + "\n"); err != nil {
-		return "", err
-	}
-	fa.Sync()
-	fb.Sync()
-
-	cmd := exec.Command("diff", fa.Name(), fb.Name())
-	data, err := cmd.Output()
-	if err == exec.ErrNotFound {
-		return "", err
-	}
-
-	return string(data), nil
 }
 
 func NewServer(rpcAddr string, srv audience.AudienceServer) (net.Listener, error) {

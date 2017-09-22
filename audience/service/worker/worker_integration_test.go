@@ -3,7 +3,6 @@
 package worker_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -16,7 +15,6 @@ import (
 
 	"cloud.google.com/go/pubsub"
 
-	"github.com/go-test/deep"
 	"github.com/pkg/errors"
 
 	"github.com/roverplatform/rover/audience/service"
@@ -24,6 +22,7 @@ import (
 	"github.com/roverplatform/rover/audience/service/mongodb"
 	"github.com/roverplatform/rover/audience/service/worker"
 	rlog "github.com/roverplatform/rover/go/log"
+	rtesting "github.com/roverplatform/rover/go/testing"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -34,20 +33,21 @@ import (
 type M = map[string]interface{}
 
 var (
+	_ = ioutil.Discard
+
 	acctIdx = func(s string) string {
 		return "test_account_" + s
 	}
 
 	mongoDSN = "mongodb://mongo:27017/service_worker_test"
 	esDSN    = "http://elastic5:9200/"
+
+	difff = rtesting.Difff
+	Diff  = rtesting.Diff
 )
 
 func TestWorker(t *testing.T) {
-	deep.MaxDepth = 50
-
-	// var l = log.New(ioutil.Discard, "elastic:", 0)
 	var (
-		_    = ioutil.Discard
 		l    = log.New(os.Stdout, "elastic:", 0)
 		rLog = rlog.New(rlog.Error)
 	)
@@ -55,6 +55,7 @@ func TestWorker(t *testing.T) {
 	esClient, err := es5.NewClient(
 		es5.SetURL(strings.Split(esDSN, ",")...),
 		es5.SetTraceLog(l),
+		es5.SetSniff(false),
 		// es5.SetGzip(false),
 	)
 	if err != nil {
@@ -78,7 +79,9 @@ func TestWorker(t *testing.T) {
 		}
 	)
 
+	//
 	// Cleanup
+	//
 	_, err = esClient.PerformRequest(ctx, "DELETE", "/"+acctIdx("*"), nil, nil)
 	if err != nil {
 		t.Fatal("deleteIndex:", err)
@@ -86,6 +89,9 @@ func TestWorker(t *testing.T) {
 
 	truncateColl(t, db.C("devices"), db.C("profiles"), db.C("profiles_schemas"))
 
+	//
+	// Setup State
+	//
 	loadFixture(t, db.C("devices"), "../testdata/devices.json")
 	loadFixture(t, db.C("profiles"), "../testdata/profiles.json")
 	loadFixture(t, db.C("profiles_schemas"), "testdata/profiles_schemas.json")
@@ -103,12 +109,10 @@ func TestWorker(t *testing.T) {
 		t.Fatal("index:", err)
 	}
 
-	// Setup State
 	createMapping(t, acctIdx("1"), "device", elastic.DeviceMapping())
 	createMapping(t, acctIdx("1"), "profile", elastic.ProfileMapping(M{}))
 
-	body := BulkBody(t, indexFixture(t, "testdata/index.json"))
-	resp, err := esClient.PerformRequest(ctx, "POST", "/_bulk", nil, string(body))
+	resp, err := esClient.PerformRequest(ctx, "POST", "/_bulk", nil, string(readFile(t, "testdata/index.json")))
 	if err != nil {
 		t.Fatal("index:", err, resp)
 	}
@@ -128,7 +132,6 @@ func TestWorker(t *testing.T) {
 
 	tcases := []struct {
 		desc string
-		name string
 		req  *pubsub.Message
 
 		before, exp, after *expect
@@ -896,19 +899,6 @@ func dialMongo(t testing.TB, dsn string) *mgo.Database {
 	return sess.DB(info.Database)
 }
 
-func Diff(exp, got interface{}, expErr, gotErr error) []string {
-	// if an error case
-	if expErr != nil || gotErr != nil {
-		return deep.Equal(expErr, gotErr)
-	}
-
-	return deep.Equal(exp, got)
-}
-
-func difff(diff []string) string {
-	return strings.Join(diff, "\n")
-}
-
 func toJSON(t *testing.T, v interface{}) []byte {
 	t.Helper()
 
@@ -933,50 +923,13 @@ func parseJSON(t *testing.T, v []byte) M {
 	return m
 }
 
-func BulkBody(t *testing.T, mm []M) []byte {
-	t.Helper()
-	var (
-		buf bytes.Buffer
-		e   = json.NewEncoder(&buf)
-	)
-
-	buf.Reset()
-
-	for _, m := range mm {
-		if err := e.Encode(m); err != nil {
-			t.Fatal("encode:", err)
-		}
-	}
-
-	return buf.Bytes()
-}
-
-func indexFixture(t *testing.T, fixturePath string) []M {
-	f, err := os.Open(fixturePath)
+func readFile(t *testing.T, fixturePath string) []byte {
+	data, err := ioutil.ReadFile(fixturePath)
 	if err != nil {
-		t.Fatal("testdata:", err)
+		t.Fatal("ReadFile:")
 	}
 
-	var (
-		docs []M
-		dec  = json.NewDecoder(f)
-	)
-
-	dec.UseNumber()
-
-	for {
-		var m M
-		if err := dec.Decode(&m); err != nil {
-			if err == io.EOF {
-				break
-			}
-			t.Error("decode:", err)
-		}
-
-		docs = append(docs, m)
-	}
-
-	return docs
+	return data
 }
 
 func truncateColl(t *testing.T, colls ...*mgo.Collection) {

@@ -9,14 +9,17 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
+	elastic "gopkg.in/olivere/elastic.v5"
 
 	"github.com/namsral/flag"
 
 	"github.com/roverplatform/rover/audience/service"
+	selastic "github.com/roverplatform/rover/audience/service/elastic"
 	"github.com/roverplatform/rover/audience/service/mongodb"
 	spubsub "github.com/roverplatform/rover/audience/service/pubsub"
 
@@ -31,14 +34,14 @@ import (
 	"golang.org/x/net/context"
 	_ "golang.org/x/net/trace"
 
+	gerrors "cloud.google.com/go/errors"
+	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/trace"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/grpclog"
 
-	gerrors "cloud.google.com/go/errors"
-	"cloud.google.com/go/pubsub"
-	"cloud.google.com/go/trace"
 	"github.com/newrelic/go-agent"
 )
 
@@ -61,6 +64,8 @@ var (
 
 	// MongoDB
 	mongoDSN = flag.String("mongo-dsn", "", "mongo Data Source Name")
+	// Elastic DSN
+	esDSN = flag.String("elastic-dsn", "", "Elastic Search Data Source Name")
 
 	// GCP Cloud
 	gcpProjectID      = flag.String("gcp-project-id", "", "GCP PROJECT_ID")
@@ -70,7 +75,7 @@ var (
 	topicName = flag.String("pubsub-topic-name", "audience-service-updates", "pubsub's topic name to push updates to")
 	NWorkers  = flag.Int("pubsub-nworkers", 10, "number of pubsub's push workers")
 
-	// Notifier
+	// PubSub Notifier
 	notifierFlushInterval = flag.Duration("notifier-flush-interval", 30*time.Second, "batch flush interval")
 	notifierBatchSize     = flag.Int("notifier-batch-size", 1000, "batch size flush threshold")
 
@@ -317,6 +322,25 @@ func main() {
 	// sess.SetSocketTimeout(10 * time.Second)
 
 	//
+	// Elastic
+	//
+
+	esClient, err := elastic.NewClient(
+		elastic.SetURL(strings.Split(*esDSN, ",")...),
+		elastic.SetErrorLog(stderr),
+		elastic.SetInfoLog(verboseLog),
+		elastic.SetTraceLog(verboseLog),
+		elastic.SetMaxRetries(2),
+		elastic.SetSniff(false),
+		// es.SetSnifferInterval(t.snifferInterval),
+		// es.SetHealthcheck(t.healthcheck),
+		// es.SetHealthcheckInterval(t.healthcheckInterval))
+	)
+	if err != nil {
+		stderr.Fatalln("elastic:", err)
+	}
+
+	//
 	// Audience Service
 	//
 
@@ -325,7 +349,12 @@ func main() {
 			mongodb.WithLogger(roverLog),
 			mongodb.WithTimeFunc(time.Now))
 
-		audienceService = service.New(db, notifier)
+		esIndex = &selastic.Index{
+			Client:    esClient,
+			IndexName: selastic.AccountIndex,
+		}
+
+		audienceService = service.New(db, esIndex, notifier)
 	)
 
 	//

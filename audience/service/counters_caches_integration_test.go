@@ -19,6 +19,12 @@ import (
 
 var _ = log.NewLog
 
+type nopIndex struct{}
+
+func (i *nopIndex) Query(context.Context, *audience.QueryRequest) (*audience.QueryResponse, error) {
+	return nil, nil
+}
+
 func testAudienceService_GetDevicesTotalCount(t *testing.T) {
 	var (
 		ctx      = context.TODO()
@@ -32,7 +38,7 @@ func testAudienceService_GetDevicesTotalCount(t *testing.T) {
 			mongodb.WithTimeFunc(timeNow),
 		)
 
-		svc = service.New(db, logNotifier(t))
+		svc = service.New(db, new(nopIndex), logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -94,7 +100,7 @@ func testAudienceService_GetProfilesTotalCount(t *testing.T) {
 			mongodb.WithTimeFunc(timeNow),
 		)
 
-		svc = service.New(db, logNotifier(t))
+		svc = service.New(db, new(nopIndex), logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)

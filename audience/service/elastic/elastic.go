@@ -1,6 +1,8 @@
 package elastic
 
 import (
+	"strconv"
+
 	"golang.org/x/net/context"
 
 	"github.com/pkg/errors"
@@ -14,6 +16,9 @@ var (
 var (
 	AccountIndex = func(id string) string {
 		return "account_" + id
+	}
+	AccountIndexInt = func(id int) string {
+		return AccountIndex(strconv.Itoa(id))
 	}
 )
 

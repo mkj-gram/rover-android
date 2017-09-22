@@ -15,7 +15,7 @@ import (
 func BenchmarkService(b *testing.B) {
 	var (
 		db               = mongodb.New(dialMongo(b, *tMongoDSN))
-		svc              = service.New(db, logNotifier(b))
+		svc              = service.New(db, new(nopIndex), logNotifier(b))
 		client, teardown = NewSeviceClient(b, "localhost:51000", svc)
 
 		ctx = context.Background()

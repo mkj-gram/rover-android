@@ -7,7 +7,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/audience/v1"
-	"github.com/roverplatform/rover/audience/service/mockdata"
 	"github.com/roverplatform/rover/audience/service/mongodb"
 )
 
@@ -26,13 +25,19 @@ type (
 	Server struct {
 		db     *mongodb.DB
 		notify *serviceNotify
+		index  Index
+	}
+
+	Index interface {
+		Query(context.Context, *audience.QueryRequest) (*audience.QueryResponse, error)
 	}
 )
 
 // New creates new Server instance with all the options provided
-func New(db *mongodb.DB, notifier Notifier) *Server {
+func New(db *mongodb.DB, index Index, notifier Notifier) *Server {
 	return &Server{
-		db: db,
+		db:    db,
+		index: index,
 		notify: &serviceNotify{
 			Notifier: notifier,
 		},
@@ -590,32 +595,16 @@ func (s *Server) ListDynamicSegments(ctx context.Context, r *audience.ListDynami
 }
 
 func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience.QueryResponse, error) {
-
-	// TODO: remove mock data and convert predicates to elasticsearch queries
-
 	if r.AuthContext == nil {
 		return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
 	}
 
-	// Pick from our list of mock data
-	switch typ := r.GetIterator().(type) {
-	// case *audience.QueryRequest_CursorIterator_:
-	// 	return s.queryWithCursorIterator(ctx, r)
-	case *audience.QueryRequest_PageIterator_:
-		return s.queryWithPageIterator(ctx, r)
-	default:
-		return nil, status.Errorf(codes.InvalidArgument, "Got type %T", typ)
-
+	resp, err := s.index.Query(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "Index.Query: %v", err)
 	}
 
-}
-
-func (s *Server) queryWithCursorIterator(ctx context.Context, r *audience.QueryRequest) (*audience.QueryResponse, error) {
-	return mockdata.Generate(r.GetAuthContext().GetAccountId(), 100), nil
-}
-
-func (s *Server) queryWithPageIterator(ctx context.Context, r *audience.QueryRequest) (*audience.QueryResponse, error) {
-	return mockdata.Generate(r.GetAuthContext().GetAccountId(), r.GetPageIterator().GetSize()), nil
+	return resp, nil
 }
 
 // Validations

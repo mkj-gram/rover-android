@@ -1,0 +1,205 @@
+{
+   "took": 110,
+   "timed_out": false,
+   "_shards": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0
+   },
+   "hits": {
+      "total": 105707,
+      "max_score": 0,
+      "hits": [
+         {
+            "_index": "account_152",
+            "_type": "device",
+            "_id": "9431B69F-F5F2-4375-9B06-E5F6033FDC0F",
+            "_score": 0,
+            "_routing": "59401bfe9cb3ac00079b0944",
+            "_parent": "59401bfe9cb3ac00079b0944",
+            "_source": {
+               "account_id": 152,
+               "advertising_id": "fc19eac9-df79-45f8-84c5-3aa22a374491",
+               "app_build": "",
+               "app_name": "",
+               "app_namespace": "com.oneup.redskins",
+               "app_version": "",
+               "carrier_name": "",
+               "created_at": null,
+               "device_id": "9431B69F-F5F2-4375-9B06-E5F6033FDC0F",
+               "device_manufacturer": "samsung",
+               "device_model": "GT-I9190",
+               "ip": "108.20.175.24",
+               "is_background_enabled": true,
+               "is_bluetooth_enabled": false,
+               "is_cellular_enabled": false,
+               "is_location_monitoring_enabled": true,
+               "is_test_device": false,
+               "is_wifi_enabled": false,
+               "locale_language": "en",
+               "locale_region": "us",
+               "locale_script": "",
+               "location": {
+                  "lat": 42.3264101,
+                  "lon": -71.2835348
+               },
+               "location_accuracy": 20,
+               "location_city": "",
+               "location_latitude": 42.3264101,
+               "location_longitude": -71.2835348,
+               "location_region": "",
+               "location_street": "",
+               "os_name": "Android",
+               "os_version": {
+                  "major": 4,
+                  "minor": 4,
+                  "revision": 2
+               },
+               "platform": "MOBILE",
+               "profile_id": "59401bfe9cb3ac00079b0944",
+               "push_environment": "production",
+               "push_token_created_at": null,
+               "push_token_is_active": false,
+               "push_token_key": "",
+               "push_token_unregistered_at": null,
+               "push_token_updated_at": null,
+               "radio": "",
+               "screen_height": 0,
+               "screen_width": 0,
+               "sdk_version": {
+                  "major": 1,
+                  "minor": 12,
+                  "revision": 3
+               },
+               "time_zone": "America/New_York",
+               "updated_at": "2017-06-13T20:20:06Z"
+            },
+            "inner_hits": {
+               "profile": {
+                  "hits": {
+                     "total": 1,
+                     "max_score": 1,
+                     "hits": [
+                        {
+                           "_type": "profile",
+                           "_id": "59401bfe9cb3ac00079b0944",
+                           "_score": 1,
+                           "_source": {
+                              "account_id": 152,
+                              "attributes": {
+                                 "none": null,
+                                 "age": 12,
+                                 "email": "hello@world.com",
+                                 "rate": 1.2,
+                                 "gender": true,
+                                 "tags": [
+                                    "roster_moves",
+                                    "general_content",
+                                    "stadium_updates"
+                                 ]
+                              },
+                              "created_at": null,
+                              "id": "59401bfe9cb3ac00079b0944",
+                              "identifier": "",
+                              "updated_at": "2017-06-13T20:20:06Z"
+                           }
+                        }
+                     ]
+                  }
+               }
+            }
+         },
+         {
+            "_index": "account_152",
+            "_type": "device",
+            "_id": "01E40D76-D181-4689-88DE-15BF4F0D2059",
+            "_score": 0,
+            "_routing": "594137bbfa8e9000073d491e",
+            "_parent": "594137bbfa8e9000073d491e",
+            "_source": {
+               "account_id": 152,
+               "advertising_id": "fc19eac9-df79-45f8-84c5-3aa22a374491",
+               "app_build": "",
+               "app_name": "",
+               "app_namespace": "com.oneup.redskins",
+               "app_version": "",
+               "carrier_name": "",
+               "created_at": null,
+               "device_id": "01E40D76-D181-4689-88DE-15BF4F0D2059",
+               "device_manufacturer": "samsung",
+               "device_model": "GT-I9190",
+               "ip": "108.20.175.24",
+               "is_background_enabled": true,
+               "is_bluetooth_enabled": false,
+               "is_cellular_enabled": false,
+               "is_location_monitoring_enabled": true,
+               "is_test_device": false,
+               "is_wifi_enabled": false,
+               "locale_language": "en",
+               "locale_region": "us",
+               "locale_script": "",
+               "location": {
+                  "lat": 42.3264399,
+                  "lon": -71.2835464
+               },
+               "location_accuracy": 265,
+               "location_city": "",
+               "location_latitude": 42.3264399,
+               "location_longitude": -71.2835464,
+               "location_region": "",
+               "location_street": "",
+               "os_name": "Android",
+               "os_version": {
+                  "major": 4,
+                  "minor": 4,
+                  "revision": 2
+               },
+               "platform": "MOBILE",
+               "profile_id": "594137bbfa8e9000073d491e",
+               "push_environment": "production",
+               "push_token_created_at": null,
+               "push_token_is_active": false,
+               "push_token_key": "",
+               "push_token_unregistered_at": null,
+               "push_token_updated_at": null,
+               "radio": "",
+               "screen_height": 0,
+               "screen_width": 0,
+               "sdk_version": {
+                  "major": 1,
+                  "minor": 15,
+                  "revision": 1
+               },
+               "time_zone": "America/New_York",
+               "updated_at": "2017-07-24T18:39:14Z"
+            },
+            "inner_hits": {
+               "profile": {
+                  "hits": {
+                     "total": 1,
+                     "max_score": 1,
+                     "hits": [
+                        {
+                           "_type": "profile",
+                           "_id": "594137bbfa8e9000073d491e",
+                           "_score": 1,
+                           "_source": {
+                              "account_id": 152,
+                              "identifier": "hello",
+                              "attributes": {
+                                 "tags": [ "game_updates" ]
+                              },
+                              "created_at": null,
+                              "id": "594137bbfa8e9000073d491e",
+                              "identifier": "",
+                              "updated_at": "2017-07-24T18:39:14Z"
+                           }
+                        }
+                     ]
+                  }
+               }
+            }
+         }
+      ]
+   }
+}
