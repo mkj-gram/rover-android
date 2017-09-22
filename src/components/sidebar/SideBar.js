@@ -156,11 +156,12 @@ class SideBar extends Component {
         const { sbDynamicSegment } = data
         const { predicates } = sbDynamicSegment[0]
         const { condition, predicateList } = predicates
-
-        // ToDo: This will need to be updated when we have categories,
-        // Use this.getProfileLabel() for category: 'profile'
-        // Use getDeviceLabel() for category: 'device'
-        const query = predicateList.map(d => ({ ...d, selector: d.selector, label: getDeviceLabel(d.attribute) }))
+       
+        const query = predicateList.map(d => ({
+            ...d,
+            selector: d.selector,
+            label: getDeviceLabel(d.attribute)
+        }))
 
         this.props.setQueryCondition(condition, true, query)
 

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash edb04328f46abb53a37a5cc54462a184
+ * @relayHash dd9514d9681a26e0ba44423c45d2964a
  */
 
 /* eslint-disable */
@@ -63,6 +63,10 @@ fragment SideBarRefetchContainer_IXE1D on Query {
               name
             }
             geofenceComparison
+          }
+          ... on StringArrayPredicate {
+            stringArrayValue
+            stringArrayComparison
           }
         }
       }
@@ -209,6 +213,26 @@ const batch /*: ConcreteBatch*/ = {
                     "args": null,
                     "name": "selector",
                     "storageKey": null
+                  },
+                  {
+                    "kind": "InlineFragment",
+                    "type": "StringArrayPredicate",
+                    "selections": [
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "args": null,
+                        "name": "stringArrayValue",
+                        "storageKey": null
+                      },
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "args": null,
+                        "name": "stringArrayComparison",
+                        "storageKey": null
+                      }
+                    ]
                   },
                   {
                     "kind": "InlineFragment",
@@ -497,7 +521,7 @@ const batch /*: ConcreteBatch*/ = {
       }
     ]
   },
-  "text": "query SideBarRefetchContainerQuery(\n  $segmentId: ID\n) {\n  ...SideBarRefetchContainer_IXE1D\n}\n\nfragment SideBarRefetchContainer_IXE1D on Query {\n  sbDynamicSegment: dynamicSegment(segmentId: $segmentId) {\n    segmentId\n    name\n    predicates {\n      condition\n      predicateList {\n        __typename\n        ... on Predicate {\n          __typename\n          attribute\n          selector\n          ... on StringPredicate {\n            stringValue\n            stringComparison\n          }\n          ... on VersionPredicate {\n            versionValue\n            versionComparison\n          }\n          ... on DatePredicate {\n            dateValue {\n              start\n              end\n            }\n            dateComparison\n          }\n          ... on BooleanPredicate {\n            booleanValue\n            booleanComparison\n          }\n          ... on NumberPredicate {\n            numberValue\n            numberComparison\n          }\n          ... on GeofencePredicate {\n            geofenceValue {\n              latitude\n              longitude\n              radius\n              name\n            }\n            geofenceComparison\n          }\n        }\n      }\n    }\n  }\n  segmentSchema {\n    deviceSchema {\n      attribute\n      __typename: type\n      label\n    }\n    profileSchema {\n      attribute\n      __typename: type\n      label\n    }\n  }\n  segmentsContainer: dynamicSegment {\n    ...SegmentsContainer_segments\n  }\n}\n\nfragment SegmentsContainer_segments on DynamicSegment {\n  name\n  segmentId\n}\n"
+  "text": "query SideBarRefetchContainerQuery(\n  $segmentId: ID\n) {\n  ...SideBarRefetchContainer_IXE1D\n}\n\nfragment SideBarRefetchContainer_IXE1D on Query {\n  sbDynamicSegment: dynamicSegment(segmentId: $segmentId) {\n    segmentId\n    name\n    predicates {\n      condition\n      predicateList {\n        __typename\n        ... on Predicate {\n          __typename\n          attribute\n          selector\n          ... on StringPredicate {\n            stringValue\n            stringComparison\n          }\n          ... on VersionPredicate {\n            versionValue\n            versionComparison\n          }\n          ... on DatePredicate {\n            dateValue {\n              start\n              end\n            }\n            dateComparison\n          }\n          ... on BooleanPredicate {\n            booleanValue\n            booleanComparison\n          }\n          ... on NumberPredicate {\n            numberValue\n            numberComparison\n          }\n          ... on GeofencePredicate {\n            geofenceValue {\n              latitude\n              longitude\n              radius\n              name\n            }\n            geofenceComparison\n          }\n          ... on StringArrayPredicate {\n            stringArrayValue\n            stringArrayComparison\n          }\n        }\n      }\n    }\n  }\n  segmentSchema {\n    deviceSchema {\n      attribute\n      __typename: type\n      label\n    }\n    profileSchema {\n      attribute\n      __typename: type\n      label\n    }\n  }\n  segmentsContainer: dynamicSegment {\n    ...SegmentsContainer_segments\n  }\n}\n\nfragment SegmentsContainer_segments on DynamicSegment {\n  name\n  segmentId\n}\n"
 };
 
 module.exports = batch;
