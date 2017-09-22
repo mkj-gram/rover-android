@@ -137,7 +137,7 @@ func ProfileAttributesMapping(attrs []*mongodb.SchemaAttribute) M {
 		case "double":
 			mapping[attr.Attribute] = M{"type": "double"}
 		case "string":
-			mapping[attr.Attribute] = M{"type": "text"}
+			mapping[attr.Attribute] = M{"type": "keyword"}
 		case "array[string]":
 			mapping[attr.Attribute] = M{"type": "keyword"}
 		case "null":

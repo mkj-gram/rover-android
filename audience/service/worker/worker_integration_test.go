@@ -216,7 +216,7 @@ func TestWorker(t *testing.T) {
 												"bool":    M{"type": "boolean"},
 												"double":  M{"type": "double"},
 												"integer": M{"type": "integer"},
-												"string":  M{"type": "text"},
+												"string":  M{"type": "keyword"},
 												"ts":      M{"type": "date"},
 											},
 										},
