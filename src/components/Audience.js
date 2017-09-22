@@ -38,13 +38,7 @@ class Audience extends Component {
     }
 
     setQueryCondition(queryCondition, initial = false, query = null) {
-        if (initial) {
-            this.setState({
-                queryCondition,
-                segmentIdRefetch: false,
-                predicates: this.formatQuery(query, queryCondition)
-            })
-        } else {
+        if (!initial) {
             const pred = JSON.parse(this.state.predicates)
 
             this.setState({
