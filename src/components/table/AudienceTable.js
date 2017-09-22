@@ -115,10 +115,16 @@ class AudienceTable extends Component {
         )
 
         const hasSelector = (elem, index, array) => {
-            return cachedSelectedColumns && Object.keys(cachedSelectedColumns)[0].includes(elem)
+            return (
+                Object.keys(cachedSelectedColumns).length > 0 &&
+                Object.keys(cachedSelectedColumns)[0].includes(elem)
+            )
         }
 
-        if (!cachedSelectedColumns || !['_DEVICE','_CUSTOM_PROFILE','_ROVER_PROFILE'].some(hasSelector))  {
+        if (
+            !cachedSelectedColumns ||
+            !['_DEVICE', '_CUSTOM_PROFILE', '_ROVER_PROFILE'].some(hasSelector)
+        ) {
             this.setState({
                 selectedColumns
             })
