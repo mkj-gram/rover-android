@@ -385,12 +385,6 @@ func (s *devicesStore) CreateDevice(ctx context.Context, r *audience.CreateDevic
 		return wrapError(err, "devices.Insert")
 	}
 
-	c := IntCounter{s.devices_counts()}
-
-	if err := c.Add(account_id, 1); err != nil {
-		errorf("counter_cache: devices: %v", err)
-	}
-
 	return nil
 }
 
@@ -656,11 +650,6 @@ func (s *devicesStore) DeleteDevice(ctx context.Context, r *audience.DeleteDevic
 
 	if err := s.devices().Remove(rq); err != nil {
 		return wrapError(err, "devices.Remove")
-	}
-
-	c := IntCounter{s.devices_counts()}
-	if err := c.Sub(account_id, 1); err != nil {
-		errorf("counter_cache: devices: %v", err)
 	}
 
 	return nil

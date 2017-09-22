@@ -188,11 +188,6 @@ func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreatePro
 		return nil, wrapError(err, "profiles.Insert")
 	}
 
-	c := IntCounter{s.profiles_counts()}
-	if err := c.Add(account_id, 1); err != nil {
-		errorf("counter_cache: profiles: %v", err)
-	}
-
 	var proto audience.Profile
 	if err := p.toProto(&proto); err != nil {
 		return nil, wrapError(err, "profile.toProto")
@@ -258,11 +253,6 @@ func (s *profilesStore) DeleteProfile(ctx context.Context, r *audience.DeletePro
 
 	if err := s.profiles().Remove(Q); err != nil {
 		return wrapError(err, "profiles.Remove")
-	}
-
-	c := IntCounter{s.profiles_counts()}
-	if err := c.Sub(account_id, 1); err != nil {
-		errorf("counter_cache: profiles: %v", err)
 	}
 
 	return nil

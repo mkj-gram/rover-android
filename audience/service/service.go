@@ -477,7 +477,11 @@ func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.Update
 
 // GetDevicesTotalCount implements the corresponding rpc
 func (s *Server) GetDevicesTotalCount(ctx context.Context, r *audience.GetDevicesTotalCountRequest) (*audience.GetDevicesTotalCountResponse, error) {
-	count, err := s.index.GetDeviceTotalCount(ctx, int(r.GetAuthContext().GetAccountId()))
+	if r.AuthContext == nil {
+		return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
+	}
+
+	count, err := s.index.GetDeviceTotalCount(ctx, int(r.AuthContext.GetAccountId()))
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "index.GetDevicesTotalCount: %v", err)
 	}
@@ -486,7 +490,11 @@ func (s *Server) GetDevicesTotalCount(ctx context.Context, r *audience.GetDevice
 
 // GetProfilesTotalCount implements the corresponding rpc
 func (s *Server) GetProfilesTotalCount(ctx context.Context, r *audience.GetProfilesTotalCountRequest) (*audience.GetProfilesTotalCountResponse, error) {
-	count, err := s.index.GetProfileTotalCount(ctx, int(r.GetAuthContext().GetAccountId()))
+	if r.AuthContext == nil {
+		return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
+	}
+
+	count, err := s.index.GetProfileTotalCount(ctx, int(r.AuthContext.GetAccountId()))
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "index.GetDevicesTotalCount: %v", err)
 	}

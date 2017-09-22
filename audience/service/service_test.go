@@ -2,13 +2,15 @@ package service_test
 
 import (
 	"encoding/hex"
-	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
+	"golang.org/x/net/context"
 	"io"
 	"math/rand"
 	"net"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 
 	"google.golang.org/grpc"
 
@@ -39,6 +41,18 @@ type (
 		exp    interface{}
 	}
 )
+
+type nopIndex struct{}
+
+func (i *nopIndex) Query(context.Context, *audience.QueryRequest) (*audience.QueryResponse, error) {
+	return nil, nil
+}
+func (i *nopIndex) GetDeviceTotalCount(context.Context, int) (int64, error) {
+	return 0, nil
+}
+func (i *nopIndex) GetProfileTotalCount(context.Context, int) (int64, error) {
+	return 0, nil
+}
 
 func truncateColl(t *testing.T, colls ...*mgo.Collection) {
 	for _, coll := range colls {

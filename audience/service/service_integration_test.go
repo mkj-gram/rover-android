@@ -65,14 +65,6 @@ func TestAudienceService(t *testing.T) {
 	loadFixture(t, profiles_schemas, "testdata/profiles_schemas.json")
 	loadFixture(t, dynamic_segments, "testdata/dynamic_segments.json")
 
-	// counter cache
-	if err := mongodb.RefreshCache(devices, mdb.C("devices_counts")); err != nil {
-		t.Fatalf("counter_cache: devices: %v", err)
-	}
-	if err := mongodb.RefreshCache(profiles, mdb.C("profiles_counts")); err != nil {
-		t.Fatalf("counter_cache: profiles: %v", err)
-	}
-
 	// Profiles
 	t.Run("CreateProfile", testAudienceService_CreateProfile)
 	t.Run("DeleteProfile", testAudienceService_DeleteProfile)
@@ -118,10 +110,6 @@ func TestAudienceService(t *testing.T) {
 	t.Run("UpdateDynamicSegmentPredicates", testAudienceService_UpdateDynamicSegmentPredicates)
 
 	t.Run("ListDynamicSegments", testAudienceService_ListDynamicSegments)
-
-	// CounterCaches
-	t.Run("GetDevicesTotalCount", testAudienceService_GetDevicesTotalCount)
-	t.Run("GetProfilesTotalCount", testAudienceService_GetProfilesTotalCount)
 
 	t.Run("EnsureNotifications", testAudienceServiceNotifications)
 
