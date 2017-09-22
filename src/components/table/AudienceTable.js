@@ -470,6 +470,9 @@ class AudienceTable extends Component {
             ret = data.name
         } else if (type === 'StringArrayPredicate') {
             ret = data.join(', ')
+        } 
+        if (ret === null) {
+            ret = ''
         }
 
         return ret
