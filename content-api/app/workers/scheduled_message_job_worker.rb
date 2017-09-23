@@ -20,44 +20,14 @@ class ScheduledMessageJobWorker
     # args => { message_template_id: 1} optional time_zone_offset
     def perform(args)
         message_template = MessageTemplate.find(args["message_template_id"])
+
+        time_zone_offset = nil
+
         if args.include?("time_zone_offset")
-            if message_template.customer_segment
-                base_query = message_template.customer_segment.to_elasticsearch_query
-            else
-                base_query = {}
-            end
-
-            time_zones = TimeZoneOffset.get_time_zones_for_offset(args["time_zone_offset"])
-
-            time_zone_query = {
-                filter: {
-                    bool: {
-                        must: [
-                            {
-                                nested: {
-                                    path: "devices",
-                                    filter: {
-                                        terms: {
-                                            "devices.time_zone" => time_zones
-                                        }
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-
-            segment_query = merge_queries(base_query, time_zone_query)
-        else
-            if message_template.customer_segment
-                segment_query = message_template.customer_segment.to_elasticsearch_query
-            else
-                segment_query = {}
-            end
+            time_zone_offset = args["time_zone_offset"].to_i
         end
 
-        SendMessageWorker.perform_async(message_template.id, segment_query)
+        SendMessageWorker.perform_async(message_template.id, {}, [], time_zone_offset)
         ack!
 
     end
