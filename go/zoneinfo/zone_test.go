@@ -57,6 +57,11 @@ func TestGetZones(t *testing.T) {
 				"Zulu",
 			},
 		},
+		{
+			name:   "returns empty array when no timezone exists",
+			offset: -1,
+			exp:    []string{},
+		},
 	}
 
 	for _, tc := range tcases {

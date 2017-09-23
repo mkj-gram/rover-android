@@ -3,7 +3,8 @@ package zoneinfo
 import "time"
 
 // Takes in a utc offset in seconds and returns all iana timezones which currently have the same offset
-func GetZones(offset int) (zones []string) {
+func GetZones(offset int) []string {
+	var zones = []string{}
 
 	now := time.Now()
 
