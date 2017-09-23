@@ -59,7 +59,8 @@ class SideBar extends Component {
                 button: violet,
                 text: lavender
             },
-            matchConditionColor: graphite
+            matchConditionColor: graphite,
+            condition: 'ALL'
         }
 
         this.setState = this.setState.bind(this)
@@ -167,7 +168,8 @@ class SideBar extends Component {
 
         this.setState({
             query,
-            sbDynamicSegment
+            sbDynamicSegment,
+            condition
         })
     }
 
@@ -355,12 +357,13 @@ class SideBar extends Component {
         const {
             isShowingAddFilterModal,
             matchConditionColor,
-            query
+            query,
+            condition
         } = this.state
 
         const addPredicateIndex = query.length
 
-        const { data, queryCondition } = this.props
+        const { data } = this.props
 
         const style = {
             height: 58,
@@ -482,13 +485,16 @@ class SideBar extends Component {
                             name="any-all-select"
                             style={selectStyle}
                             isDisabled={false}
-                            value={queryCondition}
+                            value={condition}
                             onChange={(e) => {
-                                this.props.setQueryCondition(
+                                this.setState({
+                                    condition: e.target.value
+                                }, this.props.setQueryCondition(
                                     e.target.value,
                                     false,
                                     query
-                                )
+                                ))
+                                
                             }}
                         >
                             <option value="ALL">ALL</option>
@@ -724,7 +730,7 @@ class SideBar extends Component {
                     <PredicateList
                         clearQuery={this.clearQuery}
                         query={query}
-                        queryCondition={queryCondition}
+                        queryCondition={this.state.condition}
                         removePredicate={index => this.removePredicate(index)}
                         viewModal={(attribute, index, label) =>
                             this.handleEditModal(attribute, index, label)}
