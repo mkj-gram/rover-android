@@ -1202,9 +1202,17 @@ func stringArrayPredicateToQuery(predicate *audience.Predicate) (M, bool, error)
 			must = append(must, stringValFilter)
 		}
 
+		var esCondition = "must"
+
+		// Since we are nesting the bool condition we need to apply De Morgan's law
+		// !(a && b) == (!a or !b)
+		if op == audience.StringArrayPredicate_DOES_NOT_CONTAIN_ALL {
+			esCondition = "should"
+		}
+
 		return M{
 			"bool": M{
-				"must": must,
+				esCondition: must,
 			},
 		}, op == audience.StringArrayPredicate_CONTAINS_ALL, nil
 	case audience.StringArrayPredicate_CONTAINS_ANY, audience.StringArrayPredicate_DOES_NOT_CONTAIN_ANY:

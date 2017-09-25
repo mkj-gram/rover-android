@@ -1825,7 +1825,7 @@ func test_StringArrayPredicateToFilter(t *testing.T) {
 						"must_not": []M{
 							{
 								"bool": M{
-									"must": []M{
+									"should": []M{
 										{
 											"term": M{
 												"attributes.tags": "hank",
