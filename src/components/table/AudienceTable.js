@@ -14,6 +14,7 @@ import { getDeviceSchema } from '../../localSchemas/deviceSchema'
 import roverProfileSchema from '../../localSchemas/roverProfileSchema'
 
 import SkeletonTableGrid from './SkeletonTableGrid'
+import TestDeviceIconFormatter from './TestDeviceIconFormatter'
 
 class AudienceTable extends Component {
     constructor(props) {
@@ -61,6 +62,8 @@ class AudienceTable extends Component {
         this.fetchData = this.fetchData.bind(this)
         this.renderDataGrid = this.renderDataGrid.bind(this)
         this.shouldCompleteRefresh = this.shouldCompleteRefresh.bind(this)
+        this.getCellWidth = this.getCellWidth.bind(this)
+        this.getTestDevice = this.getTestDevice.bind(this)
     }
 
     componentDidMount() {
@@ -197,6 +200,7 @@ class AudienceTable extends Component {
 
     updateChecked(selector, info, item, devices = false) {
         const { allColumns } = this.state
+
         let cachedSelectedColumns = JSON.parse(
             localStorage.getItem('selectedColumns')
         )
@@ -443,16 +447,34 @@ class AudienceTable extends Component {
         }
     }
 
+    getCellWidth(pred, key) {
+        let width
+        if (pred === 'StringArrayPredicate') {
+            width = 285
+        } else if (pred === 'BooleanPredicate' && key === 'is_test_device_DEVICE') {
+            width = 50
+        } else {
+            width = 200
+        }
+        return width
+    }
+
+    getTestDevice() {
+        return (
+            <TestDeviceIconFormatter
+                handleCellEnter={this.handleCellEnter}
+                handleCellLeave={this.handleCellLeave}
+            />
+        )
+    }
+
     getSelectedColumns() {
         const selectedColumns = JSON.parse(localStorage.selectedColumns)
 
         const columns = Object.keys(selectedColumns).map(attr => ({
             key: attr,
-            name: selectedColumns[attr].label,
-            width:
-                selectedColumns[attr].__typename === 'StringArrayPredicate'
-                    ? 285
-                    : 200,
+            name: (attr === 'is_test_device_DEVICE') ? this.getTestDevice() : selectedColumns[attr].label,
+            width: this.getCellWidth(selectedColumns[attr].__typename, attr),
             draggable: true,
             resizable: true,
             formatter: this.getFormat(selectedColumns[attr].__typename)
@@ -507,7 +529,7 @@ class AudienceTable extends Component {
 
         if (skeleton) {
             return <SkeletonTableGrid selectedColumns={selectedColumns} />
-        }
+        }    
 
         return (
             <AudienceDataGrid
