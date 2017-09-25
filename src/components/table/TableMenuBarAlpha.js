@@ -63,6 +63,7 @@ class TableMenuBarAlpha extends Component {
         this.handleSearch = this.handleSearch.bind(this)
         this.triggerColumnsMenu = this.triggerColumnsMenu.bind(this)
         this.showChecked = this.showChecked.bind(this)
+        this.numberWithCommas = this.numberWithCommas.bind(this)
     }
 
     handleSearch(e) {
@@ -90,6 +91,10 @@ class TableMenuBarAlpha extends Component {
         } else if (['CUSTOM_PROFILE','ROVER_PROFILE'].includes(info.selector)) {
             return (`${item}_${info.selector}` in selectedColumns)
         }
+    }
+
+    numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
 
     render() {
@@ -129,10 +134,10 @@ class TableMenuBarAlpha extends Component {
                                 color: graphite
                             }}
                         >
-                            {segmentSize}
+                            {this.numberWithCommas(segmentSize)}
                         </div>
                         <div style={{ ...text, fontSize: 13, color: silver }}>
-                            of {totalSize} total devices
+                            of {this.numberWithCommas(totalSize)} total devices
                         </div>
                     </div>
                 </div>
