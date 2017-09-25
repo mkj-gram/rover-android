@@ -3,8 +3,7 @@
 set -e
 
 run() {
-  go run ./audience/service/cmd/audience-service/main.go \
-    --mongo-dsn=${MONGO_DSN}
+  go run ./audience/service/cmd/audience-service/main.go
 }
 
 test() {

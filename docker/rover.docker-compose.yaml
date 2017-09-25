@@ -13,7 +13,8 @@ services:
     volumes:
       - ../../rover:/rover
 
-  elastic5:
+  elastic:
+    container_name: elastic5
     image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
     ports: [9200, 9300]
     volumes:
@@ -63,7 +64,7 @@ services:
 
   audience-service:
     image: golang:1.9-alpine
-    links: [mongo, elastic5]
+    links: [mongo, elastic]
     ports: [5100, 5080]
     command: ./docker/audience-service/cmd test run
     volumes:
@@ -71,4 +72,5 @@ services:
     working_dir: /go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
-      MONGO_DSN: "mongodb://mongo:27017/audience_service_test"
+      AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_test"
+      AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic5:9200"
