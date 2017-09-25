@@ -35,7 +35,11 @@ export default (devices, d) => {
         push_token_is_active: d.getPushTokenIsActive(),
         region_monitoring_mode: d.getRegionMonitoringMode(),
         is_background_enabled: d.getIsBackgroundEnabled(),
-        is_location_monitoring_enabled: d.getIsLocationMonitoringEnabled()
+        is_location_monitoring_enabled: d.getIsLocationMonitoringEnabled(),
+        push_environment: d.getPushEnvironment(),
+        push_token_key: d.getPushTokenKey(),
+        push_token_created_at: RoverApis.Helpers.timestampFromProto(d.getPushTokenCreatedAt()),
+        push_token_updated_at: RoverApis.Helpers.timestampFromProto(d.getPushTokenUpdatedAt())
     }
 
     devices[d.getProfileId()] = Object.keys(props).map(p => {

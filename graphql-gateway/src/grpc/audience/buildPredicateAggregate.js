@@ -434,4 +434,3 @@ export default (queryCondition, predicates) => {
     predicateAggregate.setPredicatesList(buildPredicates(predicates))
     return predicateAggregate
 }
-
