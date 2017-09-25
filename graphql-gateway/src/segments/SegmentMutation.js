@@ -3,7 +3,7 @@ import promisify from '@rover-common/grpc-promisify'
 import { audienceClient } from '../grpcClients'
 promisify(audienceClient)
 
-import { buildPredicateAggregate } from '../grpc/grpc-helpers'
+import buildPredicateAggregate from '../grpc/audience/buildPredicateAggregate'
 import { GraphQLString } from 'graphql'
 import DynamicSegment from './DynamicSegment'
 import SegmentInputType from './SegmentInputType'

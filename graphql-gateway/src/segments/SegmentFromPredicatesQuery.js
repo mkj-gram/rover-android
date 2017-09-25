@@ -4,7 +4,9 @@ import SegmentData from './SegmentData'
 import { getSegmentPageByPredicates } from './SegmentRowsQuery'
 
 import { audienceClient } from '../grpcClients'
-import { buildPredicateAggregate, profileFromProto, deviceFromProto } from '../grpc/grpc-helpers'
+import buildPredicateAggregate from '../grpc/audience/buildPredicateAggregate'
+import getProfileFromProto from '../grpc/audience/getProfileFromProto'
+import getDeviceFromProto from '../grpc/audience/getDeviceFromProto'
 import promisify from '@rover-common/grpc-promisify'
 
 
@@ -51,11 +53,11 @@ const SegmentFromPredicatesQuery = {
         const segmentSize = response.getTotalSize()
 
         response.getProfilesList().forEach(profile => {
-            profileFromProto(profiles, profile)
+            getProfileFromProto(profiles, profile)
         })
         
         response.getDevicesList().forEach(device => {
-            deviceFromProto(devices, device)
+            getDeviceFromProto(devices, device)
         })
 
         dataGridRows = Object.keys(devices).map(id => {
