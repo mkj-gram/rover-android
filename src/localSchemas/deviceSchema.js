@@ -1,5 +1,37 @@
 export const getDeviceSchema = () => [
         {
+            attribute: 'push_token_key',
+            label: 'Push Token',
+            __typename: 'StringPredicate',
+            group: null,
+            display: true,
+            filter: true
+        },
+        {
+            attribute: 'push_environment',
+            label: 'Push Environment',
+            __typename: 'StringPredicate',
+            group: null,
+            display: true,
+            filter: true
+        },
+        {
+            attribute: 'push_token_created_at',
+            label: 'Push Token Created At',
+            __typename: 'DatePredicate',
+            group: null,
+            display: true,
+            filter: false
+        },
+        {
+            attribute: 'push_token_updated_at',
+            label: 'Push Token Updated At',
+            __typename: 'DatePredicate',
+            group: null,
+            display: true,
+            filter: false
+        },
+        {
             attribute: 'created_at',
             label: 'First Seen',
             __typename: 'DatePredicate',
