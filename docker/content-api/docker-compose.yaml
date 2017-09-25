@@ -11,7 +11,7 @@ services:
 
   content-api:
     image: ruby:2.3.3
-    links: [postgres, mongo, auth-service, elastic2]
+    links: [postgres, mongo, audience-service, auth-service, elastic2 ]
     ports: [5000]
     command: ./docker/content-api/cmd _bundle migrate # test
     volumes:
@@ -20,6 +20,7 @@ services:
     working_dir: /rover/content-api
     environment:
       AUTH_V1_SERVICE_HOST: auth-service
+      AUDIENCE_V1_SERVICE_HOST: audience-service
       MONGODB_URI: mongodb://mongo:27017/rover-local
       ELASTICSEARCH_URLS: elastic2:9200
       POSTGRESQL_DB_HOST: postgres

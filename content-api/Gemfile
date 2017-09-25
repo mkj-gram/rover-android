@@ -88,6 +88,7 @@ gem 'grpc', '~> 1.2'
 
 gem 'rover-apis', path: "../apis/ruby/rover-apis"
 gem 'rover-auth', path: "../auth/clients/ruby/rover-auth"
+gem 'rover-audience', path: "../audience/clients/ruby/rover-audience"
 
 group :development do
 	gem 'pry', '~> 0.10.4'

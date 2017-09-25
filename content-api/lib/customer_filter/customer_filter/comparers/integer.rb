@@ -2,6 +2,8 @@ module CustomerFilter
     module Comparers
         class Integer < Comparer
 
+            attr_reader :from, :to
+            
             def initialize(opts)
                 super
                 @from = opts["from"]

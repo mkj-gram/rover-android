@@ -5,6 +5,12 @@ PATH
       grpc (~> 1.2)
 
 PATH
+  remote: ../audience/clients/ruby/rover-audience
+  specs:
+    rover-audience (0.0.1)
+      rover-apis
+
+PATH
   remote: ../auth/clients/ruby/rover-auth
   specs:
     rover-auth (0.0.1)
@@ -390,6 +396,7 @@ DEPENDENCIES
   rails-api
   redis (~> 3.2, >= 3.2.2)
   rover-apis!
+  rover-audience!
   rover-auth!
   rspec-rails (~> 3.0)
   sentry-raven (~> 0.15.6)
