@@ -71,7 +71,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
 
         message_templates = elasticsearch_query.per_page([page_size, 50].min).page(current_page).records
 
-        records = message_templates.includes(:customer_segment).to_a
+        records = message_templates.to_a
 
         included = []
 
@@ -181,7 +181,6 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         convert_param_if_exists(local_params[:proximity_messages], :xenio_zone_ids, :filter_xenio_zone_ids)
         convert_param_if_exists(local_params[:proximity_messages], :xenio_place_tags, :filter_xenio_place_tags)
         convert_param_if_exists(local_params[:proximity_messages], :xenio_place_ids, :filter_xenio_place_ids)
-        convert_param_if_exists(local_params[:proximity_messages], :dynamic_segment_id, :customer_segment_id)
         convert_param_if_exists(local_params[:proximity_messages], :gimbal_place_ids, :filter_gimbal_place_ids)
         convert_param_if_exists(local_params[:proximity_messages], :"landing-page", :landing_page)
 
@@ -225,7 +224,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             :content_type,
             :website_url,
             :deep_link_url,
-            :customer_segment_id,
+            :dynamic_segment_id,
             :static_segment_id,
             :experience_id,
             {:limits => [:message_limit, :number_of_minutes, :number_of_hours, :number_of_days]}
@@ -265,11 +264,6 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
         if should_include.include?("places") && message.filter_place_ids.present?
             places = message.filter_places
             included += places.map{|place| V1::PlaceSerializer.serialize(place)}
-        end
-
-        if should_include.include?("dynamic-segment") && message.customer_segment
-            message.customer_segment.account = current_account
-            included += [V1::CustomerSegmentSerializer.serialize(message.customer_segment)]
         end
 
         if should_include.include?("gimbal-places") && message.gimbal_places
@@ -315,7 +309,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
     def serialize_message(message, extra_attributes = {})
         # extra_attributes.merge!(:landing_page_template => message.landing_page_template.to_json) if message.landing_page_template
         message.account = current_account
-        message.customer_segment.account = current_account if message.customer_segment
+
         json = {
             type: "proximity-messages",
             id: message.id.to_s,
@@ -345,7 +339,7 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
                 :"content-type" => message.content_type,
                 :"website-url" => message.website_url,
                 :"deep-link-url" => message.deeplink_url,
-                :"approximate-customers-count" => message.approximate_customers_count,
+                :"approximate-customers-count" => 0,
                 :"total-delivered" => message.stats.total_delivered,
                 :"total-notification-opens" => message.stats.total_notification_opens,
                 :"total-inbox-opens" => message.stats.total_inbox_opens,
@@ -414,11 +408,11 @@ class V1::ProximityMessageTemplatesController < V1::ApplicationController
             )
         end
 
-        if message.customer_segment_id
+        if message.dynamic_segment_id
             json[:relationships].merge!(
                 {
                     :"dynamic-segment" => {
-                        data: { type: "dynamic-segments", id: message.customer_segment_id.to_s }
+                        data: { type: "dynamic-segments", id: message.dynamic_segment_id.to_s }
                     }
 
                 }
