@@ -13,7 +13,7 @@ module Events
 
             def update_stats
                 if message
-                    counters = { total_notifications_sent: 1 }
+                    counters = { total_notifications_sent: 1, notifications_attempted: 1,  notifications_delivered: 1 }
                     MessageTemplateStats.update_counters(message.message_template_id, counters)
                 end
             end

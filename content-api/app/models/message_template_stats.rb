@@ -34,11 +34,11 @@ class MessageTemplateStats
 
         def from_document(doc)
             if doc["notifications_delivered"].nil?
-                doc["notifications_delivered"] = doc["total_notifications_sent"]
+                doc["notifications_delivered"] = doc["total_notifications_sent"].to_i
             end
 
             if doc["notifications_invalid"].nil?
-                doc["notifications_invalid"] = doc["total_notifications_failed"]
+                doc["notifications_invalid"] = doc["total_notifications_failed"].to_i
             end
 
             if doc["notifications_attempted"].nil?
