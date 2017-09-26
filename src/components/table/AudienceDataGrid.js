@@ -14,6 +14,7 @@ import ReactDataGrid from 'react-data-grid'
 import { DraggableHeader } from 'react-data-grid-addons'
 import CustomRowRenderer from './CustomRowRenderer'
 import GridPagination from './GridPagination'
+import DeviceDetailsModal from './DeviceDetailsModal'
 
 const { DraggableContainer } = DraggableHeader
 
@@ -23,12 +24,14 @@ class AudienceDataGrid extends Component {
         this.state = {
             selectedIndexes: [],
             isShiftKeyPressed: false,
-            isCommandKeyPressed: false
+            isCommandKeyPressed: false,
+            isModalShowing: false
         }
 
         this.onRowsSelected = this.onRowsSelected.bind(this)
         this.onRowsDeselected = this.onRowsDeselected.bind(this)
         this.rowGetter = this.rowGetter.bind(this)
+        this.onDeviceDetailsModalClose = this.onDeviceDetailsModalClose.bind(this)
     }
 
     rowGetter(i) {
@@ -129,7 +132,7 @@ class AudienceDataGrid extends Component {
                 selectedIndexes: selectedIndexes.filter(r => r !== rowIdx)
             })
         }
-        this.setState({ selectedIndexes: [rowIdx] })
+        this.setState({ selectedIndexes: [rowIdx], isModalShowing: true })
     }
 
     onKeyDown(e) {
@@ -154,6 +157,13 @@ class AudienceDataGrid extends Component {
 
     getGridHeight() {
         return window.innerHeight - 130
+    }
+
+    onDeviceDetailsModalClose() {
+        this.setState({
+            isModalShowing: false,
+            selectedIndexes: []
+        })
     }
 
     render() {
@@ -264,6 +274,16 @@ class AudienceDataGrid extends Component {
                     updatePageNumber={this.props.updatePageNumber}
                     resetPagination={this.props.resetPagination}
                 />
+                {this.state.isModalShowing &&
+                    <DeviceDetailsModal
+                        dataGridRows={this.props.dataGridRows}
+                        isOpen={this.state.isModalShowing}
+                        onRequestClose={this.onDeviceDetailsModalClose}
+                        index={this.state.selectedIndexes[0]}
+                        allColumns={this.props.allColumns}
+                        updateDataGridRows={this.props.updateDataGridRows}
+                    />
+                }
             </div>
         )
     }

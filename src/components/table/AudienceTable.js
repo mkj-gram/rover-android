@@ -44,7 +44,8 @@ class AudienceTable extends Component {
             },
             dataGridRows: [],
             refetched: false,
-            adgDynamicSegment: []
+            adgDynamicSegment: [],
+            pageNumber: 0
         }
 
         this.createRowsAndColumns = this.createRowsAndColumns.bind(this)
@@ -64,6 +65,7 @@ class AudienceTable extends Component {
         this.shouldCompleteRefresh = this.shouldCompleteRefresh.bind(this)
         this.getCellWidth = this.getCellWidth.bind(this)
         this.getTestDevice = this.getTestDevice.bind(this)
+        this.updateDataGridRows = this.updateDataGridRows.bind(this)
     }
 
     componentDidMount() {
@@ -340,7 +342,8 @@ class AudienceTable extends Component {
                 segmentSize,
                 totalSize,
                 dataGridRows,
-                refetched: false
+                refetched: false,
+                pageNumber: nextProps.pageNumber
             },
             this.shouldCompleteRefresh(nextProps.refresh)
         )
@@ -523,9 +526,35 @@ class AudienceTable extends Component {
         this.setState({ columns, rows })
     }
 
+    updateDataGridRows(index, isTestDevice, testDeviceName) {
+        const indexrow = this.state.dataGridRows[index].map(property => {
+            if (property.attribute === 'is_test_device' && property.selector === 'DEVICE') {
+                return {
+                    attribute: 'is_test_device',
+                    selector: 'DEVICE',
+                    value: isTestDevice
+                }
+            } else if (property.attribute === 'label' && property.selector === 'DEVICE') {
+                return {
+                    attribute: 'label',
+                    selector: 'DEVICE',
+                    value: testDeviceName
+                }
+            }
+            return property
+        })
+ 
+        const dataGridRows = [...this.state.dataGridRows].slice(0)
+        dataGridRows.splice(index, 1, indexrow)
+        this.setState({
+            dataGridRows,
+            rows: this.getSelectedRows(dataGridRows, this.state.pageNumber)
+        })
+    }
+
     renderDataGrid() {
         const { skeleton, updatePageNumber, resetPagination } = this.props
-        const { selectedColumns, segmentSize, columns, rows } = this.state
+        const { selectedColumns, segmentSize, columns, rows, dataGridRows, allColumns } = this.state
 
         if (skeleton) {
             return <SkeletonTableGrid selectedColumns={selectedColumns} />
@@ -539,6 +568,9 @@ class AudienceTable extends Component {
                 updateDragColumns={this.updateDragColumns}
                 updatePageNumber={updatePageNumber}
                 resetPagination={resetPagination}
+                dataGridRows={dataGridRows}
+                allColumns={allColumns}
+                updateDataGridRows={this.updateDataGridRows}
             />
         )
     }
