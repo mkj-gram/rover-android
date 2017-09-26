@@ -82,6 +82,7 @@ const DynamicSegmentQuery = {
                     7: 'does not contain'
                 }
                 const pred = predicate.getStringPredicate()
+
                 return {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),

@@ -2,6 +2,17 @@ import RoverApis from '@rover/apis'
 
 const getVersionFromProto = p => !!p ? [p.getMajor(), p.getMinor(), p.getRevision()] : []
 
+const getPlatformFromProto = p => {
+    switch (p) {
+        case 0:
+            return 'UNDEFINED'
+        case 1:
+            return 'MOBILE'
+        case 2:
+            return 'WEB'
+    }
+}
+
 export default (devices, d) => {
     devices[d.getProfileId()] = []
 
@@ -30,7 +41,7 @@ export default (devices, d) => {
         sdk_version: getVersionFromProto(d.getFrameworksMap().get('io.rover.Rover')),
         device_id: d.getDeviceId(),
         is_test_device: d.getIsTestDevice(),
-        platform: d.getPlatform(),
+        platform: getPlatformFromProto(d.getPlatform()),
         profile_id: d.getProfileId(),
         push_token_is_active: d.getPushTokenIsActive(),
         region_monitoring_mode: d.getRegionMonitoringMode(),

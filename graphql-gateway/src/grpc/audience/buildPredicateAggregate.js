@@ -45,6 +45,7 @@ export const buildStringPredicate = ({
         default:
             comparison = 1
     }
+
     const stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
     stringPredicate.setAttributeName(attribute)
     stringPredicate.setOp(comparison)
