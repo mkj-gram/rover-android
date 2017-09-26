@@ -5,11 +5,11 @@ const getVersionFromProto = p => !!p ? [p.getMajor(), p.getMinor(), p.getRevisio
 const getPlatformFromProto = p => {
     switch (p) {
         case 0:
-            return 'UNDEFINED'
+            return ''
         case 1:
-            return 'MOBILE'
+            return 'Mobile'
         case 2:
-            return 'WEB'
+            return 'Web'
     }
 }
 

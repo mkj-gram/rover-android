@@ -45,11 +45,16 @@ export const buildStringPredicate = ({
         default:
             comparison = 1
     }
+    let value = stringValue
+
+    if (attribute === 'platform') {
+        value = value.toUpperCase()
+    }
 
     const stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
     stringPredicate.setAttributeName(attribute)
     stringPredicate.setOp(comparison)
-    stringPredicate.setValue(stringValue)
+    stringPredicate.setValue(value)
     return stringPredicate
 }
 export const buildBoolPredicate = ({

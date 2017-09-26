@@ -82,12 +82,18 @@ const DynamicSegmentQuery = {
                     7: 'does not contain'
                 }
                 const pred = predicate.getStringPredicate()
+                const attribute = pred.getAttributeName()
+                let stringValue = pred.getValue()
+
+                if (attribute === 'platform') {
+                    stringValue = stringValue.charAt(0).concat(stringValue.slice(1).toLowerCase())
+                }
 
                 return {
-                    attribute: pred.getAttributeName(),
+                    attribute,
                     selector: getSelectorName(predicate.getSelector()),
                     stringComparison: stringComparisons[pred.getOp()],
-                    stringValue: pred.getValue(),
+                    stringValue,
                     // include __typename field expected by DynamicSegment
                     __typename: 'StringPredicate'
                 }
