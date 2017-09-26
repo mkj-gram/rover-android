@@ -174,7 +174,10 @@ class BeaconRegionBaseProcessor extends BaseProcessor {
                 id: beaconConfiguration.id,
                 name: beaconConfiguration.title,
                 tags: beaconConfiguration.tags,
-                shared: beaconConfiguration.shared
+                shared: beaconConfiguration.shared,
+                uuid: beaconConfiguration.uuid,
+                "major-number": beaconConfiguration.major,
+                "minor-number": beaconConfiguration.minor
             }
         }
 
