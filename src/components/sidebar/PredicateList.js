@@ -122,9 +122,12 @@ const renderPredicateValue = value => (
     <span style={predicateValueStyle}>{value}</span>
 )
 
-const renderBooleanPredicate = ({ booleanValue }) => (
-    <div>{renderPredicateValue(booleanValue ? 'ON' : 'OFF')}</div>
-)
+const renderBooleanPredicate = ({ booleanComparison, booleanValue }) => {
+    if (booleanComparison === 'is unset') {
+        return <div>{renderPredicateComparison('is unset')}</div>
+    }
+    return <div>{renderPredicateValue(booleanValue ? 'ON' : 'OFF')}</div>
+}
 const renderStringPredicate = ({ stringComparison, stringValue }) => {
     let comparison = stringComparison
     if (stringComparison === 'is unset') {
@@ -289,9 +292,22 @@ const renderLabel = (label, rest) => {
         rest.__typename === 'StringArrayPredicate' &&
         rest.hasOwnProperty('stringArrayComparison')
     ) {
-        textToRender = rest.stringArrayComparison.includes('does not')
-            ? 'Is Not Tagged'
-            : 'Is Tagged'
+        switch (rest.stringArrayComparison) {
+            case 'does not contain all':
+            case 'does not contain any':
+                textToRender = 'Is Not Tagged:'
+                break
+            case 'is set':
+                textToRender = 'Is Tagged'
+                break
+            case 'is unset':
+                textToRender = 'Is Not Tagged'
+                break
+            case 'contains all':
+            case 'contains any':
+            default:
+                textToRender = 'Is Tagged:'
+        }
     } else {
         textToRender = label
     }
@@ -374,7 +390,7 @@ const PredicateList = ({
                             }}
                         >
                             <div style={{ flex: 'none', marginRight: 5 }}>
-                                {renderLabel(label, rest)}:
+                                {renderLabel(label, rest)}
                             </div>
                             <div style={{ flex: '1 1 auto' }}>
                                 {renderPredicate(rest)}

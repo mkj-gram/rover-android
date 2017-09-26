@@ -121,13 +121,21 @@ class StringArrayInput extends Component {
                         <option value="does not contain any">
                             does not have ANY of the following tags
                         </option>
+                        <option value="is set">
+                            is tagged
+                        </option>
+                        <option value="is unset">
+                            is not tagged
+                        </option>
                     </Select>
                 </div>
 
-                <SelectedTags
-                    tags={this.state.stringArrayValue}
-                    updateTags={this.updateTags}
-                />
+                {!stringArrayComparison.includes('set') &&
+                    <SelectedTags
+                        tags={this.state.stringArrayValue}
+                        updateTags={this.updateTags}
+                    />
+                }
             </div>
         )
     }

@@ -33,8 +33,8 @@ class StringInput extends Component {
         } = this.props
         let { stringValue } = this.state
 
-        if (stringComparison === 'is unknown') {
-            stringValue = ''
+        if (stringComparison.includes('set')) {
+            stringValue = ' '
         }
 
         updateFn({
@@ -117,9 +117,11 @@ class StringInput extends Component {
                         <option value="does not contain">
                             Does not contain
                         </option>
+                        <option value="is set">Exists</option>
+                        <option value="is unset">Does not exist</option>
                     </Select>
 
-                    {stringComparison !== 'is unknown' &&
+                    {!stringComparison.includes('set') &&
                         <ModalInput
                             type="text"
                             value={stringValue}
