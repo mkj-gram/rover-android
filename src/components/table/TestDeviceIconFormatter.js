@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
-import { purple, steel } from '@rover/react-bootstrap'
+import { TestDeviceIcon } from '@rover/react-icons'
 
-import getRelativeTime from '../../utils/getRelativeTime'
-
-class DateCellFormatter extends Component {
+class TestDeviceIconFormatter extends Component {
     constructor(props) {
         super(props)
-
         this.state = {
             isTooltipShowing: false,
             onCell: false
@@ -16,19 +13,18 @@ class DateCellFormatter extends Component {
     }
 
     handleMouseOver(e) {
-
         e.persist()
         const { handleCellEnter, value } = this.props
         this.setState({ onCell: true })
 
         setTimeout(() => {
-            if (this.state.onCell) {
-                handleCellEnter(e, new Date(value).toDateString())
+            if (this.state.onCell && !this.state.isTooltipShowing) {
+                handleCellEnter(e, 'Test Device')
                 this.setState({
-                    isModalShowing: true
+                    isTooltipShowing: true
                 })
             }
-        }, 300)
+        }, 500)
     }
 
     handleMouseLeave(e) {
@@ -38,20 +34,20 @@ class DateCellFormatter extends Component {
     }
 
     render() {
-        const { isTooltipShowing } = this.state
         return (
             <div
+                style={{
+                    position: 'absolute',
+                    bottom: 10,
+                    left: 19
+                }}
                 onMouseOver={this.handleMouseOver}
                 onMouseLeave={this.handleMouseLeave}
-                style={{
-                    color: isTooltipShowing ? purple : steel,
-                    position: 'relative'
-                }}
             >
-                {getRelativeTime(this.props.value)}
+                <TestDeviceIcon />
             </div>
         )
     }
 }
 
-export default DateCellFormatter
+export default TestDeviceIconFormatter

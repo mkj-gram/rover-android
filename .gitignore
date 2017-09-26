@@ -11,5 +11,5 @@ yarn.lock
 
 
 #generated
-__generated__
+__generated__**/
 schema.graphql

@@ -21,7 +21,12 @@ import {
     slate
 } from '@rover/react-bootstrap'
 
-import { DeviceIconSmall, ProfileIcon } from '@rover/react-icons'
+import {
+    DeviceIconSmall,
+    ProfileIcon,
+    TestDeviceIconSmall,
+    LocationIcon
+} from '@rover/react-icons'
 
 import AddFilterModal from './AddFilterModal'
 import BooleanInput from './BooleanInput'
@@ -221,6 +226,7 @@ class SideBar extends Component {
 
     renderModalTitle(currentAttribute) {
         const { query } = this.state
+        let marginBottom = 0
 
         if (query.length === 0) {
             return
@@ -232,7 +238,24 @@ class SideBar extends Component {
             return
         }
 
-        const icon = selector === 'DEVICE' ? DeviceIconSmall : ProfileIcon
+        const getIcon = currentAttribute => {
+            let icon
+            if (currentAttribute.selector === 'DEVICE') {
+                if (currentAttribute.group === 'location') {
+                    icon = LocationIcon
+                } else if (currentAttribute.attribute === 'is_test_device') {
+                    icon = TestDeviceIconSmall
+                    marginBottom = 7
+                } else {
+                    icon = DeviceIconSmall
+                }
+            } else {
+                icon = ProfileIcon
+            }
+            return icon
+        }
+
+        const icon = getIcon(currentAttribute)
 
         return (
             <div
@@ -245,8 +268,10 @@ class SideBar extends Component {
                     style: {
                         fill: steel,
                         verticalAlign: 'middle',
-                        marginRight: 10
-                    }
+                        marginRight: 10,
+                        marginBottom
+                    },
+                    fill: steel
                 })}
                 <span
                     style={{
@@ -462,7 +487,8 @@ class SideBar extends Component {
                                     attribute: predicate.attribute,
                                     index: addPredicateIndex,
                                     selector: predicate.selector,
-                                    label: predicate.label
+                                    label: predicate.label,
+                                    group: predicate.group
                                 }
                             })
                         }}
