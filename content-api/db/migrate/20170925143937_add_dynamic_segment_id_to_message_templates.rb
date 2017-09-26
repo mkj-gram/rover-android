@@ -20,11 +20,12 @@ class AddDynamicSegmentIdToMessageTemplates < ActiveRecord::Migration
                     mapped_segments[m.customer_segment_id] = s
                 end
 
-                m.dynamic_segment_id = mapped_segments[m.customer_segment_id].id
-                if !m.save
-                    Rails.logger.warn("Failed to update message template: " + m.id, m.error)
+                if mapped_segments[m.customer_segment_id].present?
+                    new_id = mapped_segments[m.customer_segment_id].id
+                    m.update_column(:dynamic_segment_id, new_id)
+                else
+                    Rails.logger.warn("Segment did not port correctly id: #{m.customer_segment_id}")
                 end
-
             end
         end
 
