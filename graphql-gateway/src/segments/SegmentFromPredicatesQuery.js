@@ -29,6 +29,30 @@ const SegmentFromPredicatesQuery = {
         }
     },
     resolve: async(_, { predicates, pageNumber, pageSize, condition}, {authContext}) => {
+
+        /*
+            Use Query Api with an empty set of predicates to get the total number of devices
+            This number will be accurate instead of using counter caches in the backend
+         */
+        const getTotalDevicesCount = async () => {
+            const request = new RoverApis.audience.v1.Models.QueryRequest()
+            request.setAuthContext(authContext)
+
+            let predicateAggregate = new RoverApis.audience.v1.Models.PredicateAggregate()
+            predicateAggregate.setPredicatesList([])
+            request.setPredicateAggregate(predicateAggregate)
+
+            const pageIterator = new RoverApis.audience.v1.Models.QueryRequest.PageIterator()
+            pageIterator.setPage(0)
+            pageIterator.setSize(0)
+
+            request.setPageIterator(pageIterator)
+            const response = await audienceClient.query(request)
+
+            return response.getTotalSize()
+        }
+
+
         let profiles = {}
         let devices = {}
         let dataGridRows = []
@@ -64,11 +88,13 @@ const SegmentFromPredicatesQuery = {
             return devices[id].concat(profiles[id])
         })
 
-        const deviceRequest = new RoverApis.audience.v1.Models.GetDevicesTotalCountRequest()
-        deviceRequest.setAuthContext(authContext)
+        let totalSize = 0
 
-        const deviceResponse = await audienceClient.getDevicesTotalCount(deviceRequest)
-        const totalSize = deviceResponse.getTotal()
+        if (predicateAggregate.getPredicatesList().length === 0) {
+            totalSize = segmentSize
+        } else {
+            totalSize = await getTotalDevicesCount()
+        }
 
         return {
             dataGridRows,
