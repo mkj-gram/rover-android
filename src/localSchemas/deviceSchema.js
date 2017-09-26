@@ -1,5 +1,37 @@
 export const getDeviceSchema = () => [
         {
+            attribute: 'is_test_device',
+            label: 'Test Device',
+            __typename: 'BooleanPredicate',
+            group: null,
+            display: true,
+            filter: true
+        },
+        {
+            attribute: 'time_zone',
+            label: 'Time Zone',
+            __typename: 'StringPredicate',
+            group: 'location',
+            display: true,
+            filter: true
+        },
+        {
+            attribute: 'location_latitude',
+            label: 'Latitude', 
+            __typename: 'FloatPredicate',
+            group: 'location',
+            display: true,
+            filter: true
+        },
+        {
+            attribute: 'location_longitude',
+            label: 'Longitude', 
+            __typename: 'FloatPredicate',
+            group: 'location',
+            display: true,
+            filter: true
+        },
+        {
             attribute: 'push_token_key',
             label: 'Push Token',
             __typename: 'StringPredicate',
@@ -144,14 +176,6 @@ export const getDeviceSchema = () => [
             filter: false
         },
         {
-            attribute: 'time_zone',
-            label: 'Time Zone',
-            __typename: 'StringPredicate',
-            group: 'location',
-            display: true,
-            filter: true
-        },
-        {
             attribute: 'is_bluetooth_enabled',
             label: 'Bluetooth', 
             __typename: 'BooleanPredicate',
@@ -181,22 +205,6 @@ export const getDeviceSchema = () => [
             __typename: 'GeofencePredicate',
             group: null,
             display: false,
-            filter: true
-        },
-        {
-            attribute: 'location_latitude',
-            label: 'Latitude', 
-            __typename: 'FloatPredicate',
-            group: 'location',
-            display: true,
-            filter: true
-        },
-        {
-            attribute: 'location_longitude',
-            label: 'Longitude', 
-            __typename: 'FloatPredicate',
-            group: 'location',
-            display: true,
             filter: true
         },
         {
@@ -231,14 +239,6 @@ export const getDeviceSchema = () => [
             display: true,
             filter: true
         },
-        // {
-        //     attribute: 'is_test_device',
-        //     label: 'is_test_device',   // Update when working on test device Milestone
-        //     __typename: 'BooleanPredicate',
-        //     group: null,
-        //     display: true,
-        //     filter: true
-        // },
     ]
 
 const getDeviceSchemaGroups = () => ['location']
