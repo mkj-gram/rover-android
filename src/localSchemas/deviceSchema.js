@@ -1,5 +1,37 @@
 export const getDeviceSchema = () => [
         {
+            attribute: 'push_token_key',
+            label: 'Push Token',
+            __typename: 'StringPredicate',
+            group: null,
+            display: true,
+            filter: true
+        },
+        {
+            attribute: 'push_environment',
+            label: 'Push Environment',
+            __typename: 'StringPredicate',
+            group: null,
+            display: true,
+            filter: true
+        },
+        {
+            attribute: 'push_token_created_at',
+            label: 'Push Token Created At',
+            __typename: 'DatePredicate',
+            group: null,
+            display: true,
+            filter: false
+        },
+        {
+            attribute: 'push_token_updated_at',
+            label: 'Push Token Updated At',
+            __typename: 'DatePredicate',
+            group: null,
+            display: true,
+            filter: false
+        },
+        {
             attribute: 'created_at',
             label: 'First Seen',
             __typename: 'DatePredicate',
@@ -12,8 +44,8 @@ export const getDeviceSchema = () => [
             label: 'App Version',
             __typename: 'StringPredicate',
             group: null,
-            display: true,
-            filter: true
+            display: false,
+            filter: false
         },
         {
             attribute: 'device_manufacturer',
@@ -60,40 +92,40 @@ export const getDeviceSchema = () => [
             label: 'Locale Script',
             __typename: 'StringPredicate',
             group: null,
-            display: true,
-            filter: true
+            display: false,
+            filter: false
         },
         {
             attribute: 'is_wifi_enabled',
             label: 'Wifi',
             __typename: 'BooleanPredicate',
             group: null,
-            display: true,
-            filter: true
+            display: false,
+            filter: false
         },
         {
             attribute: 'is_cellular_enabled',
             label: 'Cellular',
             __typename: 'BooleanPredicate',
             group: null,
-            display: true,
-            filter: true
+            display: false,
+            filter: false
         },
         {
             attribute: 'screen_width',
             label: 'Screen Width',
             __typename: 'NumberPredicate',
             group: null,
-            display: true,
-            filter: true
+            display: false,
+            filter: false
         },
         {
             attribute: 'screen_height',
             label: 'Screen Height',
             __typename: 'NumberPredicate',
             group: null,
-            display: true,
-            filter: true
+            display: false,
+            filter: false
         },
         {
             attribute: 'carrier_name',
@@ -108,7 +140,7 @@ export const getDeviceSchema = () => [
             label: 'Radio',
             __typename: 'StringPredicate',
             group: null,
-            display: true,
+            display: false,
             filter: false
         },
         {

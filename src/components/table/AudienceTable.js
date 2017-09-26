@@ -103,9 +103,9 @@ class AudienceTable extends Component {
                 label: 'OS Version',
                 selector: 'DEVICE'
             },
-            app_version_DEVICE: {
+            push_token_key_DEVICE: {
                 __typename: 'StringPredicate',
-                label: 'App Version',
+                label: 'Push Token',
                 selector: 'DEVICE'
             }
         }
@@ -121,9 +121,24 @@ class AudienceTable extends Component {
             )
         }
 
+        const containsDeprecatedColumns = () => {
+            const badSelectors = [
+                'radio_DEVICE',
+                'is_cellular_enabled_DEVICE',
+                'is_wifi_enabled_DEVICE',
+                'locale_script_DEVICE',
+                'screen_width_DEVICE',
+                'screen_height_DEVICE',
+                'app_version_DEVICE'
+            ]
+            const cachedKeys = Object.keys(cachedSelectedColumns)
+            return cachedKeys.filter(x => badSelectors.indexOf(x) > 0).length > 0
+        }
+
         if (
             !cachedSelectedColumns ||
-            !['_DEVICE', '_CUSTOM_PROFILE', '_ROVER_PROFILE'].some(hasSelector)
+            !['_DEVICE', '_CUSTOM_PROFILE', '_ROVER_PROFILE'].some(hasSelector) ||
+            containsDeprecatedColumns()
         ) {
             this.setState({
                 selectedColumns
