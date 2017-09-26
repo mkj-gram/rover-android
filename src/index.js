@@ -43,6 +43,7 @@ import SearchIcon from './SearchIcon'
 import StandPreviewIcon from './StandPreviewIcon'
 import TagIcon from './TagIcon'
 import TestDeviceIcon from './TestDeviceIcon'
+import TestDeviceIconSmall from './TestDeviceIconSmall'
 import TextBlockIcon from './TextBlockIcon'
 import TextBlockIconSmall from './TextBlockIconSmall'
 import TitleBarIconSmall from './TitleBarIconSmall'
@@ -143,6 +144,7 @@ export {
     StandPreviewIcon,
     TagIcon,
     TestDeviceIcon,
+    TestDeviceIconSmall,
     TextBlockIcon,
     TextBlockIconSmall,
     TitleBarIconSmall,
