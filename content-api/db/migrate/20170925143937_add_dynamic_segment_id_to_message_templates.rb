@@ -10,8 +10,6 @@ class AddDynamicSegmentIdToMessageTemplates < ActiveRecord::Migration
         mapped_segments = {}
 
         MessageTemplate.all.find_in_batches(batch_size: 500) do |group|
-            segment_ids = group.select{|e| e.customer_segment_id.present? }.map(&:customer_segment_id).uniq
-
             group.each do |m|
                 if m.customer_segment_id.nil?
                     next
@@ -23,7 +21,9 @@ class AddDynamicSegmentIdToMessageTemplates < ActiveRecord::Migration
                 end
 
                 m.dynamic_segment_id = mapped_segments[m.customer_segment_id].id
-                m.save!
+                if !m.save
+                    Rails.logger.warn("Failed to update message template: " + m.id, m.error)
+                end
 
             end
         end
@@ -38,7 +38,7 @@ class AddDynamicSegmentIdToMessageTemplates < ActiveRecord::Migration
 
 
     def create_dynamic_segment(customer_segment_id)
-        c = CustomerSegment.find(customer_segment_id)
+        c = CustomerSegment.find_by(id: customer_segment_id)
         if c.nil?
             return nil
         end
@@ -63,9 +63,9 @@ class AddDynamicSegmentIdToMessageTemplates < ActiveRecord::Migration
                         )
                     else
                         pred.number_predicate = Audience::NumberPredicate.new(
-                            op: op,
+                            op: :IS_GREATER_THAN,
                             attribute_name: "age",
-                            value: filter.comparer.value
+                            value: filter.comparer.value || filter.comparer.from
                         )
                     end
                 when "tags"
@@ -92,7 +92,7 @@ class AddDynamicSegmentIdToMessageTemplates < ActiveRecord::Migration
                     pred.string_predicate = Audience::StringPredicate.new(
                         op: :IS_EQUAL,
                         attribute_name: "locale_language",
-                        value: filter.comparer.value
+                        value: filter.comparer.value.is_a?(Array) ? filter.comparer.value.first : filter.comparer.value
                     )
                 when "location"
                     pred.geofence_predicate = Audience::GeofencePredicate.new(
@@ -123,6 +123,12 @@ class AddDynamicSegmentIdToMessageTemplates < ActiveRecord::Migration
                     pred.version_predicate = Audience::VersionPredicate.new(
                         op: op,
                         attribute_name: "sdk_version"
+                    )
+                when "is-test-device"
+                    pred.bool_predicate = Audience::BoolPredicate.new(
+                        op: :IS_EQUAL,
+                        attribute_name: "is_test_device",
+                        value: true
                     )
                 else
                     pred = nil
