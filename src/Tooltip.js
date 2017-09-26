@@ -83,11 +83,12 @@ class Tooltip extends Component {
     render() {
         const { message, coordinates, backgroundColor, stylePosition, position, listView } = this.props
         let pos
+        const reactGrid = document.getElementsByClassName('react-grid-Grid')[0]
         if (position !== null) {
             pos = position
         } else {
-            if (
-                document.getElementsByClassName('react-grid-Grid')[0].clientHeight -
+            if (reactGrid &&
+                reactGrid.clientHeight -
                     coordinates.y <=
                 35
             ) {
@@ -136,7 +137,7 @@ class Tooltip extends Component {
                     </div>
                 </div>
             )
-        } else {
+        } else if (reactGrid){
             res = (
                 <div
                     style={{
@@ -160,6 +161,8 @@ class Tooltip extends Component {
                     {this.displayMessage()}
                 </div>
             )
+        } else {
+            res = (<div></div>)
         }
         return res
     }
