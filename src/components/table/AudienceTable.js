@@ -253,7 +253,7 @@ class AudienceTable extends Component {
                 !(
                     nextProps.pageNumber >= this.state.group &&
                     nextProps.pageNumber < this.state.group + 3
-                ))
+                ) || this.props.context !== nextProps.context)
         ) {
             const predicates = JSON.parse(nextProps.predicates)
             refetchVariables = fragmentVariables => ({
@@ -341,7 +341,6 @@ class AudienceTable extends Component {
         } else {
             dataSource = nextProps.data.adgSegmentsFromPredicates
         }
-
         const { dataGridRows, segmentSize, totalSize } = dataSource
         this.setState({
             rows: this.getSelectedRows(dataGridRows, nextProps.pageNumber),
