@@ -287,13 +287,14 @@ const DynamicSegmentQuery = {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),
                     versionComparison: versionComparisons[pred.getOp()],
+                    // TODO: later return versionValue its own type which can be null
                     versionValue: [
-                        value.getMajor(),
-                        value.getMinor(),
-                        value.getRevision(),
-                        value2.getMajor(),
-                        value2.getMinor(),
-                        value2.getRevision()
+                        value ? value.getMajor() : 0,
+                        value ? value.getMinor() : 0,
+                        value ? value.getRevision(): 0,
+                        value2 ? value2.getMajor() : 0,
+                        value2 ? value2.getMinor() : 0,
+                        value2 ? value2.getRevision() : 0
                     ],
                     __typename: 'VersionPredicate'
                 }
