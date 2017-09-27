@@ -63,11 +63,6 @@ Rails.application.routes.draw do
         resources :"proximity-messages", controller: "proximity_message_templates", as: "proximity_message_templates"
 
         resources :"scheduled-messages", controller: "scheduled_message_templates", as: "scheduled_message_templates"
-        
-        resources :"dynamic-segments", controller: "customer_segments", as: "customer_segments"
-        scope :"dynamic-segments" do
-            post "/calculate", to: "customer_segment_calculate#create", as: "customer_segment_calculate"
-        end
 
         resources "ios-platforms", controller: "ios_platforms", as: "ios_platforms", only: [:show, :update] do
             post "/certificate", to: 'ios_platform_certificate#update', as: 'ios_platform_certificate'
