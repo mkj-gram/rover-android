@@ -58,7 +58,7 @@ class EventProcessor {
         function callback(err, updatedCustomer, updatedDevice, eventResponse) {
             const runTime = Date.now() - startTime
             if (err) {
-                logger.warn(`eventName=${eventName} eventTimestamp=${eventTimestamp} status=${status} runTime=${runTime}ms`)
+                logger.warn(`eventName=${eventName} eventTimestamp=${eventTimestamp} runTime=${runTime}ms`)
                 logger.error(err)
             }
             
