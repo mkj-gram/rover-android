@@ -1,6 +1,7 @@
 import ArchiveIcon from './ArchiveIcon'
 import ArrowIconDown from './ArrowIconDown'
 import ArrowIconRight from './ArrowIconRight'
+import AudienceRefreshIcon from './AudienceRefreshIcon'
 import BarcodeBlockIcon from './BarcodeBlockIcon'
 import BarcodeBlockIconSmall from './BarcodeBlockIconSmall'
 import ButtonBlockIcon from './ButtonBlockIcon'
@@ -102,6 +103,7 @@ export {
     ArchiveIcon,
     ArrowIconDown,
     ArrowIconRight,
+    AudienceRefreshIcon,
     BarcodeBlockIcon,
     BarcodeBlockIconSmall,
     ButtonBlockIcon,
