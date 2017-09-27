@@ -59,7 +59,7 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
             protoValue.setDoubleValue(value)
         } else if(isInteger(value)) {
             protoValue.setIntegerValue(value)
-        } else if(!isNaN(Date.parse(value))) {
+        } else if(moment(value, moment.ISO_8601).isValid()) {
             protoValue.setTimestampValue(RoverApis.Helpers.timestampToProto(new Date(value)))
         } else if(util.isString(value)) {
             protoValue.setStringValue(value)
@@ -93,6 +93,33 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
         profile.created_at = RoverApis.Helpers.timestampFromProto(p.getCreatedAt())
         return profile
     }
+
+
+    methods.profileToProto = function(profile) {
+        var p = new RoverApis.audience.v1.Models.Profile()
+
+        // pull out the ones we know are not a part of the profile
+        p.setId(profile.id)
+        p.setAccountId(profile.account_id)
+        p.setIdentifier(p.identifier)
+
+        p.setUpdatedAt(RoverApis.Helpers.timestampToProto(profile.updated_at))
+        p.setCreatedAt(RoverApis.Helpers.timestampToProto(profile.created_at))
+
+        // id, account_id, identifier, updated_at, created_at are all top level everything else is an attribute
+        var roverKeys = ["id", "account_id", "identifier", "updated_at", "created_at"]
+
+        var attributes = p.getAttributesMap()
+        Object.keys(profile).forEach(function(key) {
+            if (!roverKeys.includes(key)) {
+                const value = valueToProto(profile[key])
+                attributes.set(key, value)
+            }
+        })
+
+        return p
+    }
+
 
     function getIndexForAccount(accountId) {
         return "customers_account_" + accountId;

@@ -144,6 +144,71 @@ module.exports = function(AudienceClient, logger) {
 		return device
 	}
 
+	methods.deviceToProto = function(device) {
+		let dp = new RoverApis.audience.v1.Models.Device()
+
+		dp.setAccountId(device.account_id)
+		dp.setProfileId(device.profile_id)
+		dp.setUpdatedAt(RoverApis.Helpers.timestampToProto(device.updated_at))
+		dp.setCreatedAt(RoverApis.Helpers.timestampToProto(device.created_at))
+
+		// Tokens
+		dp.setPushEnvironment(device.push_environment)
+		dp.setPushTokenKey(device.push_token)
+		dp.setPushTokenIsActive(device.push_token_is_active)
+		dp.setPushTokenCreatedAt(RoverApis.Helpers.timestampToProto(device.push_token_created_at))
+		dp.setPushTokenUpdatedAt(RoverApis.Helpers.timestampToProto(device.push_token_updated_at))
+		dp.setPushTokenUnregisteredAt(RoverApis.Helpers.timestampToProto(device.push_token_unregistered_at))
+
+		dp.setAppName(device.app_name)
+		dp.setAppBuild(device.app_build),
+		dp.setAppNamespace(device.app_namespace)
+		dp.setDeviceManufacturer(device.device_manufacturer)
+		dp.setDeviceModel(device.device_model)
+		dp.setOsVersion(versionToProto(device.os_version))
+		dp.setOsName(device.os_name)
+
+		let frameworks = dp.getFrameworksMap()
+		frameworks.set('io.rover.Rover', versionToProto(device.sdk_version))
+		
+		dp.setLocaleLanguage(device.locale_language)
+		dp.setLocaleRegion(device.locale_region)
+		dp.setLocaleScript(device.locale_script)
+		dp.setIsWifiEnabled(device.is_wifi_enabled)
+		dp.setIsCellularEnabled(device.is_cellular_enabled)
+		dp.setScreenWidth(device.screen_width)
+		dp.setScreenHeight(device.screen_height)
+		dp.setCarrierName(device.carrier_name)
+		dp.setRadio(device.radio)
+		dp.setTimeZone(device.time_zone)
+		if (device.platform === "iOS" || device.platform === "Android") {
+			dp.setPlatform(1)
+		} else {
+			dp.setPlatform(2)
+		}
+		
+		
+		dp.setIsBackgroundEnabled(device.is_background_enabled)
+		dp.setIsLocationMonitoringEnabled(device.is_location_monitoring_enabled)
+		dp.setIsBluetoothEnabled(device.is_bluetooth_enabled)
+		dp.setAdvertisingId(device.advertising_id)
+		dp.setIp(device.ip)
+
+		dp.setLocationAccuracy(device.location_accuracy)
+		dp.setLocationLatitude(device.location_latitude)
+		dp.setLocationLongitude(device.location_longitude)
+
+		dp.setIbeaconMonitoringRegionsUpdatedAt(RoverApis.Helpers.timestampToProto(device.ibeacon_monitoring_regions_updated_at))
+		dp.setGeofenceMonitoringRegionsUpdatedAt(RoverApis.Helpers.timestampToProto(device.geofence_monitoring_regions_updated_at))
+
+		dp.setGeofenceMonitoringRegionsList((device.geofence_monitoring_regions || []).map(geofenceRegionToProto))
+	
+
+		dp.setIsTestDevice(device.is_test_device)
+
+		return dp
+	}
+
 	methods.findById = function(accountId, deviceId, callback) {
 		let request = new RoverApis.audience.v1.Models.GetDeviceRequest()
 		request.setAuthContext(buildAuthContext(accountId))

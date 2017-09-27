@@ -7,9 +7,10 @@ const logger = log4js.getLogger('[BaseProcessor]');
 const Config = require('../../../config');
 const EventProcessor = require('./event-processor');
 const async = require('async');
-const SegmentFilter = require('@rover/segment-filter');
 const underscore = require('underscore');
 const emptyArray = Object.freeze([]);
+const RoverApis = require("@rover/apis")
+const audienceClient = require("@rover/audience-client").v1.Client()
 
 logger.setLevel(Config.get('/log/level'));
 
@@ -234,25 +235,34 @@ class BaseProcessor {
         });
     }
 
+    // Only called if the dynamic_segment_id has been set
     filterMessageByDynamicSegment(messageTemplate, resolve, reject) {
         let server = this._server;
         let methods = server.methods;
 
-        methods.customerSegment.findById(messageTemplate.customer_segment_id, (err, customerSegment) => {
-            if (err) {
-                logger.error(err);
-                return resolve(null);
-            }
-             
-            let segment = new SegmentFilter(customerSegment.filters);
-            segment.withinSegment(this._customer, internals.convertToOldDeviceAttributes(this._device), (failure) => {
-                if (failure) {
-                    return resolve(null);
-                }
 
-                return resolve(messageTemplate);
-            });
-        });
+        let profileProto = methods.profile.profileToProto(this._customer)
+        let deviceProto = methods.device.deviceToProto(this._device)
+        
+        let authContext = new RoverApis.auth.v1.Models.AuthContext()
+        authContext.setAccountId(this._account.id)
+
+        let request = new RoverApis.audience.v1.Models.IsInDynamicSegmentRequest()
+        request.setAuthContext(authContext)
+        request.setSegmentId(messageTemplate.dynamic_segment_id)
+        request.setProfile(profileProto)
+        request.setDevice(deviceProto)
+
+
+        audienceClient.isInDynamicSegment(request, function(err, response) {
+            if (err) {
+                logger.error(err)
+                return resolve(null)
+            }
+
+            return resolve(response.getYes() === true ? messageTemplate : null)
+        })
+        
     }
 
     filterMessageByStaticSegment(messageTemplate, resolve, reject) {
@@ -277,15 +287,12 @@ class BaseProcessor {
             
             if (messageTemplate.static_segment_id) {
                 return this.filterMessageByStaticSegment(messageTemplate, resolve, reject);
-            } else if(messageTemplate.customer_segment_id) {
+            } else if(messageTemplate.dynamic_segment_id) {
                 return this.filterMessageByDynamicSegment(messageTemplate, resolve, reject);
             } else {
                 return resolve(messageTemplate)
             }
 
-            if (util.isNullOrUndefined(messageTemplate.customer_segment_id)) {
-                return resolve(messageTemplate);
-            }
         })).then(messageTemplatesToDeliver => {
             const filteredMessageTemplates = messageTemplatesToDeliver.filter(message => { return !util.isNullOrUndefined(message)});
             return callback(null, filteredMessageTemplates);
