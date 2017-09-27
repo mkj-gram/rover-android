@@ -125,12 +125,21 @@ const renderPredicateValue = value => (
 const renderBooleanPredicate = ({ booleanValue }) => (
     <div>{renderPredicateValue(booleanValue ? 'ON' : 'OFF')}</div>
 )
-const renderStringPredicate = ({ stringComparison, stringValue }) => (
-    <div>
-        {renderPredicateComparison(stringComparison)}
-        {renderPredicateValue(stringValue)}
-    </div>
-)
+const renderStringPredicate = ({ stringComparison, stringValue }) => {
+    let comparison = stringComparison
+    if (stringComparison === 'is unset') {
+        comparison = 'Does not exist'
+    }
+    if (stringComparison === 'is set') {
+        comparison = 'Exists'
+    }
+    return (
+        <div>
+            {renderPredicateComparison(comparison)}
+            {renderPredicateValue(stringValue)}
+        </div>
+    )
+}
 
 const renderDatePredicate = ({ dateComparison, dateValue }) => {
     if (['is equal', 'is less than', 'is greater than'].includes(dateComparison)) {
@@ -174,8 +183,12 @@ const renderVersionPredicate = ({
     versionComparison,
     versionValue = [0, 0, 0]
 }) => {
-    if (versionComparison === 'is unknown') {
-        return renderPredicateComparison(versionComparison)
+    if (versionComparison === 'is set') {
+        return renderPredicateComparison('Exists')
+    }
+
+    if (versionComparison === 'is unset') {
+        return renderPredicateComparison('Does not exist')
     }
 
     if (versionComparison === 'is between') {
@@ -233,8 +246,12 @@ const renderNumericPredicate = ({
         value = numberValue
     }
 
-    if (comparison === 'has any value' || comparison === 'is unknown') {
-        return renderPredicateComparison(comparison)
+    if (comparison === 'is set') {
+        return renderPredicateComparison('Exists')
+    }
+
+    if (comparison === 'is unset') {
+        return renderPredicateComparison('Does not exist')
     }
 
     if (comparison === 'is between') {
