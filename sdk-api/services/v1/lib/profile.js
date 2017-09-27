@@ -253,8 +253,6 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
                 return callback(err)
             }
 
-            deleteFromIndex(accountId, profileId)
-
             return callback()
         })
     }
