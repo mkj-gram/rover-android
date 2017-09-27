@@ -9,15 +9,17 @@ class AddDynamicSegmentIdToMessageTemplates < ActiveRecord::Migration
         # Holds mapping from old customer_segment_id to what was created in audience service
         mapped_segments = {}
 
+        CustomerSegment.all.find_in_batches(batch_size: 500) do |group|
+            group.each do |m|
+                s = create_dynamic_segment(m.id)
+                mapped_segments[m.id] = s
+            end
+        end
+
         MessageTemplate.all.find_in_batches(batch_size: 500) do |group|
             group.each do |m|
                 if m.customer_segment_id.nil?
                     next
-                end
-
-                if mapped_segments[m.customer_segment_id].nil?
-                    s = create_dynamic_segment(m.customer_segment_id)
-                    mapped_segments[m.customer_segment_id] = s
                 end
 
                 if mapped_segments[m.customer_segment_id].present?
