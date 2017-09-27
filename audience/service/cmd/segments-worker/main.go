@@ -115,9 +115,23 @@ func main() {
 	//
 	// Elastic
 	//
+	var urls = strings.Split(*esDSN, ",")
+	if len(urls) == 0 {
+		stderr.Fatalln("`elastic-dsn` is required")
+	}
+
+	var u, p, err = selastic.UserInfo(urls[0])
+	if err != nil {
+		stderr.Fatalln("elastic.UserInfo:", err)
+	}
+	urls, err = selastic.StripUserInfo(urls...)
+	if err != nil {
+		stderr.Fatalln("elastic.StripUserInfo:", err)
+	}
 
 	esClient, err := elastic.NewClient(
-		elastic.SetURL(strings.Split(*esDSN, ",")...),
+		elastic.SetURL(urls...),
+		elastic.SetBasicAuth(u, p),
 		elastic.SetErrorLog(stderr),
 		elastic.SetInfoLog(verboseLog),
 		elastic.SetTraceLog(verboseLog),
