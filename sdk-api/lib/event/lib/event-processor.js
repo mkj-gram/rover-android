@@ -57,13 +57,11 @@ class EventProcessor {
 
         function callback(err, updatedCustomer, updatedDevice, eventResponse) {
             const runTime = Date.now() - startTime
-            // Processed: "geofence enter" status=error runTime=23ms
-            let status = "ok"
             if (err) {
-                status = "error"
+                logger.warn(`eventName=${eventName} eventTimestamp=${eventTimestamp} status=${status} runTime=${runTime}ms`)
+                logger.error(err)
             }
-
-            logger.info(`eventName=${eventName} eventTimestamp=${eventTimestamp} status=${status} runTime=${runTime}ms`)
+            
             return cb(err, updatedDevice, eventResponse)
         }
 
@@ -81,7 +79,7 @@ class EventProcessor {
             
             this._processor.shouldProcessEvent((yes) => {
                 if (yes) {
-                    logger.debug(yes);
+                    
                     this._processor.process((err) => {
 
                         if (err) {

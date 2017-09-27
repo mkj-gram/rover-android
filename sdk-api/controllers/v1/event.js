@@ -303,28 +303,7 @@ module.exports = function() {
         const deviceId = request.headers['x-rover-device-id'].toUpperCase()
         const accountId = request.auth.credentials.account.id
         const profilePayload = parseProfilePayload(request)
-        const profilesNeedReindexing = []
         let deviceUpdated = false
-
-        function reindexProfiles(profiles, callback) {
-            profiles = lodash.uniqBy(profiles, 'id')
-            
-            let profileIds = profiles.map(p => p.id)
-            logger.debug("Reindexing Profiles:", profileIds.join(', '))
-
-            methods.device.findAllByProfileIds(accountId, profileIds, function(err, deviceIndex) {
-                if (err) {
-                    return callback(err)
-                }
-
-                profiles.forEach(function(profile) {
-                    const devices = deviceIndex[profile.id] || []
-                    methods.profile.index(profile, devices)
-                })
-
-                return callback()
-            })
-        }
 
         function createDeviceWithAnonymousProfile(accountId, deviceId, callback) {
             methods.profile.createAnonymousProfile(accountId, function(err, profile) {
@@ -389,16 +368,6 @@ module.exports = function() {
                 })
             }
 
-            if (deviceUpdated === true) {
-                profilesNeedReindexing.push(profile)
-            }
-
-            if (profilesNeedReindexing.length >= 1) {
-                tasks.push(function(callback) {
-                    reindexProfiles(profilesNeedReindexing, callback)
-                })
-            }
-            
             async.parallel(tasks, function() {
                 // if errors occur we can't do much we should just return
                 let jsonResponse = JSON.stringify(response);
@@ -415,12 +384,6 @@ module.exports = function() {
         }
 
         function updateProfileAndProcessEvent(device, profile) {
-            if (device.is_test_device) {
-                logger.debug("Device: " + device.id + " is a test device automatically indexing")
-                // Always re-index devices and profiles that have a test device
-                profilesNeedReindexing.push(profile)
-            }
-
             // we need to check what has changed between the current profile and the profile payload
             logger.debug("Updating profile: " + profile.id)
             let attributeUpdates = profileDifferences(profile, profilePayload)
@@ -431,9 +394,6 @@ module.exports = function() {
                     return writeReplyError(500, { status: 500, error: "Unable to update profile attributes" })
                 }
 
-                if (Object.keys(attributeUpdates).length !== 0) {
-                    profilesNeedReindexing.push(profile)
-                }
                 // Server doesn't send us back what the new profile looks like?
                 // We do an in memory update
                 Object.assign(profile, attributeUpdates)
@@ -536,13 +496,12 @@ module.exports = function() {
                                         if (err) {
                                             // For some reason we weren't able to delete the old profile
                                             // just reindex it with 0 devices
-                                            profilesNeedReindexing.push(oldProfile)
+                                            logger.warn(err)
                                         }
                                         return done(err)
                                     })
                                 } else {
                                     // This was an identified profile we should just reindex the new state
-                                    profilesNeedReindexing.push(oldProfile)
                                     return done()
                                 }
                             })
@@ -629,9 +588,6 @@ module.exports = function() {
                                     return writeReplyError(500, { status: 500, error: "Unable to transfer device to new anonymous profile" })
                                 }
 
-                                profilesNeedReindexing.push(currentProfile)
-                                profilesNeedReindexing.push(profile)
-
                                 // move to final logic branch
                                 return updateProfileAndProcessEvent(device, profile)
                             })
@@ -656,14 +612,12 @@ module.exports = function() {
                                             return callback(err)
                                         }
 
-                                        profilesNeedReindexing.push(newProfile)
                                         return callback(null, newProfile)
                                     })
                                 }
                             } else {
                                 logger.debug("Existing profile: " + profilePayload.identifier + " already exists")
                                 profileSetupFunction = function(callback) {
-                                    profilesNeedReindexing.push(existingProfile)
                                     return callback(null, existingProfile)
                                 }
                             }
@@ -688,7 +642,6 @@ module.exports = function() {
                                             // if we didn't delete its not the end of the world
                                             if (err) {
                                                 logger.error(err)
-                                                profilesNeedReindexing.push(currentProfile)
                                             }
 
                                             // move to final logic branch

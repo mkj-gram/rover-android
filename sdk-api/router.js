@@ -68,7 +68,6 @@ const route = function(req, res) {
 
     req.server = server;
 
-    console.log(method, url)
     if (method == httpMethods.GET) {
         RoverApiAuth.authenticate(req, (authenticated) => {
             if (!authenticated) {
@@ -108,13 +107,14 @@ const route = function(req, res) {
         let match;
         // reverse logic since there is only 1 endpoint for post, slightly optimized
         if(match = url.match(EventsMatcher)) {
+            newrelic.setTransactionName("v1/events");
             let concatStream = concat({ encoding: 'string' },function(payload) {
                 try {
                     req.payload = JSON.parse(payload);
                 } catch(err) {
                     console.error(err);
                     res.writeHead(400, {
-                    'Content-Type': 'application/json'
+                        'Content-Type': 'application/json'
                     });
                     res.write(JSON.stringify({ errors: [ { message: "Not valid JSON" } ]}));
                     return res.end();
