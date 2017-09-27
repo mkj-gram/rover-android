@@ -84,6 +84,15 @@ service Audience {
   rpc UpdateDynamicSegmentArchiveStatus(UpdateDynamicSegmentArchiveStatusRequest) returns (UpdateDynamicSegmentArchiveStatusResponse);
   rpc UpdateDynamicSegmentPredicates(UpdateDynamicSegmentPredicatesRequest) returns (UpdateDynamicSegmentPredicatesResponse);
 
+
+  // Checks if a provided device and profile would satisfy the dynamic segment
+  // Doesn't mean the device / profile needs to exist
+  rpc IsInDynamicSegment(IsInDynamicSegmentRequest) returns (IsInDynamicSegmentResponse);
+
+  // Checks if a specific device is within a dynamic segment
+  rpc DeviceIsInDynamicSegment(DeviceIsInDynamicSegmentRequest) returns (DeviceIsInDynamicSegmentResponse);
+
+
   //
   // CounterCaches
   //
@@ -988,4 +997,28 @@ message QueryResponse {
   // optional
   // Used in ScrollIterator.Next to grab the next batch in the scroll
   string scroll_id = 9;
+}
+
+
+message IsInDynamicSegmentRequest {
+  rover.auth.v1.AuthContext auth_context = 1;
+
+  string  segment_id  = 2;
+  Profile profile     = 3;
+  Device  device      = 4;
+}
+
+message IsInDynamicSegmentResponse {
+  bool yes = 1;
+}
+
+message DeviceIsInDynamicSegmentRequest {
+  rover.auth.v1.AuthContext auth_context = 1;
+
+  string segment_id   = 2;
+  string device_id    = 3;
+}
+
+message DeviceIsInDynamicSegmentResponse {
+  bool yes = 1;
 }

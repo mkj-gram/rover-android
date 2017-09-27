@@ -1,6 +1,6 @@
 {
-  "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaaaa" },
-  "account_id": 5,
+  "_id": { "$oid": "00000000000000000000aaa2" },
+  "account_id": 1,
   "identifier": "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
   "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
   "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
@@ -8,9 +8,8 @@
     "array": ["hello", "world"],
     "bool": true,
     "double": 3.1415,
-    "integer": 1,
+    "integer": {"$numberLong": 1},
     "string": "hello",
-    "timestamp": { "$date": "2016-08-22T19:05:53.102Z" },
-    "version": {"major": 1, "minor": 2, "patch": 3}
+    "timestamp": { "$date": "2016-08-22T19:05:53.102Z" }
   }
 }

@@ -586,6 +586,23 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     repeated :devices, :message, 3, "rover.audience.v1.Device"
     optional :scroll_id, :string, 9
   end
+  add_message "rover.audience.v1.IsInDynamicSegmentRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :segment_id, :string, 2
+    optional :profile, :message, 3, "rover.audience.v1.Profile"
+    optional :device, :message, 4, "rover.audience.v1.Device"
+  end
+  add_message "rover.audience.v1.IsInDynamicSegmentResponse" do
+    optional :yes, :bool, 1
+  end
+  add_message "rover.audience.v1.DeviceIsInDynamicSegmentRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :segment_id, :string, 2
+    optional :device_id, :string, 3
+  end
+  add_message "rover.audience.v1.DeviceIsInDynamicSegmentResponse" do
+    optional :yes, :bool, 1
+  end
   add_enum "rover.audience.v1.Platform" do
     value :UNDEFINED, 0
     value :MOBILE, 1
@@ -711,6 +728,10 @@ module Rover
       QueryRequest::ScrollIterator::Clear = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.ScrollIterator.Clear").msgclass
       QueryRequest::TimeZoneOffset = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.TimeZoneOffset").msgclass
       QueryResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryResponse").msgclass
+      IsInDynamicSegmentRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.IsInDynamicSegmentRequest").msgclass
+      IsInDynamicSegmentResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.IsInDynamicSegmentResponse").msgclass
+      DeviceIsInDynamicSegmentRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeviceIsInDynamicSegmentRequest").msgclass
+      DeviceIsInDynamicSegmentResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeviceIsInDynamicSegmentResponse").msgclass
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").enummodule
       Null = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Null").enummodule
     end

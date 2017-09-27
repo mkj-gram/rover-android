@@ -116,6 +116,28 @@ function deserialize_rover_audience_v1_DeleteProfileResponse(buffer_arg) {
   return audience_v1_audience_pb.DeleteProfileResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_DeviceIsInDynamicSegmentRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.DeviceIsInDynamicSegmentRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.DeviceIsInDynamicSegmentRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_DeviceIsInDynamicSegmentRequest(buffer_arg) {
+  return audience_v1_audience_pb.DeviceIsInDynamicSegmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_DeviceIsInDynamicSegmentResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.DeviceIsInDynamicSegmentResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.DeviceIsInDynamicSegmentResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_DeviceIsInDynamicSegmentResponse(buffer_arg) {
+  return audience_v1_audience_pb.DeviceIsInDynamicSegmentResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_GetDeviceByPushTokenRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.GetDeviceByPushTokenRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.GetDeviceByPushTokenRequest');
@@ -334,6 +356,28 @@ function serialize_rover_audience_v1_GetProfilesTotalCountResponse(arg) {
 
 function deserialize_rover_audience_v1_GetProfilesTotalCountResponse(buffer_arg) {
   return audience_v1_audience_pb.GetProfilesTotalCountResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_IsInDynamicSegmentRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.IsInDynamicSegmentRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.IsInDynamicSegmentRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_IsInDynamicSegmentRequest(buffer_arg) {
+  return audience_v1_audience_pb.IsInDynamicSegmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_IsInDynamicSegmentResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.IsInDynamicSegmentResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.IsInDynamicSegmentResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_IsInDynamicSegmentResponse(buffer_arg) {
+  return audience_v1_audience_pb.IsInDynamicSegmentResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_rover_audience_v1_ListDevicesByProfileIdRequest(arg) {
@@ -1125,6 +1169,31 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesRequest,
     responseSerialize: serialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
     responseDeserialize: deserialize_rover_audience_v1_UpdateDynamicSegmentPredicatesResponse,
+  },
+  // Checks if a provided device and profile would satisfy the dynamic segment
+  // Doesn't mean the device / profile needs to exist
+  isInDynamicSegment: {
+    path: '/rover.audience.v1.Audience/IsInDynamicSegment',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.IsInDynamicSegmentRequest,
+    responseType: audience_v1_audience_pb.IsInDynamicSegmentResponse,
+    requestSerialize: serialize_rover_audience_v1_IsInDynamicSegmentRequest,
+    requestDeserialize: deserialize_rover_audience_v1_IsInDynamicSegmentRequest,
+    responseSerialize: serialize_rover_audience_v1_IsInDynamicSegmentResponse,
+    responseDeserialize: deserialize_rover_audience_v1_IsInDynamicSegmentResponse,
+  },
+  // Checks if a specific device is within a dynamic segment
+  deviceIsInDynamicSegment: {
+    path: '/rover.audience.v1.Audience/DeviceIsInDynamicSegment',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.DeviceIsInDynamicSegmentRequest,
+    responseType: audience_v1_audience_pb.DeviceIsInDynamicSegmentResponse,
+    requestSerialize: serialize_rover_audience_v1_DeviceIsInDynamicSegmentRequest,
+    requestDeserialize: deserialize_rover_audience_v1_DeviceIsInDynamicSegmentRequest,
+    responseSerialize: serialize_rover_audience_v1_DeviceIsInDynamicSegmentResponse,
+    responseDeserialize: deserialize_rover_audience_v1_DeviceIsInDynamicSegmentResponse,
   },
   //
   // CounterCaches

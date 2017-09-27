@@ -778,3 +778,161 @@ func testAudienceService_ListDynamicSegments(t *testing.T) {
 		})
 	}
 }
+
+func testAudienceService_IsInDynamicSegment(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+		)
+
+		svc = service.New(db, new(nopIndex), logNotifier(t))
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	tcases := []struct {
+		name string
+		req  *audience.IsInDynamicSegmentRequest
+
+		expErr error
+		exp    *audience.IsInDynamicSegmentResponse
+	}{
+		{
+			name: "device and profile are in segment 000000000000000000000022",
+			req: &audience.IsInDynamicSegmentRequest{
+				AuthContext: &auth.AuthContext{
+					AccountId: 1,
+				},
+				SegmentId: "000000000000000000000022",
+				Device: &audience.Device{
+					LocationLatitude:  43.664565,
+					LocationLongitude: -79.392394,
+					LocationAccuracy:  10,
+				},
+				Profile: &audience.Profile{
+					Attributes: map[string]*audience.Value{
+						"age": audience.IntegerVal(22),
+					},
+				},
+			},
+
+			expErr: nil,
+			exp: &audience.IsInDynamicSegmentResponse{
+				Yes: true,
+			},
+		},
+		{
+			name: "device and profile are in segment 20000000022000000000002a checking sdk_version and os_version",
+			req: &audience.IsInDynamicSegmentRequest{
+				AuthContext: &auth.AuthContext{
+					AccountId: 1,
+				},
+				SegmentId: "20000000022000000000002a",
+				Device: &audience.Device{
+					OsVersion: &audience.Version{
+						Major:    9,
+						Minor:    1,
+						Revision: 8,
+					},
+					Frameworks: map[string]*audience.Version{
+						"io.rover.Rover": {
+							Major:    1,
+							Minor:    2,
+							Revision: 3,
+						},
+					},
+				},
+				Profile: &audience.Profile{
+					Attributes: map[string]*audience.Value{},
+				},
+			},
+
+			expErr: nil,
+			exp: &audience.IsInDynamicSegmentResponse{
+				Yes: true,
+			},
+		},
+		{
+			name: "multiple missing values in segment 342a00000220000000000000",
+			req: &audience.IsInDynamicSegmentRequest{
+				AuthContext: &auth.AuthContext{
+					AccountId: 1,
+				},
+				SegmentId: "342a00000220000000000000",
+				Device:    &audience.Device{},
+				Profile: &audience.Profile{
+					Attributes: map[string]*audience.Value{},
+				},
+			},
+
+			expErr: nil,
+			exp: &audience.IsInDynamicSegmentResponse{
+				Yes: true,
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, gotErr := client.IsInDynamicSegment(ctx, tc.req)
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func testAudienceService_DeviceIsInDynamicSegment(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+		)
+
+		svc = service.New(db, new(nopIndex), logNotifier(t))
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	tcases := []struct {
+		name string
+		req  *audience.DeviceIsInDynamicSegmentRequest
+
+		expErr error
+		exp    *audience.DeviceIsInDynamicSegmentResponse
+	}{
+		{
+			name: "device and profile are in segment 50000000000000000000002a",
+			req: &audience.DeviceIsInDynamicSegmentRequest{
+				AuthContext: &auth.AuthContext{
+					AccountId: 1,
+				},
+				SegmentId: "50000000000000000000002a",
+				DeviceId:  "adevice00",
+			},
+
+			expErr: nil,
+			exp: &audience.DeviceIsInDynamicSegmentResponse{
+				Yes: true,
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, gotErr := client.DeviceIsInDynamicSegment(ctx, tc.req)
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}

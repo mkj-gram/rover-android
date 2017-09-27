@@ -29,8 +29,8 @@ func TestProfile_UnmarshalBSON(t *testing.T) {
 		got mongodb.Profile
 
 		exp = mongodb.Profile{
-			Id:         bson.ObjectIdHex("aaaaaaaaaaaaaaaaaaaaaaaa"),
-			AccountId:  5,
+			Id:         bson.ObjectIdHex("00000000000000000000aaa2"),
+			AccountId:  1,
 			Identifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 			CreatedAt: &ts,
@@ -40,10 +40,9 @@ func TestProfile_UnmarshalBSON(t *testing.T) {
 				"array":     []interface{}{"hello", "world"},
 				"bool":      true,
 				"double":    3.1415,
-				"integer":   float64(1),
+				"integer":   int64(1),
 				"string":    "hello",
 				"timestamp": ts,
-				"version":   map[string]interface{}{"major": float64(1), "minor": float64(2), "patch": float64(3)},
 			},
 		}
 	)

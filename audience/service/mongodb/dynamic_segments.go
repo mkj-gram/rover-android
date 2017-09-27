@@ -353,6 +353,19 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 	return doc, nil
 }
 
+func num64(value interface{}) (int64, bool) {
+	switch v := value.(type) {
+	case int:
+		return int64(v), true
+	case int32:
+		return int64(v), true
+	case int64:
+		return v, true
+	default:
+		return 0, false
+	}
+}
+
 func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 	var doc bson.M
 
@@ -411,7 +424,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_BoolPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
-			if v, ok := pdef["op"].(int); ok {
+			if v, ok := num64(pdef["op"]); ok {
 				pp.Op = audience.BoolPredicate_Op(v)
 			} else {
 				// TODO: log
@@ -423,7 +436,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_StringPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
-			if v, ok := pdef["op"].(int); ok {
+			if v, ok := num64(pdef["op"]); ok {
 				pp.Op = audience.StringPredicate_Op(v)
 			} else {
 				// TODO: log
@@ -435,7 +448,8 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_NumberPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
-			if v, ok := pdef["op"].(int); ok {
+
+			if v, ok := num64(pdef["op"]); ok {
 				pp.Op = audience.NumberPredicate_Op(v)
 			} else {
 				// TODO: log
@@ -448,7 +462,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_DatePredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
-			if v, ok := pdef["op"].(int); ok {
+			if v, ok := num64(pdef["op"]); ok {
 				pp.Op = audience.DatePredicate_Op(v)
 			} else {
 				// TODO: log
@@ -465,7 +479,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_VersionPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
-			if v, ok := pdef["op"].(int); ok {
+			if v, ok := num64(pdef["op"]); ok {
 				pp.Op = audience.VersionPredicate_Op(v)
 			} else {
 				// TODO: log
@@ -477,13 +491,13 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 					return nil
 				}
 				var ver audience.Version
-				if v, ok := val["major"].(int); ok {
+				if v, ok := num64(val["major"]); ok {
 					ver.Major = int32(v)
 				}
-				if v, ok := val["minor"].(int); ok {
+				if v, ok := num64(val["minor"]); ok {
 					ver.Minor = int32(v)
 				}
-				if v, ok := val["revision"].(int); ok {
+				if v, ok := num64(val["revision"]); ok {
 					ver.Revision = int32(v)
 				}
 				return &ver
@@ -496,7 +510,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_GeofencePredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
-			if v, ok := pdef["op"].(int); ok {
+			if v, ok := num64(pdef["op"]); ok {
 				pp.Op = audience.GeofencePredicate_Op(v)
 			} else {
 				// TODO: log
@@ -510,7 +524,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pp.Value.Latitude, _ = vloc["latitude"].(float64)
 			pp.Value.Longitude, _ = vloc["longitude"].(float64)
 			pp.Value.Name, _ = vloc["name"].(string)
-			if v, ok := vloc["radius"].(int); ok {
+			if v, ok := num64(vloc["radius"]); ok {
 				pp.Value.Radius = int32(v)
 			}
 
@@ -519,7 +533,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_DoublePredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
-			if v, ok := pdef["op"].(int); ok {
+			if v, ok := num64(pdef["op"]); ok {
 				pp.Op = audience.DoublePredicate_Op(v)
 			} else {
 				// TODO: log
@@ -532,7 +546,7 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_StringArrayPredicate{&pp}})
 
 			pp.AttributeName, _ = pdef["attribute_name"].(string)
-			if v, ok := pdef["op"].(int); ok {
+			if v, ok := num64(pdef["op"]); ok {
 				pp.Op = audience.StringArrayPredicate_Op(v)
 			} else {
 				// TODO: log

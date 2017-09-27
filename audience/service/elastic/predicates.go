@@ -4,155 +4,11 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/audience/v1"
+	"github.com/roverplatform/rover/audience/service/predicates"
 	"github.com/roverplatform/rover/go/zoneinfo"
 )
 
 type M = map[string]interface{}
-
-var (
-	// TODO expose this in a common package. This is used by both elastic and the rpc call to determine
-	deviceSchema = map[string]struct {
-		MissingValue interface{}
-	}{
-		"advertising_id": {
-			MissingValue: "",
-		},
-		"app_build": {
-			MissingValue: "",
-		},
-		"app_name": {
-			MissingValue: "",
-		},
-		"app_namespace": {
-			MissingValue: "",
-		},
-		"app_version": {
-			MissingValue: "",
-		},
-		"carrier_name": {
-			MissingValue: "",
-		},
-		"created_at": {
-			MissingValue: nil,
-		},
-		"device_manufacturer": {
-			MissingValue: "",
-		},
-		"device_model": {
-			MissingValue: "",
-		},
-		"ip": {
-			MissingValue: nil,
-		},
-		"is_background_enabled": {
-			MissingValue: nil,
-		},
-		"is_bluetooth_enabled": {
-			MissingValue: nil,
-		},
-		"is_cellular_enabled": {
-			MissingValue: nil,
-		},
-		"is_location_monitoring_enabled": {
-			MissingValue: nil,
-		},
-		"is_test_device": {
-			MissingValue: nil,
-		},
-		"is_wifi_enabled": {
-			MissingValue: nil,
-		},
-		"locale_language": {
-			MissingValue: "",
-		},
-		"locale_region": {
-			MissingValue: "",
-		},
-		"locale_script": {
-			MissingValue: "",
-		},
-		"location": {
-			MissingValue: nil,
-		},
-		"location_accuracy": {
-			MissingValue: int32(0),
-		},
-		"location_city": {
-			MissingValue: "",
-		},
-		"location_latitude": {
-			MissingValue: float64(0),
-		},
-		"location_longitude": {
-			MissingValue: float64(0),
-		},
-		"location_region": {
-			MissingValue: "",
-		},
-		"location_street": {
-			MissingValue: "",
-		},
-		"os_name": {
-			MissingValue: "",
-		},
-		"os_version": {
-			MissingValue: nil,
-		},
-		"platform": {
-			MissingValue: "",
-		},
-		"push_environment": {
-			MissingValue: "",
-		},
-		"push_token_created_at": {
-			MissingValue: nil,
-		},
-		"push_token_is_active": {
-			MissingValue: nil,
-		},
-		"push_token_key": {
-			MissingValue: "",
-		},
-		"push_token_unregistered_at": {
-			MissingValue: "",
-		},
-		"push_token_updated_at": {
-			MissingValue: nil,
-		},
-		"radio": {
-			MissingValue: "",
-		},
-		"screen_height": {
-			MissingValue: int64(0),
-		},
-		"screen_width": {
-			MissingValue: int64(0),
-		},
-		"sdk_version": {
-			MissingValue: nil,
-		},
-		"time_zone": {
-			MissingValue: "",
-		},
-		"updated_at": {
-			MissingValue: nil,
-		},
-	}
-
-	profileSchema = map[string]struct {
-		MissingValue interface{}
-	}{
-		"identifier": {
-			MissingValue: "",
-		},
-		"updated_at": {
-			MissingValue: nil,
-		},
-		"created_at": {
-			MissingValue: nil,
-		},
-	}
-)
 
 func DeviceAndProfilePredicateAggregateToQuery(aggregate *audience.PredicateAggregate, offset *audience.QueryRequest_TimeZoneOffset) (M, error) {
 
@@ -509,14 +365,14 @@ func getElasticsearchMissingValue(name string, selector audience.Predicate_Selec
 	case audience.Predicate_CUSTOM_PROFILE:
 		return nil
 	case audience.Predicate_ROVER_PROFILE:
-		schema, ok := profileSchema[name]
+		schema, ok := predicates.ProfileSchema[name]
 		if !ok {
 			// TODO
 		}
 
 		return schema.MissingValue
 	case audience.Predicate_DEVICE:
-		schema, ok := deviceSchema[name]
+		schema, ok := predicates.DeviceSchema[name]
 		if !ok {
 			// TODO
 		}

@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/audience/service/mongodb"
+	"github.com/roverplatform/rover/audience/service/predicates"
 )
 
 // ensure the interface is implemented
@@ -605,6 +606,71 @@ func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience
 	}
 
 	return resp, nil
+}
+
+func (s *Server) IsInDynamicSegment(ctx context.Context, r *audience.IsInDynamicSegmentRequest) (*audience.IsInDynamicSegmentResponse, error) {
+
+	segmentLookupRequest := &audience.GetDynamicSegmentByIdRequest{
+		AuthContext: r.GetAuthContext(),
+		SegmentId:   r.GetSegmentId(),
+	}
+
+	segment, err := s.db.GetDynamicSegmentById(ctx, segmentLookupRequest)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDynamicSegmentById: %v", err)
+	}
+
+	if r.GetDevice() == nil {
+		return nil, status.Error(codes.InvalidArgument, "Device must be defined")
+	}
+
+	if r.GetProfile() == nil {
+		return nil, status.Error(codes.InvalidArgument, "Profile must be defined")
+	}
+
+	ok, err := predicates.IsInDynamicSegment(segment, r.GetDevice(), r.GetProfile())
+
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "predicates.IsInDynamicSegment: %v", err)
+	}
+
+	return &audience.IsInDynamicSegmentResponse{Yes: ok}, nil
+}
+
+func (s *Server) DeviceIsInDynamicSegment(ctx context.Context, r *audience.DeviceIsInDynamicSegmentRequest) (*audience.DeviceIsInDynamicSegmentResponse, error) {
+
+	segmentLookupRequest := &audience.GetDynamicSegmentByIdRequest{
+		AuthContext: r.GetAuthContext(),
+		SegmentId:   r.GetSegmentId(),
+	}
+
+	segment, err := s.db.GetDynamicSegmentById(ctx, segmentLookupRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	deviceLookupRequest := &audience.GetDeviceRequest{
+		AuthContext: r.GetAuthContext(),
+		DeviceId:    r.GetDeviceId(),
+	}
+
+	device, err := s.db.GetDevice(ctx, deviceLookupRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	profile, err := s.db.GetProfile(ctx, &audience.GetProfileRequest{AuthContext: r.GetAuthContext(), ProfileId: device.GetProfileId()})
+	if err != nil {
+		return nil, err
+	}
+
+	ok, err := predicates.IsInDynamicSegment(segment, device, profile)
+
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "predicates.IsInDynamicSegment: %v", err)
+	}
+
+	return &audience.DeviceIsInDynamicSegmentResponse{Yes: ok}, nil
 }
 
 // Validations

@@ -76,6 +76,11 @@ module Rover
           rpc :UpdateDynamicSegmentTitle, UpdateDynamicSegmentTitleRequest, UpdateDynamicSegmentTitleResponse
           rpc :UpdateDynamicSegmentArchiveStatus, UpdateDynamicSegmentArchiveStatusRequest, UpdateDynamicSegmentArchiveStatusResponse
           rpc :UpdateDynamicSegmentPredicates, UpdateDynamicSegmentPredicatesRequest, UpdateDynamicSegmentPredicatesResponse
+          # Checks if a provided device and profile would satisfy the dynamic segment
+          # Doesn't mean the device / profile needs to exist
+          rpc :IsInDynamicSegment, IsInDynamicSegmentRequest, IsInDynamicSegmentResponse
+          # Checks if a specific device is within a dynamic segment
+          rpc :DeviceIsInDynamicSegment, DeviceIsInDynamicSegmentRequest, DeviceIsInDynamicSegmentResponse
           #
           # CounterCaches
           #

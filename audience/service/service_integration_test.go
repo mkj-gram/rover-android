@@ -62,6 +62,7 @@ func TestAudienceService(t *testing.T) {
 	loadFixture(t, devices, "testdata/devices.json")
 	loadFixture(t, devices, "testdata/device-00.bson.json")
 	loadFixture(t, profiles, "testdata/profiles.json")
+	loadFixture(t, profiles, "testdata/profile-00.bson.json")
 	loadFixture(t, profiles_schemas, "testdata/profiles_schemas.json")
 	loadFixture(t, dynamic_segments, "testdata/dynamic_segments.json")
 
@@ -112,6 +113,10 @@ func TestAudienceService(t *testing.T) {
 	t.Run("ListDynamicSegments", testAudienceService_ListDynamicSegments)
 
 	t.Run("EnsureNotifications", testAudienceServiceNotifications)
+
+	// Predicate Checks
+	t.Run("IsInDynamicSegment", testAudienceService_IsInDynamicSegment)
+	t.Run("DeviceIsInDynamicSegment", testAudienceService_DeviceIsInDynamicSegment)
 
 	// NOTE: must run last
 	t.Run("EnsureIndexes", func(t *testing.T) {

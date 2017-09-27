@@ -99,3 +99,72 @@
     ]
   }
 }
+
+{
+  "_id":{"$oid":"000000000000000000000022"},
+  "account_id":1,
+  "title":"in queens park whos age is between 20 and 40",
+  "is_archived": false,
+  "segment_size": 3421,
+  "created_at": {"$date":"2017-08-13T09:10:18Z"},
+  "updated_at": {"$date":"2017-08-13T09:10:18Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      {"selector": "DEVICE", "predicate":{ "type": "geofence",  "attribute_name" : "location", "op" : {"$numberLong": 3 }, "value" : { "latitude": 43.664658, "longitude":  -79.392480, "radius": {"$numberLong": 500}, "name": "Queens Park"} }},
+      {"selector": "CUSTOM_PROFILE", "predicate":{ "type": "number",  "attribute_name" : "age", "op" : {"$numberLong": 6}, "value" : {"$numberLong": 20 }, "value2": {"$numberLong": 40}}}
+    ]
+  }
+}
+
+{
+  "_id":{"$oid":"50000000000000000000002a"},
+  "account_id":1,
+  "title": "device is an iOS device on rogers network",
+  "is_archived": false,
+  "segment_size": 3421,
+  "created_at": {"$date":"2017-08-13T09:10:18Z"},
+  "updated_at": {"$date":"2017-08-13T09:10:18Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      {"selector": "DEVICE", "predicate": {"type": "string", "attribute_name": "os_name", "op": {"$numberLong": 2}, "value": "iOS" }},
+      {"selector": "DEVICE", "predicate": {"type": "string", "attribute_name": "carrier_name", "op": {"$numberLong": 2 }, "value": "rogers" }}
+    ]
+  }
+}
+
+{
+  "_id":{"$oid":"20000000022000000000002a"},
+  "account_id":1,
+  "title": "sdk-version is greater than 1.2.0 and os-version is less than 10.1.3",
+  "is_archived": false,
+  "segment_size": 3421,
+  "created_at": {"$date":"2017-08-13T09:10:18Z"},
+  "updated_at": {"$date":"2017-08-13T09:10:18Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      {"selector": "DEVICE", "predicate": {"type": "version", "attribute_name": "sdk_version", "op": {"$numberLong": 4}, "value": {"major": {"$numberLong": 1}, "minor": {"$numberLong": 2}, "revision": {"$numberLong": 0 } } }},
+      {"selector": "DEVICE", "predicate": {"type": "version", "attribute_name": "os_version", "op": {"$numberLong": 5 }, "value": {"major": {"$numberLong": 10}, "minor": {"$numberLong": 1}, "revision": {"$numberLong": 3 } } }}
+    ]
+  }
+}
+
+
+{
+  "_id":{"$oid":"342a00000220000000000000"},
+  "account_id":1,
+  "title": "checks if sdk-version is missing and push-token-key is missing",
+  "is_archived": false,
+  "segment_size": 3421,
+  "created_at": {"$date":"2017-08-13T09:10:18Z"},
+  "updated_at": {"$date":"2017-08-13T09:10:18Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      {"selector": "DEVICE", "predicate": {"type": "version", "attribute_name": "sdk_version", "op": {"$numberLong": 0}, "value": null}},
+      {"selector": "DEVICE", "predicate": {"type": "string", "attribute_name": "push_token_key", "op": {"$numberLong": 0 },"value": "" }}
+    ]
+  }
+}
