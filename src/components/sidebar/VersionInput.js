@@ -70,6 +70,10 @@ class VersionInput extends Component {
             newVersionValue = versionValue.slice(0, 3)
         }
 
+        if (versionComparison.includes('set')) {
+            newVersionValue = [0, 0, 0, 0, 0, 0]
+        }
+
         updateFn({
             attribute,
             versionComparison,
@@ -135,9 +139,11 @@ class VersionInput extends Component {
                         <option value="is less than">Less than</option>
                         <option value="is greater than">Greater than</option>
                         <option value="is between">In between</option>
+                        <option value="is set">Exists</option>
+                        <option value="is unset">Does not exist</option>
                     </Select>
 
-                    {versionValue.slice(0, 3).map((val, index) =>
+                    {!versionComparison.includes('set') && versionValue.slice(0, 3).map((val, index) =>
                         <div key={index}>
                             {this.renderNumberInput(val, index)}
                             {index < 2 && '.'}
