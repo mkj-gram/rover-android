@@ -30,6 +30,11 @@ INSERT INTO tokens
 
 INSERT INTO tokens
 (account_id, key, permission_scopes, created_at, updated_at) VALUES
+ (1, 'abc', '{server}', '2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
+;
+
+INSERT INTO tokens
+(account_id, key, permission_scopes, created_at, updated_at) VALUES
  (20, 'token1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1', '{web}', '2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
 ,(20, 'token2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1', '{}', '2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
 ;

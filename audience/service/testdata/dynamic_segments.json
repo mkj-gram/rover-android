@@ -168,3 +168,20 @@
     ]
   }
 }
+
+{
+  "_id":{"$oid":"555bbb000220000000000000"},
+  "account_id":1,
+  "title": "sdk-version is missing and os-version is set",
+  "is_archived": false,
+  "segment_size": 3421,
+  "created_at": {"$date":"2017-08-13T09:10:18Z"},
+  "updated_at": {"$date":"2017-08-13T09:10:18Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      {"selector": "DEVICE", "predicate": {"type": "version", "attribute_name": "sdk_version", "op": {"$numberLong": 0}, "value": null}},
+      {"selector": "DEVICE", "predicate": {"type": "version", "attribute_name": "os_version", "op": {"$numberLong": 1 },"value": null }}
+    ]
+  }
+}
