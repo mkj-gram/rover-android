@@ -74,18 +74,6 @@ tasks.push(function(callback) {
     });
 });
 
-
-tasks.push(function(callback) {
-    let elasticsearch = require('./connections/elasticsearch');
-    elasticsearch.register(server, { host: Config.get('/elasticsearch/hosts'), log: Config.get('/elasticsearch/log') }, (err) => {
-        if (err) {
-            return callback(err);
-        }
-        Logger.info("Elasticsearch Client initialized!");
-        return callback();
-    });
-});
-
 tasks.push(function(callback) {
     let rabbitmq = require('./connections/rabbitmq');
     rabbitmq.register(server, { url: Config.get('/amqp/url') }, (err) => {

@@ -204,7 +204,8 @@ JobProcessor.prototype.getErrorContext = function() {
         preference: this._context.preference,
         query: this._context.query,
         segment: this._context.segment,
-        static_segment_id: this._context.staticSegmentId
+        static_segment_id: this._context.staticSegmentId,
+        dynamic_segment_id: this._context.dynamicSegmentId
     }  
 };
 
@@ -239,9 +240,9 @@ JobProcessor.prototype.process = function(done) {
             .then(response => this._queueNextJob(response))
 
     } else {
-        job = job.then(() => this._getSegmentFromQueryApi())
+        job = job.then(() => this._getDynamicSegment())
+            .then(segment => this._getSegmentFromQueryApi(segment))
             .then(response => this._queueNextJob(response))
-            .then(() => this._filterCustomersBySegment())
     }
     
     job
@@ -402,178 +403,78 @@ JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
 
 };
 
-function segmentToPredicates(segment) {
-    if (util.isNullOrUndefined(segment)) {
-        return []
-    }
+JobProcessor.prototype._getDynamicSegment = function() {
+    return new Promise((resolve, reject) => {
+        this._debug("Reading dynamic segment from audience service")
 
-    let filters = segment.filters
-    if (util.isNullOrUndefined(filters)) {
-        return []
-    }
-
-    let predicates = []
-
-    filters.forEach(filter => {
-        if (filter.model == "device") {
-            let predicate = new RoverApis.audience.v1.Models.Predicate()
-            predicate.setSelector(RoverApis.audience.v1.Models.Predicate.Selector.DEVICE)
-
-            switch (filter.attribute) {
-                case "locale-lang": {
-                    // {method: "in", value: ["agq", "af"]}
-                    // type is string
-
-                    let stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
-                    stringPredicate.setOp(RoverApis.audience.v1.Models.StringPredicate.Op.IS_EQUAL)
-                    stringPredicate.setAttributeName("locale_language")
-                    stringPredicate.setValue(filter.comparer.value[0])
-
-                    predicate.setStringPredicate(stringPredicate)
-                    predicates.push(predicate)
-
-                    break;
-                }
-                case "location": {
-                    // {method: "geofence", longitude: -79.3758138, latitude: 43.6506783, radius: 400}
-                    let geofencePredicate = new RoverApis.audience.v1.Models.GeofencePredicate()
-                    geofencePredicate.setOp(RoverApis.audience.v1.Models.GeofencePredicate.Op.IS_WITHIN)
-                    geofencePredicate.setAttributeName("location")
-
-                    let location = new RoverApis.audience.v1.Models.GeofencePredicate.Location()
-                    location.setLatitude(filter.comparer.latitude)
-                    location.setLongitude(filter.comparer.longitude)
-                    location.setRadius(filter.comparer.radius)
-
-                    geofencePredicate.setValue(location)
-
-                    predicate.setGeofencePredicate(geofencePredicate)
-                    predicates.push(predicate)
-                    break;
-                    
-                }
-                case "os-name": {
-
-                    let stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
-                    stringPredicate.setOp(RoverApis.audience.v1.Models.StringPredicate.Op.IS_EQUAL)
-                    stringPredicate.setAttributeName("os_name")
-                    stringPredicate.setValue(filter.comparer.value)
-
-                    predicate.setStringPredicate(stringPredicate)
-                    predicates.push(predicate)
-
-                    break;
-                    // {method: "equal", value: "iOS"}
-                }
-                case "bluetooth-enabled": {
-                    let boolPredicate = new RoverApis.audience.v1.Models.BoolPredicate()
-                    boolPredicate.setOp(RoverApis.audience.v1.Models.BoolPredicate.Op.IS_EQUAL)
-                    boolPredicate.setAttributeName("is_bluetooth_enabled")
-                    boolPredicate.setValue(filter.comparer.value)
-
-                    predicate.setBoolPredicate(boolPredicate)
-                    predicates.push(predicate)
-
-                    break;
-                    // {method: "equal", value: true}
-                }
-                case "sdk-version": {
-                    // {method: "exists", value: null}
-                    // {method: "does_not_exist", value: null}
-                    let versionPredicate = new RoverApis.audience.v1.Models.VersionPredicate()
-                    if (filter.comparer.method === "exists") {
-                        versionPredicate.setOp(RoverApis.audience.v1.Models.BoolPredicate.Op.IS_SET)
-                    } else {
-                        versionPredicate.setOp(RoverApis.audience.v1.Models.BoolPredicate.Op.IS_UNSET)
-                    }
-                    
-                    versionPredicate.setAttributeName("sdk_version")
-
-                    predicate.setVersionPredicate(versionPredicate)
-                    predicates.push(predicate)
-                    break;
-                  
-                }
-                default: {
-                    console.warn("Received filter with unknown attribute: ", filter.attribute)
-                }
-            }
-
-        } else if(filter.model === "customer") {
-            let predicate = new RoverApis.audience.v1.Models.Predicate()
-            predicate.setSelector(RoverApis.audience.v1.Models.Predicate.Selector.CUSTOM_PROFILE)
-
-            switch(filter.attribute) {
-                case "gender": {
-                    // {method: "equal", value: "male"}
-                    let stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
-                    stringPredicate.setOp(RoverApis.audience.v1.Models.StringPredicate.Op.IS_EQUAL)
-                    stringPredicate.setAttributeName("gender")
-                    stringPredicate.setValue(filter.comparer.value)
-
-                    predicate.setStringPredicate(stringPredicate)
-                    predicates.push(predicate)
-
-                    break;
-                    
-                }
-                case "age": {
-                    // Always a range
-                    // // {method: "range", from: 13, to: null}
-                    let numberPredicate = new RoverApis.audience.v1.Models.NumberPredicate()
-                    numberPredicate.setAttributeName("age")
-                    numberPredicate.setValue(filter.comparer.value || filter.comparer.from)
-
-                    if (!util.isNullOrUndefined(filter.comparer.to)) {
-                        numberPredicate.setOp(RoverApis.audience.v1.Models.NumberPredicate.Op.IS_BETWEEN)
-                        numberPredicate.setValue2(filter.comparer.to)
-                    } else {
-                        numberPredicate.setOp(RoverApis.audience.v1.Models.NumberPredicate.Op.IS_GREATER_THAN)
-                    }
-
-                    predicate.setNumberPredicate(numberPredicate)
-                    predicates.push(predicate)
-
-                    break;
-                    
-                }
-                case "tags": {
-                    // {method: "does_not_contain", value: "nope"}
-                    // {method: "contains", value: "hello"}
-                    let stringArrayPredicate = new RoverApis.audience.v1.Models.StringArrayPredicate()
-                    stringArrayPredicate.setAttributeName("tags")
-                    stringArrayPredicate.setValueList([filter.comparer.value])
-
-                    if (filter.comparer.method === "does_not_contain") {
-                        stringArrayPredicate.setOp(RoverApis.audience.v1.Models.StringArrayPredicate.Op.DOES_NOT_CONTAIN_ALL)
-                    } else {
-                        // assume contains
-                        stringArrayPredicate.setOp(RoverApis.audience.v1.Models.StringArrayPredicate.Op.CONTAINS_ALL)
-                    }
-
-                    predicate.setStringArrayPredicate(stringArrayPredicate)
-                    predicates.push(predicate)
-                   
-                    break;
-                }
-            }
-        } else {
-            console.warn("Received unknown model", filter.model)
+        if (this._context.dynamicSegmentId === undefined || this._context.dynamicSegmentId === null) {
+            return resolve(null)
         }
-    })
 
-    return predicates
+        let self = this
+        let audienceClient = require("@rover/audience-client").v1.Client()
+
+        const perform = function(request, callback) {
+            const operation = retry.operation({
+                retries: 5,
+                factor: 2,
+                minTimeout: 1 * 1000,
+                maxTimeout: 60 * 1000,
+                randomize: false,
+            });
+
+            operation.attempt(function(current) {
+                // 20 second timeout
+                const deadline = new Date(Date.now() + 30 * 1000)
+
+                self._debug("Sending request: ", JSON.stringify(request.toObject()))
+
+                audienceClient.getDynamicSegmentById(request, { deadline: deadline }, function(err, response) {
+                    /* Check if we should retry */
+                    if (operation.retry(err)) {
+                        self._debug("Operation failed retrying, err: ", err)
+                        return;
+                    }
+
+                    if (err) {
+                        return callback(err)
+                    }
+
+                    return callback(null, response)
+                })
+            })
+        }
+
+        
+        let authContext = new RoverApis.auth.v1.Models.AuthContext()
+        authContext.setAccountId(this._context.account.id)
+        authContext.setPermissionScopesList(["internal", "app:smw"])
+
+        let request = new RoverApis.audience.v1.Models.GetDynamicSegmentByIdRequest()
+        request.setAuthContext(authContext)
+        request.setSegmentId(this._context.dynamicSegmentId)
+
+        perform(request, function(err, response) {
+            if (err) {
+                return reject(err)
+            }
+
+            if (response.getSegment() === null || response.getSegment() === undefined) {
+                return reject(new Error("GetDynamicSegmentByIdRequest did not include the segment in the response"))
+            }
+            
+            return resolve(response.getSegment())
+        })
+
+    })
 }
 
-
-
-JobProcessor.prototype._getSegmentFromQueryApi = function() {
+JobProcessor.prototype._getSegmentFromQueryApi = function(segment) {
     return new Promise((resolve, reject) => {
         this._debug("Reading batch from audience service")
 
         let self = this
         let methods = this._server.methods;
-        let segment = this._context.segment
         let scrollId = this._context.scrollId;
         let streamId = this._context.streamId;
         let timeZoneOffset = this._context.timeZoneOffset;
@@ -614,13 +515,8 @@ JobProcessor.prototype._getSegmentFromQueryApi = function() {
 
         queryRequest.setScrollIterator(iterator)
 
-        if (!util.isNullOrUndefined(segment)) {
-            let predicates = segmentToPredicates(segment)
-            let aggregate = new RoverApis.audience.v1.Models.PredicateAggregate()
-            aggregate.setCondition(RoverApis.audience.v1.Models.PredicateAggregate.Condition.ALL)
-            aggregate.setPredicatesList(predicates)
-
-            queryRequest.setPredicateAggregate(aggregate)
+        if (segment !== null && segment !== undefined) {
+            queryRequest.setPredicateAggregate(segment.getPredicateAggregate())
         }
 
         const readbatch = function(request, callback) {
@@ -659,6 +555,8 @@ JobProcessor.prototype._getSegmentFromQueryApi = function() {
             if (err) {
                 return reject(err)
             }
+
+            self._debug("Total segment size", response.getDevicesList().length)
 
             let profiles = response.getProfilesList().map(methods.profile.fromProto)
             let devices = response.getDevicesList().map(methods.device.fromProto)
@@ -806,8 +704,8 @@ JobProcessor.prototype._queueNextJob = function(response) {
             stream_id: this._context.streamId,
             time_zone_offset: this._context.timeZoneOffset,
             static_segment_id: this._context.staticSegmentId,
+            dynamic_segment_id: this._context.dynamicSegmentId,
             platform_credentials: this._context.platformCredentials,
-            static_segment_id: this._context.staticSegmentId,
             test_customer_ids: this._context.testCustomerIds
         }
 
@@ -831,50 +729,6 @@ JobProcessor.prototype._queueNextJob = function(response) {
 
     this.updateState(JOB_STATE._queueNextJob);
 
-    return Promise.resolve();
-};
-
-JobProcessor.prototype._filterCustomersBySegment = function() {
-    
-    this._debug("Applying memory based segment filtering");
-
-    if (util.isNullOrUndefined(this._context.segment) || isEmptyObject(this._context.segment)) {
-        this._debug("Finished filtering");
-        return Promise.resolve();
-    }
-
-    let deviceFilters = this._context.segment.filters.filter(filter => filter.model == 'device');
-
-    if (deviceFilters.length == 0) {
-        this._debug("Finished filtering");
-        return Promise.resolve();
-    }
-
-    let segment = new SegmentFilter(deviceFilters);
-
-    
-
-    this._customers.forEach(customer => {
-        
-        if (customer && (util.isNullOrUndefined(customer.devices) || util.isArray(customer.devices) && ( customer.devices.length == 0 || customer.devices.length == 1))) {
-            return;
-        }
-
-        customer.devices = customer.devices.filter(device => {
-            let result = segment.withinSegmentSync(customer, device);
-
-            if (result.error == true ) {
-                return false;
-            } else {
-                return true;
-            }
-
-        });
-    });
-
-    this.updateState(JOB_STATE._filterCustomersBySegment);
-
-    this._debug("Finished filtering");
     return Promise.resolve();
 };
 

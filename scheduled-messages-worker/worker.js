@@ -80,6 +80,7 @@ Worker.prototype.work = function(msg) {
         query: args.query,
         testCustomerIds: args.test_customer_ids,
         staticSegmentId: args.static_segment_id,
+        dynamicSegmentId: args.dynamic_segment_id,
         nextCursor: args.next_cursor,
         scrollId: args.scroll_id,
         streamId: args.stream_id,
