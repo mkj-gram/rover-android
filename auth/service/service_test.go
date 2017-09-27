@@ -347,6 +347,13 @@ func testAuthsvc_ListTokens(t *testing.T) {
 				Tokens: []*auth.Token{
 					&auth.Token{
 						AccountId:        1,
+						Key:              "abc",
+						PermissionScopes: []string{"server"},
+						CreatedAt:        ts(t, createdAt),
+						UpdatedAt:        ts(t, createdAt),
+					},
+					&auth.Token{
+						AccountId:        1,
 						Key:              "token1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 						PermissionScopes: []string{"web"},
 						CreatedAt:        ts(t, createdAt),
