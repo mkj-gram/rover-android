@@ -12,6 +12,15 @@ class SendMessageWorker
         
         job_count = message_template.static_segment_id.present? ? 1 : 4
         
+        if !account.ios_platform.certificate.present?
+            Rails.logger.debug("Account #{account.id} does not have an ios push certificate")
+        end
+
+        if !account.android_platform.api_key.present?
+            Rails.logger.debug("Account #{account.id} does not have fcm credentials")
+        end
+        
+
         for i in 0..job_count
 
             job = {
@@ -39,6 +48,8 @@ class SendMessageWorker
                 job[:time_zone_offset] = time_zone_offset
             end
 
+            Rails.logger.debug(job)
+            Rails.logger.debug(job.to_json)
             RabbitMQPublisher.publish(job.to_json, {to_queue: 'send_message_to_customers', content_type: 'application/json'})
         end
 
