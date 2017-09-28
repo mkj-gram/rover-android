@@ -10,7 +10,7 @@ class SendMessageWorker
         message_template = message_template_or_id.is_a?(MessageTemplate) ? message_template_or_id : MessageTemplate.find(message_template_or_id)
         account = message_template.account
         
-        job_count = message_template.static_segment_id.present? ? 1 : 4
+        job_count = message_template.static_segment_id.present? ? 1 : 5
         
         if !account.ios_platform.certificate.present?
             Rails.logger.debug("Account #{account.id} does not have an ios push certificate")
@@ -20,8 +20,7 @@ class SendMessageWorker
             Rails.logger.debug("Account #{account.id} does not have fcm credentials")
         end
         
-
-        for i in 0..job_count
+        for i in 0...job_count
 
             job = {
                 message_template: message_template,
