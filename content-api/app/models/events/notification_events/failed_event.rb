@@ -15,9 +15,9 @@ module Events
                 if message
                     counters = { total_notifications_failed: 1, notifications_attempted: 1 }
                     if @errors.include?("Unregistered") || @errors.include?("NotRegistered")
-                        counter[:notifications_unreachable] = 1
+                        counters[:notifications_unreachable] = 1
                     else
-                        counter[:notifications_invalid] = 1
+                        counters[:notifications_invalid] = 1
                     end
 
                     MessageTemplateStats.update_counters(message.message_template_id, counters)
