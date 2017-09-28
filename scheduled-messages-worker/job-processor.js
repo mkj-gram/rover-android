@@ -1033,7 +1033,14 @@ JobProcessor.prototype._sendNotifications = function() {
         });
     }
 
-    this._debug("Push notifications generated");
+    this._debug("Push notifications generated",
+        {
+            ios_development: iosCustomerDevelopmentMessages.length,
+            ios_production: iosCustomerProductionMessages.length,
+            android: androidMessages.length,
+        }
+    );
+
     this._debug("Sending push notifications");
 
     let pushPromises = [];
@@ -1057,8 +1064,10 @@ JobProcessor.prototype._sendNotifications = function() {
             pushPromises.push(this._sendAndroidNotifications(androidClient, androidMessages));  
         }
     } else {
-        this._notifications_attempted += (androidMessages || []).length
-        this._notifications_invalid += (androidMessages || []).length
+        let skippedCount = (androidMessages || []).length
+        this._debug("Skipping android notifications since fcm credentials are blank, skipped: ", skippedCount)
+        this._notifications_attempted += skippedCount
+        this._notifications_invalid += skippedCount
     }
 
     if (!util.isNullOrUndefined(this._context.platformCredentials) && !util.isNullOrUndefined(this._context.platformCredentials.apns) && !util.isNullOrUndefined(this._context.platformCredentials.apns.certificate)) {
@@ -1081,8 +1090,10 @@ JobProcessor.prototype._sendNotifications = function() {
 
         pushPromises.push(this._sendIOSNotifications(iosCustomerDevelopmentClient, topic, iosCustomerDevelopmentMessages))
     } else {
-        this._notifications_attempted += (iosCustomerProductionMessages || []).length + (iosCustomerDevelopmentMessages || []).length   
-        this._notifications_invalid += (iosCustomerProductionMessages || []).length + (iosCustomerDevelopmentMessages || []).length   
+        let skippedCount = (iosCustomerProductionMessages || []).length + (iosCustomerDevelopmentMessages || []).length  
+        this._debug("Skipping ios notifications since apns credentials are blank, skipped: ", skippedCount)
+        this._notifications_attempted += skippedCount
+        this._notifications_invalid += skippedCount
     }
 
     if (iosRoverInboxProductionMessages.length > 0)
