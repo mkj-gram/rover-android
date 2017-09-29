@@ -18,6 +18,7 @@ class BooleanInput extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            booleanComparison: this.props.booleanComparison,
             booleanValue: this.props.booleanValue
         }
     }
@@ -28,16 +29,35 @@ class BooleanInput extends Component {
     }
 
     renderRadioButton(radioValue) {
-        const { booleanValue } = this.state
+        const { booleanComparison, booleanValue } = this.state
+        const onChange = () => {
+            if (radioValue === 'is unset') {
+                return this.updateBooleanComparison('is unset')
+            }
+            this.setState(
+                { booleanComparison: 'is equal' },
+                () => this.updateBooleanValue(radioValue)
+            )
+        }
+        const getDisplayValue = () => {
+            if (radioValue === 'is unset') {
+                return 'Is unknown'
+            }
+            return radioValue ? 'True' : 'False'
+        }
+        const getIsChecked = () => {
+            if (booleanComparison === 'is unset') {
+                return radioValue === 'is unset'
+            }
+            return booleanValue === radioValue
+        }
         return (
             <RadioButton
                 label={
-                    <span style={{ color: 'white' }}>
-                        {radioValue ? 'True' : 'False'}
-                    </span>
+                    <span style={{ color: 'white' }}>{getDisplayValue()}</span>
                 }
-                onChange={() => this.updateBooleanValue(radioValue, () => null)}
-                isChecked={booleanValue === radioValue}
+                onChange={onChange}
+                isChecked={getIsChecked()}
                 primaryColor={lavender}
                 style={{
                     backgroundColor: graphite,
@@ -57,16 +77,39 @@ class BooleanInput extends Component {
             __typename,
             label
         } = this.props
+        const { booleanComparison } = this.state
         updateFn({
             attribute,
             selector,
             index,
-            booleanComparison: 'is equal',
+            booleanComparison,
             booleanValue,
             __typename,
             label
         })
-        this.setState({ booleanValue })
+        this.setState({ booleanComparison, booleanValue })
+    }
+
+    updateBooleanComparison(booleanComparison) {
+        const {
+            attribute,
+            selector,
+            updateFn,
+            index,
+            __typename,
+            label
+        } = this.props
+        const { booleanValue } = this.state
+        updateFn({
+            attribute,
+            selector,
+            index,
+            booleanComparison,
+            booleanValue,
+            __typename,
+            label
+        })
+        this.setState({ booleanComparison })
     }
 
     render() {
@@ -87,6 +130,9 @@ class BooleanInput extends Component {
                 <div style={radioFieldStyle}>
                     {this.renderRadioButton(false)}
                 </div>
+                <div style={radioFieldStyle}>
+                    {this.renderRadioButton('is unset')}
+                </div>
             </div>
         )
     }
@@ -94,6 +140,7 @@ class BooleanInput extends Component {
 
 BooleanInput.propTypes = {
     attribute: PropTypes.string.isRequired,
+    booleanComparison: PropTypes.string,
     booleanValue: PropTypes.bool.isRequired,
     selector: PropTypes.string.isRequired,
     updateFn: PropTypes.func.isRequired,

@@ -38,10 +38,7 @@ class NumericInput extends Component {
             numberValue = [0, 0]
         }
 
-        if (
-            numberComparison === 'has any value' ||
-            numberComparison === 'is unknown'
-        ) {
+        if (numberComparison.includes('set')) {
             numberValue = [null, null]
         }
 
@@ -155,19 +152,24 @@ class NumericInput extends Component {
                         <option value="is greater than">Greater than</option>
                         <option value="is less than">Less than</option>
                         <option value="is between">In between</option>
+                        <option value="is set">Exists</option>
+                        <option value="is unset">Does not exist</option>
                     </Select>
-                    <ModalInput
-                        type="number"
-                        min={0}
-                        value={numberValue[0]}
-                        step={this.props.float ? 0.1 : 1}
-                        onChange={e => {
-                            const parsedValue = this.props.float
-                                ? parseFloat(e.target.value)
-                                : parseInt(e.target.value, 10)
-                            this.updateValue(parsedValue, 0)
-                        }}
-                    />
+                    {
+                        !numberComparison.includes('set') &&
+                        <ModalInput
+                            type="number"
+                            min={0}
+                            value={numberValue[0]}
+                            step={this.props.float ? 0.1 : 1}
+                            onChange={e => {
+                                const parsedValue = this.props.float
+                                    ? parseFloat(e.target.value)
+                                    : parseInt(e.target.value, 10)
+                                this.updateValue(parsedValue, 0)
+                            }}
+                        />
+                    }
                     {numberComparison === 'is between' &&
                         <div>
                             <span style={{ fontStyle: 'italic' }}>and</span>

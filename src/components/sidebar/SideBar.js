@@ -156,7 +156,7 @@ class SideBar extends Component {
         const { sbDynamicSegment } = data
         const { predicates } = sbDynamicSegment[0]
         const { condition, predicateList } = predicates
-       
+
         const query = predicateList.map(d => ({
             ...d,
             selector: d.selector,
@@ -273,7 +273,7 @@ class SideBar extends Component {
 
         const { __typename } = predicate
 
-        const updateFn = (currentPredicate) => {
+        const updateFn = currentPredicate => {
             this.setState({
                 currentPredicate,
                 isFilterModalSuccessDisabled: this.shouldDisableFilterModalSuccessButton(
@@ -454,7 +454,7 @@ class SideBar extends Component {
                         schema={data.segmentSchema}
                         onRequestClose={() =>
                             this.setState({ isShowingAddFilterModal: false })}
-                        onSelect={(predicate) => {
+                        onSelect={predicate => {
                             this.setState({
                                 query: query.concat(predicate),
                                 isShowingAddFilterModal: false,
@@ -470,20 +470,27 @@ class SideBar extends Component {
                 )}
                 <div
                     style={selectContainerStyle}
-                    onMouseOver={() => this.setState({ matchConditionColor: ash })}
-                    onMouseLeave={() => this.setState({ matchConditionColor: graphite })}
+                    onMouseOver={() =>
+                        this.setState({ matchConditionColor: ash })}
+                    onMouseLeave={() =>
+                        this.setState({ matchConditionColor: graphite })}
                 >
-                    <div style={matchStyle}>
-                        MATCH:
-                    </div>
-                    <div style={{ backgroundColor: matchConditionColor, width: 50, borderRadius: 3, marginLeft: 5 }}>
+                    <div style={matchStyle}>MATCH:</div>
+                    <div
+                        style={{
+                            backgroundColor: matchConditionColor,
+                            width: 50,
+                            borderRadius: 3,
+                            marginLeft: 5
+                        }}
+                    >
                         <Select
                             id="any-all-select"
                             name="any-all-select"
                             style={selectStyle}
                             isDisabled={false}
                             value={queryCondition}
-                            onChange={(e) => {
+                            onChange={e => {
                                 this.props.setQueryCondition(
                                     e.target.value,
                                     false,
@@ -553,8 +560,9 @@ class SideBar extends Component {
                             lineHeight: '22px',
                             pointerEvents: 'none'
                         }}
-                    >   
-                        {this.props.data && this.props.data.segmentsContainer.length}
+                    >
+                        {this.props.data &&
+                            this.props.data.segmentsContainer.length}
                     </div>
                     My Segments
                 </RoundedButton>
@@ -621,6 +629,7 @@ class SideBar extends Component {
         if (value === 'stringarrayValue') {
             value = 'stringArrayValue'
         }
+
         return { elem, value }
     }
 
@@ -640,7 +649,23 @@ class SideBar extends Component {
     }
 
     shouldDisableFilterModalSuccessButton(currentPredicate) {
-        const { value } = this.getPredicateKeywords(currentPredicate)
+        const { elem, value } = this.getPredicateKeywords(currentPredicate)
+
+        // Don't disable empty strings when testing for string/tag existence
+        if (
+            elem.__typename === 'stringPredicate' &&
+            elem.stringComparison.includes('set')
+        ) {
+            return false
+        }
+        
+        if (
+            elem.__typename === 'StringArrayPredicate' &&
+            elem.stringArrayComparison.includes('set')
+        ) {
+            return false
+        }
+
         return currentPredicate[value].length === 0
     }
 
@@ -658,7 +683,7 @@ class SideBar extends Component {
             currentAttribute,
             query,
             modalCoordinates,
-            isShowingAddFilterModal,
+            isShowingModal,
             showSegmentSelection,
             showSegmentSave,
             currentPredicate,
@@ -675,7 +700,7 @@ class SideBar extends Component {
             reset,
             queryCondition
         } = this.props
-       
+
         return (
             <div style={sideBarStyle}>
                 {this.handleModalOpen()}
@@ -740,8 +765,18 @@ class SideBar extends Component {
                             textAlign: 'center'
                         }}
                     >
-                        <img src={funnel} alt="" style={{ width: 80, marginBottom: 28 }} />
-                        <div style={{ fontSize: 16, lineHeight: '22px', fontWeight: 300 }}>
+                        <img
+                            src={funnel}
+                            alt=""
+                            style={{ width: 80, marginBottom: 28 }}
+                        />
+                        <div
+                            style={{
+                                fontSize: 16,
+                                lineHeight: '22px',
+                                fontWeight: 300
+                            }}
+                        >
                             <span
                                 style={{
                                     color: lavender,
@@ -752,26 +787,28 @@ class SideBar extends Component {
                             >
                                 Add a filter
                             </span>
-                                to start building audience segments
+                            to start building audience segments
                         </div>
                     </div>
                 )}
                 {this.renderSaveBar()}
-                {data && <SegmentsContainer
-                    query={query}
-                    showSegmentSelection={showSegmentSelection}
-                    showSegmentSave={showSegmentSave}
-                    handleSegmentAction={this.handleSegmentAction}
-                    segments={data.segmentsContainer}
-                    getSegment={getSegment}
-                    segment={segment}
-                    saveStates={saveStates}
-                    setSegment={setSegment}
-                    updateSegmentName={updateSegmentName}
-                    archiveSegment={archiveSegment}
-                    reset={reset}
-                    queryCondition={queryCondition}
-                />}
+                {data && (
+                    <SegmentsContainer
+                        query={query}
+                        showSegmentSelection={showSegmentSelection}
+                        showSegmentSave={showSegmentSave}
+                        handleSegmentAction={this.handleSegmentAction}
+                        segments={data.segmentsContainer}
+                        getSegment={getSegment}
+                        segment={segment}
+                        saveStates={saveStates}
+                        setSegment={setSegment}
+                        updateSegmentName={updateSegmentName}
+                        archiveSegment={archiveSegment}
+                        reset={reset}
+                        queryCondition={queryCondition}
+                    />
+                )}
             </div>
         )
     }
