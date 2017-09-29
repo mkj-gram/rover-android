@@ -21,8 +21,7 @@ const tableMenuBarStyle = {
     backgroundColor: cloud,
     display: 'flex',
     alignItems: 'center',
-    paddingLeft: 43,
-    justifyContent: 'space-between'
+    paddingLeft: 43
 }
 
 const tableMenuBarLeft = {
@@ -38,15 +37,7 @@ const tableMenuDonutIconStyle = {
 }
 
 const tableMenuNumberRatio = {
-    marginRight: '20px'
-}
-
-const tableMenuBarRight = {
-    flex: '0 0',
-    display: 'flex',
-    alignItems: 'center',
-    marginRight: '50px',
-    width: 290
+    marginRight: 12
 }
 
 class TableMenuBarAlpha extends Component {
@@ -78,13 +69,13 @@ class TableMenuBarAlpha extends Component {
         this.setState({
             showColumnsMenu: !this.state.showColumnsMenu,
             pageClickLocation: {
-                x: left - 230,
+                x: left,
                 y: top + 40
             }
         })
     }
 
-    showChecked(item, info) {    
+    showChecked(item, info) {
         const { selectedColumns } = this.props
         if (!info.hasOwnProperty('selector')) {
             return (`${item}_DEVICE` in selectedColumns)
@@ -140,18 +131,36 @@ class TableMenuBarAlpha extends Component {
                             of {this.numberWithCommas(totalSize)} total devices
                         </div>
                     </div>
-                </div>
+                    <div style={{
+                        display: 'flex',
 
-                <div style={tableMenuBarRight}>
-                    <div
-                        style={{ height: '100%' }}
-                        onClick={e => this.triggerColumnsMenu(e)}
-                        id="columnsIcon"
-                    >
-                        <TableMenuBarIcon
-                            val="columns"
-                            showToolTip={!showColumnsMenu}
-                        />
+                    }}>
+                        <div
+                            style={{height: '100%'}}
+                            onClick={e => this.props.refreshData()}
+                        >
+                            <TableMenuBarIcon
+                                val="refresh"
+                                showToolTip={true}
+                            />
+
+                        </div>
+                        <div style={{
+                            height: '100%',
+                            width: 1,
+                            backgroundColor: graphite
+                        }}>
+                        </div>
+                        <div
+                            style={{ height: '100%' }}
+                            onClick={e => this.triggerColumnsMenu(e)}
+                            id="columnsIcon"
+                        >
+                            <TableMenuBarIcon
+                                val="columns"
+                                showToolTip={!showColumnsMenu}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

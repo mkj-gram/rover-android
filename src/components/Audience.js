@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import AudienceTable from './table/AudienceTable'
-import SideBar from './sidebar/SideBar'
 import SideBarRefetchContainer from './relayContainers/SideBarRefetchContainer'
 import AudienceTableRefetchContainer from './relayContainers/AudienceTableRefetchContainer'
 
@@ -15,40 +13,50 @@ class Audience extends Component {
             },
             predicates: '[]',
             pageNumber: 0,
+            group: 0,
             resetPagination: false,
             context: 'predicates',
-            saveStates: {
-                isSegmentUpdate: false,
-                showSaveButton: false
-            },
+
             refetchData: true,
             refetchSideBar: true,
             reset: false,
-            queryCondition: 'ALL'
+            queryCondition: 'ALL',
+            fetchSegmentsFromPred: false,
+            refresh: false
         }
         this.getSegment = this.getSegment.bind(this)
         this.updateQuery = this.updateQuery.bind(this)
         this.formatQuery = this.formatQuery.bind(this)
         this.updatePageNumber = this.updatePageNumber.bind(this)
-        this.setSaveState = this.setSaveState.bind(this)
         this.setSegment = this.setSegment.bind(this)
         this.updateSegmentName = this.updateSegmentName.bind(this)
         this.archiveSegment = this.archiveSegment.bind(this)
         this.setQueryCondition = this.setQueryCondition.bind(this)
+        this.refreshData = this.refreshData.bind(this)
     }
 
     setQueryCondition(queryCondition, initial = false, query = null) {
         if (!initial) {
+            let predicates = this.formatQuery(query, queryCondition)
+            let fetchSegmentsFromPred = false
+            if (
+                JSON.stringify(this.state.predicates) !==
+                JSON.stringify(predicates)
+            ) {
+                fetchSegmentsFromPred = true
+            }
             this.setState({
                 queryCondition,
                 segmentIdRefetch: false,
                 refetchData: query.length !== 0,
                 refetchSideBar: false,
-                predicates: this.formatQuery(query, queryCondition),
+                predicates,
                 resetPagination: true,
                 pageNumber: 0,
+                group: 0,
                 context: 'predicates',
-                reset: false
+                reset: false,
+                fetchSegmentsFromPred
             })
         } else {
             this.setState({
@@ -58,10 +66,44 @@ class Audience extends Component {
         }
     }
 
+    refreshData(completed = false) {
+        const { context } = this.state
+        if (completed) {
+            this.setState({
+                refresh: false,
+                refetchData: false
+            })
+        } else if (!completed) {
+            if (context === 'segments') {
+                this.setState({
+                    refetchData: true,
+                    resetPagination: true,
+                    group: 0,
+                    pageNumber: 0,
+                    refetchSideBar: false,
+                    segmentIdRefetch: false,
+                    refresh: true
+                })
+            } else if (context === 'predicates') {
+                this.setState({
+                    fetchSegmentsFromPred: false,
+                    resetPagination: true,
+                    group: 0,
+                    pageNumber: 0,
+                    refetchData: true,
+                    refetchSideBar: false,
+                    segmentIdRefetch: false,
+                    refresh: true
+                })
+            }
+        }
+    }
+
     getSegment(segment) {
         this.setState({
             segment,
             resetPagination: true,
+            group: 0,
             pageNumber: 0,
             context: 'segments',
             refetchData: true,
@@ -72,21 +114,29 @@ class Audience extends Component {
     }
 
     updateQuery(rawQuery, condition) {
+        let fetchSegmentsFromPred = false
         const predicates = this.formatQuery(rawQuery, condition)
+        if (
+            JSON.stringify(this.state.predicates) !==
+                JSON.stringify(predicates) ||
+            this.state.context !== 'predicates'
+        ) {
+            fetchSegmentsFromPred = true
+        }
+
         this.setState({
             predicates,
             resetPagination: true,
+            group: 0,
             pageNumber: 0,
             context: 'predicates',
             refetchData: true,
             refetchSideBar: false,
             segmentIdRefetch: false,
-            reset: false
-        })
-    }
+            reset: false,
 
-    setSaveState(saveStates) {
-        this.setState({ saveStates })
+            fetchSegmentsFromPred
+        })
     }
 
     formatQuery(query, condition) {
@@ -116,20 +166,40 @@ class Audience extends Component {
                 predicates: '[]',
                 pageNumber: 0,
                 resetPagination: true,
+                group: 0,
                 context: 'predicates',
-                saveStates: {
-                    isSegmentUpdate: false,
-                    showSaveButton: false
-                },
-                refetchData: false,
+                refetchData: true,
                 refetchSideBar: false,
-                reset: true
+                segmentIdRefetch: false,
+                reset: true,
+                fetchSegmentsFromPred: true
             })
         }
     }
 
     updatePageNumber(pageNumber) {
-        this.setState({ pageNumber, resetPagination: false })
+        let resetPagination
+        let group = this.state.group
+        let fetchSegmentsFromPred
+        if (
+            pageNumber >= this.state.group &&
+            pageNumber < this.state.group + 3
+        ) {
+            resetPagination = false
+            fetchSegmentsFromPred = false
+        } else {
+            group = Math.floor(pageNumber / 3) * 3
+            fetchSegmentsFromPred = true
+            resetPagination = null
+        }
+
+        this.setState({
+            pageNumber,
+            resetPagination,
+            fetchSegmentsFromPred,
+            group,
+            refetchData: true
+        })
     }
 
     setSegment(segment) {
@@ -138,10 +208,6 @@ class Audience extends Component {
             context: 'segments',
             refetchData: false,
             refetchSideBar: false,
-            saveStates: {
-                isSegmentUpdate: false,
-                showSaveButton: false
-            },
             reset: false
         })
     }
@@ -152,10 +218,10 @@ class Audience extends Component {
             predicates,
             pageNumber,
             resetPagination,
-            saveStates,
             refetchData
         } = this.state
-        const { data, skeleton } = this.props
+        const { data } = this.props
+
         return (
             <div style={{ display: 'flex', flex: '1 1 100%' }}>
                 <SideBarRefetchContainer
@@ -163,7 +229,6 @@ class Audience extends Component {
                     segment={segment}
                     getSegment={this.getSegment}
                     updateQuery={this.updateQuery}
-                    saveStates={saveStates}
                     refetchData={this.state.refetchSideBar}
                     setSegment={this.setSegment}
                     segmentIdRefetch={this.state.segmentIdRefetch}
@@ -183,9 +248,10 @@ class Audience extends Component {
                     context={this.state.context}
                     updatePageNumber={this.updatePageNumber}
                     resetPagination={resetPagination}
-                    setSaveState={this.setSaveState}
                     refetchData={refetchData}
-                    reset={this.state.reset}
+                    fetchSegmentsFromPred={this.state.fetchSegmentsFromPred}
+                    refreshData={this.refreshData}
+                    refresh={this.state.refresh}
                 />
             </div>
         )
@@ -193,13 +259,11 @@ class Audience extends Component {
 }
 
 Audience.propTypes = {
-    data: PropTypes.object.isRequired,
-    skeleton: PropTypes.bool
+    data: PropTypes.object.isRequired
 }
 
 Audience.defaultProps = {
-    data: {},
-    skeleton: false
+    data: {}
 }
 
 export default Audience

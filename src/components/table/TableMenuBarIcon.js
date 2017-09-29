@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { ColumnsIcon, DownloadIcon, TagIcon } from '@rover/react-icons'
+import {
+    ColumnsIcon,
+    DownloadIcon,
+    TagIcon,
+    AudienceRefreshIcon
+} from '@rover/react-icons'
 import { purple, silver, Tooltip, offwhite } from '@rover/react-bootstrap'
 
 const iconBackdropHover = {
@@ -50,35 +55,29 @@ class TableMenuBarIcon extends Component {
         const message = {
             columns: 'Manage Columns',
             tag: 'Manage Tags',
-            download: 'Manage Downloads'
+            download: 'Manage Downloads',
+            refresh: 'Refetch Data'
         }
 
         e.persist()
-        this.setState({
-            hover: true
-        })
-        setTimeout(() => {
-            if (this.state.hover) {
-                const target = e.target.getBoundingClientRect()
-                this.setState({
-                    toolTip: {
-                        ...this.state.toolTip,
-                        isTooltipShowing: true,
-                        message: message[this.props.val],
-                        coordinates: {
-                            x: target.left - 300,
-                            y: target.top + target.height - 60,
-                            divWidth: target.width
-                        }
+        if (!this.state.toolTip.isTooltipShowing) {
+            const target = e.target.getBoundingClientRect()
+            this.setState({
+                toolTip: {
+                    isTooltipShowing: true,
+                    message: message[this.props.val],
+                    coordinates: {
+                        x: target.left - 300,
+                        y: target.top + target.height - 60,
+                        divWidth: target.width
                     }
-                })
-            }
-        }, 300)
+                }
+            })
+        }
     }
 
     handleMouseLeave() {
         this.setState({
-            hover: false,
             toolTip: {
                 isTooltipShowing: false,
                 message: '',
@@ -110,6 +109,9 @@ class TableMenuBarIcon extends Component {
             columns: ColumnsIcon({
                 fill: this.getHoverStyle()[1],
                 style: { pointerEvents: 'none' }
+            }),
+            refresh: AudienceRefreshIcon({
+                fill: this.getHoverStyle()[1]
             })
         }
         return tableMenuIcons[val]
@@ -119,15 +121,16 @@ class TableMenuBarIcon extends Component {
         const { isTooltipShowing, message, coordinates } = this.state.toolTip
         const { showToolTip } = this.props
         return (
-            <div style={this.getHoverStyle()[0]}>
-                <div
-                    onMouseOver={this.handleMouseOver}
-                    onMouseLeave={this.handleMouseLeave}
-                >
-                    {this.getTableMenuIcon(this.props.val)}
-                    {isTooltipShowing && showToolTip &&
-                        <Tooltip message={message} coordinates={coordinates} />}
-                </div>
+            <div
+                onMouseOver={this.handleMouseOver}
+                onMouseLeave={this.handleMouseLeave}
+                style={this.getHoverStyle()[0]}
+            >
+                {this.getTableMenuIcon(this.props.val)}
+                {isTooltipShowing &&
+                showToolTip && (
+                    <Tooltip message={message} coordinates={coordinates} />
+                )}
             </div>
         )
     }

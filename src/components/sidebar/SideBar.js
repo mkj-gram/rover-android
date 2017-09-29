@@ -823,7 +823,6 @@ SideBar.propTypes = {
     refetchData: PropTypes.bool.isRequired,
     segmentIdRefetch: PropTypes.bool,
     reset: PropTypes.bool.isRequired,
-    saveStates: PropTypes.object.isRequired,
     setSegment: PropTypes.func.isRequired,
     updateSegmentName: PropTypes.func.isRequired,
     archiveSegment: PropTypes.func.isRequired,
@@ -837,10 +836,6 @@ SideBar.defaultProps = {
     relay: {},
     getSegment: () => null,
     updateQuery: () => null,
-    saveStates: {
-        isSegmentUpdate: false,
-        showSaveButton: false
-    },
     refetchData: false,
     reset: false,
     setSegment: () => null,

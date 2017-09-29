@@ -168,7 +168,6 @@ class GridPagination extends Component {
 
 GridPagination.propTypes = {
     totalRows: PropTypes.number.isRequired,
-    resetPagination: PropTypes.bool.isRequired,
     updatePageNumber: PropTypes.func.isRequired
 }
 

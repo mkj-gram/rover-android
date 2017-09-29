@@ -274,7 +274,6 @@ AudienceDataGrid.propTypes = {
     columns: PropTypes.array.isRequired,
     updateDragColumns: PropTypes.func.isRequired,
     segmentSize: PropTypes.number.isRequired,
-    resetPagination: PropTypes.bool.isRequired,
     updatePageNumber: PropTypes.func.isRequired
 }
 
