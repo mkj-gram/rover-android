@@ -10,6 +10,6 @@ npm-debug.log
 yarn.lock
 
 
-src/components/__generated__/
-src/components/sidebar/__generated__/
-src/components/table/__generated__/
+#generated
+__generated__
+schema.graphql
