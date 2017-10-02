@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class HorizontalAlignment { }
-
-HorizontalAlignment.type = new GraphQLEnumType({
+const HorizontalAlignment = new GraphQLEnumType({
     name: 'HorizontalAlignment',
     values: {
         LEFT: { value: 'left' },

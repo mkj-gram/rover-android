@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class BackgroundScale { }
-
-BackgroundScale.type = new GraphQLEnumType({
+const BackgroundScale = new GraphQLEnumType({
     name: 'BackgroundScale',
     values: {
         X1: { value: 1 },

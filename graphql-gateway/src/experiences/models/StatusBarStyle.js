@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class StatusBarStyle { }
-
-StatusBarStyle.type = new GraphQLEnumType({
+const StatusBarStyle = new GraphQLEnumType({
     name: 'StatusBarStyle',
     values: {
         DARK: { value: 'dark' },

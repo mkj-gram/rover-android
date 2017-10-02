@@ -1,23 +1,23 @@
 import request from 'request'
 import { GraphQLID, GraphQLNonNull } from 'graphql'
-import Experience from './Experience'
+import Experience from '../models/Experience'
 
 const ExperienceQuery = {
-    type: Experience.type,
+    type: Experience,
     args: {
         id: {
             type: new GraphQLNonNull(GraphQLID)
         }
     },
-    resolve(_, { id }, context) {
+    resolve(_, { id }, { authContext }) {
         const options = {
             url: 'https://api.rover.io/v1/experiences/' + id + '/current',
             headers: {
                 accept: 'application/json',
-                'x-rover-api-key': context.accountToken
+                'x-rover-api-key': 'd6ab40e8a45e3040c372806baba387fd'
             }
         }
-        
+
         return new Promise((resolve, reject) => {
             request(options, (err, response, body) => {
                 if (response.statusCode === 404) {
@@ -27,7 +27,7 @@ const ExperienceQuery = {
 
                 if (response.statusCode !== 200) {
                     let error = new Error('Failed to retrieve experience with id: ' + id)
-                    return reject(error)   
+                    return reject(error)
                 }
 
                 try {
@@ -46,13 +46,10 @@ const ExperienceQuery = {
                         return null
                     }
 
-                    const props = Experience.normalizeJSON({
+                    resolve({
                         ...attributes,
                         id: data['id']
                     })
-
-                    const experience = new Experience(props)
-                    resolve(experience)
                 } catch (err) {
                     reject(err)
                 }

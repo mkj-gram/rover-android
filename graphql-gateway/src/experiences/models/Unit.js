@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class Unit { }
-
-Unit.type = new GraphQLEnumType({
+const Unit = new GraphQLEnumType({
     name: 'Unit',
     values: {
         POINTS: { value: 'points' },

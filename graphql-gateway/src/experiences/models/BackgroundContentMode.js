@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class BackgroundContentMode { }
-
-BackgroundContentMode.type = new GraphQLEnumType({
+const BackgroundContentMode = new GraphQLEnumType({
     name: 'BackgroundContentMode',
     values: {
         ORIGINAL: { value: 'original' },

@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class TitleBarButtons { }
-
-TitleBarButtons.type = new GraphQLEnumType({
+const TitleBarButtons = new GraphQLEnumType({
     name: 'TitleBarButtons',
     values: {
         CLOSE: { value: 'close' },

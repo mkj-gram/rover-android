@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class TextAlignment { }
-
-TextAlignment.type = new GraphQLEnumType({
+const TextAlignment = new GraphQLEnumType({
     name: 'TextAlignment',
     values: {
         LEFT: { value: 'left' },

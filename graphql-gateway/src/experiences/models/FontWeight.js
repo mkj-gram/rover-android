@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class FontWeight { }
-
-FontWeight.type = new GraphQLEnumType({
+const FontWeight = new GraphQLEnumType({
     name: 'FontWeight',
     values: {
         ULTRA_LIGHT: { value: 100 },

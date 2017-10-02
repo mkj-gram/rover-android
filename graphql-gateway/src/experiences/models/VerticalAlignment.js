@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class VerticalAlignment { }
-
-VerticalAlignment.type = new GraphQLEnumType({
+const VerticalAlignment = new GraphQLEnumType({
     name: 'VerticalAlignment',
     values: {
         TOP: { value: 'top' },
