@@ -54,12 +54,11 @@ const SegmentFromPredicatesQuery = {
 
 
         let profiles = {}
-        let devices = {}
         let dataGridRows = []
 
         const request = new RoverApis.audience.v1.Models.QueryRequest()
         const pageIterator = new RoverApis.audience.v1.Models.QueryRequest.PageIterator()
-            
+
         pageIterator.setPage(pageNumber)
         pageIterator.setSize(pageSize)
 
@@ -79,13 +78,11 @@ const SegmentFromPredicatesQuery = {
         response.getProfilesList().forEach(profile => {
             getProfileFromProto(profiles, profile)
         })
-        
-        response.getDevicesList().forEach(device => {
-            getDeviceFromProto(devices, device)
-        })
 
-        dataGridRows = Object.keys(devices).map(id => {
-            return devices[id].concat(profiles[id])
+        dataGridRows = response.getDevicesList().map(device => {
+          const deviceAttrs = getDeviceFromProto(device)
+          const profileAttrs = profiles[device.getProfileId()]
+          return deviceAttrs.concat(profileAttrs)
         })
 
         let totalSize = 0

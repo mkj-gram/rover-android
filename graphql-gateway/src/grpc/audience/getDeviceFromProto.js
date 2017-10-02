@@ -13,9 +13,7 @@ const getPlatformFromProto = p => {
     }
 }
 
-export default (devices, d) => {
-    devices[d.getProfileId()] = []
-
+export default (d) => {
     const props = {
         created_at: RoverApis.Helpers.timestampFromProto(d.getCreatedAt()),
         app_version: d.getAppVersion(),
@@ -53,7 +51,7 @@ export default (devices, d) => {
         push_token_updated_at: RoverApis.Helpers.timestampFromProto(d.getPushTokenUpdatedAt())
     }
 
-    devices[d.getProfileId()] = Object.keys(props).map(p => {
+     return Object.keys(props).map(p => {
         return {
             attribute: p,
             selector: 'DEVICE',
