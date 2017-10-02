@@ -298,7 +298,7 @@ class SideBar extends Component {
             case 'GeofencePredicate':
                 return <GeofenceInput {...props} />
             case 'FloatPredicate':
-                return <NumericInput {...props} float />
+                return <NumericInput {...props} float numberComparison={props.floatComparison}/>
             case 'StringArrayPredicate':
                 return <StringArrayInput {...props} />
             default:
