@@ -2,8 +2,10 @@ import {
     GraphQLBoolean,
     GraphQLFloat,
     GraphQLID,
+    GraphQLInt,
     GraphQLNonNull,
-    GraphQLObjectType
+    GraphQLObjectType,
+    GraphQLString
 } from 'graphql'
 
 import Action from './Action'
@@ -12,6 +14,7 @@ import ButtonState from './ButtonState'
 import HorizontalAlignment from './HorizontalAlignment'
 import Insets from './Insets'
 import Length from './Length'
+import LockStatus from './LockStatus'
 import Offsets from './Offsets'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
@@ -28,6 +31,13 @@ const ButtonBlock = new GraphQLObjectType({
 			type: new GraphQLNonNull(GraphQLBoolean),
 			resolve: data => data['auto-height'] || false,
 		},
+        clickCount: {
+            type: new GraphQLNonNull(GraphQLInt),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['click-count'] || 0
+            }
+        },
         disabled: {
             type: new GraphQLNonNull(ButtonState),
 			resolve: data => ({
@@ -54,6 +64,10 @@ const ButtonBlock = new GraphQLObjectType({
                 ...(data['states'] || {})['highlighted']
             })
         },
+        horizontalAlignment: {
+			type: new GraphQLNonNull(HorizontalAlignment),
+			resolve: data => (data['alignment'] || {})['horizontal']
+		},
 	    id: {
 			type: new GraphQLNonNull(GraphQLID),
 			resolve: data => data['id']
@@ -62,10 +76,20 @@ const ButtonBlock = new GraphQLObjectType({
 			type: new GraphQLNonNull(Insets),
 			resolve: data => data['inset']
 		},
-	    horizontalAlignment: {
-			type: new GraphQLNonNull(HorizontalAlignment),
-			resolve: data => (data['alignment'] || {})['horizontal']
-		},
+        lockStatus: {
+            type: new GraphQLNonNull(LockStatus),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['lock-status'] || 'unlocked'
+            }
+        },
+        name: {
+            type: new GraphQLNonNull(GraphQLString),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['name']
+            }
+        },
         normal: {
             type: new GraphQLNonNull(ButtonState),
 			resolve: data => ({

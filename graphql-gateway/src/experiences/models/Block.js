@@ -4,7 +4,8 @@ import {
     GraphQLID,
     GraphQLInt,
     GraphQLInterfaceType,
-    GraphQLNonNull
+    GraphQLNonNull,
+    GraphQLString
 } from 'graphql'
 
 import Action from './Action'
@@ -15,6 +16,7 @@ import HorizontalAlignment from './HorizontalAlignment'
 import ImageBlock from './ImageBlock'
 import Insets from './Insets'
 import Length from './Length'
+import LockStatus from './LockStatus'
 import Offsets from './Offsets'
 import OpenUrlAction from './OpenUrlAction'
 import Position from './Position'
@@ -32,6 +34,9 @@ const Block = new GraphQLInterfaceType({
         autoHeight: {
             type: new GraphQLNonNull(GraphQLBoolean)
         },
+        clickCount: {
+            type: new GraphQLNonNull(GraphQLInt)
+        },
         experienceId: {
             type: new GraphQLNonNull(GraphQLID)
         },
@@ -46,6 +51,12 @@ const Block = new GraphQLInterfaceType({
         },
         horizontalAlignment: {
             type: new GraphQLNonNull(HorizontalAlignment)
+        },
+        lockStatus: {
+            type: new GraphQLNonNull(LockStatus)
+        },
+        name: {
+            type: new GraphQLNonNull(GraphQLString)
         },
         offsets: {
             type: new GraphQLNonNull(Offsets)

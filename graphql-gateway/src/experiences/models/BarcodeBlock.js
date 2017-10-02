@@ -20,6 +20,7 @@ import HorizontalAlignment from './HorizontalAlignment'
 import Image from './Image'
 import Insets from './Insets'
 import Length from './Length'
+import LockStatus from './LockStatus'
 import Offsets from './Offsets'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
@@ -76,6 +77,13 @@ const BarcodeBlock = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLInt),
 			resolve: data => data['border-width']
         },
+        clickCount: {
+            type: new GraphQLNonNull(GraphQLInt),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['click-count'] || 0
+            }
+        },
 	    experienceId: {
 			type: new GraphQLNonNull(GraphQLID),
 			resolve: data => data['experience-id']
@@ -83,6 +91,10 @@ const BarcodeBlock = new GraphQLObjectType({
 	    height: {
 			type: new GraphQLNonNull(Length),
 			resolve: data => data['height']
+		},
+        horizontalAlignment: {
+			type: new GraphQLNonNull(HorizontalAlignment),
+			resolve: data => (data['alignment'] || {})['horizontal']
 		},
 	    id: {
 			type: new GraphQLNonNull(GraphQLID),
@@ -92,10 +104,20 @@ const BarcodeBlock = new GraphQLObjectType({
 			type: new GraphQLNonNull(Insets),
 			resolve: data => data['inset']
 		},
-	    horizontalAlignment: {
-			type: new GraphQLNonNull(HorizontalAlignment),
-			resolve: data => (data['alignment'] || {})['horizontal']
-		},
+        lockStatus: {
+            type: new GraphQLNonNull(LockStatus),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['lock-status'] || 'unlocked'
+            }
+        },
+        name: {
+            type: new GraphQLNonNull(GraphQLString),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['name']
+            }
+        },
 	    offsets: {
 			type: new GraphQLNonNull(Offsets),
 			resolve: data => data['offset']

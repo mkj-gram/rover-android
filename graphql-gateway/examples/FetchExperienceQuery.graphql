@@ -29,11 +29,13 @@ query FetchExperience($id: ID!) {
             }
           }
           autoHeight
+          clickCount
           experienceId
           height {
             value
             unit
           }
+          horizontalAlignment
           id
           insets {
             bottom
@@ -41,7 +43,8 @@ query FetchExperience($id: ID!) {
             right
             top
           }
-          horizontalAlignment
+          lockStatus
+          name
           offsets {
             bottom {
               value
@@ -126,6 +129,8 @@ query FetchExperience($id: ID!) {
           unit
         }
         id
+        isCollapsed
+        name
         screenId
       }
       statusBarStyle

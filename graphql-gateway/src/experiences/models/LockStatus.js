@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class LockStatus { }
-
-LockStatus.type = new GraphQLEnumType({
+const LockStatus = new GraphQLEnumType({
     name: 'LockStatus',
     values: {
     	UNLOCKED: { value: 'unlocked' },
