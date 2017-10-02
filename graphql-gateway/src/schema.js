@@ -12,6 +12,7 @@ import {
     VersionPredicate,
 } from './segments/Predicate'
 
+import BarcodeBlock from './experiences/models/BarcodeBlock'
 import ButtonBlock from './experiences/models/ButtonBlock'
 import RectangleBlock from './experiences/models/RectangleBlock'
 
@@ -19,6 +20,7 @@ const schema = new GraphQLSchema({
     query: Query.type,
     mutation: Mutation.type,
     types: [
+        BarcodeBlock,
         BooleanPredicate,
         ButtonBlock,
         DatePredicate,

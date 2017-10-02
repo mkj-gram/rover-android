@@ -1,8 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 
-class BarcodeFormat { }
-
-BarcodeFormat.type = new GraphQLEnumType({
+const BarcodeFormat = new GraphQLEnumType({
     name: 'BarcodeFormat',
     values: {
         QR_CODE: { value: 'qrcode' },

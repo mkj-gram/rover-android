@@ -8,6 +8,7 @@ import {
 } from 'graphql'
 
 import Action from './Action'
+import BarcodeBlock from './BarcodeBlock'
 import ButtonBlock from './ButtonBlock'
 import GoToScreenAction from './GoToScreenAction'
 import HorizontalAlignment from './HorizontalAlignment'
@@ -66,9 +67,14 @@ const Block = new GraphQLInterfaceType({
         }
     }),
     resolveType: data => {
+        if (data['barcode-scale']) {
+            return BarcodeBlock
+        }
+
         if (data['states']) {
             return ButtonBlock
         }
+
         return RectangleBlock
     }
 })
