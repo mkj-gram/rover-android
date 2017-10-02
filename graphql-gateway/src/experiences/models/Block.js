@@ -20,6 +20,7 @@ import OpenUrlAction from './OpenUrlAction'
 import Position from './Position'
 import RectangleBlock from './RectangleBlock'
 import VerticalAlignment from './VerticalAlignment'
+import WebViewBlock from './WebViewBlock'
 
 const Block = new GraphQLInterfaceType({
     name: 'Block',
@@ -78,6 +79,10 @@ const Block = new GraphQLInterfaceType({
 
         if (data['image']) {
             return ImageBlock
+        }
+
+        if (data['scrollable']) {
+            return WebViewBlock
         }
 
         return RectangleBlock

@@ -16,6 +16,7 @@ import BarcodeBlock from './experiences/models/BarcodeBlock'
 import ButtonBlock from './experiences/models/ButtonBlock'
 import ImageBlock from './experiences/models/ImageBlock'
 import RectangleBlock from './experiences/models/RectangleBlock'
+import WebViewBlock from './experiences/models/WebViewBlock'
 
 const schema = new GraphQLSchema({
     query: Query.type,
@@ -31,7 +32,8 @@ const schema = new GraphQLSchema({
         RectangleBlock,
         StringPredicate,
         StringArrayPredicate,
-        VersionPredicate
+        VersionPredicate,
+        WebViewBlock
     ]
 })
 
