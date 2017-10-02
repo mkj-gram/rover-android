@@ -3,7 +3,8 @@ import {
     GraphQLID,
     GraphQLList,
     GraphQLNonNull,
-    GraphQLObjectType
+    GraphQLObjectType,
+    GraphQLString
 } from 'graphql'
 
 import Background from './Background'
@@ -54,6 +55,20 @@ const Row = new GraphQLObjectType({
 			type: new GraphQLNonNull(GraphQLID),
 			resolve: data => data['id']
 		},
+        isCollapsed: {
+            type: new GraphQLNonNull(GraphQLBoolean),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['is-collapsed']
+            }
+        },
+        name: {
+            type: new GraphQLNonNull(GraphQLString),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['name']
+            }
+        },
 	    screenId: {
 			type: new GraphQLNonNull(GraphQLID),
 			resolve: data => data['screen-id']
