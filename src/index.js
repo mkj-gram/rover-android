@@ -1,6 +1,7 @@
 import ArchiveIcon from './ArchiveIcon'
 import ArrowIconDown from './ArrowIconDown'
 import ArrowIconRight from './ArrowIconRight'
+import AudienceRefreshIcon from './AudienceRefreshIcon'
 import BarcodeBlockIcon from './BarcodeBlockIcon'
 import BarcodeBlockIconSmall from './BarcodeBlockIconSmall'
 import ButtonBlockIcon from './ButtonBlockIcon'
@@ -43,6 +44,7 @@ import SearchIcon from './SearchIcon'
 import StandPreviewIcon from './StandPreviewIcon'
 import TagIcon from './TagIcon'
 import TestDeviceIcon from './TestDeviceIcon'
+import TestDeviceIconSmall from './TestDeviceIconSmall'
 import TextBlockIcon from './TextBlockIcon'
 import TextBlockIconSmall from './TextBlockIconSmall'
 import TitleBarIconSmall from './TitleBarIconSmall'
@@ -101,6 +103,7 @@ export {
     ArchiveIcon,
     ArrowIconDown,
     ArrowIconRight,
+    AudienceRefreshIcon,
     BarcodeBlockIcon,
     BarcodeBlockIconSmall,
     ButtonBlockIcon,
@@ -143,6 +146,7 @@ export {
     StandPreviewIcon,
     TagIcon,
     TestDeviceIcon,
+    TestDeviceIconSmall,
     TextBlockIcon,
     TextBlockIconSmall,
     TitleBarIconSmall,
