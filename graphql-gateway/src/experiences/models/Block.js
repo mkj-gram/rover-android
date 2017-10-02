@@ -19,6 +19,7 @@ import Offsets from './Offsets'
 import OpenUrlAction from './OpenUrlAction'
 import Position from './Position'
 import RectangleBlock from './RectangleBlock'
+import TextBlock from './TextBlock'
 import VerticalAlignment from './VerticalAlignment'
 import WebViewBlock from './WebViewBlock'
 
