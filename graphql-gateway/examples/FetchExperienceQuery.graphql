@@ -9,8 +9,10 @@ query FetchExperience($id: ID!) {
       ...backgroundFields
       autoColorStatusBar
       experienceId
+      hasUnpublishedChanges
       id
       isStretchyHeaderEnabled
+      name
       rows {
         ...backgroundFields
         autoHeight
@@ -154,6 +156,7 @@ query FetchExperience($id: ID!) {
         alpha
       }
       useDefaultTitleBarStyle
+      views
     }
   	name
     recentAverageDuration

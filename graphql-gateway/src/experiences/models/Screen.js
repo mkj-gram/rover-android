@@ -1,6 +1,7 @@
 import {
     GraphQLBoolean,
     GraphQLID,
+    GraphQLInt,
     GraphQLList,
     GraphQLNonNull,
     GraphQLObjectType,
@@ -44,6 +45,13 @@ const Screen = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLID),
             resolve: data => data['experience-id']
         },
+        hasUnpublishedChanges: {
+            type: new GraphQLNonNull(GraphQLBoolean),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['has-unpublished-changes']
+            }
+        },
         id: {
             type: new GraphQLNonNull(GraphQLID),
             resolve: data => data['id']
@@ -54,6 +62,13 @@ const Screen = new GraphQLObjectType({
 				const isStretchyHeaderEnabled = data['is-stretchy-header-enabled']
 				return isStretchyHeaderEnabled === undefined ? true : isStretchyHeaderEnabled
 			}
+        },
+        name: {
+            type: new GraphQLNonNull(GraphQLString),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['name']
+            }
         },
         rows: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Row))),
@@ -90,6 +105,13 @@ const Screen = new GraphQLObjectType({
         useDefaultTitleBarStyle: {
             type: new GraphQLNonNull(GraphQLBoolean),
             resolve: data => data['use-default-title-bar-style']
+        },
+        views: {
+            type: new GraphQLNonNull(GraphQLInt),
+            resolve: data => {
+                // TODO: Verify admin scope
+                return data['views'] || 0
+            }
         }
     })
 })
