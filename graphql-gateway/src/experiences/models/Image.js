@@ -15,7 +15,10 @@ const Image = new GraphQLObjectType({
 		},
         isURLOptimizationEnabled: {
 			type: new GraphQLNonNull(GraphQLBoolean),
-			resolve: data => data['is-url-optimization-enabled']
+			resolve: data => {
+                const isURLOptimizationEnabled = data['is-url-optimization-enabled']
+                return isURLOptimizationEnabled === undefined ? true : isURLOptimizationEnabled
+            }
 		},
         name: {
 			type: new GraphQLNonNull(GraphQLString),
