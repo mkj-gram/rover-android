@@ -55,9 +55,9 @@ class ListCellFormatter extends Component {
         })
     }
 
-    calcLayout() {
-        const id = `listCellElement_${this.props.column.key}`
-        let stringPixelLength = this.props.value.length * 6
+    calcLayout(props) {
+        const id = `listCellElement_${props.column.key}`
+        let stringPixelLength = props.value.length * 6
         let totalWidth = document.getElementById(id)
             .parentElement.parentElement.parentElement.parentElement
             .parentElement.offsetWidth
@@ -66,18 +66,18 @@ class ListCellFormatter extends Component {
             this.getExcess(totalWidth)
         } else {
             this.setState({
-                value: this.props.value,
+                value: props.value,
                 remaining: []
             })
         }
     }
 
     componentDidMount() {
-        this.calcLayout()
+        this.calcLayout(this.props)
     }
 
-    componentWillReceiveProps() {
-        this.calcLayout()
+    componentWillReceiveProps(nextProps) {
+        this.calcLayout(nextProps)
     }
 
     render() {
