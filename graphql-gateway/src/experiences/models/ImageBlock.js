@@ -24,6 +24,8 @@ import Offsets from './Offsets'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
 
+import requireScope from '../../requireScope'
+
 const ImageBlock = new GraphQLObjectType({
     name: 'ImageBlock',
     interfaces: () => [Block, Background, Border],
@@ -66,10 +68,9 @@ const ImageBlock = new GraphQLObjectType({
         },
         clickCount: {
             type: new GraphQLNonNull(GraphQLInt),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['click-count'] || 0
-            }
+            })
         },
 	    experienceId: {
 			type: new GraphQLNonNull(GraphQLID),
@@ -97,17 +98,15 @@ const ImageBlock = new GraphQLObjectType({
 		},
         lockStatus: {
             type: new GraphQLNonNull(LockStatus),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['lock-status'] || 'unlocked'
-            }
+            })
         },
         name: {
             type: new GraphQLNonNull(GraphQLString),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['name']
-            }
+            })
         },
 	    offsets: {
 			type: new GraphQLNonNull(Offsets),

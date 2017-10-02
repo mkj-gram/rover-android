@@ -10,15 +10,16 @@ import {
 
 import Screen from './Screen'
 
+import requireScope from '../../requireScope'
+
 const Experience = new GraphQLObjectType({
     name: 'Experience',
     fields: () => ({
         hasUnpublishedChanges: {
             type: new GraphQLNonNull(GraphQLBoolean),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['has-unpublished-changes']
-            }
+            })
         },
         id: {
             type: new GraphQLNonNull(GraphQLID),
@@ -26,17 +27,15 @@ const Experience = new GraphQLObjectType({
         },
         isArchived: {
             type: new GraphQLNonNull(GraphQLBoolean),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['is-archived']
-            }
+            })
         },
         isPublished: {
             type: new GraphQLNonNull(GraphQLBoolean),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['is-published']
-            }
+            })
         },
         homeScreenId: {
             type: new GraphQLNonNull(GraphQLString),
@@ -44,17 +43,15 @@ const Experience = new GraphQLObjectType({
         },
         name: {
             type: new GraphQLNonNull(GraphQLString),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['name']
-            }
+            })
         },
         recentAverageDuration: {
             type: GraphQLInt,
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['recent-average-duraction']
-            }
+            })
         },
         screens: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Screen))),
@@ -62,24 +59,21 @@ const Experience = new GraphQLObjectType({
         },
         simulatorUrl: {
             type: new GraphQLNonNull(GraphQLString),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['simulator-url']
-            }
+            })
         },
         versionId: {
             type: GraphQLString,
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['version-id']
-            }
+            })
         },
         viewToken: {
             type: new GraphQLNonNull(GraphQLString),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['view-token']
-            }
+            })
         }
     })
 })

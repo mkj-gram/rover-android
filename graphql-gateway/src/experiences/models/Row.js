@@ -15,6 +15,8 @@ import Color from './Color'
 import Image from './Image'
 import Length from './Length'
 
+import requireScope from '../../requireScope'
+
 const Row = new GraphQLObjectType({
     name: 'Row',
     interfaces: () => [Background],
@@ -57,17 +59,15 @@ const Row = new GraphQLObjectType({
 		},
         isCollapsed: {
             type: new GraphQLNonNull(GraphQLBoolean),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['is-collapsed']
-            }
+            })
         },
         name: {
             type: new GraphQLNonNull(GraphQLString),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['name']
-            }
+            })
         },
 	    screenId: {
 			type: new GraphQLNonNull(GraphQLID),

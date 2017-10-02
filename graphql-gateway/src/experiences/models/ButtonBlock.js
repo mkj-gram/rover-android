@@ -19,6 +19,8 @@ import Offsets from './Offsets'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
 
+import requireScope from '../../requireScope'
+
 const ButtonBlock = new GraphQLObjectType({
     name: 'ButtonBlock',
     interfaces: () => [Block],
@@ -33,10 +35,9 @@ const ButtonBlock = new GraphQLObjectType({
 		},
         clickCount: {
             type: new GraphQLNonNull(GraphQLInt),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['click-count'] || 0
-            }
+            })
         },
         disabled: {
             type: new GraphQLNonNull(ButtonState),
@@ -78,17 +79,15 @@ const ButtonBlock = new GraphQLObjectType({
 		},
         lockStatus: {
             type: new GraphQLNonNull(LockStatus),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['lock-status'] || 'unlocked'
-            }
+            })
         },
         name: {
             type: new GraphQLNonNull(GraphQLString),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['name']
-            }
+            })
         },
         normal: {
             type: new GraphQLNonNull(ButtonState),

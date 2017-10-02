@@ -17,6 +17,8 @@ import Row from './Row'
 import StatusBarStyle from './StatusBarStyle'
 import TitleBarButtons from './TitleBarButtons'
 
+import requireScope from '../../requireScope'
+
 const Screen = new GraphQLObjectType({
     name: 'Screen',
 	interfaces: () => [Background],
@@ -47,10 +49,9 @@ const Screen = new GraphQLObjectType({
         },
         hasUnpublishedChanges: {
             type: new GraphQLNonNull(GraphQLBoolean),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['has-unpublished-changes']
-            }
+            })
         },
         id: {
             type: new GraphQLNonNull(GraphQLID),
@@ -65,10 +66,9 @@ const Screen = new GraphQLObjectType({
         },
         name: {
             type: new GraphQLNonNull(GraphQLString),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['name']
-            }
+            })
         },
         rows: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Row))),
@@ -108,10 +108,9 @@ const Screen = new GraphQLObjectType({
         },
         views: {
             type: new GraphQLNonNull(GraphQLInt),
-            resolve: data => {
-                // TODO: Verify admin scope
+            resolve: requireScope('admin', data => {
                 return data['views'] || 0
-            }
+            })
         }
     })
 })
