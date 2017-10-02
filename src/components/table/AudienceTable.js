@@ -27,7 +27,6 @@ class AudienceTable extends Component {
             },
             segmentId: '',
             predicates: '[]',
-            renderFetchEnabled: null,
             columns: [],
             rows: [],
             segmentSize: 0,
@@ -43,7 +42,6 @@ class AudienceTable extends Component {
                 listView: false
             },
             dataGridRows: [],
-            group: 0,
             refetched: false,
             adgDynamicSegment: []
         }
@@ -132,12 +130,16 @@ class AudienceTable extends Component {
                 'app_version_DEVICE'
             ]
             const cachedKeys = Object.keys(cachedSelectedColumns)
-            return cachedKeys.filter(x => badSelectors.indexOf(x) > 0).length > 0
+            return (
+                cachedKeys.filter(x => badSelectors.indexOf(x) > 0).length > 0
+            )
         }
 
         if (
             !cachedSelectedColumns ||
-            !['_DEVICE', '_CUSTOM_PROFILE', '_ROVER_PROFILE'].some(hasSelector) ||
+            !['_DEVICE', '_CUSTOM_PROFILE', '_ROVER_PROFILE'].some(
+                hasSelector
+            ) ||
             containsDeprecatedColumns()
         ) {
             this.setState({
@@ -225,8 +227,8 @@ class AudienceTable extends Component {
             }
             cachedSelectedColumns = Object.assign(
                 {},
-                property,
-                cachedSelectedColumns
+                cachedSelectedColumns,
+                property
             )
         }
 
@@ -248,12 +250,7 @@ class AudienceTable extends Component {
 
         if (
             nextProps.context === 'predicates' &&
-            (JSON.stringify(this.props.predicates) !==
-                JSON.stringify(nextProps.predicates) ||
-                !(
-                    nextProps.pageNumber >= this.state.group &&
-                    nextProps.pageNumber < this.state.group + 3
-                ) || this.props.context !== nextProps.context)
+            (nextProps.fetchSegmentsFromPred || nextProps.refresh)
         ) {
             const predicates = JSON.parse(nextProps.predicates)
             refetchVariables = fragmentVariables => ({
@@ -262,7 +259,7 @@ class AudienceTable extends Component {
                 predicates: JSON.stringify(predicates.query) || '[]',
                 segmentId: '',
                 pageNumber: Math.floor(nextProps.pageNumber / 3),
-                condition: predicates.condition
+                condition: predicates.condition || 'ALL'
             })
             this.setState({ refetched: true })
             relay.refetch(
@@ -295,18 +292,11 @@ class AudienceTable extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { refetched, renderFetchEnabled } = this.state
+        const { refetched } = this.state
 
-        if (nextProps.refetchData && !nextProps.reset) {
-            if (nextProps.resetPagination) {
-                this.setState({ group: 0 })
-            }
+        if (nextProps.refetchData) {
             if (!refetched) {
-                if (
-                    nextProps.pageNumber >= this.state.group &&
-                    nextProps.pageNumber < this.state.group + 3 &&
-                    !nextProps.resetPagination
-                ) {
+                if (nextProps.resetPagination === false) {
                     this.setState({
                         rows: this.getSelectedRows(
                             this.state.dataGridRows,
@@ -316,17 +306,11 @@ class AudienceTable extends Component {
                 } else {
                     this.fetchData(nextProps)
                 }
-            } else if (renderFetchEnabled === null) {
+            } else {
                 this.renderFetch(nextProps)
             }
         } else {
             this.updateDynamicSegments(nextProps.segmentId)
-            if (nextProps.reset) {
-                this.fetchData(nextProps)
-                if (renderFetchEnabled !== null) {
-                    this.renderFetch(nextProps)
-                }
-            }
         }
     }
 
@@ -342,15 +326,16 @@ class AudienceTable extends Component {
             dataSource = nextProps.data.adgSegmentsFromPredicates
         }
         const { dataGridRows, segmentSize, totalSize } = dataSource
-        this.setState({
-            rows: this.getSelectedRows(dataGridRows, nextProps.pageNumber),
-            segmentSize,
-            totalSize,
-            dataGridRows,
-            renderFetchEnabled: null,
-            refetched: false,
-            group: Math.floor(nextProps.pageNumber / 3) * 3
-        })
+        this.setState(
+            {
+                rows: this.getSelectedRows(dataGridRows, nextProps.pageNumber),
+                segmentSize,
+                totalSize,
+                dataGridRows,
+                refetched: false
+            },
+            this.props.refreshData(true)
+        )
     }
 
     updateDynamicSegments(segmentId) {
@@ -484,7 +469,7 @@ class AudienceTable extends Component {
             ret = data.name
         } else if (type === 'StringArrayPredicate') {
             ret = data.join(', ')
-        } 
+        }
         if (ret === null) {
             ret = ''
         }
@@ -556,6 +541,7 @@ class AudienceTable extends Component {
                     allColumns={this.state.allColumns}
                     updateChecked={this.updateChecked}
                     selectedColumns={selectedColumns}
+                    refreshData={this.props.refreshData}
                 />
 
                 {columns.length > 0 && this.renderDataGrid()}
@@ -576,25 +562,20 @@ AudienceTable.propTypes = {
     relay: PropTypes.object,
     segmentId: PropTypes.string.isRequired,
     predicates: PropTypes.string.isRequired,
-    resetPagination: PropTypes.bool.isRequired,
+
     pageNumber: PropTypes.number.isRequired,
     context: PropTypes.string.isRequired,
     updatePageNumber: PropTypes.func.isRequired,
-    setSaveState: PropTypes.func.isRequired,
     refetchData: PropTypes.bool,
-    reset: PropTypes.bool.isRequired,
     skeleton: PropTypes.bool
 }
 
 AudienceTable.defaultProps = {
     segmentId: '',
     predicates: '[]',
-    resetPagination: false,
     pageNumber: 0,
     context: 'predicates',
-    updatePageNumber: () => null,
-    setSaveState: () => null,
-    reset: false
+    updatePageNumber: () => null
 }
 
 export default AudienceTable
