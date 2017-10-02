@@ -81,6 +81,10 @@ const Block = new GraphQLInterfaceType({
             return ImageBlock
         }
 
+        if (data['text']) {
+            return TextBlock
+        }
+
         if (data['scrollable']) {
             return WebViewBlock
         }

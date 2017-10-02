@@ -16,6 +16,26 @@ const Border = new GraphQLInterfaceType({
     }),
     resolveType: data => {
         if (data['experience-id'] && data['screen-id'] && data['row-id']) {
+            if (data['barcode-scale']) {
+                return BarcodeBlock
+            }
+
+            if (data['states']) {
+                return ButtonBlock
+            }
+
+            if (data['image']) {
+                return ImageBlock
+            }
+
+            if (data['text']) {
+                return TextBlock
+            }
+
+            if (data['scrollable']) {
+                return WebViewBlock
+            }
+
             return RectangleBlock
         }
 

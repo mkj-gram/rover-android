@@ -24,7 +24,13 @@ const Text = new GraphQLInterfaceType({
             type: new GraphQLNonNull(Font)
         }
     }),
-    resolveType: data => ButtonState
+    resolveType: data => {
+        if (data['experience-id'] && data['screen-id'] && data['row-id']) {
+            return TextBlock
+        }
+
+        return ButtonState
+    }
 })
 
 export default Text
