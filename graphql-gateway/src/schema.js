@@ -14,6 +14,7 @@ import {
 
 import BarcodeBlock from './experiences/models/BarcodeBlock'
 import ButtonBlock from './experiences/models/ButtonBlock'
+import ImageBlock from './experiences/models/ImageBlock'
 import RectangleBlock from './experiences/models/RectangleBlock'
 
 const schema = new GraphQLSchema({
@@ -24,6 +25,7 @@ const schema = new GraphQLSchema({
         BooleanPredicate,
         ButtonBlock,
         DatePredicate,
+        ImageBlock,
         GeofencePredicate,
         NumberPredicate,
         RectangleBlock,

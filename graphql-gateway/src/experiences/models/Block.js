@@ -12,6 +12,7 @@ import BarcodeBlock from './BarcodeBlock'
 import ButtonBlock from './ButtonBlock'
 import GoToScreenAction from './GoToScreenAction'
 import HorizontalAlignment from './HorizontalAlignment'
+import ImageBlock from './ImageBlock'
 import Insets from './Insets'
 import Length from './Length'
 import Offsets from './Offsets'
@@ -73,6 +74,10 @@ const Block = new GraphQLInterfaceType({
 
         if (data['states']) {
             return ButtonBlock
+        }
+
+        if (data['image']) {
+            return ImageBlock
         }
 
         return RectangleBlock
