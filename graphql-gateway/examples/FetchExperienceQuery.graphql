@@ -1,207 +1,215 @@
 query FetchExperience($id: ID!) {
-    experience(id: $id) {
-        id
-        homeScreenId
-        screens {
+  experience(id: $id) {
+    hasUnpublishedChanges
+    homeScreenId
+    id
+    isArchived
+    isPublished
+    screens {
+      ...backgroundFields
+      autoColorStatusBar
+      experienceId
+      id
+      isStretchyHeaderEnabled
+      rows {
+        ...backgroundFields
+        autoHeight
+        blocks {
+          __typename
+          action {
+            __typename
+            ... on GoToScreenAction {
+              experienceId
+              screenId
+            }
+            ... on OpenUrlAction {
+              url
+            }
+          }
+          autoHeight
+          experienceId
+          height {
+            value
+            unit
+          }
+          id
+          insets {
+            bottom
+            left
+            right
+            top
+          }
+          horizontalAlignment
+          offsets {
+            bottom {
+              value
+              unit
+            }
+            center {
+              value
+              unit
+            }
+            left {
+              value
+              unit
+            }
+            middle {
+              value
+              unit
+            }
+            right {
+              value
+              unit
+            }
+            top {
+              value
+              unit
+            }
+          }
+          opacity
+          position
+          rowId
+          screenId
+          verticalAlignment
+          width {
+            value
+            unit
+          }
+          ... on Background {
             ...backgroundFields
-            autoColorStatusBar
-            experienceId
-            id
-            isStretchyHeaderEnabled
-            rows {
-                ...backgroundFields
-                autoHeight
-                blocks {
-                    __typename
-                    action {
-                        __typename
-                        ... on GoToScreenAction {
-                            experienceId
-                            screenId
-                        }
-                        ... on OpenUrlAction {
-                            url
-                        }
-                    }
-                    autoHeight
-                    experienceId
-                    height {
-                        value
-                        unit
-                    }
-                    id
-                    insets {
-                        bottom
-                        left
-                        right
-                        top
-                    }
-                    horizontalAlignment
-                    offsets {
-                        bottom {
-                            value
-                            unit
-                        }
-                        center {
-                            value
-                            unit
-                        }
-                        left {
-                            value
-                            unit
-                        }
-                        middle {
-                            value
-                            unit
-                        }
-                        right {
-                            value
-                            unit
-                        }
-                        top {
-                            value
-                            unit
-                        }
-                    }
-                    opacity
-                    position
-                    rowId
-                    screenId
-                    verticalAlignment
-                    width {
-                        value
-                        unit
-                    }
-                    ... on Background {
-                        ...backgroundFields
-                    }
-                    ... on Border {
-                        ...borderFields
-                    }
-                    ... on Text {
-                        ...textFields
-                    }
-                    ... on BarcodeBlock {
-                        barcodeScale
-                        barcodeText
-                        barcodeFormat
-                    }
-                    ... on ButtonBlock {
-                        disabled {
-                            ...buttonStateFields
-                        }
-                        normal {
-                            ...buttonStateFields
-                        }
-                        highlighted {
-                            ...buttonStateFields
-                        }
-                        selected {
-                            ...buttonStateFields
-                        }
-                    }
-                    ... on ImageBlock {
-                        image {
-                            height
-                            isURLOptimizationEnabled
-                            name
-                            size
-                            width
-                            url
-                        }
-                    }
-                    ... on WebViewBlock {
-                        isScrollingEnabled
-                        url
-                    }
-                }
-                experienceId
-                height {
-                    value
-                    unit
-                }
-                id
-                screenId
+          }
+          ... on Border {
+            ...borderFields
+          }
+          ... on Text {
+            ...textFields
+          }
+          ... on BarcodeBlock {
+            barcodeScale
+            barcodeText
+            barcodeFormat
+          }
+          ... on ButtonBlock {
+            disabled {
+              ...buttonStateFields
             }
-            statusBarStyle
-            statusBarColor {
-                red
-                green
-                blue
-                alpha
+            normal {
+              ...buttonStateFields
             }
-            titleBarBackgroundColor {
-                red
-                green
-                blue
-                alpha
+            highlighted {
+              ...buttonStateFields
             }
-            titleBarButtons
-            titleBarButtonColor {
-                red
-                green
-                blue
-                alpha
+            selected {
+              ...buttonStateFields
             }
-            titleBarText
-            titleBarTextColor {
-                red
-                green
-                blue
-                alpha
+          }
+          ... on ImageBlock {
+            image {
+              height
+              isURLOptimizationEnabled
+              name
+              size
+              width
+              url
             }
-            useDefaultTitleBarStyle
+          }
+          ... on WebViewBlock {
+            isScrollingEnabled
+            url
+          }
         }
+        experienceId
+        height {
+          value
+          unit
+        }
+        id
+        screenId
+      }
+      statusBarStyle
+      statusBarColor {
+        red
+        green
+        blue
+        alpha
+      }
+      titleBarBackgroundColor {
+        red
+        green
+        blue
+        alpha
+      }
+      titleBarButtons
+      titleBarButtonColor {
+        red
+        green
+        blue
+        alpha
+      }
+      titleBarText
+      titleBarTextColor {
+        red
+        green
+        blue
+        alpha
+      }
+      useDefaultTitleBarStyle
     }
+  	name
+    recentAverageDuration
+    simulatorUrl
+    versionId
+    viewToken
+  }
 }
 
 fragment buttonStateFields on ButtonState {
-    ...backgroundFields
-    ...borderFields
-    ...textFields
+	...backgroundFields
+  ...borderFields
+  ...textFields
 }
 
 fragment backgroundFields on Background {
-    backgroundColor {
-        red
-        green
-        blue
-        alpha
-    }
-    backgroundContentMode
-    backgroundImage {
-        height
-        isURLOptimizationEnabled
-        name
-        size
-        width
-        url
-    }
-    backgroundScale
+  backgroundColor {
+    red
+    green
+    blue
+    alpha
+  }
+  backgroundContentMode
+  backgroundImage {
+    height
+    isURLOptimizationEnabled
+    name
+    size
+    width
+    url
+  }
+  backgroundScale
 }
 
 fragment borderFields on Border {
-    borderColor {
-        red
-        green
-        blue
-        alpha
-    }
-    borderRadius
-    borderWidth
+  borderColor {
+    red
+    green
+    blue
+    alpha
+  }
+  borderRadius
+  borderWidth
 }
 
 fragment textFields on Text {
-    text
-    textAlignment
-    textColor {
-        red
-        green
-        blue
-        alpha
-    }
-    textFont {
-        size
-        weight
-    }
+  text
+  textAlignment
+  textColor {
+    red
+    green
+    blue
+    alpha
+  }
+  textFont {
+    size
+    weight
+  }
 }
