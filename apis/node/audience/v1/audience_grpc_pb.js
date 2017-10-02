@@ -578,6 +578,28 @@ function deserialize_rover_audience_v1_UpdateDeviceIBeaconMonitoringResponse(buf
   return audience_v1_audience_pb.UpdateDeviceIBeaconMonitoringResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_UpdateDeviceLabelPropertyRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceLabelPropertyRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceLabelPropertyRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_UpdateDeviceLabelPropertyRequest(buffer_arg) {
+  return audience_v1_audience_pb.UpdateDeviceLabelPropertyRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_UpdateDeviceLabelPropertyResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceLabelPropertyResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceLabelPropertyResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_UpdateDeviceLabelPropertyResponse(buffer_arg) {
+  return audience_v1_audience_pb.UpdateDeviceLabelPropertyResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_UpdateDeviceLocationRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceLocationRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceLocationRequest');
@@ -1036,6 +1058,17 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_UpdateDeviceTestPropertyRequest,
     responseSerialize: serialize_rover_audience_v1_UpdateDeviceTestPropertyResponse,
     responseDeserialize: deserialize_rover_audience_v1_UpdateDeviceTestPropertyResponse,
+  },
+  updateDeviceLabelProperty: {
+    path: '/rover.audience.v1.Audience/UpdateDeviceLabelProperty',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.UpdateDeviceLabelPropertyRequest,
+    responseType: audience_v1_audience_pb.UpdateDeviceLabelPropertyResponse,
+    requestSerialize: serialize_rover_audience_v1_UpdateDeviceLabelPropertyRequest,
+    requestDeserialize: deserialize_rover_audience_v1_UpdateDeviceLabelPropertyRequest,
+    responseSerialize: serialize_rover_audience_v1_UpdateDeviceLabelPropertyResponse,
+    responseDeserialize: deserialize_rover_audience_v1_UpdateDeviceLabelPropertyResponse,
   },
   // Lists
   listDevicesByProfileId: {

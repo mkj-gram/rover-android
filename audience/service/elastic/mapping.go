@@ -22,6 +22,7 @@ func DeviceMapping() M {
 				"updated_at": M{"type": "date"},
 
 				"is_test_device": M{"type": "boolean"},
+				"label":          M{"type": "string"},
 
 				"push_environment":           M{"type": "keyword"},
 				"push_token_key":             M{"type": "keyword"},

@@ -53,6 +53,7 @@ module Rover
           rpc :UpdateDeviceIBeaconMonitoring, UpdateDeviceIBeaconMonitoringRequest, UpdateDeviceIBeaconMonitoringResponse
           # Test devices
           rpc :UpdateDeviceTestProperty, UpdateDeviceTestPropertyRequest, UpdateDeviceTestPropertyResponse
+          rpc :UpdateDeviceLabelProperty, UpdateDeviceLabelPropertyRequest, UpdateDeviceLabelPropertyResponse
           # Lists
           rpc :ListDevicesByProfileId, ListDevicesByProfileIdRequest, ListDevicesByProfileIdResponse
           rpc :ListDevicesByProfileIdentifier, ListDevicesByProfileIdentifierRequest, ListDevicesByProfileIdentifierResponse

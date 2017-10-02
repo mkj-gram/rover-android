@@ -52,6 +52,9 @@ var (
 		"is_wifi_enabled": {
 			MissingValue: nil,
 		},
+		"label": {
+			MissingValue: "",
+		},
 		"locale_language": {
 			MissingValue: "",
 		},

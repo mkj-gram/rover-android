@@ -138,6 +138,8 @@ func getDeviceValue(device *audience.Device, attribute_name string) interface{} 
 		return device.GetUpdatedAt()
 	case "is_test_device":
 		return device.GetIsTestDevice()
+	case "label":
+		return device.GetLabel()
 	case "push_environment":
 		return device.GetPushEnvironment()
 	case "push_token_key":

@@ -26,6 +26,7 @@ type Device struct {
 	IsLocationMonitoringEnabled bool       `json:"is_location_monitoring_enabled"`
 	IsTestDevice                bool       `json:"is_test_device"`
 	IsWifiEnabled               bool       `json:"is_wifi_enabled"`
+	Label                       string     `json:"label"`
 	LocaleLanguage              string     `json:"locale_language"`
 	LocaleRegion                string     `json:"locale_region"`
 	LocaleScript                string     `json:"locale_script"`
@@ -109,6 +110,7 @@ func (d *Device) toProto(proto *audience.Device) error {
 		}
 	}
 
+	proto.Label = d.Label
 	proto.LocaleLanguage = d.LocaleLanguage
 	proto.LocaleRegion = d.LocaleRegion
 	proto.LocaleScript = d.LocaleScript

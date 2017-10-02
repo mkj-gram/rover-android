@@ -29,6 +29,7 @@ type Device struct {
 	UpdatedAt *time.Time    `bson:"updated_at"`
 
 	IsTestDevice            bool       `bson:"is_test_device,omitempty"`
+	Label                   string     `bson:"label,omitempty"`
 	PushEnvironment         string     `bson:"push_environment,omitempty"`
 	PushTokenKey            string     `bson:"push_token_key,omitempty"`
 	PushTokenIsActive       bool       `bson:"push_token_is_active"`
@@ -88,6 +89,7 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.UpdatedAt, _ = protoToTime(proto.UpdatedAt)
 
 	d.IsTestDevice = proto.IsTestDevice
+	d.Label = proto.Label
 	d.PushTokenKey = proto.PushTokenKey
 	d.PushEnvironment = proto.PushEnvironment
 	d.PushTokenIsActive = proto.PushTokenIsActive
@@ -158,6 +160,7 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.UpdatedAt, _ = timeToProto(d.UpdatedAt)
 
 	proto.IsTestDevice = d.IsTestDevice
+	proto.Label = d.Label
 	proto.PushEnvironment = d.PushEnvironment
 	proto.PushTokenKey = d.PushTokenKey
 
@@ -509,6 +512,26 @@ func (s *devicesStore) UpdateDeviceTestProperty(ctx context.Context, r *audience
 			"updated_at":     now,
 		}
 	)
+
+	if err := s.devices().Update(selector, bson.M{"$set": update}); err != nil {
+		return wrapError(err, "devices.Update")
+	}
+
+	return nil
+}
+
+func (s *devicesStore) UpdateDeviceLabelProperty(ctx context.Context, r *audience.UpdateDeviceLabelPropertyRequest) error {
+	now := s.timeNow()
+
+	account_id := r.GetAuthContext().GetAccountId()
+	device_id := r.GetDeviceId()
+	label := r.GetLabel()
+
+	selector := bson.M{"device_id": device_id, "account_id": account_id}
+	update := bson.M{
+		"label":      label,
+		"updated_at": now,
+	}
 
 	if err := s.devices().Update(selector, bson.M{"$set": update}); err != nil {
 		return wrapError(err, "devices.Update")
