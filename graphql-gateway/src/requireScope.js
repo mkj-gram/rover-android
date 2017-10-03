@@ -4,7 +4,7 @@ const requireScope = (scope, callback) => (data, args, context) => {
         throw new Error('Requires authentication')
     }
 
-    const scopes = authContext.toObject().permissionScopesList
+    const scopes = authContext.getPermissionScopesList()
     if (!scopes.includes(scope)) {
         throw new Error('Missing required scope \'' + scope + '\'')
     }
