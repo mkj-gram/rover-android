@@ -1,5 +1,5 @@
 import { GraphQLObjectType } from 'graphql'
-import TrackEventsMutation from '../events/TrackEventsMutation'
+import TrackEventsMutation from '../events/mutation/TrackEventsMutation'
 import SegmentMutation from '../segments/SegmentMutation'
 import { campaignMutations } from '../campaigns/CampaignTypes'
 
