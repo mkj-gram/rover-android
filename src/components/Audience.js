@@ -33,6 +33,7 @@ class Audience extends Component {
         this.archiveSegment = this.archiveSegment.bind(this)
         this.setQueryCondition = this.setQueryCondition.bind(this)
         this.refreshData = this.refreshData.bind(this)
+        this.completeRefresh = this.completeRefresh.bind(this)
     }
 
     setQueryCondition(queryCondition, initial = false, query = null) {
@@ -66,36 +67,37 @@ class Audience extends Component {
         }
     }
 
-    refreshData(completed = false) {
+    completeRefresh() {
+        this.setState({
+            refresh: false,
+            refetchData: false
+        })
+    }
+
+    refreshData() {
         const { context } = this.state
-        if (completed) {
+        
+        if (context === 'segments') {
             this.setState({
-                refresh: false,
-                refetchData: false
+                refetchData: true,
+                resetPagination: true,
+                group: 0,
+                pageNumber: 0,
+                refetchSideBar: false,
+                segmentIdRefetch: false,
+                refresh: true
             })
-        } else if (!completed) {
-            if (context === 'segments') {
-                this.setState({
-                    refetchData: true,
-                    resetPagination: true,
-                    group: 0,
-                    pageNumber: 0,
-                    refetchSideBar: false,
-                    segmentIdRefetch: false,
-                    refresh: true
-                })
-            } else if (context === 'predicates') {
-                this.setState({
-                    fetchSegmentsFromPred: false,
-                    resetPagination: true,
-                    group: 0,
-                    pageNumber: 0,
-                    refetchData: true,
-                    refetchSideBar: false,
-                    segmentIdRefetch: false,
-                    refresh: true
-                })
-            }
+        } else if (context === 'predicates') {
+            this.setState({
+                fetchSegmentsFromPred: false,
+                resetPagination: true,
+                group: 0,
+                pageNumber: 0,
+                refetchData: true,
+                refetchSideBar: false,
+                segmentIdRefetch: false,
+                refresh: true
+            })
         }
     }
 
@@ -252,6 +254,7 @@ class Audience extends Component {
                     fetchSegmentsFromPred={this.state.fetchSegmentsFromPred}
                     refreshData={this.refreshData}
                     refresh={this.state.refresh}
+                    completeRefresh={this.completeRefresh}
                 />
             </div>
         )

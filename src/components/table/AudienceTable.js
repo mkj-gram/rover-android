@@ -57,10 +57,10 @@ class AudienceTable extends Component {
         this.getAllColumns = this.getAllColumns.bind(this)
         this.updateChecked = this.updateChecked.bind(this)
         this.getSetCachedColumns = this.getSetCachedColumns.bind(this)
-        this.updateDynamicSegments = this.updateDynamicSegments.bind(this)
         this.renderFetch = this.renderFetch.bind(this)
         this.fetchData = this.fetchData.bind(this)
         this.renderDataGrid = this.renderDataGrid.bind(this)
+        this.shouldCompleteRefresh = this.shouldCompleteRefresh.bind(this)
     }
 
     componentDidMount() {
@@ -245,6 +245,12 @@ class AudienceTable extends Component {
     }
 
     fetchData(nextProps) {
+        const callbackFetch = () => {
+            if (this.state.refetched) {
+                this.renderFetch(nextProps)
+            }
+        }
+
         const { relay } = this.props
         let refetchVariables
 
@@ -266,7 +272,7 @@ class AudienceTable extends Component {
                 refetchVariables,
                 null,
                 error => {
-                    error !== undefined ? console.log(`Error: ${error}`) : ''
+                    error !== undefined ? console.log(`Error: ${error}`) : callbackFetch()
                 },
                 { force: true }
             )
@@ -284,7 +290,7 @@ class AudienceTable extends Component {
                 refetchVariables,
                 null,
                 error => {
-                    error !== undefined ? console.log(`Error: ${error}`) : ''
+                    error !== undefined ? console.log(`Error: ${error}`) : callbackFetch()
                 },
                 { force: true }
             )
@@ -293,7 +299,6 @@ class AudienceTable extends Component {
 
     componentWillReceiveProps(nextProps) {
         const { refetched } = this.state
-
         if (nextProps.refetchData) {
             if (!refetched) {
                 if (nextProps.resetPagination === false) {
@@ -309,8 +314,6 @@ class AudienceTable extends Component {
             } else {
                 this.renderFetch(nextProps)
             }
-        } else {
-            this.updateDynamicSegments(nextProps.segmentId)
         }
     }
 
@@ -326,6 +329,7 @@ class AudienceTable extends Component {
             dataSource = nextProps.data.adgSegmentsFromPredicates
         }
         const { dataGridRows, segmentSize, totalSize } = dataSource
+
         this.setState(
             {
                 rows: this.getSelectedRows(dataGridRows, nextProps.pageNumber),
@@ -334,14 +338,14 @@ class AudienceTable extends Component {
                 dataGridRows,
                 refetched: false
             },
-            this.props.refreshData(true)
+            this.shouldCompleteRefresh(nextProps.refresh)
         )
     }
 
-    updateDynamicSegments(segmentId) {
-        this.setState({
-            segmentId
-        })
+    shouldCompleteRefresh(refresh) {
+        if (refresh) {
+            this.props.completeRefresh()
+        }
     }
 
     getSelectedRows(dataGridRows, pageNum = 0) {
