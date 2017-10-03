@@ -10,9 +10,15 @@ const ExperienceQuery = {
         }
     },
     resolve(_, { id }, { apiKey }) {
-        const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST || 'https://api.rover.io'
+        let baseUrl = 'https://api.rover.io'
+        const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST
+        const port = process.env.CONTENT_API_SERVICE_SERVICE_PORT
+        if (host && port) {
+            baseUrl = `http://${host}:${port}`
+        }
+
         const options = {
-            url: `${host}/v1/experiences/${id}/current`,
+            url: `${baseUrl}/v1/experiences/${id}/current`,
             headers: {
                 accept: 'application/json',
                 'x-rover-api-key': apiKey
@@ -21,6 +27,15 @@ const ExperienceQuery = {
 
         return new Promise((resolve, reject) => {
             request(options, (err, response, body) => {
+                if (err) {
+                    return reject(err)
+                }
+
+                if (!response) {
+                    let error = new Error('Failed to connect to host')
+                    return reject(error)
+                }
+
                 if (response.statusCode === 404) {
                     let error = new Error('No experience found with id: ' + id)
                     return reject(error)
