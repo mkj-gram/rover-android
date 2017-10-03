@@ -1,3 +1,0 @@
-mutation TrackEvents($events: [Event]!) {
-  trackEvents(events:$events)
-}

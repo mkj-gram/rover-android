@@ -6,9 +6,9 @@ import {
 
 import GraphQLJSON from 'graphql-type-json'
 
-const EventInputType = new GraphQLInputObjectType({
+const Event = new GraphQLInputObjectType({
     name: 'Event',
-    fields: {
+    fields: () => ({
         name: {
             type: new GraphQLNonNull(GraphQLString)
         },
@@ -18,7 +18,7 @@ const EventInputType = new GraphQLInputObjectType({
         attributes: {
             type: GraphQLJSON
         }
-    }
+    })
 })
 
-export default EventInputType
+export default Event

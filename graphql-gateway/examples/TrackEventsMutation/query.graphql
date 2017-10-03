@@ -1,0 +1,3 @@
+mutation TrackEvents($events: [Event]!, $context: Context!) {
+  trackEvents(events:$events, context:$context)
+}
