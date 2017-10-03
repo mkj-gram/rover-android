@@ -71,7 +71,8 @@ class TableMenuBarIcon extends Component {
                         y: target.top + target.height - 60,
                         divWidth: target.width
                     }
-                }
+                },
+                hover: true
             })
         }
     }
@@ -86,7 +87,8 @@ class TableMenuBarIcon extends Component {
                     y: 0,
                     divWidth: 0
                 }
-            }
+            },
+            hover: false
         })
     }
 
