@@ -1,8 +1,7 @@
 import { GraphQLObjectType } from 'graphql'
 import { CampaignRootType, nodeField } from '../campaigns/CampaignTypes'
 import { getViewer } from '../database'
-import ExperienceQuery from '../experiences/ExperienceQuery'
-import EditableExperienceQuery from '../experiences/EditableExperienceQuery'
+import ExperienceQuery from '../experiences/query/ExperienceQuery'
 import SegmentFromPredicatesQuery from '../segments/SegmentFromPredicatesQuery'
 import DynamicSegmentQuery from '../segments/DynamicSegmentQuery'
 import SegmentSchemaQuery from '../segments/SegmentSchemaQuery'
@@ -19,7 +18,6 @@ Query.type = new GraphQLObjectType({
         },
         node: nodeField,
         experience: ExperienceQuery,
-        editableExperience: EditableExperienceQuery,
         dynamicSegment: DynamicSegmentQuery,
         segmentFromPredicates: SegmentFromPredicatesQuery,
         segmentSchema: SegmentSchemaQuery,

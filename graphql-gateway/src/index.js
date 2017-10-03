@@ -32,8 +32,9 @@ app.disable('x-powered-by')
 app.use('/graphql', cors(), authMiddleware, graphqlHTTP(req => ({
     schema,
     graphiql: true,
-    context: { 
+    context: {
         authContext: req.auth && req.auth.context,
+        apiKey: req.headers['x-rover-api-key'],
         deviceId: req.headers['x-rover-device-id'],
         profileId: req.headers['x-rover-profile-id'],
     },

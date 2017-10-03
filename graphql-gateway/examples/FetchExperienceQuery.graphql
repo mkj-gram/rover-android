@@ -1,13 +1,18 @@
 query FetchExperience($id: ID!) {
   experience(id: $id) {
-    id
+    hasUnpublishedChanges
     homeScreenId
+    id
+    isArchived
+    isPublished
     screens {
       ...backgroundFields
       autoColorStatusBar
       experienceId
+      hasUnpublishedChanges
       id
       isStretchyHeaderEnabled
+      name
       rows {
         ...backgroundFields
         autoHeight
@@ -24,11 +29,13 @@ query FetchExperience($id: ID!) {
             }
           }
           autoHeight
+          clickCount
           experienceId
           height {
             value
             unit
           }
+          horizontalAlignment
           id
           insets {
             bottom
@@ -36,7 +43,8 @@ query FetchExperience($id: ID!) {
             right
             top
           }
-          horizontalAlignment
+          lockStatus
+          name
           offsets {
             bottom {
               value
@@ -72,35 +80,21 @@ query FetchExperience($id: ID!) {
             value
             unit
           }
-          ... on HasBackground {
+          ... on Background {
             ...backgroundFields
           }
-          ... on HasBorder {
+          ... on Border {
             ...borderFields
           }
-          ... on HasText {
+          ... on Text {
             ...textFields
           }
-          ... on HasBarcode {
+          ... on BarcodeBlock {
             barcodeScale
             barcodeText
             barcodeFormat
           }
-          ... on HasImage {
-            image {
-              height
-              isURLOptimizationEnabled
-              name
-              size
-              width
-              url
-            }
-          }
-          ... on HasWebView {
-            isScrollingEnabled
-            url
-          }
-          ... on HasButtonStates {
+          ... on ButtonBlock {
             disabled {
               ...buttonStateFields
             }
@@ -114,6 +108,20 @@ query FetchExperience($id: ID!) {
               ...buttonStateFields
             }
           }
+          ... on ImageBlock {
+            image {
+              height
+              isURLOptimizationEnabled
+              name
+              size
+              width
+              url
+            }
+          }
+          ... on WebViewBlock {
+            isScrollingEnabled
+            url
+          }
         }
         experienceId
         height {
@@ -121,6 +129,8 @@ query FetchExperience($id: ID!) {
           unit
         }
         id
+        isCollapsed
+        name
         screenId
       }
       statusBarStyle
@@ -151,17 +161,23 @@ query FetchExperience($id: ID!) {
         alpha
       }
       useDefaultTitleBarStyle
+      views
     }
+  	name
+    recentAverageDuration
+    simulatorUrl
+    versionId
+    viewToken
   }
 }
 
 fragment buttonStateFields on ButtonState {
-  ...backgroundFields
+	...backgroundFields
   ...borderFields
   ...textFields
 }
 
-fragment backgroundFields on HasBackground {
+fragment backgroundFields on Background {
   backgroundColor {
     red
     green
@@ -180,7 +196,7 @@ fragment backgroundFields on HasBackground {
   backgroundScale
 }
 
-fragment borderFields on HasBorder {
+fragment borderFields on Border {
   borderColor {
     red
     green
@@ -191,7 +207,7 @@ fragment borderFields on HasBorder {
   borderWidth
 }
 
-fragment textFields on HasText {
+fragment textFields on Text {
   text
   textAlignment
   textColor {

@@ -41,7 +41,7 @@ import GraphQLJSON from 'graphql-type-json'
 import GraphQLDate from 'graphql-date'
 import uuid from 'node-uuid'
 
-import Experience from '../experiences/Experience'
+import Experience from '../experiences/models/Experience'
 
 export const { nodeInterface, nodeField } = nodeDefinitions(
     globalId => {
@@ -126,7 +126,7 @@ const CampaignType = new GraphQLObjectType({
             resolve: obj => obj.campaignOpens
         },
         experience: {
-            type: Experience.type,
+            type: Experience,
             resolve: obj => obj.experience
         }
     }),
