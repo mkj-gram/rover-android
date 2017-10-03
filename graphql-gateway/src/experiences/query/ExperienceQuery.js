@@ -10,8 +10,9 @@ const ExperienceQuery = {
         }
     },
     resolve(_, { id }, { apiKey }) {
+        const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST || 'https://api.rover.io'
         const options = {
-            url: 'https://api.rover.io/v1/experiences/' + id + '/current',
+            url: `${host}/v1/experiences/${id}/current`,
             headers: {
                 accept: 'application/json',
                 'x-rover-api-key': apiKey
