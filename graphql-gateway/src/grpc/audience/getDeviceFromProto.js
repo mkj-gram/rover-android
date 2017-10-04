@@ -39,6 +39,7 @@ export default (d) => {
         sdk_version: getVersionFromProto(d.getFrameworksMap().get('io.rover.Rover')),
         device_id: d.getDeviceId(),
         is_test_device: d.getIsTestDevice(),
+        label: d.getLabel(),
         platform: getPlatformFromProto(d.getPlatform()),
         profile_id: d.getProfileId(),
         push_token_is_active: d.getPushTokenIsActive(),
