@@ -9,7 +9,7 @@ const ExperienceQuery = {
             type: new GraphQLNonNull(GraphQLID)
         }
     },
-    resolve(_, { id }, { apiKey }) {
+    resolve(_, { id }, { accountToken }) {
         let baseUrl = 'https://api.rover.io'
         const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST
         const port = process.env.CONTENT_API_SERVICE_SERVICE_PORT
@@ -21,7 +21,7 @@ const ExperienceQuery = {
             url: `${baseUrl}/v1/experiences/${id}/current`,
             headers: {
                 accept: 'application/json',
-                'x-rover-api-key': apiKey
+                'x-rover-api-key': accountToken
             }
         }
 
