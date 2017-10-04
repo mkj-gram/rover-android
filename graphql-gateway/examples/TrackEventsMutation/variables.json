@@ -1,37 +1,51 @@
 {
+  "context": {
+    "localeRegion": "CA",
+    "appBuild": "1",
+    "operatingSystemName": "iOS",
+    "carrierName": "Rogers",
+    "isCellularEnabled": false,
+    "appVersion": "1.0",
+    "pushToken": "216be7fc0225dea9d711fc98fb993c63ca80c3e22cb7be8f97eaf4859e5e2fa2",
+    "locationAuthorization": "authorizedAlways",
+    "notificationAuthorization": "authorized",
+    "operatingSystemVersion": "11.0",
+    "screenHeight": 736,
+    "radio": "LTE",
+    "isLocationServicesEnabled": true,
+    "appName": "Inbox",
+    "timeZone": "America/Toronto",
+    "appNamespace": "io.rover.Inbox",
+    "deviceManufacturer": "Apple",
+    "sdkVersion": "2.0.0",
+    "localeLanguage": "en",
+    "screenWidth": 414,
+    "deviceModel": "iPhone9,4",
+    "isWifiEnabled": true,
+    "pushEnvironment": "development"
+  },
   "events": [
     {
-      "name": "App Opened",
-      "timestamp": "2017-10-03T12:37:37-04:00",
+      "name": "App Installed",
+      "id": "71204F74-30BD-4750-877C-2CF8EFA6AC54",
+      "timestamp": "2017-10-04T01:24:31Z"
+    },
+    {
+      "timestamp": "2017-10-03T22:50:25Z",
+      "name": "Location Updated",
       "attributes": {
-        "foo": "bar"
-      }
+        "altitude": 118.31166076660156,
+        "horizontalAccuracy": 65,
+        "latitude": 43.66532205937902,
+        "longitude": -79.37151382294515,
+        "verticalAccuracy": 10
+      },
+      "id": "20DC798F-1563-4664-9CDA-69585BEB6093"
+    },
+    {
+      "name": "App Opened",
+      "id": "41303802-458B-4353-9F8D-A440ADC6DA55",
+      "timestamp": "2017-10-04T01:24:31Z"
     }
-  ],
-  "context": {
-    "appBuild": "1",
-    "appName": "Inbox",
-    "appNamespace": "io.rover.Inbox",
-    "appVersion": "1.0.0",
-    "carrierName": "Rogers",
-    "deviceManufacturer": "Apple",
-    "deviceModel": "iPhone9,2",
-    "isCellularEnabled": true,
-    "isLocationServicesEnabled": true,
-    "isWifiEnabled": true,
-    "locationAuthorization": "always",
-    "localeLanguage": "en",
-    "localeRegion": "US",
-    "localeScript": null,
-    "notificationAuthorization": "authorized",
-    "operatingSystemName": "iOS",
-    "operatingSystemVersion": "11.0.0",
-    "pushEnvironment": "production",
-    "pushToken": null,
-    "radio": "LTE",
-    "screenWidth": 320,
-    "screenHeight": 480,
-    "sdkVersion": "2.0.0",
-    "timeZone": "America/Toronto"
-  }
+  ]
 }

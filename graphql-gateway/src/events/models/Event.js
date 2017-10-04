@@ -1,4 +1,5 @@
 import {
+    GraphQLID,
     GraphQLInputObjectType,
     GraphQLNonNull,
     GraphQLString,
@@ -9,6 +10,9 @@ import GraphQLJSON from 'graphql-type-json'
 const Event = new GraphQLInputObjectType({
     name: 'Event',
     fields: () => ({
+        id: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
         name: {
             type: new GraphQLNonNull(GraphQLString)
         },
