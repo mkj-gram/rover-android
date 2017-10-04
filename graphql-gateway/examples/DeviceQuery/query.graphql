@@ -1,0 +1,22 @@
+query {
+  device {
+    profile {
+      identifier
+      attributes
+      createdAt
+      updatedAt
+    }
+    regions {
+      ...on BeaconRegion {
+        uuid
+        major
+        minor
+      }
+      ...on GeofenceRegion {
+        latitude
+        longitude
+        radius
+      }
+    }
+  }
+}
