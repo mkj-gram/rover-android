@@ -476,7 +476,7 @@ class AudienceTable extends Component {
             name: (attr === 'is_test_device_DEVICE') ? this.getTestDevice() : selectedColumns[attr].label,
             width: this.getCellWidth(selectedColumns[attr].__typename, attr),
             draggable: true,
-            resizable: true,
+            resizable: (attr === 'is_test_device_DEVICE') ? false : true,
             formatter: this.getFormat(selectedColumns[attr].__typename)
         }))
 

@@ -38,7 +38,8 @@ class TestDeviceIconFormatter extends Component {
             <div
                 style={{
                     position: 'absolute',
-                    bottom: 10
+                    bottom: 10,
+                    left: 19
                 }}
                 onMouseOver={this.handleMouseOver}
                 onMouseLeave={this.handleMouseLeave}
