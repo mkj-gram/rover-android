@@ -1,11 +1,11 @@
 import { GraphQLObjectType } from 'graphql'
 import { CampaignRootType, nodeField } from '../campaigns/CampaignTypes'
 import { getViewer } from '../database'
+import DeviceQuery from '../device/query/DeviceQuery'
 import ExperienceQuery from '../experiences/query/ExperienceQuery'
 import SegmentFromPredicatesQuery from '../segments/SegmentFromPredicatesQuery'
 import DynamicSegmentQuery from '../segments/DynamicSegmentQuery'
 import SegmentSchemaQuery from '../segments/SegmentSchemaQuery'
-import SyncQuery from '../sync/SyncQuery'
 
 class Query { }
 
@@ -21,7 +21,7 @@ Query.type = new GraphQLObjectType({
         dynamicSegment: DynamicSegmentQuery,
         segmentFromPredicates: SegmentFromPredicatesQuery,
         segmentSchema: SegmentSchemaQuery,
-        sync: SyncQuery
+        device: DeviceQuery
     }
 })
 
