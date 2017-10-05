@@ -54,7 +54,10 @@ const Middleware = function(client, opts = {}) {
         /*
             Choose which method to authenticate with based on header values
          */
-        if (headers.hasOwnProperty('x-rover-account-token')) {
+         if (headers.hasOwnProperty('x-rover-api-key')) {
+             request.setKey(headers['x-rover-api-key'])
+             client.authenticateToken(request, returnContext)
+        } else if (headers.hasOwnProperty('x-rover-account-token')) {
             request.setKey(headers['x-rover-account-token'])
             client.authenticateToken(request, returnContext)
         } else if (headers.hasOwnProperty('authorization')) {
