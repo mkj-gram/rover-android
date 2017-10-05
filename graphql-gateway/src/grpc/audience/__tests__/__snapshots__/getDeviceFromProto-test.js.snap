@@ -1,0 +1,185 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getDeviceFromProto should match snapshot 1`] = `
+Array [
+  Object {
+    "attribute": "created_at",
+    "selector": "DEVICE",
+    "value": 2017-06-14T15:44:18.496Z,
+  },
+  Object {
+    "attribute": "app_version",
+    "selector": "DEVICE",
+    "value": "1.0",
+  },
+  Object {
+    "attribute": "device_manufacturer",
+    "selector": "DEVICE",
+    "value": "Apple",
+  },
+  Object {
+    "attribute": "device_model",
+    "selector": "DEVICE",
+    "value": "iPhone7,2",
+  },
+  Object {
+    "attribute": "os_name",
+    "selector": "DEVICE",
+    "value": "iOS",
+  },
+  Object {
+    "attribute": "locale_language",
+    "selector": "DEVICE",
+    "value": "en",
+  },
+  Object {
+    "attribute": "locale_region",
+    "selector": "DEVICE",
+    "value": "us",
+  },
+  Object {
+    "attribute": "locale_script",
+    "selector": "DEVICE",
+    "value": "zz",
+  },
+  Object {
+    "attribute": "is_wifi_enabled",
+    "selector": "DEVICE",
+    "value": true,
+  },
+  Object {
+    "attribute": "is_cellular_enabled",
+    "selector": "DEVICE",
+    "value": true,
+  },
+  Object {
+    "attribute": "screen_width",
+    "selector": "DEVICE",
+    "value": 1080,
+  },
+  Object {
+    "attribute": "screen_height",
+    "selector": "DEVICE",
+    "value": 720,
+  },
+  Object {
+    "attribute": "carrier_name",
+    "selector": "DEVICE",
+    "value": "rogers",
+  },
+  Object {
+    "attribute": "radio",
+    "selector": "DEVICE",
+    "value": "LTE",
+  },
+  Object {
+    "attribute": "time_zone",
+    "selector": "DEVICE",
+    "value": "America/Toronto",
+  },
+  Object {
+    "attribute": "is_bluetooth_enabled",
+    "selector": "DEVICE",
+    "value": true,
+  },
+  Object {
+    "attribute": "advertising_id",
+    "selector": "DEVICE",
+    "value": "",
+  },
+  Object {
+    "attribute": "ip",
+    "selector": "DEVICE",
+    "value": "",
+  },
+  Object {
+    "attribute": "location_latitude",
+    "selector": "DEVICE",
+    "value": 22.00101,
+  },
+  Object {
+    "attribute": "location_longitude",
+    "selector": "DEVICE",
+    "value": -32.1231,
+  },
+  Object {
+    "attribute": "os_version",
+    "selector": "DEVICE",
+    "value": Array [
+      1,
+      2,
+      3,
+    ],
+  },
+  Object {
+    "attribute": "sdk_version",
+    "selector": "DEVICE",
+    "value": Array [],
+  },
+  Object {
+    "attribute": "device_id",
+    "selector": "DEVICE",
+    "value": "adevice00",
+  },
+  Object {
+    "attribute": "is_test_device",
+    "selector": "DEVICE",
+    "value": false,
+  },
+  Object {
+    "attribute": "label",
+    "selector": "DEVICE",
+    "value": "",
+  },
+  Object {
+    "attribute": "platform",
+    "selector": "DEVICE",
+    "value": "Web",
+  },
+  Object {
+    "attribute": "profile_id",
+    "selector": "DEVICE",
+    "value": "00000000000000000000aaa2",
+  },
+  Object {
+    "attribute": "push_token_is_active",
+    "selector": "DEVICE",
+    "value": true,
+  },
+  Object {
+    "attribute": "region_monitoring_mode",
+    "selector": "DEVICE",
+    "value": 2,
+  },
+  Object {
+    "attribute": "is_background_enabled",
+    "selector": "DEVICE",
+    "value": true,
+  },
+  Object {
+    "attribute": "is_location_monitoring_enabled",
+    "selector": "DEVICE",
+    "value": true,
+  },
+  Object {
+    "attribute": "push_environment",
+    "selector": "DEVICE",
+    "value": "development",
+  },
+  Object {
+    "attribute": "push_token_key",
+    "selector": "DEVICE",
+    "value": "abc",
+  },
+  Object {
+    "attribute": "push_token_created_at",
+    "selector": "DEVICE",
+    "value": 2017-06-14T15:44:18.496Z,
+  },
+  Object {
+    "attribute": "push_token_updated_at",
+    "selector": "DEVICE",
+    "value": 2017-06-14T15:44:18.496Z,
+  },
+]
+`;

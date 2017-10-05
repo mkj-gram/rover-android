@@ -10,6 +10,8 @@ node-phone-simulator/public/app.js
 node-phone-simulator/.env
 graphql-gateway/src/.env
 graphql-gateway/dist/
+graphql-gateway/coverage/
 
 .idea
 /react-bootstrap/es
+/graphql-gateway/jest_0
