@@ -1,6 +1,7 @@
 import request from 'request'
 import { GraphQLID, GraphQLNonNull } from 'graphql'
 import Experience from '../models/Experience'
+import { requireAuthentication } from '../../resolvers'
 
 const ExperienceQuery = {
     type: Experience,
@@ -9,7 +10,7 @@ const ExperienceQuery = {
             type: new GraphQLNonNull(GraphQLID)
         }
     },
-    resolve(_, { id }, { accountToken }) {
+    resolve: requireAuthentication((_, { id }, { accountToken }) => {
         let baseUrl = 'https://api.rover.io'
         const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST
         const port = process.env.CONTENT_API_SERVICE_SERVICE_PORT

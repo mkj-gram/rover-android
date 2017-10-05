@@ -17,7 +17,7 @@ import Row from './Row'
 import StatusBarStyle from './StatusBarStyle'
 import TitleBarButtons from './TitleBarButtons'
 
-import requireScope from '../../requireScope'
+import { requireScope } from '../../resolvers'
 
 const Screen = new GraphQLObjectType({
     name: 'Screen',

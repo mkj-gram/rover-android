@@ -9,8 +9,7 @@ import {
 } from 'graphql'
 
 import Screen from './Screen'
-
-import requireScope from '../../requireScope'
+import { requireScope } from '../../resolvers'
 
 const Experience = new GraphQLObjectType({
     name: 'Experience',
