@@ -108,6 +108,14 @@ func ProfileMapping(profileAttributesMapping M) M {
 	return M{
 		// Profile
 		"profile": M{
+			// disable dynamic mapping updates
+			// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/dynamic.html
+			//
+			// false - Newly detected fields are ignored. These fields will not be
+			// indexed so will not be searchable but will still appear in the _source
+			// field of returned hits. These fields will not be added to the mapping,
+			// new fields must be added explicitly.
+			"dynamic": false,
 			// Meta
 			"_all": M{"enabled": false},
 			// Props

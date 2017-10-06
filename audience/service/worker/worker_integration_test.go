@@ -172,6 +172,7 @@ func TestWorker(t *testing.T) {
 						"test_account_1": M{
 							"mappings": M{
 								"profile": M{
+									"dynamic": "false",
 									// Meta
 									"_all": M{"enabled": false},
 									// Props
@@ -201,6 +202,7 @@ func TestWorker(t *testing.T) {
 						"test_account_1": M{
 							"mappings": M{
 								"profile": M{
+									"dynamic": "false",
 									// Meta
 									"_all": M{"enabled": false},
 									// Props
