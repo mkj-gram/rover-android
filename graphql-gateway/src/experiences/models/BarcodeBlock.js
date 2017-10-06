@@ -25,7 +25,7 @@ import Offsets from './Offsets'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
 
-import requireScope from '../../requireScope'
+import { requireScope } from '../../resolvers'
 
 const BarcodeBlock = new GraphQLObjectType({
     name: 'BarcodeBlock',

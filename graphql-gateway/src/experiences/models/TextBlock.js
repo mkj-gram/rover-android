@@ -27,7 +27,7 @@ import Text from './Text'
 import TextAlignment from './TextAlignment'
 import VerticalAlignment from './VerticalAlignment'
 
-import requireScope from '../../requireScope'
+import { requireScope } from '../../resolvers'
 
 const TextBlock = new GraphQLObjectType({
     name: 'TextBlock',

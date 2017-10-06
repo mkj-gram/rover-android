@@ -6,6 +6,7 @@ import {
 
 import Context from '../models/Context'
 import Event from '../models/Event'
+import { requireAuthentication } from '../../resolvers'
 
 const TrackEventsMutation = {
     type: GraphQLString,
@@ -17,9 +18,9 @@ const TrackEventsMutation = {
             type: new GraphQLNonNull(Context)
         }
     },
-    resolve(_, { events }) {
+    resolve: requireAuthentication((_, { events }) => {
         return 'success'
-    }
+    })
 }
 
 export default TrackEventsMutation

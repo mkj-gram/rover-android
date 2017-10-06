@@ -24,7 +24,7 @@ import Offsets from './Offsets'
 import Position from './Position'
 import VerticalAlignment from './VerticalAlignment'
 
-import requireScope from '../../requireScope'
+import { requireScope } from '../../resolvers'
 
 const WebViewBlock = new GraphQLObjectType({
     name: 'WebViewBlock',

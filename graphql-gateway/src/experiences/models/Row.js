@@ -15,7 +15,7 @@ import Color from './Color'
 import Image from './Image'
 import Length from './Length'
 
-import requireScope from '../../requireScope'
+import { requireScope } from '../../resolvers'
 
 const Row = new GraphQLObjectType({
     name: 'Row',

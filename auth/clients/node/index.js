@@ -37,7 +37,7 @@ const Middleware = function(client, opts = {}) {
         const getError = function(err) {
             return (err) ? new Error(err.message) : null
         }
-        
+
         /*
             return function since authenticateToken and authenticateUserSession have the same response
          */
@@ -56,6 +56,9 @@ const Middleware = function(client, opts = {}) {
          */
         if (headers.hasOwnProperty('x-rover-api-key')) {
             request.setKey(headers['x-rover-api-key'])
+            client.authenticateToken(request, returnContext)
+        } else if (headers.hasOwnProperty('x-rover-account-token')) {
+            request.setKey(headers['x-rover-account-token'])
             client.authenticateToken(request, returnContext)
         } else if (headers.hasOwnProperty('authorization')) {
             const key = headers['authorization'].split(' ')[1]
