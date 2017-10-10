@@ -118,7 +118,7 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 	return &audience.UpdateDeviceResponse{}, nil
 }
 
-// UpdateDevice implements the corresponding rpc
+// UpdateDeviceTestProperty implements the corresponding rpc
 func (s *Server) UpdateDeviceTestProperty(ctx context.Context, r *audience.UpdateDeviceTestPropertyRequest) (*audience.UpdateDeviceTestPropertyResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
@@ -133,6 +133,26 @@ func (s *Server) UpdateDeviceTestProperty(ctx context.Context, r *audience.Updat
 	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
 
 	return &audience.UpdateDeviceTestPropertyResponse{}, nil
+}
+
+// UpdateDeviceLabelProperty implements the corresponding rpc
+func (s *Server) UpdateDeviceLabelProperty(ctx context.Context, r *audience.UpdateDeviceLabelPropertyRequest) (*audience.UpdateDeviceLabelPropertyResponse, error) {
+	if err := validateID(r.GetDeviceId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
+	}
+	db := s.db.Copy()
+	defer db.Close()
+
+	if err := db.UpdateDeviceLabelProperty(ctx, r); err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceLabelProperty: %v", err)
+	}
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
+	return &audience.UpdateDeviceLabelPropertyResponse{}, nil
 }
 
 // DeleteDevice implements the corresponding rpc

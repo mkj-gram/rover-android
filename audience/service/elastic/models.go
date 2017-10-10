@@ -55,6 +55,7 @@ func DeviceDoc(d *mongodb.Device) M {
 		"updated_at": TimeDoc(d.UpdatedAt),
 
 		"is_test_device":             d.IsTestDevice,
+		"label":                      d.Label,
 		"push_environment":           d.PushEnvironment,
 		"push_token_key":             d.PushTokenKey,
 		"push_token_is_active":       d.PushTokenIsActive,

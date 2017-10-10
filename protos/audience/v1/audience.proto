@@ -53,6 +53,7 @@ service Audience {
   rpc UpdateDeviceIBeaconMonitoring(UpdateDeviceIBeaconMonitoringRequest) returns (UpdateDeviceIBeaconMonitoringResponse);
   // Test devices
   rpc UpdateDeviceTestProperty(UpdateDeviceTestPropertyRequest) returns (UpdateDeviceTestPropertyResponse);
+  rpc UpdateDeviceLabelProperty(UpdateDeviceLabelPropertyRequest) returns (UpdateDeviceLabelPropertyResponse);
 
   // Lists
   rpc ListDevicesByProfileId(ListDevicesByProfileIdRequest) returns (ListDevicesByProfileIdResponse);
@@ -299,6 +300,14 @@ message UpdateDeviceTestPropertyRequest {
 message UpdateDeviceTestPropertyResponse {}
 
 
+message UpdateDeviceLabelPropertyRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string device_id = 2;
+  string label = 3;
+}
+message UpdateDeviceLabelPropertyResponse {}
+
+
 message DeleteDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
   string device_id = 2;
@@ -405,6 +414,8 @@ message Device {
   google.protobuf.Timestamp updated_at = 6;
 
   bool is_test_device = 7;
+
+  string label = 8;
 
   // Attributes
 

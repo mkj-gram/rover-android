@@ -82,6 +82,8 @@ func device(t *testing.T, profileId string) *audience.Device {
 		LocationAccuracy:  5,
 		CreatedAt:         protoTs(t, parseTime(t, "2013-06-05T14:10:43.678Z")),
 		UpdatedAt:         protoTs(t, parseTime(t, "2013-06-05T14:10:43.678Z")),
+		IsTestDevice:      true,
+		Label:             "my little label",
 	}
 
 }
@@ -1692,6 +1694,40 @@ func testPredicates_ComplexPredicates(t *testing.T) {
 									AttributeName: "age",
 									Op:            audience.NumberPredicate_IS_EQUAL,
 									Value:         36,
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: p,
+			device:  d,
+			exp:     true,
+			expErr:  nil,
+		},
+		{
+			name: "device label is set and is_test_device is true",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ANY,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_BoolPredicate{
+								BoolPredicate: &audience.BoolPredicate{
+									Op:            audience.BoolPredicate_IS_EQUAL,
+									AttributeName: "is_test_device",
+									Value:         true,
+								},
+							},
+						},
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									Op:            audience.StringPredicate_IS_EQUAL,
+									AttributeName: "label",
+									Value:         "my little label",
 								},
 							},
 						},

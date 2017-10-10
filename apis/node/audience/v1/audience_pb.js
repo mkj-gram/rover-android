@@ -101,6 +101,8 @@ goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringResponse', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceLocationRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceLocationResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDevicePushTokenRequest', null, global);
@@ -7039,6 +7041,331 @@ proto.rover.audience.v1.UpdateDeviceTestPropertyResponse.serializeBinaryToWriter
  * @extends {jspb.Message}
  * @constructor
  */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.displayName = 'proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    label: jspb.Message.getFieldWithDefault(msg, 3, "")
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest;
+  return proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLabel(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getLabel();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional string label = 3;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.getLabel = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyRequest.prototype.setLabel = function(value) {
+  jspb.Message.setField(this, 3, value);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.displayName = 'proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.toObject = function(includeInstance, msg) {
+  var f, obj = {
+
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse;
+  return proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceLabelPropertyResponse.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.rover.audience.v1.DeleteDeviceRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
@@ -9980,6 +10307,7 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     isTestDevice: jspb.Message.getFieldWithDefault(msg, 7, false),
+    label: jspb.Message.getFieldWithDefault(msg, 8, ""),
     pushEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
     pushTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
     pushTokenIsActive: jspb.Message.getFieldWithDefault(msg, 12, false),
@@ -10089,6 +10417,10 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
     case 7:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setIsTestDevice(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLabel(value);
       break;
     case 10:
       var value = /** @type {string} */ (reader.readString());
@@ -10344,6 +10676,13 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
   if (f) {
     writer.writeBool(
       7,
+      f
+    );
+  }
+  f = message.getLabel();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
       f
     );
   }
@@ -10792,6 +11131,21 @@ proto.rover.audience.v1.Device.prototype.getIsTestDevice = function() {
 /** @param {boolean} value */
 proto.rover.audience.v1.Device.prototype.setIsTestDevice = function(value) {
   jspb.Message.setField(this, 7, value);
+};
+
+
+/**
+ * optional string label = 8;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getLabel = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setLabel = function(value) {
+  jspb.Message.setField(this, 8, value);
 };
 
 
