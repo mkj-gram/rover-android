@@ -10,7 +10,7 @@ class PrimaryNavigator extends Component {
         this.renderSelectors = this.renderSelectors.bind(this)
     }
     renderSelectors() {
-        const { color, onClick, selectors } = this.props
+        const { color, onClick, selectors, selectorStyle, titleStyle } = this.props
 
         return selectors.map(({ icon, title, isSelected, path }, index) =>
                 <div
@@ -26,14 +26,15 @@ class PrimaryNavigator extends Component {
                       backgroundColor: isSelected ? color : 'rgba(0, 0, 0, 0)',
                       height: '100%',
                       borderLeft: index > 0 && `1px solid ${color}`,
-                      color: isSelected ? 'white' : color
+                      color: isSelected ? 'white' : color,
+                      ...selectorStyle
                   }}
                   onClick={e =>{
                       onClick(path)
                   }}
                 >
                     {icon({fill: `${isSelected ? 'white' : color}`})}
-                    <div style={{ marginLeft: 10 }}>{title}</div>
+                    <div style={{ marginLeft: 10, ...titleStyle }}>{title}</div>
                 </div>
         )
     }
