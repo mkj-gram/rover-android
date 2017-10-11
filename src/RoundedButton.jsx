@@ -50,21 +50,27 @@ const Button = ({
     }
 
     const onMouseOver = e => {
-        const backgroundColor = type === 'primary'
-            ? hoverColor || primaryColor
-            : 'rgba(0, 0, 0, 0.0)'
-        const textColor = type === 'cancel'
-            ? hoverColor || primaryColor
-            : 'white'
+        if (!isDisabled) {
+            const backgroundColor = type === 'primary'
+                ? hoverColor || primaryColor
+                : 'rgba(0, 0, 0, 0.0)'
+            const textColor = type === 'cancel'
+                ? hoverColor || primaryColor
+                : 'white'
 
-        e.target.style.backgroundColor = backgroundColor
-        e.target.style.color = textColor
+            e.target.style.backgroundColor = backgroundColor
+            e.target.style.color = textColor
+        }
+       
     }
 
     const onMouseOut = e => {
-        type === 'primary'
+        if (!isDisabled) {
+             type === 'primary'
             ? (e.target.style.backgroundColor = primaryColor)
             : (e.target.style.color = primaryColor)
+        }
+       
     }
 
     let loadingIndicator
