@@ -7,7 +7,8 @@ import {
     text,
     cloud,
     steel,
-    purple
+    purple,
+    PrimaryNavigator
 } from '@rover/react-bootstrap'
 import DeviceDetailsAttributesView from './DeviceDetailsAttributesView'
 import DeviceDetailsTestingView from './DeviceDetailsTestingView'
@@ -38,33 +39,39 @@ class DeviceDetailsModal extends Component {
     }
 
     attrTestView(val) {
-        const getBorderRadius = () => {
-            return val === 'Attributes' ? '3px 0 0 3px' : '0 3px 3px 0'
-        }
-
         const { selectedView } = this.state
+        const selectors = [
+            {
+                icon: () => null,
+                title: 'Attributes',
+                isSelected: selectedView === 'Attributes',
+                path: 'Attributes'
+            },
+            {
+                icon: () => null,
+                title: 'Testing',
+                isSelected: selectedView === 'Testing',
+                path: 'Testing'
+            }
+        ]
         return (
-            <div
-                style={{
-                    width: 145,
+            <PrimaryNavigator
+                navigatorStyle={{
+                    width: 290,
                     height: 30,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    ...text,
-                    backgroundColor: selectedView === val ? purple : 'white',
-                    color: selectedView === val ? 'white' : purple,
                     marginTop: 13,
-                    marginBottom: 13,
-                    borderStyle: 'solid',
-                    borderWidth: '1px',
-                    borderColor: purple,
-                    borderRadius: getBorderRadius()
+                    marginBottom: 13
                 }}
-                onClick={() => this.handleViewChange(val)}
-            >
-                {val}
-            </div>
+                selectors={selectors}
+                onClick={this.handleViewChange}
+                color={purple}
+                selectorStyle={{
+                    fontWeight: '400'
+                }}
+                titleStyle={{
+                    marginLeft: 0
+                }}
+            />
         )
     }
 
@@ -79,7 +86,6 @@ class DeviceDetailsModal extends Component {
                 }}
             >
                 {this.attrTestView('Attributes')}
-                {this.attrTestView('Testing')}
             </div>
         )
     }
