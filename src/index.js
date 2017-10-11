@@ -6,6 +6,7 @@ import Breadcrumbs from './Breadcrumbs'
 import Button from './Button'
 import DatePicker from './DatePicker'
 import IconButton from './IconButton'
+import FlashMessage from './FlashMessage'
 import LoadingIndicator from './LoadingIndicator'
 import Modal from './Modal'
 import ModalWithHeader from './ModalWithHeader'
@@ -95,6 +96,7 @@ export {
     Button,
     DatePicker,
     IconButton,
+    FlashMessage,
     LoadingIndicator,
     Modal,
     ModalWithHeader,

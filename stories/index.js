@@ -16,7 +16,8 @@ import {
     DatePicker,
     ash,
     straw,
-    TextField
+    TextField,
+    FlashMessage
 } from '../src'
 
 import { GearIcon, TagIcon, CancelIcon } from '@rover/react-icons'
@@ -94,20 +95,20 @@ storiesOf('Pill', module).add('Pill', () => {
     let text = 'testytest'
     let backgroundColor=ash
     let tagIconColor=silver
-    let textColor=titanium,
-    let deleteButtonBackground=null,
-    let deleteButtonColor=silver,
+    let textColor=titanium
+    let deleteButtonBackground=null
+    let deleteButtonColor=silver
     //onHighlight
-    let onHighlight = false,
-    let onHighlightBackgroundColor=straw,
-    let onHighlightTagIconColor=ash,
-    let onHighlightTextColor=graphite,
-    let onHighlightDeleteButtonBackground=null,
-    let onHighlightDeleteButtonColor=steel,
+    let onHighlight = false
+    let onHighlightBackgroundColor=straw
+    let onHighlightTagIconColor=ash
+    let onHighlightTextColor=graphite
+    let onHighlightDeleteButtonBackground=null
+    let onHighlightDeleteButtonColor=steel
     //onHover
-    let onHoverDeleteButtonBackground=steel,
-    let onHoverDeleteButtonColor='white',
-    let id="tagDeleteButton1",
+    let onHoverDeleteButtonBackground=steel
+    let onHoverDeleteButtonColor='white'
+    let id="tagDeleteButton1"
     let maxWidth=350
 
     const getIconFill = () => {
@@ -245,5 +246,11 @@ storiesOf('Pill', module).add('Pill', () => {
         </div>
         
         </div>
+    )
+})
+
+storiesOf('FlashMessage', module).add('Message', () => {
+    return (
+        <FlashMessage messageText="Updating..." />
     )
 })
