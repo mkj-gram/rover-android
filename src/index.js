@@ -5,8 +5,8 @@ import AppSwitcher from './AppSwitcher'
 import Breadcrumbs from './Breadcrumbs'
 import Button from './Button'
 import DatePicker from './DatePicker'
-import IconButton from './IconButton'
 import FlashMessage from './FlashMessage'
+import IconButton from './IconButton'
 import LoadingIndicator from './LoadingIndicator'
 import Modal from './Modal'
 import ModalWithHeader from './ModalWithHeader'
@@ -95,8 +95,8 @@ export {
     Breadcrumbs,
     Button,
     DatePicker,
-    IconButton,
     FlashMessage,
+    IconButton,
     LoadingIndicator,
     Modal,
     ModalWithHeader,
