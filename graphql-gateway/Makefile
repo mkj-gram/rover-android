@@ -10,6 +10,9 @@ run:
 clean_run:
 	${RUN} bash -c "rm -rf node_modules/@rover && npm install && npm start"
 
+clean:
+	${RUN} bash -c "rm -rf node_modules && npm install && npm start"	
+
 shell:
 	${RUN} bash
 

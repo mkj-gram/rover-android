@@ -65,7 +65,4 @@ Avoid streaming rpc calls as this makes the retry logic on the client side much 
 
 ### Generation
 
-```
-cd rover
-./protos/build
-```
+[protos/README](https://github.com/RoverPlatform/rover/blob/master/protos/README.md)
