@@ -15,6 +15,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.CreateProfileRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :identifier, :string, 2
   end
   add_message "rover.audience.v1.CreateProfileResponse" do
     optional :profile, :message, 1, "rover.audience.v1.Profile"

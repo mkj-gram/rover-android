@@ -355,8 +355,8 @@ func (s *Server) GetProfile(ctx context.Context, r *audience.GetProfileRequest) 
 
 // CreateProfile implements the corresponding rpc
 func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileRequest) (*audience.CreateProfileResponse, error) {
-	if r.GetAuthContext().GetAccountId() == 0 {
-		return nil, status.Error(codes.InvalidArgument, "AccountId: unset")
+	if r.GetAuthContext() == nil || r.GetAuthContext().GetAccountId() == 0 {
+		return nil, status.Error(codes.Unauthenticated, "AuthContext: must be set")
 	}
 
 	db := s.db.Copy()

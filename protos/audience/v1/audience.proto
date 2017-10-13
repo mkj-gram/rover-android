@@ -122,6 +122,12 @@ message GetProfileResponse {
 
 message CreateProfileRequest {
   auth.v1.AuthContext auth_context = 1;
+
+  /*
+    Optional
+    If empty string is passed this is considered to not be set
+   */
+  string identifier = 2;
 }
 message CreateProfileResponse {
   Profile profile = 1;

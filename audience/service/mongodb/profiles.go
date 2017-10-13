@@ -173,6 +173,7 @@ func (s *profilesStore) FindProfileById(ctx context.Context, id string) (*audien
 func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreateProfileRequest) (*audience.Profile, error) {
 	var (
 		account_id = r.GetAuthContext().GetAccountId()
+		identifier = r.GetIdentifier()
 		now        = s.timeNow()
 
 		p = Profile{
@@ -183,6 +184,10 @@ func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreatePro
 			UpdatedAt:  &now,
 		}
 	)
+
+	if identifier != "" {
+		p.Identifier = identifier
+	}
 
 	if err := s.profiles().Insert(p); err != nil {
 		return nil, wrapError(err, "profiles.Insert")
