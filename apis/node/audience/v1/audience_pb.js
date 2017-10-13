@@ -518,7 +518,8 @@ proto.rover.audience.v1.CreateProfileRequest.prototype.toObject = function(opt_i
  */
 proto.rover.audience.v1.CreateProfileRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f)
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    identifier: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -560,6 +561,10 @@ proto.rover.audience.v1.CreateProfileRequest.deserializeBinaryFromReader = funct
       reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
       msg.setAuthContext(value);
       break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setIdentifier(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -596,6 +601,13 @@ proto.rover.audience.v1.CreateProfileRequest.serializeBinaryToWriter = function(
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
+  f = message.getIdentifier();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
 };
 
 
@@ -626,6 +638,21 @@ proto.rover.audience.v1.CreateProfileRequest.prototype.clearAuthContext = functi
  */
 proto.rover.audience.v1.CreateProfileRequest.prototype.hasAuthContext = function() {
   return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string identifier = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.CreateProfileRequest.prototype.getIdentifier = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.CreateProfileRequest.prototype.setIdentifier = function(value) {
+  jspb.Message.setField(this, 2, value);
 };
 
 
