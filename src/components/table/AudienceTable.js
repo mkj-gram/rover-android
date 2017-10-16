@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Tooltip } from '@rover/react-bootstrap'
+import { FlashMessage, graphite, Tooltip } from '@rover/react-bootstrap'
 
 import AudienceDataGrid from './AudienceDataGrid'
 import TableMenuBarAlpha from './TableMenuBarAlpha'
@@ -522,8 +522,16 @@ class AudienceTable extends Component {
     }
 
     render() {
-        const { columns, segmentSize, totalSize, selectedColumns } = this.state
-
+        const { columns, refetched, segmentSize, totalSize, selectedColumns } = this.state
+        const flashMessageStyle = {
+            backgroundColor: '#F4EEFF',
+            borderColor: '#DDCBFE',
+            color: graphite,
+            position: 'fixed',
+            top: 5,
+            left: '50%',
+            transform: 'translateX(-50%)'
+        }
         const {
             isTooltipShowing,
             message,
@@ -547,6 +555,7 @@ class AudienceTable extends Component {
                     selectedColumns={selectedColumns}
                     refreshData={this.props.refreshData}
                 />
+                {refetched && <FlashMessage messageText="Updating..." style={flashMessageStyle} />}
 
                 {columns.length > 0 && this.renderDataGrid()}
                 {isTooltipShowing && (
