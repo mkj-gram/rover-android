@@ -132,7 +132,7 @@ class AudienceDataGrid extends Component {
                 selectedIndexes: selectedIndexes.filter(r => r !== rowIdx)
             })
         }
-        this.setState({ selectedIndexes: [rowIdx], isModalShowing: true })
+        this.setState({ selectedIndexes: [rowIdx], isModalShowing: (rowIdx >= 0) })
     }
 
     onKeyDown(e) {
@@ -274,16 +274,16 @@ class AudienceDataGrid extends Component {
                     updatePageNumber={this.props.updatePageNumber}
                     resetPagination={this.props.resetPagination}
                 />
-                {this.state.isModalShowing &&
-                    <DeviceDetailsModal
-                        dataGridRows={this.props.dataGridRows}
-                        isOpen={this.state.isModalShowing}
-                        onRequestClose={this.onDeviceDetailsModalClose}
-                        index={this.state.selectedIndexes[0]}
-                        allColumns={this.props.allColumns}
-                        updateDataGridRows={this.props.updateDataGridRows}
-                    />
-                }
+                <DeviceDetailsModal
+                    dataGridRows={this.props.dataGridRows}
+                    isOpen={this.state.isModalShowing}
+                    onRequestClose={this.onDeviceDetailsModalClose}
+                    index={this.state.selectedIndexes[0]}
+                    allColumns={this.props.allColumns}
+                    updateDataGridRows={this.props.updateDataGridRows}
+                    handleCellEnter={this.props.handleCellEnter}
+                    handleCellLeave={this.props.handleCellLeave}
+                />
             </div>
         )
     }
