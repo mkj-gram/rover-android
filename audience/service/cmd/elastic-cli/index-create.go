@@ -85,7 +85,17 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 		indexName := selastic.AccountIndex(strconv.Itoa(i))
 		_, err := esClient.CreateIndex(indexName).Do(ctx)
 		if err != nil {
-			stderr.Fatalf("account[%d]: %v", i, err)
+			switch e := err.(type) {
+			case *elastic.Error:
+				// If the index already exists we can just skip over it
+				if e.Details.Type == "index_already_exists_exception" {
+					stdout.Printf("Index already exists: %s", indexName)
+				} else {
+					stderr.Fatalf("account[%d]: %v", i, err)
+				}
+			default:
+				stderr.Fatalf("account[%d]: %v", i, err)
+			}
 		}
 
 		var (
