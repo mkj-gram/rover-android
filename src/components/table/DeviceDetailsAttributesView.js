@@ -78,7 +78,6 @@ class DeviceDetailsAttributesView extends Component {
                         >
                             <div style={attributeStyle}>{label}</div>
                             {this.displayValue(attributeStyle, value)}
-                            
                         </div>
                     </div>
                 )
@@ -110,9 +109,9 @@ class DeviceDetailsAttributesView extends Component {
 
     displayValue(style, value) {
         let display
-        if (value && value.length > 20) {
+        if (value && value.length > 23) {
             display = (
-                <div 
+                <div
                     style={style}
                     onMouseOver={e => this.handleMouseOver(e, value)}
                     onMouseLeave={this.handleMouseLeave}

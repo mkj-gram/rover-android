@@ -32,6 +32,17 @@ class DeviceDetailsModal extends Component {
         this.updateSelectedTestDevice = this.updateSelectedTestDevice.bind(this)
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.isOpen) {
+            this.setState({
+                selectedTestDevice: nextProps.dataGridRows[nextProps.index].filter(
+                    row =>
+                        row.attribute === 'is_test_device' && row.selector === 'DEVICE'
+                )[0].value
+            })
+        }
+    }
+
     handleViewChange(val) {
         this.setState({
             selectedView: val
