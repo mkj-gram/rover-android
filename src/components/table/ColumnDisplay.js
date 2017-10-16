@@ -62,7 +62,8 @@ class ColumnDisplay extends Component {
 
         const { showAll } = this.state
 
-        const size = showAll ? itemKeys.length : 5
+        const size = showAll && selector === 'profiles' ? itemKeys.length : 20
+
         const remaining = itemKeys.length - size
 
         const icon = {
