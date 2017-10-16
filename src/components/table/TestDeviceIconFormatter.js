@@ -19,7 +19,7 @@ class TestDeviceIconFormatter extends Component {
 
         setTimeout(() => {
             if (this.state.onCell && !this.state.isTooltipShowing) {
-                handleCellEnter(e, 'Test Devices')
+                handleCellEnter(e, 'Test Device')
                 this.setState({
                     isTooltipShowing: true
                 })
