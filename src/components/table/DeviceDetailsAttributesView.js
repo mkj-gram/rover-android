@@ -64,9 +64,8 @@ class DeviceDetailsAttributesView extends Component {
             }
 
             if (attr) {
-                const typename = attr.__typename
                 label = attr.label
-                value = this.getValue(row.value, typename)
+                value = this.getValue(row.value, attr.__typename)
 
                 rows.push(
                     <div key={`${label}_${value}`}>
@@ -78,7 +77,7 @@ class DeviceDetailsAttributesView extends Component {
                             }}
                         >
                             <div style={attributeStyle}>{label}</div>
-                            {this.displayValue(attributeStyle, value, typename)}
+                            {this.displayValue(attributeStyle, value)}
                             
                         </div>
                     </div>
@@ -88,14 +87,14 @@ class DeviceDetailsAttributesView extends Component {
         return rows
     }
 
-    handleMouseOver(e, label, typename) {
+    handleMouseOver(e, label) {
         e.persist()
         const { handleCellEnter, value } = this.props
         this.setState({ onCell: true })
 
         setTimeout(() => {
             if (this.state.onCell && !this.state.isTooltipShowing) {
-                handleCellEnter(e, label, typename === 'StringArrayPredicate')
+                handleCellEnter(e, label)
                 this.setState({
                     isTooltipShowing: true
                 })
@@ -109,13 +108,13 @@ class DeviceDetailsAttributesView extends Component {
         handleCellLeave()
     }
 
-    displayValue(style, value, typename) {
+    displayValue(style, value) {
         let display
         if (value && value.length > 20) {
             display = (
                 <div 
                     style={style}
-                    onMouseOver={e => this.handleMouseOver(e, value, typename)}
+                    onMouseOver={e => this.handleMouseOver(e, value)}
                     onMouseLeave={this.handleMouseLeave}
                 >{value}</div>
             )
