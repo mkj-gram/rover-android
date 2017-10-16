@@ -7,8 +7,16 @@ import getRelativeTime from '../../utils/getRelativeTime'
 class DeviceDetailsAttributesView extends Component {
     constructor(props) {
         super(props)
+        
+        this.state = {
+            isTooltipShowing: false,
+            onCell: false
+        }
         this.getRows = this.getRows.bind(this)
         this.getValue = this.getValue.bind(this)
+        this.handleMouseOver = this.handleMouseOver.bind(this)
+        this.handleMouseLeave = this.handleMouseLeave.bind(this)
+        this.displayValue = this.displayValue.bind(this)
     }
 
     getValue(value, type) {
@@ -41,7 +49,9 @@ class DeviceDetailsAttributesView extends Component {
             ...light,
             color: steel,
             width: 145,
-            overflowWrap: 'break-word'
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
         }
 
         const rows = []
@@ -54,8 +64,9 @@ class DeviceDetailsAttributesView extends Component {
             }
 
             if (attr) {
+                const typename = attr.__typename
                 label = attr.label
-                value = this.getValue(row.value, attr.__typename)
+                value = this.getValue(row.value, typename)
 
                 rows.push(
                     <div key={`${label}_${value}`}>
@@ -67,13 +78,53 @@ class DeviceDetailsAttributesView extends Component {
                             }}
                         >
                             <div style={attributeStyle}>{label}</div>
-                            <div style={attributeStyle}>{value}</div>
+                            {this.displayValue(attributeStyle, value, typename)}
+                            
                         </div>
                     </div>
                 )
             }
         })
         return rows
+    }
+
+    handleMouseOver(e, label, typename) {
+        e.persist()
+        const { handleCellEnter, value } = this.props
+        this.setState({ onCell: true })
+
+        setTimeout(() => {
+            if (this.state.onCell && !this.state.isTooltipShowing) {
+                handleCellEnter(e, label, typename === 'StringArrayPredicate')
+                this.setState({
+                    isTooltipShowing: true
+                })
+            }
+        }, 500)
+    }
+
+    handleMouseLeave(e) {
+        const { handleCellLeave } = this.props
+        this.setState({ onCell: false, isTooltipShowing: false })
+        handleCellLeave()
+    }
+
+    displayValue(style, value, typename) {
+        let display
+        if (value && value.length > 20) {
+            display = (
+                <div 
+                    style={style}
+                    onMouseOver={e => this.handleMouseOver(e, value, typename)}
+                    onMouseLeave={this.handleMouseLeave}
+                >{value}</div>
+            )
+        } else {
+            display = (
+                <div style={style}>{value}</div>
+            )
+        }
+        return display
     }
 
     render() {

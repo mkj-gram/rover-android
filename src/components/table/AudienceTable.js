@@ -571,6 +571,9 @@ class AudienceTable extends Component {
                 dataGridRows={dataGridRows}
                 allColumns={allColumns}
                 updateDataGridRows={this.updateDataGridRows}
+
+                handleCellEnter={this.handleCellEnter}
+                handleCellLeave={this.handleCellLeave}
             />
         )
     }

@@ -159,6 +159,8 @@ class DeviceDetailsModal extends Component {
                             dataGridRows={dataGridRows}
                             index={index}
                             allColumns={allColumns}
+                            handleCellEnter={this.props.handleCellEnter}
+                            handleCellLeave={this.props.handleCellLeave}
                         />
                     ) : (
                         <DeviceDetailsTestingView
