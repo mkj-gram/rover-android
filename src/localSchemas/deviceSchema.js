@@ -190,7 +190,7 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: false
     },
     //----------------------------
     //

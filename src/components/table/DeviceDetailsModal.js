@@ -38,7 +38,11 @@ class DeviceDetailsModal extends Component {
                 selectedTestDevice: nextProps.dataGridRows[nextProps.index].filter(
                     row =>
                         row.attribute === 'is_test_device' && row.selector === 'DEVICE'
-                )[0].value
+                )[0].value,
+            })
+        } else {
+            this.setState({
+                selectedView: 'Attributes'
             })
         }
     }
