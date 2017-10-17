@@ -57,7 +57,7 @@ internals.deleteMessage = function(customer, messageId, callback) {
                 return callback(err)
             }
 
-            return callback(replies[0])
+            return callback(null, replies[0])
         })
 };
 
