@@ -1,7 +1,7 @@
 const expect = require('Chai').expect
 const utils = require('../../../support/utils')
 const CsvProcessor = require('@rover/apis')['csv-processor']
-
+const Auth = require('@rover/apis').auth
 const Router = require('../../../../routes/v1/load-jobs')
 
 
@@ -35,6 +35,9 @@ describe('load-jobs', function() {
         const req = {
             params: {
                 id: "1"
+            },
+            auth: {
+                context: null
             }
         }
         
@@ -59,6 +62,9 @@ describe('load-jobs', function() {
         const req = {
             params: {
                 id: "1"
+            },
+            auth: {
+                context: null
             }
         }
         
@@ -89,6 +95,9 @@ describe('load-jobs', function() {
         const req = {
             params: {
                 id: "1"
+            },
+            auth: {
+                context: new Auth.v1.Models.AuthContext()
             }
         }
 

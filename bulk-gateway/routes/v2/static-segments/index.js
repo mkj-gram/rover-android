@@ -41,7 +41,7 @@ module.exports = function(CsvProcessorClient, FilesClient, SegmentClient) {
         let staticSegmentId = req.body.static_segment_id
 
         let request = new RoverApis.files.v1.Models.GetCsvFileRequest()
-        request.setAuthContext(req._authContext)
+        request.setAuthContext(req.auth.context)
         request.setCsvFileId(csvFileId)
 
         FilesClient.getCsvFile(request, function(err, reply) {
@@ -62,7 +62,7 @@ module.exports = function(CsvProcessorClient, FilesClient, SegmentClient) {
             // Now lookup the static segment to make sure it exists
             
             let request = new RoverApis.segment.v1.Models.GetStaticSegmentRequest()
-            request.setAuthContext(req._authContext)
+            request.setAuthContext(req.auth.context)
             request.setId(staticSegmentId)
 
             SegmentClient.getStaticSegment(request, function(err, reply) {
@@ -79,12 +79,12 @@ module.exports = function(CsvProcessorClient, FilesClient, SegmentClient) {
                 // now create a csv-file load job
                 
                 let loadJobConfig = new RoverApis.csv_processor.v1.Models.SegmentLoadJobWithCsvFileConfig()
-                loadJobConfig.setAccountId(req.authContext.account_id)
+                loadJobConfig.setAccountId(req.auth.context.getAccountId())
                 loadJobConfig.setStaticSegmentId(staticSegmentId)
                 loadJobConfig.setCsvFileId(csvFileId)
 
                 let request = new RoverApis.csv_processor.v1.Models.CreateLoadJobRequest()
-                request.setAuthContext(req._authContext)
+                request.setAuthContext(req.auth.context.getAccountId())
                 request.setType(RoverApis.csv_processor.v1.Models.JobType.SEGMENT_WITH_CSV_FILE)
                 request.setSegmentLoadJobWithCsvFileConfig(loadJobConfig)
 

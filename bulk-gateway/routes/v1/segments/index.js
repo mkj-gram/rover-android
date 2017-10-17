@@ -5,18 +5,6 @@ const RoverApis = require('@rover/apis')
 const Helpers = require('../../helpers')
 const Serializers = require ('../../../lib/serializers')
 
-
-/*
-	Helper Methods
- */
-const authenticated = function(req, res, next) {
-    if (req.authContext == undefined || req.authContext == null) {
-        return next({ status: 401 })
-    }
-
-    return next()
-}
-
 const uploadfile = function(UploaderClient) {
     return function(req, res, next) {
         const filename = crypto.randomBytes(32).toString('hex') + ".csv"
@@ -62,14 +50,14 @@ module.exports = function(CsvProcessorClient, UploaderClient) {
 
         const segmentLoadJobConfig = new RoverApis['csv-processor'].v1.Models.SegmentLoadJobConfig()
 
-        segmentLoadJobConfig.setAccountId(req.authContext.account_id)
+        segmentLoadJobConfig.setAccountId(req.auth.context.getAccountId())
         segmentLoadJobConfig.setSegmentId(parseInt(req.params.id))
         segmentLoadJobConfig.setCsv(gcsObject)
 
 
         const loadJobRequest = new RoverApis['csv-processor'].v1.Models.CreateLoadJobRequest()
   
-        loadJobRequest.setAuthContext(req._authContext)
+        loadJobRequest.setAuthContext(req.auth.context.getAccountId())
         loadJobRequest.setType(RoverApis['csv-processor'].v1.Models.JobType.SEGMENT)
         loadJobRequest.setSegmentLoadJobConfig(segmentLoadJobConfig)
 
@@ -96,7 +84,7 @@ module.exports = function(CsvProcessorClient, UploaderClient) {
 
     /* Is used by /bulk/segments and /bulk/v1/segments */
 
-    router.put('/segments/:id/csv', authenticated, uploadfile(UploaderClient), router.handlers.put)
+    router.put('/segments/:id/csv', Helpers.authenticated, uploadfile(UploaderClient), router.handlers.put)
 
     return router
 }

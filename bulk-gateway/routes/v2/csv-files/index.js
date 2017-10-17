@@ -18,7 +18,7 @@ module.exports = function(FilesClient) {
     router.handlers.index = function(req, res, next) {
         let request = new RoverApis.files.v1.Models.ListCsvFilesRequest()
 
-        request.setAuthContext(req._authContext)
+        request.setAuthContext(req.auth.context)
         request.setPageSize(100)
 
         FilesClient.listCsvFiles(request, function(err, reply) {
@@ -40,7 +40,7 @@ module.exports = function(FilesClient) {
     router.handlers.get = function(req, res, next) {
         let request = new RoverApis.files.v1.Models.GetCsvFileRequest()
 
-        request.setAuthContext(req._authContext)
+        request.setAuthContext(req.auth.context)
         request.setCsvFileId(parseInt(req.params.id) || 0)
 
         FilesClient.getCsvFile(request, function(err, reply) {
@@ -65,7 +65,7 @@ module.exports = function(FilesClient) {
 
         /* First chunk must be the meta or Files Service throws an error */
         let meta = new RoverApis.files.v1.Models.UploadCsvFileRequest.Meta()
-        meta.setAuthContext(req._authContext)
+        meta.setAuthContext(req.auth.context)
 
         request.setMeta(meta)
 
@@ -108,7 +108,7 @@ module.exports = function(FilesClient) {
     router.handlers.delete = function(req, res, next) {
         let request = new RoverApis.files.v1.Models.DeleteCsvFileRequest()
 
-        request.setAuthContext(req._authContext)
+        request.setAuthContext(req.auth.context)
         request.setCsvFileId(parseInt(req.params.id) || 0)
 
         FilesClient.deleteCsvFile(request, function(err, reply) {

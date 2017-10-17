@@ -17,7 +17,7 @@ module.exports = function(CsvProcessorClient) {
     router.handlers.get = function(req, res, next) {
 
         let request = new RoverApis.csv_processor.v1.Models.GetLoadJobRequest()
-        request.setAuthContext(req._authContext)
+        request.setAuthContext(req.auth.context)
         request.setLoadJobId(parseInt(req.params.id) || 0)
         // Use version 2 queue
         request.setQueueVersion(2)
