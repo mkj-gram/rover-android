@@ -14,6 +14,7 @@ import ReactDataGrid from 'react-data-grid'
 import { DraggableHeader } from 'react-data-grid-addons'
 import CustomRowRenderer from './CustomRowRenderer'
 import GridPagination from './GridPagination'
+import DeviceDetailsModal from './DeviceDetailsModal'
 
 const { DraggableContainer } = DraggableHeader
 
@@ -21,14 +22,16 @@ class AudienceDataGrid extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedIndexes: [],
+            selectedIndex: [],
             isShiftKeyPressed: false,
-            isCommandKeyPressed: false
+            isCommandKeyPressed: false,
+            isModalShowing: false
         }
 
         this.onRowsSelected = this.onRowsSelected.bind(this)
         this.onRowsDeselected = this.onRowsDeselected.bind(this)
         this.rowGetter = this.rowGetter.bind(this)
+        this.onDeviceDetailsModalClose = this.onDeviceDetailsModalClose.bind(this)
     }
 
     rowGetter(i) {
@@ -83,77 +86,31 @@ class AudienceDataGrid extends Component {
 
     onRowsSelected(rows) {
         this.setState({
-            selectedIndexes: this.state.selectedIndexes.concat(
-                rows.map(r => r.rowIdx)
-            )
-        })
+            selectedIndex: rows.map(r => r.rowIdx) })
     }
 
     onRowsDeselected(rows) {
         const rowIndexes = rows.map(r => r.rowIdx)
         this.setState({
-            selectedIndexes: this.state.selectedIndexes.filter(
+            selectedIndex: this.state.selectedIndex.filter(
                 i => rowIndexes.indexOf(i) === -1
             )
         })
     }
 
     onRowClick(rowIdx) {
-        const {
-            isCommandKeyPressed,
-            isShiftKeyPressed,
-            selectedIndexes
-        } = this.state
-
-        if (isShiftKeyPressed) {
-            const minIndex = Math.min(...selectedIndexes)
-            const maxIndex = Math.max(...selectedIndexes)
-
-            const start = rowIdx > minIndex ? minIndex : rowIdx
-            const end = rowIdx < maxIndex ? maxIndex : rowIdx
-            const range = (start, end) =>
-                Array.from({ length: end - start + 1 }, (x, i) => i + start)
-            return this.setState({
-                selectedIndexes: range(start, end)
-            })
-        }
-
-        if (isCommandKeyPressed) {
-            return this.setState({
-                selectedIndexes: selectedIndexes.concat(rowIdx)
-            })
-        }
-
-        if (selectedIndexes.includes(rowIdx)) {
-            return this.setState({
-                selectedIndexes: selectedIndexes.filter(r => r !== rowIdx)
-            })
-        }
-        this.setState({ selectedIndexes: [rowIdx] })
-    }
-
-    onKeyDown(e) {
-        if (e.keyCode === 16) {
-            this.setState({ isShiftKeyPressed: true })
-        }
-
-        if (e.keyCode === 91) {
-            this.setState({ isCommandKeyPressed: true })
-        }
-    }
-
-    onKeyUp(e) {
-        if (e.keyCode === 16) {
-            this.setState({ isShiftKeyPressed: false })
-        }
-
-        if (e.keyCode === 91) {
-            this.setState({ isCommandKeyPressed: false })
-        }
+        this.setState({ selectedIndex: [rowIdx], isModalShowing: (rowIdx >= 0) })
     }
 
     getGridHeight() {
         return window.innerHeight - 130
+    }
+
+    onDeviceDetailsModalClose() {
+        this.setState({
+            isModalShowing: false,
+            selectedIndex: []
+        })
     }
 
     render() {
@@ -249,20 +206,27 @@ class AudienceDataGrid extends Component {
                             onRowsSelected: this.onRowsSelected,
                             onRowsDeselected: this.onRowsDeselected,
                             selectBy: {
-                                indexes: this.state.selectedIndexes
+                                indexes: this.state.selectedIndex
                             }
                         }}
                         rowRenderer={CustomRowRenderer}
                         onRowClick={rowIdx => this.onRowClick(rowIdx)}
-                        onGridKeyDown={e => this.onKeyDown(e)}
-                        onGridKeyUp={e => this.onKeyUp(e)}
-                        // rowActionsCell={this.renderCheckbox}
                     />
                 </DraggableContainer>
                 <GridPagination
                     totalRows={this.props.segmentSize}
                     updatePageNumber={this.props.updatePageNumber}
                     resetPagination={this.props.resetPagination}
+                />
+                <DeviceDetailsModal
+                    dataGridRows={this.props.dataGridRows}
+                    isOpen={this.state.isModalShowing}
+                    onRequestClose={this.onDeviceDetailsModalClose}
+                    index={this.state.selectedIndex[0]}
+                    allColumns={this.props.allColumns}
+                    updateDataGridRows={this.props.updateDataGridRows}
+                    handleCellEnter={this.props.handleCellEnter}
+                    handleCellLeave={this.props.handleCellLeave}
                 />
             </div>
         )
