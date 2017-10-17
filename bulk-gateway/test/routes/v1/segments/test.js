@@ -53,10 +53,8 @@ describe('segments', function() {
             params: {
                 id: 1
             },
-            _authContext: new RoverApis.auth.v1.Models.AuthContext(),
-            authContext: {
-                accountId: 1,
-                scopes: ["server"]
+            auth: {
+                context: new RoverApis.auth.v1.Models.AuthContext()
             },
             file: {
                 cloudStorageObject: {
@@ -128,10 +126,8 @@ describe('segments', function() {
             params: {
                 id: 1
             },
-            _authContext: new RoverApis.auth.v1.Models.AuthContext(),
-            authContext: {
-                accountId: 1,
-                scopes: ["server"]
+            auth: {
+                context: new RoverApis.auth.v1.Models.AuthContext()
             },
             file: {
                 cloudStorageObject: {
@@ -181,10 +177,8 @@ describe('segments', function() {
             params: {
                 id: 1
             },
-            _authContext: new RoverApis.auth.v1.Models.AuthContext(),
-            authContext: {
-                accountId: 1,
-                scopes: ["server"]
+            auth: {
+                context: new RoverApis.auth.v1.Models.AuthContext()
             },
             file: {
                 cloudStorageObject: {

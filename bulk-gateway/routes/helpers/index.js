@@ -11,7 +11,7 @@ exports.loggableError = function(err) {
 }
 
 exports.authenticated = function(req, res, next) {
-    if (req.authContext == undefined || req.authContext == null) {
+    if (!(req.auth && req.auth.context)) {
         return next({ status: 401 })
     }
 

@@ -4,18 +4,6 @@ const Helpers = require('../../helpers')
 
 const Serializers = require ('../../../lib/serializers')
 
-/*
-	Helper Methods
- */
-const authenticated = function(req, res, next) {
-    if (req.authContext == undefined || req.authContext == null) {
-        return next({ status: 401 })
-    }
-
-    return next()
-}
-
-
 module.exports = function(CsvProcessorClient) {
     
     if (!CsvProcessorClient) {
@@ -29,7 +17,7 @@ module.exports = function(CsvProcessorClient) {
     router.handlers.get = function(req, res, next) {
         const request = new RoverApis['csv-processor'].v1.Models.GetLoadJobRequest()
 
-        request.setAuthContext(req._authContext)
+        request.setAuthContext(req.auth.context)
         request.setLoadJobId(req.params.id)
 
         CsvProcessorClient.getLoadJob(request, function(err, response) {
@@ -48,7 +36,7 @@ module.exports = function(CsvProcessorClient) {
         })
     }
 
-    router.get('/load-jobs/:id/csv', authenticated, router.handlers.get)
+    router.get('/load-jobs/:id/csv', Helpers.authenticated, router.handlers.get)
 
     return router
 }
