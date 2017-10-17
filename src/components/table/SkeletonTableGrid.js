@@ -8,10 +8,6 @@ import {
     semibold
 } from '@rover/react-bootstrap'
 
-import {
-    TestDeviceIcon
-} from '@rover/react-icons'
-
 class SkeletonTableGrid extends Component {
     constructor(props) {
         super(props)
@@ -19,17 +15,6 @@ class SkeletonTableGrid extends Component {
     }
 
     renderCells(arr, header = false) {
-
-        const display = ( name, label ) => {
-            let ret
-            if (name === 'is_test_device_DEVICE') {
-                ret = <TestDeviceIcon />
-            } else {
-                ret = this.props.selectedColumns[name].label
-            }
-            return ret
-        }
-
         return (
             <div style={{ display: 'flex' }}>
                 {arr.map(name => (
@@ -38,10 +23,10 @@ class SkeletonTableGrid extends Component {
                             ...text,
                             ...semibold,
                             height: 50,
-                            width: (name === 'is_test_device_DEVICE') ? 50 : 200,
+                            width: 200,
                             display: 'flex',
                             paddingLeft: 21,
-                            paddingTop: (name === 'is_test_device_DEVICE') ? 14 : 19,
+                            paddingTop: 19,
                             paddingBottom: 8,
                             paddingRight: 8,
                             backgroundColor: header ? offwhite : 'white',
@@ -51,7 +36,7 @@ class SkeletonTableGrid extends Component {
                         }}
                         key={name}
                     >
-                        {header && display(name, this.props.selectedColumns[name].label)}
+                        {header && this.props.selectedColumns[name].label}
                     </div>
                 ))}
                 <div

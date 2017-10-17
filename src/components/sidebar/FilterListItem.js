@@ -10,7 +10,7 @@ import {
     text
 } from '@rover/react-bootstrap'
 
-import { ProfileIcon, DeviceIconSmall, LocationIcon, TestDeviceIcon } from '@rover/react-icons'
+import { ProfileIcon, DeviceIconSmall, LocationIcon } from '@rover/react-icons'
 
 const listItemStyle = {
     ...text,
@@ -27,20 +27,18 @@ const listItemStyle = {
     flex: '0 0 auto'
 }
 
-const getIcon = (type, group, attribute) => {
-    let icon
-    if (type === 'CUSTOM_PROFILE' || type === 'ROVER_PROFILE') {
-        icon = <ProfileIcon fill={silver} />
-    } else if (type === 'DEVICE') {
-        if (group === 'location') {
-            icon = <LocationIcon fill={silver} />
-        } else if (attribute === 'is_test_device') {
-            icon = <TestDeviceIcon />
-        } else {
-            icon = <DeviceIconSmall style={{ fill: silver }} />
-        }
+const getIcon = type => {
+    switch (type) {
+        case 'CUSTOM_PROFILE':
+        case 'ROVER_PROFILE':
+            return <ProfileIcon fill={silver} />
+        case 'DEVICE':
+            return <DeviceIconSmall style={{ fill: silver }} />
+        case 'location':
+            return <LocationIcon fill={silver} />
+        default:
+            return
     }
-    return icon
 }
 
 const onMouseOver = e => (e.target.style.backgroundColor = ash)
@@ -53,7 +51,7 @@ const FilterListItem = ({ filter, onSelect }) =>
         onMouseOut={onMouseOut}
         onClick={() => onSelect(filter)}
     >
-        {getIcon(filter.selector, filter.group, filter.attribute)}
+        {getIcon(filter.selector)}
         <span
             style={{
                 marginLeft: 10,
