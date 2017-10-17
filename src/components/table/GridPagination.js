@@ -58,6 +58,7 @@ class GridPagination extends Component {
         this.handleNext = this.handleNext.bind(this)
         this.clickHoverColor = this.clickHoverColor.bind(this)
         this.compareValues = this.compareValues.bind(this)
+        this.getTotal = this.getTotal.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -127,6 +128,16 @@ class GridPagination extends Component {
         return [color, hover]
     }
 
+    getTotal(totalRows) {
+        let total = totalRows
+        if (totalRows >= 1000 && totalRows < 1000000) {
+            total = `${Math.floor( totalRows/1000 * Math.pow(10, 1) ) / Math.pow(10, 1)}K`
+        } else if (totalRows >= 1000000) {
+            total = `${Math.floor( totalRows/1000000 * Math.pow(10, 1) ) / Math.pow(10, 1)}M`
+        }
+        return total
+    }
+
     render() {
         const { totalRows } = this.props
         return (
@@ -135,7 +146,7 @@ class GridPagination extends Component {
                     <span style={{ ...semibold }}>
                         {this.calculateRange()}
                     </span>{' '}
-                    of {totalRows >= 1000 ? `${totalRows / 1000}K` : totalRows}
+                    of {this.getTotal(totalRows)}
                 </div>
                 <div style={middleLine} />
                 <RoundedButton
