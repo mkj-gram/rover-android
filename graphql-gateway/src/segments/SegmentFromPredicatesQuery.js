@@ -67,7 +67,7 @@ const SegmentFromPredicatesQuery = {
 
         const predicateAggregate = buildPredicateAggregate(
             condition,
-            predicates.replace(/'/g, `"`)
+            predicates
         )
 
         request.setPredicateAggregate(predicateAggregate)

@@ -12,3 +12,4 @@ graphql-gateway/src/.env
 graphql-gateway/dist/
 
 .idea
+/react-bootstrap/es
