@@ -54,7 +54,7 @@ class SkeletonTableGrid extends Component {
     }
 
     render() {
-        const numRows = Math.floor((window.innerHeight - 130 - 50) / 50)
+        const numRows = Math.floor((window.innerHeight - 130 - 50) / 50) +1
         const numCol = Math.floor((window.innerWidth - 300) / 200)
         const fakeTable = [...Array(numRows)]
 
@@ -64,7 +64,7 @@ class SkeletonTableGrid extends Component {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    flex: '1 1 100%'
+                    flex: '1 0 100%'
                 }}
             >
                 {this.renderCells(columns, true)}
