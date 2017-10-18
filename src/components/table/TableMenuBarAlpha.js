@@ -90,7 +90,11 @@ class TableMenuBarAlpha extends Component {
 
     render() {
         const { showColumnsMenu, pageClickLocation } = this.state
-        const { updateChecked, allColumns, segmentSize, totalSize } = this.props
+        const { updateChecked, allColumns, segmentSize, skeleton, totalSize } = this.props
+
+        if (skeleton) {
+            return <div style={tableMenuBarStyle} />
+        }
 
         return (
             <div style={tableMenuBarStyle}>
@@ -173,14 +177,16 @@ TableMenuBarAlpha.propTypes = {
     allColumns: PropTypes.object.isRequired,
     segmentSize: PropTypes.number.isRequired,
     totalSize: PropTypes.number.isRequired,
-    selectedColumns: PropTypes.object.isRequired
+    selectedColumns: PropTypes.object.isRequired,
+    skeleton: PropTypes.bool
 }
 
 TableMenuBarAlpha.defaultProps = {
     updateChecked: () => null,
     allColumns: {},
     segmentSize: 0,
-    totalSize: 0
+    totalSize: 0,
+    skeleton: false
 }
 
 export default TableMenuBarAlpha

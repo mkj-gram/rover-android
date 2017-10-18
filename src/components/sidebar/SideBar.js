@@ -446,6 +446,12 @@ class SideBar extends Component {
             </svg>
         )
 
+        if (!data) {
+            return (
+                <div style={style} id="filterContainer">{renderArrow()}</div>
+            )
+        }
+
         return (
             <div style={style} id="filterContainer">
                 {renderArrow()}
@@ -543,7 +549,12 @@ class SideBar extends Component {
             justifyContent: 'center',
             flex: 'none'
         }
+        const { data } = this.props
         const { showSaveButton } = this.state.saveStates
+
+        if (!data) {
+            return <div style={style} id="saveBar" />
+        }
 
         return (
             <div style={style} id="saveBar">
@@ -791,30 +802,32 @@ class SideBar extends Component {
                             textAlign: 'center'
                         }}
                     >
-                        <img
-                            src={funnel}
-                            alt=""
-                            style={{ width: 80, marginBottom: 28 }}
-                        />
-                        <div
-                            style={{
-                                fontSize: 16,
-                                lineHeight: '22px',
-                                fontWeight: 300
-                            }}
-                        >
-                            <span
+                        {data && <div>
+                            <img
+                                src={funnel}
+                                alt=""
+                                style={{ width: 80, marginBottom: 28 }}
+                            />
+                            <div
                                 style={{
-                                    color: lavender,
-                                    marginRight: 5,
-                                    cursor: 'pointer'
+                                    fontSize: 16,
+                                    lineHeight: '22px',
+                                    fontWeight: 300
                                 }}
-                                onClick={this.handleAddButton}
                             >
-                                Add a filter
-                            </span>
-                            to start building audience segments
-                        </div>
+                                <span
+                                    style={{
+                                        color: lavender,
+                                        marginRight: 5,
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={this.handleAddButton}
+                                >
+                                    Add a filter
+                                </span>
+                                to start building audience segments
+                            </div>
+                        </div>}
                     </div>
                 )}
                 {this.renderSaveBar()}

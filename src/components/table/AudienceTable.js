@@ -66,6 +66,7 @@ class AudienceTable extends Component {
         this.getCellWidth = this.getCellWidth.bind(this)
         this.getTestDevice = this.getTestDevice.bind(this)
         this.updateDataGridRows = this.updateDataGridRows.bind(this)
+        this.onColumnResize = this.onColumnResize.bind(this)
     }
 
     componentDidMount() {
@@ -201,7 +202,7 @@ class AudienceTable extends Component {
     }
 
     updateChecked(selector, info, item, devices = false) {
-        const { allColumns } = this.state
+        const { allColumns, columns } = this.state
 
         let cachedSelectedColumns = JSON.parse(
             localStorage.getItem('selectedColumns')
@@ -451,15 +452,20 @@ class AudienceTable extends Component {
     }
 
     getCellWidth(pred, key) {
-        let width
-        if (pred === 'StringArrayPredicate') {
-            width = 285
-        } else if (pred === 'BooleanPredicate' && key === 'is_test_device_DEVICE') {
-            width = 50
-        } else {
-            width = 200
+        const storedItem = JSON.parse(localStorage.getItem('selectedColumns'))[key]
+        if (storedItem && storedItem.width) {
+            return storedItem.width
         }
-        return width
+
+        if (pred === 'StringArrayPredicate') {
+            return 285
+        }
+
+        if (pred === 'BooleanPredicate' && key === 'is_test_device_DEVICE') {
+            return 50
+        }
+
+        return 200
     }
 
     getTestDevice() {
@@ -523,7 +529,14 @@ class AudienceTable extends Component {
             )
         }
 
-        this.setState({ columns, rows })
+        const resizedColumns = columns.map(column => {
+            return {
+                ...column,
+                width: selectedColumns[column.key].width || column.width
+            }
+        })
+
+        this.setState({ columns: resizedColumns, selectedColumns, rows })
     }
 
     updateDataGridRows(index, isTestDevice, testDeviceName) {
@@ -543,13 +556,33 @@ class AudienceTable extends Component {
             }
             return property
         })
- 
+
         const dataGridRows = [...this.state.dataGridRows].slice(0)
         dataGridRows.splice(index, 1, indexrow)
         this.setState({
             dataGridRows,
             rows: this.getSelectedRows(dataGridRows, this.state.pageNumber)
         })
+    }
+
+    onColumnResize(column, width) {
+        const { columns } = this.state
+        const selectedColumns = JSON.parse(
+            localStorage.getItem('selectedColumns')
+        )
+
+        const resizedColumn = columns[column].key
+        const newSelectedColumns = {
+            ...selectedColumns,
+            [resizedColumn]: {
+                ...selectedColumns[resizedColumn],
+                width
+            }
+        }
+        localStorage.setItem(
+            'selectedColumns',
+            JSON.stringify(newSelectedColumns)
+        )
     }
 
     renderDataGrid() {
@@ -571,7 +604,7 @@ class AudienceTable extends Component {
                 dataGridRows={dataGridRows}
                 allColumns={allColumns}
                 updateDataGridRows={this.updateDataGridRows}
-
+                onColumnResize={this.onColumnResize}
                 handleCellEnter={this.handleCellEnter}
                 handleCellLeave={this.handleCellLeave}
             />
@@ -579,6 +612,7 @@ class AudienceTable extends Component {
     }
 
     render() {
+        const { skeleton } = this.props
         const { columns, refetched, segmentSize, totalSize, selectedColumns } = this.state
         const flashMessageStyle = {
             backgroundColor: '#F4EEFF',
@@ -611,6 +645,7 @@ class AudienceTable extends Component {
                     updateChecked={this.updateChecked}
                     selectedColumns={selectedColumns}
                     refreshData={this.props.refreshData}
+                    skeleton={skeleton}
                 />
                 {refetched && <FlashMessage messageText="Updating..." style={flashMessageStyle} />}
 

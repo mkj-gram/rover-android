@@ -114,6 +114,7 @@ class AudienceDataGrid extends Component {
     }
 
     render() {
+        const { onColumnResize } = this.props
         return (
             <div
                 ref={(el) => {
@@ -211,6 +212,7 @@ class AudienceDataGrid extends Component {
                         }}
                         rowRenderer={CustomRowRenderer}
                         onRowClick={rowIdx => this.onRowClick(rowIdx)}
+                        onColumnResize={onColumnResize}
                     />
                 </DraggableContainer>
                 <GridPagination
@@ -234,10 +236,11 @@ class AudienceDataGrid extends Component {
 }
 
 AudienceDataGrid.propTypes = {
-    rows: PropTypes.array.isRequired,
     columns: PropTypes.array.isRequired,
-    updateDragColumns: PropTypes.func.isRequired,
+    onColumnResize: PropTypes.func.isRequired,
+    rows: PropTypes.array.isRequired,
     segmentSize: PropTypes.number.isRequired,
+    updateDragColumns: PropTypes.func.isRequired,
     updatePageNumber: PropTypes.func.isRequired
 }
 
