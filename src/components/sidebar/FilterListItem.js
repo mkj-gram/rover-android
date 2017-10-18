@@ -43,15 +43,21 @@ const getIcon = (type, group, attribute) => {
     return icon
 }
 
-const onMouseOver = e => (e.target.style.backgroundColor = ash)
-const onMouseOut = e => (e.target.style.backgroundColor = graphite)
+const onMouseOver = (e, id) => {
+    document.getElementById(id).style.backgroundColor = ash
+}
+
+const onMouseOut = (e, id) => {
+    document.getElementById(id).style.backgroundColor = graphite
+}
 
 const FilterListItem = ({ filter, onSelect }) =>
     <div
         style={listItemStyle}
-        onMouseOver={onMouseOver}
-        onMouseOut={onMouseOut}
+        onMouseOver={e => onMouseOver(e, `${filter.attribute}_${filter.selector}`)}
+        onMouseOut={e => onMouseOut(e, `${filter.attribute}_${filter.selector}`)}
         onClick={() => onSelect(filter)}
+        id={`${filter.attribute}_${filter.selector}`}
     >
         {getIcon(filter.selector, filter.group, filter.attribute)}
         <span
