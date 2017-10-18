@@ -19,17 +19,6 @@ class SkeletonTableGrid extends Component {
     }
 
     renderCells(arr, header = false) {
-
-        const display = ( name, label ) => {
-            let ret
-            if (name === 'is_test_device_DEVICE') {
-                ret = <TestDeviceIcon />
-            } else {
-                ret = this.props.selectedColumns[name].label
-            }
-            return ret
-        }
-
         return (
             <div style={{ display: 'flex' }}>
                 {arr.map(name => (
@@ -38,7 +27,7 @@ class SkeletonTableGrid extends Component {
                             ...text,
                             ...semibold,
                             height: 50,
-                            width: (name === 'is_test_device_DEVICE') ? 50 : 200,
+                            width: (name === 'is_test_device_DEVICE') ? 50 : (this.props.selectedColumns[name].width || 200),
                             display: 'flex',
                             paddingLeft: 21,
                             paddingTop: (name === 'is_test_device_DEVICE') ? 14 : 19,
@@ -50,9 +39,7 @@ class SkeletonTableGrid extends Component {
                             borderBottom: '1px solid #EEEEEE'
                         }}
                         key={name}
-                    >
-                        {header && display(name, this.props.selectedColumns[name].label)}
-                    </div>
+                    />
                 ))}
                 <div
                     style={{
@@ -67,7 +54,7 @@ class SkeletonTableGrid extends Component {
     }
 
     render() {
-        const numRows = Math.floor((window.innerHeight - 130 - 50) / 50)
+        const numRows = Math.floor((window.innerHeight - 130 - 50) / 50) +1
         const numCol = Math.floor((window.innerWidth - 300) / 200)
         const fakeTable = [...Array(numRows)]
 
@@ -77,7 +64,7 @@ class SkeletonTableGrid extends Component {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    flex: '1 1 100%'
+                    flex: '1 0 100%'
                 }}
             >
                 {this.renderCells(columns, true)}

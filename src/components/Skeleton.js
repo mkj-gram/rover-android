@@ -8,7 +8,7 @@ export default class Skeleton extends Component {
     return (
       <div style={{ display: 'flex', flex: '1 1 100%' }}>
         <SideBar />
-        <AudienceTable skeleton={true} />
+        <AudienceTable skeleton />
       </div>
     )
   }
