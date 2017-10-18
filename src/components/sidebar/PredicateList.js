@@ -149,37 +149,38 @@ const renderDatePredicate = ({ dateComparison, dateValue }) => {
         return (
             <div>
                 {renderPredicateComparison(dateComparison)}
-                {renderPredicateValue(moment().diff(dateValue.start, 'd'))}
+                {renderPredicateValue(dateValue.duration)}
                 {renderPredicateComparison('days ago')}
             </div>
         )
     }
 
     if (['is after', 'is on', 'is before'].includes(dateComparison)) {
+        let d = Object.assign({}, dateValue.start)
+        d.month -= 1
+
         return (
             <div>
                 {renderPredicateComparison(dateComparison)}
                 {renderPredicateValue(
-                    moment(dateValue.start).format('MMM Do, YYYY')
+                    moment(d).format('MMM Do, YYYY')
                 )}
             </div>
         )
     }
 
-    if (dateComparison === 'is between') {
-        return (
-            <div>
-                {renderPredicateComparison('between')}
-                {renderPredicateValue(
-                    moment(dateValue.start).format('MMM Do, YYYY')
-                )}
-                {renderPredicateComparison('and')}
-                {renderPredicateValue(
-                    moment(dateValue.end).format('MMM Do, YYYY')
-                )}
-            </div>
-        )
+    let comparison
+    if (dateComparison === 'is unset') {
+        comparison = 'Does not exist'
     }
+    if (dateComparison === 'is set') {
+        comparison = 'Exists'
+    }
+    return (
+        <div>
+            {renderPredicateComparison(comparison)}
+        </div>
+    )
 }
 
 const renderVersionPredicate = ({

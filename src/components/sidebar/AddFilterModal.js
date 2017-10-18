@@ -75,7 +75,7 @@ class AddFilterModal extends Component {
 
         const profiles = roverProfiles.concat(customProfiles)
 
-        return devices.concat(profiles).filter((filter) => filter.__typename !== 'DatePredicate')
+        return devices.concat(profiles)
     }
 
     getFilterDefault(type) {
@@ -103,7 +103,7 @@ class AddFilterModal extends Component {
     renderFilterList() {
         const { search } = this.state
         const { onSelect } = this.props
-
+        
         return this.state.filterList.map((filter, index) => {
             const { label } = filter
             if (

@@ -1,4 +1,12 @@
 export const getDeviceSchema = () => [
+{
+        attribute: 'created_at',
+        label: 'First Seen',
+        __typename: 'DatePredicate',
+        group: null,
+        display: true,
+        filter: true
+    },
     {
         attribute: 'device_id',
         label: 'Device Identifier',
@@ -30,7 +38,7 @@ export const getDeviceSchema = () => [
         __typename: 'DatePredicate',
         group: null,
         display: true,
-        filter: false
+        filter: true
     },
     {
         attribute: 'push_token_updated_at',
@@ -38,16 +46,9 @@ export const getDeviceSchema = () => [
         __typename: 'DatePredicate',
         group: null,
         display: true,
-        filter: false
+        filter: true
     },
-    {
-        attribute: 'created_at',
-        label: 'First Seen',
-        __typename: 'DatePredicate',
-        group: null,
-        display: true,
-        filter: false
-    },
+    
     {
         attribute: 'device_manufacturer',
         label: 'Hardware Manufacturer',

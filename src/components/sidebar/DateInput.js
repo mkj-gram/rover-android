@@ -23,27 +23,41 @@ import ModalInputPrompt from './ModalInputPrompt'
 class DateInput extends Component {
     constructor(props) {
         super(props)
+        const { dateValue, dateComparison } = props
+        let { start, duration } = dateValue
 
-        const { dateValue, dateComparison } = this.props
-        const { start, end } = dateValue
+        const relativeComparisons = [
+            'is greater than',
+            'is equal',
+            'is less than'
+        ]
+        if (relativeComparisons.includes(dateComparison)) {
+            start = {
+                year: moment().year(),
+                month: moment().month() + 1,
+                day: moment().date()
+            }
+        } else {
+            duration = 1
+        }
+
         this.state = {
-            start: moment(start),
-            end: moment(end),
-            dateComparison
+            start,
+            dateComparison,
+            relativeComparisons,
+            duration
         }
     }
 
     componentDidMount() {
-        const { dateValue } = this.state
+        const { dateValue } = this.props
         this.updateValue(dateValue)
     }
 
     renderDatePicker() {
-        const { start, end, dateComparison } = this.state
+        const { start, dateComparison, duration } = this.state
 
         switch (dateComparison) {
-            case 'is between':
-                return this.renderInBetweenCalendarInput(start, end)
             case 'is after':
             case 'is on':
             case 'is before':
@@ -51,14 +65,27 @@ class DateInput extends Component {
             case 'is greater than':
             case 'is equal':
             case 'is less than':
+                return this.renderRelativeDatePicker(duration)
             default:
-                return this.renderRelativeDatePicker(start)
+                return
         }
     }
 
-    renderCalendarInput(currentDate, selectFn = null) {
-        const onSelect =
-            selectFn || (date => this.updateValue({ start: moment(date) }))
+    renderCalendarInput(currentDate) {
+        let curDate = moment([
+            currentDate.year,
+            currentDate.month - 1,
+            currentDate.day
+        ])
+
+        const onSelect = date =>
+            this.updateValue({
+                start: {
+                    year: moment(date).year(),
+                    month: moment(date).month() + 1,
+                    day: moment(date).date()
+                }
+            })
 
         const onFocus = e =>
             (e.target.parentElement.parentElement.style.borderColor = silver)
@@ -97,7 +124,7 @@ class DateInput extends Component {
                     }}
                     numberColor={silver}
                     weekendBackgroundColor={graphite}
-                    value={currentDate.format('MMM Do, YYYY')}
+                    value={curDate.format('MMM Do, YYYY')}
                     onSelect={onSelect}
                     onFocus={onFocus}
                     onBlur={onBlur}
@@ -106,36 +133,18 @@ class DateInput extends Component {
         )
     }
 
-    renderInBetweenCalendarInput(start, end) {
-        const endSelectFn = date => this.updateValue({ end: moment(date) })
-        return (
-            <div style={{ display: 'flex' }}>
-                {this.renderCalendarInput(start)}
-                <span
-                    style={{
-                        fontStyle: 'italic',
-                        margin: '0px 10px',
-                        alignSelf: 'center'
-                    }}
-                >
-                    and
-                </span>
-                {this.renderCalendarInput(end, endSelectFn)}
-            </div>
-        )
-    }
-
-    renderRelativeDatePicker(start) {
+    renderRelativeDatePicker(duration) {
         return (
             <div>
                 <ModalInput
                     type="number"
-                    min={0}
-                    value={moment().diff(start, 'd')}
+                    min={1}
+                    value={duration}
                     onChange={e =>
                         this.updateValue({
-                            start: moment().subtract(e.target.value, 'days')
-                        })}
+                            duration: e.target.value
+                        })
+                    }
                 />
                 <span style={{ fontStyle: 'italic' }}>days ago</span>
             </div>
@@ -151,40 +160,26 @@ class DateInput extends Component {
             updateFn,
             label
         } = this.props
-        const start = moment()
-        const end = moment()
-
-        updateFn({
-            attribute,
-            dateComparison,
-            selector,
-            __typename,
-            index,
-            dateValue: {
-                start: start.toISOString(),
-                end: moment.isMoment(end) ? end.toISOString() : end
-            },
-            label
-        })
-
-        this.setState({ dateComparison, start, end })
-    }
-
-    updateValue(dateValue) {
-        const {
-            attribute,
-            selector,
-            __typename,
-            index,
-            updateFn,
-            label
-        } = this.props
-        const { dateComparison, start, end } = this.state
-
-        const newValue = {
-            start,
-            end,
-            ...dateValue
+        const { relativeComparisons } = this.state
+        let { start, duration } = this.state
+        let dateValue
+        if (!relativeComparisons.includes(dateComparison)) {
+            if (!relativeComparisons.includes('set')) {
+                dateValue = {
+                    start,
+                    duration: 1
+                }
+            }
+        } else {
+            let m = moment()
+            dateValue = {
+                duration,
+                start: {
+                    year: m.year(),
+                    month: m.month() + 1,
+                    day: m.date()
+                }
+            }
         }
 
         updateFn({
@@ -193,12 +188,60 @@ class DateInput extends Component {
             selector,
             __typename,
             index,
-            dateValue: {
-                start: newValue.start.toISOString(),
-                end: moment.isMoment(newValue.end)
-                    ? newValue.end.toISOString()
-                    : newValue.end
-            },
+            dateValue,
+            label
+        })
+
+        this.setState({ dateComparison, start, duration })
+    }
+
+    updateValue(curDateValue) {
+        const {
+            attribute,
+            selector,
+            __typename,
+            index,
+            updateFn,
+            label
+        } = this.props
+        const {
+            dateComparison,
+            start,
+            duration,
+            relativeComparisons
+        } = this.state
+
+        const newValue = {
+            start,
+            duration,
+            ...curDateValue
+        }
+        let dateValue
+
+        if (!relativeComparisons.includes(dateComparison)) {
+            dateValue = {
+                start: newValue.start,
+                duration: 1
+            }
+        } else {
+            let m = moment()
+            dateValue = {
+                duration: parseInt(newValue.duration),
+                start: {
+                    year: m.year(),
+                    month: m.month() + 1,
+                    day: m.date()
+                }
+            }
+        }
+
+        updateFn({
+            attribute,
+            dateComparison,
+            selector,
+            __typename,
+            index,
+            dateValue,
             label
         })
 
@@ -222,7 +265,7 @@ class DateInput extends Component {
                         style={{
                             fontSize: 16,
                             color: titanium,
-                            width: 110,
+                            width: 124,
                             marginRight: 20,
                             borderColor: steel,
                             focusedBorderColor: silver,
@@ -247,7 +290,8 @@ class DateInput extends Component {
                             <option value="is after">After</option>
                             <option value="is on">On</option>
                             <option value="is before">Before</option>
-                            <option value="is between">In Between</option>
+                            <option value="is set">Exists</option>
+                            <option value="is unset">Does not exist</option>
                         </optgroup>
                     </Select>
                     {this.renderDatePicker()}
@@ -271,8 +315,12 @@ DateInput.propTypes = {
 DateInput.defaultProps = {
     attribute: '',
     dateValue: {
-        start: moment().toISOString(),
-        end: moment().toISOString()
+        duration: 1,
+        start: {
+            year: moment().year(),
+            month: moment().month() + 1,
+            day: moment().date()
+        }
     },
     dateComparison: 'is equal',
     selector: 'DEVICE',
