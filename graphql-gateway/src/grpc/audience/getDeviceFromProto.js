@@ -13,6 +13,10 @@ export const getPlatformFromProto = p => {
     }
 }
 
+export const getPushEnvironmentFromProto = p => {
+    return p.charAt(0).toUpperCase().concat(p.slice(1))
+}
+
 export default (d) => {
     const props = {
         created_at: RoverApis.Helpers.timestampFromProto(d.getCreatedAt()),
@@ -46,7 +50,7 @@ export default (d) => {
         region_monitoring_mode: d.getRegionMonitoringMode(),
         is_background_enabled: d.getIsBackgroundEnabled(),
         is_location_monitoring_enabled: d.getIsLocationMonitoringEnabled(),
-        push_environment: d.getPushEnvironment(),
+        push_environment: getPushEnvironmentFromProto(d.getPushEnvironment()),
         push_token_key: d.getPushTokenKey(),
         push_token_created_at: RoverApis.Helpers.timestampFromProto(d.getPushTokenCreatedAt()),
         push_token_updated_at: RoverApis.Helpers.timestampFromProto(d.getPushTokenUpdatedAt())

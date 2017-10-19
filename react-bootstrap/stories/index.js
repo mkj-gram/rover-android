@@ -17,6 +17,7 @@ import {
     ash,
     straw,
     TextField,
+    TypeAhead,
     FlashMessage
 } from '../src'
 
@@ -252,5 +253,11 @@ storiesOf('Pill', module).add('Pill', () => {
 storiesOf('FlashMessage', module).add('Message', () => {
     return (
         <FlashMessage messageText="Updating..." />
+    )
+})
+
+storiesOf('TypeAhead', module).add('TextInput', () => {
+    return (
+        <TypeAhead />
     )
 })

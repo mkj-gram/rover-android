@@ -164,7 +164,7 @@ Array [
   Object {
     "attribute": "push_environment",
     "selector": "DEVICE",
-    "value": "development",
+    "value": "Development",
   },
   Object {
     "attribute": "push_token_key",

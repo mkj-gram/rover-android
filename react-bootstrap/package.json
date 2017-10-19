@@ -40,16 +40,17 @@
   "homepage": "https://github.com/RoverPlatform/web-common#readme",
   "dependencies": {
     "@rover/react-icons": "^1.1.0",
+    "downshift": "^1.14.0",
     "pikaday": "^1.6.0",
     "prop-types": "^15.5.10",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "react-modal": "^1.7.7",
+    "react-modal": "^1.9.7",
     "react-router": "^3.0.0",
     "react-tether": "^0.5.2"
   },
   "devDependencies": {
-    "@kadira/storybook": "^2.21.0",
+    "@kadira/storybook": "^2.35.3",
     "babel-cli": "^6.23.0",
     "babel-core": "^6.23.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",

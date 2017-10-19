@@ -34,6 +34,7 @@ class TextField extends Component {
             onChange,
             id,
             placeholderStyle,
+            isOpen,
             ...rest
         } = this.props
         const { isFocused, isPresent } = this.state
