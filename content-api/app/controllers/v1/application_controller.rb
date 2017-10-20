@@ -88,19 +88,7 @@ class V1::ApplicationController < ActionController::API
     end
 
     def check_access
-        # account token is automatically given full access
-        return true if current_user.nil? && !current_account.nil?
-        controller_resource = self.resource
-        if controller_resource.nil?
-            return false
-        else
-            acl = current_user.user_acl
-            method = action_name
-            method = "show" if action_name == "index"
-            if !acl.has_access(controller_resource, method)
-                render_forbidden("Access Denied", "")
-            end
-        end
+        return true
     end
 
     def resource
