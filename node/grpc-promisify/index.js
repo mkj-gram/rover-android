@@ -2,23 +2,32 @@ function promisify(client) {
     Object.keys(Object.getPrototypeOf(client)).forEach(functionName => {
         const originalFunction = client[functionName]
 
-        client[functionName] = (request, callback) => {
+        client[functionName] = (...args) => {
+
+            const request = args[0]
+            const opts = typeof args[1] === 'object' ? args[1] : undefined
+            const callback = args[args.length - 1]
+
+            if (callback && typeof callback === 'function') {
+                args = args.slice(0, args.length - 1)
+            }
+            
             if (callback && typeof callback === 'function') {
                 return originalFunction.call(
                     client,
-                    request,
+                    ...args,
                     (error, response) => {
                         callback(error, response)
                     }
                 )
             }
-
+ 
             return new Promise((resolve, reject) => {
-                originalFunction.call(client, request, (error, response) => {
+                originalFunction.call(client, ...args, (error, response) => {
                     if (error) {
-                        reject(error)
+                        return reject(error)
                     } else {
-                        resolve(response)
+                        return resolve(response)
                     }
                 })
             })
