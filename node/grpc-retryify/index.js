@@ -47,6 +47,8 @@ function retryify(client) {
             let overrides = typeof callOpts === 'object' && typeof callOpts['retry'] === 'object' && callOpts['retry']
             let retryOpts = Object.assign({}, defaults, overrides)
 
+            let retryChecker = typeof overrides.on === 'function' ? overrides.on : retryableError
+
             let requestArgs = args
             if (typeof requestArgs[requestArgs.length - 1] === 'function') {
                 // We are replacing the callback with our own
@@ -59,7 +61,7 @@ function retryify(client) {
                 originalFunction.call(client, ...requestArgs, function(err, response) {
                     
                     // Abort early if its not retryable
-                    if (err && !retryableError(err)) {
+                    if (err && !retryChecker(err)) {
                         operation.stop()
                         return callback(err)
                     }
