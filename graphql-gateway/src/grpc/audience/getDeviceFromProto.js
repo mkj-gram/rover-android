@@ -1,8 +1,8 @@
 import RoverApis from '@rover/apis'
 
-const getVersionFromProto = p => !!p ? [p.getMajor(), p.getMinor(), p.getRevision()] : []
+export const getVersionFromProto = p => !!p ? [p.getMajor(), p.getMinor(), p.getRevision()] : []
 
-const getPlatformFromProto = p => {
+export const getPlatformFromProto = p => {
     switch (p) {
         case 0:
             return ''

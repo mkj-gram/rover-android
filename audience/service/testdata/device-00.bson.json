@@ -70,3 +70,1491 @@
     { "uuid": "0001", "major": 3, "minor": 4 }
   ]
 }
+
+{
+  "_id": {
+    "$oid": "5991e73208104900011bf8e4"
+  },
+  "account_id": 1,
+  "device_id": "1BB873551-D3CC-44D6-8580-AD2DA52F4358",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-14T18:08:50.955Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-14T19:42:52.196Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": false,
+  "screen_width": 0,
+  "screen_height": 0,
+  "push_token_updated_at": {
+    "$date": "2017-08-14T18:08:50.992Z"
+  },
+  "push_environment": "development",
+  "locale_script": "",
+  "radio": "",
+  "ip": "206.248.180.234",
+  "advertising_id": "00000000-0000-0000-0000-000000000000",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 5,
+      "revision": 0
+    }
+  },
+  "push_token_created_at": {
+    "$date": "2017-08-14T18:08:50.992Z"
+  },
+  "locale_region": "ca",
+  "device_model": "iPhone8,2",
+  "locale_language": "en",
+  "time_zone": "America/Toronto",
+  "app_name": "",
+  "app_build": "",
+  "app_namespace": "io.rover.Rover",
+  "carrier_name": "rogers",
+  "push_token_key": "564B72283E9AD70125E6CD2FA622C482F56BDD8E7D5D8101DF32DB3E4E5BC17D",
+  "os_version": {
+    "major": 10,
+    "minor": 2,
+    "revision": 0
+  },
+  "app_version": "",
+  "os_name": "iOS",
+  "platform": "MOBILE",
+  "region_monitoring_mode": "UNDEFINED",
+  "push_token_unregistered_at": null,
+  "device_manufacturer": "Apple",
+  "location_accuracy": 50,
+  "location_latitude": 43.642566,
+  "location_longitude": -79.387056,
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-08-14T18:28:25.140Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "37.331701:-122.030847:50",
+      "latitude": 37.331701,
+      "longitude": -122.030847,
+      "radius": 50
+    },
+    {
+      "id": "40.712784:-74.005941:5000",
+      "latitude": 40.712784,
+      "longitude": -74.005941,
+      "radius": 5000
+    },
+    {
+      "id": "43.642566:-79.387056:50",
+      "latitude": 43.642566,
+      "longitude": -79.387056,
+      "radius": 50
+    },
+    {
+      "id": "43.650678:-79.375814:50",
+      "latitude": 43.650678,
+      "longitude": -79.375814,
+      "radius": 50
+    }
+  ],
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-08-14T18:28:25.139Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "647086E7-89A6-439C-9E3B-4A2268F13FC7",
+      "major": -1,
+      "minor": -1
+    },
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "5991ee9408104900011bf8e7"
+  },
+  "account_id": 1,
+  "device_id": "FAEC5DF4-5404-415D-B419-0D8608F9F44A",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-14T18:40:20.171Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-14T18:41:08.863Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": false,
+  "is_bluetooth_enabled": false,
+  "device_manufacturer": "",
+  "locale_region": "us",
+  "os_version": {
+    "major": 10,
+    "minor": 12,
+    "revision": 5
+  },
+  "screen_width": 0,
+  "push_token_key": null,
+  "device_model": "",
+  "push_environment": "production",
+  "app_build": "",
+  "radio": "",
+  "time_zone": "America/Toronto",
+  "ip": "206.248.180.234",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 1,
+      "revision": 0
+    }
+  },
+  "app_name": "",
+  "carrier_name": "",
+  "locale_script": "",
+  "app_namespace": "",
+  "screen_height": 0,
+  "region_monitoring_mode": "UNDEFINED",
+  "locale_language": "en",
+  "platform": "WEB",
+  "advertising_id": "",
+  "app_version": "",
+  "os_name": "OS X"
+}
+{
+  "_id": {
+    "$oid": "5991f06d08104900011bf8e9"
+  },
+  "account_id": 1,
+  "device_id": "11E46E71-7D50-4421-8671-62B56085AA08",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-14T18:48:13.777Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-14T18:48:14.037Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": false,
+  "is_bluetooth_enabled": false,
+  "app_version": "",
+  "device_model": "",
+  "time_zone": "America/Toronto",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 1,
+      "revision": 0
+    }
+  },
+  "region_monitoring_mode": "UNDEFINED",
+  "os_name": "OS X",
+  "locale_language": "en",
+  "app_namespace": "",
+  "platform": "WEB",
+  "carrier_name": "",
+  "screen_height": 0,
+  "app_build": "",
+  "advertising_id": "",
+  "ip": "206.248.180.234",
+  "push_token_key": null,
+  "device_manufacturer": "",
+  "screen_width": 0,
+  "app_name": "",
+  "locale_region": "us",
+  "radio": "",
+  "push_environment": "production",
+  "os_version": {
+    "major": 10,
+    "minor": 12,
+    "revision": 5
+  },
+  "locale_script": ""
+}
+{
+  "_id": {
+    "$oid": "599204f108104900011bf8ec"
+  },
+  "account_id": 1,
+  "device_id": "2BB873551-D3CC-44D6-8580-AD2DA52F4358",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-14T20:15:45.897Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-30T15:20:35.987Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": true,
+  "push_token_created_at": {
+    "$date": "2017-08-14T20:15:45.928Z"
+  },
+  "push_token_unregistered_at": null,
+  "push_token_updated_at": {
+    "$date": "2017-08-25T13:17:04.012Z"
+  },
+  "app_version": "",
+  "device_manufacturer": "Apple",
+  "os_version": {
+    "major": 10,
+    "minor": 2,
+    "revision": 0
+  },
+  "locale_language": "en",
+  "region_monitoring_mode": "UNDEFINED",
+  "radio": "",
+  "app_build": "",
+  "os_name": "iOS",
+  "locale_script": "",
+  "time_zone": "America/Toronto",
+  "ip": "206.248.180.234",
+  "locale_region": "ca",
+  "advertising_id": "00000000-0000-0000-0000-000000000000",
+  "push_environment": "development",
+  "push_token_key": "1D1AD8BB68D6A0372B504E0E3C96E56E00204163518257670249BC7889417282A",
+  "device_model": "iPhone8,2",
+  "carrier_name": "rogers",
+  "platform": "MOBILE",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 5,
+      "revision": 0
+    }
+  },
+  "is_test_device": true,
+  "app_name": "",
+  "app_namespace": "io.rover.Inbox",
+  "screen_width": 0,
+  "screen_height": 0,
+  "location_longitude": -79.37551527892751,
+  "location_accuracy": 65,
+  "location_latitude": 43.64918452007607,
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-08-15T04:30:55.710Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ],
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-08-15T15:21:25.009Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "599468273d0c386059dfb4fa"
+  },
+  "account_id": 1,
+  "device_id": "helloworld",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-16T15:43:35.817Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-16T15:43:35.941Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": false,
+  "is_bluetooth_enabled": false
+}
+{
+  "_id": {
+    "$oid": "599468e43d0c3861a8d97f45"
+  },
+  "account_id": 1,
+  "device_id": "helloworld2",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-16T15:46:44.644Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-16T16:04:01.141Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": false,
+  "is_bluetooth_enabled": false
+}
+{
+  "_id": {
+    "$oid": "59958717312da70001d96d01"
+  },
+  "account_id": 1,
+  "device_id": "ABC",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-17T12:07:51.257Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-17T12:07:51.362Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": false,
+  "is_bluetooth_enabled": false,
+  "locale_script": "",
+  "screen_width": 0,
+  "platform": "MOBILE",
+  "advertising_id": "",
+  "ip": "99.231.195.83",
+  "push_token_unregistered_at": null,
+  "app_name": "",
+  "device_model": "",
+  "frameworks": {},
+  "push_token_created_at": {
+    "$date": "2017-08-17T12:07:51.314Z"
+  },
+  "push_environment": "production",
+  "carrier_name": "",
+  "radio": "",
+  "locale_language": "",
+  "app_version": "",
+  "device_manufacturer": "",
+  "region_monitoring_mode": "UNDEFINED",
+  "push_token_updated_at": {
+    "$date": "2017-08-17T12:07:51.314Z"
+  },
+  "push_token_key": "token2",
+  "app_build": "",
+  "app_namespace": "",
+  "screen_height": 0,
+  "os_version": null,
+  "locale_region": "",
+  "os_name": "iOS",
+  "time_zone": "",
+  "location_accuracy": 50,
+  "location_latitude": -78.9126914,
+  "location_longitude": 43.7986039,
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-08-17T12:07:51.362Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ],
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-08-17T12:07:51.362Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "59962a09312da70001d96d03"
+  },
+  "account_id": 1,
+  "device_id": "48225543-F959-4F3E-B2EA-006EEE0E3F04",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-17T23:43:05.070Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-18T20:51:22.525Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": false,
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 5,
+      "revision": 0
+    }
+  },
+  "advertising_id": "607E7D9B-E854-413B-B54D-21AB4B19C950",
+  "os_version": {
+    "major": 10,
+    "minor": 2,
+    "revision": 0
+  },
+  "locale_region": "us",
+  "push_environment": "development",
+  "device_manufacturer": "Apple",
+  "time_zone": "America/Toronto",
+  "platform": "MOBILE",
+  "app_name": "",
+  "os_name": "iOS",
+  "locale_language": "en",
+  "locale_script": "",
+  "screen_width": 0,
+  "screen_height": 0,
+  "app_version": "",
+  "app_namespace": "io.rover.Inbox",
+  "radio": "",
+  "ip": "99.231.195.83",
+  "carrier_name": "",
+  "app_build": "",
+  "device_model": "x86_64",
+  "region_monitoring_mode": "UNDEFINED",
+  "push_token_key": null,
+  "location_accuracy": 5,
+  "location_latitude": 37.38703695,
+  "location_longitude": -122.15399578,
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-08-17T23:43:05.228Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ],
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-08-17T23:43:05.228Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "599de01065da810001f5e6a0"
+  },
+  "account_id": 1,
+  "device_id": "HELLO3",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-23T20:05:36.309Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-23T20:07:46.200Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": true,
+  "os_version": {
+    "major": 10,
+    "minor": 3,
+    "revision": 3
+  },
+  "ip": "206.248.180.234",
+  "push_token_created_at": {
+    "$date": "2017-08-23T20:05:36.356Z"
+  },
+  "carrier_name": "at&t",
+  "radio": "",
+  "push_token_unregistered_at": null,
+  "push_environment": "production",
+  "region_monitoring_mode": "UNDEFINED",
+  "push_token_key": "1233333",
+  "screen_height": 0,
+  "device_model": "iPhone7,2",
+  "screen_width": 0,
+  "app_version": "",
+  "device_manufacturer": "Apple",
+  "advertising_id": "",
+  "push_token_updated_at": {
+    "$date": "2017-08-23T20:05:36.356Z"
+  },
+  "locale_script": "",
+  "platform": "MOBILE",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 6,
+      "revision": 5
+    }
+  },
+  "app_name": "",
+  "locale_region": "us",
+  "time_zone": "America/Los_Angeles",
+  "locale_language": "en",
+  "os_name": "iOS",
+  "app_build": "",
+  "app_namespace": "com.xeniosystems.SimpleShopper"
+}
+{
+  "_id": {
+    "$oid": "599f075d65da810001f5e6a3"
+  },
+  "account_id": 1,
+  "device_id": "87C8A26B-E8E2-4A10-8D95-BC7099679D18",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-24T17:05:33.918Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-24T17:05:33.928Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": false,
+  "is_bluetooth_enabled": false,
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 1,
+      "revision": 0
+    }
+  },
+  "locale_language": "en",
+  "advertising_id": "",
+  "ip": "206.248.180.234",
+  "platform": "WEB",
+  "app_version": "",
+  "device_model": "",
+  "locale_region": "us",
+  "screen_height": 0,
+  "radio": "",
+  "screen_width": 0,
+  "carrier_name": "",
+  "push_token_key": null,
+  "app_build": "",
+  "app_namespace": "",
+  "os_name": "OS X",
+  "os_version": {
+    "major": 10,
+    "minor": 12,
+    "revision": 6
+  },
+  "push_environment": "production",
+  "locale_script": "",
+  "time_zone": "America/Toronto",
+  "region_monitoring_mode": "UNDEFINED",
+  "app_name": "",
+  "device_manufacturer": ""
+}
+{
+  "_id": {
+    "$oid": "599f140b65da810001f5e6a5"
+  },
+  "account_id": 1,
+  "device_id": "3BB873551-D3CC-44D6-8580-AD2DA52F4358",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-24T17:59:39.192Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-30T15:15:01.348Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": true,
+  "app_namespace": "io.rover.Inbox",
+  "carrier_name": "rogers",
+  "push_token_updated_at": {
+    "$date": "2017-08-24T17:59:39.227Z"
+  },
+  "push_environment": "development",
+  "push_token_created_at": {
+    "$date": "2017-08-24T17:59:39.227Z"
+  },
+  "screen_height": 0,
+  "time_zone": "America/Toronto",
+  "advertising_id": "00000000-0000-0000-0000-000000000000",
+  "app_name": "",
+  "app_version": "",
+  "os_version": {
+    "major": 10,
+    "minor": 2,
+    "revision": 0
+  },
+  "radio": "",
+  "platform": "MOBILE",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 5,
+      "revision": 0
+    }
+  },
+  "app_build": "",
+  "device_model": "iPhone8,2",
+  "region_monitoring_mode": "UNDEFINED",
+  "push_token_unregistered_at": null,
+  "push_token_key": "2D1AD8BB68D6A0372B504E0E3C96E56E00204163518257670249BC7889417282A",
+  "device_manufacturer": "Apple",
+  "os_name": "iOS",
+  "locale_language": "en",
+  "screen_width": 0,
+  "ip": "206.248.180.234",
+  "locale_region": "ca",
+  "locale_script": "",
+  "location_longitude": -79.37551527892751,
+  "location_accuracy": 65,
+  "location_latitude": 43.64918452007607,
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-08-24T17:59:39.527Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "2EE4FA7F-6AF2-4F85-95CF-71D17C7D6B4D",
+      "major": -1,
+      "minor": -1
+    },
+    {
+      "uuid": "47491597-8C69-4BED-8233-EA3A1C96D08D",
+      "major": -1,
+      "minor": -1
+    },
+    {
+      "uuid": "647086E7-89A6-439C-9E3B-4A2268F13FC7",
+      "major": -1,
+      "minor": -1
+    },
+    {
+      "uuid": "6C21D507-C7F7-42C5-BA24-ADF3010BC612",
+      "major": -1,
+      "minor": -1
+    },
+    {
+      "uuid": "AE7A6ED1-C251-4CF2-847B-AB86B7E2E4CB",
+      "major": -1,
+      "minor": -1
+    },
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6D",
+      "major": -1,
+      "minor": -1
+    },
+    {
+      "uuid": "CA41E7EA-C1B6-4778-ADBE-45DCD33F5244",
+      "major": -1,
+      "minor": -1
+    },
+    {
+      "uuid": "FC733542-62E4-46FD-8DF1-438D6ECE3DD1",
+      "major": -1,
+      "minor": -1
+    }
+  ],
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-08-24T17:59:39.527Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.650678:-79.375814:50",
+      "latitude": 43.650678,
+      "longitude": -79.375814,
+      "radius": 50
+    },
+    {
+      "id": "43.653226:-79.383184:550",
+      "latitude": 43.653226,
+      "longitude": -79.383184,
+      "radius": 550
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "59a6e5c365da810001f5e6ad"
+  },
+  "account_id": 1,
+  "device_id": "1C326EB0-F842-411D-978B-0145DD1EBEC1",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-30T16:20:19.066Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-30T16:45:08.360Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": true,
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 5,
+      "revision": 0
+    }
+  },
+  "locale_region": "ca",
+  "locale_script": "",
+  "push_environment": "development",
+  "app_namespace": "io.rover.Inbox",
+  "os_name": "iOS",
+  "app_name": "",
+  "screen_width": 0,
+  "region_monitoring_mode": "UNDEFINED",
+  "app_version": "",
+  "app_build": "",
+  "device_manufacturer": "Apple",
+  "push_token_key": "927E16590502B44F65E174DCFF940FB886CBBAC5B625334E12C88F3CD0346256",
+  "device_model": "iPhone8,2",
+  "time_zone": "America/Toronto",
+  "platform": "MOBILE",
+  "locale_language": "en",
+  "screen_height": 0,
+  "carrier_name": "rogers",
+  "advertising_id": "00000000-0000-0000-0000-000000000000",
+  "os_version": {
+    "major": 10,
+    "minor": 2,
+    "revision": 0
+  },
+  "radio": "",
+  "ip": "206.248.180.234",
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-08-30T16:20:19.239Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ],
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-08-30T16:20:19.239Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ],
+  "location_accuracy": 65,
+  "location_latitude": 43.64918452007607,
+  "location_longitude": -79.37551527892751,
+  "push_token_created_at": {
+    "$date": "2017-08-30T16:21:41.723Z"
+  },
+  "push_token_unregistered_at": null,
+  "push_token_updated_at": {
+    "$date": "2017-08-30T16:45:03.352Z"
+  }
+}
+{
+  "_id": {
+    "$oid": "59a7005765da810001f5e6af"
+  },
+  "account_id": 1,
+  "device_id": "6533ECED-3728-4B15-B0A2-C23C6C053F89",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-08-30T18:13:43.883Z"
+  },
+  "updated_at": {
+    "$date": "2017-08-30T18:14:19.488Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": true,
+  "screen_width": 0,
+  "carrier_name": "rogers",
+  "device_model": "iPhone8,2",
+  "radio": "",
+  "time_zone": "America/Toronto",
+  "app_namespace": "io.rover.Inbox",
+  "ip": "206.248.180.234",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 5,
+      "revision": 0
+    }
+  },
+  "push_token_unregistered_at": null,
+  "push_environment": "development",
+  "app_version": "",
+  "os_version": {
+    "major": 10,
+    "minor": 2,
+    "revision": 0
+  },
+  "region_monitoring_mode": "UNDEFINED",
+  "push_token_created_at": {
+    "$date": "2017-08-30T18:13:43.906Z"
+  },
+  "device_manufacturer": "Apple",
+  "screen_height": 0,
+  "platform": "MOBILE",
+  "advertising_id": "00000000-0000-0000-0000-000000000000",
+  "push_token_updated_at": {
+    "$date": "2017-08-30T18:13:43.906Z"
+  },
+  "locale_language": "en",
+  "os_name": "iOS",
+  "locale_script": "",
+  "locale_region": "ca",
+  "push_token_key": "E95EE06C1F382119B8ED869AABA646CFEB28FA95774FE872ED746EA60434654F",
+  "app_name": "",
+  "app_build": "",
+  "location_longitude": -78.975767,
+  "location_accuracy": 50,
+  "location_latitude": 43.961211,
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-08-30T18:13:46.142Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ],
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-08-30T18:14:06.617Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "59a9639333d53500017fea19"
+  },
+  "account_id": 1,
+  "device_id": "327E4C78-F904-47EC-B3B0-27406520FC79",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-09-01T13:41:39.234Z"
+  },
+  "updated_at": {
+    "$date": "2017-09-18T19:20:58.695Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": false,
+  "device_manufacturer": "Apple",
+  "locale_script": "",
+  "region_monitoring_mode": "UNDEFINED",
+  "advertising_id": "AABD7C71-FC7D-4825-BF6D-A75295E16DB7",
+  "ip": "206.248.180.234",
+  "time_zone": "America/Toronto",
+  "platform": "MOBILE",
+  "carrier_name": "",
+  "locale_language": "en",
+  "locale_region": "us",
+  "screen_width": 0,
+  "push_environment": "development",
+  "screen_height": 0,
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 5,
+      "revision": 0
+    }
+  },
+  "os_version": {
+    "major": 10,
+    "minor": 2,
+    "revision": 0
+  },
+  "app_build": "",
+  "radio": "",
+  "app_name": "",
+  "app_version": "",
+  "app_namespace": "io.rover.Inbox",
+  "device_model": "x86_64",
+  "os_name": "iOS",
+  "push_token_key": null,
+  "location_latitude": 37.33233606,
+  "location_longitude": -122.05909629,
+  "location_accuracy": 5,
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-09-01T13:41:39.417Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ],
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ],
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-09-01T13:41:39.417Z"
+  }
+}
+{
+  "_id": {
+    "$oid": "59c01f398d984a0001877081"
+  },
+  "account_id": 1,
+  "device_id": "2273F676-DEED-495B-9101-BF9037DEB28B",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-09-18T19:32:09.625Z"
+  },
+  "updated_at": {
+    "$date": "2017-09-20T13:57:04.480Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": false,
+  "is_location_monitoring_enabled": false,
+  "is_bluetooth_enabled": false,
+  "carrier_name": "",
+  "advertising_id": "",
+  "app_name": "",
+  "device_manufacturer": "",
+  "screen_width": 0,
+  "region_monitoring_mode": "UNDEFINED",
+  "app_build": "",
+  "os_version": {
+    "major": 10,
+    "minor": 1,
+    "revision": 0
+  },
+  "radio": "",
+  "push_environment": "production",
+  "device_model": "",
+  "time_zone": "",
+  "app_version": "",
+  "os_name": "iOS",
+  "locale_region": "",
+  "push_token_key": "111aaaaa",
+  "app_namespace": "",
+  "locale_script": "",
+  "platform": "MOBILE",
+  "ip": "206.248.180.234",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 9,
+      "revision": 0
+    }
+  },
+  "locale_language": "",
+  "screen_height": 0,
+  "push_token_unregistered_at": null,
+  "push_token_created_at": {
+    "$date": "2017-09-20T13:57:04.480Z"
+  },
+  "push_token_updated_at": {
+    "$date": "2017-09-20T13:57:04.480Z"
+  }
+}
+{
+  "_id": {
+    "$oid": "59c02e888d984a0001877083"
+  },
+  "account_id": 1,
+  "device_id": "D647706F-02F4-4CD6-AA8F-BF4CFB52913C",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-09-18T20:37:28.326Z"
+  },
+  "updated_at": {
+    "$date": "2017-09-27T16:29:49.467Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": true,
+  "locale_language": "en",
+  "app_namespace": "io.rover.Inbox",
+  "os_name": "iOS",
+  "app_build": "",
+  "os_version": {
+    "major": 11,
+    "minor": 0,
+    "revision": 0
+  },
+  "push_token_key": "B0A1D1838048510233BB8E05C935FC5FD9EE1AB90F0121032B9481FB6BDE14F5",
+  "screen_height": 0,
+  "carrier_name": "rogers",
+  "advertising_id": "00000000-0000-0000-0000-000000000000",
+  "locale_script": "",
+  "device_manufacturer": "Apple",
+  "radio": "",
+  "time_zone": "America/Toronto",
+  "ip": "24.114.77.98",
+  "region_monitoring_mode": "UNDEFINED",
+  "app_name": "",
+  "device_model": "iPhone8,2",
+  "screen_width": 0,
+  "platform": "MOBILE",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 9,
+      "revision": 0
+    }
+  },
+  "app_version": "",
+  "locale_region": "ca",
+  "push_environment": "development",
+  "push_token_unregistered_at": null,
+  "push_token_updated_at": {
+    "$date": "2017-09-22T18:03:02.670Z"
+  },
+  "push_token_created_at": {
+    "$date": "2017-09-19T13:14:41.828Z"
+  },
+  "location_accuracy": 50,
+  "location_latitude": 43.961211,
+  "location_longitude": -78.975767,
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-09-19T13:14:44.236Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ],
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-09-19T13:14:44.236Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "59c2a5e873a4d400017b9954"
+  },
+  "account_id": 1,
+  "device_id": "3DA88104-0DC1-4C7B-9E71-55892983E758",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-09-20T17:31:20.332Z"
+  },
+  "updated_at": {
+    "$date": "2017-09-20T17:40:41.145Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": false,
+  "os_name": "iOS",
+  "screen_width": 0,
+  "time_zone": "America/Toronto",
+  "push_environment": "production",
+  "app_version": "",
+  "carrier_name": "",
+  "advertising_id": "BE4BF9A6-DE70-4AA7-B0C3-03D6B9023D35",
+  "locale_language": "en",
+  "device_manufacturer": "Apple",
+  "platform": "MOBILE",
+  "ip": "206.248.180.234",
+  "region_monitoring_mode": "UNDEFINED",
+  "os_version": {
+    "major": 10,
+    "minor": 3,
+    "revision": 1
+  },
+  "app_namespace": "io.rover.debug",
+  "device_model": "x86_64",
+  "locale_script": "",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 8,
+      "revision": 0
+    }
+  },
+  "push_token_key": null,
+  "app_name": "",
+  "app_build": "",
+  "locale_region": "us",
+  "screen_height": 0,
+  "radio": "",
+  "location_accuracy": 5,
+  "location_latitude": 37.785834,
+  "location_longitude": -122.406417
+}
+{
+  "_id": {
+    "$oid": "59c2aa5973a4d400017b995f"
+  },
+  "account_id": 1,
+  "device_id": "53D3B667-B959-4BCA-9336-743385CF0DD1",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-09-20T17:50:17.818Z"
+  },
+  "updated_at": {
+    "$date": "2017-09-20T17:50:19.230Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": false,
+  "app_name": "",
+  "radio": "",
+  "locale_language": "en",
+  "push_token_key": null,
+  "app_namespace": "io.rover.debug",
+  "os_name": "iOS",
+  "carrier_name": "",
+  "device_manufacturer": "Apple",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 8,
+      "revision": 0
+    }
+  },
+  "region_monitoring_mode": "UNDEFINED",
+  "locale_script": "",
+  "ip": "206.248.180.234",
+  "screen_height": 0,
+  "platform": "MOBILE",
+  "push_environment": "production",
+  "app_version": "",
+  "locale_region": "us",
+  "advertising_id": "BE4BF9A6-DE70-4AA7-B0C3-03D6B9023D35",
+  "app_build": "",
+  "device_model": "x86_64",
+  "time_zone": "America/Toronto",
+  "os_version": {
+    "major": 10,
+    "minor": 3,
+    "revision": 1
+  },
+  "screen_width": 0,
+  "location_accuracy": 5,
+  "location_latitude": 51.50998,
+  "location_longitude": -0.1337
+}
+{
+  "_id": {
+    "$oid": "59c2df3581db8b0001b253bd"
+  },
+  "account_id": 1,
+  "device_id": "96BB357E-819F-463B-A9AE-7FE766BF1657",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-09-20T21:35:49.411Z"
+  },
+  "updated_at": {
+    "$date": "2017-09-20T21:35:49.549Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": false,
+  "app_name": "",
+  "app_build": "",
+  "os_version": {
+    "major": 10,
+    "minor": 3,
+    "revision": 1
+  },
+  "screen_width": 0,
+  "push_environment": "production",
+  "push_token_key": null,
+  "radio": "",
+  "region_monitoring_mode": "UNDEFINED",
+  "device_manufacturer": "Apple",
+  "locale_language": "en",
+  "screen_height": 0,
+  "time_zone": "America/Toronto",
+  "advertising_id": "BE4BF9A6-DE70-4AA7-B0C3-03D6B9023D35",
+  "carrier_name": "",
+  "ip": "206.248.180.234",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 8,
+      "revision": 0
+    }
+  },
+  "app_version": "",
+  "device_model": "x86_64",
+  "locale_region": "us",
+  "platform": "MOBILE",
+  "app_namespace": "io.rover.debug",
+  "os_name": "iOS",
+  "locale_script": "",
+  "location_accuracy": 5,
+  "location_latitude": 40.759211,
+  "location_longitude": -73.984638
+}
+{
+  "_id": {
+    "$oid": "59c56ea2c94feb00019563e4"
+  },
+  "account_id": 1,
+  "device_id": "05547D1A-E3AF-4E04-9A39-A7EE20F8117D",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-09-22T20:12:18.766Z"
+  },
+  "updated_at": {
+    "$date": "2017-09-22T20:12:30.051Z"
+  },
+  "push_token_is_active": true,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": true,
+  "app_build": "",
+  "push_token_unregistered_at": null,
+  "push_token_key": "165C410D0910768E6F4A99903A2741F45FC2034B91DFA7704C88BC982FF3091A",
+  "os_name": "iOS",
+  "carrier_name": "rogers",
+  "time_zone": "America/Toronto",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 9,
+      "revision": 0
+    }
+  },
+  "push_token_created_at": {
+    "$date": "2017-09-22T20:12:18.798Z"
+  },
+  "device_model": "iPhone9,4",
+  "locale_language": "en",
+  "screen_width": 0,
+  "push_environment": "development",
+  "app_name": "",
+  "os_version": {
+    "major": 10,
+    "minor": 3,
+    "revision": 3
+  },
+  "locale_script": "",
+  "screen_height": 0,
+  "ip": "206.248.180.234",
+  "region_monitoring_mode": "UNDEFINED",
+  "app_version": "",
+  "device_manufacturer": "Apple",
+  "advertising_id": "13F56082-25AC-47F2-A553-8C1C96468C5D",
+  "locale_region": "ca",
+  "platform": "MOBILE",
+  "app_namespace": "io.rover.debug",
+  "radio": "",
+  "push_token_updated_at": {
+    "$date": "2017-09-22T20:12:18.798Z"
+  },
+  "location_accuracy": 65,
+  "location_latitude": 43.65161698539669,
+  "location_longitude": -79.37518175364146,
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ],
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-09-22T20:12:30.050Z"
+  },
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-09-22T20:12:30.051Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "59cbfb96a629b500012f2a91"
+  },
+  "account_id": 1,
+  "device_id": "85D0F295-C617-47DA-80B5-5B33FD94D436",
+  "profile_id": {
+    "$oid": "00000000000000000000aaa2"
+  },
+  "created_at": {
+    "$date": "2017-09-27T19:27:18.258Z"
+  },
+  "updated_at": {
+    "$date": "2017-09-28T20:32:17.501Z"
+  },
+  "push_token_is_active": false,
+  "is_wifi_enabled": false,
+  "is_cellular_enabled": false,
+  "is_background_enabled": true,
+  "is_location_monitoring_enabled": true,
+  "is_bluetooth_enabled": false,
+  "app_version": "",
+  "os_name": "iOS",
+  "os_version": {
+    "major": 11,
+    "minor": 0,
+    "revision": 0
+  },
+  "region_monitoring_mode": "UNDEFINED",
+  "push_environment": "production",
+  "locale_script": "",
+  "locale_language": "en",
+  "screen_width": 0,
+  "push_token_key": null,
+  "app_name": "",
+  "time_zone": "America/Toronto",
+  "platform": "MOBILE",
+  "screen_height": 0,
+  "carrier_name": "",
+  "advertising_id": "E9E903AB-693E-42CE-A1C0-D5B6120D39C4",
+  "ip": "206.248.180.234",
+  "frameworks": {
+    "io%2Erover%2ERover": {
+      "major": 1,
+      "minor": 9,
+      "revision": 0
+    }
+  },
+  "app_build": "",
+  "device_model": "x86_64",
+  "radio": "",
+  "app_namespace": "io.rover.Inbox",
+  "device_manufacturer": "Apple",
+  "locale_region": "us",
+  "location_accuracy": 5,
+  "location_latitude": 37.7433128,
+  "location_longitude": -122.40606023,
+  "ibeacon_monitoring_regions_updated_at": {
+    "$date": "2017-09-27T19:27:18.530Z"
+  },
+  "ibeacon_monitoring_regions": [
+    {
+      "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
+      "major": -1,
+      "minor": -1
+    }
+  ],
+  "geofence_monitoring_regions_updated_at": {
+    "$date": "2017-09-27T19:27:18.530Z"
+  },
+  "geofence_monitoring_regions": [
+    {
+      "id": "43.961211:-78.975767:50",
+      "latitude": 43.961211,
+      "longitude": -78.975767,
+      "radius": 50
+    }
+  ]
+}
