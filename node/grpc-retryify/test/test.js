@@ -119,4 +119,34 @@ describe('retryify', function() {
 			done()
 		})
 	})
+
+	it('allows overriding of retry checker function', function(done) {
+		let client = makeClient()
+		let stub = sinon.stub(client, 'test')
+		retry(client)
+		
+
+		// First call returns a grpc error
+		stub.onCall(0).callsFake(function(req, opts, cb) {
+			return cb(new Error("Blow Up!"))
+		})
+
+		// Second call returns a grpc error
+		stub.onCall(1).callsFake(function(req, opts, cb) {
+			return cb({ code: 2 })
+		})
+
+		stub.onCall(2).callsFake(function(req, opts, cb) {
+			return cb(null, "a")
+		})
+
+		let retryFunc = sinon.stub().returns(true)
+
+		client.test("a", { retry: { on: retryFunc, minTimeout: 10 } }, function(err, response) {
+			expect(err).to.be.null
+			expect(response).to.be.equal("a")
+			assert.calledTwice(retryFunc)
+			done()
+		})
+	}).timeout(5000)
 })
