@@ -1,13 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import {
-    Checkbox,
-    cloud,
-    purple,
-    offwhite,
-    steel,
-    straw
-} from '@rover/react-bootstrap'
+import { cloud, offwhite, steel, straw } from '@rover/react-bootstrap'
 
 import ReactDataGrid from 'react-data-grid'
 
@@ -25,39 +18,20 @@ class AudienceDataGrid extends Component {
             selectedIndex: [],
             isShiftKeyPressed: false,
             isCommandKeyPressed: false,
-            isModalShowing: false
+            isModalShowing: false,
+            selectedView: 'Testing'
         }
 
         this.onRowsSelected = this.onRowsSelected.bind(this)
         this.onRowsDeselected = this.onRowsDeselected.bind(this)
         this.rowGetter = this.rowGetter.bind(this)
-        this.onDeviceDetailsModalClose = this.onDeviceDetailsModalClose.bind(this)
+        this.onDeviceDetailsModalClose = this.onDeviceDetailsModalClose.bind(
+            this
+        )
     }
 
     rowGetter(i) {
         return this.props.rows[i]
-    }
-
-    renderCheckbox(props) {
-        const { column, dependentValues, rowIdx } = props
-        const { onCellChange, key } = column
-        return (
-            <Checkbox
-                isChecked={props.value}
-                label=""
-                primaryColor={purple}
-                isDisabled={false}
-                onChange={e => onCellChange(rowIdx, key, dependentValues, e)}
-                style={{
-                    height: 16,
-                    width: 16
-                }}
-                labelStyle={{
-                    height: 16,
-                    left: 16
-                }}
-            />
-        )
     }
 
     onHeaderDrop(source, target) {
@@ -86,7 +60,8 @@ class AudienceDataGrid extends Component {
 
     onRowsSelected(rows) {
         this.setState({
-            selectedIndex: rows.map(r => r.rowIdx) })
+            selectedIndex: rows.map(r => r.rowIdx)
+        })
     }
 
     onRowsDeselected(rows) {
@@ -98,8 +73,12 @@ class AudienceDataGrid extends Component {
         })
     }
 
-    onRowClick(rowIdx) {
-        this.setState({ selectedIndex: [rowIdx], isModalShowing: (rowIdx >= 0) })
+    onRowClick(rowIdx, selectedView) {
+        this.setState({
+            selectedIndex: [rowIdx],
+            isModalShowing: rowIdx >= 0,
+            selectedView
+        })
     }
 
     getGridHeight() {
@@ -210,8 +189,13 @@ class AudienceDataGrid extends Component {
                                 indexes: this.state.selectedIndex
                             }
                         }}
-                        rowRenderer={CustomRowRenderer}
-                        onRowClick={rowIdx => this.onRowClick(rowIdx)}
+                        rowRenderer={props =>
+                            CustomRowRenderer({
+                                ...props,
+                                clickHandler: selectedView =>
+                                    this.onRowClick(props.idx, selectedView)
+                            })}
+                        onRowClick={rowIdx => null}
                         onColumnResize={onColumnResize}
                     />
                 </DraggableContainer>
@@ -229,6 +213,9 @@ class AudienceDataGrid extends Component {
                     updateDataGridRows={this.props.updateDataGridRows}
                     handleCellEnter={this.props.handleCellEnter}
                     handleCellLeave={this.props.handleCellLeave}
+                    selectedView={this.state.selectedView}
+                    updateSelectedView={selectedView =>
+                        this.setState({ selectedView })}
                 />
             </div>
         )
@@ -236,10 +223,19 @@ class AudienceDataGrid extends Component {
 }
 
 AudienceDataGrid.propTypes = {
+    allColumns: PropTypes.shape({
+        profiles: PropTypes.object.isRequired,
+        devices: PropTypes.object.isRequired
+    }).isRequired,
     columns: PropTypes.array.isRequired,
+    dataGridRows: PropTypes.array.isRequired,
+    handleCellEnter: PropTypes.func.isRequired,
+    handleCellLeave: PropTypes.func.isRequired,
     onColumnResize: PropTypes.func.isRequired,
+    resetPagination: PropTypes.bool.isRequired,
     rows: PropTypes.array.isRequired,
     segmentSize: PropTypes.number.isRequired,
+    updateDataGridRows: PropTypes.func.isRequired,
     updateDragColumns: PropTypes.func.isRequired,
     updatePageNumber: PropTypes.func.isRequired
 }

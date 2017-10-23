@@ -22,7 +22,6 @@ class DeviceDetailsModal extends Component {
         )[0].value
 
         this.state = {
-            selectedView: 'Attributes',
             selectedTestDevice
         }
 
@@ -35,37 +34,34 @@ class DeviceDetailsModal extends Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.isOpen) {
             this.setState({
-                selectedTestDevice: nextProps.dataGridRows[nextProps.index].filter(
+                selectedTestDevice:
+                nextProps.dataGridRows[nextProps.index].filter(
                     row =>
-                        row.attribute === 'is_test_device' && row.selector === 'DEVICE'
-                )[0].value,
-            })
-        } else {
-            this.setState({
-                selectedView: 'Attributes'
+                        row.attribute === 'is_test_device' &&
+                        row.selector === 'DEVICE'
+                )[0].value
             })
         }
     }
 
     handleViewChange(val) {
-        this.setState({
-            selectedView: val
-        })
+        this.props.updateSelectedView(val)
     }
 
     attrTestView(val) {
-        const { selectedView } = this.state
+        const { selectedView } = this.props
+        const attributesSelected = selectedView === 'Attributes'
         const selectors = [
             {
                 icon: () => null,
                 title: 'Attributes',
-                isSelected: selectedView === 'Attributes',
+                isSelected: attributesSelected,
                 path: 'Attributes'
             },
             {
                 icon: () => null,
                 title: 'Testing',
-                isSelected: selectedView === 'Testing',
+                isSelected: !attributesSelected,
                 path: 'Testing'
             }
         ]
@@ -91,6 +87,7 @@ class DeviceDetailsModal extends Component {
     }
 
     viewSelector() {
+        const { selectedView } = this.props
         return (
             <div
                 style={{
@@ -100,7 +97,7 @@ class DeviceDetailsModal extends Component {
                     justifyContent: 'center'
                 }}
             >
-                {this.attrTestView('Attributes')}
+                {this.attrTestView(selectedView)}
             </div>
         )
     }
@@ -117,10 +114,11 @@ class DeviceDetailsModal extends Component {
             onRequestClose,
             dataGridRows,
             index,
-            allColumns
+            allColumns,
+            selectedView
         } = this.props
 
-        const { selectedView, selectedTestDevice } = this.state
+        const { selectedTestDevice } = this.state
 
         return (
             <Modal
@@ -195,12 +193,16 @@ class DeviceDetailsModal extends Component {
 }
 
 DeviceDetailsModal.propTypes = {
+    allColumns: PropTypes.object,
     dataGridRows: PropTypes.array,
+    handleCellEnter: PropTypes.func.isRequired,
+    handleCellLeave: PropTypes.func.isRequired,
+    index: PropTypes.number,
     isOpen: PropTypes.bool,
     onRequestClose: PropTypes.func,
-    index: PropTypes.number,
-    allColumns: PropTypes.object,
-    updateDataGridRows: PropTypes.func
+    selectedView: PropTypes.string,
+    updateDataGridRows: PropTypes.func,
+    updateSelectedView: PropTypes.func.isRequired
 }
 
 DeviceDetailsModal.defaultProps = {
@@ -209,7 +211,8 @@ DeviceDetailsModal.defaultProps = {
     onRequestClose: () => null,
     index: 0,
     allColumns: {},
-    updateDataGridRows: () => null
+    updateDataGridRows: () => null,
+    selectedView: 'Attributes'
 }
 
 export default DeviceDetailsModal
