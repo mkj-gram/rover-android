@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"sort"
-	"strings"
 	"time"
 
 	"golang.org/x/net/context"
@@ -543,7 +542,8 @@ func (s *profilesStore) validateProfileAttributes(schema *ProfileSchema, attrUpd
 	// go through the attribute updates and validate types
 	// put attributes that don't have schema defined into schemaLess array
 	for aname, updates := range attrUpdates {
-		typ, ok := schemaAttrs[strings.ToLower(aname)]
+		typ, ok := schemaAttrs[aname]
+
 		if !ok {
 			schemaLess = append(schemaLess, aname)
 			continue
