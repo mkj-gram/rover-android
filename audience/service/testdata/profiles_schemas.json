@@ -5,6 +5,15 @@
   "attribute_type": "string",
   "created_at": {"$date":"2017-06-14T15:44:18.496Z"}
 }
+
+{
+  "_id":{"$oid":"59ed69400000000000000000"},
+  "account_id":1,
+  "attribute":"Last Name",
+  "attribute_type": "string",
+  "created_at": {"$date":"2016-08-22T19:05:53.102Z"}
+}
+
 {
   "_id":{"$oid":"000000000000000000000f03"},
   "account_id":100,
