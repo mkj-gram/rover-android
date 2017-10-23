@@ -32,6 +32,7 @@ import LocationIcon from './LocationIcon'
 import LockIcon from './LockIcon'
 import PartialLockIcon from './PartialLockIcon'
 import PencilEditIcon from './PencilEditIcon'
+import PencilIcon from './PencilIcon'
 import ProfileIcon from './ProfileIcon'
 import PreviewIcon from './PreviewIcon'
 import RefreshIcon from './RefreshIcon'
@@ -56,6 +57,7 @@ import WebViewBlockIcon from './WebViewBlockIcon'
 import WebViewBlockIconSmall from './WebViewBlockIconSmall'
 import WidePreviewIcon from './WidePreviewIcon'
 import UploadIcon from './UploadIcon'
+import VerticalEllipseIcon from './VerticalEllipseIcon'
 
 // align
 import BottomAlignIcon from './align/BottomAlignIcon'
@@ -134,6 +136,7 @@ export {
     LockIcon,
     PartialLockIcon,
     PencilEditIcon,
+    PencilIcon,
     PreviewIcon,
     ProfileIcon,
     RefreshIcon,
@@ -189,5 +192,6 @@ export {
     TextAlignLeftIcon,
     TextAlignRightIcon,
     UnderlineIcon,
-    UploadIcon
+    UploadIcon,
+    VerticalEllipseIcon
 }
