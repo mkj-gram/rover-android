@@ -3,7 +3,7 @@ const expect = require('chai').expect
 const sinon = require('sinon')
 const promisify = require('../index.js')
 
-describe('retryify', function() {
+describe('promisify', function() {
         
     function makeClient() {
         function Client() {}
@@ -40,11 +40,10 @@ describe('retryify', function() {
         let spy = sinon.spy(client, "test")
         promisify(client)
 
-
         let res = client.test("hello", { deadline: "now" })
 
-        
-        res.then(_ => {
+        res
+            .then(_ => {
                 let args = spy.getCall(0).args
                 expect(args[0]).to.equal("hello")
                 expect(args[1]).to.deep.equal({ deadline: "now" })
