@@ -40,7 +40,7 @@ import StringArrayInput from './StringArrayInput'
 
 import SegmentsContainer from './SegmentsContainer'
 
-import { getDeviceLabel } from '../../localSchemas/deviceSchema'
+import { getDeviceLabel, getDeviceOptions } from '../../localSchemas/deviceSchema'
 
 class SideBar extends Component {
     constructor(props) {
@@ -165,7 +165,8 @@ class SideBar extends Component {
         const query = predicateList.map(d => ({
             ...d,
             selector: d.selector,
-            label: getDeviceLabel(d.attribute)
+            label: getDeviceLabel(d.attribute),
+            options: getDeviceOptions(d.attribute)
         }))
 
         this.props.setQueryCondition(condition, true, query)

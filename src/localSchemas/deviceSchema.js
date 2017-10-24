@@ -180,7 +180,7 @@ export const getDeviceSchema = () => [
     },
     {
         attribute: 'is_test_device',
-        label: 'Test Device',   // Update when working on test device Milestone
+        label: 'Test Device', // Update when working on test device Milestone
         __typename: 'BooleanPredicate',
         group: null,
         display: true,
@@ -188,12 +188,12 @@ export const getDeviceSchema = () => [
     },
     {
         attribute: 'label',
-        label: 'Test Device Name',   // Update when working on test device Milestone
+        label: 'Test Device Name', // Update when working on test device Milestone
         __typename: 'StringPredicate',
         group: null,
         display: true,
         filter: false
-    },
+    }
     //----------------------------
     //
     // The following device attributes will be unlocked for SDK2.x
@@ -290,3 +290,7 @@ export const getDeviceLabel = attribute => {
         return attribute
     }
 }
+
+export const getDeviceOptions = attribute =>
+    getDeviceSchema().filter(device => attribute === device.attribute)[0]
+        .options
