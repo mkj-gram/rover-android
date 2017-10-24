@@ -7,7 +7,7 @@ import { GraphQLID, GraphQLList, GraphQLString, GraphQLInt } from 'graphql'
 import DynamicSegment from './DynamicSegment'
 import { getSegmentPageById } from './SegmentRowsQuery'
 
-import { getSegment } from './mockSegments'
+import { getPushEnvironmentFromProto } from '../grpc/audience/getDeviceFromProto'
 
 const getSelectorName = selector => {
    const selectEnum = {
@@ -87,6 +87,10 @@ const DynamicSegmentQuery = {
 
                 if (attribute === 'platform') {
                     stringValue = stringValue.charAt(0).concat(stringValue.slice(1).toLowerCase())
+                }
+
+                if (attribute === 'push_environment') {
+                    stringValue = getPushEnvironmentFromProto(stringValue)
                 }
 
                 return {

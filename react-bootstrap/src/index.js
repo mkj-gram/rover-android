@@ -28,6 +28,7 @@ import Label from './forms/Label'
 import RadioButton from './forms/RadioButton'
 import Select from './forms/Select'
 import TextField from './forms/TextField'
+import TypeAhead from './forms/TypeAhead'
 
 // layers
 import Layer from './layers/Layer'
@@ -116,6 +117,7 @@ export {
     RadioButton,
     Select,
     TextField,
+    TypeAhead,
     Layer,
     LayerGroup,
     LayerList,

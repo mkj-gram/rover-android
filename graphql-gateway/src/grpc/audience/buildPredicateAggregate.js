@@ -51,6 +51,10 @@ export const buildStringPredicate = ({
         value = value.toUpperCase()
     }
 
+    if (attribute === 'push_environment') {
+        value = value.toLowerCase()
+    }
+
     const stringPredicate = new RoverApis.audience.v1.Models.StringPredicate()
     stringPredicate.setAttributeName(attribute)
     stringPredicate.setOp(comparison)

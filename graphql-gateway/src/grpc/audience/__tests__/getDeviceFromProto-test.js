@@ -1,4 +1,8 @@
-import getDeviceFromProto, { getPlatformFromProto, getVersionFromProto } from '../getDeviceFromProto'
+import getDeviceFromProto, {
+    getPlatformFromProto,
+    getPushEnvironmentFromProto,
+    getVersionFromProto
+} from '../getDeviceFromProto'
 import RoverApis from '@rover/apis'
 import promisify from '@rover-common/grpc-promisify'
 import { audienceClient, authClient } from '../../../grpcClients'
@@ -33,6 +37,13 @@ describe('getPlatformFromProto', () => {
         const platform = getPlatformFromProto(2)
         expect(platform).toEqual('Web')
     }) 
+})
+
+describe('getPushEnvironmentFromProto', () => {
+    it('should return a string with the first letter capitalized', () => {
+        const pushEnvironment = getPushEnvironmentFromProto('development')
+        expect(pushEnvironment).toEqual('Development')
+    })
 })
 
 describe('getVersionFromProto', () => {
