@@ -13,7 +13,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: true,
+        options: ['Production', 'Development']
     },
     {
         attribute: 'push_token_created_at',

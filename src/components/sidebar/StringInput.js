@@ -1,7 +1,15 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import { light, Select, silver, text, titanium } from '@rover/react-bootstrap'
+import {
+    light,
+    Select,
+    silver,
+    steel,
+    text,
+    titanium,
+    TypeAhead
+} from '@rover/react-bootstrap'
 
 import ModalInput from './ModalInput'
 import ModalInputPrompt from './ModalInputPrompt'
@@ -29,7 +37,8 @@ class StringInput extends Component {
             __typename,
             index,
             updateFn,
-            label
+            label,
+            options
         } = this.props
         let { stringValue } = this.state
 
@@ -44,7 +53,8 @@ class StringInput extends Component {
             __typename,
             index,
             stringValue,
-            label
+            label,
+            options
         })
         this.setState({ stringComparison })
     }
@@ -56,7 +66,8 @@ class StringInput extends Component {
             __typename,
             index,
             updateFn,
-            label
+            label,
+            options
         } = this.props
         const { stringComparison } = this.state
         updateFn({
@@ -66,14 +77,79 @@ class StringInput extends Component {
             __typename,
             index,
             stringValue,
-            label
+            label,
+            options
         })
         this.setState({ stringValue })
     }
 
+    renderInputComponent() {
+        const { options } = this.props
+        const { stringComparison, stringValue } = this.state
+
+        if (stringComparison.includes('is') && options.length > 0) {
+            return this.renderTypeAhead()
+        }
+
+        return (
+            <ModalInput
+                type="text"
+                value={stringValue}
+                style={{
+                    width: 200,
+                    textAlign: 'left',
+                    paddingBottom: 4,
+                    height: 23,
+                    marginTop: 2
+                }}
+                onChange={e => this.updateValue(e.target.value)}
+            />
+        )
+    }
+
+    renderTypeAhead() {
+        const { options } = this.props
+        const { stringValue } = this.state
+        return (
+            <div style={{ display: 'relative', marginLeft: 5 }}>
+                <TypeAhead
+                    textFieldStyle={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        borderBottom: `1px solid ${steel}`,
+                        borderColor: steel,
+                        textDecoration: 'none',
+                        outline: 'none',
+                        color: titanium,
+                        fontFamily: 'Source Sans Pro',
+                        fontSize: 16,
+                        textAlign: 'left',
+                        paddingBottom: 3,
+                        paddingLeft: 5,
+                        display: 'initial',
+                        width: 200,
+                        lineHeight: 1.2,
+                        focus: {
+                            borderBottom: '1px solid',
+                            borderColor: silver
+                        },
+                        input: {
+                            borderBottom: '1px solid',
+                            borderColor: silver,
+                            padding: '3px 0 3px 10px'
+                        }
+                    }}
+                    items={options}
+                    update={value => this.updateValue(value)}
+                    value={stringValue}
+                />
+            </div>
+        )
+    }
+
     render() {
         const { selector, label } = this.props
-        const { stringValue, stringComparison } = this.state
+        const { stringComparison } = this.state
 
         return (
             <div style={{ ...text, ...light, color: silver, width: 380 }}>
@@ -85,7 +161,6 @@ class StringInput extends Component {
                 <div
                     style={{
                         display: 'flex',
-                        alignItems: 'flex-end',
                         marginTop: 15
                     }}
                 >
@@ -103,7 +178,7 @@ class StringInput extends Component {
                             borderTop: 'none',
                             borderRight: 'none',
                             borderLeft: 'none',
-                            borderRadius: 1,
+                            borderRadius: 0,
                             paddingLeft: 5
                         }}
                         isDisabled={false}
@@ -120,17 +195,7 @@ class StringInput extends Component {
                         <option value="is set">Exists</option>
                         <option value="is unset">Does not exist</option>
                     </Select>
-
-                    {!stringComparison.includes('set') &&
-                        <ModalInput
-                            type="text"
-                            value={stringValue}
-                            style={{
-                                width: 200,
-                                textAlign: 'left'
-                            }}
-                            onChange={e => this.updateValue(e.target.value)}
-                        />}
+                    {!stringComparison.includes('set') && this.renderInputComponent()}
                 </div>
             </div>
         )
@@ -145,7 +210,8 @@ StringInput.propTypes = {
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     __typename: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired
+    label: PropTypes.string.isRequired,
+    options: PropTypes.arrayOf(PropTypes.string)
 }
 
 StringInput.defaultProps = {
@@ -155,7 +221,8 @@ StringInput.defaultProps = {
     selector: 'DEVICE',
     index: 0,
     updateFn: () => null,
-    label: ''
+    label: '',
+    options: []
 }
 
 export default StringInput
