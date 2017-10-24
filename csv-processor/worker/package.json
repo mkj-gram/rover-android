@@ -4,18 +4,29 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test"
   },
   "author": "Rover Labs Inc",
   "license": "ISC",
   "dependencies": {
     "@google-cloud/storage": "^1.0.0",
-    "@rover/segment-client": "../../segment/clients/node",
+    "@rover-common/grpc-promisify": "../../node/grpc-promisify",
+    "@rover-common/grpc-retryify": "../../node/grpc-retryify",
+    "@rover-common/prefixed-logger": "../../node/prefixed-logger",
+    "@rover/audience-client": "../../audience/clients/node",
     "@rover/files-client": "../../files/clients/node",
+    "@rover/segment-client": "../../segment/clients/node",
+    "bluebird": "^3.5.1",
     "bull": "^2.2.6",
     "confidence": "^3.0.2",
     "fast-csv": "^2.4.0",
     "raven": "^2.1.0",
     "through2": "^2.0.3"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-spies": "^0.7.1",
+    "mocha": "^4.0.1",
+    "sinon": "^4.0.1"
   }
 }

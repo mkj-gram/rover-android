@@ -84,6 +84,57 @@ const buildLoadJobProto = function({ id, account_id, type, status, progress, cre
     return proto
 }
 
+const buildCreateLoadJobReply = function(job, account_id, type) {
+    let reply = new CsvProcessor.v1.Models.CreateLoadJobReply()
+
+    const loadJob = buildLoadJobProto({
+        id: job.jobId,
+        account_id: account_id,
+        type: type,
+        status: getJobStatus("waiting"),
+        progress: 0,
+        created_at: new Date(job.timestamp)
+    })
+
+    reply.setJob(loadJob)
+
+    return reply
+}
+
+/**
+ * Creates a new job to import a list of profiles
+ * @param  {Object}   call     
+ * @param  {Function} callback
+ */
+const createProfileLoadJob = function(call, callback) {
+    const request = call.request
+    const queue = this.queues.loadJob
+    const AuthContext = request.getAuthContext()
+    const profileLoadJob = request.getProfileLoadJobConfig()
+    
+    let jobData = {
+        type: JobType.PROFILE_IMPORT,
+        auth_context: {
+            account_id: AuthContext.getAccountId(),
+            user_id: AuthContext.getUserId(),
+            scopes: AuthContext.getPermissionScopesList()
+        },
+        arguments: {
+            csv_file_id: profileLoadJob.getCsvFileId(),
+            import_schema: profileLoadJob.getSchemaList().map(s => { return { type: s.getType(), field: s.getField(), description: s.getDescription() }})
+        }
+    }
+
+    queue.add(jobData)
+        .then(function(job) {
+            let reply = buildCreateLoadJobReply(job, profileLoadJob.getAccountId(), JobType.PROFILE_IMPORT)
+            return callback(null, reply)
+        })
+        .catch(function(err) {
+            return callback(err)
+        })
+}
+
 /**
  * Creates a new job of type load-static-segment-with-csv
  * @param  {Object}   call     grpc call
@@ -108,24 +159,10 @@ const createSegmentLoadJobWithCsvFile = function(call, callback) {
             csv_file_id: segmentLoadJobConfig.getCsvFileId()
         }  
     }
-
-    console.info(jobData)
     
     queue.add(jobData)
         .then(function(job) {
-            let reply = new CsvProcessor.v1.Models.CreateLoadJobReply()
-
-            const loadJob = buildLoadJobProto({
-                id: job.jobId,
-                account_id: segmentLoadJobConfig.getAccountId(),
-                type: JobType.SEGMENT_WITH_CSV_FILE,
-                status: getJobStatus("waiting"),
-                progress: 0,
-                created_at: new Date(job.timestamp)
-            })
-
-            reply.setJob(loadJob)
-
+            let reply = buildCreateLoadJobReply(job, segmentLoadJobConfig.getAccountId(), JobType.SEGMENT_WITH_CSV_FILE)
             return callback(null, reply)
         })
         .catch(function(err) {
@@ -269,6 +306,9 @@ const createLoadJob = function(call, callback) {
             break
         case CsvProcessor.v1.Models.JobType.SEGMENT_WITH_CSV_FILE:
             return createSegmentLoadJobWithCsvFile.bind(this)(call, callback)
+            break
+        case CsvProcessor.v1.Models.JobType.PROFILE_IMPORT:
+            return createProfileLoadJob.bind(this)(call, callback)
             break
         default:
             return callback({message: "Unknown job type", status: grpcCodes.status.INVALID_ARGUMENT })
