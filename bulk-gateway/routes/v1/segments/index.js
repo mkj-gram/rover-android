@@ -57,7 +57,7 @@ module.exports = function(CsvProcessorClient, UploaderClient) {
 
         const loadJobRequest = new RoverApis['csv-processor'].v1.Models.CreateLoadJobRequest()
   
-        loadJobRequest.setAuthContext(req.auth.context.getAccountId())
+        loadJobRequest.setAuthContext(req.auth.context)
         loadJobRequest.setType(RoverApis['csv-processor'].v1.Models.JobType.SEGMENT)
         loadJobRequest.setSegmentLoadJobConfig(segmentLoadJobConfig)
 

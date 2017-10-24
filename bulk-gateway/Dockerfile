@@ -1,4 +1,6 @@
-FROM node:6.9.1
+FROM node:7.10.1-alpine
+
+RUN apk add --no-cache libc6-compat
 
 WORKDIR /opt/bulk-gateway
 

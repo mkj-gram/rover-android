@@ -21,7 +21,8 @@ function normalizePort() {
 */
 Router(function(err, router) {
     if (err) {
-        throw err
+        console.error(err)
+        process.exit(1)
     }
 
     app.use(router)

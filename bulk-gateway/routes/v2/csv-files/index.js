@@ -88,9 +88,12 @@ module.exports = function(FilesClient) {
         uploadStream.write(request)
 
         req.on('data', function(data) {
+            // Data is a buffer but protobuf needs a Uint8Array
+            let dataChunk = new Uint8Array(data)
+            
             let chunkRequest = new RoverApis.files.v1.Models.UploadCsvFileRequest()
             let chunk = new RoverApis.files.v1.Models.UploadCsvFileRequest.Chunk()
-            chunk.setData(data)
+            chunk.setData(dataChunk)
 
             chunkRequest.setChunk(chunk)
             uploadStream.write(chunkRequest)

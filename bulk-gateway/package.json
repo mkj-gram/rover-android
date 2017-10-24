@@ -4,17 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "make test"
+    "test": "./node_modules/.bin/mocha --reporter spec --ui tdd",
+    "start": "node index.js"
   },
   "author": "Rover Labs Inc.",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/storage": "^0.8.0",
+    "@google-cloud/storage": "^1.2.0",
     "@rover-common/grpc-codes": "../node/grpc-codes",
     "@rover/auth-client": "../auth/clients/node",
     "@rover/csv-processor-client": "../csv-processor/clients/node",
     "@rover/files-client": "../files/clients/node",
     "@rover/segment-client": "../segment/clients/node",
+    "@rover-common/grpc-promisify": "../node/grpc-promisify",
     "async": "^2.1.5",
     "body-parser": "^1.17.2",
     "confidence": "^3.0.2",

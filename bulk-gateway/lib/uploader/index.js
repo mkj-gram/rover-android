@@ -39,23 +39,29 @@ Uploader.prototype.cleanUp = function(gcsfile, callback) {
 };
 
 Uploader.prototype.connect = function(callback) {
-    this._bucket.exists()
-        .then(data => {
-            const exists = data[0]
-            if (!exists) {
-                console.log("Uploader: creating bucket: " + this._bucket.id)
-                return this._bucket.create()
-                        .then(newBucket => {
-                            console.log(newBucket)
-                            return callback()
-                        })
-                        .catch(err => { return callback(err) })
-            }
+    var self = this
+    var called = false
+    /*
+        Google error. If an error occurs it calls the callback function multiple times
+     */
+    this._bucket.exists(function(err, exists) {
+        if (called === true) {
+            return
+        }
 
-            console.log("Uploader: bucket:= `" + this._bucket.id + "` already exists")
-            return callback()
-        })
-        .catch(err => { return callback(err) })
+        if (err) {
+            called = true
+            return callback(err)
+        }
+
+        if (!exists) {
+            called = true
+            return callback(new Error(`Bucket not found: ${self._bucket.name}`))
+        }
+
+        called = true
+        return callback()
+    })
 };
 
 

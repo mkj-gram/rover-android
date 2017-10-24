@@ -40,6 +40,7 @@ module.exports = function(callback) {
     */
     const morgan = require('morgan')
     const logger = morgan(':method :url :status :res[content-length] - :response-time ms')
+    
     router.use(logger)
     
     /* 
@@ -139,7 +140,7 @@ module.exports = function(callback) {
             Setup routes
          */
 
-        router.use('/bulk/', require('./v1')(CsvProcessorClient, UploaderClient))
+        router.use('/bulk/',    require('./v1')(CsvProcessorClient, UploaderClient))
         router.use('/bulk/v1/', require('./v1')(CsvProcessorClient, UploaderClient))
         router.use('/bulk/v2/', require('./v2')(CsvProcessorClient, FilesClient, SegmentClient))
 

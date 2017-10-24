@@ -8,6 +8,10 @@ describe('routes', function() {
 		require('./routes/v1/load-jobs/test')
 		require('./routes/v1/segments/test')
 	})
+
+	describe('v2', function() {
+		require('./routes/v2/profile-imports/test')
+	})
 })
 
 

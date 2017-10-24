@@ -17,3 +17,9 @@ exports.authenticated = function(req, res, next) {
 
     return next()
 }
+
+exports.asyncSupport = function(fn) {
+	return function(req, res, next) {
+		fn(req, res, next).catch(err => next(err))
+	}
+}

@@ -84,7 +84,7 @@ module.exports = function(CsvProcessorClient, FilesClient, SegmentClient) {
                 loadJobConfig.setCsvFileId(csvFileId)
 
                 let request = new RoverApis.csv_processor.v1.Models.CreateLoadJobRequest()
-                request.setAuthContext(req.auth.context.getAccountId())
+                request.setAuthContext(req.auth.context)
                 request.setType(RoverApis.csv_processor.v1.Models.JobType.SEGMENT_WITH_CSV_FILE)
                 request.setSegmentLoadJobWithCsvFileConfig(loadJobConfig)
 

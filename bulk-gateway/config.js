@@ -31,17 +31,17 @@ const store = new Confidence.Store({
         project_id: {
             $filter: 'env',
             production: process.env.STORAGE_PROJECT_ID,
-            $default: 'rover-development'
+            $default: 'rover-staging'
         },
         credentials: {
             $filter: 'env',
             production: tryParseJson(process.env.STORAGE_CREDENTIALS, {}),
-            $default: {  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC6jzBfdYq5LeQu\nA0yIp5EHZ/getaA4Lqt+fcZlzxBo/LTar4lP6DyFVBY/hPYV4VlCuDBEbACqWdYR\nZoigBB4C6aU/+Dk4dUGML4MmUjJx3GYlHJLShJKySRCl137dio9+mZvuRNaXFW/b\nG3v49CtBZOeurybcRm+YusxlA+sxoqBDXD151pO/Jz67GOBatnLElEu9v3aUbD4n\nLT7q5+K/28w1qODycyIeJkNDNvFcUvXc/CASPZnYOS0IkJD1fVDs6Vj+OqneC2GR\nFDx7raWnHDIsGARq8sKguhKpUKWTD6mYOe6s6Q/GtxOLoFvgi4HgwGlKM1nYwu49\ngqmUVzjDAgMBAAECggEAQy6KVG3/MVVh3OIKPxHcy8Z4lxJ/6ot/7XK8rfAFsFEE\njdX1xEVU+gyAYIpwlguLOdgbZaBhEvd7+9MpMzqYViMug51PedHb83Ause+aw98D\nF601AEOGklZ2fMpgIMajiwslGIZIoqqxF73LhKjlJM0CE6l2fI+O43itX1ksarhQ\nqdSxRe11oBA//FTDGuJSe2cfw6/YURewKEXpUmOrsn5RlC1veD0hQmY42f0jp0lg\nBq8eipTcRNg3liJSja9Ai08Mv4eNMrMnMEQe2ZzzXgMM2TIYj9//yTUXYtqkMCGr\nMorQCRQLIu9wfTK//QBGfiIHUJAgGRO23MFgiyf0TQKBgQDjWceJ9CwKWjDpu4Na\nAdEDfiV3genxv5A8/Bi8/3p/cHmLEpOEYsOxiXhBFl+yr6WliNLuNkmZGJI4nMgj\nsFYU9mRIq9tOqpTQRTientZxPJz+sgR3AvFwf8gQKTamx9wytaUgNNO4JyEbf7a4\nfpNAXVC8cSBpQ01yNOe5o2cdhQKBgQDSEYAOz6RIXtRY3VIHUxrHAUwGHeOcAHh6\ngXui8NWwQjAfia0mkTreu+t182Tb+JG/Ycy7BSx1fV1qrz4pHe6J6RWfx+pLwdyb\n0EcJFcC2lqxQ85fSF1r4riJa1z90qukPR+p86PKqsnWMIaMV+FeN5o1zjqxqW6f1\nEp67BclLpwKBgGjWhLIz238mmfmeU3LU9ZpDuGlEiinFaXEF2y6ELOvJZPLhrQ7W\nMGGU/9QbyiNu5dbQolvgws2LTBo5Cf2TGg7uk84DGc1L0fW8heB3ZHGxPsAgPPjY\nbZewBQSWzLHZ5cuoga25ToxT1uuEWDD5hVOf9FQBYq3HsFXi2Zx8Ile1AoGAQ4YQ\njbI88m5Y/3+UwHn8H3/ROh4dbaXRFD/OyB918MQ1x81vdPg13ia1lyJ3hyWtY8FC\nF9Of6Nw1TPermXffl0DvDH8sVtGn4gXe75KocYiZNyQ15vhO66S9skmCQjQ12g2Z\n2DDg3/GhSzv8ujEro5c6XKy9yypPIL2tfBxuCf0CgYEA3rH2tZMhB8bXHoakZnQZ\nGiKRaOCSgW8lZk0Jtyp9dM33L3UitC2A9ZmCrfJXdkc9yF13vcgFFH+gDytTVxVv\nLDepi8Es9pWT4e/1PXqyFiV8MEwEQ1vekgJbtIiAPeP4CWSYuZiIJ/y8T3lAeHe+\nTEBnd9eeXizjU3ShFblcBQc=\n-----END PRIVATE KEY-----\n","client_email": "files-service@rover-development.iam.gserviceaccount.com" }
+            $default: {"private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDfZX4XmvSB9bQx\nHCpug7QZ8nVZwRLuuPNIgQJ6GoA4mXLSqDAIDasz84wopnFSzypiJP3VqlPOYGlj\n9vu5LvTJGVNuPpAshbbz2Tmquulz1enC3+oWUSOdCDHDrbXKkjkedHRcwMgKsu/t\nXtMD5C9gFJRP66u6jtxLoXPrzBTa2vVyn/hKXeujqSq5CNhkBg3KshQTWwXFzKRL\nnbD4ynr+k1vxSIDt08oq2T2qTde/2z7+dkYOIIk01SagybHTzUX4HFgLGYsk092L\ndojqbMw95U+lI8TbL9gj4UR1svBz4HLR4o0l+AkbAnDXovVYbxLGlX8wITWJEfzZ\nG0+ziU8ZAgMBAAECggEAF/9PDDoZCdza/muII1cCgccJ1Bppbjtv5tn06ijunSXe\nr8JhZnwRaANBixxWEA8w/ln66njhh8nTiGl/oOTqZq/RxoXx9tZmUMuE5lItwcO4\n2LY07zDIIpY+wkZmwNv0RtE7rrsGwh92pokJIeHhNPEA/ZTTXbb68yTkzu+dTeUD\n/27TrTCr9Xj7qLyagmFUoaIdP1XufuLTohCN+P7xNBS7YbqFUizJb8vDmaTaCTqu\n/8+ijErtOaZ+pu/FnGomb+BJPYs7OqfO6BHRIePThbRytQ1c6uYhc16Fo58TH3jY\nY8glX2TPYGNOqpU+So6gr9m35A6TvNmi213L84FYAQKBgQD+L//wr0Fnbdj6nbKD\n6dNxs3WEXZMtfLgMulxQVe/82rXIb8NM08l1BAujD8/aZMIVyf5afqoPrVhng9zr\nyX91W0wI0iMsdJ8eTjKjM0ADVvisOvT2MyUC7V7ABIG3EJGh7QC5HKSctF1ID0GM\n6RpgqNIagklfmYJltxbBaAq5bQKBgQDg/Uk5yX+stswS9A4RBfw+5F+C23u0no9D\nm5NpmRMj2S1OCN6ME5BPdSjTbM2QoCm8Bfj/fYSskBRMlpULalAJ2RQM+WGv7cSw\nssQk/7jOX6cYmLnKSINm52IwlRf18yngJNzXQM9lOulENHTd+CuPQzP8CF8dqmuH\nPevadzqs3QKBgQClfz8WyCS/YMf7NJ28QYvH5d5H1l0zKpbywovESo+8g/IDlLEF\n3oa2R3IEMxFT0nKDmUagSQQUvPpoO3SlmEYCdPTmcVsxYKURKDzUAVRWWFQEX0aK\n3fXlGAOu5cBHHuSTFyp3W+zZkp2Bg11cj5D7Ci/xzo5TTjGWZETOnB0PaQKBgQC9\nxEU4DYG3vrLgJaObri21KlB5AgEUNkzmHFm4zpj7Opng4NA8299zdYFK2tGD8+Nf\nqLX9YPQ/zIKimrv51eDOfZ9Q1iMUDXtCAnY4MszAnKNGtsK2IHVcnTsPeSGtnDys\nxsrSb+K+InNPyOLtuf2bp3Y4VSNM1Uo+1vaQ3NHLrQKBgQC5tIDumJ5pRb2Z4KZC\nvG4+mMxDqTf39fJRu7xIavdbihthbIPXoTl6YH5hPvuI/Ul87Tvs1Vnms2MX0TGL\nkpg+CP1Tnyf3vvHGslHVINakvqWmpvnNwpZbEudXP/69mmRVwsCrHFgcgvYRJkb+\nq/Ae250LuiKllZv2nZR1Zk7nbQ==\n-----END PRIVATE KEY-----\n","client_email": "bulk-gateway-v1@rover-staging.iam.gserviceaccount.com"}        
         },
         bucket_name: {
             $filter: 'env',
             production: process.env.STORAGE_BUCKET_NAME,
-            $default: 'bulk-service'
+            $default: 'bulk-gateway-v1-uploads'
         }
     },
     raven: {
@@ -59,7 +59,7 @@ const store = new Confidence.Store({
 });
 
 const criteria = {
-    env: process.env.APP_ENVIRONMENT || "development"
+    env: process.env.APP_ENVIRONMENT || process.env.NODE_ENV || "development"
 };
 
 
