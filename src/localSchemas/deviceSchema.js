@@ -175,7 +175,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: true,
+        options: ['Mobile', 'Web']
     },
     {
         attribute: 'is_test_device',
