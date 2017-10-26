@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 import React from 'react'
 import PropTypes from 'prop-types'
 import { silver, steel, titanium } from '@rover/react-bootstrap'
@@ -27,6 +28,7 @@ const ModalInput = (props) => {
 
     return (
         <input
+            autoFocus
             {...props}
             style={inputStyle}
             onFocus={onFocus}
