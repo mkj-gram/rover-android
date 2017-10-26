@@ -6,9 +6,17 @@ import (
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/audience/service/predicates"
 	"github.com/roverplatform/rover/go/zoneinfo"
+	"time"
 )
 
 type M = map[string]interface{}
+
+var (
+	TimeNow = time.Now
+
+	// Use Toronto timezone as default zone where date/duration data should be compared with
+	Zone = "America/Toronto"
+)
 
 func DeviceAndProfilePredicateAggregateToQuery(aggregate *audience.PredicateAggregate, offset *audience.QueryRequest_TimeZoneOffset) (M, error) {
 
@@ -225,6 +233,10 @@ func PredicatesToFilter(condition audience.PredicateAggregate_Condition, predica
 			filter, isMustFilter, err = doublePredicateToQuery(predicate)
 		case *audience.Predicate_StringArrayPredicate:
 			filter, isMustFilter, err = stringArrayPredicateToQuery(predicate)
+		case *audience.Predicate_DatePredicate:
+			filter, isMustFilter, err = datePredicateToQuery(predicate)
+		case *audience.Predicate_DurationPredicate:
+			filter, isMustFilter, err = durationPredicateToQuery(predicate)
 		default:
 			return nil, errors.Errorf("Unknown predicate type %T", predicate)
 		}
@@ -335,6 +347,8 @@ func getAttributeNameFromPredicate(predicate *audience.Predicate) string {
 		return p.DoublePredicate.AttributeName
 	case *audience.Predicate_StringArrayPredicate:
 		return p.StringArrayPredicate.AttributeName
+	case *audience.Predicate_DurationPredicate:
+		return p.DurationPredicate.AttributeName
 	default:
 		// TODO log or throw error here???
 		return ""
@@ -1077,6 +1091,134 @@ func stringArrayPredicateToQuery(predicate *audience.Predicate) (M, bool, error)
 				attributeName: value,
 			},
 		}, op == audience.StringArrayPredicate_CONTAINS_ANY, nil
+
+	default:
+		return nil, false, errors.Errorf("Unknown operation %d", op)
+	}
+}
+
+func durationPredicateToQuery(predicate *audience.Predicate) (M, bool, error) {
+	var (
+		attributeName     = getElasticsearchAttributeName(predicate)
+		durationPredicate = predicate.GetDurationPredicate()
+		op                = durationPredicate.GetOp()
+		dur               = durationPredicate.GetValue().Duration
+		formatDuration    uint32
+	)
+
+	if durationPredicate.GetValue().Type == audience.DurationPredicate_Duration_DAYS {
+		formatDuration = dur * 24 * 60 * 60
+	} else {
+		// ToDo: Implement other time unit types (hour, minute, second)
+	}
+
+	toDateString := func(day uint32, month uint32, year uint32) string {
+		return fmt.Sprintf("%04d-%02d-%02d||/d", year, month, day)
+	}
+
+	loc, err := time.LoadLocation(Zone)
+	if err != nil {
+		return nil, false, err
+	}
+
+	timezoneTime := TimeNow().In(loc)
+
+	tYear, tMonth, tDay := timezoneTime.Add(-time.Duration(formatDuration) * time.Second).Date()
+	tYear1, tMonth1, tDay1 := timezoneTime.AddDate(0, 0, 1).Add(-time.Duration(formatDuration) * time.Second).Date()
+
+	switch op {
+	case audience.DurationPredicate_IS_LESS_THAN:
+		return M{
+			"range": M{
+				attributeName: M{
+					"lt":        toDateString(uint32(tDay), uint32(tMonth), uint32(tYear)),
+					"time_zone": Zone,
+				},
+			},
+		}, true, nil
+	case audience.DurationPredicate_IS_GREATER_THAN:
+		return M{
+			"range": M{
+				attributeName: M{
+					"gte":       toDateString(uint32(tDay), uint32(tMonth), uint32(tYear)),
+					"time_zone": Zone,
+				},
+			},
+		}, true, nil
+	case audience.DurationPredicate_IS_EQUAL:
+		return M{
+			"range": M{
+				attributeName: M{
+					"lt":        toDateString(uint32(tDay1), uint32(tMonth1), uint32(tYear1)),
+					"gte":       toDateString(uint32(tDay), uint32(tMonth), uint32(tYear)),
+					"time_zone": Zone,
+				},
+			},
+		}, true, nil
+	default:
+		return nil, false, errors.Errorf("Unknown operation %d", op)
+	}
+}
+
+func datePredicateToQuery(predicate *audience.Predicate) (M, bool, error) {
+	var (
+		attributeName = getElasticsearchAttributeName(predicate)
+		datePredicate = predicate.GetDatePredicate()
+		op            = datePredicate.GetOp()
+		val           = predicate.GetDatePredicate().GetValue()
+		missingValue  = getElasticsearchMissingValue(attributeName, predicate.GetSelector())
+	)
+
+	toDateString := func(day uint32, month uint32, year uint32) string {
+		return fmt.Sprintf("%04d-%02d-%02d||/d", year, month, day)
+	}
+
+	switch op {
+	case audience.DatePredicate_IS_SET, audience.DatePredicate_IS_UNSET:
+		if missingValue == nil {
+			return M{
+				"exists": M{
+					"field": attributeName,
+				},
+			}, op == audience.DatePredicate_IS_SET, nil
+		} else {
+			return M{
+				"term": M{
+					attributeName: missingValue,
+				},
+			}, op == audience.DatePredicate_IS_UNSET, nil
+		}
+	case audience.DatePredicate_IS_AFTER:
+		return M{
+			"range": M{
+				attributeName: M{
+					"gt":        toDateString(val.Day, val.Month, val.Year),
+					"time_zone": Zone,
+				},
+			},
+		}, true, nil
+	case audience.DatePredicate_IS_BEFORE:
+		return M{
+			"range": M{
+				attributeName: M{
+					"lt":        toDateString(val.Day, val.Month, val.Year),
+					"time_zone": Zone,
+				},
+			},
+		}, true, nil
+	case audience.DatePredicate_IS_ON:
+		// Add 1 day to the predicate value
+		y, m, d := time.Date(int(val.Year), time.Month(val.Month), int(val.Day), 0, 0, 0, 0, time.UTC).AddDate(0, 0, 1).Date()
+		onVal := toDateString(uint32(d), uint32(m), uint32(y))
+		return M{
+			"range": M{
+				attributeName: M{
+					"gte":       toDateString(val.Day, val.Month, val.Year),
+					"lt":        onVal,
+					"time_zone": Zone,
+				},
+			},
+		}, true, nil
 
 	default:
 		return nil, false, errors.Errorf("Unknown operation %d", op)

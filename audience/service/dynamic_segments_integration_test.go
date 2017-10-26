@@ -46,9 +46,8 @@ func predicateAggregate(t *testing.T) []*audience.Predicate {
 		}}},
 		{Selector: audience.Predicate_ROVER_PROFILE, Value: &audience.Predicate_DatePredicate{&audience.DatePredicate{
 			AttributeName: "created_at",
-			Op:            audience.DatePredicate_IS_BETWEEN,
-			Value:         protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-			Value2:        protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+			Op:            audience.DatePredicate_IS_BEFORE,
+			Value:         &audience.DatePredicate_Date{Day: 20, Month: 10, Year: 2017},
 		}}},
 		{Selector: audience.Predicate_DEVICE, Value: &audience.Predicate_GeofencePredicate{&audience.GeofencePredicate{
 			AttributeName: "location",

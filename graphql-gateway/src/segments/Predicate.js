@@ -6,7 +6,8 @@ import {
     GraphQLList,
     GraphQLNonNull,
     GraphQLObjectType,
-    GraphQLString
+    GraphQLString,
+    GraphQLUnionType
 } from 'graphql'
 
 import { GraphQLDateTime } from 'graphql-iso-date'
@@ -79,7 +80,9 @@ export const NumberPredicate = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLString)
         },
         numberValue: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLInt))),
+            type: new GraphQLNonNull(
+                new GraphQLList(new GraphQLNonNull(GraphQLInt))
+            ),
             resolve: predicate => predicate.numberValue
         },
         numberComparison: {
@@ -101,7 +104,9 @@ export const FloatPredicate = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLString)
         },
         floatValue: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLFloat))),
+            type: new GraphQLNonNull(
+                new GraphQLList(new GraphQLNonNull(GraphQLFloat))
+            ),
             resolve: predicate => predicate.floatValue
         },
         floatComparison: {
@@ -123,7 +128,7 @@ export const DatePredicate = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLString)
         },
         dateValue: {
-            type: new GraphQLNonNull(DateValue),
+            type: new GraphQLNonNull(DatePredicateType),
             resolve: predicate => predicate.dateValue
         },
         dateComparison: {
@@ -134,14 +139,45 @@ export const DatePredicate = new GraphQLObjectType({
     isTypeOf: predicate => !!predicate.dateValue
 })
 
+const DatePredicateType = new GraphQLUnionType({
+    name: 'DatePredicateType',
+    types: () => [DatePredicateValue, DurationPredicateValue],
+    resolveType: value =>
+        value.start && value.start.hasOwnProperty('year')
+            ? DatePredicateValue
+            : DurationPredicateValue
+})
+
+const DurationPredicateValue = new GraphQLObjectType({
+    name: 'DurationPredicateValue',
+    fields: () => ({
+        duration: {
+            type: GraphQLInt,
+            resolve: predicate => predicate.duration
+        }
+    })
+})
+
+const DatePredicateValue = new GraphQLObjectType({
+    name: 'DatePredicateValue',
+    fields: () => ({
+        start: {
+            type: DateValue
+        }
+    })
+})
+
 const DateValue = new GraphQLObjectType({
     name: 'DateValue',
     fields: () => ({
-        start: {
-            type: new GraphQLNonNull(GraphQLDateTime)
+        day: {
+            type: GraphQLInt
         },
-        end: {
-            type: new GraphQLNonNull(GraphQLDateTime)
+        month: {
+            type: GraphQLInt
+        },
+        year: {
+            type: GraphQLInt
         }
     })
 })
@@ -157,7 +193,9 @@ export const VersionPredicate = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLString)
         },
         versionValue: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLInt))),
+            type: new GraphQLNonNull(
+                new GraphQLList(new GraphQLNonNull(GraphQLInt))
+            ),
             resolve: predicate => predicate.versionValue
         },
         versionComparison: {
@@ -225,7 +263,7 @@ export const StringArrayPredicate = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLString)
         },
         stringArrayComparison: {
-            type: new GraphQLNonNull(GraphQLString),
+            type: new GraphQLNonNull(GraphQLString)
         },
         stringArrayValue: {
             type: new GraphQLNonNull(new GraphQLList(GraphQLString))

@@ -188,24 +188,59 @@ export const buildFloatPredicate = ({
     return floatPredicate
 }
 
+export const buildDurationPredicate = ({
+    attribute,
+    dateComparison,
+    dateValue
+}) => {
+    /*
+        IS_GREATER_THAN = 0;
+        IS_LESS_THAN     = 1;
+        IS_EQUAL        = 2;
+    */
+
+    let comparison
+    switch (dateComparison) {
+        case 'is less than':
+            comparison = 0
+            break
+        case 'is greater than':
+            comparison = 1
+            break
+        case 'is equal':
+            comparison = 2
+            break
+        default:
+            comparison = 2
+    }
+    const { duration } = dateValue
+    const durationPredicate = new RoverApis.audience.v1.Models
+        .DurationPredicate()
+    const value = new RoverApis.audience.v1.Models.DurationPredicate.Duration()
+
+    // enum Type , DAYS = 0 . Set this as default
+    value.setType(0)
+    value.setDuration(parseInt(duration))
+
+    durationPredicate.setAttributeName(attribute)
+    durationPredicate.setOp(comparison)
+    durationPredicate.setValue(value)
+
+    return durationPredicate
+}
+
 export const buildDatePredicate = ({
     attribute,
     dateComparison,
     dateValue
 }) => {
-    // IS_UNSET        = 0;
-    // IS_SET          = 1;
-    //
-    // IS_EQUAL        = 2;
-    // IS_NOT_EQUAL    = 3;
-    //
-    // IS_GREATER_THAN = 4;
-    // IS_LESS_THAN    = 5;
-    //
-    // IS_BETWEEN      = 6;
-    // IS_AFTER        = 7;
-    // IS_BEFORE       = 8;
-    // IS_ON           = 9;
+    /*
+        IS_AFTER      = 0;
+        IS_BEFORE     = 1;
+        IS_ON         = 2;
+        IS_SET        = 3;
+        IS_UNSET      = 4;
+    */
     let comparison
     switch (dateComparison) {
         case 'is unset':
@@ -214,43 +249,34 @@ export const buildDatePredicate = ({
         case 'is set':
             comparison = 1
             break
-        case 'is equal':
+        case 'is after':
             comparison = 2
             break
-        case 'is not equal':
+        case 'is before':
             comparison = 3
             break
-        case 'is greater than':
+        case 'is on':
             comparison = 4
             break
-        case 'is less than':
-            comparison = 5
-            break
-        case 'is between':
-            comparison = 6
-            break
-        case 'is after':
-            comparison = 7
-            break
-        case 'is before':
-            comparison = 8
-            break
-        case 'is on':
-            comparison = 9
-            break
         default:
-            comparison = 1
+            comparison = 2
     }
+
     const { start, end } = dateValue
-    const dateStart = new Date(start)
-    const dateEnd =new Date(end)
     const datePredicate = new RoverApis.audience.v1.Models.DatePredicate()
+    const value = new RoverApis.audience.v1.Models.DatePredicate.Date()
+
+    value.setDay(start.day)
+    value.setMonth(start.month)
+    value.setYear(start.year)
+
     datePredicate.setAttributeName(attribute)
     datePredicate.setOp(comparison)
-    datePredicate.setValue(RoverApis.Helpers.timestampToProto(dateStart))
-    datePredicate.setValue2(RoverApis.Helpers.timestampToProto(dateEnd))
+    datePredicate.setValue(value)
+
     return datePredicate
 }
+
 export const buildVersionPredicate = ({
     attribute,
     versionComparison,
@@ -324,7 +350,7 @@ export const buildGeofencePredicate = ({
     //
     // IS_OUTSIDE                 = 2;
     // IS_WITHIN             = 3;
-    
+
     let comparison
     switch (geofenceComparison) {
         case 'is unset':
@@ -392,16 +418,18 @@ export const buildStringArrayPredicate = ({
         default:
             comparison = 1
     }
-    const stringArrayPredicate = new RoverApis.audience.v1.Models.StringArrayPredicate()
+    const stringArrayPredicate = new RoverApis.audience.v1.Models
+        .StringArrayPredicate()
     stringArrayPredicate.setAttributeName(attribute)
     stringArrayPredicate.setOp(comparison)
     stringArrayPredicate.setValueList(stringArrayValue)
     return stringArrayPredicate
 }
 
-const getPredicateSelector = string => RoverApis.audience.v1.Models.Predicate.Selector[string]
+const getPredicateSelector = string =>
+    RoverApis.audience.v1.Models.Predicate.Selector[string]
 
-const buildPredicates = (predicates) => {
+const buildPredicates = predicates => {
     const parsedPredicates = JSON.parse(predicates)
     const predicateList = parsedPredicates.map(predicate => {
         let pred = new RoverApis.audience.v1.Models.Predicate()
@@ -419,7 +447,15 @@ const buildPredicates = (predicates) => {
                 pred.setDoublePredicate(buildFloatPredicate(predicate))
                 break
             case 'DatePredicate':
-                pred.setDatePredicate(buildDatePredicate(predicate))
+                if (
+                    ['is equal', 'is greater than', 'is less than'].includes(
+                        predicate.dateComparison
+                    )
+                ) {
+                    pred.setDurationPredicate(buildDurationPredicate(predicate))
+                } else {
+                    pred.setDatePredicate(buildDatePredicate(predicate))
+                }
                 break
             case 'VersionPredicate':
                 pred.setVersionPredicate(buildVersionPredicate(predicate))
@@ -428,7 +464,9 @@ const buildPredicates = (predicates) => {
                 pred.setGeofencePredicate(buildGeofencePredicate(predicate))
                 break
             case 'StringArrayPredicate':
-                pred.setStringArrayPredicate(buildStringArrayPredicate(predicate))
+                pred.setStringArrayPredicate(
+                    buildStringArrayPredicate(predicate)
+                )
         }
         pred.setSelector(getPredicateSelector(predicate.selector))
         return pred

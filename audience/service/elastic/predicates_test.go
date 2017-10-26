@@ -12,9 +12,16 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestPredicates(t *testing.T) {
+	defer func() {
+		TimeNow = time.Now
+	}()
+	TimeNow = func() time.Time {
+		return time.Date(2013, 6, 7, 1, 15, 0, 0, time.UTC)
+	}
 	t.Run("StringPredicateToFilter", test_StringPredicatesToFilter)
 	t.Run("BoolPredicateToFilter", test_BoolPredicateToFilter)
 	t.Run("NumberPredicateToFilter", test_NumberPredicateToFilter)
@@ -24,6 +31,8 @@ func TestPredicates(t *testing.T) {
 	t.Run("StringArrayPredicateToFilter", test_StringArrayPredicateToFilter)
 	t.Run("DevicePredicateAggregateToQuery", test_DevicePredicateAggregateToQuery)
 	t.Run("DeviceAndProfilePredicateAggregateToQuery", test_DeviceAndProfilePredicateAggregateToQuery)
+	t.Run("DatePredicateToFilter", test_DatePredicateToFilter)
+	t.Run("DurationPredicateToFilter", test_DurationPredicateToFilter)
 }
 
 func getJSON(t *testing.T, in map[string]interface{}) []byte {
@@ -60,6 +69,327 @@ func areEqualJSON(s1, s2 []byte) (bool, error) {
 	}
 
 	return reflect.DeepEqual(o1, o2), nil
+}
+
+func test_DatePredicateToFilter(t *testing.T) {
+	tcases := []struct {
+		name      string
+		condition audience.PredicateAggregate_Condition
+		predicate *audience.Predicate
+
+		exp    M
+		expErr error
+	}{
+		{
+			name:      "uses a must exists query when IS_SET is used on an attribute who's missing value null",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_DatePredicate{
+					DatePredicate: &audience.DatePredicate{
+						Op:            audience.DatePredicate_IS_SET,
+						AttributeName: "created_at",
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must": []M{
+							{
+								"exists": M{
+									"field": "created_at",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+		{
+			name:      "uses a must_not exists query when IS_UNSET is used on an attribute who's missing value null",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_DatePredicate{
+					DatePredicate: &audience.DatePredicate{
+						Op:            audience.DatePredicate_IS_UNSET,
+						AttributeName: "created_at",
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must_not": []M{
+							{
+								"exists": M{
+									"field": "created_at",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+		{
+			name:      "uses a range query when is IS_AFTER",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_DatePredicate{
+					DatePredicate: &audience.DatePredicate{
+						Op:            audience.DatePredicate_IS_AFTER,
+						AttributeName: "created_at",
+						Value:         &audience.DatePredicate_Date{Day: 8, Month: 2, Year: 1993},
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must": []M{
+							{
+								"range": M{
+									"created_at": M{
+										"gt":        "1993-02-08||/d",
+										"time_zone": Zone,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+		{
+			name:      "uses a range query when is IS_BEFORE",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_DatePredicate{
+					DatePredicate: &audience.DatePredicate{
+						Op:            audience.DatePredicate_IS_BEFORE,
+						AttributeName: "created_at",
+						Value:         &audience.DatePredicate_Date{Day: 8, Month: 2, Year: 1993},
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must": []M{
+							{
+								"range": M{
+									"created_at": M{
+										"lt":        "1993-02-08||/d",
+										"time_zone": Zone,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+		{
+			name:      "uses a range query when is IS_ON",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_DatePredicate{
+					DatePredicate: &audience.DatePredicate{
+						Op:            audience.DatePredicate_IS_ON,
+						AttributeName: "created_at",
+						Value:         &audience.DatePredicate_Date{Day: 8, Month: 2, Year: 1993},
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must": []M{
+							{
+								"range": M{
+									"created_at": M{
+										"gte":       "1993-02-08||/d",
+										"lt":        "1993-02-09||/d",
+										"time_zone": Zone,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			var p = []*audience.Predicate{tc.predicate}
+			var got, gotErr = PredicatesToFilter(tc.condition, p)
+
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func test_DurationPredicateToFilter(t *testing.T) {
+	tcases := []struct {
+		name      string
+		condition audience.PredicateAggregate_Condition
+		predicate *audience.Predicate
+
+		exp    M
+		expErr error
+	}{
+		{
+			name:      "uses a range query when is IS_LESS_THAN",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_DurationPredicate{
+					DurationPredicate: &audience.DurationPredicate{
+						Op:            audience.DurationPredicate_IS_LESS_THAN,
+						AttributeName: "created_at",
+						Value: &audience.DurationPredicate_Duration{
+							Duration: 0,
+							Type:     audience.DurationPredicate_Duration_DAYS,
+						},
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must": []M{
+							{
+								"range": M{
+									"created_at": M{
+										"lt":        "2013-06-06||/d",
+										"time_zone": Zone,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+		{
+			name:      "uses a range query when is IS_GREATER_THAN",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_DurationPredicate{
+					DurationPredicate: &audience.DurationPredicate{
+						Op:            audience.DurationPredicate_IS_GREATER_THAN,
+						AttributeName: "created_at",
+						Value: &audience.DurationPredicate_Duration{
+							Duration: 1,
+							Type:     audience.DurationPredicate_Duration_DAYS,
+						},
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must": []M{
+							{
+								"range": M{
+									"created_at": M{
+										"gte":       "2013-06-05||/d",
+										"time_zone": Zone,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+		{
+			name:      "uses a range query when is IS_EQUAL",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_DurationPredicate{
+					DurationPredicate: &audience.DurationPredicate{
+						Op:            audience.DurationPredicate_IS_EQUAL,
+						AttributeName: "created_at",
+						Value: &audience.DurationPredicate_Duration{
+							Duration: 2,
+							Type:     audience.DurationPredicate_Duration_DAYS,
+						},
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must": []M{
+							{
+								"range": M{
+									"created_at": M{
+										"lt":        "2013-06-05||/d",
+										"gte":       "2013-06-04||/d",
+										"time_zone": Zone,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			var p = []*audience.Predicate{tc.predicate}
+			var got, gotErr = PredicatesToFilter(tc.condition, p)
+
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
 }
 
 func test_StringPredicatesToFilter(t *testing.T) {
@@ -2325,7 +2655,6 @@ func test_DeviceAndProfilePredicateAggregateToQuery(t *testing.T) {
 
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
-
 			var got, gotErr = DeviceAndProfilePredicateAggregateToQuery(tc.aggregate, tc.offset)
 
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {

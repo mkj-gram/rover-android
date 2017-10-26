@@ -6,9 +6,8 @@ import (
 
 	"golang.org/x/net/context"
 
-	"gopkg.in/mgo.v2/bson"
-	// "github.com/gogo/protobuf/jsonpb"
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type dynamicSegmentsStore struct {
@@ -297,14 +296,11 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 
 		case *audience.Predicate_DatePredicate:
 			pp := val.DatePredicate
-			t1, _ := protoToTime(pp.Value)
-			t2, _ := protoToTime(pp.Value2)
 			predicates[i]["predicate"] = bson.M{
 				"type":           "date",
 				"attribute_name": pp.AttributeName,
 				"op":             pp.Op,
-				"value":          t1,
-				"value2":         t2,
+				"value":          pp.Value,
 			}
 
 		case *audience.Predicate_VersionPredicate:
@@ -340,6 +336,14 @@ func (pa *predicateAggregate) GetBSON() (interface{}, error) {
 			pp := val.StringArrayPredicate
 			predicates[i]["predicate"] = bson.M{
 				"type":           "array[string]",
+				"attribute_name": pp.AttributeName,
+				"op":             pp.Op,
+				"value":          pp.Value,
+			}
+		case *audience.Predicate_DurationPredicate:
+			pp := val.DurationPredicate
+			predicates[i]["predicate"] = bson.M{
+				"type":           "duration",
 				"attribute_name": pp.AttributeName,
 				"op":             pp.Op,
 				"value":          pp.Value,
@@ -468,12 +472,58 @@ func (pagg *predicateAggregate) SetBSON(raw bson.Raw) error {
 				// TODO: log
 			}
 
-			if val, ok := pdef["value"].(time.Time); ok {
-				pp.Value, _ = timeToProto(&val)
+			toDate := func(doc bson.M, key string) *audience.DatePredicate_Date {
+				val, ok := doc[key].(bson.M)
+
+				if !ok {
+					debugf("no such key %q in %#v", key, doc)
+					return nil
+				}
+				var date audience.DatePredicate_Date
+				if v, ok := val["day"].(int); ok {
+					date.Day = uint32(v)
+				}
+				if v, ok := val["month"].(int); ok {
+					date.Month = uint32(v)
+				}
+				if v, ok := val["year"].(int); ok {
+					date.Year = uint32(v)
+				}
+				return &date
 			}
-			if val, ok := pdef["value2"].(time.Time); ok {
-				pp.Value2, _ = timeToProto(&val)
+			pp.Value = toDate(pdef, "value")
+
+		case "duration":
+			var pp audience.DurationPredicate
+			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_DurationPredicate{&pp}})
+
+			pp.AttributeName, _ = pdef["attribute_name"].(string)
+			if v, ok := num64(pdef["op"]); ok {
+				pp.Op = audience.DurationPredicate_Op(v)
+			} else {
+				// TODO: log
 			}
+
+			toDuration := func(doc bson.M, key string) *audience.DurationPredicate_Duration {
+				val, ok := doc[key].(bson.M)
+				if !ok {
+					debugf("no such key %q in %#v", key, doc)
+					return nil
+				}
+
+				var duration audience.DurationPredicate_Duration
+
+				if v, ok := val["duration"].(int); ok {
+					duration.Duration = uint32(v)
+				}
+
+				if v, ok := num64(val["type"]); ok {
+					duration.Type = audience.DurationPredicate_Duration_Type(v)
+				}
+				return &duration
+			}
+			pp.Value = toDuration(pdef, "value")
+
 		case "version":
 			var pp audience.VersionPredicate
 			pa.Predicates = append(pa.Predicates, &audience.Predicate{Selector: selector, Value: &audience.Predicate_VersionPredicate{&pp}})
