@@ -20,6 +20,13 @@ class TextField extends Component {
         this.onChange = this.onChange.bind(this)
     }
 
+    componentDidMount() {
+        const { focusOnMount } = this.props
+        if (focusOnMount) {
+            this.focusTextInput()
+        }
+    }
+
     focusTextInput() {
         this.input.focus()
     }
@@ -35,6 +42,7 @@ class TextField extends Component {
             id,
             placeholderStyle,
             isOpen,
+            focusOnMount,
             ...rest
         } = this.props
         const { isFocused, isPresent } = this.state
@@ -205,6 +213,7 @@ TextField.defaulStyles = {
 }
 
 TextField.defaultProps = {
+    focusOnMount: false,
     style: {},
     onFocus: () => null,
     onBlur: () => null,

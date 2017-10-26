@@ -14,6 +14,23 @@ class TypeAhead extends Component {
         this.state = {
             inputValue: value
         }
+        this.getOnKeyDown = this.getOnKeyDown.bind(this)
+    }
+
+    getOnKeyDown(inputValue) {
+        const {
+            isOpen,
+            items,
+            onKeyDown
+        } = this.props
+        const itemsLength = items
+            .filter(
+                i => !inputValue || i.toLowerCase().includes(inputValue.toLowerCase())
+            ).length
+        if (!isOpen || (itemsLength === 0)) {
+            return onKeyDown
+        }
+        return undefined
     }
 
     renderInput({
@@ -30,12 +47,18 @@ class TypeAhead extends Component {
             dropdownHighlight,
             dropdownStyle,
             items,
+            onKeyDown,
             textFieldStyle
         } = this.props
         return (
             <div style={{ width: textFieldStyle.width, position: 'absolute' }}>
                 <TextField
-                    {...getInputProps({ isOpen, onFocus: openMenu })}
+                    {...getInputProps({
+                        focusOnMount: true,
+                        isOpen,
+                        onFocus: openMenu,
+                        onKeyDown: this.getOnKeyDown(inputValue)
+                    })}
                     style={{
                         ...textFieldStyle
                     }}
@@ -90,6 +113,7 @@ TypeAhead.propTypes = {
     dropdownHighlight: PropTypes.string,
     dropdownStyle: PropTypes.object,
     items: PropTypes.arrayOf(PropTypes.string),
+    onKeyDown: PropTypes.func,
     textFieldStyle: PropTypes.object,
     update: PropTypes.func,
     value: PropTypes.string
@@ -110,6 +134,7 @@ TypeAhead.defaultProps = {
         paddingLeft: 15
     },
     items: ['apple', 'orange', 'banana', 'grape', 'tomato'],
+    onKeyDown: () => null,
     textFieldStyle: {
         backgroundColor: slate,
         borderColor: silver,
