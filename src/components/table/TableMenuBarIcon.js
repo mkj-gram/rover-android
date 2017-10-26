@@ -121,12 +121,12 @@ class TableMenuBarIcon extends Component {
 
     render() {
         const { isTooltipShowing, message, coordinates } = this.state.toolTip
-        const { showToolTip } = this.props
+        const { showToolTip, style } = this.props
         return (
             <div
                 onMouseOver={this.handleMouseOver}
                 onMouseLeave={this.handleMouseLeave}
-                style={this.getHoverStyle()[0]}
+                style={{ ...this.getHoverStyle()[0], ...style }}
             >
                 {this.getTableMenuIcon(this.props.val)}
                 {isTooltipShowing &&
@@ -140,12 +140,14 @@ class TableMenuBarIcon extends Component {
 
 TableMenuBarIcon.propTypes = {
     val: PropTypes.string.isRequired,
-    showToolTip: PropTypes.bool
+    showToolTip: PropTypes.bool,
+    style: PropTypes.object
 }
 
 TableMenuBarIcon.defaultProps = {
     val: '',
-    showToolTip: true
+    showToolTip: true,
+    style: {}
 }
 
 export default TableMenuBarIcon

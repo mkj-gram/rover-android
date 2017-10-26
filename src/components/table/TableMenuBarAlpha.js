@@ -135,10 +135,8 @@ class TableMenuBarAlpha extends Component {
                             of {this.numberWithCommas(totalSize)} total devices
                         </div>
                     </div>
-                    <div style={{
-                        display: 'flex',
-
-                    }}>
+                    <div style={{ display: 'flex' }}
+                    >
                         <div
                             style={{height: '100%'}}
                             onClick={e => this.props.refreshData()}
@@ -146,6 +144,10 @@ class TableMenuBarAlpha extends Component {
                             <TableMenuBarIcon
                                 val="refresh"
                                 showToolTip={true}
+                                style={{
+                                    borderTopLeftRadius: 2,
+                                    borderBottomLeftRadius: 2
+                                }}
                             />
 
                         </div>
@@ -163,6 +165,10 @@ class TableMenuBarAlpha extends Component {
                             <TableMenuBarIcon
                                 val="columns"
                                 showToolTip={!showColumnsMenu}
+                                style={{
+                                    borderTopRightRadius: 2,
+                                    borderBottomRightRadius: 2
+                                }}
                             />
                         </div>
                     </div>

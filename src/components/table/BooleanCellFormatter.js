@@ -14,7 +14,7 @@ class BooleanCellFormatter extends Component {
         let view
 
         const getDisplayValue = () => {
-            if (value === null || value === undefined) {
+            if (value === null || value === undefined || value === '') {
                 return ''
             }
             return value ? 'True' : 'False'
@@ -40,7 +40,7 @@ class BooleanCellFormatter extends Component {
                         color: purple
                     }}
                 >
-                    {value ? 'True' : 'False'}
+                    {getDisplayValue()}
                 </div>
             )
         }
