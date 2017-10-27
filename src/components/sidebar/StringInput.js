@@ -84,7 +84,7 @@ class StringInput extends Component {
     }
 
     renderInputComponent() {
-        const { options } = this.props
+        const { options, successFn } = this.props
         const { stringComparison, stringValue } = this.state
 
         if (stringComparison.includes('is') && options.length > 0) {
@@ -103,12 +103,13 @@ class StringInput extends Component {
                     marginTop: 2
                 }}
                 onChange={e => this.updateValue(e.target.value)}
+                onKeyDown={e => e.keyCode === 13 && e.target.value.length > 0 && successFn()}
             />
         )
     }
 
     renderTypeAhead() {
-        const { options } = this.props
+        const { options, successFn } = this.props
         const { stringValue } = this.state
         return (
             <div style={{ display: 'relative', marginLeft: 5 }}>
@@ -142,6 +143,7 @@ class StringInput extends Component {
                     items={options}
                     update={value => this.updateValue(value)}
                     value={stringValue}
+                    onKeyDown={e => e.keyCode === 13 && e.target.value.length > 0 && successFn()}
                 />
             </div>
         )
@@ -207,6 +209,7 @@ StringInput.propTypes = {
     stringValue: PropTypes.string.isRequired,
     stringComparison: PropTypes.string.isRequired,
     selector: PropTypes.string.isRequired,
+    successFn: PropTypes.func,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     __typename: PropTypes.string.isRequired,

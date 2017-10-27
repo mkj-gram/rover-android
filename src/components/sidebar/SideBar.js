@@ -317,7 +317,7 @@ class SideBar extends Component {
             case 'VersionPredicate':
                 return <VersionInput {...props} />
             case 'StringPredicate':
-                return <StringInput {...props} />
+                return <StringInput {...props} successFn={() => this.updateQuery()} />
             case 'NumberPredicate':
                 return <NumericInput {...props} />
             case 'GeofencePredicate':
