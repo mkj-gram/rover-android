@@ -13,6 +13,13 @@ class BooleanCellFormatter extends Component {
         const { column, value } = this.props
         let view
 
+        const getDisplayValue = () => {
+            if (value === null || value === undefined || value === '') {
+                return ''
+            }
+            return value ? 'True' : 'False'
+        }
+
         if (column.key === 'is_test_device_DEVICE') {
             view = (
                 <div style={{
@@ -33,7 +40,7 @@ class BooleanCellFormatter extends Component {
                         color: purple
                     }}
                 >
-                    {value ? 'True' : 'False'}
+                    {getDisplayValue()}
                 </div>
             )
         }
