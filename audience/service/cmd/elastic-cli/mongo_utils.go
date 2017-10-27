@@ -19,13 +19,31 @@ func dialMongo(dsn string) (*mgo.Session, *mgo.DialInfo) {
 	return sess, dialInfo
 }
 
-func getProfileSchemas(db *mgo.Database) map[int][]*mongodb.SchemaAttribute {
+func getProfileCustomSchemas(db *mgo.Database) map[int][]*mongodb.SchemaAttribute {
 	var (
 		attrs []*mongodb.SchemaAttribute
 		m     = make(map[int][]*mongodb.SchemaAttribute)
 	)
 
 	err := db.C("profiles_schemas").Find(nil).Sort("account_id").All(&attrs)
+	if err != nil {
+		stderr.Fatalln("mongo.Find:", err)
+	}
+
+	for _, attr := range attrs {
+		m[int(attr.AccountId)] = append(m[int(attr.AccountId)], attr)
+	}
+
+	return m
+}
+
+func getDeviceCustomSchemas(db *mgo.Database) map[int][]*mongodb.SchemaAttribute {
+	var (
+		attrs []*mongodb.SchemaAttribute
+		m     = make(map[int][]*mongodb.SchemaAttribute)
+	)
+
+	err := db.C("devices_schemas").Find(nil).Sort("account_id").All(&attrs)
 	if err != nil {
 		stderr.Fatalln("mongo.Find:", err)
 	}

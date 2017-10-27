@@ -74,11 +74,11 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 		sess, info = dialMongo(cmd.mongoDSN)
 		db         = sess.DB(info.Database)
 
-		accountAttrs = getProfileSchemas(db)
-
-		deviceMapping = selastic.DeviceMapping()
-
 		idrange = cmd.idrange
+
+		// all accounts schemas for profile and device
+		profileCustomSchemas = getProfileCustomSchemas(db)
+		deviceCustomSchemas  = getDeviceCustomSchemas(db)
 	)
 
 	for i := idrange.From; i <= idrange.To; i++ {
@@ -99,8 +99,11 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 		}
 
 		var (
-			attrMapping    = selastic.ProfileAttributesMapping(accountAttrs[i])
-			profileMapping = selastic.ProfileMapping(attrMapping)
+			profileCustomAttrsMapping = selastic.CustomAttributesMapping(profileCustomSchemas[i])
+			profileMapping            = selastic.ProfileMapping(profileCustomAttrsMapping)
+
+			deviceCustomAttrsMapping = selastic.CustomAttributesMapping(deviceCustomSchemas[i])
+			deviceMapping            = selastic.DeviceMapping(deviceCustomAttrsMapping)
 		)
 
 		_, err = esClient.PutMapping().Index(indexName).

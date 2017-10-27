@@ -25,7 +25,7 @@ func (h *Worker) accountIds(msgs []service.Message) []int {
 	return ids
 }
 
-func (h *Worker) buildMappings(ctx context.Context, msgs []service.Message) ([]*elastic.IndexMapping, error) {
+func (h *Worker) buildProfileMappings(ctx context.Context, msgs []service.Message) ([]*elastic.IndexMapping, error) {
 	schemas, err := h.findProfileSchemasByAccountIds(h.accountIds(msgs))
 	if err != nil {
 		return nil, errors.Wrap(err, "findProfilesSchemasByAccountIds")
@@ -45,8 +45,9 @@ func (h *Worker) buildMappings(ctx context.Context, msgs []service.Message) ([]*
 
 	for acctId, schema := range group {
 		mappings[i] = &elastic.IndexMapping{
+			Type:      "profile",
 			IndexName: h.AccountIndex(acctId),
-			Mapping:   elastic.ProfileMapping(elastic.ProfileAttributesMapping(schema)),
+			Mapping:   elastic.ProfileMapping(elastic.CustomAttributesMapping(schema)),
 		}
 		i++
 	}

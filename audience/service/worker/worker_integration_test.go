@@ -87,7 +87,7 @@ func TestWorker(t *testing.T) {
 		t.Fatal("deleteIndex:", err)
 	}
 
-	truncateColl(t, db.C("devices"), db.C("profiles"), db.C("profiles_schemas"))
+	truncateColl(t, db.C("devices"), db.C("profiles"), db.C("profiles_schemas"), db.C("devices_schemas"))
 
 	//
 	// Setup State
@@ -95,6 +95,7 @@ func TestWorker(t *testing.T) {
 	loadFixture(t, db.C("devices"), "../testdata/devices.json")
 	loadFixture(t, db.C("profiles"), "../testdata/profiles.json")
 	loadFixture(t, db.C("profiles_schemas"), "testdata/profiles_schemas.json")
+	loadFixture(t, db.C("devices_schemas"), "testdata/devices_schemas.json")
 
 	createMapping := func(t *testing.T, idx, esType string, body M) {
 		t.Helper()
@@ -109,7 +110,7 @@ func TestWorker(t *testing.T) {
 		t.Fatal("index:", err)
 	}
 
-	createMapping(t, acctIdx("1"), "device", elastic.DeviceMapping())
+	createMapping(t, acctIdx("1"), "device", elastic.DeviceMapping(M{}))
 	createMapping(t, acctIdx("1"), "profile", elastic.ProfileMapping(M{}))
 
 	resp, err := esClient.PerformRequest(ctx, "POST", "/_bulk", nil, string(readFile(t, "testdata/index.json")))
@@ -222,6 +223,260 @@ func TestWorker(t *testing.T) {
 												"ts":      M{"type": "date"},
 											},
 										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			exp: &expect{},
+		},
+
+		{
+			//
+			// Device Schema Update
+			//
+			desc: "device schema update",
+
+			req: &pubsub.Message{
+				Data: toJSON(t, []service.Message{
+					{
+						"account_id": "1",
+						"event":      "updated",
+						"model":      "deviceSchema",
+					},
+				}),
+			},
+
+			before: &expect{
+				path: "/test_account_1/device/_mapping",
+				val: response{
+					Code: 200,
+					Body: M{
+						"test_account_1": M{
+							"mappings": M{
+								"device": M{
+									// Meta
+									// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-all-field.html
+									"_all":     M{"enabled": false},
+									"_parent":  M{"type": "profile"},
+									"_routing": M{"required": true},
+									"properties": M{
+										"account_id": M{"type": "integer"},
+
+										"device_id": M{"type": "keyword"},
+
+										"profile_id": M{"type": "keyword"},
+
+										"created_at": M{"type": "date"},
+										"updated_at": M{"type": "date"},
+
+										"is_test_device": M{"type": "boolean"},
+										"label":          M{"type": "text"},
+
+										"push_environment":           M{"type": "keyword"},
+										"push_token_key":             M{"type": "keyword"},
+										"push_token_is_active":       M{"type": "boolean"},
+										"push_token_created_at":      M{"type": "date"},
+										"push_token_updated_at":      M{"type": "date"},
+										"push_token_unregistered_at": M{"type": "date"},
+
+										"app_name":            M{"type": "keyword"},
+										"app_version":         M{"type": "keyword"},
+										"app_build":           M{"type": "keyword"},
+										"app_namespace":       M{"type": "keyword"},
+										"device_manufacturer": M{"type": "keyword"},
+										"device_model":        M{"type": "keyword"},
+										"os_name":             M{"type": "keyword"},
+										//
+										"os_version": M{
+											"properties": M{
+												"major":    M{"type": "integer"},
+												"minor":    M{"type": "integer"},
+												"revision": M{"type": "integer"},
+											},
+										},
+
+										"locale_language": M{"type": "keyword"},
+										"locale_region":   M{"type": "keyword"},
+										"locale_script":   M{"type": "keyword"},
+
+										"is_wifi_enabled":     M{"type": "boolean"},
+										"is_cellular_enabled": M{"type": "boolean"},
+
+										"screen_width":  M{"type": "integer"},
+										"screen_height": M{"type": "integer"},
+
+										"carrier_name": M{"type": "keyword"},
+										"radio":        M{"type": "keyword"},
+										"time_zone":    M{"type": "keyword"},
+										"platform":     M{"type": "keyword"},
+
+										"is_background_enabled":          M{"type": "boolean"},
+										"is_location_monitoring_enabled": M{"type": "boolean"},
+										"is_bluetooth_enabled":           M{"type": "boolean"},
+
+										"advertising_id": M{"type": "keyword"},
+
+										"ip": M{"type": "ip"},
+
+										// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html
+										"location": M{"type": "geo_point"},
+
+										"location_latitude":  M{"type": "double"},
+										"location_longitude": M{"type": "double"},
+
+										"location_accuracy": M{"type": "integer"},
+										"location_region":   M{"type": "keyword"},
+										"location_city":     M{"type": "keyword"},
+										"location_street":   M{"type": "keyword"},
+
+										// map<string, Version> frameworks 		 :M{"type": ""},
+
+										// maps to frameworks[io.rover.Rover]
+										"sdk_version": M{
+											"properties": M{
+												"major":    M{"type": "integer"},
+												"minor":    M{"type": "integer"},
+												"revision": M{"type": "integer"},
+											},
+										},
+
+										"attributes": M{
+											"type": "object",
+										},
+
+										// RegionMonitoringMode region_monitoring_mode = 47;
+										//
+										// google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
+										// repeated IBeaconRegion ibeacon_monitoring_regions = 49;
+										//
+										// google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
+										// repeated GeofenceRegion geofence_monitoring_regions = 51;
+
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			after: &expect{
+				path: "/test_account_1/device/_mapping",
+				val: response{
+					Code: 200,
+					Body: M{
+						"test_account_1": M{
+							"mappings": M{
+								"device": M{
+									// Meta
+									// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-all-field.html
+									"_all":     M{"enabled": false},
+									"_parent":  M{"type": "profile"},
+									"_routing": M{"required": true},
+									"properties": M{
+										"account_id": M{"type": "integer"},
+
+										"device_id": M{"type": "keyword"},
+
+										"profile_id": M{"type": "keyword"},
+
+										"created_at": M{"type": "date"},
+										"updated_at": M{"type": "date"},
+
+										"is_test_device": M{"type": "boolean"},
+										"label":          M{"type": "text"},
+
+										"push_environment":           M{"type": "keyword"},
+										"push_token_key":             M{"type": "keyword"},
+										"push_token_is_active":       M{"type": "boolean"},
+										"push_token_created_at":      M{"type": "date"},
+										"push_token_updated_at":      M{"type": "date"},
+										"push_token_unregistered_at": M{"type": "date"},
+
+										"app_name":            M{"type": "keyword"},
+										"app_version":         M{"type": "keyword"},
+										"app_build":           M{"type": "keyword"},
+										"app_namespace":       M{"type": "keyword"},
+										"device_manufacturer": M{"type": "keyword"},
+										"device_model":        M{"type": "keyword"},
+										"os_name":             M{"type": "keyword"},
+										//
+										"os_version": M{
+											"properties": M{
+												"major":    M{"type": "integer"},
+												"minor":    M{"type": "integer"},
+												"revision": M{"type": "integer"},
+											},
+										},
+
+										"locale_language": M{"type": "keyword"},
+										"locale_region":   M{"type": "keyword"},
+										"locale_script":   M{"type": "keyword"},
+
+										"is_wifi_enabled":     M{"type": "boolean"},
+										"is_cellular_enabled": M{"type": "boolean"},
+
+										"screen_width":  M{"type": "integer"},
+										"screen_height": M{"type": "integer"},
+
+										"carrier_name": M{"type": "keyword"},
+										"radio":        M{"type": "keyword"},
+										"time_zone":    M{"type": "keyword"},
+										"platform":     M{"type": "keyword"},
+
+										"is_background_enabled":          M{"type": "boolean"},
+										"is_location_monitoring_enabled": M{"type": "boolean"},
+										"is_bluetooth_enabled":           M{"type": "boolean"},
+
+										"advertising_id": M{"type": "keyword"},
+
+										"ip": M{"type": "ip"},
+
+										// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html
+										"location": M{"type": "geo_point"},
+
+										"location_latitude":  M{"type": "double"},
+										"location_longitude": M{"type": "double"},
+
+										"location_accuracy": M{"type": "integer"},
+										"location_region":   M{"type": "keyword"},
+										"location_city":     M{"type": "keyword"},
+										"location_street":   M{"type": "keyword"},
+
+										// map<string, Version> frameworks 		 :M{"type": ""},
+
+										// maps to frameworks[io.rover.Rover]
+										"sdk_version": M{
+											"properties": M{
+												"major":    M{"type": "integer"},
+												"minor":    M{"type": "integer"},
+												"revision": M{"type": "integer"},
+											},
+										},
+
+										"attributes": M{
+											"properties": M{
+												"arr":     M{"type": "keyword"},
+												"bool":    M{"type": "boolean"},
+												"double":  M{"type": "double"},
+												"integer": M{"type": "integer"},
+												"string":  M{"type": "keyword"},
+												"ts":      M{"type": "date"},
+											},
+										},
+
+										// RegionMonitoringMode region_monitoring_mode = 47;
+										//
+										// google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
+										// repeated IBeaconRegion ibeacon_monitoring_regions = 49;
+										//
+										// google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
+										// repeated GeofenceRegion geofence_monitoring_regions = 51;
+
 									},
 								},
 							},

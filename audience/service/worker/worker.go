@@ -56,9 +56,9 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 	}
 
 	var (
-		bulkOps                []*elastic.BulkOp
-		updatedProfileMappings []*elastic.IndexMapping
-		merr                   multiError
+		bulkOps         []*elastic.BulkOp
+		updatedMappings []*elastic.IndexMapping
+		merr            multiError
 	)
 
 	addErr := func(err error) {
@@ -74,11 +74,23 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 			for event, msgs := range groupBy(msgs, "event") {
 				switch event {
 				case "updated":
-					mappings, err := h.buildMappings(ctx, msgs)
-					if err != nil {
+					if mappings, err := h.buildProfileMappings(ctx, msgs); err != nil {
 						addErr(errors.Wrap(err, "handleProfileSchemasUpdated"))
 					} else {
-						updatedProfileMappings = mappings
+						updatedMappings = append(updatedMappings, mappings...)
+					}
+				default:
+					addErr(errors.Errorf("unknown msg: %s/%s", model, event))
+				}
+			}
+		case "deviceSchema":
+			for event, msgs := range groupBy(msgs, "event") {
+				switch event {
+				case "updated":
+					if mappings, err := h.buildDeviceMappings(ctx, msgs); err != nil {
+						addErr(errors.Wrap(err, "handleDeviceSchemasUpdated"))
+					} else {
+						updatedMappings = append(updatedMappings, mappings...)
 					}
 				default:
 					addErr(errors.Errorf("unknown msg: %s/%s", model, event))
@@ -150,8 +162,8 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 		}
 	}
 
-	if updatedProfileMappings != nil {
-		if err := h.Bulk.HandleMapping(ctx, updatedProfileMappings); err != nil {
+	if updatedMappings != nil {
+		if err := h.Bulk.HandleMapping(ctx, updatedMappings); err != nil {
 			addErr(errors.Wrap(err, "bulk.HandleMapping"))
 		}
 	}

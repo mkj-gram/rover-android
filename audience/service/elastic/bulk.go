@@ -19,6 +19,7 @@ type (
 	}
 
 	IndexMapping struct {
+		Type      string
 		IndexName string
 		Mapping   M
 	}
@@ -38,7 +39,7 @@ type (
 )
 
 func (h *BulkHandler) Handle(ctx context.Context, ops []*BulkOp) (*BulkResponse, error) {
-	bulkReq := h.Client.Bulk()
+	bulkReq := db.Client.Bulk()
 
 	for _, op := range ops {
 		req, err := toBulkRequest(op)
@@ -55,9 +56,9 @@ func (h *BulkHandler) Handle(ctx context.Context, ops []*BulkOp) (*BulkResponse,
 
 func (h *BulkHandler) HandleMapping(ctx context.Context, ims []*IndexMapping) error {
 	for _, im := range ims {
-		m := h.Client.PutMapping().
+		m := db.Client.PutMapping().
 			Index(im.IndexName).
-			Type("profile").
+			Type(im.Type).
 			BodyJson(im.Mapping)
 
 		if _, err := m.Do(ctx); err != nil {
