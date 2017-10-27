@@ -57,7 +57,7 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 
 	var (
 		bulkOps                []*elastic.BulkOp
-		updatedAccountMappings []*elastic.IndexMapping
+		updatedProfileMappings []*elastic.IndexMapping
 		merr                   multiError
 	)
 
@@ -78,7 +78,7 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 					if err != nil {
 						addErr(errors.Wrap(err, "handleProfileSchemasUpdated"))
 					} else {
-						updatedAccountMappings = mappings
+						updatedProfileMappings = mappings
 					}
 				default:
 					addErr(errors.Errorf("unknown msg: %s/%s", model, event))
@@ -150,9 +150,9 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 		}
 	}
 
-	if updatedAccountMappings != nil {
-		if err := h.Bulk.HandleMapping(ctx, updatedAccountMappings); err != nil {
-			addErr(errors.Wrap(err, "bulk.Handle"))
+	if updatedProfileMappings != nil {
+		if err := h.Bulk.HandleMapping(ctx, updatedProfileMappings); err != nil {
+			addErr(errors.Wrap(err, "bulk.HandleMapping"))
 		}
 	}
 
