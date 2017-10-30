@@ -369,8 +369,8 @@ message UpdateDeviceRequest {
 
   string device_id = 2;
 
-  string push_environment              = 10;
-  string push_token_key             = 11;
+  string push_environment             = 10;
+  string push_token_key               = 11;
   string app_name                     = 12;
   string app_version                  = 13;
   string app_build                    = 14;
@@ -429,19 +429,19 @@ message Device {
 
   string label = 8;
 
-  // Attributes
+  //
+  // Device Context Attributes
+  //
 
   // A string equal to either "development" or "production" which indicates the
   // envrionment the app was built on and used by the server to determine which
   // APNS API to use.
-  string push_environment = 10;
-
+  string push_environment                              = 10;
   // the token key value
-  string push_token_key             = 11;
-
-  bool push_token_is_active       = 12;
-  google.protobuf.Timestamp push_token_created_at = 13;
-  google.protobuf.Timestamp push_token_updated_at = 14;
+  string push_token_key                                = 11;
+  bool push_token_is_active                            = 12;
+  google.protobuf.Timestamp push_token_created_at      = 13;
+  google.protobuf.Timestamp push_token_updated_at      = 14;
   google.protobuf.Timestamp push_token_unregistered_at = 15;
 
 
@@ -464,7 +464,7 @@ message Device {
   string device_manufacturer      = 20;
 
   // E.g. "iPhone X"
-  string device_model              = 23;
+  string device_model             = 23;
 
   // Either "iOS" or "Android"
   string os_name                  = 21;
@@ -517,7 +517,7 @@ message Device {
   // ip address
   string ip                           = 40;
 
-  // End Attributes
+  // End Device Context Attributes
 
   // Location
   int32  location_accuracy            = 41;
@@ -538,10 +538,10 @@ message Device {
   RegionMonitoringMode region_monitoring_mode = 47;
 
   google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
-  repeated IBeaconRegion ibeacon_monitoring_regions = 49;
+  repeated IBeaconRegion ibeacon_monitoring_regions               = 49;
 
   google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
-  repeated GeofenceRegion geofence_monitoring_regions = 51;
+  repeated GeofenceRegion geofence_monitoring_regions              = 51;
 }
 
 
@@ -594,15 +594,14 @@ message Value {
   }
 
   oneof value_type {
+    bool boolean_value                        = 1;
+    int64 integer_value                       = 2;
+    double double_value                       = 3;
+    string string_value                       = 4;
 
-    bool boolean_value = 1;
-    int64 integer_value = 2;
-    double double_value = 3;
-    string string_value = 4;
+    StringArray string_array_value            = 5;
 
-    StringArray string_array_value = 5;
-
-    Null null_value = 7;
+    Null null_value                           = 7;
 
     google.protobuf.Timestamp timestamp_value = 8;
   }
