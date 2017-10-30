@@ -28,6 +28,9 @@ type Device struct {
 	CreatedAt *time.Time    `bson:"created_at"`
 	UpdatedAt *time.Time    `bson:"updated_at"`
 
+	// custom attributes
+	Attributes map[string]interface{} `bson:"attributes,omitempty"`
+
 	IsTestDevice            bool       `bson:"is_test_device,omitempty"`
 	Label                   string     `bson:"label,omitempty"`
 	PushEnvironment         string     `bson:"push_environment,omitempty"`
@@ -90,8 +93,22 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.CreatedAt, _ = protoToTime(proto.CreatedAt)
 	d.UpdatedAt, _ = protoToTime(proto.UpdatedAt)
 
+	// custom attributes
+	if len(proto.Attributes) > 0 {
+		d.Attributes = make(map[string]interface{})
+		for k, v := range proto.Attributes {
+			// TODO: handle errors
+			var err error
+			d.Attributes[k], err = v.Value()
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
 	d.IsTestDevice = proto.IsTestDevice
 	d.Label = proto.Label
+
 	d.PushTokenKey = proto.PushTokenKey
 	d.PushEnvironment = proto.PushEnvironment
 	d.PushTokenIsActive = proto.PushTokenIsActive
@@ -162,8 +179,21 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.CreatedAt, _ = timeToProto(d.CreatedAt)
 	proto.UpdatedAt, _ = timeToProto(d.UpdatedAt)
 
+	if len(d.Attributes) > 0 {
+		proto.Attributes = make(map[string]*audience.Value)
+		for k, v := range d.Attributes {
+			var val audience.Value
+			// TODO: handle errors
+			if err := val.Load(v); err != nil {
+				panic(err)
+			}
+			proto.Attributes[k] = &val
+		}
+	}
+
 	proto.IsTestDevice = d.IsTestDevice
 	proto.Label = d.Label
+
 	proto.PushEnvironment = d.PushEnvironment
 	proto.PushTokenKey = d.PushTokenKey
 
@@ -208,7 +238,6 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.PushTokenIsActive = d.PushTokenIsActive
 	proto.PushTokenUpdatedAt, _ = timeToProto(d.PushTokenUpdatedAt)
 	proto.PushTokenCreatedAt, _ = timeToProto(d.PushTokenCreatedAt)
-
 	proto.PushTokenUnregisteredAt, _ = timeToProto(d.PushTokenUnregisteredAt)
 
 	proto.LocationAccuracy = d.LocationAccuracy
