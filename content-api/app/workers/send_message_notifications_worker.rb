@@ -33,9 +33,10 @@ class SendMessageNotificationWorker
         trigger_arguments = args["trigger_arguments"]
        
         messages = serialized_messages.map{|message| Message.from_document(message)}
+        templates = MessageTemplate.where(id: messages.map(&:message_template_id)).all.to_a
 
-        send_ios_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
-        send_android_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
+        send_ios_notifications_to_customer(customer, messages, templates, device_ids_filter, trigger_event_id, trigger_arguments)
+        send_android_notifications_to_customer(customer, messages, templates, device_ids_filter, trigger_event_id, trigger_arguments)
 
         ack!
     end
@@ -82,7 +83,7 @@ class SendMessageNotificationWorker
         end
     end
 
-    def send_ios_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
+    def send_ios_notifications_to_customer(customer, messages, templates, device_ids_filter, trigger_event_id, trigger_arguments)
 
         ios_devices = customer.devices.select { |device| device.os_name == "iOS" && !device.token.nil? }
         ios_devices.select! { |device| device_ids_filter.include? (device.id) } if device_ids_filter
@@ -97,7 +98,7 @@ class SendMessageNotificationWorker
             if development_devices.any?
                 get_development_connection_for(account_id, app_identifier) do |connection|
                     if !connection.nil?
-                        send_ios_notifications_with_connection(connection, messages, development_devices, trigger_event_id, trigger_arguments)
+                        send_ios_notifications_with_connection(connection, messages, templates, development_devices, trigger_event_id, trigger_arguments)
                     end
                 end
             end
@@ -105,14 +106,14 @@ class SendMessageNotificationWorker
             if production_devices.any?
                 get_production_connection_for(account_id, app_identifier) do |connection|
                     if !connection.nil?
-                        send_ios_notifications_with_connection(connection, messages, production_devices, trigger_event_id, trigger_arguments)
+                        send_ios_notifications_with_connection(connection, messages, templates, production_devices, trigger_event_id, trigger_arguments)
                     end
                 end
             end
         end
     end
 
-    def send_ios_notifications_with_connection(connection, messages, devices, trigger_event_id, trigger_arguments)
+    def send_ios_notifications_with_connection(connection, messages, templates, devices, trigger_event_id, trigger_arguments)
         return if connection.nil?
         return if messages.nil?
         return if devices.nil?
@@ -133,6 +134,8 @@ class SendMessageNotificationWorker
             message = messages.find { |message| message.id == response.notification.custom_data.dig(:data, :id) }
             next if message.nil?
 
+            template = templates.find{ |template| template.id == message.message_template_id }
+
             input = {
                 message: message,
                 trigger_event_id: trigger_event_id
@@ -142,6 +145,7 @@ class SendMessageNotificationWorker
                 device: device,
                 customer: customer,
                 account_id: customer.account_id,
+                template: template, 
                 trigger_arguments: trigger_arguments
             }
 
@@ -162,7 +166,7 @@ class SendMessageNotificationWorker
         Rails.logger.info(responses)
     end
 
-    def send_android_notifications_to_customer(customer, messages, device_ids_filter, trigger_event_id, trigger_arguments)
+    def send_android_notifications_to_customer(customer, messages, templates, device_ids_filter, trigger_event_id, trigger_arguments)
         
         android_devices = customer.devices.select { |device| device.os_name == "Android" && device.token  }
         android_devices.select! { | device| device_ids_filter.include?(device.id) } if device_ids_filter
@@ -188,6 +192,7 @@ class SendMessageNotificationWorker
                 message = messages.find { |message| message.id == response.dig(:data, :message, :id) }
                 next if message.nil?
 
+                template = templates.find { |template| template.id == message.message_template_id }
                 input = {
                     message: message,
                     trigger_event_id: trigger_event_id
@@ -197,6 +202,7 @@ class SendMessageNotificationWorker
                     device: device,
                     customer: customer,
                     account_id: customer.account_id,
+                    template: template, 
                     trigger_arguments: trigger_arguments
                 }
 
