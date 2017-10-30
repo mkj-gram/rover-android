@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/net/context"
 
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/pkg/errors"
@@ -480,8 +481,8 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 		return false, wrapError(err, "getProfileSchema")
 	}
 
-	// at this point update either get accepted or rejected if there's
-	// an attribute that doesn't match the schema.
+	// the update is accepted in case everything is ok or
+	// rejected if there's an attribute that doesn't match the schema.
 	schemaLess, err := s.validateProfileAttributes(schema, attrUpdates)
 	if err != nil {
 		return false, wrapError(err, "SchemaValidation")
@@ -489,18 +490,18 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 
 	// now for all the schemaLess attributes create the corresponding schema
 	if len(schemaLess) > 0 {
-		schemaUpdate, err := s.generateProfileSchema(ctx, account_id, attrUpdates, schemaLess)
+		schemaUpdate, err := s.buildSchema(ctx, account_id, attrUpdates, schemaLess)
 		if err != nil {
-			return false, wrapError(err, "generateProfileSchema")
+			return false, wrapError(err, "buildSchema")
 		}
 
-		if err := s.updateSchema(ctx, schemaUpdate); err != nil {
+		if err := s.updateSchema(ctx, s.profiles_schemas(), schemaUpdate); err != nil {
 			return false, wrapError(err, "updateSchema")
 		}
 	}
 
 	//`schemaLess` contains names of the attributes that do not have schema defined yet
-	if err := s.updateProfileAttributes(ctx, p.Id.Hex(), attrUpdates); err != nil {
+	if err := s.updateAttributes(ctx, s.profiles(), p.Id.Hex(), attrUpdates); err != nil {
 		return false, wrapError(err, "updateProfileAttributes")
 	}
 
@@ -508,7 +509,7 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 }
 
 // updateSchema inserts provided SchemaAttributes into the DB
-func (s *profilesStore) updateSchema(ctx context.Context, schemaUpdate *ProfileSchema) error {
+func (s *profilesStore) updateSchema(ctx context.Context, coll *mgo.Collection, schemaUpdate *ProfileSchema) error {
 	if len(schemaUpdate.Attributes) == 0 {
 		// nothing to do
 		return nil
@@ -521,7 +522,7 @@ func (s *profilesStore) updateSchema(ctx context.Context, schemaUpdate *ProfileS
 		insert[i] = schemaUpdate.Attributes[i]
 	}
 
-	return wrapError(s.profiles_schemas().Insert(insert...), "profiles_schemas.Insert")
+	return wrapError(coll.Insert(insert...), "profiles_schemas.Insert")
 }
 
 // validateProfileAttributes returns an error if an attrUpdates doesn't validate against existing attribute schema.
@@ -583,7 +584,7 @@ func (s *profilesStore) validateProfileAttributes(schema *ProfileSchema, attrUpd
 	return schemaLess, nil
 }
 
-func (s *profilesStore) generateProfileSchema(ctx context.Context, account_id int32, attrs map[string]*audience.ValueUpdates, schemaLess []string) (*ProfileSchema, error) {
+func (s *profilesStore) buildSchema(ctx context.Context, account_id int32, attrs map[string]*audience.ValueUpdates, schemaLess []string) (*ProfileSchema, error) {
 	var (
 		schemaAttrs []*SchemaAttribute
 		now         = s.timeNow()
@@ -630,7 +631,7 @@ func (s *profilesStore) generateProfileSchema(ctx context.Context, account_id in
 	return &ProfileSchema{schemaAttrs}, nil
 }
 
-func (s *profilesStore) updateProfileAttributes(ctx context.Context, profile_id string, attrs map[string]*audience.ValueUpdates) (err error) {
+func (s *profilesStore) updateAttributes(ctx context.Context, coll *mgo.Collection, profile_id string, attrs map[string]*audience.ValueUpdates) (err error) {
 	debugf("profiles.UpdateAttributes : %s: %#v", profile_id, attrs)
 	// TODO:
 	// mongo doesn't allow pulls/pushes in same update
@@ -691,7 +692,7 @@ func (s *profilesStore) updateProfileAttributes(ctx context.Context, profile_id 
 
 	debugf("profile.Update: Bson: profile_id=%s: %+v", profile_id, update)
 
-	if err := s.profiles().UpdateId(bson.ObjectIdHex(profile_id), update); err != nil {
+	if err := coll.UpdateId(bson.ObjectIdHex(profile_id), update); err != nil {
 		return wrapError(err, "profiles.UpdateId")
 	}
 
