@@ -93,8 +93,8 @@ module Events
                     return nil
                 end
 
-                start_date = s.first != -Float::INFINITY ? Time.zone.parse(s.first).iso8601 : nil
-                end_date = s.last != Float::INFINITY ? Time.zone.parse(s.last).iso8601 : nil
+                start_date = s.first != -Float::INFINITY ? Time.zone.at(s.first).iso8601 : nil
+                end_date = s.last != Float::INFINITY ? Time.zone.at(s.last).iso8601 : nil
 
                 return {
                     start: start_date,
