@@ -635,7 +635,10 @@ func (s *Server) IsInDynamicSegment(ctx context.Context, r *audience.IsInDynamic
 		SegmentId:   r.GetSegmentId(),
 	}
 
-	segment, err := s.db.GetDynamicSegmentById(ctx, segmentLookupRequest)
+	db := s.db.Copy()
+	defer db.Close()
+
+	segment, err := db.GetDynamicSegmentById(ctx, segmentLookupRequest)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDynamicSegmentById: %v", err)
 	}
@@ -664,7 +667,10 @@ func (s *Server) DeviceIsInDynamicSegment(ctx context.Context, r *audience.Devic
 		SegmentId:   r.GetSegmentId(),
 	}
 
-	segment, err := s.db.GetDynamicSegmentById(ctx, segmentLookupRequest)
+	db := s.db.Copy()
+	defer db.Close()
+
+	segment, err := db.GetDynamicSegmentById(ctx, segmentLookupRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -674,12 +680,12 @@ func (s *Server) DeviceIsInDynamicSegment(ctx context.Context, r *audience.Devic
 		DeviceId:    r.GetDeviceId(),
 	}
 
-	device, err := s.db.GetDevice(ctx, deviceLookupRequest)
+	device, err := db.GetDevice(ctx, deviceLookupRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	profile, err := s.db.GetProfile(ctx, &audience.GetProfileRequest{AuthContext: r.GetAuthContext(), ProfileId: device.GetProfileId()})
+	profile, err := db.GetProfile(ctx, &audience.GetProfileRequest{AuthContext: r.GetAuthContext(), ProfileId: device.GetProfileId()})
 	if err != nil {
 		return nil, err
 	}
