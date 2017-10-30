@@ -9247,6 +9247,7 @@ proto.rover.audience.v1.UpdateDeviceRequest.toObject = function(includeInstance,
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.ValueUpdates.toObject) : [],
     pushEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
     pushTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
     appName: jspb.Message.getFieldWithDefault(msg, 12, ""),
@@ -9320,6 +9321,12 @@ proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader = functi
     case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setDeviceId(value);
+      break;
+    case 3:
+      var value = msg.getAttributesMap();
+      reader.readMessage(value, function(message, reader) {
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.ValueUpdates.deserializeBinaryFromReader);
+         });
       break;
     case 10:
       var value = /** @type {string} */ (reader.readString());
@@ -9482,6 +9489,10 @@ proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter = function(m
       2,
       f
     );
+  }
+  f = message.getAttributesMap(true);
+  if (f && f.getLength() > 0) {
+    f.serializeBinary(3, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter);
   }
   f = message.getPushEnvironment();
   if (f.length > 0) {
@@ -9729,6 +9740,24 @@ proto.rover.audience.v1.UpdateDeviceRequest.prototype.getDeviceId = function() {
 /** @param {string} value */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceId = function(value) {
   jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * map<string, ValueUpdates> attributes = 3;
+ * @param {boolean=} opt_noLazyCreate Do not create the map if
+ * empty, instead returning `undefined`
+ * @return {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAttributesMap = function(opt_noLazyCreate) {
+  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>} */ (
+      jspb.Message.getMapField(this, 3, opt_noLazyCreate,
+      proto.rover.audience.v1.ValueUpdates));
+};
+
+
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.clearAttributesMap = function() {
+  this.getAttributesMap().clear();
 };
 
 
@@ -10370,6 +10399,7 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     isTestDevice: jspb.Message.getFieldWithDefault(msg, 7, false),
     label: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Value.toObject) : [],
     pushEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
     pushTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
     pushTokenIsActive: jspb.Message.getFieldWithDefault(msg, 12, false),
@@ -10484,6 +10514,12 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
     case 8:
       var value = /** @type {string} */ (reader.readString());
       msg.setLabel(value);
+      break;
+    case 9:
+      var value = msg.getAttributesMap();
+      reader.readMessage(value, function(message, reader) {
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.Value.deserializeBinaryFromReader);
+         });
       break;
     case 10:
       var value = /** @type {string} */ (reader.readString());
@@ -10753,6 +10789,10 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
       8,
       f
     );
+  }
+  f = message.getAttributesMap(true);
+  if (f && f.getLength() > 0) {
+    f.serializeBinary(9, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.Value.serializeBinaryToWriter);
   }
   f = message.getPushEnvironment();
   if (f.length > 0) {
@@ -11222,6 +11262,24 @@ proto.rover.audience.v1.Device.prototype.getLabel = function() {
 /** @param {string} value */
 proto.rover.audience.v1.Device.prototype.setLabel = function(value) {
   jspb.Message.setField(this, 8, value);
+};
+
+
+/**
+ * map<string, Value> attributes = 9;
+ * @param {boolean=} opt_noLazyCreate Do not create the map if
+ * empty, instead returning `undefined`
+ * @return {!jspb.Map<string,!proto.rover.audience.v1.Value>}
+ */
+proto.rover.audience.v1.Device.prototype.getAttributesMap = function(opt_noLazyCreate) {
+  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.Value>} */ (
+      jspb.Message.getMapField(this, 9, opt_noLazyCreate,
+      proto.rover.audience.v1.Value));
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearAttributesMap = function() {
+  this.getAttributesMap().clear();
 };
 
 

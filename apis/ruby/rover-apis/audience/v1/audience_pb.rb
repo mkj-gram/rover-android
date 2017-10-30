@@ -196,6 +196,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.UpdateDeviceRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
+    map :attributes, :string, :message, 3, "rover.audience.v1.ValueUpdates"
     optional :push_environment, :string, 10
     optional :push_token_key, :string, 11
     optional :app_name, :string, 12
@@ -237,6 +238,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :updated_at, :message, 6, "google.protobuf.Timestamp"
     optional :is_test_device, :bool, 7
     optional :label, :string, 8
+    map :attributes, :string, :message, 9, "rover.audience.v1.Value"
     optional :push_environment, :string, 10
     optional :push_token_key, :string, 11
     optional :push_token_is_active, :bool, 12
