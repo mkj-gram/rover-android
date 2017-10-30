@@ -369,6 +369,9 @@ message UpdateDeviceRequest {
 
   string device_id = 2;
 
+  // Custom attributes
+  map<string, ValueUpdates> attributes = 3;
+
   string push_environment             = 10;
   string push_token_key               = 11;
   string app_name                     = 12;
@@ -428,6 +431,10 @@ message Device {
   bool is_test_device = 7;
 
   string label = 8;
+
+
+  // Custom Attributes
+  map<string, Value> attributes = 9;
 
   //
   // Device Context Attributes
