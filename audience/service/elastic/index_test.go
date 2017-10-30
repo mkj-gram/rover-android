@@ -6,11 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
-	rtesting "github.com/roverplatform/rover/go/testing"
-
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
 	selastic "github.com/roverplatform/rover/audience/service/elastic"
+	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
+	rtesting "github.com/roverplatform/rover/go/testing"
 	elastic "gopkg.in/olivere/elastic.v5"
 )
 
@@ -210,4 +209,36 @@ func protoTs(t *testing.T, ti time.Time) *timestamp.Timestamp {
 		t.Fatal("protoTs:", err)
 	}
 	return ts
+}
+
+func TestMapAggregateResponse(t *testing.T) {
+	var esResp elastic.AggregationBucketKeyItems
+	jsonFixture(t, &esResp, "testdata/agg.response.json")
+
+	tcases := []struct {
+		in  *elastic.AggregationBucketKeyItems
+		exp *audience.GetFieldSuggestionResponse
+		err error
+	}{
+		{
+			in:  &esResp,
+			err: nil,
+			exp: &audience.GetFieldSuggestionResponse{
+				Suggestions: []string{"result1", "result2", "result3"},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run("", func(t *testing.T) {
+			var (
+				exp = tc.exp
+				got = selastic.MapFieldAggregateResponse(tc.in)
+			)
+			t.Logf("%v", esResp.Buckets)
+			if diff := rtesting.Diff(got, exp, nil, nil); diff != nil {
+				t.Error("Diff:\n", rtesting.Difff(diff))
+			}
+		})
+	}
 }

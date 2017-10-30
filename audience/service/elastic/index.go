@@ -155,6 +155,73 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 	return res, errors.Wrap(err, "MapResponse")
 }
 
+// GetFieldSuggestion takes a StringPredicate term and returns a list of suggested StringValues
+func (q *Index) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSuggestionRequest) (*audience.GetFieldSuggestionResponse, error) {
+	var (
+		indexName      = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
+		searchSelector = r.GetSelector()
+	)
+
+	var selector string
+
+	switch searchSelector {
+	case audience.GetFieldSuggestionRequest_CUSTOM_PROFILE:
+	case audience.GetFieldSuggestionRequest_ROVER_PROFILE:
+		selector = "profile"
+	case audience.GetFieldSuggestionRequest_DEVICE:
+		selector = "device"
+	}
+
+	var search = q.Client.Search(indexName).Type(selector)
+	search.Size(0)
+	search.Aggregation(selector, source(termAggregate(r, selector)))
+
+	resp, err := search.Do(ctx)
+	if err == io.EOF {
+		return &audience.GetFieldSuggestionResponse{}, nil
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "Suggestions")
+	}
+
+	buckets, found := resp.Aggregations.Terms(selector)
+	if !found {
+		return &audience.GetFieldSuggestionResponse{}, nil
+	}
+
+	arr := MapFieldAggregateResponse(buckets)
+	return arr, nil
+}
+
+// MapFieldAggregateResponse maps AggregationBucketKeyItems to GetFieldSuggestionResponse
+func MapFieldAggregateResponse(res *elastic.AggregationBucketKeyItems) *audience.GetFieldSuggestionResponse {
+	b := res.Buckets
+	arr := make([]string, len(b))
+	for i, val := range b {
+		if str, ok := val.Key.(string); ok {
+			arr[i] = str
+		}
+	}
+
+	return &audience.GetFieldSuggestionResponse{
+		Suggestions: arr,
+	}
+}
+
+func termAggregate(r *audience.GetFieldSuggestionRequest, s string) M {
+	var (
+		f = r.Field
+		c = r.Size
+	)
+
+	return M{
+		"terms": M{
+			"field": f,
+			"size":  c,
+		},
+	}
+}
+
 func UnmarshalDevice(data []byte, proto *audience.Device) error {
 	var d Device
 	if err := json.Unmarshal(data, &d); err != nil {
