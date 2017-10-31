@@ -34,13 +34,15 @@ type Device struct {
 		Lat float64 `json:"lat"`
 		Lon float64 `json:"lon"`
 	} `json:"location"`
-	LocationAccuracy  int32   `json:"location_accuracy"`
-	LocationCity      string  `json:"location_city"`
-	LocationLatitude  float64 `json:"location_latitude"`
-	LocationLongitude float64 `json:"location_longitude"`
-	LocationRegion    string  `json:"location_region"`
-	LocationStreet    string  `json:"location_street"`
-	OsName            string  `json:"os_name"`
+	LocationAccuracy  int32      `json:"location_accuracy"`
+	LocationCity      string     `json:"location_city"`
+	LocationLatitude  float64    `json:"location_latitude"`
+	LocationLongitude float64    `json:"location_longitude"`
+	LocationRegion    string     `json:"location_region"`
+	LocationStreet    string     `json:"location_street"`
+	LocationUpdatedAt *time.Time `json:"location_updated_at"`
+
+	OsName            string     `json:"os_name"`
 	OsVersion         *struct {
 		Major    int32 `json:"major"`
 		Minor    int32 `json:"minor"`
@@ -142,6 +144,7 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.LocationStreet = d.LocationStreet
 	proto.LocationRegion = d.LocationRegion
 	proto.LocationCity = d.LocationCity
+	proto.LocationUpdatedAt, _ = timeToProto(d.LocationUpdatedAt)
 
 	// TODO:
 	// proto.RegionMonitoringMode = audience.Device_RegionMonitoringMode(audience.Device_RegionMonitoringMode_value[d.RegionMonitoringMode])

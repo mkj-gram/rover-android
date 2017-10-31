@@ -10380,6 +10380,7 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     locationRegion: jspb.Message.getFieldWithDefault(msg, 44, ""),
     locationCity: jspb.Message.getFieldWithDefault(msg, 45, ""),
     locationStreet: jspb.Message.getFieldWithDefault(msg, 46, ""),
+    locationUpdatedAt: (f = msg.getLocationUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     regionMonitoringMode: jspb.Message.getFieldWithDefault(msg, 47, 0),
     ibeaconMonitoringRegionsUpdatedAt: (f = msg.getIbeaconMonitoringRegionsUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     ibeaconMonitoringRegionsList: jspb.Message.toObjectList(msg.getIbeaconMonitoringRegionsList(),
@@ -10610,6 +10611,11 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
     case 46:
       var value = /** @type {string} */ (reader.readString());
       msg.setLocationStreet(value);
+      break;
+    case 52:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setLocationUpdatedAt(value);
       break;
     case 47:
       var value = /** @type {!proto.rover.audience.v1.Device.RegionMonitoringMode} */ (reader.readEnum());
@@ -10979,6 +10985,14 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
     writer.writeString(
       46,
       f
+    );
+  }
+  f = message.getLocationUpdatedAt();
+  if (f != null) {
+    writer.writeMessage(
+      52,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
   f = message.getRegionMonitoringMode();
@@ -11811,6 +11825,36 @@ proto.rover.audience.v1.Device.prototype.getLocationStreet = function() {
 /** @param {string} value */
 proto.rover.audience.v1.Device.prototype.setLocationStreet = function(value) {
   jspb.Message.setField(this, 46, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp location_updated_at = 52;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.rover.audience.v1.Device.prototype.getLocationUpdatedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 52));
+};
+
+
+/** @param {?proto.google.protobuf.Timestamp|undefined} value */
+proto.rover.audience.v1.Device.prototype.setLocationUpdatedAt = function(value) {
+  jspb.Message.setWrapperField(this, 52, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearLocationUpdatedAt = function() {
+  this.setLocationUpdatedAt(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasLocationUpdatedAt = function() {
+  return jspb.Message.getField(this, 52) != null;
 };
 
 

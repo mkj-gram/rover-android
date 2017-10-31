@@ -63,12 +63,13 @@ type Device struct {
 	AdvertisingId               string              `bson:"advertising_id,omitempty"`
 	Ip                          string              `bson:"ip,omitempty"`
 
-	LocationAccuracy  int32   `bson:"location_accuracy,omitempty"`
-	LocationLatitude  float64 `bson:"location_latitude,omitempty"`
-	LocationLongitude float64 `bson:"location_longitude,omitempty"`
-	LocationRegion    string  `bson:"location_region,omitempty"`
-	LocationStreet    string  `bson:"location_street,omitempty"`
-	LocationCity      string  `bson:"location_city,omitempty"`
+	LocationAccuracy  int32      `bson:"location_accuracy,omitempty"`
+	LocationLatitude  float64    `bson:"location_latitude,omitempty"`
+	LocationLongitude float64    `bson:"location_longitude,omitempty"`
+	LocationRegion    string     `bson:"location_region,omitempty"`
+	LocationStreet    string     `bson:"location_street,omitempty"`
+	LocationCity      string     `bson:"location_city,omitempty"`
+	LocationUpdatedAt *time.Time `bson:"location_updated_at,omitempty"`
 
 	RegionMonitoringMode string `bson:"region_monitoring_mode,omitempty"`
 
@@ -137,6 +138,7 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.LocationStreet = proto.LocationStreet
 	d.LocationRegion = proto.LocationRegion
 	d.LocationCity = proto.LocationCity
+	d.LocationUpdatedAt, _ = protoToTime(proto.LocationUpdatedAt)
 
 	d.RegionMonitoringMode = proto.RegionMonitoringMode.String()
 
@@ -214,6 +216,7 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.LocationStreet = d.LocationStreet
 	proto.LocationRegion = d.LocationRegion
 	proto.LocationCity = d.LocationCity
+	proto.LocationUpdatedAt, _ = timeToProto(d.LocationUpdatedAt)
 
 	proto.RegionMonitoringMode = audience.Device_RegionMonitoringMode(audience.Device_RegionMonitoringMode_value[d.RegionMonitoringMode])
 
@@ -597,9 +600,10 @@ func (s *devicesStore) UpdateDeviceLocation(ctx context.Context, r *audience.Upd
 	var update = bson.M{
 		"updated_at": now,
 
-		"location_accuracy":  r.LocationAccuracy,
-		"location_latitude":  r.LocationLatitude,
-		"location_longitude": r.LocationLongitude,
+		"location_accuracy":   r.LocationAccuracy,
+		"location_latitude":   r.LocationLatitude,
+		"location_longitude":  r.LocationLongitude,
+		"location_updated_at": now,
 	}
 
 	err := s.devices().Update(bson.M{

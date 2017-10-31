@@ -226,6 +226,8 @@ func getDeviceValue(device *audience.Device, attribute_name string) interface{} 
 		return device.GetLocationLongitude()
 	case "location_latitude":
 		return device.GetLocationLatitude()
+	case "location_updated_at":
+		return device.GetLocationUpdatedAt()
 	case "location_country":
 		return ""
 		// TODO: return device.GetLocationCountry()
