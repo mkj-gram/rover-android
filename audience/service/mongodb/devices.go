@@ -17,6 +17,34 @@ type devicesStore struct {
 	*mongoStore
 }
 
+type DeviceSchema struct {
+	Attributes []*SchemaAttribute
+}
+
+func (ps *DeviceSchema) toProto(proto *audience.DeviceSchema) error {
+	for _, v := range ps.Attributes {
+		var protoattr audience.SchemaAttribute
+		if err := v.toProto(&protoattr); err != nil {
+			return wrapError(err, "schemaAttr.toProto")
+		}
+		proto.Attributes = append(proto.Attributes, &protoattr)
+	}
+
+	return nil
+}
+
+func (ps *DeviceSchema) fromProto(proto *audience.DeviceSchema) error {
+	for _, v := range proto.Attributes {
+		var sattr SchemaAttribute
+		if err := sattr.fromProto(v); err != nil {
+			return wrapError(err, "schemaAttr.fromProto")
+		}
+		ps.Attributes = append(ps.Attributes, &sattr)
+	}
+
+	return nil
+}
+
 type Version audience.Version
 
 type Device struct {
@@ -285,11 +313,41 @@ func timeToProto(ts *time.Time) (*timestamp.Timestamp, error) {
 	return pts, nil
 }
 
+func (s *devicesStore) GetDeviceSchemaByAccountId(ctx context.Context, accountId int) (*audience.DeviceSchema, error) {
+	var schema, err = s.getDeviceSchema(ctx, accountId)
+	if err != nil {
+		return nil, wrapError(err, "getDeviceSchema")
+	}
+
+	var proto audience.DeviceSchema
+	if err := schema.toProto(&proto); err != nil {
+		return nil, wrapError(err, "schema.toProto")
+	}
+
+	return &proto, nil
+}
+
+func (s *devicesStore) getDeviceSchema(ctx context.Context, account_id int) (*DeviceSchema, error) {
+	var (
+		schema DeviceSchema
+
+		Q = s.devices_schemas().
+			Find(bson.M{"account_id": account_id}).
+			Sort("_id")
+
+		err = Q.All(&schema.Attributes)
+	)
+
+	return &schema, wrapError(err, "devices_schemas.Find")
+}
+
 func (s *devicesStore) GetDeviceProfileIdById(ctx context.Context, accountId int32, id string) (string, error) {
 	var (
 		d Device
 
-		Q = s.devices().Find(bson.M{"device_id": id, "account_id": accountId}).Select(bson.M{"profile_id": 1})
+		Q = s.devices().
+			Find(bson.M{"device_id": id, "account_id": accountId}).
+			Select(bson.M{"profile_id": 1})
 	)
 
 	if err := Q.One(&d); err != nil {

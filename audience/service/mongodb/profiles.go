@@ -496,13 +496,54 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 		}
 
 		if err := s.updateSchema(ctx, s.profiles_schemas(), schemaUpdate); err != nil {
-			return false, wrapError(err, "updateSchema")
+			return false, wrapError(err, "profile.updateSchema")
+		}
+
+		// ms-12: update device schema as well
+		// TODO: remove after ms-12 is done
+
+		// avoid id collision due to an index keyed over account_id, id
+		// for i := range schemaUpdate.Attributes {
+		// 	schemaUpdate.Attributes[i].Id = s.newObjectId()
+		// }
+		if err := s.updateSchema(ctx, s.devices_schemas(), schemaUpdate); err != nil {
+			return false, wrapError(err, "device.updateSchema")
 		}
 	}
 
 	//`schemaLess` contains names of the attributes that do not have schema defined yet
-	if err := s.updateAttributes(ctx, s.profiles(), p.Id.Hex(), attrUpdates); err != nil {
-		return false, wrapError(err, "updateProfileAttributes")
+	if err := s.updateAttributes(ctx, s.profiles(), attrUpdates, p.Id); err != nil {
+		return false, wrapError(err, "profiles.updateAttributes")
+	}
+
+	// ms-12: copy profile updates to all profile devices as well
+	// TODO: remove after ms-12 is done
+	var (
+		deviceDocs []bson.M
+
+		profileDevices = s.devices().
+				Find(bson.M{"profile_id": p.Id, "account_id": p.AccountId}).
+				Select(bson.M{"_id": 1})
+	)
+
+	if err := profileDevices.All(&deviceDocs); err != nil {
+		return false, wrapError(err, "profiles.Find")
+	}
+
+	if len(deviceDocs) > 0 {
+		var deviceOids []bson.ObjectId
+		for _, m := range deviceDocs {
+			var deviceId, ok = m["_id"].(bson.ObjectId)
+			if !ok {
+				errorf("deviceIdToObjectId: no key: %v", m["_id"])
+				continue
+			}
+			deviceOids = append(deviceOids, deviceId)
+		}
+
+		if err := s.updateAttributes(ctx, s.devices(), attrUpdates, deviceOids...); err != nil {
+			return false, wrapError(err, "devices.updateAttributes")
+		}
 	}
 
 	return len(schemaLess) > 0, nil
@@ -522,7 +563,7 @@ func (s *profilesStore) updateSchema(ctx context.Context, coll *mgo.Collection, 
 		insert[i] = schemaUpdate.Attributes[i]
 	}
 
-	return wrapError(coll.Insert(insert...), "profiles_schemas.Insert")
+	return wrapError(coll.Insert(insert...), "schema.Insert")
 }
 
 // validateProfileAttributes returns an error if an attrUpdates doesn't validate against existing attribute schema.
@@ -631,8 +672,8 @@ func (s *profilesStore) buildSchema(ctx context.Context, account_id int32, attrs
 	return &ProfileSchema{schemaAttrs}, nil
 }
 
-func (s *profilesStore) updateAttributes(ctx context.Context, coll *mgo.Collection, profile_id string, attrs map[string]*audience.ValueUpdates) (err error) {
-	debugf("profiles.UpdateAttributes : %s: %#v", profile_id, attrs)
+func (s *profilesStore) updateAttributes(ctx context.Context, coll *mgo.Collection, attrs map[string]*audience.ValueUpdates, ids ...bson.ObjectId) (err error) {
+	debugf(coll.Name+".UpdateAttributes: [%v]: %#v", ids, attrs)
 	// TODO:
 	// mongo doesn't allow pulls/pushes in same update
 	// but our model does allow
@@ -686,13 +727,13 @@ func (s *profilesStore) updateAttributes(ctx context.Context, coll *mgo.Collecti
 	}
 
 	if len(update) == 0 {
-		debugf("profile.Update: empty: skipping update: profile_id=%s", profile_id)
+		debugf(coll.Name+".Update: empty: skipping update: ids=[%v]", ids)
 		return nil
 	}
 
-	debugf("profile.Update: Bson: profile_id=%s: %+v", profile_id, update)
+	debugf(coll.Name+".Update: Bson: ids=[%v]: %+v", ids, update)
 
-	if err := coll.UpdateId(bson.ObjectIdHex(profile_id), update); err != nil {
+	if _, err := coll.UpdateAll(bson.M{"_id": bson.M{"$in": ids}}, update); err != nil {
 		return wrapError(err, "profiles.UpdateId")
 	}
 

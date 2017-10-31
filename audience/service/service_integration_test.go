@@ -32,13 +32,14 @@ func TestAudienceService(t *testing.T) {
 		profiles         = mdb.C("profiles")
 		devices          = mdb.C("devices")
 		profiles_schemas = mdb.C("profiles_schemas")
+		devices_schemas  = mdb.C("devices_schemas")
 
 		dynamic_segments = mdb.C("dynamic_segments")
 
 		system_profile = mdb.C("system.profile")
 	)
 
-	truncateColl(t, profiles, devices, profiles_schemas, dynamic_segments)
+	truncateColl(t, profiles, devices, devices_schemas, profiles_schemas, dynamic_segments)
 
 	profile := func(level int) {
 		var res bson.M
@@ -70,6 +71,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("CreateProfile", testAudienceService_CreateProfile)
 	t.Run("DeleteProfile", testAudienceService_DeleteProfile)
 	t.Run("UpdateProfile", testAudienceService_UpdateProfile)
+	t.Run("UpdateProfileCopyAttributes", testAudienceService_UpdateProfileCopyAttributes)
 	t.Run("UpdateProfileIdentifier", testAudienceService_UpdateProfileIdentifier)
 	t.Run("GetProfile", testAudienceService_GetProfile)
 	t.Run("GetProfileByDeviceId", testAudienceService_GetProfileByDeviceId)
@@ -1315,7 +1317,320 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 					exp, expErr := tc.after.expSchema, (error)(nil)
 					got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
 					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-						t.Errorf("After:\n%v", difff(diff))
+						t.Errorf("After:Schema\n%v", difff(diff))
+					}
+				}
+			}
+		})
+	}
+}
+
+// ms-12: tests that profile attributes and schema also get copied to all the devices
+// TODO: remove once migration is done
+func testAudienceService_UpdateProfileCopyAttributes(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		updatedAt = parseTime(t, "2017-10-30T14:05:53.102Z")
+		aTime     = protoTs(t, updatedAt)
+
+		db = mongodb.New(
+			dialMongo(t, *tMongoDSN),
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 1)),
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
+		)
+
+		svc = service.New(db, new(nopIndex), logNotifier(t))
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	type expect struct {
+		expErr    error
+		exp       interface{}
+		expSchema *audience.ProfileSchema
+	}
+
+	tcases := []struct {
+		name      string
+		req       *audience.UpdateProfileRequest
+		schemaReq *audience.GetProfileSchemaRequest
+
+		expErr error
+
+		before, after *expect
+	}{
+		{
+			name: "updates profile & device attributes",
+
+			req: &audience.UpdateProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 7},
+				ProfileId:   "aaa000000000000000000000",
+				Attributes: map[string]*audience.ValueUpdates{
+					"bool-set": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_SET, audience.BoolVal(false)},
+					}},
+
+					"string-set": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_SET, audience.StringVal("Maryan")},
+					}},
+
+					"integer-set": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_SET, audience.IntegerVal(1)},
+					}},
+
+					"double-set": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_SET, audience.DoubleVal(31415e-4)},
+					}},
+
+					"null-set": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_SET, audience.NullVal},
+					}},
+
+					"ts-set": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_SET, audience.TimestampVal(*aTime)},
+					}},
+
+					"arr-set": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_SET, audience.StringArrayVal("hello", "world")},
+					}},
+
+					"arr-add": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_ADD, audience.StringVal("added")},
+					}},
+
+					"arr-remove": {Values: []*audience.ValueUpdate{
+						{audience.ValueUpdate_REMOVE, audience.StringVal("removes")},
+					}},
+				},
+			},
+
+			expErr: nil,
+
+			before: &expect{
+				expErr: nil,
+				exp: &audience.Profile{
+					AccountId:  7,
+					Id:         "aaa000000000000000000000",
+					Identifier: "profilewithdevices",
+
+					CreatedAt: aTime, UpdatedAt: aTime,
+
+					Attributes: map[string]*audience.Value{
+						"bool":           audience.BoolVal(true),
+						"string":         audience.StringVal("hello world"),
+						"integer":        audience.IntegerVal(42),
+						"double":         audience.DoubleVal(42.42),
+						"null":           audience.NullVal,
+						"ts":             audience.TimestampVal(*aTime),
+						"arr":            audience.StringArrayVal("hello"),
+						"arr-add":        audience.StringArrayVal("adds"),
+						"arr-remove":     audience.StringArrayVal("keeps", "removes"),
+						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+					},
+				},
+
+				expSchema: &audience.ProfileSchema{
+					Attributes: nil,
+				},
+			},
+
+			after: &expect{
+				exp: &audience.Profile{
+					AccountId:  7,
+					Id:         "aaa000000000000000000000",
+					Identifier: "profilewithdevices",
+
+					CreatedAt: aTime, UpdatedAt: aTime,
+
+					Attributes: map[string]*audience.Value{
+						"bool":     audience.BoolVal(true),
+						"bool-set": audience.BoolVal(false),
+
+						"string":     audience.StringVal("hello world"),
+						"string-set": audience.StringVal("Maryan"),
+
+						"integer":     audience.IntegerVal(42),
+						"integer-set": audience.IntegerVal(1),
+
+						"double":     audience.DoubleVal(42.42),
+						"double-set": audience.DoubleVal(31415e-4),
+
+						"null":     audience.NullVal,
+						"null-set": audience.NullVal,
+
+						"ts":     audience.TimestampVal(*aTime),
+						"ts-set": audience.TimestampVal(*aTime),
+
+						"arr":            audience.StringArrayVal("hello"),
+						"arr-set":        audience.StringArrayVal("hello", "world"),
+						"arr-add":        audience.StringArrayVal("adds", "added"),
+						"arr-remove":     audience.StringArrayVal("keeps"),
+						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+					},
+				},
+
+				expSchema: &audience.ProfileSchema{
+					Attributes: []*audience.SchemaAttribute{
+						{
+							AccountId:     7,
+							Id:            "367951baa2ff6cd471c483f1",
+							Attribute:     "ts-set",
+							Label:         "ts-set",
+							AttributeType: "timestamp",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     7,
+							Id:            "487f6999eb9d18a44784045d",
+							Attribute:     "integer-set",
+							Label:         "integer-set",
+							AttributeType: "integer",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     7,
+							Id:            "52fdfc072182654f163f5f0f",
+							Attribute:     "arr-add",
+							Label:         "arr-add",
+							AttributeType: "array[string]",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     7,
+							Id:            "6694d2c422acd208a0072939",
+							Attribute:     "double-set",
+							Label:         "double-set",
+							AttributeType: "double",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     7,
+							Id:            "681d0d86d1e91e00167939cb",
+							Attribute:     "bool-set",
+							Label:         "bool-set",
+							AttributeType: "bool",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     7,
+							Id:            "7bbb0407d1e2c64981855ad8",
+							Attribute:     "arr-set",
+							Label:         "arr-set",
+							AttributeType: "array[string]",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     7,
+							Id:            "87f3c67cf22746e995af5a25",
+							Attribute:     "string-set",
+							Label:         "string-set",
+							AttributeType: "string",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     7,
+							Id:            "9a621d729566c74d10037c4d",
+							Attribute:     "arr-remove",
+							Label:         "arr-remove",
+							AttributeType: "array[string]",
+							CreatedAt:     aTime,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			if tc.before != nil {
+				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
+				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
+					t.Errorf("Before:\n%v", difff(diff))
+				}
+
+				{ // every device has to have same attributes as profile
+					devices, gotErr := db.ListDevicesByProfileId(ctx, &audience.ListDevicesByProfileIdRequest{
+						ProfileId:   tc.req.ProfileId,
+						AuthContext: tc.req.AuthContext,
+					})
+
+					if diff := Diff(nil, nil, nil, gotErr); diff != nil {
+						t.Errorf("Before:ListDevices:\n%v", difff(diff))
+					}
+
+					if len(devices) == 0 {
+						t.Errorf("%v", devices)
+						t.Fatalf("Before: profile must have devices")
+					}
+
+					for _, d := range devices {
+						if diff := Diff(got.Attributes, d.Attributes, nil, nil); diff != nil {
+							t.Errorf("Before:CopyDiff[%s]:\n%v", d.DeviceId, difff(diff))
+						}
+					}
+				}
+
+				{
+					exp, expErr := tc.before.expSchema, (error)(nil)
+					got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
+					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+						t.Errorf("Before:Schema:\n%v", difff(diff))
+					}
+
+					{
+						got, gotErr := db.GetDeviceSchemaByAccountId(ctx, int(tc.req.AuthContext.AccountId))
+						if diff := Diff(exp.Attributes, got.Attributes, expErr, gotErr); diff != nil {
+							t.Errorf("Before:Schema:\n%v", difff(diff))
+						}
+					}
+				}
+			}
+
+			var _, gotErr = client.UpdateProfile(ctx, tc.req)
+			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+
+			if tc.after != nil {
+				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
+				exp, expErr := tc.after.exp, tc.after.expErr
+				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+					t.Errorf("After:\n%v", difff(diff))
+				}
+
+				{ // every device has to have same attributes as profile
+					devices, gotErr := db.ListDevicesByProfileId(ctx, &audience.ListDevicesByProfileIdRequest{
+						ProfileId:   tc.req.ProfileId,
+						AuthContext: tc.req.AuthContext,
+					})
+					if diff := Diff(nil, nil, nil, gotErr); diff != nil {
+						t.Errorf("After:ListDevices:\n%v", difff(diff))
+					}
+
+					for _, d := range devices {
+						if diff := Diff(got.Attributes, d.Attributes, nil, nil); diff != nil {
+							t.Errorf("Before:CopyDiff[%s]:\n%v", d.DeviceId, difff(diff))
+						}
+					}
+				}
+
+				if tc.after.expSchema != nil {
+					exp, expErr := tc.after.expSchema, (error)(nil)
+					got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
+					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+						t.Errorf("After:Schema\n%v", difff(diff))
+					}
+
+					{
+						got, gotErr := db.GetDeviceSchemaByAccountId(ctx, int(tc.req.AuthContext.AccountId))
+						if diff := Diff(exp.Attributes, got.Attributes, expErr, gotErr); diff != nil {
+							t.Errorf("Before:Schema:\n%v", difff(diff))
+						}
 					}
 				}
 			}

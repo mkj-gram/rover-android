@@ -63,12 +63,55 @@
 
 {
   "_id":{"$oid":"59c096400000000000000000"},
+  "account_id":1,
   "device_id":"AAAAABBBBBBCCCCCCC",
   "profile_id":{"$oid":"bbbbbbbbbbbbbbbbbbbbbbbb"},
-  "account_id":1,
   "created_at":{"$date":"2017-06-14T15:44:18.497Z"},
   "updated_at":{"$date":"2017-06-14T15:44:18.497Z"},
 
   "location_latitude": 23.23,
   "location_longitude": -83.2923
+}
+
+
+{
+  "_id":{"$oid":"0ccccccccccccccccccccccc"},
+  "account_id":7,
+  "device_id":"device-with-attrs01",
+  "profile_id":{"$oid":"aaa000000000000000000000"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "bool": true,
+    "string": "hello world",
+    "integer": {"$numberLong": "42"},
+    "double": 42.42,
+    "null": null,
+    "ts":  {"$date": "2017-10-30T14:05:53.102Z"},
+    "arr": ["hello"],
+    "arr-add": ["adds"],
+    "arr-remove": ["keeps", "removes"],
+    "arr-add-remove": ["adds", "removes"]
+  }
+}
+
+{
+  "_id":{"$oid":"1ccccccccccccccccccccccc"},
+  "account_id":7,
+  "device_id":"device-with-attrs02",
+  "profile_id":{"$oid":"aaa000000000000000000000"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "bool": true,
+    "string": "hello world",
+    "integer": {"$numberLong": "42"},
+    "double": 42.42,
+    "null": null,
+    "ts":  {"$date": "2017-10-30T14:05:53.102Z"},
+    "arr": ["hello"],
+    "arr-add": ["adds"],
+    "arr-remove": ["keeps", "removes"],
+    "arr-add-remove": ["adds", "removes"]
+  }
 }

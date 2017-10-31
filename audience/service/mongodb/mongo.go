@@ -118,6 +118,10 @@ func (ds *mongoStore) profiles_schemas() *mgo.Collection {
 	return ds.sess.DB(ds.dbName).C("profiles_schemas")
 }
 
+func (ds *mongoStore) devices_schemas() *mgo.Collection {
+	return ds.sess.DB(ds.dbName).C("devices_schemas")
+}
+
 func (ds *mongoStore) dynamic_segments() *mgo.Collection {
 	return ds.sess.DB(ds.dbName).C("dynamic_segments")
 }

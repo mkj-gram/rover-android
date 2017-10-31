@@ -182,3 +182,22 @@
   }
 }
 
+{
+  "account_id": 7,
+  "_id": { "$oid": "aaa000000000000000000000" },
+  "identifier": "profilewithdevices",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": {
+    "bool": true,
+    "string": "hello world",
+    "integer": {"$numberLong": "42"},
+    "double": 42.42,
+    "null": null,
+    "ts":  {"$date": "2017-10-30T14:05:53.102Z"},
+    "arr": ["hello"],
+    "arr-add": ["adds"],
+    "arr-remove": ["keeps", "removes"],
+    "arr-add-remove": ["adds", "removes"]
+  }
+}
