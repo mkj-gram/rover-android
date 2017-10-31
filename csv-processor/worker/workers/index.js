@@ -16,6 +16,11 @@ function getFirstDefined(val, val2) {
     return val2
 }
 
+function updateJobProgress(job, logger, progress) {
+    logger.info("progress=" + progress)
+    job.progress(progress)
+}
+
 module.exports = function(context) {
 
 	const FilesClient = require('@rover/files-client').v1.Client()
