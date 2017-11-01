@@ -23,7 +23,11 @@ const ModalInput = (props) => {
         display: 'initial',
         ...style
     }
-    const onFocus = e => (e.target.style.borderColor = silver)
+    const onFocus = (e) => {
+        e.target.style.borderColor = silver
+        const length = e.target.value.length
+        e.target.setSelectionRange(length, length)
+    }
     const onBlur = e => (e.target.style.borderColor = steel)
 
     return (
