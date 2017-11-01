@@ -1,3 +1,4 @@
+// generates audience service load by calling RPCs
 package main
 
 import (

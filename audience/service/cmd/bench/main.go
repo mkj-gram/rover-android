@@ -1,3 +1,4 @@
+// estimates throughput of the audience-service by calling a method continuosly
 package main
 
 import (

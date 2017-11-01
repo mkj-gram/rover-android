@@ -1,3 +1,6 @@
+// Jul 2017
+// migrates old mongo db schema with profile having embeded devices
+// to a new schema with separate devices/profiles collections
 package main
 
 import (
