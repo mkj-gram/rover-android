@@ -1,5 +1,13 @@
 export const getDeviceSchema = () => [
     {
+        attribute: 'device_id',
+        label: 'Device Identifier',
+        __typename: 'StringPredicate',
+        group: null,
+        display: true,
+        filter: true
+    },
+    {
         attribute: 'push_token_key',
         label: 'Push Token',
         __typename: 'StringPredicate',
@@ -157,14 +165,6 @@ export const getDeviceSchema = () => [
         attribute: 'sdk_version',
         label: 'SDK Version',
         __typename: 'VersionPredicate',
-        group: null,
-        display: true,
-        filter: true
-    },
-    {
-        attribute: 'device_id',
-        label: 'Device ID',
-        __typename: 'StringPredicate',
         group: null,
         display: true,
         filter: true
