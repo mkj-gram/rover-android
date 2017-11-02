@@ -30,9 +30,7 @@ const StringSuggestionQuery = {
         }
 
         const request = new RoverApis.audience.v1.Models.GetFieldSuggestionRequest()
-        const newAuth = new RoverApis.auth.v1.Models.AuthContext()
-        newAuth.setAccountId(148)
-        request.setAuthContext(newAuth)
+        request.setAuthContext(authContext)
         request.setField(field)
         request.setSelector(getSelectorEnum(selector))
         request.setSize(size)
