@@ -700,6 +700,24 @@ func (s *Server) DeviceIsInDynamicSegment(ctx context.Context, r *audience.Devic
 	return &audience.DeviceIsInDynamicSegmentResponse{Yes: ok}, nil
 }
 
+// String Field Suggestions
+
+// GetFieldSuggestion implements the corresponding rpc
+func (s *Server) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSuggestionRequest) (*audience.GetFieldSuggestionResponse, error) {
+	if r.AuthContext == nil {
+		return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
+	}
+
+	suggestions, err := s.index.GetFieldSuggestion(ctx, r)
+
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "Index.GetFieldSuggestion: %v", err)
+	}
+
+	return suggestions, nil
+
+}
+
 // Validations
 
 func validateID(id string) error {
@@ -721,22 +739,4 @@ func validateTags(attrs map[string]*audience.ValueUpdates) error {
 	}
 
 	return nil
-}
-
-// String Field Suggestions
-
-// GetFieldSuggestion implements the corresponding rpc
-func (s *Server) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSuggestionRequest) (*audience.GetFieldSuggestionResponse, error) {
-	if r.AuthContext == nil {
-		return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
-	}
-
-	suggestions, err := s.index.GetFieldSuggestion(ctx, r)
-
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetFieldSuggestions: %v", err)
-	}
-
-	return suggestions, nil
-
 }

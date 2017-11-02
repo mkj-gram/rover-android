@@ -189,8 +189,8 @@ func (q *Index) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSugg
 		return &audience.GetFieldSuggestionResponse{}, nil
 	}
 
-	arr := MapFieldAggregateResponse(buckets)
-	return arr, nil
+	res := MapFieldAggregateResponse(buckets)
+	return res, nil
 }
 
 // MapFieldAggregateResponse maps AggregationBucketKeyItems to GetFieldSuggestionResponse
