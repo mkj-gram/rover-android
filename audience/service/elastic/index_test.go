@@ -235,8 +235,7 @@ func TestMapAggregateResponse(t *testing.T) {
 				exp = tc.exp
 				got = selastic.MapFieldAggregateResponse(tc.in)
 			)
-			t.Logf("%v", esResp.Buckets)
-			if diff := rtesting.Diff(got, exp, nil, nil); diff != nil {
+			if diff := rtesting.Diff(exp, got, nil, nil); diff != nil {
 				t.Error("Diff:\n", rtesting.Difff(diff))
 			}
 		})

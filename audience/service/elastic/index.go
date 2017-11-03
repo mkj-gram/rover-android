@@ -2,6 +2,7 @@ package elastic
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"strconv"
 
@@ -158,23 +159,27 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 // GetFieldSuggestion takes a StringPredicate term and returns a list of suggested StringValues
 func (q *Index) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSuggestionRequest) (*audience.GetFieldSuggestionResponse, error) {
 	var (
-		indexName      = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
-		searchSelector = r.GetSelector()
+		indexName = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
+		selector  string
+		field     string
 	)
 
-	var selector string
-
-	switch searchSelector {
+	switch r.GetSelector() {
+	// Custom profiles need a nested "attributes" field for ES Query
 	case audience.GetFieldSuggestionRequest_CUSTOM_PROFILE:
+		field = fmt.Sprintf("attributes.%s", r.GetField())
+		selector = "profile"
 	case audience.GetFieldSuggestionRequest_ROVER_PROFILE:
+		field = r.GetField()
 		selector = "profile"
 	case audience.GetFieldSuggestionRequest_DEVICE:
+		field = r.GetField()
 		selector = "device"
+	default:
+		panic("Selector was not of type GetFieldSuggestionRequest_Selector")
 	}
 
-	var search = q.Client.Search(indexName).Type(selector)
-	search.Size(0)
-	search.Aggregation(selector, source(termAggregate(r, selector)))
+	var search = q.Client.Search(indexName).Type(selector).Size(0).Aggregation(selector, source(termAggregate(field, r.GetSize())))
 
 	resp, err := search.Do(ctx)
 	if err == io.EOF {
@@ -195,11 +200,11 @@ func (q *Index) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSugg
 
 // MapFieldAggregateResponse maps AggregationBucketKeyItems to GetFieldSuggestionResponse
 func MapFieldAggregateResponse(res *elastic.AggregationBucketKeyItems) *audience.GetFieldSuggestionResponse {
-	b := res.Buckets
-	arr := make([]string, len(b))
-	for i, val := range b {
+
+	var arr []string
+	for _, val := range res.Buckets {
 		if str, ok := val.Key.(string); ok {
-			arr[i] = str
+			arr = append(arr, str)
 		}
 	}
 
@@ -208,16 +213,11 @@ func MapFieldAggregateResponse(res *elastic.AggregationBucketKeyItems) *audience
 	}
 }
 
-func termAggregate(r *audience.GetFieldSuggestionRequest, s string) M {
-	var (
-		f = r.Field
-		c = r.Size
-	)
-
+func termAggregate(f string, s int64) M {
 	return M{
 		"terms": M{
 			"field": f,
-			"size":  c,
+			"size":  s,
 		},
 	}
 }
