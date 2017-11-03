@@ -19,8 +19,10 @@ import (
 	es5 "gopkg.in/olivere/elastic.v5"
 )
 
-const test_index = "test_index"
-const suggest_test_index = "suggestion_test_index"
+const (
+	test_index         = "test_index"
+	suggest_test_index = "suggestion_test_index"
+)
 
 type (
 	M = map[string]interface{}
@@ -571,7 +573,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 	es5Client.CreateIndex(t, suggest_test_index)
 
 	es5Client.createMapping(t, suggest_test_index, "device", elastic.DeviceMapping())
-	es5Client.createMapping(t, suggest_test_index, "profile", elastic.ProfileMapping(M{}))
+	es5Client.createMapping(t, suggest_test_index, "profile", elastic.ProfileMapping(M{"custom_attribute_1": M{"type": "keyword"}, "custom_attribute_2": M{"type": "keyword"}}))
 
 	es5Client.LoadBulk(t, string(readFile(t, "testdata/basic.bulk.json")))
 
@@ -590,7 +592,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 			desc: "no results",
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_DEVICE, "test_field", 10),
 			exp: expect{
-				val: &audience.GetFieldSuggestionResponse{[]string{}},
+				val: &audience.GetFieldSuggestionResponse{},
 			},
 		},
 		{
@@ -608,6 +610,24 @@ func TestGetFieldSuggestion(t *testing.T) {
 			exp: expect{
 				val: &audience.GetFieldSuggestionResponse{
 					Suggestions: []string{"another app name", "my app name"},
+				},
+			},
+		},
+		{
+			desc: "Rover Profile suggestions",
+			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_ROVER_PROFILE, "identifier", 10),
+			exp: expect{
+				val: &audience.GetFieldSuggestionResponse{
+					Suggestions: []string{"profile_sp1_identifier", "profile_sp2_identifier"},
+				},
+			},
+		},
+		{
+			desc: "Custom profile suggestions",
+			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_CUSTOM_PROFILE, "custom_attribute_1", 10),
+			exp: expect{
+				val: &audience.GetFieldSuggestionResponse{
+					Suggestions: []string{"custom string", "my attribute"},
 				},
 			},
 		},
