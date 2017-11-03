@@ -501,11 +501,6 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 
 		// ms-12: update device schema as well
 		// TODO: remove after ms-12 is done
-
-		// avoid id collision due to an index keyed over account_id, id
-		// for i := range schemaUpdate.Attributes {
-		// 	schemaUpdate.Attributes[i].Id = s.newObjectId()
-		// }
 		if err := s.updateSchema(ctx, s.devices_schemas(), schemaUpdate); err != nil {
 			return false, wrapError(err, "device.updateSchema")
 		}
