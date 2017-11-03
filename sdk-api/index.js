@@ -101,6 +101,22 @@ tasks.push(function(callback) {
     });
 });
 
+tasks.push(function(callback) {
+    let redis = require('./connections/redis');
+    let initblock = { connections: {}, plugins: { logger: { logger: server.plugins.logger.logger }}}
+    redis.register(initblock, { url: Config.get('/redis/inbox_url') }, (err) => {
+        if (err) {
+            return callback(err);
+        }
+
+        server.connections.redis.inbox = {}
+        server.connections.redis.inbox.client = initblock.connections.redis.client
+        Logger.info("Redis Client initialized!");
+        return callback();
+    });
+});
+
+
 
 tasks.push(function(callback) {
     let mongo = require('./connections/mongodb');

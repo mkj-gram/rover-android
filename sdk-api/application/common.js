@@ -4,8 +4,9 @@ const ObjectId = require('mongodb').ObjectID;
 
 module.exports.register = function(server, options, next) {
     server.methods.application = {}
-    server.methods.application.getCurrentCustomer = getCurrentCustomer.bind(server)
-    server.methods.application.getCurrentProfile = getCurrentProfile.bind(server)
+    server.methods.application.getCurrentCustomer   = getCurrentCustomer.bind(server)
+    server.methods.application.getCurrentProfile    = getCurrentProfile.bind(server)
+    server.methods.application.getCurrentDevice     = getCurrentDevice.bind(server)
     next()
 };
 

@@ -48,22 +48,17 @@ class MessageBaseProcessor extends BaseProcessor {
 
                 if (message) {
 
-                    if (util.isString(message.customer_id) && message.customer_id === this._customer.id || message.customer_id instanceof ObjectId && message.customer_id.equals(this._customer.id)) {
-                        this._message = message;
-
-                        methods.messageTemplate.find(message.message_template_id, { useCache: true}, (err, template) => {
-                            if (err) {
-                                logger.error(err)
-                                return callback()
-                            }
-
-                            this._messageTemplate = template
+                    this._message = message;
+                    
+                    methods.messageTemplate.find(message.message_template_id, { useCache: true}, (err, template) => {
+                        if (err) {
+                            logger.error(err)
                             return callback()
-                        })
+                        }
 
-                    } else {
-                        return callback("You do not have permission to view this message");
-                    } 
+                        this._messageTemplate = template
+                        return callback()
+                    })
                 }
             });
         } else if (this._message) {

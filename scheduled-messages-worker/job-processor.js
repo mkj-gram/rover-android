@@ -562,12 +562,15 @@ JobProcessor.prototype._getSegmentFromQueryApi = function(segment) {
             let devices = response.getDevicesList().map(methods.device.fromProto)
 
             var devicesIndex = devices.reduce(function(index, device) {
-                index[device.profile_id] = device
+                if (index[device.profile_id] === undefined) {
+                    index[device.profile_id] = []
+                }
+                index[device.profile_id].push(device)
                 return index
             }, {})
 
             let customers = profiles.map(profile => {
-                return profileToCustomer(profile, [devicesIndex[profile.id]])
+                return profileToCustomer(profile, devicesIndex[profile.id])
             })
 
             self._customers = customers
@@ -885,61 +888,82 @@ JobProcessor.prototype._addMessagesToInbox = function() {
         return Promise.resolve();
     }
 
+    let methods = this._server.methods;
+    let debug = this._debug
     let logger = this._server.plugins.logger.logger;
-    let redis = this._server.connections.redis.client;
     let messageLimits = this._context.account.message_limits;
     let largestLimit;
     let currentTime = moment.utc(new Date()).unix();
     let startTime = Date.now();
+    let accountId = this._context.account.id
 
     if (!util.isNullOrUndefined(messageLimits) || util.isArray(messageLimits) && messageLimits.length > 0) {
         largestLimit = this._context.account.message_limits.sort((a,b) => { return a.number_of_seconds >= b.number_of_seconds })[this._context.account.message_limits.length - 1];
     }
 
-    let batch = redis.batch();
-
-    for (let i = this._messagesIndex.length - 1; i >= 0; i--) {
-        let message = this._messagesIndex[i].message;
-        let inboxKey = INBOX_KEY_PREFIX + message.customer_id.toString();
-        let rateLimitKey = RATE_LIMIT_KEY_PREFIX + message.customer_id.toString();
-
-        batch.lpush(inboxKey, message._id.toString());
-
-        if (!util.isNullOrUndefined(largestLimit)) {
-            batch.zadd(rateLimitKey, currentTime, currentTime);
-            batch.expire(rateLimitKey, largestLimit.number_of_seconds);
-        }
-    }
-
     return new Promise((resolve, reject) => {
-        batch.exec((err, replies) => {
+
+        let redisInbox = this._server.connections.redis.inbox.client
+        let redis = this._server.connections.redis.client
+
+        let messageBatch = this._messagesIndex.reduce(function(batch, message) {
+            let devices = message.devices
+            let messageId = message.message._id.toString()
+
+            if (util.isArray(devices)) {
+                devices.forEach(function(device) {
+                    const inboxKey = `${accountId}:${device._id}`
+                    debug(`Adding ${messageId} to ${inboxKey}`)
+                    batch.lpush(inboxKey, messageId)
+                })
+            }
+            return batch
+        }, redisInbox.batch())
+
+        let rateLimitBatch = this._messagesIndex.reduce(function(batch, message) {
+            let key = RATE_LIMIT_KEY_PREFIX + message.message.customer_id.toString()
+            if (!util.isNullOrUndefined(largestLimit)) {
+                batch.zadd(rateLimitKey, currentTime, currentTime)
+                batch.expire(rateLimitKey, largestLimit.number_of_seconds)
+            }
+            return batch
+        }, redis.batch())
+
+        messageBatch.exec((err, replies) => {
             if (err) {
-                return reject(new JobError(err.message, false));
+                return reject(new JobError(err.message, false))
             }
 
-            let totalTime = Date.now() - startTime;
-            this._debug("Finished adding messages to inbox");
+            debug(replies)
 
-            this.updateState(JOB_STATE._addMessagesToInbox);
+            rateLimitBatch.exec((err, replies) => {
+                if (err) {
+                    return reject(new JobError(err.message, false))
+                }
 
-            let accountId = this._context.account.id;
-            let messageTemplate = this._context.messageTemplate;
-            let currentTime = moment.utc(new Date()).unix();
-            
-            this._debug("Capturing added-to-inbox events");
+                let totalTime = Date.now() - startTime
+                this._debug("Finished adding messages to inbox")
+                this.updateState(JOB_STATE._addMessagesToInbox)
 
-            for (let i = this._messagesIndex.length - 1; i >= 0; i--) {
-                let index = this._messagesIndex[i];
-                let message = index.message;
-                let customer = index.customer;
+                let accountId = this._context.account.id
+                let messageTemplate = this._context.messageTemplate
+                let currentTime = moment.utc(new Date()).unix()
 
-                RoverEvent.addedToInbox(accountId, customer, message, messageTemplate, currentTime);
-            }
+                this._debug("Capturing added-to-inbox events")
 
-            this._debug("Events captured");
+                for (let i = this._messagesIndex.length - 1; i >= 0; i--) {
+                    let index = this._messagesIndex[i];
+                    let message = index.message;
+                    let customer = index.customer;
 
-            return resolve();
-        }); 
+                    RoverEvent.addedToInbox(accountId, customer, message, messageTemplate, currentTime);
+                }
+
+                this._debug("Events captured");
+
+                return resolve();
+            })
+        })
     });
 };
 
@@ -958,15 +982,24 @@ JobProcessor.prototype._updateCustomerInboxCacheKey = function() {
     }
 
     return new Promise((resolve, reject) => {
-        let customerIds = this._messagesIndex.map(index => index.customer._id);
+        let accountId = this._context.account.id
+        let deviceIds = []
+
+        this._messagesIndex.forEach(index => {
+            const devices = index.devices
+            if (util.isArray(devices)) {
+                deviceIds.push(...devices.map(d => d._id))
+            }
+        })
+
         let methods = this._server.methods;
         let currentTime = moment.utc().toDate();
 
-        if (customerIds.length == 0) {
+        if (deviceIds.length == 0) {
             return resolve();
         }
 
-        methods.inbox.updateManyCacheKeys(customerIds, currentTime, (err) => {
+        methods.inbox.updateManyCacheKeys(accountId, deviceIds, currentTime, (err) => {
             if (err) {
                 return reject(new JobError(err.message, false))
             }

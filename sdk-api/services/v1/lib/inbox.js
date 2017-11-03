@@ -7,7 +7,7 @@ const internals = {};
 
 internals.find = function(device, callback) {
     const server = this;
-    const redis = server.connections.redis.client;
+    const redis = server.connections.redis.inbox.client;
     const inboxKey = internals.getInboxKey(device);
 
     redis.lrange(inboxKey, 0, -1, (err, response) => {
@@ -21,7 +21,7 @@ internals.find = function(device, callback) {
 
 internals.addMessage = function(device, message, callback) {
     const server = this;
-    const redis = server.connections.redis.client;
+    const redis = server.connections.redis.inbox.client;
     const logger = server.plugins.logger.logger;
     const inboxKey = internals.getInboxKey(device);
     const inboxUpdatedAtKey = internals.getInboxUpdatedAtKey(device)
@@ -42,7 +42,7 @@ internals.addMessage = function(device, message, callback) {
 
 internals.deleteMessage = function(device, messageId, callback) {
     const server = this;
-    const redis = server.connections.redis.client;
+    const redis = server.connections.redis.inbox.client;
     const logger = server.plugins.logger.logger;
     const inboxKey = internals.getInboxKey(device);
     const inboxUpdatedAtKey = internals.getInboxUpdatedAtKey(device)
@@ -67,7 +67,7 @@ internals.getCurrentUnixTime = function() {
 
 internals.getLastModifiedAt = function(device, callback) {
     const server = this
-    const redis = server.connections.redis.client
+    const redis = server.connections.redis.inbox.client
     const logger = server.plugins.logger.logger
     const key = internals.getInboxUpdatedAtKey(device)
 
@@ -87,7 +87,7 @@ internals.getLastModifiedAt = function(device, callback) {
 
 internals.updateLastModifiedAt = function(device, time, callback) {
     const server = this
-    const redis = server.connections.redis.client
+    const redis = server.connections.redis.inbox.client
     const logger = server.plugins.logger.logger
     const key = internals.getInboxUpdatedAtKey(device)
 

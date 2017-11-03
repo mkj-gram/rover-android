@@ -430,8 +430,6 @@ class BaseProcessor {
 
             let messageEventPromises = inboxMessages.map(message => {
 
-                let inboxKey = INBOX_KEY_PREFIX + message.customer_id.toString();
-
                 let args = {
                     server: this._server,
                     customer: this._customer,
