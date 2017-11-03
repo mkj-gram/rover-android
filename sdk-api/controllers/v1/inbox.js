@@ -60,17 +60,17 @@ module.exports = function() {
         const methods = request.server.methods
         const logger = request.server.plugins.logger.logger
 
-        methods.application.getCurrentProfile(request, function(err, profile) {
+        methods.application.getCurrentDevice(request, function(err, device) {
             if (err) {
                 logger.error(err)
-                return writeReplyError(reply, 500, { status: 500, error: "Failed to get current profile" })
+                return writeReplyError(reply, 500, { status: 500, error: "Failed to get current device" })
             }
 
-            if (profile === null || profile === undefined) {
-                return writeReplyError(reply, 404, { status: 404, error: "Profile not found"})
+            if (device === null || device === undefined) {
+                return writeReplyError(reply, 404, { status: 404, error: "device not found"})
             }
 
-            methods.inbox.getLastModifiedAt(profile, function(err, inboxUpdatedAt) {
+            methods.inbox.getLastModifiedAt(device, function(err, inboxUpdatedAt) {
                 if (err) {
                     logger.error(err)
                     // its fine if we get an error we will just treat the request as non stale
@@ -91,7 +91,7 @@ module.exports = function() {
                     return reply.end();
                 }
 
-                methods.inbox.find(profile, function(err, messageIds) {
+                methods.inbox.find(device, function(err, messageIds) {
                     if (err) {
                         logger.error(err)
                         return writeReplyError(reply, 500, { status: 500, error: "Failed to get messages from inbox" })

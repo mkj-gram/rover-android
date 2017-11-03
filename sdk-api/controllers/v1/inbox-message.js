@@ -58,26 +58,22 @@ module.exports = function() {
         const logger = request.server.plugins.logger.logger;
         const messageId = request.params.id;
 
-        methods.application.getCurrentProfile(request, function(err, profile) {
+        methods.application.getCurrentDevice(request, function(err, device) {
             if (err) {
-                return callback({ status: 400, message: "Failed to get current profile" })
+                return callback({ status: 400, message: "Failed to get current device" })
             }
 
-            if (profile === null || profile === undefined) {
-                return callback({ status: 422, message: "Failed to get current profile" })
+            if (device === null || device === undefined) {
+                return callback({ status: 422, message: "Failed to get current device" })
             }
 
-            methods.message.find(messageId, { fields: ['_id', 'customer_id', 'message_template_id', 'read']}, function(err, message) {
+            methods.message.find(messageId, { fields: ['_id', 'message_template_id', 'read']}, function(err, message) {
                 if (err) {
                     return callback({ status: 500, message: "Failed to get current message" })
                 }
 
                 if (message === null || message === undefined) {
                     return callback({ status: 404, message: "Message not found" })
-                }
-
-                if (String(message.customer_id) !== profile.id) {
-                    return callback({ status: 403, message: "Permission Denied" })
                 }
 
                 const templateId = message.message_template_id
@@ -95,7 +91,7 @@ module.exports = function() {
                         return callback({ status: 404, message: "Message template not found" })
                     }
 
-                    return callback(null, profile, message, template)
+                    return callback(null, device, message, template)
                 })
             })
         })
@@ -108,7 +104,7 @@ module.exports = function() {
         const logger = request.server.plugins.logger.logger;
         const messageId = request.params.id;
 
-        before(request, function(err, profile, message, template) {
+        before(request, function(err, device, message, template) {
             if (err) {
                 logger.error(err)
                 return writeReplyError(reply, err.status, { status: err.status, error: err.message })
@@ -134,7 +130,7 @@ module.exports = function() {
         const logger = request.server.plugins.logger.logger;
         const messageId = request.params.id;
 
-        before(request, function(err, profile, message, template) {
+        before(request, function(err, device, message, template) {
             if (err) {
                 logger.error(err)
                 return writeReplyError(reply, err.status, { status: err.status, error: err.message })
@@ -183,7 +179,7 @@ module.exports = function() {
                         return writeReplyError(reply, 500, { status: 500, error: "Failed to update message" })
                     }
 
-                    methods.inbox.updateLastModifiedAt(profile, currentTime, function(err) {
+                    methods.inbox.updateLastModifiedAt(device, currentTime, function(err) {
                         if (err) {
                             logger.error(err)
                             return writeReplyError(reply, 500, { status: 500, error: "Failed to update inbox" })
@@ -212,7 +208,7 @@ module.exports = function() {
         const logger = request.server.plugins.logger.logger;
         const messageId = request.params.id;
 
-        before(request, function(err, profile, message, template) {
+        before(request, function(err, device, message, template) {
             if (err) {
                 return writeReplyError(reply, err.status, { status: err.status, error: err.message })
             }
@@ -222,7 +218,7 @@ module.exports = function() {
                     return writeReplyError(reply, 500, { status: 500, error: "Failed to delete message "});
                 }
                 
-                methods.inbox.deleteMessage(profile, message._id.toString(), function(err) {
+                methods.inbox.deleteMessage(device, message._id.toString(), function(err) {
                     if (err) {
                         return writeReplyError(reply, 500, { status: 500, error: "Failed to delete message "});
                     }

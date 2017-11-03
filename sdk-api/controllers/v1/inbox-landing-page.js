@@ -41,7 +41,7 @@ module.exports = function() {
                 return writeReplyError(400, { status: 400, error: "Profile does not exist" })
             }
 
-            methods.message.find(messageId, { fields: ['customer_id', 'message_template_id']}, function(err, message) {
+            methods.message.find(messageId, { fields: ['message_template_id']}, function(err, message) {
                 if (err) {
                     logger.error(err)
                     return writeReplyError(500, { status: 500, error: "Could not retrieve message" })
@@ -49,10 +49,6 @@ module.exports = function() {
 
                 if (message === null || message === undefined) {
                     return writeReplyError(404, { status: 404, error: "Message not found" })
-                }
-
-                if (profile.id !== String(message.customer_id)) {
-                    return writeReplyError(403, { status: 403, error: "Permission Denied" })
                 }
 
                 methods.messageTemplate.find(message.message_template_id, { useCache: true }, function(err, template) {

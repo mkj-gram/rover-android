@@ -354,7 +354,8 @@ class BaseProcessor {
         let messages = messageTemplates.map((messageTemplate) => {
             let message = {
                 _id: new ObjectId(),
-                customer_id: this._customer.id,
+                account_id: this._device.account_id,
+                device_id: this._device.id,
                 message_template_id: messageTemplate.id,
                 read: false,
                 viewed: false,
@@ -449,7 +450,7 @@ class BaseProcessor {
                 event.assignProcessorAttributes(triggerArgs);
 
                 return new Promise((resolve, reject) => {
-                    methods.inbox.addMessage(this._customer, message, (err, success) => {
+                    methods.inbox.addMessage(this._device, message, (err, success) => {
                         if (err) {
                             logger.error("methods.inbox.addMessage", err);
                             return resolve();
