@@ -1,9 +1,7 @@
-//* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-prototype-builtins */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { graphql, createRefetchContainer } from 'react-relay'
-import funnel from '../../../public/funnel.png'
 import {
     AddButton,
     ash,
@@ -28,6 +26,7 @@ import {
     LocationIcon
 } from '@rover/react-icons'
 
+import funnel from '../../../public/funnel.png'
 import AddFilterModal from './AddFilterModal'
 import BooleanInput from './BooleanInput'
 import DateInput from './DateInput'
@@ -40,7 +39,7 @@ import StringArrayInput from './StringArrayInput'
 
 import SegmentsContainer from './SegmentsContainer'
 
-import { getDeviceLabel, getDeviceOptions } from '../../localSchemas/deviceSchema'
+import { getDeviceLabel, getDeviceOptions, getDeviceNeedsPopularStringOptions } from '../../localSchemas/deviceSchema'
 
 class SideBar extends Component {
     constructor(props) {
@@ -76,9 +75,8 @@ class SideBar extends Component {
         this.handleModalOpen = this.handleModalOpen.bind(this)
         this.removeNullPredicate = this.removeNullPredicate.bind(this)
         this.getPredicateKeywords = this.getPredicateKeywords.bind(this)
-        this.shouldDisableFilterModalSuccessButton = this.shouldDisableFilterModalSuccessButton.bind(
-            this
-        )
+        this.shouldDisableFilterModalSuccessButton =
+        this.shouldDisableFilterModalSuccessButton.bind(this)
         this.updateAddFilterColors = this.updateAddFilterColors.bind(this)
         this.getProfileLabel = this.getProfileLabel.bind(this)
         this.clearQuery = this.clearQuery.bind(this)
@@ -121,7 +119,7 @@ class SideBar extends Component {
         }
 
         if (nextProps.context === 'predicates') {
-            let query = JSON.parse(nextProps.predicates).query
+            const query = JSON.parse(nextProps.predicates).query
             this.setState({
                 saveStates: {
                     isSegmentUpdate: this.state.segmentId !== '',
@@ -166,7 +164,8 @@ class SideBar extends Component {
             ...d,
             selector: d.selector,
             label: getDeviceLabel(d.attribute),
-            options: getDeviceOptions(d.attribute)
+            options: getDeviceOptions(d.attribute),
+            popularStringOption: getDeviceNeedsPopularStringOptions(d.attribute)
         }))
 
         this.props.setQueryCondition(condition, true, query)
@@ -233,13 +232,13 @@ class SideBar extends Component {
             return
         }
 
-        const { attribute, selector, label } = currentAttribute
+        const { attribute, label } = currentAttribute
 
         if (attribute === '') {
             return
         }
 
-        const getIcon = currentAttribute => {
+        const getIcon = () => {
             let icon
             if (currentAttribute.selector === 'DEVICE') {
                 if (currentAttribute.group === 'location') {
@@ -256,7 +255,7 @@ class SideBar extends Component {
             return icon
         }
 
-        const icon = getIcon(currentAttribute)
+        const icon = getIcon()
 
         return (
             <div
@@ -290,6 +289,7 @@ class SideBar extends Component {
     }
 
     renderModalInput(index) {
+        const { data } = this.props
         const { query } = this.state
         const predicate = query[index]
 
@@ -299,7 +299,7 @@ class SideBar extends Component {
 
         const { __typename } = predicate
 
-        const updateFn = currentPredicate => {
+        const updateFn = (currentPredicate) => {
             this.setState({
                 currentPredicate,
                 isFilterModalSuccessDisabled: this.shouldDisableFilterModalSuccessButton(
@@ -309,6 +309,11 @@ class SideBar extends Component {
         }
 
         const props = { ...predicate, updateFn, index }
+
+        if (predicate.popularStringOption) {
+            const { attribute } = predicate
+            props.options = data[`${attribute}_suggestions`] || []
+        }
 
         switch (__typename) {
             case 'BooleanPredicate':
@@ -324,7 +329,7 @@ class SideBar extends Component {
             case 'GeofencePredicate':
                 return <GeofenceInput {...props} />
             case 'FloatPredicate':
-                return <NumericInput {...props} float numberComparison={props.floatComparison}/>
+                return <NumericInput {...props} float numberComparison={props.floatComparison} />
             case 'StringArrayPredicate':
                 return <StringArrayInput {...props} />
             default:
@@ -486,7 +491,7 @@ class SideBar extends Component {
                         schema={data.segmentSchema}
                         onRequestClose={() =>
                             this.setState({ isShowingAddFilterModal: false })}
-                        onSelect={predicate => {
+                        onSelect={(predicate) => {
                             this.setState({
                                 query: query.concat(predicate),
                                 isShowingAddFilterModal: false,
@@ -523,7 +528,7 @@ class SideBar extends Component {
                             style={selectStyle}
                             isDisabled={false}
                             value={queryCondition}
-                            onChange={e => {
+                            onChange={(e) => {
                                 this.props.setQueryCondition(
                                     e.target.value,
                                     false,
@@ -721,7 +726,6 @@ class SideBar extends Component {
             currentAttribute,
             query,
             modalCoordinates,
-            isShowingModal,
             showSegmentSelection,
             showSegmentSave,
             currentPredicate,
@@ -761,11 +765,12 @@ class SideBar extends Component {
                         top: modalCoordinates[1],
                         left: modalCoordinates[0],
                         transform: null,
-                        overflow:
+                        overflowX:
                             currentPredicate.__typename ===
                             'StringArrayPredicate'
                                 ? 'visible'
-                                : 'auto'
+                                : 'auto',
+                        overflowY: 'unset'
                     }}
                     successButtonIsDisabled={
                         this.state.isFilterModalSuccessDisabled
@@ -855,34 +860,34 @@ class SideBar extends Component {
 }
 
 SideBar.propTypes = {
-    data: PropTypes.object,
-    relay: PropTypes.object.isRequired,
-    getSegment: PropTypes.func.isRequired,
-    segment: PropTypes.object,
-    updateQuery: PropTypes.func.isRequired,
-    refetchData: PropTypes.bool.isRequired,
-    segmentIdRefetch: PropTypes.bool,
-    reset: PropTypes.bool.isRequired,
-    setSegment: PropTypes.func.isRequired,
-    updateSegmentName: PropTypes.func.isRequired,
     archiveSegment: PropTypes.func.isRequired,
+    data: PropTypes.object,
+    getSegment: PropTypes.func.isRequired,
+    queryCondition: PropTypes.string.isRequired,
+    refetchData: PropTypes.bool.isRequired,
+    relay: PropTypes.object.isRequired,
+    reset: PropTypes.bool.isRequired,
+    segment: PropTypes.object,
+    segmentIdRefetch: PropTypes.bool,
     setQueryCondition: PropTypes.func.isRequired,
-    queryCondition: PropTypes.string.isRequired
+    setSegment: PropTypes.func.isRequired,
+    updateQuery: PropTypes.func.isRequired,
+    updateSegmentName: PropTypes.func.isRequired
 }
 
 SideBar.defaultProps = {
+    archiveSegment: () => null,
+    getSegment: () => null,
+    queryCondition: 'ALL',
+    refetchData: false,
+    relay: {},
+    reset: false,
     segment: {},
     segmentIdRefetch: false,
-    relay: {},
-    getSegment: () => null,
-    updateQuery: () => null,
-    refetchData: false,
-    reset: false,
-    setSegment: () => null,
-    updateSegmentName: () => null,
-    archiveSegment: () => null,
     setQueryCondition: () => null,
-    queryCondition: 'ALL'
+    setSegment: () => null,
+    updateQuery: () => null,
+    updateSegmentName: () => null
 }
 
 export default SideBar

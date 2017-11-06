@@ -70,7 +70,42 @@ export default createRefetchContainer(
             }
             segmentsContainer: dynamicSegment {
                 ...SegmentsContainer_segments
-            }
+            },
+            device_manufacturer_suggestions: stringSuggestion(
+                field: "device_manufacturer"
+                selector: "DEVICE"
+                size: 100
+            ),
+            device_model_suggestions: stringSuggestion(
+                field: "device_model"
+                selector: "DEVICE"
+                size: 100
+            ),
+            os_name_suggestions: stringSuggestion(
+                field: "os_name"
+                selector: "DEVICE"
+                size: 100
+            ),
+            locale_language_suggestions: stringSuggestion(
+                field: "locale_language"
+                selector: "DEVICE"
+                size: 100
+            ),
+            locale_region_suggestions: stringSuggestion(
+                field: "locale_region"
+                selector: "DEVICE"
+                size: 100
+            ),
+            carrier_name_suggestions: stringSuggestion(
+                field: "carrier_name"
+                selector: "DEVICE"
+                size: 100
+            ),
+            time_zone_suggestions: stringSuggestion(
+                field: "time_zone"
+                selector: "DEVICE"
+                size: 100
+            )
         }
     `,
     graphql.experimental`
