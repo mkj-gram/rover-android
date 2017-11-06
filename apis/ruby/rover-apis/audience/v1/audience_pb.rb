@@ -612,6 +612,20 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.DeviceIsInDynamicSegmentResponse" do
     optional :yes, :bool, 1
   end
+  add_message "rover.audience.v1.GetFieldSuggestionRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :selector, :enum, 2, "rover.audience.v1.GetFieldSuggestionRequest.Selector"
+    optional :field, :string, 3
+    optional :size, :int64, 5
+  end
+  add_enum "rover.audience.v1.GetFieldSuggestionRequest.Selector" do
+    value :ROVER_PROFILE, 0
+    value :CUSTOM_PROFILE, 1
+    value :DEVICE, 2
+  end
+  add_message "rover.audience.v1.GetFieldSuggestionResponse" do
+    repeated :suggestions, :string, 1
+  end
   add_enum "rover.audience.v1.Platform" do
     value :UNDEFINED, 0
     value :MOBILE, 1
@@ -743,6 +757,9 @@ module Rover
       IsInDynamicSegmentResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.IsInDynamicSegmentResponse").msgclass
       DeviceIsInDynamicSegmentRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeviceIsInDynamicSegmentRequest").msgclass
       DeviceIsInDynamicSegmentResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeviceIsInDynamicSegmentResponse").msgclass
+      GetFieldSuggestionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionRequest").msgclass
+      GetFieldSuggestionRequest::Selector = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionRequest.Selector").enummodule
+      GetFieldSuggestionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionResponse").msgclass
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").enummodule
       Null = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Null").enummodule
     end

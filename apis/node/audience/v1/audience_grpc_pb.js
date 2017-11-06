@@ -248,6 +248,28 @@ function deserialize_rover_audience_v1_GetDynamicSegmentByIdResponse(buffer_arg)
   return audience_v1_audience_pb.GetDynamicSegmentByIdResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_GetFieldSuggestionRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetFieldSuggestionRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetFieldSuggestionRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetFieldSuggestionRequest(buffer_arg) {
+  return audience_v1_audience_pb.GetFieldSuggestionRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_GetFieldSuggestionResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.GetFieldSuggestionResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.GetFieldSuggestionResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_GetFieldSuggestionResponse(buffer_arg) {
+  return audience_v1_audience_pb.GetFieldSuggestionResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_GetProfileByDeviceIdRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.GetProfileByDeviceIdRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.GetProfileByDeviceIdRequest');
@@ -1263,6 +1285,20 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_QueryRequest,
     responseSerialize: serialize_rover_audience_v1_QueryResponse,
     responseDeserialize: deserialize_rover_audience_v1_QueryResponse,
+  },
+  //
+  // Field Suggestions
+  //
+  getFieldSuggestion: {
+    path: '/rover.audience.v1.Audience/GetFieldSuggestion',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.GetFieldSuggestionRequest,
+    responseType: audience_v1_audience_pb.GetFieldSuggestionResponse,
+    requestSerialize: serialize_rover_audience_v1_GetFieldSuggestionRequest,
+    requestDeserialize: deserialize_rover_audience_v1_GetFieldSuggestionRequest,
+    responseSerialize: serialize_rover_audience_v1_GetFieldSuggestionResponse,
+    responseDeserialize: deserialize_rover_audience_v1_GetFieldSuggestionResponse,
   },
 };
 

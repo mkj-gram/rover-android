@@ -88,6 +88,10 @@ module Rover
           rpc :GetProfilesTotalCount, GetProfilesTotalCountRequest, GetProfilesTotalCountResponse
           rpc :GetDevicesTotalCount, GetDevicesTotalCountRequest, GetDevicesTotalCountResponse
           rpc :Query, QueryRequest, QueryResponse
+          #
+          # Field Suggestions
+          #
+          rpc :GetFieldSuggestion, GetFieldSuggestionRequest, GetFieldSuggestionResponse
         end
 
         Stub = Service.rpc_stub_class
