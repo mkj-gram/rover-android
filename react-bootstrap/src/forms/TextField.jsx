@@ -28,6 +28,7 @@ class TextField extends Component {
     }
 
     focusTextInput() {
+        this.input.selectionStart = this.input.selectionEnd = this.input.value.length
         this.input.focus()
     }
 
@@ -118,6 +119,7 @@ class TextField extends Component {
                 </style>
 
                 <input
+                    autoFocus={focusOnMount}
                     ref={e => (this.input = e)}
                     disabled={disabled}
                     style={inputStyle}

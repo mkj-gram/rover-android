@@ -12,25 +12,28 @@ class TypeAhead extends Component {
 
         const { value } = this.props
         this.state = {
-            inputValue: value
+            inputValue: value,
         }
         this.getOnKeyDown = this.getOnKeyDown.bind(this)
     }
 
-    getOnKeyDown(inputValue) {
+    getOnKeyDown(highlightedIndex, inputValue, isOpen) {
         const {
-            isOpen,
             items,
             onKeyDown
         } = this.props
-        const itemsLength = items
-            .filter(
-                i => !inputValue || i.toLowerCase().includes(inputValue.toLowerCase())
-            ).length
-        if (!isOpen || (itemsLength === 0)) {
+        if (highlightedIndex === null) {
             return onKeyDown
         }
-        return undefined
+        const itemsLength = items
+            .filter(
+                i => i.toLowerCase().includes(inputValue.toLowerCase())
+            )
+        if (isOpen && itemsLength.length > 0) {
+            return undefined
+        }
+
+        return onKeyDown
     }
 
     renderInput({
@@ -50,19 +53,20 @@ class TypeAhead extends Component {
             onKeyDown,
             textFieldStyle
         } = this.props
+
         return (
             <div style={{ width: textFieldStyle.width, position: 'absolute' }}>
                 <TextField
                     {...getInputProps({
-                        focusOnMount: true,
                         isOpen,
-                        onFocus: openMenu,
-                        onKeyDown: this.getOnKeyDown(inputValue)
+                        onFocus: () => { this.setState({ inputValue: '' }); return openMenu() },
+                        onKeyDown: this.getOnKeyDown(highlightedIndex, inputValue, isOpen),
+                        value: inputValue
                     })}
                     style={{
                         ...textFieldStyle
                     }}
-                    value={inputValue}
+
                 />
                 {isOpen ? (
                     <div>
