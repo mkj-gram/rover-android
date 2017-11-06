@@ -19,7 +19,10 @@ import (
 	es5 "gopkg.in/olivere/elastic.v5"
 )
 
-const test_index = "test_index"
+const (
+	test_index         = "test_index"
+	suggest_test_index = "suggestion_test_index"
+)
 
 type (
 	M = map[string]interface{}
@@ -552,4 +555,95 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 	}
 
 	return nil
+}
+
+func getFieldSuggestionRequest(t *testing.T, s audience.GetFieldSuggestionRequest_Selector, f string, i int64) *audience.GetFieldSuggestionRequest {
+	return &audience.GetFieldSuggestionRequest{
+		AuthContext: &auth.AuthContext{AccountId: 1},
+		Selector:    s,
+		Field:       f,
+		Size:        i,
+	}
+}
+
+func TestGetFieldSuggestion(t *testing.T) {
+	es5Client := newClient(t)
+
+	es5Client.DeleteIndex(t, suggest_test_index)
+	es5Client.CreateIndex(t, suggest_test_index)
+
+	es5Client.createMapping(t, suggest_test_index, "device", elastic.DeviceMapping())
+	es5Client.createMapping(t, suggest_test_index, "profile", elastic.ProfileMapping(M{"custom_attribute_1": M{"type": "keyword"}, "custom_attribute_2": M{"type": "keyword"}}))
+
+	es5Client.LoadBulk(t, string(readFile(t, "testdata/basic.bulk.json")))
+
+	var index = elastic.Index{
+		Client:    es5Client.c,
+		IndexName: func(_ string) string { return suggest_test_index },
+	}
+
+	tcases := []struct {
+		desc string
+		req  *audience.GetFieldSuggestionRequest
+
+		exp expect
+	}{
+		{
+			desc: "no results",
+			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_DEVICE, "test_field", 10),
+			exp: expect{
+				val: &audience.GetFieldSuggestionResponse{},
+			},
+		},
+		{
+			desc: "One result",
+			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_DEVICE, "locale_script", 10),
+			exp: expect{
+				val: &audience.GetFieldSuggestionResponse{
+					Suggestions: []string{"result1"},
+				},
+			},
+		},
+		{
+			desc: "Many results, limited to two",
+			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_DEVICE, "app_name", 2),
+			exp: expect{
+				val: &audience.GetFieldSuggestionResponse{
+					Suggestions: []string{"another app name", "my app name"},
+				},
+			},
+		},
+		{
+			desc: "Rover Profile suggestions",
+			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_ROVER_PROFILE, "identifier", 10),
+			exp: expect{
+				val: &audience.GetFieldSuggestionResponse{
+					Suggestions: []string{"profile_sp1_identifier", "profile_sp2_identifier"},
+				},
+			},
+		},
+		{
+			desc: "Custom profile suggestions",
+			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_CUSTOM_PROFILE, "custom_attribute_1", 10),
+			exp: expect{
+				val: &audience.GetFieldSuggestionResponse{
+					Suggestions: []string{"custom string", "my attribute"},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.desc, func(t *testing.T) {
+			var (
+				exp, expErr = tc.exp.val, tc.exp.err
+				got, gotErr = index.GetFieldSuggestion(context.TODO(), tc.req)
+			)
+
+			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+
 }

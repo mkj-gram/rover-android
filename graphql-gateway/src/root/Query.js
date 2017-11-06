@@ -6,6 +6,7 @@ import ExperienceQuery from '../experiences/query/ExperienceQuery'
 import SegmentFromPredicatesQuery from '../segments/SegmentFromPredicatesQuery'
 import DynamicSegmentQuery from '../segments/DynamicSegmentQuery'
 import SegmentSchemaQuery from '../segments/SegmentSchemaQuery'
+import StringSuggestionQuery from '../segments/StringSuggestionQuery'
 
 class Query { }
 
@@ -21,6 +22,7 @@ Query.type = new GraphQLObjectType({
         dynamicSegment: DynamicSegmentQuery,
         segmentFromPredicates: SegmentFromPredicatesQuery,
         segmentSchema: SegmentSchemaQuery,
+        stringSuggestion: StringSuggestionQuery,
         device: DeviceQuery
     }
 })

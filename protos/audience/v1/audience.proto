@@ -103,6 +103,11 @@ service Audience {
 
   rpc Query(QueryRequest) returns (QueryResponse);
 
+  //
+  // Field Suggestions
+  //
+  rpc GetFieldSuggestion(GetFieldSuggestionRequest) returns (GetFieldSuggestionResponse);
+
 }
 
 
@@ -1038,4 +1043,22 @@ message DeviceIsInDynamicSegmentRequest {
 
 message DeviceIsInDynamicSegmentResponse {
   bool yes = 1;
+}
+
+message GetFieldSuggestionRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  enum Selector {
+    ROVER_PROFILE = 0;
+    CUSTOM_PROFILE = 1;
+    DEVICE = 2;
+  }
+
+  Selector selector = 2;
+  string field = 3;
+  int64 size = 5;
+}
+
+message GetFieldSuggestionResponse {
+  repeated string suggestions = 1;
 }

@@ -2,6 +2,7 @@ package elastic
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"strconv"
 
@@ -153,6 +154,72 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 
 	res, err := MapResponse(resp)
 	return res, errors.Wrap(err, "MapResponse")
+}
+
+// GetFieldSuggestion takes a StringPredicate term and returns a list of suggested StringValues
+func (q *Index) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSuggestionRequest) (*audience.GetFieldSuggestionResponse, error) {
+	var (
+		indexName = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
+		selector  string
+		field     string
+	)
+
+	switch r.GetSelector() {
+	// Custom profiles need a nested "attributes" field for ES Query
+	case audience.GetFieldSuggestionRequest_CUSTOM_PROFILE:
+		field = fmt.Sprintf("attributes.%s", r.GetField())
+		selector = "profile"
+	case audience.GetFieldSuggestionRequest_ROVER_PROFILE:
+		field = r.GetField()
+		selector = "profile"
+	case audience.GetFieldSuggestionRequest_DEVICE:
+		field = r.GetField()
+		selector = "device"
+	default:
+		panic("Selector was not of type GetFieldSuggestionRequest_Selector")
+	}
+
+	var search = q.Client.Search(indexName).Type(selector).Size(0).Aggregation(selector, source(termAggregate(field, r.GetSize())))
+
+	resp, err := search.Do(ctx)
+	if err == io.EOF {
+		return &audience.GetFieldSuggestionResponse{}, nil
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "Suggestions")
+	}
+
+	buckets, found := resp.Aggregations.Terms(selector)
+	if !found {
+		return &audience.GetFieldSuggestionResponse{}, nil
+	}
+
+	res := MapFieldAggregateResponse(buckets)
+	return res, nil
+}
+
+// MapFieldAggregateResponse maps AggregationBucketKeyItems to GetFieldSuggestionResponse
+func MapFieldAggregateResponse(res *elastic.AggregationBucketKeyItems) *audience.GetFieldSuggestionResponse {
+
+	var arr []string
+	for _, val := range res.Buckets {
+		if str, ok := val.Key.(string); ok {
+			arr = append(arr, str)
+		}
+	}
+
+	return &audience.GetFieldSuggestionResponse{
+		Suggestions: arr,
+	}
+}
+
+func termAggregate(f string, s int64) M {
+	return M{
+		"terms": M{
+			"field": f,
+			"size":  s,
+		},
+	}
 }
 
 func UnmarshalDevice(data []byte, proto *audience.Device) error {

@@ -2,13 +2,14 @@ package service_test
 
 import (
 	"encoding/hex"
-	"golang.org/x/net/context"
 	"io"
 	"math/rand"
 	"net"
 	"os"
 	"testing"
 	"time"
+
+	"golang.org/x/net/context"
 
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 
@@ -52,6 +53,9 @@ func (i *nopIndex) GetDeviceTotalCount(context.Context, int) (int64, error) {
 }
 func (i *nopIndex) GetProfileTotalCount(context.Context, int) (int64, error) {
 	return 0, nil
+}
+func (i *nopIndex) GetFieldSuggestion(context.Context, *audience.GetFieldSuggestionRequest) (*audience.GetFieldSuggestionResponse, error) {
+	return nil, nil
 }
 
 func truncateColl(t *testing.T, colls ...*mgo.Collection) {

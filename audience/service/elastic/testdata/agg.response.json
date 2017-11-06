@@ -1,0 +1,19 @@
+
+{
+    "doc_count_error_upper_bound": 0, 
+    "sum_other_doc_count": 0, 
+    "buckets" : [ 
+        {
+            "key" : "result1",
+            "doc_count" : 10
+        },
+        {
+            "key" : "result2",
+            "doc_count" : 10
+        },
+        {
+            "key" : "result3",
+            "doc_count" : 10
+        }
+    ]
+}

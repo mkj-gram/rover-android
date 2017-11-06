@@ -10,3 +10,21 @@
 {"profile_id": "p1", "device_id":"d3" }
 {"index": {"_index": "test_index", "_type": "device", "_id": "d4", "_parent": "p2"}}
 {"profile_id": "p2", "device_id":"d4" }
+{"index": {"_index": "test_index", "_type": "profile", "_id": "sp1"}}
+{"account_id": 1, "id": "p1"}
+{"index": {"_index": "suggestion_test_index", "_type": "profile", "_id": "sp1"}}
+{"account_id": 1, "id": "sp1", "identifier": "profile_sp1_identifier",  "attributes": {"custom_attribute_1": "custom string", "custom_attribute_2": "attribute 2"}}
+{"index": {"_index": "suggestion_test_index", "_type": "profile", "_id": "sp2"}}
+{"account_id": 1, "id": "sp2", "identifier": "profile_sp2_identifier", "attributes": {"custom_attribute_1": "my attribute"}}
+{"index": {"_index": "suggestion_test_index", "_type": "device", "_id": "sd1", "_parent": "sp1"}}
+{"account_id": 1, "id": "sd1", "locale_script": "result1", "app_name": "my app name"}
+{"index": {"_index": "suggestion_test_index", "_type": "device", "_id": "sd2", "_parent": "sp1"}}
+{"account_id": 1, "id": "sd2", "locale_script": "result1", "app_name": "my app name"}
+{"index": {"_index": "suggestion_test_index", "_type": "device", "_id": "sd3", "_parent": "sp1"}}
+{"account_id": 1, "id": "sd4", "app_name": "another app name"}
+{"index": {"_index": "suggestion_test_index", "_type": "device", "_id": "sd4", "_parent": "sp1"}}
+{"account_id": 1, "id": "sd4", "app_name": "another app name"}
+{"index": {"_index": "suggestion_test_index", "_type": "device", "_id": "sd5", "_parent": "sp1"}}
+{"account_id": 1, "id": "sd5", "app_name": "a third app name"}
+
+
