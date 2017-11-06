@@ -25,14 +25,12 @@ const ModalInput = (props) => {
     }
     const onFocus = (e) => {
         e.target.style.borderColor = silver
-        const length = e.target.value.length
-        e.target.setSelectionRange(length, length)
+        e.target.value = ''
     }
     const onBlur = e => (e.target.style.borderColor = steel)
 
     return (
         <input
-            autoFocus
             {...props}
             style={inputStyle}
             onFocus={onFocus}
