@@ -691,12 +691,12 @@ class SideBar extends Component {
 
         // Don't disable empty strings when testing for string/tag existence
         if (
-            elem.__typename === 'stringPredicate' &&
+            elem.__typename === 'StringPredicate' &&
             elem.stringComparison.includes('set')
         ) {
             return false
         }
-        
+
         if (
             elem.__typename === 'StringArrayPredicate' &&
             elem.stringArrayComparison.includes('set')

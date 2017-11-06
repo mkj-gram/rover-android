@@ -13,6 +13,7 @@ import {
 
 import ModalInput from './ModalInput'
 import ModalInputPrompt from './ModalInputPrompt'
+import StringInputTypeAhead from './StringInputTypeAhead'
 
 class StringInput extends Component {
     constructor(props) {
@@ -40,11 +41,8 @@ class StringInput extends Component {
             label,
             options
         } = this.props
-        let { stringValue } = this.state
 
-        if (stringComparison.includes('set')) {
-            stringValue = ' '
-        }
+        const stringValue = ''
 
         updateFn({
             attribute,
@@ -56,7 +54,7 @@ class StringInput extends Component {
             label,
             options
         })
-        this.setState({ stringComparison })
+        this.setState({ stringComparison, stringValue })
     }
 
     updateValue(stringValue) {
@@ -88,11 +86,20 @@ class StringInput extends Component {
         const { stringComparison, stringValue } = this.state
 
         if (stringComparison.includes('is') && options.length > 0) {
-            return this.renderTypeAhead()
+            return (
+                <StringInputTypeAhead
+                    key={stringComparison}
+                    options={options}
+                    stringValue={stringValue}
+                    successFn={successFn}
+                    updateValue={value => this.updateValue(value)}
+                />
+                )
         }
 
         return (
             <ModalInput
+                key={stringComparison}
                 type="text"
                 value={stringValue}
                 style={{
@@ -105,47 +112,6 @@ class StringInput extends Component {
                 onChange={e => this.updateValue(e.target.value)}
                 onKeyDown={e => e.keyCode === 13 && e.target.value.length > 0 && successFn()}
             />
-        )
-    }
-
-    renderTypeAhead() {
-        const { options, successFn } = this.props
-        const { stringValue } = this.state
-        return (
-            <div style={{ display: 'relative', marginLeft: 5 }}>
-                <TypeAhead
-                    textFieldStyle={{
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        borderBottom: `1px solid ${steel}`,
-                        borderColor: steel,
-                        textDecoration: 'none',
-                        outline: 'none',
-                        color: titanium,
-                        fontFamily: 'Source Sans Pro',
-                        fontSize: 16,
-                        textAlign: 'left',
-                        paddingBottom: 3,
-                        paddingLeft: 5,
-                        display: 'initial',
-                        width: 200,
-                        lineHeight: 1.2,
-                        focus: {
-                            borderBottom: '1px solid',
-                            borderColor: silver
-                        },
-                        input: {
-                            borderBottom: '1px solid',
-                            borderColor: silver,
-                            padding: '3px 0 3px 10px'
-                        }
-                    }}
-                    items={options}
-                    update={value => this.updateValue(value)}
-                    value={stringValue}
-                    onKeyDown={e => e.keyCode === 13 && e.target.value.length > 0 && successFn()}
-                />
-            </div>
         )
     }
 
