@@ -7,7 +7,9 @@ const style = {
     height: 50,
     width: 24,
     background: 'white',
-    border: `1px solid ${cloud}`,
+    borderRight: `1px solid ${cloud}`,
+    borderBottom: `1px solid ${cloud}`,
+    borderLeft: `1px solid ${cloud}`,
     borderTop: 'none',
     display: 'flex',
     alignItems: 'center',
@@ -117,7 +119,7 @@ class RowActionButton extends Component {
                         >
                             <VerticalEllipseIcon fill={ellipseColor} width="4px" height="16px" />
                         </div>
-                        : <div style={{ ...style, zIndex: 0 }} />
+                        : <div style={{ ...style, zIndex: 0, borderLeft: 'none' }} />
                     }
                     <div
                         style={{

@@ -24,9 +24,24 @@ class HoverContainer extends Component {
     render() {
         const { hover } = this.state
         const props = this.props
+        const rowStyle = {
+            height: 50,
+            ...text,
+            border: 'none',
+            borderBottom: `1px solid ${cloud}`,
+            position: 'relative'
+        }
         return (
-            <div style={{ height: 50, ...text, border: `1px solid ${cloud}`, position: 'relative' }} onMouseOver={() => this.onMouseOver()} onMouseLeave={() => this.onMouseLeave()}>
-                <RowActionButton isButtonShowing={hover} rowId={props.idx} handleClick={type => props.clickHandler(type)} />
+            <div
+                style={rowStyle}
+                onMouseOver={() => this.onMouseOver()}
+                onMouseLeave={() => this.onMouseLeave()}
+            >
+                <RowActionButton
+                    isButtonShowing={hover}
+                    rowId={props.idx}
+                    handleClick={type => props.clickHandler(type)}
+                />
                 <Row {...props} />
             </div>
         )
