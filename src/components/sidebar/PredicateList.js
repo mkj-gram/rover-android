@@ -329,7 +329,8 @@ const PredicateList = ({
         padding: '13px 16px',
         color: 'white',
         fontSize: 14,
-        position: 'relative'
+        position: 'relative',
+        wordBreak: 'break-all'
     }
 
     const separatorStyle = {
