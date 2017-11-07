@@ -126,7 +126,7 @@ const renderBooleanPredicate = ({ booleanComparison, booleanValue }) => {
     if (booleanComparison === 'is unset') {
         return <div>{renderPredicateComparison('is unset')}</div>
     }
-    return <div>{renderPredicateValue(booleanValue ? 'ON' : 'OFF')}</div>
+    return <div>{renderPredicateValue(booleanValue ? 'True' : 'False')}</div>
 }
 const renderStringPredicate = ({ stringComparison, stringValue }) => {
     let comparison = stringComparison
@@ -196,6 +196,7 @@ const renderVersionPredicate = ({
     }
 
     if (versionComparison === 'is between') {
+
         const firstValue = versionValue.slice(0, 3).map((num, index) => (
             <span key={index}>
                 {num}
@@ -219,7 +220,6 @@ const renderVersionPredicate = ({
             </div>
         )
     }
-
     return (
         <div>
             {renderPredicateComparison(versionComparison)}

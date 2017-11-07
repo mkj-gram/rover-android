@@ -124,7 +124,8 @@ class SideBar extends Component {
                 saveStates: {
                     isSegmentUpdate: this.state.segmentId !== '',
                     showSaveButton: query && query.length > 0
-                }
+                },
+                query
             })
         } else if (nextProps.context === 'segments') {
             this.setState({

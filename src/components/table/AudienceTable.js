@@ -15,6 +15,7 @@ import roverProfileSchema from '../../localSchemas/roverProfileSchema'
 
 import SkeletonTableGrid from './SkeletonTableGrid'
 import TestDeviceIconFormatter from './TestDeviceIconFormatter'
+import formatQuery from '../../utils/formatQuery'
 
 class AudienceTable extends Component {
     constructor(props) {
@@ -45,7 +46,8 @@ class AudienceTable extends Component {
             dataGridRows: [],
             refetched: false,
             adgDynamicSegment: [],
-            pageNumber: 0
+            pageNumber: 0,
+            tooltipRowIdx: null
         }
 
         this.createRowsAndColumns = this.createRowsAndColumns.bind(this)
@@ -64,9 +66,9 @@ class AudienceTable extends Component {
         this.renderDataGrid = this.renderDataGrid.bind(this)
         this.shouldCompleteRefresh = this.shouldCompleteRefresh.bind(this)
         this.getCellWidth = this.getCellWidth.bind(this)
-        this.getTestDevice = this.getTestDevice.bind(this)
         this.updateDataGridRows = this.updateDataGridRows.bind(this)
         this.onColumnResize = this.onColumnResize.bind(this)
+        this.onCellSelected = this.onCellSelected.bind(this)
     }
 
     componentDidMount() {
@@ -99,7 +101,7 @@ class AudienceTable extends Component {
         const selectedColumns = {
             device_id_DEVICE: {
                 __typename: 'StringPredicate',
-                label: 'Device ID',
+                label: 'Device Identifier',
                 selector: 'DEVICE'
             },
             os_version_DEVICE: {
@@ -279,7 +281,9 @@ class AudienceTable extends Component {
                 refetchVariables,
                 null,
                 error => {
-                    error !== undefined ? console.log(`Error: ${error}`) : callbackFetch()
+                    error !== undefined
+                        ? console.log(`Error: ${error}`)
+                        : callbackFetch()
                 },
                 { force: true }
             )
@@ -297,7 +301,9 @@ class AudienceTable extends Component {
                 refetchVariables,
                 null,
                 error => {
-                    error !== undefined ? console.log(`Error: ${error}`) : callbackFetch()
+                    error !== undefined
+                        ? console.log(`Error: ${error}`)
+                        : callbackFetch()
                 },
                 { force: true }
             )
@@ -379,18 +385,19 @@ class AudienceTable extends Component {
         return rows.slice(startRow, startRow + 50)
     }
 
-    handleCellEnter(e, message, listView = false) {
+    handleCellEnter(e, message, listView = false, tooltipRowIdx=null) {
         const target = e.target.getBoundingClientRect()
         this.setState({
             toolTip: {
-                isTooltipShowing: !this.state.toolTip.isTooltipShowing,
+                isTooltipShowing: true,
                 message,
                 coordinates: {
                     x: target.left - 300,
                     y: target.top - 60 + target.height,
                     divWidth: target.width
                 },
-                listView
+                listView,
+                tooltipRowIdx
             }
         })
     }
@@ -428,31 +435,73 @@ class AudienceTable extends Component {
          * ToDo: Missing List Format (ListCellFormatter)  && Empty Cell
          */
         // --------------------------------------------------------------------
-
         switch (type) {
+
             case 'DatePredicate':
                 return (
                     <DateCellFormatter
                         handleCellEnter={this.handleCellEnter}
                         handleCellLeave={this.handleCellLeave}
+                        onCellSelected={this.onCellSelected}
                     />
                 )
             case 'BooleanPredicate':
-                return <BooleanCellFormatter />
+                return (
+                    <BooleanCellFormatter
+                        onCellSelected={this.onCellSelected}
+                    />
+                )
             case 'StringArrayPredicate':
                 return (
                     <ListCellFormatter
                         handleCellEnter={this.handleCellEnter}
                         handleCellLeave={this.handleCellLeave}
+                        onCellSelected={this.onCellSelected}
                     />
                 )
             default:
-                return <StringCellFormatter />
+                return (
+                    <StringCellFormatter onCellSelected={this.onCellSelected} />
+                )
+        }
+    }
+
+    onCellSelected(val, listCellVal = null) {
+        let attribute, selector, value, typeKey, typename, label
+        const types = {
+            _DEVICE: 'DEVICE',
+            _CUSTOM_PROFILE: 'CUSTOM_PROFILE',
+            _ROVER_PROFILE: 'ROVER_PROFILE'
+        }
+        const typeKeys = Object.keys(types)
+        const { key } = val.column
+
+        const findTypenameLabel = (attribute, selector) => {
+            return selector !== 'DEVICE'
+                ? this.state.allColumns.profiles[attribute]
+                : this.state.allColumns.devices[attribute]
+        }
+        typeKeys.forEach(type => {
+            if (key.indexOf(type) !== -1) {
+                attribute = key.slice(0, key.indexOf(type))
+                selector = types[type]
+                value = listCellVal || val.value
+                typeKey = findTypenameLabel(attribute, selector)
+                typename = typeKey.__typename
+                label = typeKey.label
+            }
+        })
+
+        let query = formatQuery({ attribute, selector, value, typename, label })
+        if (query !== null) {
+            this.props.clickCellUpdatePredicates([query], null)
         }
     }
 
     getCellWidth(pred, key) {
-        const storedItem = JSON.parse(localStorage.getItem('selectedColumns'))[key]
+        const storedItem = JSON.parse(localStorage.getItem('selectedColumns'))[
+            key
+        ]
         if (storedItem && storedItem.width) {
             return storedItem.width
         }
@@ -461,20 +510,7 @@ class AudienceTable extends Component {
             return 285
         }
 
-        if (pred === 'BooleanPredicate' && key === 'is_test_device_DEVICE') {
-            return 50
-        }
-
         return 200
-    }
-
-    getTestDevice() {
-        return (
-            <TestDeviceIconFormatter
-                handleCellEnter={this.handleCellEnter}
-                handleCellLeave={this.handleCellLeave}
-            />
-        )
     }
 
     getSelectedColumns() {
@@ -482,10 +518,10 @@ class AudienceTable extends Component {
 
         const columns = Object.keys(selectedColumns).map(attr => ({
             key: attr,
-            name: (attr === 'is_test_device_DEVICE') ? this.getTestDevice() : selectedColumns[attr].label,
+            name: selectedColumns[attr].label,
             width: this.getCellWidth(selectedColumns[attr].__typename, attr),
             draggable: true,
-            resizable: (attr === 'is_test_device_DEVICE') ? false : true,
+            resizable: true,
             formatter: this.getFormat(selectedColumns[attr].__typename)
         }))
 
@@ -541,13 +577,19 @@ class AudienceTable extends Component {
 
     updateDataGridRows(index, isTestDevice, testDeviceName) {
         const indexrow = this.state.dataGridRows[index].map(property => {
-            if (property.attribute === 'is_test_device' && property.selector === 'DEVICE') {
+            if (
+                property.attribute === 'is_test_device' &&
+                property.selector === 'DEVICE'
+            ) {
                 return {
                     attribute: 'is_test_device',
                     selector: 'DEVICE',
                     value: isTestDevice
                 }
-            } else if (property.attribute === 'label' && property.selector === 'DEVICE') {
+            } else if (
+                property.attribute === 'label' &&
+                property.selector === 'DEVICE'
+            ) {
                 return {
                     attribute: 'label',
                     selector: 'DEVICE',
@@ -587,11 +629,21 @@ class AudienceTable extends Component {
 
     renderDataGrid() {
         const { skeleton, updatePageNumber, resetPagination } = this.props
-        const { selectedColumns, segmentSize, columns, rows, dataGridRows, allColumns } = this.state
+        const {
+            selectedColumns,
+            segmentSize,
+            columns,
+            rows,
+            dataGridRows,
+            allColumns,
+            tooltipRowIdx,
+            toolTip
+        } = this.state
+
 
         if (skeleton) {
             return <SkeletonTableGrid selectedColumns={selectedColumns} />
-        }    
+        }
 
         return (
             <AudienceDataGrid
@@ -607,13 +659,21 @@ class AudienceTable extends Component {
                 onColumnResize={this.onColumnResize}
                 handleCellEnter={this.handleCellEnter}
                 handleCellLeave={this.handleCellLeave}
+                tooltipRowIdx={tooltipRowIdx}
+                showToolTips={toolTip.isTooltipShowing}
             />
         )
     }
 
     render() {
         const { skeleton } = this.props
-        const { columns, refetched, segmentSize, totalSize, selectedColumns } = this.state
+        const {
+            columns,
+            refetched,
+            segmentSize,
+            totalSize,
+            selectedColumns
+        } = this.state
         const flashMessageStyle = {
             backgroundColor: '#F4EEFF',
             borderColor: '#DDCBFE',
@@ -647,7 +707,12 @@ class AudienceTable extends Component {
                     refreshData={this.props.refreshData}
                     skeleton={skeleton}
                 />
-                {refetched && <FlashMessage messageText="Updating..." style={flashMessageStyle} />}
+                {refetched && (
+                    <FlashMessage
+                        messageText="Updating..."
+                        style={flashMessageStyle}
+                    />
+                )}
 
                 {columns.length > 0 && this.renderDataGrid()}
                 {isTooltipShowing && (

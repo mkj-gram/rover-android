@@ -9,12 +9,12 @@ const ModalInputPrompt = ({
     includeHas
 }) => (
     <div style={style}>
-        {`Include ${getSelector(selector)} where ${label}`}
+        {`Include ${getSelector(selector)} where ${getLabel(label)}`}
         {includeIs ? ' is' : ''}
         {includeHas ? ' has' : ''}
     </div>
 )
-
+const getLabel = label => label.replace('?', '')
 const getSelector = selector => selector === 'DEVICE' ? 'devices' : 'profiles'
 
 ModalInputPrompt.propTypes = {

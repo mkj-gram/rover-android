@@ -115,7 +115,7 @@ export const getDeviceSchema = () => [
     },
     {
         attribute: 'is_bluetooth_enabled',
-        label: 'Bluetooth',
+        label: 'Bluetooth Enabled?',
         __typename: 'BooleanPredicate',
         group: null,
         display: true,
@@ -188,7 +188,7 @@ export const getDeviceSchema = () => [
     },
     {
         attribute: 'is_test_device',
-        label: 'Test Device', // Update when working on test device Milestone
+        label: 'Test Device?', // Update when working on test device Milestone
         __typename: 'BooleanPredicate',
         group: null,
         display: true,

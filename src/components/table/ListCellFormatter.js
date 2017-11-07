@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { text, purple } from '@rover/react-bootstrap'
+import { text, purple, silver } from '@rover/react-bootstrap'
+import ListCell from './ListCell'
 
 class ListCellFormatter extends Component {
     constructor(props) {
@@ -58,9 +59,8 @@ class ListCellFormatter extends Component {
     calcLayout(props) {
         const id = `listCellElement_${props.column.key}`
         let stringPixelLength = props.value.length * 6
-        let totalWidth = document.getElementById(id)
-            .parentElement.parentElement.parentElement.parentElement
-            .parentElement.offsetWidth
+        let totalWidth = document.getElementById(id).parentElement.parentElement
+            .parentElement.parentElement.parentElement.offsetWidth
 
         if (stringPixelLength >= totalWidth - 25) {
             this.getExcess(totalWidth)
@@ -81,7 +81,22 @@ class ListCellFormatter extends Component {
     }
 
     render() {
+        const { underline } = this.state
+        const len = this.state.value.split(',').length
         const id = `listCellElement_${this.props.column.key}`
+        if (this.state.value.length === 0) {
+            return (
+                <div
+                    id={id}
+                    style={{
+                        ...text,
+                        color: silver
+                    }}
+                >
+                    Unknown
+                </div>
+            )
+        }
         return (
             <div
                 style={{
@@ -96,7 +111,19 @@ class ListCellFormatter extends Component {
                         whiteSpace: 'nowrap'
                     }}
                 >
-                    {this.state.value}
+                    {len > 0 &&
+                        this.state.value
+                            .split(',')
+                            .map((item, i) => (
+                                <ListCell
+                                    length={len}
+                                    index={i}
+                                    key={i}
+                                    item={item}
+                                    value={this.props}
+                                    onCellSelected={this.props.onCellSelected}
+                                />
+                            ))}
                 </div>
                 {this.state.remaining.length > 0 && (
                     <div
