@@ -1,7 +1,7 @@
 export default () => [
         {
             attribute: 'identifier',
-            label: 'Identifier',
+            label: 'Profile Identifier',
             __typename: 'StringPredicate',
             group: null
         },

@@ -7,7 +7,10 @@ import {
     semibold,
     titanium,
     Modal,
-    mercury
+    mercury,
+    purple,
+    light,
+    Checkbox
 } from '@rover/react-bootstrap'
 
 import { getDeviceSchemaColumns } from '../../localSchemas/deviceSchema'
@@ -83,21 +86,48 @@ const ColumnDisplayContainer = ({
                 marginTop: 20,
                 marginLeft: 20
             }}
-        >
+        >   
             <div style={modalContainer}>
-            {Object.keys(deviceColumns).map(group => (
-                <div key={group}>
-                <ColumnDisplay
-                    selector={group}
-                    items={deviceColumns[group]}
-                    updateChecked={updateChecked}
-                    showChecked={showChecked}
-                    devices
-                />
-                <div style={segmentLine} />
-                </div>
-                )
-            )}
+                {allColumns.profiles.identifier &&
+                    <div style={{ flex: '0 0 auto', paddingBottom: 17 }}>
+                        <Checkbox
+                            isChecked={showChecked('identifier', allColumns.profiles['identifier'])}
+                            label='Profile Identifier'
+                            primaryColor={purple}
+                            isDisabled={false}
+                            onChange={e =>
+                                updateChecked(
+                                    "profiles",
+                                    allColumns.profiles.identifier,
+                                    'identifier',
+                                    false
+                            )}
+                             style={{
+                                height: 16,
+                                width: 16,
+                                marginRight: 16
+                            }}
+                            labelStyle={{
+                                height: 16,
+                                ...text,
+                                ...light
+                            }}
+                        />
+                    </div>
+                }
+                {Object.keys(deviceColumns).map(group => (
+                    <div key={group}>
+                    <ColumnDisplay
+                        selector={group}
+                        items={deviceColumns[group]}
+                        updateChecked={updateChecked}
+                        showChecked={showChecked}
+                        devices
+                    />
+                    <div style={segmentLine} />
+                    </div>
+                    )
+                )}
                 <ColumnDisplay
                     selector="profiles"
                     items={allColumns.profiles}

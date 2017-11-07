@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-
 import {
-    Checkbox,
     purple,
     RoundedButton,
     text,
     silver,
     light,
-    violet
+    violet,
+    Checkbox
 } from '@rover/react-bootstrap'
 
 import { DeviceIconSmall, ProfileIcon, LocationIcon } from '@rover/react-icons'
@@ -21,6 +20,7 @@ class ColumnDisplay extends Component {
         }
         this.triggerShowHide = this.triggerShowHide.bind(this)
         this.showMore = this.showMore.bind(this)
+        this.getSelector = this.getSelector.bind(this)
     }
 
     triggerShowHide() {
@@ -50,6 +50,17 @@ class ColumnDisplay extends Component {
         }
     }
 
+    getSelector(selector) {
+        switch (selector) {
+            case 'profiles':
+                return 'Profile'
+            case 'location':
+                return 'Location'
+            default:
+                return null
+        }
+    }
+
     render() {
         const {
             selector,
@@ -74,7 +85,7 @@ class ColumnDisplay extends Component {
 
         return (
             <div style={{ flex: '0 0 auto' }}>
-                <div
+                {selector !== 'devices' && <div
                     style={{
                         paddingLeft: 2,
                         paddingBottom: 17,
@@ -91,36 +102,41 @@ class ColumnDisplay extends Component {
                             fontSize: 13
                         }}
                     >
-                        {selector}
+                        {this.getSelector(selector)}
                     </div>
-                </div>
-                {itemKeys.slice(0, size).map((item, index) =>
-                    <div style={{ paddingBottom: 17 }} key={index}>
-                        <Checkbox
-                            isChecked={showChecked(item, items[item])}
-                            label={items[item].label}
-                            primaryColor={purple}
-                            isDisabled={false}
-                            onChange={e =>
-                                updateChecked(
-                                    selector,
-                                    items[item],
-                                    item,
-                                    devices !== undefined
-                                )}
-                            style={{
-                                height: 16,
-                                width: 16,
-                                marginRight: 16
-                            }}
-                            labelStyle={{
-                                height: 16,
-                                ...text,
-                                ...light
-                            }}
-                        />
-                    </div>
-                )}
+                </div>}
+                {itemKeys.slice(0, size).map((item, index) => {
+                    if (items[item].label !== 'Profile Identifier' || items[item].selector !== 'ROVER_PROFILE') {
+                        return (
+                            <div style={{ paddingBottom: 17 }} key={index}>
+                            <Checkbox
+                                isChecked={showChecked(item, items[item])}
+                                label={items[item].label}
+                                primaryColor={purple}
+                                isDisabled={false}
+                                onChange={e =>
+                                    updateChecked(
+                                        selector,
+                                        items[item],
+                                        item,
+                                        devices !== undefined
+                                    )}
+                                style={{
+                                    height: 16,
+                                    width: 16,
+                                    marginRight: 16
+                                }}
+                                labelStyle={{
+                                    height: 16,
+                                    ...text,
+                                    ...light
+                                }}
+                            />
+                        </div>
+                        )
+                    }
+                }
+            )}
                 {this.showMore(remaining)}
             </div>
         )
