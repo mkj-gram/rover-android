@@ -23,7 +23,7 @@ class SendMessageWorker
         for i in 0...job_count
 
             job = {
-                message_template: message_template,
+                message_template: message_template.as_json.merge({"type" => message_template.type}),
                 static_segment_id: message_template.static_segment_id,
                 dynamic_segment_id: message_template.dynamic_segment_id,
                 account: account,
