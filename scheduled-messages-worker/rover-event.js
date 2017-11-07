@@ -165,23 +165,34 @@ const _getEventAttributesFromMessageTemplate = (template) => {
     }
 
     function parseDateSchedule(d) {
+        // -Infinity...Infinity
+        // 1510063200...1510063200
         if (d === null || d === undefined || d === '(,)') {
             return {}
         }
 
-        let parts = d.replace(/\[|\)/g, '').split(',').map(r => parseInt(r)).filter(r => !isNaN(r))
+        let parts = d.split('...').map(r => parseInt(r))
 
-        let start = moment.unix(parts[0]).utc().toISOString()
+        let start = moment.unix(parts[0]).utc()
         // Since postgres range is saved as (,] we need to subract 1 seconds from the end
-        let end = moment.unix(parts[1] - 1).utc().toISOString()
+        let end = moment.unix(parts[1] - 1).utc()//.toISOString()
 
-        return {
-            start:  start,
-            end:    end
+        let res = {}
+
+        if (start.isValid()) {
+            res.start = start.toISOString()
         }
+
+        if (end.isValid()) {
+            res.end = end.toISOString()
+        }
+
+        return res
     }
 
     function parseTimeSchedule(t) {
+        // 0...1441
+        // 0...650
         if (t === null || t === undefined || t === '(,)') {
             return {
                 start: 0,
@@ -189,16 +200,23 @@ const _getEventAttributesFromMessageTemplate = (template) => {
             }
         }
 
-        let parts = t.replace(/\[|\)/g, '').split(',').map(r => parseInt(r)).filter(r => !isNaN(r))
+        let parts = t.split('...').map(r => parseInt(r))
 
         let start = parts[0]
         // Since postgres range is saved as (,] we need to subract 1 seconds from the end
-        let end = parts[1]
+        let end = parts[1] - 1
 
-        return {
-            start: start,
-            end: end,
+        let res = {}
+
+        if (!isNaN(start)) {
+            res.start = start
         }
+
+        if (!isNaN(end)) {
+            res.end = end
+        }
+
+        return res
     }
 
     return {
