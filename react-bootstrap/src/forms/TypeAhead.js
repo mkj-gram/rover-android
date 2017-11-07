@@ -69,7 +69,15 @@ class TypeAhead extends Component {
 
                 />
                 {isOpen ? (
-                    <div>
+                    <div
+                        style={{
+                            width: 200,
+                            position: 'fixed',
+                            maxHeight: 350,
+                            overflowY: 'scroll',
+                            overflowX: 'hidden'
+                        }}
+                    >
                         {items
                             .filter(i => !inputValue || i.toLowerCase().includes(inputValue.toLowerCase()))
                             .map((item, index) => (
@@ -133,9 +141,16 @@ TypeAhead.defaultProps = {
         border: `1px solid ${steel}`,
         borderTop: 'none',
         color: 'white',
-        display: 'flex',
+        display: 'block',
         height: 35,
-        paddingLeft: 15
+        paddingLeft: 15,
+        // Have to add padding-top to get text vertically centered.
+        // Display: flex will not work with textOverflow: Ellipsis,
+        // adjusting line-height causes weird rendering
+        paddingTop: 9,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
     },
     items: ['apple', 'orange', 'banana', 'grape', 'tomato'],
     onKeyDown: () => null,
