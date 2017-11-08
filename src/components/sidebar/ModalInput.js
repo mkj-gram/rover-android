@@ -3,7 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { silver, steel, titanium } from '@rover/react-bootstrap'
 
-const ModalInput = (props) => {
+const ModalInput = props => {
     const { style } = props
     const inputStyle = {
         backgroundColor: 'transparent',
@@ -23,9 +23,11 @@ const ModalInput = (props) => {
         display: 'initial',
         ...style
     }
-    const onFocus = (e) => {
+    const onFocus = e => {
         e.target.style.borderColor = silver
-        e.target.value = ''
+        if (props.type === 'text') {
+            e.target.value = ''
+        }
     }
     const onBlur = e => (e.target.style.borderColor = steel)
 

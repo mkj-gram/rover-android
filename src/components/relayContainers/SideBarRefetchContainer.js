@@ -26,8 +26,17 @@ export default createRefetchContainer(
                             }
                             ... on DatePredicate {
                                 dateValue {
-                                    start
-                                    end
+                                    ... on DatePredicateValue {
+                                        start {
+                                            year
+                                            month
+                                            day
+                                        }
+                                    }
+                                    ... on DurationPredicateValue {
+                                        duration 
+
+                                    }
                                 }
                                 dateComparison
                             }
