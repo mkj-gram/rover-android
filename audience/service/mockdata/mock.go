@@ -24,7 +24,7 @@ func Generate(accountId int32, size int32) *audience.QueryResponse {
 		p.Attributes = map[string]*audience.Value{
 			"first-name": audience.StringVal(RandomFirstName()),
 			"last-name":  audience.StringVal(RandomLastName()),
-			"arr":       audience.StringArrayVal("hello", "world", "testtheWorld","gotaDLL"),
+			"arr":        audience.StringArrayVal("hello", "world", "testtheWorld", "gotaDLL"),
 			"is-good":    audience.BoolVal(true),
 			"age":        audience.IntegerVal(rand.Int63()),
 			"likelihood": audience.DoubleVal(rand.Float64()),
@@ -68,7 +68,7 @@ func Generate(accountId int32, size int32) *audience.QueryResponse {
 		}
 		d.LocaleLanguage = "en"
 		d.LocaleRegion = "us"
-		d.LocaleScript ="Hans"
+		d.LocaleScript = "Hans"
 		d.CarrierName = "rogers"
 		d.TimeZone = "America/Toronto"
 		d.Platform = audience.Platform_MOBILE

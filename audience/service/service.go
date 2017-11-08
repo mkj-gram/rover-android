@@ -620,7 +620,6 @@ func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience
 	if r.AuthContext == nil {
 		return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
 	}
-
 	resp, err := s.index.Query(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "Index.Query: %v", err)

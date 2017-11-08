@@ -18,7 +18,6 @@ import (
 )
 
 func TestPredicates(t *testing.T) {
-
 	t.Run("StringPredicates", testPredicates_StringPredicates)
 	t.Run("BoolPredicates", testPredicates_BoolPredicates)
 	t.Run("NumberPredicates", testPredicates_NumberPredicates)
@@ -27,7 +26,7 @@ func TestPredicates(t *testing.T) {
 	t.Run("VersionPredicates", testPredicates_VersionPredicates)
 	t.Run("GeofencePredicates", testPredicates_GeofencePredicates)
 	t.Run("StringArrayPredicates", testPredicates_StringArrayPredicates)
-
+	t.Run("DurationPredicates", testPredicates_DurationPredicates)
 	t.Run("ComplexPredicates", testPredicates_ComplexPredicates)
 }
 
@@ -81,6 +80,30 @@ func device(t *testing.T, profileId string) *audience.Device {
 		LocationLongitude: -79.375877,
 		LocationAccuracy:  5,
 		CreatedAt:         protoTs(t, parseTime(t, "2013-06-05T14:10:43.678Z")),
+		UpdatedAt:         protoTs(t, parseTime(t, "2013-06-05T14:10:43.678Z")),
+		IsTestDevice:      true,
+		Label:             "my little label",
+	}
+
+}
+
+func device2(t *testing.T, profileId string) *audience.Device {
+	return &audience.Device{
+		Id:        "d00000000000000000000000",
+		DeviceId:  "abc",
+		AccountId: 1,
+		ProfileId: profileId,
+		Frameworks: map[string]*audience.Version{
+			"io.rover.Rover": {
+				Major:    1,
+				Minor:    1,
+				Revision: 2,
+			},
+		},
+		LocationLatitude:  43.650737,
+		LocationLongitude: -79.375877,
+		LocationAccuracy:  5,
+		CreatedAt:         protoTs(t, parseTime(t, "1999-10-20T14:10:43.678Z")),
 		UpdatedAt:         protoTs(t, parseTime(t, "2013-06-05T14:10:43.678Z")),
 		IsTestDevice:      true,
 		Label:             "my little label",
@@ -703,7 +726,174 @@ func testPredicates_DoublePredicates(t *testing.T) {
 	}
 }
 
+func testPredicates_DurationPredicates(t *testing.T) {
+	predicates.TimeNow = func() time.Time {
+		return time.Date(2013, 6, 7, 1, 15, 0, 0, time.UTC)
+	}
+
+	var (
+		p  = identifiedProfile(t)
+		d  = device2(t, p.GetId())
+		d1 = device(t, p.GetId())
+	)
+
+	tcases := []struct {
+		name    string
+		segment *audience.DynamicSegment
+		device  *audience.Device
+		profile *audience.Profile
+
+		exp    bool
+		expErr error
+	}{
+		{
+			/*
+				2013-06-07T01:15:00 to local timezone is 2013-06-06T21:15:00
+				2013-06-06T21:15:00 minus 1 day = 2013-06-05T21:15:00
+				Floor 2013-06-05T21:15:00 -> 2013-06-05T00:00:00
+				Convert to timezone -> 2013-06-05T04:00:00
+				2013-06-05T04:00:00 < 2013-06-06T14:15:43Z <= 2013-06-06T04:00:00
+			*/
+			name: "2013-06-06T14:15:43Z is not on 2013-06-07T01:15:00-04:00 minus 1 day",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_DurationPredicate{
+								DurationPredicate: &audience.DurationPredicate{
+									Op:            audience.DurationPredicate_IS_EQUAL,
+									AttributeName: "created_at",
+									Value: &audience.DurationPredicate_Duration{
+										Type:     audience.DurationPredicate_Duration_DAYS,
+										Duration: 1,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: &audience.Profile{},
+			device: &audience.Device{
+				CreatedAt: protoTs(t, parseTime(t, "2013-06-06T14:15:43Z")),
+			},
+
+			exp:    false,
+			expErr: nil,
+		},
+		{
+			name: "1999-10-20T14:10:43.678Z is before 2013-06-07T01:15:00-04:00 minus 2 days",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_DurationPredicate{
+								DurationPredicate: &audience.DurationPredicate{
+									Op:            audience.DurationPredicate_IS_LESS_THAN,
+									AttributeName: "created_at",
+									Value: &audience.DurationPredicate_Duration{
+										Type:     audience.DurationPredicate_Duration_DAYS,
+										Duration: 2,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: p,
+			device:  d,
+
+			exp:    true,
+			expErr: nil,
+		},
+		{
+			name: "2013-06-05T14:10:43.678Z is after 2013-06-07T01:15:00-04:00 minus 3 days",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_DurationPredicate{
+								DurationPredicate: &audience.DurationPredicate{
+									Op:            audience.DurationPredicate_IS_GREATER_THAN,
+									AttributeName: "created_at",
+									Value: &audience.DurationPredicate_Duration{
+										Type:     audience.DurationPredicate_Duration_DAYS,
+										Duration: 3,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: p,
+			device:  d1,
+
+			exp:    true,
+			expErr: nil,
+		},
+		{
+			/*
+				2013-06-07T01:15:00 convert to local time is 2013-06-06T21:15:00
+				2013-06-06T21:15:00 minus 2 day = 2013-06-04T21:15:00
+				Floor 2013-06-04T21:15:00 -> 2013-06-04T00:00:00
+				Convert to timezone -> 2013-06-04T04:00:00
+				2013-06-04T04:00:00 < 2013-06-04T14:10:43.678Z <= 2013-06-05T04:00:00
+			*/
+			name: "2013-06-04T14:10:43.678Z is on 2013-06-07T10:15:00-04:00 minus 2 days",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_DurationPredicate{
+								DurationPredicate: &audience.DurationPredicate{
+									Op:            audience.DurationPredicate_IS_EQUAL,
+									AttributeName: "created_at",
+									Value: &audience.DurationPredicate_Duration{
+										Type:     audience.DurationPredicate_Duration_DAYS,
+										Duration: 2,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: p,
+			device: &audience.Device{
+				CreatedAt: protoTs(t, parseTime(t, "2013-06-04T14:10:43.678Z")),
+			},
+
+			exp:    true,
+			expErr: nil,
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			var got, gotErr = predicates.IsInDynamicSegment(tc.segment, tc.device, tc.profile)
+
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
 func testPredicates_DatePredicates(t *testing.T) {
+	predicates.TimeNow = func() time.Time {
+		return time.Date(2013, 6, 7, 1, 15, 0, 0, time.UTC)
+	}
+
 	var (
 		p = identifiedProfile(t)
 		d = device(t, p.GetId())
@@ -738,12 +928,11 @@ func testPredicates_DatePredicates(t *testing.T) {
 			},
 			profile: p,
 			device:  d,
-
-			exp:    true,
-			expErr: nil,
+			exp:     true,
+			expErr:  nil,
 		},
 		{
-			name: "is unset",
+			name: "is un set",
 			segment: &audience.DynamicSegment{
 				PredicateAggregate: &audience.PredicateAggregate{
 					Condition: audience.PredicateAggregate_ALL,
@@ -762,87 +951,11 @@ func testPredicates_DatePredicates(t *testing.T) {
 			},
 			profile: p,
 			device:  d,
-
-			exp:    false,
-			expErr: nil,
+			exp:     false,
+			expErr:  nil,
 		},
 		{
-			name: "2013-06-05 is equal to 2013-06-05",
-			segment: &audience.DynamicSegment{
-				PredicateAggregate: &audience.PredicateAggregate{
-					Condition: audience.PredicateAggregate_ALL,
-					Predicates: []*audience.Predicate{
-						{
-							Selector: audience.Predicate_DEVICE,
-							Value: &audience.Predicate_DatePredicate{
-								DatePredicate: &audience.DatePredicate{
-									Op:            audience.DatePredicate_IS_EQUAL,
-									AttributeName: "created_at",
-									Value:         protoTs(t, parseTime(t, "2013-06-05T00:00:00Z")),
-								},
-							},
-						},
-					},
-				},
-			},
-			profile: p,
-			device:  d,
-
-			exp:    true,
-			expErr: nil,
-		},
-		{
-			name: "2013-06-05 is not equal to 2017-01-01",
-			segment: &audience.DynamicSegment{
-				PredicateAggregate: &audience.PredicateAggregate{
-					Condition: audience.PredicateAggregate_ALL,
-					Predicates: []*audience.Predicate{
-						{
-							Selector: audience.Predicate_DEVICE,
-							Value: &audience.Predicate_DatePredicate{
-								DatePredicate: &audience.DatePredicate{
-									Op:            audience.DatePredicate_IS_NOT_EQUAL,
-									AttributeName: "created_at",
-									Value:         protoTs(t, parseTime(t, "2017-01-01T00:00:00Z")),
-								},
-							},
-						},
-					},
-				},
-			},
-			profile: p,
-			device:  d,
-
-			exp:    true,
-			expErr: nil,
-		},
-		{
-			name: "2013-06-05 is not equal to 2017-01-01",
-			segment: &audience.DynamicSegment{
-				PredicateAggregate: &audience.PredicateAggregate{
-					Condition: audience.PredicateAggregate_ALL,
-					Predicates: []*audience.Predicate{
-						{
-							Selector: audience.Predicate_DEVICE,
-							Value: &audience.Predicate_DatePredicate{
-								DatePredicate: &audience.DatePredicate{
-									Op:            audience.DatePredicate_IS_NOT_EQUAL,
-									AttributeName: "created_at",
-									Value:         protoTs(t, parseTime(t, "2017-01-01T00:00:00Z")),
-								},
-							},
-						},
-					},
-				},
-			},
-			profile: p,
-			device:  d,
-
-			exp:    true,
-			expErr: nil,
-		},
-		{
-			name: "2013-06-05 is after to 2011-11-31",
+			name: "2013-06-05T14:10:43.678Z is after 2011-11-31 04:00:00",
 			segment: &audience.DynamicSegment{
 				PredicateAggregate: &audience.PredicateAggregate{
 					Condition: audience.PredicateAggregate_ALL,
@@ -853,7 +966,7 @@ func testPredicates_DatePredicates(t *testing.T) {
 								DatePredicate: &audience.DatePredicate{
 									Op:            audience.DatePredicate_IS_AFTER,
 									AttributeName: "created_at",
-									Value:         protoTs(t, parseTime(t, "2011-01-01T00:00:00Z")),
+									Value:         &audience.DatePredicate_Date{Day: 31, Month: 11, Year: 2011},
 								},
 							},
 						},
@@ -867,7 +980,7 @@ func testPredicates_DatePredicates(t *testing.T) {
 			expErr: nil,
 		},
 		{
-			name: "2013-06-05 is before to 2017-01-01",
+			name: "2013-06-05T14:10:43.678Z is before 2013-06-06 04:00:00",
 			segment: &audience.DynamicSegment{
 				PredicateAggregate: &audience.PredicateAggregate{
 					Condition: audience.PredicateAggregate_ALL,
@@ -878,7 +991,7 @@ func testPredicates_DatePredicates(t *testing.T) {
 								DatePredicate: &audience.DatePredicate{
 									Op:            audience.DatePredicate_IS_BEFORE,
 									AttributeName: "created_at",
-									Value:         protoTs(t, parseTime(t, "2017-01-01T00:00:00Z")),
+									Value:         &audience.DatePredicate_Date{Day: 6, Month: 6, Year: 2013},
 								},
 							},
 						},
@@ -892,7 +1005,7 @@ func testPredicates_DatePredicates(t *testing.T) {
 			expErr: nil,
 		},
 		{
-			name: "2013-06-05 is between 2010-01-01 and 2020-07-29",
+			name: "2013-06-05T14:10:43.678Z is between 2013-06-05 04:00:00 and 2013-06-06 04:00:00",
 			segment: &audience.DynamicSegment{
 				PredicateAggregate: &audience.PredicateAggregate{
 					Condition: audience.PredicateAggregate_ALL,
@@ -901,10 +1014,9 @@ func testPredicates_DatePredicates(t *testing.T) {
 							Selector: audience.Predicate_DEVICE,
 							Value: &audience.Predicate_DatePredicate{
 								DatePredicate: &audience.DatePredicate{
-									Op:            audience.DatePredicate_IS_BETWEEN,
+									Op:            audience.DatePredicate_IS_ON,
 									AttributeName: "created_at",
-									Value:         protoTs(t, parseTime(t, "2010-01-01T00:00:00Z")),
-									Value2:        protoTs(t, parseTime(t, "2020-07-29T00:00:00Z")),
+									Value:         &audience.DatePredicate_Date{Day: 5, Month: 6, Year: 2013},
 								},
 							},
 						},

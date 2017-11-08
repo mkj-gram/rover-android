@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+var (
+	TimeNow = time.Now
+
+	// Use Toronto timezone as default zone where date/duration data should be compared with
+	Zone = "America/Toronto"
+)
+
 func IsInDynamicSegment(segment *audience.DynamicSegment, device *audience.Device, profile *audience.Profile) (bool, error) {
 	var (
 		condition  = segment.GetPredicateAggregate().GetCondition()
@@ -56,6 +63,8 @@ func IsInDynamicSegment(segment *audience.DynamicSegment, device *audience.Devic
 			passed, err = evalDoublePredicate(p.DoublePredicate, value, isAttributeSet)
 		case *audience.Predicate_StringArrayPredicate:
 			passed, err = evalStringArrayPredicate(p.StringArrayPredicate, value, isAttributeSet)
+		case *audience.Predicate_DurationPredicate:
+			passed, err = evalDurationPredicate(p.DurationPredicate, value)
 
 		default:
 			passed = false
@@ -99,6 +108,8 @@ func getAttributeNameFromPredicate(predicate *audience.Predicate) string {
 		return p.DoublePredicate.GetAttributeName()
 	case *audience.Predicate_StringArrayPredicate:
 		return p.StringArrayPredicate.GetAttributeName()
+	case *audience.Predicate_DurationPredicate:
+		return p.DurationPredicate.GetAttributeName()
 	default:
 		return ""
 	}
@@ -324,47 +335,170 @@ func evalVersionPredicate(predicate *audience.VersionPredicate, value interface{
 	}
 }
 
-func evalDatePredicate(predicate *audience.DatePredicate, value interface{}, isAttributeSet bool) (bool, error) {
-	if predicate.GetOp() == audience.DatePredicate_IS_UNSET {
-		return !isAttributeSet, nil
-	} else if predicate.GetOp() == audience.DatePredicate_IS_SET {
-		return isAttributeSet, nil
-	} else if val, ok := value.(*timestamp.Timestamp); ok {
-		valYear, valMonth, valDay := time.Unix(val.Seconds, int64(val.Nanos)).UTC().Date()
-		pred1Year, pred1Month, pred1Day := time.Unix(predicate.GetValue().Seconds, int64(predicate.GetValue().Nanos)).UTC().Date()
+func evalDurationPredicate(predicate *audience.DurationPredicate, value interface{}) (bool, error) {
+	if val, ok := value.(*timestamp.Timestamp); ok {
+		valDate := time.Unix(val.Seconds, int64(val.Nanos)).UTC()
+		op := predicate.GetOp()
 
-		// Drop time infor
-		valDate := time.Date(valYear, valMonth, valDay, 0, 0, 0, 0, time.UTC)
-		predDate := time.Date(pred1Year, pred1Month, pred1Day, 0, 0, 0, 0, time.UTC)
+		loc, err := time.LoadLocation(Zone)
+		if err != nil {
+			return false, err
+		}
 
-		switch predicate.GetOp() {
-		// Relative TODO
-		//case audience.DatePredicate_IS_EXACTLY:
-		//case audience.DatePredicate_IS_GREATER_THAN:
+		timezoneTime := TimeNow().In(loc)
 
-		//case audience.DatePredicate_IS_LESS_THAN:
-		// Absolute
-		case audience.DatePredicate_IS_BETWEEN:
-			pred2Year, pred2Month, pred2Day := time.Unix(predicate.GetValue2().Seconds, int64(predicate.GetValue2().Nanos)).Date()
-			pred2Date := time.Date(pred2Year, pred2Month, pred2Day, 0, 0, 0, 0, time.UTC)
-			return predDate.Before(valDate) && valDate.Before(pred2Date), nil
-		case audience.DatePredicate_IS_AFTER:
-			return valDate.After(predDate), nil
-		case audience.DatePredicate_IS_BEFORE:
-			return valDate.Before(predDate), nil
-		case audience.DatePredicate_IS_EQUAL:
-			return valDate.Equal(predDate), nil
-		case audience.DatePredicate_IS_NOT_EQUAL:
-			return !valDate.Equal(predDate), nil
+		// Subtract # of days
+		targetDay := timezoneTime.Add(-time.Duration(predicate.GetValue().Duration*24*60*60) * time.Second)
+
+		var utcPredTime time.Time
+		var utcPredTime1 time.Time
+
+		/*
+			ie. first seen is more than 8 days ago,
+			let timeNow = Nov 1, 2017 6:20 PM Toronto/America
+			Want values less than Oct 24, 2017 04:00:00 UTC
+
+			targetDay = Oct 24, 2017 18:20:00 Toronto/America
+			predDate = Oct 24, 2017 00:00:00 Toronto/America
+			utcPredTime = Oct 24, 2017 04:00:00 UTC
+
+			value < utcPredTime
+			<-----------o
+			_____________________________
+						|				|
+			more than 8 days ago		Nov 1
+		*/
+
+		/*
+			ie. first seen is less than 2 days ago,
+			let timeNow = Nov 1, 2017 3:38 PM Toronto/America
+			Want values more than Oct 30, 2017 04:00:00 UTC
+
+			targetDay = Oct 30, 2017 15:38:00 Toronto/America
+			predDate1 = Oct 30, 2017 00:00:00 Toronto/America
+			utcPredTime1 = Oct 30, 2017 04:00:00 UTC
+			utcPredTime <= value
+						x---------->
+			_________________________
+						|			|
+			less than 2 days ago	Nov 1
+		*/
+		predDate := time.Date(targetDay.Year(), targetDay.Month(), targetDay.Day(), 0, 0, 0, 0, time.UTC)
+		utcPredTime, err = timeZoneToUTC(predDate)
+		if err != nil {
+			return false, err
+		}
+
+		switch op {
+		case audience.DurationPredicate_IS_LESS_THAN:
+			return valDate.Before(utcPredTime), nil
+		case audience.DurationPredicate_IS_GREATER_THAN:
+			return (valDate.After(utcPredTime) || valDate.Equal(utcPredTime)), nil
+		case audience.DurationPredicate_IS_EQUAL:
+			targetDay1 := targetDay.AddDate(0, 0, 1)
+			predDate1 := time.Date(targetDay1.Year(), targetDay1.Month(), targetDay1.Day(), 0, 0, 0, 0, time.UTC)
+			utcPredTime1, err = timeZoneToUTC(predDate1)
+			if err != nil {
+				return false, err
+			}
+
+			/*
+				`first seen exactly 1 day ago`
+				time.Now() = Nov 1, 2017 3:38 PM UTC
+
+				1. Subtract # of days
+				Nov 1, 2017 3:38 PM subtract 1 days  = Oct 31, 2017 3:38 PM
+
+				2. Truncate this new day and get range of day
+				Oct 31, 2017 00:00:00   -> Nov 1, 2017 00:00:00
+
+				3. Convert this range into UTC from timezone && Search for values within this range
+				Oct 31, 2017 04:00:00 UTC <= value < Nov 1, 2017 04:00:00 UTC
+			*/
+			return (valDate.After(utcPredTime) || valDate.Equal(utcPredTime)) && valDate.Before(utcPredTime1), nil
 		default:
-			return false, errors.Errorf("DatePredicate OP: \"%s\" is not a valid operation", predicate.GetOp().String())
+			return false, errors.Errorf("DurationPredicate OP: \"%s\" is not a valid operation", op.String())
 		}
 
 		return false, nil
 	} else if value == nil {
 		return false, nil
 	} else {
+		return false, errors.Errorf("Value was not of type *timestamp.Timestamp instead got %T", value)
+	}
+}
 
+func timeZoneToUTC(t time.Time) (time.Time, error) {
+	// Convert time to Zone then add/subtract back timezone offset for UTC time
+	loc, err := time.LoadLocation(Zone)
+	if err != nil {
+		return t, err
+	}
+
+	return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), loc).UTC(), nil
+}
+
+func evalDatePredicate(predicate *audience.DatePredicate, value interface{}, isAttributeSet bool) (bool, error) {
+	if val, ok := value.(*timestamp.Timestamp); ok {
+		op := predicate.GetOp()
+
+		if op == audience.DatePredicate_IS_UNSET {
+			return !isAttributeSet, nil
+		} else if op == audience.DatePredicate_IS_SET {
+			return isAttributeSet, nil
+		} else {
+			valDate := time.Unix(val.Seconds, int64(val.Nanos)).UTC()
+			date := time.Date(int(predicate.GetValue().Year), time.Month(int(predicate.GetValue().Month)), int(predicate.GetValue().Day), 0, 0, 0, 0, time.UTC)
+
+			var (
+				utcPredTime  time.Time
+				utcPredTime1 time.Time
+				err          error
+			)
+
+			if op == audience.DatePredicate_IS_BEFORE || op == audience.DatePredicate_IS_ON {
+				predDate := date.Truncate(time.Duration(24*60*60) * time.Second)
+				utcPredTime1, err = timeZoneToUTC(predDate)
+				if err != nil {
+					return false, err
+				}
+			}
+
+			if op == audience.DatePredicate_IS_AFTER || op == audience.DatePredicate_IS_ON {
+				predDate := date.AddDate(0, 0, 1).Truncate(time.Duration(24*60*60) * time.Second)
+				utcPredTime, err = timeZoneToUTC(predDate)
+				if err != nil {
+					return false, err
+				}
+			}
+
+			switch op {
+			case audience.DatePredicate_IS_AFTER:
+				/*
+					After Oct 30, 2017
+					Oct 31, 2017 04:00:00 <= values
+				*/
+				return (valDate.After(utcPredTime) || valDate.Equal(utcPredTime)), nil
+			case audience.DatePredicate_IS_BEFORE:
+				/*
+					Before Oct 30, 2017
+					 values < Oct 30, 2017 04:00:00
+				*/
+				return valDate.Before(utcPredTime1), nil
+			case audience.DatePredicate_IS_ON:
+				/*
+					ie. Predicate Value = Oct 30, 2017
+					 Oct-30-2017 4:00:00:00 UTC <= valDate (UTC) < Oct-31-2017 4:00:00:00 UTC
+				*/
+				return (valDate.After(utcPredTime1) || valDate.Equal(utcPredTime1)) && valDate.Before(utcPredTime), nil
+			default:
+				return false, errors.Errorf("DatePredicate OP: \"%s\" is not a valid operation", op.String())
+			}
+		}
+		return false, nil
+	} else if value == nil {
+		return false, nil
+	} else {
 		return false, errors.Errorf("Value was not of type *timestamp.Timestamp instead got %T", value)
 	}
 

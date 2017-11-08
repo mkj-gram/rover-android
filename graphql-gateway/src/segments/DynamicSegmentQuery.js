@@ -10,13 +10,13 @@ import { getSegmentPageById } from './SegmentRowsQuery'
 import { getPushEnvironmentFromProto } from '../grpc/audience/getDeviceFromProto'
 
 const getSelectorName = selector => {
-   const selectEnum = {
-       0: 'CUSTOM_PROFILE',
-       1: 'DEVICE',
-       2: 'ROVER_PROFILE'
-   }
+    const selectEnum = {
+        0: 'CUSTOM_PROFILE',
+        1: 'DEVICE',
+        2: 'ROVER_PROFILE'
+    }
 
-   return selectEnum[selector]
+    return selectEnum[selector]
 }
 
 const DynamicSegmentQuery = {
@@ -51,26 +51,27 @@ const DynamicSegmentQuery = {
         }
 
         const GetDynamicSegmentByIdFromGrpc = async () => {
-            const request = new RoverApis.audience.v1.Models.GetDynamicSegmentByIdRequest()
+            const request = new RoverApis.audience.v1.Models
+                .GetDynamicSegmentByIdRequest()
             request.setAuthContext(authContext)
             request.setSegmentId(segmentId)
             const response = await audienceClient.getDynamicSegmentById(request)
 
             const segment = response.getSegment()
-            
+
             const unpackStringPredicate = predicate => {
                 // IS_UNSET        = 0;
                 // IS_SET          = 1;
-                // 
+                //
                 // IS_EQUAL        = 2;
                 // IS_NOT_EQUAL    = 3;
-                // 
+                //
                 // STARTS_WITH  = 4;
                 // ENDS_WITH    = 5;
-                // 
+                //
                 // CONTAINS     = 6;
                 // DOES_NOT_CONTAIN = 7;
-                
+
                 const stringComparisons = {
                     0: 'is unset',
                     1: 'is set',
@@ -86,7 +87,9 @@ const DynamicSegmentQuery = {
                 let stringValue = pred.getValue()
 
                 if (attribute === 'platform') {
-                    stringValue = stringValue.charAt(0).concat(stringValue.slice(1).toLowerCase())
+                    stringValue = stringValue
+                        .charAt(0)
+                        .concat(stringValue.slice(1).toLowerCase())
                 }
 
                 if (attribute === 'push_environment') {
@@ -102,13 +105,13 @@ const DynamicSegmentQuery = {
                     __typename: 'StringPredicate'
                 }
             }
-            
+
             const unpackBoolPredicate = predicate => {
                 // IS_UNSET    = 0;
                 // IS_SET      = 1;
-                // 
+                //
                 // IS_EQUAL   = 2;
-                
+
                 const boolComparisons = {
                     0: 'is unset',
                     1: 'is set',
@@ -123,19 +126,19 @@ const DynamicSegmentQuery = {
                     __typename: 'BooleanPredicate'
                 }
             }
-            
+
             const unpackNumberPredicate = predicate => {
                 // IS_UNSET        = 0;
                 // IS_SET          = 1;
-                // 
+                //
                 // IS_EQUAL        = 2;
                 // IS_NOT_EQUAL    = 3;
-                // 
+                //
                 // IS_GREATER_THAN = 4;
                 // IS_LESS_THAN    = 5;
-                // 
+                //
                 // IS_BETWEEN      = 6;
-                
+
                 const numberComparisons = {
                     0: 'is unset',
                     1: 'is set',
@@ -154,19 +157,19 @@ const DynamicSegmentQuery = {
                     __typename: 'NumberPredicate'
                 }
             }
-            
+
             const unpackDoublePredicate = predicate => {
                 // IS_UNSET        = 0;
                 // IS_SET          = 1;
-                // 
+                //
                 // IS_EQUAL        = 2;
                 // IS_NOT_EQUAL    = 3;
-                // 
+                //
                 // IS_GREATER_THAN = 4;
                 // IS_LESS_THAN    = 5;
-                // 
+                //
                 // IS_BETWEEN      = 6;
-                
+
                 const doubleComparisons = {
                     0: 'is unset',
                     1: 'is set',
@@ -185,62 +188,69 @@ const DynamicSegmentQuery = {
                     __typename: 'FloatPredicate'
                 }
             }
-            
+
+            const unpackDurationPredicate = predicate => {
+                const durationComparisons = {
+                    0: 'is less than',
+                    1: 'is greater than',
+                    2: 'is equal'
+                }
+
+                const pred = predicate.getDurationPredicate()
+                const predValue = pred.getValue()
+
+                return {
+                    attribute: pred.getAttributeName(),
+                    selector: getSelectorName(predicate.getSelector()),
+                    dateComparison: durationComparisons[pred.getOp()],
+                    dateValue: {
+                        duration: predValue.getDuration()
+                    },
+                    __typename: 'DatePredicate'
+                }
+            }
+
             const unpackDatePredicate = predicate => {
-                // IS_UNSET        = 0;
-                // IS_SET          = 1;
-                // 
-                // IS_EQUAL        = 2;
-                // IS_NOT_EQUAL    = 3;
-                // 
-                // IS_GREATER_THAN = 4;
-                // IS_LESS_THAN    = 5;
-                // 
-                // IS_BETWEEN      = 6;
-                // 
-                // IS_AFTER        = 7;
-                // IS_BEFORE       = 8;
-                // IS_ON           = 9;
-                
                 const dateComparisons = {
                     0: 'is unset',
                     1: 'is set',
-                    2: 'is equal',
-                    3: 'is not equal',
-                    4: 'is greater than',
-                    5: 'is less than',
-                    6: 'is between',
-                    7: 'is after',
-                    8: 'is before',
-                    9: 'is on'
+                    2: 'is after',
+                    3: 'is before',
+                    4: 'is on'
                 }
+
                 const pred = predicate.getDatePredicate()
+                const predValue = pred.getValue()
+
                 return {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),
                     dateComparison: dateComparisons[pred.getOp()],
                     dateValue: {
-                        start: RoverApis.Helpers.timestampFromProto(pred.getValue()),
-                        end: RoverApis.Helpers.timestampFromProto(pred.getValue2())
+                        start: {
+                            day: predValue.getDay(),
+                            month: predValue.getMonth(),
+                            year: predValue.getYear()
+                        }
                     },
                     __typename: 'DatePredicate'
                 }
             }
-            
+
             const unpackGeofencePredicate = predicate => {
                 // IS_UNSET   = 0;
                 // IS_SET     = 1;
-                // 
+                //
                 // IS_OUTSIDE = 2;
                 // IS_WITHIN  = 3;
-                
+
                 const geofenceComparisons = {
                     0: 'is unset',
                     1: 'is set',
                     2: 'is outside',
                     3: 'is within'
                 }
-                
+
                 const pred = predicate.getGeofencePredicate()
                 const predLocation = pred.getValue()
                 return {
@@ -251,27 +261,27 @@ const DynamicSegmentQuery = {
                         longitude: predLocation.getLongitude(),
                         latitude: predLocation.getLatitude(),
                         radius: predLocation.getRadius(),
-                        name: predLocation.getName(),
+                        name: predLocation.getName()
                     },
                     __typename: 'GeofencePredicate'
                 }
             }
-            
+
             const unpackVersionPredicate = predicate => {
                 // IS_UNSET                 = 0;
                 // IS_SET                   = 1;
-                // 
+                //
                 // IS_EQUAL                 = 2;
                 // IS_NOT_EQUAL             = 3;
-                // 
+                //
                 // IS_GREATER_THAN          = 4;
                 // IS_LESS_THAN             = 5;
-                // 
+                //
                 // IS_BETWEEN               = 6;
-                // 
+                //
                 // IS_GREATER_THAN_OR_EQUAL = 7;
                 // IS_LESS_THAN_OR_EQUAL    = 8;
-                
+
                 const versionComparisons = {
                     0: 'is unset',
                     1: 'is set',
@@ -283,7 +293,7 @@ const DynamicSegmentQuery = {
                     7: 'is greater than or equal',
                     8: 'is less than or equal'
                 }
-                
+
                 const pred = predicate.getVersionPredicate()
                 const value = pred.getValue()
                 const value2 = pred.getValue2()
@@ -295,7 +305,7 @@ const DynamicSegmentQuery = {
                     versionValue: [
                         value ? value.getMajor() : 0,
                         value ? value.getMinor() : 0,
-                        value ? value.getRevision(): 0,
+                        value ? value.getRevision() : 0,
                         value2 ? value2.getMajor() : 0,
                         value2 ? value2.getMinor() : 0,
                         value2 ? value2.getRevision() : 0
@@ -307,10 +317,10 @@ const DynamicSegmentQuery = {
             const unpackStringArrayPredicate = predicate => {
                 // IS_UNSET                 = 0;
                 // IS_SET                   = 1;
-            
+
                 // CONTAINS_ANY             = 2;
                 // DOES_NOT_CONTAIN_ANY     = 3;
-            
+
                 // CONTAINS_ALL            = 4;
                 // DOES_NOT_CONTAIN_ALL    = 5;
                 const stringArrayComparisons = {
@@ -331,45 +341,55 @@ const DynamicSegmentQuery = {
                 }
             }
 
-            const predicateList = segment.getPredicateAggregate().getPredicatesList().map(predicate => {
-                switch (predicate.getValueCase()) {
-                    case 2:
-                        return unpackStringPredicate(predicate)
-                        break
-                    case 3:
-                        return unpackBoolPredicate(predicate)
-                        break
-                    case 4:
-                        return unpackNumberPredicate(predicate)
-                        break
-                    case 5:
-                        return unpackDatePredicate(predicate)
-                        break
-                    case 6:
-                        return unpackVersionPredicate(predicate)
-                        break
-                    case 7:
-                        return unpackGeofencePredicate(predicate)
-                        break
-                    case 8:
-                        return unpackFloatPredicate(predicate)
-                        break
-                    case 9:
-                        return unpackStringArrayPredicate(predicate)
-                        break
+            const predicateList = segment
+                .getPredicateAggregate()
+                .getPredicatesList()
+                .map(predicate => {
+                    switch (predicate.getValueCase()) {
+                        case 2:
+                            return unpackStringPredicate(predicate)
+                            break
+                        case 3:
+                            return unpackBoolPredicate(predicate)
+                            break
+                        case 4:
+                            return unpackNumberPredicate(predicate)
+                            break
+                        case 5:
+                            return unpackDatePredicate(predicate)
+                            break
+                        case 6:
+                            return unpackVersionPredicate(predicate)
+                            break
+                        case 7:
+                            return unpackGeofencePredicate(predicate)
+                            break
+                        case 8:
+                            return unpackDoublePredicate(predicate)
+                            break
+                        case 9:
+                            return unpackStringArrayPredicate(predicate)
+                            break
+                        case 10:
+                            return unpackDurationPredicate(predicate)
+                            break
+                    }
+                })
+
+            const condition =
+                segment.getPredicateAggregate().getCondition() === 0
+                    ? 'ANY'
+                    : 'ALL'
+            return [
+                {
+                    segmentId: segment.getId(),
+                    name: segment.getTitle(),
+                    predicateList,
+                    condition,
+                    pageNumber,
+                    pageSize
                 }
-            })
-
-            const condition = segment.getPredicateAggregate().getCondition() === 0 ? 'ANY' : 'ALL'
-            return [{
-                segmentId: segment.getId(),
-                name: segment.getTitle(),
-                predicateList,
-                condition,
-                pageNumber,
-                pageSize
-            }]
-
+            ]
         }
 
         if (!segmentId) {

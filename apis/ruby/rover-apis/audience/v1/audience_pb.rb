@@ -462,21 +462,37 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.DatePredicate" do
     optional :op, :enum, 1, "rover.audience.v1.DatePredicate.Op"
-    optional :attribute_name, :string, 2
-    optional :value, :message, 3, "google.protobuf.Timestamp"
-    optional :value2, :message, 4, "google.protobuf.Timestamp"
+    optional :value, :message, 2, "rover.audience.v1.DatePredicate.Date"
+    optional :attribute_name, :string, 3
+  end
+  add_message "rover.audience.v1.DatePredicate.Date" do
+    optional :day, :uint32, 1
+    optional :month, :uint32, 2
+    optional :year, :uint32, 3
   end
   add_enum "rover.audience.v1.DatePredicate.Op" do
     value :IS_UNSET, 0
     value :IS_SET, 1
+    value :IS_AFTER, 2
+    value :IS_BEFORE, 3
+    value :IS_ON, 4
+  end
+  add_message "rover.audience.v1.DurationPredicate" do
+    optional :op, :enum, 1, "rover.audience.v1.DurationPredicate.Op"
+    optional :value, :message, 2, "rover.audience.v1.DurationPredicate.Duration"
+    optional :attribute_name, :string, 3
+  end
+  add_message "rover.audience.v1.DurationPredicate.Duration" do
+    optional :duration, :uint32, 1
+    optional :type, :enum, 2, "rover.audience.v1.DurationPredicate.Duration.Type"
+  end
+  add_enum "rover.audience.v1.DurationPredicate.Duration.Type" do
+    value :DAYS, 0
+  end
+  add_enum "rover.audience.v1.DurationPredicate.Op" do
+    value :IS_GREATER_THAN, 0
+    value :IS_LESS_THAN, 1
     value :IS_EQUAL, 2
-    value :IS_NOT_EQUAL, 3
-    value :IS_GREATER_THAN, 4
-    value :IS_LESS_THAN, 5
-    value :IS_BETWEEN, 6
-    value :IS_AFTER, 7
-    value :IS_BEFORE, 8
-    value :IS_ON, 9
   end
   add_message "rover.audience.v1.GeofencePredicate" do
     optional :op, :enum, 1, "rover.audience.v1.GeofencePredicate.Op"
@@ -544,6 +560,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :geofence_predicate, :message, 7, "rover.audience.v1.GeofencePredicate"
       optional :double_predicate, :message, 8, "rover.audience.v1.DoublePredicate"
       optional :string_array_predicate, :message, 9, "rover.audience.v1.StringArrayPredicate"
+      optional :duration_predicate, :message, 10, "rover.audience.v1.DurationPredicate"
     end
   end
   add_enum "rover.audience.v1.Predicate.Selector" do
@@ -732,7 +749,12 @@ module Rover
       DoublePredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DoublePredicate").msgclass
       DoublePredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DoublePredicate.Op").enummodule
       DatePredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DatePredicate").msgclass
+      DatePredicate::Date = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DatePredicate.Date").msgclass
       DatePredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DatePredicate.Op").enummodule
+      DurationPredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DurationPredicate").msgclass
+      DurationPredicate::Duration = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DurationPredicate.Duration").msgclass
+      DurationPredicate::Duration::Type = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DurationPredicate.Duration.Type").enummodule
+      DurationPredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DurationPredicate.Op").enummodule
       GeofencePredicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofencePredicate").msgclass
       GeofencePredicate::Location = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofencePredicate.Location").msgclass
       GeofencePredicate::Op = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofencePredicate.Op").enummodule
