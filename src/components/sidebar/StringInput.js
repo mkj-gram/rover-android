@@ -5,15 +5,15 @@ import {
     light,
     Select,
     silver,
-    steel,
     text,
-    titanium,
-    TypeAhead
+    titanium
 } from '@rover/react-bootstrap'
 
 import ModalInput from './ModalInput'
 import ModalInputPrompt from './ModalInputPrompt'
 import StringInputTypeAhead from './StringInputTypeAhead'
+// Will use StringInputQueryRenderer once true typeahead is supported
+// import StringInputQueryRenderer from '../relayContainers/StringInputQueryRenderer'
 
 class StringInput extends Component {
     constructor(props) {
@@ -82,19 +82,21 @@ class StringInput extends Component {
     }
 
     renderInputComponent() {
-        const { options, successFn } = this.props
+        const { attribute, options, selector, successFn } = this.props
         const { stringComparison, stringValue } = this.state
 
-        if (stringComparison.includes('is') && options.length > 0) {
+        if (stringComparison.includes('is') && options) {
             return (
                 <StringInputTypeAhead
+                    attribute={attribute}
                     key={stringComparison}
-                    options={options}
+                    data={{ suggestions: options }}
+                    selector={selector}
                     stringValue={stringValue}
                     successFn={successFn}
                     updateValue={value => this.updateValue(value)}
                 />
-                )
+            )
         }
 
         return (
@@ -175,7 +177,7 @@ StringInput.propTypes = {
     stringValue: PropTypes.string.isRequired,
     stringComparison: PropTypes.string.isRequired,
     selector: PropTypes.string.isRequired,
-    successFn: PropTypes.func,
+    successFn: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     __typename: PropTypes.string.isRequired,

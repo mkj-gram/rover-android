@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { silver, steel, titanium, TypeAhead } from '@rover/react-bootstrap'
 
-const StringInputTypeAhead = ({ options, stringValue, successFn, updateValue }) => (
+const StringInputTypeAhead = ({ stringValue, successFn, updateValue, data }) => (
     <div style={{ display: 'relative', marginLeft: 5 }}>
         <TypeAhead
             textFieldStyle={{
@@ -32,7 +32,7 @@ const StringInputTypeAhead = ({ options, stringValue, successFn, updateValue }) 
                     padding: '3px 0 3px 10px'
                 }
             }}
-            items={options}
+            items={(data && data.suggestions.filter(s => s !== '')) || []}
             update={updateValue}
             value={stringValue}
             onKeyDown={e => e.keyCode === 13 && e.target.value.length > 0 && successFn()}
@@ -41,10 +41,18 @@ const StringInputTypeAhead = ({ options, stringValue, successFn, updateValue }) 
 )
 
 StringInputTypeAhead.propTypes = {
-    options: PropTypes.arrayOf(PropTypes.string).isRequired,
+    data: PropTypes.shape({
+        suggestions: PropTypes.arrayOf(PropTypes.string)
+    }),
     stringValue: PropTypes.string.isRequired,
     successFn: PropTypes.func.isRequired,
     updateValue: PropTypes.func.isRequired
+}
+
+StringInputTypeAhead.defaultProps = {
+    data: {
+        stringSuggestion: []
+    }
 }
 
 export default StringInputTypeAhead

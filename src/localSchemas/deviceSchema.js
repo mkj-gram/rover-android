@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 export const getDeviceSchema = () => [
 {
         attribute: 'created_at',
@@ -55,7 +56,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'device_model',
@@ -63,7 +65,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'os_name',
@@ -71,7 +74,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'locale_language',
@@ -79,7 +83,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'locale_region',
@@ -87,7 +92,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'carrier_name',
@@ -95,7 +101,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: null,
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
 
     {
@@ -104,7 +111,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: 'location',
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'is_bluetooth_enabled',
@@ -195,11 +203,11 @@ export const getDeviceSchema = () => [
         display: true,
         filter: false
     }
-    //----------------------------
+    // ----------------------------
     //
     // The following device attributes will be unlocked for SDK2.x
     //
-    //-----------------------------
+    // -----------------------------
     // {
     //     attribute: 'locale_script',
     //     label: 'Locale Script',
@@ -264,10 +272,10 @@ export const getDeviceSchemaColumns = () => {
     const columns = {
         devices: {}
     }
-    getDeviceSchemaGroups().forEach(group => {
+    getDeviceSchemaGroups().forEach((group) => {
         columns[group] = {}
     })
-    getDeviceSchema().forEach(property => {
+    getDeviceSchema().forEach((property) => {
         if (property.display !== false) {
             const { attribute, ...rest } = property
             if (property.group === null) {
@@ -280,11 +288,9 @@ export const getDeviceSchemaColumns = () => {
     return columns
 }
 
-export const getDeviceLabel = attribute => {
-    const findLabel = property => {
-        return property.attribute === attribute
-    }
-    let obj = getDeviceSchema().find(findLabel)
+export const getDeviceLabel = (attribute) => {
+    const findLabel = property => property.attribute === attribute
+    const obj = getDeviceSchema().find(findLabel)
     if (obj) {
         return obj.label
     } else {
@@ -295,3 +301,6 @@ export const getDeviceLabel = attribute => {
 export const getDeviceOptions = attribute =>
     getDeviceSchema().filter(device => attribute === device.attribute)[0]
         .options
+
+export const getDeviceNeedsPopularStringOptions = attribute =>
+    getDeviceSchema().filter(device => attribute === device.attribute)[0].popularStringOption

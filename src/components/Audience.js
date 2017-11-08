@@ -38,7 +38,7 @@ class Audience extends Component {
 
     setQueryCondition(queryCondition, initial = false, query = null) {
         if (!initial) {
-            let predicates = this.formatQuery(query, queryCondition)
+            const predicates = this.formatQuery(query, queryCondition)
             let fetchSegmentsFromPred = false
             if (
                 JSON.stringify(this.state.predicates) !==
@@ -76,7 +76,7 @@ class Audience extends Component {
 
     refreshData() {
         const { context } = this.state
-        
+
         if (context === 'segments') {
             this.setState({
                 refetchData: true,
