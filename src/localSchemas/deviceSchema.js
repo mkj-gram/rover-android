@@ -49,7 +49,6 @@ export const getDeviceSchema = () => [
         display: true,
         filter: true
     },
-    
     {
         attribute: 'device_manufacturer',
         label: 'Hardware Manufacturer',
@@ -298,9 +297,18 @@ export const getDeviceLabel = (attribute) => {
     }
 }
 
-export const getDeviceOptions = attribute =>
-    getDeviceSchema().filter(device => attribute === device.attribute)[0]
-        .options
+export const getDeviceOptions = (attribute) => {
+    const obj = getDeviceSchema().find(device => attribute === device.attribute)
+    if (obj) {
+        return obj.options
+    }
+    return undefined
+}
 
-export const getDeviceNeedsPopularStringOptions = attribute =>
-    getDeviceSchema().filter(device => attribute === device.attribute)[0].popularStringOption
+export const getDeviceNeedsPopularStringOptions = (attribute) => {
+    const obj = getDeviceSchema().find(device => attribute === device.attribute)
+    if (obj) {
+        return obj.popularStringOption
+    }
+    return undefined
+}
