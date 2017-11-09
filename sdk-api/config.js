@@ -36,6 +36,10 @@ const store = new Confidence.Store({
         url: {
             $filter: 'env',
             production: process.env.REDIS_URL,
+        },
+        inbox_url: {
+            $filter: 'env',
+            production: process.env.REDIS_INBOX_URL
         }
     },
     mongo: {

@@ -4,8 +4,9 @@ const ObjectId = require('mongodb').ObjectID;
 
 module.exports.register = function(server, options, next) {
     server.methods.application = {}
-    server.methods.application.getCurrentCustomer = getCurrentCustomer.bind(server)
-    server.methods.application.getCurrentProfile = getCurrentProfile.bind(server)
+    server.methods.application.getCurrentCustomer   = getCurrentCustomer.bind(server)
+    server.methods.application.getCurrentProfile    = getCurrentProfile.bind(server)
+    server.methods.application.getCurrentDevice     = getCurrentDevice.bind(server)
     next()
 };
 
@@ -66,5 +67,31 @@ const getCurrentProfile = function(request, callback) {
         }
 
         return callback(null, profile)
+    })
+}
+
+const getCurrentDevice = function(request, callback) {
+
+    const server = this
+    const methods = server.methods
+
+    const deviceId = request.headers['x-rover-device-id'].toUpperCase()
+
+    if (deviceId === null || deviceId === undefined) {
+        return callback(null, null)
+    }
+
+    const accountId = request.auth.credentials.account.id
+
+    if (accountId === null || accountId === undefined) {
+        return callback(new Error('Account ID missing'))
+    }
+
+    methods.device.findById(accountId, deviceId, function(err, device) {
+        if (err) {
+            return callback(err)
+        }
+
+        return callback(null, device)
     })
 }

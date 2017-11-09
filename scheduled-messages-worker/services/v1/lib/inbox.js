@@ -5,12 +5,12 @@ const internals = {};
 const moment = require('moment')
 
 
-internals.updateManyCacheKeys = function(customerIds, time, callback) {
+internals.updateManyCacheKeys = function(accountId, deviceIds, time, callback) {
     const server = this;
-    const redis = server.connections.redis.client;
+    const redis = server.connections.redis.inbox.client;
     const logger = server.plugins.logger.logger;
 
-    const ids = customerIds.map(id => String(id))
+    const ids = deviceIds.map(id => String(id))
     const unixTime = moment.utc(time).unix()
 
     let batch = redis.batch()
@@ -31,12 +31,12 @@ internals.updateManyCacheKeys = function(customerIds, time, callback) {
 
 
 // @private
-internals.getInboxKey = (customerId) => {
-    return keyPrefix + customerId
+internals.getInboxKey = (accountId, deviceId) => {
+    return `${accountId}:${deviceId}`
 };
 
-internals.getInboxUpdatedAtKey = (customerId) => {
-    return internals.getInboxKey(customerId).concat("_updated_at")
+internals.getInboxUpdatedAtKey = (accountId, deviceId) => {
+    return internals.getInboxKey(accountId, deviceId).concat("_updated_at")
 }
 
 
