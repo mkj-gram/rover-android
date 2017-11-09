@@ -913,7 +913,6 @@ JobProcessor.prototype._addMessagesToInbox = function() {
             if (util.isArray(devices)) {
                 devices.forEach(function(device) {
                     const inboxKey = `${accountId}:${device._id}`
-                    debug(`Adding ${messageId} to ${inboxKey}`)
                     batch.lpush(inboxKey, messageId)
                 })
             }
@@ -933,8 +932,6 @@ JobProcessor.prototype._addMessagesToInbox = function() {
             if (err) {
                 return reject(new JobError(err.message, false))
             }
-
-            debug(replies)
 
             rateLimitBatch.exec((err, replies) => {
                 if (err) {
