@@ -8,6 +8,7 @@ import { DraggableHeader } from 'react-data-grid-addons'
 import CustomRowRenderer from './CustomRowRenderer'
 import GridPagination from './GridPagination'
 import DeviceDetailsModal from './DeviceDetailsModal'
+import tableHeader from '../../../public/tableHeader.png'
 
 const { DraggableContainer } = DraggableHeader
 
@@ -109,7 +110,7 @@ class AudienceDataGrid extends Component {
                                 margin-left: 1px;
                             }
                             .rover-data-grid .react-grid-HeaderRow {
-                                border-bottom: 1px solid ${cloud};
+                                background-image: url(${tableHeader});
                             }
                             .rover-data-grid .react-grid-HeaderCell {
                                 background-color: ${offwhite};
@@ -144,7 +145,8 @@ class AudienceDataGrid extends Component {
                                 border-right: none!important;
                             }
                             .rover-data-grid .row-selected {
-                                background-color: ${straw}!important;
+                                background-color: #f9f9f9!important;
+                                border-bottom: 1px solid ${cloud};
                             }
 
                             .rover-data-grid .react-grid-Main {
@@ -166,6 +168,11 @@ class AudienceDataGrid extends Component {
 
                             .rover-data-grid .react-grid-Canvas {
                                 height: 100% !important;
+                            }
+                            
+                            .rover-data-grid .react-grid-Row:hover {
+                                background-color: #f9f9f9!important;
+                                border-bottom: 1px solid ${cloud}!important;
                             }
                     `}
                 </style>
