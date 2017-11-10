@@ -9257,6 +9257,7 @@ proto.rover.audience.v1.UpdateDeviceRequest.toObject = function(includeInstance,
     osName: jspb.Message.getFieldWithDefault(msg, 17, ""),
     osVersion: (f = msg.getOsVersion()) && proto.rover.audience.v1.Version.toObject(includeInstance, f),
     deviceModel: jspb.Message.getFieldWithDefault(msg, 19, ""),
+    deviceModelRaw: jspb.Message.getFieldWithDefault(msg, 50, ""),
     frameworksMap: (f = msg.getFrameworksMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Version.toObject) : [],
     localeLanguage: jspb.Message.getFieldWithDefault(msg, 21, ""),
     localeRegion: jspb.Message.getFieldWithDefault(msg, 22, ""),
@@ -9360,6 +9361,10 @@ proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader = functi
     case 19:
       var value = /** @type {string} */ (reader.readString());
       msg.setDeviceModel(value);
+      break;
+    case 50:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceModelRaw(value);
       break;
     case 20:
       var value = msg.getFrameworksMap();
@@ -9546,6 +9551,13 @@ proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter = function(m
   if (f.length > 0) {
     writer.writeString(
       19,
+      f
+    );
+  }
+  f = message.getDeviceModelRaw();
+  if (f.length > 0) {
+    writer.writeString(
+      50,
       f
     );
   }
@@ -9882,6 +9894,21 @@ proto.rover.audience.v1.UpdateDeviceRequest.prototype.getDeviceModel = function(
 /** @param {string} value */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceModel = function(value) {
   jspb.Message.setField(this, 19, value);
+};
+
+
+/**
+ * optional string device_model_raw = 50;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getDeviceModelRaw = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 50, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceModelRaw = function(value) {
+  jspb.Message.setField(this, 50, value);
 };
 
 

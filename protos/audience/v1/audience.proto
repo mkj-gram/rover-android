@@ -379,6 +379,7 @@ message UpdateDeviceRequest {
   string os_name                      = 17;
   Version os_version                  = 18;
   string device_model                 = 19;
+  string device_model_raw             = 50;
   map<string, Version> frameworks     = 20;
   string locale_language              = 21;
   string locale_region                = 22;
@@ -462,7 +463,7 @@ message Device {
   // Samsung, LG etc.
   string device_manufacturer      = 20;
 
-  // E.g. "iPhone9,2" or "Galaxy4"
+  // E.g. "iPhone X"
   string device_model              = 23;
 
   // Either "iOS" or "Android"

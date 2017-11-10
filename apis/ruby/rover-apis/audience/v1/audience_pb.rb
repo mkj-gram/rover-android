@@ -206,6 +206,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :os_name, :string, 17
     optional :os_version, :message, 18, "rover.audience.v1.Version"
     optional :device_model, :string, 19
+    optional :device_model_raw, :string, 50
     map :frameworks, :string, :message, 20, "rover.audience.v1.Version"
     optional :locale_language, :string, 21
     optional :locale_region, :string, 22

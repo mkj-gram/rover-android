@@ -43,6 +43,7 @@ type Device struct {
 	AppNamespace                string              `bson:"app_namespace,omitempty"`
 	DeviceManufacturer          string              `bson:"device_manufacturer,omitempty"`
 	DeviceModel                 string              `bson:"device_model,omitempty"`
+	DeviceModelRaw              string              `bson:"device_model_raw,omitempty"`
 	OsName                      string              `bson:"os_name,omitempty"`
 	OsVersion                   *Version            `bson:"os_version,omitempty"`
 	Frameworks                  map[string]*Version `bson:"frameworks,omitempty"`
@@ -439,6 +440,7 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 	update["app_namespace"] = r.AppNamespace
 	update["device_manufacturer"] = r.DeviceManufacturer
 	update["device_model"] = r.DeviceModel
+	update["device_model_raw"] = r.DeviceModelRaw
 	update["os_name"] = r.OsName
 	update["os_version"] = r.OsVersion
 	update["locale_language"] = r.LocaleLanguage

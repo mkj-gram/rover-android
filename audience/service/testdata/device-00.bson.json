@@ -43,7 +43,7 @@
   "location_street": "55 Adelaide Street East",
   "location_region": "Canada",
 
-  "device_model": "iPhone7,2",
+  "device_model": "iPhone 6",
   "os_name": "iOS",
   "os_version": {
     "major": 1,
@@ -114,7 +114,7 @@
     "$date": "2017-08-14T18:08:50.992Z"
   },
   "locale_region": "ca",
-  "device_model": "iPhone8,2",
+  "device_model": "iPhone 6s Plus",
   "locale_language": "en",
   "time_zone": "America/Toronto",
   "app_name": "",
@@ -341,7 +341,7 @@
   "advertising_id": "00000000-0000-0000-0000-000000000000",
   "push_environment": "development",
   "push_token_key": "1D1AD8BB68D6A0372B504E0E3C96E56E00204163518257670249BC7889417282A",
-  "device_model": "iPhone8,2",
+  "device_model": "iPhone 6s Plus",
   "carrier_name": "rogers",
   "platform": "MOBILE",
   "frameworks": {
@@ -626,7 +626,7 @@
   "region_monitoring_mode": "UNDEFINED",
   "push_token_key": "1233333",
   "screen_height": 0,
-  "device_model": "iPhone7,2",
+  "device_model": "iPhone 6",
   "screen_width": 0,
   "app_version": "",
   "device_manufacturer": "Apple",
@@ -756,7 +756,7 @@
     }
   },
   "app_build": "",
-  "device_model": "iPhone8,2",
+  "device_model": "iPhone 6s Plus",
   "region_monitoring_mode": "UNDEFINED",
   "push_token_unregistered_at": null,
   "push_token_key": "2D1AD8BB68D6A0372B504E0E3C96E56E00204163518257670249BC7889417282A",
@@ -876,7 +876,7 @@
   "app_build": "",
   "device_manufacturer": "Apple",
   "push_token_key": "927E16590502B44F65E174DCFF940FB886CBBAC5B625334E12C88F3CD0346256",
-  "device_model": "iPhone8,2",
+  "device_model": "iPhone 6s Plus",
   "time_zone": "America/Toronto",
   "platform": "MOBILE",
   "locale_language": "en",
@@ -948,7 +948,7 @@
   "is_bluetooth_enabled": true,
   "screen_width": 0,
   "carrier_name": "rogers",
-  "device_model": "iPhone8,2",
+  "device_model": "iPhone 6s Plus",
   "radio": "",
   "time_zone": "America/Toronto",
   "app_namespace": "io.rover.Inbox",
@@ -1199,7 +1199,7 @@
   "ip": "24.114.77.98",
   "region_monitoring_mode": "UNDEFINED",
   "app_name": "",
-  "device_model": "iPhone8,2",
+  "device_model": "iPhone 6s Plus",
   "screen_width": 0,
   "platform": "MOBILE",
   "frameworks": {
@@ -1467,7 +1467,7 @@
   "push_token_created_at": {
     "$date": "2017-09-22T20:12:18.798Z"
   },
-  "device_model": "iPhone9,4",
+  "device_model": "iPhone 7 Plus",
   "locale_language": "en",
   "screen_width": 0,
   "push_environment": "development",

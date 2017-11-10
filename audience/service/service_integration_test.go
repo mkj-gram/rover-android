@@ -2030,7 +2030,7 @@ func testAudienceService_GetDevice(t *testing.T) {
 					LocaleLanguage:    "en",
 					LocaleRegion:      "us",
 					LocaleScript:      "zz",
-					DeviceModel:       "iPhone7,2",
+					DeviceModel:       "iPhone 6",
 					OsName:            "iOS",
 					OsVersion:         &audience.Version{1, 2, 3},
 					Radio:             "LTE",
@@ -2376,7 +2376,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				DeviceManufacturer: "Apple",
 				OsName:             "iOS",
 				OsVersion:          &audience.Version{1, 0, 0},
-				DeviceModel:        "iPhone7,2",
+				DeviceModel:        "iPhone 6",
 				Frameworks: map[string]*audience.Version{
 					"io.rover.Rover":     &audience.Version{1, 2, 3},
 					"io.rover.RoverPush": &audience.Version{1, 2, 3},
@@ -2439,7 +2439,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					DeviceManufacturer: "Apple",
 					OsName:             "iOS",
 					OsVersion:          &audience.Version{1, 0, 0},
-					DeviceModel:        "iPhone7,2",
+					DeviceModel:        "iPhone 6",
 					Frameworks: map[string]*audience.Version{
 						"io.rover.Rover":     &audience.Version{1, 2, 3},
 						"io.rover.RoverPush": &audience.Version{1, 2, 3},
@@ -2484,7 +2484,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				DeviceManufacturer: "Apple",
 				OsName:             "iOS",
 				OsVersion:          &audience.Version{1, 0, 0},
-				DeviceModel:        "iPhone7,2",
+				DeviceModel:        "iPhone 6",
 				Frameworks: map[string]*audience.Version{
 					"RoverEvents": &audience.Version{1, 2, 3},
 					"RoverPush":   &audience.Version{1, 2, 3},
@@ -2533,7 +2533,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					DeviceManufacturer: "Apple",
 					OsName:             "iOS",
 					OsVersion:          &audience.Version{1, 0, 0},
-					DeviceModel:        "iPhone7,2",
+					DeviceModel:        "iPhone 6",
 					Frameworks: map[string]*audience.Version{
 						"RoverEvents": &audience.Version{1, 2, 3},
 						"RoverPush":   &audience.Version{1, 2, 3},
@@ -2713,6 +2713,7 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.before != nil {
+
 				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
 				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
 					t.Errorf("Before:\n%v", difff(diff))
