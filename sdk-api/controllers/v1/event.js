@@ -97,6 +97,8 @@ function parseDevicePayload(request) {
     }
 
     const input = request.payload.data.attributes.device || {}
+
+    const rawDeviceMap = JSON.parse(fs.readFileSync('../../rawDeviceMap.json'))
     
     function parseVersion(string) {
         if (string === null || string === undefined) {
@@ -120,7 +122,8 @@ function parseDevicePayload(request) {
         device_manufacturer: String(input.manufacturer || ""),
         os_name: String(input['os-name'] || ""),
         os_version: parseVersion(input['os-version']),
-        device_model: String(input.model || ""),
+        device_model: String(rawDeviceMap[input.model] || input.model || ""),
+        device_model_raw: String(input.model || ""),
         sdk_version: parseVersion(input['sdk-version']),
         locale_language: String((input['locale-lang'] || "")).toLowerCase(),
         locale_script: String((input['locale-script'] || "")).toLowerCase(),

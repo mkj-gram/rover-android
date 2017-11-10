@@ -165,6 +165,7 @@ module.exports = function(AudienceClient, logger) {
 		dp.setAppNamespace(device.app_namespace)
 		dp.setDeviceManufacturer(device.device_manufacturer)
 		dp.setDeviceModel(device.device_model)
+		dp.setDeviceModelRaw(device.device_model_raw)
 		dp.setOsVersion(versionToProto(device.os_version))
 		dp.setOsName(device.os_name)
 
