@@ -115,9 +115,15 @@ class Audience extends Component {
         })
     }
 
-    updateQuery(rawQuery, condition) {
+    updateQuery(rawQuery, condition=null) {
         let fetchSegmentsFromPred = false
-        const predicates = this.formatQuery(rawQuery, condition)
+        let cond
+        if (condition === null) {
+            cond = JSON.parse(this.state.predicates).condition
+        } else {
+            cond = condition
+        }
+        const predicates = this.formatQuery(rawQuery, cond)
         if (
             JSON.stringify(this.state.predicates) !==
                 JSON.stringify(predicates) ||
@@ -255,6 +261,7 @@ class Audience extends Component {
                     refreshData={this.refreshData}
                     refresh={this.state.refresh}
                     completeRefresh={this.completeRefresh}
+                    clickCellUpdatePredicates={this.updateQuery}
                 />
             </div>
         )

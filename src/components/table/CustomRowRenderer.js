@@ -38,7 +38,9 @@ class HoverContainer extends Component {
                 onMouseLeave={() => this.onMouseLeave()}
             >
                 <RowActionButton
-                    isButtonShowing={hover}
+                    isButtonShowing={hover ||
+                        (props.tooltipRowIdx === props.idx &&
+                            props.showToolTips)}
                     rowId={props.idx}
                     handleClick={type => props.clickHandler(type)}
                 />

@@ -94,10 +94,10 @@ class AudienceDataGrid extends Component {
     }
 
     render() {
-        const { onColumnResize } = this.props
+        const { onColumnResize, showToolTips, tooltipRowIdx } = this.props
         return (
             <div
-                ref={(el) => {
+                ref={el => {
                     this.parent = el
                 }}
                 style={{ flex: '1 1 100%', position: 'relative' }}
@@ -199,11 +199,14 @@ class AudienceDataGrid extends Component {
                         rowRenderer={props =>
                             CustomRowRenderer({
                                 ...props,
+                                showToolTips,
+                                tooltipRowIdx,
                                 clickHandler: selectedView =>
                                     this.onRowClick(props.idx, selectedView)
                             })}
                         onRowClick={rowIdx => null}
                         onColumnResize={onColumnResize}
+                        
                     />
                 </DraggableContainer>
                 <GridPagination
