@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "rover-audience-staging",
+    "staging": "rover-audience-staging",
+    "production": "rover-audience-production"
+  }
+}
