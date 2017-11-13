@@ -119,7 +119,7 @@ class SideBar extends Component {
         }
 
         if (nextProps.context === 'predicates') {
-            const query = JSON.parse(nextProps.predicates).query
+            const query = JSON.parse(nextProps.predicates).query || []
             this.setState({
                 saveStates: {
                     isSegmentUpdate: this.state.segmentId !== '',
