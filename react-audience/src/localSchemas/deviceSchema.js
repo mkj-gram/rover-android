@@ -103,16 +103,6 @@ export const getDeviceSchema = () => [
         filter: true,
         popularStringOption: true
     },
-
-    {
-        attribute: 'time_zone',
-        label: 'Time Zone',
-        __typename: 'StringPredicate',
-        group: 'location',
-        display: true,
-        filter: true,
-        popularStringOption: true
-    },
     {
         attribute: 'is_bluetooth_enabled',
         label: 'Bluetooth Enabled?',
@@ -161,6 +151,23 @@ export const getDeviceSchema = () => [
         display: true,
         filter: true
     },
+    {
+        attribute: 'time_zone',
+        label: 'Time Zone',
+        __typename: 'StringPredicate',
+        group: 'location',
+        display: true,
+        filter: true,
+        popularStringOption: true
+    },
+    {
+        attribute: 'location_updated_at',
+        label: 'Location Updated At',
+        __typename: 'DatePredicate',
+        group: 'location',
+        display: true,
+        filter: true
+    },    
     {
         attribute: 'os_version',
         label: 'OS Version',

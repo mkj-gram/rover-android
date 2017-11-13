@@ -15,3 +15,14 @@ graphql-gateway/coverage/
 .idea
 /react-bootstrap/es
 /graphql-gateway/jest_0
+
+# generated
+__generated__**/
+schema.graphql
+
+# production
+dist
+
+# misc
+npm-debug.log
+yarn.lock
