@@ -39,6 +39,7 @@ export default (d) => {
         ip: d.getIp(),
         location_latitude: d.getLocationLatitude(),
         location_longitude: d.getLocationLongitude(),
+        location_updated_at: RoverApis.Helpers.timestampFromProto(d.getLocationUpdatedAt()),
         os_version: getVersionFromProto(d.getOsVersion()),
         sdk_version: getVersionFromProto(d.getFrameworksMap().get('io.rover.Rover')),
         device_id: d.getDeviceId(),

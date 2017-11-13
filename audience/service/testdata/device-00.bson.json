@@ -38,6 +38,7 @@
   "location_accuracy": 65,
   "location_latitude": 22.00101,
   "location_longitude": -32.1231,
+  "location_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
   "location_city": "Toronto",
   "location_street": "55 Adelaide Street East",
   "location_region": "Canada",
@@ -135,6 +136,9 @@
   "location_accuracy": 50,
   "location_latitude": 43.642566,
   "location_longitude": -79.387056,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "geofence_monitoring_regions_updated_at": {
     "$date": "2017-08-14T18:28:25.140Z"
   },
@@ -355,6 +359,9 @@
   "location_longitude": -79.37551527892751,
   "location_accuracy": 65,
   "location_latitude": 43.64918452007607,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "geofence_monitoring_regions_updated_at": {
     "$date": "2017-08-15T04:30:55.710Z"
   },
@@ -475,6 +482,9 @@
   "location_accuracy": 50,
   "location_latitude": -78.9126914,
   "location_longitude": 43.7986039,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "ibeacon_monitoring_regions_updated_at": {
     "$date": "2017-08-17T12:07:51.362Z"
   },
@@ -554,6 +564,9 @@
   "location_accuracy": 5,
   "location_latitude": 37.38703695,
   "location_longitude": -122.15399578,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "ibeacon_monitoring_regions_updated_at": {
     "$date": "2017-08-17T23:43:05.228Z"
   },
@@ -757,6 +770,9 @@
   "location_longitude": -79.37551527892751,
   "location_accuracy": 65,
   "location_latitude": 43.64918452007607,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "ibeacon_monitoring_regions_updated_at": {
     "$date": "2017-08-24T17:59:39.527Z"
   },
@@ -898,6 +914,9 @@
   "location_accuracy": 65,
   "location_latitude": 43.64918452007607,
   "location_longitude": -79.37551527892751,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "push_token_created_at": {
     "$date": "2017-08-30T16:21:41.723Z"
   },
@@ -970,6 +989,9 @@
   "location_longitude": -78.975767,
   "location_accuracy": 50,
   "location_latitude": 43.961211,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "geofence_monitoring_regions_updated_at": {
     "$date": "2017-08-30T18:13:46.142Z"
   },
@@ -1049,6 +1071,9 @@
   "location_latitude": 37.33233606,
   "location_longitude": -122.05909629,
   "location_accuracy": 5,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "ibeacon_monitoring_regions_updated_at": {
     "$date": "2017-09-01T13:41:39.417Z"
   },
@@ -1197,6 +1222,9 @@
   "location_accuracy": 50,
   "location_latitude": 43.961211,
   "location_longitude": -78.975767,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "geofence_monitoring_regions_updated_at": {
     "$date": "2017-09-19T13:14:44.236Z"
   },
@@ -1275,7 +1303,10 @@
   "radio": "",
   "location_accuracy": 5,
   "location_latitude": 37.785834,
-  "location_longitude": -122.406417
+  "location_longitude": -122.406417,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  }
 }
 {
   "_id": {
@@ -1333,7 +1364,10 @@
   "screen_width": 0,
   "location_accuracy": 5,
   "location_latitude": 51.50998,
-  "location_longitude": -0.1337
+  "location_longitude": -0.1337,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  }
 }
 {
   "_id": {
@@ -1391,7 +1425,10 @@
   "locale_script": "",
   "location_accuracy": 5,
   "location_latitude": 40.759211,
-  "location_longitude": -73.984638
+  "location_longitude": -73.984638,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  }
 }
 {
   "_id": {
@@ -1457,6 +1494,9 @@
   "location_accuracy": 65,
   "location_latitude": 43.65161698539669,
   "location_longitude": -79.37518175364146,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "ibeacon_monitoring_regions": [
     {
       "uuid": "B9407F30-F5F8-466E-AFF9-25556B57FE6A",
@@ -1536,6 +1576,9 @@
   "location_accuracy": 5,
   "location_latitude": 37.7433128,
   "location_longitude": -122.40606023,
+  "location_updated_at": {
+    "$date": "2017-06-14T15:44:18.496Z"
+  },
   "ibeacon_monitoring_regions_updated_at": {
     "$date": "2017-09-27T19:27:18.530Z"
   },

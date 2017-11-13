@@ -41,6 +41,7 @@ func hardcodedDeviceSchema(acctID int32) []*audience.SchemaAttribute {
 		{AccountId: acctID, AttributeType: "double", Attribute: "location_longitude", Label: "Location Longitude", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "string", Attribute: "location_region", Label: "Location Region", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "string", Attribute: "location_city", Label: "Location City", Id: "", Path: ""},
+		{AccountId: acctID, AttributeType: "timestamp", Attribute: "location_updated_at", Label: "Location Updated At", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "string", Attribute: "location_street", Label: "Location Street", Id: "", Path: ""},
 		{AccountId: acctID, AttributeType: "version", Attribute: "os_version", Label: "Os Version", Id: "", Path: ""},
 		// sdk_version is a temporary workaround for frameworks

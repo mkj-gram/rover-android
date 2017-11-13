@@ -79,6 +79,9 @@ var (
 		"location_longitude": {
 			MissingValue: float64(0),
 		},
+		"location_updated_at": {
+			MissingValue: nil,
+		},
 		"location_region": {
 			MissingValue: "",
 		},

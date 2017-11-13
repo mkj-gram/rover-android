@@ -76,10 +76,11 @@ func DeviceMapping() M {
 				"location_latitude":  M{"type": "double"},
 				"location_longitude": M{"type": "double"},
 
-				"location_accuracy": M{"type": "integer"},
-				"location_region":   M{"type": "keyword"},
-				"location_city":     M{"type": "keyword"},
-				"location_street":   M{"type": "keyword"},
+				"location_accuracy":   M{"type": "integer"},
+				"location_region":     M{"type": "keyword"},
+				"location_city":       M{"type": "keyword"},
+				"location_street":     M{"type": "keyword"},
+				"location_updated_at": M{"type": "date"},
 
 				// map<string, Version> frameworks 		 :M{"type": ""},
 

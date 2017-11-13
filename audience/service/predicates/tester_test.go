@@ -79,6 +79,7 @@ func device(t *testing.T, profileId string) *audience.Device {
 		LocationLatitude:  43.650737,
 		LocationLongitude: -79.375877,
 		LocationAccuracy:  5,
+		LocationUpdatedAt: protoTs(t, parseTime(t, "2013-06-05T14:10:43.678Z")),
 		CreatedAt:         protoTs(t, parseTime(t, "2013-06-05T14:10:43.678Z")),
 		UpdatedAt:         protoTs(t, parseTime(t, "2013-06-05T14:10:43.678Z")),
 		IsTestDevice:      true,

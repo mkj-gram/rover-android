@@ -2049,6 +2049,7 @@ func testAudienceService_GetDevice(t *testing.T) {
 					LocationRegion:    "Canada",
 					LocationCity:      "Toronto",
 					LocationStreet:    "55 Adelaide Street East",
+					LocationUpdatedAt: createdAt,
 
 					RegionMonitoringMode: audience.Device_GIMBAL,
 
@@ -3125,6 +3126,7 @@ func testAudienceService_UpdateDeviceLocation(t *testing.T) {
 					LocationAccuracy:  65,
 					LocationLatitude:  22.00101,
 					LocationLongitude: -32.1231,
+					LocationUpdatedAt: protoTs(t, updatedAt),
 				},
 			},
 		},
@@ -3772,6 +3774,7 @@ func testAudienceService_GetDeviceSchema(t *testing.T) {
 						{AccountId: 1, AttributeType: "double", Attribute: "location_longitude", Label: "Location Longitude", Id: "", Path: ""},
 						{AccountId: 1, AttributeType: "string", Attribute: "location_region", Label: "Location Region", Id: "", Path: ""},
 						{AccountId: 1, AttributeType: "string", Attribute: "location_city", Label: "Location City", Id: "", Path: ""},
+						{AccountId: 1, AttributeType: "timestamp", Attribute: "location_updated_at", Label: "Location Updated At", Id: "", Path: ""},
 						{AccountId: 1, AttributeType: "string", Attribute: "location_street", Label: "Location Street", Id: "", Path: ""},
 						{AccountId: 1, AttributeType: "version", Attribute: "os_version", Label: "Os Version", Id: "", Path: ""},
 						// sdk_version is a temporary workaround for frameworks

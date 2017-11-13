@@ -273,6 +273,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :location_region, :string, 44
     optional :location_city, :string, 45
     optional :location_street, :string, 46
+    optional :location_updated_at, :message, 52, "google.protobuf.Timestamp"
     optional :region_monitoring_mode, :enum, 47, "rover.audience.v1.Device.RegionMonitoringMode"
     optional :ibeacon_monitoring_regions_updated_at, :message, 48, "google.protobuf.Timestamp"
     repeated :ibeacon_monitoring_regions, :message, 49, "rover.audience.v1.IBeaconRegion"

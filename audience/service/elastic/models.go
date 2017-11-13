@@ -97,10 +97,11 @@ func DeviceDoc(d *mongodb.Device) M {
 		"location_latitude":  d.LocationLatitude,
 		"location_longitude": d.LocationLongitude,
 
-		"location_accuracy": d.LocationAccuracy,
-		"location_region":   d.LocationRegion,
-		"location_city":     d.LocationCity,
-		"location_street":   d.LocationStreet,
+		"location_accuracy":   d.LocationAccuracy,
+		"location_region":     d.LocationRegion,
+		"location_city":       d.LocationCity,
+		"location_street":     d.LocationStreet,
+		"location_updated_at": d.LocationUpdatedAt,
 
 		// map<string, Version> frameworks 		 :M{"type": ""},
 

@@ -812,6 +812,7 @@ func testAudienceService_IsInDynamicSegment(t *testing.T) {
 					LocationLatitude:  43.664565,
 					LocationLongitude: -79.392394,
 					LocationAccuracy:  10,
+					LocationUpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 				},
 				Profile: &audience.Profile{
 					Attributes: map[string]*audience.Value{

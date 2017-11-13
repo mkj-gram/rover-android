@@ -525,6 +525,8 @@ message Device {
   string location_region              = 44;
   string location_city                = 45;
   string location_street              = 46;
+  google.protobuf.Timestamp location_updated_at = 52;
+  
 
   enum RegionMonitoringMode {
     UNDEFINED = 0;
