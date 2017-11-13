@@ -1140,7 +1140,7 @@ func durationPredicateToQuery(predicate *audience.Predicate) (M, bool, error) {
 		return M{
 			"range": M{
 				attributeName: M{
-					"gte":       toDateString(uint32(tDay), uint32(tMonth), uint32(tYear)),
+					"gt":        toDateString(uint32(tDay), uint32(tMonth), uint32(tYear)),
 					"time_zone": Zone,
 				},
 			},
