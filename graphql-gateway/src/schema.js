@@ -28,6 +28,7 @@ const schema = new GraphQLSchema({
         BooleanPredicate,
         ButtonBlock,
         DatePredicate,
+        FloatPredicate,
         ImageBlock,
         GeofencePredicate,
         NumberPredicate,
@@ -36,8 +37,7 @@ const schema = new GraphQLSchema({
         StringArrayPredicate,
         TextBlock,
         VersionPredicate,
-        WebViewBlock,
-        FloatPredicate
+        WebViewBlock
     ]
 })
 
