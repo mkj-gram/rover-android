@@ -48,6 +48,10 @@ export default createRefetchContainer(
                                 numberValue
                                 numberComparison
                             }
+                            ... on FloatPredicate {
+                                floatValue
+                                floatComparison
+                            }
                             ... on GeofencePredicate {
                                 geofenceValue {
                                     latitude

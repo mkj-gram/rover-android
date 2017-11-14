@@ -10,10 +10,21 @@ class NumericInput extends Component {
     constructor(props) {
         super(props)
 
-        const { numberValue, numberComparison } = this.props
-        this.state = {
-            numberValue,
-            numberComparison
+        if (
+            props.__typename === 'FloatPredicate' &&
+            props.floatValue !== undefined &&
+            props.floatComparison !== undefined
+        ) {
+            this.state = {
+                numberValue: props.floatValue,
+                numberComparison: props.floatComparison
+            }
+        } else {
+            const { numberValue, numberComparison } = props
+            this.state = {
+                numberValue,
+                numberComparison
+            }
         }
     }
 
@@ -155,8 +166,7 @@ class NumericInput extends Component {
                         <option value="is set">Exists</option>
                         <option value="is unset">Does not exist</option>
                     </Select>
-                    {
-                        !numberComparison.includes('set') &&
+                    {!numberComparison.includes('set') && (
                         <ModalInput
                             type="number"
                             min={0}
@@ -169,8 +179,8 @@ class NumericInput extends Component {
                                 this.updateValue(parsedValue, 0)
                             }}
                         />
-                    }
-                    {numberComparison === 'is between' &&
+                    )}
+                    {numberComparison === 'is between' && (
                         <div>
                             <span style={{ fontStyle: 'italic' }}>and</span>
                             <ModalInput
@@ -185,7 +195,8 @@ class NumericInput extends Component {
                                     this.updateValue(parsedValue, 1)
                                 }}
                             />
-                        </div>}
+                        </div>
+                    )}
                 </div>
             </div>
         )

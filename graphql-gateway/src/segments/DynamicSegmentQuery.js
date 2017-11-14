@@ -183,8 +183,8 @@ const DynamicSegmentQuery = {
                 return {
                     attribute: pred.getAttributeName(),
                     selector: getSelectorName(predicate.getSelector()),
-                    numberComparison: doubleComparisons[pred.getOp()],
-                    numberValue: [pred.getValue(), pred.getValue2()],
+                    floatComparison: doubleComparisons[pred.getOp()],
+                    floatValue: [pred.getValue(), pred.getValue2()],
                     __typename: 'FloatPredicate'
                 }
             }
