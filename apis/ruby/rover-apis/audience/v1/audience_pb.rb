@@ -103,6 +103,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :profile_id, :string, 2
     optional :device_id, :string, 3
+    optional :ms12, :bool, 4
+    optional :profile_identifier, :string, 5
   end
   add_message "rover.audience.v1.CreateDeviceResponse" do
   end
@@ -167,12 +169,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
     optional :profile_id, :string, 3
+    optional :ms12, :bool, 4
+    optional :profile_identifier, :string, 5
   end
   add_message "rover.audience.v1.SetDeviceProfileResponse" do
   end
   add_message "rover.audience.v1.ListDevicesByProfileIdRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :profile_id, :string, 2
+    optional :ms12, :bool, 4
   end
   add_message "rover.audience.v1.ListDevicesByProfileIdResponse" do
     repeated :devices, :message, 1, "rover.audience.v1.Device"
@@ -180,6 +185,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.ListDevicesByProfileIdentifierRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :identifier, :string, 2
+    optional :ms12, :bool, 4
+    optional :profile_identifier, :string, 5
   end
   add_message "rover.audience.v1.ListDevicesByProfileIdentifierResponse" do
     repeated :devices, :message, 1, "rover.audience.v1.Device"
@@ -229,6 +236,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :notification_authorization, :enum, 39, "rover.audience.v1.NotificationAuthorization"
   end
   add_message "rover.audience.v1.UpdateDeviceResponse" do
+  end
+  add_message "rover.audience.v1.UpdateDeviceCustomAttributesRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :device_id, :string, 2
+    map :attributes, :string, :message, 5, "rover.audience.v1.ValueUpdates"
+  end
+  add_message "rover.audience.v1.UpdateDeviceCustomAttributesResponse" do
   end
   add_message "rover.audience.v1.Device" do
     optional :id, :string, 1
@@ -284,6 +298,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     repeated :ibeacon_monitoring_regions, :message, 49, "rover.audience.v1.IBeaconRegion"
     optional :geofence_monitoring_regions_updated_at, :message, 50, "google.protobuf.Timestamp"
     repeated :geofence_monitoring_regions, :message, 51, "rover.audience.v1.GeofenceRegion"
+    optional :profile_identifier, :string, 60
   end
   add_enum "rover.audience.v1.Device.RegionMonitoringMode" do
     value :UNDEFINED, 0
@@ -723,6 +738,8 @@ module Rover
       DeviceSchema = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeviceSchema").msgclass
       UpdateDeviceRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceRequest").msgclass
       UpdateDeviceResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceResponse").msgclass
+      UpdateDeviceCustomAttributesRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceCustomAttributesRequest").msgclass
+      UpdateDeviceCustomAttributesResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceCustomAttributesResponse").msgclass
       Device = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Device").msgclass
       Device::RegionMonitoringMode = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Device.RegionMonitoringMode").enummodule
       IBeaconRegion = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.IBeaconRegion").msgclass

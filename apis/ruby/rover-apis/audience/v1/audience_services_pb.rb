@@ -46,6 +46,7 @@ module Rover
           rpc :CreateDevice, CreateDeviceRequest, CreateDeviceResponse
           # Device Updates
           rpc :UpdateDevice, UpdateDeviceRequest, UpdateDeviceResponse
+          rpc :UpdateDeviceCustomAttributes, UpdateDeviceCustomAttributesRequest, UpdateDeviceCustomAttributesResponse
           rpc :UpdateDevicePushToken, UpdateDevicePushTokenRequest, UpdateDevicePushTokenResponse
           rpc :UpdateDeviceUnregisterPushToken, UpdateDeviceUnregisterPushTokenRequest, UpdateDeviceUnregisterPushTokenResponse
           rpc :UpdateDeviceLocation, UpdateDeviceLocationRequest, UpdateDeviceLocationResponse

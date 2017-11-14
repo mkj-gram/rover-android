@@ -556,6 +556,28 @@ function deserialize_rover_audience_v1_SetDeviceProfileResponse(buffer_arg) {
   return audience_v1_audience_pb.SetDeviceProfileResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_UpdateDeviceCustomAttributesRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceCustomAttributesRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceCustomAttributesRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_UpdateDeviceCustomAttributesRequest(buffer_arg) {
+  return audience_v1_audience_pb.UpdateDeviceCustomAttributesRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_UpdateDeviceCustomAttributesResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceCustomAttributesResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceCustomAttributesResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_UpdateDeviceCustomAttributesResponse(buffer_arg) {
+  return audience_v1_audience_pb.UpdateDeviceCustomAttributesResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_UpdateDeviceGeofenceMonitoringRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceGeofenceMonitoringRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest');
@@ -1013,6 +1035,17 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_UpdateDeviceRequest,
     responseSerialize: serialize_rover_audience_v1_UpdateDeviceResponse,
     responseDeserialize: deserialize_rover_audience_v1_UpdateDeviceResponse,
+  },
+  updateDeviceCustomAttributes: {
+    path: '/rover.audience.v1.Audience/UpdateDeviceCustomAttributes',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.UpdateDeviceCustomAttributesRequest,
+    responseType: audience_v1_audience_pb.UpdateDeviceCustomAttributesResponse,
+    requestSerialize: serialize_rover_audience_v1_UpdateDeviceCustomAttributesRequest,
+    requestDeserialize: deserialize_rover_audience_v1_UpdateDeviceCustomAttributesRequest,
+    responseSerialize: serialize_rover_audience_v1_UpdateDeviceCustomAttributesResponse,
+    responseDeserialize: deserialize_rover_audience_v1_UpdateDeviceCustomAttributesResponse,
   },
   updateDevicePushToken: {
     path: '/rover.audience.v1.Audience/UpdateDevicePushToken',

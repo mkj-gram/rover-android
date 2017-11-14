@@ -106,6 +106,8 @@ goog.exportSymbol('proto.rover.audience.v1.StringArrayPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.StringArrayPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.StringPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.StringPredicate.Op', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest', null, global);
+goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceGeofenceMonitoringResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateDeviceIBeaconMonitoringRequest', null, global);
@@ -4727,7 +4729,9 @@ proto.rover.audience.v1.CreateDeviceRequest.toObject = function(includeInstance,
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     profileId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    deviceId: jspb.Message.getFieldWithDefault(msg, 3, "")
+    deviceId: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    ms12: jspb.Message.getFieldWithDefault(msg, 4, false),
+    profileIdentifier: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -4777,6 +4781,14 @@ proto.rover.audience.v1.CreateDeviceRequest.deserializeBinaryFromReader = functi
       var value = /** @type {string} */ (reader.readString());
       msg.setDeviceId(value);
       break;
+    case 4:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setMs12(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProfileIdentifier(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -4824,6 +4836,20 @@ proto.rover.audience.v1.CreateDeviceRequest.serializeBinaryToWriter = function(m
   if (f.length > 0) {
     writer.writeString(
       3,
+      f
+    );
+  }
+  f = message.getMs12();
+  if (f) {
+    writer.writeBool(
+      4,
+      f
+    );
+  }
+  f = message.getProfileIdentifier();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -4887,6 +4913,38 @@ proto.rover.audience.v1.CreateDeviceRequest.prototype.getDeviceId = function() {
 /** @param {string} value */
 proto.rover.audience.v1.CreateDeviceRequest.prototype.setDeviceId = function(value) {
   jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional bool ms12 = 4;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.CreateDeviceRequest.prototype.getMs12 = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 4, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.CreateDeviceRequest.prototype.setMs12 = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional string profile_identifier = 5;
+ * @return {string}
+ */
+proto.rover.audience.v1.CreateDeviceRequest.prototype.getProfileIdentifier = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.CreateDeviceRequest.prototype.setProfileIdentifier = function(value) {
+  jspb.Message.setField(this, 5, value);
 };
 
 
@@ -7737,7 +7795,9 @@ proto.rover.audience.v1.SetDeviceProfileRequest.toObject = function(includeInsta
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    profileId: jspb.Message.getFieldWithDefault(msg, 3, "")
+    profileId: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    ms12: jspb.Message.getFieldWithDefault(msg, 4, false),
+    profileIdentifier: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -7787,6 +7847,14 @@ proto.rover.audience.v1.SetDeviceProfileRequest.deserializeBinaryFromReader = fu
       var value = /** @type {string} */ (reader.readString());
       msg.setProfileId(value);
       break;
+    case 4:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setMs12(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProfileIdentifier(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -7834,6 +7902,20 @@ proto.rover.audience.v1.SetDeviceProfileRequest.serializeBinaryToWriter = functi
   if (f.length > 0) {
     writer.writeString(
       3,
+      f
+    );
+  }
+  f = message.getMs12();
+  if (f) {
+    writer.writeBool(
+      4,
+      f
+    );
+  }
+  f = message.getProfileIdentifier();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -7897,6 +7979,38 @@ proto.rover.audience.v1.SetDeviceProfileRequest.prototype.getProfileId = functio
 /** @param {string} value */
 proto.rover.audience.v1.SetDeviceProfileRequest.prototype.setProfileId = function(value) {
   jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * optional bool ms12 = 4;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.SetDeviceProfileRequest.prototype.getMs12 = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 4, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.SetDeviceProfileRequest.prototype.setMs12 = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional string profile_identifier = 5;
+ * @return {string}
+ */
+proto.rover.audience.v1.SetDeviceProfileRequest.prototype.getProfileIdentifier = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.SetDeviceProfileRequest.prototype.setProfileIdentifier = function(value) {
+  jspb.Message.setField(this, 5, value);
 };
 
 
@@ -8061,7 +8175,8 @@ proto.rover.audience.v1.ListDevicesByProfileIdRequest.prototype.toObject = funct
 proto.rover.audience.v1.ListDevicesByProfileIdRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    profileId: jspb.Message.getFieldWithDefault(msg, 2, "")
+    profileId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    ms12: jspb.Message.getFieldWithDefault(msg, 4, false)
   };
 
   if (includeInstance) {
@@ -8107,6 +8222,10 @@ proto.rover.audience.v1.ListDevicesByProfileIdRequest.deserializeBinaryFromReade
       var value = /** @type {string} */ (reader.readString());
       msg.setProfileId(value);
       break;
+    case 4:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setMs12(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -8147,6 +8266,13 @@ proto.rover.audience.v1.ListDevicesByProfileIdRequest.serializeBinaryToWriter = 
   if (f.length > 0) {
     writer.writeString(
       2,
+      f
+    );
+  }
+  f = message.getMs12();
+  if (f) {
+    writer.writeBool(
+      4,
       f
     );
   }
@@ -8195,6 +8321,23 @@ proto.rover.audience.v1.ListDevicesByProfileIdRequest.prototype.getProfileId = f
 /** @param {string} value */
 proto.rover.audience.v1.ListDevicesByProfileIdRequest.prototype.setProfileId = function(value) {
   jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional bool ms12 = 4;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.ListDevicesByProfileIdRequest.prototype.getMs12 = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 4, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.ListDevicesByProfileIdRequest.prototype.setMs12 = function(value) {
+  jspb.Message.setField(this, 4, value);
 };
 
 
@@ -8413,7 +8556,9 @@ proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.prototype.toObject
 proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    identifier: jspb.Message.getFieldWithDefault(msg, 2, "")
+    identifier: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    ms12: jspb.Message.getFieldWithDefault(msg, 4, false),
+    profileIdentifier: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -8459,6 +8604,14 @@ proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.deserializeBinaryF
       var value = /** @type {string} */ (reader.readString());
       msg.setIdentifier(value);
       break;
+    case 4:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setMs12(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProfileIdentifier(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -8499,6 +8652,20 @@ proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.serializeBinaryToW
   if (f.length > 0) {
     writer.writeString(
       2,
+      f
+    );
+  }
+  f = message.getMs12();
+  if (f) {
+    writer.writeBool(
+      4,
+      f
+    );
+  }
+  f = message.getProfileIdentifier();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -8547,6 +8714,38 @@ proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.prototype.getIdent
 /** @param {string} value */
 proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.prototype.setIdentifier = function(value) {
   jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional bool ms12 = 4;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.prototype.getMs12 = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 4, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.prototype.setMs12 = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional string profile_identifier = 5;
+ * @return {string}
+ */
+proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.prototype.getProfileIdentifier = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.ListDevicesByProfileIdentifierRequest.prototype.setProfileIdentifier = function(value) {
+  jspb.Message.setField(this, 5, value);
 };
 
 
@@ -10377,6 +10576,333 @@ proto.rover.audience.v1.UpdateDeviceResponse.serializeBinaryToWriter = function(
  * @extends {jspb.Message}
  * @constructor
  */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.displayName = 'proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
+    deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.ValueUpdates.toObject) : []
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest;
+  return proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new auth_v1_auth_pb.AuthContext;
+      reader.readMessage(value,auth_v1_auth_pb.AuthContext.deserializeBinaryFromReader);
+      msg.setAuthContext(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeviceId(value);
+      break;
+    case 5:
+      var value = msg.getAttributesMap();
+      reader.readMessage(value, function(message, reader) {
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.ValueUpdates.deserializeBinaryFromReader);
+         });
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAuthContext();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
+    );
+  }
+  f = message.getDeviceId();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
+  f = message.getAttributesMap(true);
+  if (f && f.getLength() > 0) {
+    f.serializeBinary(5, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter);
+  }
+};
+
+
+/**
+ * optional rover.auth.v1.AuthContext auth_context = 1;
+ * @return {?proto.rover.auth.v1.AuthContext}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.getAuthContext = function() {
+  return /** @type{?proto.rover.auth.v1.AuthContext} */ (
+    jspb.Message.getWrapperField(this, auth_v1_auth_pb.AuthContext, 1));
+};
+
+
+/** @param {?proto.rover.auth.v1.AuthContext|undefined} value */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.setAuthContext = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.clearAuthContext = function() {
+  this.setAuthContext(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.hasAuthContext = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional string device_id = 2;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.getDeviceId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.setDeviceId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * map<string, ValueUpdates> attributes = 5;
+ * @param {boolean=} opt_noLazyCreate Do not create the map if
+ * empty, instead returning `undefined`
+ * @return {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.getAttributesMap = function(opt_noLazyCreate) {
+  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>} */ (
+      jspb.Message.getMapField(this, 5, opt_noLazyCreate,
+      proto.rover.audience.v1.ValueUpdates));
+};
+
+
+proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.clearAttributesMap = function() {
+  this.getAttributesMap().clear();
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.displayName = 'proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.toObject = function(includeInstance, msg) {
+  var f, obj = {
+
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse;
+  return proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.audience.v1.UpdateDeviceCustomAttributesResponse.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.rover.audience.v1.Device = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.Device.repeatedFields_, null);
 };
@@ -10473,7 +10999,8 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     proto.rover.audience.v1.IBeaconRegion.toObject, includeInstance),
     geofenceMonitoringRegionsUpdatedAt: (f = msg.getGeofenceMonitoringRegionsUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     geofenceMonitoringRegionsList: jspb.Message.toObjectList(msg.getGeofenceMonitoringRegionsList(),
-    proto.rover.audience.v1.GeofenceRegion.toObject, includeInstance)
+    proto.rover.audience.v1.GeofenceRegion.toObject, includeInstance),
+    profileIdentifier: jspb.Message.getFieldWithDefault(msg, 60, "")
   };
 
   if (includeInstance) {
@@ -10736,6 +11263,10 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
       var value = new proto.rover.audience.v1.GeofenceRegion;
       reader.readMessage(value,proto.rover.audience.v1.GeofenceRegion.deserializeBinaryFromReader);
       msg.addGeofenceMonitoringRegions(value);
+      break;
+    case 60:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProfileIdentifier(value);
       break;
     default:
       reader.skipField();
@@ -11139,6 +11670,13 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
       51,
       f,
       proto.rover.audience.v1.GeofenceRegion.serializeBinaryToWriter
+    );
+  }
+  f = message.getProfileIdentifier();
+  if (f.length > 0) {
+    writer.writeString(
+      60,
+      f
     );
   }
 };
@@ -12136,6 +12674,21 @@ proto.rover.audience.v1.Device.prototype.addGeofenceMonitoringRegions = function
 
 proto.rover.audience.v1.Device.prototype.clearGeofenceMonitoringRegionsList = function() {
   this.setGeofenceMonitoringRegionsList([]);
+};
+
+
+/**
+ * optional string profile_identifier = 60;
+ * @return {string}
+ */
+proto.rover.audience.v1.Device.prototype.getProfileIdentifier = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 60, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.Device.prototype.setProfileIdentifier = function(value) {
+  jspb.Message.setField(this, 60, value);
 };
 
 
