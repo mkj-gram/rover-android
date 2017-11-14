@@ -1,5 +1,5 @@
 {"_id":{"$oid":"0000000000000000000000d0"},"device_id":"D00000000000000000000000","profile_id":{"$oid":"000000000000000000000aa2"},"account_id":1, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
-{"_id":{"$oid":"0000000000000000000000d2"},"device_id":"D00000000000000000000002","profile_id":{"$oid":"000000000000000000000aa2"},"account_id":1, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
+{"_id":{"$oid":"0000000000000000000000d2"},"device_id":"D00000000000000000000002","profile_identifier":"hello","profile_id":{"$oid":"000000000000000000000aa2"},"account_id":1, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
 {"_id":{"$oid":"000000000000000000000aa3"},"device_id":"D00000000000000000000003","profile_id":{"$oid":"000000000000000000000aa3"},"account_id":1, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
 {"_id":{"$oid":"0000000000000000000000d3"},"device_id":"D00000000000000000000003","profile_id":{"$oid":"000000000000000000000aa3"},"account_id":5, "created_at":{"$date":"2017-06-14T15:44:18.496Z"},"updated_at":{"$date":"2017-06-14T15:44:18.496Z"}}
 
@@ -114,4 +114,170 @@
     "arr-remove": ["keeps", "removes"],
     "arr-add-remove": ["adds", "removes"]
   }
+}
+
+{
+  "_id":{"$oid":"1aaaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":8,
+  "profile_identifier": "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
+  "device_id":"1aaaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"1aaaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "bool": true,
+    "string": "hello world",
+    "integer": {"$numberLong": "42"},
+    "double": 3.1415,
+    "null": null,
+    "ts":  {"$date": "2017-10-30T14:05:53.102Z"},
+    "arr": ["hello", "world"]
+  }
+}
+
+{
+  "_id":{"$oid":"2aaaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":8,
+  "profile_identifier": "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
+  "device_id":"2aaaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"1aaaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": { 
+    "bool": true
+  }
+}
+
+{
+  "_id":{"$oid":"3aaaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":9,
+  "profile_identifier": "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
+  "device_id":"3aaaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"3aaaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "Last_Name": "bob"
+  }
+}
+
+{
+  "_id":{"$oid":"4aaaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":8,
+  "profile_identifier": "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
+  "device_id":"4aaaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"1aaaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "arr": ["hello"],
+    "arr-add": ["adds"],
+    "arr-remove": ["keeps", "removes"],
+    "arr-add-remove": ["adds", "removes"]
+  }
+}
+
+{
+  "_id":{"$oid":"5aaaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":11,
+  "profile_identifier": "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
+  "device_id":"5aaaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"5aaaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "bool":           true,
+    "string":         "hello world",
+    "integer":        {"$numberLong": "42"},
+    "double":         42.42,
+    "null":           null,
+    "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
+    "arr":            ["hello"],
+    "arr-add":        ["adds"],
+    "arr-remove":     ["keeps", "removes"],
+    "arr-add-remove": ["adds", "removes"]
+  }
+}
+
+{
+  "_id":{"$oid":"12aaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":12,
+  "profile_identifier": "12aaaaaaaaaaaaaaaaaaaaaa",
+  "device_id":"12aaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"12aaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "bool":           true,
+    "integer":        {"$numberLong": "42"},
+    "double":         42.42,
+    "string":         "hello world",
+    "arr":            ["hello", "world"],
+    "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
+    "null":           null
+  }
+}
+
+{
+  "_id":{"$oid":"13aaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":13,
+  "profile_identifier": "13aaaaaaaaaaaaaaaaaaaaaa",
+  "device_id":"13aaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"13aaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "bool":           true,
+    "integer":        {"$numberLong": "42"},
+    "double":         42.42,
+    "string":         "hello world",
+    "arr":            ["hello"],
+    "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
+    "null":           null
+  }
+}
+
+{
+  "_id":{"$oid":"14aaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":14,
+  "profile_identifier": "14aaaaaaaaaaaaaaaaaaaaaa",
+  "device_id":"14aaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"000000000000000000000000"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": { }
+}
+
+{
+  "_id":{"$oid":"15aaaaaaaaaaaaaaaaaaaaaa"},
+  "account_id":14,
+  "profile_identifier": "15aaaaaaaaaaaaaaaaaaaaaa",
+  "device_id":"15aaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"0194fdc2fa2ffcc041d3ff12"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": { }
+}
+
+
+{
+  "account_id":16,
+  "_id":{"$oid":"16aaaaaaaaaaaaaaaaaaaaaa"},
+  "device_id":"16aaaaaaaaaaaaaaaaaaaaaa",
+  "profile_identifier": "16aaaaaaaaaaaaaaaaaaaaaa",
+  "profile_id":{"$oid":"16aaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": { }
+}
+
+{
+  "account_id":16,
+  "_id":{"$oid":"17aaaaaaaaaaaaaaaaaaaaaa"},
+  "device_id":"17aaaaaaaaaaaaaaaaaaaaaa",
+  "profile_identifier": "",
+  "profile_id":{"$oid":"17aaaaaaaaaaaaaaaaaaaaaa"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": { }
 }

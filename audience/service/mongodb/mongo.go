@@ -62,6 +62,14 @@ func New(db *mgo.Database, options ...Option) *DB {
 	}
 }
 
+func (db DB) SetModeStrong() {
+	db.store.sess.SetMode(mgo.Strong, false)
+}
+
+func (db DB) ModeRefresh() {
+	db.store.sess.Refresh()
+}
+
 func (db *DB) Close() {
 	db.store.sess.Close()
 }

@@ -48,7 +48,7 @@ func (n *Notifier) Listen(ctx context.Context) {
 		flush = func() {
 			select {
 			case n.Pubc <- msgs:
-				msgs = msgs[:0]
+				msgs = make([]service.Message, 0, n.BatchSize)
 			default:
 				n.Log.Errorf("notify: listen: failed to submit batch")
 			}

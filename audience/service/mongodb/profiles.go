@@ -1,15 +1,12 @@
 package mongodb
 
 import (
-	"sort"
 	"time"
 
 	"golang.org/x/net/context"
 
-	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/pkg/errors"
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
@@ -268,28 +265,28 @@ func (s *profilesStore) GetProfileByDeviceId(ctx context.Context, r *audience.Ge
 		account_id = r.GetAuthContext().GetAccountId()
 		device_id  = r.GetDeviceId()
 
-		d bson.M
+		d Device
 
-		dq = bson.M{
-			"device_id":  device_id,
-			"account_id": account_id,
-		}
+		dQ = s.devices().
+			Find(bson.M{"device_id": device_id, "account_id": account_id}).
+			Select(bson.M{"profile_identifier": 1})
 	)
 
-	if err := s.devices().Find(dq).Select(bson.M{"profile_id": 1}).One(&d); err != nil {
+	if err := dQ.One(&d); err != nil {
 		return nil, wrapError(err, "devices.Find")
 	}
 
 	var (
 		p Profile
 
-		pq = bson.M{
-			"_id":        d["profile_id"],
-			"account_id": account_id,
-		}
+		pQ = s.profiles().
+			Find(bson.M{
+				"account_id": account_id,
+				"identifier": d.ProfileIdentifier,
+			})
 	)
 
-	if err := s.profiles().Find(pq).One(&p); err != nil {
+	if err := pQ.One(&p); err != nil {
 		return nil, wrapError(err, "profiles.Find")
 	}
 
@@ -483,31 +480,31 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 
 	// the update is accepted in case everything is ok or
 	// rejected if there's an attribute that doesn't match the schema.
-	schemaLess, err := s.validateProfileAttributes(schema, attrUpdates)
+	schemaLess, err := validateUpdateWithSchema(schema.Attributes, attrUpdates)
 	if err != nil {
 		return false, wrapError(err, "SchemaValidation")
 	}
 
 	// now for all the schemaLess attributes create the corresponding schema
 	if len(schemaLess) > 0 {
-		schemaUpdate, err := s.buildSchema(ctx, account_id, attrUpdates, schemaLess)
+		schemaUpdateAttrs, err := s.buildSchema(ctx, account_id, attrUpdates, schemaLess)
 		if err != nil {
 			return false, wrapError(err, "buildSchema")
 		}
 
-		if err := s.updateSchema(ctx, s.profiles_schemas(), schemaUpdate); err != nil {
+		if err := updateSchema(ctx, s.profiles_schemas(), schemaUpdateAttrs); err != nil {
 			return false, wrapError(err, "profile.updateSchema")
 		}
 
 		// ms-12: update device schema as well
 		// TODO: remove after ms-12 is done
-		if err := s.updateSchema(ctx, s.devices_schemas(), schemaUpdate); err != nil {
+		if err := updateSchema(ctx, s.devices_schemas(), schemaUpdateAttrs); err != nil {
 			return false, wrapError(err, "device.updateSchema")
 		}
 	}
 
 	//`schemaLess` contains names of the attributes that do not have schema defined yet
-	if err := s.updateAttributes(ctx, s.profiles(), attrUpdates, p.Id); err != nil {
+	if err := updateAttributes(ctx, s.profiles(), attrUpdates, p.Id); err != nil {
 		return false, wrapError(err, "profiles.updateAttributes")
 	}
 
@@ -536,201 +533,10 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 			deviceOids = append(deviceOids, deviceId)
 		}
 
-		if err := s.updateAttributes(ctx, s.devices(), attrUpdates, deviceOids...); err != nil {
+		if err := updateAttributes(ctx, s.devices(), attrUpdates, deviceOids...); err != nil {
 			return false, wrapError(err, "devices.updateAttributes")
 		}
 	}
 
 	return len(schemaLess) > 0, nil
-}
-
-// updateSchema inserts provided SchemaAttributes into the DB
-func (s *profilesStore) updateSchema(ctx context.Context, coll *mgo.Collection, schemaUpdate *ProfileSchema) error {
-	if len(schemaUpdate.Attributes) == 0 {
-		// nothing to do
-		return nil
-	}
-
-	// since []*SchemaAttribute isn't covariant to []interface{}
-	// explicit conversion is required, so .Insert can take whole collection to insert
-	var insert = make([]interface{}, len(schemaUpdate.Attributes))
-	for i := range schemaUpdate.Attributes {
-		insert[i] = schemaUpdate.Attributes[i]
-	}
-
-	return wrapError(coll.Insert(insert...), "schema.Insert")
-}
-
-// validateProfileAttributes returns an error if an attrUpdates doesn't validate against existing attribute schema.
-// Otherwise it returns attribtue names having no schema
-func (s *profilesStore) validateProfileAttributes(schema *ProfileSchema, attrUpdates map[string]*audience.ValueUpdates) ([]string, error) {
-	var (
-		// map of schema's attributeName -> AttributeType
-		schemaAttrs = make(map[string]string)
-		// attributes with no schema
-		schemaLess []string
-	)
-
-	// populate the schema map
-	for _, sa := range schema.Attributes {
-		schemaAttrs[sa.Attribute] = sa.AttributeType
-	}
-
-	// go through the attribute updates and validate types
-	// put attributes that don't have schema defined into schemaLess array
-	for aname, updates := range attrUpdates {
-		typ, ok := schemaAttrs[aname]
-
-		if !ok {
-			schemaLess = append(schemaLess, aname)
-			continue
-		}
-
-		if len(updates.GetValues()) == 0 {
-			errorf("ValueUpdate: %q: empty", aname)
-			continue
-		}
-
-		// TODO:
-		// ensure all updates are same type | null
-		var valueUpdate = updates.GetValues()[0]
-
-		// figure out the attribute type from the ValueUpdate
-		attrType, err := audience.ValueUpdateToTypeName(valueUpdate)
-		if err != nil {
-			return nil, wrapError(err, "ValidateAttribute")
-		}
-
-		// null values are valid values for all types
-		if attrType == audience.NullType {
-			continue
-		}
-
-		// ensure types match
-		if attrType != typ {
-			err := ErrorInvalidArgument{
-				error:        errors.New("TypeMismatch"),
-				ArgumentName: aname,
-				Value:        errors.Errorf("attr[type]=%q[%s] got=%s", aname, typ, attrType),
-			}
-			return nil, err
-		}
-	}
-
-	return schemaLess, nil
-}
-
-func (s *profilesStore) buildSchema(ctx context.Context, account_id int32, attrs map[string]*audience.ValueUpdates, schemaLess []string) (*ProfileSchema, error) {
-	var (
-		schemaAttrs []*SchemaAttribute
-		now         = s.timeNow()
-	)
-
-	// defined order
-	sort.Strings(schemaLess)
-
-	for i := range schemaLess {
-		var attrName, valueUpdates = schemaLess[i], attrs[schemaLess[i]]
-
-		if len(valueUpdates.GetValues()) == 0 {
-			errorf("ValueUpdates: %q: empty", attrName)
-			continue
-		}
-
-		// take first ValueUpdate
-		// it can be either SET with a type or
-		// ADD|REMOVE for a string array
-		valueUpdate := valueUpdates.GetValues()[0]
-
-		attrType, err := audience.ValueUpdateToTypeName(valueUpdate)
-		if err != nil {
-			errorf("ValueUpdateToTypeName: %s=%v: %v", attrName, valueUpdate, err)
-			continue
-		}
-
-		// null values are untyped: no schema affected
-		if attrType == audience.NullType {
-			continue
-		}
-
-		var schemaAttr = SchemaAttribute{
-			Id:            s.newObjectId(),
-			AccountId:     account_id,
-			CreatedAt:     now,
-			Attribute:     attrName,
-			AttributeType: attrType,
-		}
-
-		schemaAttrs = append(schemaAttrs, &schemaAttr)
-	}
-
-	return &ProfileSchema{schemaAttrs}, nil
-}
-
-func (s *profilesStore) updateAttributes(ctx context.Context, coll *mgo.Collection, attrs map[string]*audience.ValueUpdates, ids ...bson.ObjectId) (err error) {
-	debugf(coll.Name+".UpdateAttributes: [%v]: %#v", ids, attrs)
-	// TODO:
-	// mongo doesn't allow pulls/pushes in same update
-	// but our model does allow
-	// so we need to separate pulls/pushes into separate calls
-	var (
-		sets   = bson.M{}
-		pulls  = map[string][]string{}
-		pushes = map[string][]string{}
-	)
-
-	for k, vUpdate := range attrs {
-		var attr_name = "attributes." + k
-		for _, u := range vUpdate.GetValues() {
-			switch u.UpdateType {
-			case audience.ValueUpdate_SET:
-				if u.Value == nil {
-					continue
-				}
-				val, err := u.Value.Value()
-				if err != nil {
-					// TODO: handle error
-					panic(err)
-				}
-				sets[attr_name] = val
-			case audience.ValueUpdate_REMOVE:
-				pulls[attr_name] = append(pulls[attr_name], u.GetValue().GetStringValue())
-			case audience.ValueUpdate_ADD:
-				pushes[attr_name] = append(pushes[attr_name], u.GetValue().GetStringValue())
-			}
-		}
-	}
-
-	var update = bson.M{}
-
-	if len(sets) > 0 {
-		update["$set"] = sets
-	}
-	if len(pulls) > 0 {
-		var _pulls = bson.M{}
-		for k, v := range pulls {
-			_pulls[k] = bson.M{"$in": v}
-		}
-		update["$pull"] = _pulls
-	}
-	if len(pushes) > 0 {
-		var _pushes = bson.M{}
-		for k, v := range pushes {
-			_pushes[k] = bson.M{"$each": v}
-		}
-		update["$push"] = _pushes
-	}
-
-	if len(update) == 0 {
-		debugf(coll.Name+".Update: empty: skipping update: ids=[%v]", ids)
-		return nil
-	}
-
-	debugf(coll.Name+".Update: Bson: ids=[%v]: %+v", ids, update)
-
-	if _, err := coll.UpdateAll(bson.M{"_id": bson.M{"$in": ids}}, update); err != nil {
-		return wrapError(err, "profiles.UpdateId")
-	}
-
-	return nil
 }

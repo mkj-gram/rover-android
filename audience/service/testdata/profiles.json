@@ -96,11 +96,18 @@
   }
 }
 
+{
+  "account_id": 1,
+  "_id": { "$oid": "D00000000000000000000002" },
+  "identifier": "hello",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" }
+}
 
 {
   "account_id": 1,
   "_id": { "$oid": "bbaaaaaaaaaaaaaaaaaaaa00" },
-  "identifier": "",
+  "identifier": "bbaaaaaaaaaaaaaaaaaaaa00",
   "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
   "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
   "attributes": {
@@ -199,5 +206,60 @@
     "arr-add": ["adds"],
     "arr-remove": ["keeps", "removes"],
     "arr-add-remove": ["adds", "removes"]
+  }
+}
+
+{
+  "account_id": 8,
+  "_id": { "$oid": "1aaaaaaaaaaaaaaaaaaaaaaa" },
+  "identifier": "profilewithdevices",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": {
+  }
+}
+
+{
+  "account_id": 9,
+  "_id": { "$oid": "3aaaaaaaaaaaaaaaaaaaaaaa" },
+  "identifier": "profilewithdevices",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": { }
+}
+
+{
+  "account_id": 11,
+  "_id": { "$oid": "5aaaaaaaaaaaaaaaaaaaaaaa" },
+  "identifier": "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": { }
+}
+
+{
+  "account_id": 12,
+  "_id": { "$oid": "12aaaaaaaaaaaaaaaaaaaaaa" },
+  "identifier": "12aaaaaaaaaaaaaaaaaaaaaa",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": { }
+}
+
+
+{
+  "account_id": 13,
+  "_id": { "$oid": "13aaaaaaaaaaaaaaaaaaaaaa" },
+  "identifier": "13aaaaaaaaaaaaaaaaaaaaaa",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": { 
+    "bool":           true,
+    "integer":        {"$numberLong": "42"},
+    "double":         42.42,
+    "string":         "hello world",
+    "arr":            ["hello"],
+    "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
+    "null":           null
   }
 }

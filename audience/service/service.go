@@ -93,6 +93,23 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 	db := s.db.Copy()
 	defer db.Close()
 
+	// TODO: ms-12
+	if r.Ms12 {
+		if r.GetProfileId() != "" {
+			return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: deprecated")
+		}
+
+		// TODO: ms-12: note it returns associated profile
+		var profile, err = db.CreateDevice_Ms12(ctx, r)
+		if err != nil {
+			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice_ms12: %v", err)
+		}
+		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, profile.Id)
+		s.notify.deviceCreated(ctx, r.AuthContext.AccountId, profile.Id, r.DeviceId)
+
+		return &audience.CreateDeviceResponse{}, nil
+	}
+
 	if err := db.CreateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice: %v", err)
 	}
@@ -117,6 +134,41 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
 
 	return &audience.UpdateDeviceResponse{}, nil
+}
+
+// UpdateDeviceCustomAttributes implements the corresponding rpc
+func (s *Server) UpdateDeviceCustomAttributes(ctx context.Context, r *audience.UpdateDeviceCustomAttributesRequest) (*audience.UpdateDeviceCustomAttributesResponse, error) {
+	if err := validateID(r.GetDeviceId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
+	}
+
+	if err := validateTags(r.GetAttributes()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: tags: %v", err)
+	}
+
+	db := s.db.Copy()
+	defer db.Close()
+
+	schemaUpdated, err := db.UpdateDeviceCustomAttributes(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceCustomAttributes: %v", err)
+	}
+
+	// TODO: ms-12
+	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+	}
+
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+	if schemaUpdated {
+		// since deviceSchema <-> profileSchema is duplicated
+		s.notify.profileSchemaUpdated(ctx, r.AuthContext.AccountId)
+		// TODO: ms-12: disable once changes need to be pushed to the index
+		// s.notify.deviceSchemaUpdated(ctx, r.AuthContext.AccountId)
+	}
+
+	return &audience.UpdateDeviceCustomAttributesResponse{}, nil
 }
 
 // UpdateDeviceTestProperty implements the corresponding rpc
@@ -183,12 +235,46 @@ func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProf
 	if err := validateID(r.GetDeviceId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
 	}
-	if err := validateID(r.GetProfileId()); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
-	}
 
 	db := s.db.Copy()
 	defer db.Close()
+
+	// TODO: ms-12
+	if r.Ms12 {
+		if r.GetProfileId() != "" {
+			return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: deprecated")
+		}
+
+		// TODO: optimize this query out
+		before, err := db.FindDeviceById(ctx, r.DeviceId)
+		if err != nil {
+			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.FindDeviceById: before: %v", err)
+		}
+
+		// to ensure write and consequent read are made on the same node
+		// otherwise the read data may get stale
+		db.SetModeStrong()
+		db.ModeRefresh()
+
+		if err := db.SetDeviceProfile_Ms12(ctx, r); err != nil {
+			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.SetDeviceProfile_Ms12: %v", err)
+		}
+		// TODO: optimize this query out
+		after, err := db.FindDeviceById(ctx, r.DeviceId)
+		if err != nil {
+			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.FindDeviceById: after: %v", err)
+		}
+		// NOTE: profile may get created, so needs a notification
+		// it will eventually be removed
+		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, after.ProfileId)
+		s.notify.deviceProfileUpdated(ctx, r.AuthContext.AccountId, before.ProfileId, after.ProfileId, r.DeviceId)
+
+		return &audience.SetDeviceProfileResponse{}, nil
+	}
+
+	if err := validateID(r.GetProfileId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
+	}
 
 	oldProfileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
 	if err != nil {
@@ -198,7 +284,6 @@ func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProf
 	if err := db.SetDeviceProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.SetDeviceProfile: %v", err)
 	}
-
 	s.notify.deviceProfileUpdated(ctx, r.AuthContext.AccountId, oldProfileId, r.ProfileId, r.DeviceId)
 
 	return &audience.SetDeviceProfileResponse{}, nil
@@ -300,6 +385,10 @@ func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDev
 	db := s.db.Copy()
 	defer db.Close()
 
+	if r.Ms12 {
+		return nil, status.Errorf(codes.Unimplemented, "Validation: FindDevicesByProfileId: not implemented")
+	}
+
 	devices, err := db.ListDevicesByProfileId(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileId: %v", err)
@@ -309,12 +398,21 @@ func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDev
 }
 
 func (s *Server) ListDevicesByProfileIdentifier(ctx context.Context, r *audience.ListDevicesByProfileIdentifierRequest) (*audience.ListDevicesByProfileIdentifierResponse, error) {
+	db := s.db.Copy()
+	defer db.Close()
+
+	//TODO: ms-12
+	if r.Ms12 {
+		devices, err := db.ListDevicesByProfileIdentifier_ms12(ctx, r)
+		if err != nil {
+			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileIdentifier: %v", err)
+		}
+		return &audience.ListDevicesByProfileIdentifierResponse{devices}, nil
+	}
+
 	if err := validateID(r.GetIdentifier()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: Identifier: %v", err)
 	}
-
-	db := s.db.Copy()
-	defer db.Close()
 
 	devices, err := db.ListDevicesByProfileIdentifier(ctx, r)
 	if err != nil {
@@ -470,7 +568,7 @@ func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileReq
 
 	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId)
 	if schemaUpdated {
-		s.notify.schemaUpdated(ctx, r.AuthContext.AccountId)
+		s.notify.profileSchemaUpdated(ctx, r.AuthContext.AccountId)
 	}
 
 	return &audience.UpdateProfileResponse{}, nil
