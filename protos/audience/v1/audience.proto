@@ -46,6 +46,7 @@ service Audience {
 
   // Device Updates
   rpc UpdateDevice(UpdateDeviceRequest) returns (UpdateDeviceResponse);
+  rpc UpdateDeviceCustomAttributes(UpdateDeviceCustomAttributesRequest) returns (UpdateDeviceCustomAttributesResponse);
   rpc UpdateDevicePushToken(UpdateDevicePushTokenRequest) returns (UpdateDevicePushTokenResponse);
   rpc UpdateDeviceUnregisterPushToken(UpdateDeviceUnregisterPushTokenRequest) returns (UpdateDeviceUnregisterPushTokenResponse);
   rpc UpdateDeviceLocation(UpdateDeviceLocationRequest) returns (UpdateDeviceLocationResponse);
@@ -253,17 +254,25 @@ message GetDeviceByPushTokenResponse {
 
 message CreateDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
-  string profile_id                = 2;
+  // use profile_identifier instead
+  string profile_id                = 2 [deprecated=true];
   string device_id                 = 3;
+
+
+  // TODO: ms-12: this is transition-phase attribute to distinguish between old/new clients
+  // all clients using new data-model must set this attribute
+  // Once transition is complete ms12 will be ignored
+  bool ms12                        = 4;
+  string profile_identifier        = 5;
 }
 message CreateDeviceResponse {}
 
 message UpdateDevicePushTokenRequest {
   auth.v1.AuthContext auth_context = 1;
 
-  string device_id        = 2;
+  string device_id         = 2;
 
-  string push_token_key = 3;
+  string push_token_key    = 3;
   string push_environment  = 4;
 }
 message UpdateDevicePushTokenResponse {}
@@ -330,14 +339,20 @@ message SetDeviceProfileRequest {
   auth.v1.AuthContext auth_context = 1;
 
   string device_id = 2;
-  string profile_id = 3;
+  // use profile_identifier instead
+  string profile_id = 3 [deprecated = true];
+
+  bool ms12                 = 4;
+  string profile_identifier = 5;
 }
 message SetDeviceProfileResponse {}
 
 
 message ListDevicesByProfileIdRequest {
   auth.v1.AuthContext auth_context = 1;
-  string profile_id = 2;
+  string profile_id = 2 [deprecated = true];
+
+  bool ms12                 = 4;
 }
 message ListDevicesByProfileIdResponse {
   repeated Device devices = 1;
@@ -346,7 +361,11 @@ message ListDevicesByProfileIdResponse {
 
 message ListDevicesByProfileIdentifierRequest {
   auth.v1.AuthContext auth_context = 1;
-  string identifier = 2;
+  // use profile_identifier instead
+  string identifier = 2 [deprecated = true];
+
+  bool ms12                 = 4;
+  string profile_identifier = 5;
 }
 message ListDevicesByProfileIdentifierResponse {
   repeated Device devices = 1;
@@ -407,6 +426,13 @@ message UpdateDeviceRequest {
 message UpdateDeviceResponse { }
 
 
+message UpdateDeviceCustomAttributesRequest {
+  auth.v1.AuthContext auth_context = 1;
+  string device_id = 2;
+  map<string, ValueUpdates> attributes = 5;
+}
+message UpdateDeviceCustomAttributesResponse {}
+
 // Devices represent a single device that the Rover sdk is installed on. The
 // currently supported platforms are iOS,  Android, and Web. A device is the
 // last state that the sdk reported to the server. Only the device itself is
@@ -430,7 +456,6 @@ message Device {
   google.protobuf.Timestamp updated_at = 6;
 
   bool is_test_device = 7;
-
   string label = 8;
 
 
@@ -552,6 +577,8 @@ message Device {
 
   google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
   repeated GeofenceRegion geofence_monitoring_regions              = 51;
+
+  string profile_identifier = 60;
 }
 
 enum NotificationAuthorization {
