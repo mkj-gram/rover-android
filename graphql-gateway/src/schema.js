@@ -10,6 +10,7 @@ import {
     StringArrayPredicate,
     StringPredicate,
     VersionPredicate,
+    FloatPredicate
 } from './segments/Predicate'
 
 import BarcodeBlock from './experiences/models/BarcodeBlock'
@@ -27,6 +28,7 @@ const schema = new GraphQLSchema({
         BooleanPredicate,
         ButtonBlock,
         DatePredicate,
+        FloatPredicate,
         ImageBlock,
         GeofencePredicate,
         NumberPredicate,
