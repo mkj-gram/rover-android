@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/auth/service"
@@ -61,10 +62,15 @@ func main() {
 		log.Fatalf("CreateUser: %v", err)
 	}
 
-	fmt.Printf("Account: %v \n", account.GetId())
+	debugLogger := log.New(os.Stderr, "", 0)
+
+	debugLogger.Printf("Account: %v \n", account.GetId())
 	for _, token := range tokens.GetTokens() {
 		for _, scope := range token.GetPermissionScopes() {
-			fmt.Printf("Token: %v, Scope: %v\n", token.GetKey(), scope)
+			debugLogger.Printf("Token: %v, Scope: %v\n", token.GetKey(), scope)
 		}
 	}
+
+	// Need to pipe account id to ES index script
+	fmt.Printf("%d", account.GetId())
 }

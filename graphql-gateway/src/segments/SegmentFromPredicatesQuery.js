@@ -52,7 +52,6 @@ const SegmentFromPredicatesQuery = {
             return response.getTotalSize()
         }
 
-
         let profiles = {}
         let dataGridRows = []
 

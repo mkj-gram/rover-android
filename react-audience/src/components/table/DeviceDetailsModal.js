@@ -16,13 +16,10 @@ import DeviceDetailsTestingView from './DeviceDetailsTestingView'
 class DeviceDetailsModal extends Component {
     constructor(props) {
         super(props)
-        let selectedTestDevice = false
-        if (props.dataGridRows.length > 0 ) {
-            selectedTestDevice = props.dataGridRows[props.index].filter(
-                row =>
-                    row.attribute === 'is_test_device' && row.selector === 'DEVICE'
-            )[0].value
-        }
+        const selectedTestDevice = props.dataGridRows[props.index].filter(
+            row =>
+                row.attribute === 'is_test_device' && row.selector === 'DEVICE'
+        )[0].value
 
         this.state = {
             selectedTestDevice

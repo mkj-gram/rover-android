@@ -1,13 +1,9 @@
 #!/bin/sh
 
-# export MIGRATIONS_DIR=${MIGRATIONS_DIR:-'./auth/service/db/migrations/postgres'}
-# export DB_DSN=${DB_DSN:-'postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable'}
-
 set -e
-# set -x
 
 run() {
-	go run ./auth/service/cmd/authsvcd/main.go -db-dsn=${DB_DSN}
+	go run /go/src/github.com/roverplatform/rover/auth/service/cmd/authsvcd/main.go -db-dsn=${DB_DSN}
 }
 
 test() {
@@ -25,9 +21,13 @@ bench() {
 }
 
 migrate() {
-  go run ./auth/service/cmd/migration-cli/main.go \
+  go run /go/src/github.com/roverplatform/rover/auth/service/cmd/migration-cli/main.go \
       -pg-dsn=${DB_DSN} \
       -migrations-dir=${MIGRATION_DIR}
+}
+
+create_account() { 
+  go run /go/src/github.com/roverplatform/rover/auth/service/cmd/auth-cli/main.go -pg-dsn ${DB_DSN} -name ${NAME} -password ${PASSWORD} -email ${EMAIL}
 }
 
 for cmd in $*; do

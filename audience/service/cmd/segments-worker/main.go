@@ -13,6 +13,7 @@ import (
 
 	"golang.org/x/net/context"
 	_ "golang.org/x/net/trace"
+	"google.golang.org/api/option"
 
 	audience_elastic "github.com/roverplatform/rover/audience/service/elastic"
 	"github.com/roverplatform/rover/audience/service/mongodb"
@@ -28,13 +29,12 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	prom "github.com/prometheus/client_golang/prometheus"
 
-	"google.golang.org/api/option"
-
-	gerrors "cloud.google.com/go/errors"
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/trace"
 
 	"github.com/newrelic/go-agent"
+
+	gerrors "cloud.google.com/go/errors"
 )
 
 const (
@@ -207,28 +207,43 @@ func main() {
 	//
 	// GCP
 	//
-	if *gcpProjectID != "" && *gcpSvcAcctKeyPath != "" {
-		traceClient, err := trace.NewClient(ctx, *gcpProjectID, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
-		if err != nil {
-			stderr.Fatalf("trace.NewClient: %v", err)
+	if *gcpProjectID != "" {
+		var (
+			err          error
+			traceClient  *trace.Client
+			errClient    *gerrors.Client
+			pubsubClient *pubsub.Client
+			pubSubOpts   []option.ClientOption
+		)
+
+		if *gcpSvcAcctKeyPath != "" {
+			traceClient, err = trace.NewClient(ctx, *gcpProjectID, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+			if err != nil {
+				stderr.Fatalf("trace.NewClient: %v", err)
+			}
+
+			stdout.Println("gcp.tracing=on")
+
+			errClient, err = gerrors.NewClient(ctx, *gcpProjectID, projectName, "v1", true, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+			if err != nil {
+				stderr.Fatalf("errors.NewClient: %v", err)
+			}
+			runTests = func(h http.Handler) http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					h.ServeHTTP(w, r)
+					errClient.Report(r.Context(), r, r.URL.Path)
+				})
+			}(runTests)
+
+			stdout.Println("gcp.errors=on")
+
+			pubSubOpts = append(pubSubOpts, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+		} else {
+			stdout.Println("gcp.errors=off")
+			stdout.Println("gcp.tracing=off")
 		}
 
-		stdout.Println("gcp.tracing=on")
-
-		errClient, err := gerrors.NewClient(ctx, *gcpProjectID, projectName, "v1", true, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
-		if err != nil {
-			stderr.Fatalf("errors.NewClient: %v", err)
-		}
-		runTests = func(h http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				h.ServeHTTP(w, r)
-				errClient.Report(r.Context(), r, r.URL.Path)
-			})
-		}(runTests)
-
-		stdout.Println("gcp.errors=on")
-
-		pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+		pubsubClient, err = pubsub.NewClient(ctx, *gcpProjectID, pubSubOpts...)
 		if err != nil {
 			stderr.Fatalf("pubsub.NewClient: %v", err)
 		} else {
@@ -246,14 +261,19 @@ func main() {
 
 		workHandler = func(h WorkHandler) WorkHandler {
 			return func(ctx context.Context, msg *pubsub.Message) error {
-				errClient.Catch(ctx, gerrors.Repanic(false))
-				span := traceClient.NewSpan("segments-worker/work/pubsub")
-				defer span.Finish()
-				span.SetLabel("pubsub.Subscription", *pubsubSubcription)
-				span.SetLabel("pubsub.ID", msg.ID)
-				span.SetLabel("pubsub.PublishTime", msg.PublishTime.Format(time.RFC3339))
+				if errClient != nil {
+					errClient.Catch(ctx, gerrors.Repanic(false))
+				}
+				if traceClient != nil {
+					span := traceClient.NewSpan("segments-worker/work/pubsub")
+					defer span.Finish()
+					span.SetLabel("pubsub.Subscription", *pubsubSubcription)
+					span.SetLabel("pubsub.ID", msg.ID)
+					span.SetLabel("pubsub.PublishTime", msg.PublishTime.Format(time.RFC3339))
+				}
+
 				err := h(ctx, msg)
-				if err != nil {
+				if err != nil && errClient != nil {
 					errClient.Reportf(ctx, nil, "worker: pubsub.id=%s error=%v", msg.ID, err)
 				}
 				return err
@@ -276,10 +296,10 @@ func main() {
 				stdout.Printf("pubsub.receive=exiting status=OK\n")
 			}
 		}()
-
 	} else {
 		stdout.Println("gcp.errors=off")
 		stdout.Println("gcp.tracing=off")
+		stdout.Println("gcp.pubsub=off")
 	}
 
 	//

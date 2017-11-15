@@ -20,9 +20,9 @@ func main() {
 
 	var (
 		cmds = map[string]command{
-			"index:populate": new(cmdIndexPopulate),
-			"index:create":   new(cmdIndexCreate),
-			"index:delete":   new(cmdIndexDelete),
+			"mongo:clear": new(cmdMongoClear),
+			"mongo:seed":  new(cmdMongoSeed),
+			"mongo:reset": new(cmdMongoReset),
 		}
 
 		ctx, cancelFn = context.WithCancel(context.Background())
