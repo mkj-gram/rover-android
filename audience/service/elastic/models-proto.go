@@ -42,8 +42,8 @@ type Device struct {
 	LocationStreet    string     `json:"location_street"`
 	LocationUpdatedAt *time.Time `json:"location_updated_at"`
 
-	OsName            string     `json:"os_name"`
-	OsVersion         *struct {
+	OsName    string `json:"os_name"`
+	OsVersion *struct {
 		Major    int32 `json:"major"`
 		Minor    int32 `json:"minor"`
 		Revision int32 `json:"revision"`
