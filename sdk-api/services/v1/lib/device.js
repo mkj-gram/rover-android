@@ -165,7 +165,6 @@ module.exports = function(AudienceClient, logger) {
 		dp.setAppNamespace(device.app_namespace)
 		dp.setDeviceManufacturer(device.device_manufacturer)
 		dp.setDeviceModel(device.device_model)
-		dp.setDeviceModelRaw(device.device_model_raw)
 		dp.setOsVersion(versionToProto(device.os_version))
 		dp.setOsName(device.os_name)
 
@@ -289,6 +288,7 @@ module.exports = function(AudienceClient, logger) {
   		request.setAppBuild(deviceContext.app_build)
   		request.setAppNamespace(deviceContext.app_namespace)
   		request.setDeviceModel(deviceContext.device_model)
+  		request.setDeviceModelRaw(deviceContext.device_model_raw)
   		request.setDeviceManufacturer(deviceContext.device_manufacturer)
   		request.setOsName(deviceContext.os_name)
   		request.setOsVersion(versionToProto(deviceContext.os_version))

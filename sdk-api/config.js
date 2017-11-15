@@ -19,6 +19,19 @@ function saveToFile(name, data) {
     })
 }
 
+function readJsonFile(file, fallback) {
+    if (file === undefined || file === null) {
+        return fallback
+    }
+
+    try {
+        let contents = fs.readFileSync(file)
+        return JSON.parse(contents)
+    } catch(e) {
+        return fallback
+    }
+}
+
 const store = new Confidence.Store({
     connection: {
         host: {
@@ -154,6 +167,13 @@ const store = new Confidence.Store({
             $filter: 'env',
             production: process.env.LOG_LEVEL || 'info',
             $default: 'debug'
+        }
+    },
+    mappings: {
+        device: {
+            $filter: 'env',
+            production: readJsonFile(process.env.MAPPINGS_DEVICE, {}),
+            $default: readJsonFile(process.env.MAPPINGS_DEVICE, {'iPhone7,2': 'iPhone 6'})
         }
     }
 });

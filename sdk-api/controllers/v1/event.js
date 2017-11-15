@@ -4,7 +4,9 @@ const ISO3611 = require('../../lib/iso-3611')
 const IpParse = require("@rover-common/ip-parse")
 const AllowedScopes = ["sdk", "web", "server"]
 const Event = require('../../lib/event')
-
+const Config = require('../../config')
+const DeviceMappings = Config.get('/mappings/device')
+const DeviceContextSkipKeys = ['device_model_raw']
 
 function underscore(object) {
     if (object === null || object === undefined) {
@@ -97,8 +99,6 @@ function parseDevicePayload(request) {
     }
 
     const input = request.payload.data.attributes.device || {}
-
-    const rawDeviceMap = JSON.parse(fs.readFileSync('../../rawDeviceMap.json'))
     
     function parseVersion(string) {
         if (string === null || string === undefined) {
@@ -122,7 +122,7 @@ function parseDevicePayload(request) {
         device_manufacturer: String(input.manufacturer || ""),
         os_name: String(input['os-name'] || ""),
         os_version: parseVersion(input['os-version']),
-        device_model: String(rawDeviceMap[input.model] || input.model || ""),
+        device_model: String(DeviceMappings[input.model] || input.model || ""),
         device_model_raw: String(input.model || ""),
         sdk_version: parseVersion(input['sdk-version']),
         locale_language: String((input['locale-lang'] || "")).toLowerCase(),
@@ -461,7 +461,7 @@ module.exports = function() {
             }
 
             Object.keys(deviceContext).forEach(key => {
-                if (deviceContext[key] !== undefined && !lodash.isEqual(deviceContext[key], device[key])) {
+                if (!DeviceContextSkipKeys.includes(key) && deviceContext[key] !== undefined && !lodash.isEqual(deviceContext[key], device[key])) {
                     logger.debug("NO MATCH: " + key + " from: " + JSON.stringify(device[key]) + " to: " + JSON.stringify(deviceContext[key]))
                     needsUpdate = true
                 }
