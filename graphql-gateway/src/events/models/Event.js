@@ -6,6 +6,7 @@ import {
 } from 'graphql'
 
 import GraphQLJSON from 'graphql-type-json'
+import Context from './Context'
 
 const Event = new GraphQLInputObjectType({
     name: 'Event',

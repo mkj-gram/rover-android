@@ -4,7 +4,6 @@ import {
     GraphQLString
 } from 'graphql'
 
-import Context from '../models/Context'
 import Event from '../models/Event'
 import { requireAuthentication } from '../../resolvers'
 
