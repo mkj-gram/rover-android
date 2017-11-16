@@ -19,6 +19,9 @@ const Event = new GraphQLInputObjectType({
         timestamp: {
             type: new GraphQLNonNull(GraphQLString)
         },
+        context: {
+            type: new GraphQLNonNull(Context)
+        },
         attributes: {
             type: GraphQLJSON
         }

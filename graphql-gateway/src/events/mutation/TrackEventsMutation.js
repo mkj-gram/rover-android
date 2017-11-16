@@ -13,9 +13,6 @@ const TrackEventsMutation = {
     args: {
         events: {
             type: new GraphQLNonNull(new GraphQLList(Event))
-        },
-        context: {
-            type: new GraphQLNonNull(Context)
         }
     },
     resolve: requireAuthentication((_, { events }) => {
