@@ -35,8 +35,7 @@ app.use('/graphql', cors(), authMiddleware, graphqlHTTP(req => ({
     context: {
         authContext: req.auth && req.auth.context,
         accountToken: req.headers['x-rover-account-token'],
-        deviceId: req.headers['x-rover-device-id'],
-        profileId: req.headers['x-rover-profile-id'],
+        deviceId: req.headers['x-rover-device-id']
     },
     formatError: (error) => {
         return {
