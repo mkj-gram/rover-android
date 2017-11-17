@@ -10,8 +10,8 @@ import Region from './Region'
 import { marie } from '../fixtures/profiles'
 import { geofenceRegions, beaconRegions } from '../fixtures/regions'
 
-const ApplicationState = new GraphQLObjectType({
-    name: 'ApplicationState',
+const DeviceState = new GraphQLObjectType({
+    name: 'DeviceState',
     fields: {
         profile: {
             type: Profile,
@@ -28,4 +28,4 @@ const ApplicationState = new GraphQLObjectType({
     }
 })
 
-export default ApplicationState
+export default DeviceState
