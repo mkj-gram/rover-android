@@ -3,7 +3,7 @@ import Device from '../models/Device'
 import { requireAuthentication } from '../../resolvers'
 
 const DeviceQuery = {
-    type: new GraphQLNonNull(Device),
+    type: Device,
     resolve: requireAuthentication(() => ({}))
 }
 
