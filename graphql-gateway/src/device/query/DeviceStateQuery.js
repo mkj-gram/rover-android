@@ -1,10 +1,10 @@
 import { GraphQLNonNull } from 'graphql'
-import Device from '../models/Device'
+import DeviceState from '../models/DeviceState'
 import { requireAuthentication } from '../../resolvers'
 
-const DeviceQuery = {
-    type: new GraphQLNonNull(Device),
+const DeviceStateQuery = {
+    type: DeviceState,
     resolve: requireAuthentication(() => ({}))
 }
 
-export default DeviceQuery
+export default DeviceStateQuery

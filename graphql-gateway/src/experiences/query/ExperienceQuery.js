@@ -8,6 +8,9 @@ const ExperienceQuery = {
     args: {
         id: {
             type: new GraphQLNonNull(GraphQLID)
+        },
+        campaignId: {
+            type: GraphQLID
         }
     },
     resolve: requireAuthentication((_, { id }, { accountToken }) => {

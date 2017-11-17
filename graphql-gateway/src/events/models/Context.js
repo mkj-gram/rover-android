@@ -61,6 +61,9 @@ const Context = new GraphQLInputObjectType({
         operatingSystemVersion: {
             type: GraphQLString
         },
+        profileIdentifier: {
+            type: GraphQLString
+        },
         pushEnvironment: {
             type: GraphQLString
         },
