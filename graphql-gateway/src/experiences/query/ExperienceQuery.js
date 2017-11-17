@@ -1,5 +1,5 @@
 import request from 'request'
-import { GraphQLID, GraphQLNonNull, GraphQLString } from 'graphql'
+import { GraphQLID, GraphQLNonNull } from 'graphql'
 import Experience from '../models/Experience'
 import { requireAuthentication } from '../../resolvers'
 
@@ -10,7 +10,7 @@ const ExperienceQuery = {
             type: new GraphQLNonNull(GraphQLID)
         },
         campaignId: {
-            type: GraphQLString
+            type: GraphQLID
         }
     },
     resolve: requireAuthentication((_, { id }, { accountToken }) => {
