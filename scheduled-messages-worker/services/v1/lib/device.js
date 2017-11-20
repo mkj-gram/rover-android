@@ -90,6 +90,21 @@ module.exports = function(AudienceClient, logger) {
 		return region
 	}
 
+	function notificationAuthorizationFromProto(n) {
+		switch (n) {
+			case RoverApis.audience.v1.Models.NotificationAuthorization.UNKNOWN:
+				return "unknown"
+			case RoverApis.audience.v1.Models.NotificationAuthorization.NOT_DETERMINED:
+				return "not_determined"
+			case RoverApis.audience.v1.Models.NotificationAuthorization.DENIED:
+				return "denied"
+			case RoverApis.audience.v1.Models.NotificationAuthorization.AUTHORIZED:
+				return "authorized"
+			default:
+				return "unknown"
+		}
+	}
+
 	methods.fromProto = function(dp) {
 		let device = {}
 		device.id = dp.getDeviceId()
@@ -125,6 +140,7 @@ module.exports = function(AudienceClient, logger) {
 		device.radio = dp.getRadio()
 		device.time_zone = dp.getTimeZone()
 		device.platform = dp.getPlatform() === 1 ? dp.getOsName() : "Web"
+		device.notification_authorization = notificationAuthorizationFromProto(dp.getNotificationAuthorization())
 		device.is_background_enabled = dp.getIsBackgroundEnabled()
 		device.is_location_monitoring_enabled = dp.getIsLocationMonitoringEnabled()
 		device.is_bluetooth_enabled = dp.getIsBluetoothEnabled()
