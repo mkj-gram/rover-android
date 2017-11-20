@@ -5,7 +5,7 @@ const IpParse = require("@rover-common/ip-parse")
 const AllowedScopes = ["sdk", "web", "server"]
 const Event = require('../../lib/event')
 const Config = require('../../config')
-const DeviceMappings = Config.get('/mappings/device')
+const DeviceModelMappings = Config.get('/mappings/device')
 const DeviceContextSkipKeys = ['device_model_raw']
 
 function underscore(object) {
@@ -122,7 +122,7 @@ function parseDevicePayload(request) {
         device_manufacturer: String(input.manufacturer || ""),
         os_name: String(input['os-name'] || ""),
         os_version: parseVersion(input['os-version']),
-        device_model: String(DeviceMappings[input.model] || input.model || ""),
+        device_model: String(DeviceModelMappings[input.model] || input.model || ""),
         device_model_raw: String(input.model || ""),
         sdk_version: parseVersion(input['sdk-version']),
         locale_language: String((input['locale-lang'] || "")).toLowerCase(),
