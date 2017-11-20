@@ -97,6 +97,9 @@ var (
 		"platform": {
 			MissingValue: "",
 		},
+		"notification_authorization": {
+			MissingValue: "",
+		},
 		"push_environment": {
 			MissingValue: "",
 		},

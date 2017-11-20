@@ -2712,6 +2712,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				IsBluetoothEnabled:          true,
 				AdvertisingId:               "123hello",
 				Ip:                          "1.2.3.4",
+				NotificationAuthorization: audience.NotificationAuthorization_DENIED,
 
 				RegionMonitoringMode: audience.Device_GIMBAL,
 			},
@@ -2721,12 +2722,13 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 			before: &expect{
 				expErr: nil,
 				exp: &audience.Device{
-					AccountId: 5,
-					Id:        "000000000000000000000dd1",
-					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
-					ProfileId: "000000000000000000000ad1",
-					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+					AccountId:                 5,
+					Id:                        "000000000000000000000dd1",
+					DeviceId:                  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
+					ProfileId:                 "000000000000000000000ad1",
+					NotificationAuthorization: audience.NotificationAuthorization_UNKNOWN,
+					CreatedAt:                 protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt:                 protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 				},
 			},
 
@@ -2775,6 +2777,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					IsBluetoothEnabled:          true,
 					AdvertisingId:               "123hello",
 					Ip:                          "1.2.3.4",
+					NotificationAuthorization: audience.NotificationAuthorization_DENIED,
 
 					RegionMonitoringMode: audience.Device_GIMBAL,
 				},

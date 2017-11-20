@@ -106,6 +106,7 @@ const _getEventAttributesFromDevice = (device) => {
         time_zone: device.time_zone,
         sdk_version: serializeVersion(device.sdk_version),
         platform: device.platform,
+        notification_authorization: device.notification_authorization,
         os_name: device.os_name,
         os_version: serializeVersion(device.os_version),
         model: device.model,

@@ -94,6 +94,7 @@ type Device struct {
 	IsBluetoothEnabled          bool                `bson:"is_bluetooth_enabled"`
 	AdvertisingId               string              `bson:"advertising_id,omitempty"`
 	Ip                          string              `bson:"ip,omitempty"`
+	NotificationAuthorization   string              `bson:"notification_authorization,omitempty"`
 
 	LocationAccuracy  int32      `bson:"location_accuracy,omitempty"`
 	LocationLatitude  float64    `bson:"location_latitude,omitempty"`
@@ -177,6 +178,7 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.AdvertisingId = proto.AdvertisingId
 
 	d.Ip = proto.Ip
+	d.NotificationAuthorization = proto.NotificationAuthorization.String()
 
 	d.LocationAccuracy = proto.LocationAccuracy
 	d.LocationLongitude = proto.LocationLongitude
@@ -262,6 +264,7 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.AdvertisingId = d.AdvertisingId
 
 	proto.Ip = d.Ip
+	proto.NotificationAuthorization = audience.NotificationAuthorization(audience.NotificationAuthorization_value[d.NotificationAuthorization])
 
 	proto.PushTokenIsActive = d.PushTokenIsActive
 	proto.PushTokenUpdatedAt, _ = timeToProto(d.PushTokenUpdatedAt)
@@ -546,6 +549,7 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 	update["is_bluetooth_enabled"] = r.IsBluetoothEnabled
 	update["advertising_id"] = r.AdvertisingId
 	update["ip"] = r.Ip
+	update["notification_authorization"] = r.NotificationAuthorization.String()
 
 	frameworks := bson.M{}
 	for k, v := range r.Frameworks {

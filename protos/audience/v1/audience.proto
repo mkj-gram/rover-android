@@ -401,7 +401,8 @@ message UpdateDeviceRequest {
   string advertising_id               = 35;
   string ip                           = 36;
 
-  Device.RegionMonitoringMode region_monitoring_mode = 37;
+  Device.RegionMonitoringMode region_monitoring_mode   = 37;
+  NotificationAuthorization notification_authorization = 39;
 }
 message UpdateDeviceResponse { }
 
@@ -524,6 +525,8 @@ message Device {
   // ip address
   string ip                           = 40;
 
+  NotificationAuthorization notification_authorization = 53;
+
   // End Device Context Attributes
 
   // Location
@@ -551,6 +554,12 @@ message Device {
   repeated GeofenceRegion geofence_monitoring_regions              = 51;
 }
 
+enum NotificationAuthorization {
+  UNKNOWN         = 0;
+  NOT_DETERMINED  = 1;
+  AUTHORIZED      = 2;
+  DENIED          = 3;
+}
 
 enum Platform {
   UNDEFINED = 0;

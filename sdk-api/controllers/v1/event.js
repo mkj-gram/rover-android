@@ -130,7 +130,7 @@ function parseDevicePayload(request) {
         is_background_enabled: input['background-enabled'] === true ? true : false,
         is_location_monitoring_enabled: input['location-monitoring-enabled'] === true ? true : false,
         is_bluetooth_enabled: input['bluetooth-enabled'] === true ? true : false,
-        advertising_id: String(input.aid || "")
+        advertising_id: String(input.aid || ""),
     }
 
     const localeRegion = (input['locale-region'] || "").toLowerCase()
@@ -145,6 +145,14 @@ function parseDevicePayload(request) {
         }
     } else {
         context.locale_region = ""
+    }
+
+    if (context.platform === 'iOS' && context.os_name === 'iOS' && input['local-notifications-enabled'] !== undefined) {
+        context.notification_authorization = input['local-notifications-enabled'] === true ? 'authorized' : 'denied'
+    }
+
+    if (context.platform === 'Android' && context.os_name === 'Android' && input['notifications-enabled'] !== undefined) {
+        context.notification_authorization = input['notifications-enabled'] === true ? 'authorized' : 'denied'
     }
 
     if (request.headers['x-real-ip']) {

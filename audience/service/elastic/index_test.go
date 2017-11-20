@@ -75,8 +75,9 @@ func TestResponseMapping(t *testing.T) {
 						Frameworks: map[string]*audience.Version{
 							"io.rover.Rover": {1, 12, 3},
 						},
-						TimeZone:  "America/New_York",
-						UpdatedAt: protoTs(t, parseTime(t, "2017-06-13T20:20:06Z")),
+						TimeZone:                  "America/New_York",
+						NotificationAuthorization: audience.NotificationAuthorization_AUTHORIZED,
+						UpdatedAt:                 protoTs(t, parseTime(t, "2017-06-13T20:20:06Z")),
 					},
 					{
 						Id:                          "",
@@ -125,8 +126,9 @@ func TestResponseMapping(t *testing.T) {
 						Frameworks: map[string]*audience.Version{
 							"io.rover.Rover": {1, 15, 1},
 						},
-						TimeZone:  "America/New_York",
-						UpdatedAt: protoTs(t, parseTime(t, "2017-07-24T18:39:14Z")),
+						NotificationAuthorization: audience.NotificationAuthorization_UNKNOWN,
+						TimeZone:                  "America/New_York",
+						UpdatedAt:                 protoTs(t, parseTime(t, "2017-07-24T18:39:14Z")),
 					},
 				},
 				Profiles: []*audience.Profile{

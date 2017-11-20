@@ -70,6 +70,8 @@ func DeviceMapping() M {
 
 				"ip": M{"type": "ip"},
 
+				"notification_authorization": M{"type": "keyword"},
+
 				// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html
 				"location": M{"type": "geo_point"},
 

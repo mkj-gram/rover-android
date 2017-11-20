@@ -226,6 +226,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :advertising_id, :string, 35
     optional :ip, :string, 36
     optional :region_monitoring_mode, :enum, 37, "rover.audience.v1.Device.RegionMonitoringMode"
+    optional :notification_authorization, :enum, 39, "rover.audience.v1.NotificationAuthorization"
   end
   add_message "rover.audience.v1.UpdateDeviceResponse" do
   end
@@ -270,6 +271,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :is_bluetooth_enabled, :bool, 38
     optional :advertising_id, :string, 39
     optional :ip, :string, 40
+    optional :notification_authorization, :enum, 53, "rover.audience.v1.NotificationAuthorization"
     optional :location_accuracy, :int32, 41
     optional :location_latitude, :double, 42
     optional :location_longitude, :double, 43
@@ -647,6 +649,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.GetFieldSuggestionResponse" do
     repeated :suggestions, :string, 1
   end
+  add_enum "rover.audience.v1.NotificationAuthorization" do
+    value :UNKNOWN, 0
+    value :NOT_DETERMINED, 1
+    value :AUTHORIZED, 2
+    value :DENIED, 3
+  end
   add_enum "rover.audience.v1.Platform" do
     value :UNDEFINED, 0
     value :MOBILE, 1
@@ -786,6 +794,7 @@ module Rover
       GetFieldSuggestionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionRequest").msgclass
       GetFieldSuggestionRequest::Selector = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionRequest.Selector").enummodule
       GetFieldSuggestionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionResponse").msgclass
+      NotificationAuthorization = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.NotificationAuthorization").enummodule
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").enummodule
       Null = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Null").enummodule
     end
