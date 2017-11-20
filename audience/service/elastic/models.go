@@ -103,6 +103,8 @@ func DeviceDoc(d *mongodb.Device) M {
 		"location_street":     d.LocationStreet,
 		"location_updated_at": d.LocationUpdatedAt,
 
+		"notification_authorization": d.NotificationAuthorization,
+
 		// map<string, Version> frameworks 		 :M{"type": ""},
 
 		// RegionMonitoringMode region_monitoring_mode = 47;

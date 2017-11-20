@@ -20,6 +20,7 @@ type Device struct {
 	DeviceManufacturer          string     `json:"device_manufacturer"`
 	DeviceModel                 string     `json:"device_model"`
 	IP                          string     `json:"ip"`
+	NotificationAuthorization   string     `json:"notification_authorization"`
 	IsBackgroundEnabled         bool       `json:"is_background_enabled"`
 	IsBluetoothEnabled          bool       `json:"is_bluetooth_enabled"`
 	IsCellularEnabled           bool       `json:"is_cellular_enabled"`
@@ -145,6 +146,8 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.LocationRegion = d.LocationRegion
 	proto.LocationCity = d.LocationCity
 	proto.LocationUpdatedAt, _ = timeToProto(d.LocationUpdatedAt)
+
+	proto.NotificationAuthorization = audience.NotificationAuthorization(audience.NotificationAuthorization_value[d.NotificationAuthorization])
 
 	// TODO:
 	// proto.RegionMonitoringMode = audience.Device_RegionMonitoringMode(audience.Device_RegionMonitoringMode_value[d.RegionMonitoringMode])
