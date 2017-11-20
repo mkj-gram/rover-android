@@ -525,7 +525,8 @@ class BaseProcessor {
                     bluetooth_enabled: this._device.is_bluetooth_enabled,
                     location_monitoring_enabled: this._device.is_location_monitoring_enabled,
                     aid: this._device.advertising_id,
-                    ip: this._device.ip
+                    ip: this._device.ip,
+                    notification_authorization: this._device.notification_authorization
                 }
             }
 

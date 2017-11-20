@@ -46,6 +46,36 @@ module.exports = function(AudienceClient, logger) {
 
 	}
 
+	function notificationAuthorizationFromProto(n) {
+		switch (n) {
+			case RoverApis.audience.v1.Models.NotificationAuthorization.UNKNOWN:
+				return "unknown"
+			case RoverApis.audience.v1.Models.NotificationAuthorization.NOT_DETERMINED:
+				return "not_determined"
+			case RoverApis.audience.v1.Models.NotificationAuthorization.DENIED:
+				return "denied"
+			case RoverApis.audience.v1.Models.NotificationAuthorization.AUTHORIZED:
+				return "authorized"
+			default:
+				return "unknown"
+		}
+	}
+
+	function notificationAuthorizationToProto(n) {
+		switch (n) {
+			case "unknown":
+				return RoverApis.audience.v1.Models.NotificationAuthorization.UNKNOWN
+			case "not_determined":
+				return RoverApis.audience.v1.Models.NotificationAuthorization.NOT_DETERMINED
+			case "denied":
+				return RoverApis.audience.v1.Models.NotificationAuthorization.DENIED
+			case "authorized":
+				return RoverApis.audience.v1.Models.NotificationAuthorization.AUTHORIZED
+			default:
+				return RoverApis.audience.v1.Models.NotificationAuthorization.UNKNOWN
+		}
+	}
+
 	function geofenceRegionFromProto(gp) {
   		const region = {}
   		region.id = gp.getId()
@@ -130,6 +160,8 @@ module.exports = function(AudienceClient, logger) {
 		device.is_bluetooth_enabled = dp.getIsBluetoothEnabled()
 		device.advertising_id = dp.getAdvertisingId()
 		device.ip = dp.getIp()
+		device.notification_authorization = notificationAuthorizationFromProto(dp.getNotificationAuthorization())
+
 		device.location_accuracy = dp.getLocationAccuracy() === 0 ? null : dp.getLocationAccuracy()
 		device.location_latitude = dp.getLocationLatitude() === 0 ? null : dp.getLocationLatitude()
 		device.location_longitude = dp.getLocationLongitude() === 0 ? null : dp.getLocationLongitude()
@@ -193,6 +225,7 @@ module.exports = function(AudienceClient, logger) {
 		dp.setIsBluetoothEnabled(device.is_bluetooth_enabled)
 		dp.setAdvertisingId(device.advertising_id)
 		dp.setIp(device.ip)
+		dp.setNotificationAuthorization(notificationAuthorizationToProto(device.notification_authorization))
 
 		dp.setLocationAccuracy(device.location_accuracy)
 		dp.setLocationLatitude(device.location_latitude)
@@ -319,6 +352,7 @@ module.exports = function(AudienceClient, logger) {
   		request.setIsBluetoothEnabled(deviceContext.is_bluetooth_enabled)
   		request.setAdvertisingId(deviceContext.advertising_id)
   		request.setIp(deviceContext.ip)
+  		request.setNotificationAuthorization(notificationAuthorizationToProto(deviceContext.notification_authorization))
 
   		AudienceClient.updateDevice(request, function(err, reply) {
   			if (err) {
