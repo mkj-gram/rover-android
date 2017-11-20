@@ -24,12 +24,8 @@ function readJsonFile(file, fallback) {
         return fallback
     }
 
-    try {
-        let contents = fs.readFileSync(file)
-        return JSON.parse(contents)
-    } catch(e) {
-        return fallback
-    }
+    const contents = fs.readFileSync(file)
+    return JSON.parse(contents)
 }
 
 const store = new Confidence.Store({
@@ -170,10 +166,10 @@ const store = new Confidence.Store({
         }
     },
     mappings: {
-        device: {
+        device_model: {
             $filter: 'env',
-            production: readJsonFile(process.env.MAPPINGS_DEVICE, {}),
-            $default: readJsonFile(process.env.MAPPINGS_DEVICE, {'iPhone7,2': 'iPhone 6'})
+            production: readJsonFile(process.env.MAPPINGS_DEVICE_MODEL, {}),
+            $default: readJsonFile(process.env.MAPPINGS_DEVICE_MODEL, {})
         }
     }
 });
