@@ -1,35 +1,48 @@
 import request from 'request'
-import { GraphQLID, GraphQLNonNull } from 'graphql'
+import { GraphQLID, GraphQLNonNull, GraphQLString } from 'graphql'
 import Experience from '../models/Experience'
 import { requireAuthentication } from '../../resolvers'
+import { URL } from 'url'
 
 const ExperienceQuery = {
     type: Experience,
     args: {
         id: {
-            type: new GraphQLNonNull(GraphQLID)
+            type: GraphQLID
         },
         campaignId: {
             type: GraphQLID
+        },
+        url: {
+            type: GraphQLString
         }
     },
-    resolve: requireAuthentication((_, { id }, { accountToken }) => {
-        let baseUrl = 'https://api.rover.io'
-        const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST
-        const port = process.env.CONTENT_API_SERVICE_SERVICE_PORT
-        if (host && port) {
-            baseUrl = `http://${host}:${port}`
-        }
-
-        const options = {
-            url: `${baseUrl}/v1/experiences/${id}/current`,
-            headers: {
-                accept: 'application/json',
-                'x-rover-api-key': accountToken
-            }
-        }
-
+    resolve: requireAuthentication((_, { id: experienceId, url: campaignUrl }, { accountToken }) => {
         return new Promise((resolve, reject) => {
+            let identifier
+            if (experienceId !== null && experienceId !== undefined) {
+                identifier = experienceId
+            } else if (campaignUrl !== null && campaignUrl !== undefined) {
+                identifier = new URL(campaignUrl).pathname.replace('/', '')
+            } else {
+                return reject('Field "experience" argument "id" of type "ID" or argument "url" of type "String" is required but neither were provided.')
+            }
+
+            let baseUrl = 'https://api.rover.io'
+            const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST
+            const port = process.env.CONTENT_API_SERVICE_SERVICE_PORT
+            if (host && port) {
+                baseUrl = `http://${host}:${port}`
+            }
+
+            const options = {
+                url: `${baseUrl}/v1/experiences/${identifier}`,
+                headers: {
+                    accept: 'application/json',
+                    'x-rover-api-key': accountToken
+                }
+            }
+
             request(options, (err, response, body) => {
                 const error = err || errorFromResponse(response)
                 if (error) {
