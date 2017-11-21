@@ -13,6 +13,21 @@ export const getPlatformFromProto = p => {
     }
 }
 
+export const getNotificationAuthorizationFromProto = p => {
+    switch (p) {
+        case 1:
+            return 'Not Determined'
+        case 2:
+            return 'Authorized'
+        case 3:
+            return 'Denied'
+        default:
+            // TODO convert to null when front-end app can support
+            return ''
+    }
+}
+
+
 export const getPushEnvironmentFromProto = p => {
     return p.charAt(0).toUpperCase().concat(p.slice(1))
 }
@@ -46,6 +61,7 @@ export default (d) => {
         is_test_device: d.getIsTestDevice(),
         label: d.getLabel(),
         platform: getPlatformFromProto(d.getPlatform()),
+        notification_authorization: getNotificationAuthorizationFromProto(d.getNotificationAuthorization()),
         profile_id: d.getProfileId(),
         push_token_is_active: d.getPushTokenIsActive(),
         region_monitoring_mode: d.getRegionMonitoringMode(),

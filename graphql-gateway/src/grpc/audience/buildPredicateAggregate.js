@@ -51,6 +51,25 @@ export const buildStringPredicate = ({
         value = value.toUpperCase()
     }
 
+    if (attribute === 'notification_authorization') {
+        switch (value) {
+            case 'Unknown':
+                value = 'UNKNOWN'
+                break
+            case 'Not Determined':
+                value = 'NOT_DETERMINED'
+                break
+            case 'Authorized':
+                value = 'AUTHORIZED'
+                break
+            case 'Denied':
+                value = 'DENIED'
+                break
+            default:
+                value = 'UNKNOWN'
+        }
+    }
+
     if (attribute === 'push_environment') {
         value = value.toLowerCase()
     }

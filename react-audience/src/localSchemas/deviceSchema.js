@@ -194,6 +194,15 @@ export const getDeviceSchema = () => [
         options: ['Mobile', 'Web']
     },
     {
+        attribute: 'notification_authorization',
+        label: 'Notification Authorization',
+        __typename: 'StringPredicate',
+        group: null,
+        display: true,
+        filter: true,
+        options: ['Not Determined', 'Authorized', 'Denied']
+    },
+    {
         attribute: 'is_test_device',
         label: 'Test Device?', // Update when working on test device Milestone
         __typename: 'BooleanPredicate',
