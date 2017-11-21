@@ -1,7 +1,7 @@
 import {
+    GraphQLBoolean,
     GraphQLInputObjectType,
     GraphQLInt,
-    GraphQLBoolean,
     GraphQLString,
 } from 'graphql'
 
@@ -21,6 +21,9 @@ const Context = new GraphQLInputObjectType({
         },
         appVersion: {
             type: GraphQLString
+        },
+        attributes: {
+            type: GraphQLJSON
         },
         carrierName: {
             type: GraphQLString
