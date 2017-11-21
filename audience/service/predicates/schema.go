@@ -98,7 +98,7 @@ var (
 			MissingValue: "",
 		},
 		"notification_authorization": {
-			MissingValue: "",
+			MissingValue: "UNKNOWN",
 		},
 		"push_environment": {
 			MissingValue: "",
