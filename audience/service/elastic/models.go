@@ -103,8 +103,6 @@ func DeviceDoc(d *mongodb.Device) M {
 		"location_street":     d.LocationStreet,
 		"location_updated_at": d.LocationUpdatedAt,
 
-		"notification_authorization": d.NotificationAuthorization,
-
 		// map<string, Version> frameworks 		 :M{"type": ""},
 
 		// RegionMonitoringMode region_monitoring_mode = 47;
@@ -115,6 +113,12 @@ func DeviceDoc(d *mongodb.Device) M {
 		// google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
 		// repeated GeofenceRegion geofence_monitoring_regions = 51;
 
+	}
+
+	if d.NotificationAuthorization == "" {
+		m["notification_authorization"] = "UNKNOWN"
+	} else {
+		m["notification_authorization"] = d.NotificationAuthorization
 	}
 
 	if d.LocationLongitude != float64(0) && d.LocationLatitude != float64(0) {
