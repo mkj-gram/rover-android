@@ -6,12 +6,12 @@ const async = require('async');
 const keyPrefix = 'msgrl_';
 const internals = {};
 
-internals.getMessageRateLimitKey = function(customer, messageTemplate) {
-    return `${keyPrefix}${customer.id}:${messageTemplate.id}`;
+internals.getMessageRateLimitKey = function(device, messageTemplate) {
+    return `${device.account_id}${device.id}:${messageTemplate.id}`;
 };
 
-internals.getGlobalRateLimitKey = function(customer) {
-    return `${keyPrefix}${customer.id.toString()}`
+internals.getGlobalRateLimitKey = function(device) {
+    return `${keyPrefix}${device.id.toString()}`
 };
 
 
@@ -37,11 +37,11 @@ class LimitExceeded extends Error {
     }
 }
 
-internals.update = function(customer, messageTemplate, globalLimits, callback) {
+internals.update = function(device, messageTemplate, globalLimits, callback) {
     const server = this;
     const redis = server.connections.redis.client;
-    const messageRateLimitKey = internals.getMessageRateLimitKey(customer, messageTemplate);
-    const globalRateLimitKey = internals.getGlobalRateLimitKey(customer);
+    const messageRateLimitKey = internals.getMessageRateLimitKey(device, messageTemplate);
+    const globalRateLimitKey = internals.getGlobalRateLimitKey(device);
 
     let multi = redis.multi();
     let currentTime = moment.utc(new Date).unix();
@@ -88,13 +88,13 @@ internals.update = function(customer, messageTemplate, globalLimits, callback) {
 
 };
 
-internals.withinLimit = function(customer, messageTemplate, globalLimits, callback) {
+internals.withinLimit = function(device, messageTemplate, globalLimits, callback) {
     // first check the global limit
     // then check the individual limit
     const server = this;
     const redis = server.connections.redis.client;
-    const messageRateLimitKey = internals.getMessageRateLimitKey(customer, messageTemplate);
-    const globalRateLimitKey = internals.getGlobalRateLimitKey(customer);
+    const messageRateLimitKey = internals.getMessageRateLimitKey(device, messageTemplate);
+    const globalRateLimitKey = internals.getGlobalRateLimitKey(device);
     const currentTime = moment.utc(new Date);
 
     let tasks = [];

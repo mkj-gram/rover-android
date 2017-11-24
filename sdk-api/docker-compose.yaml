@@ -10,12 +10,12 @@ services:
 
   sdkapi:
     image: node:7.5
-    links: [rabbitmq, redis, postgres, audience-service, auth-service]
+    depends_on: [rabbitmq, redis, elastic, postgres, audience-service, auth-service]
     working_dir: /rover/sdk-api
     ports: ["3100:3100"]
     volumes:
       - ../../rover:/rover
-    command: node index.js
+    command: ./node_modules/.bin/nodemon index.js
     environment:
       NODE_ENV: production
 

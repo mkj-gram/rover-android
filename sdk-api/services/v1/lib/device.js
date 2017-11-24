@@ -1,6 +1,8 @@
 const RoverApis = require('@rover/apis')
 const grpc = require('grpc')
+const util = require('util')
 const async = require('async')
+const moment = require('moment')
 
 module.exports = function(AudienceClient, logger) {
 	let methods = {}
@@ -102,6 +104,75 @@ module.exports = function(AudienceClient, logger) {
 		return region
 	}
 
+
+	function isInteger(n) {
+		return Number(n) === n && n % 1 === 0
+	}
+
+	function isFloat(n) {
+		return Number(n) === n && n % 1 !== 0
+	}
+
+	function valueFromProto(value) {
+		if (!value.getValueTypeCase) {
+			return undefined
+		}
+
+		switch (value.getValueTypeCase()) {
+			case 1: {
+					return value.getBooleanValue()
+			}
+			case 2: {
+					return value.getIntegerValue()
+			}
+			case 3: {
+					return value.getDoubleValue()
+			}
+			case 4: {
+					return value.getStringValue()
+			}
+			case 5: {
+					return value.getStringArrayValue().getValuesList()
+			}
+			case 7: {
+					return null
+			}
+			case 8: {
+					return RoverApis.Helpers.timestampFromProto(value.getTimestampValue())
+			}
+			default: {
+					return undefined
+			}
+		}
+	}
+
+	function valueToProto(value) {
+		const protoValue = new RoverApis.audience.v1.Models.Value()
+
+		if(util.isBoolean(value)) {
+				protoValue.setBooleanValue(value)
+		} else if(isFloat(value)) {
+				protoValue.setDoubleValue(value)
+		} else if(isInteger(value)) {
+				protoValue.setIntegerValue(value)
+		} else if(moment(value, moment.ISO_8601).isValid()) {
+				protoValue.setTimestampValue(RoverApis.Helpers.timestampToProto(new Date(value)))
+		} else if(util.isString(value)) {
+				protoValue.setStringValue(value)
+		} else if(value === null) {
+				protoValue.setNullValue(RoverApis.audience.v1.Models.Null.NULL)
+		} else if(util.isArray(value)) {
+				const strings  = value.filter(v => { return util.isString(v) })
+				const stringArray = new RoverApis.audience.v1.Models.Value.StringArray()
+				stringArray.setValuesList(strings)
+				protoValue.setStringArrayValue(stringArray)
+		} else {
+			return null
+		}
+
+		return protoValue
+	}
+
 	function ibeaconRegionToProto(ibeacon) {
 		const region = new RoverApis.audience.v1.Models.IBeaconRegion()
 		region.setUuid(ibeacon.uuid)
@@ -120,13 +191,36 @@ module.exports = function(AudienceClient, logger) {
 		return region
 	}
 
+	function attributesFromProto(attrMap) {
+		let attrs = {};
+
+		attrMap.keys().arr_.forEach(key => {
+			attrs[key] = valueFromProto(attrMap.get(key))
+		})
+
+		return attrs
+	}
+
+	function attributesToProto(attrMap, attrs) {
+		Object.keys(attrs).forEach(key => {
+			const value = valueToProto(attrs[key])
+			if (value) {
+				attrMap.set(key, value)
+			}
+		})
+	}
+
 	function deviceFromProto(dp) {
 		let device = {}
 		device.id = dp.getDeviceId()
 		device.account_id = dp.getAccountId()
-		device.profile_id = dp.getProfileId()
 		device.updated_at = RoverApis.Helpers.timestampFromProto(dp.getUpdatedAt())
 		device.created_at = RoverApis.Helpers.timestampFromProto(dp.getCreatedAt())
+
+		// deprecated: use profile_identifier to reference profile
+		device.profile_id = dp.getProfileId()
+		device.profile_identifier = dp.getProfileIdentifier()
+		device.attributes = attributesFromProto(dp.getAttributesMap())
 
 		// Tokens
 		device.push_environment = dp.getPushEnvironment()
@@ -184,6 +278,11 @@ module.exports = function(AudienceClient, logger) {
 		dp.setUpdatedAt(RoverApis.Helpers.timestampToProto(device.updated_at))
 		dp.setCreatedAt(RoverApis.Helpers.timestampToProto(device.created_at))
 
+		dp.setProfileIdentifier(device.profile_identifier)
+
+		// custom attributes
+		attributesToProto(dp.getAttributesMap(), device)
+
 		// Tokens
 		dp.setPushEnvironment(device.push_environment)
 		dp.setPushTokenKey(device.push_token)
@@ -201,7 +300,10 @@ module.exports = function(AudienceClient, logger) {
 		dp.setOsName(device.os_name)
 
 		let frameworks = dp.getFrameworksMap()
-		frameworks.set('io.rover.Rover', versionToProto(device.sdk_version))
+		const v = versionToProto(device.sdk_version)
+		if (v) {
+			frameworks.set('io.rover.Rover', v)
+		}
 		
 		dp.setLocaleLanguage(device.locale_language)
 		dp.setLocaleRegion(device.locale_region)
@@ -269,11 +371,13 @@ module.exports = function(AudienceClient, logger) {
 
 	}
 
-	methods.create = function(accountId, deviceId, profileId, callback) {
+
+	methods.create = function(accountId, deviceId, profileIdentifier, callback) {
 		let request = new RoverApis.audience.v1.Models.CreateDeviceRequest()
 		request.setAuthContext(buildAuthContext(accountId))
+		request.setMs12(true)
 		request.setDeviceId(deviceId)
-		request.setProfileId(profileId)
+		request.setProfileIdentifier(profileIdentifier)
 
 		AudienceClient.createDevice(request, function(err, reply) {
 			if (err) {
@@ -283,7 +387,7 @@ module.exports = function(AudienceClient, logger) {
 			let device = {
 				id: deviceId,
 				account_id: accountId,
-				profile_id: profileId
+				profile_identifier: profileIdentifier
 			}
 
 			return callback(null, device)
@@ -306,10 +410,11 @@ module.exports = function(AudienceClient, logger) {
 	}
 
 	methods.updateDeviceWithContext = function(accountId, deviceId, deviceContext, callback) {
-
-  		let request = new RoverApis.audience.v1.Models.UpdateDeviceRequest()
+			let request = new RoverApis.audience.v1.Models.UpdateDeviceRequest()
   		request.setAuthContext(buildAuthContext(accountId))
   		request.setDeviceId(deviceId)
+      // TODO: should profile_identifier be part of the update?
+  		// request.setProfileIdentifier(deviceContext.profile_identifier)
 
   		/*
   			Build Request
@@ -331,7 +436,6 @@ module.exports = function(AudienceClient, logger) {
   		if (sdkVersion) {
   			frameworks.set('io.rover.Rover', versionToProto(deviceContext.sdk_version))
   		}
-  		
 
   		request.setLocaleLanguage(deviceContext.locale_language)
   		request.setLocaleRegion(deviceContext.locale_region)
@@ -359,17 +463,53 @@ module.exports = function(AudienceClient, logger) {
   			if (err) {
   				return callback(err)
   			}
-  			
+
   			return callback()
   		})
 	}
 
-	methods.moveToProfile = function(accountId, deviceId, newProfileId, callback) {
-		let request = new RoverApis.audience.v1.Models.SetDeviceProfileRequest()
+
+	methods.updateCustomAttributes = function(accountId, deviceId, attributeUpdates, callback) {
+		if (Object.keys(attributeUpdates).length === 0) {
+			return callback()
+		}
+
+		let request = new RoverApis.audience.v1.Models.UpdateDeviceCustomAttributesRequest()
 		request.setAuthContext(buildAuthContext(accountId))
 		request.setDeviceId(deviceId)
-		request.setProfileId(newProfileId)
 
+		let updates = request.getAttributesMap()
+
+		Object.keys(attributeUpdates).forEach(key => {
+			const value = valueToProto(attributeUpdates[key])
+			if (value) {
+				const valueUpdates = new RoverApis.audience.v1.Models.ValueUpdates()
+				const setOperation = new RoverApis.audience.v1.Models.ValueUpdate()
+				setOperation.setUpdateType(RoverApis.audience.v1.Models.ValueUpdate.UpdateType.SET)
+				setOperation.setValue(value)
+				valueUpdates.setValuesList([setOperation])
+				updates.set(key, valueUpdates)
+			}
+		})
+
+		logger.debug("UpdateCustomAttributes:", JSON.stringify(request.toObject()))
+		AudienceClient.updateDeviceCustomAttributes(request, function(err, reply) {
+			if (err) {
+				return callback(err)
+			}
+
+			return callback()
+		})
+	}
+
+	methods.setDeviceProfile = function(accountId, deviceId, profileIdentifier, callback) {
+		let request = new RoverApis.audience.v1.Models.SetDeviceProfileRequest()
+    request.setMs12(true) // use new data model api
+		request.setAuthContext(buildAuthContext(accountId))
+		request.setDeviceId(deviceId)
+		request.setProfileIdentifier(profileIdentifier || "")
+
+		logger.debug("setDeviceProfile:", JSON.stringify(request.toObject()))
 		AudienceClient.setDeviceProfile(request, function(err, reply) {
 			if (err) {
 				return callback(err)
@@ -452,16 +592,17 @@ module.exports = function(AudienceClient, logger) {
 		})
 	}
 
-	methods.findAllByProfileIds = function(accountId, profileIds, callback) {
+	methods.findAllByProfileIdentifiers = function(accountId, profileIdentifiers, callback) {
 		const authContext = buildAuthContext(accountId)
 
-		let requests = profileIds.map(function(id) {
+		let requests = profileIdentifiers.map(function(profileIdentifier) {
 			return function(done) {
-				let request = new RoverApis.audience.v1.Models.ListDevicesByProfileIdRequest()
+				let request = new RoverApis.audience.v1.Models.ListDevicesByProfileIdentifierRequest()
 				request.setAuthContext(authContext)
-				request.setProfileId(id)
+        request.setMs12(true)
+				request.setProfileIdentifier(profileIdentifier)
 
-				AudienceClient.listDevicesByProfileId(request, function(err, reply) {
+				AudienceClient.listDevicesByProfileIdentifier(request, function(err, reply) {
 					if (err) {
 						logger.error(err)
 						// Don't error out just continue

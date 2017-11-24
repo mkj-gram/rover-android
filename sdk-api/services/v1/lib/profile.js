@@ -70,9 +70,11 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
             const stringArray = new RoverApis.audience.v1.Models.Value.StringArray()
             stringArray.setValuesList(strings)
             protoValue.setStringArrayValue(stringArray)
+        } else {
+          return null
         }
 
-        return protoValue        
+        return protoValue
     }
 
 
@@ -113,7 +115,9 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
         Object.keys(profile).forEach(function(key) {
             if (!roverKeys.includes(key)) {
                 const value = valueToProto(profile[key])
-                attributes.set(key, value)
+                if (value !== null) {
+                    attributes.set(key, value)
+                }
             }
         })
 
@@ -257,6 +261,7 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
         })
     }
 
+    // update profile custom attributes
     methods.updateAttributes = function(accountId, profileId, attributeUpdates, callback) {
         if (Object.keys(attributeUpdates).length === 0) {
             // NO-OP
@@ -272,12 +277,14 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
 
         Object.keys(attributeUpdates).forEach(key => {
             const value = valueToProto(attributeUpdates[key])
-            const valueUpdates = new RoverApis.audience.v1.Models.ValueUpdates()
-            const setOperation = new RoverApis.audience.v1.Models.ValueUpdate()
-            setOperation.setUpdateType(RoverApis.audience.v1.Models.ValueUpdate.UpdateType.SET)
-            setOperation.setValue(value)
-            valueUpdates.setValuesList([setOperation])
-            updates.set(key, valueUpdates)
+            if (value !== null) {
+                const valueUpdates = new RoverApis.audience.v1.Models.ValueUpdates()
+                const setOperation = new RoverApis.audience.v1.Models.ValueUpdate()
+                setOperation.setUpdateType(RoverApis.audience.v1.Models.ValueUpdate.UpdateType.SET)
+                setOperation.setValue(value)
+                valueUpdates.setValuesList([setOperation])
+                updates.set(key, valueUpdates)
+            }
         })
 
         logger.debug(JSON.stringify(request.toObject()))

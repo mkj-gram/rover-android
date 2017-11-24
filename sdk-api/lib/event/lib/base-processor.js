@@ -315,7 +315,7 @@ class BaseProcessor {
 
         Promise.map(messageTemplates, (messageTemplate) => new Promise((resolve, reject) => {
             
-            methods.rateLimit.withinLimit(this._customer, messageTemplate, this._account.message_limits, (err, success) => {
+            methods.rateLimit.withinLimit(this._device, messageTemplate, this._account.message_limits, (err, success) => {
                 if (err) {
                     logger.error(err);
                     return resolve();
@@ -420,7 +420,7 @@ class BaseProcessor {
             }));
 
             let rateLimitPromises = messageTemplates.map(messageTemplate => new Promise((resolve, reject) => {
-                methods.rateLimit.update(this._customer, messageTemplate, this._account.message_limits, (err) => {
+                methods.rateLimit.update(this._device, messageTemplate, this._account.message_limits, (err) => {
                     if (err) {
                         logger.error(err);
                     }
@@ -509,6 +509,7 @@ class BaseProcessor {
             let deviceEventAttributes = {
                 device: {
                     id: this._device.id,
+                    attributes: this._device.attributes,
                     token: this._device.push_token,
                     locale_lang: this._device.locale_language,
                     locale_region: this._device.locale_region,

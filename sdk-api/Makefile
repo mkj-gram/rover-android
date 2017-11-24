@@ -1,7 +1,7 @@
 DC ?= docker-compose -f ../docker/rover.docker-compose.yaml -f docker-compose.yaml
 
 start:
-	${DC} up --remove-orphans
+	${DC} up --remove-orphans sdkapi
 
 stop:
 	${DC} down
@@ -11,3 +11,5 @@ run:
 
 shell:
 	${DC} run --rm --service-ports sdkapi bash
+
+.PHONY: start stop run shell

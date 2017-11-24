@@ -6,7 +6,10 @@ const AllowedScopes = ["sdk", "web", "server"]
 const Event = require('../../lib/event')
 const Config = require('../../config')
 const DeviceModelMappings = Config.get('/mappings/device_model')
-const DeviceContextSkipKeys = ['device_model_raw']
+const DeviceContextSkipKeys = [
+  'device_model_raw',
+  'profile_identifier' // it's a special attribute that has its own RPC, it shoudn't trigger update, so do not treat it as rest of context attrs
+]
 
 function underscore(object) {
     if (object === null || object === undefined) {
@@ -55,41 +58,37 @@ function parseEventPayload(request) {
     return event;
 }
 
-function parseProfilePayload(request) {
-    let profile = {}
+function parseCustomPayload(request) {
+    let payload = {}
     // Do we need to underscore?
-    let input = request.payload.data.attributes.user || {} //underscore(request.payload.data.attributes.user)
+    let customAttrs = request.payload.data.attributes.user || {} //underscore(request.payload.data.attributes.user)
 
-    if(request.headers['x-rover-customer-id']) {
-        input['identifier'] = request.headers['x-rover-customer-id']
-    }
-
-    Object.keys(input).forEach(key => {
+    Object.keys(customAttrs).forEach(key => {
         // Flatten out traits
         if (key === 'traits') {
-            Object.assign(profile, input['traits'])
+            Object.assign(payload, customAttrs['traits'])
         } else {
-            profile[key] = input[key]
+            payload[key] = customAttrs[key]
         }
     })
 
-    if (profile["id"]) {
-        delete profile["id"]
+    if (payload["id"]) {
+        delete payload["id"]
     }
 
-    if (profile["account_id"]) {
-        delete profile["account_id"]
+    if (payload["account_id"]) {
+        delete payload["account_id"]
     }
 
-    if (profile["identifier"] === undefined || profile["identifier"] === "") {
-        profile["identifier"] = null
+    if (payload["identifier"] === undefined || payload["identifier"] === "") {
+        payload["identifier"] = null
     }
 
-    if (profile['tags'] === null) {
-        profile['tags'] = []
+    if (payload['tags'] === null) {
+        payload['tags'] = []
     }
 
-    return profile
+    return payload
 }
 
 
@@ -99,7 +98,7 @@ function parseDevicePayload(request) {
     }
 
     const input = request.payload.data.attributes.device || {}
-    
+
     function parseVersion(string) {
         if (string === null || string === undefined) {
             return null
@@ -115,7 +114,12 @@ function parseDevicePayload(request) {
         return version
     }
 
+    const profile = request.payload.data.attributes.user || {}
+    const profile_identifier = profile.identifier || request.headers['x-rover-customer-id']
+
     let context = {
+        profile_identifier: String( profile_identifier || ""),
+
         push_environment: input.development === true ? "development" : "production",
         push_token: String(input.token || ""),
         app_namespace: String(input['app-identifier'] || ""),
@@ -167,37 +171,40 @@ function parseDevicePayload(request) {
 
 // If a server or client doesn't send in the entire profile this does not mean
 // the missing attributes in the payload equal to deleting them. Can only be set to null
-function profileDifferences(currentProfile, newProfile) {
-    let attributeUpdated = {}
+function diffAttributes(aAttrs, bAttrs) {
+    let diffAttrs = {}
 
     // Compare all attributes except for id, identifier, account_id
-    Object.keys(currentProfile).forEach(key => {
-        const value = currentProfile[key]
-        if ((typeof value !== 'object' || value instanceof Array) && !lodash.isEqual(newProfile[key], value) && newProfile[key] !== undefined) {
-            attributeUpdated[key] = newProfile[key]
+    // go through aAttrs and find keys which values differ/absent in bAttrs
+    Object.keys(aAttrs).forEach(key => {
+        const value = aAttrs[key]
+        if ((typeof value !== 'object' || value instanceof Array) && !lodash.isEqual(bAttrs[key], value) && bAttrs[key] !== undefined) {
+            diffAttrs[key] = bAttrs[key]
         }
     })
 
-    Object.keys(newProfile).forEach(key => {
-        const newValue = newProfile[key]
-        if (!lodash.isEqual(currentProfile[key], newValue) && !(currentProfile[key] === null && newValue === null || currentProfile[key] === undefined && newValue === null )) {
-            attributeUpdated[key] = newValue
+    // also go through bAttrs and find keys which values differ/absent in aAttrs
+    Object.keys(bAttrs).forEach(key => {
+        const newValue = bAttrs[key]
+        if (!lodash.isEqual(aAttrs[key], newValue) && !(aAttrs[key] === null && newValue === null || aAttrs[key] === undefined && newValue === null )) {
+            diffAttrs[key] = newValue
         }
     })
 
-    if (attributeUpdated["id"]) {
-        delete attributeUpdated["id"]
+    // skip id,account_id/identifier attrs
+    if (diffAttrs["id"]) {
+        delete diffAttrs["id"]
     }
 
-    if (attributeUpdated["account_id"]) {
-        delete attributeUpdated["account_id"]
+    if (diffAttrs["account_id"]) {
+        delete diffAttrs["account_id"]
     }
 
-    if (attributeUpdated["identifier"]) {
-        delete attributeUpdated["identifier"]
+    if (diffAttrs["identifier"]) {
+        delete diffAttrs["identifier"]
     }
 
-    return attributeUpdated
+    return diffAttrs
 }
 
 function didDeviceUpdateLocation(device, newDevice) {
@@ -313,28 +320,11 @@ module.exports = function() {
         const methods = server.methods
         const deviceId = request.headers['x-rover-device-id'].toUpperCase()
         const accountId = request.auth.credentials.account.id
-        const profilePayload = parseProfilePayload(request)
+        const customPayload = parseCustomPayload(request)
         let deviceUpdated = false
 
-        function createDeviceWithAnonymousProfile(accountId, deviceId, callback) {
-            methods.profile.createAnonymousProfile(accountId, function(err, profile) {
-                if (err) {
-                    return callback()
-                }
-
-
-                methods.device.create(accountId, deviceId, profile.id, function(err, device) {
-                    if (err) {
-                        return callback(err)
-                    }
-
-                    return callback(null, device, profile)
-                })
-            })
-        }
-
-        function updateDeviceAndWriteResponse(profile, device, newDevice, response) {
-            
+        // updates Location, BeaconRegions, GeofenseRegion in parallel
+        function updateDeviceAndWriteResponse(device, newDevice, response) {
             let tasks = []
 
             if (didDeviceUpdateLocation(device, newDevice)) {
@@ -394,49 +384,66 @@ module.exports = function() {
             })
         }
 
-        function updateProfileAndProcessEvent(device, profile) {
+        // updates custom profile attributes
+        function updateDeviceAndProcessEvent(device) {
             // we need to check what has changed between the current profile and the profile payload
-            logger.debug("Updating profile: " + profile.id)
-            let attributeUpdates = profileDifferences(profile, profilePayload)
+            logger.debug("updating device: " + device.id)
 
-            methods.profile.updateAttributes(accountId, profile.id, attributeUpdates, function(err) {
-                if (err) {
-                    logger.error(err)
-                    return writeReplyError(500, { status: 500, error: "Unable to update profile attributes" })
-                }
+            if (!device.attributes) {
+              device.attributes = {}
+            }
 
-                // Server doesn't send us back what the new profile looks like?
-                // We do an in memory update
-                Object.assign(profile, attributeUpdates)
-                profile.updated_at = new Date()
+            let attributeUpdates = diffAttributes(device.attributes, customPayload)
+            let customerProfile = {identifier: device.profile_identifier}
 
-                let args = {
-                    server: request.server,
-                    customer: profile,
-                    device: device,
-                    account: request.auth.credentials.account,
-                    event: parseEventPayload(request)
-                }
-                
-                logger.debug("Processing Event", args.event)
+            methods.profile.findByIdentifier(accountId, device.profile_identifier, function(err, profile) {
+              if (err) {
+                logger.error("profile.findByIdentifier:", err)
+                return writeReplyError(500, { status: 500, error: "Unable to update device attributes" })
+              }
 
-                let event = Event.init(args);
+              if (profile) {
+                customerProfile = profile
+              }
 
-                // newrelic.setTransactionName(event.getTransactionName());
-                event.process(function(err, newDevice, eventResponse) {
-                    if (err) {
-                        logger.error("Event Processing Error:", err)
-                        const status = err.status || 500
-                        const message = status < 500 && err.message ? err.message : "unknown"
-                        return writeReplyError(status, { status: status, error: message })
-                    }
+              methods.device.updateCustomAttributes(accountId, device.id, attributeUpdates, function(err) {
+                  if (err) {
+                      logger.error("updateCustomAttributes:", err)
+                      return writeReplyError(500, { status: 500, error: "Unable to update device attributes" })
+                  }
 
-                    return updateDeviceAndWriteResponse(profile, device, newDevice, eventResponse)
-                })
+                  // construct resulting device with updates
+                  Object.assign(device.attributes, attributeUpdates)
+                  device.updated_at = new Date()
+
+                  let args = {
+                      server: request.server,
+                      customer: customerProfile,
+                      device: device,
+                      account: request.auth.credentials.account,
+                      event: parseEventPayload(request)
+                  }
+
+                  logger.debug("Processing Event", args.event)
+
+                  let event = Event.init(args);
+
+                  // newrelic.setTransactionName(event.getTransactionName());
+                  event.process(function(err, newDevice, eventResponse) {
+                      if (err) {
+                          logger.error("event.process:", err)
+                          const status = err.status || 500
+                          const message = status < 500 && err.message ? err.message : "unknown"
+                          return writeReplyError(status, { status: status, error: message })
+                      }
+
+                      return updateDeviceAndWriteResponse(device, newDevice, eventResponse)
+                  })
+              })
             })
         }
 
-        function findOrCreateDeviceById(accountId, deviceId, callback) {
+        function findOrCreateDeviceById(accountId, deviceId, profileIdentifier, callback) {
             methods.device.findById(accountId, deviceId, function(err, device) {
                 if (err) {
                     return callback(err)
@@ -446,18 +453,19 @@ module.exports = function() {
                     return callback(null, device)
                 }
 
-                logger.debug("Device: " + deviceId + " was not found creating one")
-                // the device doesn't exist so we must create it
-                createDeviceWithAnonymousProfile(accountId, deviceId, function(err, device, profile) {
+                logger.debug("Device: " + deviceId + " was not found, creating one")
+
+                methods.device.create(accountId, deviceId, profileIdentifier, function(err, device) {
                     if (err) {
                         return callback(err)
                     }
-                    
+
                     return callback(null, device)
                 })
             })
         }
 
+      // update device record with context
         function updateDeviceWithContext(accountId, device, deviceContext, callback) {
             // if there is no differences in context then we don't need to update
             let needsUpdate = false
@@ -468,6 +476,8 @@ module.exports = function() {
                 return callback(null, device)
             }
 
+            // compare device context with device model attributes
+          // figure out if update is necessary
             Object.keys(deviceContext).forEach(key => {
                 if (!DeviceContextSkipKeys.includes(key) && deviceContext[key] !== undefined && !lodash.isEqual(deviceContext[key], device[key])) {
                     logger.debug("NO MATCH: " + key + " from: " + JSON.stringify(device[key]) + " to: " + JSON.stringify(deviceContext[key]))
@@ -480,10 +490,12 @@ module.exports = function() {
                 return callback(null, device)
             }
 
+            // device push_token differs from the context's push_token
             if (device.push_token !== deviceContext.push_token && deviceContext.push_token !== "") {
                 logger.debug("Device token has changed from: " + device.push_token + " to: " + deviceContext.push_token)
                 tasks.push(function(done) {
                     // Since push tokens are unique we can't have a device with the same push token
+                    // find a device with the same push_token
                     methods.device.findByPushToken(accountId, deviceContext.push_token, function(err, oldDevice) {
                         if (err) {
                             return done(err)
@@ -496,35 +508,20 @@ module.exports = function() {
                         }
 
                         logger.debug("Device with push token: " + deviceContext.push_token + " exists deleting device: " + oldDevice.id)
+                        // delete device with the same push_token
                         methods.device.delete(accountId, oldDevice.id, function(err) {
                             if (err) {
                                 return done(err)
                             }
 
-                            methods.profile.findById(accountId, oldDevice.profile_id, function(err, oldProfile) {
-                                if (oldProfile.identifier === null) {
-                                    methods.profile.delete(accountId, oldProfile.id, function(err) {
-                                        if (err) {
-                                            // For some reason we weren't able to delete the old profile
-                                            // just reindex it with 0 devices
-                                            logger.warn(err)
-                                        }
-                                        return done(err)
-                                    })
-                                } else {
-                                    // This was an identified profile we should just reindex the new state
-                                    return done()
-                                }
-                            })
+                            return done()
                         })
-                    })    
+                    })
                 })
-               
             }
 
             tasks.push(function(done) {
                 logger.debug("Updating device with context: " + device.id)
-
                 methods.device.updateDeviceWithContext(accountId, device.id, deviceContext, function(err) {
                     if (err) {
                         return done(err)
@@ -553,123 +550,38 @@ module.exports = function() {
         if (deviceId === null || deviceId === undefined) {
             return writeReplyError(400, { status: 400, error: "Device ID is not defined"})
         }
-        
-        findOrCreateDeviceById(accountId, deviceId, function(err, device) {
+
+        const deviceContext = parseDevicePayload(request)
+
+        // finds by deviceId or creates a device
+        findOrCreateDeviceById(accountId, deviceId, deviceContext.profile_identifier, function(err, device) {
             if (err) {
                 logger.error(err)
                 return writeReplyError(500, { status: 500, error: "Could not lookup current device"})
             }
 
-            const deviceContext = parseDevicePayload(request)
+            const deviceProfileIdentifier = device.profile_identifier
 
+            // update device context
             updateDeviceWithContext(accountId, device, deviceContext, function(err, device) {
                 if (err) {
-                    logger.error(err)
+                    logger.error("updateDeviceWithContext:", err)
                     return writeReplyError(500, { status: 500, error: "Could not update device context" })
                 }
 
+                logger.debug("setDeviceProfile:", deviceProfileIdentifier, deviceContext.profile_identifier)
+                if (deviceProfileIdentifier !== deviceContext.profile_identifier) {
+                    methods.device.setDeviceProfile(accountId, deviceId, deviceContext.profile_identifier, function(err) {
+                        if (err) {
+                            logger.error("setDeviceProfile:", err)
+                            return writeReplyError(500, { status: 500, error: "Could not grab device's current profile" })
+                        }
 
-                // Grab the devices profile
-                logger.debug("Getting device's current profile: " + device.profile_id)
-                methods.profile.findById(accountId, device.profile_id, function(err, currentProfile) {
-                    if (err) {
-                        logger.error(err)
-                        return writeReplyError(500, { status: 500, error: "Could not grab device's current profile" })
-                    }
-
-                    if (currentProfile === null) {
-                        logger.error("Device: " + device.id + " does not have a profile")
-                        return writeReplyError(500, { status: 500, error: "Device does not have a profile"})
-                    }
-
-                    if ((currentProfile.identifier !== null && currentProfile.identifier !== undefined) && (profilePayload.identifier === null || profilePayload.identifier === undefined)) {
-                        // The device is reporting it is no longer identifying
-                        logger.debug("Device: " + device.id + " has gone from: " + currentProfile.identifier + " to anonymous")
-                        methods.profile.createAnonymousProfile(accountId, function(err, profile) {
-                            if (err) {
-                                logger.error(err)
-                                return writeReplyError(500, { status: 500, error: "Unable to create anonymous profile" })
-                            }
-
-                            logger.debug("Device transfered from: " + currentProfile.id + " to: " + profile.id)
-                            // new anonymous profile exists lets transfer device
-                            methods.device.moveToProfile(accountId, device.id, profile.id, function(err) {
-                                if (err) {
-                                    logger.error(err)
-                                    return writeReplyError(500, { status: 500, error: "Unable to transfer device to new anonymous profile" })
-                                }
-
-                                // move to final logic branch
-                                return updateProfileAndProcessEvent(device, profile)
-                            })
-                        })
-                    } else if(currentProfile.identifier !== profilePayload.identifier) {
-                        logger.debug("Device: " + device.id + " has switched profiles from: " + currentProfile.identifier + " to: " + profilePayload.identifier)
-                        // The device is reporting that they are identifying as someone else
-                        methods.profile.findByIdentifier(accountId, profilePayload.identifier, function(err, existingProfile) {
-                            if (err) {
-                                logger.error(err)
-                                return writeReplyError(500, { status: 500, error: "Unable to find existing profile" })
-                            }
-
-                            let profileSetupFunction = null
-
-                            if (existingProfile === null || existingProfile === undefined) {
-                                logger.debug("Existing profile: " + profilePayload.identifier + " does not exist creating!")
-                                profileSetupFunction = function(callback) {
-                                    // there is no profile we need to create one and then transfer
-                                    methods.profile.createIdentifiedProfile(accountId, profilePayload.identifier, function(err, newProfile) {
-                                        if (err) {
-                                            return callback(err)
-                                        }
-
-                                        return callback(null, newProfile)
-                                    })
-                                }
-                            } else {
-                                logger.debug("Existing profile: " + profilePayload.identifier + " already exists")
-                                profileSetupFunction = function(callback) {
-                                    return callback(null, existingProfile)
-                                }
-                            }
-
-                            profileSetupFunction(function(err, profile) {
-                                if (err) {
-                                    logger.error(err)
-                                    return writeReplyError(500, { status: 500, error: "Unable to execute profile setup function" })
-                                }
-
-                                methods.device.moveToProfile(accountId, device.id, profile.id, function(err) {
-                                    if (err) {
-                                        logger.error(err)
-                                        return writeReplyError(500, { status: 500, error: "Unable to update device's profile" })
-                                    }
-
-                                    logger.debug("Device transfered from: " + currentProfile.id + " to: " + profile.id)
-
-                                    if (currentProfile.identifier === null || currentProfile.identifier === undefined) {
-                                        logger.debug("Deleting old anonymous profile: " + currentProfile.id)
-                                        methods.profile.delete(accountId, currentProfile.id, function(err) {
-                                            // if we didn't delete its not the end of the world
-                                            if (err) {
-                                                logger.error(err)
-                                            }
-
-                                            // move to final logic branch
-                                            return updateProfileAndProcessEvent(device, profile)
-                                        })
-                                    } else {
-                                        // move to final logic branch
-                                        return updateProfileAndProcessEvent(device, profile)
-                                    }
-                                })
-                            })
-                        })
-                    } else {
-                        return updateProfileAndProcessEvent(device, currentProfile)
-                    }
-
-                })
+                      return updateDeviceAndProcessEvent(device)
+                    })
+                } else {
+                    return updateDeviceAndProcessEvent(device)
+                }
             })
         })
     }

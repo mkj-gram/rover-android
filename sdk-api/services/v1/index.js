@@ -1,5 +1,4 @@
 'use strict';
-const CustomerService = require('./lib/customer');
 const EventService = require('./lib/event');
 const InboxService = require('./lib/inbox');
 const MessageService = require('./lib/message');
@@ -43,20 +42,6 @@ module.exports.register = function(server, options, next) {
     server.methods.xenioZone = {};
     server.methods.xenioPlace = {};
     server.methods.staticSegment = {};
-    
-    server.methods.customer.findByIdentifier = CustomerService.findByIdentifier.bind(server);
-    server.methods.customer.findByDeviceId = CustomerService.findByDeviceId.bind(server);
-    server.methods.customer.update = CustomerService.update.bind(server);
-    server.methods.customer.updateByDevice = CustomerService.updateByDevice.bind(server);
-    server.methods.customer.create = CustomerService.create.bind(server);
-    server.methods.customer.delete = CustomerService.delete.bind(server);
-    server.methods.customer.pushDevice = CustomerService.pushDevice.bind(server);
-    server.methods.customer.pullDevice = CustomerService.pullDevice.bind(server);
-    server.methods.customer.index = CustomerService.index.bind(server);
-    server.methods.customer.deleteIndex = CustomerService.deleteIndex.bind(server);
-
-
-
 
     server.methods.inbox.find = InboxService.find.bind(server);
     server.methods.inbox.addMessage = InboxService.addMessage.bind(server);
@@ -72,7 +57,7 @@ module.exports.register = function(server, options, next) {
 
     server.methods.messageTemplate.find = MessageTemplateService.find.bind(server);
     server.methods.messageTemplate.findAll = MessageTemplateService.findAll.bind(server);
-    
+
     server.methods.account.find = AccountService.find.bind(server);
     server.methods.account.incrementCounter = AccountService.incrementCounter.bind(server);
     server.methods.account.decrementCounter = AccountService.decrementCounter.bind(server);
