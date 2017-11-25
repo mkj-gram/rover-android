@@ -1,0 +1,313 @@
+[
+  {
+    "address_components": [
+      {
+        "long_name": "G 30 Lian Huo Gao Su",
+        "short_name": "G30",
+        "types": [
+          "route"
+        ]
+      },
+      {
+        "long_name": "Guazhou Xian",
+        "short_name": "Guazhou Xian",
+        "types": [
+          "political",
+          "sublocality",
+          "sublocality_level_1"
+        ]
+      },
+      {
+        "long_name": "Jiuquan Shi",
+        "short_name": "Jiuquan Shi",
+        "types": [
+          "locality",
+          "political"
+        ]
+      },
+      {
+        "long_name": "Gansu Sheng",
+        "short_name": "Gansu Sheng",
+        "types": [
+          "administrative_area_level_1",
+          "political"
+        ]
+      },
+      {
+        "long_name": "China",
+        "short_name": "CN",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "G 30 Lian Huo Gao Su, Guazhou Xian, Jiuquan Shi, Gansu Sheng, China",
+    "geometry": {
+      "location": {
+        "lat": 41.47641300000001,
+        "lng": 95.33326799999999
+      },
+      "location_type": "GEOMETRIC_CENTER",
+      "bounds": {
+        "northeast": {
+          "lat": 41.5642315,
+          "lng": 95.33961860000001
+        },
+        "southwest": {
+          "lat": 41.3843568,
+          "lng": 95.2998939
+        }
+      },
+      "viewport": {
+        "northeast": {
+          "lat": 41.5642315,
+          "lng": 95.33961860000001
+        },
+        "southwest": {
+          "lat": 41.3843568,
+          "lng": 95.2998939
+        }
+      },
+      "types": null
+    },
+    "types": [
+      "route"
+    ],
+    "place_id": "ChIJ64fylK0UwjcRiUlhkWhQ-wo"
+  },
+  {
+    "address_components": [
+      {
+        "long_name": "Guazhou",
+        "short_name": "Guazhou",
+        "types": [
+          "political",
+          "sublocality",
+          "sublocality_level_1"
+        ]
+      },
+      {
+        "long_name": "Jiuquan",
+        "short_name": "Jiuquan",
+        "types": [
+          "locality",
+          "political"
+        ]
+      },
+      {
+        "long_name": "Gansu",
+        "short_name": "Gansu",
+        "types": [
+          "administrative_area_level_1",
+          "political"
+        ]
+      },
+      {
+        "long_name": "China",
+        "short_name": "CN",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "Guazhou, Jiuquan, Gansu, China",
+    "geometry": {
+      "location": {
+        "lat": 40.520545,
+        "lng": 95.78230599999999
+      },
+      "location_type": "APPROXIMATE",
+      "bounds": {
+        "northeast": {
+          "lat": 41.8033979,
+          "lng": 96.984343
+        },
+        "southwest": {
+          "lat": 39.8575551,
+          "lng": 94.7670551
+        }
+      },
+      "viewport": {
+        "northeast": {
+          "lat": 41.8033979,
+          "lng": 96.984343
+        },
+        "southwest": {
+          "lat": 39.8575551,
+          "lng": 94.7670551
+        }
+      },
+      "types": null
+    },
+    "types": [
+      "political",
+      "sublocality",
+      "sublocality_level_1"
+    ],
+    "place_id": "ChIJCxAqYlZywTcRYhc4lepi1vs"
+  },
+  {
+    "address_components": [
+      {
+        "long_name": "Jiuquan",
+        "short_name": "Jiuquan",
+        "types": [
+          "locality",
+          "political"
+        ]
+      },
+      {
+        "long_name": "Gansu",
+        "short_name": "Gansu",
+        "types": [
+          "administrative_area_level_1",
+          "political"
+        ]
+      },
+      {
+        "long_name": "China",
+        "short_name": "CN",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "Jiuquan, Gansu, China",
+    "geometry": {
+      "location": {
+        "lat": 39.73287,
+        "lng": 98.494548
+      },
+      "location_type": "APPROXIMATE",
+      "bounds": {
+        "northeast": {
+          "lat": 42.7951629,
+          "lng": 100.2425736
+        },
+        "southwest": {
+          "lat": 38.1453985,
+          "lng": 92.3391463
+        }
+      },
+      "viewport": {
+        "northeast": {
+          "lat": 39.8237307,
+          "lng": 98.6462402
+        },
+        "southwest": {
+          "lat": 39.624083,
+          "lng": 98.37226869999999
+        }
+      },
+      "types": null
+    },
+    "types": [
+      "locality",
+      "political"
+    ],
+    "place_id": "ChIJ8xbIkHDRxjcRwubqU_3XmuU"
+  },
+  {
+    "address_components": [
+      {
+        "long_name": "Gansu",
+        "short_name": "Gansu",
+        "types": [
+          "administrative_area_level_1",
+          "political"
+        ]
+      },
+      {
+        "long_name": "China",
+        "short_name": "CN",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "Gansu, China",
+    "geometry": {
+      "location": {
+        "lat": 35.7518326,
+        "lng": 104.2861116
+      },
+      "location_type": "APPROXIMATE",
+      "bounds": {
+        "northeast": {
+          "lat": 42.7951629,
+          "lng": 108.7123359
+        },
+        "southwest": {
+          "lat": 32.5941103,
+          "lng": 92.3391463
+        }
+      },
+      "viewport": {
+        "northeast": {
+          "lat": 42.7951629,
+          "lng": 108.7123359
+        },
+        "southwest": {
+          "lat": 32.5941103,
+          "lng": 92.3391463
+        }
+      },
+      "types": null
+    },
+    "types": [
+      "administrative_area_level_1",
+      "political"
+    ],
+    "place_id": "ChIJ5bRHsW5cTDYR2b_TuLO4yq8"
+  },
+  {
+    "address_components": [
+      {
+        "long_name": "China",
+        "short_name": "CN",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "China",
+    "geometry": {
+      "location": {
+        "lat": 35.86166,
+        "lng": 104.195397
+      },
+      "location_type": "APPROXIMATE",
+      "bounds": {
+        "northeast": {
+          "lat": 53.56097399999999,
+          "lng": 134.7728099
+        },
+        "southwest": {
+          "lat": 17.9996,
+          "lng": 73.4994136
+        }
+      },
+      "viewport": {
+        "northeast": {
+          "lat": 53.56097399999999,
+          "lng": 134.7728099
+        },
+        "southwest": {
+          "lat": 17.9996,
+          "lng": 73.4994136
+        }
+      },
+      "types": null
+    },
+    "types": [
+      "country",
+      "political"
+    ],
+    "place_id": "ChIJwULG5WSOUDERbzafNHyqHZU"
+  }
+]

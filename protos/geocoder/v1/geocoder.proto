@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package rover.geocoder.v1;
+
+option go_package = "geocoder/v1;geocoder";
+
+
+service Geocoder {
+    rpc ReverseGeocode(ReverseGeocodeRequest) returns (ReverseGeocodeResponse);
+}
+
+message ReverseGeocodeRequest {
+    double latitude  = 1;
+    double longitude = 2;
+    double accuracy  = 3;
+}
+
+message ReverseGeocodeResponse {
+    string country = 1;
+    string state   = 2;
+    string city    = 3;
+
+}
