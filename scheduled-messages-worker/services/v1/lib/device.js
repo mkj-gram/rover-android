@@ -113,6 +113,8 @@ module.exports = function(AudienceClient, logger) {
 		device.updated_at = RoverApis.Helpers.timestampFromProto(dp.getUpdatedAt())
 		device.created_at = RoverApis.Helpers.timestampFromProto(dp.getCreatedAt())
 
+		device.profile_identifier = dp.getProfileIdentifier()
+
 		// Tokens
 		device.push_environment = dp.getPushEnvironment()
 		device.push_token = dp.getPushTokenKey()
@@ -159,17 +161,19 @@ module.exports = function(AudienceClient, logger) {
 
 		return device
 	}
-	
-	methods.findAllByProfileIds = function(accountId, profileIds, callback) {
+
+
+	methods.findAllByProfileIdentifiers = function(accountId, profileIdentifiers, callback) {
 		const authContext = buildAuthContext(accountId)
 
-		let requests = profileIds.map(function(id) {
+		let requests = profileIdentifiers.map(function(profileIdentifier) {
 			return function(done) {
-				let request = new RoverApis.audience.v1.Models.ListDevicesByProfileIdRequest()
+				let request = new RoverApis.audience.v1.Models.ListDevicesByProfileIdentifierRequest()
 				request.setAuthContext(authContext)
-				request.setProfileId(id)
+        request.setMs12(true)
+				request.setProfileIdentifier(profileIdentifier)
 
-				AudienceClient.listDevicesByProfileId(request, function(err, reply) {
+				AudienceClient.listDevicesByProfileIdentifier(request, function(err, reply) {
 					if (err) {
 						logger.error(err)
 						// Don't error out just continue
@@ -189,22 +193,14 @@ module.exports = function(AudienceClient, logger) {
 				return callback(err)
 			}
 
-			let index = results.filter(result => result !== undefined).reduce(function(accumulator, result) {
+			let devices = results.
+				filter(result => result !== undefined).
+				reduce((acc, devices) => acc.concat(devices), [])
 
-				result.forEach(function(result) {
-					if (accumulator[result.profile_id] === undefined) {
-						accumulator[result.profile_id] = []	
-					}
-					accumulator[result.profile_id].push(result)
-				})
-
-				return accumulator
-			}, {})
-			
-			return callback(null, index)
+			return callback(null, devices)
 		})
 		
 	}
-
+	
 	return methods
 }

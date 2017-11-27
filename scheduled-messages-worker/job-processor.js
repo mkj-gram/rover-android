@@ -30,6 +30,10 @@ const APNS_CONCURRENCY = Config.get('/worker/apns_concurrency');
 /* 
     Private Helpers
 */
+const RateLimitKey = (attrs) => {
+  return `${attrs.account_id}:${attrs.device_id}`
+}
+
 const isEmptyObject = (obj) => {
     return !Object.keys(obj).length;
 };
@@ -244,7 +248,7 @@ JobProcessor.prototype.process = function(done) {
             .then(segment => this._getSegmentFromQueryApi(segment))
             .then(response => this._queueNextJob(response))
     }
-    
+
     job
     .then(() => this._rateLimitMessages())
     .then(() => this._saveMessages())
@@ -292,6 +296,7 @@ JobProcessor.prototype._getSegmentFromService = function() {
         let SegmentClient = require("@rover/segment-client").v1.Client()
 
         let nextCursor = this._context.nextCursor || ''
+        let accountId = this._context.account.id
 
         let authContext = new RoverApis.auth.v1.Models.AuthContext()
 
@@ -328,7 +333,6 @@ JobProcessor.prototype._getSegmentFromService = function() {
         }
 
 
-        
         const request = new RoverApis.segment.v1.Models.GetStaticSegmentPushIdsRequest()
 
         request.setAuthContext(authContext)
@@ -340,67 +344,99 @@ JobProcessor.prototype._getSegmentFromService = function() {
         readbatch(request, (err, response) => {
             if (err) {
                 return reject(err)
-            }        
+            }
 
             const identifiers = response.getPushIdsList().map(function(pushId) {
                 return pushId.getId()
             })
 
-            this._getCustomersFromIdentifiers(identifiers)
-            .then(customers => {
-                this.updateState(JOB_STATE._getSegment)
-                this._customers = customers
-                return resolve(response)
-            })
-            .catch(err => {
-                return reject(err)
-            })
+            let profiles = []
+
+            this._getProfilesByIdentifiers(identifiers)
+              .then(_profiles => {
+                let profileMap = _profiles.reduce((acc, profile) => {
+                  if (!acc[profile.identifier]) {
+                    acc[profile.identifier] = profile
+                  }
+                  return acc
+                }, {})
+
+                this._getDevicesFromProfileIdentifiers(identifiers)
+                  .then(devices => {
+                      let deviceMap = devices.reduce((acc, device) => {
+                        if (!acc[device.profile_identifier]) {
+                          acc[device.profile_identifier] = []
+                        }
+                        acc[device.profile_identifier].push(device)
+                        return acc
+                      }, {})
+
+                      let customers = Object.keys(deviceMap).map((identifier) => {
+                        let profile = profileMap[identifier] || {account_id: accountId, identifier: identifier}
+                        return profileToCustomer(profile, deviceMap[identifier] || [])
+                      })
+
+                      this.updateState(JOB_STATE._getSegment)
+                      this._customers = customers
+                      return resolve(response)
+                  })
+                  .catch(err => {
+                      return reject(err)
+                  })
+              })
+              .catch(err => {
+                  return reject(err)
+              })
         })
-        
     })
 }
 
-JobProcessor.prototype._getCustomersFromIdentifiers = function(identifiers) {
+JobProcessor.prototype._getProfilesByIdentifiers = function(identifiers) {
 
     if (util.isNullOrUndefined(identifiers) || util.isArray(identifiers) && identifiers.length == 0) {
         return Promise.resolve([]);
     }
 
     return new Promise((resolve, reject) => {
-        
+        let methods = this._server.methods;
+        let accountId = this._context.account.id;
+
+        methods.profile.findAllByIdentifiers(accountId, identifiers, (err, profiles) => {
+            if (err) {
+                return reject(new JobError("profiles.findAllByIdentifiers:", true))
+            }
+
+            this._debug("profiles.findAllByIdentifiers: DONE")
+
+            return resolve(profiles)
+        })
+    })
+};
+
+JobProcessor.prototype._getDevicesFromProfileIdentifiers = function(identifiers) {
+
+    if (util.isNullOrUndefined(identifiers) || util.isArray(identifiers) && identifiers.length == 0) {
+        return Promise.resolve([]);
+    }
+
+    return new Promise((resolve, reject) => {
+
         this._debug("Reading customer identifiers");
 
         let methods = this._server.methods;
         let logger = this._server.plugins.logger.logger;
         let accountId = this._context.account.id;
 
-        methods.profile.findAllByIdentifiers(accountId, identifiers, (err, profiles) => {
+        methods.device.findAllByProfileIdentifiers(accountId, identifiers, (err, devices) => {
             if (err) {
-                return reject(new JobError("failed to read profiles from audience service", true))
+                return reject(new JobError("failed to read devices from audience service", true))
             }
 
-            this._debug("Finished reading profiles")
+            this._debug("Finished reading devices")
 
-            // now we need to get all of their devices and map them back to old school style yall
-            
-            const profileIds = profiles.map(profile => profile.id)
-
-            methods.device.findAllByProfileIds(accountId, profileIds, (err, deviceIndex) => {
-                if (err) {
-                    return reject(new JobError("failed to read devices from audience service", true))
-                }
-
-                this._debug("Finished reading devices")
-
-                let customers = profiles.map(profile => {
-                    return profileToCustomer(profile, deviceIndex[profile.id])
-                })
-
-                return resolve(customers)
-            })
+            return resolve(devices)
         })
-    });
-
+    })
 };
 
 JobProcessor.prototype._getDynamicSegment = function() {
@@ -478,6 +514,7 @@ JobProcessor.prototype._getSegmentFromQueryApi = function(segment) {
         let scrollId = this._context.scrollId;
         let streamId = this._context.streamId;
         let timeZoneOffset = this._context.timeZoneOffset;
+        let accountId = this._context.account.id
         
         // New client for each job as this helps load balance the connections
         let audienceClient = require("@rover/audience-client").v1.Client()
@@ -552,131 +589,54 @@ JobProcessor.prototype._getSegmentFromQueryApi = function(segment) {
         }
 
         readbatch(queryRequest, function(err, response) {
-            if (err) {
-                return reject(err)
-            }
+          if (err) {
+              return reject(err)
+          }
 
-            self._debug("Total segment size", response.getDevicesList().length)
+          self._debug("Total segment size", response.getDevicesList().length)
 
-            let profiles = response.getProfilesList().map(methods.profile.fromProto)
-            let devices = response.getDevicesList().map(methods.device.fromProto)
+          let profiles = response.getProfilesList().map(methods.profile.fromProto)
+          let devices = response.getDevicesList().map(methods.device.fromProto)
 
-            var devicesIndex = devices.reduce(function(index, device) {
-                if (index[device.profile_id] === undefined) {
-                    index[device.profile_id] = []
-                }
-                index[device.profile_id].push(device)
-                return index
-            }, {})
+          var devicesIndex = devices.reduce(function(index, device) {
+              const pid = device.profile_identifier || ""
+              if (index[pid] === undefined) {
+                  index[pid] = []
+              }
+              index[pid].push(device)
+              return index
+          }, {})
 
-            let customers = profiles.map(profile => {
-                return profileToCustomer(profile, devicesIndex[profile.id])
-            })
+          let anonymousDevices = devicesIndex[""] || []
+          delete devicesIndex[""]
 
-            self._customers = customers
+          let customers = []
 
-            return resolve(response)
+          // devices with corresponding profiles
+          profiles.forEach(profile => {
+            customers.push(profileToCustomer(profile, devicesIndex[profile.identifier]))
+            delete devicesIndex[profile.identifier]
+          })
+
+          // devices without corresponding profiles
+          Object.keys(devicesIndex).forEach(k => {
+            const profile = {identifier: k, account_id: accountId}
+            customers.push(profileToCustomer(profile, devicesIndex[k]))
+          })
+
+          // anonymous devices without profile
+          anonymousDevices.forEach(device => {
+            const profile = {identifier: "", account_id: accountId}
+            customers.push(profileToCustomer(profile, [device]))
+          })
+
+          self._customers = customers
+
+          return resolve(response)
         })
-
     })
 }
 
-
-JobProcessor.prototype._getSegmentFromElasticsearch = function() {
-    return new Promise((resolve, reject) => {
-
-        this._debug("Reading batch from elasticsearch");
-
-        let query = this._context.query;
-
-        if (util.isNullOrUndefined(query)) {
-            return reject();
-        }
-
-        query = util._extend(query, { size: READ_BATCH_SIZE });
-
-        let elasticsearch = this._server.connections.elasticsearch.client;
-        let logger = this._server.plugins.logger.logger;
-
-        let scrollId = this._context.scrollId;
-        let account = this._context.account;
-        let preference = this._context.preference;
-        let offset = this._context.offset;
-
-        let elasticsearchQuery = {};
-
-        let readPromise;
-
-        let readStartTime = Date.now();
-
-        if (util.isNullOrUndefined(scrollId)) {
-            // we need to scroll
-            elasticsearchQuery = {
-                index: this._getElasticsearchIndex(account),
-                type: 'customer',
-                body: query,
-                search_type: 'scan',
-                scroll: '30m'
-            }
-
-            if (preference) {
-                elasticsearchQuery = util._extend(elasticsearchQuery, { preference: preference });
-            }
-
-            readPromise = elasticsearch.search(elasticsearchQuery);
-        } else {
-
-            elasticsearchQuery = {
-                scroll: '30m',
-                scrollId: scrollId,
-            }
-
-            readPromise = elasticsearch.scroll(elasticsearchQuery);
-        }
-
-        const scroll = (scrollId, customers, callback) => {
-            elasticsearch.scroll({ scrollId: scrollId, scroll: '30m'}).then(response => {
-                if (!util.isNullOrUndefined(response.hits.hits)) {
-                    customers = customers.concat(response.hits.hits.map(source => parseCustomer(source)));
-                }
-
-                if (response.hits.hits.length < READ_BATCH_SIZE || customers.length >= BATCH_SIZE) {
-                    return callback(null, customers, response);
-                } else {
-                    return scroll(response._scroll_id, customers, callback);
-                }
-            }).catch(err => {
-                return callback(err, customers, null);
-            });
-        }
-
-
-
-        readPromise.then(response => {
-
-            let parsedCustomers = [];
-
-            if (!util.isNullOrUndefined(response.hits.hits)) {
-                parsedCustomers = response.hits.hits.map(source => parseCustomer(source));  
-            }
-
-            scroll(response._scroll_id, parsedCustomers, (err, customers, lastResponse) => {
-                if (err) {
-                    console.warn(err);
-                }
-
-                this._customers = customers;
-
-                this._debug("Finished reading: " + this._customers.length + " customers");
-                this.updateState(JOB_STATE._getSegment);
-                return resolve(lastResponse);
-            });
-        }).catch(err => {
-            console.warn(err);
-            return reject(err);
-        });
-    });
-};
 
 JobProcessor.prototype._queueNextJob = function(response) {
     // this._previousState < JOB_STATE._queueNextJob
@@ -737,6 +697,7 @@ JobProcessor.prototype._queueNextJob = function(response) {
 
 JobProcessor.prototype._rateLimitMessages = function() {
     let messageLimits = this._context.account.message_limits;
+    let accountId = this._context.account.id;
 
     if (util.isNullOrUndefined(messageLimits) || !util.isArray(messageLimits) || util.isArray(messageLimits) && messageLimits.length == 0) {
         return Promise.resolve();
@@ -754,9 +715,7 @@ JobProcessor.prototype._rateLimitMessages = function() {
 
         const filterCustomers = (limit) => {
             return function(customers) {
-                
                 return new Promise((resolve, reject) => {
-
                     // If have filtered out all customers keep moving on
                     if (customers.length == 0) {
                         return resolve(customers);
@@ -764,12 +723,24 @@ JobProcessor.prototype._rateLimitMessages = function() {
 
                     let limitDropInterval = currentTime.subtract(limit.number_of_seconds, 'seconds').unix();
                     let multi = redis.multi();
+                    let customerIdx = []
+                    let deviceIdx = []
 
                     for (let i = 0; i < customers.length; i++) {
-                         let key = RATE_LIMIT_KEY_PREFIX + customers[i]._id.toString();
-                        // count number of messages sent to this user based on the time window
+                      customers[i].__idx = i
+                      // save customer devices locally
+                      const devices = customers[i].devices || []
+                      // filtering out devices
+                      customers[i].devices = []
+
+                      for (let ii = 0; ii < devices.length; ii++) {
+                         let key = RateLimitKey({account_id: accountId, device_id: devices[ii]._id.toString()})
+                         customerIdx.push(i)
+                         deviceIdx.push(devices[ii])
+                        // count number of messages sent to this device based on the time window
                         // ie count how many messages sent in the last 1 day
                         multi.zcount(key, limitDropInterval, "+inf");
+                      }
                     }
 
                     multi.exec((err, replies) => {
@@ -777,15 +748,24 @@ JobProcessor.prototype._rateLimitMessages = function() {
                             return reject(new JobError(err.message, true));
                         }
 
-                        let filteredCustomers = [];
+                        let filteredCustomers = {};
 
                         for (let i = 0; i < replies.length; i++) {
                             if (replies[i] < limit.message_limit) {
-                                filteredCustomers.push(customers[i]);
+                              const customer = customers[customerIdx[i]]
+                              customer.devices.push(deviceIdx[i]);
+                              if (!filteredCustomers[customer.__idx]) {
+                                filteredCustomers[customer.__idx] = customer
+                              }
                             }
                         }
 
-                        return resolve(filteredCustomers);
+                        let newCustomers = []
+                        Object.keys(filteredCustomers, (key) => {
+                          newCustomers.push(filteredCustomers[key])
+                        })
+
+                        return resolve(newCustomers);
                     });
                 })
             }
@@ -802,10 +782,12 @@ JobProcessor.prototype._rateLimitMessages = function() {
 
             let multi = redis.multi();
 
-            for ( let i = 0; i < this._customers; i++) {
-                // clean up
-                let key = RATE_LIMIT_KEY_PREFIX + this._customers[i]._id.toString();
+            for ( let i = 0; i < this._customers.length; i++) {
+              const customer = this._customers[i]
+              for (let ii = 0; ii < customer.devices.length; ii ++ ) {
+                let key = RateLimitKey({account_id: accountId, device_id: customer.devices[ii]._id.toString()})
                 multi.zremrangebyscore(key, "-inf", dropInterval);
+              }
             }
 
             multi.exec((err, replies) => {
@@ -920,10 +902,13 @@ JobProcessor.prototype._addMessagesToInbox = function() {
         }, redisInbox.batch())
 
         let rateLimitBatch = this._messagesIndex.reduce(function(batch, message) {
-            let key = RATE_LIMIT_KEY_PREFIX + message.message.customer_id.toString()
-            if (!util.isNullOrUndefined(largestLimit)) {
-                batch.zadd(rateLimitKey, currentTime, currentTime)
-                batch.expire(rateLimitKey, largestLimit.number_of_seconds)
+            for (let i = 0; i < message.devices.length; i++) {
+              const device = message.devices[i]
+              const key = RateLimitKey({account_id: accountId, device_id: device._id.toString()})
+              if (!util.isNullOrUndefined(largestLimit)) {
+                  batch.zadd(key, currentTime, currentTime)
+                  batch.expire(key, largestLimit.number_of_seconds)
+              }
             }
             return batch
         }, redis.batch())

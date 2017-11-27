@@ -14,6 +14,7 @@ debug.log = console.info.bind(console)
 const RETRY_TIMEOUT = 500;
 const MAX_RETRY = 10;
 
+// Worker constructor
 function Worker(server) {
     if (!(this instanceof Worker)) {
         return new Worker(server);
@@ -24,6 +25,8 @@ function Worker(server) {
     // this._metricsDisplayTimer = setInterval(this.displayMetrics.bind(this), 5000);
 };
 
+// Worker#shutdown iterates over worker's active jobs 
+// and shuts down each or timeouts otherwise
 Worker.prototype.shutdown = function(callback) {
     if (!util.isNullOrUndefined(arg)) {
         clearInterval(this._metricsDisplayTimer);
@@ -46,6 +49,7 @@ Worker.prototype.shutdown = function(callback) {
 };
 
 
+// Worker.displayMetrics displays info about Worker's _activeJobs
 Worker.prototype.displayMetrics = function() {
     if (this._activeJobs.length == 0 ) {
         return;
@@ -64,6 +68,8 @@ Worker.prototype.displayMetrics = function() {
     return;
 }
 
+// Worker.work accepts a message parses it, applies limits
+//
 Worker.prototype.work = function(msg) {
 
     // check to see the type of segment being passed in is
@@ -97,6 +103,7 @@ Worker.prototype.work = function(msg) {
     }
 
     if (context.account.message_limits) {
+        // TODO: misuse of `map`: should be `forEach`
         context.account.message_limits.map(limit => {
             if (limit.number_of_minutes) {
                 limit.number_of_seconds = limit.number_of_minutes * 60 
@@ -118,9 +125,6 @@ Worker.prototype.work = function(msg) {
         jobId = msg.properties.headers['x-job-id'];
     }
 
-    
-
-
 
     let job = new JobProcessor(jobId, this._server, context, previousState);
 
@@ -131,12 +135,12 @@ Worker.prototype.work = function(msg) {
     let self = this;
 
     job.process(function(err) {
-        
+
         if (err) {
             logger.error(err);
             return self._handleFailedJob(job, err);
         }
-        
+
         let totalTime = Date.now() - startTime;
         let librato = self._server.plugins.librato.client;
         logger.debug("worker job finished in " + totalTime + "ms");

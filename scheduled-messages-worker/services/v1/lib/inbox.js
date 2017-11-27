@@ -16,7 +16,7 @@ internals.updateManyCacheKeys = function(accountId, deviceIds, time, callback) {
     let batch = redis.batch()
 
     ids.forEach(id => {
-        const key = internals.getInboxUpdatedAtKey(id)
+        const key = internals.getInboxUpdatedAtKey(accountId, id)
         batch.set(key, unixTime)
     })
 

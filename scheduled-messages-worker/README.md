@@ -15,3 +15,11 @@ make install
 make run
 ```
 
+
+### Testing
+
+```sh
+
+make simulate
+```
+

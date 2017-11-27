@@ -12,7 +12,7 @@ let template = {
         "notification_text": "This is a test message",
         "published": true,
         "archived": false,
-        "save_to_inbox": false,
+        "save_to_inbox": true,
         "date_schedule": "-Infinity...Infinity",
         "time_schedule": "0...1441",
         "schedule_monday": true,
@@ -49,7 +49,6 @@ let template = {
         "sent": true,
         "filter_gimbal_place_ids": [],
         "experience_id": null,
-        "limits": [],
         "filter_xenio_zone_tags": [],
         "filter_xenio_zone_ids": [],
         "filter_xenio_place_tags": [],
@@ -92,7 +91,16 @@ let template = {
         "experiences_archived_count": 11,
         "places_updated_at": "2017-07-07T14:43:02.673Z",
         "beacon_configurations_updated_at": "2017-03-23T22:54:12.034Z",
-        "message_limits": [],
+        "message_limits": [
+            {
+                "message_limit": 1,
+                "number_of_minutes": 30
+            },
+            {
+                "message_limit": 5,
+                "number_of_days": 1
+            }
+        ],
         "subdomain": "rover",
         "searchable_xenio_zones_count": 0,
         "searchable_xenio_places_count": 0,
