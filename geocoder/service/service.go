@@ -7,6 +7,7 @@ import (
 	"googlemaps.github.io/maps"
 
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
+	"github.com/roverplatform/rover/geocoder/service/cache"
 )
 
 var (
@@ -19,9 +20,15 @@ type MapsClient interface {
 
 type Server struct {
 	Client MapsClient
+	Cache  *cache.Store
 }
 
 func (s *Server) ReverseGeocode(ctx context.Context, req *geocoder.ReverseGeocodeRequest) (*geocoder.ReverseGeocodeResponse, error) {
+
+	response, err := s.Cache.GetReverseGeocodeResponse(req)
+	if response != nil && err == nil {
+		return response, nil
+	}
 
 	result, err := s.Client.ReverseGeocode(ctx, &maps.GeocodingRequest{
 		LatLng: &maps.LatLng{
@@ -34,11 +41,18 @@ func (s *Server) ReverseGeocode(ctx context.Context, req *geocoder.ReverseGeocod
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	return &geocoder.ReverseGeocodeResponse{
+	response = &geocoder.ReverseGeocodeResponse{
 		Country: getCountry(result[0]),
 		State:   getState(result[0]),
 		City:    getCity(result[0]),
-	}, nil
+	}
+
+	err = s.Cache.CacheReverseGeocodeResponse(req, response, 0)
+	if err != nil {
+		// TODO log? we don't really care about errors until we have monitoring
+	}
+
+	return response, nil
 }
 
 func getComponentByType(result maps.GeocodingResult, ctype string) *maps.AddressComponent {

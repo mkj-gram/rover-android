@@ -43,7 +43,10 @@ services:
     volumes:
       - ../../rover:/rover
       - pgdata:/var/lib/postgresql/data
-  
+
+  redis:
+    image: redis:4.0.2-alpine
+
 
   # ROVER PROJECTS
   audience-frontend:
@@ -104,6 +107,8 @@ services:
   geocoder-service:
     image: golang:1.9-alpine
     working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - redis
     command: bash -c "go run ./geocoder/service/cmd/service/main.go"
     volumes:
       - ../../rover:/go/src/github.com/roverplatform/rover

@@ -6,18 +6,22 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/go-redis/redis"
 	"github.com/namsral/flag"
 	"google.golang.org/grpc"
 	"googlemaps.github.io/maps"
 
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service"
+	"github.com/roverplatform/rover/geocoder/service/cache"
 )
 
 var (
 	rpcAddr = flag.String("rpc-addr", ":5100", "rpc address")
 
 	gcpApiKey = flag.String("gcp-api-key", "", "google api key")
+
+	redisDsn = flag.String("redis-dsn", "", "redis dsn")
 )
 
 func main() {
@@ -38,7 +42,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := service.Server{Client: client}
+	// Setup redis
+	redis := redis.NewClient(&redis.Options{Addr: *redisDsn})
+	cacheStore := &cache.Store{Client: redis}
+
+	server := service.Server{Client: client, Cache: cacheStore}
 	geocoder.RegisterGeocoderServer(grpcServer, &server)
 
 	go func() {
