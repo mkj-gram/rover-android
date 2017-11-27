@@ -18,7 +18,6 @@ services:
     command: node index.js
     environment:
       NODE_ENV: production
-      NPM_TOKEN: "db2323f3-e375-4945-97d6-02eeabf09a3f"
 
       POSTGRESQL_DB_HOST: postgres
       POSTGRESQL_DB_NAME: rover-local
