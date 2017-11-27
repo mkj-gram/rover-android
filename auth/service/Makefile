@@ -1,4 +1,4 @@
-DCF ?= docker-compose -f ../../docker/rover.docker-compose.yaml
+DCF ?= docker-compose -f ../../docker/main.docker-compose.yaml
 RUN ?= ${DCF} run --rm auth-service
 
 ROVER ?= github.com/roverplatform/rover
@@ -8,8 +8,7 @@ test:
 	${RUN} go test -tags integration -v ${ROVER}/auth/service/... --service.DSN=$(DB_DSN)
 
 run:
-	${RUN} go run -x -v ./auth/service/cmd/authsvcd/main.go \
-		-db-dsn=$$DB_DSN
+	${RUN}
 
 shell:
 	${RUN} sh

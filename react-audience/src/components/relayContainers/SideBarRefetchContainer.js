@@ -3,7 +3,7 @@ import SideBar from '../sidebar/SideBar'
 
 export default createRefetchContainer(
     SideBar,
-    graphql.experimental`
+    graphql`
         fragment SideBarRefetchContainer on Query
             @argumentDefinitions(segmentId: { type: "ID", defaultValue: "" }) {
             sbDynamicSegment: dynamicSegment(segmentId: $segmentId) {
@@ -121,7 +121,7 @@ export default createRefetchContainer(
             )
         }
     `,
-    graphql.experimental`
+    graphql`
         query SideBarRefetchContainerQuery($segmentId: ID) {
             ...SideBarRefetchContainer @arguments(segmentId: $segmentId)
         }

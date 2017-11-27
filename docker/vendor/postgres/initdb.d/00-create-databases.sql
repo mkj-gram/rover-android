@@ -1,5 +1,8 @@
--- auth-service
+-- auth-service: test
 CREATE DATABASE authsvc_test;
+
+-- auth-service: development
+CREATE DATABASE authsvc_dev;
 
 -- content-api:
 

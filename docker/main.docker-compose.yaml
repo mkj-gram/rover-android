@@ -1,0 +1,102 @@
+version: "3"
+
+volumes:
+  cachefs:
+  pgdata:
+  esdata:
+
+services:
+  # DATABASES
+  mongo:
+    image: mongo:3.4.4
+    ports:
+      - 27017
+    volumes:
+      - ../../rover:/rover
+
+  elastic:
+    container_name: elastic5
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
+    ports:
+      - 9200
+      - 9300
+    volumes:
+      - ../../rover:/rover
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      xpack.monitoring.enabled: "false"
+      xpack.security.enabled: "false"
+      transport.host: "127.0.0.1"
+      network.host: "0.0.0.0"
+      http.host: "0.0.0.0"
+      cluster.name: docker-cluster
+      bootstrap.memory_lock: "true"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+        
+  postgres:
+    image: rover/postgres
+    ports:
+      - 5432
+    build:
+      context: ../../rover
+      dockerfile: ./docker/vendor/postgres/Dockerfile
+    volumes:
+      - ../../rover:/rover
+      - pgdata:/var/lib/postgresql/data
+  
+
+  # ROVER PROJECTS
+  audience-frontend:
+    depends_on:
+      - graphql-gateway
+    image: node:9.1.0
+    volumes:
+      - ../../rover:/rover/
+    working_dir: /rover/react-audience
+    command: npm install && npm run schema && npm run relay && npm start
+    environment:
+      NODE_ENV: development
+      GRAPHQL_HOST: "http://graphql-gateway/graphql"
+  
+  audience-service:
+    image: golang:1.9-alpine
+    depends_on:
+      - mongo
+      - elastic
+    command: ./docker/audience-service/cmd test run
+    volumes:
+      - ../../rover:/go/src/github.com/roverplatform/rover
+    working_dir: /go/src/github.com/roverplatform/rover
+    environment:
+      CGO_ENABLED: 0
+      AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_test"
+      AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic5:9200"
+  
+  auth-service:
+    image: golang:1.9-alpine
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - postgres
+    command: ./docker/auth-service/cmd migrate run
+    volumes:
+      - ../../rover:/go/src/github.com/roverplatform/rover
+    environment:
+      CGO_ENABLED: 0
+      DB_DSN: "postgres://postgres:@postgres:5432/authsvc_dev?sslmode=disable"
+      MIGRATION_DIR: ./auth/service/db/migrations/postgres
+  
+  graphql-gateway:
+    image: node:7.5.0
+    depends_on:
+      - auth-service
+      - audience-service
+    ports:
+      - "4000:80"
+    command: bash -c "npm install && npm run build && npm run serve"
+    volumes:
+      - ../../rover:/rover/
+    working_dir: /rover/graphql-gateway
+    environment:
+      AUTH_V1_SERVICE_HOST: auth-service
+      AUDIENCE_V1_SERVICE_HOST: audience-service
+      NODE_ENV: development

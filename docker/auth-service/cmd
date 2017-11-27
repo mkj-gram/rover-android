@@ -24,6 +24,11 @@ bench() {
     -service.DSN=${DB_DSN}
 }
 
+migrate() {
+  go run ./auth/service/cmd/migration-cli/main.go \
+      -pg-dsn=${DB_DSN} \
+      -migrations-dir=${MIGRATION_DIR}
+}
 
 for cmd in $*; do
   $cmd

@@ -15,7 +15,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:es": "BABEL_ENV=es babel src --out-dir es --source-maps",
     "build": "npm run build:es",
-    "prepublish": "npm run clean && npm run build",
+    "postinstall": "npm run clean && npm run build",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/RoverPlatform/web-common#readme",
   "dependencies": {
-    "@rover/react-icons": "^1.1.0",
+    "@rover/react-icons": "../react-icons",
     "downshift": "^1.14.0",
     "pikaday": "^1.6.0",
     "prop-types": "^15.5.10",

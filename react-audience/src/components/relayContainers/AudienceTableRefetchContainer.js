@@ -3,7 +3,7 @@ import AudienceTable from '../table/AudienceTable'
 
 export default createRefetchContainer(
     AudienceTable,
-    graphql.experimental`
+    graphql`
         fragment AudienceTableRefetchContainer on Query
             @argumentDefinitions(
                 segmentId: { type: "ID", defaultValue: "" }
@@ -61,7 +61,7 @@ export default createRefetchContainer(
             }
         }
     `,
-    graphql.experimental`
+    graphql`
         query AudienceTableRefetchContainerQuery(
             $segmentId: ID
             $includeSegmentsFromPredicates: Boolean!
