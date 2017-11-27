@@ -13,7 +13,6 @@
     "@rover/segment-client": "../segment/clients/node",
     "@rover/audience-client": "../audience/clients/node",
     "@rover-common/ip-parse": "../node/ip-parse",
-    "@rover/segment-filter": "0.0.9",
     "amqplib": "0.4.2",
     "async": "2.0.1",
     "bluebird": "3.4.1",
