@@ -17,11 +17,12 @@ import (
 var (
 	rpcAddr = flag.String("rpc-addr", ":5100", "rpc address")
 
-	gcpApiKey = flag.String("gcp-api-key", "AIzaSyCdH-KwCz1qzZQUAH2RTZY3lGS8RzD3Fmg", "google api key")
+	gcpApiKey = flag.String("gcp-api-key", "", "google api key")
 )
 
 func main() {
 	flag.EnvironmentPrefix = "GEOCODER_SERVICE"
+	flag.CommandLine.Init("", flag.ExitOnError)
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", *rpcAddr)
