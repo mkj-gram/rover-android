@@ -43,8 +43,12 @@ func main() {
 	}
 
 	// Setup redis
-	redis := redis.NewClient(&redis.Options{Addr: *redisDsn})
-	cacheStore := &cache.Store{Client: redis}
+	redisOpts, err := redis.ParseURL(*redisDsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	redisClient := redis.NewClient(redisOpts)
+	cacheStore := &cache.Store{Client: redisClient}
 
 	server := service.Server{Client: client, Cache: cacheStore}
 	geocoder.RegisterGeocoderServer(grpcServer, &server)
