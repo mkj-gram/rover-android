@@ -39,13 +39,13 @@ func main() {
 
 	client, err := maps.NewClient(maps.WithAPIKey(*gcpApiKey))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("maps.NewClient: %v\n", err)
 	}
 
 	// Setup redis
 	redisOpts, err := redis.ParseURL(*redisDsn)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("redis.ParseURL: %v\n", err)
 	}
 	redisClient := redis.NewClient(redisOpts)
 	cacheStore := &cache.Store{Client: redisClient}
