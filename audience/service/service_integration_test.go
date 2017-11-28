@@ -3888,9 +3888,9 @@ func testAudienceService_GetDevice(t *testing.T) {
 					LocationAccuracy:  65,
 					LocationLatitude:  22.00101,
 					LocationLongitude: -32.1231,
-					LocationRegion:    "Canada",
+					LocationCountry:   "Canada",
+					LocationState:     "Ontario",
 					LocationCity:      "Toronto",
-					LocationStreet:    "55 Adelaide Street East",
 					LocationUpdatedAt: createdAt,
 
 					RegionMonitoringMode: audience.Device_GIMBAL,

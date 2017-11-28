@@ -98,13 +98,19 @@ type Device struct {
 	Ip                          string              `bson:"ip,omitempty"`
 	NotificationAuthorization   string              `bson:"notification_authorization,omitempty"`
 
-	LocationAccuracy  int32      `bson:"location_accuracy,omitempty"`
-	LocationLatitude  float64    `bson:"location_latitude,omitempty"`
-	LocationLongitude float64    `bson:"location_longitude,omitempty"`
-	LocationRegion    string     `bson:"location_region,omitempty"`
-	LocationStreet    string     `bson:"location_street,omitempty"`
+	LocationAccuracy  int32   `bson:"location_accuracy,omitempty"`
+	LocationLatitude  float64 `bson:"location_latitude,omitempty"`
+	LocationLongitude float64 `bson:"location_longitude,omitempty"`
+
+	LocationCountry   string     `bson:"location_country,omitempty"`
+	LocationState     string     `bson:"location_state,omitempty"`
 	LocationCity      string     `bson:"location_city,omitempty"`
 	LocationUpdatedAt *time.Time `bson:"location_updated_at,omitempty"`
+
+	// deprecated
+	LocationRegion string `bson:"location_region,omitempty"`
+	// deprecated
+	LocationStreet string `bson:"location_street,omitempty"`
 
 	RegionMonitoringMode string `bson:"region_monitoring_mode,omitempty"`
 
@@ -187,8 +193,8 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.LocationAccuracy = proto.LocationAccuracy
 	d.LocationLongitude = proto.LocationLongitude
 	d.LocationLatitude = proto.LocationLatitude
-	d.LocationStreet = proto.LocationStreet
-	d.LocationRegion = proto.LocationRegion
+	d.LocationCountry = proto.LocationCountry
+	d.LocationState = proto.LocationState
 	d.LocationCity = proto.LocationCity
 	d.LocationUpdatedAt, _ = protoToTime(proto.LocationUpdatedAt)
 
@@ -280,8 +286,8 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.LocationAccuracy = d.LocationAccuracy
 	proto.LocationLongitude = d.LocationLongitude
 	proto.LocationLatitude = d.LocationLatitude
-	proto.LocationStreet = d.LocationStreet
-	proto.LocationRegion = d.LocationRegion
+	proto.LocationCountry = d.LocationCountry
+	proto.LocationState = d.LocationState
 	proto.LocationCity = d.LocationCity
 	proto.LocationUpdatedAt, _ = timeToProto(d.LocationUpdatedAt)
 
@@ -893,9 +899,13 @@ func (s *devicesStore) UpdateDeviceLocation(ctx context.Context, r *audience.Upd
 	var update = bson.M{
 		"updated_at": now,
 
-		"location_accuracy":   r.LocationAccuracy,
-		"location_latitude":   r.LocationLatitude,
-		"location_longitude":  r.LocationLongitude,
+		"location_accuracy":  r.LocationAccuracy,
+		"location_latitude":  r.LocationLatitude,
+		"location_longitude": r.LocationLongitude,
+
+		"location_country":    r.LocationCountry,
+		"location_state":      r.LocationState,
+		"location_city":       r.LocationCity,
 		"location_updated_at": now,
 	}
 

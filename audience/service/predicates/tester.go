@@ -229,14 +229,11 @@ func getDeviceValue(device *audience.Device, attribute_name string) interface{} 
 	case "location_updated_at":
 		return device.GetLocationUpdatedAt()
 	case "location_country":
-		return ""
-		// TODO: return device.GetLocationCountry()
-	case "location_region":
-		return device.GetLocationRegion()
+		return device.GetLocationCountry()
+	case "location_state":
+		return device.GetLocationState()
 	case "location_city":
 		return device.GetLocationCity()
-	case "location_street":
-		return device.GetLocationStreet()
 	case "region_monitoring_mode":
 		return device.GetRegionMonitoringMode()
 	case "ibeacon_monitoring_regions_updated_at":

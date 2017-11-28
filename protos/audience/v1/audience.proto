@@ -291,6 +291,10 @@ message UpdateDeviceLocationRequest {
   int32  location_accuracy            = 3;
   double location_latitude            = 4;
   double location_longitude           = 5;
+  string location_country             = 6;
+  string location_state               = 7;
+  string location_city                = 8;
+  
 }
 message UpdateDeviceLocationResponse {}
 
@@ -558,9 +562,9 @@ message Device {
   int32  location_accuracy            = 41;
   double location_latitude            = 42;
   double location_longitude           = 43;
-  string location_region              = 44;
-  string location_city                = 45;
-  string location_street              = 46;
+  string location_country             = 44;
+  string location_state               = 45;
+  string location_city                = 46;
   google.protobuf.Timestamp location_updated_at = 52;
   
 

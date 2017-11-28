@@ -39,9 +39,9 @@
   "location_latitude": 22.00101,
   "location_longitude": -32.1231,
   "location_updated_at": { "$date": "2017-06-14T15:44:18.496Z" },
+  "location_country": "Canada",
+  "location_state": "Ontario",
   "location_city": "Toronto",
-  "location_street": "55 Adelaide Street East",
-  "location_region": "Canada",
 
   "device_model": "iPhone 6",
   "os_name": "iOS",
