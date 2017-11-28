@@ -114,3 +114,4 @@ services:
       - ../../rover:/go/src/github.com/roverplatform/rover
     environment:
       GEOCODER_SERVICE_GCP_API_KEY: "AIzaSyBNFTti0wKJ3J_FMw1tCpTB4bPyQ8j53bc"
+      GEOCODER_SERVICE_REDIS_DSN: "redis://redis:6379/3"
