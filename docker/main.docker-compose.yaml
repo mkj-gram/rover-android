@@ -109,7 +109,7 @@ services:
     working_dir: /go/src/github.com/roverplatform/rover
     depends_on:
       - redis
-    command: bash -c "go run ./geocoder/service/cmd/service/main.go"
+    command: go run ./geocoder/service/cmd/service/main.go
     volumes:
       - ../../rover:/go/src/github.com/roverplatform/rover
     environment:

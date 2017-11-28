@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"reflect"
 	"testing"
 
 	"github.com/go-redis/redis"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service/cache"
+	rtesting "github.com/roverplatform/rover/go/testing"
 )
 
 type MapsClientMock struct {
@@ -25,12 +25,6 @@ func (m *MapsClientMock) ReverseGeocode(ctx context.Context, request *maps.Geoco
 }
 
 func TestServer_ReverseGeocode(t *testing.T) {
-	type fields struct {
-		Client MapsClient
-	}
-	type args struct {
-		req *geocoder.ReverseGeocodeRequest
-	}
 
 	redis := redis.NewClient(&redis.Options{
 		Addr: "redis:6379",
@@ -44,13 +38,13 @@ func TestServer_ReverseGeocode(t *testing.T) {
 
 	tests := []struct {
 		name     string
+		onBefore func()
 		client   MapsClient
 		req      *geocoder.ReverseGeocodeRequest
 		want     *geocoder.ReverseGeocodeResponse
-		onBefore func()
-		wantErr  bool
 	}{
 		{
+			name:   "Loads and parses /testdata/response.01.json",
 			client: &MapsClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.01.json"), Error: nil},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  43.6507328,
@@ -63,6 +57,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 			},
 		},
 		{
+			name:   "Loads and parses /testdata/response.02.json",
 			client: &MapsClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.02.json"), Error: nil},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  50.10228739999999,
@@ -75,6 +70,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 			},
 		},
 		{
+			name:   "Loads and parses /testdata/response.03.json",
 			client: &MapsClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.03.json"), Error: nil},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  41.47641300000001,
@@ -87,8 +83,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 			},
 		},
 		{
-			name:   "Returns cached property",
-			client: &MapsClientMock{Result: nil, Error: errors.New("Value Not From Cache")},
+			name: "Returns cached property",
 			onBefore: func() {
 				cache.CacheReverseGeocodeResponse(&geocoder.ReverseGeocodeRequest{
 					Latitude:  100,
@@ -99,6 +94,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 					City:    "Random String",
 				}, 0)
 			},
+			client: &MapsClientMock{Result: nil, Error: errors.New("Value Not From Cache")},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  100,
 				Longitude: -23.22,
@@ -108,7 +104,6 @@ func TestServer_ReverseGeocode(t *testing.T) {
 				State:   "Brooklin",
 				City:    "Random String",
 			},
-			wantErr: false,
 		},
 	}
 
@@ -123,13 +118,10 @@ func TestServer_ReverseGeocode(t *testing.T) {
 				tt.onBefore()
 			}
 			got, err := s.ReverseGeocode(ctx, tt.req)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Server.ReverseGeocode() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if diff := rtesting.Diff(tt.want, got, nil, err); diff != nil {
+				t.Error(diff)
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Server.ReverseGeocode() = %v, want %v", got, tt.want)
-			}
+
 		})
 	}
 }
