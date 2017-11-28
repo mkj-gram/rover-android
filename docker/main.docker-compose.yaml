@@ -43,7 +43,10 @@ services:
     volumes:
       - ../../rover:/rover
       - pgdata:/var/lib/postgresql/data
-  
+
+  redis:
+    image: redis:4.0.2-alpine
+
 
   # ROVER PROJECTS
   audience-frontend:
@@ -100,3 +103,14 @@ services:
       AUTH_V1_SERVICE_HOST: auth-service
       AUDIENCE_V1_SERVICE_HOST: audience-service
       NODE_ENV: development
+
+  geocoder-service:
+    image: golang:1.9-alpine
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - redis
+    command: go run ./geocoder/service/cmd/service/main.go
+    volumes:
+      - ../../rover:/go/src/github.com/roverplatform/rover
+    environment:
+      GEOCODER_SERVICE_GCP_API_KEY: "AIzaSyBNFTti0wKJ3J_FMw1tCpTB4bPyQ8j53bc"
