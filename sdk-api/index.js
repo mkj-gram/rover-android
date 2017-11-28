@@ -65,6 +65,18 @@ tasks.push(function(callback)  {
     })
 })
 
+tasks.push(function(callback)  {
+    let geocoder = require('./connections/geocoder')
+    geocoder.register(server, {}, (err) => {
+        if (err) {
+            return callback(err)
+        }
+
+        Logger.info("Geocoder Client initialized")
+        return callback()
+    })
+})
+
 
 const postgresConnectionOptions = {
     host: Config.get('/postgres/host'),

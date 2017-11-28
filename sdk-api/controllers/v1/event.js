@@ -11,6 +11,8 @@ const DeviceContextSkipKeys = [
   'profile_identifier' // it's a special attribute that has its own RPC, it shoudn't trigger update, so do not treat it as rest of context attrs
 ]
 
+var locationUpdatesTicker = 0
+
 function underscore(object) {
     if (object === null || object === undefined) {
         return {}
@@ -293,7 +295,7 @@ module.exports = function() {
     const handlers = {}
 
     handlers.create = function(request, reply) {
-
+        
         function writeReplyError(status, body) {
             let response = JSON.stringify(body)
             reply.writeHead(status, {
@@ -329,15 +331,44 @@ module.exports = function() {
 
             if (didDeviceUpdateLocation(device, newDevice)) {
                 deviceUpdated = true
-                logger.debug("Updating device's location: " + device.id)
+                
                 tasks.push(function(callback) {
-                    methods.device.updateLocation(accountId, device.id, newDevice.location_accuracy, newDevice.location_latitude, newDevice.location_longitude, function(err) {
-                        if (err) {
-                            logger.debug("Unable to update device's location:", err)
-                        }
 
-                        return callback()
-                    })
+                    let update = {
+                        accuracy: newDevice.location_accuracy,
+                        latitude: newDevice.location_latitude,
+                        longitude: newDevice.location_longitude,
+
+                    }
+
+                    function updateLocation() {
+                        logger.debug("Updating device's location: " + device.id, update)
+                        
+                        methods.device.updateLocation(accountId, device.id, update, function(err) {
+                            if (err) {
+                                logger.debug("Unable to update device's location:", err)
+                            }
+
+                            return callback()
+                        })
+                    }
+
+                    locationUpdatesTicker = (locationUpdatesTicker + 1) % 25
+                   
+                    // every 25 requests we reverse geocode
+                    if(locationUpdatesTicker == 0)  {
+                       methods.geocoder.reverseGeocode(newDevice.location_latitude, newDevice.location_longitude, newDevice.location_accuracy, function(err, geocodedLocation) {
+                            if (!err) {
+                                update.country = geocodedLocation.country
+                                update.state = geocodedLocation.state
+                                update.city = geocodedLocation.city
+                            }
+
+                            return updateLocation()
+                        })    
+                    } else {
+                        return updateLocation()
+                    }
                 })
             }
 

@@ -4,15 +4,18 @@
   "description": "Nodejs Application handling all sdk api calls",
   "main": "start.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "nodemon": "1.12.1",
     "@rover/auth-client": "../auth/clients/node",
     "@rover/segment-client": "../segment/clients/node",
     "@rover/audience-client": "../audience/clients/node",
     "@rover-common/ip-parse": "../node/ip-parse",
+    "@rover/geocoder-client": "../geocoder/clients/node",
     "amqplib": "0.4.2",
     "async": "2.0.1",
     "bluebird": "3.4.1",

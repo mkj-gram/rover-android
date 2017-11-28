@@ -259,6 +259,10 @@ module.exports = function(AudienceClient, logger) {
 		device.location_accuracy = dp.getLocationAccuracy() === 0 ? null : dp.getLocationAccuracy()
 		device.location_latitude = dp.getLocationLatitude() === 0 ? null : dp.getLocationLatitude()
 		device.location_longitude = dp.getLocationLongitude() === 0 ? null : dp.getLocationLongitude()
+		device.location_country = dp.getLocationCountry()
+		device.location_state 	= dp.getLocationState()
+		device.location_city 	= dp.getLocationCity()
+
 		device.ibeacon_monitoring_regions_updated_at = RoverApis.Helpers.timestampFromProto(dp.getIbeaconMonitoringRegionsUpdatedAt())
 		device.geofence_monitoring_regions_updated_at = RoverApis.Helpers.timestampFromProto(dp.getGeofenceMonitoringRegionsUpdatedAt())
 
@@ -519,13 +523,44 @@ module.exports = function(AudienceClient, logger) {
 		})
 	}
 
-	methods.updateLocation = function(accountId, deviceId, accuracy, latitude, longitude, callback) {
+	/**
+	 * Update the devices location
+	 * @param  {Integer}   accountId
+	 * @param  {String}   deviceId  
+	 * @param  {Object}   location
+	 * @param  {Function} callback
+	 *
+	 * `location` object has the following properties
+	 * @param  {Integer}	accuracy
+	 * @param  {Float}   	longitude
+	 * @param  {Float}   	latitude
+	 * @param  {String}   	country
+	 * @param  {String}   	state
+	 * @param  {String}   	city
+	 */
+	methods.updateLocation = function(accountId, deviceId, location, callback) {
+		if (!location) {
+			return callback()
+		}
+
+		let {
+			accuracy,
+			longitude,
+			latitude,
+			country,
+			state,
+			city
+		} = location
+
 		let request = new RoverApis.audience.v1.Models.UpdateDeviceLocationRequest()
 		request.setAuthContext(buildAuthContext(accountId))
 		request.setDeviceId(deviceId)
 		request.setLocationAccuracy(accuracy)
 		request.setLocationLatitude(latitude)
 		request.setLocationLongitude(longitude)
+		request.setLocationCountry(country)
+		request.setLocationState(state)
+		request.setLocationCity(city)
 
 		AudienceClient.updateDeviceLocation(request, function(err, reply) {
 			if (err) {
