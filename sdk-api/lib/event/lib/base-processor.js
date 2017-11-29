@@ -436,6 +436,7 @@ class BaseProcessor {
                     device: this._device,
                     account: this._account,
                     trigger_event_id: this._eventId,
+                    message_template: messageTemplateIndex[message.message_template_id],
                     event: {
                         name: "message added-to-inbox",
                         attributes: {
