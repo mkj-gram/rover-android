@@ -19,6 +19,10 @@ class MessageBaseProcessor extends BaseProcessor {
             this._message = args.event.attributes.message;
             delete this._rawInput["message"];
         }
+
+        if (args.message_template) {
+            this._messageTemplate = args.message_template
+        }
     }
 
     valid() {
@@ -36,11 +40,11 @@ class MessageBaseProcessor extends BaseProcessor {
 
     process(callback) {
 
-        if (this._messageId) {
-            let server = this._server;
-            let methods = server.methods;
-            let ObjectId = server.connections.mongodb.ObjectId;
+        let server = this._server;
+        let methods = server.methods;
+        let ObjectId = server.connections.mongodb.ObjectId;
 
+        if (this._messageId) {
             methods.message.find(this._messageId, {}, (err, message) => {
                 if (err) {
                     return callback(err);
@@ -60,9 +64,21 @@ class MessageBaseProcessor extends BaseProcessor {
                         return callback()
                     })
                 }
-            });
+            })
         } else if (this._message) {
-            return callback();
+            if (!this._messageTemplate) {
+                methods.messageTemplate.find(this._message.message_template_id, { useCache: true }, (err, template) => {
+                    if (err) {
+                        logger.error(err)
+                        return callback()
+                    }
+
+                    this._messageTemplate = template
+                    return callback()
+                })
+            } else {
+                return callback();
+            }
         } else {
             return callback("Message was not defined");
         }
@@ -106,7 +122,6 @@ class MessageBaseProcessor extends BaseProcessor {
             record = Object.assign(record, messageRecord);
         }
 
-        let template = this._messageTemplate
 
         function parseDateSchedule(d) {
             if (d === null || d === undefined || d === '(,)') {
@@ -145,6 +160,7 @@ class MessageBaseProcessor extends BaseProcessor {
             }
         }
 
+        let template = this._messageTemplate
         if (template) {
             let templateRecord = {
                 message_template: {
