@@ -5,15 +5,23 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/namsral/flag"
+	"github.com/newrelic/go-agent"
 	"google.golang.org/grpc"
 	"googlemaps.github.io/maps"
 
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service"
 	"github.com/roverplatform/rover/geocoder/service/cache"
+	"github.com/roverplatform/rover/go/grpc/middleware"
+	"github.com/roverplatform/rover/go/grpc/middleware/newrelic"
+)
+
+const (
+	newRelicAppName = "Geocoder Service"
 )
 
 var (
@@ -22,6 +30,8 @@ var (
 	gcpApiKey = flag.String("gcp-api-key", "", "google api key")
 
 	redisDsn = flag.String("redis-dsn", "", "redis dsn")
+
+	newRelicKey = flag.String("newrelic-key", "", "Newrelic license key")
 )
 
 func main() {
@@ -29,20 +39,14 @@ func main() {
 	flag.CommandLine.Init("", flag.ExitOnError)
 	flag.Parse()
 
-	lis, err := net.Listen("tcp", *rpcAddr)
-	if err != nil {
-		log.Fatalf("net.Listen: %v", err)
-	}
-
-	var grpcOpts []grpc.ServerOption
-	grpcServer := grpc.NewServer(grpcOpts...)
-
+	/*
+		Service handler setup
+	*/
 	client, err := maps.NewClient(maps.WithAPIKey(*gcpApiKey))
 	if err != nil {
 		log.Fatalf("maps.NewClient: %v\n", err)
 	}
 
-	// Setup redis
 	redisOpts, err := redis.ParseURL(*redisDsn)
 	if err != nil {
 		log.Fatalf("redis.ParseURL: %v\n", err)
@@ -51,6 +55,41 @@ func main() {
 	cacheStore := &cache.Store{Client: redisClient}
 
 	server := service.Server{Client: client, Cache: cacheStore}
+
+	/*
+		GRPC setup
+	*/
+	var (
+		grpcOpts            []grpc.ServerOption
+		grpcUnaryMiddleware []grpc.UnaryServerInterceptor
+	)
+
+	if *newRelicKey != "" {
+		config := newrelic.NewConfig(newRelicAppName, *newRelicKey)
+		app, err := newrelic.NewApplication(config)
+		if err != nil {
+			log.Fatalf("Failed to initialize New Relic: %v", err)
+		}
+
+		defer app.Shutdown(time.Second * 10)
+
+		grpcUnaryMiddleware = append(grpcUnaryMiddleware, grpc_newrelic.UnaryServerInterceptor(app))
+
+		log.Println("newrelic=on")
+	} else {
+		log.Println("newrelic=off")
+	}
+
+	lis, err := net.Listen("tcp", *rpcAddr)
+	if err != nil {
+		log.Fatalf("net.Listen: %v", err)
+	}
+
+	if len(grpcUnaryMiddleware) > 0 {
+		grpcOpts = append(grpcOpts, grpc.UnaryInterceptor(middleware.UnaryChain(grpcUnaryMiddleware...)))
+	}
+
+	grpcServer := grpc.NewServer(grpcOpts...)
 	geocoder.RegisterGeocoderServer(grpcServer, &server)
 
 	go func() {
@@ -60,9 +99,9 @@ func main() {
 		}
 	}()
 
-	//
-	// Signals
-	//
+	/*
+		Signals
+	*/
 	sigc := make(chan os.Signal)
 	signal.Notify(sigc, os.Interrupt)
 
