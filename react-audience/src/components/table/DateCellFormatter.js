@@ -19,18 +19,21 @@ class DateCellFormatter extends Component {
     handleMouseOver(e) {
         e.persist()
         const { handleCellEnter, value, rowIdx } = this.props
+        this.setState({
+            onCell: true,
+            isTooltipShowing: true
+        })
 
-        this.setState(
-            {
-                isTooltipShowing: true
-            },
-            handleCellEnter(
-                e,
-                new Date(value).toDateString(),
-                false,
-                rowIdx
-            )
-        )
+        setTimeout(() => {
+            if (this.state.onCell && this.state.isTooltipShowing != false) {
+                handleCellEnter(
+                    e,
+                    new Date(value).toDateString(),
+                    false,
+                    rowIdx
+                )
+            }
+        }, 600)
     }
 
     handleMouseLeave(e) {

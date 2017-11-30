@@ -387,19 +387,22 @@ class AudienceTable extends Component {
 
     handleCellEnter(e, message, listView = false, tooltipRowIdx=null) {
         const target = e.target.getBoundingClientRect()
-        this.setState({
-            toolTip: {
-                isTooltipShowing: true,
-                message,
-                coordinates: {
-                    x: target.left - 300,
-                    y: target.top - 60 + target.height,
-                    divWidth: target.width
-                },
-                listView,
-                tooltipRowIdx
-            }
-        })
+
+        if (!(target.left === target.top && target.left === 0)) {
+            this.setState({
+                toolTip: {
+                    isTooltipShowing: true,
+                    message,
+                    coordinates: {
+                        x: target.left - 300,
+                        y: target.top - 60 + target.height,
+                        divWidth: target.width
+                    },
+                    listView,
+                    tooltipRowIdx
+                }
+            })
+        }
     }
 
     handleCellLeave(listView = false) {

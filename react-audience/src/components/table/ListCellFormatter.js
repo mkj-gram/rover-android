@@ -41,7 +41,7 @@ class ListCellFormatter extends Component {
         let remaining = []
         this.props.value.split(',').forEach(val => {
             if (
-                (newStr.length + val.length) * 6 <= remainingWidth &&
+                (newStr.length + val.length) * 7 <= remainingWidth &&
                 remaining.length === 0
             ) {
                 newStr += `${val},`
@@ -49,7 +49,6 @@ class ListCellFormatter extends Component {
                 remaining.push(val.trim())
             }
         })
-
         this.setState({
             value: newStr,
             remaining
@@ -83,8 +82,9 @@ class ListCellFormatter extends Component {
     render() {
         const { underline } = this.state
         const len = this.state.value.split(',').length
+
         const id = `listCellElement_${this.props.column.key}`
-        if (this.state.value.length === 0) {
+        if (this.props.value.length === 0) {
             return (
                 <div
                     id={id}
