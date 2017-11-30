@@ -69,11 +69,12 @@ class ColumnDisplay extends Component {
             updateChecked,
             devices
         } = this.props
+
         const itemKeys = Object.keys(items)
 
         const { showAll } = this.state
 
-        const size = showAll && selector === 'profiles' ? itemKeys.length : 20
+        const size = showAll || selector !== 'profiles' ? itemKeys.length : 20
 
         const remaining = itemKeys.length - size
 
@@ -85,58 +86,62 @@ class ColumnDisplay extends Component {
 
         return (
             <div style={{ flex: '0 0 auto' }}>
-                {selector !== 'devices' && <div
-                    style={{
-                        paddingLeft: 2,
-                        paddingBottom: 17,
-                        flex: '0 0 auto',
-                        display: 'flex'
-                    }}
-                >
-                    {icon[selector]}
+                {selector !== 'devices' && (
                     <div
                         style={{
-                            marginLeft: 16,
-                            ...text,
-                            color: silver,
-                            fontSize: 13
+                            paddingLeft: 2,
+                            paddingBottom: 17,
+                            flex: '0 0 auto',
+                            display: 'flex'
                         }}
                     >
-                        {this.getSelector(selector)}
+                        {icon[selector]}
+                        <div
+                            style={{
+                                marginLeft: 16,
+                                ...text,
+                                color: silver,
+                                fontSize: 13
+                            }}
+                        >
+                            {this.getSelector(selector)}
+                        </div>
                     </div>
-                </div>}
+                )}
                 {itemKeys.slice(0, size).map((item, index) => {
-                    if (items[item].label !== 'Profile Identifier' || items[item].selector !== 'ROVER_PROFILE') {
+                    if (
+                        items[item].label !== 'Profile Identifier' ||
+                        items[item].selector !== 'ROVER_PROFILE'
+                    ) {
                         return (
                             <div style={{ paddingBottom: 17 }} key={index}>
-                            <Checkbox
-                                isChecked={showChecked(item, items[item])}
-                                label={items[item].label}
-                                primaryColor={purple}
-                                isDisabled={false}
-                                onChange={e =>
-                                    updateChecked(
-                                        selector,
-                                        items[item],
-                                        item,
-                                        devices !== undefined
-                                    )}
-                                style={{
-                                    height: 16,
-                                    width: 16,
-                                    marginRight: 16
-                                }}
-                                labelStyle={{
-                                    height: 16,
-                                    ...text,
-                                    ...light
-                                }}
-                            />
-                        </div>
+                                <Checkbox
+                                    isChecked={showChecked(item, items[item])}
+                                    label={items[item].label}
+                                    primaryColor={purple}
+                                    isDisabled={false}
+                                    onChange={e =>
+                                        updateChecked(
+                                            selector,
+                                            items[item],
+                                            item,
+                                            devices !== undefined
+                                        )}
+                                    style={{
+                                        height: 16,
+                                        width: 16,
+                                        marginRight: 16
+                                    }}
+                                    labelStyle={{
+                                        height: 16,
+                                        ...text,
+                                        ...light
+                                    }}
+                                />
+                            </div>
                         )
                     }
-                }
-            )}
+                })}
                 {this.showMore(remaining)}
             </div>
         )
