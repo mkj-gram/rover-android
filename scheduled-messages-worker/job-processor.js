@@ -4,7 +4,6 @@ var Promise = require('bluebird');
 
 const util = require('util');
 const uuid = require('uuid');
-const SegmentFilter = require('@rover/segment-filter');
 const moment = require('moment');
 const Config = require('./config');
 const path = require('path');

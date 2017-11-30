@@ -38,14 +38,19 @@ services:
     ports:
       - 5432
     build:
-      context: ../../rover
-      dockerfile: ./docker/vendor/postgres/Dockerfile
+      context: ./vendor/postgres
     volumes:
       - ../../rover:/rover
       - pgdata:/var/lib/postgresql/data
 
   redis:
     image: redis:4.0.2-alpine
+
+  rabbitmq:
+    build:
+      context: ./vendor/rabbitmq
+    ports:
+      - 15672:15672
 
 
   # ROVER PROJECTS
@@ -115,3 +120,25 @@ services:
     environment:
       GEOCODER_SERVICE_GCP_API_KEY: "AIzaSyBNFTti0wKJ3J_FMw1tCpTB4bPyQ8j53bc"
       GEOCODER_SERVICE_REDIS_DSN: "redis://redis:6379/3"
+
+  smw:
+    image: node:6.9.1
+    working_dir: /rover/scheduled-messages-worker
+    volumes:
+      - ../../rover:/rover/
+    depends_on:
+      - mongo
+      - rabbitmq
+      - redis
+      - audience-service
+    command: bash -c "npm install & node index.js"
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: DEBUG
+      REDIS_URL: redis://redis/1
+      REDIS_INBOX_URL: redis://redis/2
+      RAVEN_ENABLED: "false"
+      CLOUDAMQP_URL: amqp://rabbitmq
+      MONGODB_URI: mongodb://mongo:27017/rover-local
+      AUDIENCE_V1_SERVICE_HOST: audience-service
+      NPM_TOKEN: dad33a01-0f48-47df-9797-9b36dd5f957c

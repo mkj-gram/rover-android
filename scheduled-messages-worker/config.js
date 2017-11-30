@@ -84,7 +84,7 @@ var store = new Confidence.Store({
 	raven: {
 		enabled: {
 			$filter: 'env',
-			production: process.env.RAVEN_ENABLED === undefined ? true : Boolean(process.env.RAVEN_ENABLED),
+			production: process.env.RAVEN_ENABLED === "true" ? true : false,
 			$default: false
 		},
 		url: 'https://0930fbc1dc134f6588ff76b633a02ac0:cdcce6d6a22e408b96a6d5d679940368@app.getsentry.com/85918'

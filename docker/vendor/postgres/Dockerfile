@@ -1,5 +1,5 @@
 FROM postgres:9.6-alpine
 
-COPY docker/vendor/postgres/initdb.d/*.sql  /docker-entrypoint-initdb.d/
+COPY ./initdb.d/*.sql  /docker-entrypoint-initdb.d/
 
 CMD ["postgres"]

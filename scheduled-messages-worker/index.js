@@ -142,11 +142,7 @@ process.on('SIGINT', function() {
     let tasks = [];
     let queue;
     let librato;
-
-    if (server.connections && server.connections.elasticsearch && server.connections.elasticsearch.queue) {
-        queue = server.connections.elasticsearch.queue;
-    }
-
+    
     if (server.plugins && server.plugins.librato && server.plugins.librato.client) {
         librato = server.plugins.librato.client;    
     }
@@ -209,7 +205,9 @@ async.series(tasks, (err) => {
     })
     .then(function() {
         Logger.info("[*] Waiting for messages. To exit press CTRL+C");
-        return channel.consume('send_message_to_customers', function(msg) { worker.work(msg) }, {});
+        return channel.consume('send_message_to_customers', function(msg) {
+            worker.work(msg) 
+        }, {});
     })
     .catch(err => { throw err });
 });

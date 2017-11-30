@@ -7,7 +7,6 @@
     "@rover/node-fcm-ccs": "0.0.3",
     "@rover/audience-client": "../audience/clients/node",
     "@rover/segment-client": "../segment/clients/node",
-    "@rover/segment-filter": "0.0.8",
     "amqplib": "^0.4.2",
     "apn": "^2.1.4",
     "async": "^2.1.2",
@@ -29,7 +28,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "configure": "node scripts/configure.js",
+    "simulate": "node scripts/simulate.js"
   },
   "author": "",
   "license": "ISC",
