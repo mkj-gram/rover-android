@@ -1,0 +1,14 @@
+steps:
+- name: 'gcr.io/cloud-builders/go:alpine'
+  env:
+    - PROJECT_ROOT=github.com/roverplatform/rover
+  args:
+    - install
+    - github.com/roverplatform/rover/geocoder/service/cmd/service
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - build
+    - --tag=gcr.io/$PROJECT_ID/geocoder-service:$REVISION_ID
+    - -f=./docker/geocoder-service/Dockerfile
+    - .
+images: ['gcr.io/$PROJECT_ID/geocoder-service:$REVISION_ID']
