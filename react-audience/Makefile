@@ -17,7 +17,7 @@ relay:
 	${RUN} bash -c "npm run relay"
 
 run:
-	${RUN} bash -c "npm install && npm run schema && npm run relay && npm start"
+	${RUN}
 
 stop:
 	${DCF} stop
