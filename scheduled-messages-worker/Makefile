@@ -5,13 +5,22 @@ install:
 	${RUN} npm install
 
 configure:
-	${RUN} npm run configure
+	${RUN} /rover/docker/scripts/wait.sh rabbitmq:5672 -- npm run configure
 
 run:
-	${RUN} npm start
+	${RUN}
+
+start:
+	${DCF} up
+
+stop:
+	${DCF} stop
+
+clean:
+	${DCF} down
 
 simulate:
-	${RUN} npm run simulate
+	${RUN} /rover/docker/scripts/wait.sh rabbitmq:5672 -- npm run simulate
 
 shell:
 	${RUN} bash

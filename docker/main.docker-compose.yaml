@@ -131,10 +131,12 @@ services:
       - rabbitmq
       - redis
       - audience-service
-    command: bash -c "npm install & node index.js"
+    command: bash -c "/rover/docker/scripts/wait.sh rabbitmq:5672 -s -- npm install && node index.js"
     environment:
       NODE_ENV: production
       LOG_LEVEL: DEBUG
+      DEBUG: job:*
+      DEBUG_COLORS: 1
       REDIS_URL: redis://redis/1
       REDIS_INBOX_URL: redis://redis/2
       RAVEN_ENABLED: "false"
