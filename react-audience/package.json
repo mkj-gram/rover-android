@@ -27,6 +27,7 @@
     "get-graphql-schema": "2.1.1",
     "relay-compiler": "1.4.1",
     "style-loader": "0.18.2",
+    "uglifyjs-webpack-plugin": "1.1.2",
     "webpack": "3.5.5",
     "webpack-dev-server": "2.9.4"
   },

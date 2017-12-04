@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const webpack = require('webpack')
 const path = require('path')
 
@@ -39,7 +40,8 @@ module.exports = {
           'process.env': {
             NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production')
           }
-        })
+        }),
+        new UglifyJSPlugin()
     ],
     devServer: {
         historyApiFallback: {
