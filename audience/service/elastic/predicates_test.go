@@ -328,7 +328,7 @@ func test_DurationPredicateToFilter(t *testing.T) {
 							{
 								"range": M{
 									"created_at": M{
-										"gte":       "2013-06-05||/d",
+										"gt":        "2013-06-05||/d",
 										"time_zone": Zone,
 									},
 								},

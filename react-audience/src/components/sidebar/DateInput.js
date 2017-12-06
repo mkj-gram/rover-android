@@ -138,7 +138,7 @@ class DateInput extends Component {
             <div>
                 <ModalInput
                     type="number"
-                    min={1}
+                    min={0}
                     value={duration}
                     onChange={e =>
                         this.updateValue({

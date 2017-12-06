@@ -339,6 +339,10 @@ func evalVersionPredicate(predicate *audience.VersionPredicate, value interface{
 
 func evalDurationPredicate(predicate *audience.DurationPredicate, value interface{}) (bool, error) {
 	if val, ok := value.(*timestamp.Timestamp); ok {
+		var (
+			utcPredTime  time.Time
+			utcPredTime1 time.Time
+		)
 		valDate := time.Unix(val.Seconds, int64(val.Nanos)).UTC()
 		op := predicate.GetOp()
 
@@ -351,9 +355,6 @@ func evalDurationPredicate(predicate *audience.DurationPredicate, value interfac
 
 		// Subtract # of days
 		targetDay := timezoneTime.Add(-time.Duration(predicate.GetValue().Duration*24*60*60) * time.Second)
-
-		var utcPredTime time.Time
-		var utcPredTime1 time.Time
 
 		/*
 			ie. first seen is more than 8 days ago,
@@ -372,13 +373,13 @@ func evalDurationPredicate(predicate *audience.DurationPredicate, value interfac
 		*/
 
 		/*
-			ie. first seen is less than 2 days ago,
+			ie. first seen is less than 2 days ago, (all values from the start of yesterday til now)
 			let timeNow = Nov 1, 2017 3:38 PM Toronto/America
-			Want values more than Oct 30, 2017 04:00:00 UTC
+			Want values more than Oct 31, 2017 04:00:00 UTC
 
-			targetDay = Oct 30, 2017 15:38:00 Toronto/America
-			predDate1 = Oct 30, 2017 00:00:00 Toronto/America
-			utcPredTime1 = Oct 30, 2017 04:00:00 UTC
+			targetDay = Oct 31, 2017 15:38:00 Toronto/America
+			predDate1 = Oct 31, 2017 00:00:00 Toronto/America
+			utcPredTime1 = Oct 31, 2017 04:00:00 UTC
 			utcPredTime <= value
 						x---------->
 			_________________________
@@ -391,19 +392,21 @@ func evalDurationPredicate(predicate *audience.DurationPredicate, value interfac
 			return false, err
 		}
 
-		switch op {
-		case audience.DurationPredicate_IS_LESS_THAN:
-			return valDate.Before(utcPredTime), nil
-		case audience.DurationPredicate_IS_GREATER_THAN:
-			return (valDate.After(utcPredTime) || valDate.Equal(utcPredTime)), nil
-		case audience.DurationPredicate_IS_EQUAL:
+		if op == audience.DurationPredicate_IS_GREATER_THAN || op == audience.DurationPredicate_IS_EQUAL {
 			targetDay1 := targetDay.AddDate(0, 0, 1)
 			predDate1 := time.Date(targetDay1.Year(), targetDay1.Month(), targetDay1.Day(), 0, 0, 0, 0, time.UTC)
 			utcPredTime1, err = timeZoneToUTC(predDate1)
 			if err != nil {
 				return false, err
 			}
+		}
 
+		switch op {
+		case audience.DurationPredicate_IS_LESS_THAN:
+			return valDate.Before(utcPredTime), nil
+		case audience.DurationPredicate_IS_GREATER_THAN:
+			return (valDate.After(utcPredTime1) || valDate.Equal(utcPredTime1)), nil
+		case audience.DurationPredicate_IS_EQUAL:
 			/*
 				`first seen exactly 1 day ago`
 				time.Now() = Nov 1, 2017 3:38 PM UTC

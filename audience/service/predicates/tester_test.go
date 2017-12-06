@@ -842,6 +842,100 @@ func testPredicates_DurationPredicates(t *testing.T) {
 		},
 		{
 			/*
+				Values less than 3 days ago relative to 2013-06-07T01:15:00-04:00 have to be greater than or equal to
+				2013-06-04T04:00:00 because 2013-06-03 is ON 3 days ago
+			*/
+			name: "2013-06-03T14:10:43.678Z is not less than 3 days ago relative to 2013-06-07T01:15:00-04:00",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_DurationPredicate{
+								DurationPredicate: &audience.DurationPredicate{
+									Op:            audience.DurationPredicate_IS_GREATER_THAN,
+									AttributeName: "created_at",
+									Value: &audience.DurationPredicate_Duration{
+										Type:     audience.DurationPredicate_Duration_DAYS,
+										Duration: 3,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: p,
+			device: &audience.Device{
+				CreatedAt: protoTs(t, parseTime(t, "2013-06-03T14:10:43Z")),
+			},
+
+			exp:    false,
+			expErr: nil,
+		},
+		{
+			name: "2013-06-04T14:10:43.678Z is less than 3 days ago relative to 2013-06-07T01:15:00-04:00",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_DurationPredicate{
+								DurationPredicate: &audience.DurationPredicate{
+									Op:            audience.DurationPredicate_IS_GREATER_THAN,
+									AttributeName: "created_at",
+									Value: &audience.DurationPredicate_Duration{
+										Type:     audience.DurationPredicate_Duration_DAYS,
+										Duration: 3,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: p,
+			device: &audience.Device{
+				CreatedAt: protoTs(t, parseTime(t, "2013-06-04T14:10:43Z")),
+			},
+
+			exp:    true,
+			expErr: nil,
+		},
+		{
+			name: "2013-06-06T20:15:43.678Z is not less than 0 days ago relative to 2013-06-07T01:15:00-04:00",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_DurationPredicate{
+								DurationPredicate: &audience.DurationPredicate{
+									Op:            audience.DurationPredicate_IS_GREATER_THAN,
+									AttributeName: "created_at",
+									Value: &audience.DurationPredicate_Duration{
+										Type:     audience.DurationPredicate_Duration_DAYS,
+										Duration: 0,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: p,
+			device: &audience.Device{
+				CreatedAt: protoTs(t, parseTime(t, "2013-06-06T20:15:43Z")),
+			},
+
+			exp:    false,
+			expErr: nil,
+		},
+		{
+			/*
 				2013-06-07T01:15:00 convert to local time is 2013-06-06T21:15:00
 				2013-06-06T21:15:00 minus 2 day = 2013-06-04T21:15:00
 				Floor 2013-06-04T21:15:00 -> 2013-06-04T00:00:00
