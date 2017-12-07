@@ -10,7 +10,7 @@ class Customer
 
     index_name("customers")
 
-    attribute :_id, BSON::ObjectId, default: lambda { |model, attribute| BSON::ObjectId.new }
+    attribute :_id, BSON::ObjectId
     attribute :account_id, Integer
     attribute :identifier, NullableString
     attribute :first_name, NullableString
@@ -30,7 +30,7 @@ class Customer
     define_model_callbacks :save, :create, :update, :destroy
 
     def id
-        _id.to_s
+      _id.nil? ? nil: _id.to_s
     end
 
     def self.search_string_mapping
