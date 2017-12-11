@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates tzdata tmux
+RUN apk --no-cache add ca-certificates tmux
 
 RUN mkdir -p /rover/
 WORKDIR /rover
