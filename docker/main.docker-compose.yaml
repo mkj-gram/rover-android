@@ -55,13 +55,13 @@ services:
 
   # ROVER PROJECTS
   audience-frontend:
+    image: node:6.12.0
     depends_on:
       - graphql-gateway
-    image: node:9.1.0
     volumes:
       - ../../rover:/rover/
     working_dir: /rover/react-audience
-    command: npm install && npm run schema && npm run relay && npm start
+    command: bash -c "/rover/docker/scripts/wait.sh graphql-gateway:80 -t 60 -- npm install && npm run schema && npm run relay && npm start"
     environment:
       NODE_ENV: development
       GRAPHQL_HOST: "http://graphql-gateway/graphql"
