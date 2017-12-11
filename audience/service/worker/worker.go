@@ -84,10 +84,25 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 					addErr(errors.Errorf("unknown msg: %s/%s", model, event))
 				}
 			}
+		case "deviceSchema":
+			for event, _ := range groupBy(msgs, "event") {
+				switch event {
+				case "updated":
+					// ms-12: device schema is not part of ES indexes yet
+					h.Log.Errorf("skipping event: %s/%s", model, event)
+
+				default:
+					addErr(errors.Errorf("unknown msg: %s/%s", model, event))
+				}
+			}
 
 		case "device":
 			for event, msgs := range groupBy(msgs, "event") {
 				switch event {
+				case "SetDeviceProfileIdentifier":
+					// ms-12: profile_identifier is not used as parent_id yet
+					h.Log.Errorf("skipping event: %s/%s", model, event)
+
 				case "updated", "created":
 					ops, err := h.handleDevicesUpdated(ctx, msgs)
 					if err != nil {
@@ -100,6 +115,7 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 						addErr(errors.Wrap(err, "HandleDevicesDeleted"))
 					}
 					bulkOps = append(bulkOps, ops...)
+
 				case "SetDeviceProfile":
 					ops, err := h.handleDevicesSetDeviceProfile(ctx, msgs)
 					if err != nil {
@@ -144,7 +160,7 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 		if resp, err := h.Bulk.Handle(ctx, bulkOps); err != nil {
 			addErr(errors.Wrap(err, "bulk.Handle"))
 		} else {
-			for _, item := range resp.Failed() {
+			for i, item := range resp.Failed() {
 				switch item.Status {
 				case 404:
 					continue
@@ -154,7 +170,7 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 				if item.Error != nil {
 					details = *item.Error
 				}
-				h.Log.Errorf("bulk: failed=%+v error=%+v details=%+v", item.Index, item, details)
+				h.Log.Errorf("bulk: failed=%+v error=%+v details=%+v elasticop=%+v", item.Index, item, details, bulkOps[i])
 			}
 		}
 	}

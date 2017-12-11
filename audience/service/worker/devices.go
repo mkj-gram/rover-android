@@ -101,7 +101,6 @@ func (h *Worker) handleDevicesSetDeviceProfile(ctx context.Context, msgs []servi
 		ops = append(ops, op)
 	}
 
-	// delete from old profiles
 	devices, err := h.findDevicesByIds(deviceIds)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindDevicesByIds")
