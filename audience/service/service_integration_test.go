@@ -100,13 +100,13 @@ func TestAudienceService(t *testing.T) {
 	t.Run("UpdateDeviceCustomAttributes", testAudienceService_UpdateDeviceCustomAttributes)
 	t.Run("UpdateDeviceCustomAttributes_ms12", testAudienceService_UpdateDeviceCustomAttributes_ms12)
 
+	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfile)
+	t.Run("SetDeviceProfile_ms12", testAudienceService_SetDeviceProfile_ms12)
+
 	t.Run("DeleteDevice", testAudienceService_DeleteDevice)
 	t.Run("ListDevicesByProfileId", testAudienceService_ListDevicesByProfileId)
 	t.Run("ListDevicesByProfileIdentifier", testAudienceService_ListDevicesByProfileIdentifier)
 	t.Run("ListDevicesByProfileIdentifier_ms12", testAudienceService_ListDevicesByProfileIdentifier_ms12)
-
-	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfile)
-	t.Run("SetDeviceProfile_ms12", testAudienceService_SetDeviceProfile_ms12)
 
 	t.Run("GetDeviceSchema", testAudienceService_GetDeviceSchema)
 
@@ -3582,10 +3582,11 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 			after: &expect{
 				expErr: nil,
 				exp: &audience.Device{
-					Id:        "0000000000000000000000d0",
-					DeviceId:  "D00000000000000000000000",
-					AccountId: 1,
-					ProfileId: "000000000000000000000aa1",
+					Id:                "0000000000000000000000d0",
+					DeviceId:          "D00000000000000000000000",
+					AccountId:         1,
+					ProfileId:         "000000000000000000000aa1",
+					ProfileIdentifier: "a12abbc1-8935-407a-bf81-111111111111",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
@@ -4052,7 +4053,7 @@ func testAudienceService_CreateDevice(t *testing.T) {
 				ProfileId: "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.CreateDevice: profiles.Exist: StringToObjectID: ProfileId: bson.IsObjectIdHex: false"),
+			expErr: grpc.Errorf(codes.InvalidArgument, "db.CreateDevice: StringToObjectID: ProfileId: bson.IsObjectIdHex: false"),
 		},
 
 		{
@@ -4064,7 +4065,7 @@ func testAudienceService_CreateDevice(t *testing.T) {
 				ProfileId: "zer0",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.CreateDevice: profiles.Exist: StringToObjectID: ProfileId: bson.IsObjectIdHex: false"),
+			expErr: grpc.Errorf(codes.InvalidArgument, "db.CreateDevice: StringToObjectID: ProfileId: bson.IsObjectIdHex: false"),
 		},
 
 		{
@@ -4076,7 +4077,7 @@ func testAudienceService_CreateDevice(t *testing.T) {
 				ProfileId: "000000000000000000000000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.CreateDevice: profiles.Exist: not found"),
+			expErr: grpc.Errorf(codes.NotFound, "db.CreateDevice: profiles.Find: not found"),
 		},
 
 		{
@@ -4110,12 +4111,13 @@ func testAudienceService_CreateDevice(t *testing.T) {
 			after: &expect{
 				expErr: nil,
 				exp: &audience.Device{
-					Id:        "0194fdc2fa2ffcc041d3ff12",
-					AccountId: 1,
-					DeviceId:  "DDDDDDDD-0000-0000-0000-000000000001",
-					ProfileId: "dddddddddddddddddddddddd",
-					CreatedAt: protoTs(t, createdAt),
-					UpdatedAt: protoTs(t, createdAt),
+					Id:                "0194fdc2fa2ffcc041d3ff12",
+					AccountId:         1,
+					DeviceId:          "DDDDDDDD-0000-0000-0000-000000000001",
+					ProfileId:         "dddddddddddddddddddddddd",
+					CreatedAt:         protoTs(t, createdAt),
+					UpdatedAt:         protoTs(t, createdAt),
+					ProfileIdentifier: "11111111-1111-1111-1111-dddddddddddd",
 				},
 			},
 		},

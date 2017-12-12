@@ -565,11 +565,29 @@ func (s *devicesStore) CreateDevice(ctx context.Context, r *audience.CreateDevic
 		device_id  = r.GetDeviceId()
 	)
 
-	if err := s.profileExists(ctx, profile_id); err != nil {
-		return wrapError(err, "profiles.Exist")
+	var pid, err = StringToObjectID(profile_id)
+	if err != nil {
+		err = &ErrorInvalidArgument{
+			ArgumentName: "ProfileId",
+			Value:        profile_id,
+			error:        err,
+		}
+		return wrapError(err, "StringToObjectID: ProfileId")
+	}
+
+	var (
+		Q = s.profiles().Find(bson.M{"_id": pid})
+		p Profile
+	)
+
+	if err := Q.One(&p); err != nil {
+		return wrapError(err, "profiles.Find")
 	}
 
 	var device = Device{
+		// NOTE: ms-12: forward compatibility
+		ProfileIdentifier: p.Identifier,
+
 		Id:        s.newObjectId(),
 		DeviceId:  device_id,
 		AccountId: account_id,
@@ -1017,8 +1035,13 @@ func (s *devicesStore) SetDeviceProfile(ctx context.Context, r *audience.SetDevi
 		return wrapError(err, "StringToObjectID: ProfileId")
 	}
 
-	if err := s.profileExists(ctx, pid.Hex()); err != nil {
-		return wrapError(err, "profileExists")
+	var (
+		Q = s.profiles().Find(bson.M{"_id": pid})
+		p Profile
+	)
+
+	if err := Q.One(&p); err != nil {
+		return wrapError(err, "profiles.Find")
 	}
 
 	err = s.devices().Update(
@@ -1027,6 +1050,9 @@ func (s *devicesStore) SetDeviceProfile(ctx context.Context, r *audience.SetDevi
 			"account_id": account_id,
 		},
 		bson.M{"$set": bson.M{
+			// NOTE: ms-12: forward compatibility
+			"profile_identifier": p.Identifier,
+
 			"profile_id": pid,
 			"updated_at": now,
 		}})
