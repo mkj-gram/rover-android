@@ -60,7 +60,7 @@ func main() {
 	stdout.Println("Starting:")
 	for iter := Q.Iter(); iter.Next(&profile); {
 		var (
-			selector = bson.M{"profile_id": profile.Id}
+			selector = bson.M{"profile_id": profile.Id, "profile_identifier": bson.M{"$exists": false}}
 			update   = bson.M{"$set": bson.M{
 				"profile_identifier": profile.Identifier,
 			}}
