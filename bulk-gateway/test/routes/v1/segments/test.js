@@ -1,4 +1,4 @@
-const expect = require('Chai').expect
+const expect = require('chai').expect
 const utils = require('../../../support/utils')
 const RoverApis = require("@rover/apis")
 const CsvProcessor = RoverApis['csv-processor']

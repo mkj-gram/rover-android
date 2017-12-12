@@ -1,4 +1,4 @@
-var expect = require('Chai').expect
+var expect = require('chai').expect
 const Serializers = require('../../lib/serializers')
 const RoverApis = require("@rover/apis")
 const CsvProcessor = RoverApis['csv-processor']

@@ -6,10 +6,10 @@ RUN mkdir -p /rover/
 
 WORKDIR /rover
 
-COPY ./gopath/bin /rover/bin
+COPY ./auth /rover/bin/
 
 # service is configured from ENV vars
-ENTRYPOINT ["/rover/bin/authsvcd"]
+ENTRYPOINT ["/rover/bin/auth"]
 
 # the port service listens on
 EXPOSE 5100

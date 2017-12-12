@@ -77,12 +77,12 @@ services:
   
   auth-service:
     image: golang:1.9-alpine
-    working_dir: /go/src/github.com/roverplatform/rover
+    # working_dir: /
     depends_on:
       - postgres
-    command: ./docker/auth-service/cmd migrate run
-    volumes:
-      - ../../rover:/go/src/github.com/roverplatform/rover
+    # volumes:
+      # - /workspace/:/go/src/github.com/roverplatform/rover/
+    command: find ./ -maxdepth 5
     environment:
       CGO_ENABLED: 0
       DB_DSN: "postgres://postgres:@postgres:5432/authsvc_dev?sslmode=disable"

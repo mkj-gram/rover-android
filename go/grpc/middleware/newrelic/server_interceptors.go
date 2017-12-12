@@ -4,8 +4,8 @@ import (
 	"github.com/newrelic/go-agent"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func UnaryServerInterceptor(app newrelic.Application) grpc.UnaryServerInterceptor {

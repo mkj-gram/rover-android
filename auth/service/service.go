@@ -36,7 +36,7 @@ var (
 
 	// TimeNow provides current time
 	// tests override this
-	 TimeNow = time.Now
+	TimeNow = time.Now
 
 	// EncodeToString converts binary slice to a human readable string
 	// and is used to encode session/token keys

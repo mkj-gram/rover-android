@@ -1,4 +1,4 @@
-var expect = require('Chai').expect
+var expect = require('chai').expect
 var request = require('request')
 // var BulkGateway = require('../index')
 // 
