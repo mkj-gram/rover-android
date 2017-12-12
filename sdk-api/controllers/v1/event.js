@@ -394,7 +394,7 @@ module.exports = function() {
             }
 
             let attributeUpdates = diffAttributes(device.attributes, customPayload)
-            let customerProfile = {identifier: device.profile_identifier}
+            let customerProfile = {account_id: accountId, identifier: device.profile_identifier}
 
             methods.profile.findByIdentifier(accountId, device.profile_identifier, function(err, profile) {
               if (err) {
