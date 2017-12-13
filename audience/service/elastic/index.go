@@ -250,6 +250,9 @@ func MapResponse(res *elastic.SearchResult) (*audience.QueryResponse, error) {
 	var (
 		devices  []*audience.Device
 		profiles []*audience.Profile
+
+		// Use empty structs instead of bools to save on memory space
+		profileAdded = make(map[string]struct{})
 	)
 
 	for _, dhit := range res.Hits.Hits {
@@ -275,7 +278,12 @@ func MapResponse(res *elastic.SearchResult) (*audience.QueryResponse, error) {
 				if err := UnmarshalProfile(*phit.Source, &protoProfile); err != nil {
 					panic(err)
 				}
-				profiles = append(profiles, &protoProfile)
+
+				if _, ok := profileAdded[protoProfile.Id]; !ok {
+					profiles = append(profiles, &protoProfile)
+					profileAdded[protoProfile.Id] = struct{}{}
+				}
+
 			}
 		}
 	}

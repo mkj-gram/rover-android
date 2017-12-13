@@ -14,8 +14,13 @@ import (
 )
 
 func TestResponseMapping(t *testing.T) {
-	var esResp elastic.SearchResult
+	var (
+		esResp                 elastic.SearchResult
+		esRespDuplicateProfile elastic.SearchResult
+	)
+
 	jsonFixture(t, &esResp, "testdata/query.response.json")
+	jsonFixture(t, &esRespDuplicateProfile, "testdata/query-duplicate-profile.response.json")
 
 	tcases := []struct {
 		in  *elastic.SearchResult
@@ -163,13 +168,154 @@ func TestResponseMapping(t *testing.T) {
 				ScrollId: "",
 			},
 		},
+		{
+			in:  &esRespDuplicateProfile,
+			err: nil,
+			exp: &audience.QueryResponse{
+				TotalSize: 2,
+				Devices: []*audience.Device{
+					{
+						Id:                          "",
+						DeviceId:                    "16CDD064-760C-4F3D-A128-3859E9E692C7",
+						AccountId:                   85,
+						ProfileId:                   "59f3311b3e1fae00018f1fcd",
+						CreatedAt:                   protoTs(t, parseTime(t, "2017-10-27T12:43:18Z")),
+						UpdatedAt:                   protoTs(t, parseTime(t, "2017-11-23T00:03:27Z")),
+						IsTestDevice:                false,
+						Label:                       "",
+						Attributes:                  nil,
+						PushEnvironment:             "production",
+						PushTokenKey:                "F418BCD467F53ADFAXJSJSJS4E8ED271F0CC1493A0C6EEB6880DF8587A68220F",
+						PushTokenIsActive:           true,
+						PushTokenCreatedAt:          protoTs(t, parseTime(t, "2017-10-27T12:43:45Z")),
+						PushTokenUpdatedAt:          protoTs(t, parseTime(t, "2017-10-27T12:43:45Z")),
+						PushTokenUnregisteredAt:     nil,
+						AppName:                     "",
+						AppVersion:                  "",
+						AppBuild:                    "",
+						AppNamespace:                "com.yinzcam.nfl.colts",
+						DeviceManufacturer:          "Apple",
+						DeviceModel:                 "iPhone 8 Plus",
+						OsName:                      "iOS",
+						OsVersion:                   &audience.Version{Major: 11, Minor: 0, Revision: 0},
+						Frameworks:                  map[string]*audience.Version{"io.rover.Rover": {Major: 1, Minor: 8, Revision: 0}},
+						LocaleLanguage:              "en",
+						LocaleRegion:                "us",
+						LocaleScript:                "",
+						IsWifiEnabled:               false,
+						IsCellularEnabled:           false,
+						ScreenWidth:                 0,
+						ScreenHeight:                0,
+						CarrierName:                 "verizon",
+						Radio:                       "",
+						TimeZone:                    "America/Indianapolis",
+						Platform:                    1,
+						IsBackgroundEnabled:         true,
+						IsLocationMonitoringEnabled: true,
+						IsBluetoothEnabled:          true,
+						AdvertisingId:               "CFE2D5BF-228D-44B1-92C7-0C92D8204EC6",
+						Ip:                          "157.130.99.154",
+						NotificationAuthorization:          0,
+						LocationAccuracy:                   65,
+						LocationLatitude:                   39.850747605710495,
+						LocationLongitude:                  -86.28539541969405,
+						LocationRegion:                     "",
+						LocationCity:                       "",
+						LocationStreet:                     "",
+						LocationUpdatedAt:                  nil,
+						RegionMonitoringMode:               0,
+						IbeaconMonitoringRegionsUpdatedAt:  nil,
+						IbeaconMonitoringRegions:           []*audience.IBeaconRegion(nil),
+						GeofenceMonitoringRegionsUpdatedAt: nil,
+						GeofenceMonitoringRegions:          []*audience.GeofenceRegion(nil),
+						ProfileIdentifier:                  "",
+					},
+					{
+						Id:                          "",
+						DeviceId:                    "2840176F-0D54-4A82-9067-30A9FC5822F6",
+						AccountId:                   85,
+						ProfileId:                   "59f3311b3e1fae00018f1fcd",
+						CreatedAt:                   protoTs(t, parseTime(t, "2017-10-27T16:03:13Z")),
+						UpdatedAt:                   protoTs(t, parseTime(t, "2017-11-23T00:03:34Z")),
+						IsTestDevice:                false,
+						Label:                       "",
+						Attributes:                  map[string]*audience.Value(nil),
+						PushEnvironment:             "production",
+						PushTokenKey:                "F2765E7E27900C7370CD78562C23453256AEF9F40118522C3E25D884679DA403",
+						PushTokenIsActive:           true,
+						PushTokenCreatedAt:          protoTs(t, parseTime(t, "2017-10-27T16:03:26Z")),
+						PushTokenUpdatedAt:          protoTs(t, parseTime(t, "2017-10-27T16:03:26Z")),
+						PushTokenUnregisteredAt:     nil,
+						AppName:                     "",
+						AppVersion:                  "",
+						AppBuild:                    "",
+						AppNamespace:                "com.yinzcam.nfl.colts",
+						DeviceManufacturer:          "Apple",
+						DeviceModel:                 "iPhone 8 Plus",
+						OsName:                      "iOS",
+						OsVersion:                   &audience.Version{Major: 11, Minor: 0, Revision: 0},
+						Frameworks:                  map[string]*audience.Version{"io.rover.Rover": {Major: 1, Minor: 8, Revision: 0}},
+						LocaleLanguage:              "en",
+						LocaleRegion:                "us",
+						LocaleScript:                "",
+						IsWifiEnabled:               false,
+						IsCellularEnabled:           false,
+						ScreenWidth:                 0,
+						ScreenHeight:                0,
+						CarrierName:                 "verizon",
+						Radio:                       "",
+						TimeZone:                    "America/Indianapolis",
+						Platform:                    1,
+						IsBackgroundEnabled:         true,
+						IsLocationMonitoringEnabled: true,
+						IsBluetoothEnabled:          true,
+						AdvertisingId:               "CFE2D5BF-228D-44B1-92C7-0C92D8204EC6",
+						Ip:                          "157.130.99.154",
+						NotificationAuthorization:          0,
+						LocationAccuracy:                   165,
+						LocationLatitude:                   39.85071871053182,
+						LocationLongitude:                  -86.28542039360563,
+						LocationRegion:                     "",
+						LocationCity:                       "",
+						LocationStreet:                     "",
+						LocationUpdatedAt:                  nil,
+						RegionMonitoringMode:               0,
+						IbeaconMonitoringRegionsUpdatedAt:  nil,
+						IbeaconMonitoringRegions:           []*audience.IBeaconRegion(nil),
+						GeofenceMonitoringRegionsUpdatedAt: nil,
+						GeofenceMonitoringRegions:          []*audience.GeofenceRegion(nil),
+						ProfileIdentifier:                  "",
+					},
+				},
+				Profiles: []*audience.Profile{
+					{
+						Id:         "59f3311b3e1fae00018f1fcd",
+						AccountId:  85,
+						Identifier: "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
+						Attributes: map[string]*audience.Value{
+							"tags": audience.StringArrayVal(
+								"breaking_news",
+								"contest_rewards",
+								"live_programming",
+								"injury_reports",
+								"team_news",
+								"game_updates",
+								"stadium_updates",
+							),
+						},
+						CreatedAt: protoTs(t, parseTime(t, "2017-10-27T13:14:03Z")),
+						UpdatedAt: protoTs(t, parseTime(t, "2017-10-27T13:14:03Z")),
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tcases {
 		t.Run("", func(t *testing.T) {
 			var (
 				exp, expErr = tc.exp, tc.err
-				got, gotErr = selastic.MapResponse(&esResp)
+				got, gotErr = selastic.MapResponse(tc.in)
 			)
 
 			if diff := rtesting.Diff(got, exp, gotErr, expErr); diff != nil {
