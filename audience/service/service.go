@@ -161,6 +161,8 @@ func (s *Server) UpdateDeviceCustomAttributes(ctx context.Context, r *audience.U
 	}
 
 	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+	// NOTE: ms-12: profile attributes get updated as weel
+	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, profileId)
 	if schemaUpdated {
 		// since deviceSchema <-> profileSchema is duplicated
 		s.notify.profileSchemaUpdated(ctx, r.AuthContext.AccountId)
