@@ -165,7 +165,6 @@ func test_Query_Pager(t *testing.T) {
 					},
 					Profiles: []*audience.Profile{
 						{Id: "p2", AccountId: 1},
-						{Id: "p2", AccountId: 1},
 						{Id: "p1", AccountId: 1},
 					},
 					TotalSize: 4,
@@ -238,7 +237,6 @@ func test_Query_Scroller(t *testing.T) {
 					Profiles: []*audience.Profile{
 						{Id: "p2", AccountId: 1},
 						{Id: "p1", AccountId: 1},
-						{Id: "p2", AccountId: 1},
 					},
 					TotalSize: 4,
 				},

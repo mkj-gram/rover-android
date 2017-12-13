@@ -1,0 +1,210 @@
+{
+  "took": 10,
+  "timed_out": false,
+  "_shards": {
+    "total": 3,
+    "successful": 3,
+    "failed": 0
+  },
+  "hits": {
+    "total": 2,
+    "max_score": 0,
+    "hits": [{
+      "_index": "account_85",
+      "_type": "device",
+      "_id": "16CDD064-760C-4F3D-A128-3859E9E692C7",
+      "_score": 0,
+      "_routing": "59f3311b3e1fae00018f1fcd",
+      "_parent": "59f3311b3e1fae00018f1fcd",
+      "_source": {
+        "account_id": 85,
+        "advertising_id": "CFE2D5BF-228D-44B1-92C7-0C92D8204EC6",
+        "app_build": "",
+        "app_name": "",
+        "app_namespace": "com.yinzcam.nfl.colts",
+        "app_version": "",
+        "carrier_name": "verizon",
+        "created_at": "2017-10-27T12:43:18Z",
+        "device_id": "16CDD064-760C-4F3D-A128-3859E9E692C7",
+        "device_manufacturer": "Apple",
+        "device_model": "iPhone 8 Plus",
+        "ip": "157.130.99.154",
+        "is_background_enabled": true,
+        "is_bluetooth_enabled": true,
+        "is_cellular_enabled": false,
+        "is_location_monitoring_enabled": true,
+        "is_test_device": false,
+        "is_wifi_enabled": false,
+        "label": "",
+        "locale_language": "en",
+        "locale_region": "us",
+        "locale_script": "",
+        "location": {
+          "lat": 39.850747605710495,
+          "lon": -86.28539541969405
+        },
+        "location_accuracy": 65,
+        "location_city": "",
+        "location_latitude": 39.850747605710495,
+        "location_longitude": -86.28539541969405,
+        "location_region": "",
+        "location_street": "",
+        "location_updated_at": null,
+        "notification_authorization": "UNKNOWN",
+        "os_name": "iOS",
+        "os_version": {
+          "major": 11,
+          "minor": 0,
+          "revision": 0
+        },
+        "platform": "MOBILE",
+        "profile_id": "59f3311b3e1fae00018f1fcd",
+        "push_environment": "production",
+        "push_token_created_at": "2017-10-27T12:43:45Z",
+        "push_token_is_active": true,
+        "push_token_key": "F418BCD467F53ADFAXJSJSJS4E8ED271F0CC1493A0C6EEB6880DF8587A68220F",
+        "push_token_unregistered_at": null,
+        "push_token_updated_at": "2017-10-27T12:43:45Z",
+        "radio": "",
+        "screen_height": 0,
+        "screen_width": 0,
+        "sdk_version": {
+          "major": 1,
+          "minor": 8,
+          "revision": 0
+        },
+        "time_zone": "America/Indianapolis",
+        "updated_at": "2017-11-23T00:03:27Z"
+      },
+      "inner_hits": {
+        "profile": {
+          "hits": {
+            "total": 1,
+            "max_score": 1,
+            "hits": [{
+              "_type": "profile",
+              "_id": "59f3311b3e1fae00018f1fcd",
+              "_score": 1,
+              "_source": {
+                "account_id": 85,
+                "attributes": {
+                  "tags": [
+                    "breaking_news",
+                    "contest_rewards",
+                    "live_programming",
+                    "injury_reports",
+                    "team_news",
+                    "game_updates",
+                    "stadium_updates"
+                  ]
+                },
+                "created_at": "2017-10-27T13:14:03Z",
+                "id": "59f3311b3e1fae00018f1fcd",
+                "identifier": "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
+                "updated_at": "2017-10-27T13:14:03Z"
+              }
+            }]
+          }
+        }
+      }
+    }, {
+      "_index": "account_85",
+      "_type": "device",
+      "_id": "2840176F-0D54-4A82-9067-30A9FC5822F6",
+      "_score": 0,
+      "_routing": "59f3311b3e1fae00018f1fcd",
+      "_parent": "59f3311b3e1fae00018f1fcd",
+      "_source": {
+        "account_id": 85,
+        "advertising_id": "CFE2D5BF-228D-44B1-92C7-0C92D8204EC6",
+        "app_build": "",
+        "app_name": "",
+        "app_namespace": "com.yinzcam.nfl.colts",
+        "app_version": "",
+        "carrier_name": "verizon",
+        "created_at": "2017-10-27T16:03:13Z",
+        "device_id": "2840176F-0D54-4A82-9067-30A9FC5822F6",
+        "device_manufacturer": "Apple",
+        "device_model": "iPhone 8 Plus",
+        "ip": "157.130.99.154",
+        "is_background_enabled": true,
+        "is_bluetooth_enabled": true,
+        "is_cellular_enabled": false,
+        "is_location_monitoring_enabled": true,
+        "is_test_device": false,
+        "is_wifi_enabled": false,
+        "label": "",
+        "locale_language": "en",
+        "locale_region": "us",
+        "locale_script": "",
+        "location": {
+          "lat": 39.85071871053182,
+          "lon": -86.28542039360563
+        },
+        "location_accuracy": 165,
+        "location_city": "",
+        "location_latitude": 39.85071871053182,
+        "location_longitude": -86.28542039360563,
+        "location_region": "",
+        "location_street": "",
+        "location_updated_at": null,
+        "notification_authorization": "UNKNOWN",
+        "os_name": "iOS",
+        "os_version": {
+          "major": 11,
+          "minor": 0,
+          "revision": 0
+        },
+        "platform": "MOBILE",
+        "profile_id": "59f3311b3e1fae00018f1fcd",
+        "push_environment": "production",
+        "push_token_created_at": "2017-10-27T16:03:26Z",
+        "push_token_is_active": true,
+        "push_token_key": "F2765E7E27900C7370CD78562C23453256AEF9F40118522C3E25D884679DA403",
+        "push_token_unregistered_at": null,
+        "push_token_updated_at": "2017-10-27T16:03:26Z",
+        "radio": "",
+        "screen_height": 0,
+        "screen_width": 0,
+        "sdk_version": {
+          "major": 1,
+          "minor": 8,
+          "revision": 0
+        },
+        "time_zone": "America/Indianapolis",
+        "updated_at": "2017-11-23T00:03:34Z"
+      },
+      "inner_hits": {
+        "profile": {
+          "hits": {
+            "total": 1,
+            "max_score": 1,
+            "hits": [{
+              "_type": "profile",
+              "_id": "59f3311b3e1fae00018f1fcd",
+              "_score": 1,
+              "_source": {
+                "account_id": 85,
+                "attributes": {
+                  "tags": [
+                    "breaking_news",
+                    "contest_rewards",
+                    "live_programming",
+                    "injury_reports",
+                    "team_news",
+                    "game_updates",
+                    "stadium_updates"
+                  ]
+                },
+                "created_at": "2017-10-27T13:14:03Z",
+                "id": "59f3311b3e1fae00018f1fcd",
+                "identifier": "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
+                "updated_at": "2017-10-27T13:14:03Z"
+              }
+            }]
+          }
+        }
+      }
+    }]
+  }
+}
