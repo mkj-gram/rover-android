@@ -1,0 +1,228 @@
+[
+  {
+    "address_components": [
+      {
+        "long_name": "Unnamed Road",
+        "short_name": "Unnamed Road",
+        "types": [
+          "route"
+        ]
+      },
+      {
+        "long_name": "White Pine County",
+        "short_name": "White Pine County",
+        "types": [
+          "administrative_area_level_2",
+          "political"
+        ]
+      },
+      {
+        "long_name": "Nevada",
+        "short_name": "NV",
+        "types": [
+          "administrative_area_level_1",
+          "political"
+        ]
+      },
+      {
+        "long_name": "United States",
+        "short_name": "US",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "Unnamed Road, Nevada, USA",
+    "geometry": {
+      "bounds": {
+        "northeast": {
+          "lat": 39.065996,
+          "lng": -115.5381637
+        },
+        "southwest": {
+          "lat": 39.0342028,
+          "lng": -115.5572916
+        }
+      },
+      "location": {
+        "lat": 39.0487586,
+        "lng": -115.5460444
+      },
+      "location_type": "GEOMETRIC_CENTER",
+      "viewport": {
+        "northeast": {
+          "lat": 39.065996,
+          "lng": -115.5381637
+        },
+        "southwest": {
+          "lat": 39.0342028,
+          "lng": -115.5572916
+        }
+      }
+    },
+    "place_id": "ChIJ66-j8Ul8sIARfFx6tsDa13o",
+    "types": [
+      "route"
+    ]
+  },
+  {
+    "address_components": [
+      {
+        "long_name": "White Pine County",
+        "short_name": "White Pine County",
+        "types": [
+          "administrative_area_level_2",
+          "political"
+        ]
+      },
+      {
+        "long_name": "Nevada",
+        "short_name": "NV",
+        "types": [
+          "administrative_area_level_1",
+          "political"
+        ]
+      },
+      {
+        "long_name": "United States",
+        "short_name": "US",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "White Pine County, NV, USA",
+    "geometry": {
+      "bounds": {
+        "northeast": {
+          "lat": 40.128799,
+          "lng": -114.046385
+        },
+        "southwest": {
+          "lat": 38.677298,
+          "lng": -115.907659
+        }
+      },
+      "location": {
+        "lat": 39.5564495,
+        "lng": -114.524264
+      },
+      "location_type": "APPROXIMATE",
+      "viewport": {
+        "northeast": {
+          "lat": 40.128799,
+          "lng": -114.046385
+        },
+        "southwest": {
+          "lat": 38.677298,
+          "lng": -115.907659
+        }
+      }
+    },
+    "place_id": "ChIJT0dsM3dlpYARsqdrf0iJCRQ",
+    "types": [
+      "administrative_area_level_2",
+      "political"
+    ]
+  },
+  {
+    "address_components": [
+      {
+        "long_name": "Nevada",
+        "short_name": "NV",
+        "types": [
+          "administrative_area_level_1",
+          "political"
+        ]
+      },
+      {
+        "long_name": "United States",
+        "short_name": "US",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "Nevada, USA",
+    "geometry": {
+      "bounds": {
+        "northeast": {
+          "lat": 42.002207,
+          "lng": -114.0396479
+        },
+        "southwest": {
+          "lat": 35.001857,
+          "lng": -120.0064729
+        }
+      },
+      "location": {
+        "lat": 38.8026097,
+        "lng": -116.419389
+      },
+      "location_type": "APPROXIMATE",
+      "viewport": {
+        "northeast": {
+          "lat": 42.002207,
+          "lng": -114.0396479
+        },
+        "southwest": {
+          "lat": 35.001857,
+          "lng": -120.0064729
+        }
+      }
+    },
+    "place_id": "ChIJcbTe-KEKmYARs5X8qooDR88",
+    "types": [
+      "administrative_area_level_1",
+      "political"
+    ]
+  },
+  {
+    "address_components": [
+      {
+        "long_name": "United States",
+        "short_name": "US",
+        "types": [
+          "country",
+          "political"
+        ]
+      }
+    ],
+    "formatted_address": "United States",
+    "geometry": {
+      "bounds": {
+        "northeast": {
+          "lat": 71.5388001,
+          "lng": -66.885417
+        },
+        "southwest": {
+          "lat": 18.7763,
+          "lng": 170.5957
+        }
+      },
+      "location": {
+        "lat": 37.09024,
+        "lng": -95.712891
+      },
+      "location_type": "APPROXIMATE",
+      "viewport": {
+        "northeast": {
+          "lat": 49.38,
+          "lng": -66.94
+        },
+        "southwest": {
+          "lat": 25.82,
+          "lng": -124.39
+        }
+      }
+    },
+    "place_id": "ChIJCzYy5IS16lQRQrfeQ5K5Oxw",
+    "types": [
+      "country",
+      "political"
+    ]
+  }
+]
