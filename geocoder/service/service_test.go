@@ -83,6 +83,19 @@ func TestServer_ReverseGeocode(t *testing.T) {
 			},
 		},
 		{
+			name:   "Loads and parses /testdata/response.04.json",
+			client: &MapsClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.04.json"), Error: nil},
+			req: &geocoder.ReverseGeocodeRequest{
+				Latitude:  39.037842,
+				Longitude: -115.537396,
+			},
+			want: &geocoder.ReverseGeocodeResponse{
+				Country: "United States",
+				State:   "Nevada",
+				City:    "",
+			},
+		},
+		{
 			name: "Returns cached property",
 			onBefore: func() {
 				cache.CacheReverseGeocodeResponse(&geocoder.ReverseGeocodeRequest{
