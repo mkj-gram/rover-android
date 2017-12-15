@@ -128,6 +128,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :location_accuracy, :int32, 3
     optional :location_latitude, :double, 4
     optional :location_longitude, :double, 5
+    optional :location_country, :string, 6
+    optional :location_state, :string, 7
+    optional :location_city, :string, 8
   end
   add_message "rover.audience.v1.UpdateDeviceLocationResponse" do
   end
@@ -289,9 +292,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :location_accuracy, :int32, 41
     optional :location_latitude, :double, 42
     optional :location_longitude, :double, 43
-    optional :location_region, :string, 44
-    optional :location_city, :string, 45
-    optional :location_street, :string, 46
+    optional :location_country, :string, 44
+    optional :location_state, :string, 45
+    optional :location_city, :string, 46
     optional :location_updated_at, :message, 52, "google.protobuf.Timestamp"
     optional :region_monitoring_mode, :enum, 47, "rover.audience.v1.Device.RegionMonitoringMode"
     optional :ibeacon_monitoring_regions_updated_at, :message, 48, "google.protobuf.Timestamp"

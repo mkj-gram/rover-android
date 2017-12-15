@@ -70,6 +70,12 @@ var (
 		"location_accuracy": {
 			MissingValue: int32(0),
 		},
+		"location_country": {
+			MissingValue: "",
+		},
+		"location_state": {
+			MissingValue: "",
+		},
 		"location_city": {
 			MissingValue: "",
 		},
@@ -81,12 +87,6 @@ var (
 		},
 		"location_updated_at": {
 			MissingValue: nil,
-		},
-		"location_region": {
-			MissingValue: "",
-		},
-		"location_street": {
-			MissingValue: "",
 		},
 		"os_name": {
 			MissingValue: "",

@@ -5762,7 +5762,10 @@ proto.rover.audience.v1.UpdateDeviceLocationRequest.toObject = function(includeI
     deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
     locationAccuracy: jspb.Message.getFieldWithDefault(msg, 3, 0),
     locationLatitude: +jspb.Message.getFieldWithDefault(msg, 4, 0.0),
-    locationLongitude: +jspb.Message.getFieldWithDefault(msg, 5, 0.0)
+    locationLongitude: +jspb.Message.getFieldWithDefault(msg, 5, 0.0),
+    locationCountry: jspb.Message.getFieldWithDefault(msg, 6, ""),
+    locationState: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    locationCity: jspb.Message.getFieldWithDefault(msg, 8, "")
   };
 
   if (includeInstance) {
@@ -5819,6 +5822,18 @@ proto.rover.audience.v1.UpdateDeviceLocationRequest.deserializeBinaryFromReader 
     case 5:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setLocationLongitude(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocationCountry(value);
+      break;
+    case 7:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocationState(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLocationCity(value);
       break;
     default:
       reader.skipField();
@@ -5881,6 +5896,27 @@ proto.rover.audience.v1.UpdateDeviceLocationRequest.serializeBinaryToWriter = fu
   if (f !== 0.0) {
     writer.writeDouble(
       5,
+      f
+    );
+  }
+  f = message.getLocationCountry();
+  if (f.length > 0) {
+    writer.writeString(
+      6,
+      f
+    );
+  }
+  f = message.getLocationState();
+  if (f.length > 0) {
+    writer.writeString(
+      7,
+      f
+    );
+  }
+  f = message.getLocationCity();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
       f
     );
   }
@@ -5974,6 +6010,51 @@ proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getLocationLongitu
 /** @param {number} value */
 proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setLocationLongitude = function(value) {
   jspb.Message.setField(this, 5, value);
+};
+
+
+/**
+ * optional string location_country = 6;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getLocationCountry = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setLocationCountry = function(value) {
+  jspb.Message.setField(this, 6, value);
+};
+
+
+/**
+ * optional string location_state = 7;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getLocationState = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setLocationState = function(value) {
+  jspb.Message.setField(this, 7, value);
+};
+
+
+/**
+ * optional string location_city = 8;
+ * @return {string}
+ */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.getLocationCity = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.audience.v1.UpdateDeviceLocationRequest.prototype.setLocationCity = function(value) {
+  jspb.Message.setField(this, 8, value);
 };
 
 
@@ -10989,9 +11070,9 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     locationAccuracy: jspb.Message.getFieldWithDefault(msg, 41, 0),
     locationLatitude: +jspb.Message.getFieldWithDefault(msg, 42, 0.0),
     locationLongitude: +jspb.Message.getFieldWithDefault(msg, 43, 0.0),
-    locationRegion: jspb.Message.getFieldWithDefault(msg, 44, ""),
-    locationCity: jspb.Message.getFieldWithDefault(msg, 45, ""),
-    locationStreet: jspb.Message.getFieldWithDefault(msg, 46, ""),
+    locationCountry: jspb.Message.getFieldWithDefault(msg, 44, ""),
+    locationState: jspb.Message.getFieldWithDefault(msg, 45, ""),
+    locationCity: jspb.Message.getFieldWithDefault(msg, 46, ""),
     locationUpdatedAt: (f = msg.getLocationUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     regionMonitoringMode: jspb.Message.getFieldWithDefault(msg, 47, 0),
     ibeaconMonitoringRegionsUpdatedAt: (f = msg.getIbeaconMonitoringRegionsUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
@@ -11225,15 +11306,15 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
       break;
     case 44:
       var value = /** @type {string} */ (reader.readString());
-      msg.setLocationRegion(value);
+      msg.setLocationCountry(value);
       break;
     case 45:
       var value = /** @type {string} */ (reader.readString());
-      msg.setLocationCity(value);
+      msg.setLocationState(value);
       break;
     case 46:
       var value = /** @type {string} */ (reader.readString());
-      msg.setLocationStreet(value);
+      msg.setLocationCity(value);
       break;
     case 52:
       var value = new google_protobuf_timestamp_pb.Timestamp;
@@ -11604,21 +11685,21 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
       f
     );
   }
-  f = message.getLocationRegion();
+  f = message.getLocationCountry();
   if (f.length > 0) {
     writer.writeString(
       44,
       f
     );
   }
-  f = message.getLocationCity();
+  f = message.getLocationState();
   if (f.length > 0) {
     writer.writeString(
       45,
       f
     );
   }
-  f = message.getLocationStreet();
+  f = message.getLocationCity();
   if (f.length > 0) {
     writer.writeString(
       46,
@@ -12462,46 +12543,46 @@ proto.rover.audience.v1.Device.prototype.setLocationLongitude = function(value) 
 
 
 /**
- * optional string location_region = 44;
+ * optional string location_country = 44;
  * @return {string}
  */
-proto.rover.audience.v1.Device.prototype.getLocationRegion = function() {
+proto.rover.audience.v1.Device.prototype.getLocationCountry = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 44, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setLocationRegion = function(value) {
+proto.rover.audience.v1.Device.prototype.setLocationCountry = function(value) {
   jspb.Message.setField(this, 44, value);
 };
 
 
 /**
- * optional string location_city = 45;
+ * optional string location_state = 45;
  * @return {string}
  */
-proto.rover.audience.v1.Device.prototype.getLocationCity = function() {
+proto.rover.audience.v1.Device.prototype.getLocationState = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 45, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setLocationCity = function(value) {
+proto.rover.audience.v1.Device.prototype.setLocationState = function(value) {
   jspb.Message.setField(this, 45, value);
 };
 
 
 /**
- * optional string location_street = 46;
+ * optional string location_city = 46;
  * @return {string}
  */
-proto.rover.audience.v1.Device.prototype.getLocationStreet = function() {
+proto.rover.audience.v1.Device.prototype.getLocationCity = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 46, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.audience.v1.Device.prototype.setLocationStreet = function(value) {
+proto.rover.audience.v1.Device.prototype.setLocationCity = function(value) {
   jspb.Message.setField(this, 46, value);
 };
 
