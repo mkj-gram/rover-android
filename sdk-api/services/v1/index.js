@@ -21,6 +21,7 @@ const StaticSegmentService = require('./lib/static-segments');
 
 const ProfileService = require('./lib/profile')
 const DeviceService = require('./lib/device')
+const GeocoderService = require('./lib/geocoder')
 
 module.exports.register = function(server, options, next) {
     server.methods.customer = {};
@@ -103,6 +104,8 @@ module.exports.register = function(server, options, next) {
 
     server.methods.profile = ProfileService(server.connections.audience.client, server.plugins.logger.logger, server.connections.elasticsearch.queue)
     server.methods.device = DeviceService(server.connections.audience.client, server.plugins.logger.logger)
+    server.methods.geocoder = GeocoderService(server.connections.geocoder.client, server.plugins.logger.logger)
+
     next();
 };
 

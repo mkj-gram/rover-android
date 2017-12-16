@@ -52,7 +52,6 @@ services:
     ports:
       - 15672:15672
 
-
   # ROVER PROJECTS
   audience-frontend:
     image: node:6.12.0
@@ -71,7 +70,7 @@ services:
     depends_on:
       - mongo
       - elastic
-    command: ./docker/audience-service/cmd test run
+    command: ./docker/audience-service/cmd run
     volumes:
       - ../../rover:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover
@@ -144,3 +143,39 @@ services:
       MONGODB_URI: mongodb://mongo:27017/rover-local
       AUDIENCE_V1_SERVICE_HOST: audience-service
       NPM_TOKEN: dad33a01-0f48-47df-9797-9b36dd5f957c
+
+  sdk-api:
+    image: node:7.5
+    depends_on:
+      - rabbitmq
+      - redis
+      - postgres
+      - audience-service
+      - auth-service
+      - geocoder-service
+    working_dir: /rover/sdk-api
+    ports: ["3100:3100"]
+    volumes:
+      - ../../rover:/rover
+    command: bash -c "/rover/docker/scripts/wait.sh rabbitmq:5672 -- npm install && npm run dev"
+    environment:
+      NODE_ENV: production
+
+      POSTGRESQL_DB_HOST: postgres
+      POSTGRESQL_DB_NAME: rover-local
+
+      REDIS_URL: redis://redis:6379/0
+      REDIS_INBOX_URL: redis://redis:6379/1
+
+      AUDIENCE_V1_SERVICE_HOST: audience-service
+      AUTH_V1_SERVICE_HOST: auth-service
+      GEOCODER_V1_SERVICE_HOST: geocoder-service
+
+      MONGODB_URI: mongodb://mongo:27017/sdk-api-dev
+
+      ELASTICSEARCH_URLS: http://elastic:9200/
+
+      CLOUDAMQP_URL: amqp://rabbitmq
+
+      LOG_LEVEL: "debug"
+      PORT: 3100
