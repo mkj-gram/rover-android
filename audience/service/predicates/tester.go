@@ -42,6 +42,9 @@ func IsInDynamicSegment(segment *audience.DynamicSegment, device *audience.Devic
 		case audience.Predicate_DEVICE:
 			isAttributeSet = isDeviceAttributeSet(device, attribute_name)
 			value = getDeviceValue(device, attribute_name)
+		case audience.Predicate_CUSTOM_DEVICE:
+			isAttributeSet = isDeviceCustomAttributeSet(device, attribute_name)
+			value = getDeviceCustomValue(device, attribute_name)
 		default:
 			return false, errors.Errorf("Unknown category type got %s", predicate.GetSelector().String())
 		}
@@ -117,6 +120,10 @@ func getAttributeNameFromPredicate(predicate *audience.Predicate) string {
 
 // Given an attribute name lookup and pull out the custom value from the profile
 func getProfileCustomValue(profile *audience.Profile, attribute_name string) interface{} {
+	if profile == nil {
+		return nil
+	}
+
 	val, ok := profile.GetAttributes()[attribute_name]
 	if !ok {
 		return nil
@@ -129,6 +136,10 @@ func getProfileCustomValue(profile *audience.Profile, attribute_name string) int
 
 // Given an attribute name lookup and pull out the rover value from the profile
 func getProfileValue(profile *audience.Profile, attribute_name string) interface{} {
+	if profile == nil {
+		return nil
+	}
+
 	switch attribute_name {
 	case "identifier":
 		return profile.GetIdentifier()
@@ -245,12 +256,30 @@ func getDeviceValue(device *audience.Device, attribute_name string) interface{} 
 	}
 }
 
+func getDeviceCustomValue(device *audience.Device, attribute_name string) interface{} {
+	val, ok := device.GetAttributes()[attribute_name]
+	if !ok {
+		return nil
+	}
+
+	value, _ := val.Value()
+
+	return value
+}
+
 func isProfileCustomAttributeSet(profile *audience.Profile, attribute_name string) bool {
+	if profile == nil {
+		return false
+	}
 	_, ok := profile.GetAttributes()[attribute_name]
 	return ok
 }
 
 func isProfileAttributeSet(profile *audience.Profile, attribute_name string) bool {
+	if profile == nil {
+		return false
+	}
+
 	switch attribute_name {
 	case "identifier":
 		return profile.GetIdentifier() != ""
@@ -274,6 +303,11 @@ func isDeviceAttributeSet(device *audience.Device, attribute_name string) bool {
 	value := getDeviceValue(device, attribute_name)
 
 	return schema.MissingValue != value
+}
+
+func isDeviceCustomAttributeSet(device *audience.Device, attribute_name string) bool {
+	_, ok := device.GetAttributes()[attribute_name]
+	return ok
 }
 
 func evalVersionPredicate(predicate *audience.VersionPredicate, value interface{}, isAttributeSet bool) (bool, error) {
