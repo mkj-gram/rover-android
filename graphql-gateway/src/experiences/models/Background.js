@@ -42,7 +42,7 @@ const Background = new GraphQLInterfaceType({
                 return TextBlock
             }
 
-            if (data['scrollable']) {
+            if (typeof data['scrollable'] !== 'undefined') {
                 return WebViewBlock
             }
 

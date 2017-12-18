@@ -97,7 +97,7 @@ const Block = new GraphQLInterfaceType({
             return TextBlock
         }
 
-        if (data['scrollable']) {
+        if (typeof data['scrollable'] !== 'undefined') {
             return WebViewBlock
         }
 

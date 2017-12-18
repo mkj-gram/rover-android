@@ -17,7 +17,7 @@ const ExperienceQuery = {
             type: GraphQLString
         }
     },
-    resolve: requireAuthentication((_, { id: experienceId, url: campaignUrl }, { accountToken }) => {
+    resolve: (_, { id: experienceId, url: campaignUrl }, { accountToken }) => {
         return new Promise((resolve, reject) => {
             let identifier
             if (experienceId !== null && experienceId !== undefined) {
@@ -72,7 +72,7 @@ const ExperienceQuery = {
                 }
             })
         })
-    })
+    }
 }
 
 const errorFromResponse = response => {
