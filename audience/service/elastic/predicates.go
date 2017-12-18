@@ -2,11 +2,13 @@ package elastic
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/pkg/errors"
+
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/audience/service/predicates"
 	"github.com/roverplatform/rover/go/zoneinfo"
-	"time"
 )
 
 type M = map[string]interface{}
@@ -58,44 +60,24 @@ func DeviceAndProfilePredicateAggregateToQuery(aggregate *audience.PredicateAggr
 		mustNot = append(mustNot, dmustNot...)
 	}
 
-	var wrapProfileFilter = func(filter M) M {
-		return M{
-			"has_parent": M{
-				"parent_type": "profile",
-				"query": M{
-					"bool": M{
-						"filter": filter,
-					},
-				},
-			},
-		}
+	profileFilter, err := PredicatesToFilter(aggregate.GetCondition(), profilePredicates)
+	if err != nil {
+		return nil, err
 	}
 
-	profileFilter, err := PredicatesToFilter(aggregate.GetCondition(), profilePredicates)
-
-	// TODO dry up
 	pshould, ok := profileFilter["filter"].(M)["bool"].(M)["should"].([]M)
 	if ok {
-		for _, i := range pshould {
-			pfilter := wrapProfileFilter(i)
-			should = append(should, pfilter)
-		}
+		should = append(should, pshould...)
 	}
 
 	pmust, ok := profileFilter["filter"].(M)["bool"].(M)["must"].([]M)
 	if ok {
-		for _, i := range pmust {
-			pfilter := wrapProfileFilter(i)
-			must = append(must, pfilter)
-		}
+		must = append(must, pmust...)
 	}
 
 	pmustNot, ok := profileFilter["filter"].(M)["bool"].(M)["must_not"].([]M)
 	if ok {
-		for _, i := range pmustNot {
-			pfilter := wrapProfileFilter(i)
-			mustNot = append(mustNot, pfilter)
-		}
+		mustNot = append(mustNot, pmustNot...)
 	}
 
 	var rootBoolFilter = M{}
@@ -111,34 +93,6 @@ func DeviceAndProfilePredicateAggregateToQuery(aggregate *audience.PredicateAggr
 	if len(should) > 0 {
 		rootBoolFilter["should"] = should
 	}
-
-	// The query should return all devices that also have a valid profile
-
-	mustFilter, ok := rootBoolFilter["must"].([]M)
-	// Make sure its initialized
-	if !ok {
-		mustFilter = []M{}
-		rootBoolFilter["must"] = mustFilter
-	}
-
-	// Match all using the filter context
-	hasProfileFilter := M{
-		"has_parent": M{
-			"inner_hits":  M{},
-			"parent_type": "profile",
-			"query": M{
-				"bool": M{
-					"filter": M{
-						"bool": M{},
-					},
-				},
-			},
-		},
-	}
-
-	mustFilter = append(mustFilter, hasProfileFilter)
-
-	rootBoolFilter["must"] = mustFilter
 
 	query := M{
 		"query": M{
@@ -319,7 +273,7 @@ func getDevicePredicates(predicates []*audience.Predicate) []*audience.Predicate
 	)
 
 	for _, p := range predicates {
-		if p.GetSelector() == audience.Predicate_DEVICE {
+		if p.GetSelector() == audience.Predicate_DEVICE || p.GetSelector() == audience.Predicate_CUSTOM_DEVICE {
 			devicePredicates = append(devicePredicates, p)
 		}
 	}
@@ -364,9 +318,11 @@ func getElasticsearchAttributeName(predicate *audience.Predicate) string {
 
 	switch selector {
 	case audience.Predicate_CUSTOM_PROFILE:
-		return fmt.Sprintf("attributes.%s", predicateAttributeName)
+		return fmt.Sprintf("profile.attributes.%s", predicateAttributeName)
 	case audience.Predicate_ROVER_PROFILE:
-		return predicateAttributeName
+		return fmt.Sprintf("profile.%s", predicateAttributeName)
+	case audience.Predicate_CUSTOM_DEVICE:
+		return fmt.Sprintf("attributes.%s", predicateAttributeName)
 	case audience.Predicate_DEVICE:
 		return predicateAttributeName
 	default:
@@ -376,7 +332,7 @@ func getElasticsearchAttributeName(predicate *audience.Predicate) string {
 
 func getElasticsearchMissingValue(name string, selector audience.Predicate_Selector) interface{} {
 	switch selector {
-	case audience.Predicate_CUSTOM_PROFILE:
+	case audience.Predicate_CUSTOM_PROFILE, audience.Predicate_CUSTOM_DEVICE:
 		return nil
 	case audience.Predicate_ROVER_PROFILE:
 		schema, ok := predicates.ProfileSchema[name]

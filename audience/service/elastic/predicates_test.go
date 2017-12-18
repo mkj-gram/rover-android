@@ -546,7 +546,7 @@ func test_StringPredicatesToFilter(t *testing.T) {
 						"must": []M{
 							{
 								"exists": M{
-									"field": "attributes.age",
+									"field": "profile.attributes.age",
 								},
 							},
 						},
@@ -576,7 +576,7 @@ func test_StringPredicatesToFilter(t *testing.T) {
 						"must_not": []M{
 							{
 								"exists": M{
-									"field": "attributes.age",
+									"field": "profile.attributes.age",
 								},
 							},
 						},
@@ -857,7 +857,7 @@ func test_BoolPredicateToFilter(t *testing.T) {
 						"must": []M{
 							{
 								"exists": M{
-									"field": "attributes.is_canadian",
+									"field": "profile.attributes.is_canadian",
 								},
 							},
 						},
@@ -887,7 +887,7 @@ func test_BoolPredicateToFilter(t *testing.T) {
 						"must_not": []M{
 							{
 								"exists": M{
-									"field": "attributes.is_canadian",
+									"field": "profile.attributes.is_canadian",
 								},
 							},
 						},
@@ -1095,7 +1095,7 @@ func test_NumberPredicateToFilter(t *testing.T) {
 						"must": []M{
 							{
 								"exists": M{
-									"field": "attributes.age",
+									"field": "profile.attributes.age",
 								},
 							},
 						},
@@ -1125,7 +1125,7 @@ func test_NumberPredicateToFilter(t *testing.T) {
 						"must_not": []M{
 							{
 								"exists": M{
-									"field": "attributes.age",
+									"field": "profile.attributes.age",
 								},
 							},
 						},
@@ -1927,7 +1927,7 @@ func test_DoublePredicateToFilter(t *testing.T) {
 						"must": []M{
 							{
 								"exists": M{
-									"field": "attributes.age",
+									"field": "profile.attributes.age",
 								},
 							},
 						},
@@ -1957,7 +1957,7 @@ func test_DoublePredicateToFilter(t *testing.T) {
 						"must_not": []M{
 							{
 								"exists": M{
-									"field": "attributes.age",
+									"field": "profile.attributes.age",
 								},
 							},
 						},
@@ -2116,12 +2116,12 @@ func test_StringArrayPredicateToFilter(t *testing.T) {
 									"must": []M{
 										{
 											"term": M{
-												"attributes.tags": "bob",
+												"profile.attributes.tags": "bob",
 											},
 										},
 										{
 											"term": M{
-												"attributes.tags": "billy",
+												"profile.attributes.tags": "billy",
 											},
 										},
 									},
@@ -2158,12 +2158,12 @@ func test_StringArrayPredicateToFilter(t *testing.T) {
 									"should": []M{
 										{
 											"term": M{
-												"attributes.tags": "hank",
+												"profile.attributes.tags": "hank",
 											},
 										},
 										{
 											"term": M{
-												"attributes.tags": "frank",
+												"profile.attributes.tags": "frank",
 											},
 										},
 									},
@@ -2197,7 +2197,7 @@ func test_StringArrayPredicateToFilter(t *testing.T) {
 						"must": []M{
 							{
 								"terms": M{
-									"attributes.tags": []string{"leo", "tucker"},
+									"profile.attributes.tags": []string{"leo", "tucker"},
 								},
 							},
 						},
@@ -2228,7 +2228,7 @@ func test_StringArrayPredicateToFilter(t *testing.T) {
 						"must_not": []M{
 							{
 								"terms": M{
-									"attributes.tags": []string{"leo", "tucker"},
+									"profile.attributes.tags": []string{"leo", "tucker"},
 								},
 							},
 						},
@@ -2353,7 +2353,7 @@ func test_DeviceAndProfilePredicateAggregateToQuery(t *testing.T) {
 		expErr error
 	}{
 		{
-			name: "Uses a root query object and includes empty match_parent when no profile predicates are defined",
+			name: "Uses a root query object",
 			aggregate: &audience.PredicateAggregate{
 				Condition: audience.PredicateAggregate_ALL,
 				Predicates: []*audience.Predicate{
@@ -2381,17 +2381,57 @@ func test_DeviceAndProfilePredicateAggregateToQuery(t *testing.T) {
 											"os_name": "iOS",
 										},
 									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+		{
+			name: "uses a root query and a nested query for custom device property",
+			aggregate: &audience.PredicateAggregate{
+				Condition: audience.PredicateAggregate_ALL,
+				Predicates: []*audience.Predicate{
+					{
+						Selector: audience.Predicate_CUSTOM_DEVICE,
+						Value: &audience.Predicate_StringPredicate{
+							StringPredicate: &audience.StringPredicate{
+								Op:            audience.StringPredicate_IS_EQUAL,
+								AttributeName: "water-bottle",
+								Value:         "NOPE",
+							},
+						},
+					},
+					{
+						Selector: audience.Predicate_DEVICE,
+						Value: &audience.Predicate_BoolPredicate{
+							BoolPredicate: &audience.BoolPredicate{
+								Op:            audience.BoolPredicate_IS_EQUAL,
+								AttributeName: "is_wifi_enabled",
+								Value:         true,
+							},
+						},
+					},
+				},
+			},
+
+			exp: M{
+				"query": M{
+					"bool": M{
+						"filter": M{
+							"bool": M{
+								"must": []M{
 									{
-										"has_parent": M{
-											"inner_hits":  M{},
-											"parent_type": "profile",
-											"query": M{
-												"bool": M{
-													"filter": M{
-														"bool": M{},
-													},
-												},
-											},
+										"term": M{
+											"attributes.water-bottle": "NOPE",
+										},
+									},
+									{
+										"term": M{
+											"is_wifi_enabled": true,
 										},
 									},
 								},
@@ -2403,9 +2443,8 @@ func test_DeviceAndProfilePredicateAggregateToQuery(t *testing.T) {
 
 			expErr: nil,
 		},
-
 		{
-			name: "uses a root query object with the match_parent filled out",
+			name: "uses a root query object with nested query for profile",
 			aggregate: &audience.PredicateAggregate{
 				Condition: audience.PredicateAggregate_ALL,
 				Predicates: []*audience.Predicate{
@@ -2444,120 +2483,8 @@ func test_DeviceAndProfilePredicateAggregateToQuery(t *testing.T) {
 										},
 									},
 									{
-										"has_parent": M{
-											"parent_type": "profile",
-											"query": M{
-												"bool": M{
-													"filter": M{
-														"term": M{
-															"attributes.first-name": "Bob",
-														},
-													},
-												},
-											},
-										},
-									},
-									{
-										"has_parent": M{
-											"inner_hits":  M{},
-											"parent_type": "profile",
-											"query": M{
-												"bool": M{
-													"filter": M{
-														"bool": M{},
-													},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-
-			expErr: nil,
-		},
-		{
-			name: "wraps profile should query in has_parent",
-			aggregate: &audience.PredicateAggregate{
-				Condition: audience.PredicateAggregate_ANY,
-				Predicates: []*audience.Predicate{
-					{
-						Selector: audience.Predicate_CUSTOM_PROFILE,
-						Value: &audience.Predicate_StringPredicate{
-							StringPredicate: &audience.StringPredicate{
-								Op:            audience.StringPredicate_IS_EQUAL,
-								AttributeName: "first-name",
-								Value:         "Bob",
-							},
-						},
-					},
-					{
-						Selector: audience.Predicate_CUSTOM_PROFILE,
-						Value: &audience.Predicate_NumberPredicate{
-							NumberPredicate: &audience.NumberPredicate{
-								Op:            audience.NumberPredicate_IS_BETWEEN,
-								AttributeName: "age",
-								Value:         1,
-								Value2:        10,
-							},
-						},
-					},
-				},
-			},
-
-			exp: M{
-				"query": M{
-					"bool": M{
-						"filter": M{
-							"bool": M{
-								"should": []M{
-									{
-										"has_parent": M{
-											"parent_type": "profile",
-											"query": M{
-												"bool": M{
-													"filter": M{
-														"term": M{
-															"attributes.first-name": "Bob",
-														},
-													},
-												},
-											},
-										},
-									},
-									{
-										"has_parent": M{
-											"parent_type": "profile",
-											"query": M{
-												"bool": M{
-													"filter": M{
-														"range": M{
-															"attributes.age": M{
-																"gte": int64(1),
-																"lte": int64(10),
-															},
-														},
-													},
-												},
-											},
-										},
-									},
-								},
-								"must": []M{
-									{
-										"has_parent": M{
-											"inner_hits":  M{},
-											"parent_type": "profile",
-											"query": M{
-												"bool": M{
-													"filter": M{
-														"bool": M{},
-													},
-												},
-											},
+										"term": M{
+											"profile.attributes.first-name": "Bob",
 										},
 									},
 								},
@@ -2625,19 +2552,6 @@ func test_DeviceAndProfilePredicateAggregateToQuery(t *testing.T) {
 												"Universal",
 												"UTC",
 												"Zulu",
-											},
-										},
-									},
-									{
-										"has_parent": M{
-											"inner_hits":  M{},
-											"parent_type": "profile",
-											"query": M{
-												"bool": M{
-													"filter": M{
-														"bool": M{},
-													},
-												},
 											},
 										},
 									},
