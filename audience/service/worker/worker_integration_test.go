@@ -67,7 +67,7 @@ func TestWorker(t *testing.T) {
 
 		db = dialMongo(t, mongoDSN)
 
-		ES = &elastic.DB{
+		ES = &elastic.BulkHandler{
 			Client: esClient,
 		}
 
