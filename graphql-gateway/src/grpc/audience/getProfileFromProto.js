@@ -1,6 +1,6 @@
 import RoverApis from '@rover/apis'
 
-const valueFromProto = (value) => {
+export const valueFromProto = (value) => {
     switch (value.getValueTypeCase()) {
        case 1: {
            return value.getBooleanValue()

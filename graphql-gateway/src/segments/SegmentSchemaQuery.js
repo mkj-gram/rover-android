@@ -35,12 +35,13 @@ const SegmentSchemaQuery = {
             } catch (e) {
                 throw new Error(e)
             }
-        
+
             return response.getSchema().getAttributesList().map(schema => ({
                 attribute: schema.getAttribute(),
                 label: schema.getLabel(),
-                attributeType: attributeTypeMap[schema.getAttributeType()]
-            }))
+                attributeType: attributeTypeMap[schema.getAttributeType()],
+                selector: 'CUSTOM_DEVICE'
+            }))          
         }
         
         const getProfileSchemaFromGrpc = async () => {
