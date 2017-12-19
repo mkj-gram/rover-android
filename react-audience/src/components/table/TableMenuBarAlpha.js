@@ -79,7 +79,7 @@ class TableMenuBarAlpha extends Component {
         const { selectedColumns } = this.props
         if (!info.hasOwnProperty('selector')) {
             return (`${item}_DEVICE` in selectedColumns)
-        } else if (['CUSTOM_PROFILE','ROVER_PROFILE'].includes(info.selector)) {
+        } else if (['DEVICE', 'CUSTOM_DEVICE', 'CUSTOM_PROFILE', 'ROVER_PROFILE'].includes(info.selector)) {
             return (`${item}_${info.selector}` in selectedColumns)
         }
     }

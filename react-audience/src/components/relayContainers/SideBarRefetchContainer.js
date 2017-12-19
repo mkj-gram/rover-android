@@ -74,6 +74,7 @@ export default createRefetchContainer(
                     attribute
                     __typename: type
                     label
+                    selector
                 }
                 profileSchema {
                     attribute
