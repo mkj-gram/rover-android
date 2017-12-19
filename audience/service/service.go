@@ -425,18 +425,18 @@ func (s *Server) ListDevicesByProfileIdentifier(ctx context.Context, r *audience
 
 func (s *Server) GetDeviceSchema(ctx context.Context, r *audience.GetDeviceSchemaRequest) (*audience.GetDeviceSchemaResponse, error) {
 	if r.GetAuthContext() == nil {
-		return &audience.GetDeviceSchemaResponse{
-			Schema: &audience.DeviceSchema{
-				Attributes: nil,
-			},
-		}, nil
+		return nil, status.Errorf(codes.Unauthenticated, "AuthContext: must be set")
 	}
 
-	return &audience.GetDeviceSchemaResponse{
-		Schema: &audience.DeviceSchema{
-			Attributes: hardcodedDeviceSchema(r.GetAuthContext().GetAccountId()),
-		},
-	}, nil
+	db := s.db.Copy()
+	defer db.Close()
+
+	schema, err := db.GetDeviceSchemaByAccountId(ctx, int(r.GetAuthContext().GetAccountId()))
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceSchema: %v", err)
+	}
+
+	return &audience.GetDeviceSchemaResponse{Schema: schema}, nil
 }
 
 // Profiles

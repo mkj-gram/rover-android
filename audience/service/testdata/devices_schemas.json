@@ -49,3 +49,19 @@
   "attribute_type": "string",
   "created_at": {"$date":"2016-08-22T19:05:53.102Z"}
 }
+
+{
+  "_id":{"$oid":"000000000000000000000f26"},
+  "account_id":33,
+  "attribute":"arr",
+  "attribute_type": "array[string]",
+  "created_at": {"$date":"2016-08-22T19:05:53.102Z"}
+}
+{
+  "_id":{"$oid":"000000000000000000000f27"},
+  "account_id":33,
+  "attribute":"string",
+  "attribute_type": "string",
+  "created_at": {"$date":"2016-08-22T19:05:53.102Z"}
+}
+

@@ -5657,9 +5657,12 @@ func testAudienceService_ListDevicesByProfileIdentifier_ms12(t *testing.T) {
 
 func testAudienceService_GetDeviceSchema(t *testing.T) {
 	var (
-		ctx              = context.TODO()
-		mdb              = dialMongo(t, *tMongoDSN)
-		db               = mongodb.New(mdb)
+		ctx = context.TODO()
+
+		db = mongodb.New(
+			dialMongo(t, *tMongoDSN),
+		)
+
 		svc              = service.New(db, new(nopIndex), logNotifier(t))
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -5670,74 +5673,49 @@ func testAudienceService_GetDeviceSchema(t *testing.T) {
 		name string
 		req  *audience.GetDeviceSchemaRequest
 
-		expErr error
 		exp    *audience.GetDeviceSchemaResponse
+		expErr error
 	}{
 		{
-			name: "gets schema",
+			name: "no schema",
 			req: &audience.GetDeviceSchemaRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
+				AuthContext: &auth.AuthContext{
+					AccountId: 0,
+				},
 			},
 
-			expErr: nil,
 			exp: &audience.GetDeviceSchemaResponse{
 				Schema: &audience.DeviceSchema{
-					Attributes: []*audience.SchemaAttribute{
-						{AccountId: 1, AttributeType: "timestamp", Attribute: "created_at", Label: "Created At", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "timestamp", Attribute: "updated_at", Label: "Updated At", Id: "", Path: ""},
-
-						{AccountId: 1, AttributeType: "timestamp", Attribute: "push_token_updated_at", Label: "Push Token Updated At", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "timestamp", Attribute: "push_token_unregistered_at", Label: "Push Token Unregistered At", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "push_environment", Label: "Push Environment", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "push_token_key", Label: "Push Token", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "bool", Attribute: "push_token_is_active", Label: "Push Token Is Active", Id: "", Path: ""},
-
-						{AccountId: 1, AttributeType: "string", Attribute: "app_name", Label: "App Name", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "app_version", Label: "App Version", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "app_build", Label: "App Build", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "app_namespace", Label: "App Namespace", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "device_manufacturer", Label: "Device Manufacturer", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "device_model", Label: "Device Model", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "os_name", Label: "Os Name", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "locale_language", Label: "Locale Language", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "locale_region", Label: "Locale Region", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "locale_script", Label: "Locale Script", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "bool", Attribute: "is_wifi_enabled", Label: "Wifi Enabled", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "bool", Attribute: "is_cellular_enabled", Label: "Cellular Enabled", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "int32", Attribute: "screen_width", Label: "Screen Width", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "int32", Attribute: "screen_height", Label: "Screen Height", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "carrier_name", Label: "Carrier", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "radio", Label: "Radio", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "time_zone", Label: "Time Zone", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "bool", Attribute: "is_background_enabled", Label: "Background Enabled", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "bool", Attribute: "is_location_monitoring_enabled", Label: "Location Monitoring Enabled", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "bool", Attribute: "is_bluetooth_enabled", Label: "Bluetooth Enabled", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "advertising_id", Label: "Advertising Id", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "ip", Label: "IP", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "geopoint", Attribute: "location", Label: "Location", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "int32", Attribute: "location_accuracy", Label: "Location Accuracy", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "double", Attribute: "location_latitude", Label: "Location Latitude", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "double", Attribute: "location_longitude", Label: "Location Longitude", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "location_region", Label: "Location Region", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "location_city", Label: "Location City", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "timestamp", Attribute: "location_updated_at", Label: "Location Updated At", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "string", Attribute: "location_street", Label: "Location Street", Id: "", Path: ""},
-						{AccountId: 1, AttributeType: "version", Attribute: "os_version", Label: "Os Version", Id: "", Path: ""},
-						// sdk_version is a temporary workaround for frameworks
-						// which points to frameworks["io.rover.Rover"] value
-						{AccountId: 1, AttributeType: "version", Attribute: "sdk_version", Label: "SDK Version", Id: "", Path: ""},
-					},
+					Attributes: nil,
 				},
 			},
 		},
 		{
-			name: "gets schema unauthenticated",
-			req:  &audience.GetDeviceSchemaRequest{},
+			name: "a schema",
+			req: &audience.GetDeviceSchemaRequest{
+				AuthContext: &auth.AuthContext{AccountId: 33},
+			},
 
-			expErr: nil,
 			exp: &audience.GetDeviceSchemaResponse{
 				Schema: &audience.DeviceSchema{
-					Attributes: nil,
+					Attributes: []*audience.SchemaAttribute{
+						{
+							Id:            "000000000000000000000f26",
+							AccountId:     33,
+							Attribute:     "arr",
+							Label:         "arr",
+							AttributeType: "array[string]",
+							CreatedAt:     protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+						},
+						{
+							Id:            "000000000000000000000f27",
+							AccountId:     33,
+							Attribute:     "string",
+							Label:         "string",
+							AttributeType: "string",
+							CreatedAt:     protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
+						},
+					},
 				},
 			},
 		},
@@ -5745,7 +5723,7 @@ func testAudienceService_GetDeviceSchema(t *testing.T) {
 
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, gotErr := client.GetDeviceSchema(ctx, tc.req)
+			var got, gotErr = client.GetDeviceSchema(ctx, tc.req)
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}
