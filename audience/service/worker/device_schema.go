@@ -12,28 +12,37 @@ import (
 )
 
 func (h *Worker) buildDeviceMappings(ctx context.Context, msgs []service.Message) ([]*elastic.IndexMapping, error) {
-	schemas, err := h.findDeviceSchemasByAccountIds(h.accountIds(msgs))
+	deviceSchemas, err := h.findDeviceSchemasByAccountIds(h.accountIds(msgs))
 	if err != nil {
 		return nil, errors.Wrap(err, "findDeviceSchemasByAccountIds")
 	}
 
-	var group = make(map[string][]*mongodb.SchemaAttribute)
-	for i := range schemas {
-		var acctId = strconv.Itoa(int(schemas[i].AccountId))
-		group[acctId] = append(group[acctId], schemas[i])
+	profileSchemas, err := h.findProfileSchemasByAccountIds(h.accountIds(msgs))
+	if err != nil {
+		return nil, errors.Wrap(err, "findProfileSchemasByAccountIds")
 	}
 
 	var (
-		mappings = make([]*elastic.IndexMapping, len(group))
+		deviceSchemaByAccount  = byAccountId(deviceSchemas)
+		profileSchemaByAccount = byAccountId(profileSchemas)
+
+		schemaToMapping = elastic.CustomAttributesMapping
 
 		i int
+
+		mappings = make([]*elastic.IndexMapping, len(deviceSchemaByAccount))
 	)
 
-	for acctId, schema := range group {
+	for acctId := range deviceSchemaByAccount {
+		var (
+			deviceMapping  = schemaToMapping(deviceSchemaByAccount[acctId])
+			profileMapping = schemaToMapping(profileSchemaByAccount[acctId])
+		)
+
 		mappings[i] = &elastic.IndexMapping{
+			IndexName: h.AccountIndex(strconv.Itoa(acctId)),
 			Type:      "device",
-			IndexName: h.AccountIndex(acctId),
-			Mapping:   elastic.DeviceMapping(elastic.CustomAttributesMapping(schema)),
+			Mapping:   elastic.DeviceMapping(deviceMapping, profileMapping),
 		}
 		i++
 	}
@@ -55,4 +64,14 @@ func (h *Worker) findDeviceSchemasByAccountIds(ids []int) ([]*mongodb.SchemaAttr
 	}
 
 	return schemaAttrs, nil
+}
+
+func byAccountId(schemas []*mongodb.SchemaAttribute) map[int][]*mongodb.SchemaAttribute {
+	var group = make(map[int][]*mongodb.SchemaAttribute)
+	for i := range schemas {
+		var acctId = int(schemas[i].AccountId)
+		group[acctId] = append(group[acctId], schemas[i])
+	}
+
+	return group
 }

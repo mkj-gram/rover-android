@@ -11,11 +11,12 @@ import (
 	"strings"
 	"testing"
 
-	"golang.org/x/net/context"
-
 	"cloud.google.com/go/pubsub"
-
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+	es5 "gopkg.in/olivere/elastic.v5"
 
 	"github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/elastic"
@@ -23,11 +24,6 @@ import (
 	"github.com/roverplatform/rover/audience/service/worker"
 	rlog "github.com/roverplatform/rover/go/log"
 	rtesting "github.com/roverplatform/rover/go/testing"
-
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-
-	es5 "gopkg.in/olivere/elastic.v5"
 )
 
 type M = map[string]interface{}
@@ -39,7 +35,7 @@ var (
 		return "test_account_" + s
 	}
 
-	mongoDSN = "mongodb://mongo:27017/service_worker_test"
+	mongoDSN = "mongodb://mongo:27017/audience_worker_test"
 	esDSN    = "http://elastic5:9200/"
 
 	difff = rtesting.Difff
@@ -48,13 +44,15 @@ var (
 
 func TestWorker(t *testing.T) {
 	var (
-		l    = log.New(os.Stdout, "elastic:", 0)
-		rLog = rlog.New(rlog.Error)
+		elasticOut = createFile(t, "elastic.test.log")
+		elasticLog = log.New(elasticOut, "", 0)
 	)
+
+	t.Log("Elastic log:", elasticOut.Name())
 
 	esClient, err := es5.NewClient(
 		es5.SetURL(strings.Split(esDSN, ",")...),
-		es5.SetTraceLog(l),
+		es5.SetTraceLog(elasticLog),
 		es5.SetSniff(false),
 		// es5.SetGzip(false),
 	)
@@ -67,14 +65,12 @@ func TestWorker(t *testing.T) {
 
 		db = dialMongo(t, mongoDSN)
 
-		ES = &elastic.BulkHandler{
-			Client: esClient,
-		}
-
 		w = worker.Worker{
-			Log:          rLog,
-			DB:           db,
-			Bulk:         ES,
+			Log: rlog.New(rlog.Error),
+			DB:  db,
+			Bulk: &elastic.BulkHandler{
+				Client: esClient,
+			},
 			AccountIndex: acctIdx,
 		}
 	)
@@ -92,8 +88,8 @@ func TestWorker(t *testing.T) {
 	//
 	// Setup State
 	//
-	loadFixture(t, db.C("devices"), "../testdata/devices.json")
-	loadFixture(t, db.C("profiles"), "../testdata/profiles.json")
+	loadFixture(t, db.C("devices"), "testdata/devices.bson.json")
+	loadFixture(t, db.C("profiles"), "testdata/profiles.bson.json")
 	loadFixture(t, db.C("profiles_schemas"), "testdata/profiles_schemas.json")
 	loadFixture(t, db.C("devices_schemas"), "testdata/devices_schemas.json")
 
@@ -110,7 +106,7 @@ func TestWorker(t *testing.T) {
 		t.Fatal("index:", err)
 	}
 
-	createMapping(t, acctIdx("1"), "device", elastic.DeviceMapping(M{}))
+	createMapping(t, acctIdx("1"), "device", elastic.DeviceMapping(M{}, M{}))
 	createMapping(t, acctIdx("1"), "profile", elastic.ProfileMapping(M{}))
 
 	resp, err := esClient.PerformRequest(ctx, "POST", "/_bulk", nil, string(readFile(t, "testdata/index.json")))
@@ -260,15 +256,29 @@ func TestWorker(t *testing.T) {
 								"device": M{
 									// Meta
 									// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-all-field.html
-									"_all":     M{"enabled": false},
-									"_parent":  M{"type": "profile"},
-									"_routing": M{"required": true},
+									"_all": M{"enabled": false},
 									"properties": M{
 										"account_id": M{"type": "integer"},
 
-										"device_id": M{"type": "keyword"},
-
+										// deprecated
 										"profile_id": M{"type": "keyword"},
+										// NOTE: ms-12:
+										"profile_identifier": M{"type": "keyword"},
+										"profile": M{
+											"properties": M{
+												"id":         M{"type": "keyword"},
+												"account_id": M{"type": "integer"},
+												"created_at": M{"type": "date"},
+												"identifier": M{"type": "keyword"},
+												"updated_at": M{"type": "date"},
+
+												"attributes": M{"type": "object"},
+											},
+										},
+
+										"attributes": M{"type": "object"},
+
+										"device_id": M{"type": "keyword"},
 
 										"created_at": M{"type": "date"},
 										"updated_at": M{"type": "date"},
@@ -323,15 +333,18 @@ func TestWorker(t *testing.T) {
 										"ip": M{"type": "ip"},
 
 										// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html
-										"location": M{"type": "geo_point"},
+										"location":            M{"type": "geo_point"},
+										"location_updated_at": M{"type": "date"},
 
 										"location_latitude":  M{"type": "double"},
 										"location_longitude": M{"type": "double"},
 
 										"location_accuracy": M{"type": "integer"},
-										"location_region":   M{"type": "keyword"},
+										"location_country":  M{"type": "keyword"},
+										"location_state":    M{"type": "keyword"},
 										"location_city":     M{"type": "keyword"},
-										"location_street":   M{"type": "keyword"},
+
+										"notification_authorization": M{"type": "keyword"},
 
 										// map<string, Version> frameworks 		 :M{"type": ""},
 
@@ -342,10 +355,6 @@ func TestWorker(t *testing.T) {
 												"minor":    M{"type": "integer"},
 												"revision": M{"type": "integer"},
 											},
-										},
-
-										"attributes": M{
-											"type": "object",
 										},
 
 										// RegionMonitoringMode region_monitoring_mode = 47;
@@ -374,18 +383,50 @@ func TestWorker(t *testing.T) {
 								"device": M{
 									// Meta
 									// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-all-field.html
-									"_all":     M{"enabled": false},
-									"_parent":  M{"type": "profile"},
-									"_routing": M{"required": true},
+									"_all": M{"enabled": false},
 									"properties": M{
 										"account_id": M{"type": "integer"},
 
 										"device_id": M{"type": "keyword"},
 
-										"profile_id": M{"type": "keyword"},
-
 										"created_at": M{"type": "date"},
 										"updated_at": M{"type": "date"},
+
+										// deprecated
+										"profile_id": M{"type": "keyword"},
+										// NOTE: ms-12:
+										"profile_identifier": M{"type": "keyword"},
+										"profile": M{
+											"properties": M{
+												"id":         M{"type": "keyword"},
+												"account_id": M{"type": "integer"},
+												"created_at": M{"type": "date"},
+												"identifier": M{"type": "keyword"},
+												"updated_at": M{"type": "date"},
+
+												"attributes": M{
+													"properties": M{
+														"arr":     M{"type": "keyword"},
+														"bool":    M{"type": "boolean"},
+														"double":  M{"type": "double"},
+														"integer": M{"type": "integer"},
+														"string":  M{"type": "keyword"},
+														"ts":      M{"type": "date"},
+													},
+												},
+											},
+										},
+
+										"attributes": M{
+											"properties": M{
+												"arr":     M{"type": "keyword"},
+												"bool":    M{"type": "boolean"},
+												"double":  M{"type": "double"},
+												"integer": M{"type": "integer"},
+												"string":  M{"type": "keyword"},
+												"ts":      M{"type": "date"},
+											},
+										},
 
 										"is_test_device": M{"type": "boolean"},
 										"label":          M{"type": "text"},
@@ -437,15 +478,16 @@ func TestWorker(t *testing.T) {
 										"ip": M{"type": "ip"},
 
 										// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html
-										"location": M{"type": "geo_point"},
+										"location":            M{"type": "geo_point"},
+										"location_updated_at": M{"type": "date"},
 
 										"location_latitude":  M{"type": "double"},
 										"location_longitude": M{"type": "double"},
 
 										"location_accuracy": M{"type": "integer"},
-										"location_region":   M{"type": "keyword"},
 										"location_city":     M{"type": "keyword"},
-										"location_street":   M{"type": "keyword"},
+										"location_state":    M{"type": "keyword"},
+										"location_country":  M{"type": "keyword"},
 
 										// map<string, Version> frameworks 		 :M{"type": ""},
 
@@ -458,16 +500,7 @@ func TestWorker(t *testing.T) {
 											},
 										},
 
-										"attributes": M{
-											"properties": M{
-												"arr":     M{"type": "keyword"},
-												"bool":    M{"type": "boolean"},
-												"double":  M{"type": "double"},
-												"integer": M{"type": "integer"},
-												"string":  M{"type": "keyword"},
-												"ts":      M{"type": "date"},
-											},
-										},
+										"notification_authorization": M{"type": "keyword"},
 
 										// RegionMonitoringMode region_monitoring_mode = 47;
 										//
@@ -489,52 +522,47 @@ func TestWorker(t *testing.T) {
 		},
 
 		//
-		// Set Device Profile
+		// Set Device Profile Identifier
 		//
 		{
 			desc: "verify: device belongs to the old profile",
 
 			before: &expect{
-				path: "/test_account_1/device/D00000000000000000000000?parent=000000000000000000000aa1",
+				path: "/test_account_1/device/D00000000000000000000001",
 				// err: &es5.Error{Status: 404},
 				val: response{
 					Code: 200,
 					Body: M{
 						"_index":   "test_account_1",
 						"_type":    "device",
-						"_id":      "D00000000000000000000000",
-						"_parent":  "000000000000000000000aa1",
-						"_routing": "000000000000000000000aa1",
+						"_id":      "D00000000000000000000001",
 						"_version": 1.0,
 						"found":    true,
 						"_source": M{
-							"profile_id": "000000000000000000000aa1",
+							"account_id":         1.0,
+							"profile_identifier": "p1",
+							"profile": M{
+								"account_id": 1.0,
+								"identifier": "p1",
+							},
 						}},
 				},
 			},
 		},
 
 		{
-			desc: "verify: old new profile doesn't have the device",
-
-			before: &expect{
-				path: "/test_account_1/device/D00000000000000000000000?parent=000000000000000000000aa2",
-				err:  &es5.Error{Status: 404},
-			},
-		},
-
-		{
-			desc: "transfers device between profiles",
+			desc: "notify: profile_identifier updated",
 
 			req: &pubsub.Message{
 				Data: toJSON(t, []service.Message{
 					{
-						"account_id":     "1",
-						"event":          "SetDeviceProfile",
-						"model":          "device",
-						"old_profile_id": "000000000000000000000aa1",
-						"profile_id":     "000000000000000000000aa2",
-						"device_id":      "D00000000000000000000000",
+						"event":              "SetDeviceProfileIdentifier",
+						"account_id":         "1",
+						"model":              "device",
+						"device_id":          "D00000000000000000000001",
+						"profile_identifier": "p2",
+						// NOTE: unused
+						"old_profile_identifier": "p1",
 					},
 				}),
 			},
@@ -543,77 +571,26 @@ func TestWorker(t *testing.T) {
 		},
 
 		{
-			desc: "verify: device deleted from old profile",
-
-			after: &expect{
-				path: "/test_account_1/device/D00000000000000000000000?parent=000000000000000000000aa1",
-				err:  &es5.Error{Status: 404},
-			},
-		},
-
-		{
 			desc: "verify: device indexed with new profile",
 
 			after: &expect{
-				path: "/test_account_1/device/D00000000000000000000000?parent=000000000000000000000aa2",
-				// err: &es5.Error{Status: 404},
+				path: "/test_account_1/device/D00000000000000000000001",
 				val: response{
 					Code: 200,
 					Body: M{
 						"_index":   "test_account_1",
 						"_type":    "device",
-						"_id":      "D00000000000000000000000",
-						"_version": 1.0,
-						"_routing": "000000000000000000000aa2",
-						"_parent":  "000000000000000000000aa2",
+						"_id":      "D00000000000000000000001",
+						"_version": 2.0,
 						"found":    true,
 						"_source": M{
-							"account_id":                     1.0,
-							"advertising_id":                 "",
-							"app_build":                      "",
-							"app_name":                       "",
-							"app_namespace":                  "",
-							"app_version":                    "",
-							"carrier_name":                   "",
-							"created_at":                     "2017-06-14T15:44:18Z",
-							"device_id":                      "D00000000000000000000000",
-							"device_manufacturer":            "",
-							"device_model":                   "",
-							"is_background_enabled":          false,
-							"is_bluetooth_enabled":           false,
-							"is_cellular_enabled":            false,
-							"is_location_monitoring_enabled": false,
-							"is_test_device":                 false,
-							"is_wifi_enabled":                false,
-							"label":                          "",
-							"locale_language":                "",
-							"locale_region":                  "",
-							"locale_script":                  "",
-
-							"location_latitude":  0.0,
-							"location_longitude": 0.0,
-
-							"location_accuracy":          0.0,
-							"location_city":              "",
-							"location_region":            "",
-							"location_street":            "",
-							"location_updated_at":        nil,
-							"os_name":                    "",
-							"os_version":                 nil,
-							"platform":                   "",
-							"notification_authorization": "UNKNOWN",
-							"profile_id":                 "000000000000000000000aa2",
-							"push_environment":           "",
-							"push_token_created_at":      nil,
-							"push_token_is_active":       false,
-							"push_token_key":             "",
-							"push_token_unregistered_at": nil,
-							"push_token_updated_at":      nil,
-							"radio":                      "",
-							"screen_height":              0.0,
-							"screen_width":               0.0,
-							"time_zone":                  "",
-							"updated_at":                 "2017-06-14T15:44:18Z",
+							"account_id":         1.0,
+							"profile_identifier": "p2",
+							"profile": M{
+								"TODO":       "should pickup profile here",
+								"account_id": 1.0,
+								"identifier": "p2",
+							},
 						},
 					},
 				},
@@ -632,33 +609,34 @@ func TestWorker(t *testing.T) {
 						"account_id": "1",
 						"event":      "deleted",
 						"model":      "device",
-						"profile_id": "000000000000000000000add",
-						"device_id":  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD",
+						"device_id":  "d2",
 					},
 				}),
 			},
 
 			before: &expect{
-				path: "/test_account_1/device/DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD?parent=000000000000000000000add",
-				// err: &es5.Error{Status: 404},
+				path: "/test_account_1/device/d2",
 				val: response{
 					Code: 200,
 					Body: M{
 						"_index":   "test_account_1",
 						"_type":    "device",
-						"_id":      "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD",
-						"_parent":  "000000000000000000000add",
-						"_routing": "000000000000000000000add",
+						"_id":      "d2",
 						"_version": 1.0,
 						"found":    true,
 						"_source": M{
-							"profile_id": "000000000000000000000add",
+							"account_id":         1.0,
+							"profile_identifier": "p2",
+							"profile": M{
+								"account_id": 1.0,
+								"identifier": "p2",
+							},
 						}},
 				},
 			},
 
 			after: &expect{
-				path: "/test_account_1/device/DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD?parent=000000000000000000000add",
+				path: "/test_account_1/device/d2",
 				err:  &es5.Error{Status: 404},
 			},
 
@@ -677,19 +655,18 @@ func TestWorker(t *testing.T) {
 						"account_id": "1",
 						"event":      "updated",
 						"model":      "device",
-						"profile_id": "000000000000000000000aa2",
 						"device_id":  "D00000000000000000000002",
 					},
 				}),
 			},
 
 			before: &expect{
-				path: "/test_account_1/device/D00000000000000000000002?parent=000000000000000000000aa2",
+				path: "/test_account_1/device/D00000000000000000000002",
 				err:  &es5.Error{Status: 404},
 			},
 
 			after: &expect{
-				path: "/test_account_1/device/D00000000000000000000002?parent=000000000000000000000aa2",
+				path: "/test_account_1/device/D00000000000000000000002",
 				val: response{
 					Code: 200,
 					Body: M{
@@ -697,56 +674,80 @@ func TestWorker(t *testing.T) {
 						"_type":    "device",
 						"_id":      "D00000000000000000000002",
 						"_version": 1.0,
-						"_routing": "000000000000000000000aa2",
-						"_parent":  "000000000000000000000aa2",
 						"found":    true,
 						"_source": M{
-							"account_id":                     1.0,
-							"advertising_id":                 "",
-							"app_build":                      "",
-							"app_name":                       "",
-							"app_namespace":                  "",
-							"app_version":                    "",
-							"carrier_name":                   "",
-							"created_at":                     "2017-06-14T15:44:18Z",
-							"device_id":                      "D00000000000000000000002",
-							"device_manufacturer":            "",
-							"device_model":                   "",
+							"account_id": 1.0,
+
+							"profile": M{
+								"TODO": nil,
+							},
+
+							"attributes": M{
+								"bool":   true,
+								"string": "hello world",
+
+								// NOTE: json decoding int -> float
+								"integer": 42.0,
+								"double":  42.42,
+								"null":    nil,
+								"ts":      "2017-10-14T15:44:18.497Z",
+								"arr":     []interface{}{"hello"},
+							},
+
+							"created_at": "2017-10-14T15:44:18Z",
+							"updated_at": "2017-10-14T15:44:18Z",
+
+							"advertising_id": "",
+							"app_build":      "",
+							"app_name":       "",
+							"app_namespace":  "",
+							"app_version":    "",
+							"carrier_name":   "",
+
+							"device_id":           "D00000000000000000000002",
+							"device_manufacturer": "",
+							"device_model":        "",
+
 							"is_background_enabled":          false,
 							"is_bluetooth_enabled":           false,
 							"is_cellular_enabled":            false,
 							"is_location_monitoring_enabled": false,
 							"is_test_device":                 false,
 							"is_wifi_enabled":                false,
-							"label":                          "",
-							"locale_language":                "",
-							"locale_region":                  "",
-							"locale_script":                  "",
 
+							"label": "",
+
+							"locale_script":   "",
+							"locale_language": "",
+							"locale_region":   "",
+
+							"location_region":    "",
 							"location_latitude":  0.0,
 							"location_longitude": 0.0,
+							"location_street":    "",
+							"location_city":      "",
 
-							"location_accuracy":          0.0,
-							"location_city":              "",
-							"location_region":            "",
-							"location_street":            "",
-							"location_updated_at":        nil,
-							"os_name":                    "",
-							"os_version":                 nil,
+							"location_accuracy":   0.0,
+							"location_updated_at": nil,
+
+							"os_version": nil,
+							"os_name":    "",
+
 							"platform":                   "",
 							"notification_authorization": "UNKNOWN",
-							"profile_id":                 "000000000000000000000aa2",
+							"profile_id":                 "",
+
 							"push_environment":           "",
+							"push_token_key":             "",
 							"push_token_created_at":      nil,
 							"push_token_is_active":       false,
-							"push_token_key":             "",
 							"push_token_unregistered_at": nil,
 							"push_token_updated_at":      nil,
-							"radio":                      "",
-							"screen_height":              0.0,
-							"screen_width":               0.0,
-							"time_zone":                  "",
-							"updated_at":                 "2017-06-14T15:44:18Z",
+
+							"radio":         "",
+							"screen_height": 0.0,
+							"screen_width":  0.0,
+							"time_zone":     "",
 						},
 					},
 				},
@@ -771,12 +772,12 @@ func TestWorker(t *testing.T) {
 			},
 
 			before: &expect{
-				path: "/test_account_1/device/AAAAABBBBBBCCCCCCC?parent=bbbbbbbbbbbbbbbbbbbbbbbb",
+				path: "/test_account_1/device/AAAAABBBBBBCCCCCCC",
 				err:  &es5.Error{Status: 404},
 			},
 
 			after: &expect{
-				path: "/test_account_1/device/AAAAABBBBBBCCCCCCC?parent=bbbbbbbbbbbbbbbbbbbbbbbb",
+				path: "/test_account_1/device/AAAAABBBBBBCCCCCCC",
 				val: response{
 					Code: 200,
 					Body: M{
@@ -784,8 +785,6 @@ func TestWorker(t *testing.T) {
 						"_type":    "device",
 						"_id":      "AAAAABBBBBBCCCCCCC",
 						"_version": 1.0,
-						"_routing": "bbbbbbbbbbbbbbbbbbbbbbbb",
-						"_parent":  "bbbbbbbbbbbbbbbbbbbbbbbb",
 						"found":    true,
 						"_source": M{
 							"account_id":                     1.0,
@@ -863,12 +862,12 @@ func TestWorker(t *testing.T) {
 			},
 
 			before: &expect{
-				path: "/test_account_1/device/D00000000000000000000003?parent=000000000000000000000aa3",
+				path: "/test_account_1/device/D00000000000000000000003",
 				err:  &es5.Error{Status: 404},
 			},
 
 			after: &expect{
-				path: "/test_account_1/device/D00000000000000000000003?parent=000000000000000000000aa3",
+				path: "/test_account_1/device/D00000000000000000000003",
 				val: response{
 					Code: 200,
 					Body: M{
@@ -876,8 +875,6 @@ func TestWorker(t *testing.T) {
 						"_type":    "device",
 						"_id":      "D00000000000000000000003",
 						"_version": 1.0,
-						"_routing": "000000000000000000000aa3",
-						"_parent":  "000000000000000000000aa3",
 						"found":    true,
 						"_source": M{
 							"account_id":                     1.0,
@@ -1190,6 +1187,15 @@ func parseJSON(t *testing.T, v []byte) M {
 	}
 
 	return m
+}
+
+func createFile(t *testing.T, name string) *os.File {
+	f, err := os.Create(name)
+	if err != nil {
+		t.Fatal("createFile:", err)
+	}
+
+	return f
 }
 
 func readFile(t *testing.T, fixturePath string) []byte {

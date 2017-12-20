@@ -11,7 +11,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func (h *Worker) deviceIds(msgs []service.Message) []string {
+func deviceIds(msgs []service.Message) []string {
 	var ids = make([]string, len(msgs))
 	for i := range msgs {
 		ids[i] = msgs[i]["device_id"]
@@ -19,23 +19,76 @@ func (h *Worker) deviceIds(msgs []service.Message) []string {
 	return ids
 }
 
+func (h *Worker) accountProfileIdentifiers(msgs []service.Message) []aid {
+	var apids = make([]aid, len(msgs))
+	for i := range msgs {
+		var acctId int
+		if id, err := strconv.Atoi(msgs[i]["account_id"]); err != nil {
+			h.Log.Errorf("accountProfileIdentifiers: strconv.Atoi: %v", err)
+			continue
+		} else {
+			acctId = id
+		}
+
+		apids[i] = aid{
+			AccountId: acctId,
+			Id:        msgs[i]["profile_identifier"],
+		}
+	}
+
+	return apids
+}
+
 func (h *Worker) handleDevicesUpdated(ctx context.Context, msgs []service.Message) ([]*elastic.BulkOp, error) {
-	devices, err := h.findDevicesByIds(h.deviceIds(msgs))
+	// TODO: fetch considering account_id
+	var devices, err = h.findDevicesByIds(deviceIds(msgs))
 	if err != nil {
 		return nil, errors.Wrap(err, "FindDevicesByIds")
 	}
 
-	ops := make([]*elastic.BulkOp, len(devices))
-
+	var deviceMap = make(map[aid]*mongodb.Device)
 	for i := range devices {
-		d := &devices[i]
+		var key = aid{int(devices[i].AccountId), devices[i].DeviceId}
+		deviceMap[key] = &devices[i]
+	}
+
+	// fetching profiles requires {account_id, profile_identifier} tuples
+	var aids = make([]aid, 0, len(devices))
+	for i := range devices {
+		// skip anonymous profiles
+		if devices[i].ProfileIdentifier == "" {
+			continue
+		}
+		aids = append(aids, aid{
+			AccountId: int(devices[i].AccountId),
+			Id:        devices[i].ProfileIdentifier,
+		})
+	}
+
+	var profiles []mongodb.Profile
+	profiles, err = h.findProfilesByIdentifiers(aids)
+	if err != nil {
+		return nil, errors.Wrap(err, "findProfilesByIdentifiers")
+	}
+
+	var profileMap = make(map[aid]*mongodb.Profile)
+	for i := range profiles {
+		var key = aid{int(profiles[i].AccountId), profiles[i].Identifier}
+		profileMap[key] = &profiles[i]
+	}
+
+	var ops = make([]*elastic.BulkOp, len(devices))
+	for i := range devices {
+		var (
+			d = &devices[i]
+			p = profileMap[aid{int(d.AccountId), d.ProfileIdentifier}]
+		)
 		ops[i] = &elastic.BulkOp{
 			OpName:       elastic.BulkOpIndex,
 			DocumentType: "device",
-			Document:     elastic.DeviceDoc(d),
+			Document:     elastic.DeviceDoc(d, p),
 			Id:           d.DeviceId,
 			IndexName:    h.AccountIndex(strconv.Itoa(int(d.AccountId))),
-			ParentId:     d.ProfileId.Hex(),
 		}
 	}
 
@@ -43,13 +96,12 @@ func (h *Worker) handleDevicesUpdated(ctx context.Context, msgs []service.Messag
 }
 
 func (h *Worker) handleDevicesDeleted(ctx context.Context, msgs []service.Message) ([]*elastic.BulkOp, error) {
-	ops := make([]*elastic.BulkOp, len(msgs))
+	var ops = make([]*elastic.BulkOp, len(msgs))
 
 	for i, msg := range msgs {
 		var (
 			deviceId  = msg["device_id"]
 			accountId = msg["account_id"]
-			profileId = msg["profile_id"]
 		)
 
 		ops[i] = &elastic.BulkOp{
@@ -58,7 +110,6 @@ func (h *Worker) handleDevicesDeleted(ctx context.Context, msgs []service.Messag
 			Document:     nil,
 			Id:           deviceId,
 			IndexName:    h.AccountIndex(accountId),
-			ParentId:     profileId,
 		}
 	}
 
@@ -66,59 +117,70 @@ func (h *Worker) handleDevicesDeleted(ctx context.Context, msgs []service.Messag
 }
 
 // Message{
-// 		"account_id":     "1",
-// 		"event":          "SetDeviceProfile",
-// 		"model":          "device",
-// 		"old_profile_id": oldProfileId,
-// 		"profile_id":			newProfileId,
-// 		"device_id":      deviceId,
+// 		"event":                  "SetDeviceProfileIdentifier",
+// 		"model":                  "device",
+// 		"old_profile_identifier": oldPId,
+// 		"profile_identifier":			newPId,
+// 		"device_id":							deviceId,
+// 		"account_id":							strconv.Itoa(int(acctId)),
 // 	}
 
-func (h *Worker) handleDevicesSetDeviceProfile(ctx context.Context, msgs []service.Message) ([]*elastic.BulkOp, error) {
+func (h *Worker) handleDevicesSetDeviceProfileIdentifier(ctx context.Context, msgs []service.Message) ([]*elastic.BulkOp, error) {
+
 	var (
-		deviceIds = make([]string, len(msgs))
-		ops       = make([]*elastic.BulkOp, 0, len(msgs))
+		profiles []mongodb.Profile
+
+		err error
 	)
 
-	for i, msg := range msgs {
+	profiles, err = h.findProfilesByIdentifiers(h.accountProfileIdentifiers(msgs))
+	if err != nil {
+		return nil, errors.Wrap(err, "findProfilesByIdentifiers")
+	}
+
+	var profileMap = make(map[aid]*mongodb.Profile)
+	for i := range profiles {
+		var key = aid{int(profiles[i].AccountId), profiles[i].Identifier}
+		profileMap[key] = &profiles[i]
+	}
+
+	var ops = make([]*elastic.BulkOp, 0, len(msgs))
+
+	for i := range msgs {
 		var (
-			deviceId     = msg["device_id"]
-			accountId    = msg["account_id"]
-			oldProfileId = msg["old_profile_id"]
+			acctId int
+			msg    = msgs[i]
 		)
 
-		deviceIds[i] = deviceId
+		if id, err := strconv.Atoi(msg["account_id"]); err != nil {
+			h.Log.Errorf("handleDevicesSetDeviceProfileIdentifiers: strconv.Atoi: %v", err)
+			continue
+		} else {
+			acctId = id
+		}
 
-		op := &elastic.BulkOp{
-			OpName:       elastic.BulkOpDelete,
+		var (
+			deviceId = msg["device_id"]
+			pid      = msg["profile_identifier"]
+
+			update = elastic.M{
+				"profile_identifier": pid,
+			}
+		)
+
+		if p, ok := profileMap[aid{acctId, pid}]; ok {
+			update["profile"] = elastic.ProfileDoc(p)
+		} else {
+			update["profile"] = nil
+		}
+
+		ops = append(ops, &elastic.BulkOp{
+			OpName:       elastic.BulkOpUpdate,
 			DocumentType: "device",
-			Document:     nil,
+			Document:     update,
 			Id:           deviceId,
-			IndexName:    h.AccountIndex(accountId),
-			ParentId:     oldProfileId,
-		}
-
-		ops = append(ops, op)
-	}
-
-	devices, err := h.findDevicesByIds(deviceIds)
-	if err != nil {
-		return nil, errors.Wrap(err, "FindDevicesByIds")
-	}
-
-	for i := range devices {
-		var d = &devices[i]
-
-		op := &elastic.BulkOp{
-			OpName:       elastic.BulkOpIndex,
-			DocumentType: "device",
-			Document:     elastic.DeviceDoc(d),
-			Id:           d.DeviceId,
-			IndexName:    h.AccountIndex(strconv.Itoa(int(d.AccountId))),
-			ParentId:     d.ProfileId.Hex(),
-		}
-
-		ops = append(ops, op)
+			IndexName:    h.AccountIndex(strconv.Itoa(acctId)),
+		})
 	}
 
 	return ops, nil
@@ -141,4 +203,52 @@ func (h *Worker) findDevicesByIds(deviceIds []string) ([]mongodb.Device, error) 
 	}
 
 	return devices, nil
+}
+
+type aid struct {
+	AccountId int
+	Id        string
+}
+
+func (h *Worker) findProfilesByIdentifiers(apids []aid) ([]mongodb.Profile, error) {
+	var acctPIDs = make(map[int][]string)
+	for i := range apids {
+		// do not query anonymous profiles
+		if apids[i].Id == "" {
+			continue
+		}
+		acctPIDs[apids[i].AccountId] = append(acctPIDs[apids[i].AccountId], apids[i].Id)
+	}
+
+	var conditions []elastic.M
+	for acctId, pids := range acctPIDs {
+		if len(pids) == 0 {
+			continue
+		}
+		conditions = append(conditions, bson.M{
+			"account_id":         acctId,
+			"profile_identifier": bson.M{"$in": pids},
+		})
+	}
+
+	if len(conditions) == 0 {
+		return nil, nil
+	}
+
+	var (
+		profiles []mongodb.Profile
+
+		Q = bson.M{"$or": conditions}
+
+		db, sess = h.db()
+	)
+
+	defer sess.Close()
+
+	err := db.C("profiles").Find(Q).All(&profiles)
+	if err != nil {
+		return nil, errors.Wrap(err, "profiles.Find")
+	}
+
+	return profiles, nil
 }

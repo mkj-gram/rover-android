@@ -1,0 +1,16 @@
+{
+  "account_id": 1,
+  "_id": { "$oid": "D00000000000000000000001" },
+  "identifier": "p2",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": {
+    "bool": true,
+    "string": "hello world",
+    "integer": {"$numberLong": "42"},
+    "double": 42.42,
+    "null": null,
+    "ts":   {"$date": "2016-08-22T19:05:53.102Z"},
+    "arr": ["hello"]
+  }
+}

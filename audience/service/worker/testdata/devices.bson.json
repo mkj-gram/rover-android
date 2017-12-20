@@ -1,0 +1,36 @@
+{
+  "_id":{"$oid":"D00000000000000000000001"},
+  "account_id":1,
+  "profile_identifier": "p2",
+  "device_id":"D00000000000000000000001",
+  "profile_id":{"$oid":"D00000000000000000000001"},
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "bool":           true,
+    "integer":        {"$numberLong": "42"},
+    "double":         42.42,
+    "string":         "hello world",
+    "arr":            ["hello"],
+    "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
+    "null":           null
+  }
+}
+
+{
+  "_id":{"$oid":"D00000000000000000000002"},
+  "account_id":1,
+  "profile_identifier": "p2",
+  "device_id":"D00000000000000000000002",
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "bool":           true,
+    "integer":        {"$numberLong": "42"},
+    "double":         42.42,
+    "string":         "hello world",
+    "arr":            ["hello"],
+    "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
+    "null":           null
+  }
+}
