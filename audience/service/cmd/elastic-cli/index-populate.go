@@ -99,104 +99,98 @@ func (cmd *cmdIndexPopulate) Run(ctx context.Context) error {
 		}
 
 		var (
-			batchSize = 1000
-
-			profile *mongodb.Profile
-			device  *mongodb.Device
-			bulk    = esClient.Bulk().Index(acctIndex)
-
-			i int
+			batchSize    = 1000
+			totalIndexed = 0
+			finished     = false
 		)
 
-		// profiles
-		iter := db.C("profiles").
+		iter := db.C("devices").
 			Find(bson.M{"account_id": acctId}).
 			Batch(batchSize).
 			Iter()
 
-		for iter.Next(&profile) {
-			i++
+		// Keep reading batches till we have consumed all
+		for finished == false {
 
-			bulk.Add(elastic.NewBulkIndexRequest().
-				Id(profile.Id.Hex()).
-				Doc(selastic.ProfileDoc(profile)).
-				Type("profile").
-				Index(acctIndex))
+			var (
+				profiles []*mongodb.Profile
+				devices  []*mongodb.Device
+				//device   mongodb.Device
 
-			if i%batchSize == 0 {
+				identifiers          []string
+				profilesByIdentifier = map[string]*mongodb.Profile{}
+				bulk                 = esClient.Bulk().Index(acctIndex)
+			)
+
+			// Build a batch to work with
+			for len(devices) <= batchSize && iter.Done() == false {
+				var device mongodb.Device
+				if ok := iter.Next(&device); ok {
+					devices = append(devices, &device)
+				} else {
+					stderr.Println("iter.Next failed")
+				}
+			}
+
+			// When there is no more to read from mongo we can stop looping
+			if len(devices) < batchSize || iter.Done() == true {
+				finished = true
+			}
+
+			// grab all the profiles
+			for _, device := range devices {
+				if device.ProfileIdentifier != "" {
+					identifiers = append(identifiers, device.ProfileIdentifier)
+				}
+			}
+
+			err = db.C("profiles").
+				Find(bson.M{"account_id": acctId, "identifier": bson.M{"$in": identifiers}}).
+				All(&profiles)
+
+			if err != nil {
+				stderr.Fatal("profiles.All:", err)
+			}
+
+			// Build an index of profile identifiers to profile
+			for _, profile := range profiles {
+				if _, ok := profilesByIdentifier[profile.Identifier]; !ok {
+					profilesByIdentifier[profile.Identifier] = profile
+				}
+			}
+
+			// Build the es bulk index
+			for _, device := range devices {
+				var profile *mongodb.Profile
+				if device.ProfileIdentifier != "" {
+					profile = profilesByIdentifier[device.ProfileIdentifier]
+				}
+
+				bulk.Add(elastic.NewBulkIndexRequest().
+					Id(device.DeviceId).
+					Doc(selastic.DeviceDoc(device, profile)).
+					Type("device").
+					Index(acctIndex))
+			}
+
+			if bulk.NumberOfActions() > 0 {
 				if resp, err := bulk.Do(ctx); err != nil {
 					stderr.Println("bulk.Do:", err)
 				} else {
 					for _, item := range resp.Failed() {
 						stderr.Printf("bulk.Failed: %+v\n", item)
 					}
-				}
-				// reset batch
-				bulk = esClient.Bulk().Index(acctIndex)
-			}
-		}
 
-		if bulk.NumberOfActions() > 0 {
-			if resp, err := bulk.Do(ctx); err != nil {
-				stderr.Println("bulk.Do:", err)
-			} else {
-				for _, item := range resp.Failed() {
-					stderr.Printf("bulk.Failed: %+v\n", item)
+					totalIndexed += len(devices)
+					stdout.Printf("reindex[%s]: status=done devices.indexed=%d", acctIndex, totalIndexed)
 				}
 			}
 		}
 
 		if err := iter.Close(); err != nil {
-			stderr.Println("iter.Close:", err)
+			stderr.Printf("[%s]iter.Close:%e\n", acctIndex, err)
 		}
 
-		stdout.Printf("reindex[%s]: status=done profiles.indexed=%d", acctIndex, i)
-
-		i = 0
-
-		// devices
-		iter = db.C("devices").
-			Find(bson.M{"account_id": acctId}).
-			Batch(batchSize).
-			Iter()
-
-		for iter.Next(&device) {
-			i++
-
-			bulk.Add(elastic.NewBulkIndexRequest().
-				Id(device.DeviceId).
-				Doc(selastic.DeviceDoc(device)).
-				Parent(device.ProfileId.Hex()).
-				Type("device").
-				Index(acctIndex))
-
-			if i%batchSize == 0 {
-				if resp, err := bulk.Do(ctx); err != nil {
-					stderr.Println("bulk.Do:", err)
-				} else {
-					for _, item := range resp.Failed() {
-						stderr.Printf("bulk.Failed: %+v\n", item)
-					}
-				}
-				// reset batch
-				bulk = esClient.Bulk().Index(acctIndex)
-			}
-		}
-
-		if bulk.NumberOfActions() > 0 {
-			if resp, err := bulk.Do(ctx); err != nil {
-				stderr.Println("bulk.Do:", err)
-				for _, item := range resp.Failed() {
-					stderr.Printf("bulk.Failed: %+v\n", item)
-				}
-			}
-		}
-
-		if err := iter.Close(); err != nil {
-			stderr.Println("iter.Close:", err)
-		}
-
-		stdout.Printf("reindex[%s]: status=done devices.indexed=%d", acctIndex, i)
 	}
 
 	for i := 0; i < cmd.nWorkers; i++ {
