@@ -5,6 +5,7 @@ const IpParse = require("@rover-common/ip-parse")
 const AllowedScopes = ["sdk", "web", "server"]
 const Event = require('../../lib/event')
 const Config = require('../../config')
+const GeocodeRate = Config.get('/geocode_rate')
 const DeviceModelMappings = Config.get('/mappings/device_model')
 const DeviceContextSkipKeys = [
   'device_model_raw',
@@ -353,9 +354,7 @@ module.exports = function() {
                         })
                     }
 
-                    locationUpdatesTicker = (locationUpdatesTicker + 1) % 25
-                   
-                    // every 25 requests we reverse geocode
+                    locationUpdatesTicker = (locationUpdatesTicker + 1) % GeocodeRate
                     if(locationUpdatesTicker == 0)  {
                        methods.geocoder.reverseGeocode(newDevice.location_latitude, newDevice.location_longitude, newDevice.location_accuracy, function(err, geocodedLocation) {
                             if (!err) {

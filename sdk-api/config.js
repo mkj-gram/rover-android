@@ -171,6 +171,11 @@ const store = new Confidence.Store({
             production: readJsonFile(process.env.MAPPINGS_DEVICE_MODEL, {}),
             $default: readJsonFile(process.env.MAPPINGS_DEVICE_MODEL, {})
         }
+    },
+    geocode_rate: {
+        "$filter": "env",
+        production: parseInt(process.env.GEOCODE_RATE) || 25,
+        $default: 25
     }
 });
 
