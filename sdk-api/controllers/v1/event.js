@@ -11,7 +11,6 @@ const DeviceContextSkipKeys = [
   'profile_identifier' // it's a special attribute that has its own RPC, it shoudn't trigger update, so do not treat it as rest of context attrs
 ]
 
-var locationUpdatesTicker = 0
 
 function underscore(object) {
     if (object === null || object === undefined) {
@@ -333,15 +332,19 @@ module.exports = function() {
                 deviceUpdated = true
                 
                 tasks.push(function(callback) {
-
                     let update = {
                         accuracy: newDevice.location_accuracy,
                         latitude: newDevice.location_latitude,
                         longitude: newDevice.location_longitude,
-
                     }
+                    
+                    methods.geocoder.reverseGeocode(newDevice.location_latitude, newDevice.location_longitude, newDevice.location_accuracy, function(err, geocodedLocation) {
+                        if (!err) {
+                            update.country = geocodedLocation.country
+                            update.state = geocodedLocation.state
+                            update.city = geocodedLocation.city
+                        }
 
-                    function updateLocation() {
                         logger.debug("Updating device's location: " + device.id, update)
                         
                         methods.device.updateLocation(accountId, device.id, update, function(err) {
@@ -351,24 +354,7 @@ module.exports = function() {
 
                             return callback()
                         })
-                    }
-
-                    locationUpdatesTicker = (locationUpdatesTicker + 1) % 25
-                   
-                    // every 25 requests we reverse geocode
-                    if(locationUpdatesTicker == 0)  {
-                       methods.geocoder.reverseGeocode(newDevice.location_latitude, newDevice.location_longitude, newDevice.location_accuracy, function(err, geocodedLocation) {
-                            if (!err) {
-                                update.country = geocodedLocation.country
-                                update.state = geocodedLocation.state
-                                update.city = geocodedLocation.city
-                            }
-
-                            return updateLocation()
-                        })    
-                    } else {
-                        return updateLocation()
-                    }
+                    })    
                 })
             }
 
