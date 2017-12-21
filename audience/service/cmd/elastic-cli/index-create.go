@@ -102,8 +102,10 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 			profileCustomAttrsMapping = selastic.CustomAttributesMapping(profileCustomSchemas[i])
 			profileMapping            = selastic.ProfileMapping(profileCustomAttrsMapping)
 
-			deviceCustomAttrsMapping = selastic.CustomAttributesMapping(deviceCustomSchemas[i])
-			deviceMapping            = selastic.DeviceMapping(deviceCustomAttrsMapping)
+			deviceMapping = selastic.DeviceMapping(
+				schemaToMapping(deviceCustomSchemas[i]),
+				schemaToMapping(profileCustomSchemas[i]),
+			)
 		)
 
 		_, err = esClient.PutMapping().Index(indexName).
@@ -112,14 +114,6 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 			Do(ctx)
 		if err != nil {
 			stderr.Fatalf("deviceMapping[%d]: %v", i, err)
-		}
-
-		_, err = esClient.PutMapping().Index(indexName).
-			Type("profile").
-			BodyJson(profileMapping).
-			Do(ctx)
-		if err != nil {
-			stderr.Fatalf("profileMapping[%d]: %v", i, err)
 		}
 
 	}
