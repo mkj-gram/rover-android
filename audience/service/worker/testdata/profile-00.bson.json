@@ -1,0 +1,12 @@
+{
+  "account_id": 1,
+  "_id": { "$oid": "5a3d24672659df520c068068" },
+  "identifier": "does not exist",
+  "created_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "updated_at": { "$date": "2016-08-22T19:05:53.102Z" },
+  "attributes": {
+    "string": "funky-town",
+    "arr": ["nsync"]
+  }
+}
+

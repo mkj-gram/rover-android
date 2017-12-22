@@ -74,8 +74,8 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 			for event, msgs := range groupBy(msgs, "event") {
 				switch event {
 				case "updated":
-					if mappings, err := h.buildProfileMappings(ctx, msgs); err != nil {
-						addErr(errors.Wrap(err, "buildProfileMappings"))
+					if mappings, err := h.buildDeviceMappings(ctx, msgs); err != nil {
+						addErr(errors.Wrap(err, "buildDeviceMappings"))
 					} else {
 						updatedMappings = append(updatedMappings, mappings...)
 					}
@@ -101,8 +101,13 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 		case "device":
 			for event, msgs := range groupBy(msgs, "event") {
 				switch event {
-
-				case "updated", "created":
+				case "created":
+					ops, err := h.handleDevicesCreated(ctx, msgs)
+					if err != nil {
+						addErr(errors.Wrap(err, "HandleDevicesCreated"))
+					}
+					bulkOps = append(bulkOps, ops...)
+				case "updated":
 					ops, err := h.handleDevicesUpdated(ctx, msgs)
 					if err != nil {
 						addErr(errors.Wrap(err, "HandleDevicesUpdated"))

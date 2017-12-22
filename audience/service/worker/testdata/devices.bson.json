@@ -7,30 +7,37 @@
   "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
   "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
   "attributes": {
-    "bool":           true,
-    "integer":        {"$numberLong": "42"},
-    "double":         42.42,
-    "string":         "hello world",
-    "arr":            ["hello"],
+    "bool":           false,
+    "integer":        {"$numberLong": "1"},
+    "double":         11.1,
+    "string":         "SOMETHING",
+    "arr":            ["a", "b", "c"],
     "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
     "null":           null
-  }
+  },
+  "location_country": "Canada",
+  "location_state": "Ontario",
+  "location_city": "Toronto"
 }
 
 {
   "_id":{"$oid":"D00000000000000000000002"},
   "account_id":1,
-  "profile_identifier": "p2",
+  "profile_identifier": "",
   "device_id":"D00000000000000000000002",
   "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
   "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
   "attributes": {
-    "bool":           true,
-    "integer":        {"$numberLong": "42"},
-    "double":         42.42,
-    "string":         "hello world",
-    "arr":            ["hello"],
-    "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
-    "null":           null
+    "bool": true
   }
+}
+
+{
+  "_id":{"$oid":"D00000000000000000000003"},
+  "account_id":1,
+  "profile_identifier": "does not exist",
+  "device_id":"D00000000000000000000003",
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {}
 }

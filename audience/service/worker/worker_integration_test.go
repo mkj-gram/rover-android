@@ -107,12 +107,11 @@ func TestWorker(t *testing.T) {
 	}
 
 	createMapping(t, acctIdx("1"), "device", elastic.DeviceMapping(M{}, M{}))
-	createMapping(t, acctIdx("1"), "profile", elastic.ProfileMapping(M{}))
 
-	resp, err := esClient.PerformRequest(ctx, "POST", "/_bulk", nil, string(readFile(t, "testdata/index.json")))
-	if err != nil {
-		t.Fatal("index:", err, resp)
-	}
+	//resp, err := esClient.PerformRequest(ctx, "POST", "/_bulk", nil, string(readFile(t, "testdata/index.json")))
+	//if err != nil {
+	//	t.Fatal("index:", err, resp)
+	//}
 
 	// RunTest
 
@@ -128,9 +127,9 @@ func TestWorker(t *testing.T) {
 	}
 
 	tcases := []struct {
-		desc string
-		req  *pubsub.Message
-
+		desc               string
+		req                *pubsub.Message
+		beforeRun          func()
 		before, exp, after *expect
 	}{
 		{
@@ -146,94 +145,6 @@ func TestWorker(t *testing.T) {
 		},
 
 		{
-			//
-			// Profile Schema Update
-			//
-			desc: "profile schema update",
-
-			req: &pubsub.Message{
-				Data: toJSON(t, []service.Message{
-					{
-						"account_id": "1",
-						"event":      "updated",
-						"model":      "profileSchema",
-					},
-				}),
-			},
-
-			before: &expect{
-				path: "/test_account_1/profile/_mapping",
-				val: response{
-					Code: 200,
-					Body: M{
-						"test_account_1": M{
-							"mappings": M{
-								"profile": M{
-									"dynamic": "false",
-									// Meta
-									"_all": M{"enabled": false},
-									// Props
-									"properties": M{
-										"id":         M{"type": "keyword"},
-										"account_id": M{"type": "integer"},
-										"created_at": M{"type": "date"},
-										"identifier": M{"type": "keyword"},
-										"updated_at": M{"type": "date"},
-
-										"attributes": M{
-											"type": "object",
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-
-			after: &expect{
-				path: "/test_account_1/profile/_mapping",
-				val: response{
-					Code: 200,
-					Body: M{
-						"test_account_1": M{
-							"mappings": M{
-								"profile": M{
-									"dynamic": "false",
-									// Meta
-									"_all": M{"enabled": false},
-									// Props
-									"properties": M{
-										"id":         M{"type": "keyword"},
-										"account_id": M{"type": "integer"},
-										"created_at": M{"type": "date"},
-										"identifier": M{"type": "keyword"},
-										"updated_at": M{"type": "date"},
-										"attributes": M{
-											"properties": M{
-												"arr":     M{"type": "keyword"},
-												"bool":    M{"type": "boolean"},
-												"double":  M{"type": "double"},
-												"integer": M{"type": "integer"},
-												"string":  M{"type": "keyword"},
-												"ts":      M{"type": "date"},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-
-			exp: &expect{},
-		},
-
-		{
-			//
-			// Device Schema Update
-			//
 			desc: "device schema update",
 
 			req: &pubsub.Message{
@@ -254,24 +165,18 @@ func TestWorker(t *testing.T) {
 						"test_account_1": M{
 							"mappings": M{
 								"device": M{
-									// Meta
-									// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-all-field.html
 									"_all": M{"enabled": false},
 									"properties": M{
 										"account_id": M{"type": "integer"},
 
-										// deprecated
-										"profile_id": M{"type": "keyword"},
-										// NOTE: ms-12:
 										"profile_identifier": M{"type": "keyword"},
 										"profile": M{
 											"properties": M{
 												"id":         M{"type": "keyword"},
 												"account_id": M{"type": "integer"},
-												"created_at": M{"type": "date"},
 												"identifier": M{"type": "keyword"},
+												"created_at": M{"type": "date"},
 												"updated_at": M{"type": "date"},
-
 												"attributes": M{"type": "object"},
 											},
 										},
@@ -300,7 +205,6 @@ func TestWorker(t *testing.T) {
 										"device_manufacturer": M{"type": "keyword"},
 										"device_model":        M{"type": "keyword"},
 										"os_name":             M{"type": "keyword"},
-										//
 										"os_version": M{
 											"properties": M{
 												"major":    M{"type": "integer"},
@@ -346,9 +250,6 @@ func TestWorker(t *testing.T) {
 
 										"notification_authorization": M{"type": "keyword"},
 
-										// map<string, Version> frameworks 		 :M{"type": ""},
-
-										// maps to frameworks[io.rover.Rover]
 										"sdk_version": M{
 											"properties": M{
 												"major":    M{"type": "integer"},
@@ -356,15 +257,6 @@ func TestWorker(t *testing.T) {
 												"revision": M{"type": "integer"},
 											},
 										},
-
-										// RegionMonitoringMode region_monitoring_mode = 47;
-										//
-										// google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
-										// repeated IBeaconRegion ibeacon_monitoring_regions = 49;
-										//
-										// google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
-										// repeated GeofenceRegion geofence_monitoring_regions = 51;
-
 									},
 								},
 							},
@@ -381,37 +273,26 @@ func TestWorker(t *testing.T) {
 						"test_account_1": M{
 							"mappings": M{
 								"device": M{
-									// Meta
-									// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-all-field.html
 									"_all": M{"enabled": false},
 									"properties": M{
 										"account_id": M{"type": "integer"},
 
-										"device_id": M{"type": "keyword"},
-
-										"created_at": M{"type": "date"},
-										"updated_at": M{"type": "date"},
-
-										// deprecated
-										"profile_id": M{"type": "keyword"},
-										// NOTE: ms-12:
 										"profile_identifier": M{"type": "keyword"},
 										"profile": M{
 											"properties": M{
 												"id":         M{"type": "keyword"},
 												"account_id": M{"type": "integer"},
-												"created_at": M{"type": "date"},
 												"identifier": M{"type": "keyword"},
+												"created_at": M{"type": "date"},
 												"updated_at": M{"type": "date"},
-
 												"attributes": M{
 													"properties": M{
 														"arr":     M{"type": "keyword"},
 														"bool":    M{"type": "boolean"},
 														"double":  M{"type": "double"},
-														"integer": M{"type": "integer"},
-														"string":  M{"type": "keyword"},
 														"ts":      M{"type": "date"},
+														"string":  M{"type": "keyword"},
+														"integer": M{"type": "integer"},
 													},
 												},
 											},
@@ -422,11 +303,16 @@ func TestWorker(t *testing.T) {
 												"arr":     M{"type": "keyword"},
 												"bool":    M{"type": "boolean"},
 												"double":  M{"type": "double"},
-												"integer": M{"type": "integer"},
-												"string":  M{"type": "keyword"},
 												"ts":      M{"type": "date"},
+												"string":  M{"type": "keyword"},
+												"integer": M{"type": "integer"},
 											},
 										},
+
+										"device_id": M{"type": "keyword"},
+
+										"created_at": M{"type": "date"},
+										"updated_at": M{"type": "date"},
 
 										"is_test_device": M{"type": "boolean"},
 										"label":          M{"type": "text"},
@@ -445,7 +331,6 @@ func TestWorker(t *testing.T) {
 										"device_manufacturer": M{"type": "keyword"},
 										"device_model":        M{"type": "keyword"},
 										"os_name":             M{"type": "keyword"},
-										//
 										"os_version": M{
 											"properties": M{
 												"major":    M{"type": "integer"},
@@ -485,13 +370,12 @@ func TestWorker(t *testing.T) {
 										"location_longitude": M{"type": "double"},
 
 										"location_accuracy": M{"type": "integer"},
-										"location_city":     M{"type": "keyword"},
-										"location_state":    M{"type": "keyword"},
 										"location_country":  M{"type": "keyword"},
+										"location_state":    M{"type": "keyword"},
+										"location_city":     M{"type": "keyword"},
 
-										// map<string, Version> frameworks 		 :M{"type": ""},
+										"notification_authorization": M{"type": "keyword"},
 
-										// maps to frameworks[io.rover.Rover]
 										"sdk_version": M{
 											"properties": M{
 												"major":    M{"type": "integer"},
@@ -499,17 +383,6 @@ func TestWorker(t *testing.T) {
 												"revision": M{"type": "integer"},
 											},
 										},
-
-										"notification_authorization": M{"type": "keyword"},
-
-										// RegionMonitoringMode region_monitoring_mode = 47;
-										//
-										// google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
-										// repeated IBeaconRegion ibeacon_monitoring_regions = 49;
-										//
-										// google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
-										// repeated GeofenceRegion geofence_monitoring_regions = 51;
-
 									},
 								},
 							},
@@ -520,58 +393,24 @@ func TestWorker(t *testing.T) {
 
 			exp: &expect{},
 		},
-
-		//
-		// Set Device Profile Identifier
-		//
 		{
-			desc: "verify: device belongs to the old profile",
-
-			before: &expect{
-				path: "/test_account_1/device/D00000000000000000000001",
-				// err: &es5.Error{Status: 404},
-				val: response{
-					Code: 200,
-					Body: M{
-						"_index":   "test_account_1",
-						"_type":    "device",
-						"_id":      "D00000000000000000000001",
-						"_version": 1.0,
-						"found":    true,
-						"_source": M{
-							"account_id":         1.0,
-							"profile_identifier": "p1",
-							"profile": M{
-								"account_id": 1.0,
-								"identifier": "p1",
-							},
-						}},
-				},
-			},
-		},
-
-		{
-			desc: "notify: profile_identifier updated",
+			desc: "device created with profile",
 
 			req: &pubsub.Message{
 				Data: toJSON(t, []service.Message{
 					{
-						"event":              "SetDeviceProfileIdentifier",
-						"account_id":         "1",
-						"model":              "device",
-						"device_id":          "D00000000000000000000001",
-						"profile_identifier": "p2",
-						// NOTE: unused
-						"old_profile_identifier": "p1",
+						"event":      "created",
+						"model":      "device",
+						"device_id":  "D00000000000000000000001",
+						"account_id": "1",
 					},
 				}),
 			},
 
-			exp: &expect{},
-		},
-
-		{
-			desc: "verify: device indexed with new profile",
+			before: &expect{
+				path: "/test_account_1/device/D00000000000000000000001",
+				err:  &es5.Error{Status: 404},
+			},
 
 			after: &expect{
 				path: "/test_account_1/device/D00000000000000000000001",
@@ -581,81 +420,95 @@ func TestWorker(t *testing.T) {
 						"_index":   "test_account_1",
 						"_type":    "device",
 						"_id":      "D00000000000000000000001",
-						"_version": 2.0,
+						"_version": 1.0,
 						"found":    true,
 						"_source": M{
-							"account_id":         1.0,
-							"profile_identifier": "p2",
-							"profile": M{
-								"TODO":       "should pickup profile here",
-								"account_id": 1.0,
-								"identifier": "p2",
+							"account_id":     1.0,
+							"advertising_id": "",
+							"app_build":      "",
+							"app_name":       "",
+							"app_namespace":  "",
+							"app_version":    "",
+							"attributes": M{
+								"arr":     []interface{}{"a", "b", "c"},
+								"bool":    false,
+								"double":  11.1,
+								"integer": 1.0,
+								"null":    nil,
+								"string":  "SOMETHING",
+								"ts":      "2017-10-14T15:44:18.497Z",
 							},
+							"carrier_name":                   "",
+							"created_at":                     "2017-10-14T15:44:18Z",
+							"device_id":                      "D00000000000000000000001",
+							"device_manufacturer":            "",
+							"device_model":                   "",
+							"is_background_enabled":          false,
+							"is_bluetooth_enabled":           false,
+							"is_cellular_enabled":            false,
+							"is_location_monitoring_enabled": false,
+							"is_test_device":                 false,
+							"is_wifi_enabled":                false,
+							"label":                          "",
+							"locale_language":                "",
+							"locale_region":                  "",
+							"locale_script":                  "",
+							"location_accuracy":              0.0,
+							"location_country":               "Canada",
+							"location_state":                 "Ontario",
+							"location_city":                  "Toronto",
+							"location_latitude":              0.0,
+							"location_longitude":             0.0,
+							"location_updated_at":            nil,
+							"notification_authorization":     "UNKNOWN",
+							"os_name":                        "",
+							"os_version":                     nil,
+							"platform":                       "",
+							"profile": M{
+								"account_id": 1.0,
+								"attributes": M{
+									"arr":     []interface{}{"hello"},
+									"bool":    true,
+									"double":  42.42,
+									"integer": 42.0,
+									"null":    nil,
+									"string":  "hello world",
+									"ts":      "2016-08-22T19:05:53.102Z",
+								},
+								"created_at": "2016-08-22T19:05:53Z",
+								"id":         "d00000000000000000000001",
+								"identifier": "p2",
+								"updated_at": "2016-08-22T19:05:53Z",
+							},
+							"profile_identifier":         "p2",
+							"push_environment":           "",
+							"push_token_created_at":      nil,
+							"push_token_is_active":       false,
+							"push_token_key":             "",
+							"push_token_unregistered_at": nil,
+							"push_token_updated_at":      nil,
+							"radio":                      "",
+							"screen_height":              0.0,
+							"screen_width":               0.0,
+							"time_zone":                  "",
+							"updated_at":                 "2017-10-14T15:44:18Z",
 						},
 					},
 				},
 			},
-		},
-
-		//
-		// Delete Device
-		//
-		{
-			desc: "deletes device",
-
-			req: &pubsub.Message{
-				Data: toJSON(t, []service.Message{
-					{
-						"account_id": "1",
-						"event":      "deleted",
-						"model":      "device",
-						"device_id":  "d2",
-					},
-				}),
-			},
-
-			before: &expect{
-				path: "/test_account_1/device/d2",
-				val: response{
-					Code: 200,
-					Body: M{
-						"_index":   "test_account_1",
-						"_type":    "device",
-						"_id":      "d2",
-						"_version": 1.0,
-						"found":    true,
-						"_source": M{
-							"account_id":         1.0,
-							"profile_identifier": "p2",
-							"profile": M{
-								"account_id": 1.0,
-								"identifier": "p2",
-							},
-						}},
-				},
-			},
-
-			after: &expect{
-				path: "/test_account_1/device/d2",
-				err:  &es5.Error{Status: 404},
-			},
 
 			exp: &expect{},
 		},
-
-		//
-		// Update Device
-		//
 		{
-			desc: "device gets indexed",
+			desc: "device created with no profile",
 
 			req: &pubsub.Message{
 				Data: toJSON(t, []service.Message{
 					{
-						"account_id": "1",
-						"event":      "updated",
+						"event":      "created",
 						"model":      "device",
 						"device_id":  "D00000000000000000000002",
+						"account_id": "1",
 					},
 				}),
 			},
@@ -676,126 +529,18 @@ func TestWorker(t *testing.T) {
 						"_version": 1.0,
 						"found":    true,
 						"_source": M{
-							"account_id": 1.0,
-
-							"profile": M{
-								"TODO": nil,
-							},
-
-							"attributes": M{
-								"bool":   true,
-								"string": "hello world",
-
-								// NOTE: json decoding int -> float
-								"integer": 42.0,
-								"double":  42.42,
-								"null":    nil,
-								"ts":      "2017-10-14T15:44:18.497Z",
-								"arr":     []interface{}{"hello"},
-							},
-
-							"created_at": "2017-10-14T15:44:18Z",
-							"updated_at": "2017-10-14T15:44:18Z",
-
+							"account_id":     1.0,
 							"advertising_id": "",
 							"app_build":      "",
 							"app_name":       "",
 							"app_namespace":  "",
 							"app_version":    "",
-							"carrier_name":   "",
-
-							"device_id":           "D00000000000000000000002",
-							"device_manufacturer": "",
-							"device_model":        "",
-
-							"is_background_enabled":          false,
-							"is_bluetooth_enabled":           false,
-							"is_cellular_enabled":            false,
-							"is_location_monitoring_enabled": false,
-							"is_test_device":                 false,
-							"is_wifi_enabled":                false,
-
-							"label": "",
-
-							"locale_script":   "",
-							"locale_language": "",
-							"locale_region":   "",
-
-							"location_region":    "",
-							"location_latitude":  0.0,
-							"location_longitude": 0.0,
-							"location_street":    "",
-							"location_city":      "",
-
-							"location_accuracy":   0.0,
-							"location_updated_at": nil,
-
-							"os_version": nil,
-							"os_name":    "",
-
-							"platform":                   "",
-							"notification_authorization": "UNKNOWN",
-							"profile_id":                 "",
-
-							"push_environment":           "",
-							"push_token_key":             "",
-							"push_token_created_at":      nil,
-							"push_token_is_active":       false,
-							"push_token_unregistered_at": nil,
-							"push_token_updated_at":      nil,
-
-							"radio":         "",
-							"screen_height": 0.0,
-							"screen_width":  0.0,
-							"time_zone":     "",
-						},
-					},
-				},
-			},
-
-			exp: &expect{},
-		},
-
-		{
-			desc: "device gets indexed with location",
-
-			req: &pubsub.Message{
-				Data: toJSON(t, []service.Message{
-					{
-						"account_id": "1",
-						"event":      "updated",
-						"model":      "device",
-						"profile_id": "bbbbbbbbbbbbbbbbbbbbbbbb",
-						"device_id":  "AAAAABBBBBBCCCCCCC",
-					},
-				}),
-			},
-
-			before: &expect{
-				path: "/test_account_1/device/AAAAABBBBBBCCCCCCC",
-				err:  &es5.Error{Status: 404},
-			},
-
-			after: &expect{
-				path: "/test_account_1/device/AAAAABBBBBBCCCCCCC",
-				val: response{
-					Code: 200,
-					Body: M{
-						"_index":   "test_account_1",
-						"_type":    "device",
-						"_id":      "AAAAABBBBBBCCCCCCC",
-						"_version": 1.0,
-						"found":    true,
-						"_source": M{
-							"account_id":                     1.0,
-							"advertising_id":                 "",
-							"app_build":                      "",
-							"app_name":                       "",
-							"app_namespace":                  "",
-							"app_version":                    "",
+							"attributes": M{
+								"bool": true,
+							},
 							"carrier_name":                   "",
-							"created_at":                     "2017-06-14T15:44:18Z",
-							"device_id":                      "AAAAABBBBBBCCCCCCC",
+							"created_at":                     "2017-10-14T15:44:18Z",
+							"device_id":                      "D00000000000000000000002",
 							"device_manufacturer":            "",
 							"device_model":                   "",
 							"is_background_enabled":          false,
@@ -808,32 +553,30 @@ func TestWorker(t *testing.T) {
 							"locale_language":                "",
 							"locale_region":                  "",
 							"locale_script":                  "",
-
-							"location":           M{"lat": 23.23, "lon": -83.2923},
-							"location_latitude":  23.23,
-							"location_longitude": -83.2923,
-
-							"location_accuracy":          0.0,
-							"location_city":              "",
-							"location_region":            "",
-							"location_street":            "",
-							"location_updated_at":        nil,
-							"os_name":                    "",
-							"os_version":                 nil,
-							"platform":                   "",
-							"notification_authorization": "UNKNOWN",
-							"profile_id":                 "bbbbbbbbbbbbbbbbbbbbbbbb",
-							"push_environment":           "",
-							"push_token_created_at":      nil,
-							"push_token_is_active":       false,
-							"push_token_key":             "",
-							"push_token_unregistered_at": nil,
-							"push_token_updated_at":      nil,
-							"radio":                      "",
-							"screen_height":              0.0,
-							"screen_width":               0.0,
-							"time_zone":                  "",
-							"updated_at":                 "2017-06-14T15:44:18Z",
+							"location_accuracy":              0.0,
+							"location_country":               "",
+							"location_state":                 "",
+							"location_city":                  "",
+							"location_latitude":              0.0,
+							"location_longitude":             0.0,
+							"location_updated_at":            nil,
+							"notification_authorization":     "UNKNOWN",
+							"os_name":                        "",
+							"os_version":                     nil,
+							"platform":                       "",
+							"profile":                        nil,
+							"profile_identifier":             "",
+							"push_environment":               "",
+							"push_token_created_at":          nil,
+							"push_token_is_active":           false,
+							"push_token_key":                 "",
+							"push_token_unregistered_at":     nil,
+							"push_token_updated_at":          nil,
+							"radio":                          "",
+							"screen_height":                  0.0,
+							"screen_width":                   0.0,
+							"time_zone":                      "",
+							"updated_at":                     "2017-10-14T15:44:18Z",
 						},
 					},
 				},
@@ -841,22 +584,16 @@ func TestWorker(t *testing.T) {
 
 			exp: &expect{},
 		},
-
-		//
-		// Creates Device
-		//
-
 		{
-			desc: "created device gets indexed",
+			desc: "device created with profile identifier but no matching profile",
 
 			req: &pubsub.Message{
 				Data: toJSON(t, []service.Message{
 					{
-						"account_id": "1",
 						"event":      "created",
 						"model":      "device",
-						"profile_id": "000000000000000000000aa3",
 						"device_id":  "D00000000000000000000003",
+						"account_id": "1",
 					},
 				}),
 			},
@@ -883,8 +620,9 @@ func TestWorker(t *testing.T) {
 							"app_name":                       "",
 							"app_namespace":                  "",
 							"app_version":                    "",
+							"attributes":                     M{},
 							"carrier_name":                   "",
-							"created_at":                     "2017-06-14T15:44:18Z",
+							"created_at":                     "2017-10-14T15:44:18Z",
 							"device_id":                      "D00000000000000000000003",
 							"device_manufacturer":            "",
 							"device_model":                   "",
@@ -898,20 +636,175 @@ func TestWorker(t *testing.T) {
 							"locale_language":                "",
 							"locale_region":                  "",
 							"locale_script":                  "",
+							"location_accuracy":              0.0,
+							"location_country":               "",
+							"location_state":                 "",
+							"location_city":                  "",
+							"location_latitude":              0.0,
+							"location_longitude":             0.0,
+							"location_updated_at":            nil,
+							"notification_authorization":     "UNKNOWN",
+							"os_name":                        "",
+							"os_version":                     nil,
+							"platform":                       "",
+							"profile":                        nil,
+							"profile_identifier":             "does not exist",
+							"push_environment":               "",
+							"push_token_created_at":          nil,
+							"push_token_is_active":           false,
+							"push_token_key":                 "",
+							"push_token_unregistered_at":     nil,
+							"push_token_updated_at":          nil,
+							"radio":                          "",
+							"screen_height":                  0.0,
+							"screen_width":                   0.0,
+							"time_zone":                      "",
+							"updated_at":                     "2017-10-14T15:44:18Z",
+						},
+					},
+				},
+			},
 
-							"location_latitude":  0.0,
-							"location_longitude": 0.0,
+			exp: &expect{},
+		},
 
-							"location_accuracy":          0.0,
-							"location_city":              "",
-							"location_region":            "",
-							"location_street":            "",
-							"location_updated_at":        nil,
-							"os_name":                    "",
-							"os_version":                 nil,
-							"platform":                   "",
-							"notification_authorization": "UNKNOWN",
-							"profile_id":                 "000000000000000000000aa3",
+		{
+			desc: "profile created with an existing device",
+
+			before: &expect{
+				path: "/test_account_1/device/D00000000000000000000003",
+				val: response{
+					Code: 200,
+					Body: M{
+						"_index":   "test_account_1",
+						"_type":    "device",
+						"_id":      "D00000000000000000000003",
+						"_version": 1.0,
+						"found":    true,
+						"_source": M{
+							"account_id":                     1.0,
+							"advertising_id":                 "",
+							"app_build":                      "",
+							"app_name":                       "",
+							"app_namespace":                  "",
+							"app_version":                    "",
+							"attributes":                     M{},
+							"carrier_name":                   "",
+							"created_at":                     "2017-10-14T15:44:18Z",
+							"device_id":                      "D00000000000000000000003",
+							"device_manufacturer":            "",
+							"device_model":                   "",
+							"is_background_enabled":          false,
+							"is_bluetooth_enabled":           false,
+							"is_cellular_enabled":            false,
+							"is_location_monitoring_enabled": false,
+							"is_test_device":                 false,
+							"is_wifi_enabled":                false,
+							"label":                          "",
+							"locale_language":                "",
+							"locale_region":                  "",
+							"locale_script":                  "",
+							"location_accuracy":              0.0,
+							"location_country":               "",
+							"location_state":                 "",
+							"location_city":                  "",
+							"location_latitude":              0.0,
+							"location_longitude":             0.0,
+							"location_updated_at":            nil,
+							"notification_authorization":     "UNKNOWN",
+							"os_name":                        "",
+							"os_version":                     nil,
+							"platform":                       "",
+							"profile":                        nil,
+							"profile_identifier":             "does not exist",
+							"push_environment":               "",
+							"push_token_created_at":          nil,
+							"push_token_is_active":           false,
+							"push_token_key":                 "",
+							"push_token_unregistered_at":     nil,
+							"push_token_updated_at":          nil,
+							"radio":                          "",
+							"screen_height":                  0.0,
+							"screen_width":                   0.0,
+							"time_zone":                      "",
+							"updated_at":                     "2017-10-14T15:44:18Z",
+						},
+					},
+				},
+			},
+
+			beforeRun: func() {
+				// Create a new device in mongo with the profile identifier "does not exist"
+				loadFixture(t, db.C("profiles"), "testdata/profile-00.bson.json")
+			},
+
+			req: &pubsub.Message{
+				Data: toJSON(t, []service.Message{
+					{
+						"event":      "created",
+						"model":      "profile",
+						"id":         "5a3d24672659df520c068068",
+						"account_id": "1",
+					},
+				}),
+			},
+
+			after: &expect{
+				path: "/test_account_1/device/D00000000000000000000003",
+				val: response{
+					Code: 200,
+					Body: M{
+						"_index":   "test_account_1",
+						"_type":    "device",
+						"_id":      "D00000000000000000000003",
+						"_version": 2.0,
+						"found":    true,
+						"_source": M{
+							"account_id":                     1.0,
+							"advertising_id":                 "",
+							"app_build":                      "",
+							"app_name":                       "",
+							"app_namespace":                  "",
+							"app_version":                    "",
+							"attributes":                     M{},
+							"carrier_name":                   "",
+							"created_at":                     "2017-10-14T15:44:18Z",
+							"device_id":                      "D00000000000000000000003",
+							"device_manufacturer":            "",
+							"device_model":                   "",
+							"is_background_enabled":          false,
+							"is_bluetooth_enabled":           false,
+							"is_cellular_enabled":            false,
+							"is_location_monitoring_enabled": false,
+							"is_test_device":                 false,
+							"is_wifi_enabled":                false,
+							"label":                          "",
+							"locale_language":                "",
+							"locale_region":                  "",
+							"locale_script":                  "",
+							"location_accuracy":              0.0,
+							"location_country":               "",
+							"location_state":                 "",
+							"location_city":                  "",
+							"location_latitude":              0.0,
+							"location_longitude":             0.0,
+							"location_updated_at":            nil,
+							"notification_authorization":     "UNKNOWN",
+							"os_name":                        "",
+							"os_version":                     nil,
+							"platform":                       "",
+							"profile": M{
+								"account_id": 1.0,
+								"id":         "5a3d24672659df520c068068",
+								"identifier": "does not exist",
+								"created_at": "2016-08-22T19:05:53Z",
+								"updated_at": "2016-08-22T19:05:53Z",
+								"attributes": M{
+									"string": "funky-town",
+									"arr":    []interface{}{"nsync"},
+								},
+							},
+							"profile_identifier":         "does not exist",
 							"push_environment":           "",
 							"push_token_created_at":      nil,
 							"push_token_is_active":       false,
@@ -922,7 +815,7 @@ func TestWorker(t *testing.T) {
 							"screen_height":              0.0,
 							"screen_width":               0.0,
 							"time_zone":                  "",
-							"updated_at":                 "2017-06-14T15:44:18Z",
+							"updated_at":                 "2017-10-14T15:44:18Z",
 						},
 					},
 				},
@@ -932,165 +825,199 @@ func TestWorker(t *testing.T) {
 		},
 
 		{
-			//
-			// Create Profile
-			//
-			desc: "created profile gets indexed",
+			desc: "profile created with no devices should not fail",
+
+			beforeRun: func() {
+				// Create a new device in mongo with the profile identifier "does not exist"
+				loadFixture(t, db.C("profiles"), "testdata/profile-01.bson.json")
+			},
 
 			req: &pubsub.Message{
 				Data: toJSON(t, []service.Message{
 					{
-						"account_id": "1",
 						"event":      "created",
 						"model":      "profile",
-						"id":         "aaaaaaaaaaaaaaaaaaaaaa99",
+						"id":         "5a3d3b78951724b6b55f5389",
+						"account_id": "1",
 					},
 				}),
 			},
 
-			before: &expect{
-				path: "/test_account_1/profile/aaaaaaaaaaaaaaaaaaaaaa99",
-				err:  &es5.Error{Status: 404},
+			exp: &expect{},
+		},
+
+		{
+			desc: "profile deleted with no devices should not fail",
+
+			req: &pubsub.Message{
+				Data: toJSON(t, []service.Message{
+					{
+						"event":      "deleted",
+						"model":      "profile",
+						"id":         "5a3d3b78951724b6b55f5389",
+						"identifier": "BNANANAAMNAMNAMANMANMANAM",
+						"account_id": "1",
+					},
+				}),
 			},
 
-			after: &expect{
-				path: "/test_account_1/profile/aaaaaaaaaaaaaaaaaaaaaa99",
+			exp: &expect{},
+		},
+
+		{
+			desc: "profile deleted with associated device",
+
+			before: &expect{
+				path: "/test_account_1/device/D00000000000000000000003",
 				val: response{
 					Code: 200,
 					Body: M{
 						"_index":   "test_account_1",
-						"_type":    "profile",
-						"_id":      "aaaaaaaaaaaaaaaaaaaaaa99",
-						"_version": 1.0,
-						"found":    true,
-						"_source": M{
-							"account_id": 1.0,
-							"id":         "aaaaaaaaaaaaaaaaaaaaaa99",
-							"identifier": "78e19dbf-8c0b-47a5-b28f-444444444444",
-							"created_at": "2016-08-22T19:05:53Z",
-							"updated_at": "2016-08-22T19:05:53Z",
-							"attributes": M{
-								"bool":   true,
-								"string": "hello world",
-								// NOTE: unmarshalling into M only produces floats
-								"integer": 42.0,
-								"double":  42.42,
-								"null":    nil,
-								"ts":      "2016-08-22T19:05:53.102Z",
-								"arr":     []interface{}{"hello"},
-							},
-						},
-					},
-				},
-			},
-
-			exp: &expect{},
-		},
-
-		{
-			//
-			// Update Profile
-			//
-			desc: "updated profile gets indexed",
-
-			req: &pubsub.Message{
-				Data: toJSON(t, []service.Message{
-					{
-						"account_id": "1",
-						"event":      "updated",
-						"model":      "profile",
-						"id":         "aaaaaaaaaaaaaaaaaaaaaa99",
-					},
-				}),
-			},
-
-			after: &expect{
-				path: "/test_account_1/profile/aaaaaaaaaaaaaaaaaaaaaa99",
-				val: response{
-					Code: 200,
-					Body: M{
-						"_index": "test_account_1",
-						"_type":  "profile",
-						"_id":    "aaaaaaaaaaaaaaaaaaaaaa99",
-						// Updates version
+						"_type":    "device",
+						"_id":      "D00000000000000000000003",
 						"_version": 2.0,
 						"found":    true,
 						"_source": M{
-							"account_id": 1.0,
-							"id":         "aaaaaaaaaaaaaaaaaaaaaa99",
-							"identifier": "78e19dbf-8c0b-47a5-b28f-444444444444",
-							"created_at": "2016-08-22T19:05:53Z",
-							"updated_at": "2016-08-22T19:05:53Z",
-							"attributes": M{
-								"bool":   true,
-								"string": "hello world",
-								// NOTE: unmarshalling into M only produces floats
-								"integer": 42.0,
-								"double":  42.42,
-								"null":    nil,
-								"ts":      "2016-08-22T19:05:53.102Z",
-								"arr":     []interface{}{"hello"},
+							"account_id":                     1.0,
+							"advertising_id":                 "",
+							"app_build":                      "",
+							"app_name":                       "",
+							"app_namespace":                  "",
+							"app_version":                    "",
+							"attributes":                     M{},
+							"carrier_name":                   "",
+							"created_at":                     "2017-10-14T15:44:18Z",
+							"device_id":                      "D00000000000000000000003",
+							"device_manufacturer":            "",
+							"device_model":                   "",
+							"is_background_enabled":          false,
+							"is_bluetooth_enabled":           false,
+							"is_cellular_enabled":            false,
+							"is_location_monitoring_enabled": false,
+							"is_test_device":                 false,
+							"is_wifi_enabled":                false,
+							"label":                          "",
+							"locale_language":                "",
+							"locale_region":                  "",
+							"locale_script":                  "",
+							"location_accuracy":              0.0,
+							"location_country":               "",
+							"location_state":                 "",
+							"location_city":                  "",
+							"location_latitude":              0.0,
+							"location_longitude":             0.0,
+							"location_updated_at":            nil,
+							"notification_authorization":     "UNKNOWN",
+							"os_name":                        "",
+							"os_version":                     nil,
+							"platform":                       "",
+							"profile": M{
+								"account_id": 1.0,
+								"id":         "5a3d24672659df520c068068",
+								"identifier": "does not exist",
+								"created_at": "2016-08-22T19:05:53Z",
+								"updated_at": "2016-08-22T19:05:53Z",
+								"attributes": M{
+									"string": "funky-town",
+									"arr":    []interface{}{"nsync"},
+								},
 							},
+							"profile_identifier":         "does not exist",
+							"push_environment":           "",
+							"push_token_created_at":      nil,
+							"push_token_is_active":       false,
+							"push_token_key":             "",
+							"push_token_unregistered_at": nil,
+							"push_token_updated_at":      nil,
+							"radio":                      "",
+							"screen_height":              0.0,
+							"screen_width":               0.0,
+							"time_zone":                  "",
+							"updated_at":                 "2017-10-14T15:44:18Z",
 						},
 					},
 				},
 			},
 
-			exp: &expect{},
-		},
-
-		{
-			//
-			// Deleted Profile
-			//
-			desc: "deleted profile gets deleted",
+			beforeRun: func() {
+				err := db.C("profiles").Remove(bson.M{"_id": bson.ObjectIdHex("5a3d24672659df520c068068")})
+				if err != nil {
+					t.Fatal(err)
+				}
+			},
 
 			req: &pubsub.Message{
 				Data: toJSON(t, []service.Message{
 					{
-						"account_id": "1",
 						"event":      "deleted",
 						"model":      "profile",
-						"id":         "aaaaaaaaaaaaaaaaaaaaaa99",
+						"id":         "5a3d24672659df520c068068",
+						"identifier": "does not exist",
+						"account_id": "1",
 					},
 				}),
 			},
 
-			before: &expect{
-				path: "/test_account_1/profile/aaaaaaaaaaaaaaaaaaaaaa99",
+			after: &expect{
+				path: "/test_account_1/device/D00000000000000000000003",
 				val: response{
 					Code: 200,
 					Body: M{
-						"_index": "test_account_1",
-						"_type":  "profile",
-						"_id":    "aaaaaaaaaaaaaaaaaaaaaa99",
-						// Updates version
-						"_version": 2.0,
+						"_index":   "test_account_1",
+						"_type":    "device",
+						"_id":      "D00000000000000000000003",
+						"_version": 3.0,
 						"found":    true,
 						"_source": M{
-							"account_id": 1.0,
-							"id":         "aaaaaaaaaaaaaaaaaaaaaa99",
-							"identifier": "78e19dbf-8c0b-47a5-b28f-444444444444",
-							"created_at": "2016-08-22T19:05:53Z",
-							"updated_at": "2016-08-22T19:05:53Z",
-							"attributes": M{
-								"bool":   true,
-								"string": "hello world",
-								// NOTE: unmarshalling into M only produces floats
-								"integer": 42.0,
-								"double":  42.42,
-								"null":    nil,
-								"ts":      "2016-08-22T19:05:53.102Z",
-								"arr":     []interface{}{"hello"},
-							},
+							"account_id":                     1.0,
+							"advertising_id":                 "",
+							"app_build":                      "",
+							"app_name":                       "",
+							"app_namespace":                  "",
+							"app_version":                    "",
+							"attributes":                     M{},
+							"carrier_name":                   "",
+							"created_at":                     "2017-10-14T15:44:18Z",
+							"device_id":                      "D00000000000000000000003",
+							"device_manufacturer":            "",
+							"device_model":                   "",
+							"is_background_enabled":          false,
+							"is_bluetooth_enabled":           false,
+							"is_cellular_enabled":            false,
+							"is_location_monitoring_enabled": false,
+							"is_test_device":                 false,
+							"is_wifi_enabled":                false,
+							"label":                          "",
+							"locale_language":                "",
+							"locale_region":                  "",
+							"locale_script":                  "",
+							"location_accuracy":              0.0,
+							"location_country":               "",
+							"location_state":                 "",
+							"location_city":                  "",
+							"location_latitude":              0.0,
+							"location_longitude":             0.0,
+							"location_updated_at":            nil,
+							"notification_authorization":     "UNKNOWN",
+							"os_name":                        "",
+							"os_version":                     nil,
+							"platform":                       "",
+							"profile":                        nil,
+							"profile_identifier":             "does not exist",
+							"push_environment":               "",
+							"push_token_created_at":          nil,
+							"push_token_is_active":           false,
+							"push_token_key":                 "",
+							"push_token_unregistered_at":     nil,
+							"push_token_updated_at":          nil,
+							"radio":                          "",
+							"screen_height":                  0.0,
+							"screen_width":                   0.0,
+							"time_zone":                      "",
+							"updated_at":                     "2017-10-14T15:44:18Z",
 						},
 					},
 				},
-			},
-
-			after: &expect{
-				path: "/test_account_1/profile/aaaaaaaaaaaaaaaaaaaaaa99",
-				err:  &es5.Error{Status: 404},
 			},
 
 			exp: &expect{},
@@ -1115,6 +1042,10 @@ func TestWorker(t *testing.T) {
 				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 					t.Errorf("Before:\n%v", difff(diff))
 				}
+			}
+
+			if run := tc.beforeRun; run != nil {
+				run()
 			}
 
 			if tc.req != nil {

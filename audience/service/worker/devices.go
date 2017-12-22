@@ -39,56 +39,175 @@ func (h *Worker) accountProfileIdentifiers(msgs []service.Message) []aid {
 	return apids
 }
 
+// Handle events where only the device attributes have been updated
 func (h *Worker) handleDevicesUpdated(ctx context.Context, msgs []service.Message) ([]*elastic.BulkOp, error) {
-	// TODO: fetch considering account_id
-	var devices, err = h.findDevicesByIds(deviceIds(msgs))
-	if err != nil {
-		return nil, errors.Wrap(err, "FindDevicesByIds")
-	}
 
-	var deviceMap = make(map[aid]*mongodb.Device)
-	for i := range devices {
-		var key = aid{int(devices[i].AccountId), devices[i].DeviceId}
-		deviceMap[key] = &devices[i]
-	}
+	var (
+		deviceIdsByAccount = map[int64][]string{}
+		queries            []bson.M
+	)
 
-	// fetching profiles requires {account_id, profile_identifier} tuples
-	var aids = make([]aid, 0, len(devices))
-	for i := range devices {
-		// skip anonymous profiles
-		if devices[i].ProfileIdentifier == "" {
-			continue
+	// Group device ids by their account_id
+	for _, msg := range msgs {
+		if id, ok := msg["account_id"]; ok {
+			accountId, err := strconv.ParseInt(id, 0, 64)
+			if err != nil {
+				continue
+			}
+
+			if deviceId, ok := msg["device_id"]; ok {
+				deviceIds := deviceIdsByAccount[accountId]
+				deviceIds = append(deviceIds, deviceId)
+				deviceIdsByAccount[accountId] = deviceIds
+			}
+
 		}
-		aids = append(aids, aid{
-			AccountId: int(devices[i].AccountId),
-			Id:        devices[i].ProfileIdentifier,
-		})
 	}
 
-	var profiles []mongodb.Profile
-	profiles, err = h.findProfilesByIdentifiers(aids)
+	// Generate a query for each account
+	// ex. {"account_id": 1, device_id: {"$in": ["DEVICE01", "DEVICE02"] }}
+	for accountId, deviceIds := range deviceIdsByAccount {
+		queries = append(queries, bson.M{"account_id": accountId, "device_id": bson.M{"$in": deviceIds}})
+	}
+
+	var (
+		devices []*mongodb.Device
+
+		Q = bson.M{"$or": queries}
+
+		db, sess = h.db()
+	)
+
+	defer sess.Close()
+
+	err := db.C("devices").Find(Q).All(&devices)
 	if err != nil {
-		return nil, errors.Wrap(err, "findProfilesByIdentifiers")
-	}
-
-	var profileMap = make(map[aid]*mongodb.Profile)
-	for i := range profiles {
-		var key = aid{int(profiles[i].AccountId), profiles[i].Identifier}
-		profileMap[key] = &profiles[i]
+		return nil, errors.Wrap(err, "db.devices.Find")
 	}
 
 	var ops = make([]*elastic.BulkOp, len(devices))
-	for i := range devices {
-		var (
-			d = &devices[i]
-			p = profileMap[aid{int(d.AccountId), d.ProfileIdentifier}]
-		)
+	for i, device := range devices {
+		// only grab device attributes
+		doc := elastic.DeviceDoc(device, nil)
+		// remove the profile key so we don't overwrite any profile attributes
+		delete(doc, "profile")
+
+		ops[i] = &elastic.BulkOp{
+			OpName:       elastic.BulkOpUpdate,
+			DocumentType: "device",
+			Document:     doc,
+			Id:           device.DeviceId,
+			IndexName:    h.AccountIndex(strconv.Itoa(int(device.AccountId))),
+		}
+	}
+
+	return ops, nil
+}
+
+// Handle events where only the device attributes have been updated
+func (h *Worker) handleDevicesCreated(ctx context.Context, msgs []service.Message) ([]*elastic.BulkOp, error) {
+
+	var (
+		deviceIdsByAccount = map[int64][]string{}
+		queries            []bson.M
+	)
+
+	// Group device ids by their account_id
+	for _, msg := range msgs {
+		if id, ok := msg["account_id"]; ok {
+			accountId, err := strconv.ParseInt(id, 0, 64)
+			if err != nil {
+				continue
+			}
+
+			if deviceId, ok := msg["device_id"]; ok {
+				deviceIds := deviceIdsByAccount[accountId]
+				deviceIds = append(deviceIds, deviceId)
+				deviceIdsByAccount[accountId] = deviceIds
+			}
+
+		}
+	}
+
+	// Generate a query for each account
+	// ex. {"account_id": 1, device_id: {"$in": ["DEVICE01", "DEVICE02"] }}
+	for accountId, deviceIds := range deviceIdsByAccount {
+		queries = append(queries, bson.M{"account_id": accountId, "device_id": bson.M{"$in": deviceIds}})
+	}
+
+	var (
+		devices []*mongodb.Device
+
+		Q = bson.M{"$or": queries}
+
+		db, sess = h.db()
+	)
+
+	defer sess.Close()
+
+	err := db.C("devices").Find(Q).All(&devices)
+	if err != nil {
+		return nil, errors.Wrap(err, "db.devices.Find")
+	}
+
+	var profileQueries []bson.M
+	var identifiersByAccountId = map[int32][]string{}
+
+	for _, device := range devices {
+		if device.ProfileIdentifier != "" {
+			identifiers := identifiersByAccountId[device.AccountId]
+			identifiers = append(identifiers, device.ProfileIdentifier)
+			identifiersByAccountId[device.AccountId] = identifiers
+		}
+	}
+
+	for accountId, identifiers := range identifiersByAccountId {
+		profileQueries = append(profileQueries, bson.M{"account_id": accountId, "identifier": bson.M{"$in": identifiers}})
+	}
+
+	var profiles []*mongodb.Profile
+
+	if len(profileQueries) != 0 {
+		Q = bson.M{"$or": profileQueries}
+		err = db.C("profiles").Find(Q).All(&profiles)
+		if err != nil {
+			return nil, errors.Wrap(err, "db.profiles.Find")
+		}
+	}
+
+	var profilesByIdentifierByAccountId = map[int32]map[string]*mongodb.Profile{}
+
+	for _, profile := range profiles {
+		if profile.Identifier == "" {
+			continue
+		}
+
+		accountId := profile.AccountId
+		identifier := profile.Identifier
+		// ensure the submap is initialized
+		if _, ok := profilesByIdentifierByAccountId[accountId]; !ok {
+			profilesByIdentifierByAccountId[accountId] = map[string]*mongodb.Profile{}
+		}
+		profilesByIdentifierByAccountId[accountId][identifier] = profile
+	}
+
+	var ops = make([]*elastic.BulkOp, len(devices))
+	for i, device := range devices {
+		// only grab device attributes
+		var doc elastic.M
+		if device.ProfileIdentifier != "" {
+			profile := profilesByIdentifierByAccountId[device.AccountId][device.ProfileIdentifier]
+			doc = elastic.DeviceDoc(device, profile)
+		} else {
+			doc = elastic.DeviceDoc(device, nil)
+		}
+
 		ops[i] = &elastic.BulkOp{
 			OpName:       elastic.BulkOpIndex,
 			DocumentType: "device",
-			Document:     elastic.DeviceDoc(d, p),
-			Id:           d.DeviceId,
-			IndexName:    h.AccountIndex(strconv.Itoa(int(d.AccountId))),
+			Document:     doc,
+			Id:           device.DeviceId,
+			IndexName:    h.AccountIndex(strconv.Itoa(int(device.AccountId))),
 		}
 	}
 

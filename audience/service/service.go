@@ -480,7 +480,7 @@ func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileReq
 	if err := db.DeleteProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteProfile: %v", err)
 	}
-	s.notify.profileDeleted(ctx, r.AuthContext.AccountId, r.ProfileId)
+	s.notify.profileDeleted(ctx, r.AuthContext.AccountId, r.ProfileId, "")
 
 	return &audience.DeleteProfileResponse{}, nil
 }

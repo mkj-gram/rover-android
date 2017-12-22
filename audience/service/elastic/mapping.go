@@ -203,15 +203,6 @@ func DeviceMapping() M {
 						"revision": M{"type": "integer"},
 					},
 				},
-
-				// RegionMonitoringMode region_monitoring_mode = 47;
-				//
-				// google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
-				// repeated IBeaconRegion ibeacon_monitoring_regions = 49;
-				//
-				// google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
-				// repeated GeofenceRegion geofence_monitoring_regions = 51;
-
 			},
 		},
 	}

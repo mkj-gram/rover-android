@@ -47,9 +47,9 @@ func VersionDoc(v *mongodb.Version) interface{} {
 
 func DeviceDoc(d *mongodb.Device) M {
 	var m = M{
-		"account_id": d.AccountId,
-		"device_id":  d.DeviceId,
-		"profile_id": d.ProfileId,
+		"account_id":         d.AccountId,
+		"device_id":          d.DeviceId,
+		"profile_identifier": d.ProfileIdentifier,
 
 		"created_at": TimeDoc(d.CreatedAt),
 		"updated_at": TimeDoc(d.UpdatedAt),
@@ -98,21 +98,10 @@ func DeviceDoc(d *mongodb.Device) M {
 		"location_longitude": d.LocationLongitude,
 
 		"location_accuracy":   d.LocationAccuracy,
-		"location_region":     d.LocationRegion,
+		"location_country":    d.LocationCountry,
+		"location_state":      d.LocationState,
 		"location_city":       d.LocationCity,
-		"location_street":     d.LocationStreet,
 		"location_updated_at": d.LocationUpdatedAt,
-
-		// map<string, Version> frameworks 		 :M{"type": ""},
-
-		// RegionMonitoringMode region_monitoring_mode = 47;
-		//
-		// google.protobuf.Timestamp ibeacon_monitoring_regions_updated_at = 48;
-		// repeated IBeaconRegion ibeacon_monitoring_regions = 49;
-		//
-		// google.protobuf.Timestamp geofence_monitoring_regions_updated_at = 50;
-		// repeated GeofenceRegion geofence_monitoring_regions = 51;
-
 	}
 
 	if d.NotificationAuthorization == "" {
