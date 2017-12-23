@@ -1,0 +1,48 @@
+<!DOCTYPE html>  
+ <html lang="en">  
+ <head>  
+   <title>Rover TypeScript Bootstrap</title>  
+   <meta charset="UTF-8">  
+ </head>  
+ <!-- Below is the initialization snippet for my Firebase project. It will vary for each project -->  
+<script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>  
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyD-ojqHBiswLW1I5XjEneWnR_MUxZv1mZU",
+    authDomain: "ts-bootstrap.firebaseapp.com",
+    projectId: "ts-bootstrap",
+  };
+  firebase.initializeApp(config);
+</script>
+<script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
+<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+<script type="text/javascript">
+    var uiConfig = {  
+      callbacks: {
+        signInSuccess: function(currentUser) {
+            if (currentUser.email.includes("@rover.io")) {
+                return true;
+            } else {
+                return false;
+            }
+          },
+      },
+      signInSuccessUrl: 'storybook.html',  
+      signInOptions: [  
+       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      ]  
+    };  
+    // Initialize the FirebaseUI Widget using Firebase.  
+    var ui = new firebaseui.auth.AuthUI(firebase.auth());  
+    // The start method will wait until the DOM is loaded.  
+    ui.start('#firebaseui-auth-container', uiConfig);  
+</script>
+
+
+<body style="margin: 0;">
+    <div id="root"></div>
+    <div id="firebaseui-auth-container"></div>
+
+</body>
+</html>

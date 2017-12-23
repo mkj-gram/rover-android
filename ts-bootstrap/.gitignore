@@ -1,0 +1,10 @@
+# dependencies
+/node_modules
+/**/*.bundle.js
+
+# misc
+.DS_Store
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

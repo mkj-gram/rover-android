@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  ts-bootstrap:
+    image: node:7.10.0
+    volumes:
+      - ../../rover:/rover/
+    working_dir: /rover/ts-bootstrap
