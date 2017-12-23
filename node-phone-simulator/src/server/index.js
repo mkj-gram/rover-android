@@ -29,6 +29,7 @@ const renderCache = lruCache({ max: 500, maxAge: 60 * 1000 })
 app.use(morgan('tiny'))
 
 app.use(express.static('public'))
+app.use('/.well-known/pki-validation/', express.static('pki-validation'))
 app.use(compression())
 app.disable('x-powered-by')
 
