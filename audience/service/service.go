@@ -104,7 +104,7 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 		if err != nil {
 			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice_ms12: %v", err)
 		}
-		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, profile.Id)
+		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, profile.Id, profile.Identifier)
 		s.notify.deviceCreated(ctx, r.AuthContext.AccountId, profile.Id, r.DeviceId)
 
 		return &audience.CreateDeviceResponse{}, nil
@@ -155,14 +155,14 @@ func (s *Server) UpdateDeviceCustomAttributes(ctx context.Context, r *audience.U
 	}
 
 	// TODO: ms-12
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	profileId, profileIdentifier, err := db.GetDeviceProfileIdAndIdentifierById(ctx, r.AuthContext.AccountId, r.DeviceId)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
 	}
 
 	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
 	// NOTE: ms-12: profile attributes get updated as weel
-	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, profileId)
+	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, profileId, profileIdentifier)
 	if schemaUpdated {
 		// since deviceSchema <-> profileSchema is duplicated
 		s.notify.profileSchemaUpdated(ctx, r.AuthContext.AccountId)
@@ -268,7 +268,7 @@ func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProf
 		}
 		// NOTE: profile may get created, so needs a notification
 		// it will eventually be removed
-		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, after.ProfileId)
+		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, after.ProfileId, after.ProfileIdentifier)
 		s.notify.deviceProfileUpdated(ctx, r.AuthContext.AccountId, before.ProfileId, after.ProfileId, r.DeviceId)
 
 		return &audience.SetDeviceProfileResponse{}, nil
@@ -467,12 +467,13 @@ func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileReq
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateProfile: %v", err)
 	}
-	s.notify.profileCreated(ctx, r.AuthContext.AccountId, p.GetId())
+	s.notify.profileCreated(ctx, r.AuthContext.AccountId, p.GetId(), p.GetIdentifier())
 
 	return &audience.CreateProfileResponse{p}, nil
 }
 
 // DeleteProfile implements the corresponding rpc
+// TODO request should only take in
 func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileRequest) (*audience.DeleteProfileResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
@@ -480,7 +481,7 @@ func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileReq
 	if err := db.DeleteProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteProfile: %v", err)
 	}
-	s.notify.profileDeleted(ctx, r.AuthContext.AccountId, r.ProfileId, "")
+	s.notify.profileDeleted(ctx, r.AuthContext.AccountId, r.ProfileId)
 
 	return &audience.DeleteProfileResponse{}, nil
 }
@@ -568,7 +569,10 @@ func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileReq
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfile: %v", err)
 	}
 
-	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId)
+	// We need to lookup the profile identifier for new worker
+	profile, err := db.GetProfile(ctx, &audience.GetProfileRequest{AuthContext: r.AuthContext, ProfileId: r.GetProfileId()})
+	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId, profile.Identifier)
+
 	if schemaUpdated {
 		s.notify.profileSchemaUpdated(ctx, r.AuthContext.AccountId)
 	}
@@ -588,7 +592,7 @@ func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.Update
 	if err := db.UpdateProfileIdentifier(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfileIdentifier: %v", err)
 	}
-	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId)
+	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId, r.Identifier)
 
 	return &audience.UpdateProfileIdentifierResponse{}, nil
 }

@@ -4,11 +4,12 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/elastic"
 	"github.com/roverplatform/rover/audience/service/mongodb"
-	"golang.org/x/net/context"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func (h *Worker) accountIds(msgs []service.Message) []int {

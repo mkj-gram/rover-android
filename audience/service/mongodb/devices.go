@@ -374,6 +374,22 @@ func (s *devicesStore) GetDeviceProfileIdById(ctx context.Context, accountId int
 	return d.ProfileId.Hex(), nil
 }
 
+func (s *devicesStore) GetDeviceProfileIdAndIdentifierById(ctx context.Context, accountId int32, id string) (string, string, error) {
+	var (
+		d Device
+
+		Q = s.devices().
+			Find(bson.M{"device_id": id, "account_id": accountId}).
+			Select(bson.M{"profile_id": 1, "profile_identifier": 1})
+	)
+
+	if err := Q.One(&d); err != nil {
+		return "", "", wrapError(err, "devices.FindId")
+	}
+
+	return d.ProfileId.Hex(), d.ProfileIdentifier, nil
+}
+
 // FindDeviceById finds a device by device_id.
 func (s *devicesStore) FindDeviceById(ctx context.Context, id string) (*audience.Device, error) {
 	var (
