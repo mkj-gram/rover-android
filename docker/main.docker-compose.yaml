@@ -64,7 +64,6 @@ services:
     environment:
       NODE_ENV: development
       GRAPHQL_HOST: "http://graphql-gateway/graphql"
-  
   audience-service:
     image: golang:1.9-alpine
     depends_on:
@@ -92,6 +91,18 @@ services:
       DB_DSN: "postgres://postgres:@postgres:5432/authsvc_dev?sslmode=disable"
       MIGRATION_DIR: ./auth/service/db/migrations/postgres
   
+  campaigns-frontend:
+    image: node:7.5.0
+    depends_on:
+      - graphql-gateway
+    volumes:
+      - ../../rover:/rover/
+    working_dir: /rover/react-campaigns
+    command: bash -c "npm install && npm start"
+    environment:
+      NODE_ENV: development
+      GRAPHQL_HOST: "http://graphql-gateway/graphql"
+
   graphql-gateway:
     image: node:7.5.0
     depends_on:
