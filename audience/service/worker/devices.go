@@ -255,7 +255,9 @@ func (h *Worker) handleDevicesSetDeviceProfileIdentifier(ctx context.Context, ms
 			continue
 		}
 
-		identifiersByAccountId[accountId] = append(identifiersByAccountId[accountId], identifier)
+		if identifier != "" {
+			identifiersByAccountId[accountId] = append(identifiersByAccountId[accountId], identifier)
+		}
 
 		messages = append(messages, message{
 			AccountId:  accountId,
@@ -273,10 +275,6 @@ func (h *Worker) handleDevicesSetDeviceProfileIdentifier(ctx context.Context, ms
 		}
 	}
 
-	if len(queries) == 0 {
-		return []*elastic.BulkOp{}, nil
-	}
-
 	var (
 		profiles []mongodb.Profile
 
@@ -286,9 +284,11 @@ func (h *Worker) handleDevicesSetDeviceProfileIdentifier(ctx context.Context, ms
 
 	defer sess.Close()
 
-	err := db.C("profiles").Find(Q).All(&profiles)
-	if err != nil {
-		return nil, errors.Wrap(err, "db.profiles.Find")
+	if len(queries) != 0 {
+		err := db.C("profiles").Find(Q).All(&profiles)
+		if err != nil {
+			return nil, errors.Wrap(err, "db.profiles.Find")
+		}
 	}
 
 	var (
@@ -309,6 +309,8 @@ func (h *Worker) handleDevicesSetDeviceProfileIdentifier(ctx context.Context, ms
 
 		if profile, ok := profileByIdentifierByAccountId[msg.AccountId][msg.Identifier]; ok {
 			doc["profile"] = elastic.ProfileDoc(profile)
+		} else {
+			doc["profile"] = nil
 		}
 
 		ops = append(ops, &elastic.BulkOp{
