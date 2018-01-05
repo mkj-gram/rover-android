@@ -25,7 +25,9 @@ const Screen = new GraphQLObjectType({
     fields: () => ({
         autoColorStatusBar: {
             type: new GraphQLNonNull(GraphQLBoolean),
-            resolve: data => data['status-bar-auto-color']
+            resolve: requireScope('admin', data => {
+                return data['status-bar-auto-color']
+            })
         },
 		backgroundColor: {
 			type: new GraphQLNonNull(Color),
