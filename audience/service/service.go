@@ -269,7 +269,7 @@ func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProf
 		// NOTE: profile may get created, so needs a notification
 		// it will eventually be removed
 		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, after.ProfileId, after.ProfileIdentifier)
-		s.notify.deviceProfileUpdated(ctx, r.AuthContext.AccountId, before.ProfileId, after.ProfileId, r.DeviceId)
+		s.notify.deviceProfileIdentifierUpdated(ctx, r.AuthContext.AccountId, before.ProfileIdentifier, after.ProfileIdentifier, r.DeviceId)
 
 		return &audience.SetDeviceProfileResponse{}, nil
 	}

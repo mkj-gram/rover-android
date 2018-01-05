@@ -62,8 +62,11 @@ func (h *Worker) handleDevicesUpdated(ctx context.Context, msgs []service.Messag
 	for i, device := range devices {
 		// only grab device attributes
 		doc := elastic.DeviceV2Doc(device, nil)
-		// remove the profile key so we don't overwrite any profile attributes
-		delete(doc, "profile")
+
+		if device.ProfileIdentifier != "" {
+			// remove the profile key so we don't overwrite any profile attributes
+			delete(doc, "profile")
+		}
 
 		ops[i] = &elastic.BulkOp{
 			OpName:       elastic.BulkOpUpdate,
