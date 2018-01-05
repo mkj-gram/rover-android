@@ -168,7 +168,7 @@ func (cmd *cmdIndexPopulate) Run(ctx context.Context) error {
 
 				bulk.Add(elastic.NewBulkIndexRequest().
 					Id(device.DeviceId).
-					Doc(selastic.DeviceDoc(device, profile)).
+					Doc(selastic.DeviceV2Doc(device, profile)).
 					Type("device").
 					Index(acctIndex))
 			}

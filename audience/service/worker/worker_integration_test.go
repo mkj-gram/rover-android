@@ -106,7 +106,7 @@ func TestWorker(t *testing.T) {
 		t.Fatal("index:", err)
 	}
 
-	createMapping(t, acctIdx("1"), "device", elastic.DeviceMapping(M{}, M{}))
+	createMapping(t, acctIdx("1"), "device", elastic.DeviceV2Mapping(M{}, M{}))
 
 	//resp, err := esClient.PerformRequest(ctx, "POST", "/_bulk", nil, string(readFile(t, "testdata/index.json")))
 	//if err != nil {

@@ -42,7 +42,7 @@ func (h *Worker) buildDeviceMappings(ctx context.Context, msgs []service.Message
 		mappings[i] = &elastic.IndexMapping{
 			IndexName: h.AccountIndex(strconv.Itoa(acctId)),
 			Type:      "device",
-			Mapping:   elastic.DeviceMapping(deviceMapping, profileMapping),
+			Mapping:   elastic.DeviceV2Mapping(deviceMapping, profileMapping),
 		}
 		i++
 	}

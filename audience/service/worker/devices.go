@@ -61,7 +61,7 @@ func (h *Worker) handleDevicesUpdated(ctx context.Context, msgs []service.Messag
 	var ops = make([]*elastic.BulkOp, len(devices))
 	for i, device := range devices {
 		// only grab device attributes
-		doc := elastic.DeviceDoc(device, nil)
+		doc := elastic.DeviceV2Doc(device, nil)
 		// remove the profile key so we don't overwrite any profile attributes
 		delete(doc, "profile")
 
@@ -175,9 +175,9 @@ func (h *Worker) handleDevicesCreated(ctx context.Context, msgs []service.Messag
 		var doc elastic.M
 		if device.ProfileIdentifier != "" {
 			profile := profilesByIdentifierByAccountId[device.AccountId][device.ProfileIdentifier]
-			doc = elastic.DeviceDoc(&device, profile)
+			doc = elastic.DeviceV2Doc(&device, profile)
 		} else {
-			doc = elastic.DeviceDoc(&device, nil)
+			doc = elastic.DeviceV2Doc(&device, nil)
 		}
 
 		ops[i] = &elastic.BulkOp{

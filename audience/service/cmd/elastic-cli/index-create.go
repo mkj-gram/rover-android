@@ -79,6 +79,8 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 		// all accounts schemas for profile and device
 		profileCustomSchemas = getProfileCustomSchemas(db)
 		deviceCustomSchemas  = getDeviceCustomSchemas(db)
+
+		schemaToMapping = selastic.CustomAttributesMapping
 	)
 
 	for i := idrange.From; i <= idrange.To; i++ {
@@ -99,10 +101,7 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 		}
 
 		var (
-			profileCustomAttrsMapping = selastic.CustomAttributesMapping(profileCustomSchemas[i])
-			profileMapping            = selastic.ProfileMapping(profileCustomAttrsMapping)
-
-			deviceMapping = selastic.DeviceMapping(
+			deviceMapping = selastic.DeviceV2Mapping(
 				schemaToMapping(deviceCustomSchemas[i]),
 				schemaToMapping(profileCustomSchemas[i]),
 			)

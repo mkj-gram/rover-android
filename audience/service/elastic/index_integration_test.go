@@ -77,7 +77,7 @@ func TestQuery(t *testing.T) {
 	es5Client.DeleteIndex(t, test_index)
 	es5Client.CreateIndex(t, test_index)
 
-	es5Client.createMapping(t, test_index, "device", elastic.DeviceMapping(M{}))
+	es5Client.createMapping(t, test_index, "device", elastic.DeviceMapping())
 	es5Client.createMapping(t, test_index, "profile", elastic.ProfileMapping(M{}))
 
 	es5Client.LoadBulk(t, string(readFile(t, "testdata/basic.bulk.json")))

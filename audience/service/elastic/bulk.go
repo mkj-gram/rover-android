@@ -2,8 +2,9 @@ package elastic
 
 import (
 	"github.com/pkg/errors"
+
 	"golang.org/x/net/context"
-	elastic "gopkg.in/olivere/elastic.v5"
+	"gopkg.in/olivere/elastic.v5"
 )
 
 type (
@@ -15,7 +16,6 @@ type (
 		IndexName    string
 		DocumentType string
 		Document     M
-		ParentId     string
 	}
 
 	IndexMapping struct {
@@ -28,6 +28,7 @@ type (
 const (
 	BulkOpIndex  = BulkOpKind("index")
 	BulkOpDelete = BulkOpKind("delete")
+	BulkOpUpdate = BulkOpKind("update")
 )
 
 type (
@@ -39,7 +40,7 @@ type (
 )
 
 func (h *BulkHandler) Handle(ctx context.Context, ops []*BulkOp) (*BulkResponse, error) {
-	bulkReq := db.Client.Bulk()
+	bulkReq := h.Client.Bulk()
 
 	for _, op := range ops {
 		req, err := toBulkRequest(op)
@@ -56,7 +57,7 @@ func (h *BulkHandler) Handle(ctx context.Context, ops []*BulkOp) (*BulkResponse,
 
 func (h *BulkHandler) HandleMapping(ctx context.Context, ims []*IndexMapping) error {
 	for _, im := range ims {
-		m := db.Client.PutMapping().
+		m := h.Client.PutMapping().
 			Index(im.IndexName).
 			Type(im.Type).
 			BodyJson(im.Mapping)
@@ -77,7 +78,6 @@ func toBulkRequest(op *BulkOp) (elastic.BulkableRequest, error) {
 		case BulkOpIndex:
 			return elastic.NewBulkIndexRequest().
 				Id(op.Id).
-				Parent(op.ParentId).
 				Type(op.DocumentType).
 				Doc(op.Document).
 				Index(op.IndexName), nil
@@ -85,8 +85,13 @@ func toBulkRequest(op *BulkOp) (elastic.BulkableRequest, error) {
 		case BulkOpDelete:
 			return elastic.NewBulkDeleteRequest().
 				Id(op.Id).
-				Parent(op.ParentId).
 				Type(op.DocumentType).
+				Index(op.IndexName), nil
+		case BulkOpUpdate:
+			return elastic.NewBulkUpdateRequest().
+				Id(op.Id).
+				Type(op.DocumentType).
+				Doc(op.Document).
 				Index(op.IndexName), nil
 		default:
 			return nil, errors.Errorf("device: unexpected op: %+v", op)

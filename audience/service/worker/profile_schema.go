@@ -62,7 +62,7 @@ func (h *Worker) buildProfileMappings(ctx context.Context, msgs []service.Messag
 		mappings[i] = &elastic.IndexMapping{
 			Type:      "device",
 			IndexName: h.AccountIndex(acctId),
-			Mapping:   elastic.DeviceMapping(elastic.CustomAttributesMapping(schema), elastic.CustomAttributesMapping(profileSchemasByAccountId[acctId])),
+			Mapping:   elastic.DeviceV2Mapping(elastic.CustomAttributesMapping(schema), elastic.CustomAttributesMapping(profileSchemasByAccountId[acctId])),
 		}
 		i++
 	}
