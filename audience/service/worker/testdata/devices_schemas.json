@@ -1,0 +1,47 @@
+{
+  "_id":{"$oid":"000000000000000000000000"},
+  "account_id":1,
+  "attribute":"arr",
+  "attribute_type": "array[string]",
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"}
+}
+{
+  "_id":{"$oid":"000000000000000000000001"},
+  "account_id":1,
+  "attribute":"bool",
+  "attribute_type": "bool",
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"}
+}
+
+
+{
+  "_id":{"$oid":"000000000000000000000002"},
+  "account_id":1,
+  "attribute":"double",
+  "attribute_type": "double",
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"}
+}
+
+{
+  "_id":{"$oid":"000000000000000000000003"},
+  "account_id":1,
+  "attribute":"ts",
+  "attribute_type": "timestamp",
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"}
+}
+
+{
+  "_id":{"$oid":"000000000000000000000004"},
+  "account_id":1,
+  "attribute":"string",
+  "attribute_type": "string",
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"}
+}
+
+{
+  "_id":{"$oid":"000000000000000000000005"},
+  "account_id":1,
+  "attribute":"integer",
+  "attribute_type": "integer",
+  "created_at": {"$date":"2017-06-14T15:44:18.496Z"}
+}

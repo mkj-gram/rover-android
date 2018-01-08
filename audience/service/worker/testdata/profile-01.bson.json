@@ -1,0 +1,9 @@
+{
+  "account_id": 1,
+  "_id": { "$oid": "5a3d3b78951724b6b55f5389" },
+  "identifier": "abananahahaanananana",
+  "created_at": { "$date": "2016-08-23T10:00:01Z" },
+  "updated_at": { "$date": "2016-08-23T10:00:01Z" },
+  "attributes": {}
+}
+

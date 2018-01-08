@@ -74,11 +74,13 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 		sess, info = dialMongo(cmd.mongoDSN)
 		db         = sess.DB(info.Database)
 
-		accountAttrs = getProfileSchemas(db)
-
-		deviceMapping = selastic.DeviceMapping()
-
 		idrange = cmd.idrange
+
+		// all accounts schemas for profile and device
+		profileCustomSchemas = getProfileCustomSchemas(db)
+		deviceCustomSchemas  = getDeviceCustomSchemas(db)
+
+		schemaToMapping = selastic.CustomAttributesMapping
 	)
 
 	for i := idrange.From; i <= idrange.To; i++ {
@@ -99,8 +101,10 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 		}
 
 		var (
-			attrMapping    = selastic.ProfileAttributesMapping(accountAttrs[i])
-			profileMapping = selastic.ProfileMapping(attrMapping)
+			deviceMapping = selastic.DeviceV2Mapping(
+				schemaToMapping(deviceCustomSchemas[i]),
+				schemaToMapping(profileCustomSchemas[i]),
+			)
 		)
 
 		_, err = esClient.PutMapping().Index(indexName).
@@ -109,14 +113,6 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 			Do(ctx)
 		if err != nil {
 			stderr.Fatalf("deviceMapping[%d]: %v", i, err)
-		}
-
-		_, err = esClient.PutMapping().Index(indexName).
-			Type("profile").
-			BodyJson(profileMapping).
-			Do(ctx)
-		if err != nil {
-			stderr.Fatalf("profileMapping[%d]: %v", i, err)
 		}
 
 	}

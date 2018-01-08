@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/context"
 	_ "golang.org/x/net/trace"
 
-	selastic "github.com/roverplatform/rover/audience/service/elastic"
+	audience_elastic "github.com/roverplatform/rover/audience/service/elastic"
 	"github.com/roverplatform/rover/audience/service/mongodb"
 	"github.com/roverplatform/rover/audience/service/worker"
 	rlog "github.com/roverplatform/rover/go/log"
@@ -120,11 +120,11 @@ func main() {
 		stderr.Fatalln("`elastic-dsn` is required")
 	}
 
-	var u, p, err = selastic.UserInfo(urls[0])
+	var u, p, err = audience_elastic.UserInfo(urls[0])
 	if err != nil {
 		stderr.Fatalln("elastic.UserInfo:", err)
 	}
-	urls, err = selastic.StripUserInfo(urls...)
+	urls, err = audience_elastic.StripUserInfo(urls...)
 	if err != nil {
 		stderr.Fatalln("elastic.StripUserInfo:", err)
 	}
@@ -152,8 +152,8 @@ func main() {
 	wServer := &worker.Worker{
 		Log:          rLog,
 		DB:           sess.DB(mongoInfo.Database),
-		Bulk:         &selastic.DB{Client: esClient},
-		AccountIndex: selastic.AccountIndex,
+		Bulk:         &audience_elastic.BulkHandler{Client: esClient},
+		AccountIndex: audience_elastic.AccountIndex,
 	}
 
 	workHandler = func(ctx context.Context, msg *pubsub.Message) error {

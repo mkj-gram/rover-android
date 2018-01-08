@@ -13,7 +13,6 @@ import (
 
 	"github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/elastic"
-	"github.com/roverplatform/rover/go/log"
 )
 
 var (
@@ -22,8 +21,9 @@ var (
 )
 
 type (
-	Logger interface {
-		Printf(string, ...interface{})
+	logger interface {
+		Infof(string, ...interface{})
+		Errorf(string, ...interface{})
 	}
 
 	BulkHandler interface {
@@ -32,7 +32,7 @@ type (
 	}
 
 	Worker struct {
-		Log          log.Interface
+		Log          logger
 		DB           *mgo.Database
 		Bulk         BulkHandler
 		AccountIndex func(string) string
@@ -56,9 +56,9 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 	}
 
 	var (
-		bulkOps                []*elastic.BulkOp
-		updatedAccountMappings []*elastic.IndexMapping
-		merr                   multiError
+		bulkOps         []*elastic.BulkOp
+		updatedMappings []*elastic.IndexMapping
+		merr            multiError
 	)
 
 	addErr := func(err error) {
@@ -74,23 +74,25 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 			for event, msgs := range groupBy(msgs, "event") {
 				switch event {
 				case "updated":
-					mappings, err := h.buildMappings(ctx, msgs)
-					if err != nil {
-						addErr(errors.Wrap(err, "handleProfileSchemasUpdated"))
+					if mappings, err := h.buildDeviceMappings(ctx, msgs); err != nil {
+						addErr(errors.Wrap(err, "buildDeviceMappings"))
 					} else {
-						updatedAccountMappings = mappings
+						updatedMappings = append(updatedMappings, mappings...)
 					}
 				default:
 					addErr(errors.Errorf("unknown msg: %s/%s", model, event))
 				}
 			}
+
 		case "deviceSchema":
-			for event, _ := range groupBy(msgs, "event") {
+			for event, msgs := range groupBy(msgs, "event") {
 				switch event {
 				case "updated":
-					// ms-12: device schema is not part of ES indexes yet
-					h.Log.Errorf("skipping event: %s/%s", model, event)
-
+					if mappings, err := h.buildDeviceMappings(ctx, msgs); err != nil {
+						addErr(errors.Wrap(err, "buildDeviceMappings"))
+					} else {
+						updatedMappings = append(updatedMappings, mappings...)
+					}
 				default:
 					addErr(errors.Errorf("unknown msg: %s/%s", model, event))
 				}
@@ -99,11 +101,13 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 		case "device":
 			for event, msgs := range groupBy(msgs, "event") {
 				switch event {
-				case "SetDeviceProfileIdentifier":
-					// ms-12: profile_identifier is not used as parent_id yet
-					h.Log.Errorf("skipping event: %s/%s", model, event)
-
-				case "updated", "created":
+				case "created":
+					ops, err := h.handleDevicesCreated(ctx, msgs)
+					if err != nil {
+						addErr(errors.Wrap(err, "HandleDevicesCreated"))
+					}
+					bulkOps = append(bulkOps, ops...)
+				case "updated":
 					ops, err := h.handleDevicesUpdated(ctx, msgs)
 					if err != nil {
 						addErr(errors.Wrap(err, "HandleDevicesUpdated"))
@@ -117,9 +121,13 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 					bulkOps = append(bulkOps, ops...)
 
 				case "SetDeviceProfile":
-					ops, err := h.handleDevicesSetDeviceProfile(ctx, msgs)
+					// NOTE: ms-12: deprecated
+					h.Log.Infof("event=%s/%s reaction=skip reason=ms-12", model, event)
+
+				case "SetDeviceProfileIdentifier":
+					ops, err := h.handleDevicesSetDeviceProfileIdentifier(ctx, msgs)
 					if err != nil {
-						addErr(errors.Wrap(err, "HandleDevicesSetDeviceProfile"))
+						addErr(errors.Wrap(err, "handleDevicesSetDeviceProfileIdentifier"))
 					}
 					bulkOps = append(bulkOps, ops...)
 				default:
@@ -150,9 +158,9 @@ func (h *Worker) Handle(ctx context.Context, msg *pubsub.Message) error {
 		}
 	}
 
-	if updatedAccountMappings != nil {
-		if err := h.Bulk.HandleMapping(ctx, updatedAccountMappings); err != nil {
-			addErr(errors.Wrap(err, "bulk.Handle"))
+	if updatedMappings != nil {
+		if err := h.Bulk.HandleMapping(ctx, updatedMappings); err != nil {
+			addErr(errors.Wrap(err, "bulk.HandleMapping"))
 		}
 	}
 

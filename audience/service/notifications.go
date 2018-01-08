@@ -31,11 +31,12 @@ func (fn FuncNotifier) Notify(ctx context.Context, msg Message) error {
 //
 // Notifier
 //
-func (n *serviceNotify) profileCreated(ctx context.Context, acctId int32, id string) {
+func (n *serviceNotify) profileCreated(ctx context.Context, acctId int32, id string, identifier string) {
 	n.Notify(ctx, Message{
 		"event":      "created",
 		"model":      "profile",
 		"id":         id,
+		"identifier": identifier,
 		"account_id": strconv.Itoa(int(acctId)),
 	})
 }
@@ -49,11 +50,12 @@ func (n *serviceNotify) profileDeleted(ctx context.Context, acctId int32, id str
 	})
 }
 
-func (n *serviceNotify) profileUpdated(ctx context.Context, acctId int32, id string) {
+func (n *serviceNotify) profileUpdated(ctx context.Context, acctId int32, id string, identifier string) {
 	m := Message{
 		"event":      "updated",
 		"model":      "profile",
 		"id":         id,
+		"identifier": identifier,
 		"account_id": strconv.Itoa(int(acctId)),
 	}
 

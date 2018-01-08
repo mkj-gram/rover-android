@@ -2,7 +2,9 @@ package elastic
 
 import (
 	"github.com/pkg/errors"
-	elastic "gopkg.in/olivere/elastic.v5"
+
+	"golang.org/x/net/context"
+	"gopkg.in/olivere/elastic.v5"
 )
 
 type (
@@ -14,10 +16,10 @@ type (
 		IndexName    string
 		DocumentType string
 		Document     M
-		ParentId     string
 	}
 
 	IndexMapping struct {
+		Type      string
 		IndexName string
 		Mapping   M
 	}
@@ -26,7 +28,47 @@ type (
 const (
 	BulkOpIndex  = BulkOpKind("index")
 	BulkOpDelete = BulkOpKind("delete")
+	BulkOpUpdate = BulkOpKind("update")
 )
+
+type (
+	BulkHandler struct {
+		Client *elastic.Client
+	}
+
+	BulkResponse = elastic.BulkResponse
+)
+
+func (h *BulkHandler) Handle(ctx context.Context, ops []*BulkOp) (*BulkResponse, error) {
+	bulkReq := h.Client.Bulk()
+
+	for _, op := range ops {
+		req, err := toBulkRequest(op)
+		if err != nil {
+			return nil, errors.Wrapf(err, "toBulkReq: %v", err)
+		}
+		bulkReq.Add(req)
+	}
+
+	resp, err := bulkReq.Do(ctx)
+
+	return (*BulkResponse)(resp), errors.Wrap(err, "client.Bulk")
+}
+
+func (h *BulkHandler) HandleMapping(ctx context.Context, ims []*IndexMapping) error {
+	for _, im := range ims {
+		m := h.Client.PutMapping().
+			Index(im.IndexName).
+			Type(im.Type).
+			BodyJson(im.Mapping)
+
+		if _, err := m.Do(ctx); err != nil {
+			return errors.Wrap(err, "client.PutMapping")
+		}
+	}
+
+	return nil
+}
 
 func toBulkRequest(op *BulkOp) (elastic.BulkableRequest, error) {
 
@@ -36,7 +78,6 @@ func toBulkRequest(op *BulkOp) (elastic.BulkableRequest, error) {
 		case BulkOpIndex:
 			return elastic.NewBulkIndexRequest().
 				Id(op.Id).
-				Parent(op.ParentId).
 				Type(op.DocumentType).
 				Doc(op.Document).
 				Index(op.IndexName), nil
@@ -44,8 +85,13 @@ func toBulkRequest(op *BulkOp) (elastic.BulkableRequest, error) {
 		case BulkOpDelete:
 			return elastic.NewBulkDeleteRequest().
 				Id(op.Id).
-				Parent(op.ParentId).
 				Type(op.DocumentType).
+				Index(op.IndexName), nil
+		case BulkOpUpdate:
+			return elastic.NewBulkUpdateRequest().
+				Id(op.Id).
+				Type(op.DocumentType).
+				Doc(op.Document).
 				Index(op.IndexName), nil
 		default:
 			return nil, errors.Errorf("device: unexpected op: %+v", op)

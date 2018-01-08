@@ -1,4 +1,4 @@
-DCF ?= docker-compose -f ../../docker/rover.docker-compose.yaml
+DCF ?= docker-compose -f ../../docker/main.docker-compose.yaml
 RUN ?= ${DCF} run --rm ${RPC_PORT} audience-service
 MONGO_RUN ?= ${DCF} run --rm mongo
 
