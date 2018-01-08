@@ -7,10 +7,9 @@ help:
 	@echo "  \033[34mcompile\033[0m  - Compile tsx to js"
 	@echo "  \033[34mstop\033[0m  - Stop all running containers"
 	@echo "  \033[34mlint\033[0m  - Run linter"
-	@echo
 
 storybook:
-	${RUN} bash -c "npm install && npm run compile && npm run build-storybook && npm run storybook"
+	${RUN} bash -c "npm install && npm run storybook"
 
 compile:
 	${RUN} bash -c "npm install && npm run compile"
