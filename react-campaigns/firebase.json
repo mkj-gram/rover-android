@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "public": "dist",
+    "rewrites": [
+      {
+        "source": "/campaigns/**",
+        "destination": "/campaigns/index.html"
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "rover-campaigns-staging",
+    "staging": "rover-campaigns-staging",
+    "production": "rover-campaigns-production"
+  }
+}
