@@ -1,6 +1,5 @@
 /* tslint:disable no-any */
 /// <reference path="../typings/index.d.ts" />
-
 import * as React from 'react'
 import { charcoal } from '../styles/colors'
 
@@ -31,7 +30,6 @@ class ContentEditable extends React.Component<Props, {}> {
 
         // We need not rerender if the change of props simply reflects the user's edits.
         // Rerendering in this case would make the cursor/caret jump
-
         // Rerender if there is no element yet... (somehow?)
         if (!htmlEl) {
             return true
@@ -120,5 +118,4 @@ class ContentEditable extends React.Component<Props, {}> {
         )
     }
 }
-
 export default ContentEditable

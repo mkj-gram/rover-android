@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Text } from '../src'
+import { Text, Button } from '../src'
 
 import { storiesOf } from '@storybook/react'
 
@@ -93,3 +93,65 @@ storiesOf('Text', module)
             position="center"
         />
     ))
+
+storiesOf('Button', module)
+    .add('rounded-large-primary', () => (
+        <Button text="Next" size="large" type="primary" onClick={() => null} />
+    ))
+    .add('rounded-large-primary-override', () => {
+        return (
+            <div style={{ width: 130, display: 'inline' }}>
+                <Button
+                    text="Next"
+                    size="large"
+                    type="primary"
+                    style={{ outerStyle: { marginRight: 10 } }}
+                />
+                <Button
+                    text="NextOne"
+                    size="large"
+                    type="primary"
+                    overrideWidth={95.47}
+                    style={{ outerStyle: { marginRight: 10 } }}
+                />
+            </div>
+        )
+    })
+
+    .add('rounded-small-primary', () => (
+        <Button text="Next" size="small" type="primary" />
+    ))
+    .add('rounded-small-primary-override', () => {
+        return (
+            <div style={{ width: 130, display: 'inline' }}>
+                <Button
+                    text="Next"
+                    size="small"
+                    type="primary"
+                    style={{ outerStyle: { marginRight: 10 } }}
+                />
+                <Button
+                    text="Next"
+                    size="small"
+                    type="primary"
+                    overrideWidth={60}
+                />
+            </div>
+        )
+    })
+
+    .add('rounded-large-secondary', () => (
+        <Button text="Next" size="large" type="secondary" />
+    ))
+    .add('rounded-small-secondary', () => (
+        <Button text="Next" size="small" type="secondary" />
+    ))
+
+    .add('rounded-large-disabled', () => (
+        <Button text="Next" size="large" type="disabled" />
+    ))
+    .add('rounded-small-disabled', () => (
+        <Button text="Next" size="small" type="disabled" />
+    ))
+
+    .add('regular', () => <Button text="Button" type="regular" />)
