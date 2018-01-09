@@ -34,14 +34,11 @@ services:
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
         
   postgres:
-    image: rover/postgres
-    ports:
-      - 5432
-    build:
-      context: ./vendor/postgres
+    image: postgres:9.6-alpine
+    ports: [5432]
     volumes:
-      - ../../rover:/rover
-      - pgdata:/var/lib/postgresql/data
+      # postgres runs *.sql from /docker-entrypoint-initdb.d on startup
+      - ./vendor/postgres/initdb.d:/docker-entrypoint-initdb.d/
 
   redis:
     image: redis:4.0.2-alpine
