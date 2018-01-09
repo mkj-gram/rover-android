@@ -157,7 +157,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: 'location',
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'location_state',
@@ -165,7 +166,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: 'location',
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'location_city',
@@ -173,7 +175,8 @@ export const getDeviceSchema = () => [
         __typename: 'StringPredicate',
         group: 'location',
         display: true,
-        filter: true
+        filter: true,
+        popularStringOption: true
     },
     {
         attribute: 'time_zone',
@@ -191,7 +194,7 @@ export const getDeviceSchema = () => [
         group: 'location',
         display: true,
         filter: true
-    },    
+    },  
     {
         attribute: 'os_version',
         label: 'OS Version',
