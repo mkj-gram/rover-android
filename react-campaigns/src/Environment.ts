@@ -1,9 +1,6 @@
+/// <reference path="../typings/index.d.ts"/>
 import { execute, makePromise, GraphQLRequest } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
-
-interface StringMap<T> {
-  [x: string]: T;
-}
 
 const environments: StringMap<string> = {
     production: 'https://api.rover.io/graphql',
