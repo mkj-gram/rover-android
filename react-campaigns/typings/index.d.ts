@@ -86,7 +86,7 @@
         scheduledDeliveryStatus: ScheduledDeliveryStatus
     }
 
-    class AutomatedNotifcationCampaign extends Campaign {
+    class AutomatedNotificationCampaign extends Campaign {
         notificationBody: string
         notificationTitle: string
         notificationAttachmentUrl: string
