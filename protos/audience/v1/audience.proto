@@ -1123,6 +1123,8 @@ message GetFieldSuggestionRequest {
     ROVER_PROFILE = 0;
     CUSTOM_PROFILE = 1;
     DEVICE = 2;
+    // Custom properties set by developers inside the Rover SDK
+    CUSTOM_DEVICE = 3;
   }
 
   Selector selector = 2;

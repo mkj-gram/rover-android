@@ -23938,7 +23938,8 @@ proto.rover.audience.v1.GetFieldSuggestionRequest.serializeBinaryToWriter = func
 proto.rover.audience.v1.GetFieldSuggestionRequest.Selector = {
   ROVER_PROFILE: 0,
   CUSTOM_PROFILE: 1,
-  DEVICE: 2
+  DEVICE: 2,
+  CUSTOM_DEVICE: 3
 };
 
 /**
