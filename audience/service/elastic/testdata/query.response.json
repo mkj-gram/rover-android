@@ -26,6 +26,10 @@
                "app_version": "",
                "carrier_name": "",
                "created_at": null,
+               "attributes": {
+                  "fresh-find": true,
+                  "string-value": "fidget spinner"
+               },
                "device_id": "9431B69F-F5F2-4375-9B06-E5F6033FDC0F",
                "device_manufacturer": "samsung",
                "device_model": "GT-I9190",
@@ -75,41 +79,9 @@
                },
                "notification_authorization": "AUTHORIZED",
                "time_zone": "America/New_York",
-               "updated_at": "2017-06-13T20:20:06Z"
-            },
-            "inner_hits": {
-               "profile": {
-                  "hits": {
-                     "total": 1,
-                     "max_score": 1,
-                     "hits": [
-                        {
-                           "_type": "profile",
-                           "_id": "59401bfe9cb3ac00079b0944",
-                           "_score": 1,
-                           "_source": {
-                              "account_id": 152,
-                              "attributes": {
-                                 "none": null,
-                                 "age": 12,
-                                 "email": "hello@world.com",
-                                 "rate": 1.2,
-                                 "gender": true,
-                                 "tags": [
-                                    "roster_moves",
-                                    "general_content",
-                                    "stadium_updates"
-                                 ]
-                              },
-                              "created_at": null,
-                              "id": "59401bfe9cb3ac00079b0944",
-                              "identifier": "",
-                              "updated_at": "2017-06-13T20:20:06Z"
-                           }
-                        }
-                     ]
-                  }
-               }
+               "updated_at": "2017-06-13T20:20:06Z",
+               "profile_identifier": "",
+               "profile": null
             }
          },
          {
@@ -176,32 +148,17 @@
                   "revision": 1
                },
                "time_zone": "America/New_York",
-               "updated_at": "2017-07-24T18:39:14Z"
-            },
-            "inner_hits": {
+               "updated_at": "2017-07-24T18:39:14Z",
+               "profile_identifier": "hello",
                "profile": {
-                  "hits": {
-                     "total": 1,
-                     "max_score": 1,
-                     "hits": [
-                        {
-                           "_type": "profile",
-                           "_id": "594137bbfa8e9000073d491e",
-                           "_score": 1,
-                           "_source": {
-                              "account_id": 152,
-                              "identifier": "hello",
-                              "attributes": {
-                                 "tags": [ "game_updates" ]
-                              },
-                              "created_at": null,
-                              "id": "594137bbfa8e9000073d491e",
-                              "identifier": "",
-                              "updated_at": "2017-07-24T18:39:14Z"
-                           }
-                        }
-                     ]
-                  }
+                  "account_id": 152,
+                  "identifier": "hello",
+                  "attributes": {
+                     "tags": [ "game_updates" ]
+                  },
+                  "created_at": null,
+                  "id": "594137bbfa8e9000073d491e",
+                  "updated_at": "2017-07-24T18:39:14Z"
                }
             }
          }

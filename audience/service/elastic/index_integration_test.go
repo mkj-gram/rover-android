@@ -3,20 +3,15 @@
 package elastic_test
 
 import (
-	"io/ioutil"
-	"log"
-	"os"
-	"strings"
 	"testing"
 
 	"github.com/pkg/errors"
+	"golang.org/x/net/context"
+
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
 	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/audience/service/elastic"
-	rlog "github.com/roverplatform/rover/go/log"
 	rtesting "github.com/roverplatform/rover/go/testing"
-	"golang.org/x/net/context"
-	es5 "gopkg.in/olivere/elastic.v5"
 )
 
 const (
@@ -37,10 +32,6 @@ type (
 		Body M
 	}
 
-	client struct {
-		c *es5.Client
-	}
-
 	pager             = audience.QueryRequest_PageIterator
 	scroller          = audience.QueryRequest_ScrollIterator_StartScroll
 	scrollerParallell = audience.QueryRequest_ScrollIterator_StartParallelScroll
@@ -55,32 +46,25 @@ type (
 )
 
 var (
-	_ = ioutil.Discard
-
-	l    = log.New(os.Stdout, "elastic:", 0)
-	rLog = rlog.New(rlog.Error)
-
 	idxName = func(s string) string {
 		return "test_account_" + s
 	}
-
-	mongoDSN = "mongodb://mongo:27017/service_worker_test"
-	esDSN    = "http://elastic5:9200/"
 
 	difff = rtesting.Difff
 	Diff  = rtesting.Diff
 )
 
 func TestQuery(t *testing.T) {
-	es5Client := newClient(t)
+	t.Log("\n\nElasticSearch Log:", elasticOut.Name(), "\n\n")
 
-	es5Client.DeleteIndex(t, test_index)
-	es5Client.CreateIndex(t, test_index)
+	var es5Client = newClient(t)
 
-	es5Client.createMapping(t, test_index, "device", elastic.DeviceMapping())
-	es5Client.createMapping(t, test_index, "profile", elastic.ProfileMapping(M{}))
+	es5Client.DeleteIndex(test_index)
+	es5Client.CreateIndex(test_index)
 
-	es5Client.LoadBulk(t, string(readFile(t, "testdata/basic.bulk.json")))
+	es5Client.createMapping(test_index, "device", elastic.DeviceV2Mapping(M{}, M{}))
+
+	es5Client.LoadBulk(string(readFile(t, "testdata/basic.bulk.json")))
 
 	t.Run("TestQuery_misc", test_Query_misc)
 	t.Run("TestQuery_Pager", test_Query_Pager)
@@ -159,13 +143,12 @@ func test_Query_Pager(t *testing.T) {
 			exp: expect{
 				val: &audience.QueryResponse{
 					Devices: []*audience.Device{
-						{DeviceId: "d2", ProfileId: "p2"},
-						{DeviceId: "d4", ProfileId: "p2"},
-						{DeviceId: "d1", ProfileId: "p1"},
+						{DeviceId: "d4", ProfileIdentifier: ""},
+						{DeviceId: "d3", ProfileIdentifier: "p1"},
+						{DeviceId: "d1", ProfileIdentifier: "p1"},
 					},
 					Profiles: []*audience.Profile{
-						{Id: "p2", AccountId: 1},
-						{Id: "p1", AccountId: 1},
+						{Identifier: "p1", AccountId: 1},
 					},
 					TotalSize: 4,
 				},
@@ -178,10 +161,7 @@ func test_Query_Pager(t *testing.T) {
 			exp: expect{
 				val: &audience.QueryResponse{
 					Devices: []*audience.Device{
-						{DeviceId: "d3", ProfileId: "p1"},
-					},
-					Profiles: []*audience.Profile{
-						{Id: "p1", AccountId: 1},
+						{DeviceId: "d2", ProfileIdentifier: "frank"},
 					},
 					TotalSize: 4,
 				},
@@ -230,13 +210,12 @@ func test_Query_Scroller(t *testing.T) {
 			exp: expect{
 				val: &audience.QueryResponse{
 					Devices: []*audience.Device{
-						{DeviceId: "d2", ProfileId: "p2"},
-						{DeviceId: "d1", ProfileId: "p1"},
-						{DeviceId: "d4", ProfileId: "p2"},
+						{DeviceId: "d4", ProfileIdentifier: ""},
+						{DeviceId: "d3", ProfileIdentifier: "p1"},
+						{DeviceId: "d1", ProfileIdentifier: "p1"},
 					},
 					Profiles: []*audience.Profile{
-						{Id: "p2", AccountId: 1},
-						{Id: "p1", AccountId: 1},
+						{Identifier: "p1", AccountId: 1},
 					},
 					TotalSize: 4,
 				},
@@ -249,10 +228,7 @@ func test_Query_Scroller(t *testing.T) {
 			exp: expect{
 				val: &audience.QueryResponse{
 					Devices: []*audience.Device{
-						{DeviceId: "d3", ProfileId: "p1"},
-					},
-					Profiles: []*audience.Profile{
-						{Id: "p1", AccountId: 1},
+						{DeviceId: "d2", ProfileIdentifier: "frank"},
 					},
 					TotalSize: 4,
 				},
@@ -309,20 +285,17 @@ func test_Query_ScrollerParallell(t *testing.T) {
 		{
 			desc: "scroller: first page",
 			req: scrollerParallell{
+				StreamId:   0,
 				MaxStreams: 2,
-				StreamId:   1,
 				BatchSize:  1,
 			},
 
 			exp: expect{
 				val: &audience.QueryResponse{
 					Devices: []*audience.Device{
-						{DeviceId: "d2", ProfileId: "p2"},
+						{DeviceId: "d4", ProfileIdentifier: ""},
 					},
-					Profiles: []*audience.Profile{
-						{Id: "p2", AccountId: 1},
-					},
-					TotalSize: 2,
+					TotalSize: 3,
 				},
 			},
 		},
@@ -333,12 +306,12 @@ func test_Query_ScrollerParallell(t *testing.T) {
 			exp: expect{
 				val: &audience.QueryResponse{
 					Devices: []*audience.Device{
-						{DeviceId: "d4", ProfileId: "p2"},
+						{DeviceId: "d1", ProfileIdentifier: "p1"},
 					},
 					Profiles: []*audience.Profile{
-						{Id: "p2", AccountId: 1},
+						{Identifier: "p1", AccountId: 1},
 					},
-					TotalSize: 2,
+					TotalSize: 3,
 				},
 			},
 		},
@@ -368,66 +341,6 @@ func test_Query_ScrollerParallell(t *testing.T) {
 			}
 		})
 	}
-}
-
-func newClient(t *testing.T) *client {
-	esClient, err := es5.NewClient(
-		es5.SetURL(strings.Split(esDSN, ",")...),
-		es5.SetTraceLog(l),
-		// es5.SetGzip(false),
-	)
-	if err != nil {
-		t.Fatal("elastic.NewClient:", err)
-	}
-
-	return &client{esClient}
-}
-
-func (c *client) CreateIndex(t *testing.T, name string) {
-	t.Helper()
-	if _, err := c.c.CreateIndex(name).Do(context.TODO()); err != nil {
-		t.Fatal("index:", err)
-	}
-}
-
-func (c *client) DeleteIndex(t *testing.T, name string) {
-	t.Helper()
-	resp, err := c.c.PerformRequest(context.TODO(), "DELETE", "/"+name, nil, nil)
-	if err != nil {
-		if resp != nil && resp.StatusCode == 404 {
-			return
-		}
-		t.Fatal("deleteIndex:", err)
-	}
-}
-
-func (c *client) LoadBulk(t *testing.T, body string) {
-	t.Helper()
-	if _, err := c.c.PerformRequest(context.TODO(), "POST", "/_bulk?refresh=wait_for", nil, body); err != nil {
-		t.Fatal("loadBulk:", err)
-	}
-}
-
-func (c *client) createMapping(t *testing.T, idx string, esType string, body M) {
-	t.Helper()
-
-	var m = c.c.PutMapping().
-		Index(idx).
-		Type(esType).
-		BodyJson(body)
-
-	if _, err := m.Do(context.TODO()); err != nil {
-		t.Fatal("mapping:", err)
-	}
-}
-
-func readFile(t *testing.T, fixturePath string) []byte {
-	data, err := ioutil.ReadFile(fixturePath)
-	if err != nil {
-		t.Fatal("ReadFile:", err)
-	}
-
-	return data
 }
 
 func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
@@ -565,15 +478,19 @@ func getFieldSuggestionRequest(t *testing.T, s audience.GetFieldSuggestionReques
 }
 
 func TestGetFieldSuggestion(t *testing.T) {
-	es5Client := newClient(t)
+	var (
+		profileCustomAttributesMapping = M{"custom_attribute_1": M{"type": "keyword"}, "custom_attribute_2": M{"type": "keyword"}}
+		deviceCustomAttributesMapping  = M{"device_attribute_1": M{"type": "keyword"}}
 
-	es5Client.DeleteIndex(t, suggest_test_index)
-	es5Client.CreateIndex(t, suggest_test_index)
+		es5Client = newClient(t)
+	)
 
-	es5Client.createMapping(t, suggest_test_index, "device", elastic.DeviceMapping())
-	es5Client.createMapping(t, suggest_test_index, "profile", elastic.ProfileMapping(M{"custom_attribute_1": M{"type": "keyword"}, "custom_attribute_2": M{"type": "keyword"}}))
+	es5Client.DeleteIndex(suggest_test_index)
+	es5Client.CreateIndex(suggest_test_index)
 
-	es5Client.LoadBulk(t, string(readFile(t, "testdata/basic.bulk.json")))
+	es5Client.createMapping(suggest_test_index, "device", elastic.DeviceV2Mapping(deviceCustomAttributesMapping, profileCustomAttributesMapping))
+
+	es5Client.LoadBulk(string(readFile(t, "testdata/suggestions.bulk.json")))
 
 	var index = elastic.Index{
 		Client:    es5Client.c,
@@ -607,7 +524,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_DEVICE, "app_name", 2),
 			exp: expect{
 				val: &audience.GetFieldSuggestionResponse{
-					Suggestions: []string{"another app name", "my app name"},
+					Suggestions: []string{"another app name", "a third app name"},
 				},
 			},
 		},
@@ -616,7 +533,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_ROVER_PROFILE, "identifier", 10),
 			exp: expect{
 				val: &audience.GetFieldSuggestionResponse{
-					Suggestions: []string{"profile_sp1_identifier", "profile_sp2_identifier"},
+					Suggestions: []string{"profile_sp2_identifier", "profile_sp1_identifier"},
 				},
 			},
 		},
@@ -625,7 +542,16 @@ func TestGetFieldSuggestion(t *testing.T) {
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_CUSTOM_PROFILE, "custom_attribute_1", 10),
 			exp: expect{
 				val: &audience.GetFieldSuggestionResponse{
-					Suggestions: []string{"custom string", "my attribute"},
+					Suggestions: []string{"another", "custom string"},
+				},
+			},
+		},
+		{
+			desc: "Custom device suggestions",
+			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_CUSTOM_DEVICE, "device_attribute_1", 10),
+			exp: expect{
+				val: &audience.GetFieldSuggestionResponse{
+					Suggestions: []string{"water", "wine"},
 				},
 			},
 		},

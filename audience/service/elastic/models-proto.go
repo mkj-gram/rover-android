@@ -9,6 +9,7 @@ import (
 
 type Device struct {
 	AccountID                   int32      `json:"account_id"`
+	Attributes                  M          `json:"attributes"`
 	AdvertisingID               string     `json:"advertising_id"`
 	AppBuild                    string     `json:"app_build"`
 	AppName                     string     `json:"app_name"`
@@ -53,7 +54,8 @@ type Device struct {
 		Minor    int32 `json:"minor"`
 		Revision int32 `json:"revision"`
 	} `json:"os_version"`
-	Platform                string     `json:"platform"`
+	Platform string `json:"platform"`
+	// deprecated
 	ProfileID               string     `json:"profile_id"`
 	PushEnvironment         string     `json:"push_environment"`
 	PushTokenCreatedAt      *time.Time `json:"push_token_created_at"`
@@ -73,6 +75,9 @@ type Device struct {
 	} `json:"sdk_version"`
 	TimeZone  string     `json:"time_zone"`
 	UpdatedAt *time.Time `json:"updated_at"`
+
+	ProfileIdentifier string   `json:"profile_identifier"`
+	Profile           *Profile `json:"profile"`
 }
 
 func (d *Device) toProto(proto *audience.Device) error {
@@ -81,6 +86,8 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.DeviceId = d.DeviceID
 	proto.ProfileId = d.ProfileID
 	proto.AccountId = d.AccountID
+	proto.ProfileIdentifier = d.ProfileIdentifier
+	proto.Attributes = attributesToProto(d.Attributes)
 
 	proto.AdvertisingId = d.AdvertisingID
 
@@ -197,17 +204,26 @@ func (p *Profile) toProto(proto *audience.Profile) error {
 	proto.CreatedAt, _ = timeToProto(p.CreatedAt)
 	proto.UpdatedAt, _ = timeToProto(p.UpdatedAt)
 
-	if len(p.Attributes) > 0 {
-		proto.Attributes = make(map[string]*audience.Value)
-		for k, v := range p.Attributes {
-			var val audience.Value
-			// TODO: handle errors
-			if err := val.Load(v); err != nil {
-				panic(err)
-			}
-			proto.Attributes[k] = &val
-		}
-	}
+	proto.Attributes = attributesToProto(p.Attributes)
 
 	return nil
+}
+
+func attributesToProto(attributes M) map[string]*audience.Value {
+	if attributes == nil || len(attributes) == 0 {
+		return nil
+	}
+
+	var proto = make(map[string]*audience.Value)
+
+	for k, v := range attributes {
+		var val audience.Value
+		if err := val.Load(v); err != nil {
+			panic(err)
+		}
+
+		proto[k] = &val
+	}
+
+	return proto
 }

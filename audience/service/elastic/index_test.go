@@ -23,19 +23,25 @@ func TestResponseMapping(t *testing.T) {
 	jsonFixture(t, &esRespDuplicateProfile, "testdata/query-duplicate-profile.response.json")
 
 	tcases := []struct {
-		in  *elastic.SearchResult
-		exp *audience.QueryResponse
-		err error
+		desc string
+		in   *elastic.SearchResult
+		exp  *audience.QueryResponse
+		err  error
 	}{
 		{
-			in:  &esResp,
-			err: nil,
+			desc: "maps response",
+			in:   &esResp,
+			err:  nil,
 			exp: &audience.QueryResponse{
 				TotalSize: 105707,
 				Devices: []*audience.Device{
 					{
-						Id:                          "",
-						AccountId:                   152,
+						Id:        "",
+						AccountId: 152,
+						Attributes: map[string]*audience.Value{
+							"fresh-find":   audience.BoolVal(true),
+							"string-value": audience.StringVal("fidget spinner"),
+						},
 						AdvertisingId:               "fc19eac9-df79-45f8-84c5-3aa22a374491",
 						AppBuild:                    "",
 						AppName:                     "",
@@ -87,6 +93,7 @@ func TestResponseMapping(t *testing.T) {
 					{
 						Id:                          "",
 						AccountId:                   152,
+						ProfileIdentifier:           "hello",
 						AdvertisingId:               "fc19eac9-df79-45f8-84c5-3aa22a374491",
 						AppBuild:                    "",
 						AppName:                     "",
@@ -138,25 +145,9 @@ func TestResponseMapping(t *testing.T) {
 				},
 				Profiles: []*audience.Profile{
 					{
-						Id:         "59401bfe9cb3ac00079b0944",
-						AccountId:  152,
-						Identifier: "",
-						CreatedAt:  nil,
-						UpdatedAt:  protoTs(t, parseTime(t, "2017-06-13T20:20:06Z")),
-						Attributes: map[string]*audience.Value{
-							"none": audience.NullVal,
-							// TODO:
-							"age":    audience.DoubleVal(12),
-							"email":  audience.StringVal("hello@world.com"),
-							"rate":   audience.DoubleVal(1.2),
-							"gender": audience.BoolVal(true),
-							"tags":   audience.StringArrayVal("roster_moves", "general_content", "stadium_updates"),
-						},
-					},
-					{
 						Id:         "594137bbfa8e9000073d491e",
 						AccountId:  152,
-						Identifier: "",
+						Identifier: "hello",
 						CreatedAt:  nil,
 						UpdatedAt:  protoTs(t, parseTime(t, "2017-07-24T18:39:14Z")),
 
@@ -169,8 +160,9 @@ func TestResponseMapping(t *testing.T) {
 			},
 		},
 		{
-			in:  &esRespDuplicateProfile,
-			err: nil,
+			desc: "deduplicates profiles",
+			in:   &esRespDuplicateProfile,
+			err:  nil,
 			exp: &audience.QueryResponse{
 				TotalSize: 2,
 				Devices: []*audience.Device{
@@ -226,7 +218,7 @@ func TestResponseMapping(t *testing.T) {
 						IbeaconMonitoringRegions:           []*audience.IBeaconRegion(nil),
 						GeofenceMonitoringRegionsUpdatedAt: nil,
 						GeofenceMonitoringRegions:          []*audience.GeofenceRegion(nil),
-						ProfileIdentifier:                  "",
+						ProfileIdentifier:                  "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
 					},
 					{
 						Id:                          "",
@@ -280,7 +272,7 @@ func TestResponseMapping(t *testing.T) {
 						IbeaconMonitoringRegions:           []*audience.IBeaconRegion(nil),
 						GeofenceMonitoringRegionsUpdatedAt: nil,
 						GeofenceMonitoringRegions:          []*audience.GeofenceRegion(nil),
-						ProfileIdentifier:                  "",
+						ProfileIdentifier:                  "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
 					},
 				},
 				Profiles: []*audience.Profile{
@@ -308,7 +300,7 @@ func TestResponseMapping(t *testing.T) {
 	}
 
 	for _, tc := range tcases {
-		t.Run("", func(t *testing.T) {
+		t.Run(tc.desc, func(t *testing.T) {
 			var (
 				exp, expErr = tc.exp, tc.err
 				got, gotErr = selastic.MapResponse(tc.in)

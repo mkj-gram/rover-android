@@ -159,27 +159,27 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 // GetFieldSuggestion takes a StringPredicate term and returns a list of suggested StringValues
 func (q *Index) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSuggestionRequest) (*audience.GetFieldSuggestionResponse, error) {
 	var (
-		indexName = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
-		selector  string
-		field     string
+		indexName          = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
+		aggregateFieldName = fmt.Sprintf("top-%s", r.GetField())
+
+		field string
 	)
 
 	switch r.GetSelector() {
 	// Custom profiles need a nested "attributes" field for ES Query
 	case audience.GetFieldSuggestionRequest_CUSTOM_PROFILE:
-		field = fmt.Sprintf("attributes.%s", r.GetField())
-		selector = "profile"
+		field = fmt.Sprintf("profile.attributes.%s", r.GetField())
 	case audience.GetFieldSuggestionRequest_ROVER_PROFILE:
-		field = r.GetField()
-		selector = "profile"
+		field = fmt.Sprintf("profile.%s", r.GetField())
 	case audience.GetFieldSuggestionRequest_DEVICE:
 		field = r.GetField()
-		selector = "device"
+	case audience.GetFieldSuggestionRequest_CUSTOM_DEVICE:
+		field = fmt.Sprintf("attributes.%s", r.GetField())
 	default:
 		panic("Selector was not of type GetFieldSuggestionRequest_Selector")
 	}
 
-	var search = q.Client.Search(indexName).Type(selector).Size(0).Aggregation(selector, source(termAggregate(field, r.GetSize())))
+	var search = q.Client.Search(indexName).Type("device").Size(0).Aggregation(aggregateFieldName, source(termAggregate(field, r.GetSize())))
 
 	resp, err := search.Do(ctx)
 	if err == io.EOF {
@@ -189,7 +189,7 @@ func (q *Index) GetFieldSuggestion(ctx context.Context, r *audience.GetFieldSugg
 		return nil, errors.Wrap(err, "Suggestions")
 	}
 
-	buckets, found := resp.Aggregations.Terms(selector)
+	buckets, found := resp.Aggregations.Terms(aggregateFieldName)
 	if !found {
 		return &audience.GetFieldSuggestionResponse{}, nil
 	}
@@ -251,7 +251,6 @@ func MapResponse(res *elastic.SearchResult) (*audience.QueryResponse, error) {
 		devices  []*audience.Device
 		profiles []*audience.Profile
 
-		// Use empty structs instead of bools to save on memory space
 		profileAdded = make(map[string]struct{})
 	)
 
@@ -260,30 +259,28 @@ func MapResponse(res *elastic.SearchResult) (*audience.QueryResponse, error) {
 			continue
 		}
 
-		var protoDevice audience.Device
-		if err := UnmarshalDevice(*dhit.Source, &protoDevice); err != nil {
-			panic(err)
-			continue
+		var device Device
+		if err := json.Unmarshal(*dhit.Source, &device); err != nil {
+			return nil, errors.Wrap(err, "json.Unmarshal")
 		}
 
-		devices = append(devices, &protoDevice)
+		var deviceProto audience.Device
+		if err := device.toProto(&deviceProto); err != nil {
+			return nil, errors.Wrap(err, "device.toProto")
+		}
 
-		if phit, ok := dhit.InnerHits["profile"]; ok {
-			for _, phit := range phit.Hits.Hits {
-				if phit.Source == nil {
-					continue
+		devices = append(devices, &deviceProto)
+
+		if device.Profile != nil {
+			if _, ok := profileAdded[device.Profile.Identifier]; !ok {
+				// This profile hasn't been added to the list of profiles
+				var profileProto audience.Profile
+				if err := device.Profile.toProto(&profileProto); err != nil {
+					return nil, errors.Wrap(err, "profile.toProto")
 				}
 
-				var protoProfile audience.Profile
-				if err := UnmarshalProfile(*phit.Source, &protoProfile); err != nil {
-					panic(err)
-				}
-
-				if _, ok := profileAdded[protoProfile.Id]; !ok {
-					profiles = append(profiles, &protoProfile)
-					profileAdded[protoProfile.Id] = struct{}{}
-				}
-
+				profiles = append(profiles, &profileProto)
+				profileAdded[device.Profile.Identifier] = struct{}{}
 			}
 		}
 	}
