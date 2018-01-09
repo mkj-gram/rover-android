@@ -89,7 +89,7 @@ const DynamicSegment = new GraphQLObjectType({
 
                 dataGridRows = response.getDevicesList().map(device => {
                   const deviceAttrs = getDeviceFromProto(device)
-                  const profileAttrs = profiles[device.getProfileId()]
+                  const profileAttrs = profiles[device.getProfileIdentifier()] || []
                   return deviceAttrs.concat(profileAttrs)
                 })
 

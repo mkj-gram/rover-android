@@ -29,9 +29,8 @@ export const valueFromProto = (value) => {
    }
 }
 
-const getRoverProfileValues = (id, p) => {
+const getRoverProfileValues = (p) => {
    const props = {
-       id,
        account_id: p.getAccountId(),
        identifier: p.getIdentifier() === "" ? null : p.getIdentifier(),
        updated_at: RoverApis.Helpers.timestampFromProto(p.getUpdatedAt()),
@@ -65,6 +64,6 @@ const getCustomProfileValues = (p) => {
 }
 
 export default (profiles, p) => {
-   const id = p.getId()
-   profiles[id] = getRoverProfileValues(id, p).concat(getCustomProfileValues(p))
+   const identifier = p.getIdentifier()
+   profiles[identifier] = getRoverProfileValues(p).concat(getCustomProfileValues(p))
 }
