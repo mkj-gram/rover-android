@@ -85,7 +85,18 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 
 	for i := idrange.From; i <= idrange.To; i++ {
 		indexName := selastic.AccountIndex(strconv.Itoa(i))
-		_, err := esClient.CreateIndex(indexName).Do(ctx)
+		_, err := esClient.CreateIndex(indexName).
+			Body(`
+					{
+					"settings" : {
+						"index" : {
+							"number_of_shards" : 5,
+							"number_of_replicas" : 0
+						}
+					}
+				}
+			`).
+			Do(ctx)
 		if err != nil {
 			switch e := err.(type) {
 			case *elastic.Error:
