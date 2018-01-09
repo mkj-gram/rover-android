@@ -169,7 +169,7 @@ class AudienceTable extends Component {
         const customProfiles = {}
         const roverProfiles = {}
 
-        deviceSchema.filter(device => device.selector === 'CUSTOM_DEVICE').map(
+        deviceSchema.map(
             device =>
                 (devices[device.attribute] = {
                     __typename: device.__typename,

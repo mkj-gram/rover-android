@@ -63,8 +63,11 @@ class AddFilterModal extends Component {
             ...device
         })).filter(device => device.filter !== false)
 
-        const customDevices = deviceSchema.filter(device => device.selector === 'CUSTOM_DEVICE')
-
+        const customDevices = deviceSchema.map(device => ({
+            selector: 'CUSTOM_DEVICE',
+            ...device
+        }))
+        
         const customProfiles = profileSchema.map(profile => ({
             selector: 'CUSTOM_PROFILE',
             ...profile
