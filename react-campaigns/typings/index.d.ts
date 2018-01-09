@@ -45,7 +45,7 @@
     }
 
     interface StringMap<T> {
-    [x: string]: T
+        [x: string]: T
     }
 
     abstract class Campaign {
