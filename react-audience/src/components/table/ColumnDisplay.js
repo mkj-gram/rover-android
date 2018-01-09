@@ -125,7 +125,7 @@ class ColumnDisplay extends Component {
                                             selector,
                                             items[item],
                                             item,
-                                            devices !== undefined
+                                            !items[item].selector
                                         )}
                                     style={{
                                         height: 16,
