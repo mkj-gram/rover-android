@@ -74,6 +74,7 @@ export default createRefetchContainer(
                     attribute
                     __typename: type
                     label
+                    selector
                 }
                 profileSchema {
                     attribute
@@ -106,6 +107,21 @@ export default createRefetchContainer(
             ),
             locale_region_suggestions: stringSuggestion(
                 field: "locale_region"
+                selector: "DEVICE"
+                size: 100
+            ),
+            location_country_suggestions: stringSuggestion(
+                field: "location_country"
+                selector: "DEVICE"
+                size: 100
+            ),
+            location_state_suggestions: stringSuggestion(
+                field: "location_state"
+                selector: "DEVICE"
+                size: 100
+            ),
+            location_city_suggestions: stringSuggestion(
+                field: "location_city"
                 selector: "DEVICE"
                 size: 100
             ),

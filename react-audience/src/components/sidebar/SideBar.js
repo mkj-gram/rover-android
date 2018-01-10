@@ -241,7 +241,7 @@ class SideBar extends Component {
 
         const getIcon = () => {
             let icon
-            if (currentAttribute.selector === 'DEVICE') {
+            if (currentAttribute.selector === 'DEVICE' || currentAttribute.selector === 'CUSTOM_DEVICE') {
                 if (currentAttribute.group === 'location') {
                     icon = LocationIcon
                 } else if (currentAttribute.attribute === 'is_test_device') {

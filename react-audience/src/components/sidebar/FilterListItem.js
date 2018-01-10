@@ -31,7 +31,7 @@ const getIcon = (type, group, attribute) => {
     let icon
     if (type === 'CUSTOM_PROFILE' || type === 'ROVER_PROFILE') {
         icon = <ProfileIcon fill={silver} />
-    } else if (type === 'DEVICE') {
+    } else if (type === 'DEVICE' || type === 'CUSTOM_DEVICE') {
         if (group === 'location') {
             icon = <LocationIcon fill={silver} />
         } else if (attribute === 'is_test_device') {

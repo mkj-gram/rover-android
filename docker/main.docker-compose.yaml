@@ -75,7 +75,7 @@ services:
     working_dir: /go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
-      AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_test"
+      AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_dev"
       AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic5:9200"
   
   auth-service:
@@ -110,7 +110,7 @@ services:
       - audience-service
     ports:
       - "4000:80"
-    command: bash -c "npm install && npm run build && npm run serve"
+    command: bash -c "npm install && npm run build && npm start"
     volumes:
       - ../../rover:/rover/
     working_dir: /rover/graphql-gateway

@@ -15,7 +15,7 @@ const ModalInputPrompt = ({
     </div>
 )
 const getLabel = label => label.replace('?', '')
-const getSelector = selector => selector === 'DEVICE' ? 'devices' : 'profiles'
+const getSelector = selector => selector === 'DEVICE' || selector === 'CUSTOM_DEVICE' ? 'devices' : 'profiles'
 
 ModalInputPrompt.propTypes = {
     selector: PropTypes.string.isRequired,

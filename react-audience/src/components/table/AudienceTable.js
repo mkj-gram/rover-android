@@ -74,8 +74,8 @@ class AudienceTable extends Component {
     componentDidMount() {
         if (this.props.data) {
             const { data } = this.props
-            const { profileSchema } = data.adgSegmentSchema
-            const deviceSchema = getDeviceSchema()
+            const { deviceSchema, profileSchema } = data.adgSegmentSchema
+            const roverDeviceSchema = getDeviceSchema()
 
             const {
                 dataGridRows,
@@ -84,7 +84,7 @@ class AudienceTable extends Component {
             } = data.adgSegmentsFromPredicates
 
             this.getSetCachedColumns()
-            this.getAllColumns(deviceSchema, profileSchema)
+            this.getAllColumns(deviceSchema, profileSchema, roverDeviceSchema)
             this.createRowsAndColumns(dataGridRows)
             this.setState({ segmentSize, totalSize, dataGridRows })
         } else {
@@ -145,7 +145,7 @@ class AudienceTable extends Component {
 
         if (
             !cachedSelectedColumns ||
-            !['_DEVICE', '_CUSTOM_PROFILE', '_ROVER_PROFILE'].some(
+            !['_DEVICE', '_CUSTOM_DEVICE', '_CUSTOM_PROFILE', '_ROVER_PROFILE'].some(
                 hasSelector
             ) ||
             containsDeprecatedColumns()
@@ -164,12 +164,21 @@ class AudienceTable extends Component {
         }
     }
 
-    getAllColumns(deviceSchema, profileSchema) {
+    getAllColumns(deviceSchema, profileSchema, roverDeviceSchema) {
         const devices = {}
         const customProfiles = {}
         const roverProfiles = {}
 
         deviceSchema.map(
+            device =>
+                (devices[device.attribute] = {
+                    __typename: device.__typename,
+                    label: device.label,
+                    group: null,
+                    selector: 'CUSTOM_DEVICE'
+                })
+        )
+        roverDeviceSchema.map(
             device =>
                 (devices[device.attribute] = {
                     __typename: device.__typename,
@@ -470,32 +479,39 @@ class AudienceTable extends Component {
     }
 
     onCellSelected(val, listCellVal = null) {
-        let attribute, selector, value, typeKey, typename, label
-        const types = {
-            _DEVICE: 'DEVICE',
-            _CUSTOM_PROFILE: 'CUSTOM_PROFILE',
-            _ROVER_PROFILE: 'ROVER_PROFILE'
-        }
-        const typeKeys = Object.keys(types)
+        let attribute, selector
         const { key } = val.column
 
         const findTypenameLabel = (attribute, selector) => {
-            return selector !== 'DEVICE'
+            return (selector !== 'DEVICE' && selector !== 'CUSTOM_DEVICE')
                 ? this.state.allColumns.profiles[attribute]
                 : this.state.allColumns.devices[attribute]
         }
-        typeKeys.forEach(type => {
-            if (key.indexOf(type) !== -1) {
-                attribute = key.slice(0, key.indexOf(type))
-                selector = types[type]
-                value = listCellVal || val.value
-                typeKey = findTypenameLabel(attribute, selector)
-                typename = typeKey.__typename
-                label = typeKey.label
-            }
-        })
 
-        let query = formatQuery({ attribute, selector, value, typename, label })
+        if (key.includes('CUSTOM_DEVICE')) {
+            attribute = key.slice(0, key.indexOf('CUSTOM_DEVICE') - 1)
+            selector = 'CUSTOM_DEVICE'
+        } else if (key.includes('DEVICE')) {
+            attribute = key.slice(0, key.indexOf('DEVICE') - 1)
+            selector = 'DEVICE'
+        }
+
+        if (key.includes('CUSTOM_PROFILE')) {
+            attribute = key.slice(0, key.indexOf('CUSTOM_PROFILE') - 1)
+            selector = 'CUSTOM_PROFILE'
+        }
+
+        if (key.includes('ROVER_PROFILE')) {
+            attribute = key.slice(0, key.indexOf('ROVER_PROFILE') - 1)
+            selector = 'ROVER_PROFILE'
+        }
+
+        const value = listCellVal || val.value
+        const typeKey = findTypenameLabel(attribute, selector)
+        const typename = typeKey && typeKey.__typename
+        const label = typeKey && typeKey.label
+
+        const query = formatQuery({ attribute, selector, value, typename, label })
         if (query !== null) {
             this.props.clickCellUpdatePredicates([query], null)
         }

@@ -56,13 +56,18 @@ class AddFilterModal extends Component {
 
     buildFilterList() {
         const { schema } = this.props
-        const { profileSchema } = schema
+        const { deviceSchema, profileSchema } = schema
 
         const devices = getDeviceSchema().map(device => ({
             selector: 'DEVICE',
             ...device
-        })).filter((device) => device.filter !== false)
+        })).filter(device => device.filter !== false)
 
+        const customDevices = deviceSchema.map(device => ({
+            selector: 'CUSTOM_DEVICE',
+            ...device
+        }))
+        
         const customProfiles = profileSchema.map(profile => ({
             selector: 'CUSTOM_PROFILE',
             ...profile
@@ -75,7 +80,7 @@ class AddFilterModal extends Component {
 
         const profiles = roverProfiles.concat(customProfiles)
 
-        return devices.concat(profiles)
+        return devices.concat(customDevices).concat(profiles)
     }
 
     getFilterDefault(type) {
