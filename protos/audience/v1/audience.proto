@@ -992,12 +992,14 @@ message PredicateAggregate {
 message Predicate {
 
   enum Selector {
-    // Custom properties set by clients
+    // Custom properties set by clients using Bulk API
     CUSTOM_PROFILE = 0;
     // All Device properties which are currently only set by Rover
     DEVICE  = 1;
     // Properties set by Rover and can not be changed from outside our systems
     ROVER_PROFILE = 2;
+    // Custom properties set by developers inside the Rover SDK
+    CUSTOM_DEVICE = 3;
   }
 
   Selector selector = 1;
@@ -1121,6 +1123,8 @@ message GetFieldSuggestionRequest {
     ROVER_PROFILE = 0;
     CUSTOM_PROFILE = 1;
     DEVICE = 2;
+    // Custom properties set by developers inside the Rover SDK
+    CUSTOM_DEVICE = 3;
   }
 
   Selector selector = 2;

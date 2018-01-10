@@ -74,37 +74,25 @@
           "revision": 0
         },
         "time_zone": "America/Indianapolis",
-        "updated_at": "2017-11-23T00:03:27Z"
-      },
-      "inner_hits": {
+        "updated_at": "2017-11-23T00:03:27Z",
+        "profile_identifier": "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
         "profile": {
-          "hits": {
-            "total": 1,
-            "max_score": 1,
-            "hits": [{
-              "_type": "profile",
-              "_id": "59f3311b3e1fae00018f1fcd",
-              "_score": 1,
-              "_source": {
-                "account_id": 85,
-                "attributes": {
-                  "tags": [
-                    "breaking_news",
-                    "contest_rewards",
-                    "live_programming",
-                    "injury_reports",
-                    "team_news",
-                    "game_updates",
-                    "stadium_updates"
-                  ]
-                },
-                "created_at": "2017-10-27T13:14:03Z",
-                "id": "59f3311b3e1fae00018f1fcd",
-                "identifier": "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
-                "updated_at": "2017-10-27T13:14:03Z"
-              }
-            }]
-          }
+          "account_id": 85,
+          "attributes": {
+            "tags": [
+              "breaking_news",
+              "contest_rewards",
+              "live_programming",
+              "injury_reports",
+              "team_news",
+              "game_updates",
+              "stadium_updates"
+            ]
+          },
+          "created_at": "2017-10-27T13:14:03Z",
+          "id": "59f3311b3e1fae00018f1fcd",
+          "identifier": "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
+          "updated_at": "2017-10-27T13:14:03Z"
         }
       }
     }, {
@@ -172,37 +160,25 @@
           "revision": 0
         },
         "time_zone": "America/Indianapolis",
-        "updated_at": "2017-11-23T00:03:34Z"
-      },
-      "inner_hits": {
+        "updated_at": "2017-11-23T00:03:34Z",
+        "profile_identifier": "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
         "profile": {
-          "hits": {
-            "total": 1,
-            "max_score": 1,
-            "hits": [{
-              "_type": "profile",
-              "_id": "59f3311b3e1fae00018f1fcd",
-              "_score": 1,
-              "_source": {
-                "account_id": 85,
-                "attributes": {
-                  "tags": [
-                    "breaking_news",
-                    "contest_rewards",
-                    "live_programming",
-                    "injury_reports",
-                    "team_news",
-                    "game_updates",
-                    "stadium_updates"
-                  ]
-                },
-                "created_at": "2017-10-27T13:14:03Z",
-                "id": "59f3311b3e1fae00018f1fcd",
-                "identifier": "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
-                "updated_at": "2017-10-27T13:14:03Z"
-              }
-            }]
-          }
+          "account_id": 85,
+          "attributes": {
+            "tags": [
+              "breaking_news",
+              "contest_rewards",
+              "live_programming",
+              "injury_reports",
+              "team_news",
+              "game_updates",
+              "stadium_updates"
+            ]
+          },
+          "created_at": "2017-10-27T13:14:03Z",
+          "id": "59f3311b3e1fae00018f1fcd",
+          "identifier": "b2a709b7-67a6-408a-ac54-cd5df8a8d09a",
+          "updated_at": "2017-10-27T13:14:03Z"
         }
       }
     }]

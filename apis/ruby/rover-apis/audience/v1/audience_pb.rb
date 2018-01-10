@@ -591,6 +591,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :CUSTOM_PROFILE, 0
     value :DEVICE, 1
     value :ROVER_PROFILE, 2
+    value :CUSTOM_DEVICE, 3
   end
   add_message "rover.audience.v1.QueryRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
@@ -663,6 +664,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :ROVER_PROFILE, 0
     value :CUSTOM_PROFILE, 1
     value :DEVICE, 2
+    value :CUSTOM_DEVICE, 3
   end
   add_message "rover.audience.v1.GetFieldSuggestionResponse" do
     repeated :suggestions, :string, 1

@@ -20846,7 +20846,8 @@ proto.rover.audience.v1.Predicate.serializeBinaryToWriter = function(message, wr
 proto.rover.audience.v1.Predicate.Selector = {
   CUSTOM_PROFILE: 0,
   DEVICE: 1,
-  ROVER_PROFILE: 2
+  ROVER_PROFILE: 2,
+  CUSTOM_DEVICE: 3
 };
 
 /**
@@ -23937,7 +23938,8 @@ proto.rover.audience.v1.GetFieldSuggestionRequest.serializeBinaryToWriter = func
 proto.rover.audience.v1.GetFieldSuggestionRequest.Selector = {
   ROVER_PROFILE: 0,
   CUSTOM_PROFILE: 1,
-  DEVICE: 2
+  DEVICE: 2,
+  CUSTOM_DEVICE: 3
 };
 
 /**

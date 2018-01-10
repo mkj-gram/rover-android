@@ -1,0 +1,6 @@
+{"index": {"_index": "suggestion_test_index", "_type": "device", "_id": "sd3"}}
+{"account_id": 1, "id": "sd3", "app_name": "another app name", "attributes": { "device_attribute_1": "wine"}, "locale_script": "result1", "profile": {"identifier": "profile_sp1_identifier", "attributes": { "custom_attribute_1": "custom string" }}}
+{"index": {"_index": "suggestion_test_index", "_type": "device", "_id": "sd4"}}
+{"account_id": 1, "id": "sd4", "app_name": "another app name", "profile": {"identifier": "profile_sp2_identifier" }}
+{"index": {"_index": "suggestion_test_index", "_type": "device", "_id": "sd5"}}
+{"account_id": 1, "id": "sd5", "app_name": "a third app name", "attributes": {"device_attribute_1": "water" }, "profile": {"identifier": "profile_sp2_identifier", "attributes": { "custom_attribute_1": "another" }}}

@@ -28,6 +28,8 @@ func TestPredicates(t *testing.T) {
 	t.Run("StringArrayPredicates", testPredicates_StringArrayPredicates)
 	t.Run("DurationPredicates", testPredicates_DurationPredicates)
 	t.Run("ComplexPredicates", testPredicates_ComplexPredicates)
+	t.Run("DeviceWithoutProfile", testPredicates_DeviceWithoutProfile)
+
 }
 
 func parseTime(t *testing.T, str string) time.Time {
@@ -1944,6 +1946,82 @@ func testPredicates_ComplexPredicates(t *testing.T) {
 			profile: p,
 			device:  d,
 			exp:     true,
+			expErr:  nil,
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			var got, gotErr = predicates.IsInDynamicSegment(tc.segment, tc.device, tc.profile)
+
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
+}
+
+func testPredicates_DeviceWithoutProfile(t *testing.T) {
+	var (
+		p = identifiedProfile(t)
+		d = device(t, p.GetId())
+	)
+
+	tcases := []struct {
+		name    string
+		segment *audience.DynamicSegment
+		device  *audience.Device
+		profile *audience.Profile
+
+		exp    bool
+		expErr error
+	}{
+		{
+			name: "predicate selects profile custom attribute from nil profile",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_CUSTOM_PROFILE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									AttributeName: "first-name",
+									Op:            audience.StringPredicate_STARTS_WITH,
+									Value:         "bill",
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: nil,
+			device:  d,
+			exp:     false,
+			expErr:  nil,
+		},
+		{
+			name: "predicate selects rover profile attribute from nil profile",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_CUSTOM_PROFILE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									AttributeName: "identifier",
+									Op:            audience.StringPredicate_STARTS_WITH,
+									Value:         "bill",
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: nil,
+			device:  d,
+			exp:     false,
 			expErr:  nil,
 		},
 	}
