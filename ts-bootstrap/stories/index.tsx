@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Alert, Text, Button, Switch } from '../src'
+import { Alert, Text, Button, Switch, RadioButton } from '../src'
 import {
     black,
     charcoal,
@@ -342,3 +342,11 @@ storiesOf('Switch', module)
             </div>
         )
     })
+storiesOf('RadioButton', module).add('selected and unselected', () => {
+    return (
+        <div>
+            <RadioButton selected={true} />
+            <RadioButton selected={false} />
+        </div>
+    )
+})
