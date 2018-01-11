@@ -16,9 +16,16 @@ interface SwitchProps {
     text?: string
     style?: style
     forceOn?: boolean
+    onClick?: () => void
 }
 
-const Switch: React.SFC<SwitchProps> = ({ on, text, style, forceOn }) => {
+const Switch: React.SFC<SwitchProps> = ({
+    on,
+    text,
+    style,
+    forceOn,
+    onClick
+}) => {
     let outerStyle: StringMap<string | number> = {
         display: 'inline-block',
         fontSize: 0 /* clear whitespace*/,
@@ -109,9 +116,18 @@ const Switch: React.SFC<SwitchProps> = ({ on, text, style, forceOn }) => {
     }
 
     return (
-        <div style={outerStyle}>
-            <div style={innerStyle} />
-            <div style={textStyle}> {text}</div>
+        <div style={outerStyle} onClick={onClick}>
+            <style type="text/css">
+                {`
+                    .slide {
+                        transition: .2s ease-in-out;
+                    }
+                `}
+            </style>
+            <div className="slide" style={innerStyle} />
+            <div className="slide" style={textStyle}>
+                {text}
+            </div>
         </div>
     )
 }

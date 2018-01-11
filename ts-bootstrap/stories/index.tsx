@@ -276,23 +276,59 @@ storiesOf('Alert', module)
     ))
 storiesOf('Switch', module)
     .add('all buttons', () => {
-        return (
-            <div>
-                <div>
-                    <Switch on={true} text="doYouKnowTheWay" />
-                </div>
-                <div>
-                    <Switch on={false} text="PM" />
-                </div>
-                <div>
-                    <Switch forceOn={true} />
-                </div>
-                <div>
-                    <Switch on={false} />
-                </div>
-                <Switch on={true} />
-            </div>
-        )
+        interface XState {
+            switched: boolean
+        }
+
+        class X extends React.Component<{}, XState> {
+            constructor(props: any) {
+                super(props)
+                this.state = {
+                    switched: false
+                }
+                this.toggle = this.toggle.bind(this)
+            }
+            toggle() {
+                this.setState({
+                    switched: !this.state.switched
+                })
+            }
+            render() {
+                return (
+                    <div>
+                        <div>
+                            <Switch
+                                on={this.state.switched}
+                                text="AM"
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <div>
+                            <Switch
+                                on={!this.state.switched}
+                                text="PM"
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <div>
+                            <Switch forceOn={true} />
+                        </div>
+                        <div>
+                            <Switch
+                                on={this.state.switched}
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <Switch
+                            on={!this.state.switched}
+                            onClick={this.toggle}
+                        />
+                    </div>
+                )
+            }
+        }
+
+        return <X />
     })
     .add('off', () => <Switch on={false} />)
     .add('on', () => <Switch on={true} />)
