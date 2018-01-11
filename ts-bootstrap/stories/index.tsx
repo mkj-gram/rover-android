@@ -1,5 +1,34 @@
 import * as React from 'react'
 import { Text, Button } from '../src'
+import {
+    black,
+    charcoal,
+    graphite,
+    steel,
+    silver,
+    titanium,
+    mercury,
+    cloud,
+    almostWhite,
+    white,
+    turquoise,
+    aquamarine,
+    foam,
+    paleblue,
+    beige,
+    red,
+    yellow,
+    green
+} from '../styles/colors'
+
+import {
+    text,
+    regular,
+    semibold,
+    large,
+    medium,
+    small
+} from '../styles/typography'
 
 import { storiesOf } from '@storybook/react'
 
@@ -155,3 +184,72 @@ storiesOf('Button', module)
     ))
 
     .add('regular', () => <Button text="Button" type="regular" />)
+
+const shades: StringMap<string> = {
+    black,
+    charcoal,
+    graphite,
+    steel,
+    silver,
+    titanium,
+    mercury,
+    cloud,
+    almostWhite,
+    white
+}
+const campaignPalette: StringMap<string> = {
+    turquoise,
+    aquamarine,
+    foam,
+    paleblue,
+    beige
+}
+const alertPalette: StringMap<string> = {
+    red,
+    yellow,
+    green
+}
+const colorBlock = (key: number, name: string, hex: string) => (
+    <div
+        style={{
+            ...text,
+            ...small,
+            width: 120,
+            height: 120,
+            marginRight: 10,
+            backgroundColor: hex,
+            color: black,
+            textShadow:
+                '0.05em 0 white, 0 0.05em white, -0.05em 0 white, 0 -0.05em white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column'
+        }}
+    >
+        <div>{hex}</div>
+        <div>{name}</div>
+    </div>
+)
+storiesOf('Colors', module)
+    .add('Shades', () => (
+        <div style={{ width: '100%', display: 'flex', flexAlign: 'left' }}>
+            {Object.keys(shades).map((shade, index) =>
+                colorBlock(index, shade, shades[shade])
+            )}
+        </div>
+    ))
+    .add('Campaigns Palette', () => (
+        <div style={{ width: '100%', display: 'flex', flexAlign: 'left' }}>
+            {Object.keys(campaignPalette).map((shade, index) =>
+                colorBlock(index, shade, campaignPalette[shade])
+            )}
+        </div>
+    ))
+    .add('Alert Palette', () => (
+        <div style={{ width: '100%', display: 'flex', flexAlign: 'left' }}>
+            {Object.keys(alertPalette).map((shade, index) =>
+                colorBlock(index, shade, alertPalette[shade])
+            )}
+        </div>
+    ))
