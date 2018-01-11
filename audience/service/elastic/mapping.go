@@ -7,6 +7,7 @@ func DeviceV2Mapping(customDeviceAttributesMapping, customProfileAttributesMappi
 	return M{
 		"device": M{
 			// Meta
+			"dynamic": false,
 			// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping-all-field.html
 			"_all": M{"enabled": false},
 			"properties": M{
