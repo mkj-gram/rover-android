@@ -13,7 +13,8 @@ const getSelectorName = selector => {
     const selectEnum = {
         0: 'CUSTOM_PROFILE',
         1: 'DEVICE',
-        2: 'ROVER_PROFILE'
+        2: 'ROVER_PROFILE',
+        3: 'CUSTOM_DEVICE'
     }
 
     return selectEnum[selector]
