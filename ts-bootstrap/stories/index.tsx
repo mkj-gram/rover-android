@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Text, Button } from '../src'
+import { Alert, Text, Button } from '../src'
 import {
     black,
     charcoal,
@@ -211,6 +211,7 @@ const alertPalette: StringMap<string> = {
 }
 const colorBlock = (key: number, name: string, hex: string) => (
     <div
+        key={key}
         style={{
             ...text,
             ...small,
@@ -252,4 +253,18 @@ storiesOf('Colors', module)
                 colorBlock(index, shade, alertPalette[shade])
             )}
         </div>
+    ))
+
+storiesOf('Alert', module)
+    .add('Info', () => (
+        <Alert
+            message="Mutable Content must be enabled because you have attached rich media to your notification"
+            type="info"
+        />
+    ))
+    .add('Warning', () => (
+        <Alert
+            message="Android devices will always present the website in a web browser"
+            type="warn"
+        />
     ))
