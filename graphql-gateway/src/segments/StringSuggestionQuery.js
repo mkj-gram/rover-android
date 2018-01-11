@@ -24,8 +24,14 @@ const StringSuggestionQuery = {
                     return 1
                     break
                 case 'DEVICE':
+                    return 2
+                    break
+                case 'CUSTOM_DEVICE':
+                    return 3
+                    break
                 default:
                     return 2
+
             }
         }
 
