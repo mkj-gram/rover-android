@@ -4,11 +4,15 @@ export const text = {
 }
 
 export const regular = {
-    fontWeight: '400'
+    fontWeight: 400
 }
 
 export const semibold = {
-    fontWeight: '600'
+    fontWeight: 600
+}
+
+export const bold = {
+    fontWeight: 700
 }
 
 export const large = {
