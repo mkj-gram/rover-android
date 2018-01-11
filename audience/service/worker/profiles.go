@@ -50,6 +50,10 @@ func (h *Worker) handleProfileUpdated(ctx context.Context, msgs []service.Messag
 		deviceQueries = append(deviceQueries, bson.M{"account_id": accountId, "profile_identifier": bson.M{"$in": identifiers}})
 	}
 
+	if len(deviceQueries) == 0 {
+		return []*elastic.BulkOp{}, nil
+	}
+
 	var (
 		// Lookup table
 		profileByIdentifierByAccountId = h.profileByIdentifierByAccountId(profiles)
@@ -100,6 +104,10 @@ func (h *Worker) handleProfilesDeleted(ctx context.Context, msgs []service.Messa
 		queries = append(queries, bson.M{"account_id": accountId, "profile_identifier": bson.M{"$in": identifiers}})
 	}
 
+	if len(queries) == 0 {
+		return []*elastic.BulkOp{}, nil
+	}
+
 	var (
 		Q        = bson.M{"$or": queries}
 		db, sess = h.db()
@@ -143,7 +151,7 @@ func (h *Worker) profileIdentifiersByAccountId(msgs []service.Message) map[int32
 	for _, msg := range msgs {
 		if i, ok := msg["account_id"]; ok {
 			if accountId, err := strconv.ParseInt(i, 0, 32); err == nil {
-				if identifier, ok := msg["identifier"]; ok {
+				if identifier, ok := msg["identifier"]; ok && identifier != "" {
 					profileIdentifiersByAccountId[int32(accountId)] = append(profileIdentifiersByAccountId[int32(accountId)], identifier)
 				}
 			}
@@ -157,14 +165,17 @@ func (h *Worker) profileByIdentifierByAccountId(profiles []mongodb.Profile) map[
 	var profileByIdentifierByAccountId = make(map[int]map[string]*mongodb.Profile)
 
 	for _, profile := range profiles {
-		if profile.Identifier != "" {
-			// Make sure the sub-map is initialized
-			if profileByIdentifierByAccountId[int(profile.AccountId)] == nil {
-				profileByIdentifierByAccountId[int(profile.AccountId)] = make(map[string]*mongodb.Profile)
-			}
-
-			profileByIdentifierByAccountId[int(profile.AccountId)][profile.Identifier] = &profile
+		if profile.Identifier == "" {
+			continue
 		}
+
+		// Make sure the sub-map is initialized
+		if profileByIdentifierByAccountId[int(profile.AccountId)] == nil {
+			profileByIdentifierByAccountId[int(profile.AccountId)] = make(map[string]*mongodb.Profile)
+		}
+
+		profileByIdentifierByAccountId[int(profile.AccountId)][profile.Identifier] = &profile
+
 	}
 
 	return profileByIdentifierByAccountId
