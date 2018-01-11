@@ -61,7 +61,8 @@ var (
 	gcpSvcAcctKeyPath = flag.String("gcp-service-account-key-path", "", "path to google service account key file")
 
 	// GCP PubSub
-	pubsubSubcription = flag.String("pubsub-subscription", "audience-service-updates-segments-worker", "GCP pubsub's subscription name")
+	pubsubSubcription            = flag.String("pubsub-subscription", "audience-service-updates-segments-worker", "GCP pubsub's subscription name")
+	pubSubMaxOutstandingMessages = flag.Int("pubsub-max-outstanding-messages", 1, "number of batches allowed to be processed in parallel")
 )
 
 var (
@@ -236,7 +237,7 @@ func main() {
 
 		pubsub.DefaultReceiveSettings = pubsub.ReceiveSettings{
 			MaxExtension:           10 * time.Minute,
-			MaxOutstandingMessages: 1000,
+			MaxOutstandingMessages: *pubSubMaxOutstandingMessages,
 			MaxOutstandingBytes:    1e9, // 1G
 			NumGoroutines:          10,
 		}
