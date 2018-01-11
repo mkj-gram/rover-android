@@ -165,7 +165,8 @@ func TestWorker(t *testing.T) {
 						"test_account_1": M{
 							"mappings": M{
 								"device": M{
-									"_all": M{"enabled": false},
+									"dynamic": "false",
+									"_all":    M{"enabled": false},
 									"properties": M{
 										"account_id": M{"type": "integer"},
 
@@ -273,7 +274,8 @@ func TestWorker(t *testing.T) {
 						"test_account_1": M{
 							"mappings": M{
 								"device": M{
-									"_all": M{"enabled": false},
+									"dynamic": "false",
+									"_all":    M{"enabled": false},
 									"properties": M{
 										"account_id": M{"type": "integer"},
 
