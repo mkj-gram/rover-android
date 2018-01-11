@@ -29,9 +29,7 @@ func (h *Worker) handleDevicesUpdated(ctx context.Context, msgs []service.Messag
 			}
 
 			if deviceId, ok := msg["device_id"]; ok {
-				deviceIds := deviceIdsByAccount[accountId]
-				deviceIds = append(deviceIds, deviceId)
-				deviceIdsByAccount[accountId] = deviceIds
+				deviceIdsByAccount[accountId] = append(deviceIdsByAccount[accountId], deviceId)
 			}
 
 		}
@@ -43,8 +41,12 @@ func (h *Worker) handleDevicesUpdated(ctx context.Context, msgs []service.Messag
 		queries = append(queries, bson.M{"account_id": accountId, "device_id": bson.M{"$in": deviceIds}})
 	}
 
+	if len(queries) == 0 {
+		return []*elastic.BulkOp{}, nil
+	}
+
 	var (
-		devices []*mongodb.Device
+		devices []mongodb.Device
 
 		Q = bson.M{"$or": queries}
 
@@ -61,7 +63,7 @@ func (h *Worker) handleDevicesUpdated(ctx context.Context, msgs []service.Messag
 	var ops = make([]*elastic.BulkOp, len(devices))
 	for i, device := range devices {
 		// only grab device attributes
-		doc := elastic.DeviceV2Doc(device, nil)
+		doc := elastic.DeviceV2Doc(&device, nil)
 
 		if device.ProfileIdentifier != "" {
 			// remove the profile key so we don't overwrite any profile attributes
