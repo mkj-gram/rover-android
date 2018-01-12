@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Alert, Text, Button, Switch } from '../src'
+import { Alert, Text, Button, Switch, ProgressBar } from '../src'
 import {
     black,
     charcoal,
@@ -342,3 +342,16 @@ storiesOf('Switch', module)
             </div>
         )
     })
+
+storiesOf('Progress Bar', module)
+    .add('0', () => <ProgressBar progress={0} />)
+    .add('20', () => <ProgressBar progress={0} />)
+    .add('25', () => <ProgressBar progress={0} />)
+    .add('33', () => <ProgressBar progress={0} />)
+    .add('40', () => <ProgressBar progress={0} />)
+    .add('50', () => <ProgressBar progress={0} />)
+    .add('60', () => <ProgressBar progress={0} />)
+    .add('66', () => <ProgressBar progress={0} />)
+    .add('75', () => <ProgressBar progress={0} />)
+    .add('80', () => <ProgressBar progress={0} />)
+    .add('100', () => <ProgressBar progress={0} />)
