@@ -11,7 +11,7 @@ import {
 
 import { text as typographyText, semibold } from '../styles/typography'
 
-type style = {
+type propStyle = {
     innerStyle?: StringMap<string | number>
     outerStyle?: StringMap<string | number>
 }
@@ -22,7 +22,7 @@ interface ButtonProps {
     size?: 'large' | 'small'
     overrideWidth?: number
     onClick?: () => void
-    style?: style
+    style?: propStyle
 }
 
 interface ButtonState {

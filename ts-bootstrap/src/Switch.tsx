@@ -5,7 +5,7 @@ import { titanium, turquoise, white, steel } from '../styles/colors'
 
 import { text as typographyText, bold } from '../styles/typography'
 
-type style = {
+type propStyle = {
     innerStyle?: StringMap<string | number>
     outerStyle?: StringMap<string | number>
     textStyle?: StringMap<string | number>
@@ -14,7 +14,7 @@ type style = {
 interface SwitchProps {
     on?: boolean
     text?: string
-    style?: style
+    style?: propStyle
     forceOn?: boolean
     onClick?: () => void
 }
@@ -116,7 +116,7 @@ const Switch: React.SFC<SwitchProps> = ({
     }
 
     return (
-        <div style={outerStyle} onClick={onClick}>
+        <div style={outerStyle} onClick={forceOn ? () => null : onClick}>
             <style type="text/css">
                 {`
                     .slide {

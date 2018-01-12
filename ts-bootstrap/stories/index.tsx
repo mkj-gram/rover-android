@@ -281,6 +281,7 @@ storiesOf('Switch', module)
         }
 
         class X extends React.Component<{}, XState> {
+            // tslint:disable-next-line:no-any
             constructor(props: any) {
                 super(props)
                 this.state = {
