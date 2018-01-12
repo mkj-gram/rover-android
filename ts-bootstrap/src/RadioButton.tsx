@@ -22,6 +22,7 @@ const RadioButton: React.SFC<RadioButtonProps> = ({ selected, style }) => {
         height: 14,
         border: `2px solid ${silver}`,
         borderRadius: '50%',
+        pointerEvents: 'none',
         ...style.outerStyle
     }
 
@@ -30,6 +31,7 @@ const RadioButton: React.SFC<RadioButtonProps> = ({ selected, style }) => {
         height: 10,
         borderRadius: '50%',
         backgroundColor: turquoise,
+        pointerEvents: 'none',
         ...style.innerStyle
     }
 
@@ -39,6 +41,7 @@ const RadioButton: React.SFC<RadioButtonProps> = ({ selected, style }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        pointerEvents: 'none',
         ...style.containerStyle
     }
 
