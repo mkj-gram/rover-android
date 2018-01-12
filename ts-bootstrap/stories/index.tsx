@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Alert, Text, Button } from '../src'
+import { Alert, Text, Button, Switch } from '../src'
 import {
     black,
     charcoal,
@@ -234,21 +234,27 @@ const colorBlock = (key: number, name: string, hex: string) => (
 )
 storiesOf('Colors', module)
     .add('Shades', () => (
-        <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}>
+        <div
+            style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}
+        >
             {Object.keys(shades).map((shade, index) =>
                 colorBlock(index, shade, shades[shade])
             )}
         </div>
     ))
     .add('Campaigns Palette', () => (
-        <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}>
+        <div
+            style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}
+        >
             {Object.keys(campaignPalette).map((shade, index) =>
                 colorBlock(index, shade, campaignPalette[shade])
             )}
         </div>
     ))
     .add('Alert Palette', () => (
-        <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}>
+        <div
+            style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}
+        >
             {Object.keys(alertPalette).map((shade, index) =>
                 colorBlock(index, shade, alertPalette[shade])
             )}
@@ -268,3 +274,71 @@ storiesOf('Alert', module)
             type="warn"
         />
     ))
+storiesOf('Switch', module)
+    .add('all buttons', () => {
+        interface XState {
+            switched: boolean
+        }
+
+        class X extends React.Component<{}, XState> {
+            // tslint:disable-next-line:no-any
+            constructor(props: any) {
+                super(props)
+                this.state = {
+                    switched: false
+                }
+                this.toggle = this.toggle.bind(this)
+            }
+            toggle() {
+                this.setState({
+                    switched: !this.state.switched
+                })
+            }
+            render() {
+                return (
+                    <div>
+                        <div>
+                            <Switch
+                                on={this.state.switched}
+                                text="AM"
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <div>
+                            <Switch
+                                on={!this.state.switched}
+                                text="PM"
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <div>
+                            <Switch forceOn={true} />
+                        </div>
+                        <div>
+                            <Switch
+                                on={this.state.switched}
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <Switch
+                            on={!this.state.switched}
+                            onClick={this.toggle}
+                        />
+                    </div>
+                )
+            }
+        }
+
+        return <X />
+    })
+    .add('off', () => <Switch on={false} />)
+    .add('on', () => <Switch on={true} />)
+    .add('forceOn', () => <Switch forceOn={true} />)
+    .add('text', () => {
+        return (
+            <div>
+                <Switch on={true} text="AM" />
+                <Switch on={false} text="PM" />
+            </div>
+        )
+    })
