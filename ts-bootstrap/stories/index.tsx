@@ -234,21 +234,21 @@ const colorBlock = (key: number, name: string, hex: string) => (
 )
 storiesOf('Colors', module)
     .add('Shades', () => (
-        <div style={{ width: '100%', display: 'flex', flexAlign: 'left' }}>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}>
             {Object.keys(shades).map((shade, index) =>
                 colorBlock(index, shade, shades[shade])
             )}
         </div>
     ))
     .add('Campaigns Palette', () => (
-        <div style={{ width: '100%', display: 'flex', flexAlign: 'left' }}>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}>
             {Object.keys(campaignPalette).map((shade, index) =>
                 colorBlock(index, shade, campaignPalette[shade])
             )}
         </div>
     ))
     .add('Alert Palette', () => (
-        <div style={{ width: '100%', display: 'flex', alignItems: 'left' }}>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start' }}>
             {Object.keys(alertPalette).map((shade, index) =>
                 colorBlock(index, shade, alertPalette[shade])
             )}
