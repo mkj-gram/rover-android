@@ -1,5 +1,7 @@
 export const aquamarine: string = '#25B0C0'
 
+export const almostWhite: string = '#FBFBFB'
+
 export const beige: string = '#FFFEF4'
 
 export const black: string = '#000000'
@@ -15,8 +17,6 @@ export const graphite: string = '#5D5D5D'
 export const green: string = '#34CBB3'
 
 export const mercury: string = '#E9E9E9'
-
-export const offwhite: string = '#FBFBFB'
 
 export const paleblue: string = '#95E1EA'
 
