@@ -1,18 +1,41 @@
 /// <reference path="../typings/index.d.ts"/>
 import * as React from 'react'
+import { cloud } from '../styles/colors'
 
 type ProgressBarProps = {
+    children?: JSX.Element
     progress: number
-    barStyle?: StringMap<string | number>
-    progressStyle?: StringMap<string | number>
+    style: {
+        barStyle?: React.CSSProperties
+        progressStyle?: React.CSSProperties
+    }
 }
 
-export default ({ barStyle, progress, progressStyle }: ProgressBarProps) => {
-    const style = {
-        backgroundColor: 'tomato',
-        width: 0,
+const ProgressBar: React.SFC<ProgressBarProps> = ({
+    progress,
+    style,
+    children
+}: ProgressBarProps) => {
+    const barStyle = {
+        overflow: 'hidden' as 'hidden',
+        width: 240,
         height: 8,
-        ...progressStyle
+        backgroundColor: cloud,
+        borderRadius: 4,
+        ...style.barStyle
     }
-    return <div>{`Progress ${progress}%`}</div>
+    const progressStyle = {
+        backgroundColor: 'tomato',
+        width: progress > 3 ? `${progress}%` : barStyle.height,
+        height: '100%',
+        borderRadius: 8,
+        ...style.progressStyle
+    }
+    return (
+        <div style={barStyle}>
+            <div style={progressStyle}>{children}</div>
+        </div>
+    )
 }
+
+export default ProgressBar

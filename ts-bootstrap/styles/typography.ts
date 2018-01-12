@@ -1,28 +1,30 @@
-export const text = {
+import * as React from 'react'
+
+export const text: React.CSSProperties = {
     cursor: 'default',
     fontFamily: '"Source Sans Pro", sans-serif'
 }
 
-export const regular = {
+export const regular: React.CSSProperties = {
     fontWeight: 400
 }
 
-export const semibold = {
+export const semibold: React.CSSProperties = {
     fontWeight: 600
 }
 
-export const bold = {
+export const bold: React.CSSProperties = {
     fontWeight: 700
 }
 
-export const large = {
+export const large: React.CSSProperties = {
     fontSize: 16
 }
 
-export const medium = {
+export const medium: React.CSSProperties = {
     fontSize: 17
 }
 
-export const small = {
+export const small: React.CSSProperties = {
     fontSize: 15
 }

@@ -344,14 +344,105 @@ storiesOf('Switch', module)
     })
 
 storiesOf('Progress Bar', module)
-    .add('0', () => <ProgressBar progress={0} />)
-    .add('20', () => <ProgressBar progress={0} />)
-    .add('25', () => <ProgressBar progress={0} />)
-    .add('33', () => <ProgressBar progress={0} />)
-    .add('40', () => <ProgressBar progress={0} />)
-    .add('50', () => <ProgressBar progress={0} />)
-    .add('60', () => <ProgressBar progress={0} />)
-    .add('66', () => <ProgressBar progress={0} />)
-    .add('75', () => <ProgressBar progress={0} />)
-    .add('80', () => <ProgressBar progress={0} />)
-    .add('100', () => <ProgressBar progress={0} />)
+    .add('0%', () => (
+        <ProgressBar
+            progress={0}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('20%', () => (
+        <ProgressBar
+            progress={20}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('25%', () => (
+        <ProgressBar
+            progress={25}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('33%', () => (
+        <ProgressBar
+            progress={33}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('40%', () => (
+        <ProgressBar
+            progress={40}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('50%', () => (
+        <ProgressBar
+            progress={50}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('60%', () => (
+        <ProgressBar
+            progress={60}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('66%', () => (
+        <ProgressBar
+            progress={66}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('75%', () => (
+        <ProgressBar
+            progress={75}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('80%', () => (
+        <ProgressBar
+            progress={80}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('100%', () => (
+        <ProgressBar
+            progress={100}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('120%', () => (
+        <ProgressBar
+            progress={120}
+            style={{ progressStyle: { backgroundColor: turquoise } }}
+        />
+    ))
+    .add('30% with children', () => (
+        <ProgressBar
+            progress={30}
+            style={{
+                progressStyle: {
+                    backgroundColor: turquoise,
+                    display: 'flex',
+                    alignItems: 'center',
+                    borderRadius: 8
+                },
+                barStyle: {
+                    height: 16,
+                    borderRadius: 8,
+                    backgroundColor: paleblue
+                }
+            }}
+        >
+            <div
+                style={{
+                    ...text,
+                    fontSize: 13,
+                    ...semibold,
+                    color: almostWhite,
+                    marginLeft: 8
+                }}
+            >
+                3600
+            </div>
+        </ProgressBar>
+    ))
