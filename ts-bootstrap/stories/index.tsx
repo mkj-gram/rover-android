@@ -248,7 +248,7 @@ storiesOf('Colors', module)
         </div>
     ))
     .add('Alert Palette', () => (
-        <div style={{ width: '100%', display: 'flex', flexAlign: 'left' }}>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'left' }}>
             {Object.keys(alertPalette).map((shade, index) =>
                 colorBlock(index, shade, alertPalette[shade])
             )}
