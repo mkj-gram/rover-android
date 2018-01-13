@@ -1,9 +1,0 @@
-steps:
-- name: 'gcr.io/rover-production/npm:6.4.0'
-  args: ['install']
-  dir: 'sdk-api'
-  env:
-    - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID', 'sdk-api']
-images: ['gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID']
