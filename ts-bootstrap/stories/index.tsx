@@ -5,6 +5,7 @@ import {
     Text,
     Button,
     RadioButton,
+    SliderComponent,
     Switch,
     ProgressBar,
     ProgressBarThin
@@ -391,6 +392,48 @@ storiesOf('RadioButton', module).add('selected and unselected', () => {
             <RadioButton selected={false} />
         </div>
     )
+})
+
+storiesOf('SliderComponent', module).add('slider', () => {
+    const Fragment = React.Fragment
+
+    interface YState {
+        val: number
+    }
+
+    class Y extends React.Component<{}, YState> {
+        // tslint:disable-next-line:no-any
+        constructor(props: any) {
+            super(props)
+            this.state = {
+                val: 68
+            }
+            this.handleChange = this.handleChange.bind(this)
+        }
+
+        handleChange(val: number) {
+            this.setState({
+                val
+            })
+        }
+
+        render() {
+            return (
+                <Fragment>
+                    <div style={{ ...text, ...semibold, ...medium }}>
+                        value: {this.state.val}
+                    </div>
+                    <SliderComponent
+                        min={0}
+                        max={100}
+                        value={this.state.val}
+                        onChange={this.handleChange}
+                    />
+                </Fragment>
+            )
+        }
+    }
+    return <Y />
 })
 
 storiesOf('Text', module)

@@ -18,7 +18,8 @@
   "dependencies": {
     "react": "16.2.0",
     "react-dev-utils": "4.0.1",
-    "react-dom": "16.2.0"
+    "react-dom": "16.2.0",
+    "react-rangeslider": "^2.2.0"
   },
   "devDependencies": {
     "@storybook/addon-actions": "3.3.3",
