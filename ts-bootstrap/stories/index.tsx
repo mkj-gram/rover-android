@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
     Alert,
     Text,
+    Badge,
     Button,
     RadioButton,
     Switch,
@@ -58,6 +59,11 @@ storiesOf('Alert', module)
     .add('Error', () => (
         <Alert message="Lorem ipsum sit dolor amet..." type="error" />
     ))
+
+storiesOf('Badge', module)
+    .add('Green Badge', () => <Badge color={green} text="badge" />)
+    .add('Yellow Badge', () => <Badge color={yellow} text="badge / yellow" />)
+    .add('Red Badge', () => <Badge color={red} text="badge / red" />)
 
 storiesOf('Button', module)
     .add('rounded-large-primary', () => (

@@ -30,7 +30,7 @@ const Text: React.SFC<TextProps> = ({
         ...typographyText,
         ...regular,
         color: charcoal,
-        width: 500,
+        display: 'inline-block',
         height: 24
     }
 

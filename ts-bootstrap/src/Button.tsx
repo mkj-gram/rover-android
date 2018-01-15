@@ -131,8 +131,8 @@ class Button extends React.Component<ButtonProps, ButtonState> {
                 innerStyle = {
                     ...innerStyle,
                     color: mouseDown === true ? aquamarine : turquoise,
-                    fontSize: 16,
-                    padding: '2px 0px 2px 0px'
+                    fontSize: 17,
+                    padding: '1px 0px 1px 0px'
                 }
                 outerStyle = {
                     ...outerStyle,
