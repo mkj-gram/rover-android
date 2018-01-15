@@ -7,6 +7,9 @@ steps:
 #    Allows for parallel steps to reuse cache images    #                                                
 # ----------------------------------------------------- #
 
+  - id: 'container-cache-docker-compose-1.16.1'
+    name: 'docker/compose:1.16.1'
+    args: 'version'
 
   - id: 'container-cache-node-7.10.1'
     name: 'node:7.10.1'
@@ -17,12 +20,13 @@ steps:
     entrypoint: 'sh'
 
   - id: 'container-cache-complete'
-    name: 'gcr.io/cloud-builders/go:alpine'
+    name: 'ubuntu'
     entrypoint: 'sh'
     args:
       - '-c'
       - printf "\n\n Container Cache Built ┏(＾0＾)┛┗(＾0＾) ┓\n\n"
     waitFor:
+      - 'container-cache-docker-compose-1.16.1'
       - 'container-cache-node-7.10.1'
       - 'container-cache-node-6.9.1'
 
@@ -68,12 +72,12 @@ steps:
   #     - 'fmt'
 
   # End of Format/Lint stage
-  - name: 'gcr.io/cloud-builders/go:alpine'
+  - id: 'lint-complete'
+    name: 'ubuntu'
     entrypoint: 'sh'
     args:
       - '-c'
       - printf "\n\n Lint Stage Complete ( ͡° ͜ʖ ͡°)\n\n"
-    id: 'lint-complete'
     waitFor:
       - 'fmt'
 
@@ -180,7 +184,7 @@ steps:
 
 # End Install Stage
   - id: 'install-complete'
-    name: 'gcr.io/cloud-builders/go:alpine'
+    name: 'ubuntu'
     entrypoint: 'sh'
     args:
       - '-c'
@@ -205,26 +209,30 @@ steps:
 # Note use a uniq --project-name property so ensure each run does not interfere with others
 
 # Auth Service
-#   - name: 'docker/compose:1.16.1'
-#     args:
-#       - -f
-#       - ./docker/main.docker-compose.yaml
-#       - run
-#       - --volume=/workspace/:/go/src/github.com/roverplatform/rover/
-#       - --workdir=/go/
-#       - --rm
-#       - auth-service
-#       - go
-#       - test
-#       - -tags
-#       - integration
-#       - -v
-#       - ./src/github.com/roverplatform/rover/auth/service/...
-#       - --service.DSN=postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable
-#     id: 'auth-test'
-#     waitFor:
-#       - 'install-complete'
+  - id: 'test-auth-service'
+    name: 'docker/compose:1.16.1'
+    args:
+     - -f 
+     - ./docker/main.docker-compose.yaml 
+     - run 
+     - auth-service
+     - docker/auth-service/cmd 
+     - test
+    waitFor:
+      - 'install-complete'
 
+# Audience Service
+  - id: 'test-audience-service'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -f
+      - ./docker/main.docker-compose.yaml
+      - run
+      - audience-service
+      - docker/audience-service/cmd
+      - test
+    waitFor:
+      - 'install-complete'
 
 # Bulk Gateway
   - id: 'test-bulk-gateway'
@@ -256,17 +264,29 @@ steps:
     waitFor:
       - 'install-complete'
 
+# Clean up the images running. This frees memory from the cloudbuilder server
+  - id: 'test-cleanup-docker-compose'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -f
+      - ./docker/main.docker-compose.yaml
+      - kill
+    waitFor:
+        - 'test-auth-service'
+        - 'test-audience-service'
+        - 'test-bulk-gateway'
+        - 'test-csv-processor-worker'
+        - 'test-segment-service'
+
 # End Test Stage
   - id: 'test-complete'
-    name: 'gcr.io/cloud-builders/go:alpine'
+    name: 'ubuntu'
     entrypoint: 'sh'
     args:
       - '-c'
       - printf "\n\n Test Stage Complete (☞ﾟヮﾟ)☞\n\n"
     waitFor:
-      - 'test-bulk-gateway'
-      - 'test-csv-processor-worker'
-      - 'test-segment-service'
+      - 'test-cleanup-docker-compose'
 
 
 
@@ -517,7 +537,7 @@ steps:
       - 'build-sdk-api-prune'
 
 options:
-  machineType: 'N1_HIGHCPU_8'
+  machineType: 'N1_HIGHCPU_32'
 
 # ----------------------------------------------------- #
 #                       Images                          #
