@@ -1,4 +1,5 @@
 import Alert from './Alert'
+import Badge from './Badge'
 import Button from './Button'
 import ProgressBar from './ProgressBar'
 import ProgressBarThin from './ProgressBarThin'
@@ -8,6 +9,7 @@ import Switch from './Switch'
 
 export {
     Alert,
+    Badge,
     Button,
     ProgressBar,
     ProgressBarThin,
