@@ -6,7 +6,7 @@ RUN mkdir -p /rover/
 
 WORKDIR /rover
 
-COPY ./gopath/bin /rover/bin
+COPY ./audience-service /rover/bin/
 
 # service is configured from ENV vars
 ENTRYPOINT ["/rover/bin/audience-service"]

@@ -6,10 +6,10 @@ RUN mkdir -p /rover/
 
 WORKDIR /rover
 
-COPY ./gopath/bin /rover/bin
+COPY ./audience-segments-worker /rover/bin
 
 # service is configured from ENV vars
-ENTRYPOINT ["/rover/bin/segments-worker"]
+ENTRYPOINT ["/rover/bin/audience-segments-worker"]
 
 # the port service listens on
 EXPOSE 5100

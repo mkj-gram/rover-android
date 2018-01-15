@@ -1,0 +1,559 @@
+steps:
+
+# ----------------------------------------------------- #
+#                   Container Cache                     #
+#                                                       #
+#     Fetch and cache images used to build and test     #   
+#    Allows for parallel steps to reuse cache images    #                                                
+# ----------------------------------------------------- #
+
+  - id: 'container-cache-docker-compose-1.16.1'
+    name: 'docker/compose:1.16.1'
+    args: 'version'
+
+  - id: 'container-cache-node-7.10.1'
+    name: 'node:7.10.1'
+    entrypoint: 'sh'
+
+  - id: 'container-cache-node-6.9.1'
+    name: 'node:6.9.1'
+    entrypoint: 'sh'
+
+  - id: 'container-cache-complete'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - printf "\n\n Container Cache Built ┏(＾0＾)┛┗(＾0＾) ┓\n\n"
+    waitFor:
+      - 'container-cache-docker-compose-1.16.1'
+      - 'container-cache-node-7.10.1'
+      - 'container-cache-node-6.9.1'
+
+# ----------------------------------------------------- #
+#                Formatting & Linting                   #
+#                                                       #
+# Run lint and formatting checkers before installation  #                                                    
+# ----------------------------------------------------- #
+  
+  # TODO turn this into a prebuilt go-fmt container with more
+  # meaningful output
+  - id: 'fmt'
+    name: 'gcr.io/cloud-builders/go:alpine'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        set -x
+        files=$(go fmt ./auth/service ./audience/service)
+            if [[ $? != 0 ]]; then
+                echo "Command failed."
+                exit 1
+            elif [[ $files ]]; then
+                echo $files
+                echo "Files found."
+                exit 1
+            else
+                echo "No files found."
+            fi
+    waitFor:
+      - 'container-cache-complete'
+  # golint
+  # - name: 'gcr.io/cloud-builders/go:alpine'
+  #   entrypoint: 'sh'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       set -x
+  #       go get -u github.com/golang/lint/golint
+  #       golint ./...
+  #   id: 'lint'
+  #   waitFor:
+  #     - 'fmt'
+
+  # End of Format/Lint stage
+  - id: 'lint-complete'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - printf "\n\n Lint Stage Complete ( ͡° ͜ʖ ͡°)\n\n"
+    waitFor:
+      - 'fmt'
+
+
+
+# ----------------------------------------------------- #
+#                    Installation                       #
+#                                                       #
+#  Use this stage to import external packages eg. npm   #                                                    
+# ----------------------------------------------------- #
+
+#  Barcodes Service
+  - id: 'install-barcodes'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'barcodes'
+    waitFor:
+      - 'lint-complete'
+
+# Bulk Gateway
+  - id: 'install-bulk-gateway'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'bulk-gateway'
+    waitFor:
+      - 'lint-complete'
+
+# CSV Processor Worker
+  - id: 'install-csv-processor-worker'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'csv-processor/worker'
+    waitFor:
+      - 'lint-complete'
+
+# GraphQL Gateway
+  - id: 'install-graphql-gateway'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'graphql-gateway'
+    env:
+      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+    waitFor:
+      - 'lint-complete'
+
+# REST Gateway
+  - id: 'install-rest-gateway'
+    name: 'gcr.io/cloud-builders/npm'
+    args:
+      - install
+      - '--silent'
+    dir: 'rest-gateway'
+    waitFor:
+      - 'lint-complete'
+
+# Scheduled Messages Worker
+  - id: 'install-scheduled-messages-worker'
+    name: 'node:6.9.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'scheduled-messages-worker'
+    env:
+      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+    waitFor:
+      - 'lint-complete'
+
+# SDK API
+  - id: 'install-sdk-api'
+    name: 'node:6.9.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'sdk-api'
+    env:
+      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+    waitFor:
+      - 'lint-complete'
+
+# Segment Service
+  - id: 'install-segment-service'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'segment/service'
+    waitFor:
+      - 'lint-complete'
+
+# End Install Stage
+  - id: 'install-complete'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - printf "\n\n Install Stage Complete (ᵔᴥᵔ)\n\n"
+    waitFor:
+      - 'install-barcodes'
+      - 'install-bulk-gateway'
+      - 'install-csv-processor-worker'
+      - 'install-graphql-gateway'
+      - 'install-rest-gateway'
+      - 'install-scheduled-messages-worker'
+      - 'install-sdk-api'
+
+
+# ----------------------------------------------------- #
+#                        Test                           #
+#                                                       #
+#   Run integration & unit tests for all packages       #
+# ----------------------------------------------------- #
+  
+# TODO figure out a clean way to use docker-compose for integration tests
+# Note use a uniq --project-name property so ensure each run does not interfere with others
+
+# Auth Service
+  - id: 'test-auth-service'
+    name: 'docker/compose:1.16.1'
+    args:
+     - -f 
+     - ./docker/main.docker-compose.yaml 
+     - run 
+     - auth-service
+     - docker/auth-service/cmd 
+     - test
+    waitFor:
+      - 'install-complete'
+
+# Audience Service
+  - id: 'test-audience-service'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -f
+      - ./docker/main.docker-compose.yaml
+      - run
+      - audience-service
+      - docker/audience-service/cmd
+      - test
+    waitFor:
+      - 'install-complete'
+
+# Bulk Gateway
+  - id: 'test-bulk-gateway'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - test
+    dir: 'bulk-gateway'
+    waitFor:
+      - 'install-complete'
+
+# CSV Processor
+  - id: 'test-csv-processor-worker'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - test
+    dir: 'csv-processor/worker'
+    waitFor:
+      - 'install-complete'
+  
+# Segment Service
+  - id: 'test-segment-service'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - test
+    dir: 'segment/service'
+    waitFor:
+      - 'install-complete'
+
+# Clean up the images running. This frees memory from the cloudbuilder server
+  - id: 'test-cleanup-docker-compose'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -f
+      - ./docker/main.docker-compose.yaml
+      - kill
+    waitFor:
+        - 'test-auth-service'
+        - 'test-audience-service'
+        - 'test-bulk-gateway'
+        - 'test-csv-processor-worker'
+        - 'test-segment-service'
+
+# End Test Stage
+  - id: 'test-complete'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - printf "\n\n Test Stage Complete (☞ﾟヮﾟ)☞\n\n"
+    waitFor:
+      - 'test-cleanup-docker-compose'
+
+
+
+# ----------------------------------------------------- #
+#                       Build                           #
+#                                                       #
+#   Build all apps into their production docker images  #
+# ----------------------------------------------------- #
+
+# Auth Service
+  - id: 'build-auth-service-executable'
+    name: 'gcr.io/cloud-builders/go:alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/auth-service/auth
+      - github.com/roverplatform/rover/auth/service/cmd/authsvcd
+    waitFor:
+      - 'test-complete'
+
+  - id: 'build-auth-service-container'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - --tag=gcr.io/$PROJECT_ID/auth-service:$REVISION_ID
+      - ./docker/auth-service/
+    waitFor:
+      - 'build-auth-service-executable'
+
+# Audience Service
+  - id: 'build-audience-service-executable'
+    name: 'gcr.io/cloud-builders/go:alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/audience-service/audience-service
+      - github.com/roverplatform/rover/audience/service/cmd/audience-service
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - --tag=gcr.io/$PROJECT_ID/audience-service:$REVISION_ID
+      - docker/audience-service/
+    waitFor:
+      - 'build-audience-service-executable'
+
+# Audience Segments Worker
+  - id: 'build-audience-segments-worker-executable'
+    name: 'gcr.io/cloud-builders/go:alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/audience-segments-worker/audience-segments-worker
+      - github.com/roverplatform/rover/audience/service/cmd/segments-worker
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - --tag=gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID
+      - docker/audience-segments-worker/
+    waitFor:
+      - 'build-audience-segments-worker-executable'
+
+# Barcodes Service
+  - id: 'build-barcodes-prune'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'barcodes'
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/barcodes:$REVISION_ID'
+      - barcodes
+    waitFor:
+      - 'build-barcodes-prune'
+
+# Bulk Gateway
+  
+  - id: 'build-bulk-gateway-prune'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'bulk-gateway'
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
+      - 'bulk-gateway'
+    waitFor:
+      - 'build-bulk-gateway-prune'
+
+# CSV Processor Worker
+  
+  - id: 'build-csv-processor-worker-prune'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'csv-processor/worker'
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/csv-processor-worker:$REVISION_ID'
+      - 'csv-processor/worker'
+    waitFor:
+      - 'build-csv-processor-worker-prune'
+
+# GraphQL Gateway
+
+  # Transpile with babel
+  - id: 'build-graphql-gateway-transpile'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - run
+      - build
+    dir: 'graphql-gateway'
+
+  # Remove all devDependencies
+  - id: 'build-graphql-gateway-prune'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'graphql-gateway'
+    waitFor:
+      - 'build-graphql-gateway-transpile'
+
+  # Build final production image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--tag=gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
+      - 'graphql-gateway'
+    waitFor:
+      - 'build-graphql-gateway-prune'
+
+# REST Gateway
+  - id: 'build-rest-gateway-prune'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'rest-gateway'
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID'
+      - 'rest-gateway'
+    waitFor:
+      - 'build-rest-gateway-prune'
+
+# Segment Service
+  - id: 'build-segment-service-prune'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'segment/service'
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/segment-service:$REVISION_ID'
+      - 'segment/service'
+    waitFor:
+      - 'build-segment-service-prune'
+
+# Scheduled Messages Worker
+  - id: 'build-scheduled-messages-worker-prune'
+    name: 'node:6.9.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'scheduled-messages-worker'
+    env:
+      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/scheduled-messages-worker:$REVISION_ID'
+      - 'scheduled-messages-worker'
+    waitFor:
+      - 'build-scheduled-messages-worker-prune'
+
+# SDK API
+  - id: 'build-sdk-api-prune'
+    name: 'node:6.9.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'sdk-api'
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID'
+      - 'sdk-api'
+    waitFor:
+      - 'build-sdk-api-prune'
+
+options:
+  machineType: 'N1_HIGHCPU_32'
+
+# ----------------------------------------------------- #
+#                       Images                          #
+#                                                       #
+#            Upload any built images to GCR             #
+# ----------------------------------------------------- #
+
+images:
+  - 'gcr.io/$PROJECT_ID/auth-service:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/barcodes:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/csv-processor-worker:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/segment-service:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/scheduled-messages-worker:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID'

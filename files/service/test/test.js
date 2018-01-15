@@ -1,4 +1,4 @@
-const expect = require('Chai').expect
+const expect = require('chai').expect
 const squel = require('squel').useFlavour('postgres')
 const Path = require('path')
 const RoverApis = require('@rover/apis')

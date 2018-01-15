@@ -13,7 +13,7 @@ run() {
 test() {
   go test -tags integration \
     github.com/roverplatform/rover/auth/service/... \
-    -service.DSN=${DB_DSN} \
+    -pg-dsn=${DB_DSN} \
     -service.migrations.dir=./db/migrations/postgres \
     -service.migrations.run true
 }

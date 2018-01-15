@@ -4,8 +4,7 @@ RUN ?= ${DCF} run --rm auth-service
 ROVER ?= github.com/roverplatform/rover
 
 test:
-	echo $$DB_DSN
-	${RUN} go test -tags integration -v ${ROVER}/auth/service/... --service.DSN=$(DB_DSN)
+	${RUN} go test -tags integration -v ${ROVER}/auth/service/...
 
 run:
 	${RUN}
