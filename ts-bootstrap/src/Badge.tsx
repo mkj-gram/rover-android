@@ -12,7 +12,7 @@ const Badge: React.SFC<BadgeProps> = ({ color, style, text }) => {
     let container: React.CSSProperties = {
         ...bold,
         ...typographyText,
-        height: 16,
+        lineHeight: '16px',
         fontSize: 13,
         display: 'inline-block',
         color: color,
