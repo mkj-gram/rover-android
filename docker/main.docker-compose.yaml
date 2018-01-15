@@ -12,7 +12,7 @@ services:
     ports:
       - 27017
     volumes:
-      - ../../rover:/rover
+      - ../:/rover
 
   elastic:
     container_name: elastic5
@@ -21,7 +21,7 @@ services:
       - 9200
       - 9300
     volumes:
-      - ../../rover:/rover
+      - ../:/rover
       - esdata:/usr/share/elasticsearch/data
     environment:
       xpack.monitoring.enabled: "false"
@@ -55,7 +55,7 @@ services:
     depends_on:
       - graphql-gateway
     volumes:
-      - ../../rover:/rover/
+      - ../:/rover/
     working_dir: /rover/react-audience
     command: bash -c "/rover/docker/scripts/wait.sh graphql-gateway:80 -t 60 -- npm install && npm run schema && npm run relay && npm start"
     environment:
@@ -68,7 +68,7 @@ services:
       - elastic
     command: ./docker/audience-service/cmd run
     volumes:
-      - ../../rover:/go/src/github.com/roverplatform/rover
+      - ../:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
@@ -82,7 +82,7 @@ services:
       - postgres
     command: ./docker/auth-service/cmd migrate run
     volumes:
-      - ../../rover:/go/src/github.com/roverplatform/rover
+      - ../:/go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
       DB_DSN: "postgres://postgres:@postgres:5432/authsvc_dev?sslmode=disable"
@@ -93,7 +93,7 @@ services:
     depends_on:
       - graphql-gateway
     volumes:
-      - ../../rover:/rover/
+      - ../:/rover/
     working_dir: /rover/react-campaigns
     command: bash -c "npm install && npm start"
     environment:
@@ -109,7 +109,7 @@ services:
       - "4000:80"
     command: bash -c "npm install && npm run build && npm start"
     volumes:
-      - ../../rover:/rover/
+      - ../:/rover/
     working_dir: /rover/graphql-gateway
     environment:
       AUTH_V1_SERVICE_HOST: auth-service
@@ -123,7 +123,7 @@ services:
       - redis
     command: go run ./geocoder/service/cmd/service/main.go
     volumes:
-      - ../../rover:/go/src/github.com/roverplatform/rover
+      - ../:/go/src/github.com/roverplatform/rover
     environment:
       GEOCODER_SERVICE_GCP_API_KEY: "AIzaSyBNFTti0wKJ3J_FMw1tCpTB4bPyQ8j53bc"
       GEOCODER_SERVICE_REDIS_DSN: "redis://redis:6379/3"
@@ -132,7 +132,7 @@ services:
     image: node:6.9.1
     working_dir: /rover/scheduled-messages-worker
     volumes:
-      - ../../rover:/rover/
+      - ../:/rover/
     depends_on:
       - mongo
       - rabbitmq
@@ -164,7 +164,7 @@ services:
     working_dir: /rover/sdk-api
     ports: ["3100:3100"]
     volumes:
-      - ../../rover:/rover
+      - ../:/rover
     command: bash -c "/rover/docker/scripts/wait.sh rabbitmq:5672 -- npm install && npm run dev"
     environment:
       NODE_ENV: production
