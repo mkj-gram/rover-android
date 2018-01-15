@@ -213,12 +213,14 @@ steps:
   - id: 'test-auth-service'
     name: 'docker/compose:1.16.1'
     args:
-     - -f 
-     - ./docker/main.docker-compose.yaml 
-     - run 
-     - auth-service
-     - docker/auth-service/cmd 
-     - test
+      - -p 
+      - test-auth-service
+      - -f 
+      - ./docker/main.docker-compose.yaml 
+      - run 
+      - auth-service
+      - docker/auth-service/cmd 
+      - test
     waitFor:
       - 'install-complete'
 
@@ -226,6 +228,8 @@ steps:
   - id: 'test-audience-service'
     name: 'docker/compose:1.16.1'
     args:
+      - -p 
+      - test-audience-service
       - -f
       - ./docker/main.docker-compose.yaml
       - run
