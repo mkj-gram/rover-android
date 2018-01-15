@@ -9,7 +9,8 @@ steps:
 
   - id: 'container-cache-docker-compose-1.16.1'
     name: 'docker/compose:1.16.1'
-    args: 'version'
+    args:
+      - 'version'
 
   - id: 'container-cache-node-7.10.1'
     name: 'node:7.10.1'
