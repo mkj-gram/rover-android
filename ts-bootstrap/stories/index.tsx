@@ -47,6 +47,9 @@ storiesOf('Alert', module)
             type="warn"
         />
     ))
+    .add('Error', () => (
+        <Alert message="Lorem ipsum sit dolor amet..." type="error" />
+    ))
 
 storiesOf('Button', module)
     .add('rounded-large-primary', () => (
