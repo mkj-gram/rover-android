@@ -1,13 +1,13 @@
 /// <reference path="../typings/index.d.ts" />
 import * as React from 'react'
 
-import { AlertInfoIcon, AlertWarnIcon } from './Icons'
-import { turquoise, yellow } from '../styles/colors'
+import { AlertInfoIcon, AlertWarnIcon, AlertErrorIcon } from './Icons'
+import { turquoise, yellow, red } from '../styles/colors'
 import { small, text } from '../styles/typography'
 
 interface AlertProps {
     message: string
-    type: 'info' | 'warn' | 'custom'
+    type: 'info' | 'warn' | 'custom' | 'error'
     style?: StringMap<string | number>
 }
 
@@ -27,7 +27,8 @@ const Alert: React.SFC<AlertProps> = ({ message, type, style }) => {
     if (type === 'info') {
         messageStyle = {
             ...messageStyle,
-            borderColor: turquoise
+            borderColor: turquoise,
+            backgroundColor: `${turquoise}10`
         }
     }
 
@@ -36,6 +37,14 @@ const Alert: React.SFC<AlertProps> = ({ message, type, style }) => {
             ...messageStyle,
             borderColor: yellow,
             backgroundColor: `${yellow}10`
+        }
+    }
+
+    if (type === 'error') {
+        messageStyle = {
+            ...messageStyle,
+            borderColor: red,
+            backgroundColor: `${red}10`
         }
     }
 
@@ -52,6 +61,13 @@ const Alert: React.SFC<AlertProps> = ({ message, type, style }) => {
                 return (
                     <AlertWarnIcon
                         fill={yellow}
+                        style={{ marginLeft: 8, marginRight: 8 }}
+                    />
+                )
+            case 'error':
+                return (
+                    <AlertErrorIcon
+                        fill={red}
                         style={{ marginLeft: 8, marginRight: 8 }}
                     />
                 )
