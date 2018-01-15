@@ -1,6 +1,6 @@
 /// <reference path="../typings/index.d.ts"/>
 import * as React from 'react'
-import { cloud, almostWhite } from '../styles/colors'
+import { cloud } from '../styles/colors'
 
 type ProgressBarProps = {
     children?: JSX.Element

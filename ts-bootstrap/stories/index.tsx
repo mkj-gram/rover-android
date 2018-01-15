@@ -1,6 +1,14 @@
 import * as React from 'react'
 
-import { Alert, Text, Button, RadioButton, Switch, ProgressBar } from '../src'
+import {
+    Alert,
+    Text,
+    Button,
+    RadioButton,
+    Switch,
+    ProgressBar,
+    ProgressBarThin
+} from '../src'
 
 import {
     black,
@@ -361,6 +369,20 @@ storiesOf('Progress Bar', module)
             </div>
         </ProgressBar>
     ))
+
+storiesOf('Progress Bar (thin)', module)
+    .add('0%', () => <ProgressBarThin progress={0} />)
+    .add('20%', () => <ProgressBarThin progress={20} />)
+    .add('25%', () => <ProgressBarThin progress={25} />)
+    .add('33%', () => <ProgressBarThin progress={33} />)
+    .add('40%', () => <ProgressBarThin progress={40} />)
+    .add('50%', () => <ProgressBarThin progress={50} />)
+    .add('60%', () => <ProgressBarThin progress={60} />)
+    .add('66%', () => <ProgressBarThin progress={66} />)
+    .add('75%', () => <ProgressBarThin progress={75} />)
+    .add('80%', () => <ProgressBarThin progress={80} />)
+    .add('100%', () => <ProgressBarThin progress={100} />)
+    .add('120%', () => <ProgressBarThin progress={120} />)
 
 storiesOf('RadioButton', module).add('selected and unselected', () => {
     return (
