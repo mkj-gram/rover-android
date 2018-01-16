@@ -9,7 +9,9 @@ import {
     SliderComponent,
     Switch,
     ProgressBar,
-    ProgressBarThin
+    ProgressBarThin,
+    Tab,
+    TabBar
 } from '../src'
 
 import {
@@ -441,6 +443,68 @@ storiesOf('SliderComponent', module).add('slider', () => {
     }
     return <Y />
 })
+interface TState {
+    selected: string
+}
+
+interface TProps {
+    tabs: string[]
+    containerStyle?: React.CSSProperties
+    tabStyle?: {
+        container?: React.CSSProperties
+        selection?: React.CSSProperties
+    }
+}
+
+class T extends React.Component<TProps, TState> {
+    // tslint:disable-next-line:no-any
+    constructor(props: any) {
+        super(props)
+        this.state = {
+            selected: 'one'
+        }
+        this.onClick = this.onClick.bind(this)
+    }
+
+    onClick(selected: string) {
+        this.setState({
+            selected: selected
+        })
+    }
+
+    render() {
+        return (
+            <div
+                style={{
+                    width: 360,
+                    height: 56,
+                    border: '1px solid black'
+                }}
+            >
+                <TabBar containerStyle={this.props.containerStyle}>
+                    {this.props.tabs.map(tab => (
+                        <Tab
+                            val={tab}
+                            selected={this.state.selected}
+                            onClick={this.onClick}
+                            tabStyle={this.props.tabStyle}
+                        />
+                    ))}
+                </TabBar>
+            </div>
+        )
+    }
+}
+
+storiesOf('TabBar', module)
+    .add('3 tabs', () => {
+        let tabs = ['one', 'two', 'three']
+        return <T tabs={tabs} />
+    })
+    .add('2 tabs', () => {
+        let tabs = ['one', 'two']
+        return <T tabs={tabs} />
+    })
 
 storiesOf('Text', module)
     .add('h1', () => <Text text="Header 1" size="h1" />)
