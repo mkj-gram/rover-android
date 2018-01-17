@@ -5,6 +5,7 @@ import {
     Text,
     Badge,
     Button,
+    Dialog,
     RadioButton,
     SliderComponent,
     Switch,
@@ -204,6 +205,25 @@ storiesOf('Colors', module)
                 colorBlock(index, shade, alertPalette[shade])
             )}
         </div>
+    ))
+
+storiesOf('Dialog', module)
+    .add('two buttons', () => (
+        <Dialog
+            buttonPrimaryText="Primary"
+            buttonSecondaryText="Next"
+            primaryOnClick={() => console.log('primary click')}
+            secondaryOnClick={() => console.log('secondary click')}
+        >
+            Publishing this campagin will schedule it for delivery on Jan 8 at
+            3:00 PM America/Toronto. Continue?
+        </Dialog>
+    ))
+    .add('one button', () => (
+        <Dialog buttonPrimaryText="Primary">
+            Publishing this campagin will schedule it for delivery on Jan 8 at
+            3:00 PM America/Toronto. Continue?
+        </Dialog>
     ))
 
 storiesOf('Switch', module)

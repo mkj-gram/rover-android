@@ -16,10 +16,12 @@
         "storybook": "start-storybook -c .storybook -p 6006"
     },
     "dependencies": {
+        "@types/react-responsive": "^3.0.0",
         "react": "16.2.0",
         "react-dev-utils": "4.0.1",
         "react-dom": "16.2.0",
-        "react-rangeslider": "2.2.0"
+        "react-rangeslider": "2.2.0",
+        "react-responsive": "^4.0.3"
     },
     "devDependencies": {
         "@storybook/addon-actions": "3.3.3",
