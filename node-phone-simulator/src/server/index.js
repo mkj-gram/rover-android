@@ -575,7 +575,8 @@ const normalizeBlock = (map, response) => {
         lockStatus: response['lock-status'],
         middle: offset['middle']['value'],
         name: response['name'],
-        opacity: response['opacity'] || 1.0,
+        opacity:
+            typeof response['opacity'] === 'number' ? response['opacity'] : 1.0,
         position: response['position'],
         right: offset['right']['value'],
         rowId: response['row-id'],
