@@ -52,7 +52,7 @@ type Device struct {
 	AccountId int32         `bson:"account_id"`
 	DeviceId  string        `bson:"device_id"`
 
-	ProfileId bson.ObjectId `bson:"profile_id"`
+	ProfileId bson.ObjectId `bson:"profile_id,omitempty"`
 	CreatedAt *time.Time    `bson:"created_at"`
 	UpdatedAt *time.Time    `bson:"updated_at"`
 
