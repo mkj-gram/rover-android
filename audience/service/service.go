@@ -93,27 +93,12 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 	db := s.db.Copy()
 	defer db.Close()
 
-	// TODO: ms-12
-	if r.Ms12 {
-		if r.GetProfileId() != "" {
-			return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: deprecated")
-		}
-
-		// TODO: ms-12: note it returns associated profile
-		var profile, err = db.CreateDevice_Ms12(ctx, r)
-		if err != nil {
-			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice_ms12: %v", err)
-		}
-		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, profile.Id, profile.Identifier)
-		s.notify.deviceCreated(ctx, r.AuthContext.AccountId, profile.Id, r.DeviceId)
-
-		return &audience.CreateDeviceResponse{}, nil
-	}
-
-	if err := db.CreateDevice(ctx, r); err != nil {
+	device, err := db.CreateDevice(ctx, r)
+	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice: %v", err)
 	}
-	s.notify.deviceCreated(ctx, r.AuthContext.AccountId, r.ProfileId, r.DeviceId)
+
+	s.notify.deviceCreated(ctx, device.AccountId, device.Id)
 
 	return &audience.CreateDeviceResponse{}, nil
 }
@@ -123,15 +108,11 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 	db := s.db.Copy()
 	defer db.Close()
 
-	// TODO: use find and modify to avoid DB 2 calls
 	if err := db.UpdateDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevice: %v", err)
 	}
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.UpdateDeviceResponse{}, nil
 }
@@ -154,20 +135,10 @@ func (s *Server) UpdateDeviceCustomAttributes(ctx context.Context, r *audience.U
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceCustomAttributes: %v", err)
 	}
 
-	// TODO: ms-12
-	profileId, profileIdentifier, err := db.GetDeviceProfileIdAndIdentifierById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
-	// NOTE: ms-12: profile attributes get updated as weel
-	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, profileId, profileIdentifier)
 	if schemaUpdated {
-		// since deviceSchema <-> profileSchema is duplicated
-		s.notify.profileSchemaUpdated(ctx, r.AuthContext.AccountId)
-		// TODO: ms-12: disable once changes need to be pushed to the index
-		// s.notify.deviceSchemaUpdated(ctx, r.AuthContext.AccountId)
+		s.notify.deviceSchemaUpdated(ctx, r.AuthContext.AccountId)
 	}
 
 	return &audience.UpdateDeviceCustomAttributesResponse{}, nil
@@ -181,11 +152,8 @@ func (s *Server) UpdateDeviceTestProperty(ctx context.Context, r *audience.Updat
 	if err := db.UpdateDeviceTestProperty(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceTestProperty: %v", err)
 	}
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.UpdateDeviceTestPropertyResponse{}, nil
 }
@@ -201,11 +169,8 @@ func (s *Server) UpdateDeviceLabelProperty(ctx context.Context, r *audience.Upda
 	if err := db.UpdateDeviceLabelProperty(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceLabelProperty: %v", err)
 	}
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.UpdateDeviceLabelPropertyResponse{}, nil
 }
@@ -215,80 +180,43 @@ func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceReque
 	if err := validateID(r.GetDeviceId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
 	}
+
 	db := s.db.Copy()
 	defer db.Close()
-
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
 
 	if err := db.DeleteDevice(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteDevice: %v", err)
 	}
 
-	s.notify.deviceDeleted(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+	s.notify.deviceDeleted(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.DeleteDeviceResponse{}, nil
 }
 
-// SetDeviceProfile implements the corresponding rpc
-func (s *Server) SetDeviceProfile(ctx context.Context, r *audience.SetDeviceProfileRequest) (*audience.SetDeviceProfileResponse, error) {
+func (s *Server) SetDeviceProfileIdentifier(ctx context.Context, r *audience.SetDeviceProfileIdentifierRequest) (*audience.SetDeviceProfileIdentifierResponse, error) {
 	if err := validateID(r.GetDeviceId()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
+	}
+
+	if r.GetProfileIdentifier() == "" {
+		return nil, status.Error(codes.InvalidArgument, "Validation: ProfileIdentifier cannot be blank")
 	}
 
 	db := s.db.Copy()
 	defer db.Close()
 
-	// TODO: ms-12
-	if r.Ms12 {
-		if r.GetProfileId() != "" {
-			return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: deprecated")
-		}
-
-		// TODO: optimize this query out
-		before, err := db.FindDeviceById(ctx, r.DeviceId)
-		if err != nil {
-			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.FindDeviceById: before: %v", err)
-		}
-
-		// to ensure write and consequent read are made on the same node
-		// otherwise the read data may get stale
-		db.SetModeStrong()
-		db.ModeRefresh()
-
-		if err := db.SetDeviceProfile_Ms12(ctx, r); err != nil {
-			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.SetDeviceProfile_Ms12: %v", err)
-		}
-		// TODO: optimize this query out
-		after, err := db.FindDeviceById(ctx, r.DeviceId)
-		if err != nil {
-			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.FindDeviceById: after: %v", err)
-		}
-		// NOTE: profile may get created, so needs a notification
-		// it will eventually be removed
-		s.notify.profileUpdated(ctx, r.AuthContext.AccountId, after.ProfileId, after.ProfileIdentifier)
-		s.notify.deviceProfileIdentifierUpdated(ctx, r.AuthContext.AccountId, before.ProfileIdentifier, after.ProfileIdentifier, r.DeviceId)
-
-		return &audience.SetDeviceProfileResponse{}, nil
-	}
-
-	if err := validateID(r.GetProfileId()); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
-	}
-
-	oldProfileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
+	before, err := db.FindDeviceById(ctx, r.DeviceId)
 	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.FindDeviceById: before: %v", err)
 	}
 
-	if err := db.SetDeviceProfile(ctx, r); err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.SetDeviceProfile: %v", err)
+	if err := db.SetDeviceProfileIdentifier(ctx, r); err != nil {
+		return nil, status.Error(ErrorToStatus(errors.Cause(err)), errors.Cause(err).Error())
 	}
-	s.notify.deviceProfileUpdated(ctx, r.AuthContext.AccountId, oldProfileId, r.ProfileId, r.DeviceId)
 
-	return &audience.SetDeviceProfileResponse{}, nil
+	s.notify.deviceProfileIdentifierUpdated(ctx, r.GetAuthContext().GetAccountId(), before.GetProfileIdentifier(), r.GetProfileIdentifier(), r.GetDeviceId())
+
+	return &audience.SetDeviceProfileIdentifierResponse{}, nil
 }
 
 // UpdateDevicePushToken implements the corresponding rpc
@@ -300,11 +228,7 @@ func (s *Server) UpdateDevicePushToken(ctx context.Context, r *audience.UpdateDe
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevicePushToken: %v", err)
 	}
 
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.UpdateDevicePushTokenResponse{}, nil
 }
@@ -318,11 +242,7 @@ func (s *Server) UpdateDeviceUnregisterPushToken(ctx context.Context, r *audienc
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceUnregisterPushToken: %v", err)
 	}
 
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.UpdateDeviceUnregisterPushTokenResponse{}, nil
 }
@@ -336,11 +256,7 @@ func (s *Server) UpdateDeviceLocation(ctx context.Context, r *audience.UpdateDev
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceLocation: %v", err)
 	}
 
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.UpdateDeviceLocationResponse{}, nil
 }
@@ -353,11 +269,8 @@ func (s *Server) UpdateDeviceGeofenceMonitoring(ctx context.Context, r *audience
 	if err := db.UpdateDeviceGeofenceMonitoring(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceGeofenceMonitoring: %v", err)
 	}
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.UpdateDeviceGeofenceMonitoringResponse{}, nil
 }
@@ -370,57 +283,26 @@ func (s *Server) UpdateDeviceIBeaconMonitoring(ctx context.Context, r *audience.
 	if err := db.UpdateDeviceIBeaconMonitoring(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceIBeaconMonitoring: %v", err)
 	}
-	profileId, err := db.GetDeviceProfileIdById(ctx, r.AuthContext.AccountId, r.DeviceId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetDeviceProfileIdById: %v", err)
-	}
-	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, profileId, r.DeviceId)
+
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
 	return &audience.UpdateDeviceIBeaconMonitoringResponse{}, nil
-}
-
-func (s *Server) ListDevicesByProfileId(ctx context.Context, r *audience.ListDevicesByProfileIdRequest) (*audience.ListDevicesByProfileIdResponse, error) {
-	if err := validateID(r.GetProfileId()); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
-	}
-
-	db := s.db.Copy()
-	defer db.Close()
-
-	if r.Ms12 {
-		return nil, status.Errorf(codes.Unimplemented, "Validation: FindDevicesByProfileId: not implemented")
-	}
-
-	devices, err := db.ListDevicesByProfileId(ctx, r)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileId: %v", err)
-	}
-
-	return &audience.ListDevicesByProfileIdResponse{devices}, nil
 }
 
 func (s *Server) ListDevicesByProfileIdentifier(ctx context.Context, r *audience.ListDevicesByProfileIdentifierRequest) (*audience.ListDevicesByProfileIdentifierResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
 
-	//TODO: ms-12
-	if r.Ms12 {
-		devices, err := db.ListDevicesByProfileIdentifier_ms12(ctx, r)
-		if err != nil {
-			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileIdentifier: %v", err)
-		}
-		return &audience.ListDevicesByProfileIdentifierResponse{devices}, nil
-	}
-
-	if err := validateID(r.GetIdentifier()); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Validation: Identifier: %v", err)
+	if r.GetProfileIdentifier() == "" {
+		return nil, status.Error(codes.InvalidArgument, "Validation: ProfileIdentifier cannot be blank")
 	}
 
 	devices, err := db.ListDevicesByProfileIdentifier(ctx, r)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDevicesByProfileIdentifier: %v", err)
 	}
-	return &audience.ListDevicesByProfileIdentifierResponse{devices}, nil
+
+	return &audience.ListDevicesByProfileIdentifierResponse{Devices: devices}, nil
 }
 
 func (s *Server) GetDeviceSchema(ctx context.Context, r *audience.GetDeviceSchemaRequest) (*audience.GetDeviceSchemaResponse, error) {
@@ -445,6 +327,10 @@ func (s *Server) GetDeviceSchema(ctx context.Context, r *audience.GetDeviceSchem
 func (s *Server) GetProfile(ctx context.Context, r *audience.GetProfileRequest) (*audience.GetProfileResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
+
+	if r.GetIdentifier() == "" && r.GetProfileId() == "" {
+		return nil, status.Error(codes.InvalidArgument, "ProfileIdentifier or ProfileId must be set")
+	}
 
 	p, err := db.GetProfile(ctx, r)
 	if err != nil {
@@ -473,15 +359,19 @@ func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileReq
 }
 
 // DeleteProfile implements the corresponding rpc
-// TODO request should only take in
 func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileRequest) (*audience.DeleteProfileResponse, error) {
 	db := s.db.Copy()
 	defer db.Close()
 
+	if r.GetIdentifier() == "" {
+		return nil, status.Error(codes.InvalidArgument, "Identifier cannot be blank")
+	}
+
 	if err := db.DeleteProfile(ctx, r); err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.DeleteProfile: %v", err)
 	}
-	s.notify.profileDeleted(ctx, r.AuthContext.AccountId, r.ProfileId)
+
+	s.notify.profileDeleted(ctx, r.AuthContext.AccountId, r.GetIdentifier())
 
 	return &audience.DeleteProfileResponse{}, nil
 }
@@ -501,10 +391,15 @@ func (s *Server) GetProfileByDeviceId(ctx context.Context, r *audience.GetProfil
 
 // GetProfileByIdentifier implements the corresponding rpc
 func (s *Server) GetProfileByIdentifier(ctx context.Context, r *audience.GetProfileByIdentifierRequest) (*audience.GetProfileByIdentifierResponse, error) {
+	var (
+		accountId  = r.GetAuthContext().GetAccountId()
+		identifier = r.GetIdentifier()
+	)
+
 	db := s.db.Copy()
 	defer db.Close()
 
-	p, err := db.GetProfileByIdentifier(ctx, r)
+	p, err := db.GetProfileByIdentifier(ctx, accountId, identifier)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.GetProfileByIdentifier: %v", err)
 	}
@@ -525,19 +420,6 @@ func (s *Server) GetProfileSchema(ctx context.Context, r *audience.GetProfileSch
 	return &audience.GetProfileSchemaResponse{p}, nil
 }
 
-// ListProfilesByIdsRequest implements the corresponding rpc
-func (s *Server) ListProfilesByIds(ctx context.Context, r *audience.ListProfilesByIdsRequest) (*audience.ListProfilesByIdsResponse, error) {
-	db := s.db.Copy()
-	defer db.Close()
-
-	ps, err := db.ListProfilesByIds(ctx, r)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListProfilesByIds: %v", err)
-	}
-
-	return &audience.ListProfilesByIdsResponse{ps}, nil
-}
-
 // ListProfilesByIdentifiersRequest implements the corresponding rpc
 func (s *Server) ListProfilesByIdentifiers(ctx context.Context, r *audience.ListProfilesByIdentifiersRequest) (*audience.ListProfilesByIdentifiersResponse, error) {
 	db := s.db.Copy()
@@ -553,12 +435,12 @@ func (s *Server) ListProfilesByIdentifiers(ctx context.Context, r *audience.List
 
 // UpdateProfile implements the corresponding rpc
 func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileRequest) (*audience.UpdateProfileResponse, error) {
-	if err := validateID(r.GetProfileId()); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
-	}
-
 	if err := validateTags(r.GetAttributes()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: tags: %v", err)
+	}
+
+	if r.GetIdentifier() == "" {
+		return nil, status.Error(codes.InvalidArgument, "Validation: identifier cannot be blank")
 	}
 
 	db := s.db.Copy()
@@ -569,32 +451,13 @@ func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileReq
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfile: %v", err)
 	}
 
-	// We need to lookup the profile identifier for new worker
-	profile, err := db.GetProfile(ctx, &audience.GetProfileRequest{AuthContext: r.AuthContext, ProfileId: r.GetProfileId()})
-	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId, profile.Identifier)
+	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.Identifier)
 
 	if schemaUpdated {
 		s.notify.profileSchemaUpdated(ctx, r.AuthContext.AccountId)
 	}
 
 	return &audience.UpdateProfileResponse{}, nil
-}
-
-// UpdateProfileIdentifier implements the corresponding rpc
-func (s *Server) UpdateProfileIdentifier(ctx context.Context, r *audience.UpdateProfileIdentifierRequest) (*audience.UpdateProfileIdentifierResponse, error) {
-	if err := validateID(r.GetProfileId()); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Validation: ProfileId: %v", err)
-	}
-
-	db := s.db.Copy()
-	defer db.Close()
-
-	if err := db.UpdateProfileIdentifier(ctx, r); err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateProfileIdentifier: %v", err)
-	}
-	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.ProfileId, r.Identifier)
-
-	return &audience.UpdateProfileIdentifierResponse{}, nil
 }
 
 //

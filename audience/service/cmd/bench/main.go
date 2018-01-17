@@ -18,15 +18,15 @@ import (
 )
 
 // Example
-// ./bench -rpc-addr=10.47.251.194:5100 -nconn 50 --acct-id 38 --profile-id 57d21747d4f912002d716322
+// ./bench -rpc-addr=10.47.251.194:5100 -nconn 50 --acct-id 38 --profile-identifier bose-qc35
 
 var (
 	rpcAddr = flag.String("rpc-addr", "", "service rpc addr")
 	N       = flag.Int("nconn", 50, "number of concurrent clients")
 	logErrs = flag.Bool("log-errors", false, "log errros")
 
-	accountId = flag.Int("acct-id", 3, "account id")
-	profileId = flag.String("profile-id", "5991f86308104900011bf8ea", "profile id")
+	accountId         = flag.Int("acct-id", 3, "account id")
+	profileIdentifier = flag.String("profile-identifier", "honey", "profile identifier")
 )
 
 func main() {
@@ -39,9 +39,9 @@ func main() {
 		ctx = context.Background()
 	)
 
-	req := &audience.ListDevicesByProfileIdRequest{
-		AuthContext: &auth.AuthContext{AccountId: 3},
-		ProfileId:   *profileId,
+	req := &audience.ListDevicesByProfileIdentifierRequest{
+		AuthContext:       &auth.AuthContext{AccountId: 3},
+		ProfileIdentifier: *profileIdentifier,
 	}
 
 	log.Printf("Starting")
@@ -80,7 +80,7 @@ func main() {
 
 			for {
 				start := time.Now()
-				_, err := client.ListDevicesByProfileId(ctx, req)
+				_, err := client.ListDevicesByProfileIdentifier(ctx, req)
 				dur := time.Now().Sub(start)
 				stats.Lock()
 				stats.N++

@@ -263,3 +263,14 @@
     "null":           null
   }
 }
+
+
+{
+  "account_id": 1,
+  "_id": { "$oid": "5a5d86d00000000000000000" },
+  "identifier": "delete",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": {
+  }
+}

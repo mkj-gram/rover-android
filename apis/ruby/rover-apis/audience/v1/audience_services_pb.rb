@@ -28,11 +28,10 @@ module Rover
           rpc :DeleteProfile, DeleteProfileRequest, DeleteProfileResponse
           # UpdateProfile updates profile with provided subset of attributes
           rpc :UpdateProfile, UpdateProfileRequest, UpdateProfileResponse
-          rpc :UpdateProfileIdentifier, UpdateProfileIdentifierRequest, UpdateProfileIdentifierResponse
           # GetProfileByDeviceId returns a profile which is associated to the device id
           rpc :GetProfileByDeviceId, GetProfileByDeviceIdRequest, GetProfileByDeviceIdResponse
+          # deprecated (use GetProfile)
           rpc :GetProfileByIdentifier, GetProfileByIdentifierRequest, GetProfileByIdentifierResponse
-          rpc :ListProfilesByIds, ListProfilesByIdsRequest, ListProfilesByIdsResponse
           rpc :ListProfilesByIdentifiers, ListProfilesByIdentifiersRequest, ListProfilesByIdentifiersResponse
           # GetProfileSchema returns the currently tracked profiles schema by account id
           rpc :GetProfileSchema, GetProfileSchemaRequest, GetProfileSchemaResponse
@@ -56,10 +55,8 @@ module Rover
           rpc :UpdateDeviceTestProperty, UpdateDeviceTestPropertyRequest, UpdateDeviceTestPropertyResponse
           rpc :UpdateDeviceLabelProperty, UpdateDeviceLabelPropertyRequest, UpdateDeviceLabelPropertyResponse
           # Lists
-          rpc :ListDevicesByProfileId, ListDevicesByProfileIdRequest, ListDevicesByProfileIdResponse
           rpc :ListDevicesByProfileIdentifier, ListDevicesByProfileIdentifierRequest, ListDevicesByProfileIdentifierResponse
-          # SetDeviceProfile sets the profile the device belongs to
-          rpc :SetDeviceProfile, SetDeviceProfileRequest, SetDeviceProfileResponse
+          rpc :SetDeviceProfileIdentifier, SetDeviceProfileIdentifierRequest, SetDeviceProfileIdentifierResponse
           # DeleteDevice deletes device from the database and removes it from any segments
           rpc :DeleteDevice, DeleteDeviceRequest, DeleteDeviceResponse
           # GetDeviceSchema returns description of device attributes

@@ -402,28 +402,6 @@ function deserialize_rover_audience_v1_IsInDynamicSegmentResponse(buffer_arg) {
   return audience_v1_audience_pb.IsInDynamicSegmentResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_rover_audience_v1_ListDevicesByProfileIdRequest(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.ListDevicesByProfileIdRequest)) {
-    throw new Error('Expected argument of type rover.audience.v1.ListDevicesByProfileIdRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_ListDevicesByProfileIdRequest(buffer_arg) {
-  return audience_v1_audience_pb.ListDevicesByProfileIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_audience_v1_ListDevicesByProfileIdResponse(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.ListDevicesByProfileIdResponse)) {
-    throw new Error('Expected argument of type rover.audience.v1.ListDevicesByProfileIdResponse');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_ListDevicesByProfileIdResponse(buffer_arg) {
-  return audience_v1_audience_pb.ListDevicesByProfileIdResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_rover_audience_v1_ListDevicesByProfileIdentifierRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.ListDevicesByProfileIdentifierRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.ListDevicesByProfileIdentifierRequest');
@@ -490,28 +468,6 @@ function deserialize_rover_audience_v1_ListProfilesByIdentifiersResponse(buffer_
   return audience_v1_audience_pb.ListProfilesByIdentifiersResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_rover_audience_v1_ListProfilesByIdsRequest(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.ListProfilesByIdsRequest)) {
-    throw new Error('Expected argument of type rover.audience.v1.ListProfilesByIdsRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_ListProfilesByIdsRequest(buffer_arg) {
-  return audience_v1_audience_pb.ListProfilesByIdsRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_audience_v1_ListProfilesByIdsResponse(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.ListProfilesByIdsResponse)) {
-    throw new Error('Expected argument of type rover.audience.v1.ListProfilesByIdsResponse');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_ListProfilesByIdsResponse(buffer_arg) {
-  return audience_v1_audience_pb.ListProfilesByIdsResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_rover_audience_v1_QueryRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.QueryRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.QueryRequest');
@@ -534,26 +490,26 @@ function deserialize_rover_audience_v1_QueryResponse(buffer_arg) {
   return audience_v1_audience_pb.QueryResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_rover_audience_v1_SetDeviceProfileRequest(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.SetDeviceProfileRequest)) {
-    throw new Error('Expected argument of type rover.audience.v1.SetDeviceProfileRequest');
+function serialize_rover_audience_v1_SetDeviceProfileIdentifierRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.SetDeviceProfileIdentifierRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.SetDeviceProfileIdentifierRequest');
   }
   return new Buffer(arg.serializeBinary());
 }
 
-function deserialize_rover_audience_v1_SetDeviceProfileRequest(buffer_arg) {
-  return audience_v1_audience_pb.SetDeviceProfileRequest.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_rover_audience_v1_SetDeviceProfileIdentifierRequest(buffer_arg) {
+  return audience_v1_audience_pb.SetDeviceProfileIdentifierRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_rover_audience_v1_SetDeviceProfileResponse(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.SetDeviceProfileResponse)) {
-    throw new Error('Expected argument of type rover.audience.v1.SetDeviceProfileResponse');
+function serialize_rover_audience_v1_SetDeviceProfileIdentifierResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.SetDeviceProfileIdentifierResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.SetDeviceProfileIdentifierResponse');
   }
   return new Buffer(arg.serializeBinary());
 }
 
-function deserialize_rover_audience_v1_SetDeviceProfileResponse(buffer_arg) {
-  return audience_v1_audience_pb.SetDeviceProfileResponse.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_rover_audience_v1_SetDeviceProfileIdentifierResponse(buffer_arg) {
+  return audience_v1_audience_pb.SetDeviceProfileIdentifierResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_rover_audience_v1_UpdateDeviceCustomAttributesRequest(arg) {
@@ -820,28 +776,6 @@ function deserialize_rover_audience_v1_UpdateDynamicSegmentTitleResponse(buffer_
   return audience_v1_audience_pb.UpdateDynamicSegmentTitleResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_rover_audience_v1_UpdateProfileIdentifierRequest(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.UpdateProfileIdentifierRequest)) {
-    throw new Error('Expected argument of type rover.audience.v1.UpdateProfileIdentifierRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_UpdateProfileIdentifierRequest(buffer_arg) {
-  return audience_v1_audience_pb.UpdateProfileIdentifierRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_audience_v1_UpdateProfileIdentifierResponse(arg) {
-  if (!(arg instanceof audience_v1_audience_pb.UpdateProfileIdentifierResponse)) {
-    throw new Error('Expected argument of type rover.audience.v1.UpdateProfileIdentifierResponse');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_audience_v1_UpdateProfileIdentifierResponse(buffer_arg) {
-  return audience_v1_audience_pb.UpdateProfileIdentifierResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_rover_audience_v1_UpdateProfileRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.UpdateProfileRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.UpdateProfileRequest');
@@ -918,17 +852,6 @@ var AudienceService = exports.AudienceService = {
     responseSerialize: serialize_rover_audience_v1_UpdateProfileResponse,
     responseDeserialize: deserialize_rover_audience_v1_UpdateProfileResponse,
   },
-  updateProfileIdentifier: {
-    path: '/rover.audience.v1.Audience/UpdateProfileIdentifier',
-    requestStream: false,
-    responseStream: false,
-    requestType: audience_v1_audience_pb.UpdateProfileIdentifierRequest,
-    responseType: audience_v1_audience_pb.UpdateProfileIdentifierResponse,
-    requestSerialize: serialize_rover_audience_v1_UpdateProfileIdentifierRequest,
-    requestDeserialize: deserialize_rover_audience_v1_UpdateProfileIdentifierRequest,
-    responseSerialize: serialize_rover_audience_v1_UpdateProfileIdentifierResponse,
-    responseDeserialize: deserialize_rover_audience_v1_UpdateProfileIdentifierResponse,
-  },
   // GetProfileByDeviceId returns a profile which is associated to the device id
   getProfileByDeviceId: {
     path: '/rover.audience.v1.Audience/GetProfileByDeviceId',
@@ -941,6 +864,7 @@ var AudienceService = exports.AudienceService = {
     responseSerialize: serialize_rover_audience_v1_GetProfileByDeviceIdResponse,
     responseDeserialize: deserialize_rover_audience_v1_GetProfileByDeviceIdResponse,
   },
+  // deprecated (use GetProfile)
   getProfileByIdentifier: {
     path: '/rover.audience.v1.Audience/GetProfileByIdentifier',
     requestStream: false,
@@ -951,17 +875,6 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_GetProfileByIdentifierRequest,
     responseSerialize: serialize_rover_audience_v1_GetProfileByIdentifierResponse,
     responseDeserialize: deserialize_rover_audience_v1_GetProfileByIdentifierResponse,
-  },
-  listProfilesByIds: {
-    path: '/rover.audience.v1.Audience/ListProfilesByIds',
-    requestStream: false,
-    responseStream: false,
-    requestType: audience_v1_audience_pb.ListProfilesByIdsRequest,
-    responseType: audience_v1_audience_pb.ListProfilesByIdsResponse,
-    requestSerialize: serialize_rover_audience_v1_ListProfilesByIdsRequest,
-    requestDeserialize: deserialize_rover_audience_v1_ListProfilesByIdsRequest,
-    responseSerialize: serialize_rover_audience_v1_ListProfilesByIdsResponse,
-    responseDeserialize: deserialize_rover_audience_v1_ListProfilesByIdsResponse,
   },
   listProfilesByIdentifiers: {
     path: '/rover.audience.v1.Audience/ListProfilesByIdentifiers',
@@ -1126,17 +1039,6 @@ var AudienceService = exports.AudienceService = {
     responseDeserialize: deserialize_rover_audience_v1_UpdateDeviceLabelPropertyResponse,
   },
   // Lists
-  listDevicesByProfileId: {
-    path: '/rover.audience.v1.Audience/ListDevicesByProfileId',
-    requestStream: false,
-    responseStream: false,
-    requestType: audience_v1_audience_pb.ListDevicesByProfileIdRequest,
-    responseType: audience_v1_audience_pb.ListDevicesByProfileIdResponse,
-    requestSerialize: serialize_rover_audience_v1_ListDevicesByProfileIdRequest,
-    requestDeserialize: deserialize_rover_audience_v1_ListDevicesByProfileIdRequest,
-    responseSerialize: serialize_rover_audience_v1_ListDevicesByProfileIdResponse,
-    responseDeserialize: deserialize_rover_audience_v1_ListDevicesByProfileIdResponse,
-  },
   listDevicesByProfileIdentifier: {
     path: '/rover.audience.v1.Audience/ListDevicesByProfileIdentifier',
     requestStream: false,
@@ -1148,17 +1050,16 @@ var AudienceService = exports.AudienceService = {
     responseSerialize: serialize_rover_audience_v1_ListDevicesByProfileIdentifierResponse,
     responseDeserialize: deserialize_rover_audience_v1_ListDevicesByProfileIdentifierResponse,
   },
-  // SetDeviceProfile sets the profile the device belongs to
-  setDeviceProfile: {
-    path: '/rover.audience.v1.Audience/SetDeviceProfile',
+  setDeviceProfileIdentifier: {
+    path: '/rover.audience.v1.Audience/SetDeviceProfileIdentifier',
     requestStream: false,
     responseStream: false,
-    requestType: audience_v1_audience_pb.SetDeviceProfileRequest,
-    responseType: audience_v1_audience_pb.SetDeviceProfileResponse,
-    requestSerialize: serialize_rover_audience_v1_SetDeviceProfileRequest,
-    requestDeserialize: deserialize_rover_audience_v1_SetDeviceProfileRequest,
-    responseSerialize: serialize_rover_audience_v1_SetDeviceProfileResponse,
-    responseDeserialize: deserialize_rover_audience_v1_SetDeviceProfileResponse,
+    requestType: audience_v1_audience_pb.SetDeviceProfileIdentifierRequest,
+    responseType: audience_v1_audience_pb.SetDeviceProfileIdentifierResponse,
+    requestSerialize: serialize_rover_audience_v1_SetDeviceProfileIdentifierRequest,
+    requestDeserialize: deserialize_rover_audience_v1_SetDeviceProfileIdentifierRequest,
+    responseSerialize: serialize_rover_audience_v1_SetDeviceProfileIdentifierResponse,
+    responseDeserialize: deserialize_rover_audience_v1_SetDeviceProfileIdentifierResponse,
   },
   // DeleteDevice deletes device from the database and removes it from any segments
   deleteDevice: {

@@ -50,11 +50,11 @@ func (n *serviceNotify) profileDeleted(ctx context.Context, acctId int32, id str
 	})
 }
 
-func (n *serviceNotify) profileUpdated(ctx context.Context, acctId int32, id string, identifier string) {
+func (n *serviceNotify) profileUpdated(ctx context.Context, acctId int32, identifier string) {
 	m := Message{
-		"event":      "updated",
-		"model":      "profile",
-		"id":         id,
+		"event": "updated",
+		"model": "profile",
+
 		"identifier": identifier,
 		"account_id": strconv.Itoa(int(acctId)),
 	}
@@ -62,46 +62,28 @@ func (n *serviceNotify) profileUpdated(ctx context.Context, acctId int32, id str
 	n.Notify(ctx, m)
 }
 
-func (n *serviceNotify) deviceCreated(ctx context.Context, acctId int32, profileId, deviceId string) {
+func (n *serviceNotify) deviceCreated(ctx context.Context, acctId int32, deviceId string) {
 	n.Notify(ctx, Message{
-		"event":     "created",
-		"model":     "device",
-		"device_id": deviceId,
-		// profile_id is used to specify parent document in ES
-		"profile_id": profileId,
+		"event":      "created",
+		"model":      "device",
+		"device_id":  deviceId,
 		"account_id": strconv.Itoa(int(acctId)),
 	})
 }
 
-func (n *serviceNotify) deviceDeleted(ctx context.Context, acctId int32, profileId, deviceId string) {
+func (n *serviceNotify) deviceDeleted(ctx context.Context, acctId int32, deviceId string) {
 	n.Notify(ctx, Message{
-		"event":     "deleted",
-		"model":     "device",
-		"device_id": deviceId,
-		// profile_id is used to specify parent document in ES
-		"profile_id": profileId,
+		"event":      "deleted",
+		"model":      "device",
+		"device_id":  deviceId,
 		"account_id": strconv.Itoa(int(acctId)),
 	})
 }
 
-func (n *serviceNotify) deviceUpdated(ctx context.Context, acctId int32, profileId, deviceId string) {
+func (n *serviceNotify) deviceUpdated(ctx context.Context, acctId int32, deviceId string) {
 	n.Notify(ctx, Message{
-		"event":     "updated",
-		"model":     "device",
-		"device_id": deviceId,
-		// profile_id is used to specify parent document in ES
-		"profile_id": profileId,
-		"account_id": strconv.Itoa(int(acctId)),
-	})
-}
-
-func (n *serviceNotify) deviceProfileUpdated(ctx context.Context, acctId int32, oldProfileId, profileId, deviceId string) {
-	n.Notify(ctx, Message{
-		"event":          "SetDeviceProfile",
-		"model":          "device",
-		"old_profile_id": oldProfileId,
-		// profile_id is used to specify parent document in ES
-		"profile_id": profileId,
+		"event":      "updated",
+		"model":      "device",
 		"device_id":  deviceId,
 		"account_id": strconv.Itoa(int(acctId)),
 	})

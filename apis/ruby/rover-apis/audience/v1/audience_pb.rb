@@ -9,6 +9,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.GetProfileRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :profile_id, :string, 2
+    optional :identifier, :string, 3
   end
   add_message "rover.audience.v1.GetProfileResponse" do
     optional :profile, :message, 1, "rover.audience.v1.Profile"
@@ -22,23 +23,16 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.DeleteProfileRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :profile_id, :string, 2
+    optional :identifier, :string, 3
   end
   add_message "rover.audience.v1.DeleteProfileResponse" do
   end
   add_message "rover.audience.v1.UpdateProfileRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :profile_id, :string, 2
     map :attributes, :string, :message, 5, "rover.audience.v1.ValueUpdates"
+    optional :identifier, :string, 6
   end
   add_message "rover.audience.v1.UpdateProfileResponse" do
-  end
-  add_message "rover.audience.v1.UpdateProfileIdentifierRequest" do
-    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :profile_id, :string, 2
-    optional :identifier, :string, 3
-  end
-  add_message "rover.audience.v1.UpdateProfileIdentifierResponse" do
   end
   add_message "rover.audience.v1.GetProfileByDeviceIdRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
@@ -53,13 +47,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.GetProfileByIdentifierResponse" do
     optional :profile, :message, 1, "rover.audience.v1.Profile"
-  end
-  add_message "rover.audience.v1.ListProfilesByIdsRequest" do
-    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    repeated :profile_ids, :string, 2
-  end
-  add_message "rover.audience.v1.ListProfilesByIdsResponse" do
-    repeated :profiles, :message, 2, "rover.audience.v1.Profile"
   end
   add_message "rover.audience.v1.ListProfilesByIdentifiersRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
@@ -168,28 +155,16 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.DeleteDeviceResponse" do
   end
-  add_message "rover.audience.v1.SetDeviceProfileRequest" do
+  add_message "rover.audience.v1.SetDeviceProfileIdentifierRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
-    optional :profile_id, :string, 3
-    optional :ms12, :bool, 4
-    optional :profile_identifier, :string, 5
+    optional :profile_identifier, :string, 3
   end
-  add_message "rover.audience.v1.SetDeviceProfileResponse" do
-  end
-  add_message "rover.audience.v1.ListDevicesByProfileIdRequest" do
-    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :profile_id, :string, 2
-    optional :ms12, :bool, 4
-  end
-  add_message "rover.audience.v1.ListDevicesByProfileIdResponse" do
-    repeated :devices, :message, 1, "rover.audience.v1.Device"
+  add_message "rover.audience.v1.SetDeviceProfileIdentifierResponse" do
   end
   add_message "rover.audience.v1.ListDevicesByProfileIdentifierRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :identifier, :string, 2
-    optional :ms12, :bool, 4
-    optional :profile_identifier, :string, 5
+    optional :profile_identifier, :string, 2
   end
   add_message "rover.audience.v1.ListDevicesByProfileIdentifierResponse" do
     repeated :devices, :message, 1, "rover.audience.v1.Device"
@@ -696,14 +671,10 @@ module Rover
       DeleteProfileResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteProfileResponse").msgclass
       UpdateProfileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateProfileRequest").msgclass
       UpdateProfileResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateProfileResponse").msgclass
-      UpdateProfileIdentifierRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateProfileIdentifierRequest").msgclass
-      UpdateProfileIdentifierResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateProfileIdentifierResponse").msgclass
       GetProfileByDeviceIdRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileByDeviceIdRequest").msgclass
       GetProfileByDeviceIdResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileByDeviceIdResponse").msgclass
       GetProfileByIdentifierRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileByIdentifierRequest").msgclass
       GetProfileByIdentifierResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileByIdentifierResponse").msgclass
-      ListProfilesByIdsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListProfilesByIdsRequest").msgclass
-      ListProfilesByIdsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListProfilesByIdsResponse").msgclass
       ListProfilesByIdentifiersRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListProfilesByIdentifiersRequest").msgclass
       ListProfilesByIdentifiersResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListProfilesByIdentifiersResponse").msgclass
       GetProfileSchemaRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetProfileSchemaRequest").msgclass
@@ -732,10 +703,8 @@ module Rover
       UpdateDeviceLabelPropertyResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceLabelPropertyResponse").msgclass
       DeleteDeviceRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteDeviceRequest").msgclass
       DeleteDeviceResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteDeviceResponse").msgclass
-      SetDeviceProfileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.SetDeviceProfileRequest").msgclass
-      SetDeviceProfileResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.SetDeviceProfileResponse").msgclass
-      ListDevicesByProfileIdRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDevicesByProfileIdRequest").msgclass
-      ListDevicesByProfileIdResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDevicesByProfileIdResponse").msgclass
+      SetDeviceProfileIdentifierRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.SetDeviceProfileIdentifierRequest").msgclass
+      SetDeviceProfileIdentifierResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.SetDeviceProfileIdentifierResponse").msgclass
       ListDevicesByProfileIdentifierRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDevicesByProfileIdentifierRequest").msgclass
       ListDevicesByProfileIdentifierResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ListDevicesByProfileIdentifierResponse").msgclass
       GetDeviceSchemaRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetDeviceSchemaRequest").msgclass
