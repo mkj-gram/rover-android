@@ -208,23 +208,170 @@ storiesOf('Colors', module)
     ))
 
 storiesOf('Dialog', module)
-    .add('two buttons', () => (
-        <Dialog
-            buttonPrimaryText="Primary"
-            buttonSecondaryText="Next"
-            primaryOnClick={() => console.log('primary click')}
-            secondaryOnClick={() => console.log('secondary click')}
-        >
-            Publishing this campagin will schedule it for delivery on Jan 8 at
-            3:00 PM America/Toronto. Continue?
-        </Dialog>
-    ))
-    .add('one button', () => (
-        <Dialog buttonPrimaryText="Primary">
-            Publishing this campagin will schedule it for delivery on Jan 8 at
-            3:00 PM America/Toronto. Continue?
-        </Dialog>
-    ))
+    .add('two buttons', () => {
+        interface XState {
+            switched: boolean
+        }
+
+        class WholeScreen extends React.Component<{}, XState> {
+            // tslint:disable-next-line:no-any
+            constructor(props: any) {
+                super(props)
+                this.state = {
+                    switched: false
+                }
+                this.toggle = this.toggle.bind(this)
+            }
+            toggle() {
+                this.setState({
+                    switched: !this.state.switched
+                })
+            }
+            render() {
+                return (
+                    <div
+                        id="entire"
+                        style={{
+                            width: '100%',
+                            height: 700,
+                            background: 'blue',
+                            display: 'flex',
+                            justifyContent: 'space-evenly',
+                            alignItems: 'center',
+                            position: 'relative'
+                        }}
+                    >
+                        <div
+                            id="left"
+                            style={{
+                                flex: '1 1 auto',
+                                background: 'white',
+                                margin: '5px 5px 5px 5px',
+                                width: '100%',
+                                height: 690
+                            }}
+                        >
+                            <div
+                                style={{
+                                    height: 30,
+                                    width: 30,
+                                    background: 'yellow'
+                                }}
+                                onClick={() => this.toggle()}
+                            />
+                        </div>
+                        <div
+                            id="right"
+                            style={{
+                                flex: '1 1 auto',
+                                background: 'pink',
+                                margin: '5px 5px 5px 5px',
+                                width: '100%',
+                                height: 690
+                            }}
+                        />
+                        {this.state.switched && (
+                            <Dialog
+                                buttonPrimaryText="Primary"
+                                buttonSecondaryText="Next"
+                                primaryOnClick={() => this.toggle()}
+                                secondaryOnClick={() => this.toggle()}
+                                isOpen={this.state.switched}
+                            >
+                                Publishing this campagin will schedule it for
+                                delivery on Jan 8 at 3:00 PM America/Toronto.
+                                Continue?
+                            </Dialog>
+                        )}
+                        }
+                    </div>
+                )
+            }
+        }
+
+        return <WholeScreen />
+    })
+    .add('one button', () => {
+        interface XState {
+            switched: boolean
+        }
+
+        class WholeScreen extends React.Component<{}, XState> {
+            // tslint:disable-next-line:no-any
+            constructor(props: any) {
+                super(props)
+                this.state = {
+                    switched: false
+                }
+                this.toggle = this.toggle.bind(this)
+            }
+            toggle() {
+                this.setState({
+                    switched: !this.state.switched
+                })
+            }
+            render() {
+                return (
+                    <div
+                        id="entire"
+                        style={{
+                            width: '100%',
+                            height: 700,
+                            background: 'blue',
+                            display: 'flex',
+                            justifyContent: 'space-evenly',
+                            alignItems: 'center',
+                            position: 'relative'
+                        }}
+                    >
+                        <div
+                            id="left"
+                            style={{
+                                flex: '1 1 auto',
+                                background: 'white',
+                                margin: '5px 5px 5px 5px',
+                                width: '100%',
+                                height: 690
+                            }}
+                        >
+                            <div
+                                style={{
+                                    height: 30,
+                                    width: 30,
+                                    background: 'yellow'
+                                }}
+                                onClick={() => this.toggle()}
+                            />
+                        </div>
+                        <div
+                            id="right"
+                            style={{
+                                flex: '1 1 auto',
+                                background: 'pink',
+                                margin: '5px 5px 5px 5px',
+                                width: '100%',
+                                height: 690
+                            }}
+                        />
+                        {this.state.switched && (
+                            <Dialog
+                                buttonPrimaryText="Primary"
+                                primaryOnClick={() => this.toggle()}
+                                isOpen={this.state.switched}
+                            >
+                                Publishing this campagin will schedule it for
+                                delivery on Jan 8 at 3:00 PM America/Toronto.
+                                Continue?
+                            </Dialog>
+                        )}
+                        }
+                    </div>
+                )
+            }
+        }
+
+        return <WholeScreen />
+    })
 
 storiesOf('Switch', module)
     .add('all buttons', () => {
