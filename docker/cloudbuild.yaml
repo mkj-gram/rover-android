@@ -116,10 +116,11 @@ steps:
 
 # REST Gateway
   - id: 'install-rest-gateway'
-    name: 'gcr.io/cloud-builders/npm'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
     args:
       - install
-      - '--silent'
+      - --silent
     dir: 'rest-gateway'
     waitFor:
       - 'lint-complete'
