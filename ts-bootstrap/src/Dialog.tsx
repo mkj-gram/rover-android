@@ -46,7 +46,7 @@ class Dialog extends React.Component<DialogProps, {}> {
 
         let button: React.CSSProperties = {
             display: 'flex',
-            justifyContent: 'space-evenly',
+            justifyContent: 'center',
             alignItems: 'center',
             height: 80,
             width: '100%'
@@ -115,6 +115,11 @@ class Dialog extends React.Component<DialogProps, {}> {
                                         type="secondary"
                                         onClick={secondaryOnClick}
                                         overrideWidth={overRideWidth}
+                                        style={{
+                                            outerStyle: {
+                                                marginRight: 8
+                                            }
+                                        }}
                                     />
                                     <Button
                                         text={buttonPrimaryText}
@@ -122,6 +127,11 @@ class Dialog extends React.Component<DialogProps, {}> {
                                         type="primary"
                                         onClick={primaryOnClick}
                                         overrideWidth={overRideWidth}
+                                        style={{
+                                            outerStyle: {
+                                                marginLeft: 8
+                                            }
+                                        }}
                                     />
                                 </div>
                             )
