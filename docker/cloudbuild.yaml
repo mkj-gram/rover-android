@@ -90,17 +90,6 @@ steps:
 #  Use this stage to import external packages eg. npm   #                                                    
 # ----------------------------------------------------- #
 
-#  Barcodes Service
-  - id: 'install-barcodes'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args:
-      - install
-      - --silent
-    dir: 'barcodes'
-    waitFor:
-      - 'lint-complete'
-
 # Bulk Gateway
   - id: 'install-bulk-gateway'
     name: 'node:7.10.1'
@@ -109,17 +98,6 @@ steps:
       - install
       - --silent
     dir: 'bulk-gateway'
-    waitFor:
-      - 'lint-complete'
-
-# CSV Processor Worker
-  - id: 'install-csv-processor-worker'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args:
-      - install
-      - --silent
-    dir: 'csv-processor/worker'
     waitFor:
       - 'lint-complete'
 
@@ -172,16 +150,6 @@ steps:
     waitFor:
       - 'lint-complete'
 
-# Segment Service
-  - id: 'install-segment-service'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args:
-      - install
-      - --silent
-    dir: 'segment/service'
-    waitFor:
-      - 'lint-complete'
 
 # End Install Stage
   - id: 'install-complete'
@@ -191,9 +159,7 @@ steps:
       - '-c'
       - printf "\n\n Install Stage Complete (ᵔᴥᵔ)\n\n"
     waitFor:
-      - 'install-barcodes'
       - 'install-bulk-gateway'
-      - 'install-csv-processor-worker'
       - 'install-graphql-gateway'
       - 'install-rest-gateway'
       - 'install-scheduled-messages-worker'
@@ -249,25 +215,6 @@ steps:
     waitFor:
       - 'install-complete'
 
-# CSV Processor
-  - id: 'test-csv-processor-worker'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args:
-      - test
-    dir: 'csv-processor/worker'
-    waitFor:
-      - 'install-complete'
-  
-# Segment Service
-  - id: 'test-segment-service'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args:
-      - test
-    dir: 'segment/service'
-    waitFor:
-      - 'install-complete'
 
 # Clean up the images running. This frees memory from the cloudbuilder server
   - id: 'test-cleanup-docker-compose'
@@ -280,8 +227,6 @@ steps:
         - 'test-auth-service'
         - 'test-audience-service'
         - 'test-bulk-gateway'
-        - 'test-csv-processor-worker'
-        - 'test-segment-service'
 
 # End Test Stage
   - id: 'test-complete'
@@ -365,25 +310,6 @@ steps:
     waitFor:
       - 'build-audience-segments-worker-executable'
 
-# Barcodes Service
-  - id: 'build-barcodes-prune'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args: 
-      - prune
-      - --production
-      - --silent
-    dir: 'barcodes'
-    waitFor:
-      - 'test-complete'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '--tag=gcr.io/$PROJECT_ID/barcodes:$REVISION_ID'
-      - barcodes
-    waitFor:
-      - 'build-barcodes-prune'
 
 # Bulk Gateway
   
@@ -406,26 +332,6 @@ steps:
     waitFor:
       - 'build-bulk-gateway-prune'
 
-# CSV Processor Worker
-  
-  - id: 'build-csv-processor-worker-prune'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args: 
-      - prune
-      - --production
-      - --silent
-    dir: 'csv-processor/worker'
-    waitFor:
-      - 'test-complete'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '--tag=gcr.io/$PROJECT_ID/csv-processor-worker:$REVISION_ID'
-      - 'csv-processor/worker'
-    waitFor:
-      - 'build-csv-processor-worker-prune'
 
 # GraphQL Gateway
 
@@ -478,26 +384,6 @@ steps:
       - 'rest-gateway'
     waitFor:
       - 'build-rest-gateway-prune'
-
-# Segment Service
-  - id: 'build-segment-service-prune'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args: 
-      - prune
-      - --production
-      - --silent
-    dir: 'segment/service'
-    waitFor:
-      - 'test-complete'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '--tag=gcr.io/$PROJECT_ID/segment-service:$REVISION_ID'
-      - 'segment/service'
-    waitFor:
-      - 'build-segment-service-prune'
 
 # Scheduled Messages Worker
   - id: 'build-scheduled-messages-worker-prune'
@@ -554,11 +440,8 @@ images:
   - 'gcr.io/$PROJECT_ID/auth-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/barcodes:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/csv-processor-worker:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/segment-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/scheduled-messages-worker:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID'
