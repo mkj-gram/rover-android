@@ -6,6 +6,8 @@ import ProgressBarThin from './ProgressBarThin'
 import RadioButton from './RadioButton'
 import SliderComponent from './SliderComponent'
 import Switch from './Switch'
+import Tab from './Tab'
+import TabBar from './TabBar'
 import Text from './Text'
 
 export {
@@ -17,5 +19,7 @@ export {
     RadioButton,
     SliderComponent,
     Switch,
+    Tab,
+    TabBar,
     Text
 }
