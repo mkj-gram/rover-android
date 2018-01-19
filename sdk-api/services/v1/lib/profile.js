@@ -128,28 +128,9 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
     methods.index = function(profile, devices) {
     }
 
-    methods.findById = function(accountId, profileId, callback) {
-        let request = new RoverApis.audience.v1.Models.GetProfileRequest()
-        request.setAuthContext(buildAuthContext(accountId))
-        request.setProfileId(profileId)
-
-        AudienceClient.getProfile(request, function(err, reply) {
-            if (err) {
-                if (err.code === grpc.status.NOT_FOUND) {
-                    return callback(null, null)
-                }
-
-                return callback(err)
-            }
-
-            let profileProto = reply.getProfile()
-            if (profileProto === null) {
-                return callback(new Error("Was expecting profile in response but got nothing"))
-            }
-
-            let profile = profileFromProto(profileProto)
-            return callback(null, profile)
-        })
+    // deprecated
+    methods.findById = function(accountId, id, callback) {
+        return methods.findByIdentifier(accountId, id, callback)
     }
 
     methods.findByDeviceId = function(accountId, deviceId, callback) {
@@ -177,28 +158,31 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
         })
     }
 
+    
     methods.findByIdentifier = function(accountId, identifier, callback) {
+        if (identifier === null || identifier === undefined || identifier === "") {
+            return callback(null, null)
+        }
 
-        let request = new RoverApis.audience.v1.Models.GetProfileByIdentifierRequest()
+        let request = new RoverApis.audience.v1.Models.GetProfileRequest()
         request.setAuthContext(buildAuthContext(accountId))
         request.setIdentifier(identifier)
 
-        AudienceClient.getProfileByIdentifier(request, function(err, reply) {
+        AudienceClient.getProfile(request, function(err, reply) {
             if (err) {
                 if (err.code === grpc.status.NOT_FOUND) {
                     return callback(null, null)
                 }
+
                 return callback(err)
             }
 
             let profileProto = reply.getProfile()
             if (profileProto === null) {
-                // Really bad!
                 return callback(new Error("Was expecting profile in response but got nothing"))
             }
 
             let profile = profileFromProto(profileProto)
-
             return callback(null, profile)
         })
     }
@@ -220,30 +204,6 @@ module.exports = function(AudienceClient, logger, elasticsearchQueue) {
             let profile = profileFromProto(profileProto)
 
             return callback(null, profile)
-        })
-    }
-
-    methods.createIdentifiedProfile = function(accountId, identifier, callback) {
-        methods.createAnonymousProfile(accountId, function(err, profile) {
-            if (err) {
-                return callback(err)
-            }
-
-            let request = new RoverApis.audience.v1.Models.UpdateProfileIdentifierRequest()
-            request.setAuthContext(buildAuthContext(accountId))
-            request.setIdentifier(identifier)
-            request.setProfileId(profile.id)
-
-            AudienceClient.updateProfileIdentifier(request, function(err, reply) {
-                if (err) {
-                    return callback(err)
-                }
-
-                profile.identifier = identifier
-
-                return callback(null, profile)
-            })
-
         })
     }
 
