@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@rover/apis": "../apis/node",
-    "@rover/audience-service": "../audience/clients/node",
+    "@rover/audience-client": "../audience/clients/node",
     "@rover/auth-client": "../auth/clients/node",
     "@rover-common/grpc-promisify": "../node/grpc-promisify",
     "babel-cli": "^6.22.2",
