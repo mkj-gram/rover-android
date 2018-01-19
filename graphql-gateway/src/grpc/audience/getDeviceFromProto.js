@@ -87,7 +87,7 @@ export default (d) => {
         time_zone: d.getTimeZone()
     }
 
-     return Object.keys(props).map(p => {
+    return Object.keys(props).map(p => {
         return {
             attribute: p,
             selector: 'DEVICE',
