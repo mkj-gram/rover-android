@@ -2,7 +2,6 @@
     "name": "@rover/ts-bootstrap",
     "version": "0.1.0",
     "description": "Rover's TypeScript Web Component Library",
-    "private": true,
     "authors": [
         "Sean Rucker <sean@rover.io> (https://github.com/seanrucker",
         "Alex Graham <alex@rover.io> (https://github.com/alexjgraham",
@@ -38,5 +37,8 @@
         "typescript": "2.5.3",
         "ts-loader": "3.2.0",
         "webpack": "3.10.0"
-    }
+    },
+    "main": "src/index.tsx",
+    "author": "",
+    "license": "ISC"
 }
