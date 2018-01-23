@@ -2,7 +2,14 @@
 import * as React from 'react'
 
 import { AlertInfoIcon, AlertWarnIcon, AlertErrorIcon } from './Icons'
-import { turquoise, yellow, red } from '../styles/colors'
+import {
+    turquoise,
+    yellow,
+    red,
+    palefoam,
+    paleyellow,
+    palered
+} from '../styles/colors'
 import { small, text } from '../styles/typography'
 
 interface AlertProps {
@@ -28,7 +35,7 @@ const Alert: React.SFC<AlertProps> = ({ message, type, style }) => {
         messageStyle = {
             ...messageStyle,
             borderColor: turquoise,
-            backgroundColor: `${turquoise}10`
+            backgroundColor: palefoam
         }
     }
 
@@ -36,7 +43,7 @@ const Alert: React.SFC<AlertProps> = ({ message, type, style }) => {
         messageStyle = {
             ...messageStyle,
             borderColor: yellow,
-            backgroundColor: `${yellow}10`
+            backgroundColor: paleyellow
         }
     }
 
@@ -44,7 +51,7 @@ const Alert: React.SFC<AlertProps> = ({ message, type, style }) => {
         messageStyle = {
             ...messageStyle,
             borderColor: red,
-            backgroundColor: `${red}10`
+            backgroundColor: palered
         }
     }
 

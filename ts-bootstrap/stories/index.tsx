@@ -29,7 +29,10 @@ import {
     turquoise,
     aquamarine,
     foam,
-    paleblue,
+    palered,
+    paleyellow,
+    palegreen,
+    palefoam,
     beige,
     red,
     yellow,
@@ -147,7 +150,10 @@ const campaignPalette: StringMap<string> = {
     turquoise,
     aquamarine,
     foam,
-    paleblue,
+    palered,
+    paleyellow,
+    palegreen,
+    palefoam,
     beige
 }
 const alertPalette: StringMap<string> = {
@@ -528,7 +534,7 @@ storiesOf('Progress Bar', module)
                 barStyle: {
                     height: 16,
                     borderRadius: 8,
-                    backgroundColor: paleblue
+                    backgroundColor: palefoam
                 }
             }}
         >
