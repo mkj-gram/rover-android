@@ -17,11 +17,15 @@
     },
     "dependencies": {
         "@types/react-responsive": "3.0.0",
+        "@types/reactstrap": "^5.0.10",
+        "bootstrap": "4.0.0-beta.3",
         "react": "16.2.0",
         "react-dev-utils": "4.0.1",
         "react-dom": "16.2.0",
+        "react-popover": "0.5.4",
         "react-rangeslider": "2.2.0",
-        "react-responsive": "4.0.3"
+        "react-responsive": "4.0.3",
+        "reactstrap": "5.0.0-alpha.4"
     },
     "devDependencies": {
         "@storybook/addon-actions": "3.3.3",

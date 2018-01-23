@@ -12,8 +12,8 @@ import {
 import { text as typographyText, semibold } from '../styles/typography'
 
 type propStyle = {
-    innerStyle?: StringMap<string | number>
-    outerStyle?: StringMap<string | number>
+    innerStyle?: React.CSSProperties
+    outerStyle?: React.CSSProperties
 }
 
 interface ButtonProps {
@@ -62,12 +62,12 @@ class Button extends React.Component<ButtonProps, ButtonState> {
 
         const { mouseDown } = this.state
 
-        let outerStyle: StringMap<string | number> = {
+        let outerStyle: React.CSSProperties = {
             borderRadius: 5,
             textAlign: 'center',
             display: 'inline-block'
         }
-        let innerStyle: StringMap<string | number> = {
+        let innerStyle: React.CSSProperties = {
             ...typographyText,
             ...semibold,
             color: 'white'
