@@ -21,8 +21,7 @@ const notification = new GraphQLInterfaceType({
     fields: () => ({
         notificationBody: {
             type: new GraphQLNonNull(GraphQLString),
-            description: 'Text body of the notification',
-            resolve: obj => obj.notificationBody
+            description: 'Text body of the notification'
         },
         notificationTitle: {
             type: GraphQLString,

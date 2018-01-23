@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { cloud } from '../styles/colors'
 
-type ProgressBarProps = {
+export type ProgressBarProps = {
     children?: JSX.Element
     progress: number
     style: {

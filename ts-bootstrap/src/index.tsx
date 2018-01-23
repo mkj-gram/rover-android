@@ -47,6 +47,16 @@ import {
     small
 } from '../styles/typography'
 
+import {
+    AlertErrorIcon,
+    AlertInfoIcon,
+    AlertWarnIcon,
+    CalendarIcon,
+    LinkIcon,
+    PhoneIcon,
+    ZapIcon
+} from './Icons'
+
 export {
     aquamarine,
     almostWhite,
@@ -82,5 +92,12 @@ export {
     Switch,
     Tab,
     TabBar,
-    Text
+    Text,
+    AlertErrorIcon,
+    AlertInfoIcon,
+    AlertWarnIcon,
+    CalendarIcon,
+    LinkIcon,
+    PhoneIcon,
+    ZapIcon
 }

@@ -6,7 +6,7 @@ import Button from './Button'
 import { white } from '../styles/colors'
 import { text, medium } from '../styles/typography'
 
-interface DialogProps {
+export interface DialogProps {
     children?: string
     buttonPrimaryText: string
     buttonSecondaryText?: string

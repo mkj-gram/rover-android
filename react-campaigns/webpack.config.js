@@ -12,20 +12,20 @@ module.exports = {
         publicPath: '/campaigns/'
     },
     resolve: {
-        extensions: [".ts", ".tsx", ".js"]
+        extensions: ['.tsx', '.js', '.ts']
     },
     module: {
         rules: [
             {
-                test: /\.(ts|tsx)$/,
+                test: /\.ts|\.tsx$/,
                 enforce: 'pre',
                 loader: 'tslint-loader',
-                exclude: /node_modules/
+                include: [path.resolve(__dirname, 'src')]
             },
             {
-                test: /\.(ts|tsx)$/,
+                test: /\.ts|\.tsx$/,
                 loader: 'ts-loader',
-                exclude: /node_modules/
+                include: [path.resolve(__dirname, 'src')]
             },
             {
                 test: /\.css$/,
@@ -46,9 +46,9 @@ module.exports = {
             template: 'index.html'
         }),
         new webpack.DefinePlugin({
-          'process.env': {
-            NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production')
-          }
+            'process.env': {
+                NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production')
+            }
         }),
         new UglifyJSPlugin()
     ],

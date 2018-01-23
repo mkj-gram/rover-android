@@ -85,7 +85,7 @@ services:
       - ../:/go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
-      CAMPAIGNS_DB_DSN: "postgres://postgres:@postgres:5432/authsvc_dev?sslmode=disable"
+      DB_DSN: "postgres://postgres:@postgres:5432/authsvc_dev?sslmode=disable"
       MIGRATION_DIR: ./auth/service/db/migrations/postgres
 
   campaigns-service:

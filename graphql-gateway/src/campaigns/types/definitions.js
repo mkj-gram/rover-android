@@ -63,7 +63,7 @@ export const scheduledType = new GraphQLEnumType({
     name: 'ScheduledType',
     values: {
         SCHEDULED_TYPE_UNKNOWN: {},
-        SCHEDULED_TYPE_NO: {},
+        SCHEDULED_TYPE_NOW: {},
         SCHEDULED_TYPE_SCHEDULED: {}
     }
 })
@@ -71,7 +71,7 @@ export const scheduledType = new GraphQLEnumType({
 export const segmentCondition = new GraphQLEnumType({
     name: 'SegmentCondition',
     values: {
-        ANY: {},
-        ALL: {}
+        SEGMENT_CONDITION_ANY: {},
+        SEGMENT_CONDITION_ALL: {}
     }
 })

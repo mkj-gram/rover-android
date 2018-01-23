@@ -5,13 +5,13 @@ import { titanium, turquoise, white, steel } from '../styles/colors'
 
 import { text as typographyText, bold } from '../styles/typography'
 
-type propStyle = {
+export type propStyle = {
     innerStyle?: StringMap<string | number>
     outerStyle?: StringMap<string | number>
     textStyle?: StringMap<string | number>
 }
 
-interface SwitchProps {
+export interface SwitchProps {
     on?: boolean
     text?: string
     style?: propStyle

@@ -61,6 +61,8 @@ export default c => ({
     automatedUseLocalDeviceTime: c.getAutomatedUseLocalDeviceTime(),
     automatedEventName: c.getAutomatedEventName(),
     automatedFrequencySingleUse: c.getAutomatedFrequencySingleUse(),
-    segmentCondition: c.getSegmentCondition(),
+    segmentCondition: grpcEnumMap(
+        RoverApis.campaigns.v1.Models.SegmentCondition
+    )[c.getSegmentCondition()],
     segmentIds: c.getSegmentIdsList(seg => map(seg.getSegmentId))
 })

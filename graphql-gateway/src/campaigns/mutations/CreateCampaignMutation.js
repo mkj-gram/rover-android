@@ -20,7 +20,7 @@ const CreateCampaignMutation = {
         const request = new RoverApis.campaigns.v1.Models.CreateRequest()
         request.setAuthContext(authContext)
         request.setName(name)
-        request.setCampaignType(1)
+        request.setCampaignType(2)
         const response = await campaignsClient.create(request)
 
         const campaign = response.getCampaign()

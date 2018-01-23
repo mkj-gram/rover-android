@@ -5,7 +5,7 @@ import { turquoise, cloud, silver } from '../styles/colors'
 
 import Slider from 'react-rangeslider'
 
-interface SliderProps {
+export interface SliderProps {
     min: number
     max: number
     value: number

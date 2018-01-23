@@ -7,11 +7,10 @@ export default combineReducers({
     campaigns
 })
 
-export const getCampaign = (state: State, id: string) => 
-    campaignsSelector.getCampaign(state.Campaigns, id)
+export const getCampaign = (state: State, id: string) =>
+    campaignsSelector.getCampaign(state.campaigns, id)
 
-export const getAllCampaigns = (state: State) =>
-    campaignsSelector.getAllCampaigns(state.Campaigns)
+export const getAllCampaigns = (state: State) => campaignsSelector.getAllCampaigns(state.campaigns)
 
 export const getFilteredCampaigns = (state: State, filter: CampaignStatus) =>
-    campaignsSelector.getFilteredCampaigns(state.Campaigns, filter)
+    campaignsSelector.getFilteredCampaigns(state.campaigns, filter)

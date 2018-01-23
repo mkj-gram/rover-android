@@ -13,7 +13,8 @@
             "build-storybook -c .storybook -o firebase && cp firebase/index.html firebase/storybook.html && cp firebase/index-temp.html firebase/index.html",
         "compile": "tsc stories/index.tsx --outDir firebase --jsx react",
         "lint": "tslint -c tslint.json './**/*.tsx'",
-        "storybook": "start-storybook -c .storybook -p 6006"
+        "storybook": "start-storybook -c .storybook -p 6006",
+        "transpile": "tsc"
     },
     "dependencies": {
         "@types/react-responsive": "3.0.0",

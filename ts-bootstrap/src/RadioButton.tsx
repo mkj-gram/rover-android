@@ -2,13 +2,13 @@
 import * as React from 'react'
 import { silver, turquoise } from '../styles/colors'
 
-type propStyle = {
+export type propStyle = {
     innerStyle?: StringMap<string | number>
     outerStyle?: StringMap<string | number>
     containerStyle?: StringMap<string | number>
 }
 
-interface RadioButtonProps {
+export interface RadioButtonProps {
     selected: boolean
     style?: propStyle
 }

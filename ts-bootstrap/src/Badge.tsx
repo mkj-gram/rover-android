@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { bold, text as typographyText } from '../styles/typography'
 
-interface BadgeProps {
+export interface BadgeProps {
     color: string
     text: string
     style?: React.CSSProperties

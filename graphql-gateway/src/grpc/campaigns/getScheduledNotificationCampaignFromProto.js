@@ -53,6 +53,8 @@ export default c => ({
     deliveryStatus: grpcEnumMap(
         RoverApis.campaigns.v1.Models.ScheduledDeliveryStatus
     )[c.getScheduledDeliveryStatus],
-    segmentCondition: c.getSegmentCondition(),
+    segmentCondition: grpcEnumMap(
+        RoverApis.campaigns.v1.Models.SegmentCondition
+    )[c.getSegmentCondition()],
     segmentIds: c.getSegmentIdsList(seg => map(seg.getSegmentId))
 })
