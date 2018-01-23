@@ -110,13 +110,19 @@ module.exports = function(callback) {
 
 
     
-
+    const retryify = require("@rover-common/grpc-retryify")
+  
     /*
         Setup Clients
     */
     const CsvProcessorClient = require("@rover/csv-processor-client").v1.Client()
     const FilesClient = require("@rover/files-client").v1.Client()
     const SegmentClient = require("@rover/segment-client").v1.Client()
+
+    /*
+        retryify clients
+    */
+    retryify(FilesClient)
 
     const Uploader = require('../lib/uploader')
     const UploaderClient = new Uploader(
