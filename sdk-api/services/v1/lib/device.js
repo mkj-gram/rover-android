@@ -277,6 +277,7 @@ module.exports = function(AudienceClient, logger) {
 	methods.deviceToProto = function(device) {
 		let dp = new RoverApis.audience.v1.Models.Device()
 
+		dp.setDeviceId(device.id)
 		dp.setAccountId(device.account_id)
 		dp.setProfileId(device.profile_id)
 		dp.setUpdatedAt(RoverApis.Helpers.timestampToProto(device.updated_at))
