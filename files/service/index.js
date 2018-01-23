@@ -99,13 +99,17 @@ async.parallel(tasks, function(err, results) {
 
 
     // We are healthy and alive once the grpc server starts
-    HealthCheckServer.on('readiness', function() {
-        return true
+    HealthCheckServer.on('readiness', function(callback) {
+        // Always say we are ready to accept connections
+        return callback(null)
     })
 
 
-    HealthCheckServer.on('liveliness', function() {
-        return true
+    HealthCheckServer.on('liveliness', function(callback) {
+        // ping postgres to check if the connection is still alive
+        PGClient.query('SELECT NOW()', (err, res) => {
+            return callback(err)
+        })
     })
 
     function gracefulShutdown() {

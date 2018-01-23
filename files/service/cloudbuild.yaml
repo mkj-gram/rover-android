@@ -1,7 +1,11 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
+
+- name: 'node:6.9.1'
+  entrypoint: 'npm'
   args: ['install']
   dir: 'files/service'
+
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/files-service:$REVISION_ID', 'files/service']
+
 images: ['gcr.io/$PROJECT_ID/files-service:$REVISION_ID']
