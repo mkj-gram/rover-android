@@ -17,6 +17,7 @@
     "@rover/files-client": "../files/clients/node",
     "@rover/segment-client": "../segment/clients/node",
     "@rover-common/grpc-promisify": "../node/grpc-promisify",
+    "@rover-common/grpc-retryify": "../node/grpc-retryify",
     "async": "^2.1.5",
     "body-parser": "^1.17.2",
     "confidence": "^3.0.2",
