@@ -38,6 +38,16 @@ function retryableError(err) {
 function retryify(client) {
     Object.keys(Object.getPrototypeOf(client)).forEach(functionName => {
         const originalFunction = client[functionName]
+        const genericFunctionSelector = (originalFunction.requestStream ? 2 : 0) | (originalFunction.responseStream ? 1 : 0)
+
+        // Only wrap unary request, response
+        // 0 Unary
+        // 1 ServerStream
+        // 2 ClientStream
+        // 3 BiStream
+        if (genericFunctionSelector != 0) {
+            return
+        }
 
         client[functionName] = (...args) => {
             let callOpts = args[1]
