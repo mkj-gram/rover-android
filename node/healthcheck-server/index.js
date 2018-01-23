@@ -79,32 +79,35 @@ HealthCheckServer.prototype._clearConditionals = function() {
 
 HealthCheckServer.prototype._handleRequest = function(req, res) {
     if (req.url === '/readiness') {
-        let isReady = this._checkConditionals('readiness')
-        res.writeHead(isReady == true ? 200 : 404)
+        this._checkConditionals('readiness', function(err) {
+            res.writeHead(err === null || err === undefined ? 200 : 404)
+            return res.end()
+        })
+        
     } else if (req.url === '/liveliness') {
-        let isAlive = this._checkConditionals('liveliness')
-        res.writeHead(isAlive == true ? 200 : 404)
+        this._checkConditionals('liveliness', function(err) {
+            res.writeHead(err === null || err === undefined ? 200 : 404)
+            return res.end()
+        })
     } else {
         res.writeHead(404)
+        return res.end()
     }
-
-    return res.end()
 };
 
 
-HealthCheckServer.prototype._checkConditionals = function(name) {
+HealthCheckServer.prototype._checkConditionals = function(name, cb) {
     let conditionalFunctions = this._conditionals[name]
 
-    var passed = true
-
-    for (var i = 0; i < conditionalFunctions.length; i++) {
-        let func = conditionalFunctions[i]
-        if (func() !== true) {
-            passed = false
-            break
+    // Check each conditional function one by one. Break checks early if a callback returns an error
+    conditionalFunctions.reduceRight(function(chain, fn) {
+        return function(err) {
+            if (err !== null && err !== undefined) {
+                return cb(err) 
+            }
+            return fn(chain)
         }
-    }
-    return passed
+    }, cb)()
 };
 
 module.exports = HealthCheckServer

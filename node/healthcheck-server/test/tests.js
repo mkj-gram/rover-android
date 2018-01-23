@@ -50,8 +50,8 @@ describe('readiness', function() {
 
     it('should return 404 when readiness fails', function(done) {
         
-        server.on('readiness', function() {
-            return false
+        server.on('readiness', function(cb) {
+            return cb(false)
         })
 
         request.get(testUrl, function (err, res, body){
@@ -63,8 +63,8 @@ describe('readiness', function() {
 
     it('should return 200 when readiness passes', function(done) {
         
-        server.on('readiness', function() {
-            return true
+        server.on('readiness', function(cb) {
+            return cb()
         })
 
         request.get(testUrl, function (err, res, body){
@@ -76,16 +76,16 @@ describe('readiness', function() {
 
     it('should return 404 when at least one readiness fails', function(done) {
         
-        server.on('readiness', function() {
-            return true
+        server.on('readiness', function(cb) {
+            return cb()
         })
 
-        server.on('readiness', function() {
-            return false
+        server.on('readiness', function(cb) {
+            return cb(false)
         })
 
-        server.on('readiness', function() {
-            return true
+        server.on('readiness', function(cb) {
+            return cb()
         })
 
         request.get(testUrl, function (err, res, body){
@@ -119,8 +119,8 @@ describe('liveliness', function() {
 
     it('should return 404 when liveliness fails', function(done) {
         
-        server.on('liveliness', function() {
-            return false
+        server.on('liveliness', function(cb) {
+           return cb(false)
         })
 
         request.get(testUrl, function (err, res, body){
@@ -132,8 +132,8 @@ describe('liveliness', function() {
 
     it('should return 200 when liveliness passes', function(done) {
         
-        server.on('liveliness', function() {
-            return true
+        server.on('liveliness', function(cb) {
+            return cb()
         })
 
         request.get(testUrl, function (err, res, body){
@@ -145,16 +145,16 @@ describe('liveliness', function() {
 
     it('should return 404 when at least one liveliness fails', function(done) {
         
-        server.on('liveliness', function() {
-            return true
+        server.on('liveliness', function(cb) {
+            return cb()
         })
 
-        server.on('liveliness', function() {
-            return false
+        server.on('liveliness', function(cb) {
+            return cb(false)
         })
 
-        server.on('liveliness', function() {
-            return true
+        server.on('liveliness', function(cb) {
+            return cb()
         })
 
         request.get(testUrl, function (err, res, body){
