@@ -87,9 +87,16 @@ func IsInDynamicSegment(segment *audience.DynamicSegment, device *audience.Devic
 		}
 	}
 
-	// Everything must have passed here
-	return true, nil
-
+	switch condition {
+	case audience.PredicateAggregate_ANY:
+		// Got here due to all predicates returning false. The loop did not break early
+		return false, nil
+	case audience.PredicateAggregate_ALL:
+		// Got here due to all predicates returning true. The loop did not break early
+		return true, nil
+	default:
+		return false, nil
+	}
 }
 
 // Helper method to pull out the attribute name from the predicate
@@ -154,6 +161,8 @@ func getProfileValue(profile *audience.Profile, attribute_name string) interface
 
 func getDeviceValue(device *audience.Device, attribute_name string) interface{} {
 	switch attribute_name {
+	case "device_id":
+		return device.GetDeviceId()
 	case "created_at":
 		return device.GetCreatedAt()
 	case "updated_at":

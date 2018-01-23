@@ -4,6 +4,9 @@ var (
 	DeviceSchema = map[string]struct {
 		MissingValue interface{}
 	}{
+		"device_id": {
+			MissingValue: "",
+		},
 		"advertising_id": {
 			MissingValue: "",
 		},

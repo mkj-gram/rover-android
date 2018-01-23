@@ -1844,6 +1844,74 @@ func testPredicates_ComplexPredicates(t *testing.T) {
 		expErr error
 	}{
 		{
+			name: "returns false when condition is ANY and all predicates return false",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ANY,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									AttributeName: "device_id",
+									Op:            audience.StringPredicate_STARTS_WITH,
+									Value:         "xjj",
+								},
+							},
+						},
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									AttributeName: "device_id",
+									Op:            audience.StringPredicate_STARTS_WITH,
+									Value:         "opp",
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: nil,
+			device:  d,
+			exp:     false,
+			expErr:  nil,
+		},
+		{
+			name: "returns true when condition is ALL and all predicates return true",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									AttributeName: "device_id",
+									Op:            audience.StringPredicate_STARTS_WITH,
+									Value:         "a",
+								},
+							},
+						},
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									AttributeName: "device_id",
+									Op:            audience.StringPredicate_STARTS_WITH,
+									Value:         "ab",
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: nil,
+			device:  d,
+			exp:     true,
+			expErr:  nil,
+		},
+		{
 			name: "device is located at RoverHQ and its profile's first-name starts with bill",
 			segment: &audience.DynamicSegment{
 				PredicateAggregate: &audience.PredicateAggregate{
