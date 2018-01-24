@@ -346,9 +346,10 @@ const PredicateList = ({
     }
 
     const clearAllStyle = {
-        position: 'absolute',
-        right: 40,
+        display: 'flex',
+        justifyContent: 'flex-end',
         marginTop: 10,
+        marginRight: 10,
         ...text,
         fontSize: 12,
         color: lavender,
