@@ -11,3 +11,8 @@ declare module 'react-rangeslider' {
     var a: any
     export default a
 }
+
+declare module 'react-travel' {
+    var a: any
+    export default a
+}

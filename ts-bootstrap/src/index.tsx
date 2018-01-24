@@ -3,7 +3,7 @@ import Badge from './Badge'
 import Button from './Button'
 import Dialog from './Dialog'
 import NavBar from './NavBar'
-import PopoverComponent from './PopoverComponent'
+import Popover from './Popover'
 import ProgressBar from './ProgressBar'
 import ProgressBarThin from './ProgressBarThin'
 import RadioButton from './RadioButton'
@@ -19,7 +19,7 @@ export {
     Button,
     Dialog,
     NavBar,
-    PopoverComponent,
+    Popover,
     ProgressBar,
     ProgressBarThin,
     RadioButton,

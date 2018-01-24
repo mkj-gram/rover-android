@@ -10,22 +10,22 @@
     ],
     "scripts": {
         "build-storybook": "build-storybook",
-        "build-storybook-firebase": "build-storybook -c .storybook -o firebase && cp firebase/index.html firebase/storybook.html && cp firebase/index-temp.html firebase/index.html",
+        "build-storybook-firebase":
+            "build-storybook -c .storybook -o firebase && cp firebase/index.html firebase/storybook.html && cp firebase/index-temp.html firebase/index.html",
         "compile": "tsc stories/index.tsx --outDir firebase --jsx react",
         "lint": "tslint -c tslint.json './**/*.tsx'",
         "storybook": "start-storybook -c .storybook -p 6006"
     },
     "dependencies": {
         "@types/react-responsive": "3.0.0",
-        "@types/reactstrap": "^5.0.10",
-        "bootstrap": "4.0.0-beta.3",
+        "popper.js": "^1.12.9",
         "react": "16.2.0",
         "react-dev-utils": "4.0.1",
         "react-dom": "16.2.0",
-        "react-popover": "0.5.4",
+        "react-popper": "0.7.4",
         "react-rangeslider": "2.2.0",
         "react-responsive": "4.0.3",
-        "reactstrap": "5.0.0-alpha.4"
+        "react-travel": "^1.3.5"
     },
     "devDependencies": {
         "@storybook/addon-actions": "3.3.3",

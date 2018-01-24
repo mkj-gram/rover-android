@@ -36,7 +36,7 @@ class NavBar extends React.Component<NavBarProps, {}> {
     componentDidUpdate() {
         if (this.props.id) {
             this.props.getElement(
-                (document.getElementsByClassName('popover')[0] as HTMLElement)
+                (document.getElementsByClassName('popper')[0] as HTMLElement)
                     .dataset.placement,
                 document.getElementById(this.props.id).style.height
             )

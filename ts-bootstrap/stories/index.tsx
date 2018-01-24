@@ -1,5 +1,5 @@
 import * as React from 'react'
-import 'bootstrap/dist/css/bootstrap.css'
+import { Manager, Target } from 'react-popper'
 
 import {
     Alert,
@@ -8,7 +8,7 @@ import {
     Button,
     Dialog,
     NavBar,
-    PopoverComponent,
+    Popover,
     ProgressBar,
     ProgressBarThin,
     RadioButton,
@@ -446,7 +446,7 @@ storiesOf('Popover', module).add('various cases', () => {
             return (
                 <div
                     style={{
-                        height: 1500,
+                        height: 700,
                         width: '100%',
                         display: 'flex',
                         flexDirection: 'column',
@@ -460,149 +460,173 @@ storiesOf('Popover', module).add('various cases', () => {
                         }}
                     >
                         <div>
-                            <div
-                                id="Popover1"
-                                onClick={() => this.toggle()}
-                                style={{
-                                    height: 100,
-                                    width: 100,
-                                    background: 'yellow'
-                                }}
-                            >
-                                NavBar Popover
-                            </div>
-                            {this.state.popoverOpen && (
-                                <PopoverComponent
-                                    toggle={this.toggle}
-                                    placement="left"
-                                    target="Popover1"
-                                    popoverOpen={this.state.popoverOpen}
-                                    containerStyle={{
-                                        height: 288,
-                                        width: 384,
-                                        background: white,
-                                        flexDirection: 'column',
-                                        borderRadius: 3
-                                    }}
-                                    navBarProperties={{
-                                        buttonLeft: 'Button',
-                                        title: 'Title',
-                                        buttonRight: 'Button',
-                                        id: 'navBarId',
-                                        style: {
-                                            containerStyle: {
-                                                borderRadius: '3px 3px 0px 0px'
-                                            }
-                                        }
-                                    }}
-                                    navBarBorderColors={{
-                                        primary: cloud,
-                                        secondary: white
-                                    }}
-                                />
-                            )}
-                        </div>
-                        <div>
-                            <div
-                                id="Popover2"
-                                onClick={() => this.toggle1()}
-                                style={{
-                                    height: 100,
-                                    width: 100,
-                                    background: 'yellow'
-                                }}
-                            >
-                                TabBar Popover
-                            </div>
-                            {this.state.popoverOpen1 && (
-                                <PopoverComponent
-                                    toggle={this.toggle1}
-                                    placement="left"
-                                    target="Popover2"
-                                    popoverOpen={this.state.popoverOpen1}
-                                    containerStyle={{
-                                        height: 288,
-                                        width: 384,
-                                        background: white,
-                                        flexDirection: 'column',
-                                        borderRadius: 3
-                                    }}
-                                >
+                            <Manager>
+                                <Target>
                                     <div
+                                        id="target5"
+                                        onClick={() => this.toggle2()}
                                         style={{
-                                            width: '100%',
-                                            height: 56
+                                            height: 100,
+                                            width: 100,
+                                            background: 'yellow'
                                         }}
                                     >
-                                        <TabBar>
-                                            {['one', 'two', 'three'].map(
-                                                tab => (
-                                                    <Tab
-                                                        val={tab}
-                                                        selected={
-                                                            this.state.selected
-                                                        }
-                                                        onClick={this.onClick}
-                                                        key={tab}
-                                                    />
-                                                )
-                                            )}
-                                        </TabBar>
+                                        TabBar
                                     </div>
-                                </PopoverComponent>
-                            )}
+                                </Target>
+                                {this.state.popoverOpen2 && (
+                                    <Popover
+                                        placement="right"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${titanium}`
+                                        }}
+                                        toggle={this.toggle2}
+                                        targetId="target5"
+                                    >
+                                        <div
+                                            style={{
+                                                width: '100%',
+                                                height: 56
+                                            }}
+                                        >
+                                            <TabBar>
+                                                {['one', 'two', 'three'].map(
+                                                    tab => (
+                                                        <Tab
+                                                            val={tab}
+                                                            selected={
+                                                                this.state
+                                                                    .selected
+                                                            }
+                                                            onClick={
+                                                                this.onClick
+                                                            }
+                                                            key={tab}
+                                                        />
+                                                    )
+                                                )}
+                                            </TabBar>
+                                        </div>
+                                    </Popover>
+                                )}
+                            </Manager>
+                        </div>
+
+                        <div>
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target4"
+                                        onClick={() => this.toggle3()}
+                                        style={{
+                                            height: 60,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        NavBar not toggable
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen3 && (
+                                    <Popover
+                                        placement="right"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${titanium}`
+                                        }}
+                                        toggle={this.toggle3}
+                                        navBarProperties={{
+                                            buttonLeft: 'Button',
+                                            title: 'Title',
+                                            buttonRight: 'Button',
+                                            id: 'navBarId',
+                                            style: {
+                                                containerStyle: {
+                                                    borderRadius:
+                                                        '3px 3px 0px 0px'
+                                                }
+                                            }
+                                        }}
+                                        arrowColors={{
+                                            primary: cloud,
+                                            secondary: white,
+                                            border: titanium
+                                        }}
+                                        toggleable={false}
+                                        targetId="target4"
+                                    />
+                                )}
+                            </Manager>
                         </div>
                     </div>
                     <div
                         style={{
                             display: 'flex',
+                            flexDirection: 'column',
                             justifyContent: 'center',
                             alignItems: 'center'
                         }}
                     >
                         <div>
-                            <div
-                                id="Popover3"
-                                onClick={() => this.toggle2()}
-                                style={{
-                                    height: 100,
-                                    width: 100,
-                                    background: 'yellow'
-                                }}
-                            >
-                                Bottom navbar Popover
-                            </div>
-                            {this.state.popoverOpen2 && (
-                                <PopoverComponent
-                                    toggle={this.toggle2}
-                                    placement="bottom"
-                                    target="Popover3"
-                                    popoverOpen={this.state.popoverOpen2}
-                                    containerStyle={{
-                                        height: 288,
-                                        width: 384,
-                                        background: white,
-                                        flexDirection: 'column',
-                                        borderRadius: 3
-                                    }}
-                                    navBarProperties={{
-                                        buttonLeft: 'Button',
-                                        title: 'Title',
-                                        buttonRight: 'Button',
-                                        id: 'navBarId',
-                                        style: {
-                                            containerStyle: {
-                                                borderRadius: '3px 3px 0px 0px'
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target1"
+                                        onClick={() => this.toggle1()}
+                                        style={{
+                                            height: 100,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        NavBar
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen1 && (
+                                    <Popover
+                                        placement="bottom"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${titanium}`
+                                        }}
+                                        toggle={this.toggle1}
+                                        navBarProperties={{
+                                            buttonLeft: 'Button',
+                                            title: 'Title',
+                                            buttonRight: 'Button',
+                                            id: 'navBarId',
+                                            style: {
+                                                containerStyle: {
+                                                    borderRadius:
+                                                        '3px 3px 0px 0px'
+                                                }
                                             }
-                                        }
-                                    }}
-                                    navBarBorderColors={{
-                                        primary: cloud,
-                                        secondary: white
-                                    }}
-                                />
-                            )}
+                                        }}
+                                        arrowColors={{
+                                            primary: cloud,
+                                            secondary: white,
+                                            border: titanium
+                                        }}
+                                        toggleable={true}
+                                        targetId="target1"
+                                    />
+                                )}
+                            </Manager>
                         </div>
+                        <div> ok ok</div>
                     </div>
 
                     <div
@@ -612,76 +636,93 @@ storiesOf('Popover', module).add('various cases', () => {
                         }}
                     >
                         <div>
-                            <div
-                                id="Popover4"
-                                onClick={() => this.toggle3()}
-                                style={{
-                                    height: 100,
-                                    width: 300,
-                                    background: 'yellow'
-                                }}
-                            >
-                                Unable to click off popover close
-                            </div>
-                            {this.state.popoverOpen3 && (
-                                <PopoverComponent
-                                    toggle={this.toggle3}
-                                    placement="left"
-                                    target="Popover4"
-                                    popoverOpen={this.state.popoverOpen3}
-                                    containerStyle={{
-                                        height: 288,
-                                        width: 384,
-                                        background: white,
-                                        flexDirection: 'column',
-                                        borderRadius: 3
-                                    }}
-                                    navBarProperties={{
-                                        buttonLeft: 'Button',
-                                        title: 'Title',
-                                        buttonRight: 'Button',
-                                        id: 'navBarId',
-                                        style: {
-                                            containerStyle: {
-                                                borderRadius: '3px 3px 0px 0px'
-                                            }
-                                        }
-                                    }}
-                                    navBarBorderColors={{
-                                        primary: cloud,
-                                        secondary: white
-                                    }}
-                                    toggleable={false}
-                                />
-                            )}
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target2"
+                                        onClick={() => this.toggle4()}
+                                        style={{
+                                            height: 100,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        empty child
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen4 && (
+                                    <Popover
+                                        placement="top"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${red}`
+                                        }}
+                                        toggle={this.toggle4}
+                                        arrowColors={{
+                                            primary: white,
+                                            secondary: turquoise,
+                                            border: red
+                                        }}
+                                        toggleable={true}
+                                        targetId="target2"
+                                    />
+                                )}
+                            </Manager>
                         </div>
+
                         <div>
-                            <div
-                                id="Popover5"
-                                onClick={() => this.toggle4()}
-                                style={{
-                                    height: 100,
-                                    width: 100,
-                                    background: 'yellow'
-                                }}
-                            >
-                                Launch Empty child
-                            </div>
-                            {this.state.popoverOpen4 && (
-                                <PopoverComponent
-                                    toggle={this.toggle4}
-                                    placement="top"
-                                    target="Popover5"
-                                    popoverOpen={this.state.popoverOpen4}
-                                    containerStyle={{
-                                        height: 288,
-                                        width: 384,
-                                        background: white,
-                                        flexDirection: 'column',
-                                        borderRadius: 3
-                                    }}
-                                />
-                            )}
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target3"
+                                        onClick={() => this.toggle()}
+                                        style={{
+                                            height: 100,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        navbar
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen && (
+                                    <Popover
+                                        placement="auto"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${red}`
+                                        }}
+                                        toggle={this.toggle}
+                                        navBarProperties={{
+                                            buttonLeft: 'Button',
+                                            title: 'Title',
+                                            buttonRight: 'Button',
+                                            id: 'navBarId',
+                                            style: {
+                                                containerStyle: {
+                                                    borderRadius:
+                                                        '3px 3px 0px 0px'
+                                                }
+                                            }
+                                        }}
+                                        arrowColors={{
+                                            primary: cloud,
+                                            secondary: white,
+                                            border: red
+                                        }}
+                                        toggleable={true}
+                                        targetId="target3"
+                                    />
+                                )}
+                            </Manager>
                         </div>
                     </div>
                 </div>
