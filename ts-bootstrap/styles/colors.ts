@@ -10,7 +10,7 @@ export const charcoal: string = '#323232'
 
 export const cloud: string = '#EEEEEE'
 
-export const foam: string = '#5DD7E5'
+export const foam: string = '#95E1EA'
 
 export const graphite: string = '#5D5D5D'
 
@@ -18,7 +18,13 @@ export const green: string = '#34CBB3'
 
 export const mercury: string = '#E9E9E9'
 
-export const paleblue: string = '#95E1EA'
+export const palefoam: string = '#F2FCFD'
+
+export const palegreen: string = '#E6FAF7'
+
+export const palered: string = '#FEF1EB'
+
+export const paleyellow: string = '#FDF7ED'
 
 export const red: string = '#E37A48'
 
