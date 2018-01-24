@@ -11,7 +11,56 @@ import Tab from './Tab'
 import TabBar from './TabBar'
 import Text from './Text'
 
+import {
+    aquamarine,
+    almostWhite,
+    beige,
+    black,
+    charcoal,
+    cloud,
+    foam,
+    graphite,
+    green,
+    mercury,
+    paleblue,
+    red,
+    silver,
+    steel,
+    titanium,
+    turquoise,
+    white,
+    yellow
+} from '../styles/colors'
+
+import {
+    text,
+    regular,
+    semibold,
+    bold,
+    large,
+    medium,
+    small
+} from '../styles/typography'
+
 export {
+    aquamarine,
+    almostWhite,
+    beige,
+    black,
+    charcoal,
+    cloud,
+    foam,
+    graphite,
+    green,
+    mercury,
+    paleblue,
+    red,
+    silver,
+    steel,
+    titanium,
+    turquoise,
+    white,
+    yellow,
     Alert,
     Badge,
     Button,
