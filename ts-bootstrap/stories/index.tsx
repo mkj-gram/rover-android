@@ -604,7 +604,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                         }}
                                         toggle={this.toggle1}
                                         navBarProperties={{
-                                            buttonLeft: 'Button',
                                             title: 'Title',
                                             buttonRight: 'Button',
                                             id: 'navBarId',
@@ -612,6 +611,12 @@ storiesOf('Popover', module).add('various cases', () => {
                                                 containerStyle: {
                                                     borderRadius:
                                                         '3px 3px 0px 0px'
+                                                },
+                                                buttonLeftStyle: {
+                                                    innerStyle: {
+                                                        width: 50.125,
+                                                        height: 22
+                                                    }
                                                 }
                                             }
                                         }}
@@ -626,7 +631,7 @@ storiesOf('Popover', module).add('various cases', () => {
                                 )}
                             </Manager>
                         </div>
-                        <div> ok ok</div>
+                        <div> Should be covered </div>
                     </div>
 
                     <div

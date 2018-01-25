@@ -11,7 +11,8 @@ interface PopoverProps {
     containerStyle?: React.CSSProperties
     toggle?: () => void
     arrowColors?: StringMap<string>
-    navBarProperties?: StringMap<string | number | StringMap<StringMap<string>>>
+    navBarProperties?: StringMap<string | number | object>
+
     toggleable?: boolean
     targetId: string
 }
