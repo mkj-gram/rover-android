@@ -47,8 +47,7 @@ class Popover extends React.Component<PopoverProps, {}> {
         document.removeEventListener('keydown', this.handleKeyPress, false)
     }
 
-    // tslint:disable-next-line:no-any
-    handleKeyPress(e: any) {
+    handleKeyPress(e: KeyboardEvent) {
         if (this.props.toggleable) {
             if (e.keyCode === 27) {
                 this.props.toggle()
@@ -150,12 +149,13 @@ class Popover extends React.Component<PopoverProps, {}> {
         this.wrapperRef = node
     }
 
-    // tslint:disable-next-line:no-any
-    handleClickOutside(e: any) {
+    handleClickOutside(e: MouseEvent) {
         if (
             this.wrapperRef &&
-            !this.wrapperRef.contains(e.target) &&
-            !document.getElementById(this.props.targetId).contains(e.target) &&
+            !this.wrapperRef.contains(e.target as HTMLElement) &&
+            !document
+                .getElementById(this.props.targetId)
+                .contains(e.target as HTMLElement) &&
             this.props.toggleable
         ) {
             this.props.toggle()
