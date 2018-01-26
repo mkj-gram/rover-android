@@ -12,7 +12,11 @@ cp -r ./protos/* $GOPATH/src/
 
 PROTO_PATH=$GOPATH/src/
 
-GO_MAPS="Mgoogle/protobuf/timestamp.proto=github.com/roverplatform/rover/go/protobuf/ptypes/timestamp,Mauth/v1/auth.proto=github.com/roverplatform/rover/apis/go/auth/v1"
+GO_MAPS="Mgoogle/protobuf/timestamp.proto=github.com/roverplatform/rover/go/protobuf/ptypes/timestamp\
+,Mauth/v1/auth.proto=github.com/roverplatform/rover/apis/go/auth/v1\
+,Mprotobuf/predicates.proto=github.com/roverplatform/rover/apis/go/protobuf/predicates\
+,Mprotobuf/version.proto=github.com/roverplatform/rover/apis/go/protobuf\
+"
 
 FILES="`find $PROTO_PATH -name *.proto`"
 echo "Proto Files: "
