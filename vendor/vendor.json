@@ -135,6 +135,12 @@
 			"revisionTime": "2017-04-27T21:32:20Z"
 		},
 		{
+			"checksumSHA1": "eG45Hg4ZnB4b1KuqsMknc5eAx4A=",
+			"path": "github.com/golang/protobuf/jsonpb",
+			"revision": "c65a0412e71e8b9b3bfd22925720d23c0f054237",
+			"revisionTime": "2018-01-22T22:16:10Z"
+		},
+		{
 			"checksumSHA1": "yqF125xVSkmfLpIVGrLlfE05IUk=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "1909bc2f63dc92bb931deace8b8312c4db72d12f",
