@@ -6,7 +6,7 @@ RUN mkdir -p /rover/
 
 WORKDIR /rover
 
-COPY ./campaigns-service /rover/bin
+COPY ./campaigns-service /rover/bin/
 
 # service is configured from ENV vars
 ENTRYPOINT ["/rover/bin/campaigns-service"]
