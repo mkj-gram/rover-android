@@ -180,14 +180,14 @@ steps:
   - id: 'test-auth-service'
     name: 'docker/compose:1.16.1'
     args:
-      - -p 
-      - test-auth-service
-      - -f 
-      - ./docker/main.docker-compose.yaml 
-      - run 
-      - auth-service
-      - docker/auth-service/cmd 
-      - test
+     - -p
+     - test-auth-service
+     - -f
+     - ./docker/main.docker-compose.yaml 
+     - run 
+     - auth-service
+     - docker/auth-service/cmd 
+     - test
     waitFor:
       - 'install-complete'
 
@@ -195,13 +195,28 @@ steps:
   - id: 'test-audience-service'
     name: 'docker/compose:1.16.1'
     args:
-      - -p 
+      - -p
       - test-audience-service
       - -f
       - ./docker/main.docker-compose.yaml
       - run
       - audience-service
       - docker/audience-service/cmd
+      - test
+    waitFor:
+      - 'install-complete'
+
+# Campaigns Service
+  - id: 'test-campaigns-service'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -p
+      - test-campaigns-service
+      - -f
+      - ./docker/main.docker-compose.yaml
+      - run
+      - campaigns-service
+      - docker/campaigns-service/cmd
       - test
     waitFor:
       - 'install-complete'
@@ -289,6 +304,27 @@ steps:
       - docker/audience-service/
     waitFor:
       - 'build-audience-service-executable'
+
+# Campaigns Service
+  - id: 'build-campaigns-service-executable'
+    name: 'gcr.io/cloud-builders/go:alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/campaigns-service/campaigns-service
+      - github.com/roverplatform/rover/campaigns/cmd/campaigns-service
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - --tag=gcr.io/$PROJECT_ID/campaigns-service:$REVISION_ID
+      - docker/campaigns-service/
+    waitFor:
+      - 'build-campaigns-service-executable'
 
 # Audience Segments Worker
   - id: 'build-audience-segments-worker-executable'
@@ -441,6 +477,7 @@ images:
   - 'gcr.io/$PROJECT_ID/auth-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/campaigns-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID'

@@ -1,0 +1,14 @@
+steps:
+- name: 'gcr.io/cloud-builders/go:alpine'
+  env:
+    - PROJECT_ROOT=github.com/roverplatform/rover
+  args:
+    - install
+    - github.com/roverplatform/rover/campaigns/service/cmd/campaigns-service
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - build
+    - --tag=gcr.io/$PROJECT_ID/campaigns:$REVISION_ID
+    - -f=./docker/campaigns-service/Dockerfile
+    - .
+images: ['gcr.io/$PROJECT_ID/campaigns:$REVISION_ID']
