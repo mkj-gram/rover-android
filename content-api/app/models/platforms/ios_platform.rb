@@ -10,11 +10,7 @@ class IosPlatform < ActiveRecord::Base
     belongs_to :account
 
     def certificate
-        if self.credentials
-            self.credentials[:certificate]
-        else
-            nil
-        end
+        return Base64.decode64(self.apns_certificate)
     end
 
     def certificate=(new_certificate)
@@ -22,49 +18,49 @@ class IosPlatform < ActiveRecord::Base
             self.certificate_filename = new_certificate.original_filename
             new_certificate = new_certificate.read
         end
-        self.credentials = ( self.credentials || {}).merge(certificate: new_certificate)
+        self.apns_certificate = Base64.encode64(new_certificate)
     end
 
     def passphrase
-        if self.credentials
-            self.credentials[:passphrase]
-        else
-            nil
-        end
+        return self.apns_passphrase
     end
 
     def passphrase=(new_passphrase)
-        self.credentials = ( self.credentials || {}).merge(passphrase: new_passphrase)
+        self.apns_passphrase = new_passphrase
     end
 
     private
 
-    def apns_certificate
+    def parse_apns_certificate
         return nil if certificate.nil?
-        @apns_certificate ||= ApnsCertificate.new(certificate, passphrase)
+        return ApnsCertificate.new(certificate, passphrase)
     end
 
     def valid_certificate
-        if !apns_certificate.valid?
+        cert = parse_apns_certificate
+
+        if !cert.valid?
             errors.add(:certificate, "invalid file or passphrase")
         end
 
-        if !apns_certificate.universal?
+        if !cert.universal?
             errors.add(:certificate, "needs to be a universal certificate")
         end
     end
 
     def set_app_identifier
+        cert = parse_apns_certificate
         # overwrite the bundle id if a certificate exists
-        if apns_certificate
-            self.bundle_id = apns_certificate.app_bundle_id
+        if cert
+            self.bundle_id = cert.app_bundle_id
         end
     end
 
     def set_certificate_expiry
-        if credentials_changed?
-            if apns_certificate
-                self.certificate_expires_at = apns_certificate.expires_at
+        if apns_certificate_changed? || apns_passphrase_changed?
+            cert = parse_apns_certificate
+            if cert
+                self.certificate_expires_at = cert.expires_at
             else
                 self.certificate_expires_at = nil
                 self.certificate_filename = nil
