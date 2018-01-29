@@ -15,6 +15,8 @@ export interface TextProps {
     placeholder?: boolean
     label?: boolean
     handleChange?: (evt: string) => void
+    textStyle?: React.CSSProperties
+    id?: string
 }
 
 const Text: React.SFC<TextProps> = ({
@@ -24,14 +26,16 @@ const Text: React.SFC<TextProps> = ({
     placeholder,
     label,
     contentEditable,
-    handleChange
+    handleChange,
+    textStyle,
+    id
 }) => {
     let style: StringMap<string | number> = {
         ...typographyText,
         ...regular,
         color: charcoal,
         display: 'inline-block',
-        height: 24
+        lineHeight: '24px'
     }
 
     switch (size) {
@@ -39,7 +43,7 @@ const Text: React.SFC<TextProps> = ({
             style = {
                 ...style,
                 ...semibold,
-                height: 40,
+                lineHeight: '40px',
                 fontSize: 32
             }
             break
@@ -47,7 +51,7 @@ const Text: React.SFC<TextProps> = ({
             style = {
                 ...style,
                 ...semibold,
-                height: 32,
+                lineHeight: '32px',
                 fontSize: 25
             }
             break
@@ -90,6 +94,11 @@ const Text: React.SFC<TextProps> = ({
         }
     }
 
+    style = {
+        ...style,
+        ...textStyle
+    }
+
     let ret
     if (contentEditable === false) {
         ret = <div style={style}>{text}</div>
@@ -101,6 +110,7 @@ const Text: React.SFC<TextProps> = ({
                 html={html}
                 onChange={handleChange}
                 style={style}
+                id={id}
             />
         )
     }

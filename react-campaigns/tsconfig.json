@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "jsx": "react",
-        "lib": ["es2016", "dom", "dom.iterable"],
+        "lib": ["es2016", "dom", "dom.iterable", "es2017"],
         "module": "commonjs",
         "noImplicitAny": true,
         "outDir": "./dist/",

@@ -25,6 +25,7 @@ const CampaignsQuery = {
         { campaignStatus, campaignType, keyword, pageNumber, pageSize },
         { authContext }
     ) => {
+        console.log('we in ??')
         const request = new RoverApis.campaigns.v1.Models.ListRequest()
         request.setAuthContext(authContext)
         request.setCampaignStatus()
@@ -32,9 +33,10 @@ const CampaignsQuery = {
         request.setKeyword()
         request.setPage()
         request.setPageSize()
-
+        console.log('we fget here')
         const response = await campaignsClient.list(request)
-
+        console.log('in here?')
+        console.log(response)
         return response.getCampaignsList().map(campaign => {
             if (campaign.hasAutomatedNotificationCampaign())
                 return getAutomatedNotificationCampaignFromProto(

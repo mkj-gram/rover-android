@@ -6,9 +6,11 @@ import {
     Text,
     Badge,
     Button,
+    CheckBox,
     Dialog,
     NavBar,
     Popover,
+    PopoverContainer,
     ProgressBar,
     ProgressBarThin,
     RadioButton,
@@ -52,6 +54,7 @@ import {
 } from '../styles/typography'
 
 import { storiesOf } from '@storybook/react'
+import { CheckmarkIcon } from '../src/Icons/index'
 
 storiesOf('Alert', module)
     .add('Info', () => (
@@ -216,6 +219,12 @@ storiesOf('Colors', module)
         </div>
     ))
 
+storiesOf('Checkbox', module).add('on and off', () => (
+    <div style={{ width: 500, height: 500 }}>
+        <CheckBox checked={true} />
+    </div>
+))
+
 storiesOf('Dialog', module)
     .add('two buttons', () => {
         interface XState {
@@ -237,6 +246,8 @@ storiesOf('Dialog', module)
                 })
             }
             render() {
+                let x =
+                    'Publishing this campagin will schedule it for delivery on Jan 8 at 3:00 PM America/Toronto. Continue?'
                 return (
                     <div
                         id="entire"
@@ -286,11 +297,9 @@ storiesOf('Dialog', module)
                                 primaryOnClick={() => this.toggle()}
                                 secondaryOnClick={() => this.toggle()}
                                 isOpen={this.state.switched}
-                            >
-                                Publishing this campagin will schedule it for
-                                delivery on Jan 8 at 3:00 PM America/Toronto.
-                                Continue?
-                            </Dialog>
+                                targetParent="entire"
+                                dialogText={x}
+                            />
                         )}
                         }
                     </div>
@@ -367,11 +376,9 @@ storiesOf('Dialog', module)
                                 buttonPrimaryText="Primary"
                                 primaryOnClick={() => this.toggle()}
                                 isOpen={this.state.switched}
-                            >
-                                Publishing this campagin will schedule it for
-                                delivery on Jan 8 at 3:00 PM America/Toronto.
-                                Continue?
-                            </Dialog>
+                                targetParent="entire"
+                                dialogText="Publishing this campagin will schedule it for delivery on Jan 8 at 3:00 PM America/Toronto. Continue?"
+                            />
                         )}
                         }
                     </div>
@@ -381,6 +388,84 @@ storiesOf('Dialog', module)
 
         return <WholeScreen />
     })
+
+storiesOf('PopoverContainer', module).add('cases', () => {
+    interface XState {
+        switched: boolean
+    }
+
+    class X extends React.Component<{}, XState> {
+        // tslint:disable-next-line:no-any
+        constructor(props: any) {
+            super(props)
+            this.state = {
+                switched: false
+            }
+            this.toggle = this.toggle.bind(this)
+        }
+        toggle() {
+            this.setState({
+                switched: !this.state.switched
+            })
+        }
+        render() {
+            const popoverProps = {
+                placement: 'bottom',
+                containerStyle: {
+                    height: 288,
+                    width: 384,
+                    background: white,
+                    flexDirection: 'column',
+                    borderRadius: 3,
+                    border: `2px solid ${red}`
+                }
+            }
+            const targetParent = 'coverThis'
+            return (
+                <div
+                    style={{
+                        height: 700,
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexDirection: 'column'
+                    }}
+                    id={targetParent}
+                >
+                    <PopoverContainer
+                        id="12345"
+                        popoverProps={popoverProps}
+                        targetParent={targetParent}
+                        onClick={this.toggle}
+                        showPopover={this.state.switched}
+                    >
+                        {[
+                            <div
+                                key="123456"
+                                style={{
+                                    height: 100,
+                                    width: 100,
+                                    background: 'yellow',
+                                    display: 'inline-block'
+                                }}
+                            >
+                                Test
+                            </div>
+                        ]}
+                    </PopoverContainer>
+                    <div
+                        style={{ width: 500, height: 100, background: 'pink' }}
+                    >
+                        ok leroy
+                    </div>
+                </div>
+            )
+        }
+    }
+
+    return <X />
+})
 
 storiesOf('Popover', module).add('various cases', () => {
     interface ReactstrapState {
@@ -1052,8 +1137,71 @@ storiesOf('Text', module)
             size="h1"
             contentEditable={true}
             handleChange={() => null}
+            id="the"
         />
     ))
+    .add('Text editable test', () => {
+        interface ZState {
+            edittable: boolean
+            text: string
+        }
+        class T extends React.Component<{}, ZState> {
+            // tslint:disable-next-line:no-any
+            constructor(props: any) {
+                super(props)
+                this.state = {
+                    edittable: false,
+                    text: "Lorem ipsum sit dolor amet     a   s "
+                }
+                this.onClick = this.onClick.bind(this)
+                this.handleChange = this.handleChange.bind(this)
+            }
+
+            onClick() {
+                this.setState({
+                    edittable: !this.state.edittable
+                })
+            }
+
+            handleChange(text: string) {
+                this.setState({
+                    edittable: !this.state.edittable,
+                    text
+                })
+            }
+
+            render() {
+                return (
+                    <div
+                        style={{
+                            width: 300,
+                            height: 200
+                        }}
+                    >
+                        <Text
+                            text={this.state.text}
+                            size="h1"
+                            contentEditable={this.state.edittable}
+                            handleChange={this.handleChange}
+                            id="thy"
+                        />
+                        <div
+                            style={{
+                                width: 500,
+                                height: 500,
+                                background: red
+                            }}
+                            onClick={this.onClick}
+                        >
+                            clickMe
+                        </div>
+                    </div>
+                )
+            }
+        }
+
+        return <T />
+    })
     .add('h2', () => <Text text="Header 2" size="h2" />)
     .add('h2-editable', () => (
         <Text
@@ -1061,6 +1209,7 @@ storiesOf('Text', module)
             size="h2"
             contentEditable={true}
             handleChange={() => null}
+            id="this"
         />
     ))
 
@@ -1083,6 +1232,7 @@ storiesOf('Text', module)
             contentEditable={true}
             handleChange={() => null}
             placeholder={true}
+            id="that"
         />
     ))
     .add('text-large-left-non-editable-placeholder', () => (
@@ -1092,6 +1242,7 @@ storiesOf('Text', module)
             contentEditable={false}
             handleChange={() => null}
             placeholder={true}
+            id="those"
         />
     ))
     .add('text-medium-left', () => (
@@ -1104,6 +1255,7 @@ storiesOf('Text', module)
             contentEditable={true}
             handleChange={() => null}
             placeholder={true}
+            id="they"
         />
     ))
 
@@ -1112,6 +1264,7 @@ storiesOf('Text', module)
             text="Lorem ipsum sit dolor amet"
             size="small"
             contentEditable={true}
+            id="thiz"
         />
     ))
     .add('text-small-center-editable', () => (
@@ -1120,6 +1273,7 @@ storiesOf('Text', module)
             size="small"
             position="center"
             contentEditable={true}
+            id="there"
         />
     ))
 

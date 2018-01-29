@@ -7,7 +7,7 @@ import { white } from '../styles/colors'
 import { text, medium } from '../styles/typography'
 
 export interface DialogProps {
-    children?: string
+    dialogText?: string
     buttonPrimaryText: string
     buttonSecondaryText?: string
     containerStyle?: React.CSSProperties
@@ -16,6 +16,7 @@ export interface DialogProps {
     primaryOnClick?: () => void
     secondaryOnClick?: () => void
     isOpen?: boolean
+    targetParent?: string
 }
 
 class Dialog extends React.Component<DialogProps, {}> {
@@ -26,7 +27,7 @@ class Dialog extends React.Component<DialogProps, {}> {
 
     render() {
         let {
-            children,
+            dialogText,
             buttonPrimaryText,
             buttonSecondaryText,
             containerStyle,
@@ -34,7 +35,8 @@ class Dialog extends React.Component<DialogProps, {}> {
             childStyle,
             primaryOnClick,
             secondaryOnClick,
-            isOpen
+            isOpen,
+            targetParent
         } = this.props
 
         let container: React.CSSProperties = {
@@ -105,7 +107,7 @@ class Dialog extends React.Component<DialogProps, {}> {
                             ...buttonStyle
                         }
 
-                        let childElem = <div style={child}>{children}</div>
+                        let childElem = <div style={child}>{dialogText}</div>
                         if (buttonSecondaryText !== undefined) {
                             buttons = (
                                 <div style={button}>
@@ -176,7 +178,7 @@ class Dialog extends React.Component<DialogProps, {}> {
         )
         return ReactDOM.createPortal(
             this.node,
-            document.getElementById('entire')
+            document.getElementById(targetParent)
         )
     }
 }

@@ -9,7 +9,6 @@ import getProfileFromProto, { getEmptyProfileValues } from '../grpc/audience/get
 import getDeviceFromProto from '../grpc/audience/getDeviceFromProto'
 import promisify from '@rover-common/grpc-promisify'
 
-
 promisify(audienceClient)
 
 const SegmentFromPredicatesQuery = {
@@ -28,8 +27,11 @@ const SegmentFromPredicatesQuery = {
             type: GraphQLString
         }
     },
-    resolve: async(_, { predicates, pageNumber, pageSize, condition}, {authContext}) => {
-
+    resolve: async (
+        _,
+        { predicates, pageNumber, pageSize, condition },
+        { authContext }
+    ) => {
         /*
             Use Query Api with an empty set of predicates to get the total number of devices
             This number will be accurate instead of using counter caches in the backend
@@ -70,18 +72,16 @@ const SegmentFromPredicatesQuery = {
         )
 
         request.setPredicateAggregate(predicateAggregate)
-
         const response = await audienceClient.query(request)
         const segmentSize = response.getTotalSize()
 
         response.getProfilesList().forEach(profile => {
             getProfileFromProto(profiles, profile)
         })
-
         dataGridRows = response.getDevicesList().map(device => {
-          const deviceAttrs = getDeviceFromProto(device)
-          const profileAttrs = profiles[device.getProfileIdentifier()] || []
-          return deviceAttrs.concat(profileAttrs)
+            const deviceAttrs = getDeviceFromProto(device)
+            const profileAttrs = profiles[device.getProfileIdentifier()] || []
+            return deviceAttrs.concat(profileAttrs)
         })
 
         let totalSize = 0

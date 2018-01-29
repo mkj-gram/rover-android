@@ -11,7 +11,8 @@ export interface Props
     onChange: (val: string) => void
     onBlur?: (evt: any) => void
     style?: StringMap<string | number>
-    placeholder: boolean
+    placeholder?: boolean
+    id: string
 }
 
 class ContentEditable extends React.Component<Props, {}> {
@@ -23,6 +24,8 @@ class ContentEditable extends React.Component<Props, {}> {
         this.emitChange = this.emitChange.bind(this)
         this.onFocus = this.onFocus.bind(this)
         this.onPaste = this.onPaste.bind(this)
+        this.placeCaretAtEnd = this.placeCaretAtEnd.bind(this)
+        this.handleKeyPress = this.handleKeyPress.bind(this)
     }
 
     shouldComponentUpdate(nextProps: Props) {
@@ -57,11 +60,50 @@ class ContentEditable extends React.Component<Props, {}> {
         }
     }
 
+    componentDidMount() {
+        document.addEventListener('keydown', this.handleKeyPress, false)
+        if (!this.props.placeholder) {
+            this.placeCaretAtEnd(document.getElementById(this.props.id))
+        }
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.handleKeyPress, false)
+    }
+
+    handleKeyPress(e: KeyboardEvent) {
+        if (e.keyCode === 13) {
+            this.props.onChange(this.htmlEl.innerHTML.replace(/&nbsp;/g," ").replace(/\s*$/,'') as string)
+        }
+    }
+
+    placeCaretAtEnd(el: any) {
+        el.focus()
+        if (
+            typeof window.getSelection != 'undefined' &&
+            typeof document.createRange != 'undefined'
+        ) {
+            var range = document.createRange()
+            range.selectNodeContents(el)
+            range.collapse(false)
+            var sel = window.getSelection()
+            sel.removeAllRanges()
+            sel.addRange(range)
+        } else if (typeof el.createTextRange != 'undefined') {
+            var textRange = el.createTextRange()
+            textRange.moveToElementText(el)
+            textRange.collapse(false)
+            textRange.select()
+        }
+    }
+
     emitChange(evt: any) {
         if (!this.htmlEl) {
             return
         }
-        var html = this.htmlEl.innerHTML
+
+        var html = this.htmlEl.innerHTML.replace(/&nbsp;/g," ").replace(/\s*$/,'')
+
         if (this.props.onChange && html !== this.lastHtml) {
             evt.target = { value: html }
             this.props.onChange(html as string)
@@ -73,13 +115,13 @@ class ContentEditable extends React.Component<Props, {}> {
         if (!this.htmlEl) {
             return
         }
+
         if (this.props.placeholder && this.lastHtml === undefined) {
             this.htmlEl.innerHTML = ''
             var html = this.htmlEl.innerHTML
 
             evt.target = { value: html }
-
-            this.props.onChange(html as string)
+            // this.props.onChange(html as string)
             this.lastHtml = html
             this.htmlEl.style.color = charcoal
         }
@@ -92,7 +134,7 @@ class ContentEditable extends React.Component<Props, {}> {
     }
 
     render() {
-        var { html, ...props } = this.props
+        var { html, id, ...props } = this.props
         return (
             <div>
                 <style type="text/css">
@@ -103,14 +145,15 @@ class ContentEditable extends React.Component<Props, {}> {
                 {React.createElement(
                     'div',
                     {
-                        ...props,
+                        style: props.style,
                         ref: (e: HTMLElement) => (this.htmlEl = e),
-                        onInput: this.emitChange,
+                        // onInput: this.emitChange,
                         onBlur: this.props.onBlur || this.emitChange,
                         onPaste: this.onPaste,
                         onFocus: this.onFocus,
                         contentEditable: true,
-                        dangerouslySetInnerHTML: { __html: html }
+                        dangerouslySetInnerHTML: { __html: html },
+                        id: id
                     },
                     this.props.children
                 )}
