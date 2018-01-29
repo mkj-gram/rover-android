@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Manager, Target } from 'react-popper'
 
 import {
     Alert,
@@ -6,11 +7,13 @@ import {
     Badge,
     Button,
     Dialog,
+    NavBar,
+    Popover,
+    ProgressBar,
+    ProgressBarThin,
     RadioButton,
     SliderComponent,
     Switch,
-    ProgressBar,
-    ProgressBarThin,
     Tab,
     TabBar
 } from '../src'
@@ -379,74 +382,367 @@ storiesOf('Dialog', module)
         return <WholeScreen />
     })
 
-storiesOf('Switch', module)
-    .add('all buttons', () => {
-        interface XState {
-            switched: boolean
+storiesOf('Popover', module).add('various cases', () => {
+    interface ReactstrapState {
+        popoverOpen: boolean
+        popoverOpen1: boolean
+        popoverOpen2: boolean
+        popoverOpen3: boolean
+        popoverOpen4: boolean
+        selected: string
+    }
+
+    class ReactstrapComp extends React.Component<{}, ReactstrapState> {
+        // tslint:disable-next-line:no-any
+        constructor(props: any) {
+            super(props)
+            this.state = {
+                popoverOpen: false,
+                popoverOpen1: false,
+                popoverOpen2: false,
+                popoverOpen3: false,
+                popoverOpen4: false,
+                selected: 'one'
+            }
+            this.toggle = this.toggle.bind(this)
+            this.toggle1 = this.toggle1.bind(this)
+            this.toggle2 = this.toggle2.bind(this)
+            this.toggle3 = this.toggle3.bind(this)
+            this.toggle4 = this.toggle4.bind(this)
+            this.onClick = this.onClick.bind(this)
         }
 
-        class X extends React.Component<{}, XState> {
-            // tslint:disable-next-line:no-any
-            constructor(props: any) {
-                super(props)
-                this.state = {
-                    switched: false
-                }
-                this.toggle = this.toggle.bind(this)
-            }
-            toggle() {
-                this.setState({
-                    switched: !this.state.switched
-                })
-            }
-            render() {
-                return (
-                    <div>
+        toggle() {
+            this.setState({
+                popoverOpen: !this.state.popoverOpen
+            })
+        }
+
+        toggle1() {
+            this.setState({
+                popoverOpen1: !this.state.popoverOpen1
+            })
+        }
+
+        toggle2() {
+            this.setState({
+                popoverOpen2: !this.state.popoverOpen2
+            })
+        }
+
+        toggle3() {
+            this.setState({
+                popoverOpen3: !this.state.popoverOpen3
+            })
+        }
+
+        toggle4() {
+            this.setState({
+                popoverOpen4: !this.state.popoverOpen4
+            })
+        }
+
+        onClick(selected: string) {
+            this.setState({
+                selected
+            })
+        }
+
+        render() {
+            return (
+                <div
+                    style={{
+                        height: 700,
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between'
+                        }}
+                    >
                         <div>
-                            <Switch
-                                on={this.state.switched}
-                                text="AM"
-                                onClick={this.toggle}
-                            />
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target5"
+                                        onClick={() => this.toggle2()}
+                                        style={{
+                                            height: 100,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        TabBar
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen2 && (
+                                    <Popover
+                                        placement="right"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${titanium}`
+                                        }}
+                                        toggle={this.toggle2}
+                                        targetId="target5"
+                                    >
+                                        <div
+                                            style={{
+                                                width: '100%',
+                                                height: 56
+                                            }}
+                                        >
+                                            <TabBar>
+                                                {['one', 'two', 'three'].map(
+                                                    tab => (
+                                                        <Tab
+                                                            val={tab}
+                                                            selected={
+                                                                this.state
+                                                                    .selected
+                                                            }
+                                                            onClick={
+                                                                this.onClick
+                                                            }
+                                                            key={tab}
+                                                        />
+                                                    )
+                                                )}
+                                            </TabBar>
+                                        </div>
+                                    </Popover>
+                                )}
+                            </Manager>
                         </div>
+
                         <div>
-                            <Switch
-                                on={!this.state.switched}
-                                text="PM"
-                                onClick={this.toggle}
-                            />
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target4"
+                                        onClick={() => this.toggle3()}
+                                        style={{
+                                            height: 60,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        NavBar not toggable
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen3 && (
+                                    <Popover
+                                        placement="right"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${titanium}`
+                                        }}
+                                        toggle={this.toggle3}
+                                        navBarProperties={{
+                                            buttonLeft: 'Button',
+                                            title: 'Title',
+                                            buttonRight: 'Button',
+                                            id: 'navBarId',
+                                            style: {
+                                                containerStyle: {
+                                                    borderRadius:
+                                                        '3px 3px 0px 0px'
+                                                }
+                                            }
+                                        }}
+                                        arrowColors={{
+                                            primary: cloud,
+                                            secondary: white,
+                                            border: titanium
+                                        }}
+                                        toggleable={false}
+                                        targetId="target4"
+                                    />
+                                )}
+                            </Manager>
                         </div>
-                        <div>
-                            <Switch forceOn={true} />
-                        </div>
-                        <div>
-                            <Switch
-                                on={this.state.switched}
-                                onClick={this.toggle}
-                            />
-                        </div>
-                        <Switch
-                            on={!this.state.switched}
-                            onClick={this.toggle}
-                        />
                     </div>
-                )
-            }
-        }
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <div>
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target1"
+                                        onClick={() => this.toggle1()}
+                                        style={{
+                                            height: 100,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        NavBar
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen1 && (
+                                    <Popover
+                                        placement="bottom"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${titanium}`
+                                        }}
+                                        toggle={this.toggle1}
+                                        navBarProperties={{
+                                            title: 'Title',
+                                            buttonRight: 'Button',
+                                            id: 'navBarId',
+                                            style: {
+                                                containerStyle: {
+                                                    borderRadius:
+                                                        '3px 3px 0px 0px'
+                                                },
+                                                buttonLeftStyle: {
+                                                    innerStyle: {
+                                                        width: 50.125,
+                                                        height: 22
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                        arrowColors={{
+                                            primary: cloud,
+                                            secondary: white,
+                                            border: titanium
+                                        }}
+                                        toggleable={true}
+                                        targetId="target1"
+                                    />
+                                )}
+                            </Manager>
+                        </div>
+                        <div> Should be covered </div>
+                    </div>
 
-        return <X />
-    })
-    .add('off', () => <Switch on={false} />)
-    .add('on', () => <Switch on={true} />)
-    .add('forceOn', () => <Switch forceOn={true} />)
-    .add('text', () => {
-        return (
-            <div>
-                <Switch on={true} text="AM" />
-                <Switch on={false} text="PM" />
-            </div>
-        )
-    })
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        <div>
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target2"
+                                        onClick={() => this.toggle4()}
+                                        style={{
+                                            height: 100,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        empty child
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen4 && (
+                                    <Popover
+                                        placement="top"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${red}`
+                                        }}
+                                        toggle={this.toggle4}
+                                        arrowColors={{
+                                            primary: white,
+                                            secondary: turquoise,
+                                            border: red
+                                        }}
+                                        toggleable={true}
+                                        targetId="target2"
+                                    />
+                                )}
+                            </Manager>
+                        </div>
+
+                        <div>
+                            <Manager>
+                                <Target>
+                                    <div
+                                        id="target3"
+                                        onClick={() => this.toggle()}
+                                        style={{
+                                            height: 100,
+                                            width: 100,
+                                            background: 'yellow'
+                                        }}
+                                    >
+                                        navbar
+                                    </div>
+                                </Target>
+                                {this.state.popoverOpen && (
+                                    <Popover
+                                        placement="auto"
+                                        containerStyle={{
+                                            height: 288,
+                                            width: 384,
+                                            background: white,
+                                            flexDirection: 'column',
+                                            borderRadius: 3,
+                                            border: `1px solid ${red}`
+                                        }}
+                                        toggle={this.toggle}
+                                        navBarProperties={{
+                                            buttonLeft: 'Button',
+                                            title: 'Title',
+                                            buttonRight: 'Button',
+                                            id: 'navBarId',
+                                            style: {
+                                                containerStyle: {
+                                                    borderRadius:
+                                                        '3px 3px 0px 0px'
+                                                }
+                                            }
+                                        }}
+                                        arrowColors={{
+                                            primary: cloud,
+                                            secondary: white,
+                                            border: red
+                                        }}
+                                        toggleable={true}
+                                        targetId="target3"
+                                    />
+                                )}
+                            </Manager>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+    }
+
+    return <ReactstrapComp />
+})
 
 storiesOf('Progress Bar', module)
     .add('0%', () => (
@@ -616,6 +912,75 @@ storiesOf('SliderComponent', module).add('slider', () => {
     }
     return <Y />
 })
+
+storiesOf('Switch', module)
+    .add('all buttons', () => {
+        interface XState {
+            switched: boolean
+        }
+
+        class X extends React.Component<{}, XState> {
+            // tslint:disable-next-line:no-any
+            constructor(props: any) {
+                super(props)
+                this.state = {
+                    switched: false
+                }
+                this.toggle = this.toggle.bind(this)
+            }
+            toggle() {
+                this.setState({
+                    switched: !this.state.switched
+                })
+            }
+            render() {
+                return (
+                    <div>
+                        <div>
+                            <Switch
+                                on={this.state.switched}
+                                text="AM"
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <div>
+                            <Switch
+                                on={!this.state.switched}
+                                text="PM"
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <div>
+                            <Switch forceOn={true} />
+                        </div>
+                        <div>
+                            <Switch
+                                on={this.state.switched}
+                                onClick={this.toggle}
+                            />
+                        </div>
+                        <Switch
+                            on={!this.state.switched}
+                            onClick={this.toggle}
+                        />
+                    </div>
+                )
+            }
+        }
+
+        return <X />
+    })
+    .add('off', () => <Switch on={false} />)
+    .add('on', () => <Switch on={true} />)
+    .add('forceOn', () => <Switch forceOn={true} />)
+    .add('text', () => {
+        return (
+            <div>
+                <Switch on={true} text="AM" />
+                <Switch on={false} text="PM" />
+            </div>
+        )
+    })
 interface TState {
     selected: string
 }
