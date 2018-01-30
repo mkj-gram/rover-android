@@ -95,7 +95,7 @@ func (db *DB) List(ctx context.Context, params ListParams) ([]*campaigns.Campaig
 	}
 
 	if params.Keyword != "" {
-		q += ` AND lower(name) like lower(:search) `
+		q += ` AND name ILIKE :search `
 		args["search"] = "%" + params.Keyword + "%"
 	}
 
