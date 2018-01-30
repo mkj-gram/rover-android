@@ -291,8 +291,6 @@ func test_List(t *testing.T) {
 			expErr: status.Errorf(codes.InvalidArgument, "validate: auth_context: is required. account_id: is required."),
 		},
 
-		{name: "filters by keyword"},
-
 		{
 			name: "lists campaigns",
 			req: &campaignspb.ListRequest{
