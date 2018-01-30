@@ -108,6 +108,7 @@ service Auth {
     rpc CreateUser(CreateUserRequest) returns (User) {};
     rpc UpdateUser(UpdateUserRequest) returns (User) {};
     rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Empty) {};
+    rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {};
 
     /*
         A user session is simple sign on using email & password based authentication to generate a new session token
@@ -238,6 +239,14 @@ message ListTokensResponse {
 /*
     User RPC requests & replies
  */
+
+message GetUserInfoRequest {
+  AuthContext auth_context = 1;
+}
+message GetUserInfoResponse {
+  Account account          = 1;
+  User    user             = 2;
+}
 
 message GetUserRequest {
     int32 account_id = 1;
