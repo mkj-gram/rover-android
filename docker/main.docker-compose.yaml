@@ -32,7 +32,7 @@ services:
       cluster.name: docker-cluster
       bootstrap.memory_lock: "true"
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-        
+
   postgres:
     image: postgres:9.6-alpine
     ports: [5432]
@@ -87,7 +87,20 @@ services:
       CGO_ENABLED: 0
       DB_DSN: "postgres://postgres:@postgres:5432/authsvc_dev?sslmode=disable"
       MIGRATION_DIR: ./auth/service/db/migrations/postgres
-  
+
+  campaigns-service:
+    image: golang:1.9-alpine
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - postgres
+    command: ./docker/campaigns-service/cmd migrate run
+    volumes:
+      - ../:/go/src/github.com/roverplatform/rover
+    environment:
+      CGO_ENABLED: 0
+      DB_DSN: "postgres://postgres:@postgres:5432/campaigns_dev?sslmode=disable"
+      TEST_DSN: "postgres://postgres:@postgres:5432/campaigns_test?sslmode=disable"
+
   campaigns-frontend:
     image: node:7.5.0
     depends_on:
@@ -99,7 +112,7 @@ services:
     environment:
       NODE_ENV: development
       GRAPHQL_HOST: "http://graphql-gateway/graphql"
-
+ 
   graphql-gateway:
     image: node:7.5.0
     depends_on:

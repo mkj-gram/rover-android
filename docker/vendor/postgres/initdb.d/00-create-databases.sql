@@ -1,11 +1,28 @@
--- auth-service: test
+--
+-- auth-service
+--
 CREATE DATABASE authsvc_test;
-
--- auth-service: development
 CREATE DATABASE authsvc_dev;
 
--- content-api:
+--
+-- campaigns-service
+--
+CREATE DATABASE campaigns_test;
+CREATE DATABASE campaigns_dev;
 
+ALTER DATABASE campaigns_test SET log_statement = 'all';
+ALTER DATABASE campaigns_dev SET log_statement = 'all';
+
+--
+-- test-service
+--
+CREATE DATABASE test_test;
+CREATE DATABASE test_dev;
+
+--
+-- content-api:
+--
+--
 -- content-api: testing
 CREATE ROLE "rover_test" with login createdb superuser;
 CREATE DATABASE "rover-test" OWNER "rover_test";

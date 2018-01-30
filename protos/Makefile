@@ -1,5 +1,7 @@
 VERSION ?= 3.2.0
 
+all: deps-base deps build
+
 deps-base:
 	cd builds && docker build --tag=protoc:${VERSION} -f Dockerfile .
 
@@ -9,6 +11,5 @@ deps:
 build:
 	cd builds/scripts && bash build.sh
 
-all: deps-base deps build
 
 .PHONY: deps-base deps build

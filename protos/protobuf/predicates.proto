@@ -1,0 +1,225 @@
+syntax = "proto3";
+
+package rover.protobuf;
+
+option go_package = "protobuf/predicates";
+
+import "protobuf/version.proto";
+
+message PredicateAggregate {
+  Condition condition           = 1;
+  repeated Predicate predicates = 2;
+
+  enum Condition {
+    ANY = 0;
+    ALL = 1;
+  }
+}
+
+message Predicate {
+  oneof value {
+    StringPredicate   string_predicate          = 2;
+    BoolPredicate     bool_predicate            = 3;
+    NumberPredicate   number_predicate          = 4;
+    DatePredicate     date_predicate            = 5;
+    VersionPredicate  version_predicate         = 6;
+    GeofencePredicate geofence_predicate        = 7;
+    DoublePredicate   double_predicate          = 8;
+    StringArrayPredicate string_array_predicate = 9;
+    DurationPredicate  duration_predicate       = 10;
+  }
+}
+
+
+message StringPredicate {
+  Op op                 = 1;
+  string selector       = 2;
+  string attribute_name = 3;
+  string value          = 4;
+
+  enum Op {
+    IS_UNSET        = 0;
+    IS_SET          = 1;
+
+    IS_EQUAL        = 2;
+    IS_NOT_EQUAL    = 3;
+
+    STARTS_WITH  = 4;
+    ENDS_WITH    = 5;
+
+    CONTAINS     = 6;
+    DOES_NOT_CONTAIN = 7;
+  }
+}
+
+
+message BoolPredicate {
+  Op op                 = 1;
+  string selector       = 2;
+  string attribute_name = 3;
+  bool value            = 4;
+
+  enum Op {
+    IS_UNSET    = 0;
+    IS_SET      = 1;
+
+    IS_EQUAL   = 2;
+  }
+}
+
+
+message DoublePredicate {
+  Op op                 = 1;
+  string selector       = 2;
+  string attribute_name = 3;
+  double value          = 4;
+  double value2         = 5;
+
+  enum Op {
+    IS_UNSET        = 0;
+    IS_SET          = 1;
+
+    IS_EQUAL        = 2;
+    IS_NOT_EQUAL    = 3;
+
+    IS_GREATER_THAN = 4;
+    IS_LESS_THAN    = 5;
+
+    IS_BETWEEN      = 6;
+  }
+}
+
+
+message NumberPredicate {
+  Op op                 = 1;
+  string selector       = 2;
+  string attribute_name = 3;
+  int64 value           = 4;
+  int64 value2          = 5;
+
+  enum Op {
+    IS_UNSET        = 0;
+    IS_SET          = 1;
+
+    IS_EQUAL        = 2;
+    IS_NOT_EQUAL    = 3;
+
+    IS_GREATER_THAN = 4;
+    IS_LESS_THAN    = 5;
+
+    IS_BETWEEN      = 6;
+  }
+}
+
+
+message DatePredicate {
+  Op op                 = 1;
+  string selector       = 2;
+  string attribute_name = 3;
+  Date value            = 4;
+
+  message Date {
+    uint32 day     = 1;
+    uint32 month   = 2;
+    uint32 year    = 3;
+  }
+
+  enum Op {
+    IS_UNSET      = 0;
+    IS_SET        = 1;
+    IS_AFTER      = 2;
+    IS_BEFORE     = 3;
+    IS_ON         = 4;
+  }
+}
+
+
+message VersionPredicate {
+  Op op                 = 1;
+  string selector       = 2;
+  string attribute_name = 3;
+  Version value         = 4;
+  Version value2        = 5;
+
+  enum Op {
+    IS_UNSET                 = 0;
+    IS_SET                   = 1;
+
+    IS_EQUAL                 = 2;
+    IS_NOT_EQUAL             = 3;
+
+    IS_GREATER_THAN          = 4;
+    IS_LESS_THAN             = 5;
+
+    IS_BETWEEN               = 6;
+
+    IS_GREATER_THAN_OR_EQUAL = 7;
+    IS_LESS_THAN_OR_EQUAL    = 8;
+  }
+}
+
+
+message GeofencePredicate {
+  Op op                 = 1;
+  string selector       = 2;
+  string attribute_name = 3;
+  Location value        = 4;
+
+
+  message Location {
+    double longitude = 1;
+    double latitude  = 2;
+    int32  radius    = 3;
+    string name      = 4;
+  }
+
+  enum Op {
+    IS_UNSET   = 0;
+    IS_SET     = 1;
+
+    IS_OUTSIDE = 2;
+    IS_WITHIN  = 3;
+  }
+}
+
+
+message DurationPredicate {
+  Op op                 = 1;
+  string selector       = 2;
+  string attribute_name = 3;
+  Duration value        = 4;
+
+  message Duration {
+    enum Type {
+      DAYS         = 0;
+    }
+
+    uint32 duration  = 1;
+    Type type        = 2;
+  }
+
+  enum Op {
+    IS_GREATER_THAN   = 0;
+    IS_LESS_THAN      = 1;
+    IS_EQUAL          = 2;
+  }
+}
+
+
+message StringArrayPredicate {
+  Op op                   = 1;
+  string selector         = 2;
+  string attribute_name   = 3;
+  repeated string value   = 4;
+
+  enum Op {
+    IS_UNSET                 = 0;
+    IS_SET                   = 1;
+
+    CONTAINS_ANY             = 2;
+    DOES_NOT_CONTAIN_ANY     = 3;
+
+    CONTAINS_ALL            = 4;
+    DOES_NOT_CONTAIN_ALL    = 5;
+  }
+}

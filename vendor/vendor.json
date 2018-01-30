@@ -135,6 +135,12 @@
 			"revisionTime": "2017-04-27T21:32:20Z"
 		},
 		{
+			"checksumSHA1": "eG45Hg4ZnB4b1KuqsMknc5eAx4A=",
+			"path": "github.com/golang/protobuf/jsonpb",
+			"revision": "c65a0412e71e8b9b3bfd22925720d23c0f054237",
+			"revisionTime": "2018-01-22T22:16:10Z"
+		},
+		{
 			"checksumSHA1": "yqF125xVSkmfLpIVGrLlfE05IUk=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "1909bc2f63dc92bb931deace8b8312c4db72d12f",
@@ -193,6 +199,18 @@
 			"path": "github.com/grpc-ecosystem/go-grpc-prometheus",
 			"revision": "2500245aa6110c562d17020fb31a2c133d737799",
 			"revisionTime": "2017-03-30T21:24:24Z"
+		},
+		{
+			"checksumSHA1": "QmAzbypFddS3Tl/HDca0X0zXZ/M=",
+			"path": "github.com/jmoiron/sqlx",
+			"revision": "de8647470aafe4854c976707c431dbe1eb2822c6",
+			"revisionTime": "2017-12-11T23:49:05Z"
+		},
+		{
+			"checksumSHA1": "bXFrevmVL5Q2EwYlRHlPihxvAJA=",
+			"path": "github.com/jmoiron/sqlx/reflectx",
+			"revision": "de8647470aafe4854c976707c431dbe1eb2822c6",
+			"revisionTime": "2017-12-11T23:49:05Z"
 		},
 		{
 			"checksumSHA1": "uTUsjF7bymOuKvXbW2BpkK/w4Vg=",
