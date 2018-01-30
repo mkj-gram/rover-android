@@ -110,6 +110,7 @@ module Rover
           rpc :CreateUser, CreateUserRequest, User
           rpc :UpdateUser, UpdateUserRequest, User
           rpc :UpdateUserPassword, UpdateUserPasswordRequest, Empty
+          rpc :GetUserInfo, GetUserInfoRequest, GetUserInfoResponse
           #
           # A user session is simple sign on using email & password based authentication to generate a new session token
           rpc :CreateUserSession, CreateUserSessionRequest, UserSession

@@ -93,6 +93,28 @@ function deserialize_rover_auth_v1_GetAccountRequest(buffer_arg) {
   return auth_v1_auth_pb.GetAccountRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_auth_v1_GetUserInfoRequest(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.GetUserInfoRequest)) {
+    throw new Error('Expected argument of type rover.auth.v1.GetUserInfoRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_GetUserInfoRequest(buffer_arg) {
+  return auth_v1_auth_pb.GetUserInfoRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_auth_v1_GetUserInfoResponse(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.GetUserInfoResponse)) {
+    throw new Error('Expected argument of type rover.auth.v1.GetUserInfoResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_GetUserInfoResponse(buffer_arg) {
+  return auth_v1_auth_pb.GetUserInfoResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_auth_v1_GetUserRequest(arg) {
   if (!(arg instanceof auth_v1_auth_pb.GetUserRequest)) {
     throw new Error('Expected argument of type rover.auth.v1.GetUserRequest');
@@ -356,6 +378,17 @@ var AuthService = exports.AuthService = {
     requestDeserialize: deserialize_rover_auth_v1_UpdateUserPasswordRequest,
     responseSerialize: serialize_rover_auth_v1_Empty,
     responseDeserialize: deserialize_rover_auth_v1_Empty,
+  },
+  getUserInfo: {
+    path: '/rover.auth.v1.Auth/GetUserInfo',
+    requestStream: false,
+    responseStream: false,
+    requestType: auth_v1_auth_pb.GetUserInfoRequest,
+    responseType: auth_v1_auth_pb.GetUserInfoResponse,
+    requestSerialize: serialize_rover_auth_v1_GetUserInfoRequest,
+    requestDeserialize: deserialize_rover_auth_v1_GetUserInfoRequest,
+    responseSerialize: serialize_rover_auth_v1_GetUserInfoResponse,
+    responseDeserialize: deserialize_rover_auth_v1_GetUserInfoResponse,
   },
   //
   // A user session is simple sign on using email & password based authentication to generate a new session token
