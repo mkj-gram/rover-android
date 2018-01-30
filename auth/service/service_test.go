@@ -33,7 +33,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&testDSN, "pg-dsn", `postgres://postgres:postgres@localhost:5432/authsvc_test?sslmode=disable`, "test DSN")
+	flag.StringVar(&testDSN, "pg-dsn", `postgres://postgres:postgres@postgres:5432/authsvc_test?sslmode=disable`, "test DSN")
 	flag.StringVar(&migrationsPath, "service.migrations.dir", `./db/migrations/postgres`, "path to migrations")
 	flag.BoolVar(&migrationsRun, "service.migrations.run", false, "run migrations")
 }
