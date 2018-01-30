@@ -6,6 +6,7 @@ import {
     GraphQLObjectType,
     GraphQLString
 } from 'graphql'
+import GraphQLJSON from 'graphql-type-json'
 
 import Background from './Background'
 import BackgroundContentMode from './BackgroundContentMode'
@@ -72,7 +73,11 @@ const Row = new GraphQLObjectType({
 	    screenId: {
 			type: new GraphQLNonNull(GraphQLID),
 			resolve: data => data['screen-id']
-		}
+		},
+        customKeys: {
+            type: new GraphQLNonNull(GraphQLJSON),
+            resolve: data => data['custom-keys']
+        }
 	})
 })
 

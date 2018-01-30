@@ -7,6 +7,7 @@ import {
     GraphQLObjectType,
     GraphQLString
 } from 'graphql'
+import GraphQLJSON from 'graphql-type-json'
 
 import Background from './Background'
 import BackgroundContentMode from './BackgroundContentMode'
@@ -113,6 +114,10 @@ const Screen = new GraphQLObjectType({
             resolve: requireScope('admin', data => {
                 return data['views'] || 0
             })
+        },
+        customKeys: {
+            type: new GraphQLNonNull(GraphQLJSON),
+            resolve: data => data['custom-keys']
         }
     })
 })

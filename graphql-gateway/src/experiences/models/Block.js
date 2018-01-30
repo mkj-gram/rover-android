@@ -7,6 +7,7 @@ import {
     GraphQLNonNull,
     GraphQLString
 } from 'graphql'
+import GraphQLJSON from 'graphql-type-json'
 
 import Action from './Action'
 import BarcodeBlock from './BarcodeBlock'
@@ -78,6 +79,9 @@ const Block = new GraphQLInterfaceType({
         },
         width: {
             type: Length
+        },
+        customKeys: {
+            type: new GraphQLNonNull(GraphQLJSON)
         }
     }),
     resolveType: data => {
