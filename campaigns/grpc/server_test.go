@@ -136,8 +136,8 @@ func TestCampaigns(t *testing.T) {
 
 	db.TimeNow = func() time.Time { return timeCreatedAt }
 
-	t.Run("List", test_List_Options)
 	t.Run("List", test_List)
+	t.Run("List_Options", test_List_Options)
 	t.Run("Create", test_Create)
 	t.Run("Rename", test_Rename)
 	t.Run("Duplicate", test_Duplicate)
@@ -230,6 +230,15 @@ func test_List_Options(t *testing.T) {
 				Keyword:     "C2",
 			},
 			exp: []int{2},
+		},
+
+		{
+			name: "keyword: injection free",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Keyword:     "C1 or account_id = 1",
+			},
+			exp: nil,
 		},
 	}
 
