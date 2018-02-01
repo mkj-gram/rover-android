@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { charcoal } from '../styles/colors'
 
-interface Props
+export interface Props
     extends StringMap<
             string | StringMap<string | number> | Function | boolean
         > {

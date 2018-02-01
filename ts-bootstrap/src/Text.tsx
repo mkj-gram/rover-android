@@ -7,7 +7,7 @@ import { silver, graphite, charcoal } from '../styles/colors'
 
 import ContentEditable from '../components/ContentEditable'
 
-interface TextProps {
+export interface TextProps {
     text: string
     size: 'h1' | 'h2' | 'large' | 'medium' | 'small'
     position?: 'left' | 'center'

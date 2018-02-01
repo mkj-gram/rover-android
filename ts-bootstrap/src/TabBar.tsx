@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-type TabBarProps = {
+export type TabBarProps = {
     children: JSX.Element[] | JSX.Element
     containerStyle?: React.CSSProperties
 }

@@ -13,7 +13,7 @@ const configureStore = (): Store<{}> => {
         const logger: Middleware = createLogger()
         middleware.push(logger)
     }
-    
+
     const enhancer = applyMiddleware(...middleware)
 
     const store = createStore(

@@ -118,6 +118,7 @@ services:
     depends_on:
       - auth-service
       - audience-service
+      - campaigns-service
     ports:
       - "4000:80"
     command: bash -c "npm install && npm run build && npm start"
@@ -127,6 +128,7 @@ services:
     environment:
       AUTH_V1_SERVICE_HOST: auth-service
       AUDIENCE_V1_SERVICE_HOST: audience-service
+      CAMPAIGNS_V1_SERVICE_HOST: campaigns-service
       NODE_ENV: development
 
   geocoder-service:

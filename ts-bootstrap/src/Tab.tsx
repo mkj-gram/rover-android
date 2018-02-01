@@ -2,7 +2,7 @@ import * as React from 'react'
 import { turquoise, black } from '../styles/colors'
 import { regular, text, semibold, medium } from '../styles/typography'
 
-type TabProps = {
+export type TabProps = {
     val: string
     selected: string
     onClick: (val: string) => void

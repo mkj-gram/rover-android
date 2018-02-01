@@ -1,16 +1,16 @@
 import { GraphQLObjectType } from 'graphql'
 import TrackEventsMutation from '../events/mutation/TrackEventsMutation'
 import SegmentMutation from '../segments/SegmentMutation'
-import { campaignMutations } from '../campaigns/CampaignTypes'
 import UpdateTestDeviceMutation from '../segments/UpdateTestDeviceMutation'
+import CreateCampaignMutation from '../campaigns/mutations/CreateCampaignMutation'
 
-class Mutation { }
+class Mutation {}
 
 Mutation.type = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
+        createCampaign: CreateCampaignMutation,
         trackEvents: TrackEventsMutation,
-        ...campaignMutations,
         ...SegmentMutation,
         ...UpdateTestDeviceMutation
     }

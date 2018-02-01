@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { cloud, turquoise } from '../styles/colors'
 
-type ProgressBarThinProps = {
+export type ProgressBarThinProps = {
     progress: number
     barPropStyle?: React.CSSProperties
     progressPropStyle?: React.CSSProperties

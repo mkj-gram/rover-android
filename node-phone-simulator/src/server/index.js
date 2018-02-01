@@ -19,7 +19,6 @@ import Auth from '@rover/auth-client'
 
 dotenv.config()
 
-
 const AuthClient = Auth.v1.Client()
 
 const app = express()
@@ -169,11 +168,11 @@ app.get('/:shortUrl', (req, res, next) => {
                 description: getTextDescription(experience),
                 simulatorUrl: experience.simulatorUrl
             })
-            .then(html => {
-                res.setHeader('Content-Type', 'text/html; charset=utf-8')
-                res.send(html)
-            })
-            .catch(respondWithError(res))
+                .then(html => {
+                    res.setHeader('Content-Type', 'text/html; charset=utf-8')
+                    res.send(html)
+                })
+                .catch(respondWithError(res))
         })
         .catch(respondWithError(res))
 })
@@ -263,7 +262,8 @@ const renderExperienceHtml = (experience, useRenderCache, options) => {
     } = options
 
     function render() {
-        const analyticsURL = process.env.ANALYTICS_URL || 'https://api.rover.io/v1/events'
+        const analyticsURL =
+            process.env.ANALYTICS_URL || 'https://api.rover.io/v1/events'
         return new Promise((resolve, reject) => {
             const reactApp = ReactDOMServer.renderToString(
                 <App
@@ -276,7 +276,7 @@ const renderExperienceHtml = (experience, useRenderCache, options) => {
                     showCloseButton={showCloseButton}
                 />
             )
-            
+
             const props = {
                 experience: experience,
                 analyticsToken: analyticsToken,
@@ -393,9 +393,8 @@ const fetchExperienceByShortUrl = (shortUrl, version, token) => {
                 experiences: {
                     [id]: {
                         accountId: attributes['account-id'],
-                        hasUnpublishedChanges: attributes[
-                            'has-unpublished-changes'
-                        ],
+                        hasUnpublishedChanges:
+                            attributes['has-unpublished-changes'],
                         homeScreenId: attributes['home-screen-id'],
                         id: id,
                         isArchived: attributes['is-archived'],
@@ -414,23 +413,24 @@ const fetchExperienceByShortUrl = (shortUrl, version, token) => {
 
 const getAnalyticsToken = accountId => {
     return new Promise((resolve, reject) => {
-        
         const request = new RoverApis.auth.v1.Models.ListTokensRequest()
         request.setAccountId(accountId)
-        
+
         AuthClient.listTokens(request, (err, response) => {
             if (err) {
                 reject({ statuscode: 500 })
             }
-            
+
             const tokens = response.getTokensList()
-            
-            const webToken = tokens.find(token => token.getPermissionScopesList().includes('web'))
-            
+
+            const webToken = tokens.find(token =>
+                token.getPermissionScopesList().includes('web')
+            )
+
             if (webToken) {
                 return resolve(webToken.getKey())
             }
-            
+
             return reject({ statuscode: 500 })
         })
     })

@@ -12,7 +12,7 @@ import {
 } from '../styles/colors'
 import { small, text } from '../styles/typography'
 
-interface AlertProps {
+export interface AlertProps {
     message: string
     type: 'info' | 'warn' | 'custom' | 'error'
     style?: StringMap<string | number>

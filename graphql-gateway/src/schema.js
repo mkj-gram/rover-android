@@ -20,10 +20,14 @@ import RectangleBlock from './experiences/models/RectangleBlock'
 import TextBlock from './experiences/models/TextBlock'
 import WebViewBlock from './experiences/models/WebViewBlock'
 
+import automatedNotification from './campaigns/types/automatedNotification'
+import scheduledNotification from './campaigns/types/scheduledNotification'
+
 const schema = new GraphQLSchema({
     query: Query.type,
     mutation: Mutation.type,
     types: [
+        automatedNotification,
         BarcodeBlock,
         BooleanPredicate,
         ButtonBlock,
@@ -33,6 +37,7 @@ const schema = new GraphQLSchema({
         GeofencePredicate,
         NumberPredicate,
         RectangleBlock,
+        scheduledNotification,
         StringPredicate,
         StringArrayPredicate,
         TextBlock,

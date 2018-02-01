@@ -16,7 +16,7 @@ type propStyle = {
     outerStyle?: React.CSSProperties
 }
 
-interface ButtonProps {
+export interface ButtonProps {
     text: string
     type: 'primary' | 'secondary' | 'disabled' | 'regular'
     size?: 'large' | 'small'
@@ -25,7 +25,7 @@ interface ButtonProps {
     style?: propStyle
 }
 
-interface ButtonState {
+export interface ButtonState {
     mouseDown: boolean
 }
 
