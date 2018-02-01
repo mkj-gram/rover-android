@@ -11,6 +11,8 @@ import {
 import Screen from './Screen'
 import { requireScope } from '../../resolvers'
 
+import GraphQLJSON from 'graphql-type-json'
+
 const Experience = new GraphQLObjectType({
     name: 'Experience',
     fields: () => ({
@@ -19,6 +21,10 @@ const Experience = new GraphQLObjectType({
             resolve: requireScope('admin', data => {
                 return data['has-unpublished-changes']
             })
+        },
+        customKeys: {
+            type: new GraphQLNonNull(GraphQLJSON),
+            resolve: data => data['custom-keys']
         },
         id: {
             type: new GraphQLNonNull(GraphQLID),

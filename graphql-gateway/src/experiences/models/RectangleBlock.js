@@ -7,6 +7,7 @@ import {
     GraphQLObjectType,
     GraphQLString
 } from 'graphql'
+import GraphQLJSON from 'graphql-type-json'
 
 import Action from './Action'
 import Background from './Background'
@@ -131,7 +132,11 @@ const RectangleBlock = new GraphQLObjectType({
 	    width: {
 			type: Length,
 			resolve: data => data['width']
-		}
+		},
+        customKeys: {
+            type: new GraphQLNonNull(GraphQLJSON),
+			resolve: data => data['custom-keys']
+        }
 	})
 })
 
