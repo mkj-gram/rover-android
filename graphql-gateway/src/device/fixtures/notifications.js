@@ -2,7 +2,7 @@ const notifications = [
     {
         __className: "Notification",
         id: "1111",
-        campaignID: "7889",
+        campaignId: "7889",
         title: "20180204 -- Kirsch App",
         body: "Follow Super Bowl LII live now!",
         action: {
@@ -17,7 +17,7 @@ const notifications = [
     {
         __className: "Notification",
         id: "1112",
-        campaignID: "7870",
+        campaignId: "7870",
         title: null,
         body: "Watch a live edition of Patriots All Access direct from Minnesota on the Not Done Network!",
         action: {
@@ -32,7 +32,7 @@ const notifications = [
     {
         __className: "Notification",
         id: "1113",
-        campaignID: "7843",
+        campaignId: "7843",
         title: "20180201 -- RKK Live",
         body: "Robert Kraft joins us now live now on the Not Done Network",
         action: {

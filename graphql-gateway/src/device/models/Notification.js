@@ -18,7 +18,7 @@ const Notification = new GraphQLObjectType({
         id: {
             type: new GraphQLNonNull(GraphQLID)
         },
-        campaignID: {
+        campaignId: {
             type: new GraphQLNonNull(GraphQLID)
         },
         title: {
