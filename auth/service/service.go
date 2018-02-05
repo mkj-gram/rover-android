@@ -188,6 +188,46 @@ func (svr *Server) GetUser(ctx context.Context, r *auth.GetUserRequest) (*auth.U
 	return &usr.User, nil
 }
 
+// GetUserInfo implements auth.AuthServer
+func (svr *Server) GetUserInfo(ctx context.Context, r *auth.GetUserInfoRequest) (*auth.GetUserInfoResponse, error) {
+	var authCtx = r.GetAuthContext()
+
+	if authCtx == nil {
+		return nil, grpc.Errorf(codes.InvalidArgument, "auth_context: is required")
+	}
+
+	acct, err := svr.DB.GetAccount(ctx, &auth.GetAccountRequest{AccountId: authCtx.GetAccountId()})
+	if err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, grpc.Errorf(codes.NotFound, "db.getAccount: %v", err)
+		}
+		return nil, grpc.Errorf(codes.Unknown, "db.getAccount: %v", err)
+	}
+
+	var u *auth.User
+
+	if authCtx.UserId > 0 {
+		usr, err := svr.DB.GetUserById(ctx, int(authCtx.UserId))
+		if err != nil {
+			if errors.Cause(err) == sql.ErrNoRows {
+				return nil, grpc.Errorf(codes.NotFound, "db.GetUserById: %v", err)
+			}
+			return nil, grpc.Errorf(codes.Unknown, "db.GetUserById: %v", err)
+		}
+
+		if usr.AccountId != acct.Id {
+			return nil, grpc.Errorf(codes.PermissionDenied, "account_id: mismatch")
+		}
+
+		u = &usr.User
+	}
+
+	return &auth.GetUserInfoResponse{
+		Account: acct,
+		User:    u,
+	}, nil
+}
+
 // CreateUser implements auth.AuthServer
 func (svr *Server) CreateUser(ctx context.Context, r *auth.CreateUserRequest) (*auth.User, error) {
 	if err := validatePassword(r.GetPassword()); err != nil {

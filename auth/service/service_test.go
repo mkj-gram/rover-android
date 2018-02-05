@@ -33,7 +33,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&testDSN, "pg-dsn", `postgres://postgres:postgres@localhost:5432/authsvc_test?sslmode=disable`, "test DSN")
+	flag.StringVar(&testDSN, "pg-dsn", `postgres://postgres:postgres@postgres:5432/authsvc_test?sslmode=disable`, "test DSN")
 	flag.StringVar(&migrationsPath, "service.migrations.dir", `./db/migrations/postgres`, "path to migrations")
 	flag.BoolVar(&migrationsRun, "service.migrations.run", false, "run migrations")
 }
@@ -140,6 +140,8 @@ func TestAuthsvc(t *testing.T) {
 	t.Run("UpdateAccount", testAuthsvc_UpdateAccount)
 	t.Run("ListTokens", testAuthsvc_ListTokens)
 
+	t.Run("GetUserInfo", testAuthsvc_GetUserInfo)
+
 	t.Run("GetUser", testAuthsvc_GetUser)
 	t.Run("CreateUser", testAuthsvc_CreateUser)
 	t.Run("UpdateUser", testAuthsvc_UpdateUser)
@@ -203,11 +205,11 @@ func testAuthsvc_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			got, err := svc.CreateAccount(tt.args.ctx, tt.args.r)
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Fatal("error:", diff)
 				return
 			}
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -278,11 +280,11 @@ func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			got, err := svc.CreateAccount(tt.args.ctx, tt.args.r)
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Fatal("error:", diff)
 				return
 			}
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 			{
@@ -296,7 +298,7 @@ func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 					return got[i].Key < got[j].Key
 				})
 
-				if diff := deep.Equal(got, tt.wantTokens); diff != nil {
+				if diff := deep.Equal(tt.wantTokens, got); diff != nil {
 					t.Error(diff)
 				}
 			}
@@ -380,12 +382,12 @@ func testAuthsvc_ListTokens(t *testing.T) {
 				return got.Tokens[i].Key < got.Tokens[j].Key
 			})
 
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Fatal("error:", diff)
 				return
 			}
 
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -438,11 +440,11 @@ func testAuthsvc_GetAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := svc.GetAccount(tt.args.ctx, tt.args.r)
 
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Error("error:", diff)
 				return
 			}
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -505,11 +507,11 @@ func testAuthsvc_UpdateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := svc.UpdateAccount(tt.args.ctx, tt.args.r)
 
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Error("error:", diff)
 				return
 			}
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -582,6 +584,85 @@ func testAuthsvc_GetUser(t *testing.T) {
 				return
 			}
 			if diff := deep.Equal(got, tt.want); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func testAuthsvc_GetUserInfo(t *testing.T) {
+	var db, closeDB = dbConnect(t, testDSN)
+	var svc = service.Server{DB: db}
+	defer closeDB()
+
+	type args struct {
+		ctx context.Context
+		r   *auth.GetUserInfoRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *auth.GetUserInfoResponse
+		wantErr error
+	}{{
+
+		name:    "error: getting a non-existant user",
+		wantErr: grpc.Errorf(codes.NotFound, "db.getAccount: Scan: sql: no rows in result set"),
+
+		args: args{context.Background(),
+			&auth.GetUserInfoRequest{
+				AuthContext: &auth.AuthContext{UserId: 1, AccountId: -1},
+			},
+		},
+	}, {
+
+		name:    "error: getting a user belonging to non-existing account",
+		wantErr: grpc.Errorf(codes.PermissionDenied, "account_id: mismatch"),
+
+		args: args{context.Background(),
+			&auth.GetUserInfoRequest{
+				AuthContext: &auth.AuthContext{UserId: 1, AccountId: 2},
+			},
+		},
+	}, {
+
+		name: "getting an existing user",
+
+		args: args{context.Background(),
+			&auth.GetUserInfoRequest{
+				AuthContext: &auth.AuthContext{UserId: 4, AccountId: 20},
+			},
+		},
+
+		want: &auth.GetUserInfoResponse{
+			Account: &auth.Account{
+				CreatedAt: ts(t, createdAt),
+				UpdatedAt: ts(t, createdAt),
+				Id:        20,
+				Name:      "account20",
+			},
+			User: &auth.User{
+				CreatedAt: ts(t, otherTime),
+				UpdatedAt: ts(t, otherTime),
+
+				AccountId:        20,
+				Id:               4,
+				Name:             "user20",
+				Email:            "user20@example.com",
+				PermissionScopes: []string{"admin"},
+			},
+		},
+	}}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := svc.GetUserInfo(tt.args.ctx, tt.args.r)
+
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
+				t.Error("error:", diff)
+				return
+			}
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -692,13 +773,13 @@ func testAuthsvc_CreateUser(t *testing.T) {
 			got, err := svc.CreateUser(tt.args.ctx, tt.args.r)
 
 			if err != nil || tt.wantErr != nil {
-				if diff := deep.Equal(err, tt.wantErr); diff != nil {
+				if diff := deep.Equal(tt.wantErr, err); diff != nil {
 					t.Error("error:", diff)
 				}
 				return
 			}
 
-			if diff := deep.Equal(*got, tt.want.User); diff != nil {
+			if diff := deep.Equal(tt.want.User, *got); diff != nil {
 				t.Error(diff)
 			}
 
@@ -708,7 +789,7 @@ func testAuthsvc_CreateUser(t *testing.T) {
 					t.Error("unexpected:", err)
 				}
 
-				if diff := deep.Equal(got, tt.want); diff != nil {
+				if diff := deep.Equal(tt.want, got); diff != nil {
 					t.Error(diff)
 				}
 			}
@@ -857,13 +938,13 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 			got, err := svc.UpdateUser(tt.args.ctx, tt.args.r)
 
 			if err != nil || tt.wantErr != nil {
-				if diff := deep.Equal(err, tt.wantErr); diff != nil {
+				if diff := deep.Equal(tt.wantErr, err); diff != nil {
 					t.Error("error:", diff)
 				}
 				return
 			}
 
-			if diff := deep.Equal(got, &tt.want.User); diff != nil {
+			if diff := deep.Equal(&tt.want.User, got); diff != nil {
 				t.Error(diff)
 			}
 
@@ -873,7 +954,7 @@ func testAuthsvc_UpdateUser(t *testing.T) {
 					t.Error("unexpected:", err)
 				}
 
-				if diff := deep.Equal(got, tt.want); diff != nil {
+				if diff := deep.Equal(tt.want, got); diff != nil {
 					t.Error(diff)
 				}
 			}
@@ -963,13 +1044,13 @@ func testAuthsvc_UpdateUserPassword(t *testing.T) {
 			got, err := svc.UpdateUserPassword(tt.args.ctx, tt.args.r)
 
 			if err != nil || tt.wantErr != nil {
-				if diff := deep.Equal(err, tt.wantErr); diff != nil {
+				if diff := deep.Equal(tt.wantErr, err); diff != nil {
 					t.Error("error:", diff)
 				}
 				return
 			}
 
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 
@@ -979,7 +1060,7 @@ func testAuthsvc_UpdateUserPassword(t *testing.T) {
 					t.Error("unexpected:", err)
 				}
 
-				if diff := deep.Equal(got, tt.wantUser); diff != nil {
+				if diff := deep.Equal(tt.wantUser, got); diff != nil {
 					t.Error(diff)
 				}
 			}
@@ -1119,12 +1200,12 @@ func testAuthsvc_CreateUserSession(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := svc.CreateUserSession(tt.args.ctx, tt.args.r)
 
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Error("error:", diff)
 				return
 			}
 
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -1200,13 +1281,13 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 			got, err := svc.AuthenticateUserSession(tt.args.ctx, tt.args.r)
 
 			if err != nil || tt.wantErr != nil {
-				if diff := deep.Equal(err, tt.wantErr); diff != nil {
+				if diff := deep.Equal(tt.wantErr, err); diff != nil {
 					t.Error("error:", diff)
 				}
 				return
 			}
 
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 
@@ -1217,7 +1298,7 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 					t.Fatalf("unexpected:", err)
 				}
 
-				if diff := deep.Equal(got, tt.wantSession); diff != nil {
+				if diff := deep.Equal(tt.wantSession, got); diff != nil {
 					t.Error("session", diff)
 				}
 			}
@@ -1287,13 +1368,13 @@ func testAuthsvc_AuthenticateToken(t *testing.T) {
 			got, err := svc.AuthenticateToken(tt.args.ctx, tt.args.r)
 
 			if err != nil || tt.wantErr != nil {
-				if diff := deep.Equal(err, tt.wantErr); diff != nil {
+				if diff := deep.Equal(tt.wantErr, err); diff != nil {
 					t.Error("error:", diff)
 				}
 				return
 			}
 
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 
@@ -1304,7 +1385,7 @@ func testAuthsvc_AuthenticateToken(t *testing.T) {
 					t.Fatalf("unexpected:", err)
 				}
 
-				if diff := deep.Equal(got, tt.wantToken); diff != nil {
+				if diff := deep.Equal(tt.wantToken, got); diff != nil {
 					t.Error("wantToken:", diff)
 				}
 			}
@@ -1363,11 +1444,11 @@ func testDB_GetUserById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := db.GetUserById(tt.args.ctx, tt.args.id)
 
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Error("error:", diff)
 				return
 			}
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -1423,11 +1504,11 @@ func testDB_FindUserByEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := db.FindUserByEmail(tt.args.ctx, tt.args.email)
 
-			if diff := deep.Equal(err, tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Error("error:", diff)
 				return
 			}
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -1471,12 +1552,12 @@ func testDB_FindUserSessionByKey(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := db.FindSessionByKey(tt.args.ctx, tt.args.key)
 
-			if diff := deep.Equal((err), tt.wantErr); diff != nil {
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
 				t.Error("error:", diff)
 				return
 			}
 
-			if diff := deep.Equal(got, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}
 		})
