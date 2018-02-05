@@ -8,8 +8,8 @@ import { GraphQLDateTime } from 'graphql-iso-date'
 
 import { scheduledDeliveryStatus, scheduledType } from '../types/definitions'
 
-const scheduled = new GraphQLInterfaceType({
-    name: 'ScheduledNotificationDetails',
+const ScheduledCampaign = new GraphQLInterfaceType({
+    name: 'ScheduledCampaign',
     description: 'Attributes associated with Scheduled Notifcation Campaigns',
     fields: () => ({
         scheduledType: {
@@ -33,4 +33,4 @@ const scheduled = new GraphQLInterfaceType({
     })
 })
 
-export default scheduled
+export default ScheduledCampaign

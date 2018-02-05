@@ -15,8 +15,8 @@ import {
     notificationTapPresentationType
 } from '../types/definitions'
 
-const notification = new GraphQLInterfaceType({
-    name: 'Notification',
+const NotificationCampaign = new GraphQLInterfaceType({
+    name: 'NotificationCampaign',
     description: 'Campaign Notification Attributes',
     fields: () => ({
         notificationBody: {
@@ -108,4 +108,4 @@ const notification = new GraphQLInterfaceType({
     })
 })
 
-export default notification
+export default NotificationCampaign

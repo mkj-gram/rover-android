@@ -8,9 +8,9 @@ import {
 } from 'graphql'
 import PredicateAggregate from '../../segments/PredicateAggregate'
 
-const automated = new GraphQLInterfaceType({
-    name: 'AutomatedNotificationDetails',
-    description: 'Attributes associated with Automated Notifcation Campaigns',
+const AutomatedCampaign = new GraphQLInterfaceType({
+    name: 'AutomatedCampaign',
+    description: 'Attributes associated with Automated Campaigns',
     fields: () => ({
         automatedMonday: {
             type: new GraphQLNonNull(GraphQLBoolean),
@@ -76,4 +76,4 @@ const automated = new GraphQLInterfaceType({
     })
 })
 
-export default automated
+export default AutomatedCampaign

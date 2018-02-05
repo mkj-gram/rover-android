@@ -5,12 +5,14 @@ promisify(campaignsClient)
 
 import { GraphQLString } from 'graphql'
 
-import { campaign } from '../interfaces'
-import getAutomatedNotificationCampaignFromProto from '../../grpc/campaigns/getAutomatedNotificationCampaignFromProto'
-import getScheduledNotificationCampaignFromProto from '../../grpc/campaigns/getScheduledNotificationCampaignFromProto'
+import { Campaign } from '../interfaces'
+import {
+    getAutomatedNotificationCampaignFromProto,
+    getScheduledNotificationCampaignFromProto
+} from '../../grpc/campaigns'
 
 const CreateCampaignMutation = {
-    type: campaign,
+    type: Campaign,
     description: 'Create a new Campaign',
     args: {
         name: { type: GraphQLString },

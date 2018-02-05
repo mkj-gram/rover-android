@@ -11,7 +11,12 @@ import {
 import { GraphQLDateTime } from 'graphql-iso-date'
 import GraphQLJSON from 'graphql-type-json'
 
-import { automated, campaign, notification, segmentIdList } from '../interfaces'
+import {
+    AutomatedCampaign,
+    Campaign,
+    NotificationCampaign,
+    SegmentableCampaign
+} from '../interfaces'
 
 import {
     campaignStatus,
@@ -23,9 +28,14 @@ import {
 } from './definitions'
 import PredicateAggregate from '../../segments/PredicateAggregate'
 
-const automatedNotification = new GraphQLObjectType({
-    name: 'AutomatedNotification',
-    interfaces: () => [automated, campaign, notification, segmentIdList],
+const AutomatedNotificationCampaign = new GraphQLObjectType({
+    name: 'AutomatedNotificationCampaign',
+    interfaces: () => [
+        AutomatedCampaign,
+        Campaign,
+        NotificationCampaign,
+        SegmentableCampaign
+    ],
     isTypeOf: ({ campaignType }) =>
         campaignType === 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION',
     fields: () => ({
@@ -218,4 +228,4 @@ const automatedNotification = new GraphQLObjectType({
     })
 })
 
-export default automatedNotification
+export default AutomatedNotificationCampaign

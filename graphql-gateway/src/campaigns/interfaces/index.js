@@ -1,7 +1,13 @@
-import automated from './automated'
-import campaign from './campaign'
-import notification from './notification'
-import scheduled from './scheduled'
-import segmentIdList from './segmentIdList'
+import AutomatedCampaign from './AutomatedCampaign'
+import Campaign from './Campaign'
+import NotificationCampaign from './NotificationCampaign'
+import ScheduledCampaign from './ScheduledCampaign'
+import SegmentableCampaign from './SegmentableCampaign'
 
-export { automated, campaign, notification, scheduled, segmentIdList }
+export {
+    AutomatedCampaign,
+    Campaign,
+    NotificationCampaign,
+    ScheduledCampaign,
+    SegmentableCampaign
+}

@@ -11,7 +11,12 @@ import {
 import { GraphQLDateTime } from 'graphql-iso-date'
 import GraphQLJSON from 'graphql-type-json'
 
-import { campaign, notification, scheduled, segmentIdList } from '../interfaces'
+import {
+    Campaign,
+    NotificationCampaign,
+    ScheduledCampaign,
+    SegmentableCampaign
+} from '../interfaces'
 
 import {
     campaignType,
@@ -24,9 +29,14 @@ import {
     scheduledDeliveryStatus
 } from './definitions'
 
-const scheduledNotification = new GraphQLObjectType({
+const ScheduledNotificationCampaign = new GraphQLObjectType({
     name: 'ScheduledNotificationCampaign',
-    interfaces: () => [scheduled, campaign, notification, segmentIdList],
+    interfaces: () => [
+        ScheduledCampaign,
+        Campaign,
+        NotificationCampaign,
+        SegmentableCampaign
+    ],
     isTypeOf: ({ campaignType }) =>
         campaignType === 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION',
     fields: () => ({
@@ -177,4 +187,4 @@ const scheduledNotification = new GraphQLObjectType({
     })
 })
 
-export default scheduledNotification
+export default ScheduledNotificationCampaign
