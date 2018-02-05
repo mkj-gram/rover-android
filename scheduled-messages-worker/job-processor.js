@@ -58,17 +58,29 @@ const parseCustomer = (customer) => {
     }
 }
 
-const roverInboxApnsProductionClient = new apn.Provider({
-    pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.inbox.p12')),
-    passphrase: null,
-    production: true
-});
+let roverInboxApnsProductionClient = null
 
-const roverInboxApnsDevelopmentClient = new apn.Provider({
-    pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.inbox.p12')),
-    passphrase: null,
-    production: false
-});
+try {
+    roverInboxApnsProductionClient = new apn.Provider({
+        pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.inbox.p12')),
+        passphrase: null,
+        production: true
+    });
+} catch(err) {
+    console.log(err)
+}
+
+let roverInboxApnsDevelopmentClient = null
+try {
+    roverInboxApnsDevelopmentClient = new apn.Provider({
+        pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.inbox.p12')),
+        passphrase: null,
+        production: false
+    }); 
+} catch(err) {
+    console.log(err)
+}
+
 
 
 function profileToCustomer(profile, devices) {
