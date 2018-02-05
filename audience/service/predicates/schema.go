@@ -7,6 +7,9 @@ var (
 		"device_id": {
 			MissingValue: "",
 		},
+		"profile_identifier": {
+			MissingValue: "",
+		},
 		"advertising_id": {
 			MissingValue: "",
 		},
