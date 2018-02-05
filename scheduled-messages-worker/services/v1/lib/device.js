@@ -170,7 +170,6 @@ module.exports = function(AudienceClient, logger) {
 			return function(done) {
 				let request = new RoverApis.audience.v1.Models.ListDevicesByProfileIdentifierRequest()
 				request.setAuthContext(authContext)
-        request.setMs12(true)
 				request.setProfileIdentifier(profileIdentifier)
 
 				AudienceClient.listDevicesByProfileIdentifier(request, function(err, reply) {

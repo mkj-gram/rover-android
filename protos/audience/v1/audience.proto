@@ -22,13 +22,13 @@ service Audience {
   rpc DeleteProfile(DeleteProfileRequest) returns (DeleteProfileResponse);
   // UpdateProfile updates profile with provided subset of attributes
   rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
-  rpc UpdateProfileIdentifier(UpdateProfileIdentifierRequest) returns (UpdateProfileIdentifierResponse);
 
   // GetProfileByDeviceId returns a profile which is associated to the device id
   rpc GetProfileByDeviceId(GetProfileByDeviceIdRequest) returns (GetProfileByDeviceIdResponse);
+
+  // deprecated (use GetProfile)
   rpc GetProfileByIdentifier(GetProfileByIdentifierRequest) returns (GetProfileByIdentifierResponse);
 
-  rpc ListProfilesByIds(ListProfilesByIdsRequest) returns (ListProfilesByIdsResponse);
   rpc ListProfilesByIdentifiers(ListProfilesByIdentifiersRequest) returns (ListProfilesByIdentifiersResponse);
 
   // GetProfileSchema returns the currently tracked profiles schema by account id
@@ -57,11 +57,9 @@ service Audience {
   rpc UpdateDeviceLabelProperty(UpdateDeviceLabelPropertyRequest) returns (UpdateDeviceLabelPropertyResponse);
 
   // Lists
-  rpc ListDevicesByProfileId(ListDevicesByProfileIdRequest) returns (ListDevicesByProfileIdResponse);
   rpc ListDevicesByProfileIdentifier(ListDevicesByProfileIdentifierRequest) returns (ListDevicesByProfileIdentifierResponse);
 
-  // SetDeviceProfile sets the profile the device belongs to
-  rpc SetDeviceProfile(SetDeviceProfileRequest) returns (SetDeviceProfileResponse);
+  rpc SetDeviceProfileIdentifier(SetDeviceProfileIdentifierRequest) returns(SetDeviceProfileIdentifierResponse);
 
   // DeleteDevice deletes device from the database and removes it from any segments
   rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
@@ -119,7 +117,10 @@ service Audience {
 
 message GetProfileRequest {
   auth.v1.AuthContext auth_context = 1;
-  string profile_id = 2;
+  // deprecated
+  string profile_id = 2 [deprecated=true];
+
+  string identifier = 3;
 }
 message GetProfileResponse {
   Profile profile = 1;
@@ -128,11 +129,6 @@ message GetProfileResponse {
 
 message CreateProfileRequest {
   auth.v1.AuthContext auth_context = 1;
-
-  /*
-    Optional
-    If empty string is passed this is considered to not be set
-   */
   string identifier = 2;
 }
 message CreateProfileResponse {
@@ -142,28 +138,19 @@ message CreateProfileResponse {
 
 message DeleteProfileRequest {
   auth.v1.AuthContext auth_context = 1;
-  string profile_id = 2;
+  string identifier = 3;
 }
 message DeleteProfileResponse {}
 
 
 message UpdateProfileRequest {
   auth.v1.AuthContext auth_context = 1;
-  string profile_id = 2;
+
   map<string, ValueUpdates> attributes = 5;
+
+  string identifier = 6;
 }
 message UpdateProfileResponse {}
-
-
-message UpdateProfileIdentifierRequest {
-  auth.v1.AuthContext auth_context = 1;
-  // profile to set identifier on
-  string profile_id = 2;
-  // the identifier value to set the identifier to
-  string identifier = 3;
-}
-message UpdateProfileIdentifierResponse {}
-
 
 message GetProfileByDeviceIdRequest {
   auth.v1.AuthContext auth_context = 1;
@@ -180,16 +167,6 @@ message GetProfileByIdentifierRequest {
 }
 message GetProfileByIdentifierResponse {
   Profile profile = 1;
-}
-
-
-message ListProfilesByIdsRequest {
-  auth.v1.AuthContext auth_context = 1;
-
-  repeated string profile_ids = 2;
-}
-message ListProfilesByIdsResponse {
-  repeated Profile profiles = 2;
 }
 
 message ListProfilesByIdentifiersRequest {
@@ -216,9 +193,11 @@ message ProfileSchema {
 // Profile represents a variable set of a user attributes that customer pushes to Rover.
 // It can be thought as a flat JSON object of simple key-value pairs ( There is no nesting of attributes )
 message Profile {
-  string id  = 1;
+  // deprecated
+  string id  = 1 [deprecated=true];
   int32 account_id = 2;
   // identifier represents an id used by customers to map back this profile to their data
+  // required
   string identifier = 3;
 
 
@@ -254,15 +233,11 @@ message GetDeviceByPushTokenResponse {
 
 message CreateDeviceRequest {
   auth.v1.AuthContext auth_context = 1;
-  // use profile_identifier instead
+  // deprecated use profile_identifier instead
   string profile_id                = 2 [deprecated=true];
   string device_id                 = 3;
 
-
-  // TODO: ms-12: this is transition-phase attribute to distinguish between old/new clients
-  // all clients using new data-model must set this attribute
-  // Once transition is complete ms12 will be ignored
-  bool ms12                        = 4;
+  bool ms12                        = 4 [deprecated=true];
   string profile_identifier        = 5;
 }
 message CreateDeviceResponse {}
@@ -339,37 +314,16 @@ message DeleteDeviceRequest {
 message DeleteDeviceResponse {}
 
 
-message SetDeviceProfileRequest {
+message SetDeviceProfileIdentifierRequest {
   auth.v1.AuthContext auth_context = 1;
-
   string device_id = 2;
-  // use profile_identifier instead
-  string profile_id = 3 [deprecated = true];
-
-  bool ms12                 = 4;
-  string profile_identifier = 5;
+  string profile_identifier = 3;
 }
-message SetDeviceProfileResponse {}
-
-
-message ListDevicesByProfileIdRequest {
-  auth.v1.AuthContext auth_context = 1;
-  string profile_id = 2 [deprecated = true];
-
-  bool ms12                 = 4;
-}
-message ListDevicesByProfileIdResponse {
-  repeated Device devices = 1;
-}
-
+message SetDeviceProfileIdentifierResponse {}
 
 message ListDevicesByProfileIdentifierRequest {
   auth.v1.AuthContext auth_context = 1;
-  // use profile_identifier instead
-  string identifier = 2 [deprecated = true];
-
-  bool ms12                 = 4;
-  string profile_identifier = 5;
+  string profile_identifier = 2;
 }
 message ListDevicesByProfileIdentifierResponse {
   repeated Device devices = 1;

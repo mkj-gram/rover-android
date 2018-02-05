@@ -12,7 +12,6 @@ import (
 
 	"gopkg.in/mgo.v2/bson"
 
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
@@ -20,6 +19,7 @@ import (
 	"github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/mongodb"
 	"github.com/roverplatform/rover/go/log"
+	"google.golang.org/grpc/status"
 )
 
 var _ = log.Debug
@@ -72,13 +72,10 @@ func TestAudienceService(t *testing.T) {
 	t.Run("CreateProfile", testAudienceService_CreateProfile)
 	t.Run("DeleteProfile", testAudienceService_DeleteProfile)
 	t.Run("UpdateProfile", testAudienceService_UpdateProfile)
-	t.Run("UpdateProfile_ms12", testAudienceService_UpdateProfile_ms12)
-	t.Run("UpdateProfileIdentifier", testAudienceService_UpdateProfileIdentifier)
 	t.Run("GetProfile", testAudienceService_GetProfile)
 	t.Run("GetProfileByDeviceId", testAudienceService_GetProfileByDeviceId)
 	t.Run("GetProfileByIdentifier", testAudienceService_GetProfileByIdentifier)
 
-	t.Run("ListProfilesByIds", testAudienceService_ListProfilesByIds)
 	t.Run("ListProfilesByIdentifiers", testAudienceService_ListProfilesByIdentifiers)
 
 	// Profile Schema
@@ -89,7 +86,6 @@ func TestAudienceService(t *testing.T) {
 	t.Run("GetDevice", testAudienceService_GetDevice)
 	t.Run("GetDeviceByPushToken", testAudienceService_GetDeviceByPushToken)
 	t.Run("CreateDevice", testAudienceService_CreateDevice)
-	t.Run("CreateDevice_ms12", testAudienceService_CreateDevice_Ms12)
 	t.Run("UpdateDevice", testAudienceService_UpdateDevice)
 	t.Run("UpdateDevicePushToken", testAudienceService_UpdateDevicePushToken)
 	t.Run("UpdateDeviceUnregisterPushToken", testAudienceService_UpdateDeviceUnregisterPushToken)
@@ -98,15 +94,11 @@ func TestAudienceService(t *testing.T) {
 	t.Run("UpdateDeviceIBeaconMonitoring", testAudienceService_UpdateDeviceIBeaconMonitoring)
 	t.Run("UpdateDeviceTestProperty", testAudienceService_UpdateDeviceTestProperty)
 	t.Run("UpdateDeviceCustomAttributes", testAudienceService_UpdateDeviceCustomAttributes)
-	t.Run("UpdateDeviceCustomAttributes_ms12", testAudienceService_UpdateDeviceCustomAttributes_ms12)
 
-	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfile)
-	t.Run("SetDeviceProfile_ms12", testAudienceService_SetDeviceProfile_ms12)
+	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfileIdentifier)
 
 	t.Run("DeleteDevice", testAudienceService_DeleteDevice)
-	t.Run("ListDevicesByProfileId", testAudienceService_ListDevicesByProfileId)
 	t.Run("ListDevicesByProfileIdentifier", testAudienceService_ListDevicesByProfileIdentifier)
-	t.Run("ListDevicesByProfileIdentifier_ms12", testAudienceService_ListDevicesByProfileIdentifier_ms12)
 
 	t.Run("GetDeviceSchema", testAudienceService_GetDeviceSchema)
 
@@ -184,7 +176,7 @@ func testAudienceService_CreateProfile(t *testing.T) {
 		{
 			name: "error: requires account id to be set",
 
-			expErr: grpc.Errorf(codes.Unauthenticated, "AuthContext: must be set"),
+			expErr: status.Errorf(codes.Unauthenticated, "AuthContext: must be set"),
 
 			req: &audience.CreateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 0},
@@ -267,23 +259,21 @@ func testAudienceService_DeleteProfile(t *testing.T) {
 		{
 			name: "error: invalid id",
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.DeleteProfile: StringToObjectID: bson.IsObjectIdHex: false"),
+			expErr: status.Errorf(codes.InvalidArgument, "Identifier cannot be blank"),
 
 			req: &audience.DeleteProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				ProfileId: "notreallyavalidid",
+				Identifier:  "",
 			},
 		},
 		{
 			name: "error: deleting non-existing profile",
 
-			expErr: grpc.Errorf(codes.NotFound, "db.DeleteProfile: profiles.Remove: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.DeleteProfile: profiles.Remove: not found"),
 
 			req: &audience.DeleteProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				ProfileId: "000000000000000000000000",
+				Identifier:  "xbxbxbxbxbxbxbxbxbx",
 			},
 		},
 
@@ -292,8 +282,7 @@ func testAudienceService_DeleteProfile(t *testing.T) {
 
 			req: &audience.DeleteProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				ProfileId: "0194fdc2fa2ffcc041d3ff12",
+				Identifier:  "delete",
 			},
 
 			expErr: nil,
@@ -301,13 +290,13 @@ func testAudienceService_DeleteProfile(t *testing.T) {
 			before: &expect{
 				expErr: nil,
 				exp: &audience.Profile{
-					Id:         "0194fdc2fa2ffcc041d3ff12",
+					Id:         "5a5d86d00000000000000000",
 					AccountId:  1,
 					Attributes: nil,
-					Identifier: "",
+					Identifier: "delete",
 
-					CreatedAt: protoTs(t, parseTime(t, "2016-11-11T00:00:00.111Z")),
-					UpdatedAt: protoTs(t, parseTime(t, "2016-11-11T00:00:00.111Z")),
+					CreatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
 				},
 			},
 
@@ -322,7 +311,7 @@ func testAudienceService_DeleteProfile(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			if tc.before != nil {
-				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
+				got, gotErr := db.FindProfileByIdentifier(ctx, tc.req.AuthContext.AccountId, tc.req.GetIdentifier())
 				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
 					t.Errorf("Before:\n%v", difff(diff))
 				}
@@ -334,136 +323,7 @@ func testAudienceService_DeleteProfile(t *testing.T) {
 			}
 
 			if tc.after != nil {
-				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
-				exp, expErr := tc.after.exp, tc.after.expErr
-				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-					t.Errorf("After:\n%v", difff(diff))
-				}
-			}
-		})
-	}
-}
-
-func testAudienceService_UpdateProfileIdentifier(t *testing.T) {
-	var (
-		ctx = context.TODO()
-
-		createdAt = parseTime(t, "2016-08-22T19:05:53.102Z")
-		updatedAt = time.Now().Truncate(time.Millisecond)
-
-		db = mongodb.New(
-			dialMongo(t, *tMongoDSN),
-			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
-			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
-		)
-
-		svc = service.New(db, new(nopIndex), logNotifier(t))
-
-		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
-	)
-
-	defer teardown()
-
-	tcases := []struct {
-		name      string
-		req       *audience.UpdateProfileIdentifierRequest
-		schemaReq *audience.GetProfileSchemaRequest
-
-		expErr error
-
-		before, after *expect
-	}{
-		{
-			// TODO:
-			name: "error: profile id: blank",
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: ProfileId: blank"),
-
-			req: &audience.UpdateProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				ProfileId:   "",
-			},
-		},
-		{
-			name: "error: profile: not found",
-
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateProfileIdentifier: profiles.Update: not found"),
-
-			req: &audience.UpdateProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				ProfileId: "000000000000000000000000",
-			},
-		},
-
-		{
-			name: "error: duplicate: identifier",
-
-			expErr: grpc.Errorf(codes.AlreadyExists, `db.UpdateProfileIdentifier: profiles.Update: E11000 duplicate key error collection: audience_service_test.profiles index: account_id_1_identifier_1 dup key: { : 1.0, : "a12abbc1-8935-407a-bf81-3f77abaff9d0" }`),
-
-			req: &audience.UpdateProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				ProfileId: "000000000000000000000a00",
-
-				Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
-			},
-		},
-
-		{
-			name: "updates profile identifier",
-
-			req: &audience.UpdateProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 5},
-				ProfileId:   "000000000000000000000aa0",
-
-				Identifier: "22222222-2222-2222-2222-222222222222",
-			},
-
-			expErr: nil,
-
-			before: &expect{
-				expErr: nil,
-				exp: &audience.Profile{
-					Id:         "000000000000000000000aa0",
-					AccountId:  5,
-					Identifier: "11111111-1111-1111-1111-111111111111",
-
-					CreatedAt: protoTs(t, createdAt),
-					UpdatedAt: protoTs(t, createdAt),
-				},
-			},
-
-			after: &expect{
-				exp: &audience.Profile{
-					Id:         "000000000000000000000aa0",
-					AccountId:  5,
-					Identifier: "22222222-2222-2222-2222-222222222222",
-
-					CreatedAt: protoTs(t, createdAt),
-					UpdatedAt: protoTs(t, updatedAt),
-				},
-			},
-		},
-	}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-
-			if tc.before != nil {
-				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
-				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
-					t.Errorf("Before:\n%v", difff(diff))
-				}
-			}
-
-			var _, gotErr = client.UpdateProfileIdentifier(ctx, tc.req)
-			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", difff(diff))
-			}
-
-			if tc.after != nil {
-				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
+				got, gotErr := db.FindProfileByIdentifier(ctx, tc.req.AuthContext.AccountId, tc.req.GetIdentifier())
 				exp, expErr := tc.after.exp, tc.after.expErr
 				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 					t.Errorf("After:\n%v", difff(diff))
@@ -509,24 +369,23 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 		before, after *expect
 	}{
 		{
-			name: "error: profile id: blank",
+			name: "error: identifier: blank",
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: ProfileId: blank"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: identifier cannot be blank"),
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
-				ProfileId:   "",
+				Identifier:  "",
 			},
 		},
 		{
 			name: "error: profile: not found",
 
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateProfile: profiles.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateProfile: profiles.Find: not found"),
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				ProfileId: "000000000000000000000000",
+				Identifier:  "xbxbxbxbxbx",
 			},
 		},
 
@@ -535,7 +394,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 5},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaaaa",
+				Identifier:  "aaaaaaaaaaaaaaaaaaaaaaaa",
 				Attributes: map[string]*audience.ValueUpdates{
 					"tags": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(true)},
@@ -543,7 +402,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: tags: IsStringArray: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: tags: IsStringArray: TypeMismatch"),
 		},
 
 		{
@@ -551,7 +410,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 5},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaaaa",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 			},
 
 			expErr: nil,
@@ -563,7 +422,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 					AccountId:  5,
 					Identifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
-					CreatedAt: aTime, UpdatedAt: aTime,
+					CreatedAt: aTime,
+					UpdatedAt: aTime,
 
 					Attributes: map[string]*audience.Value{
 						"string":    audience.StringVal("hello"),
@@ -583,7 +443,9 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 					Id:         "aaaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:  5,
 					Identifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
-					CreatedAt:  aTime, UpdatedAt: aTime,
+
+					CreatedAt: aTime,
+					UpdatedAt: aTime,
 
 					Attributes: map[string]*audience.Value{
 						"string":    audience.StringVal("hello"),
@@ -603,7 +465,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 5},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa00",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-333333333333",
 				Attributes: map[string]*audience.ValueUpdates{
 					"bool-set-true": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(true)},
@@ -623,7 +485,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 					AccountId:  5,
 					Identifier: "78e19dbf-8c0b-47a5-b28f-333333333333",
 
-					CreatedAt: aTime, UpdatedAt: aTime,
+					CreatedAt: aTime,
+					UpdatedAt: aTime,
 
 					Attributes: map[string]*audience.Value{
 						"bool": audience.BoolVal(false),
@@ -635,11 +498,12 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 			after: &expect{
 				exp: &audience.Profile{
-					Id:        "aaaaaaaaaaaaaaaaaaaaaa00",
-					AccountId: 5,
-
-					CreatedAt: aTime, UpdatedAt: aTime,
+					Id:         "aaaaaaaaaaaaaaaaaaaaaa00",
+					AccountId:  5,
 					Identifier: "78e19dbf-8c0b-47a5-b28f-333333333333",
+
+					CreatedAt: aTime,
+					UpdatedAt: aTime,
 
 					Attributes: map[string]*audience.Value{
 						"bool-set-false": audience.BoolVal(false),
@@ -674,7 +538,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
-				ProfileId:   "bbaaaaaaaaaaaaaaaaaaaa00",
+				Identifier:  "bbaaaaaaaaaaaaaaaaaaaa00",
 				Attributes: map[string]*audience.ValueUpdates{
 					"Last Name": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.StringVal("Mouse")},
@@ -757,7 +621,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 5},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa01",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-444444444444",
 
 				Attributes: map[string]*audience.ValueUpdates{
 					"arr-set": {Values: []*audience.ValueUpdate{
@@ -885,7 +749,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 6},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaaff",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-555555555555",
 				Attributes: map[string]*audience.ValueUpdates{
 					"bool-set": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(false)},
@@ -1066,7 +930,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa20",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
 				Attributes: map[string]*audience.ValueUpdates{
 					"bool": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.IntegerVal(1)},
@@ -1074,7 +938,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
 
 			before: &expect{
 				expErr: nil,
@@ -1149,7 +1013,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			name: "error: schema validation: integer",
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa20",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
 				Attributes: map[string]*audience.ValueUpdates{
 					"integer": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(true)},
@@ -1157,14 +1021,14 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
 		},
 
 		{
 			name: "error: schema validation: timestamp",
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa20",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
 				Attributes: map[string]*audience.ValueUpdates{
 					"ts": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(true)},
@@ -1172,14 +1036,14 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
 		},
 
 		{
 			name: "error: schema validation: string",
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa20",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
 				Attributes: map[string]*audience.ValueUpdates{
 					"string": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(true)},
@@ -1187,14 +1051,14 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
 		},
 
 		{
 			name: "error: schema validation: array",
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa20",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
 				Attributes: map[string]*audience.ValueUpdates{
 					"arr": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(true)},
@@ -1202,14 +1066,14 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
 		},
 
 		{
 			name: "error: schema validation: double",
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa20",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
 				Attributes: map[string]*audience.ValueUpdates{
 					"arr": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(true)},
@@ -1217,14 +1081,14 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateProfile: SchemaValidation: TypeMismatch"),
 		},
 
 		{
 			name: "schema validation: null",
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa20",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
 				Attributes: map[string]*audience.ValueUpdates{
 					"null": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.BoolVal(true)},
@@ -1239,7 +1103,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			name: "null'em all",
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
-				ProfileId:   "aaaaaaaaaaaaaaaaaaaaaa20",
+				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
 				Attributes: map[string]*audience.ValueUpdates{
 					"null": {Values: []*audience.ValueUpdate{
 						{audience.ValueUpdate_SET, audience.NullVal},
@@ -1274,7 +1138,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 					AccountId:  20,
 					Identifier: "78e19dbf-8c0b-47a5-b28f-666666666666",
 
-					CreatedAt: aTime, UpdatedAt: aTime,
+					CreatedAt: aTime,
+					UpdatedAt: aTime,
 
 					Attributes: map[string]*audience.Value{
 						"bool":    audience.NullVal,
@@ -1294,7 +1159,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			if tc.before != nil {
-				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
+				got, gotErr := db.FindProfileByIdentifier(ctx, tc.req.AuthContext.AccountId, tc.req.GetIdentifier())
 				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
 					t.Errorf("Before:\n%v", difff(diff))
 				}
@@ -1314,7 +1179,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			}
 
 			if tc.after != nil {
-				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
+				got, gotErr := db.FindProfileByIdentifier(ctx, tc.req.AuthContext.AccountId, tc.req.GetIdentifier())
 				exp, expErr := tc.after.exp, tc.after.expErr
 				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 					t.Errorf("After:\n%v", difff(diff))
@@ -1371,7 +1236,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 		{
 			name: "error: device id: blank",
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
 
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
@@ -1382,7 +1247,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 		{
 			name: "error: device: not found",
 
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceCustomAttributes: devices.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceCustomAttributes: devices.Find: not found"),
 
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 8},
@@ -1404,7 +1269,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: tags: IsStringArray: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: tags: IsStringArray: TypeMismatch"),
 		},
 
 		{
@@ -1423,7 +1288,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "1aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         8,
 					DeviceId:          "1aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "1aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1448,7 +1312,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "1aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         8,
 					DeviceId:          "1aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "1aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1493,7 +1356,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "2aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         8,
 					DeviceId:          "2aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "1aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1512,7 +1374,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "2aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         8,
 					DeviceId:          "2aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "1aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1570,7 +1431,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "3aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         9,
 					DeviceId:          "3aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "3aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1600,7 +1460,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "3aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         9,
 					DeviceId:          "3aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "3aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1668,7 +1527,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "4aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         8,
 					DeviceId:          "4aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "1aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1709,7 +1567,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "4aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         8,
 					DeviceId:          "4aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "1aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1825,7 +1682,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "5aaaaaaaaaaaaaaaaaaaaaaa",
 					DeviceId:          "5aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         11,
-					ProfileId:         "5aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1855,7 +1711,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "5aaaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         11,
 					DeviceId:          "5aaaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "5aaaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "78e19dbf-8c0b-47a5-b28f-4f1650feccf6",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -1973,7 +1828,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
 
 			before: &expect{
 				expErr: nil,
@@ -1982,7 +1837,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "12aaaaaaaaaaaaaaaaaaaaaa",
 					ProfileIdentifier: "12aaaaaaaaaaaaaaaaaaaaaa",
 					DeviceId:          "12aaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "12aaaaaaaaaaaaaaaaaaaaaa",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -2059,7 +1913,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
 		},
 
 		{
@@ -2074,7 +1928,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
 		},
 
 		{
@@ -2089,7 +1943,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
 		},
 		//
 		{
@@ -2105,7 +1959,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
 		},
 
 		{
@@ -2120,7 +1974,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				},
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.UpdateDeviceCustomAttributes: SchemaValidation: TypeMismatch"),
 		},
 
 		{
@@ -2176,7 +2030,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Id:                "12aaaaaaaaaaaaaaaaaaaaaa",
 					AccountId:         12,
 					ProfileIdentifier: "12aaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "12aaaaaaaaaaaaaaaaaaaaaa",
 					DeviceId:          "12aaaaaaaaaaaaaaaaaaaaaa",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
@@ -2238,779 +2091,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 	}
 }
 
-// ms-12: tests that device attributes and schema also get copied to the profile
-// TODO: remove once migration is done
-func testAudienceService_UpdateDeviceCustomAttributes_ms12(t *testing.T) {
-	var (
-		ctx = context.TODO()
-
-		updatedAt = parseTime(t, "2017-10-30T14:05:53.102Z")
-		aTime     = protoTs(t, updatedAt)
-
-		db = mongodb.New(
-			dialMongo(t, *tMongoDSN),
-			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 13)),
-			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
-		)
-
-		svc = service.New(db, new(nopIndex), logNotifier(t))
-
-		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
-	)
-
-	defer teardown()
-
-	type expect struct {
-		expErr    error
-		exp       interface{}
-		expSchema *audience.DeviceSchema
-	}
-
-	tcases := []struct {
-		name      string
-		req       *audience.UpdateDeviceCustomAttributesRequest
-		schemaReq *audience.GetDeviceSchemaRequest
-
-		expErr error
-
-		before, after *expect
-	}{
-		{
-			name: "updates profile & device attributes",
-
-			req: &audience.UpdateDeviceCustomAttributesRequest{
-				AuthContext: &auth.AuthContext{AccountId: 13},
-				DeviceId:    "13aaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"bool-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(false)},
-					}},
-
-					"string-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringVal("Maryan")},
-					}},
-
-					"integer-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.IntegerVal(1)},
-					}},
-
-					"double-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.DoubleVal(31415e-4)},
-					}},
-
-					"null-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-
-					"ts-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.TimestampVal(*aTime)},
-					}},
-
-					"arr-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringArrayVal("hello", "world")},
-					}},
-
-					"arr-add": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_ADD, audience.StringVal("added")},
-					}},
-				},
-			},
-
-			expErr: nil,
-
-			before: &expect{
-				expErr: nil,
-				exp: &audience.Device{
-					AccountId:         13,
-					Id:                "13aaaaaaaaaaaaaaaaaaaaaa",
-					ProfileIdentifier: "13aaaaaaaaaaaaaaaaaaaaaa",
-					DeviceId:          "13aaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "13aaaaaaaaaaaaaaaaaaaaaa",
-
-					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-					UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-
-					Attributes: map[string]*audience.Value{
-						"bool":    audience.BoolVal(true),
-						"integer": audience.IntegerVal(42),
-						"double":  audience.DoubleVal(42.42),
-						"string":  audience.StringVal("hello world"),
-						"arr":     audience.StringArrayVal("hello"),
-						"ts":      audience.TimestampVal(*protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z"))),
-						"null":    audience.NullVal,
-					},
-				},
-
-				expSchema: &audience.DeviceSchema{
-					Attributes: nil,
-				},
-			},
-
-			after: &expect{
-				exp: &audience.Device{
-					AccountId:         13,
-					Id:                "13aaaaaaaaaaaaaaaaaaaaaa",
-					ProfileIdentifier: "13aaaaaaaaaaaaaaaaaaaaaa",
-					DeviceId:          "13aaaaaaaaaaaaaaaaaaaaaa",
-					ProfileId:         "13aaaaaaaaaaaaaaaaaaaaaa",
-
-					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-					UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-
-					Attributes: map[string]*audience.Value{
-						"bool":     audience.BoolVal(true),
-						"bool-set": audience.BoolVal(false),
-
-						"string":     audience.StringVal("hello world"),
-						"string-set": audience.StringVal("Maryan"),
-
-						"integer":     audience.IntegerVal(42),
-						"integer-set": audience.IntegerVal(1),
-
-						"double":     audience.DoubleVal(42.42),
-						"double-set": audience.DoubleVal(31415e-4),
-
-						"null":     audience.NullVal,
-						"null-set": audience.NullVal,
-
-						"ts":     audience.TimestampVal(*protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z"))),
-						"ts-set": audience.TimestampVal(*aTime),
-
-						"arr":     audience.StringArrayVal("hello"),
-						"arr-set": audience.StringArrayVal("hello", "world"),
-						"arr-add": audience.StringArrayVal("added"),
-					},
-				},
-
-				expSchema: &audience.DeviceSchema{
-					Attributes: []*audience.SchemaAttribute{
-						{
-							AccountId:     13,
-							Id:            "1407bf28e80aebf04cf75781",
-							Attribute:     "arr-add",
-							Label:         "arr-add",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     13,
-							Id:            "2428b0763112efb33b6f4fad",
-							Attribute:     "arr-set",
-							Label:         "arr-set",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     13,
-							Id:            "388e83b42296ba1412acec2f",
-							Attribute:     "string-set",
-							Label:         "string-set",
-							AttributeType: "string",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     13,
-							Id:            "7a43d41fa5385d9754040908",
-							Attribute:     "double-set",
-							Label:         "double-set",
-							AttributeType: "double",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     13,
-							Id:            "7deb445e54d8cac4061761a9",
-							Attribute:     "bool-set",
-							Label:         "bool-set",
-							AttributeType: "bool",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     13,
-							Id:            "c9a0c0f71a1e479a49f3773c",
-							Attribute:     "ts-set",
-							Label:         "ts-set",
-							AttributeType: "timestamp",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     13,
-							Id:            "cb95aaec3927e88d053271d3",
-							Attribute:     "integer-set",
-							Label:         "integer-set",
-							AttributeType: "integer",
-							CreatedAt:     aTime,
-						},
-					},
-				},
-			},
-		},
-	}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-
-			if tc.before != nil {
-				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
-				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
-					t.Fatalf("Before:\n%v", difff(diff))
-				}
-
-				{
-					profile, gotErr := db.FindProfileById(ctx, got.ProfileId)
-					if diff := Diff(got.Attributes, profile.Attributes, nil, gotErr); diff != nil {
-						t.Fatalf("Before:Attributes[%s]:\n%v", profile.Id, difff(diff))
-					}
-				}
-
-				{
-					exp, expErr := tc.before.expSchema, (error)(nil)
-					got, gotErr := db.GetDeviceSchemaByAccountId(ctx, int(tc.req.AuthContext.AccountId))
-					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-						t.Fatalf("Before:Schema:\n%v", difff(diff))
-					}
-
-					{
-						got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
-						if diff := Diff(exp.Attributes, got.Attributes, expErr, gotErr); diff != nil {
-							t.Fatalf("Before:ProfileSchema:\n%v", difff(diff))
-						}
-					}
-				}
-			}
-
-			var _, gotErr = client.UpdateDeviceCustomAttributes(ctx, tc.req)
-			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", difff(diff))
-			}
-
-			if tc.after != nil {
-				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
-				if diff := Diff(tc.after.exp, got, tc.after.expErr, gotErr); diff != nil {
-					t.Fatalf("After:\n%v", difff(diff))
-				}
-
-				{
-					profile, gotErr := db.FindProfileById(ctx, got.ProfileId)
-
-					if diff := Diff(got.Attributes, profile.Attributes, nil, gotErr); diff != nil {
-						t.Fatalf("After:Attributes[%s]:\n%v", profile.Id, difff(diff))
-					}
-				}
-
-				{
-					exp, expErr := tc.after.expSchema, (error)(nil)
-					got, gotErr := db.GetDeviceSchemaByAccountId(ctx, int(tc.req.AuthContext.AccountId))
-					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-						t.Fatalf("After:Schema:\n%v", difff(diff))
-					}
-
-					{
-						got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
-						if diff := Diff(exp.Attributes, got.Attributes, expErr, gotErr); diff != nil {
-							t.Fatalf("After:ProfileSchema:\n%v", difff(diff))
-						}
-					}
-				}
-			}
-		})
-	}
-}
-
-func testAudienceService_CreateDevice_Ms12(t *testing.T) {
-	var (
-		ctx = context.TODO()
-
-		createdAt = time.Now().Truncate(time.Millisecond)
-
-		mdb = dialMongo(t, *tMongoDSN)
-		db  = mongodb.New(
-			mdb,
-			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 5)),
-			mongodb.WithTimeFunc(func() time.Time { return createdAt }),
-		)
-
-		svc = service.New(db, new(nopIndex), logNotifier(t))
-
-		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
-	)
-
-	defer teardown()
-
-	type tCase struct {
-		name string
-		req  *audience.CreateDeviceRequest
-
-		expErr error
-
-		before, after *expect
-	}
-
-	tcases := []tCase{
-		{
-			name: "error: profile_id: set",
-			req: &audience.CreateDeviceRequest{
-				Ms12:        true,
-				AuthContext: &auth.AuthContext{AccountId: 21},
-
-				DeviceId:  "0000",
-				ProfileId: "invalid",
-			},
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: ProfileId: deprecated"),
-		},
-
-		{
-			name: "error: device id: invalid",
-			req: &audience.CreateDeviceRequest{
-				Ms12:        true,
-				AuthContext: &auth.AuthContext{AccountId: 21},
-
-				DeviceId:  "",
-				ProfileId: "000000000000000000000aa2",
-			},
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
-		},
-
-		{
-			name: "creates device with anonymous profile",
-			req: &audience.CreateDeviceRequest{
-				Ms12:              true,
-				AuthContext:       &auth.AuthContext{AccountId: 21},
-				ProfileIdentifier: "",
-				DeviceId:          "CCCCCCCC-0000-0000-0000-000000000001",
-			},
-
-			expErr: nil,
-
-			before: &expect{
-				expErr: errors.Wrap(errors.New("not found"), "devices.FindId"),
-				exp:    nil,
-			},
-
-			after: &expect{
-				expErr: nil,
-				exp: &audience.Device{
-					Id:        "e282fad85af699815c18c595",
-					AccountId: 21,
-					DeviceId:  "CCCCCCCC-0000-0000-0000-000000000001",
-					ProfileId: "c00913e02a63e4cf532d9b2c",
-					CreatedAt: protoTs(t, createdAt),
-					UpdatedAt: protoTs(t, createdAt),
-
-					ProfileIdentifier: "",
-				},
-			},
-		},
-
-		{
-			name: "creates device with identified profile",
-			req: &audience.CreateDeviceRequest{
-				Ms12:        true,
-				AuthContext: &auth.AuthContext{AccountId: 21},
-
-				DeviceId:          "CCCCCCCC-0000-0000-0000-000000000002",
-				ProfileIdentifier: "helloworld",
-			},
-
-			expErr: nil,
-
-			before: &expect{
-				expErr: errors.Wrap(errors.New("not found"), "devices.FindId"),
-				exp:    nil,
-			},
-
-			after: &expect{
-				expErr: nil,
-				exp: &audience.Device{
-					CreatedAt:         protoTs(t, createdAt),
-					UpdatedAt:         protoTs(t, createdAt),
-					Id:                "28c43daa5aa248d5a17dde49",
-					AccountId:         21,
-					DeviceId:          "CCCCCCCC-0000-0000-0000-000000000002",
-					ProfileId:         "ea804462a794f75123135cc7",
-					ProfileIdentifier: "helloworld",
-				},
-			},
-		},
-
-		{
-			name: "creates device and reuses existing profile",
-			req: &audience.CreateDeviceRequest{
-				Ms12:        true,
-				AuthContext: &auth.AuthContext{AccountId: 21},
-
-				DeviceId:          "CCCCCCCC-0000-0000-0000-000000000003",
-				ProfileIdentifier: "helloworld",
-			},
-
-			expErr: nil,
-
-			before: &expect{
-				expErr: errors.Wrap(errors.New("not found"), "devices.FindId"),
-				exp:    nil,
-			},
-
-			after: &expect{
-				expErr: nil,
-				exp: &audience.Device{
-					CreatedAt:         protoTs(t, createdAt),
-					UpdatedAt:         protoTs(t, createdAt),
-					Id:                "06843049a995cbd0b80d2369",
-					AccountId:         21,
-					DeviceId:          "CCCCCCCC-0000-0000-0000-000000000003",
-					ProfileId:         "ea804462a794f75123135cc7",
-					ProfileIdentifier: "helloworld",
-				},
-			},
-		},
-	}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-			if tc.before != nil {
-				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
-				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
-					t.Errorf("Before:\n%v", difff(diff))
-				}
-			}
-
-			var _, gotErr = client.CreateDevice(ctx, tc.req)
-			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", difff(diff))
-			}
-
-			if tc.after != nil {
-				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
-				if diff := Diff(tc.after.exp, got, tc.after.expErr, gotErr); diff != nil {
-					t.Errorf("After:\n%v", difff(diff))
-				}
-
-				if d, ok := tc.after.exp.(*audience.Device); ok && d != nil {
-					_, gotErr := db.FindProfileById(ctx, d.ProfileId)
-
-					if diff := Diff(nil, nil, nil, gotErr); diff != nil {
-						t.Errorf("After:FindProfileById\n%v", difff(diff))
-					}
-				}
-			}
-		})
-	}
-}
-
-// ms-12: tests that profile attributes and schema also get copied to all the devices
-// TODO: remove once migration is done
-func testAudienceService_UpdateProfile_ms12(t *testing.T) {
-	var (
-		ctx = context.TODO()
-
-		updatedAt = parseTime(t, "2017-10-30T14:05:53.102Z")
-		aTime     = protoTs(t, updatedAt)
-
-		db = mongodb.New(
-			dialMongo(t, *tMongoDSN),
-			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 1)),
-			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
-		)
-
-		svc = service.New(db, new(nopIndex), logNotifier(t))
-
-		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
-	)
-
-	defer teardown()
-
-	type expect struct {
-		expErr    error
-		exp       interface{}
-		expSchema *audience.ProfileSchema
-	}
-
-	tcases := []struct {
-		name      string
-		req       *audience.UpdateProfileRequest
-		schemaReq *audience.GetProfileSchemaRequest
-
-		expErr error
-
-		before, after *expect
-	}{
-		{
-			name: "updates profile & device attributes",
-
-			req: &audience.UpdateProfileRequest{
-				AuthContext: &auth.AuthContext{AccountId: 7},
-				ProfileId:   "aaa000000000000000000000",
-				Attributes: map[string]*audience.ValueUpdates{
-					"bool-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(false)},
-					}},
-
-					"string-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringVal("Maryan")},
-					}},
-
-					"integer-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.IntegerVal(1)},
-					}},
-
-					"double-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.DoubleVal(31415e-4)},
-					}},
-
-					"null-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-
-					"ts-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.TimestampVal(*aTime)},
-					}},
-
-					"arr-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringArrayVal("hello", "world")},
-					}},
-
-					"arr-add": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_ADD, audience.StringVal("added")},
-					}},
-
-					"arr-remove": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_REMOVE, audience.StringVal("removes")},
-					}},
-				},
-			},
-
-			expErr: nil,
-
-			before: &expect{
-				expErr: nil,
-				exp: &audience.Profile{
-					AccountId:  7,
-					Id:         "aaa000000000000000000000",
-					Identifier: "profilewithdevices",
-
-					CreatedAt: aTime, UpdatedAt: aTime,
-
-					Attributes: map[string]*audience.Value{
-						"bool":           audience.BoolVal(true),
-						"string":         audience.StringVal("hello world"),
-						"integer":        audience.IntegerVal(42),
-						"double":         audience.DoubleVal(42.42),
-						"null":           audience.NullVal,
-						"ts":             audience.TimestampVal(*aTime),
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-add":        audience.StringArrayVal("adds"),
-						"arr-remove":     audience.StringArrayVal("keeps", "removes"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
-					},
-				},
-
-				expSchema: &audience.ProfileSchema{
-					Attributes: nil,
-				},
-			},
-
-			after: &expect{
-				exp: &audience.Profile{
-					AccountId:  7,
-					Id:         "aaa000000000000000000000",
-					Identifier: "profilewithdevices",
-
-					CreatedAt: aTime, UpdatedAt: aTime,
-
-					Attributes: map[string]*audience.Value{
-						"bool":     audience.BoolVal(true),
-						"bool-set": audience.BoolVal(false),
-
-						"string":     audience.StringVal("hello world"),
-						"string-set": audience.StringVal("Maryan"),
-
-						"integer":     audience.IntegerVal(42),
-						"integer-set": audience.IntegerVal(1),
-
-						"double":     audience.DoubleVal(42.42),
-						"double-set": audience.DoubleVal(31415e-4),
-
-						"null":     audience.NullVal,
-						"null-set": audience.NullVal,
-
-						"ts":     audience.TimestampVal(*aTime),
-						"ts-set": audience.TimestampVal(*aTime),
-
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-set":        audience.StringArrayVal("hello", "world"),
-						"arr-add":        audience.StringArrayVal("adds", "added"),
-						"arr-remove":     audience.StringArrayVal("keeps"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
-					},
-				},
-
-				expSchema: &audience.ProfileSchema{
-					Attributes: []*audience.SchemaAttribute{
-						{
-							AccountId:     7,
-							Id:            "367951baa2ff6cd471c483f1",
-							Attribute:     "ts-set",
-							Label:         "ts-set",
-							AttributeType: "timestamp",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     7,
-							Id:            "487f6999eb9d18a44784045d",
-							Attribute:     "integer-set",
-							Label:         "integer-set",
-							AttributeType: "integer",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     7,
-							Id:            "52fdfc072182654f163f5f0f",
-							Attribute:     "arr-add",
-							Label:         "arr-add",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     7,
-							Id:            "6694d2c422acd208a0072939",
-							Attribute:     "double-set",
-							Label:         "double-set",
-							AttributeType: "double",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     7,
-							Id:            "681d0d86d1e91e00167939cb",
-							Attribute:     "bool-set",
-							Label:         "bool-set",
-							AttributeType: "bool",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     7,
-							Id:            "7bbb0407d1e2c64981855ad8",
-							Attribute:     "arr-set",
-							Label:         "arr-set",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     7,
-							Id:            "87f3c67cf22746e995af5a25",
-							Attribute:     "string-set",
-							Label:         "string-set",
-							AttributeType: "string",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     7,
-							Id:            "9a621d729566c74d10037c4d",
-							Attribute:     "arr-remove",
-							Label:         "arr-remove",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-					},
-				},
-			},
-		},
-	}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-
-			if tc.before != nil {
-				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
-				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
-					t.Errorf("Before:\n%v", difff(diff))
-				}
-
-				{ // every device has to have same attributes as profile
-					devices, gotErr := db.ListDevicesByProfileId(ctx, &audience.ListDevicesByProfileIdRequest{
-						ProfileId:   tc.req.ProfileId,
-						AuthContext: tc.req.AuthContext,
-					})
-
-					if diff := Diff(nil, nil, nil, gotErr); diff != nil {
-						t.Errorf("Before:ListDevices:\n%v", difff(diff))
-					}
-
-					if len(devices) == 0 {
-						t.Errorf("%v", devices)
-						t.Fatalf("Before: profile must have devices")
-					}
-
-					for _, d := range devices {
-						if diff := Diff(got.Attributes, d.Attributes, nil, nil); diff != nil {
-							t.Errorf("Before:CopyDiff[%s]:\n%v", d.DeviceId, difff(diff))
-						}
-					}
-				}
-
-				{
-					exp, expErr := tc.before.expSchema, (error)(nil)
-					got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
-					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-						t.Errorf("Before:Schema:\n%v", difff(diff))
-					}
-
-					{
-						got, gotErr := db.GetDeviceSchemaByAccountId(ctx, int(tc.req.AuthContext.AccountId))
-						if diff := Diff(exp.Attributes, got.Attributes, expErr, gotErr); diff != nil {
-							t.Errorf("Before:Schema:\n%v", difff(diff))
-						}
-					}
-				}
-			}
-
-			var _, gotErr = client.UpdateProfile(ctx, tc.req)
-			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", difff(diff))
-			}
-
-			if tc.after != nil {
-				got, gotErr := db.FindProfileById(ctx, tc.req.GetProfileId())
-				exp, expErr := tc.after.exp, tc.after.expErr
-				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-					t.Errorf("After:\n%v", difff(diff))
-				}
-
-				{ // every device has to have same attributes as profile
-					devices, gotErr := db.ListDevicesByProfileId(ctx, &audience.ListDevicesByProfileIdRequest{
-						ProfileId:   tc.req.ProfileId,
-						AuthContext: tc.req.AuthContext,
-					})
-					if diff := Diff(nil, nil, nil, gotErr); diff != nil {
-						t.Errorf("After:ListDevices:\n%v", difff(diff))
-					}
-
-					for _, d := range devices {
-						if diff := Diff(got.Attributes, d.Attributes, nil, nil); diff != nil {
-							t.Errorf("Before:CopyDiff[%s]:\n%v", d.DeviceId, difff(diff))
-						}
-					}
-				}
-
-				if tc.after.expSchema != nil {
-					exp, expErr := tc.after.expSchema, (error)(nil)
-					got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
-					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-						t.Errorf("After:Schema\n%v", difff(diff))
-					}
-
-					{
-						got, gotErr := db.GetDeviceSchemaByAccountId(ctx, int(tc.req.AuthContext.AccountId))
-						if diff := Diff(exp.Attributes, got.Attributes, expErr, gotErr); diff != nil {
-							t.Errorf("Before:Schema:\n%v", difff(diff))
-						}
-					}
-				}
-			}
-		})
-	}
-}
-
 func testAudienceService_GetProfileByDeviceId(t *testing.T) {
 	var (
 		ctx = context.TODO()
@@ -3036,7 +2116,7 @@ func testAudienceService_GetProfileByDeviceId(t *testing.T) {
 		{
 			name: "error: not found: no such device",
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetProfileByDeviceId: devices.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.GetProfileByDeviceId: devices.Find: not found"),
 
 			req: &audience.GetProfileByDeviceIdRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
@@ -3103,7 +2183,7 @@ func testAudienceService_GetProfile(t *testing.T) {
 		{
 			name: "error: not found ",
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetProfile: profiles.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.GetProfile: profiles.Find: not found"),
 
 			req: &audience.GetProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
@@ -3114,7 +2194,7 @@ func testAudienceService_GetProfile(t *testing.T) {
 		{
 			name: "error: invalid: profile id",
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.GetProfile: StringToObjectID: bson.IsObjectIdHex: false"),
+			expErr: status.Errorf(codes.InvalidArgument, "db.GetProfile: StringToObjectID: bson.IsObjectIdHex: false"),
 
 			req: &audience.GetProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
@@ -3181,7 +2261,7 @@ func testAudienceService_GetProfileByIdentifier(t *testing.T) {
 		{
 			name: "error: not found: no such identifier",
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetProfileByIdentifier: profiles.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.GetProfileByIdentifier: profiles.Find: not found"),
 
 			req: &audience.GetProfileByIdentifierRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
@@ -3192,7 +2272,7 @@ func testAudienceService_GetProfileByIdentifier(t *testing.T) {
 		{
 			name: "error: not found: wrong account",
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetProfileByIdentifier: profiles.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.GetProfileByIdentifier: profiles.Find: not found"),
 
 			req: &audience.GetProfileByIdentifierRequest{
 				AuthContext: &auth.AuthContext{AccountId: 100},
@@ -3228,103 +2308,6 @@ func testAudienceService_GetProfileByIdentifier(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			got, gotErr := client.GetProfileByIdentifier(ctx, tc.req)
-
-			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", difff(diff))
-			}
-		})
-	}
-}
-
-func testAudienceService_ListProfilesByIds(t *testing.T) {
-	var (
-		ctx = context.TODO()
-
-		db = mongodb.New(
-			dialMongo(t, *tMongoDSN),
-		)
-
-		svc = service.New(db, new(nopIndex), logNotifier(t))
-
-		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
-	)
-
-	defer teardown()
-
-	tcases := []struct {
-		name string
-		req  *audience.ListProfilesByIdsRequest
-
-		exp    *audience.ListProfilesByIdsResponse
-		expErr error
-	}{
-		{
-			name: "error: invalid profile id",
-
-			req: &audience.ListProfilesByIdsRequest{
-				AuthContext: &auth.AuthContext{AccountId: 100},
-				ProfileIds: []string{
-					"hello world",
-				},
-			},
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.ListProfilesByIds: StringToObjectID: bson.IsObjectIdHex: false"),
-		},
-		{
-			name: "no profiles in account",
-
-			req: &audience.ListProfilesByIdsRequest{
-				AuthContext: &auth.AuthContext{AccountId: 100},
-				ProfileIds: []string{
-					"000000000000000000000aa0",
-					"000000000000000000000aa2",
-				},
-			},
-
-			exp: &audience.ListProfilesByIdsResponse{
-				Profiles: nil,
-			},
-		},
-		{
-			name: "lists profiles",
-
-			req: &audience.ListProfilesByIdsRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				ProfileIds: []string{
-					"000000000000000000000aa2",
-					"000000000000000000000aa1",
-				},
-			},
-
-			exp: &audience.ListProfilesByIdsResponse{
-				Profiles: []*audience.Profile{
-					{
-						AccountId: 1,
-
-						Id:         "000000000000000000000aa1",
-						Identifier: "a12abbc1-8935-407a-bf81-111111111111",
-						Attributes: nil,
-						CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
-						UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
-					},
-					{
-						AccountId: 1,
-
-						Id:         "000000000000000000000aa2",
-						Identifier: "a12abbc1-8935-407a-bf81-3f77abaff9d0",
-						Attributes: nil,
-						CreatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
-						UpdatedAt:  protoTs(t, parseTime(t, "2016-08-22T19:05:53.102Z")),
-					},
-				},
-			},
-		},
-	}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-
-			got, gotErr := client.ListProfilesByIds(ctx, tc.req)
 
 			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
@@ -3494,7 +2477,7 @@ func testAudienceService_GetProfilesSchema(t *testing.T) {
 	}
 }
 
-func testAudienceService_SetDeviceProfile(t *testing.T) {
+func testAudienceService_SetDeviceProfileIdentifier(t *testing.T) {
 	var (
 		ctx = context.TODO()
 
@@ -3515,53 +2498,32 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 
 	tcases := []struct {
 		name string
-		req  *audience.SetDeviceProfileRequest
+		req  *audience.SetDeviceProfileIdentifierRequest
 
 		expErr error
 
 		before, after *expect
 	}{
-		{
-			name: "error: invalid profile_id",
-			req: &audience.SetDeviceProfileRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				DeviceId:    "invalid",
-				ProfileId:   "invalid",
-			},
-
-			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceProfileIdById: devices.FindId: not found"),
-		},
 
 		{
 			name: "error: device_id: blank",
-			req: &audience.SetDeviceProfileRequest{
+			req: &audience.SetDeviceProfileIdentifierRequest{
 				AuthContext: &auth.AuthContext{
 					AccountId: 1,
 				},
-				DeviceId:  "",
-				ProfileId: "000000000000000000000000",
+				DeviceId:          "",
+				ProfileIdentifier: "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
-		},
-
-		{
-			name: "error: not found: profile",
-			req: &audience.SetDeviceProfileRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				DeviceId:    "000000000000000000000000",
-				ProfileId:   "000000000000000000000000",
-			},
-
-			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceProfileIdById: devices.FindId: not found"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
 		},
 
 		{
 			name: "sets profile",
-			req: &audience.SetDeviceProfileRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				DeviceId:    "D00000000000000000000000",
-				ProfileId:   "000000000000000000000aa1",
+			req: &audience.SetDeviceProfileIdentifierRequest{
+				AuthContext:       &auth.AuthContext{AccountId: 1},
+				DeviceId:          "D00000000000000000000000",
+				ProfileIdentifier: "00000000-0000-0000-0000-000000000bb2",
 			},
 
 			expErr: nil,
@@ -3569,10 +2531,10 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 			before: &expect{
 				expErr: nil,
 				exp: &audience.Device{
-					Id:        "0000000000000000000000d0",
-					DeviceId:  "D00000000000000000000000",
-					AccountId: 1,
-					ProfileId: "000000000000000000000aa2",
+					Id:                "0000000000000000000000d0",
+					DeviceId:          "D00000000000000000000000",
+					AccountId:         1,
+					ProfileIdentifier: "",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
@@ -3585,8 +2547,7 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 					Id:                "0000000000000000000000d0",
 					DeviceId:          "D00000000000000000000000",
 					AccountId:         1,
-					ProfileId:         "000000000000000000000aa1",
-					ProfileIdentifier: "a12abbc1-8935-407a-bf81-111111111111",
+					ProfileIdentifier: "00000000-0000-0000-0000-000000000bb2",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
@@ -3605,165 +2566,7 @@ func testAudienceService_SetDeviceProfile(t *testing.T) {
 				}
 			}
 
-			_, gotErr := client.SetDeviceProfile(ctx, tc.req)
-			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", difff(diff))
-			}
-
-			if tc.after != nil {
-				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
-				if diff := Diff(tc.after.exp, got, tc.after.expErr, gotErr); diff != nil {
-					t.Errorf("After:\n%v", difff(diff))
-				}
-			}
-		})
-	}
-}
-
-func testAudienceService_SetDeviceProfile_ms12(t *testing.T) {
-	var (
-		ctx = context.TODO()
-
-		updatedAt = time.Now().Truncate(time.Millisecond)
-
-		mdb = dialMongo(t, *tMongoDSN)
-		db  = mongodb.New(
-			mdb,
-			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
-			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
-		)
-
-		svc = service.New(db, new(nopIndex), logNotifier(t))
-
-		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
-	)
-
-	defer teardown()
-
-	tcases := []struct {
-		name string
-		req  *audience.SetDeviceProfileRequest
-
-		expErr error
-
-		before, after *expect
-	}{
-		{
-			name: "error: device_id: blank",
-			req: &audience.SetDeviceProfileRequest{
-				Ms12:        true,
-				AuthContext: &auth.AuthContext{AccountId: 14},
-				DeviceId:    "",
-				ProfileId:   "000000000000000000000000",
-			},
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
-		},
-
-		{
-			name: "error: profile_id: is set",
-			req: &audience.SetDeviceProfileRequest{
-				Ms12:        true,
-				AuthContext: &auth.AuthContext{AccountId: 14},
-				DeviceId:    "000000000000000000000000",
-				ProfileId:   "000000000000000000000000",
-			},
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: ProfileId: deprecated"),
-		},
-
-		{
-			name: "updates device: profile_identifier: empty",
-			req: &audience.SetDeviceProfileRequest{
-				Ms12:              true,
-				AuthContext:       &auth.AuthContext{AccountId: 14},
-				DeviceId:          "14aaaaaaaaaaaaaaaaaaaaaa",
-				ProfileIdentifier: "",
-			},
-
-			expErr: nil,
-
-			before: &expect{
-				expErr: nil,
-				exp: &audience.Device{
-					Id:                "14aaaaaaaaaaaaaaaaaaaaaa",
-					DeviceId:          "14aaaaaaaaaaaaaaaaaaaaaa",
-					AccountId:         14,
-					ProfileId:         "000000000000000000000000",
-					ProfileIdentifier: "14aaaaaaaaaaaaaaaaaaaaaa",
-
-					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-					UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-				},
-			},
-
-			after: &expect{
-				expErr: nil,
-				exp: &audience.Device{
-					Id:                "14aaaaaaaaaaaaaaaaaaaaaa",
-					DeviceId:          "14aaaaaaaaaaaaaaaaaaaaaa",
-					AccountId:         14,
-					ProfileId:         "0194fdc2fa2ffcc041d3ff12",
-					ProfileIdentifier: "",
-
-					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-					UpdatedAt: protoTs(t, updatedAt),
-				},
-			},
-		},
-
-		{
-			name: "updates device: profile_identifier: is set",
-			req: &audience.SetDeviceProfileRequest{
-				Ms12:              true,
-				AuthContext:       &auth.AuthContext{AccountId: 14},
-				DeviceId:          "15aaaaaaaaaaaaaaaaaaaaaa",
-				ProfileIdentifier: "155555555555555555555555",
-			},
-
-			expErr: nil,
-
-			before: &expect{
-				expErr: nil,
-				exp: &audience.Device{
-					Id:                "15aaaaaaaaaaaaaaaaaaaaaa",
-					DeviceId:          "15aaaaaaaaaaaaaaaaaaaaaa",
-					AccountId:         14,
-					ProfileId:         "0194fdc2fa2ffcc041d3ff12",
-					ProfileIdentifier: "15aaaaaaaaaaaaaaaaaaaaaa",
-
-					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-					UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-				},
-			},
-
-			after: &expect{
-				expErr: nil,
-				exp: &audience.Device{
-					Id:                "15aaaaaaaaaaaaaaaaaaaaaa",
-					DeviceId:          "15aaaaaaaaaaaaaaaaaaaaaa",
-					AccountId:         14,
-					ProfileId:         "045b73c86e4ff95ff662a5ee",
-					ProfileIdentifier: "155555555555555555555555",
-
-					CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-					UpdatedAt: protoTs(t, updatedAt),
-				},
-			},
-		},
-	}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-
-			if tc.before != nil {
-				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
-				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
-					t.Errorf("Before:\n%v", difff(diff))
-				}
-			}
-
-			_, gotErr := client.SetDeviceProfile(ctx, tc.req)
+			_, gotErr := client.SetDeviceProfileIdentifier(ctx, tc.req)
 			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}
@@ -3809,7 +2612,7 @@ func testAudienceService_GetDevice(t *testing.T) {
 				DeviceId:    "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
 		},
 		{
 			name: "error: not found",
@@ -3818,7 +2621,7 @@ func testAudienceService_GetDevice(t *testing.T) {
 				DeviceId:    "0000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetDevice: devices.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.GetDevice: devices.Find: not found"),
 		},
 
 		{
@@ -3828,7 +2631,7 @@ func testAudienceService_GetDevice(t *testing.T) {
 				DeviceId:    "adevice00",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetDevice: devices.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.GetDevice: devices.Find: not found"),
 		},
 
 		{
@@ -3953,7 +2756,7 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 				PushTokenKey: "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: PushTokenKey: blank"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: PushTokenKey: blank"),
 		},
 
 		{
@@ -3963,7 +2766,7 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 				PushTokenKey: "doesntexists",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceByPushToken: devices.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.GetDeviceByPushToken: devices.Find: not found"),
 		},
 
 		{
@@ -3973,7 +2776,7 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 				PushTokenKey: "token:bbbbbbbbbbbbbbbbbbbbbbbb",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceByPushToken: devices.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.GetDeviceByPushToken: devices.Find: not found"),
 		},
 
 		{
@@ -3986,11 +2789,10 @@ func testAudienceService_GetDeviceByPushToken(t *testing.T) {
 			expErr: nil,
 
 			exp: &audience.GetDeviceByPushTokenResponse{
-				&audience.Device{
+				Device: &audience.Device{
 					Id:        "bbbbbbbbbbbbbbbbbbbbbbbb",
 					DeviceId:  "BBBBBBBB",
 					AccountId: 1,
-					ProfileId: "bbbbbbbbbbbbbbbbbbbbbbbb",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
@@ -4045,51 +2847,15 @@ func testAudienceService_CreateDevice(t *testing.T) {
 
 	tcases := []tCase{
 		{
-			name: "error: profile_id: unset",
-			req: &audience.CreateDeviceRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				DeviceId:  "0000",
-				ProfileId: "",
-			},
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.CreateDevice: StringToObjectID: ProfileId: bson.IsObjectIdHex: false"),
-		},
-
-		{
-			name: "error: profile_id: invalid",
-			req: &audience.CreateDeviceRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				DeviceId:  "0000",
-				ProfileId: "zer0",
-			},
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "db.CreateDevice: StringToObjectID: ProfileId: bson.IsObjectIdHex: false"),
-		},
-
-		{
-			name: "error: profile_id: doesn't exist",
-			req: &audience.CreateDeviceRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-
-				DeviceId:  "0000",
-				ProfileId: "000000000000000000000000",
-			},
-
-			expErr: grpc.Errorf(codes.NotFound, "db.CreateDevice: profiles.Find: not found"),
-		},
-
-		{
 			name: "error: device id: invalid",
 			req: &audience.CreateDeviceRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 
-				DeviceId:  "",
-				ProfileId: "000000000000000000000aa2",
+				DeviceId:          "",
+				ProfileIdentifier: "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
 		},
 
 		{
@@ -4097,8 +2863,8 @@ func testAudienceService_CreateDevice(t *testing.T) {
 			req: &audience.CreateDeviceRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 
-				DeviceId:  "DDDDDDDD-0000-0000-0000-000000000001",
-				ProfileId: "dddddddddddddddddddddddd",
+				DeviceId:          "DDDDDDDD-0000-0000-0000-000000000001",
+				ProfileIdentifier: "dddddddddddddddddddddddd",
 			},
 
 			expErr: nil,
@@ -4114,10 +2880,9 @@ func testAudienceService_CreateDevice(t *testing.T) {
 					Id:                "0194fdc2fa2ffcc041d3ff12",
 					AccountId:         1,
 					DeviceId:          "DDDDDDDD-0000-0000-0000-000000000001",
-					ProfileId:         "dddddddddddddddddddddddd",
+					ProfileIdentifier: "dddddddddddddddddddddddd",
 					CreatedAt:         protoTs(t, createdAt),
 					UpdatedAt:         protoTs(t, createdAt),
-					ProfileIdentifier: "11111111-1111-1111-1111-dddddddddddd",
 				},
 			},
 		},
@@ -4178,15 +2943,6 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 	}
 
 	tcases := []tCase{
-		{
-			name: "error: profile_id: unset",
-			req: &audience.UpdateDeviceRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				DeviceId:    "00000000-0000-0000-0000-000000000000",
-			},
-
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDevice: devices.Find: not found"),
-		},
 
 		{
 			name: "error: wrong account",
@@ -4198,7 +2954,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				DeviceId: "00000000-0000-0000-0000-000000000000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDevice: devices.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDevice: devices.Find: not found"),
 		},
 
 		{
@@ -4218,11 +2974,11 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				AppNamespace:       "io.rover",
 				DeviceManufacturer: "Apple",
 				OsName:             "iOS",
-				OsVersion:          &audience.Version{1, 0, 0},
+				OsVersion:          &audience.Version{Major: 1, Minor: 0, Revision: 0},
 				DeviceModel:        "iPhone 6",
 				Frameworks: map[string]*audience.Version{
-					"io.rover.Rover":     &audience.Version{1, 2, 3},
-					"io.rover.RoverPush": &audience.Version{1, 2, 3},
+					"io.rover.Rover":     {Major: 1, Minor: 2, Revision: 3},
+					"io.rover.RoverPush": {Major: 1, Minor: 2, Revision: 3},
 				},
 				LocaleLanguage:              "en",
 				LocaleRegion:                "us",
@@ -4253,7 +3009,6 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					AccountId:                 5,
 					Id:                        "000000000000000000000dd1",
 					DeviceId:                  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
-					ProfileId:                 "000000000000000000000ad1",
 					NotificationAuthorization: audience.NotificationAuthorization_UNKNOWN,
 					CreatedAt:                 protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt:                 protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
@@ -4267,7 +3022,6 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
 
 					AccountId: 5,
-					ProfileId: "000000000000000000000ad1",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -4361,7 +3115,6 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd1",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
-					ProfileId: "000000000000000000000ad1",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -4466,7 +3219,7 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 				DeviceId:    "000000000000000000000000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceTestProperty: devices.Update: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceTestProperty: devices.Update: not found"),
 		},
 
 		{
@@ -4476,7 +3229,7 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 				DeviceId:    "000000000000000000000dd4",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceTestProperty: devices.Update: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceTestProperty: devices.Update: not found"),
 		},
 
 		{
@@ -4495,7 +3248,6 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 
 					Id:        "000000000000000000000dd7",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
-					ProfileId: "000000000000000000000ad6",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 				},
@@ -4507,9 +3259,8 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 					AccountId:    5,
 					IsTestDevice: true,
 
-					Id:        "000000000000000000000dd7",
-					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
-					ProfileId: "000000000000000000000ad6",
+					Id:       "000000000000000000000dd7",
+					DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
@@ -4533,7 +3284,6 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 
 					Id:        "000000000000000000000dd7",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
-					ProfileId: "000000000000000000000ad6",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 				},
@@ -4545,9 +3295,8 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 					AccountId:    5,
 					IsTestDevice: false,
 
-					Id:        "000000000000000000000dd7",
-					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
-					ProfileId: "000000000000000000000ad6",
+					Id:       "000000000000000000000dd7",
+					DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD7",
 
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
@@ -4618,7 +3367,7 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 100},
 				DeviceId:    "00000000-0000-0000-0000-000000000000",
 			},
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDevicePushToken: devices.Find: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDevicePushToken: devices.Find: not found"),
 		},
 
 		{
@@ -4638,7 +3387,6 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd3",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
-					ProfileId: "000000000000000000000ad3",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 				},
@@ -4650,7 +3398,6 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd3",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
-					ProfileId: "000000000000000000000ad3",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -4683,7 +3430,6 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd3",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
-					ProfileId: "000000000000000000000ad3",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -4713,7 +3459,6 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd3",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
-					ProfileId: "000000000000000000000ad3",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -4743,7 +3488,6 @@ func testAudienceService_UpdateDevicePushToken(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd3",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD3",
-					ProfileId: "000000000000000000000ad3",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -4818,7 +3562,7 @@ func testAudienceService_UpdateDeviceUnregisterPushToken(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 100},
 				DeviceId:    "00000000-0000-0000-0000-000000000000",
 			},
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceUnregisterPushToken: devices.Update: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceUnregisterPushToken: devices.Update: not found"),
 		},
 
 		{
@@ -4837,7 +3581,6 @@ func testAudienceService_UpdateDeviceUnregisterPushToken(t *testing.T) {
 					AccountId: 5,
 					Id:        "dddddddddddddddddddddddd",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-000000000000",
-					ProfileId: "000000000000000000000bbb",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 
@@ -4855,7 +3598,6 @@ func testAudienceService_UpdateDeviceUnregisterPushToken(t *testing.T) {
 					AccountId: 5,
 					Id:        "dddddddddddddddddddddddd",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-000000000000",
-					ProfileId: "000000000000000000000bbb",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -4930,7 +3672,7 @@ func testAudienceService_UpdateDeviceLocation(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 100},
 				DeviceId:    "00000000-0000-0000-0000-000000000000",
 			},
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceLocation: devices.Update: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceLocation: devices.Update: not found"),
 		},
 
 		{
@@ -4954,7 +3696,6 @@ func testAudienceService_UpdateDeviceLocation(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd4",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD4",
-					ProfileId: "000000000000000000000ad4",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 				},
@@ -4966,7 +3707,6 @@ func testAudienceService_UpdateDeviceLocation(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd4",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD4",
-					ProfileId: "000000000000000000000ad4",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -5040,7 +3780,7 @@ func testAudienceService_UpdateDeviceGeofenceMonitoring(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 100},
 				DeviceId:    "00000000-0000-0000-0000-000000000000",
 			},
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceGeofenceMonitoring: devices.Update: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceGeofenceMonitoring: devices.Update: not found"),
 		},
 
 		{
@@ -5066,7 +3806,6 @@ func testAudienceService_UpdateDeviceGeofenceMonitoring(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd5",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD5",
-					ProfileId: "000000000000000000000ad5",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 				},
@@ -5078,7 +3817,6 @@ func testAudienceService_UpdateDeviceGeofenceMonitoring(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd5",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD5",
-					ProfileId: "000000000000000000000ad5",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -5154,7 +3892,7 @@ func testAudienceService_UpdateDeviceIBeaconMonitoring(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 5},
 				DeviceId:    "00000000-0000-0000-0000-000000000000",
 			},
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceIBeaconMonitoring: devices.Update: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceIBeaconMonitoring: devices.Update: not found"),
 		},
 		{
 			name: "error: wrong account",
@@ -5162,7 +3900,7 @@ func testAudienceService_UpdateDeviceIBeaconMonitoring(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 100},
 				DeviceId:    "00000000-0000-0000-0000-000000000000",
 			},
-			expErr: grpc.Errorf(codes.NotFound, "db.UpdateDeviceIBeaconMonitoring: devices.Update: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceIBeaconMonitoring: devices.Update: not found"),
 		},
 
 		{
@@ -5185,7 +3923,6 @@ func testAudienceService_UpdateDeviceIBeaconMonitoring(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd6",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD6",
-					ProfileId: "000000000000000000000ad6",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 				},
@@ -5197,7 +3934,6 @@ func testAudienceService_UpdateDeviceIBeaconMonitoring(t *testing.T) {
 					AccountId: 5,
 					Id:        "000000000000000000000dd6",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD6",
-					ProfileId: "000000000000000000000ad6",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, updatedAt),
 
@@ -5266,7 +4002,7 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 				DeviceId: "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
 		},
 
 		{
@@ -5278,7 +4014,7 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 				DeviceId: "000000000000000000000000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceProfileIdById: devices.FindId: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.DeleteDevice: devices.Remove: not found"),
 		},
 
 		{
@@ -5288,7 +4024,7 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 				DeviceId:    "00000000-0000-0000-0000-000000000000",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.GetDeviceProfileIdById: devices.FindId: not found"),
+			expErr: status.Errorf(codes.NotFound, "db.DeleteDevice: devices.Remove: not found"),
 		},
 
 		{
@@ -5306,7 +4042,6 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 					Id:        "000000000000000000000ddd",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD",
 					AccountId: 5,
-					ProfileId: "000000000000000000000add",
 					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
 				},
@@ -5344,112 +4079,6 @@ func testAudienceService_DeleteDevice(t *testing.T) {
 	}
 }
 
-func testAudienceService_ListDevicesByProfileId(t *testing.T) {
-	var (
-		ctx = context.TODO()
-		// createdAt = protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z"))
-
-		mdb = dialMongo(t, *tMongoDSN)
-		db  = mongodb.New(mdb,
-			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
-		)
-		svc = service.New(db, new(nopIndex), logNotifier(t))
-
-		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
-	)
-
-	defer teardown()
-
-	tcases := []struct {
-		name string
-		req  *audience.ListDevicesByProfileIdRequest
-
-		exp    *audience.ListDevicesByProfileIdResponse
-		expErr error
-	}{
-		{
-			name: "error: validation: blank id",
-			req: &audience.ListDevicesByProfileIdRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				ProfileId:   "",
-			},
-
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: ProfileId: blank"),
-		},
-		{
-			name: "error: not found: profile",
-			req: &audience.ListDevicesByProfileIdRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				ProfileId:   "000000000000000000000000",
-			},
-
-			expErr: grpc.Errorf(codes.NotFound, "db.ListDevicesByProfileId: profileExists: not found"),
-		},
-
-		{
-			name: "profiles with no devices",
-			req: &audience.ListDevicesByProfileIdRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				ProfileId:   "d0000000000000000000000d",
-			},
-
-			expErr: nil,
-			exp:    &audience.ListDevicesByProfileIdResponse{nil},
-		},
-
-		{
-			name: "wrong account",
-			req: &audience.ListDevicesByProfileIdRequest{
-				AuthContext: &auth.AuthContext{AccountId: 100},
-				ProfileId:   "000000000000000000000bb2",
-			},
-
-			expErr: nil,
-			exp:    &audience.ListDevicesByProfileIdResponse{nil},
-		},
-
-		{
-			name: "finds devices",
-			req: &audience.ListDevicesByProfileIdRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				ProfileId:   "000000000000000000000bb2",
-			},
-
-			expErr: nil,
-
-			exp: &audience.ListDevicesByProfileIdResponse{
-				[]*audience.Device{
-					{
-						AccountId: 1,
-						Id:        "d00000000000000000000bb0",
-						DeviceId:  "d-bb0",
-						ProfileId: "000000000000000000000bb2",
-						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					},
-					{
-						AccountId: 1,
-						Id:        "d00000000000000000000bb2",
-						DeviceId:  "d-bb2",
-						ProfileId: "000000000000000000000bb2",
-						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					},
-				},
-			},
-		},
-	}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-			got, gotErr := client.ListDevicesByProfileId(ctx, tc.req)
-			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", difff(diff))
-			}
-		})
-	}
-}
-
 func testAudienceService_ListDevicesByProfileIdentifier(t *testing.T) {
 	var (
 		ctx = context.TODO()
@@ -5477,168 +4106,60 @@ func testAudienceService_ListDevicesByProfileIdentifier(t *testing.T) {
 		{
 			name: "error: validation: blank id",
 			req: &audience.ListDevicesByProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				Identifier:  "",
+				AuthContext:       &auth.AuthContext{AccountId: 1},
+				ProfileIdentifier: "",
 			},
 
-			expErr: grpc.Errorf(codes.InvalidArgument, "Validation: Identifier: blank"),
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: ProfileIdentifier cannot be blank"),
 		},
-		{
-			name: "error: not found: profile",
-			req: &audience.ListDevicesByProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				Identifier:  "00000000-0000-0000-0000-000000000zzz",
-			},
-
-			expErr: grpc.Errorf(codes.NotFound, "db.ListDevicesByProfileIdentifier: profiles.Find: not found"),
-		},
-
 		{
 			name: "profiles with no devices",
 			req: &audience.ListDevicesByProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				Identifier:  "11111111-1111-1111-1111-222222222222",
+				AuthContext:       &auth.AuthContext{AccountId: 1},
+				ProfileIdentifier: "11111111-1111-1111-1111-222222222222",
 			},
 
 			expErr: nil,
-			exp:    &audience.ListDevicesByProfileIdentifierResponse{nil},
+			exp:    &audience.ListDevicesByProfileIdentifierResponse{Devices: nil},
 		},
 
 		{
 			name: "wrong account",
 			req: &audience.ListDevicesByProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 100},
-				Identifier:  "00000000-0000-0000-0000-000000000bb2",
+				AuthContext:       &auth.AuthContext{AccountId: 100},
+				ProfileIdentifier: "00000000-0000-0000-0000-000000000bb2",
 			},
 
-			expErr: grpc.Errorf(codes.NotFound, "db.ListDevicesByProfileIdentifier: profiles.Find: not found"),
+			expErr: nil,
+			exp:    &audience.ListDevicesByProfileIdentifierResponse{Devices: nil},
 		},
 
 		{
 			name: "finds devices",
 			req: &audience.ListDevicesByProfileIdentifierRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				Identifier:  "00000000-0000-0000-0000-000000000bb2",
+				AuthContext:       &auth.AuthContext{AccountId: 1},
+				ProfileIdentifier: "000-ABC-333",
 			},
 
 			expErr: nil,
 
 			exp: &audience.ListDevicesByProfileIdentifierResponse{
-				[]*audience.Device{
+				Devices: []*audience.Device{
 					{
-						AccountId: 1,
-						Id:        "d00000000000000000000bb0",
-						DeviceId:  "d-bb0",
-						ProfileId: "000000000000000000000bb2",
-						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						AccountId:         1,
+						Id:                "d00000000000000000000bb0",
+						DeviceId:          "d-bb0",
+						ProfileIdentifier: "000-ABC-333",
+						CreatedAt:         protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt:         protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					},
 					{
-						AccountId: 1,
-						Id:        "d00000000000000000000bb2",
-						DeviceId:  "d-bb2",
-						ProfileId: "000000000000000000000bb2",
-						CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-						UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
-					},
-				},
-			},
-		},
-	}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-			got, gotErr := client.ListDevicesByProfileIdentifier(ctx, tc.req)
-			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", difff(diff))
-			}
-		})
-	}
-}
-
-func testAudienceService_ListDevicesByProfileIdentifier_ms12(t *testing.T) {
-	var (
-		ctx = context.TODO()
-		// createdAt = protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z"))
-
-		mdb = dialMongo(t, *tMongoDSN)
-		db  = mongodb.New(mdb,
-			mongodb.WithLogger(log.NewLog(log.Debug)),
-			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
-		)
-		svc = service.New(db, new(nopIndex), logNotifier(t))
-
-		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
-	)
-
-	defer teardown()
-
-	tcases := []struct {
-		name string
-		req  *audience.ListDevicesByProfileIdentifierRequest
-
-		exp    *audience.ListDevicesByProfileIdentifierResponse
-		expErr error
-	}{
-		{
-			name: "profiles with no devices",
-			req: &audience.ListDevicesByProfileIdentifierRequest{
-				Ms12:              true,
-				AuthContext:       &auth.AuthContext{AccountId: 16},
-				ProfileIdentifier: "000000000000000000000000",
-			},
-
-			expErr: nil,
-			exp:    &audience.ListDevicesByProfileIdentifierResponse{nil},
-		},
-
-		{
-			name: "assinged profile: finds devices",
-			req: &audience.ListDevicesByProfileIdentifierRequest{
-				Ms12:              true,
-				AuthContext:       &auth.AuthContext{AccountId: 16},
-				ProfileIdentifier: "16aaaaaaaaaaaaaaaaaaaaaa",
-			},
-
-			expErr: nil,
-
-			exp: &audience.ListDevicesByProfileIdentifierResponse{
-				[]*audience.Device{
-					{
-						AccountId:         16,
-						Id:                "16aaaaaaaaaaaaaaaaaaaaaa",
-						DeviceId:          "16aaaaaaaaaaaaaaaaaaaaaa",
-						ProfileId:         "16aaaaaaaaaaaaaaaaaaaaaa",
-						ProfileIdentifier: "16aaaaaaaaaaaaaaaaaaaaaa",
-
-						CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-						UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-					},
-				},
-			},
-		},
-
-		{
-			name: "anonymous profile: finds devices",
-			req: &audience.ListDevicesByProfileIdentifierRequest{
-				Ms12:              true,
-				AuthContext:       &auth.AuthContext{AccountId: 16},
-				ProfileIdentifier: "",
-			},
-
-			expErr: nil,
-
-			exp: &audience.ListDevicesByProfileIdentifierResponse{
-				[]*audience.Device{
-					{
-						AccountId:         16,
-						Id:                "17aaaaaaaaaaaaaaaaaaaaaa",
-						DeviceId:          "17aaaaaaaaaaaaaaaaaaaaaa",
-						ProfileId:         "17aaaaaaaaaaaaaaaaaaaaaa",
-						ProfileIdentifier: "",
-
-						CreatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
-						UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
+						AccountId:         1,
+						Id:                "d00000000000000000000bb2",
+						DeviceId:          "d-bb2",
+						ProfileIdentifier: "000-ABC-333",
+						CreatedAt:         protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+						UpdatedAt:         protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
 					},
 				},
 			},

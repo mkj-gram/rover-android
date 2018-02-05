@@ -5,7 +5,7 @@ import { getSegmentPageByPredicates } from './SegmentRowsQuery'
 
 import { audienceClient } from '../grpcClients'
 import buildPredicateAggregate from '../grpc/audience/buildPredicateAggregate'
-import getProfileFromProto from '../grpc/audience/getProfileFromProto'
+import getProfileFromProto, { getEmptyProfileValues } from '../grpc/audience/getProfileFromProto'
 import getDeviceFromProto from '../grpc/audience/getDeviceFromProto'
 import promisify from '@rover-common/grpc-promisify'
 

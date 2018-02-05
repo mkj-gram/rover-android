@@ -145,16 +145,17 @@ func (p *SchemaAttribute) toProto(proto *audience.SchemaAttribute) error {
 	return nil
 }
 
-func (s *profilesStore) FindProfileById(ctx context.Context, id string) (*audience.Profile, error) {
+func (s *profilesStore) FindProfileByIdentifier(ctx context.Context, accountId int32, identifier string) (*audience.Profile, error) {
 
-	pid, err := StringToObjectID(id)
-	if err != nil {
-		return nil, wrapError(err, "StringToObjectID")
-	}
+	var (
+		Q = bson.M{
+			"account_id": accountId,
+			"identifier": identifier,
+		}
+		pf Profile
+	)
 
-	var pf Profile
-
-	if err := s.profiles().FindId(pid).One(&pf); err != nil {
+	if err := s.profiles().Find(Q).One(&pf); err != nil {
 		return nil, wrapError(err, "profiles.FindId")
 	}
 
@@ -169,13 +170,13 @@ func (s *profilesStore) FindProfileById(ctx context.Context, id string) (*audien
 // CreateProfile creates an empty Profile for the account
 func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreateProfileRequest) (*audience.Profile, error) {
 	var (
-		account_id = r.GetAuthContext().GetAccountId()
+		accountId  = r.GetAuthContext().GetAccountId()
 		identifier = r.GetIdentifier()
 		now        = s.timeNow()
 
 		p = Profile{
 			Id:         s.newObjectId(),
-			AccountId:  account_id,
+			AccountId:  accountId,
 			Attributes: nil,
 			CreatedAt:  &now,
 			UpdatedAt:  &now,
@@ -198,26 +199,56 @@ func (s *profilesStore) CreateProfile(ctx context.Context, r *audience.CreatePro
 	return &proto, nil
 }
 
-// GetProfile returns a account profile given the ids
+// GetProfile returns a account profile given the identifier
 func (s *profilesStore) GetProfile(ctx context.Context, r *audience.GetProfileRequest) (*audience.Profile, error) {
 
-	profile_oid, err := StringToObjectID(r.GetProfileId())
+	var accountId = r.GetAuthContext().GetAccountId()
+
+	if r.GetIdentifier() != "" {
+		return s.GetProfileByIdentifier(ctx, accountId, r.GetIdentifier())
+	} else {
+		return s.GetProfileById(ctx, accountId, r.GetProfileId())
+	}
+}
+
+func (s *profilesStore) GetProfileByIdentifier(ctx context.Context, accountId int32, identifier string) (*audience.Profile, error) {
+	var (
+		p Profile
+
+		Q = bson.M{
+			"account_id": accountId,
+			"identifier": identifier,
+		}
+	)
+
+	if err := s.profiles().Find(Q).One(&p); err != nil {
+		return nil, wrapError(err, "profiles.Find")
+	}
+
+	var proto audience.Profile
+	if err := p.toProto(&proto); err != nil {
+		return nil, wrapError(err, "profile.toProto")
+	}
+
+	return &proto, nil
+}
+
+func (s *profilesStore) GetProfileById(ctx context.Context, accountId int32, id string) (*audience.Profile, error) {
+	profileOid, err := StringToObjectID(id)
 	if err != nil {
 		err = ErrorInvalidArgument{
 			error:        err,
 			ArgumentName: "ProfileId",
-			Value:        r.GetProfileId(),
+			Value:        id,
 		}
 		return nil, wrapError(err, "StringToObjectID")
 	}
 
 	var (
-		account_id = r.GetAuthContext().GetAccountId()
-
 		p Profile
 		Q = bson.M{
-			"_id":        profile_oid,
-			"account_id": account_id,
+			"_id":        profileOid,
+			"account_id": accountId,
 		}
 	)
 
@@ -235,22 +266,17 @@ func (s *profilesStore) GetProfile(ctx context.Context, r *audience.GetProfileRe
 
 func (s *profilesStore) DeleteProfile(ctx context.Context, r *audience.DeleteProfileRequest) error {
 	var (
-		account_id = r.GetAuthContext().GetAccountId()
+		identifier = r.GetIdentifier()
+		accountId  = r.GetAuthContext().GetAccountId()
 	)
 
-	id, err := StringToObjectID(r.GetProfileId())
-	if err != nil {
-		err = ErrorInvalidArgument{
-			error:        err,
-			ArgumentName: "ProfileId",
-			Value:        r.GetProfileId(),
-		}
-		return wrapError(err, "StringToObjectID")
+	if identifier == "" {
+		return ErrorInvalidArgument{ArgumentName: "Identifier", Value: identifier}
 	}
 
-	Q := bson.M{
-		"_id":        id,
-		"account_id": account_id,
+	var Q = bson.M{
+		"account_id": accountId,
+		"identifier": identifier,
 	}
 
 	if err := s.profiles().Remove(Q); err != nil {
@@ -298,81 +324,16 @@ func (s *profilesStore) GetProfileByDeviceId(ctx context.Context, r *audience.Ge
 	return &proto, nil
 }
 
-func (s *profilesStore) GetProfileByIdentifier(ctx context.Context, r *audience.GetProfileByIdentifierRequest) (*audience.Profile, error) {
-	var (
-		account_id = r.GetAuthContext().GetAccountId()
-		identifier = r.GetIdentifier()
-
-		p Profile
-
-		Q = bson.M{
-			"account_id": account_id,
-			"identifier": identifier,
-		}
-	)
-
-	if err := s.profiles().Find(Q).One(&p); err != nil {
-		return nil, wrapError(err, "profiles.Find")
-	}
-
-	var proto audience.Profile
-	if err := p.toProto(&proto); err != nil {
-		return nil, wrapError(err, "profile.toProto")
-	}
-
-	return &proto, nil
-}
-
-func (s *profilesStore) ListProfilesByIds(ctx context.Context, r *audience.ListProfilesByIdsRequest) ([]*audience.Profile, error) {
-	var (
-		account_id  = r.GetAuthContext().GetAccountId()
-		profile_ids = r.GetProfileIds()
-
-		profile_oids = make([]bson.ObjectId, len(profile_ids))
-	)
-
-	for i := range profile_ids {
-		poid, err := StringToObjectID(profile_ids[i])
-		if err != nil {
-			err = ErrorInvalidArgument{
-				error:        err,
-				ArgumentName: "ProfileId",
-				Value:        profile_ids[i],
-			}
-			return nil, wrapError(err, "StringToObjectID")
-		}
-		profile_oids[i] = poid
-	}
-
-	var (
-		profiles []Profile
-
-		Q = bson.M{"account_id": account_id, "_id": bson.M{"$in": profile_oids}}
-	)
-
-	if err := s.profiles().Find(Q).Sort("_id").All(&profiles); err != nil {
-		return nil, wrapError(err, "profiles.Find")
-	}
-
-	var protoProfiles = make([]*audience.Profile, len(profiles))
-	for i := range profiles {
-		protoProfiles[i] = new(audience.Profile)
-		profiles[i].toProto(protoProfiles[i])
-	}
-
-	return protoProfiles, nil
-}
-
 func (s *profilesStore) ListProfilesByIdentifiers(ctx context.Context, r *audience.ListProfilesByIdentifiersRequest) ([]*audience.Profile, error) {
 	var (
-		account_id          = r.GetAuthContext().GetAccountId()
-		profile_identifiers = r.GetProfileIdentifiers()
+		accountId          = r.GetAuthContext().GetAccountId()
+		profileIdentifiers = r.GetProfileIdentifiers()
 	)
 
 	var (
 		profiles []Profile
 
-		Q = bson.M{"account_id": account_id, "identifier": bson.M{"$in": profile_identifiers}}
+		Q = bson.M{"account_id": accountId, "identifier": bson.M{"$in": profileIdentifiers}}
 	)
 
 	if err := s.profiles().Find(Q).Sort("_id").All(&profiles); err != nil {
@@ -406,66 +367,18 @@ func (s *profilesStore) GetProfileSchema(ctx context.Context, r *audience.GetPro
 	return &proto, nil
 }
 
-func (s *profilesStore) getProfileSchema(ctx context.Context, account_id int32) (*ProfileSchema, error) {
-	var (
-		schema ProfileSchema
-	)
-
-	err := s.profiles_schemas().
-		Find(bson.M{"account_id": account_id}).
-		Sort("_id").
-		All(&schema.Attributes)
-
-	return &schema, wrapError(err, "profile_schemas.Find")
-}
-
-func (s *profilesStore) UpdateProfileIdentifier(ctx context.Context, r *audience.UpdateProfileIdentifierRequest) error {
-	var (
-		account_id = r.GetAuthContext().GetAccountId()
-		profile_id = r.GetProfileId()
-		identifier = r.GetIdentifier()
-
-		now = s.timeNow()
-
-		update = bson.M{
-			"identifier": identifier,
-			"updated_at": now,
-		}
-	)
-
-	err := s.profiles().Update(bson.M{
-		"_id":        bson.ObjectIdHex(profile_id),
-		"account_id": account_id,
-	}, bson.M{"$set": update})
-	if err != nil {
-		return wrapError(err, "profiles.Update")
-	}
-
-	return nil
-}
-
-// UpdateProfile updates the profile
-//
-// 1. validate attributes against profile schema
-// 2. collect attributes that have no schema
-// 3. create schema for the attributes with no schema
-// 4. error if an attribute doesn't match the schema type
-// 5. if no errros
-// 6. update attributes
-// 7. update schema
-//
 func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdateProfileRequest) (bool, error) {
 	var (
-		profile_id  = r.GetProfileId()
-		account_id  = r.GetAuthContext().GetAccountId()
+		accountId   = r.GetAuthContext().GetAccountId()
+		identifier  = r.GetIdentifier()
 		attrUpdates = r.GetAttributes()
 
 		p Profile
 	)
 
 	err := s.profiles().Find(bson.M{
-		"_id":        bson.ObjectIdHex(profile_id),
-		"account_id": account_id,
+		"identifier": identifier,
+		"account_id": accountId,
 	}).One(&p)
 
 	if err != nil {
@@ -473,7 +386,7 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 	}
 
 	// schema is a bag of `SchemaAttribute`s
-	schema, err := s.getProfileSchema(ctx, account_id)
+	schema, err := s.getProfileSchema(ctx, accountId)
 	if err != nil {
 		return false, wrapError(err, "getProfileSchema")
 	}
@@ -487,19 +400,13 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 
 	// now for all the schemaLess attributes create the corresponding schema
 	if len(schemaLess) > 0 {
-		schemaUpdateAttrs, err := s.buildSchema(ctx, account_id, attrUpdates, schemaLess)
+		schemaUpdateAttrs, err := s.buildSchema(ctx, accountId, attrUpdates, schemaLess)
 		if err != nil {
 			return false, wrapError(err, "buildSchema")
 		}
 
 		if err := updateSchema(ctx, s.profiles_schemas(), schemaUpdateAttrs); err != nil {
 			return false, wrapError(err, "profile.updateSchema")
-		}
-
-		// ms-12: update device schema as well
-		// TODO: remove after ms-12 is done
-		if err := updateSchema(ctx, s.devices_schemas(), schemaUpdateAttrs); err != nil {
-			return false, wrapError(err, "device.updateSchema")
 		}
 	}
 
@@ -508,35 +415,18 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 		return false, wrapError(err, "profiles.updateAttributes")
 	}
 
-	// ms-12: copy profile updates to all profile devices as well
-	// TODO: remove after ms-12 is done
-	var (
-		deviceDocs []bson.M
+	return len(schemaLess) > 0, nil
+}
 
-		profileDevices = s.devices().
-				Find(bson.M{"profile_id": p.Id, "account_id": p.AccountId}).
-				Select(bson.M{"_id": 1})
+func (s *profilesStore) getProfileSchema(ctx context.Context, account_id int32) (*ProfileSchema, error) {
+	var (
+		schema ProfileSchema
 	)
 
-	if err := profileDevices.All(&deviceDocs); err != nil {
-		return false, wrapError(err, "profiles.Find")
-	}
+	err := s.profiles_schemas().
+		Find(bson.M{"account_id": account_id}).
+		Sort("_id").
+		All(&schema.Attributes)
 
-	if len(deviceDocs) > 0 {
-		var deviceOids []bson.ObjectId
-		for _, m := range deviceDocs {
-			var deviceId, ok = m["_id"].(bson.ObjectId)
-			if !ok {
-				errorf("deviceIdToObjectId: no key: %v", m["_id"])
-				continue
-			}
-			deviceOids = append(deviceOids, deviceId)
-		}
-
-		if err := updateAttributes(ctx, s.devices(), attrUpdates, deviceOids...); err != nil {
-			return false, wrapError(err, "devices.updateAttributes")
-		}
-	}
-
-	return len(schemaLess) > 0, nil
+	return &schema, wrapError(err, "profile_schemas.Find")
 }

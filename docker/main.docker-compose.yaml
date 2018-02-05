@@ -153,7 +153,7 @@ services:
       - rabbitmq
       - redis
       - audience-service
-    command: bash -c "/rover/docker/scripts/wait.sh rabbitmq:5672 -s -- npm install && node index.js"
+    command: bash -c "/rover/docker/scripts/wait.sh rabbitmq:5672 -s -- npm install && npm start"
     environment:
       NODE_ENV: production
       LOG_LEVEL: DEBUG

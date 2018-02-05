@@ -74,6 +74,7 @@ export default (d) => {
         os_version: getVersionFromProto(d.getOsVersion()),
         platform: getPlatformFromProto(d.getPlatform()),
         profile_id: d.getProfileIdentifier(),
+        profile_identifier: d.getProfileIdentifier(),
         push_environment: getPushEnvironmentFromProto(d.getPushEnvironment()),
         push_token_created_at: RoverApis.Helpers.timestampFromProto(d.getPushTokenCreatedAt()),
         push_token_is_active: d.getPushTokenIsActive(),
@@ -87,7 +88,7 @@ export default (d) => {
         time_zone: d.getTimeZone()
     }
 
-     return Object.keys(props).map(p => {
+    return Object.keys(props).map(p => {
         return {
             attribute: p,
             selector: 'DEVICE',

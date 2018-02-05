@@ -63,6 +63,20 @@ const getCustomProfileValues = (p) => {
    return custom_profiles
 }
 
+export const getEmptyProfileValues = (identifier) => {
+    if (identifier == "") {
+        return []
+    }
+    
+    return [
+        {
+            attribute: 'identifier',
+            selector:  'ROVER_PROFILE',
+            value: identifier
+        }
+    ]
+}
+
 export default (profiles, p) => {
    const identifier = p.getIdentifier()
    profiles[identifier] = getRoverProfileValues(p).concat(getCustomProfileValues(p))

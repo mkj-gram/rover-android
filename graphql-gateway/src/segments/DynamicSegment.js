@@ -11,7 +11,7 @@ import RoverApis from '@rover/apis'
 import promisify from '@rover-common/grpc-promisify'
 import { audienceClient } from '../grpcClients'
 import buildPredicateAggregate from '../grpc/audience/buildPredicateAggregate'
-import getProfileFromProto from '../grpc/audience/getProfileFromProto'
+import getProfileFromProto, { getEmptyProfileValues } from '../grpc/audience/getProfileFromProto'
 import getDeviceFromProto from '../grpc/audience/getDeviceFromProto'
 promisify(audienceClient)
 
@@ -90,6 +90,7 @@ const DynamicSegment = new GraphQLObjectType({
                 dataGridRows = response.getDevicesList().map(device => {
                   const deviceAttrs = getDeviceFromProto(device)
                   const profileAttrs = profiles[device.getProfileIdentifier()] || []
+
                   return deviceAttrs.concat(profileAttrs)
                 })
 

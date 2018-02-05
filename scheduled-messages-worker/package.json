@@ -4,8 +4,8 @@
   "description": "Sends and saves messages to customers",
   "main": "index.js",
   "dependencies": {
-    "@rover/node-fcm-ccs": "0.0.3",
     "@rover/audience-client": "../audience/clients/node",
+    "@rover/node-fcm-ccs": "0.0.3",
     "@rover/segment-client": "../segment/clients/node",
     "amqplib": "^0.4.2",
     "apn": "^2.1.4",
@@ -15,6 +15,7 @@
     "debug": "^2.3.3",
     "elasticsearch": "^11.0.1",
     "fluent-logger": "2.1.0",
+    "joi": "^13.1.1",
     "librato-node": "^4.1.0",
     "log4js": "^0.6.38",
     "moment": "^2.15.1",
@@ -25,10 +26,12 @@
     "retry": "^0.10.1",
     "uuid": "^2.0.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^1.14.11"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
+    "start": "./node_modules/nodemon/bin/nodemon.js index.js",
     "configure": "node scripts/configure.js",
     "simulate": "node scripts/simulate.js"
   },

@@ -601,7 +601,7 @@ module.exports = function() {
 
                 logger.debug("setDeviceProfile:", deviceProfileIdentifier, deviceContext.profile_identifier)
                 if (deviceProfileIdentifier !== deviceContext.profile_identifier) {
-                    methods.device.setDeviceProfile(accountId, deviceId, deviceContext.profile_identifier, function(err) {
+                    methods.device.setDeviceProfileIdentifier(accountId, deviceId, deviceContext.profile_identifier, function(err) {
                         if (err) {
                             logger.error("setDeviceProfile:", err)
                             return writeReplyError(500, { status: 500, error: "Could not grab device's current profile" })

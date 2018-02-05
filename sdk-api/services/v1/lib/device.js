@@ -507,15 +507,15 @@ module.exports = function(AudienceClient, logger) {
 		})
 	}
 
-	methods.setDeviceProfile = function(accountId, deviceId, profileIdentifier, callback) {
-		let request = new RoverApis.audience.v1.Models.SetDeviceProfileRequest()
-    request.setMs12(true) // use new data model api
+	methods.setDeviceProfileIdentifier = function(accountId, deviceId, profileIdentifier, callback) {
+		let request = new RoverApis.audience.v1.Models.SetDeviceProfileIdentifierRequest()
+  
 		request.setAuthContext(buildAuthContext(accountId))
 		request.setDeviceId(deviceId)
 		request.setProfileIdentifier(profileIdentifier || "")
 
 		logger.debug("setDeviceProfile:", JSON.stringify(request.toObject()))
-		AudienceClient.setDeviceProfile(request, function(err, reply) {
+		AudienceClient.setDeviceProfileIdentifier(request, function(err, reply) {
 			if (err) {
 				return callback(err)
 			}
