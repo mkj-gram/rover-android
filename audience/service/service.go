@@ -91,6 +91,7 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
 	}
 	db := s.db.Copy()
+	db.SetSafeMode()
 	defer db.Close()
 
 	device, err := db.CreateDevice(ctx, r)
@@ -182,6 +183,7 @@ func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceReque
 	}
 
 	db := s.db.Copy()
+	db.SetSafeMode()
 	defer db.Close()
 
 	if err := db.DeleteDevice(ctx, r); err != nil {
@@ -203,6 +205,7 @@ func (s *Server) SetDeviceProfileIdentifier(ctx context.Context, r *audience.Set
 	}
 
 	db := s.db.Copy()
+	db.SetSafeMode()
 	defer db.Close()
 
 	before, err := db.FindDeviceById(ctx, r.DeviceId)
@@ -347,6 +350,7 @@ func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileReq
 	}
 
 	db := s.db.Copy()
+	db.SetSafeMode()
 	defer db.Close()
 
 	p, err := db.CreateProfile(ctx, r)
@@ -361,6 +365,7 @@ func (s *Server) CreateProfile(ctx context.Context, r *audience.CreateProfileReq
 // DeleteProfile implements the corresponding rpc
 func (s *Server) DeleteProfile(ctx context.Context, r *audience.DeleteProfileRequest) (*audience.DeleteProfileResponse, error) {
 	db := s.db.Copy()
+	db.SetSafeMode()
 	defer db.Close()
 
 	if r.GetIdentifier() == "" {

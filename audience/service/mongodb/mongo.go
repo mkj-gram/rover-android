@@ -70,6 +70,13 @@ func (db DB) ModeRefresh() {
 	db.store.sess.Refresh()
 }
 
+// Set the mgo session to majority
+// https://docs.mongodb.com/manual/reference/write-concern/
+// Requests acknowledgement that write operations have propagated to the majority of voting nodes, including the primary.
+func (db DB) SetSafeMode() {
+	db.store.sess.SetSafe(&mgo.Safe{WMode: "majority"})
+}
+
 func (db *DB) Close() {
 	db.store.sess.Close()
 }
