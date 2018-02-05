@@ -200,10 +200,6 @@ func (s *Server) SetDeviceProfileIdentifier(ctx context.Context, r *audience.Set
 		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
 	}
 
-	if r.GetProfileIdentifier() == "" {
-		return nil, status.Error(codes.InvalidArgument, "Validation: ProfileIdentifier cannot be blank")
-	}
-
 	db := s.db.Copy()
 	db.SetSafeMode()
 	defer db.Close()

@@ -2554,6 +2554,42 @@ func testAudienceService_SetDeviceProfileIdentifier(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "unsets profile",
+			req: &audience.SetDeviceProfileIdentifierRequest{
+				AuthContext:       &auth.AuthContext{AccountId: 1},
+				DeviceId:          "D00000000000000000000000",
+				ProfileIdentifier: "",
+			},
+
+			expErr: nil,
+
+			before: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					Id:                "0000000000000000000000d0",
+					DeviceId:          "D00000000000000000000000",
+					AccountId:         1,
+					ProfileIdentifier: "00000000-0000-0000-0000-000000000bb2",
+
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, updatedAt),
+				},
+			},
+
+			after: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					Id:                "0000000000000000000000d0",
+					DeviceId:          "D00000000000000000000000",
+					AccountId:         1,
+					ProfileIdentifier: "",
+
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, updatedAt),
+				},
+			},
+		},
 	}
 
 	for _, tc := range tcases {
