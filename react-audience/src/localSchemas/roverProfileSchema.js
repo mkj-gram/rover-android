@@ -1,11 +1,5 @@
 export default () => [
         {
-            attribute: 'identifier',
-            label: 'Profile Identifier',
-            __typename: 'StringPredicate',
-            group: null
-        },
-        {
             attribute: 'updated_at',
             label: 'Updated At',
             __typename: 'DatePredicate',

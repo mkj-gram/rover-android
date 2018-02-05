@@ -17,6 +17,14 @@ export const getDeviceSchema = () => [
         filter: true
     },
     {
+        attribute: 'profile_identifier',
+        label: 'Profile Identifier',
+        __typename: 'StringPredicate',
+        group: null,
+        display: true,
+        filter: true
+    },
+    {
         attribute: 'push_token_key',
         label: 'Push Token',
         __typename: 'StringPredicate',
