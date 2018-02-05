@@ -81,7 +81,7 @@ const SegmentFromPredicatesQuery = {
 
         dataGridRows = response.getDevicesList().map(device => {
           const deviceAttrs = getDeviceFromProto(device)
-          const profileAttrs = profiles[device.getProfileIdentifier()]
+          const profileAttrs = profiles[device.getProfileIdentifier()] || []
           return deviceAttrs.concat(profileAttrs)
         })
 
