@@ -7,8 +7,8 @@ import {
 } from 'graphql'
 import { segmentCondition } from '../types/definitions'
 
-const segmentIdList = new GraphQLInterfaceType({
-    name: 'SegmentIdList',
+const SegmentableCampaign = new GraphQLInterfaceType({
+    name: 'SegmentableCampaign',
     description: 'List of Rover Segments to apply to Rover Campaign',
     fields: () => ({
         segmentIds: {
@@ -22,4 +22,4 @@ const segmentIdList = new GraphQLInterfaceType({
     })
 })
 
-export default segmentIdList
+export default SegmentableCampaign

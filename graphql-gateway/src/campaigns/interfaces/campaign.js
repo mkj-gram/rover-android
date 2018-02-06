@@ -11,7 +11,7 @@ import GraphQLJSON from 'graphql-type-json'
 
 import { campaignStatus, campaignType } from '../types/definitions'
 
-const campaign = new GraphQLInterfaceType({
+const Campaign = new GraphQLInterfaceType({
     name: 'Campaign',
     description: 'TBD',
     fields: () => ({
@@ -46,4 +46,4 @@ const campaign = new GraphQLInterfaceType({
     })
 })
 
-export default campaign
+export default Campaign

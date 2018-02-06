@@ -5,12 +5,14 @@ promisify(campaignsClient)
 
 import { GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLString } from 'graphql'
 
-import campaign from './interfaces/campaign'
-import getScheduledNotificationCampaignFromProto from '../grpc/campaigns/getScheduledNotificationCampaignFromProto'
-import getAutomatedNotificationCampaignFromProto from '../grpc/campaigns/getAutomatedNotificationCampaignFromProto'
+import { Campaign } from './interfaces'
+import {
+    getScheduledNotificationCampaignFromProto,
+    getAutomatedNotificationCampaignFromProto
+} from '../grpc/campaigns'
 
 const CampaignsQuery = {
-    type: new GraphQLNonNull(new GraphQLList(campaign)),
+    type: new GraphQLNonNull(new GraphQLList(Campaign)),
     args: {
         campaignStatus: { type: GraphQLString },
         campaignType: { type: GraphQLString },

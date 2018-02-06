@@ -1,65 +1,24 @@
 import {
     GraphQLBoolean,
-    GraphQLEnumType,
     GraphQLInt,
-    GraphQLObjectType,
-    GraphQLString,
+    GraphQLInterfaceType,
+    GraphQLEnumType,
     GraphQLNonNull,
-    GraphQLList
+    GraphQLString
 } from 'graphql'
 
-import { GraphQLDateTime } from 'graphql-iso-date'
 import GraphQLJSON from 'graphql-type-json'
 
-import { campaign, notification, scheduled, segmentIdList } from '../interfaces'
-
 import {
-    campaignType,
-    campaignStatus,
     notificationAttachmentType,
     notificationTapBehaviorType,
-    notificationTapPresentationType,
-    scheduledType,
-    segmentCondition,
-    scheduledDeliveryStatus
-} from './definitions'
+    notificationTapPresentationType
+} from '../types/definitions'
 
-const scheduledNotification = new GraphQLObjectType({
-    name: 'ScheduledNotificationCampaign',
-    interfaces: () => [scheduled, campaign, notification, segmentIdList],
-    isTypeOf: ({ campaignType }) =>
-        campaignType === 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION',
+const NotificationCampaign = new GraphQLInterfaceType({
+    name: 'NotificationCampaign',
+    description: 'Campaign Notification Attributes',
     fields: () => ({
-        // CAMPAIGN ATTRIBUTES
-        campaignId: {
-            type: new GraphQLNonNull(GraphQLInt),
-            description: 'Campaign Identifier'
-        },
-        name: {
-            type: new GraphQLNonNull(GraphQLString),
-            description: 'Name of the Campaign'
-        },
-        campaignType: {
-            type: new GraphQLNonNull(campaignType),
-            description: 'Type of the Campaign'
-        },
-        campaignStatus: {
-            type: new GraphQLNonNull(campaignStatus),
-            description: 'Status of the Campaign'
-        },
-        UIState: {
-            type: GraphQLJSON,
-            description: 'State object for Campaigns App UI'
-        },
-        createdAt: {
-            type: GraphQLDateTime,
-            description: 'Campaign create date'
-        },
-        updatedAt: {
-            type: GraphQLDateTime,
-            description: 'Campaign latest update date'
-        },
-        // NOTIFICATION ATTRIBUTES
         notificationBody: {
             type: new GraphQLNonNull(GraphQLString),
             description: 'Text body of the notification'
@@ -145,36 +104,8 @@ const scheduledNotification = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLBoolean),
             description:
                 'Badge number is increased on delivery when notificationAlertOptionNotificationCenter is true'
-        },
-        // SCHEDULE ATTRIBUTES
-        scheduledType: {
-            type: scheduledType
-        },
-        scheduledTimestamp: {
-            type: GraphQLDateTime,
-            description: 'Timestamp to send scheduled message'
-        },
-        scheduledTimeZone: {
-            type: GraphQLString,
-            description: 'Timezone used to parse scheduledTimestamp'
-        },
-        scheduledUseLocalDeviceTime: {
-            type: GraphQLBoolean,
-            description: "Use this device's timezone"
-        },
-        scheduledDeliveryStatus: {
-            type: scheduledDeliveryStatus
-        },
-        // SEGMENT ATTRIBUTES
-        segmentIds: {
-            type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
-            description: 'List of segments'
-        },
-        segmentCondition: {
-            type: segmentCondition,
-            description: 'Include any or all segments'
         }
     })
 })
 
-export default scheduledNotification
+export default NotificationCampaign
