@@ -156,7 +156,7 @@ module.exports = function(AudienceClient, logger) {
 		} else if(isInteger(value)) {
 				protoValue.setIntegerValue(value)
 		} else if(moment(value, moment.ISO_8601).isValid()) {
-				protoValue.setTimestampValue(RoverApis.Helpers.timestampToProto(new Date(value)))
+				protoValue.setTimestampValue(RoverApis.Helpers.timestampToProto(moment.parseZone(value).toDate()))
 		} else if(util.isString(value)) {
 				protoValue.setStringValue(value)
 		} else if(value === null) {
