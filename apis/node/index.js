@@ -75,7 +75,7 @@ const CommonModels = Object.assign({}, require('google-protobuf/google/protobuf/
 
 const HelperMethods = {
     timestampToProto: function(timestamp) {
-        if (timestamp instanceof Date) {
+        if (timestamp instanceof Date && !isNaN(timestamp)) {
             let proto = new CommonModels.Timestamp()
             let unixTime = timestamp.getTime()
             proto.setSeconds(Math.floor(unixTime / 1000 ))
