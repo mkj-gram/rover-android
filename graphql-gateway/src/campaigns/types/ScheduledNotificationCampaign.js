@@ -14,7 +14,6 @@ import GraphQLJSON from 'graphql-type-json'
 import {
     Campaign,
     NotificationCampaign,
-    ScheduledCampaign,
     SegmentableCampaign
 } from '../interfaces'
 
@@ -31,12 +30,7 @@ import {
 
 const ScheduledNotificationCampaign = new GraphQLObjectType({
     name: 'ScheduledNotificationCampaign',
-    interfaces: () => [
-        ScheduledCampaign,
-        Campaign,
-        NotificationCampaign,
-        SegmentableCampaign
-    ],
+    interfaces: () => [Campaign, NotificationCampaign, SegmentableCampaign],
     isTypeOf: ({ campaignType }) =>
         campaignType === 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION',
     fields: () => ({

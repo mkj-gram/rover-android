@@ -20,8 +20,10 @@ import RectangleBlock from './experiences/models/RectangleBlock'
 import TextBlock from './experiences/models/TextBlock'
 import WebViewBlock from './experiences/models/WebViewBlock'
 
-import AutomatedNotificationCampaign from './campaigns/types/AutomatedNotificationCampaign'
-import ScheduledNotificationCampaign from './campaigns/types/ScheduledNotificationCampaign'
+import {
+    AutomatedNotificationCampaign,
+    ScheduledNotificationCampaign
+} from './campaigns/types'
 
 const schema = new GraphQLSchema({
     query: Query.type,

@@ -12,7 +12,6 @@ import { GraphQLDateTime } from 'graphql-iso-date'
 import GraphQLJSON from 'graphql-type-json'
 
 import {
-    AutomatedCampaign,
     Campaign,
     NotificationCampaign,
     SegmentableCampaign
@@ -30,12 +29,7 @@ import PredicateAggregate from '../../segments/PredicateAggregate'
 
 const AutomatedNotificationCampaign = new GraphQLObjectType({
     name: 'AutomatedNotificationCampaign',
-    interfaces: () => [
-        AutomatedCampaign,
-        Campaign,
-        NotificationCampaign,
-        SegmentableCampaign
-    ],
+    interfaces: () => [Campaign, NotificationCampaign, SegmentableCampaign],
     isTypeOf: ({ campaignType }) =>
         campaignType === 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION',
     fields: () => ({
