@@ -1,0 +1,8 @@
+steps:
+- name: 'node:7.10.1-alpine'
+  entrypoint: 'npm'
+  args: ['install']
+  dir: 'csv-processor/worker'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/csv-processor-worker:$REVISION_ID', 'csv-processor/worker']
+images: ['gcr.io/$PROJECT_ID/csv-processor-worker:$REVISION_ID']

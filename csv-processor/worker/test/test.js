@@ -155,6 +155,9 @@ describe('ProfileImportJob', function() {
 
 
 		it('calls updateProfile with the correctly parsed line', function(done) {
+			let updateProfileCalled = false
+			let getProfileByIdentifierCalled = false
+
 			let job = {
 				data: {
 					auth_context: {
@@ -227,39 +230,31 @@ describe('ProfileImportJob', function() {
 
 			var aclient = {
 				getProfileByIdentifier: async function(request) {
+					getProfileByIdentifierCalled = true
 					assert(request !== null)
 					assert.equal(request.getIdentifier(), "id")
 
 					let res = new Audience.GetProfileByIdentifierResponse()
 					let profile = new Audience.Profile()
 
-					profile.setId("123")
+					profile.setId("5a7d165d0000000000000000")
+					profile.setIdentifier("123")
 					res.setProfile(profile)
 					return res
 				},
 				updateProfile: async function(request) {
+					updateProfileCalled = true
 					expect(request).to.be.an.instanceof(Audience.UpdateProfileRequest)
-					expect(request.getProfileId()).to.equal("123")
+					expect(request.getIdentifier()).to.equal("123")
 					let updates = request.getAttributesMap()
 
-					expect(updates.get('string').getValuesList()[0].getUpdateType()).to.equal(0)
-					expect(updates.get('string').getValuesList()[0].getValue().getStringValue()).to.equal("string")
-
-					expect(updates.get('integer').getValuesList()[0].getUpdateType()).to.equal(0)
-					expect(updates.get('integer').getValuesList()[0].getValue().getIntegerValue()).to.equal(1)
-
-					expect(updates.get('float').getValuesList()[0].getUpdateType()).to.equal(0)
-					expect(updates.get('float').getValuesList()[0].getValue().getDoubleValue()).to.equal(1.234)
-
-					expect(updates.get('boolean').getValuesList()[0].getUpdateType()).to.equal(0)
-					expect(updates.get('boolean').getValuesList()[0].getValue().getBooleanValue()).to.equal(true)
-
-					expect(updates.get('list').getValuesList()[0].getUpdateType()).to.equal(0)
-					expect(updates.get('list').getValuesList()[0].getValue().getStringArrayValue().getValuesList()).to.deep.equal(['tag1', 'tag2', 'tag3'])
-
-					expect(updates.get('timestamp').getValuesList()[0].getUpdateType()).to.equal(0)
-					expect(updates.get('timestamp').getValuesList()[0].getValue().getTimestampValue().getSeconds()).to.equal(1499425200)
-					expect(updates.get('timestamp').getValuesList()[0].getValue().getTimestampValue().getNanos()).to.equal(0)
+					expect(updates.get('string').getStringValue()).to.equal("string")
+					expect(updates.get('integer').getIntegerValue()).to.equal(1)
+					expect(updates.get('float').getDoubleValue()).to.equal(1.234)
+					expect(updates.get('boolean').getBooleanValue()).to.equal(true)
+					expect(updates.get('list').getStringArrayValue().getValuesList()).to.deep.equal(['tag1', 'tag2', 'tag3'])
+					expect(updates.get('timestamp').getTimestampValue().getSeconds()).to.equal(1499425200)
+					expect(updates.get('timestamp').getTimestampValue().getNanos()).to.equal(0)
 
 					return null
 				}
@@ -267,8 +262,13 @@ describe('ProfileImportJob', function() {
 
 			let worker = Worker(fclient, aclient)
 			worker.loadProfiles(job, logger)
-				.then(_ => done())
-				.catch(e => done(e))
+				.then(_ => {
+					expect(getProfileByIdentifierCalled).to.equal(true)
+					expect(updateProfileCalled).to.equal(true)
+					
+					done()
+				})
+				.catch(done)
 		})
 
 

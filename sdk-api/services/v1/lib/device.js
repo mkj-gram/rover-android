@@ -483,17 +483,12 @@ module.exports = function(AudienceClient, logger) {
 		request.setAuthContext(buildAuthContext(accountId))
 		request.setDeviceId(deviceId)
 
-		let updates = request.getAttributesMap()
+		let attributes = request.getAttributesMap()
 
 		Object.keys(attributeUpdates).forEach(key => {
 			const value = valueToProto(attributeUpdates[key])
 			if (value) {
-				const valueUpdates = new RoverApis.audience.v1.Models.ValueUpdates()
-				const setOperation = new RoverApis.audience.v1.Models.ValueUpdate()
-				setOperation.setUpdateType(RoverApis.audience.v1.Models.ValueUpdate.UpdateType.SET)
-				setOperation.setValue(value)
-				valueUpdates.setValuesList([setOperation])
-				updates.set(key, valueUpdates)
+				attributes.set(key, value)
 			}
 		})
 

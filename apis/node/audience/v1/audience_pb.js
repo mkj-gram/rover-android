@@ -130,9 +130,6 @@ goog.exportSymbol('proto.rover.audience.v1.UpdateProfileRequest', null, global);
 goog.exportSymbol('proto.rover.audience.v1.UpdateProfileResponse', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Value', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Value.StringArray', null, global);
-goog.exportSymbol('proto.rover.audience.v1.ValueUpdate', null, global);
-goog.exportSymbol('proto.rover.audience.v1.ValueUpdate.UpdateType', null, global);
-goog.exportSymbol('proto.rover.audience.v1.ValueUpdates', null, global);
 goog.exportSymbol('proto.rover.audience.v1.Version', null, global);
 goog.exportSymbol('proto.rover.audience.v1.VersionPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.VersionPredicate.Op', null, global);
@@ -1190,7 +1187,7 @@ proto.rover.audience.v1.UpdateProfileRequest.prototype.toObject = function(opt_i
 proto.rover.audience.v1.UpdateProfileRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.ValueUpdates.toObject) : [],
+    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Value.toObject) : [],
     identifier: jspb.Message.getFieldWithDefault(msg, 6, "")
   };
 
@@ -1236,7 +1233,7 @@ proto.rover.audience.v1.UpdateProfileRequest.deserializeBinaryFromReader = funct
     case 5:
       var value = msg.getAttributesMap();
       reader.readMessage(value, function(message, reader) {
-        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.ValueUpdates.deserializeBinaryFromReader);
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.Value.deserializeBinaryFromReader);
          });
       break;
     case 6:
@@ -1281,7 +1278,7 @@ proto.rover.audience.v1.UpdateProfileRequest.serializeBinaryToWriter = function(
   }
   f = message.getAttributesMap(true);
   if (f && f.getLength() > 0) {
-    f.serializeBinary(5, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter);
+    f.serializeBinary(5, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.Value.serializeBinaryToWriter);
   }
   f = message.getIdentifier();
   if (f.length > 0) {
@@ -1324,15 +1321,15 @@ proto.rover.audience.v1.UpdateProfileRequest.prototype.hasAuthContext = function
 
 
 /**
- * map<string, ValueUpdates> attributes = 5;
+ * map<string, Value> attributes = 5;
  * @param {boolean=} opt_noLazyCreate Do not create the map if
  * empty, instead returning `undefined`
- * @return {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>}
+ * @return {!jspb.Map<string,!proto.rover.audience.v1.Value>}
  */
 proto.rover.audience.v1.UpdateProfileRequest.prototype.getAttributesMap = function(opt_noLazyCreate) {
-  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>} */ (
+  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.Value>} */ (
       jspb.Message.getMapField(this, 5, opt_noLazyCreate,
-      proto.rover.audience.v1.ValueUpdates));
+      proto.rover.audience.v1.Value));
 };
 
 
@@ -8356,7 +8353,7 @@ proto.rover.audience.v1.UpdateDeviceRequest.toObject = function(includeInstance,
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.ValueUpdates.toObject) : [],
+    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Value.toObject) : [],
     pushEnvironment: jspb.Message.getFieldWithDefault(msg, 10, ""),
     pushTokenKey: jspb.Message.getFieldWithDefault(msg, 11, ""),
     appName: jspb.Message.getFieldWithDefault(msg, 12, ""),
@@ -8435,7 +8432,7 @@ proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader = functi
     case 3:
       var value = msg.getAttributesMap();
       reader.readMessage(value, function(message, reader) {
-        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.ValueUpdates.deserializeBinaryFromReader);
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.Value.deserializeBinaryFromReader);
          });
       break;
     case 10:
@@ -8606,7 +8603,7 @@ proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter = function(m
   }
   f = message.getAttributesMap(true);
   if (f && f.getLength() > 0) {
-    f.serializeBinary(3, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter);
+    f.serializeBinary(3, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.Value.serializeBinaryToWriter);
   }
   f = message.getPushEnvironment();
   if (f.length > 0) {
@@ -8865,15 +8862,15 @@ proto.rover.audience.v1.UpdateDeviceRequest.prototype.setDeviceId = function(val
 
 
 /**
- * map<string, ValueUpdates> attributes = 3;
+ * map<string, Value> attributes = 3;
  * @param {boolean=} opt_noLazyCreate Do not create the map if
  * empty, instead returning `undefined`
- * @return {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>}
+ * @return {!jspb.Map<string,!proto.rover.audience.v1.Value>}
  */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAttributesMap = function(opt_noLazyCreate) {
-  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>} */ (
+  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.Value>} */ (
       jspb.Message.getMapField(this, 3, opt_noLazyCreate,
-      proto.rover.audience.v1.ValueUpdates));
+      proto.rover.audience.v1.Value));
 };
 
 
@@ -9522,7 +9519,7 @@ proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.toObject = function(
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
     deviceId: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.ValueUpdates.toObject) : []
+    attributesMap: (f = msg.getAttributesMap()) ? f.toObject(includeInstance, proto.rover.audience.v1.Value.toObject) : []
   };
 
   if (includeInstance) {
@@ -9571,7 +9568,7 @@ proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.deserializeBinaryFro
     case 5:
       var value = msg.getAttributesMap();
       reader.readMessage(value, function(message, reader) {
-        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.ValueUpdates.deserializeBinaryFromReader);
+        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.audience.v1.Value.deserializeBinaryFromReader);
          });
       break;
     default:
@@ -9619,7 +9616,7 @@ proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.serializeBinaryToWri
   }
   f = message.getAttributesMap(true);
   if (f && f.getLength() > 0) {
-    f.serializeBinary(5, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter);
+    f.serializeBinary(5, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.audience.v1.Value.serializeBinaryToWriter);
   }
 };
 
@@ -9670,15 +9667,15 @@ proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.setDeviceI
 
 
 /**
- * map<string, ValueUpdates> attributes = 5;
+ * map<string, Value> attributes = 5;
  * @param {boolean=} opt_noLazyCreate Do not create the map if
  * empty, instead returning `undefined`
- * @return {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>}
+ * @return {!jspb.Map<string,!proto.rover.audience.v1.Value>}
  */
 proto.rover.audience.v1.UpdateDeviceCustomAttributesRequest.prototype.getAttributesMap = function(opt_noLazyCreate) {
-  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.ValueUpdates>} */ (
+  return /** @type {!jspb.Map<string,!proto.rover.audience.v1.Value>} */ (
       jspb.Message.getMapField(this, 5, opt_noLazyCreate,
-      proto.rover.audience.v1.ValueUpdates));
+      proto.rover.audience.v1.Value));
 };
 
 
@@ -12013,367 +12010,6 @@ proto.rover.audience.v1.GeofenceRegion.prototype.getRadius = function() {
 /** @param {number} value */
 proto.rover.audience.v1.GeofenceRegion.prototype.setRadius = function(value) {
   jspb.Message.setField(this, 4, value);
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.rover.audience.v1.ValueUpdates = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.audience.v1.ValueUpdates.repeatedFields_, null);
-};
-goog.inherits(proto.rover.audience.v1.ValueUpdates, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.ValueUpdates.displayName = 'proto.rover.audience.v1.ValueUpdates';
-}
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.rover.audience.v1.ValueUpdates.repeatedFields_ = [1];
-
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.rover.audience.v1.ValueUpdates.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.ValueUpdates.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.ValueUpdates} msg The msg instance to transform.
- * @return {!Object}
- */
-proto.rover.audience.v1.ValueUpdates.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    valuesList: jspb.Message.toObjectList(msg.getValuesList(),
-    proto.rover.audience.v1.ValueUpdate.toObject, includeInstance)
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.ValueUpdates}
- */
-proto.rover.audience.v1.ValueUpdates.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.ValueUpdates;
-  return proto.rover.audience.v1.ValueUpdates.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.rover.audience.v1.ValueUpdates} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.ValueUpdates}
- */
-proto.rover.audience.v1.ValueUpdates.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = new proto.rover.audience.v1.ValueUpdate;
-      reader.readMessage(value,proto.rover.audience.v1.ValueUpdate.deserializeBinaryFromReader);
-      msg.addValues(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.rover.audience.v1.ValueUpdates.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter(this, writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the given message to binary data (in protobuf wire
- * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.ValueUpdates} message
- * @param {!jspb.BinaryWriter} writer
- */
-proto.rover.audience.v1.ValueUpdates.serializeBinaryToWriter = function(message, writer) {
-  var f = undefined;
-  f = message.getValuesList();
-  if (f.length > 0) {
-    writer.writeRepeatedMessage(
-      1,
-      f,
-      proto.rover.audience.v1.ValueUpdate.serializeBinaryToWriter
-    );
-  }
-};
-
-
-/**
- * repeated ValueUpdate values = 1;
- * If you change this array by adding, removing or replacing elements, or if you
- * replace the array itself, then you must call the setter to update it.
- * @return {!Array.<!proto.rover.audience.v1.ValueUpdate>}
- */
-proto.rover.audience.v1.ValueUpdates.prototype.getValuesList = function() {
-  return /** @type{!Array.<!proto.rover.audience.v1.ValueUpdate>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.rover.audience.v1.ValueUpdate, 1));
-};
-
-
-/** @param {!Array.<!proto.rover.audience.v1.ValueUpdate>} value */
-proto.rover.audience.v1.ValueUpdates.prototype.setValuesList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 1, value);
-};
-
-
-/**
- * @param {!proto.rover.audience.v1.ValueUpdate=} opt_value
- * @param {number=} opt_index
- * @return {!proto.rover.audience.v1.ValueUpdate}
- */
-proto.rover.audience.v1.ValueUpdates.prototype.addValues = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.rover.audience.v1.ValueUpdate, opt_index);
-};
-
-
-proto.rover.audience.v1.ValueUpdates.prototype.clearValuesList = function() {
-  this.setValuesList([]);
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
-proto.rover.audience.v1.ValueUpdate = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
-};
-goog.inherits(proto.rover.audience.v1.ValueUpdate, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.rover.audience.v1.ValueUpdate.displayName = 'proto.rover.audience.v1.ValueUpdate';
-}
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.rover.audience.v1.ValueUpdate.prototype.toObject = function(opt_includeInstance) {
-  return proto.rover.audience.v1.ValueUpdate.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.rover.audience.v1.ValueUpdate} msg The msg instance to transform.
- * @return {!Object}
- */
-proto.rover.audience.v1.ValueUpdate.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    updateType: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    value: (f = msg.getValue()) && proto.rover.audience.v1.Value.toObject(includeInstance, f)
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.rover.audience.v1.ValueUpdate}
- */
-proto.rover.audience.v1.ValueUpdate.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.rover.audience.v1.ValueUpdate;
-  return proto.rover.audience.v1.ValueUpdate.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.rover.audience.v1.ValueUpdate} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.rover.audience.v1.ValueUpdate}
- */
-proto.rover.audience.v1.ValueUpdate.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = /** @type {!proto.rover.audience.v1.ValueUpdate.UpdateType} */ (reader.readEnum());
-      msg.setUpdateType(value);
-      break;
-    case 2:
-      var value = new proto.rover.audience.v1.Value;
-      reader.readMessage(value,proto.rover.audience.v1.Value.deserializeBinaryFromReader);
-      msg.setValue(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.rover.audience.v1.ValueUpdate.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  proto.rover.audience.v1.ValueUpdate.serializeBinaryToWriter(this, writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the given message to binary data (in protobuf wire
- * format), writing to the given BinaryWriter.
- * @param {!proto.rover.audience.v1.ValueUpdate} message
- * @param {!jspb.BinaryWriter} writer
- */
-proto.rover.audience.v1.ValueUpdate.serializeBinaryToWriter = function(message, writer) {
-  var f = undefined;
-  f = message.getUpdateType();
-  if (f !== 0.0) {
-    writer.writeEnum(
-      1,
-      f
-    );
-  }
-  f = message.getValue();
-  if (f != null) {
-    writer.writeMessage(
-      2,
-      f,
-      proto.rover.audience.v1.Value.serializeBinaryToWriter
-    );
-  }
-};
-
-
-/**
- * @enum {number}
- */
-proto.rover.audience.v1.ValueUpdate.UpdateType = {
-  SET: 0,
-  ADD: 3,
-  REMOVE: 4
-};
-
-/**
- * optional UpdateType update_type = 1;
- * @return {!proto.rover.audience.v1.ValueUpdate.UpdateType}
- */
-proto.rover.audience.v1.ValueUpdate.prototype.getUpdateType = function() {
-  return /** @type {!proto.rover.audience.v1.ValueUpdate.UpdateType} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
-};
-
-
-/** @param {!proto.rover.audience.v1.ValueUpdate.UpdateType} value */
-proto.rover.audience.v1.ValueUpdate.prototype.setUpdateType = function(value) {
-  jspb.Message.setField(this, 1, value);
-};
-
-
-/**
- * optional Value value = 2;
- * @return {?proto.rover.audience.v1.Value}
- */
-proto.rover.audience.v1.ValueUpdate.prototype.getValue = function() {
-  return /** @type{?proto.rover.audience.v1.Value} */ (
-    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Value, 2));
-};
-
-
-/** @param {?proto.rover.audience.v1.Value|undefined} value */
-proto.rover.audience.v1.ValueUpdate.prototype.setValue = function(value) {
-  jspb.Message.setWrapperField(this, 2, value);
-};
-
-
-proto.rover.audience.v1.ValueUpdate.prototype.clearValue = function() {
-  this.setValue(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.rover.audience.v1.ValueUpdate.prototype.hasValue = function() {
-  return jspb.Message.getField(this, 2) != null;
 };
 
 

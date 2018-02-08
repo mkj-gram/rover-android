@@ -395,10 +395,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 5},
 				Identifier:  "aaaaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"tags": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"tags": audience.BoolVal(true),
 				},
 			},
 
@@ -466,13 +464,9 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 5},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-333333333333",
-				Attributes: map[string]*audience.ValueUpdates{
-					"bool-set-true": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
-					"bool-set-false": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(false)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"bool-set-true":  audience.BoolVal(true),
+					"bool-set-false": audience.BoolVal(false),
 				},
 			},
 
@@ -539,13 +533,9 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				Identifier:  "bbaaaaaaaaaaaaaaaaaaaa00",
-				Attributes: map[string]*audience.ValueUpdates{
-					"Last Name": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringVal("Mouse")},
-					}},
-					"Last_Name": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringVal("Moose")},
-					}},
+				Attributes: map[string]*audience.Value{
+					"Last Name": audience.StringVal("Mouse"),
+					"Last_Name": audience.StringVal("Moose"),
 				},
 			},
 
@@ -623,21 +613,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 5},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-444444444444",
 
-				Attributes: map[string]*audience.ValueUpdates{
-					"arr-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringArrayVal("hello")},
-					}},
-					"arr-add": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_ADD, audience.StringVal("added")},
-					}},
-					"arr-remove": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_REMOVE, audience.StringVal("removes")},
-					}},
-					// rpc error: code = Internal desc = db.UpdateProfile: UpdateProfileAttributes: profiles.UpdateId: Cannot update 'attributes.arr-add-remove' and 'attributes.arr-add-remove' at the same time
-					// "arr-add-remove": {Values: []*audience.ValueUpdate{
-					// 	{audience.ValueUpdate_ADD, audience.StringVal("adds")},
-					// 	{audience.ValueUpdate_REMOVE, audience.StringVal("removes")},
-					// }},
+				Attributes: map[string]*audience.Value{
+					"arr-set": audience.StringArrayVal("hello"),
 				},
 			},
 
@@ -653,10 +630,7 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 					CreatedAt: aTime, UpdatedAt: aTime,
 
 					Attributes: map[string]*audience.Value{
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-add":        audience.StringArrayVal("adds"),
-						"arr-remove":     audience.StringArrayVal("keeps", "removes"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+						"arr": audience.StringArrayVal("hello"),
 					},
 				},
 
@@ -689,11 +663,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 					CreatedAt: aTime, UpdatedAt: aTime,
 
 					Attributes: map[string]*audience.Value{
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-set":        audience.StringArrayVal("hello"),
-						"arr-add":        audience.StringArrayVal("adds", "added"),
-						"arr-remove":     audience.StringArrayVal("keeps"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+						"arr":     audience.StringArrayVal("hello"),
+						"arr-set": audience.StringArrayVal("hello"),
 					},
 				},
 
@@ -717,25 +688,9 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 						},
 						{
 							AccountId:     5,
-							Id:            "0875d64ee2d3d0d0de6bf8f9",
+							Id:            "48a79ee0b10d394651850fd4",
 							Attribute:     "arr-set",
 							Label:         "arr-set",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     5,
-							Id:            "48a79ee0b10d394651850fd4",
-							Attribute:     "arr-add",
-							Label:         "arr-add",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     5,
-							Id:            "a178892ee285ece151145578",
-							Attribute:     "arr-remove",
-							Label:         "arr-remove",
 							AttributeType: "array[string]",
 							CreatedAt:     aTime,
 						},
@@ -750,42 +705,14 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 6},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-555555555555",
-				Attributes: map[string]*audience.ValueUpdates{
-					"bool-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(false)},
-					}},
-
-					"string-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringVal("Maryan")},
-					}},
-
-					"integer-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.IntegerVal(1)},
-					}},
-
-					"double-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.DoubleVal(31415e-4)},
-					}},
-
-					"null-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-
-					"ts-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.TimestampVal(*aTime)},
-					}},
-
-					"arr-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringArrayVal("hello", "world")},
-					}},
-
-					"arr-add": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_ADD, audience.StringVal("added")},
-					}},
-
-					"arr-remove": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_REMOVE, audience.StringVal("removes")},
-					}},
+				Attributes: map[string]*audience.Value{
+					"bool-set":    audience.BoolVal(false),
+					"string-set":  audience.StringVal("Maryan"),
+					"integer-set": audience.IntegerVal(1),
+					"double-set":  audience.DoubleVal(31415e-4),
+					"null-set":    audience.NullVal,
+					"ts-set":      audience.TimestampVal(*aTime),
+					"arr-set":     audience.StringArrayVal("hello", "world"),
 				},
 			},
 
@@ -801,16 +728,13 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 					CreatedAt: aTime, UpdatedAt: aTime,
 
 					Attributes: map[string]*audience.Value{
-						"bool":           audience.BoolVal(true),
-						"string":         audience.StringVal("hello world"),
-						"integer":        audience.IntegerVal(42),
-						"double":         audience.DoubleVal(42.42),
-						"null":           audience.NullVal,
-						"ts":             audience.TimestampVal(*aTime),
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-add":        audience.StringArrayVal("adds"),
-						"arr-remove":     audience.StringArrayVal("keeps", "removes"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+						"bool":    audience.BoolVal(true),
+						"string":  audience.StringVal("hello world"),
+						"integer": audience.IntegerVal(42),
+						"double":  audience.DoubleVal(42.42),
+						"null":    audience.NullVal,
+						"ts":      audience.TimestampVal(*aTime),
+						"arr":     audience.StringArrayVal("hello"),
 					},
 				},
 
@@ -846,78 +770,59 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 						"ts":     audience.TimestampVal(*aTime),
 						"ts-set": audience.TimestampVal(*aTime),
 
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-set":        audience.StringArrayVal("hello", "world"),
-						"arr-add":        audience.StringArrayVal("adds", "added"),
-						"arr-remove":     audience.StringArrayVal("keeps"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+						"arr":     audience.StringArrayVal("hello"),
+						"arr-set": audience.StringArrayVal("hello", "world"),
 					},
 				},
 
 				expSchema: &audience.ProfileSchema{
 					Attributes: []*audience.SchemaAttribute{
-						0: {
+						{
 							AccountId:     6,
-							Id:            "0dcecc77c75e7a81bfde275f",
+							Id:            "0875d64ee2d3d0d0de6bf8f9",
 							Attribute:     "bool-set",
 							Label:         "bool-set",
 							AttributeType: "bool",
 							CreatedAt:     aTime,
 						},
-						1: {
+						{
 							AccountId:     6,
-							Id:            "32f3a8aeb79ef856f659c18f",
-							Attribute:     "arr-set",
-							Label:         "arr-set",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						2: {
-							AccountId:     6,
-							Id:            "3bbf857aab99c5b252c7429c",
-							Attribute:     "arr-remove",
-							Label:         "arr-remove",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						3: {
-							AccountId:     6,
-							Id:            "67cfe242cf3cc354f3ede2d6",
-							Attribute:     "double-set",
-							Label:         "double-set",
-							AttributeType: "double",
-							CreatedAt:     aTime,
-						},
-						4: {
-							AccountId:     6,
-							Id:            "8bcb9ef2d4a65314768d6d29",
-							Attribute:     "string-set",
-							Label:         "string-set",
-							AttributeType: "string",
-							CreatedAt:     aTime,
-						},
-						5: {
-							AccountId:     6,
-							Id:            "9761ea9e4f5aa6aec3fc78c6",
+							Id:            "0dcecc77c75e7a81bfde275f",
 							Attribute:     "ts-set",
 							Label:         "ts-set",
 							AttributeType: "timestamp",
 							CreatedAt:     aTime,
 						},
-						6: {
+						{
 							AccountId:     6,
-							Id:            "b44ce85ff044c6b1f83b8e88",
-							Attribute:     "arr-add",
-							Label:         "arr-add",
-							AttributeType: "array[string]",
+							Id:            "32f3a8aeb79ef856f659c18f",
+							Attribute:     "string-set",
+							Label:         "string-set",
+							AttributeType: "string",
 							CreatedAt:     aTime,
 						},
-						7: {
+						{
 							AccountId:     6,
-							Id:            "becc4ea3ae5e88526a9f4a57",
+							Id:            "3bbf857aab99c5b252c7429c",
 							Attribute:     "integer-set",
 							Label:         "integer-set",
 							AttributeType: "integer",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     6,
+							Id:            "a178892ee285ece151145578",
+							Attribute:     "arr-set",
+							Label:         "arr-set",
+							AttributeType: "array[string]",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     6,
+							Id:            "b44ce85ff044c6b1f83b8e88",
+							Attribute:     "double-set",
+							Label:         "double-set",
+							AttributeType: "double",
 							CreatedAt:     aTime,
 						},
 					},
@@ -931,10 +836,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
-				Attributes: map[string]*audience.ValueUpdates{
-					"bool": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.IntegerVal(1)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"bool": audience.IntegerVal(1),
 				},
 			},
 
@@ -1014,10 +917,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
-				Attributes: map[string]*audience.ValueUpdates{
-					"integer": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"integer": audience.BoolVal(true),
 				},
 			},
 
@@ -1029,10 +930,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
-				Attributes: map[string]*audience.ValueUpdates{
-					"ts": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"ts": audience.BoolVal(true),
 				},
 			},
 
@@ -1044,10 +943,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
-				Attributes: map[string]*audience.ValueUpdates{
-					"string": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"string": audience.BoolVal(true),
 				},
 			},
 
@@ -1059,10 +956,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
-				Attributes: map[string]*audience.ValueUpdates{
-					"arr": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"arr": audience.BoolVal(true),
 				},
 			},
 
@@ -1074,10 +969,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
-				Attributes: map[string]*audience.ValueUpdates{
-					"arr": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"arr": audience.BoolVal(true),
 				},
 			},
 
@@ -1089,10 +982,8 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
-				Attributes: map[string]*audience.ValueUpdates{
-					"null": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"null": audience.BoolVal(true),
 				},
 			},
 
@@ -1104,28 +995,14 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			req: &audience.UpdateProfileRequest{
 				AuthContext: &auth.AuthContext{AccountId: 20},
 				Identifier:  "78e19dbf-8c0b-47a5-b28f-666666666666",
-				Attributes: map[string]*audience.ValueUpdates{
-					"null": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"arr": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"bool": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"integer": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"double": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"ts": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"string": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
+				Attributes: map[string]*audience.Value{
+					"null":    audience.NullVal,
+					"arr":     audience.NullVal,
+					"bool":    audience.NullVal,
+					"integer": audience.NullVal,
+					"double":  audience.NullVal,
+					"ts":      audience.NullVal,
+					"string":  audience.NullVal,
 				},
 			},
 
@@ -1262,10 +1139,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 8},
 				DeviceId:    "aaaaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"tags": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"tags": audience.BoolVal(true),
 				},
 			},
 
@@ -1338,13 +1213,9 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 8},
 				DeviceId:    "2aaaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"bool-set-true": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
-					"bool-set-false": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(false)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"bool-set-true":  audience.BoolVal(true),
+					"bool-set-false": audience.BoolVal(false),
 				},
 			},
 
@@ -1413,13 +1284,9 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 9},
 				DeviceId:    "3aaaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"Last Name": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringVal("Mouse")},
-					}},
-					"Last_Name": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringVal("Moose")},
-					}},
+				Attributes: map[string]*audience.Value{
+					"Last Name": audience.StringVal("Mouse"),
+					"Last_Name": audience.StringVal("Moose"),
 				},
 			},
 
@@ -1501,21 +1368,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 8},
 				DeviceId:    "4aaaaaaaaaaaaaaaaaaaaaaa",
 
-				Attributes: map[string]*audience.ValueUpdates{
-					"arr-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringArrayVal("hello")},
-					}},
-					"arr-add": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_ADD, audience.StringVal("added")},
-					}},
-					"arr-remove": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_REMOVE, audience.StringVal("removes")},
-					}},
-					// rpc error: code = Internal desc = db.UpdateProfile: UpdateProfileAttributes: profiles.UpdateId: Cannot update 'attributes.arr-add-remove' and 'attributes.arr-add-remove' at the same time
-					// "arr-add-remove": {Values: []*audience.ValueUpdate{
-					// 	{audience.ValueUpdate_ADD, audience.StringVal("adds")},
-					// 	{audience.ValueUpdate_REMOVE, audience.StringVal("removes")},
-					// }},
+				Attributes: map[string]*audience.Value{
+					"arr-set": audience.StringArrayVal("hello"),
 				},
 			},
 
@@ -1533,10 +1387,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
 
 					Attributes: map[string]*audience.Value{
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-add":        audience.StringArrayVal("adds"),
-						"arr-remove":     audience.StringArrayVal("keeps", "removes"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+						"arr": audience.StringArrayVal("hello"),
 					},
 				},
 
@@ -1573,11 +1424,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
 
 					Attributes: map[string]*audience.Value{
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-set":        audience.StringArrayVal("hello"),
-						"arr-add":        audience.StringArrayVal("adds", "added"),
-						"arr-remove":     audience.StringArrayVal("keeps"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+						"arr":     audience.StringArrayVal("hello"),
+						"arr-set": audience.StringArrayVal("hello"),
 					},
 				},
 
@@ -1585,17 +1433,9 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Attributes: []*audience.SchemaAttribute{
 						{
 							AccountId:     8,
-							Id:            "078998d0bbaa2890d02c28b1",
+							Id:            "24ae38421a8457d894a5593b",
 							Attribute:     "arr-set",
 							Label:         "arr-set",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     8,
-							Id:            "24ae38421a8457d894a5593b",
-							Attribute:     "arr-add",
-							Label:         "arr-add",
 							AttributeType: "array[string]",
 							CreatedAt:     aTime,
 						},
@@ -1615,14 +1455,6 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 							AttributeType: "bool",
 							CreatedAt:     aTime,
 						},
-						{
-							AccountId:     8,
-							Id:            "d1da7f90fa45603d51ff78d8",
-							Attribute:     "arr-remove",
-							Label:         "arr-remove",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
 					},
 				},
 			},
@@ -1635,42 +1467,14 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 11},
 				DeviceId:    "5aaaaaaaaaaaaaaaaaaaaaaa",
 
-				Attributes: map[string]*audience.ValueUpdates{
-					"bool-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(false)},
-					}},
-
-					"string-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringVal("Maryan")},
-					}},
-
-					"integer-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.IntegerVal(1)},
-					}},
-
-					"double-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.DoubleVal(31415e-4)},
-					}},
-
-					"null-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-
-					"ts-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.TimestampVal(*aTime)},
-					}},
-
-					"arr-set": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.StringArrayVal("hello", "world")},
-					}},
-
-					"arr-add": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_ADD, audience.StringVal("added")},
-					}},
-
-					"arr-remove": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_REMOVE, audience.StringVal("removes")},
-					}},
+				Attributes: map[string]*audience.Value{
+					"bool-set":    audience.BoolVal(false),
+					"string-set":  audience.StringVal("Maryan"),
+					"integer-set": audience.IntegerVal(1),
+					"double-set":  audience.DoubleVal(31415e-4),
+					"null-set":    audience.NullVal,
+					"ts-set":      audience.TimestampVal(*aTime),
+					"arr-set":     audience.StringArrayVal("hello", "world"),
 				},
 			},
 
@@ -1688,16 +1492,13 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					UpdatedAt: protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z")),
 
 					Attributes: map[string]*audience.Value{
-						"bool":           audience.BoolVal(true),
-						"string":         audience.StringVal("hello world"),
-						"integer":        audience.IntegerVal(42),
-						"double":         audience.DoubleVal(42.42),
-						"null":           audience.NullVal,
-						"ts":             audience.TimestampVal(*protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z"))),
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-add":        audience.StringArrayVal("adds"),
-						"arr-remove":     audience.StringArrayVal("keeps", "removes"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+						"bool":    audience.BoolVal(true),
+						"string":  audience.StringVal("hello world"),
+						"integer": audience.IntegerVal(42),
+						"double":  audience.DoubleVal(42.42),
+						"null":    audience.NullVal,
+						"ts":      audience.TimestampVal(*protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z"))),
+						"arr":     audience.StringArrayVal("hello"),
 					},
 				},
 
@@ -1735,11 +1536,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 						"ts":     audience.TimestampVal(*protoTs(t, parseTime(t, "2017-10-14T15:44:18.497Z"))),
 						"ts-set": audience.TimestampVal(*aTime),
 
-						"arr":            audience.StringArrayVal("hello"),
-						"arr-set":        audience.StringArrayVal("hello", "world"),
-						"arr-add":        audience.StringArrayVal("adds", "added"),
-						"arr-remove":     audience.StringArrayVal("keeps"),
-						"arr-add-remove": audience.StringArrayVal("adds", "removes"),
+						"arr":     audience.StringArrayVal("hello"),
+						"arr-set": audience.StringArrayVal("hello", "world"),
 					},
 				},
 
@@ -1747,55 +1545,7 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 					Attributes: []*audience.SchemaAttribute{
 						{
 							AccountId:     11,
-							Id:            "3f2c5e3962106a33388f8147",
-							Attribute:     "integer-set",
-							Label:         "integer-set",
-							AttributeType: "integer",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     11,
-							Id:            "4f17818a5d5af14a8b452513",
-							Attribute:     "arr-set",
-							Label:         "arr-set",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     11,
-							Id:            "539716581fe9a6373add13bc",
-							Attribute:     "double-set",
-							Label:         "double-set",
-							AttributeType: "double",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     11,
-							Id:            "58ec76ecbc343c7b29929f40",
-							Attribute:     "arr-remove",
-							Label:         "arr-remove",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     11,
-							Id:            "70599f2976bffa10e6ef87e4",
-							Attribute:     "ts-set",
-							Label:         "ts-set",
-							AttributeType: "timestamp",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     11,
-							Id:            "7bcb212775664518ccc46306",
-							Attribute:     "arr-add",
-							Label:         "arr-add",
-							AttributeType: "array[string]",
-							CreatedAt:     aTime,
-						},
-						{
-							AccountId:     11,
-							Id:            "b5d751885f470b2fe8219c89",
+							Id:            "078998d0bbaa2890d02c28b1",
 							Attribute:     "bool-set",
 							Label:         "bool-set",
 							AttributeType: "bool",
@@ -1803,10 +1553,42 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 						},
 						{
 							AccountId:     11,
-							Id:            "f5a13a3727760e5274ad4e6d",
+							Id:            "4f17818a5d5af14a8b452513",
 							Attribute:     "string-set",
 							Label:         "string-set",
 							AttributeType: "string",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     11,
+							Id:            "58ec76ecbc343c7b29929f40",
+							Attribute:     "integer-set",
+							Label:         "integer-set",
+							AttributeType: "integer",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     11,
+							Id:            "7bcb212775664518ccc46306",
+							Attribute:     "double-set",
+							Label:         "double-set",
+							AttributeType: "double",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     11,
+							Id:            "b5d751885f470b2fe8219c89",
+							Attribute:     "ts-set",
+							Label:         "ts-set",
+							AttributeType: "timestamp",
+							CreatedAt:     aTime,
+						},
+						{
+							AccountId:     11,
+							Id:            "d1da7f90fa45603d51ff78d8",
+							Attribute:     "arr-set",
+							Label:         "arr-set",
+							AttributeType: "array[string]",
 							CreatedAt:     aTime,
 						},
 					},
@@ -1821,10 +1603,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 12},
 				DeviceId:    "12aaaaaaaaaaaaaaaaaaaaaa",
 
-				Attributes: map[string]*audience.ValueUpdates{
-					"bool": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.IntegerVal(1)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"bool": audience.IntegerVal(1),
 				},
 			},
 
@@ -1906,10 +1686,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 12},
 				DeviceId:    "12aaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"integer": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"integer": audience.BoolVal(true),
 				},
 			},
 
@@ -1921,10 +1699,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 12},
 				DeviceId:    "12aaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"ts": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"ts": audience.BoolVal(true),
 				},
 			},
 
@@ -1936,10 +1712,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 12},
 				DeviceId:    "12aaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"string": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"string": audience.BoolVal(true),
 				},
 			},
 
@@ -1952,10 +1726,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 12},
 				DeviceId:    "12aaaaaaaaaaaaaaaaaaaaaa",
 
-				Attributes: map[string]*audience.ValueUpdates{
-					"arr": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"arr": audience.BoolVal(true),
 				},
 			},
 
@@ -1967,10 +1739,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 12},
 				DeviceId:    "12aaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"arr": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"arr": audience.BoolVal(true),
 				},
 			},
 
@@ -1982,10 +1752,8 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 12},
 				DeviceId:    "12aaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"null": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.BoolVal(true)},
-					}},
+				Attributes: map[string]*audience.Value{
+					"null": audience.BoolVal(true),
 				},
 			},
 
@@ -1997,28 +1765,14 @@ func testAudienceService_UpdateDeviceCustomAttributes(t *testing.T) {
 			req: &audience.UpdateDeviceCustomAttributesRequest{
 				AuthContext: &auth.AuthContext{AccountId: 12},
 				DeviceId:    "12aaaaaaaaaaaaaaaaaaaaaa",
-				Attributes: map[string]*audience.ValueUpdates{
-					"null": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"arr": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"bool": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"integer": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"double": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"ts": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
-					"string": {Values: []*audience.ValueUpdate{
-						{audience.ValueUpdate_SET, audience.NullVal},
-					}},
+				Attributes: map[string]*audience.Value{
+					"null":    audience.NullVal,
+					"arr":     audience.NullVal,
+					"bool":    audience.NullVal,
+					"integer": audience.NullVal,
+					"double":  audience.NullVal,
+					"ts":      audience.NullVal,
+					"string":  audience.NullVal,
 				},
 			},
 

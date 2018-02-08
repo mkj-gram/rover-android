@@ -146,8 +146,8 @@ message DeleteProfileResponse {}
 message UpdateProfileRequest {
   auth.v1.AuthContext auth_context = 1;
 
-  map<string, ValueUpdates> attributes = 5;
-
+  map<string,Value> attributes = 5;
+  
   string identifier = 6;
 }
 message UpdateProfileResponse {}
@@ -347,7 +347,7 @@ message UpdateDeviceRequest {
   string device_id = 2;
 
   // Custom attributes
-  map<string, ValueUpdates> attributes = 3;
+  map<string, Value> attributes = 3;
 
   string push_environment             = 10;
   string push_token_key               = 11;
@@ -387,7 +387,7 @@ message UpdateDeviceResponse { }
 message UpdateDeviceCustomAttributesRequest {
   auth.v1.AuthContext auth_context = 1;
   string device_id = 2;
-  map<string, ValueUpdates> attributes = 5;
+  map<string, Value> attributes = 5;
 }
 message UpdateDeviceCustomAttributesResponse {}
 
@@ -568,25 +568,6 @@ message GeofenceRegion {
 //
 // Value
 //
-
-// ValueUpdates allows bulk updates as adding/removing tags in the same call
-message ValueUpdates {
-  repeated ValueUpdate values = 1;
-}
-
-// ValueUpdate represents a change that needs to be applied to already existing value
-message ValueUpdate {
-  UpdateType update_type = 1;
-  Value value = 2;
-
-  // UpdateType describes possible updates
-  enum UpdateType {
-    SET = 0;
-    // ADD and REMOVE are for array[string]
-    ADD = 3;
-    REMOVE = 4;
-  }
-}
 
 // Value represents supported value types the system accepts
 message Value {
