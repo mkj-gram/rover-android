@@ -29,7 +29,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.UpdateProfileRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    map :attributes, :string, :message, 5, "rover.audience.v1.ValueUpdates"
+    map :attributes, :string, :message, 5, "rover.audience.v1.Value"
     optional :identifier, :string, 6
   end
   add_message "rover.audience.v1.UpdateProfileResponse" do
@@ -181,7 +181,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.UpdateDeviceRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
-    map :attributes, :string, :message, 3, "rover.audience.v1.ValueUpdates"
+    map :attributes, :string, :message, 3, "rover.audience.v1.Value"
     optional :push_environment, :string, 10
     optional :push_token_key, :string, 11
     optional :app_name, :string, 12
@@ -218,7 +218,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.UpdateDeviceCustomAttributesRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
-    map :attributes, :string, :message, 5, "rover.audience.v1.ValueUpdates"
+    map :attributes, :string, :message, 5, "rover.audience.v1.Value"
   end
   add_message "rover.audience.v1.UpdateDeviceCustomAttributesResponse" do
   end
@@ -293,18 +293,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :latitude, :double, 2
     optional :longitude, :double, 3
     optional :radius, :int32, 4
-  end
-  add_message "rover.audience.v1.ValueUpdates" do
-    repeated :values, :message, 1, "rover.audience.v1.ValueUpdate"
-  end
-  add_message "rover.audience.v1.ValueUpdate" do
-    optional :update_type, :enum, 1, "rover.audience.v1.ValueUpdate.UpdateType"
-    optional :value, :message, 2, "rover.audience.v1.Value"
-  end
-  add_enum "rover.audience.v1.ValueUpdate.UpdateType" do
-    value :SET, 0
-    value :ADD, 3
-    value :REMOVE, 4
   end
   add_message "rover.audience.v1.Value" do
     oneof :value_type do
@@ -718,9 +706,6 @@ module Rover
       Device::RegionMonitoringMode = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Device.RegionMonitoringMode").enummodule
       IBeaconRegion = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.IBeaconRegion").msgclass
       GeofenceRegion = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofenceRegion").msgclass
-      ValueUpdates = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ValueUpdates").msgclass
-      ValueUpdate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ValueUpdate").msgclass
-      ValueUpdate::UpdateType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.ValueUpdate.UpdateType").enummodule
       Value = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Value").msgclass
       Value::StringArray = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Value.StringArray").msgclass
       SchemaAttribute = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.SchemaAttribute").msgclass

@@ -83,22 +83,12 @@ func (v *Value) Load(lv interface{}) error {
 	return err
 }
 
-func IsStringArray(vu *ValueUpdates) error {
+func IsStringArray(vu *Value) error {
 	if vu == nil {
 		return fmt.Errorf("nil")
 	}
 
-	if len(vu.GetValues()) == 0 {
-		return fmt.Errorf("empty")
-	}
-
-	typ, err := ValueUpdateToTypeName(vu.GetValues()[0])
-	if err != nil {
-		return err
-	}
-
-	const exp = "array[string]"
-	if typ != exp {
+	if _, ok := vu.GetValueType().(*Value_StringArrayValue); !ok {
 		return fmt.Errorf("TypeMismatch")
 	}
 
@@ -106,7 +96,7 @@ func IsStringArray(vu *ValueUpdates) error {
 }
 
 // TODO: how to automatically have it generated with protobuf?
-func valueToTypeName(v *Value) (string, error) {
+func ValueToTypeName(v *Value) (string, error) {
 	switch typ := v.GetValueType().(type) {
 	case *Value_BooleanValue:
 		return "bool", nil
@@ -124,17 +114,6 @@ func valueToTypeName(v *Value) (string, error) {
 		return "timestamp", nil
 	default:
 		return "", fmt.Errorf("ValueToTypeName: unknown: %T", typ)
-	}
-}
-
-func ValueUpdateToTypeName(vu *ValueUpdate) (string, error) {
-	switch vu.GetUpdateType() {
-	case ValueUpdate_SET:
-		return valueToTypeName(vu.GetValue())
-	case ValueUpdate_ADD, ValueUpdate_REMOVE:
-		return "array[string]", nil
-	default:
-		return "", fmt.Errorf("ValueUpdateToTypeName: unknown: %q", vu.GetUpdateType())
 	}
 }
 
