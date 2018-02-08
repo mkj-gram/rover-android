@@ -90,6 +90,17 @@ steps:
 #  Use this stage to import external packages eg. npm   #                                                    
 # ----------------------------------------------------- #
 
+# @rover/apis node module
+  - id: 'install-rover-apis'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'apis/node'
+    waitFor:
+      - 'lint-complete'
+
 # Bulk Gateway
   - id: 'install-bulk-gateway'
     name: 'node:7.10.1'
@@ -160,6 +171,7 @@ steps:
       - '-c'
       - printf "\n\n Install Stage Complete (ᵔᴥᵔ)\n\n"
     waitFor:
+      - 'install-rover-apis'
       - 'install-bulk-gateway'
       - 'install-graphql-gateway'
       - 'install-rest-gateway'
@@ -221,6 +233,16 @@ steps:
     waitFor:
       - 'install-complete'
 
+# @rover/apis node module
+  - id: 'test-rover-apis'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - test
+    dir: 'apis/node'
+    waitFor:
+      - 'install-complete'
+      
 # Bulk Gateway
   - id: 'test-bulk-gateway'
     name: 'node:7.10.1'
@@ -242,6 +264,7 @@ steps:
     waitFor:
         - 'test-auth-service'
         - 'test-audience-service'
+        - 'test-rover-apis'
         - 'test-bulk-gateway'
 
 # End Test Stage
