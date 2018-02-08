@@ -265,7 +265,7 @@ module.exports = function(FilesClient, AudienceClient) {
                                 }
                             }
 
-                            return await updateProfile(profile.getId(), row.attributes)
+                            return await updateProfile(profile.getIdentifier(), row.attributes)
                         }
 
                         let self = this

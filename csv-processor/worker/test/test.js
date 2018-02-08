@@ -237,7 +237,8 @@ describe('ProfileImportJob', function() {
 					let res = new Audience.GetProfileByIdentifierResponse()
 					let profile = new Audience.Profile()
 
-					profile.setId("123")
+					profile.setId("5a7d165d0000000000000000")
+					profile.setIdentifier("123")
 					res.setProfile(profile)
 					return res
 				},
