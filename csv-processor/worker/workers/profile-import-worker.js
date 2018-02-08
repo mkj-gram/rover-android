@@ -24,13 +24,9 @@ function rowToAttributeUpdates(row, rowSchema) {
     }
 
     row.forEach((value, index) => {
-        let schema = rowSchema[index]
-        let type = schema.type
-        let field = schema.field
-
-        const valueUpdates = new RoverApis.audience.v1.Models.ValueUpdates()
-        const setOperation = new RoverApis.audience.v1.Models.ValueUpdate()
-        setOperation.setUpdateType(RoverApis.audience.v1.Models.ValueUpdate.UpdateType.SET)
+        const schema = rowSchema[index]
+        const type = schema.type
+        const field = schema.field
 
         const protoValue = new RoverApis.audience.v1.Models.Value()
 
@@ -62,13 +58,13 @@ function rowToAttributeUpdates(row, rowSchema) {
                 break
             }
             case 'boolean': {
-                let v = stringToBoolean(value)
+                const v = stringToBoolean(value)
                 protoValue.setBooleanValue(v)
                 break
             }
             case 'list': {
-                let v = value.toString().split("|")
-                let arrayString = new RoverApis.audience.v1.Models.Value.StringArray()
+                const v = value.toString().split("|")
+                const arrayString = new RoverApis.audience.v1.Models.Value.StringArray()
                 arrayString.setValuesList(v)
                 protoValue.setStringArrayValue(arrayString)
                 break
@@ -90,10 +86,7 @@ function rowToAttributeUpdates(row, rowSchema) {
 
         // Only add to map if the protovalue was actually set
         if (protoValue.getValueTypeCase() !== 0) {
-            setOperation.setValue(protoValue)
-            valueUpdates.setValuesList([setOperation])
-
-            parsedRow[field] = valueUpdates
+            parsedRow[field] = protoValue
         }
 
     })
@@ -181,9 +174,6 @@ module.exports = function(FilesClient, AudienceClient) {
                 let currentRow = 0
 
                 csvFileReadStream
-                    .on('error', function(err) {
-                        return reject(err)
-                    })
                     .pipe(through({ objectMode: true }, function (chunk, encoding, callback) {
                         /*
                             Keep track of which line we are parsing in the csv file
@@ -221,7 +211,7 @@ module.exports = function(FilesClient, AudienceClient) {
                         async function updateProfile(profileId, attributes) {
                             let request = new RoverApis.audience.v1.Models.UpdateProfileRequest()
                             request.setAuthContext(authContext)
-                            request.setProfileId(profileId)
+                            request.setIdentifier(profileId)
 
                             let updates = request.getAttributesMap()
                             Object.keys(attributes).forEach(a => {
@@ -340,6 +330,9 @@ module.exports = function(FilesClient, AudienceClient) {
                         logger.info("Failed:", numFailed)
                         logger.info("Errors:", errors.reduce(function(acc, input) { return acc.concat(`row: ${input.rowNumber} error: ${input.error}\n`)}, "") )
                         return resolve()
+                    })
+                    .on('error', function(err) {
+                        return reject(err)
                     })
             })
             
