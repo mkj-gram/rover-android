@@ -560,10 +560,18 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :predicate_aggregate, :message, 2, "rover.audience.v1.PredicateAggregate"
     optional :time_zone_offset, :message, 5, "rover.audience.v1.QueryRequest.TimeZoneOffset"
+    oneof :query do
+      optional :predicate, :message, 11, "rover.audience.v1.PredicateAggregate"
+      optional :query_segments, :message, 12, "rover.audience.v1.QueryRequest.QuerySegments"
+    end
     oneof :iterator do
       optional :page_iterator, :message, 3, "rover.audience.v1.QueryRequest.PageIterator"
       optional :scroll_iterator, :message, 4, "rover.audience.v1.QueryRequest.ScrollIterator"
     end
+  end
+  add_message "rover.audience.v1.QueryRequest.QuerySegments" do
+    repeated :ids, :string, 1
+    optional :condition, :enum, 2, "rover.audience.v1.PredicateAggregate.Condition"
   end
   add_message "rover.audience.v1.QueryRequest.PageIterator" do
     optional :page, :int32, 1
@@ -755,6 +763,7 @@ module Rover
       Predicate = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate").msgclass
       Predicate::Selector = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Predicate.Selector").enummodule
       QueryRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest").msgclass
+      QueryRequest::QuerySegments = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.QuerySegments").msgclass
       QueryRequest::PageIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.PageIterator").msgclass
       QueryRequest::ScrollIterator = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.ScrollIterator").msgclass
       QueryRequest::ScrollIterator::StartParallelScroll = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.QueryRequest.ScrollIterator.StartParallelScroll").msgclass
