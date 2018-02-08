@@ -129,6 +129,7 @@ class AudienceTable extends Component {
 
         const containsDeprecatedColumns = () => {
             const badSelectors = [
+                'identifier_ROVER_PROFILE',
                 'radio_DEVICE',
                 'is_cellular_enabled_DEVICE',
                 'is_wifi_enabled_DEVICE',
