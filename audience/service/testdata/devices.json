@@ -84,10 +84,7 @@
     "double": 42.42,
     "null": null,
     "ts":  {"$date": "2017-10-30T14:05:53.102Z"},
-    "arr": ["hello"],
-    "arr-add": ["adds"],
-    "arr-remove": ["keeps", "removes"],
-    "arr-add-remove": ["adds", "removes"]
+    "arr": ["hello"]
   }
 }
 
@@ -104,10 +101,7 @@
     "double": 42.42,
     "null": null,
     "ts":  {"$date": "2017-10-30T14:05:53.102Z"},
-    "arr": ["hello"],
-    "arr-add": ["adds"],
-    "arr-remove": ["keeps", "removes"],
-    "arr-add-remove": ["adds", "removes"]
+    "arr": ["hello"]
   }
 }
 
@@ -161,10 +155,7 @@
   "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
   "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
   "attributes": {
-    "arr": ["hello"],
-    "arr-add": ["adds"],
-    "arr-remove": ["keeps", "removes"],
-    "arr-add-remove": ["adds", "removes"]
+    "arr": ["hello"]
   }
 }
 
@@ -182,10 +173,7 @@
     "double":         42.42,
     "null":           null,
     "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
-    "arr":            ["hello"],
-    "arr-add":        ["adds"],
-    "arr-remove":     ["keeps", "removes"],
-    "arr-add-remove": ["adds", "removes"]
+    "arr":            ["hello"]
   }
 }
 

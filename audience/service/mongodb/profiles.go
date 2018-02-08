@@ -15,8 +15,6 @@ type profilesStore struct {
 	*mongoStore
 }
 
-type ProfileAttributesUpdates map[string]*audience.ValueUpdates
-
 type Profile struct {
 	Id         bson.ObjectId `bson:"_id"`
 	AccountId  int32         `bson:"account_id"`

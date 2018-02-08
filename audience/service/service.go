@@ -695,13 +695,13 @@ func validateID(id string) error {
 	return nil
 }
 
-func validateTags(attrs map[string]*audience.ValueUpdates) error {
-	valueUpdates, ok := attrs["tags"]
+func validateTags(attrs map[string]*audience.Value) error {
+	valueUpdate, ok := attrs["tags"]
 	if !ok {
 		return nil
 	}
 
-	if err := audience.IsStringArray(valueUpdates); err != nil {
+	if err := audience.IsStringArray(valueUpdate); err != nil {
 		return errors.Wrap(err, "IsStringArray")
 	}
 
