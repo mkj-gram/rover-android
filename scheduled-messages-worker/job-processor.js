@@ -63,7 +63,7 @@ let roverInboxApnsProductionClient = null
 try {
     roverInboxApnsProductionClient = new apn.Provider({
         pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.inbox.p12')),
-        passphrase: null,
+        passphrase: "FwrXaRwHtnmkHXnzVhGZq7DC",
         production: true
     });
 } catch(err) {
@@ -74,7 +74,7 @@ let roverInboxApnsDevelopmentClient = null
 try {
     roverInboxApnsDevelopmentClient = new apn.Provider({
         pfx: fs.readFileSync(path.join(process.cwd(), '/apns-certs/io.rover.inbox.p12')),
-        passphrase: null,
+        passphrase: "FwrXaRwHtnmkHXnzVhGZq7DC",
         production: false
     }); 
 } catch(err) {
