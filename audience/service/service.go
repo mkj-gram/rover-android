@@ -99,7 +99,7 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.CreateDevice: %v", err)
 	}
 
-	s.notify.deviceCreated(ctx, device.AccountId, device.Id)
+	s.notify.deviceCreated(ctx, device.AccountId, device.DeviceId)
 
 	return &audience.CreateDeviceResponse{}, nil
 }
