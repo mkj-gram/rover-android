@@ -1729,6 +1729,92 @@ func TestWorker(t *testing.T) {
 
 			exp: &expect{},
 		},
+
+		{
+			desc: "device update event should create device if it does not exist in es",
+
+			before: &expect{
+				path: "/test_account_1/device/BNSSS000001",
+				err:  &es5.Error{Status: 404},
+			},
+
+			req: &pubsub.Message{
+				Data: toJSON(t, []service.Message{
+					{
+						"event":      "updated",
+						"model":      "device",
+						"device_id":  "BNSSS000001",
+						"account_id": "1",
+					},
+				}),
+			},
+
+			after: &expect{
+				path: "/test_account_1/device/BNSSS000001",
+				val: response{
+					Code: 200,
+					Body: M{
+						"_index":   "test_account_1",
+						"_type":    "device",
+						"_id":      "BNSSS000001",
+						"_version": 1.0,
+						"found":    true,
+						"_source": M{
+							"account_id":     1.0,
+							"advertising_id": "",
+							"app_build":      "",
+							"app_name":       "",
+							"app_namespace":  "",
+							"app_version":    "",
+							"attributes": M{
+								"string": "hello",
+							},
+							"carrier_name":                   "",
+							"created_at":                     "2017-10-14T15:44:18Z",
+							"device_id":                      "BNSSS000001",
+							"device_manufacturer":            "",
+							"device_model":                   "",
+							"is_background_enabled":          false,
+							"is_bluetooth_enabled":           false,
+							"is_cellular_enabled":            false,
+							"is_location_monitoring_enabled": false,
+							"is_test_device":                 false,
+							"is_wifi_enabled":                false,
+							"label":                          "",
+							"locale_language":                "",
+							"locale_region":                  "",
+							"locale_script":                  "",
+							"location_accuracy":              0.0,
+							"location_country":               "",
+							"location_state":                 "",
+							"location_city":                  "",
+							"location_latitude":              0.0,
+							"location_longitude":             0.0,
+							"location_updated_at":            nil,
+							"notification_authorization":     "UNKNOWN",
+							"os_name":                        "",
+							"os_version":                     nil,
+							"platform":                       "",
+							"profile":                        nil,
+							"profile_identifier":             "",
+							"push_environment":               "",
+							"push_token_created_at":          nil,
+							"push_token_is_active":           false,
+							"push_token_key":                 "",
+							"push_token_unregistered_at":     nil,
+							"push_token_updated_at":          nil,
+							"radio":                          "",
+							"screen_height":                  0.0,
+							"screen_width":                   0.0,
+							"time_zone":                      "",
+							"updated_at":                     "2017-10-14T15:44:18Z",
+						},
+					},
+				},
+			},
+
+			exp: &expect{},
+		},
 	}
 
 	// TODO add more test cases where the service messages is more than just 1

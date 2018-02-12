@@ -92,6 +92,7 @@ func toBulkRequest(op *BulkOp) (elastic.BulkableRequest, error) {
 				Id(op.Id).
 				Type(op.DocumentType).
 				Doc(op.Document).
+				DocAsUpsert(true).
 				Index(op.IndexName), nil
 		default:
 			return nil, errors.Errorf("device: unexpected op: %+v", op)
