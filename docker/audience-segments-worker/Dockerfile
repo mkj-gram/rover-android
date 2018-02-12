@@ -6,7 +6,7 @@ RUN mkdir -p /rover/
 
 WORKDIR /rover
 
-COPY ./audience-segments-worker /rover/bin
+COPY ./audience-segments-worker /rover/bin/
 
 # service is configured from ENV vars
 ENTRYPOINT ["/rover/bin/audience-segments-worker"]
