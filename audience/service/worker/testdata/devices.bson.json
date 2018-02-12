@@ -53,3 +53,15 @@
   "attributes": {}
 }
 
+{
+  "_id":{"$oid":"D00000000000000000000005"},
+  "account_id":1,
+  "profile_identifier": "",
+  "device_id":"BNSSS000001",
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {
+    "string": "hello"
+  }
+}
+
