@@ -31,34 +31,37 @@ module.exports = function() {
         const logger = request.server.plugins.logger.logger
         const messageId = request.params.id
 
-        methods.application.getCurrentProfile(request, function(err, profile) {
+        methods.application.getCurrentDevice(request, function(err, device) {
             if (err) {
-                logger.error(err)
-                return writeReplyError(500, { status: 500, error: "Could not get current profile"})
+                return callback({ status: 400, message: "Failed to get current device" })
             }
 
-            if (profile === null || profile === undefined) {
-                return writeReplyError(400, { status: 400, error: "Profile does not exist" })
+            if (device === null || device === undefined) {
+                return callback({ status: 422, message: "Failed to get current device" })
             }
 
             methods.message.find(messageId, { fields: ['message_template_id']}, function(err, message) {
                 if (err) {
-                    logger.error(err)
-                    return writeReplyError(500, { status: 500, error: "Could not retrieve message" })
+                    return callback({ status: 500, message: "Failed to get current message" })
                 }
 
                 if (message === null || message === undefined) {
-                    return writeReplyError(404, { status: 404, error: "Message not found" })
+                    return callback({ status: 404, message: "Message not found" })
                 }
 
-                methods.messageTemplate.find(message.message_template_id, { useCache: true }, function(err, template) {
+                const templateId = message.message_template_id
+
+                if (templateId === null || templateId === undefined) {
+                    return callback({ status: 404, message: "Message template not found" })
+                }
+
+                methods.messageTemplate.find(templateId, { useCache: true }, function(err, template) {
                     if (err) {
-                        logger.error(err)
-                        return writeReplyError(500, { status: 500, error: "Unable to lookup message template" })
+                        return callback({ status: 500, message: "Failed to find message template" })
                     }
 
                     if (template === null || template === undefined) {
-                        return writeReplyError(404, { status: 404, error: "Message Template not found" })
+                        return callback({ status: 404, message: "Message template not found" })
                     }
 
                     let response = JSON.stringify(serializeLandingPage(template.landing_page_template))
