@@ -86,7 +86,7 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 
 	switch typ := r.GetIterator().(type) {
 	case nil:
-		return nil, errors.Wrap(InvalidArgument, "GetIterator: nil iterator")
+		return nil, errors.Wrap(InvalidArgument, "GetIterator: nil")
 	case *audience.QueryRequest_ScrollIterator_:
 		var (
 			scroller = typ.ScrollIterator

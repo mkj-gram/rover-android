@@ -138,7 +138,7 @@ func test_Query_Pager(t *testing.T) {
 			req: newRequest(t, nil),
 
 			exp: expect{
-				err: status.Errorf(codes.Internal, "Index.Query: GetIterator: nil iterator: invalid argument"),
+				err: status.Errorf(codes.InvalidArgument, "Index.Query: GetIterator: nil: invalid argument"),
 			},
 		},
 

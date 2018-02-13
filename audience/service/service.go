@@ -601,7 +601,7 @@ func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience
 	}
 
 	if _, ok := r.Query.(*audience.QueryRequest_QuerySegments_); ok {
-		return nil, status.Errorf(codes.Unimplemented, "QuerySegments is not yet implemented")
+		return nil, status.Errorf(codes.Unimplemented, "QueryRequest.QuerySegments is not yet implemented")
 	}
 
 	resp, err := s.index.Query(ctx, r)
