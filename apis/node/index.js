@@ -22,7 +22,7 @@ function isGrpcServiceFile(jsFile) {
 
 function traverse(currentpath, dir) {
 
-    const directories = getDirectories(currentpath, { exclude: ["node_modules"] })
+    const directories = getDirectories(currentpath, { exclude: ["node_modules", "test"] })
 
     var glob = {}
 
