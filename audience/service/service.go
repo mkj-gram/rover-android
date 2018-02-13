@@ -597,21 +597,18 @@ func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience
 		r.Query = &audience.QueryRequest_Predicate{
 			Predicate: r.PredicateAggregate,
 		}
+		r.PredicateAggregate = nil
 	}
 
-	switch q := r.Query.(type) {
-	case *audience.QueryRequest_QuerySegments_:
-		_ = q
-		return nil, status.Errorf(codes.Unimplemented, "QuerySegments is not yet implemented")
-	case *audience.QueryRequest_Predicate:
-		resp, err := s.index.Query(ctx, r)
-		if err != nil {
-			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "Index.Query: %v", err)
-		}
-		return resp, nil
+	if _, ok := r.Query.(*audience.QueryRequest_QuerySegments_); ok {
+		return nil, status.Errorf(codes.Unimplemented, "QueryRequest.QuerySegments is not yet implemented")
 	}
 
-	panic(status.Errorf(codes.InvalidArgument, "unexpected query: %T", r.Query))
+	resp, err := s.index.Query(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "Index.Query: %v", err)
+	}
+	return resp, nil
 }
 
 func (s *Server) IsInDynamicSegment(ctx context.Context, r *audience.IsInDynamicSegmentRequest) (*audience.IsInDynamicSegmentResponse, error) {

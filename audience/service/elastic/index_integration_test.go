@@ -5,11 +5,13 @@ package elastic_test
 import (
 	"testing"
 
-	"github.com/pkg/errors"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
 	auth "github.com/roverplatform/rover/apis/go/auth/v1"
+	"github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/elastic"
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
@@ -76,10 +78,12 @@ func test_Query_misc(t *testing.T) {
 	var (
 		es5Client = newClient(t)
 
-		index = elastic.Index{
+		index = &elastic.Index{
 			Client:    es5Client.c,
 			IndexName: func(_ string) string { return test_index },
 		}
+
+		svc = service.New(nil, index, nil)
 	)
 
 	tcases := []struct {
@@ -102,7 +106,7 @@ func test_Query_misc(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
 				exp, expErr = tc.exp.val, tc.exp.err
-				got, gotErr = index.Query(context.TODO(), tc.req)
+				got, gotErr = svc.Query(context.TODO(), tc.req)
 			)
 
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
@@ -116,10 +120,12 @@ func test_Query_Pager(t *testing.T) {
 	var (
 		es5Client = newClient(t)
 
-		index = elastic.Index{
+		index = &elastic.Index{
 			Client:    es5Client.c,
 			IndexName: func(_ string) string { return test_index },
 		}
+
+		svc = service.New(nil, index, nil)
 	)
 
 	tcases := []struct {
@@ -132,7 +138,7 @@ func test_Query_Pager(t *testing.T) {
 			req: newRequest(t, nil),
 
 			exp: expect{
-				err: errors.Wrap(elastic.InvalidArgument, "GetIterator: nil iterator"),
+				err: status.Errorf(codes.InvalidArgument, "Index.Query: GetIterator: nil: invalid argument"),
 			},
 		},
 
@@ -173,7 +179,7 @@ func test_Query_Pager(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
 				exp, expErr = tc.exp.val, tc.exp.err
-				got, gotErr = index.Query(context.TODO(), tc.req)
+				got, gotErr = svc.Query(context.TODO(), tc.req)
 			)
 
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
@@ -187,10 +193,12 @@ func test_Query_Scroller(t *testing.T) {
 	var (
 		es5Client = newClient(t)
 
-		index = elastic.Index{
+		index = &elastic.Index{
 			Client:    es5Client.c,
 			IndexName: func(_ string) string { return test_index },
 		}
+
+		svc = service.New(nil, index, nil)
 
 		ptr string
 
@@ -248,7 +256,7 @@ func test_Query_Scroller(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
 				exp, expErr = tc.exp.val, tc.exp.err
-				got, gotErr = index.Query(context.TODO(), newRequest(t, tc.req))
+				got, gotErr = svc.Query(context.TODO(), newRequest(t, tc.req))
 			)
 
 			*lastScrollId = got.ScrollId
@@ -266,10 +274,12 @@ func test_Query_ScrollerParallell(t *testing.T) {
 	var (
 		es5Client = newClient(t)
 
-		index = elastic.Index{
+		index = &elastic.Index{
 			Client:    es5Client.c,
 			IndexName: func(_ string) string { return test_index },
 		}
+
+		svc = service.New(nil, index, nil)
 
 		ptr string
 
@@ -329,7 +339,7 @@ func test_Query_ScrollerParallell(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
 				exp, expErr = tc.exp.val, tc.exp.err
-				got, gotErr = index.Query(context.TODO(), newRequest(t, tc.req))
+				got, gotErr = svc.Query(context.TODO(), newRequest(t, tc.req))
 			)
 
 			*lastScrollId = got.ScrollId
@@ -395,7 +405,6 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 
 		return &audience.QueryRequest{
 			AuthContext: &auth.AuthContext{AccountId: 1},
-			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
 			Iterator:    iter,
 		}
 	case scroller:
@@ -411,7 +420,6 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 
 		return &audience.QueryRequest{
 			AuthContext: &auth.AuthContext{AccountId: 1},
-			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
 			Iterator:    iter,
 		}
 	case scrollerParallell:
@@ -425,7 +433,6 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 
 		return &audience.QueryRequest{
 			AuthContext: &auth.AuthContext{AccountId: 1},
-			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
 			Iterator:    iter,
 		}
 	case scrollNext:
@@ -441,7 +448,6 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 
 		return &audience.QueryRequest{
 			AuthContext: &auth.AuthContext{AccountId: 1},
-			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
 			Iterator:    iter,
 		}
 
@@ -458,7 +464,6 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 
 		return &audience.QueryRequest{
 			AuthContext: &auth.AuthContext{AccountId: 1},
-			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
 			Iterator:    iter,
 		}
 	default:
@@ -492,10 +497,14 @@ func TestGetFieldSuggestion(t *testing.T) {
 
 	es5Client.LoadBulk(string(readFile(t, "testdata/suggestions.bulk.json")))
 
-	var index = elastic.Index{
-		Client:    es5Client.c,
-		IndexName: func(_ string) string { return suggest_test_index },
-	}
+	var (
+		index = &elastic.Index{
+			Client:    es5Client.c,
+			IndexName: func(_ string) string { return suggest_test_index },
+		}
+
+		svc = service.New(nil, index, nil)
+	)
 
 	tcases := []struct {
 		desc string
@@ -561,7 +570,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
 				exp, expErr = tc.exp.val, tc.exp.err
-				got, gotErr = index.GetFieldSuggestion(context.TODO(), tc.req)
+				got, gotErr = svc.GetFieldSuggestion(context.TODO(), tc.req)
 			)
 
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {

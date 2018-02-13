@@ -1,9 +1,12 @@
 package service
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/roverplatform/rover/audience/service/elastic"
 )
 
 var (
@@ -29,6 +32,14 @@ type (
 )
 
 func ErrorToStatus(err error) codes.Code {
+	if s, ok := status.FromError(err); ok {
+		return s.Code()
+	}
+
+	if err == elastic.InvalidArgument {
+		return codes.InvalidArgument
+	}
+
 	switch err.(type) {
 	case nil:
 		return codes.OK
@@ -41,6 +52,6 @@ func ErrorToStatus(err error) codes.Code {
 	case errorClient:
 		return codes.InvalidArgument
 	default:
-		return codes.Internal
+		return codes.Unknown
 	}
 }
