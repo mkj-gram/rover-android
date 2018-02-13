@@ -59,7 +59,15 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 		indexName = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
 	)
 
-	rq, err := DeviceAndProfilePredicateAggregateToQuery(r.GetPredicateAggregate(), r.GetTimeZoneOffset())
+	var predicate *audience.PredicateAggregate
+	switch query := r.Query.(type) {
+	case *audience.QueryRequest_Predicate:
+		predicate = query.Predicate
+	default:
+		panic(fmt.Errorf("unexpected query: %T", query))
+	}
+
+	rq, err := DeviceAndProfilePredicateAggregateToQuery(predicate, r.GetTimeZoneOffset())
 	if err != nil {
 		return nil, errors.Wrap(err, "ToQuery")
 	}

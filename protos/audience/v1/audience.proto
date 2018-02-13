@@ -955,13 +955,27 @@ message Predicate {
 
 message QueryRequest {
   rover.auth.v1.AuthContext auth_context = 1;
-  PredicateAggregate predicate_aggregate = 2;
+
+  // DEPRECATED: use query.predicate_aggregate instead
+  PredicateAggregate predicate_aggregate = 2 [deprecated = true];
+
+  oneof query {
+  // query using the predicate aggregate
+    PredicateAggregate predicate           = 11;
+    QuerySegments query_segments           = 12;
+  }
+
+  // FromSegments instructs service to merge segments' predicate aggregates using the condition
+  // and perform a query returning the scroll id
+  message QuerySegments {
+    repeated string              ids       = 1;
+    PredicateAggregate.Condition condition = 2;
+  }
 
   message PageIterator {
     int32 page = 1;
     int32 size = 2;
   }
-
 
   message ScrollIterator {
 
@@ -1012,8 +1026,6 @@ message QueryRequest {
 
   // Optional
   TimeZoneOffset time_zone_offset = 5;
-
-  
 }
 
 message QueryResponse {

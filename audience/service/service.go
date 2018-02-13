@@ -588,12 +588,30 @@ func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience
 	if r.AuthContext == nil {
 		return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
 	}
-	resp, err := s.index.Query(ctx, r)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "Index.Query: %v", err)
+
+	if r.PredicateAggregate != nil {
+		if r.Query != nil {
+			return nil, status.Error(codes.InvalidArgument, "QueryRequest.PredicateAggregate is deprecated")
+		}
+
+		r.Query = &audience.QueryRequest_Predicate{
+			Predicate: r.PredicateAggregate,
+		}
 	}
 
-	return resp, nil
+	switch q := r.Query.(type) {
+	case *audience.QueryRequest_QuerySegments_:
+		_ = q
+		return nil, status.Errorf(codes.Unimplemented, "QuerySegments is not yet implemented")
+	case *audience.QueryRequest_Predicate:
+		resp, err := s.index.Query(ctx, r)
+		if err != nil {
+			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "Index.Query: %v", err)
+		}
+		return resp, nil
+	}
+
+	panic(status.Errorf(codes.InvalidArgument, "unexpected query: %T", r.Query))
 }
 
 func (s *Server) IsInDynamicSegment(ctx context.Context, r *audience.IsInDynamicSegmentRequest) (*audience.IsInDynamicSegmentResponse, error) {

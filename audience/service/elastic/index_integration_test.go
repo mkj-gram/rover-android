@@ -352,9 +352,9 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 	switch v := i.(type) {
 	case nil:
 		return &audience.QueryRequest{
-			AuthContext:        &auth.AuthContext{AccountId: 1},
-			PredicateAggregate: pa,
-			Iterator:           nil,
+			AuthContext: &auth.AuthContext{AccountId: 1},
+			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Iterator:    nil,
 		}
 	case string:
 		// Build a scroll that returns no results
@@ -383,9 +383,9 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 		}
 
 		return &audience.QueryRequest{
-			AuthContext:        &auth.AuthContext{AccountId: 1},
-			PredicateAggregate: pa,
-			Iterator:           iter,
+			AuthContext: &auth.AuthContext{AccountId: 1},
+			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Iterator:    iter,
 		}
 	case pager:
 		iter := &audience.QueryRequest_PageIterator_{
@@ -394,9 +394,9 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 			}}
 
 		return &audience.QueryRequest{
-			AuthContext:        &auth.AuthContext{AccountId: 1},
-			PredicateAggregate: pa,
-			Iterator:           iter,
+			AuthContext: &auth.AuthContext{AccountId: 1},
+			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Iterator:    iter,
 		}
 	case scroller:
 		iter := &audience.QueryRequest_ScrollIterator_{
@@ -410,9 +410,9 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 		}
 
 		return &audience.QueryRequest{
-			AuthContext:        &auth.AuthContext{AccountId: 1},
-			PredicateAggregate: pa,
-			Iterator:           iter,
+			AuthContext: &auth.AuthContext{AccountId: 1},
+			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Iterator:    iter,
 		}
 	case scrollerParallell:
 		iter := &audience.QueryRequest_ScrollIterator_{
@@ -424,9 +424,9 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 		}
 
 		return &audience.QueryRequest{
-			AuthContext:        &auth.AuthContext{AccountId: 1},
-			PredicateAggregate: pa,
-			Iterator:           iter,
+			AuthContext: &auth.AuthContext{AccountId: 1},
+			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Iterator:    iter,
 		}
 	case scrollNext:
 		iter := &audience.QueryRequest_ScrollIterator_{
@@ -440,9 +440,9 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 		}
 
 		return &audience.QueryRequest{
-			AuthContext:        &auth.AuthContext{AccountId: 1},
-			PredicateAggregate: pa,
-			Iterator:           iter,
+			AuthContext: &auth.AuthContext{AccountId: 1},
+			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Iterator:    iter,
 		}
 
 	case clear:
@@ -457,9 +457,9 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 		}
 
 		return &audience.QueryRequest{
-			AuthContext:        &auth.AuthContext{AccountId: 1},
-			PredicateAggregate: pa,
-			Iterator:           iter,
+			AuthContext: &auth.AuthContext{AccountId: 1},
+			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Iterator:    iter,
 		}
 	default:
 		t.Fatalf("unknown type: %T", v)
