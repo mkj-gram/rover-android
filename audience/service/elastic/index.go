@@ -59,12 +59,13 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 		indexName = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
 	)
 
+	if r.PredicateAggregate != nil {
+		panic(fmt.Errorf("QueryRequest.PredicateAggregate is deprecated"))
+	}
+
 	var predicate *audience.PredicateAggregate
-	switch query := r.Query.(type) {
-	case *audience.QueryRequest_Predicate:
-		predicate = query.Predicate
-	default:
-		panic(fmt.Errorf("unexpected query: %T", query))
+	if p, ok := r.Query.(*audience.QueryRequest_Predicate); ok {
+		predicate = p.Predicate
 	}
 
 	rq, err := DeviceAndProfilePredicateAggregateToQuery(predicate, r.GetTimeZoneOffset())
