@@ -2,11 +2,6 @@
 
 set -e
 
-run() {
-  go run ./audience/service/cmd/segments-worker/main.go \
-    --mongo-dsn=${MONGO_DSN}
-}
-
 test() {
   go test -tags integration \
     github.com/roverplatform/rover/audience/service/...
@@ -15,6 +10,14 @@ test() {
 bench() {
   go test -tags integration -bench . -run NONE -benchtime 10s \
     ./audience/service/...
+}
+
+configure_pubsub() {
+  go run /go/src/github.com/roverplatform/rover/audience/service/cmd/pubsub-cli/main.go
+}
+
+run() {
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/segments-worker/main.go -gcp-project-id=${GCP_PROJECT_ID} -pubsub-subscription=${PUBSUB_SUBSCRIPTION} -mongo-dsn=${AUDIENCE_SERVICE_MONGO_DSN} -elastic-dsn=${AUDIENCE_SERVICE_ELASTIC_DSN}
 }
 
 

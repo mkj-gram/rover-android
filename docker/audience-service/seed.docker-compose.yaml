@@ -1,0 +1,19 @@
+version: "3"
+
+services: 
+  source_data:
+    image: mongo:3.4.4
+    command: mongod --port 27018 --directoryperdb
+    volumes:
+      - ${BACKUP_DIR}:/data/db
+    ports:
+      - "27018:27018"
+  seed:
+    image: golang:1.9-alpine
+    command: ./docker/audience-service/cmd seed
+    volumes:
+      - ../../rover:/go/src/github.com/roverplatform/rover
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - source_data
+      - audience-service

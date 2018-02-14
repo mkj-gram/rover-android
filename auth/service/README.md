@@ -11,3 +11,5 @@ implements auth/v1/auth.proto service
 
 1. `make down` stops the postres container
 
+## Generate auth token(s) and account id
+make NAME=${STRING} PASSWORD=${STRING} EMAIL=${STRING} create_account

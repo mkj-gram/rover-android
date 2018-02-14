@@ -2,10 +2,6 @@
 
 set -e
 
-run() {
-  go run ./audience/service/cmd/audience-service/main.go
-}
-
 test() {
   go test -tags integration \
     github.com/roverplatform/rover/audience/service/...
@@ -14,6 +10,39 @@ test() {
 bench() {
   go test -tags integration -bench . -run NONE -benchtime 10s \
     ./audience/service/...
+}
+
+run() {
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/audience-service/main.go -gcp-project-id=${GCP_PROJECT_ID} -pubsub-topic-name=${PUBSUB_TOPIC_NAME} -mongo-dsn=${AUDIENCE_SERVICE_MONGO_DSN} -elastic-dsn=${AUDIENCE_SERVICE_ELASTIC_DSN}
+}
+
+mongo_clear() {
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/mongo-cli/*.go mongo:clear -mongo-dsn=${AUDIENCE_SERVICE_MONGO_DSN}
+}
+
+elastic_clear_index() {
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/elastic-cli/*.go index:delete -elastic-dsn=${AUDIENCE_SERVICE_ELASTIC_DSN}
+}
+
+elastic_clear_one_index() {
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/elastic-cli/*.go index:delete -elastic-dsn=${AUDIENCE_SERVICE_ELASTIC_DSN} -account-ids=${ACCOUNT_ID}
+}
+
+configure_pubsub() {
+  go run /go/src/github.com/roverplatform/rover/audience/service/cmd/pubsub-cli/main.go
+}
+
+index() {
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/elastic-cli/*.go index:create -account-ids ${ACCOUNT_ID} -mongo-dsn=${AUDIENCE_SERVICE_MONGO_DSN} -elastic-dsn=${AUDIENCE_SERVICE_ELASTIC_DSN}
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/elastic-cli/*.go index:populate -account-ids ${ACCOUNT_ID} -mongo-dsn=${AUDIENCE_SERVICE_MONGO_DSN} -elastic-dsn=${AUDIENCE_SERVICE_ELASTIC_DSN}
+}
+
+seed() {
+   go run /go/src/github.com/roverplatform/rover/audience/service/cmd/mongo-cli/*.go mongo:seed -account-id=${ACCOUNT_ID} -devices=${DEVICES} -source-mongo-dsn=${SRC_MONGO} -receiver-mongo-dsn=${RCVR_MONGO}
+}
+
+reset() {
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/mongo-cli/*.go mongo:reset -account-id=${ACCOUNT_ID} -mongo-dsn=${MONGO_DSN}
 }
 
 

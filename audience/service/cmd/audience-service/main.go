@@ -145,44 +145,57 @@ func main() {
 	//
 	// GCP
 	//
-	if *gcpProjectID != "" && *gcpSvcAcctKeyPath != "" {
-		var err error
-		//
-		// GCP tracing
-		//
+	if *gcpProjectID != "" {
+		var (
+			err          error
+			tc           *trace.Client
+			errClient    *gerrors.Client
+			pubsubClient *pubsub.Client
+			pubSubOpts   []option.ClientOption
+		)
 
-		tc, err := trace.NewClient(ctx, *gcpProjectID, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
-		if err != nil {
-			stderr.Fatalf("trace.NewClient: %v", err)
-		} else {
-			stdout.Println("gcp.tracing=on")
-			unaryMiddleware = append(unaryMiddleware, traceUnaryInterceptor(tc))
+		if *gcpSvcAcctKeyPath != "" {
+			//
+			// GCP tracing
+			//
 
-			policy, err := trace.NewLimitedSampler(0.1, 100)
+			tc, err = trace.NewClient(ctx, *gcpProjectID, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
 			if err != nil {
-				stderr.Fatalf("trace.NewLimitedSampler: %v", err)
+				stderr.Fatalf("trace.NewClient: %v", err)
+			} else {
+				stdout.Println("gcp.tracing=on")
+				unaryMiddleware = append(unaryMiddleware, traceUnaryInterceptor(tc))
+
+				policy, err := trace.NewLimitedSampler(0.1, 100)
+				if err != nil {
+					stderr.Fatalf("trace.NewLimitedSampler: %v", err)
+				}
+
+				tc.SetSamplingPolicy(policy)
 			}
 
-			tc.SetSamplingPolicy(policy)
-		}
+			//
+			// GCP errors
+			//
 
-		//
-		// GCP errors
-		//
+			errClient, err = gerrors.NewClient(ctx, *gcpProjectID, "audience-service", "v1", true, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+			if err != nil {
+				stderr.Fatalf("errors.NewClient: %v", err)
+			} else {
+				stdout.Println("gcp.errors=on")
+				unaryMiddleware = append(unaryMiddleware, panicUnaryInterceptor(errClient))
+			}
 
-		errClient, err := gerrors.NewClient(ctx, *gcpProjectID, "audience-service", "v1", true, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
-		if err != nil {
-			stderr.Fatalf("errors.NewClient: %v", err)
+			pubSubOpts = append(pubSubOpts, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
 		} else {
-			stdout.Println("gcp.errors=on")
-			unaryMiddleware = append(unaryMiddleware, panicUnaryInterceptor(errClient))
+			stdout.Println("gcp.errors=off")
+			stdout.Println("gcp.tracing=off")
 		}
 
 		//
 		// GCP pubsub
 		//
-
-		pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+		pubsubClient, err = pubsub.NewClient(ctx, *gcpProjectID, pubSubOpts...)
 		if err != nil {
 			log.Fatalf("pubsub.NewClient: %v", err)
 		} else {
@@ -220,16 +233,22 @@ func main() {
 			return func(pub spubsub.Publisher) spubsub.Publisher {
 				pub = pw(pub)
 				return spubsub.PublisherFunc(func(ctx context.Context, msgs []service.Message) (string, error) {
-					span := tc.NewSpan("audience-service/push/pubsub")
-					span.SetLabel("batch.size", fmt.Sprintf("%d", len(msgs)))
-					span.SetLabel("pubsub.Topic", *topicName)
-					defer span.Finish()
 					verboseLog.Printf("pubsub: batch.size=%d: push", len(msgs))
 					id, err := pub.Publish(ctx, msgs)
-					span.SetLabel("pubsub.ID", id)
+
+					if tc != nil {
+						span := tc.NewSpan("audience-service/push/pubsub")
+						span.SetLabel("batch.size", fmt.Sprintf("%d", len(msgs)))
+						span.SetLabel("pubsub.Topic", *topicName)
+						defer span.Finish()
+						span.SetLabel("pubsub.ID", id)
+					}
+
 					if err != nil {
 						stderr.Printf("pubsub: pubsub.id=%v status=error error=%v", id, err)
-						errClient.Reportf(ctx, nil, "pubsub: status=error error=%v", err)
+						if errClient != nil {
+							errClient.Reportf(ctx, nil, "pubsub: status=error error=%v", err)
+						}
 					} else {
 						verboseLog.Printf("pubsub: pubsub.id=%v status=OK", id)
 					}
@@ -247,18 +266,9 @@ func main() {
 		}()
 
 	} else {
-		//
-		// Local env
-		//
 		stdout.Println("gcp.errors=off")
 		stdout.Println("gcp.tracing=off")
 		stdout.Println("gcp.pubsub=off")
-
-		// development mode just logs notifications
-		notifier = service.FuncNotifier(func(ctx context.Context, msg service.Message) error {
-			stdout.Printf("%+v\n", msg)
-			return nil
-		})
 	}
 
 	//

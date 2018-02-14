@@ -66,3 +66,28 @@ Avoid streaming rpc calls as this makes the retry logic on the client side much 
 ### Generation
 
 [protos/README](https://github.com/RoverPlatform/rover/blob/master/protos/README.md)
+
+
+
+## Run Services
+
+### Audience
+```bash
+cd audience/service && make run
+```
+
+### GraphQL-Gateway
+```bash
+cd graphql-gateway && make run
+```
+
+### Run Audience App
+```bash
+cd react-audience && make run
+```
+
+## Create meta data
+
+[Generate auth tokens and account id](https://github.com/RoverPlatform/rover/blob/master/auth/service/README.md)
+
+[Seed or Reset mongoDB / Elastic Search](https://github.com/RoverPlatform/rover/blob/master/audience/service/README.md)

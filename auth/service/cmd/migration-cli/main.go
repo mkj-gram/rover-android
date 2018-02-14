@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
+	_ "github.com/lib/pq"
 )
 
 var (
