@@ -16,6 +16,8 @@ GO_MAPS="Mgoogle/protobuf/timestamp.proto=github.com/roverplatform/rover/go/prot
 ,Mauth/v1/auth.proto=github.com/roverplatform/rover/apis/go/auth/v1\
 ,Mprotobuf/predicates.proto=github.com/roverplatform/rover/apis/go/protobuf/predicates\
 ,Mprotobuf/version.proto=github.com/roverplatform/rover/apis/go/protobuf\
+,Mprotobuf/wrappers.proto=github.com/roverplatform/rover/apis/go/protobuf/wrappers\
+,Mprotobuf/struct.proto=github.com/roverplatform/rover/apis/go/protobuf/struct\
 "
 
 FILES="`find $PROTO_PATH -name *.proto`"
