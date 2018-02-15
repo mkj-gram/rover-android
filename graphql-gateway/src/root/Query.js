@@ -1,6 +1,6 @@
 import { GraphQLObjectType } from 'graphql'
 import CampaignsQuery from '../campaigns/CampaignsQuery'
-import DeviceStateQuery from '../device/query/DeviceStateQuery'
+import DeviceQuery from '../device/query/DeviceQuery'
 import ExperienceQuery from '../experiences/query/ExperienceQuery'
 import SegmentFromPredicatesQuery from '../segments/SegmentFromPredicatesQuery'
 import DynamicSegmentQuery from '../segments/DynamicSegmentQuery'
@@ -18,7 +18,7 @@ Query.type = new GraphQLObjectType({
         segmentFromPredicates: SegmentFromPredicatesQuery,
         segmentSchema: SegmentSchemaQuery,
         stringSuggestion: StringSuggestionQuery,
-        deviceState: DeviceStateQuery
+        device: DeviceQuery
     }
 })
 

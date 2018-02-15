@@ -10,6 +10,9 @@ import GraphQLJSON from 'graphql-type-json'
 const Context = new GraphQLInputObjectType({
     name: 'Context',
     fields: () => ({
+        appBadgeNumber: {
+            type: GraphQLInt
+        },
         appBuild: {
             type: GraphQLString
         },
