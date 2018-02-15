@@ -1,6 +1,6 @@
 // +build integration
 
-package elastic_test
+package service_test
 
 import (
 	"testing"
@@ -13,7 +13,6 @@ import (
 	auth "github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/audience/service"
 	"github.com/roverplatform/rover/audience/service/elastic"
-	rtesting "github.com/roverplatform/rover/go/testing"
 )
 
 const (
@@ -23,11 +22,6 @@ const (
 
 type (
 	M = map[string]interface{}
-
-	expect struct {
-		err error
-		val interface{}
-	}
 
 	response struct {
 		Code int
@@ -51,9 +45,6 @@ var (
 	idxName = func(s string) string {
 		return "test_account_" + s
 	}
-
-	difff = rtesting.Difff
-	Diff  = rtesting.Diff
 )
 
 func TestQuery(t *testing.T) {
@@ -66,12 +57,201 @@ func TestQuery(t *testing.T) {
 
 	es5Client.createMapping(test_index, "device", elastic.DeviceV2Mapping(M{}, M{}))
 
-	es5Client.LoadBulk(string(readFile(t, "testdata/basic.bulk.json")))
+	es5Client.LoadBulk(string(readFile(t, "../elastic/testdata/basic.bulk.json")))
 
+	t.Run("TestQuery", test_Query)
 	t.Run("TestQuery_misc", test_Query_misc)
 	t.Run("TestQuery_Pager", test_Query_Pager)
 	t.Run("TestQuery_Scroller", test_Query_Scroller)
 	t.Run("TestQuery_Scroller_Parallell", test_Query_ScrollerParallell)
+}
+
+func test_Query(t *testing.T) {
+	var (
+		es5Client = newClient(t)
+
+		index = &elastic.Index{
+			Client:    es5Client.c,
+			IndexName: func(_ string) string { return test_index },
+		}
+
+		svc = service.New(nil, index, nil)
+	)
+
+	tcases := []struct {
+		desc string
+		req  *audience.QueryRequest
+
+		exp expect
+	}{
+		// {
+		// 	desc: "condition: all",
+		// 	req:  newRequest(t, "predicate_aggregates"),
+		//
+		// 	exp: expect{
+		// 		val: &audience.QueryResponse{},
+		// 	},
+		// },
+		{
+			desc: "condition: ANY",
+			req: &audience.QueryRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+
+				Iterator: &audience.QueryRequest_ScrollIterator_{
+					ScrollIterator: &audience.QueryRequest_ScrollIterator{
+						Operation: &audience.QueryRequest_ScrollIterator_StartScroll_{
+							StartScroll: &audience.QueryRequest_ScrollIterator_StartScroll{
+								BatchSize: 1001,
+							},
+						},
+					},
+				},
+
+				Query: &audience.QueryRequest_QueryPredicateAggregates{
+					QueryPredicateAggregates: &audience.QueryRequest_PredicateAggregateAggregate{
+						Condition: audience.PredicateAggregate_ANY,
+						PredicateAggregates: []*audience.PredicateAggregate{
+							&audience.PredicateAggregate{
+								Condition: audience.PredicateAggregate_ANY,
+								Predicates: []*audience.Predicate{
+									&audience.Predicate{
+										Selector: audience.Predicate_DEVICE,
+										Value: &audience.Predicate_StringPredicate{
+											StringPredicate: &audience.StringPredicate{
+												Op:            audience.StringPredicate_IS_EQUAL,
+												AttributeName: "profile_identifier",
+												Value:         "p1",
+											},
+										},
+									},
+								},
+							},
+							&audience.PredicateAggregate{
+								Condition: audience.PredicateAggregate_ANY,
+								Predicates: []*audience.Predicate{
+									&audience.Predicate{
+										Selector: audience.Predicate_DEVICE,
+										Value: &audience.Predicate_StringPredicate{
+											StringPredicate: &audience.StringPredicate{
+												Op:            audience.StringPredicate_IS_EQUAL,
+												AttributeName: "device_id",
+												Value:         "d2",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			exp: expect{
+				exp: &audience.QueryResponse{
+					TotalSize: 3,
+					ScrollId:  "", // unpredictable
+					Devices: []*audience.Device{
+						{DeviceId: "d3", ProfileIdentifier: "p1"},
+						{DeviceId: "d1", ProfileIdentifier: "p1"},
+						{DeviceId: "d2", ProfileIdentifier: "frank"},
+					},
+					Profiles: []*audience.Profile{
+						{Identifier: "p1", AccountId: 1},
+					},
+				},
+			},
+		},
+
+		{
+			desc: "condition: ALL",
+			req: &audience.QueryRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+
+				Iterator: &audience.QueryRequest_ScrollIterator_{
+					ScrollIterator: &audience.QueryRequest_ScrollIterator{
+						Operation: &audience.QueryRequest_ScrollIterator_StartScroll_{
+							StartScroll: &audience.QueryRequest_ScrollIterator_StartScroll{
+								BatchSize: 1002,
+							},
+						},
+					},
+				},
+
+				Query: &audience.QueryRequest_QueryPredicateAggregates{
+					QueryPredicateAggregates: &audience.QueryRequest_PredicateAggregateAggregate{
+						Condition: audience.PredicateAggregate_ALL,
+						PredicateAggregates: []*audience.PredicateAggregate{
+							&audience.PredicateAggregate{
+								Condition: audience.PredicateAggregate_ANY,
+								Predicates: []*audience.Predicate{
+									&audience.Predicate{
+										Selector: audience.Predicate_DEVICE,
+										Value: &audience.Predicate_StringPredicate{
+											StringPredicate: &audience.StringPredicate{
+												AttributeName: "profile_identifier",
+												Op:            audience.StringPredicate_IS_EQUAL,
+												Value:         "p1",
+											},
+										},
+									},
+								},
+							},
+							&audience.PredicateAggregate{
+								Condition: audience.PredicateAggregate_ANY,
+								Predicates: []*audience.Predicate{
+									&audience.Predicate{
+										Selector: audience.Predicate_DEVICE,
+										Value: &audience.Predicate_StringPredicate{
+											StringPredicate: &audience.StringPredicate{
+												AttributeName: "device_id",
+												Op:            audience.StringPredicate_IS_EQUAL,
+												Value:         "d3",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			exp: expect{
+				exp: &audience.QueryResponse{
+					TotalSize: 1,
+					ScrollId:  "", // unpredictable
+					Devices: []*audience.Device{
+						{DeviceId: "d3", ProfileIdentifier: "p1"},
+					},
+					Profiles: []*audience.Profile{
+						{Identifier: "p1", AccountId: 1},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.desc, func(t *testing.T) {
+			var (
+				exp, expErr = tc.exp.exp, tc.exp.expErr
+				got, gotErr = svc.Query(context.TODO(), tc.req)
+			)
+
+			if gotErr == nil {
+				if got.ScrollId == "" {
+					t.Fatal("scroll id must be set")
+				}
+				// blank it since it's unpredictable
+				// and next comparison fails
+				got.ScrollId = ""
+			}
+
+			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+		})
+	}
 }
 
 func test_Query_misc(t *testing.T) {
@@ -97,7 +277,7 @@ func test_Query_misc(t *testing.T) {
 			req:  newRequest(t, "none"),
 
 			exp: expect{
-				val: &audience.QueryResponse{},
+				exp: &audience.QueryResponse{},
 			},
 		},
 	}
@@ -105,7 +285,7 @@ func test_Query_misc(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
-				exp, expErr = tc.exp.val, tc.exp.err
+				exp, expErr = tc.exp.exp, tc.exp.expErr
 				got, gotErr = svc.Query(context.TODO(), tc.req)
 			)
 
@@ -138,7 +318,7 @@ func test_Query_Pager(t *testing.T) {
 			req: newRequest(t, nil),
 
 			exp: expect{
-				err: status.Errorf(codes.InvalidArgument, "Index.Query: GetIterator: nil: invalid argument"),
+				expErr: status.Errorf(codes.InvalidArgument, "Index.Query: GetIterator: nil: invalid argument"),
 			},
 		},
 
@@ -147,7 +327,7 @@ func test_Query_Pager(t *testing.T) {
 			req:  newRequest(t, pager{Page: 0, Size: 3}),
 
 			exp: expect{
-				val: &audience.QueryResponse{
+				exp: &audience.QueryResponse{
 					Devices: []*audience.Device{
 						{DeviceId: "d4", ProfileIdentifier: ""},
 						{DeviceId: "d3", ProfileIdentifier: "p1"},
@@ -165,7 +345,7 @@ func test_Query_Pager(t *testing.T) {
 			req:  newRequest(t, pager{Page: 1, Size: 3}),
 
 			exp: expect{
-				val: &audience.QueryResponse{
+				exp: &audience.QueryResponse{
 					Devices: []*audience.Device{
 						{DeviceId: "d2", ProfileIdentifier: "frank"},
 					},
@@ -178,7 +358,7 @@ func test_Query_Pager(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
-				exp, expErr = tc.exp.val, tc.exp.err
+				exp, expErr = tc.exp.exp, tc.exp.expErr
 				got, gotErr = svc.Query(context.TODO(), tc.req)
 			)
 
@@ -216,7 +396,7 @@ func test_Query_Scroller(t *testing.T) {
 			req:  scroller{BatchSize: 3},
 
 			exp: expect{
-				val: &audience.QueryResponse{
+				exp: &audience.QueryResponse{
 					Devices: []*audience.Device{
 						{DeviceId: "d4", ProfileIdentifier: ""},
 						{DeviceId: "d3", ProfileIdentifier: "p1"},
@@ -234,7 +414,7 @@ func test_Query_Scroller(t *testing.T) {
 			req:  scrollNext{ScrollId: lastScrollId},
 
 			exp: expect{
-				val: &audience.QueryResponse{
+				exp: &audience.QueryResponse{
 					Devices: []*audience.Device{
 						{DeviceId: "d2", ProfileIdentifier: "frank"},
 					},
@@ -247,7 +427,7 @@ func test_Query_Scroller(t *testing.T) {
 			req:  clear{ScrollId: lastScrollId},
 
 			exp: expect{
-				val: &audience.QueryResponse{},
+				exp: &audience.QueryResponse{},
 			},
 		},
 	}
@@ -255,13 +435,15 @@ func test_Query_Scroller(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
-				exp, expErr = tc.exp.val, tc.exp.err
+				exp, expErr = tc.exp.exp, tc.exp.expErr
 				got, gotErr = svc.Query(context.TODO(), newRequest(t, tc.req))
 			)
 
-			*lastScrollId = got.ScrollId
-			// NOTE: it's unpredictable
-			got.ScrollId = ""
+			if gotErr == nil {
+				*lastScrollId = got.ScrollId
+				// NOTE: it's unpredictable
+				got.ScrollId = ""
+			}
 
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
@@ -301,7 +483,7 @@ func test_Query_ScrollerParallell(t *testing.T) {
 			},
 
 			exp: expect{
-				val: &audience.QueryResponse{
+				exp: &audience.QueryResponse{
 					Devices: []*audience.Device{
 						{DeviceId: "d4", ProfileIdentifier: ""},
 					},
@@ -314,7 +496,7 @@ func test_Query_ScrollerParallell(t *testing.T) {
 			req:  scrollNext{ScrollId: lastScrollId},
 
 			exp: expect{
-				val: &audience.QueryResponse{
+				exp: &audience.QueryResponse{
 					Devices: []*audience.Device{
 						{DeviceId: "d1", ProfileIdentifier: "p1"},
 					},
@@ -330,7 +512,7 @@ func test_Query_ScrollerParallell(t *testing.T) {
 			req:  clear{ScrollId: lastScrollId},
 
 			exp: expect{
-				val: &audience.QueryResponse{},
+				exp: &audience.QueryResponse{},
 			},
 		},
 	}
@@ -338,13 +520,15 @@ func test_Query_ScrollerParallell(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
-				exp, expErr = tc.exp.val, tc.exp.err
+				exp, expErr = tc.exp.exp, tc.exp.expErr
 				got, gotErr = svc.Query(context.TODO(), newRequest(t, tc.req))
 			)
 
-			*lastScrollId = got.ScrollId
-			// NOTE: it's unpredictable
-			got.ScrollId = ""
+			if gotErr == nil {
+				*lastScrollId = got.ScrollId
+				// NOTE: it's unpredictable
+				got.ScrollId = ""
+			}
 
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
@@ -354,19 +538,34 @@ func test_Query_ScrollerParallell(t *testing.T) {
 }
 
 func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
-	var pa = &audience.PredicateAggregate{
-		Condition:  audience.PredicateAggregate_ALL,
-		Predicates: []*audience.Predicate{},
-	}
-
 	switch v := i.(type) {
 	case nil:
+
+		var pa = &audience.PredicateAggregate{
+			Condition:  audience.PredicateAggregate_ALL,
+			Predicates: []*audience.Predicate{},
+		}
+
 		return &audience.QueryRequest{
 			AuthContext: &auth.AuthContext{AccountId: 1},
-			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Query:       &audience.QueryRequest_QueryPredicateAggregate{QueryPredicateAggregate: pa},
 			Iterator:    nil,
 		}
 	case string:
+		var iter = &audience.QueryRequest_ScrollIterator_{
+			ScrollIterator: &audience.QueryRequest_ScrollIterator{
+				Operation: &audience.QueryRequest_ScrollIterator_StartScroll_{
+					StartScroll: &audience.QueryRequest_ScrollIterator_StartScroll{
+						BatchSize: 100,
+					},
+				},
+			},
+		}
+
+		var pa = &audience.PredicateAggregate{
+			Condition:  audience.PredicateAggregate_ALL,
+			Predicates: []*audience.Predicate{},
+		}
 		// Build a scroll that returns no results
 		if v == "none" {
 			var p = &audience.Predicate{
@@ -382,19 +581,9 @@ func newRequest(t *testing.T, i interface{}) *audience.QueryRequest {
 			pa.Predicates = append(pa.Predicates, p)
 		}
 
-		iter := &audience.QueryRequest_ScrollIterator_{
-			ScrollIterator: &audience.QueryRequest_ScrollIterator{
-				Operation: &audience.QueryRequest_ScrollIterator_StartScroll_{
-					StartScroll: &audience.QueryRequest_ScrollIterator_StartScroll{
-						BatchSize: 100,
-					},
-				},
-			},
-		}
-
 		return &audience.QueryRequest{
 			AuthContext: &auth.AuthContext{AccountId: 1},
-			Query:       &audience.QueryRequest_Predicate{Predicate: pa},
+			Query:       &audience.QueryRequest_QueryPredicateAggregate{QueryPredicateAggregate: pa},
 			Iterator:    iter,
 		}
 	case pager:
@@ -495,7 +684,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 
 	es5Client.createMapping(suggest_test_index, "device", elastic.DeviceV2Mapping(deviceCustomAttributesMapping, profileCustomAttributesMapping))
 
-	es5Client.LoadBulk(string(readFile(t, "testdata/suggestions.bulk.json")))
+	es5Client.LoadBulk(string(readFile(t, "../elastic/testdata/suggestions.bulk.json")))
 
 	var (
 		index = &elastic.Index{
@@ -516,14 +705,14 @@ func TestGetFieldSuggestion(t *testing.T) {
 			desc: "no results",
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_DEVICE, "test_field", 10),
 			exp: expect{
-				val: &audience.GetFieldSuggestionResponse{},
+				exp: &audience.GetFieldSuggestionResponse{},
 			},
 		},
 		{
 			desc: "One result",
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_DEVICE, "locale_script", 10),
 			exp: expect{
-				val: &audience.GetFieldSuggestionResponse{
+				exp: &audience.GetFieldSuggestionResponse{
 					Suggestions: []string{"result1"},
 				},
 			},
@@ -532,7 +721,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 			desc: "Many results, limited to two",
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_DEVICE, "app_name", 2),
 			exp: expect{
-				val: &audience.GetFieldSuggestionResponse{
+				exp: &audience.GetFieldSuggestionResponse{
 					Suggestions: []string{"another app name", "a third app name"},
 				},
 			},
@@ -541,7 +730,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 			desc: "Rover Profile suggestions",
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_ROVER_PROFILE, "identifier", 10),
 			exp: expect{
-				val: &audience.GetFieldSuggestionResponse{
+				exp: &audience.GetFieldSuggestionResponse{
 					Suggestions: []string{"profile_sp2_identifier", "profile_sp1_identifier"},
 				},
 			},
@@ -550,7 +739,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 			desc: "Custom profile suggestions",
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_CUSTOM_PROFILE, "custom_attribute_1", 10),
 			exp: expect{
-				val: &audience.GetFieldSuggestionResponse{
+				exp: &audience.GetFieldSuggestionResponse{
 					Suggestions: []string{"another", "custom string"},
 				},
 			},
@@ -559,7 +748,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 			desc: "Custom device suggestions",
 			req:  getFieldSuggestionRequest(t, audience.GetFieldSuggestionRequest_CUSTOM_DEVICE, "device_attribute_1", 10),
 			exp: expect{
-				val: &audience.GetFieldSuggestionResponse{
+				exp: &audience.GetFieldSuggestionResponse{
 					Suggestions: []string{"water", "wine"},
 				},
 			},
@@ -569,7 +758,7 @@ func TestGetFieldSuggestion(t *testing.T) {
 	for _, tc := range tcases {
 		t.Run(tc.desc, func(t *testing.T) {
 			var (
-				exp, expErr = tc.exp.val, tc.exp.err
+				exp, expErr = tc.exp.exp, tc.exp.expErr
 				got, gotErr = svc.GetFieldSuggestion(context.TODO(), tc.req)
 			)
 

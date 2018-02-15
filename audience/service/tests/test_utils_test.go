@@ -1,4 +1,4 @@
-package elastic_test
+package service_test
 
 import (
 	"encoding/json"
@@ -17,9 +17,9 @@ import (
 var (
 	elasticOut = mustCreateFile("elastic.test.log")
 	elasticLog = log.New(elasticOut, "", 0)
+	tracingLog = es5.SetTraceLog(elasticLog)
 
-	mongoDSN = "mongodb://mongo:27017/service_worker_test"
-	esDSN    = "http://elastic5:9200/"
+	esDSN = "http://elastic5:9200/"
 )
 
 type (
@@ -29,20 +29,29 @@ type (
 	}
 )
 
+func readFile(t *testing.T, path string) []byte {
+	t.Helper()
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatal("ReadFile:", err)
+	}
+
+	return data
+}
+
 func mustCreateFile(name string) *os.File {
 	var f, err = os.Create(name)
 	if err != nil {
-		panic("audience.elastic.log:" + err.Error())
+		panic("os.Create:" + err.Error())
 	}
 
 	return f
 }
 
 func newClient(t *testing.T) *client {
-
 	var esClient, err = es5.NewClient(
 		es5.SetURL(strings.Split(esDSN, ",")...),
-		es5.SetTraceLog(elasticLog),
+		tracingLog,
 		// es5.SetGzip(false),
 	)
 
@@ -102,13 +111,4 @@ func (c *client) createMapping(idx string, esType string, body relastic.M) {
 	if _, err := m.Do(context.TODO()); err != nil {
 		c.t.Fatal("mapping:", err)
 	}
-}
-
-func readFile(t *testing.T, fixturePath string) []byte {
-	data, err := ioutil.ReadFile(fixturePath)
-	if err != nil {
-		t.Fatal("ReadFile:", err)
-	}
-
-	return data
 }

@@ -82,7 +82,7 @@ func testAudienceService_CreateDynamicSegment(t *testing.T) {
 			mongodb.WithTimeFunc(timeNow),
 		)
 
-		svc = service.New(db, new(nopIndex), logNotifier(t))
+		svc = service.New(db, nil, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -153,7 +153,7 @@ func testAudienceService_GetDynamicSegmentById(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db, new(nopIndex), logNotifier(t))
+		svc = service.New(db, nil, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -299,7 +299,7 @@ func testAudienceService_UpdateDynamicSegmentTitle(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db, new(nopIndex), logNotifier(t))
+		svc = service.New(db, nil, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -409,7 +409,7 @@ func testAudienceService_UpdateDynamicSegmentArchiveStatus(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db, new(nopIndex), logNotifier(t))
+		svc = service.New(db, nil, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -520,7 +520,7 @@ func testAudienceService_UpdateDynamicSegmentPredicates(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db, new(nopIndex), logNotifier(t))
+		svc = service.New(db, nil, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -639,7 +639,7 @@ func testAudienceService_ListDynamicSegments(t *testing.T) {
 			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
 		)
 
-		svc = service.New(db, new(nopIndex), logNotifier(t))
+		svc = service.New(db, nil, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -787,7 +787,7 @@ func testAudienceService_IsInDynamicSegment(t *testing.T) {
 			mdb,
 		)
 
-		svc = service.New(db, new(nopIndex), logNotifier(t))
+		svc = service.New(db, nil, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)
@@ -896,7 +896,7 @@ func testAudienceService_DeviceIsInDynamicSegment(t *testing.T) {
 			mdb,
 		)
 
-		svc = service.New(db, new(nopIndex), logNotifier(t))
+		svc = service.New(db, nil, logNotifier(t))
 
 		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
 	)

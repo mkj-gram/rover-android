@@ -1,0 +1,8 @@
+{"index": {"_index": "test_query_segments_index", "_type": "device", "_id": "d1"}}
+{"device_id":"d1", "profile_identifier": "p1", "profile": { "identifier": "p1", "account_id": 1 }}
+{"index": {"_index": "test_query_segments_index", "_type": "device", "_id": "d2"}}
+{"device_id":"d2", "profile_identifier": "frank", "profile": null}
+{"index": {"_index": "test_query_segments_index", "_type": "device", "_id": "d3"}}
+{"device_id":"d3", "profile_identifier": "p1", "profile": { "identifier": "p1", "account_id": 1 }}
+{"index": {"_index": "test_query_segments_index", "_type": "device", "_id": "d4"}}
+{"device_id":"d4", "profile": null}

@@ -594,14 +594,36 @@ func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience
 			return nil, status.Error(codes.InvalidArgument, "QueryRequest.PredicateAggregate is deprecated")
 		}
 
-		r.Query = &audience.QueryRequest_Predicate{
-			Predicate: r.PredicateAggregate,
+		r.Query = &audience.QueryRequest_QueryPredicateAggregate{
+			QueryPredicateAggregate: r.PredicateAggregate,
 		}
 		r.PredicateAggregate = nil
 	}
 
-	if _, ok := r.Query.(*audience.QueryRequest_QuerySegments_); ok {
-		return nil, status.Errorf(codes.Unimplemented, "QueryRequest.QuerySegments is not yet implemented")
+	if req, ok := r.Query.(*audience.QueryRequest_QuerySegments_); ok {
+		if req.QuerySegments == nil {
+			return nil, status.Errorf(codes.InvalidArgument, "QuerySegments: nil")
+		}
+		dx, err := s.db.ListDynamicSegmentsByIds(ctx, r.GetAuthContext().GetAccountId(), req.QuerySegments.Ids)
+		if err != nil {
+			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDynamicSegmentsByIds: %v", err)
+		}
+
+		if len(dx) != len(req.QuerySegments.Ids) {
+			return nil, status.Errorf(codes.FailedPrecondition, "db.ListDynamicSegmentsByIds: exp=%d got=%d segments", len(req.QuerySegments.Ids), len(dx))
+		}
+
+		var px []*audience.PredicateAggregate
+		for i := range dx {
+			px = append(px, dx[i].PredicateAggregate)
+		}
+		// convert segment predicates into predicate_aggregates query
+		r.Query = &audience.QueryRequest_QueryPredicateAggregates{
+			QueryPredicateAggregates: &audience.QueryRequest_PredicateAggregateAggregate{
+				Condition:           req.QuerySegments.GetCondition(),
+				PredicateAggregates: px,
+			},
+		}
 	}
 
 	resp, err := s.index.Query(ctx, r)
