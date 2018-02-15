@@ -143,7 +143,8 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.Label = proto.Label
 
 	d.PushTokenKey = proto.PushTokenKey
-	d.PushEnvironment = proto.PushEnvironment
+	d.PushEnvironment = pushEnvironmentToString(proto.GetPushEnvironment())
+
 	d.PushTokenIsActive = proto.PushTokenIsActive
 
 	d.PushTokenUpdatedAt, _ = protoToTime(proto.PushTokenUpdatedAt)
@@ -174,7 +175,15 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.CarrierName = proto.CarrierName
 	d.Radio = proto.Radio
 	d.TimeZone = proto.TimeZone
-	d.Platform = proto.Platform.String()
+
+	switch proto.Platform {
+	case audience.Platform_MOBILE:
+		d.Platform = "MOBILE"
+	case audience.Platform_WEB:
+		d.Platform = "WEB"
+	default:
+		d.Platform = ""
+	}
 
 	d.IsBackgroundEnabled = proto.IsBackgroundEnabled
 	d.IsLocationMonitoringEnabled = proto.IsLocationMonitoringEnabled
@@ -232,7 +241,15 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.IsTestDevice = d.IsTestDevice
 	proto.Label = d.Label
 
-	proto.PushEnvironment = d.PushEnvironment
+	switch d.PushEnvironment {
+	case "production":
+		proto.PushEnvironment = audience.PushEnvironment_PRODUCTION
+	case "development":
+		proto.PushEnvironment = audience.PushEnvironment_DEVELOPMENT
+	default:
+		proto.PushEnvironment = audience.PushEnvironment_UNKNOWN
+	}
+
 	proto.PushTokenKey = d.PushTokenKey
 
 	proto.AppName = d.AppName
@@ -264,7 +281,14 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.Radio = d.Radio
 	proto.TimeZone = d.TimeZone
 
-	proto.Platform = audience.Platform(audience.Platform_value[d.Platform])
+	switch d.Platform {
+	case "MOBILE":
+		proto.Platform = audience.Platform_MOBILE
+	case "WEB":
+		proto.Platform = audience.Platform_WEB
+	default:
+		proto.Platform = audience.Platform_UNKNOWN
+	}
 
 	proto.IsBackgroundEnabled = d.IsBackgroundEnabled
 	proto.IsLocationMonitoringEnabled = d.IsLocationMonitoringEnabled
@@ -272,7 +296,7 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.AdvertisingId = d.AdvertisingId
 
 	proto.Ip = d.Ip
-	proto.NotificationAuthorization = audience.NotificationAuthorization(audience.NotificationAuthorization_value[d.NotificationAuthorization])
+	proto.NotificationAuthorization = audience.NotificationAuthorization_Value(audience.NotificationAuthorization_Value_value[d.NotificationAuthorization])
 
 	proto.PushTokenIsActive = d.PushTokenIsActive
 	proto.PushTokenUpdatedAt, _ = timeToProto(d.PushTokenUpdatedAt)
@@ -322,6 +346,17 @@ func timeToProto(ts *time.Time) (*timestamp.Timestamp, error) {
 	}
 
 	return pts, nil
+}
+
+func pushEnvironmentToString(value audience.PushEnvironment_Value) string {
+	switch value {
+	case audience.PushEnvironment_DEVELOPMENT:
+		return "development"
+	case audience.PushEnvironment_PRODUCTION:
+		return "production"
+	default:
+		return ""
+	}
 }
 
 func (s *devicesStore) getDeviceSchema(ctx context.Context, account_id int) (*DeviceSchema, error) {
@@ -499,7 +534,7 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 
 	update["updated_at"] = now
 
-	update["push_environment"] = r.PushEnvironment
+	update["push_environment"] = pushEnvironmentToString(r.PushEnvironment)
 	update["push_token_key"] = r.PushTokenKey
 	if r.PushTokenKey == "" {
 		update["push_token_key"] = nil
@@ -523,13 +558,22 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 	update["carrier_name"] = r.CarrierName
 	update["radio"] = r.Radio
 	update["time_zone"] = r.TimeZone
-	update["platform"] = r.Platform.String()
 	update["is_background_enabled"] = r.IsBackgroundEnabled
 	update["is_location_monitoring_enabled"] = r.IsLocationMonitoringEnabled
 	update["is_bluetooth_enabled"] = r.IsBluetoothEnabled
 	update["advertising_id"] = r.AdvertisingId
 	update["ip"] = r.Ip
 	update["notification_authorization"] = r.NotificationAuthorization.String()
+
+	// To support backwards compatibility where UNDEFINED is now UNKNOWN
+	var platform = ""
+	switch r.Platform {
+	case audience.Platform_WEB:
+		platform = "WEB"
+	case audience.Platform_MOBILE:
+		platform = "MOBILE"
+	}
+	update["platform"] = platform
 
 	frameworks := bson.M{}
 	for k, v := range r.Frameworks {
@@ -697,7 +741,7 @@ func (s *devicesStore) UpdateDevicePushToken(ctx context.Context, r *audience.Up
 	}
 
 	update["push_token_key"] = r.PushTokenKey
-	update["push_environment"] = r.PushEnvironment
+	update["push_environment"] = pushEnvironmentToString(r.PushEnvironment)
 	update["updated_at"] = now
 
 	err = s.devices().Update(bson.M{

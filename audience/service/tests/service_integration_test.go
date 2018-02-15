@@ -2460,7 +2460,7 @@ func testAudienceService_GetDevice(t *testing.T) {
 					PushTokenIsActive:  true,
 					PushTokenCreatedAt: createdAt,
 					PushTokenUpdatedAt: createdAt,
-					PushEnvironment:    "development",
+					PushEnvironment:    audience.PushEnvironment_DEVELOPMENT,
 
 					Frameworks: map[string]*audience.Version{
 						"RoverEvents": {Major: 1, Minor: 2, Revision: 2},
@@ -2763,7 +2763,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
 
 				AppName:            "rover",
-				PushEnvironment:    "development",
+				PushEnvironment:    audience.PushEnvironment_DEVELOPMENT,
 				PushTokenKey:       "000000000000000000000000000000000000000000",
 				AppVersion:         "1.0",
 				AppBuild:           "52",
@@ -2827,7 +2827,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					PushTokenCreatedAt: protoTs(t, updatedAt),
 
 					AppName:            "rover",
-					PushEnvironment:    "development",
+					PushEnvironment:    audience.PushEnvironment_DEVELOPMENT,
 					AppVersion:         "1.0",
 					AppBuild:           "52",
 					AppNamespace:       "io.rover",
@@ -2873,7 +2873,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				PushTokenKey: "",
 
 				AppName:            "rover",
-				PushEnvironment:    "development",
+				PushEnvironment:    audience.PushEnvironment_DEVELOPMENT,
 				AppVersion:         "1.0",
 				AppBuild:           "52",
 				AppNamespace:       "io.rover",
@@ -2921,7 +2921,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					PushTokenIsActive:       false,
 
 					AppName:            "rover",
-					PushEnvironment:    "development",
+					PushEnvironment:    audience.PushEnvironment_DEVELOPMENT,
 					AppVersion:         "1.0",
 					AppBuild:           "52",
 					AppNamespace:       "io.rover",
