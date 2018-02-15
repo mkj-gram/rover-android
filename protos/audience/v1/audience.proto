@@ -247,8 +247,8 @@ message UpdateDevicePushTokenRequest {
 
   string device_id         = 2;
 
-  string push_token_key    = 3;
-  string push_environment  = 4;
+  string push_token_key                   = 3;
+  PushEnvironment.Value push_environment  = 4;
 }
 message UpdateDevicePushTokenResponse {}
 
@@ -349,37 +349,37 @@ message UpdateDeviceRequest {
   // DEPRECATED
   map<string, Value> attributes = 3 [deprecated = true];
 
-  string push_environment             = 10;
-  string push_token_key               = 11;
-  string app_name                     = 12;
-  string app_version                  = 13;
-  string app_build                    = 14;
-  string app_namespace                = 15;
-  string device_manufacturer          = 16;
-  string os_name                      = 17;
-  Version os_version                  = 18;
-  string device_model                 = 19;
-  string device_model_raw             = 50;
-  map<string, Version> frameworks     = 20;
-  string locale_language              = 21;
-  string locale_region                = 22;
-  string locale_script                = 23;
-  bool is_wifi_enabled                = 24;
-  bool is_cellular_enabled            = 25;
-  int32 screen_width                  = 26;
-  int32 screen_height                 = 27;
-  string carrier_name                 = 28;
-  string radio                        = 29;
-  string time_zone                    = 30;
-  Platform platform                   = 31;
-  bool is_background_enabled          = 32;
-  bool is_location_monitoring_enabled = 33;
-  bool is_bluetooth_enabled           = 34;
-  string advertising_id               = 35;
-  string ip                           = 36;
+  PushEnvironment.Value push_environment  = 10;
+  string push_token_key                   = 11;
+  string app_name                         = 12;
+  string app_version                      = 13;
+  string app_build                        = 14;
+  string app_namespace                    = 15;
+  string device_manufacturer              = 16;
+  string os_name                          = 17;
+  Version os_version                      = 18;
+  string device_model                     = 19;
+  string device_model_raw                 = 50;
+  map<string, Version> frameworks         = 20;
+  string locale_language                  = 21;
+  string locale_region                    = 22;
+  string locale_script                    = 23;
+  bool is_wifi_enabled                    = 24;
+  bool is_cellular_enabled                = 25;
+  int32 screen_width                      = 26;
+  int32 screen_height                     = 27;
+  string carrier_name                     = 28;
+  string radio                            = 29;
+  string time_zone                        = 30;
+  Platform.Value platform                 = 31;
+  bool is_background_enabled              = 32;
+  bool is_location_monitoring_enabled     = 33;
+  bool is_bluetooth_enabled               = 34;
+  string advertising_id                   = 35;
+  string ip                               = 36;
 
   Device.RegionMonitoringMode region_monitoring_mode   = 37;
-  NotificationAuthorization notification_authorization = 39;
+  NotificationAuthorization.Value notification_authorization = 39;
 }
 message UpdateDeviceResponse { }
 
@@ -427,7 +427,7 @@ message Device {
   // A string equal to either "development" or "production" which indicates the
   // envrionment the app was built on and used by the server to determine which
   // APNS API to use.
-  string push_environment                              = 10;
+  PushEnvironment.Value push_environment               = 10;
   // the token key value
   string push_token_key                                = 11;
   bool push_token_is_active                            = 12;
@@ -497,7 +497,7 @@ message Device {
   // The current device time zone. E.g. "America/Toronto".
   string time_zone                    = 34;
 
-  Platform platform                   = 35;
+  Platform.Value platform             = 35;
 
   bool is_background_enabled          = 36;
   bool is_location_monitoring_enabled = 37;
@@ -508,7 +508,7 @@ message Device {
   // ip address
   string ip                           = 40;
 
-  NotificationAuthorization notification_authorization = 53;
+  NotificationAuthorization.Value notification_authorization = 53;
 
   // End Device Context Attributes
 
@@ -539,17 +539,43 @@ message Device {
   string profile_identifier = 60;
 }
 
-enum NotificationAuthorization {
-  UNKNOWN         = 0;
-  NOT_DETERMINED  = 1;
-  AUTHORIZED      = 2;
-  DENIED          = 3;
+
+message LocationAuthorization {
+  enum Value {
+    UNKNOWN                 = 0;
+    NOT_DETERMINED          = 1;
+    RESTRICTED              = 2;
+    DENIED                  = 3;
+    AUTHORIZED_WHEN_IN_USE  = 4;
+    AUTHORIZED_ALWAYS       = 5;
+    COARSE                  = 6;
+    FINE                    = 7;
+  }
 }
 
-enum Platform {
-  UNDEFINED = 0;
-  MOBILE    = 1;
-  WEB       = 2;
+message NotificationAuthorization {
+  enum Value {
+    UNKNOWN         = 0;
+    NOT_DETERMINED  = 1;
+    AUTHORIZED      = 2;
+    DENIED          = 3;
+  }
+}
+
+message PushEnvironment {
+  enum Value {
+    UNKNOWN = 0;
+    PRODUCTION = 1;
+    DEVELOPMENT = 2;
+  }
+}
+
+message Platform {
+  enum Value {
+    UNKNOWN = 0;
+    MOBILE  = 1;
+    WEB     = 2;
+  }
 }
 
 message IBeaconRegion {
