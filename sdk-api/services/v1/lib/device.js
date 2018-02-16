@@ -51,13 +51,13 @@ module.exports = function(AudienceClient, logger) {
 
 	function notificationAuthorizationFromProto(n) {
 		switch (n) {
-			case RoverApis.audience.v1.Models.NotificationAuthorization.UNKNOWN:
+			case RoverApis.audience.v1.Models.NotificationAuthorization.Value.UNKNOWN:
 				return "unknown"
-			case RoverApis.audience.v1.Models.NotificationAuthorization.NOT_DETERMINED:
+			case RoverApis.audience.v1.Models.NotificationAuthorization.Value.NOT_DETERMINED:
 				return "not_determined"
-			case RoverApis.audience.v1.Models.NotificationAuthorization.DENIED:
+			case RoverApis.audience.v1.Models.NotificationAuthorization.Value.DENIED:
 				return "denied"
-			case RoverApis.audience.v1.Models.NotificationAuthorization.AUTHORIZED:
+			case RoverApis.audience.v1.Models.NotificationAuthorization.Value.AUTHORIZED:
 				return "authorized"
 			default:
 				return "unknown"
@@ -67,15 +67,37 @@ module.exports = function(AudienceClient, logger) {
 	function notificationAuthorizationToProto(n) {
 		switch (n) {
 			case "unknown":
-				return RoverApis.audience.v1.Models.NotificationAuthorization.UNKNOWN
+				return RoverApis.audience.v1.Models.NotificationAuthorization.Value.UNKNOWN
 			case "not_determined":
-				return RoverApis.audience.v1.Models.NotificationAuthorization.NOT_DETERMINED
+				return RoverApis.audience.v1.Models.NotificationAuthorization.Value.NOT_DETERMINED
 			case "denied":
-				return RoverApis.audience.v1.Models.NotificationAuthorization.DENIED
+				return RoverApis.audience.v1.Models.NotificationAuthorization.Value.DENIED
 			case "authorized":
-				return RoverApis.audience.v1.Models.NotificationAuthorization.AUTHORIZED
+				return RoverApis.audience.v1.Models.NotificationAuthorization.Value.AUTHORIZED
 			default:
-				return RoverApis.audience.v1.Models.NotificationAuthorization.UNKNOWN
+				return RoverApis.audience.v1.Models.NotificationAuthorization.Value.UNKNOWN
+		}
+	}
+
+	function pushEnvironmentToProto(p) {
+		switch (p) {
+			case "production":
+				return RoverApis.audience.v1.Models.PushEnvironment.Value.PRODUCTION
+			case "development":
+				return RoverApis.audience.v1.Models.PushEnvironment.Value.DEVELOPMENT
+			default:
+				return RoverApis.audience.v1.Models.PushEnvironment.Value.UNKNOWN
+		}
+	}
+
+	function pushEnvironmentFromProto(p) {
+		switch (p) {
+			case RoverApis.audience.v1.Models.PushEnvironment.Value.PRODUCTION:
+				return "production"
+			case RoverApis.audience.v1.Models.PushEnvironment.Value.DEVELOPMENT:
+				return "production"
+			default:
+				return "production"
 		}
 	}
 
@@ -229,7 +251,7 @@ module.exports = function(AudienceClient, logger) {
 		device.attributes = attributesFromProto(dp.getAttributesMap())
 
 		// Tokens
-		device.push_environment = dp.getPushEnvironment()
+		device.push_environment = pushEnvironmentFromProto(dp.getPushEnvironment())
 		device.push_token = dp.getPushTokenKey()
 		device.push_token_is_active = dp.getPushTokenIsActive()
 		device.push_token_created_at = RoverApis.Helpers.timestampFromProto(dp.getPushTokenCreatedAt())
@@ -299,7 +321,7 @@ module.exports = function(AudienceClient, logger) {
 		attributesToProto(dp.getAttributesMap(), device.attributes)
 
 		// Tokens
-		dp.setPushEnvironment(device.push_environment)
+		dp.setPushEnvironment(pushEnvironmentToProto(device.push_environment))
 		dp.setPushTokenKey(device.push_token)
 		dp.setPushTokenIsActive(device.push_token_is_active)
 		dp.setPushTokenCreatedAt(RoverApis.Helpers.timestampToProto(device.push_token_created_at))
@@ -435,7 +457,7 @@ module.exports = function(AudienceClient, logger) {
   		 */
   		request.setAuthContext(buildAuthContext(accountId))
   		request.setDeviceId(deviceId)
-  		request.setPushEnvironment(deviceContext.push_environment)
+  		request.setPushEnvironment(pushEnvironmentToProto(deviceContext.push_environment))
   		request.setPushTokenKey(deviceContext.push_token)
   		request.setAppName(deviceContext.app_name)
   		request.setAppVersion(deviceContext.app_version)
