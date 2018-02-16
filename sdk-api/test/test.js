@@ -31,9 +31,17 @@ describe('Device', function() {
 			app_namespace: "io.rover.Rover",
 			device_manufacturer: "Apple",
 			device_model: "iPhone 6s",
-			os_version: "1.3.1",
+			os_version: {
+				major: 1,
+				minor: 3,
+				revision: 1
+			},
 			os_name: "iOS",
-			sdk_version: "1.7.11",
+			sdk_version:{
+				major: 1,
+				minor: 7,
+				revision: 11
+			},
 			locale_language: "en",
 			locale_region: "ca",
 			locale_script: "",
@@ -78,13 +86,40 @@ describe('Device', function() {
 			label: "Rover Test Device"
 		}
 
-		let output = Device.deviceFromProto(Device.deviceToProto(input))
+		// Make sure we can serialize to binary and not throw any assertion errors
+		const got = Device.deviceFromProto(AudienceProtobuf.Device.deserializeBinary(Device.deviceToProto(input).serializeBinary()))
 
-		expect(input).to.deep.equal(output)
+		expect(input).to.deep.equal(got)
+	})
+
+	it('accepts strings as version numbers and returns parsed objects', function() {
+	
+		const input = {
+			os_version: "1.3.4",
+			sdk_version: "3.111.3"
+		}
+
+		const exp = {
+			os_version: {
+				major: 1,
+				minor: 3,
+				revision: 4
+			},
+			sdk_version: {
+				major: 3,
+				minor: 111,
+				revision: 3
+			}
+		}
+
+		// Make sure we can serialize to binary and not throw any assertion errors
+		const got = Device.deviceFromProto(AudienceProtobuf.Device.deserializeBinary(Device.deviceToProto(input).serializeBinary()))
+
+		expect(got).to.deep.include(exp)
 	})
 
 	it('builds device context request', function() {
-		let ctx = {
+		const input = {
 			push_environment: "production",
 			push_token: "TOKENABC_123",
 			app_name: "Rover Inbox",
@@ -116,53 +151,92 @@ describe('Device', function() {
 			notification_authorization: "denied"
 		}
 
-		let proto = Device.deviceContextToProto(1, "ABC", ctx)
+		
+
+		const exp = {
+			push_environment: "production",
+			push_token: "TOKENABC_123",
+			app_name: "Rover Inbox",
+			app_version: "1.4.1.beta",
+			app_build: "Prod 52",
+			app_namespace: "io.rover.Rover",
+			device_manufacturer: "Apple",
+			os_name: "iOS",
+			os_version: {
+				major: 1,
+				minor: 2,
+				revision: 3
+			},
+			device_model: "iPhone 6s",
+			device_model_raw: "iPhone 8,1",
+			sdk_version: {
+				major: 2,
+				minor: 1,
+				revision: 1
+			},
+			locale_language: "en",
+			locale_region: "ca",
+			locale_script: "zz",
+			is_wifi_enabled: true,
+			is_cellular_enabled: true,
+			screen_width: 480,
+			screen_height: 720,
+			carrier_name: "rogers",
+			radio: "LTE",
+			time_zone: "America/Toronto",
+			platform: AudienceProtobuf.Platform.MOBILE,
+			is_background_enabled: false,
+			is_location_monitoring_enabled: true,
+			is_bluetooth_enabled: true,
+			advertising_id: "HJDIEJA-123BNAHA",
+			ip: "127.0.0.1",
+			notification_authorization: AudienceProtobuf.NotificationAuthorization.DENIED
+		}
+
+		const proto = Device.deviceContextToProto(1, "ABC", input)
 
 		expect(proto.getAuthContext()).to.not.be.undefined
 		expect(proto.getAuthContext().getAccountId()).to.equal(1)
 		expect(proto.getDeviceId()).to.equal("ABC")
 
-		expect(proto.getPushEnvironment()).to.equal("production")
-		expect(proto.getPushTokenKey()).to.equal("TOKENABC_123")
-		expect(proto.getAppName()).to.equal("Rover Inbox")
-		expect(proto.getAppVersion()).to.equal("1.4.1.beta")
-		expect(proto.getAppBuild()).to.equal("Prod 52")
-		expect(proto.getAppNamespace()).to.equal("io.rover.Rover")
-		expect(proto.getDeviceManufacturer()).to.equal("Apple")
-		expect(proto.getOsName()).to.equal("iOS")
-		expect(proto.getOsVersion().toObject()).to.deep.equal({
-			major: 1,
-			minor: 2,
-			revision: 3
-		})
-		expect(proto.getDeviceModel()).to.equal("iPhone 6s")
-		expect(proto.getDeviceModelRaw()).to.equal("iPhone 8,1")
-
-		let framworks = proto.getFrameworksMap()
+		const framworks = proto.getFrameworksMap()
 		expect(framworks.get('io.rover.Rover')).to.not.be.undefined
-		expect(framworks.get('io.rover.Rover').toObject()).to.deep.equal({
-			major: 2,
-			minor: 1,
-			revision: 1
-		})
 
-		expect(proto.getLocaleLanguage()).to.equal("en")
-		expect(proto.getLocaleRegion()).to.equal("ca")
-		expect(proto.getLocaleScript()).to.equal("zz")
-		expect(proto.getIsWifiEnabled()).to.equal(true)
-		expect(proto.getIsCellularEnabled()).to.equal(true)
-		expect(proto.getScreenWidth()).to.equal(480)
-		expect(proto.getScreenHeight()).to.equal(720)
-		expect(proto.getCarrierName()).to.equal("rogers")
-		expect(proto.getRadio()).to.equal("LTE")
-		expect(proto.getTimeZone()).to.equal("America/Toronto")
-		expect(proto.getPlatform()).to.equal(AudienceProtobuf.Platform.MOBILE)
-		expect(proto.getIsBackgroundEnabled()).to.equal(false)
-		expect(proto.getIsLocationMonitoringEnabled()).to.equal(true)
-		expect(proto.getIsBluetoothEnabled()).to.equal(true)
-		expect(proto.getAdvertisingId()).to.equal("HJDIEJA-123BNAHA")
-		expect(proto.getIp()).to.equal("127.0.0.1")
-		expect(proto.getNotificationAuthorization()).to.equal(AudienceProtobuf.NotificationAuthorization.DENIED)
+
+		const got = {
+			push_environment: proto.getPushEnvironment(),
+			push_token: proto.getPushTokenKey(),
+			app_name: proto.getAppName(),
+			app_version: proto.getAppVersion(),
+			app_build: proto.getAppBuild(),
+			app_namespace: proto.getAppNamespace(),
+			device_manufacturer: proto.getDeviceManufacturer(),
+			os_name: proto.getOsName(),
+			os_version: proto.getOsVersion().toObject(),
+			device_model: proto.getDeviceModel(),
+			device_model_raw: proto.getDeviceModelRaw(),
+			sdk_version: framworks.get('io.rover.Rover').toObject(),
+			locale_language: proto.getLocaleLanguage(),
+			locale_region: proto.getLocaleRegion(),
+			locale_script: proto.getLocaleScript(),
+			is_wifi_enabled: proto.getIsWifiEnabled(),
+			is_cellular_enabled: proto.getIsCellularEnabled(),
+			screen_width: proto.getScreenWidth(),
+			screen_height: proto.getScreenHeight(),
+			carrier_name: proto.getCarrierName(),
+			radio: proto.getRadio(),
+			time_zone: proto.getTimeZone(),
+			platform: proto.getPlatform(),
+			is_background_enabled: proto.getIsBackgroundEnabled(),
+			is_location_monitoring_enabled: proto.getIsLocationMonitoringEnabled(),
+			is_bluetooth_enabled: proto.getIsBluetoothEnabled(),
+			advertising_id: proto.getAdvertisingId(),
+			ip: proto.getIp(),
+			notification_authorization: proto.getNotificationAuthorization()
+		}
+
+	
+		expect(exp).to.deep.equal(got)
 		
 	})
 })

@@ -18,8 +18,12 @@ module.exports = function(AudienceClient, logger) {
 		if (vp === null || vp === undefined) {
 			return null
 		}
-		const version = `${vp.getMajor()}.${vp.getMinor()}.${vp.getRevision()}`
-		return version
+
+		return {
+			major: vp.getMajor(),
+			minor: vp.getMinor(),
+			revision: vp.getRevision()
+		}
 	}
 
 	function versionToProto(v) {
@@ -200,6 +204,10 @@ module.exports = function(AudienceClient, logger) {
 	}
 
 	function attributesToProto(attrMap, attrs) {
+		if (attrs === null || attrs === undefined) {
+			return
+		}
+		
 		Object.keys(attrs).forEach(key => {
 			const value = valueToProto(attrs[key])
 			if (value) {
