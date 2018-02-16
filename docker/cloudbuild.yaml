@@ -242,6 +242,16 @@ steps:
     dir: 'apis/node'
     waitFor:
       - 'install-complete'
+
+# SDK-API
+  - id: 'test-sdk-api'
+    name: 'node:6.9.1'
+    entrypoint: 'npm'
+    args:
+      - test
+    dir: 'sdk-api'
+    waitFor:
+      - 'install-complete'
       
 # Bulk Gateway
   - id: 'test-bulk-gateway'
@@ -264,7 +274,9 @@ steps:
     waitFor:
         - 'test-auth-service'
         - 'test-audience-service'
+        - 'test-campaigns-service'
         - 'test-rover-apis'
+        - 'test-sdk-api'
         - 'test-bulk-gateway'
 
 # End Test Stage
