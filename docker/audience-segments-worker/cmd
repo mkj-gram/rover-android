@@ -17,7 +17,7 @@ configure_pubsub() {
 }
 
 run() {
-    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/segments-worker/main.go -gcp-project-id=${GCP_PROJECT_ID} -pubsub-subscription=${PUBSUB_SUBSCRIPTION} -mongo-dsn=${AUDIENCE_SERVICE_MONGO_DSN} -elastic-dsn=${AUDIENCE_SERVICE_ELASTIC_DSN}
+    go run /go/src/github.com/roverplatform/rover/audience/service/cmd/segments-worker/main.go
 }
 
 
