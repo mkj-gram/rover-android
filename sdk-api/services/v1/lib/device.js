@@ -18,10 +18,7 @@ module.exports = function(AudienceClient, logger) {
 		if (vp === null || vp === undefined) {
 			return null
 		}
-		const version = {}
-		version.major = vp.getMajor()
-		version.minor = vp.getMinor()
-		version.revision = vp.getRevision()
+		const version = `${vp.getMajor()}.${vp.getMinor()}.${vp.getRevision()}`
 		return version
 	}
 
@@ -78,6 +75,7 @@ module.exports = function(AudienceClient, logger) {
 		}
 	}
 
+	
 	function geofenceRegionFromProto(gp) {
   		const region = {}
   		region.id = gp.getId()
@@ -101,6 +99,24 @@ module.exports = function(AudienceClient, logger) {
 		region.uuid = ibp.getUuid()
 		region.major = ibp.getMajor() < 0 ? null : ibp.getMajor()
 		region.minor = ibp.getMinor() < 0 ? null : ibp.getMinor()
+		return region
+	}
+
+	function ibeaconRegionToProto(ibeacon) {
+		const region = new RoverApis.audience.v1.Models.IBeaconRegion()
+		region.setUuid(ibeacon.uuid)
+		if (ibeacon.major === null) {
+			region.setMajor(-1)
+		} else {
+			region.setMajor(ibeacon.major)
+		}
+
+		if (ibeacon.minor === null) {
+			region.setMinor(-1)
+		} else {
+			region.setMinor(ibeacon.minor)
+		}
+		
 		return region
 	}
 
@@ -171,24 +187,6 @@ module.exports = function(AudienceClient, logger) {
 		}
 
 		return protoValue
-	}
-
-	function ibeaconRegionToProto(ibeacon) {
-		const region = new RoverApis.audience.v1.Models.IBeaconRegion()
-		region.setUuid(ibeacon.uuid)
-		if (ibeacon.major === null) {
-			region.setMajor(-1)
-		} else {
-			region.setMajor(ibeacon.major)
-		}
-
-		if (ibeacon.minor === null) {
-			region.setMinor(-1)
-		} else {
-			region.setMinor(region.minor)
-		}
-
-		return region
 	}
 
 	function attributesFromProto(attrMap) {
@@ -270,10 +268,14 @@ module.exports = function(AudienceClient, logger) {
 		device.ibeacon_monitoring_regions = dp.getIbeaconMonitoringRegionsList().map(ibeaconRegionFromProto)
 
 		device.is_test_device = dp.getIsTestDevice() || false
+		device.label = dp.getLabel()
 
 		return device
 	}
 
+	// export private function
+	methods.deviceFromProto = deviceFromProto
+	
 	methods.deviceToProto = function(device) {
 		let dp = new RoverApis.audience.v1.Models.Device()
 
@@ -286,7 +288,7 @@ module.exports = function(AudienceClient, logger) {
 		dp.setProfileIdentifier(device.profile_identifier)
 
 		// custom attributes
-		attributesToProto(dp.getAttributesMap(), device)
+		attributesToProto(dp.getAttributesMap(), device.attributes)
 
 		// Tokens
 		dp.setPushEnvironment(device.push_environment)
@@ -337,14 +339,18 @@ module.exports = function(AudienceClient, logger) {
 		dp.setLocationAccuracy(device.location_accuracy)
 		dp.setLocationLatitude(device.location_latitude)
 		dp.setLocationLongitude(device.location_longitude)
+		dp.setLocationCountry(device.location_country)
+		dp.setLocationState(device.location_state)
+		dp.setLocationCity(device.location_city)
 
 		dp.setIbeaconMonitoringRegionsUpdatedAt(RoverApis.Helpers.timestampToProto(device.ibeacon_monitoring_regions_updated_at))
 		dp.setGeofenceMonitoringRegionsUpdatedAt(RoverApis.Helpers.timestampToProto(device.geofence_monitoring_regions_updated_at))
 
 		dp.setGeofenceMonitoringRegionsList((device.geofence_monitoring_regions || []).map(geofenceRegionToProto))
-	
+		dp.setIbeaconMonitoringRegionsList((device.ibeacon_monitoring_regions || []).map(ibeaconRegionToProto))
 
 		dp.setIsTestDevice(device.is_test_device)
+		dp.setLabel(device.label)
 
 		return dp
 	}
@@ -414,16 +420,13 @@ module.exports = function(AudienceClient, logger) {
 		})
 	}
 
-	methods.updateDeviceWithContext = function(accountId, deviceId, deviceContext, callback) {
-			let request = new RoverApis.audience.v1.Models.UpdateDeviceRequest()
-  		request.setAuthContext(buildAuthContext(accountId))
-  		request.setDeviceId(deviceId)
-      // TODO: should profile_identifier be part of the update?
-  		// request.setProfileIdentifier(deviceContext.profile_identifier)
-
-  		/*
+	methods.deviceContextToProto = function(accountId, deviceId, deviceContext) {
+		let request = new RoverApis.audience.v1.Models.UpdateDeviceRequest()
+		/*
   			Build Request
   		 */
+  		request.setAuthContext(buildAuthContext(accountId))
+  		request.setDeviceId(deviceId)
   		request.setPushEnvironment(deviceContext.push_environment)
   		request.setPushTokenKey(deviceContext.push_token)
   		request.setAppName(deviceContext.app_name)
@@ -463,6 +466,12 @@ module.exports = function(AudienceClient, logger) {
   		request.setAdvertisingId(deviceContext.advertising_id)
   		request.setIp(deviceContext.ip)
   		request.setNotificationAuthorization(notificationAuthorizationToProto(deviceContext.notification_authorization))
+
+  		return request
+	}
+
+	methods.updateDeviceWithContext = function(accountId, deviceId, deviceContext, callback) {
+		let request = methods.deviceContextToProto(accountId, deviceId, deviceContext)
 
   		AudienceClient.updateDevice(request, function(err, reply) {
   			if (err) {
