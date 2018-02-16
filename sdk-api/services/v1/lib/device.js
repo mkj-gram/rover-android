@@ -95,7 +95,7 @@ module.exports = function(AudienceClient, logger) {
 			case RoverApis.audience.v1.Models.PushEnvironment.Value.PRODUCTION:
 				return "production"
 			case RoverApis.audience.v1.Models.PushEnvironment.Value.DEVELOPMENT:
-				return "production"
+				return "development"
 			default:
 				return "production"
 		}

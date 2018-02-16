@@ -118,6 +118,50 @@ describe('Device', function() {
 		expect(got).to.deep.include(exp)
 	})
 
+	describe('PushEnvironment', function() {
+		it('preserves production value', function() {
+			const input = {
+				push_environment: "production"
+			}
+
+			const exp = {
+				push_environment: "production"
+			}
+
+			const got = Device.deviceFromProto(AudienceProtobuf.Device.deserializeBinary(Device.deviceToProto(input).serializeBinary()))
+
+			expect(got).to.deep.include(exp)
+		})
+
+		it('maps development to constant DEVELOPMENT', function() {
+			const input = {
+				push_environment: "development"
+			}
+
+			const exp = {
+				push_environment: "development"
+			}
+
+			const got = Device.deviceFromProto(AudienceProtobuf.Device.deserializeBinary(Device.deviceToProto(input).serializeBinary()))
+
+			expect(got).to.deep.include(exp)
+		})
+
+		it('maps unknown to constant UNKNOWN', function() {
+			const input = {
+				push_environment: "unknown"
+			}
+
+			const exp = {
+				push_environment: "production"
+			}
+
+			const got = Device.deviceFromProto(AudienceProtobuf.Device.deserializeBinary(Device.deviceToProto(input).serializeBinary()))
+
+			expect(got).to.deep.include(exp)
+		})
+	})
+
 	it('builds device context request', function() {
 		const input = {
 			push_environment: "production",
