@@ -268,7 +268,13 @@ func main() {
 	} else {
 		stdout.Println("gcp.errors=off")
 		stdout.Println("gcp.tracing=off")
-		stdout.Println("gcp.pubsub=off")
+		stdout.Println("gcp.pubsub=off|logging")
+
+		// development mode just logs notifications
+		notifier = service.FuncNotifier(func(ctx context.Context, msg service.Message) error {
+			stdout.Printf("%+v\n", msg)
+			return nil
+		})
 	}
 
 	//

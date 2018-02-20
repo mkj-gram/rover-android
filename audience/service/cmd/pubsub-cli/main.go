@@ -10,13 +10,12 @@ import (
 )
 
 var (
-	topicName    = flag.String("topic-name", "audience-service-dev-topic", "pubsub's local topic name to push updates to")
-	subscription = flag.String("subscription", "audience-service-dev-subscription", "pubsub's local subscription to local topic name")
+	topicName    = flag.String("pubsub-topic-name", "audience-service-dev-topic", "pubsub's local topic name to push updates to")
+	subscription = flag.String("pubsub-subscription", "audience-service-dev-subscription", "pubsub's local subscription to local topic name")
 	gcpProjectID = flag.String("gcp-project-id", "rover-development", "GCP PROJECT_ID")
 )
 
 func main() {
-	flag.EnvironmentPrefix = "PUBSUB"
 	flag.CommandLine.Init("", flag.ExitOnError)
 	flag.Parse()
 
@@ -68,5 +67,5 @@ func main() {
 		}
 	}
 
-	return
+	stdout.Println("PubSub configured successfully")
 }

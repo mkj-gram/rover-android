@@ -71,6 +71,7 @@ services:
     environment:
       NODE_ENV: development
       GRAPHQL_HOST: "http://graphql-gateway/graphql"
+
   audience-service:
     image: golang:1.9-alpine
     depends_on:
@@ -84,11 +85,15 @@ services:
     working_dir: /go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
+      AUDIENCE_SERVICE_PUBSUB_TOPIC_NAME: "audience-service-dev-topic"
       AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_dev"
       AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic5:9200"
+      AUDIENCE_SERVICE_NOTIFIER_FLUSH_INTERVAL: 5s
+      AUDIENCE_SERVICE_GCP_PROJECT_ID: "rover-development"
       PUBSUB_EMULATOR_HOST: "pubsub:8085"
       GCP_PROJECT_ID: "rover-development"
-      PUBSUB_TOPIC_NAME: "audience-service-dev-topic"
+      PUBSUB_TOPIC_NAME: "audience-service-dev-topic"           # Used in pubsub-cli to configure the topic
+      PUBSUB_SUBSCRIPTION: "audience-service-dev-subscription"  # Used in pubsub-cli to configure the topic
 
   segments-worker:
     image: golang:1.9-alpine
@@ -101,11 +106,15 @@ services:
       - ../:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover
     environment: 
-      AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_dev"
-      AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic5:9200"
+      SEGMENTS_WORKER_MONGO_DSN: "mongodb://mongo:27017/audience_service_dev"
+      SEGMENTS_WORKER_ELASTIC_DSN: "http://elastic5:9200"
+      SEGMENTS_WORKER_PUBSUB_SUBSCRIPTION: "audience-service-dev-subscription"
+      SEGMENTS_WORKER_GCP_PROJECT_ID: "rover-development"
       PUBSUB_EMULATOR_HOST: "pubsub:8085"
       GCP_PROJECT_ID: "rover-development"
-      PUBSUB_SUBSCRIPTION: "audience-service-dev-subscription"
+      PUBSUB_TOPIC_NAME: "audience-service-dev-topic"           # Used in pubsub-cli to configure the topic
+      PUBSUB_SUBSCRIPTION: "audience-service-dev-subscription"  # Used in pubsub-cli to configure the topic
+      
   
   auth-service:
     image: golang:1.9-alpine
