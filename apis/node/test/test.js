@@ -45,6 +45,77 @@ describe('Struct', function() {
 })
 
 
+
+/**
+ *  rover.protobuf.Version Tests
+ */
+const Version = require("../protobuf/version_pb.js").Version
+require("../protobuf/version_pb_ext.js")
+
+describe('Version', function() {
+
+	it('throws an error when input is not an object or a string', function() {
+		expect(function() {
+			Version.fromJavaScript(1)
+		}).to.throw('unsupported value: 1')
+	})
+
+	it('throws an error when input is a string but does not match version regex', function() {
+		expect(function() {
+			Version.fromJavaScript("hello.hello")
+		}).to.throw('unrecognized input, must be in the form of (^\d+\.\d+\.\d+$|^\d+\.\d+$) got: "hello.hello"')
+	})
+
+	it('parses string values', function() {
+		const got = Version.fromJavaScript("1.3")
+		expect(got.getMajor()).to.equal(1)
+		expect(got.getMinor()).to.equal(3)
+
+		const got2 = Version.fromJavaScript("3.4.2")
+		expect(got2.getMajor()).to.equal(3)
+		expect(got2.getMinor()).to.equal(4)
+		expect(got2.getRevision()).to.equal(2)
+	})
+
+	it('parses version objects', function() {
+		const got = Version.fromJavaScript({ major: 4, minor: 3 })
+		expect(got.getMajor()).to.equal(4)
+		expect(got.getMinor()).to.equal(3)
+
+		const got2 = Version.fromJavaScript({ major: 3, minor: 10, revision: 6 })
+		expect(got2.getMajor()).to.equal(3)
+		expect(got2.getMinor()).to.equal(10)
+		expect(got2.getRevision()).to.equal(6)
+	})
+
+	it('maps back to a version string', function() {
+		const input	= "3.1.4"
+		const exp	= "3.1.4"
+		const got	= Version.fromJavaScript(input).toStringValue()
+
+		expect(exp).to.equal(got)
+	})
+
+	it('maps back to a version object', function() {
+		const input = {
+			major: 3,
+			minor: 1,
+			revision: 4
+		}
+
+		const exp = {
+			major: 3,
+			minor: 1,
+			revision: 4
+		}
+
+		const got = Version.fromJavaScript(input).toObjectValue()
+
+		expect(exp).to.deep.equal(got)
+	})
+})
+
+
 /**
  *  rover.protobuf.Wrappers Tests
  */
