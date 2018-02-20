@@ -1,7 +1,8 @@
-FROM golang:alpine
+# from https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go
+FROM golang:1.9-alpine
 
 # Install VCS tools to support "go get" commands and install gcc.
-RUN apk add --update --no-cache git mercurial subversion build-base
+RUN apk add --update --no-cache git bash build-base
 
 # We blank out the GOPATH because the base image sets it, and
 # if the user of this build step does *not* set it, we want to
@@ -10,11 +11,9 @@ ENV GOPATH=
 
 RUN mkdir /builder
 
-COPY go_workspace.go prepare_workspace.inc /builder/
+COPY prepare_workspace.inc /builder/
 
 COPY go.ash /builder/bin/
 ENV PATH=/builder/bin:$PATH
-
-RUN go build -o /builder/go_workspace /builder/go_workspace.go
 
 ENTRYPOINT ["go.ash"]

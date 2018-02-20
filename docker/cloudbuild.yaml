@@ -287,7 +287,7 @@ steps:
 
 # Auth Service
   - id: 'build-auth-service-executable'
-    name: 'gcr.io/cloud-builders/go:alpine'
+    name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
@@ -309,7 +309,7 @@ steps:
 
 # Audience Service
   - id: 'build-audience-service-executable'
-    name: 'gcr.io/cloud-builders/go:alpine'
+    name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
@@ -330,7 +330,7 @@ steps:
 
 # Campaigns Service
   - id: 'build-campaigns-service-executable'
-    name: 'gcr.io/cloud-builders/go:alpine'
+    name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
@@ -351,7 +351,7 @@ steps:
 
 # Audience Segments Worker
   - id: 'build-audience-segments-worker-executable'
-    name: 'gcr.io/cloud-builders/go:alpine'
+    name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
