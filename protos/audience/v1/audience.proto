@@ -346,8 +346,8 @@ message UpdateDeviceRequest {
 
   string device_id = 2;
 
-  // Custom attributes
-  map<string, Value> attributes = 3;
+  // DEPRECATED
+  map<string, Value> attributes = 3 [deprecated = true];
 
   string push_environment             = 10;
   string push_token_key               = 11;

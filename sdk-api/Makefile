@@ -12,5 +12,10 @@ install:
 run:
 	${DC} run --service-ports --rm sdk-api
 
+test:
+	${DC} run --rm sdk-api npm test
+
 shell:
 	${DC} run --rm sdk-api bash
+
+.PHONY: start stop install run test shell
