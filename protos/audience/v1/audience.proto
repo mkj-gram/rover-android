@@ -960,9 +960,26 @@ message QueryRequest {
   PredicateAggregate predicate_aggregate = 2 [deprecated = true];
 
   oneof query {
-  // query using the predicate aggregate
-    PredicateAggregate predicate           = 11;
-    QuerySegments query_segments           = 12;
+    // query using multiple predicate aggregates
+    PredicateAggregateAggregate query_predicate_aggregates  = 10;
+    // query using signle predicate aggregate
+    PredicateAggregate query_predicate_aggregate            = 11;
+    // query using mutliple predicate aggregates
+    // taken from specified segments
+    QuerySegments query_segments                            = 12;
+  }
+
+  oneof iterator {
+    PageIterator page_iterator      = 3;
+    ScrollIterator scroll_iterator  = 4;
+  }
+
+  // Optional
+  TimeZoneOffset time_zone_offset   = 5;
+
+  message PredicateAggregateAggregate {
+    repeated PredicateAggregate     predicate_aggregates = 1;
+    PredicateAggregate.Condition               condition = 2;
   }
 
   // FromSegments instructs service to merge segments' predicate aggregates using the condition
@@ -1019,13 +1036,6 @@ message QueryRequest {
     int32 seconds = 1;
   }
 
-  oneof iterator {
-    PageIterator page_iterator = 3;
-    ScrollIterator scroll_iterator = 4;
-  }
-
-  // Optional
-  TimeZoneOffset time_zone_offset = 5;
 }
 
 message QueryResponse {

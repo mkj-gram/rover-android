@@ -185,3 +185,52 @@
     ]
   }
 }
+
+
+{
+  "_id":{"$oid":"111000000000000000000000"},
+  "account_id":1,
+  "title": "device_id=d2",
+  "is_archived": false,
+  "segment_size": 1,
+  "created_at": {"$date":"2017-08-13T09:10:18Z"},
+  "updated_at": {"$date":"2017-08-13T09:10:18Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      {
+        "selector": "DEVICE",
+        "predicate": {
+          "type": "string",
+          "attribute_name": "device_id",
+          "op": {"$numberLong": 2},
+          "value": "d2"
+        }
+      }
+    ]
+  }
+}
+
+{
+  "_id":{"$oid":"112000000000000000000000"},
+  "account_id":1,
+  "title": "profile_identifier=p1",
+  "is_archived": false,
+  "segment_size": 1,
+  "created_at": {"$date":"2017-08-13T09:10:18Z"},
+  "updated_at": {"$date":"2017-08-13T09:10:18Z"},
+  "predicate_aggregate": {
+    "condition": 1,
+    "predicates": [
+      {
+        "selector": "DEVICE",
+        "predicate": {
+          "type": "string",
+          "attribute_name": "profile_identifier",
+          "op": {"$numberLong": 2},
+          "value": "p1"
+        }
+      }
+    ]
+  }
+}

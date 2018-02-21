@@ -67,6 +67,42 @@ func (s *dynamicSegmentsStore) FindDynamicSegmentById(ctx context.Context, segme
 	return &proto, nil
 }
 
+// ListDynamicSegmentByIds finds dynamics segment by ids
+func (s *dynamicSegmentsStore) ListDynamicSegmentsByIds(ctx context.Context, acctId int32, segment_ids []string) ([]*audience.DynamicSegment, error) {
+	var ids []bson.ObjectId
+
+	for i := range segment_ids {
+		if !bson.IsObjectIdHex(segment_ids[i]) {
+			continue
+		}
+		ids = append(ids, bson.ObjectIdHex(segment_ids[i]))
+	}
+
+	var (
+		Q = bson.M{
+			"account_id": acctId,
+			"_id":        bson.M{"$in": ids},
+		}
+
+		ds []*DynamicSegment
+	)
+
+	if err := s.dynamic_segments().Find(Q).All(&ds); err != nil {
+		return nil, wrapError(err, "dynamic_segments.Find")
+	}
+
+	var dspb []*audience.DynamicSegment
+	for i := range ds {
+		var proto audience.DynamicSegment
+		if err := ds[i].toProto(&proto); err != nil {
+			return nil, wrapError(err, "dynamic_segment.toProto")
+		}
+		dspb = append(dspb, &proto)
+	}
+
+	return dspb, nil
+}
+
 // GetDynamicSegmentById finds a dynamic segment by id scoped by account
 func (s *dynamicSegmentsStore) GetDynamicSegmentById(ctx context.Context, r *audience.GetDynamicSegmentByIdRequest) (*audience.DynamicSegment, error) {
 	var (

@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/net/context"
-
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 
 	"google.golang.org/grpc"
@@ -43,22 +41,8 @@ type (
 	}
 )
 
-type nopIndex struct{}
-
-func (i *nopIndex) Query(context.Context, *audience.QueryRequest) (*audience.QueryResponse, error) {
-	return nil, nil
-}
-func (i *nopIndex) GetDeviceTotalCount(context.Context, int) (int64, error) {
-	return 0, nil
-}
-func (i *nopIndex) GetProfileTotalCount(context.Context, int) (int64, error) {
-	return 0, nil
-}
-func (i *nopIndex) GetFieldSuggestion(context.Context, *audience.GetFieldSuggestionRequest) (*audience.GetFieldSuggestionResponse, error) {
-	return nil, nil
-}
-
 func truncateColl(t *testing.T, colls ...*mgo.Collection) {
+	t.Helper()
 	for _, coll := range colls {
 		if err := coll.DropCollection(); err != nil {
 			if err.Error() == "ns not found" {
@@ -70,6 +54,8 @@ func truncateColl(t *testing.T, colls ...*mgo.Collection) {
 }
 
 func loadFixture(t *testing.T, coll *mgo.Collection, fixturePath string) {
+	t.Helper()
+
 	f, err := os.Open(fixturePath)
 	if err != nil {
 		t.Fatal("testdata:", err)
@@ -87,6 +73,7 @@ func loadFixture(t *testing.T, coll *mgo.Collection, fixturePath string) {
 
 // predictable object id generator
 func tNewObjectIdFunc(t *testing.T, seed int64) func() bson.ObjectId {
+	t.Helper()
 	var rnd = rand.New(rand.NewSource(seed))
 
 	return func() bson.ObjectId {

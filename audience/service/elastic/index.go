@@ -55,34 +55,78 @@ func (q *Index) GetProfileTotalCount(ctx context.Context, accountId int) (int64,
 }
 
 func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.QueryResponse, error) {
-	var (
-		indexName = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
-	)
-
 	if r.PredicateAggregate != nil {
 		panic(fmt.Errorf("QueryRequest.PredicateAggregate is deprecated"))
 	}
 
-	var predicate *audience.PredicateAggregate
-	if p, ok := r.Query.(*audience.QueryRequest_Predicate); ok {
-		predicate = p.Predicate
-	}
+	var (
+		indexName = q.IndexName(strconv.Itoa(int(r.GetAuthContext().GetAccountId())))
+	)
 
-	rq, err := DeviceAndProfilePredicateAggregateToQuery(predicate, r.GetTimeZoneOffset())
-	if err != nil {
-		return nil, errors.Wrap(err, "ToQuery")
+	var query M
+	switch val := r.Query.(type) {
+	default:
+		// query all by default
+		query = M{
+			"bool": M{
+				"filter": M{
+					"bool": M{},
+				},
+			},
+		}
+	// single predicate aggregate
+	case *audience.QueryRequest_QueryPredicateAggregate:
+		rq, err := DeviceAndProfilePredicateAggregateToQuery(val.QueryPredicateAggregate, r.GetTimeZoneOffset())
+		if err != nil {
+			return nil, errors.Wrap(err, "PredicateToQuery")
+		}
+		if q, present := rq["query"].(M); !present {
+			panic("no query defined")
+		} else {
+			query = q
+		}
+
+	// multiple predicate aggregates
+	case *audience.QueryRequest_QueryPredicateAggregates:
+		var root []M
+
+		for _, pa := range val.QueryPredicateAggregates.PredicateAggregates {
+			rq, err := DeviceAndProfilePredicateAggregateToQuery(pa, r.GetTimeZoneOffset())
+			if err != nil {
+				return nil, errors.Wrap(err, "PredicatesToQuery")
+			}
+			// TODO: refactor
+			rootQ := rq["query"].(M)["bool"].(M)["filter"].(M)
+
+			root = append(root, rootQ)
+		}
+
+		var condition string
+		switch cond := val.QueryPredicateAggregates.GetCondition(); cond {
+		case audience.PredicateAggregate_ALL:
+			condition = "must"
+		case audience.PredicateAggregate_ANY:
+			condition = "should"
+		default:
+			return nil, errors.Wrapf(InvalidArgument, "unknown condition: %v", cond)
+		}
+
+		query = M{
+			"bool": M{
+				"filter": M{
+					"bool": M{
+						condition: root,
+					},
+				},
+			},
+		}
 	}
 
 	var (
-		query, present = rq["query"].(M)
-		doer           interface {
+		doer interface {
 			Do(context.Context) (*elastic.SearchResult, error)
 		}
 	)
-
-	if !present {
-		panic("no query defined")
-	}
 
 	switch typ := r.GetIterator().(type) {
 	case nil:
