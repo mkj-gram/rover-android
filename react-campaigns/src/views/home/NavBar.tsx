@@ -1,6 +1,7 @@
 /// <reference path="../../../typings/index.d.ts" />
 import * as React from 'react'
 import { almostWhite, Button, titanium } from '@rover/ts-bootstrap/dist/src'
+import { Link } from 'react-router-dom'
 
 export interface Props {
     media: Media
@@ -15,9 +16,11 @@ const NavBar: React.SFC<Props> = ({ media, onCreate, style }) => {
         borderBottom: `1px solid ${titanium}`,
         flex: 'none'
     }
+
     return (
         <div style={{ height: 97, ...baseStyle }}>
             {media}
+
             <Button
                 onClick={onCreate}
                 text="create campaign"

@@ -1,20 +1,24 @@
 /// <reference path="../typings/index.d.ts" />
 import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 import NavBar from './NavBar'
 import { titanium, white } from '../styles/colors'
-import { Manager, Target, Popper, Arrow } from 'react-popper'
+import { Popper, Arrow } from 'react-popper'
 import PopperJS from 'popper.js'
 
-interface PopoverProps {
+export type func = () => void
+
+export interface PopoverProps {
     placement?: PopperJS.Placement
     children?: JSX.Element
     containerStyle?: React.CSSProperties
     toggle?: () => void
     arrowColors?: StringMap<string>
-    navBarProperties?: StringMap<string | number | object>
+    navBarProperties?: StringMap<string | number | object | func>
 
     toggleable?: boolean
     targetId: string
+    targetParent?: string
 }
 
 class Popover extends React.Component<PopoverProps, {}> {
@@ -163,7 +167,7 @@ class Popover extends React.Component<PopoverProps, {}> {
     }
 
     render() {
-        let { placement } = this.props
+        let { placement, targetParent } = this.props
         let { primary, border } = this.props.arrowColors
 
         const modifiers = {
@@ -182,9 +186,19 @@ class Popover extends React.Component<PopoverProps, {}> {
         }
 
         const Fragment = React.Fragment
-        return (
-            <div ref={this.setWrapperRef}>
-                <style type="text/css">{`
+        let node = (
+            <div
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    zIndex: 2,
+                    position: 'absolute',
+                    top: 0,
+                    backgroundColor: 'rgba(0,0,0,0.02)'
+                }}
+            >
+                <div ref={this.setWrapperRef}>
+                    <style type="text/css">{`
                     .popper {                        
                         width: 150px;
                         border-radius: 2px;
@@ -275,16 +289,22 @@ class Popover extends React.Component<PopoverProps, {}> {
                     }
                     
                 `}</style>
-                <Popper
-                    modifiers={modifiers}
-                    placement={placement}
-                    className="popper"
-                >
-                    <Arrow className="popper__arrow" />
-                    {this.evalChild()}
-                    {this.props.children}
-                </Popper>
+                    <Popper
+                        modifiers={modifiers}
+                        placement={placement}
+                        className="popper"
+                    >
+                        <Arrow className="popper__arrow" />
+                        {this.evalChild()}
+                        {this.props.children}
+                    </Popper>
+                </div>
             </div>
+        )
+
+        return ReactDOM.createPortal(
+            node,
+            document.getElementById(targetParent)
         )
     }
 }

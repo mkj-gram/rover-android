@@ -2,21 +2,15 @@
 import { AnyAction } from 'redux'
 
 export default (
-    state: StringMap<Campaign>,
+    state: StringMap<Campaign> = {},
     action: AnyAction
 ): StringMap<Campaign> | null => {
     if (action.campaigns) {
-        const { campaigns } = action
-        const newCampaigns = {
-            ...state.campaigns,
-            ...campaigns
-        }
         return {
-            ...state,
-            ...newCampaigns
+            ...action.campaigns
         }
     }
-    return { ...state }
+    return state
 }
 
 export const getCampaign = (state: StringMap<Campaign>, id: string) =>

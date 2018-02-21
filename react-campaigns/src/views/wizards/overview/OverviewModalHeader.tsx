@@ -1,0 +1,254 @@
+/// <reference path="../../../../typings/index.d.ts"/>
+import * as React from 'react'
+import { connect, Dispatch } from 'react-redux'
+import { withRouter, RouteComponentProps, Redirect } from 'react-router'
+import {
+    renameCampaign,
+    duplicateCampaign,
+    archiveCampaign
+} from '../../../actions/campaigns'
+import { handleOverviewModalDisplay } from '../../../actions/modal'
+import { Link } from 'react-router-dom'
+import * as H from 'history'
+
+import {
+    turquoise,
+    white,
+    CloseIcon,
+    MoreIcon,
+    Text,
+    PopoverContainer,
+    titanium
+} from '@rover/ts-bootstrap/dist/src'
+
+import ShowMorePopoverChildren from '../../utils/ShowMorePopoverChildren'
+
+export type OverviewModalHeaderProps = {
+    campaignName: string
+    campaignType: string
+    onExit?: () => void
+    onMore?: () => void
+    campaignId: string
+}
+
+export type OverviewModalHeaderState = {
+    showPopover: boolean
+    rename: boolean
+}
+
+export interface routerProps {
+    history: H.History
+    location: H.Location
+}
+
+export interface DispatchProps {
+    renameCampaign: (name: string, campaignId: number) => void
+    duplicateCampaign: (name: string, campaignId: number) => void
+    archiveCampaign: (campaignId: number) => void
+    handleOverviewModalDisplay: (history: H.History) => void
+}
+
+class OverviewModalHeader extends React.Component<
+    OverviewModalHeaderProps &
+        DispatchProps &
+        routerProps &
+        // tslint:disable-next-line:no-any
+        RouteComponentProps<any>,
+    OverviewModalHeaderState
+> {
+    constructor(
+        props: OverviewModalHeaderProps &
+            DispatchProps &
+            routerProps &
+            // tslint:disable-next-line:no-any
+            RouteComponentProps<any>
+    ) {
+        super(props)
+        this.state = {
+            showPopover: false,
+            rename: false
+        }
+        this.handleShowMore = this.handleShowMore.bind(this)
+        this.getCampaignType = this.getCampaignType.bind(this)
+        this.handleShowMoreSelection = this.handleShowMoreSelection.bind(this)
+        this.handleRename = this.handleRename.bind(this)
+        this.handleClose = this.handleClose.bind(this)
+    }
+
+    handleShowMore() {
+        this.setState({
+            showPopover: !this.state.showPopover
+        })
+    }
+
+    getCampaignType(val: string) {
+        switch (val) {
+            case 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION': {
+                return 'Scheduled Notification Campaign'
+            }
+            case 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION': {
+                return 'Automated Notification Campaign'
+            }
+            default: {
+                return 'ERROR'
+            }
+        }
+    }
+
+    handleShowMoreSelection(val: string) {
+        const {
+            campaignName,
+            campaignId,
+            archiveCampaign,
+            duplicateCampaign
+        } = this.props
+
+        if (val === 'Rename') {
+            this.setState({
+                rename: true,
+                showPopover: false
+            })
+        } else if (val === 'Duplicate') {
+            duplicateCampaign(`${campaignName}- Copy`, parseInt(campaignId, 10))
+            this.setState({
+                showPopover: false
+            })
+        } else if (val === 'Archive') {
+            archiveCampaign(parseInt(campaignId, 10))
+            this.setState({
+                showPopover: false
+            })
+        }
+    }
+
+    handleRename(name: string) {
+        this.props.renameCampaign(name, parseInt(this.props.campaignId, 10))
+        this.setState({
+            rename: false
+        })
+    }
+
+    handleClose() {
+        this.props.handleOverviewModalDisplay(this.props.history)
+    }
+
+    render() {
+        const { campaignName, campaignType, onExit, onMore } = this.props
+
+        const popoverProps = {
+            placement: 'top-end',
+            containerStyle: {
+                width: 320,
+                background: white,
+                flexDirection: 'column',
+                borderRadius: 3,
+                border: `1px solid ${titanium}`
+            }
+        }
+
+        return (
+            <div
+                style={{
+                    height: 152,
+                    width: '100%',
+                    background: turquoise,
+                    flex: 'none'
+                }}
+            >
+                <div
+                    style={{
+                        margin: '16px 32px 32px 32px'
+                    }}
+                >
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        <div onClick={this.handleClose}>
+                            <CloseIcon fill={white} />
+                        </div>
+
+                        <PopoverContainer
+                            id="moreIcon"
+                            popoverProps={popoverProps}
+                            targetParent="root"
+                            onClick={this.handleShowMore}
+                            showPopover={this.state.showPopover}
+                        >
+                            {[
+                                <MoreIcon fill={white} key="moreIcon1" />,
+                                <ShowMorePopoverChildren
+                                    key="moreIcon2"
+                                    names={['Rename', 'Duplicate', 'Archive']}
+                                    onClick={this.handleShowMoreSelection}
+                                />
+                            ]}
+                        </PopoverContainer>
+                    </div>
+                    <div
+                        style={{
+                            marginTop: 16
+                        }}
+                    >
+                        <Text
+                            text={campaignName}
+                            size="h1"
+                            textStyle={{ color: white }}
+                            contentEditable={this.state.rename}
+                            handleChange={this.handleRename}
+                            id="renameCampaign"
+                        />
+                    </div>
+                    <div>
+                        <Text
+                            text={this.getCampaignType(campaignType)}
+                            size="medium"
+                            textStyle={{ color: white }}
+                        />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
+const mapDispatchToProps = (
+    // tslint:disable-next-line:no-any
+    dispatch: Dispatch<any>,
+    props: routerProps
+): DispatchProps => {
+    const { location, history } = props
+    return {
+        renameCampaign: (name, campaignId) => {
+            dispatch(renameCampaign(name, campaignId))
+        },
+        duplicateCampaign: (name, campaignId) => {
+            dispatch(duplicateCampaign(name, campaignId)).then(id => {
+                let params = location.search.replace(
+                    `campaignId=${campaignId}`,
+                    `campaignId=${id}`
+                )
+
+                history.push(`${location.pathname}${params}`)
+            })
+        },
+        archiveCampaign: campaignId => {
+            dispatch(archiveCampaign(campaignId)).then(complete => {
+                if (complete) {
+                    history.push(`/campaigns/`)
+                }
+            })
+        },
+        handleOverviewModalDisplay: () => {
+            dispatch(handleOverviewModalDisplay(history))
+        }
+    }
+}
+
+const mapStateToProps = (state: State): {} => ({})
+
+export default withRouter(
+    connect(mapStateToProps, mapDispatchToProps)(OverviewModalHeader)
+)

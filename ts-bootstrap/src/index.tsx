@@ -1,9 +1,11 @@
 import Alert from './Alert'
 import Badge from './Badge'
 import Button from './Button'
+import CheckBox from './CheckBox'
 import Dialog from './Dialog'
 import NavBar from './NavBar'
 import Popover from './Popover'
+import PopoverContainer from './PopoverContainer'
 import ProgressBar from './ProgressBar'
 import ProgressBarThin from './ProgressBarThin'
 import RadioButton from './RadioButton'
@@ -54,7 +56,14 @@ import {
     CalendarIcon,
     LinkIcon,
     PhoneIcon,
-    ZapIcon
+    ZapIcon,
+    MoreIcon,
+    CloseIcon,
+    ChevronRightIcon,
+    CheckCircleIcon,
+    RenameIcon,
+    DuplicateIcon,
+    ArchiveIcon
 } from './Icons'
 
 export {
@@ -99,5 +108,14 @@ export {
     CalendarIcon,
     LinkIcon,
     PhoneIcon,
-    ZapIcon
+    ZapIcon,
+    MoreIcon,
+    CloseIcon,
+    ChevronRightIcon,
+    CheckCircleIcon,
+    PopoverContainer,
+    RenameIcon,
+    DuplicateIcon,
+    ArchiveIcon,
+    CheckBox
 }

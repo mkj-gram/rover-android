@@ -11,9 +11,9 @@ import {
 
 import { text as typographyText, semibold } from '../styles/typography'
 
-type propStyle = {
-    innerStyle?: React.CSSProperties
-    outerStyle?: React.CSSProperties
+export type propStyle = {
+    innerStyle?: StringMap<string | number>
+    outerStyle?: StringMap<string | number>
 }
 
 export interface ButtonProps {
@@ -77,21 +77,23 @@ class Button extends React.Component<ButtonProps, ButtonState> {
             case 'large':
                 innerStyle = {
                     ...innerStyle,
-                    padding: '14px 32px 14px 32px',
+                    padding: '16px 32px 16px 32px',
                     fontSize: 16
                 }
                 outerStyle = {
-                    ...outerStyle
+                    ...outerStyle,
+                    height: 48
                 }
                 break
             case 'small':
                 innerStyle = {
                     ...innerStyle,
-                    padding: '7px 24px 7px 24px',
+                    padding: '8px 24px 8px 24px',
                     fontSize: 14
                 }
                 outerStyle = {
-                    ...outerStyle
+                    ...outerStyle,
+                    height: 32
                 }
                 break
         }
@@ -130,7 +132,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
             case 'regular':
                 innerStyle = {
                     ...innerStyle,
-                    color: mouseDown === true ? aquamarine : turquoise,
+                    color: mouseDown === true ? graphite : steel,
                     fontSize: 17,
                     padding: '1px 0px 1px 0px'
                 }

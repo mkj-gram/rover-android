@@ -54,6 +54,7 @@ declare abstract class Campaign {
     campaignId: string
     campaignType: CampaignType
     campaignStatus: CampaignStatus
+    UIState: string
 }
 
 declare class ScheduledCampaign extends Campaign {
@@ -130,6 +131,24 @@ declare class AutomatedNotificationCampaign extends Campaign {
 
 type State = {
     readonly campaigns: StringMap<Campaign>
+    readonly testDevices: StringMap<string>
+    readonly modal: StringMap<string | boolean>
 }
 
 type Media = 'Mobile' | 'Tablet' | 'Desktop'
+
+declare module 'react-media' {
+    var a: any
+    export default a
+}
+
+interface OverviewModalRowContainerProps {
+    name: string
+    text: string
+    val: number | boolean
+}
+
+type RoverSVGProps = {
+    fill?: string
+    style?: StringMap<string | number>
+}

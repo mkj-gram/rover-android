@@ -3,7 +3,7 @@ import Button from './Button'
 import { cloud } from '../styles/colors'
 import { text, medium } from '../styles/typography'
 
-interface NavBarProps {
+export interface NavBarProps {
     buttonLeft?: string
     title?: string
     buttonRight?: string

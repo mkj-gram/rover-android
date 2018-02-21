@@ -22,7 +22,7 @@ const Alert: React.SFC<AlertProps> = ({ message, type, style }) => {
     let messageStyle: StringMap<string | number> = {
         ...small,
         ...text,
-        width: 924,
+        width: '100%',
         height: 36,
         border: '2px solid',
         borderRadius: 4,
