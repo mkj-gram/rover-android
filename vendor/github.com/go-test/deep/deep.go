@@ -100,15 +100,6 @@ func (c *cmp) equals(a, b reflect.Value, level int) {
 	// If differenet types, they can't be equal
 	aType := a.Type()
 	bType := b.Type()
-	if aType != bType {
-		c.saveDiff(aType, bType)
-		logError(ErrTypeMismatch)
-		return
-	}
-
-	// Primitive https://golang.org/pkg/reflect/#Kind
-	aKind := a.Kind()
-	bKind := b.Kind()
 
 	// If both types implement the error interface, compare the error strings.
 	// This must be done before dereferencing because the interface is on a
@@ -123,6 +114,19 @@ func (c *cmp) equals(a, b reflect.Value, level int) {
 			return
 		}
 	}
+
+
+	if aType != bType {
+		c.saveDiff(aType, bType)
+		logError(ErrTypeMismatch)
+		return
+	}
+
+	// Primitive https://golang.org/pkg/reflect/#Kind
+	aKind := a.Kind()
+	bKind := b.Kind()
+
+
 
 	// Dereference pointers and interface{}
 	if aElem, bElem := (aKind == reflect.Ptr || aKind == reflect.Interface),
