@@ -4,7 +4,7 @@ import (
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	"time"
 
-	audience "github.com/roverplatform/rover/apis/go/audience/v1"
+	"github.com/roverplatform/rover/apis/go/audience/v1"
 )
 
 type Device struct {
@@ -95,7 +95,16 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.UpdatedAt, _ = timeToProto(d.UpdatedAt)
 
 	proto.IsTestDevice = d.IsTestDevice
-	proto.PushEnvironment = d.PushEnvironment
+
+	switch d.PushEnvironment {
+	case "production":
+		proto.PushEnvironment = audience.PushEnvironment_PRODUCTION
+	case "development":
+		proto.PushEnvironment = audience.PushEnvironment_DEVELOPMENT
+	default:
+		proto.PushEnvironment = audience.PushEnvironment_UNKNOWN
+	}
+
 	proto.PushTokenKey = d.PushTokenKey
 
 	proto.AppName = d.AppName
@@ -136,7 +145,14 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.Radio = d.Radio
 	proto.TimeZone = d.TimeZone
 
-	proto.Platform = audience.Platform(audience.Platform_value[d.Platform])
+	switch d.Platform {
+	case "MOBILE":
+		proto.Platform = audience.Platform_MOBILE
+	case "WEB":
+		proto.Platform = audience.Platform_WEB
+	default:
+		proto.Platform = audience.Platform_UNKNOWN
+	}
 
 	proto.IsBackgroundEnabled = d.IsBackgroundEnabled
 	proto.IsLocationMonitoringEnabled = d.IsLocationMonitoringEnabled
@@ -159,7 +175,7 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.LocationCity = d.LocationCity
 	proto.LocationUpdatedAt, _ = timeToProto(d.LocationUpdatedAt)
 
-	proto.NotificationAuthorization = audience.NotificationAuthorization(audience.NotificationAuthorization_value[d.NotificationAuthorization])
+	proto.NotificationAuthorization = audience.NotificationAuthorization_Value(audience.NotificationAuthorization_Value_value[d.NotificationAuthorization])
 
 	// TODO:
 	// proto.RegionMonitoringMode = audience.Device_RegionMonitoringMode(audience.Device_RegionMonitoringMode_value[d.RegionMonitoringMode])

@@ -172,7 +172,14 @@ func getDeviceValue(device *audience.Device, attribute_name string) interface{} 
 	case "label":
 		return device.GetLabel()
 	case "push_environment":
-		return device.GetPushEnvironment()
+		switch device.GetPushEnvironment() {
+		case audience.PushEnvironment_PRODUCTION:
+			return "production"
+		case audience.PushEnvironment_DEVELOPMENT:
+			return "development"
+		default:
+			return ""
+		}
 	case "push_token_key":
 		return device.GetPushTokenKey()
 	case "push_token_is_active":
@@ -226,7 +233,16 @@ func getDeviceValue(device *audience.Device, attribute_name string) interface{} 
 	case "time_zone":
 		return device.GetTimeZone()
 	case "platform":
-		return device.GetPlatform()
+		switch device.GetPlatform() {
+		case audience.Platform_MOBILE:
+			return "MOBILE"
+		case audience.Platform_WEB:
+			return "WEB"
+		default:
+			return ""
+		}
+	case "notification_authorization":
+		return device.GetNotificationAuthorization().String()
 	case "is_background_enabled":
 		return device.GetIsBackgroundEnabled()
 	case "is_location_monitoring_enabled":

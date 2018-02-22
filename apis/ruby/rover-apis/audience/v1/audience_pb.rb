@@ -99,7 +99,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
     optional :push_token_key, :string, 3
-    optional :push_environment, :string, 4
+    optional :push_environment, :enum, 4, "rover.audience.v1.PushEnvironment.Value"
   end
   add_message "rover.audience.v1.UpdateDevicePushTokenResponse" do
   end
@@ -182,7 +182,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
     map :attributes, :string, :message, 3, "rover.audience.v1.Value"
-    optional :push_environment, :string, 10
+    optional :push_environment, :enum, 10, "rover.audience.v1.PushEnvironment.Value"
     optional :push_token_key, :string, 11
     optional :app_name, :string, 12
     optional :app_version, :string, 13
@@ -204,14 +204,14 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :carrier_name, :string, 28
     optional :radio, :string, 29
     optional :time_zone, :string, 30
-    optional :platform, :enum, 31, "rover.audience.v1.Platform"
+    optional :platform, :enum, 31, "rover.audience.v1.Platform.Value"
     optional :is_background_enabled, :bool, 32
     optional :is_location_monitoring_enabled, :bool, 33
     optional :is_bluetooth_enabled, :bool, 34
     optional :advertising_id, :string, 35
     optional :ip, :string, 36
     optional :region_monitoring_mode, :enum, 37, "rover.audience.v1.Device.RegionMonitoringMode"
-    optional :notification_authorization, :enum, 39, "rover.audience.v1.NotificationAuthorization"
+    optional :notification_authorization, :enum, 39, "rover.audience.v1.NotificationAuthorization.Value"
   end
   add_message "rover.audience.v1.UpdateDeviceResponse" do
   end
@@ -232,7 +232,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :is_test_device, :bool, 7
     optional :label, :string, 8
     map :attributes, :string, :message, 9, "rover.audience.v1.Value"
-    optional :push_environment, :string, 10
+    optional :push_environment, :enum, 10, "rover.audience.v1.PushEnvironment.Value"
     optional :push_token_key, :string, 11
     optional :push_token_is_active, :bool, 12
     optional :push_token_created_at, :message, 13, "google.protobuf.Timestamp"
@@ -257,13 +257,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :carrier_name, :string, 32
     optional :radio, :string, 33
     optional :time_zone, :string, 34
-    optional :platform, :enum, 35, "rover.audience.v1.Platform"
+    optional :platform, :enum, 35, "rover.audience.v1.Platform.Value"
     optional :is_background_enabled, :bool, 36
     optional :is_location_monitoring_enabled, :bool, 37
     optional :is_bluetooth_enabled, :bool, 38
     optional :advertising_id, :string, 39
     optional :ip, :string, 40
-    optional :notification_authorization, :enum, 53, "rover.audience.v1.NotificationAuthorization"
+    optional :notification_authorization, :enum, 53, "rover.audience.v1.NotificationAuthorization.Value"
     optional :location_accuracy, :int32, 41
     optional :location_latitude, :double, 42
     optional :location_longitude, :double, 43
@@ -282,6 +282,40 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :UNDEFINED, 0
     value :ROVER, 1
     value :GIMBAL, 2
+  end
+  add_message "rover.audience.v1.LocationAuthorization" do
+  end
+  add_enum "rover.audience.v1.LocationAuthorization.Value" do
+    value :UNKNOWN, 0
+    value :NOT_DETERMINED, 1
+    value :RESTRICTED, 2
+    value :DENIED, 3
+    value :AUTHORIZED_WHEN_IN_USE, 4
+    value :AUTHORIZED_ALWAYS, 5
+    value :COARSE, 6
+    value :FINE, 7
+  end
+  add_message "rover.audience.v1.NotificationAuthorization" do
+  end
+  add_enum "rover.audience.v1.NotificationAuthorization.Value" do
+    value :UNKNOWN, 0
+    value :NOT_DETERMINED, 1
+    value :AUTHORIZED, 2
+    value :DENIED, 3
+  end
+  add_message "rover.audience.v1.PushEnvironment" do
+  end
+  add_enum "rover.audience.v1.PushEnvironment.Value" do
+    value :UNKNOWN, 0
+    value :PRODUCTION, 1
+    value :DEVELOPMENT, 2
+  end
+  add_message "rover.audience.v1.Platform" do
+  end
+  add_enum "rover.audience.v1.Platform.Value" do
+    value :UNKNOWN, 0
+    value :MOBILE, 1
+    value :WEB, 2
   end
   add_message "rover.audience.v1.IBeaconRegion" do
     optional :uuid, :string, 1
@@ -645,17 +679,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.GetFieldSuggestionResponse" do
     repeated :suggestions, :string, 1
   end
-  add_enum "rover.audience.v1.NotificationAuthorization" do
-    value :UNKNOWN, 0
-    value :NOT_DETERMINED, 1
-    value :AUTHORIZED, 2
-    value :DENIED, 3
-  end
-  add_enum "rover.audience.v1.Platform" do
-    value :UNDEFINED, 0
-    value :MOBILE, 1
-    value :WEB, 2
-  end
   add_enum "rover.audience.v1.Null" do
     value :NULL, 0
   end
@@ -717,6 +740,14 @@ module Rover
       UpdateDeviceCustomAttributesResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceCustomAttributesResponse").msgclass
       Device = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Device").msgclass
       Device::RegionMonitoringMode = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Device.RegionMonitoringMode").enummodule
+      LocationAuthorization = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.LocationAuthorization").msgclass
+      LocationAuthorization::Value = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.LocationAuthorization.Value").enummodule
+      NotificationAuthorization = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.NotificationAuthorization").msgclass
+      NotificationAuthorization::Value = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.NotificationAuthorization.Value").enummodule
+      PushEnvironment = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PushEnvironment").msgclass
+      PushEnvironment::Value = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.PushEnvironment.Value").enummodule
+      Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").msgclass
+      Platform::Value = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform.Value").enummodule
       IBeaconRegion = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.IBeaconRegion").msgclass
       GeofenceRegion = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GeofenceRegion").msgclass
       Value = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Value").msgclass
@@ -785,8 +816,6 @@ module Rover
       GetFieldSuggestionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionRequest").msgclass
       GetFieldSuggestionRequest::Selector = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionRequest.Selector").enummodule
       GetFieldSuggestionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.GetFieldSuggestionResponse").msgclass
-      NotificationAuthorization = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.NotificationAuthorization").enummodule
-      Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Platform").enummodule
       Null = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.Null").enummodule
     end
   end

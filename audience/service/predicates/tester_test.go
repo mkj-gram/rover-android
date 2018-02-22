@@ -322,6 +322,144 @@ func testPredicates_StringPredicates(t *testing.T) {
 			exp:    true,
 			expErr: nil,
 		},
+		{
+			name: "push environment is production",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									Op:            audience.StringPredicate_IS_EQUAL,
+									AttributeName: "push_environment",
+									Value:         "production",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			profile: nil,
+			device: &audience.Device{
+				PushEnvironment: audience.PushEnvironment_PRODUCTION,
+			},
+
+			exp:    true,
+			expErr: nil,
+		},
+		{
+			name: "push environment is no set",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									Op:            audience.StringPredicate_IS_UNSET,
+									AttributeName: "push_environment",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			profile: nil,
+			device: &audience.Device{
+				PushEnvironment: audience.PushEnvironment_UNKNOWN,
+			},
+
+			exp:    true,
+			expErr: nil,
+		},
+		{
+			name: "notification authorization is AUTHORIZED",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									Op:            audience.StringPredicate_IS_EQUAL,
+									AttributeName: "notification_authorization",
+									Value:         "AUTHORIZED",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			profile: nil,
+			device: &audience.Device{
+				NotificationAuthorization: audience.NotificationAuthorization_AUTHORIZED,
+			},
+
+			exp:    true,
+			expErr: nil,
+		},
+		{
+			name: "platform is set",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									Op:            audience.StringPredicate_IS_SET,
+									AttributeName: "platform",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			profile: nil,
+			device: &audience.Device{
+				Platform: audience.Platform_WEB,
+			},
+
+			exp:    true,
+			expErr: nil,
+		},
+		{
+			name: "platform is MOBILE false",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_StringPredicate{
+								StringPredicate: &audience.StringPredicate{
+									Op:            audience.StringPredicate_IS_EQUAL,
+									AttributeName: "platform",
+									Value:         "MOBILE",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			profile: nil,
+			device: &audience.Device{
+				Platform: audience.Platform_WEB,
+			},
+
+			exp:    false,
+			expErr: nil,
+		},
 	}
 
 	for _, tc := range tcases {

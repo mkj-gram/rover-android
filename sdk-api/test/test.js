@@ -118,6 +118,50 @@ describe('Device', function() {
 		expect(got).to.deep.include(exp)
 	})
 
+	describe('PushEnvironment', function() {
+		it('preserves production value', function() {
+			const input = {
+				push_environment: "production"
+			}
+
+			const exp = {
+				push_environment: "production"
+			}
+
+			const got = Device.deviceFromProto(AudienceProtobuf.Device.deserializeBinary(Device.deviceToProto(input).serializeBinary()))
+
+			expect(got).to.deep.include(exp)
+		})
+
+		it('maps development to constant DEVELOPMENT', function() {
+			const input = {
+				push_environment: "development"
+			}
+
+			const exp = {
+				push_environment: "development"
+			}
+
+			const got = Device.deviceFromProto(AudienceProtobuf.Device.deserializeBinary(Device.deviceToProto(input).serializeBinary()))
+
+			expect(got).to.deep.include(exp)
+		})
+
+		it('maps unknown to constant UNKNOWN', function() {
+			const input = {
+				push_environment: "unknown"
+			}
+
+			const exp = {
+				push_environment: "production"
+			}
+
+			const got = Device.deviceFromProto(AudienceProtobuf.Device.deserializeBinary(Device.deviceToProto(input).serializeBinary()))
+
+			expect(got).to.deep.include(exp)
+		})
+	})
+
 	it('builds device context request', function() {
 		const input = {
 			push_environment: "production",
@@ -154,7 +198,7 @@ describe('Device', function() {
 		
 
 		const exp = {
-			push_environment: "production",
+			push_environment: AudienceProtobuf.PushEnvironment.Value.PRODUCTION,
 			push_token: "TOKENABC_123",
 			app_name: "Rover Inbox",
 			app_version: "1.4.1.beta",
@@ -184,13 +228,13 @@ describe('Device', function() {
 			carrier_name: "rogers",
 			radio: "LTE",
 			time_zone: "America/Toronto",
-			platform: AudienceProtobuf.Platform.MOBILE,
+			platform: AudienceProtobuf.Platform.Value.MOBILE,
 			is_background_enabled: false,
 			is_location_monitoring_enabled: true,
 			is_bluetooth_enabled: true,
 			advertising_id: "HJDIEJA-123BNAHA",
 			ip: "127.0.0.1",
-			notification_authorization: AudienceProtobuf.NotificationAuthorization.DENIED
+			notification_authorization: AudienceProtobuf.NotificationAuthorization.Value.DENIED
 		}
 
 		const proto = Device.deviceContextToProto(1, "ABC", input)

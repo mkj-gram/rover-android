@@ -105,18 +105,30 @@ module.exports = function(AudienceClient, logger) {
 		}
 	}
 
+	function pushEnvironmentFromProto(p) {
+		switch (p) {
+			case RoverApis.audience.v1.Models.PushEnvironment.Value.PRODUCTION:
+				return "production"
+			case RoverApis.audience.v1.Models.PushEnvironment.Value.DEVELOPMENT:
+				return "development"
+			default:
+				return "production"
+		}
+	}
+
 	methods.fromProto = function(dp) {
 		let device = {}
 		device.id = dp.getDeviceId()
 		device.account_id = dp.getAccountId()
-		device.profile_id = dp.getProfileId()
 		device.updated_at = RoverApis.Helpers.timestampFromProto(dp.getUpdatedAt())
 		device.created_at = RoverApis.Helpers.timestampFromProto(dp.getCreatedAt())
 
+		// deprecated: use profile_identifier to reference profile
+		device.profile_id = dp.getProfileId()
 		device.profile_identifier = dp.getProfileIdentifier()
 
 		// Tokens
-		device.push_environment = dp.getPushEnvironment()
+		device.push_environment = pushEnvironmentFromProto(dp.getPushEnvironment())
 		device.push_token = dp.getPushTokenKey()
 		device.push_token_is_active = dp.getPushTokenIsActive()
 		device.push_token_created_at = RoverApis.Helpers.timestampFromProto(dp.getPushTokenCreatedAt())
