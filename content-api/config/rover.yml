@@ -4,7 +4,7 @@ development:
   debug_certificate: <%= Rails.root.join("config", "certs", "apns", "io.rover.debug.p12") %>
   debug_passphrase: <%= ENV['ROVER_DEBUG_CERTIFICATE_PASSPHRASE'] %>
   inbox_certificate: <%= Rails.root.join("config", "certs", "apns", "io.rover.inbox.p12") %>
-  inbox_passphrase: <%= ENV['ROVER_INBOX_CERTIFICATE_PASSPHRASE'] %>
+  inbox_passphrase: "FwrXaRwHtnmkHXnzVhGZq7DC"
   
 production:
   certificate: <%= Rails.root.join("config", "certs", "apns", "rover-cert.p12") %>
@@ -12,4 +12,4 @@ production:
   debug_certificate: <%= Rails.root.join("config", "certs", "apns", "io.rover.debug.p12") %>
   debug_passphrase: <%= ENV['ROVER_DEBUG_CERTIFICATE_PASSPHRASE'] %>
   inbox_certificate: <%= Rails.root.join("config", "certs", "apns", "io.rover.inbox.p12") %>
-  inbox_passphrase: <%= ENV['ROVER_INBOX_CERTIFICATE_PASSPHRASE'] %>
+  inbox_passphrase: "FwrXaRwHtnmkHXnzVhGZq7DC"
