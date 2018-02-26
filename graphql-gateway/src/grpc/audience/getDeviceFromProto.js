@@ -30,7 +30,12 @@ export const getNotificationAuthorizationFromProto = p => {
 
 
 export const getPushEnvironmentFromProto = p => {
-    return p.charAt(0).toUpperCase().concat(p.slice(1))
+    switch (p) {
+        case 2:
+            return "Development"
+        default:
+            return "Production"
+    }
 }
 
 export const getCustomDeviceAttributes = d => {
