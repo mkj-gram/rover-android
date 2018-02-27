@@ -12,10 +12,25 @@ export default c => ({
     UIState: c.getUiState(),
     notificationBody: c.getNotificationBody(),
     notificationTitle: c.getNotificationTitle(),
-    notificationAttachmentType: grpcEnumMap(
-        RoverApis.campaigns.v1.Models.NotificationAttachmentType
-    )[c.getNotificationAttachmentType()],
-    notificationAttachmentUrl: c.getNotificationAttachmentUrl(),
+    notificationAttachment: () => {
+        let attachment = {}
+        switch (c.getNotificationAttachmentType()) {
+            case 0:
+                return null
+            case 1:
+                attachment.type = 'image'
+                break
+            case 2:
+                attachment.type = 'audio'
+                break
+            case 3:
+                attachment.type = 'video'
+                break
+        }
+
+        attachment.url = c.getNotificationAttachmentUrl()
+        return attachment
+    },
     notificationTapBehaviorType: grpcEnumMap(
         RoverApis.campaigns.v1.Models.NotificationTapBehaviorType
     )[c.getNotificationTapBehaviorType()],

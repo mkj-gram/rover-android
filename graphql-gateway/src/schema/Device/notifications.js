@@ -13,6 +13,10 @@ const notifications = {
                 campaignId: "7889",
                 title: "20180204 -- Kirsch App",
                 body: "Follow Super Bowl LII live now!",
+                attachment: {
+                    type: "image",
+                    url: "https://dy5jipgyozh6.cloudfront.net/wp-content/uploads/2017/05/08214717/small-dog-breeds-dont-shed.jpg"
+                },
                 action: {
                     __className: "OpenURLNotificationAction",
                     url: "twitter://status?id=12345"

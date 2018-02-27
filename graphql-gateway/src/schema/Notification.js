@@ -1,5 +1,6 @@
 import {
     GraphQLBoolean,
+    GraphQLEnumType,
     GraphQLID,
     GraphQLNonNull,
     GraphQLString,
@@ -41,6 +42,45 @@ const PresentWebsiteNotificationAction = new GraphQLObjectType({
     }
 })
 
+const Notification = new GraphQLObjectType({
+    name: 'Notification',
+    fields: () => ({
+        id: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        campaignId: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        title: {
+            type: GraphQLString
+        },
+        body: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        attachment: {
+            type: NotificationAttachment
+        },
+        action: {
+            type: new GraphQLNonNull(NotificationAction)
+        },
+        deliveredAt: {
+            type: new GraphQLNonNull(GraphQLDateTime)
+        },
+        expiresAt: {
+            type: GraphQLDateTime
+        },
+        isRead: {
+            type: new  GraphQLNonNull(GraphQLBoolean)
+        },
+        isNotificationCenterEnabled: {
+            type: new  GraphQLNonNull(GraphQLBoolean)
+        },
+        isDeleted: {
+            type: new GraphQLNonNull(GraphQLBoolean)
+        }
+    })
+})
+
 const NotificationAction = new GraphQLUnionType({
     name: 'NotificationAction',
     types: () => [OpenURLNotificationAction, PresentExperienceNotificationAction, PresentWebsiteNotificationAction],
@@ -61,39 +101,24 @@ const NotificationAction = new GraphQLUnionType({
     }
 })
 
-const Notification = new GraphQLObjectType({
-    name: 'Notification',
-    fields: {
-        id: {
-            type: new GraphQLNonNull(GraphQLID)
+export const NotificationAttachment = new GraphQLObjectType({
+    name: 'NotificationAttachment',
+    fields: () => ({
+        type: {
+            type: new GraphQLNonNull(NotificationAttachmentType)
         },
-        campaignId: {
-            type: new GraphQLNonNull(GraphQLID)
-        },
-        title: {
-            type: GraphQLString
-        },
-        body: {
+        url: {
             type: new GraphQLNonNull(GraphQLString)
-        },
-        action: {
-            type: new GraphQLNonNull(NotificationAction)
-        },
-        deliveredAt: {
-            type: new GraphQLNonNull(GraphQLDateTime)
-        },
-        expiresAt: {
-            type: GraphQLDateTime
-        },
-        isRead: {
-            type: new  GraphQLNonNull(GraphQLBoolean)
-        },
-        isNotificationCenterEnabled: {
-            type: new  GraphQLNonNull(GraphQLBoolean)
-        },
-        isDeleted: {
-            type: new GraphQLNonNull(GraphQLBoolean)
         }
+    })
+})
+
+const NotificationAttachmentType = new GraphQLEnumType({
+    name: 'NotificationAttachmentType',
+    values: {
+        AUDIO: { value: 'audio' },
+        IMAGE: { value: 'image' },
+        VIDEO: { value: 'video' }
     }
 })
 

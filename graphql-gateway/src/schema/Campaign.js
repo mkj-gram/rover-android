@@ -12,6 +12,7 @@ import {
 import { GraphQLDateTime } from 'graphql-iso-date'
 import GraphQLJSON from 'graphql-type-json'
 
+import { NotificationAttachment } from './Notification'
 import { PredicateAggregate } from './Predicate'
 
 export const AutomatedNotificationCampaign = new GraphQLObjectType({
@@ -58,13 +59,9 @@ export const AutomatedNotificationCampaign = new GraphQLObjectType({
             type: GraphQLString,
             description: 'Title of the notification'
         },
-        notificationAttachmentUrl: {
-            type: GraphQLString,
-            description: 'URL of the notification attachment'
-        },
-        notificationAttachmentType: {
-            type: NotificationAttachmentType,
-            description: 'Attachment type of the notification'
+        notificationAttachment: {
+            type: NotificationAttachment,
+            description: 'Rich media attachment (image, video or audio clip)'
         },
         notificationTapBehaviorType: {
             type: NotificationTapBehaviorType
@@ -261,16 +258,6 @@ const CampaignType = new GraphQLEnumType({
     }
 })
 
-const NotificationAttachmentType = new GraphQLEnumType({
-    name: 'NotificationAttachmentType',
-    values: {
-        NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN: {},
-        NOTIFICATION_ATTACHMENT_TYPE_IMAGE: {},
-        NOTIFICATION_ATTACHMENT_TYPE_AUDIO: {},
-        NOTIFICATION_ATTACHMENT_TYPE_VIDEO: {}
-    }
-})
-
 const NotificationCampaign = new GraphQLInterfaceType({
     name: 'NotificationCampaign',
     description: 'Campaign Notification Attributes',
@@ -283,13 +270,9 @@ const NotificationCampaign = new GraphQLInterfaceType({
             type: GraphQLString,
             description: 'Title of the notification'
         },
-        notificationAttachmentUrl: {
-            type: GraphQLString,
-            description: 'URL of the notification attachment'
-        },
-        notificationAttachmentType: {
-            type: NotificationAttachmentType,
-            description: 'Attachment type of the notification'
+        notificationAttachment: {
+            type: NotificationAttachment,
+            description: 'Rich media attachment (image, video or audio clip)'
         },
         notificationTapBehaviorType: {
             type: NotificationTapBehaviorType,
@@ -437,13 +420,9 @@ export const ScheduledNotificationCampaign = new GraphQLObjectType({
             type: GraphQLString,
             description: 'Title of the notification'
         },
-        notificationAttachmentUrl: {
-            type: GraphQLString,
-            description: 'URL of the notification attachment'
-        },
-        notificationAttachmentType: {
-            type: NotificationAttachmentType,
-            description: 'Attachment type of the notification'
+        notificationAttachment: {
+            type: NotificationAttachment,
+            description: 'Rich media attachment (image, video or audio clip)'
         },
         notificationTapBehaviorType: {
             type: NotificationTapBehaviorType,
