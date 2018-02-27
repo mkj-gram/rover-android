@@ -9,6 +9,8 @@ import {
 
 import GraphQLJSON from 'graphql-type-json'
 
+import GraphQLFrameworkMap from './FrameworkMap'
+
 const Context = new GraphQLInputObjectType({
     name: 'Context',
     fields: () => ({
@@ -38,6 +40,9 @@ const Context = new GraphQLInputObjectType({
         },
         deviceModel: {
             type: GraphQLString
+        },
+        frameworks: {
+            type: GraphQLFrameworkMap
         },
         isCellularEnabled: {
             type: GraphQLBoolean
@@ -86,9 +91,6 @@ const Context = new GraphQLInputObjectType({
         },
         screenHeight: {
             type: GraphQLInt
-        },
-        sdkVersion: {
-            type: GraphQLString
         },
         timeZone: {
             type: GraphQLString
