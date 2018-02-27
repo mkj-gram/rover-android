@@ -20,7 +20,8 @@ const notifications = {
                 deliveredAt: "2018-02-05T14:18:50-05:00",
                 expiresAt: null,
                 isRead: false,
-                isNotificationCenterEnabled: true
+                isNotificationCenterEnabled: true,
+                isDeleted: false
             },
             {
                 __className: "Notification",
@@ -35,7 +36,8 @@ const notifications = {
                 deliveredAt: "2018-02-04T14:18:50-05:00",
                 expiresAt: null,
                 isRead: true,
-                isNotificationCenterEnabled: true
+                isNotificationCenterEnabled: true,
+                isDeleted: false
             },
             {
                 __className: "Notification",
@@ -50,7 +52,8 @@ const notifications = {
                 deliveredAt: "2018-02-03T14:18:50-05:00",
                 expiresAt: null,
                 isRead: false,
-                isNotificationCenterEnabled: false
+                isNotificationCenterEnabled: false,
+                isDeleted: false
             }
         ]
     }

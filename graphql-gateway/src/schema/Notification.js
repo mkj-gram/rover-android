@@ -90,6 +90,9 @@ const Notification = new GraphQLObjectType({
         },
         isNotificationCenterEnabled: {
             type: new  GraphQLNonNull(GraphQLBoolean)
+        },
+        isDeleted: {
+            type: new GraphQLNonNull(GraphQLBoolean)
         }
     }
 })
