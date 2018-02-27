@@ -240,7 +240,9 @@ message CreateDeviceRequest {
   bool ms12                        = 4 [deprecated=true];
   string profile_identifier        = 5;
 }
-message CreateDeviceResponse {}
+message CreateDeviceResponse {
+  Device device = 1;
+}
 
 message UpdateDevicePushTokenRequest {
   auth.v1.AuthContext auth_context = 1;
