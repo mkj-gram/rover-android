@@ -2636,9 +2636,7 @@ func testAudienceService_CreateDevice(t *testing.T) {
 		name string
 		req  *audience.CreateDeviceRequest
 
-		expErr error
-
-		before, after *expect
+		exp, before *expect
 	}
 
 	tcases := []tCase{
@@ -2651,7 +2649,9 @@ func testAudienceService_CreateDevice(t *testing.T) {
 				ProfileIdentifier: "",
 			},
 
-			expErr: status.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
+			exp: &expect{
+				expErr: status.Errorf(codes.InvalidArgument, "Validation: DeviceId: blank"),
+			},
 		},
 
 		{
@@ -2663,22 +2663,22 @@ func testAudienceService_CreateDevice(t *testing.T) {
 				ProfileIdentifier: "dddddddddddddddddddddddd",
 			},
 
-			expErr: nil,
-
 			before: &expect{
 				expErr: errors.Wrap(errors.New("not found"), "devices.FindId"),
 				exp:    nil,
 			},
 
-			after: &expect{
+			exp: &expect{
 				expErr: nil,
-				exp: &audience.Device{
-					Id:                "0194fdc2fa2ffcc041d3ff12",
-					AccountId:         1,
-					DeviceId:          "DDDDDDDD-0000-0000-0000-000000000001",
-					ProfileIdentifier: "dddddddddddddddddddddddd",
-					CreatedAt:         protoTs(t, createdAt),
-					UpdatedAt:         protoTs(t, createdAt),
+				exp: &audience.CreateDeviceResponse{
+					Device: &audience.Device{
+						Id:                "0194fdc2fa2ffcc041d3ff12",
+						AccountId:         1,
+						DeviceId:          "DDDDDDDD-0000-0000-0000-000000000001",
+						ProfileIdentifier: "dddddddddddddddddddddddd",
+						CreatedAt:         protoTs(t, createdAt),
+						UpdatedAt:         protoTs(t, createdAt),
+					},
 				},
 			},
 		},
@@ -2693,16 +2693,9 @@ func testAudienceService_CreateDevice(t *testing.T) {
 				}
 			}
 
-			var _, gotErr = client.CreateDevice(ctx, tc.req)
-			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
+			var got, gotErr = client.CreateDevice(ctx, tc.req)
+			if diff := Diff(tc.exp.exp, got, tc.exp.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
-			}
-
-			if tc.after != nil {
-				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
-				if diff := Diff(tc.after.exp, got, tc.after.expErr, gotErr); diff != nil {
-					t.Errorf("After:\n%v", difff(diff))
-				}
 			}
 		})
 	}

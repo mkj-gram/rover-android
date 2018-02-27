@@ -101,7 +101,7 @@ func (s *Server) CreateDevice(ctx context.Context, r *audience.CreateDeviceReque
 
 	s.notify.deviceCreated(ctx, device.AccountId, device.DeviceId)
 
-	return &audience.CreateDeviceResponse{}, nil
+	return &audience.CreateDeviceResponse{Device: device}, nil
 }
 
 // UpdateDevice implements the corresponding rpc

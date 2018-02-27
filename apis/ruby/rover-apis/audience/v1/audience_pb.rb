@@ -94,6 +94,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :profile_identifier, :string, 5
   end
   add_message "rover.audience.v1.CreateDeviceResponse" do
+    optional :device, :message, 1, "rover.audience.v1.Device"
   end
   add_message "rover.audience.v1.UpdateDevicePushTokenRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
