@@ -1,5 +1,9 @@
 import RoverApis from '@rover/apis'
 import { valueFromProto } from './getProfileFromProto'
+import util from 'util'
+
+
+const isNullOrUndefined = util.isNullOrUndefined
 
 export const getVersionFromProto = p => !!p ? [p.getMajor(), p.getMinor(), p.getRevision()] : []
 
@@ -59,11 +63,11 @@ export default (d) => {
         device_model: d.getDeviceModel(),
         ip: d.getIp(),
         is_background_enabled: d.getIsBackgroundEnabled(),
-        is_bluetooth_enabled: d.getIsBluetoothEnabled(),
-        is_cellular_enabled: d.getIsCellularEnabled(),
+        is_bluetooth_enabled: !isNullOrUndefined(d.getIsBluetoothEnabled()) ? d.getIsBluetoothEnabled().getValue() : false,
+        is_cellular_enabled: !isNullOrUndefined(d.getIsCellularEnabled()) ? d.getIsCellularEnabled().getValue() : false,
         is_location_monitoring_enabled: d.getIsLocationMonitoringEnabled(),
         is_test_device: d.getIsTestDevice(),
-        is_wifi_enabled: d.getIsWifiEnabled(),
+        is_wifi_enabled: !isNullOrUndefined(d.getIsWifiEnabled()) ? d.getIsWifiEnabled().getValue() : false,
         label: d.getLabel(),
         locale_language: d.getLocaleLanguage(),
         locale_region: d.getLocaleRegion(),

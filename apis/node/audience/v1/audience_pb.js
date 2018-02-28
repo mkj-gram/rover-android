@@ -11,6 +11,7 @@ var global = Function('return this')();
 
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
+var protobuf_wrappers_pb = require('../../protobuf/wrappers_pb.js');
 goog.exportSymbol('proto.rover.audience.v1.BoolPredicate', null, global);
 goog.exportSymbol('proto.rover.audience.v1.BoolPredicate.Op', null, global);
 goog.exportSymbol('proto.rover.audience.v1.CreateDeviceRequest', null, global);
@@ -8420,8 +8421,8 @@ proto.rover.audience.v1.UpdateDeviceRequest.toObject = function(includeInstance,
     localeLanguage: jspb.Message.getFieldWithDefault(msg, 21, ""),
     localeRegion: jspb.Message.getFieldWithDefault(msg, 22, ""),
     localeScript: jspb.Message.getFieldWithDefault(msg, 23, ""),
-    isWifiEnabled: jspb.Message.getFieldWithDefault(msg, 24, false),
-    isCellularEnabled: jspb.Message.getFieldWithDefault(msg, 25, false),
+    isWifiEnabled: (f = msg.getIsWifiEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
+    isCellularEnabled: (f = msg.getIsCellularEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
     screenWidth: jspb.Message.getFieldWithDefault(msg, 26, 0),
     screenHeight: jspb.Message.getFieldWithDefault(msg, 27, 0),
     carrierName: jspb.Message.getFieldWithDefault(msg, 28, ""),
@@ -8430,7 +8431,7 @@ proto.rover.audience.v1.UpdateDeviceRequest.toObject = function(includeInstance,
     platform: jspb.Message.getFieldWithDefault(msg, 31, 0),
     isBackgroundEnabled: jspb.Message.getFieldWithDefault(msg, 32, false),
     isLocationMonitoringEnabled: jspb.Message.getFieldWithDefault(msg, 33, false),
-    isBluetoothEnabled: jspb.Message.getFieldWithDefault(msg, 34, false),
+    isBluetoothEnabled: (f = msg.getIsBluetoothEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
     advertisingId: jspb.Message.getFieldWithDefault(msg, 35, ""),
     ip: jspb.Message.getFieldWithDefault(msg, 36, ""),
     regionMonitoringMode: jspb.Message.getFieldWithDefault(msg, 37, 0),
@@ -8550,11 +8551,13 @@ proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader = functi
       msg.setLocaleScript(value);
       break;
     case 24:
-      var value = /** @type {boolean} */ (reader.readBool());
+      var value = new protobuf_wrappers_pb.BoolValue;
+      reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
       msg.setIsWifiEnabled(value);
       break;
     case 25:
-      var value = /** @type {boolean} */ (reader.readBool());
+      var value = new protobuf_wrappers_pb.BoolValue;
+      reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
       msg.setIsCellularEnabled(value);
       break;
     case 26:
@@ -8590,7 +8593,8 @@ proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader = functi
       msg.setIsLocationMonitoringEnabled(value);
       break;
     case 34:
-      var value = /** @type {boolean} */ (reader.readBool());
+      var value = new protobuf_wrappers_pb.BoolValue;
+      reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
       msg.setIsBluetoothEnabled(value);
       break;
     case 35:
@@ -8760,17 +8764,19 @@ proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter = function(m
     );
   }
   f = message.getIsWifiEnabled();
-  if (f) {
-    writer.writeBool(
+  if (f != null) {
+    writer.writeMessage(
       24,
-      f
+      f,
+      protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
     );
   }
   f = message.getIsCellularEnabled();
-  if (f) {
-    writer.writeBool(
+  if (f != null) {
+    writer.writeMessage(
       25,
-      f
+      f,
+      protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
     );
   }
   f = message.getScreenWidth();
@@ -8830,10 +8836,11 @@ proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter = function(m
     );
   }
   f = message.getIsBluetoothEnabled();
-  if (f) {
-    writer.writeBool(
+  if (f != null) {
+    writer.writeMessage(
       34,
-      f
+      f,
+      protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
     );
   }
   f = message.getAdvertisingId();
@@ -9174,36 +9181,62 @@ proto.rover.audience.v1.UpdateDeviceRequest.prototype.setLocaleScript = function
 
 
 /**
- * optional bool is_wifi_enabled = 24;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
+ * optional rover.protobuf.BoolValue is_wifi_enabled = 24;
+ * @return {?proto.rover.protobuf.BoolValue}
  */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsWifiEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 24, false));
+  return /** @type{?proto.rover.protobuf.BoolValue} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.BoolValue, 24));
 };
 
 
-/** @param {boolean} value */
+/** @param {?proto.rover.protobuf.BoolValue|undefined} value */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsWifiEnabled = function(value) {
-  jspb.Message.setField(this, 24, value);
+  jspb.Message.setWrapperField(this, 24, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.clearIsWifiEnabled = function() {
+  this.setIsWifiEnabled(undefined);
 };
 
 
 /**
- * optional bool is_cellular_enabled = 25;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
+ * Returns whether this field is set.
+ * @return {!boolean}
  */
-proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsCellularEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 25, false));
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.hasIsWifiEnabled = function() {
+  return jspb.Message.getField(this, 24) != null;
 };
 
 
-/** @param {boolean} value */
+/**
+ * optional rover.protobuf.BoolValue is_cellular_enabled = 25;
+ * @return {?proto.rover.protobuf.BoolValue}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsCellularEnabled = function() {
+  return /** @type{?proto.rover.protobuf.BoolValue} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.BoolValue, 25));
+};
+
+
+/** @param {?proto.rover.protobuf.BoolValue|undefined} value */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsCellularEnabled = function(value) {
-  jspb.Message.setField(this, 25, value);
+  jspb.Message.setWrapperField(this, 25, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.clearIsCellularEnabled = function() {
+  this.setIsCellularEnabled(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.hasIsCellularEnabled = function() {
+  return jspb.Message.getField(this, 25) != null;
 };
 
 
@@ -9332,19 +9365,32 @@ proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsLocationMonitoringEna
 
 
 /**
- * optional bool is_bluetooth_enabled = 34;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
+ * optional rover.protobuf.BoolValue is_bluetooth_enabled = 34;
+ * @return {?proto.rover.protobuf.BoolValue}
  */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.getIsBluetoothEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 34, false));
+  return /** @type{?proto.rover.protobuf.BoolValue} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.BoolValue, 34));
 };
 
 
-/** @param {boolean} value */
+/** @param {?proto.rover.protobuf.BoolValue|undefined} value */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.setIsBluetoothEnabled = function(value) {
-  jspb.Message.setField(this, 34, value);
+  jspb.Message.setWrapperField(this, 34, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.clearIsBluetoothEnabled = function() {
+  this.setIsBluetoothEnabled(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.hasIsBluetoothEnabled = function() {
+  return jspb.Message.getField(this, 34) != null;
 };
 
 
@@ -9929,8 +9975,8 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     localeLanguage: jspb.Message.getFieldWithDefault(msg, 25, ""),
     localeRegion: jspb.Message.getFieldWithDefault(msg, 26, ""),
     localeScript: jspb.Message.getFieldWithDefault(msg, 27, ""),
-    isWifiEnabled: jspb.Message.getFieldWithDefault(msg, 28, false),
-    isCellularEnabled: jspb.Message.getFieldWithDefault(msg, 29, false),
+    isWifiEnabled: (f = msg.getIsWifiEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
+    isCellularEnabled: (f = msg.getIsCellularEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
     screenWidth: jspb.Message.getFieldWithDefault(msg, 30, 0),
     screenHeight: jspb.Message.getFieldWithDefault(msg, 31, 0),
     carrierName: jspb.Message.getFieldWithDefault(msg, 32, ""),
@@ -9939,7 +9985,7 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     platform: jspb.Message.getFieldWithDefault(msg, 35, 0),
     isBackgroundEnabled: jspb.Message.getFieldWithDefault(msg, 36, false),
     isLocationMonitoringEnabled: jspb.Message.getFieldWithDefault(msg, 37, false),
-    isBluetoothEnabled: jspb.Message.getFieldWithDefault(msg, 38, false),
+    isBluetoothEnabled: (f = msg.getIsBluetoothEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
     advertisingId: jspb.Message.getFieldWithDefault(msg, 39, ""),
     ip: jspb.Message.getFieldWithDefault(msg, 40, ""),
     notificationAuthorization: jspb.Message.getFieldWithDefault(msg, 53, 0),
@@ -10113,11 +10159,13 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
       msg.setLocaleScript(value);
       break;
     case 28:
-      var value = /** @type {boolean} */ (reader.readBool());
+      var value = new protobuf_wrappers_pb.BoolValue;
+      reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
       msg.setIsWifiEnabled(value);
       break;
     case 29:
-      var value = /** @type {boolean} */ (reader.readBool());
+      var value = new protobuf_wrappers_pb.BoolValue;
+      reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
       msg.setIsCellularEnabled(value);
       break;
     case 30:
@@ -10153,7 +10201,8 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
       msg.setIsLocationMonitoringEnabled(value);
       break;
     case 38:
-      var value = /** @type {boolean} */ (reader.readBool());
+      var value = new protobuf_wrappers_pb.BoolValue;
+      reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
       msg.setIsBluetoothEnabled(value);
       break;
     case 39:
@@ -10443,17 +10492,19 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
     );
   }
   f = message.getIsWifiEnabled();
-  if (f) {
-    writer.writeBool(
+  if (f != null) {
+    writer.writeMessage(
       28,
-      f
+      f,
+      protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
     );
   }
   f = message.getIsCellularEnabled();
-  if (f) {
-    writer.writeBool(
+  if (f != null) {
+    writer.writeMessage(
       29,
-      f
+      f,
+      protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
     );
   }
   f = message.getScreenWidth();
@@ -10513,10 +10564,11 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
     );
   }
   f = message.getIsBluetoothEnabled();
-  if (f) {
-    writer.writeBool(
+  if (f != null) {
+    writer.writeMessage(
       38,
-      f
+      f,
+      protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
     );
   }
   f = message.getAdvertisingId();
@@ -11154,36 +11206,62 @@ proto.rover.audience.v1.Device.prototype.setLocaleScript = function(value) {
 
 
 /**
- * optional bool is_wifi_enabled = 28;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
+ * optional rover.protobuf.BoolValue is_wifi_enabled = 28;
+ * @return {?proto.rover.protobuf.BoolValue}
  */
 proto.rover.audience.v1.Device.prototype.getIsWifiEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 28, false));
+  return /** @type{?proto.rover.protobuf.BoolValue} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.BoolValue, 28));
 };
 
 
-/** @param {boolean} value */
+/** @param {?proto.rover.protobuf.BoolValue|undefined} value */
 proto.rover.audience.v1.Device.prototype.setIsWifiEnabled = function(value) {
-  jspb.Message.setField(this, 28, value);
+  jspb.Message.setWrapperField(this, 28, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearIsWifiEnabled = function() {
+  this.setIsWifiEnabled(undefined);
 };
 
 
 /**
- * optional bool is_cellular_enabled = 29;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
+ * Returns whether this field is set.
+ * @return {!boolean}
  */
-proto.rover.audience.v1.Device.prototype.getIsCellularEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 29, false));
+proto.rover.audience.v1.Device.prototype.hasIsWifiEnabled = function() {
+  return jspb.Message.getField(this, 28) != null;
 };
 
 
-/** @param {boolean} value */
+/**
+ * optional rover.protobuf.BoolValue is_cellular_enabled = 29;
+ * @return {?proto.rover.protobuf.BoolValue}
+ */
+proto.rover.audience.v1.Device.prototype.getIsCellularEnabled = function() {
+  return /** @type{?proto.rover.protobuf.BoolValue} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.BoolValue, 29));
+};
+
+
+/** @param {?proto.rover.protobuf.BoolValue|undefined} value */
 proto.rover.audience.v1.Device.prototype.setIsCellularEnabled = function(value) {
-  jspb.Message.setField(this, 29, value);
+  jspb.Message.setWrapperField(this, 29, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearIsCellularEnabled = function() {
+  this.setIsCellularEnabled(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasIsCellularEnabled = function() {
+  return jspb.Message.getField(this, 29) != null;
 };
 
 
@@ -11312,19 +11390,32 @@ proto.rover.audience.v1.Device.prototype.setIsLocationMonitoringEnabled = functi
 
 
 /**
- * optional bool is_bluetooth_enabled = 38;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
+ * optional rover.protobuf.BoolValue is_bluetooth_enabled = 38;
+ * @return {?proto.rover.protobuf.BoolValue}
  */
 proto.rover.audience.v1.Device.prototype.getIsBluetoothEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 38, false));
+  return /** @type{?proto.rover.protobuf.BoolValue} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.BoolValue, 38));
 };
 
 
-/** @param {boolean} value */
+/** @param {?proto.rover.protobuf.BoolValue|undefined} value */
 proto.rover.audience.v1.Device.prototype.setIsBluetoothEnabled = function(value) {
-  jspb.Message.setField(this, 38, value);
+  jspb.Message.setWrapperField(this, 38, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearIsBluetoothEnabled = function() {
+  this.setIsBluetoothEnabled(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasIsBluetoothEnabled = function() {
+  return jspb.Message.getField(this, 38) != null;
 };
 
 

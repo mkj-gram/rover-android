@@ -7,6 +7,7 @@ option go_package = "audience/v1;audience";
 import "google/protobuf/timestamp.proto";
 
 import "auth/v1/auth.proto";
+import "protobuf/wrappers.proto";
 
 // Audience service is responsible for managing profiles & devices as well as static & dynamic segments.
 service Audience {
@@ -351,34 +352,34 @@ message UpdateDeviceRequest {
   // DEPRECATED
   map<string, Value> attributes = 3 [deprecated = true];
 
-  PushEnvironment.Value push_environment  = 10;
-  string push_token_key                   = 11;
-  string app_name                         = 12;
-  string app_version                      = 13;
-  string app_build                        = 14;
-  string app_namespace                    = 15;
-  string device_manufacturer              = 16;
-  string os_name                          = 17;
-  Version os_version                      = 18;
-  string device_model                     = 19;
-  string device_model_raw                 = 50;
-  map<string, Version> frameworks         = 20;
-  string locale_language                  = 21;
-  string locale_region                    = 22;
-  string locale_script                    = 23;
-  bool is_wifi_enabled                    = 24;
-  bool is_cellular_enabled                = 25;
-  int32 screen_width                      = 26;
-  int32 screen_height                     = 27;
-  string carrier_name                     = 28;
-  string radio                            = 29;
-  string time_zone                        = 30;
-  Platform.Value platform                 = 31;
-  bool is_background_enabled              = 32;
-  bool is_location_monitoring_enabled     = 33;
-  bool is_bluetooth_enabled               = 34;
-  string advertising_id                   = 35;
-  string ip                               = 36;
+  PushEnvironment.Value push_environment        = 10;
+  string push_token_key                         = 11;
+  string app_name                               = 12;
+  string app_version                            = 13;
+  string app_build                              = 14;
+  string app_namespace                          = 15;
+  string device_manufacturer                    = 16;
+  string os_name                                = 17;
+  Version os_version                            = 18;
+  string device_model                           = 19;
+  string device_model_raw                       = 50;
+  map<string, Version> frameworks               = 20;
+  string locale_language                        = 21;
+  string locale_region                          = 22;
+  string locale_script                          = 23;
+  rover.protobuf.BoolValue is_wifi_enabled      = 24;
+  rover.protobuf.BoolValue is_cellular_enabled  = 25;
+  int32 screen_width                            = 26;
+  int32 screen_height                           = 27;
+  string carrier_name                           = 28;
+  string radio                                  = 29;
+  string time_zone                              = 30;
+  Platform.Value platform                       = 31;
+  bool is_background_enabled                    = 32;
+  bool is_location_monitoring_enabled           = 33;
+  rover.protobuf.BoolValue is_bluetooth_enabled = 34;
+  string advertising_id                         = 35;
+  string ip                                     = 36;
 
   Device.RegionMonitoringMode region_monitoring_mode   = 37;
   NotificationAuthorization.Value notification_authorization = 39;
@@ -479,10 +480,10 @@ message Device {
   string locale_script            = 27;
 
   // Boolean indicates if WiFi is turned on and has signal.
-  bool is_wifi_enabled            = 28;
+  rover.protobuf.BoolValue is_wifi_enabled      = 28;
 
   // Boolean indicates if cell radio is on and has signal.
-  bool is_cellular_enabled        = 29;
+  rover.protobuf.BoolValue is_cellular_enabled  = 29;
 
   // Resolution of the screen in points or DPI
   int32 screen_width             = 30;
@@ -501,9 +502,9 @@ message Device {
 
   Platform.Value platform             = 35;
 
-  bool is_background_enabled          = 36;
-  bool is_location_monitoring_enabled = 37;
-  bool is_bluetooth_enabled           = 38;
+  bool is_background_enabled                    = 36;
+  bool is_location_monitoring_enabled           = 37;
+  rover.protobuf.BoolValue is_bluetooth_enabled = 38;
 
   string advertising_id               = 39;
 

@@ -5,6 +5,7 @@ require 'google/protobuf'
 
 require 'google/protobuf/timestamp_pb'
 require 'auth/v1/auth_pb'
+require 'protobuf/wrappers_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.audience.v1.GetProfileRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
@@ -198,8 +199,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :locale_language, :string, 21
     optional :locale_region, :string, 22
     optional :locale_script, :string, 23
-    optional :is_wifi_enabled, :bool, 24
-    optional :is_cellular_enabled, :bool, 25
+    optional :is_wifi_enabled, :message, 24, "rover.protobuf.BoolValue"
+    optional :is_cellular_enabled, :message, 25, "rover.protobuf.BoolValue"
     optional :screen_width, :int32, 26
     optional :screen_height, :int32, 27
     optional :carrier_name, :string, 28
@@ -208,7 +209,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :platform, :enum, 31, "rover.audience.v1.Platform.Value"
     optional :is_background_enabled, :bool, 32
     optional :is_location_monitoring_enabled, :bool, 33
-    optional :is_bluetooth_enabled, :bool, 34
+    optional :is_bluetooth_enabled, :message, 34, "rover.protobuf.BoolValue"
     optional :advertising_id, :string, 35
     optional :ip, :string, 36
     optional :region_monitoring_mode, :enum, 37, "rover.audience.v1.Device.RegionMonitoringMode"
@@ -251,8 +252,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :locale_language, :string, 25
     optional :locale_region, :string, 26
     optional :locale_script, :string, 27
-    optional :is_wifi_enabled, :bool, 28
-    optional :is_cellular_enabled, :bool, 29
+    optional :is_wifi_enabled, :message, 28, "rover.protobuf.BoolValue"
+    optional :is_cellular_enabled, :message, 29, "rover.protobuf.BoolValue"
     optional :screen_width, :int32, 30
     optional :screen_height, :int32, 31
     optional :carrier_name, :string, 32
@@ -261,7 +262,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :platform, :enum, 35, "rover.audience.v1.Platform.Value"
     optional :is_background_enabled, :bool, 36
     optional :is_location_monitoring_enabled, :bool, 37
-    optional :is_bluetooth_enabled, :bool, 38
+    optional :is_bluetooth_enabled, :message, 38, "rover.protobuf.BoolValue"
     optional :advertising_id, :string, 39
     optional :ip, :string, 40
     optional :notification_authorization, :enum, 53, "rover.audience.v1.NotificationAuthorization.Value"

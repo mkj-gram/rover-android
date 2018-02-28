@@ -7,6 +7,7 @@ import (
 	"time"
 
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
+	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
 	selastic "github.com/roverplatform/rover/audience/service/elastic"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	rtesting "github.com/roverplatform/rover/go/testing"
@@ -16,10 +17,12 @@ import (
 func TestResponseMapping(t *testing.T) {
 	var (
 		esResp                 elastic.SearchResult
+		esRespMissingValues    elastic.SearchResult
 		esRespDuplicateProfile elastic.SearchResult
 	)
 
 	jsonFixture(t, &esResp, "testdata/query.response.json")
+	jsonFixture(t, &esRespMissingValues, "testdata/query-missing-values.response.json")
 	jsonFixture(t, &esRespDuplicateProfile, "testdata/query-duplicate-profile.response.json")
 
 	tcases := []struct {
@@ -54,11 +57,11 @@ func TestResponseMapping(t *testing.T) {
 						DeviceModel:                 "GT-I9190",
 						Ip:                          "108.20.175.24",
 						IsBackgroundEnabled:         true,
-						IsBluetoothEnabled:          false,
-						IsCellularEnabled:           false,
+						IsBluetoothEnabled:          wrappers.Bool(false),
+						IsCellularEnabled:           wrappers.Bool(false),
 						IsLocationMonitoringEnabled: true,
 						IsTestDevice:                false,
-						IsWifiEnabled:               false,
+						IsWifiEnabled:               wrappers.Bool(false),
 						Label:                       "label_1",
 						LocaleLanguage:              "en",
 						LocaleRegion:                "us",
@@ -106,11 +109,11 @@ func TestResponseMapping(t *testing.T) {
 						DeviceModel:                 "GT-I9190",
 						Ip:                          "108.20.175.24",
 						IsBackgroundEnabled:         true,
-						IsBluetoothEnabled:          false,
-						IsCellularEnabled:           false,
+						IsBluetoothEnabled:          wrappers.Bool(false),
+						IsCellularEnabled:           wrappers.Bool(false),
 						IsLocationMonitoringEnabled: true,
 						IsTestDevice:                false,
-						IsWifiEnabled:               false,
+						IsWifiEnabled:               wrappers.Bool(false),
 						Label:                       "label_2",
 						LocaleLanguage:              "en",
 						LocaleRegion:                "us",
@@ -159,6 +162,72 @@ func TestResponseMapping(t *testing.T) {
 				ScrollId: "",
 			},
 		},
+
+		{
+			desc: "maps response preserving missing boolean values",
+			in:   &esRespMissingValues,
+			err:  nil,
+			exp: &audience.QueryResponse{
+				TotalSize: 1,
+				Devices: []*audience.Device{
+					{
+						Id:                          "",
+						AccountId:                   152,
+						Attributes:                  nil,
+						AdvertisingId:               "fc19eac9-df79-45f8-84c5-3aa22a374491",
+						AppBuild:                    "",
+						AppName:                     "",
+						AppNamespace:                "com.oneup.redskins",
+						AppVersion:                  "",
+						CarrierName:                 "",
+						CreatedAt:                   nil,
+						DeviceId:                    "9431B69F-F5F2-4375-9B06-E5F6033FDC0F",
+						DeviceManufacturer:          "samsung",
+						DeviceModel:                 "GT-I9190",
+						Ip:                          "108.20.175.24",
+						IsBackgroundEnabled:         true,
+						IsBluetoothEnabled:          nil,
+						IsCellularEnabled:           nil,
+						IsLocationMonitoringEnabled: true,
+						IsTestDevice:                false,
+						IsWifiEnabled:               nil,
+						Label:                       "label_1",
+						LocaleLanguage:              "en",
+						LocaleRegion:                "us",
+						LocaleScript:                "",
+						LocationAccuracy:            20,
+						LocationLatitude:            42.3264101,
+						LocationLongitude:           -71.2835348,
+						LocationCountry:             "",
+						LocationState:               "",
+						LocationCity:                "",
+						LocationUpdatedAt:           protoTs(t, parseTime(t, "2017-06-13T20:20:06Z")),
+						OsName:                      "Android",
+						OsVersion:                   &audience.Version{4, 4, 2},
+						Platform:                    audience.Platform_MOBILE,
+						ProfileId:                   "59401bfe9cb3ac00079b0944",
+						PushEnvironment:             audience.PushEnvironment_PRODUCTION,
+						PushTokenCreatedAt:          nil,
+						PushTokenIsActive:           false,
+						PushTokenKey:                "",
+						PushTokenUnregisteredAt:     nil,
+						PushTokenUpdatedAt:          nil,
+						Radio:                       "",
+						ScreenHeight:                0,
+						ScreenWidth:                 0,
+						Frameworks: map[string]*audience.Version{
+							"io.rover.Rover": {1, 12, 3},
+						},
+						TimeZone:                  "America/New_York",
+						NotificationAuthorization: audience.NotificationAuthorization_AUTHORIZED,
+						UpdatedAt:                 protoTs(t, parseTime(t, "2017-06-13T20:20:06Z")),
+					},
+				},
+				Profiles: nil,
+				ScrollId: "",
+			},
+		},
+
 		{
 			desc: "deduplicates profiles",
 			in:   &esRespDuplicateProfile,
@@ -194,8 +263,8 @@ func TestResponseMapping(t *testing.T) {
 						LocaleLanguage:              "en",
 						LocaleRegion:                "us",
 						LocaleScript:                "",
-						IsWifiEnabled:               false,
-						IsCellularEnabled:           false,
+						IsWifiEnabled:               wrappers.Bool(false),
+						IsCellularEnabled:           wrappers.Bool(false),
 						ScreenWidth:                 0,
 						ScreenHeight:                0,
 						CarrierName:                 "verizon",
@@ -204,7 +273,7 @@ func TestResponseMapping(t *testing.T) {
 						Platform:                    1,
 						IsBackgroundEnabled:         true,
 						IsLocationMonitoringEnabled: true,
-						IsBluetoothEnabled:          true,
+						IsBluetoothEnabled:          wrappers.Bool(true),
 						AdvertisingId:               "CFE2D5BF-228D-44B1-92C7-0C92D8204EC6",
 						Ip:                          "157.130.99.154",
 						NotificationAuthorization:          0,
@@ -248,8 +317,8 @@ func TestResponseMapping(t *testing.T) {
 						LocaleLanguage:              "en",
 						LocaleRegion:                "us",
 						LocaleScript:                "",
-						IsWifiEnabled:               false,
-						IsCellularEnabled:           false,
+						IsWifiEnabled:               wrappers.Bool(false),
+						IsCellularEnabled:           wrappers.Bool(false),
 						ScreenWidth:                 0,
 						ScreenHeight:                0,
 						CarrierName:                 "verizon",
@@ -258,7 +327,7 @@ func TestResponseMapping(t *testing.T) {
 						Platform:                    1,
 						IsBackgroundEnabled:         true,
 						IsLocationMonitoringEnabled: true,
-						IsBluetoothEnabled:          true,
+						IsBluetoothEnabled:          wrappers.Bool(true),
 						AdvertisingId:               "CFE2D5BF-228D-44B1-92C7-0C92D8204EC6",
 						Ip:                          "157.130.99.154",
 						NotificationAuthorization:          0,
@@ -306,7 +375,7 @@ func TestResponseMapping(t *testing.T) {
 				got, gotErr = selastic.MapResponse(tc.in)
 			)
 
-			if diff := rtesting.Diff(got, exp, gotErr, expErr); diff != nil {
+			if diff := rtesting.Diff(exp, got, expErr, gotErr); diff != nil {
 				t.Error("Diff:\n", rtesting.Difff(diff))
 			}
 		})

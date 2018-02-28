@@ -1,6 +1,8 @@
 const RoverApis = require('@rover/apis')
 const grpc = require('grpc')
 const async = require('async')
+const util = require('util')
+const isNullOrUndefined = util.isNullOrUndefined
 
 module.exports = function(AudienceClient, logger) {
 	let methods = {}
@@ -146,8 +148,8 @@ module.exports = function(AudienceClient, logger) {
 		device.locale_language = dp.getLocaleLanguage()
 		device.locale_region = dp.getLocaleRegion()
 		device.locale_script = dp.getLocaleScript()
-		device.is_wifi_enabled = dp.getIsWifiEnabled()
-		device.is_cellular_enabled = dp.getIsCellularEnabled()
+		device.is_wifi_enabled = !isNullOrUndefined(dp.getIsWifiEnabled()) ? dp.getIsWifiEnabled().getValue() : false
+		device.is_cellular_enabled = !isNullOrUndefined(dp.getIsCellularEnabled()) ? dp.getIsCellularEnabled().getValue() : false
 		device.screen_width = dp.getScreenWidth()
 		device.screen_height = dp.getScreenHeight()
 		device.carrier_name = dp.getCarrierName()
@@ -157,7 +159,7 @@ module.exports = function(AudienceClient, logger) {
 		device.notification_authorization = notificationAuthorizationFromProto(dp.getNotificationAuthorization())
 		device.is_background_enabled = dp.getIsBackgroundEnabled()
 		device.is_location_monitoring_enabled = dp.getIsLocationMonitoringEnabled()
-		device.is_bluetooth_enabled = dp.getIsBluetoothEnabled()
+		device.is_bluetooth_enabled = !isNullOrUndefined(dp.getIsBluetoothEnabled()) ? dp.getIsBluetoothEnabled().getValue() : false
 		device.advertising_id = dp.getAdvertisingId()
 		device.ip = dp.getIp()
 		device.location_accuracy = dp.getLocationAccuracy() === 0 ? null : dp.getLocationAccuracy()

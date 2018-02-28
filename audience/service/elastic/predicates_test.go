@@ -868,6 +868,36 @@ func test_BoolPredicateToFilter(t *testing.T) {
 			expErr: nil,
 		},
 		{
+			name:      "should use exist filter on optional bool values",
+			condition: audience.PredicateAggregate_ALL,
+
+			predicate: &audience.Predicate{
+				Selector: audience.Predicate_DEVICE,
+				Value: &audience.Predicate_BoolPredicate{
+					BoolPredicate: &audience.BoolPredicate{
+						Op:            audience.BoolPredicate_IS_SET,
+						AttributeName: "is_wifi_enabled",
+					},
+				},
+			},
+
+			exp: M{
+				"filter": M{
+					"bool": M{
+						"must": []M{
+							{
+								"exists": M{
+									"field": "is_wifi_enabled",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			expErr: nil,
+		},
+		{
 			name:      "uses a must_not term query when IS_SET is used on an attribute who's missing value is null",
 			condition: audience.PredicateAggregate_ALL,
 

@@ -5,6 +5,7 @@ var grpc = require('grpc');
 var audience_v1_audience_pb = require('../../audience/v1/audience_pb.js');
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
+var protobuf_wrappers_pb = require('../../protobuf/wrappers_pb.js');
 
 function serialize_rover_audience_v1_CreateDeviceRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.CreateDeviceRequest)) {

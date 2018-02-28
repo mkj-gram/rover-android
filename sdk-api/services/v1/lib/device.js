@@ -1,11 +1,24 @@
-const RoverApis = require('@rover/apis')
+ const RoverApis = require('@rover/apis')
 const grpc = require('grpc')
 const util = require('util')
 const async = require('async')
 const moment = require('moment')
+const Protobuf = RoverApis.protobuf.Models
+const isNullOrUndefined = util.isNullOrUndefined
 
 module.exports = function(AudienceClient, logger) {
 	let methods = {}
+
+	function newBoolValue(value) {
+		if (value === null || value === undefined) {
+			return undefined
+		}
+
+		const v = new Protobuf.BoolValue()
+		v.setValue(value)
+
+		return v
+	}
 
 	function buildAuthContext(accountId) {
 		const context = new RoverApis.auth.v1.Models.AuthContext()
@@ -269,8 +282,8 @@ module.exports = function(AudienceClient, logger) {
 		device.locale_language = dp.getLocaleLanguage()
 		device.locale_region = dp.getLocaleRegion()
 		device.locale_script = dp.getLocaleScript()
-		device.is_wifi_enabled = dp.getIsWifiEnabled()
-		device.is_cellular_enabled = dp.getIsCellularEnabled()
+		device.is_wifi_enabled = !isNullOrUndefined(dp.getIsWifiEnabled()) ? dp.getIsWifiEnabled().getValue() : false
+		device.is_cellular_enabled = !isNullOrUndefined(dp.getIsCellularEnabled()) ? dp.getIsCellularEnabled().getValue() : false 
 		device.screen_width = dp.getScreenWidth()
 		device.screen_height = dp.getScreenHeight()
 		device.carrier_name = dp.getCarrierName()
@@ -279,7 +292,7 @@ module.exports = function(AudienceClient, logger) {
 		device.platform = dp.getPlatform() === 1 ? dp.getOsName() : "Web"
 		device.is_background_enabled = dp.getIsBackgroundEnabled()
 		device.is_location_monitoring_enabled = dp.getIsLocationMonitoringEnabled()
-		device.is_bluetooth_enabled = dp.getIsBluetoothEnabled()
+		device.is_bluetooth_enabled = !isNullOrUndefined(dp.getIsBluetoothEnabled()) ? dp.getIsBluetoothEnabled().getValue() : false
 		device.advertising_id = dp.getAdvertisingId()
 		device.ip = dp.getIp()
 		device.notification_authorization = notificationAuthorizationFromProto(dp.getNotificationAuthorization())
@@ -345,8 +358,8 @@ module.exports = function(AudienceClient, logger) {
 		dp.setLocaleLanguage(device.locale_language)
 		dp.setLocaleRegion(device.locale_region)
 		dp.setLocaleScript(device.locale_script)
-		dp.setIsWifiEnabled(device.is_wifi_enabled)
-		dp.setIsCellularEnabled(device.is_cellular_enabled)
+		dp.setIsWifiEnabled(newBoolValue(device.is_wifi_enabled))
+		dp.setIsCellularEnabled(newBoolValue(device.is_cellular_enabled))
 		dp.setScreenWidth(device.screen_width)
 		dp.setScreenHeight(device.screen_height)
 		dp.setCarrierName(device.carrier_name)
@@ -361,7 +374,7 @@ module.exports = function(AudienceClient, logger) {
 		
 		dp.setIsBackgroundEnabled(device.is_background_enabled)
 		dp.setIsLocationMonitoringEnabled(device.is_location_monitoring_enabled)
-		dp.setIsBluetoothEnabled(device.is_bluetooth_enabled)
+		dp.setIsBluetoothEnabled(newBoolValue(device.is_bluetooth_enabled))
 		dp.setAdvertisingId(device.advertising_id)
 		dp.setIp(device.ip)
 		dp.setNotificationAuthorization(notificationAuthorizationToProto(device.notification_authorization))
@@ -478,8 +491,8 @@ module.exports = function(AudienceClient, logger) {
   		request.setLocaleLanguage(deviceContext.locale_language)
   		request.setLocaleRegion(deviceContext.locale_region)
   		request.setLocaleScript(deviceContext.locale_script)
-  		request.setIsWifiEnabled(deviceContext.is_wifi_enabled)
-  		request.setIsCellularEnabled(deviceContext.is_cellular_enabled)
+  		request.setIsWifiEnabled(newBoolValue(deviceContext.is_wifi_enabled))
+  		request.setIsCellularEnabled(newBoolValue(deviceContext.is_cellular_enabled))
   		request.setScreenWidth(deviceContext.screen_width)
   		request.setScreenHeight(deviceContext.screen_height)
   		request.setCarrierName(deviceContext.carrier_name)
@@ -492,7 +505,7 @@ module.exports = function(AudienceClient, logger) {
   		}
   		request.setIsBackgroundEnabled(deviceContext.is_background_enabled)
   		request.setIsLocationMonitoringEnabled(deviceContext.is_location_monitoring_enabled)
-  		request.setIsBluetoothEnabled(deviceContext.is_bluetooth_enabled)
+  		request.setIsBluetoothEnabled(newBoolValue(deviceContext.is_bluetooth_enabled))
   		request.setAdvertisingId(deviceContext.advertising_id)
   		request.setIp(deviceContext.ip)
   		request.setNotificationAuthorization(notificationAuthorizationToProto(deviceContext.notification_authorization))
@@ -669,7 +682,7 @@ module.exports = function(AudienceClient, logger) {
 			return function(done) {
 				let request = new RoverApis.audience.v1.Models.ListDevicesByProfileIdentifierRequest()
 				request.setAuthContext(authContext)
-        request.setMs12(true)
+		        request.setMs12(true)
 				request.setProfileIdentifier(profileIdentifier)
 
 				AudienceClient.listDevicesByProfileIdentifier(request, function(err, reply) {

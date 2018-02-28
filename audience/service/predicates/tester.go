@@ -219,9 +219,17 @@ func getDeviceValue(device *audience.Device, attribute_name string) interface{} 
 	case "locale_script":
 		return device.GetLocaleScript()
 	case "is_wifi_enabled":
-		return device.GetIsWifiEnabled()
+		if device.GetIsWifiEnabled() != nil {
+			return device.GetIsWifiEnabled().GetValue()
+		} else {
+			return nil
+		}
 	case "is_cellular_enabled":
-		return device.GetIsCellularEnabled()
+		if device.GetIsCellularEnabled() != nil {
+			return device.GetIsCellularEnabled().GetValue()
+		} else {
+			return nil
+		}
 	case "screen_width":
 		return device.GetScreenWidth()
 	case "screen_height":
@@ -248,6 +256,11 @@ func getDeviceValue(device *audience.Device, attribute_name string) interface{} 
 	case "is_location_monitoring_enabled":
 		return device.GetIsLocationMonitoringEnabled()
 	case "is_bluetooth_enabled":
+		if device.GetIsBluetoothEnabled() != nil {
+			return device.GetIsBluetoothEnabled().GetValue()
+		} else {
+			return nil
+		}
 		return device.GetIsBluetoothEnabled()
 	case "advertising_id":
 		return device.GetAdvertisingId()

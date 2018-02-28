@@ -4,10 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/go-test/deep"
-	"github.com/roverplatform/rover/apis/go/audience/v1"
-	"github.com/roverplatform/rover/audience/service/predicates"
-	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -15,6 +11,12 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-test/deep"
+	"github.com/roverplatform/rover/apis/go/audience/v1"
+	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
+	"github.com/roverplatform/rover/audience/service/predicates"
+	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
 
 func TestPredicates(t *testing.T) {
@@ -299,6 +301,34 @@ func testPredicates_StringPredicates(t *testing.T) {
 			expErr: nil,
 		},
 		{
+			name: "is equal with optional bool value",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_BoolPredicate{
+								BoolPredicate: &audience.BoolPredicate{
+									Op:            audience.BoolPredicate_IS_EQUAL,
+									AttributeName: "is_cellular_enabled",
+									Value:         true,
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: nil,
+			device: &audience.Device{
+				IsCellularEnabled: wrappers.Bool(true),
+			},
+
+			exp:    true,
+			expErr: nil,
+		},
+
+		{
 			name: "is set",
 			segment: &audience.DynamicSegment{
 				PredicateAggregate: &audience.PredicateAggregate{
@@ -351,7 +381,7 @@ func testPredicates_StringPredicates(t *testing.T) {
 			expErr: nil,
 		},
 		{
-			name: "push environment is no set",
+			name: "push environment is not set",
 			segment: &audience.DynamicSegment{
 				PredicateAggregate: &audience.PredicateAggregate{
 					Condition: audience.PredicateAggregate_ALL,
@@ -460,6 +490,32 @@ func testPredicates_StringPredicates(t *testing.T) {
 			exp:    false,
 			expErr: nil,
 		},
+		{
+			name: "is unset with nil boolean value",
+			segment: &audience.DynamicSegment{
+				PredicateAggregate: &audience.PredicateAggregate{
+					Condition: audience.PredicateAggregate_ALL,
+					Predicates: []*audience.Predicate{
+						{
+							Selector: audience.Predicate_DEVICE,
+							Value: &audience.Predicate_BoolPredicate{
+								BoolPredicate: &audience.BoolPredicate{
+									Op:            audience.BoolPredicate_IS_UNSET,
+									AttributeName: "is_wifi_enabled",
+								},
+							},
+						},
+					},
+				},
+			},
+			profile: nil,
+			device: &audience.Device{
+				IsWifiEnabled: nil,
+			},
+
+			exp:    true,
+			expErr: nil,
+		},
 	}
 
 	for _, tc := range tcases {
@@ -532,6 +588,7 @@ func testPredicates_BoolPredicates(t *testing.T) {
 			exp:    true,
 			expErr: nil,
 		},
+
 		{
 			name: "is unset",
 			segment: &audience.DynamicSegment{

@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/roverplatform/rover/apis/go/audience/v1"
+	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
 
@@ -81,8 +82,8 @@ type Device struct {
 	LocaleLanguage              string              `bson:"locale_language,omitempty"`
 	LocaleRegion                string              `bson:"locale_region,omitempty"`
 	LocaleScript                string              `bson:"locale_script,omitempty"`
-	IsWifiEnabled               bool                `bson:"is_wifi_enabled"`
-	IsCellularEnabled           bool                `bson:"is_cellular_enabled"`
+	IsWifiEnabled               boolValue           `bson:"is_wifi_enabled"`
+	IsCellularEnabled           boolValue           `bson:"is_cellular_enabled"`
 	ScreenWidth                 int32               `bson:"screen_width,omitempty"`
 	ScreenHeight                int32               `bson:"screen_height,omitempty"`
 	CarrierName                 string              `bson:"carrier_name,omitempty"`
@@ -91,7 +92,7 @@ type Device struct {
 	Platform                    string              `bson:"platform,omitempty"`
 	IsBackgroundEnabled         bool                `bson:"is_background_enabled"`
 	IsLocationMonitoringEnabled bool                `bson:"is_location_monitoring_enabled"`
-	IsBluetoothEnabled          bool                `bson:"is_bluetooth_enabled"`
+	IsBluetoothEnabled          boolValue           `bson:"is_bluetooth_enabled"`
 	AdvertisingId               string              `bson:"advertising_id,omitempty"`
 	Ip                          string              `bson:"ip,omitempty"`
 	NotificationAuthorization   string              `bson:"notification_authorization,omitempty"`
@@ -168,8 +169,19 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.LocaleLanguage = proto.LocaleLanguage
 	d.LocaleRegion = proto.LocaleRegion
 	d.LocaleScript = proto.LocaleScript
-	d.IsWifiEnabled = proto.IsWifiEnabled
-	d.IsCellularEnabled = proto.IsCellularEnabled
+
+	if proto.IsWifiEnabled != nil {
+		d.IsWifiEnabled = newBoolValue(proto.IsWifiEnabled.GetValue())
+	} else {
+		d.IsWifiEnabled.Unset()
+	}
+
+	if proto.IsCellularEnabled != nil {
+		d.IsCellularEnabled = newBoolValue(proto.IsCellularEnabled.GetValue())
+	} else {
+		d.IsCellularEnabled.Unset()
+	}
+
 	d.ScreenWidth = proto.ScreenWidth
 	d.ScreenHeight = proto.ScreenHeight
 	d.CarrierName = proto.CarrierName
@@ -187,7 +199,13 @@ func (d *Device) fromProto(proto *audience.Device) error {
 
 	d.IsBackgroundEnabled = proto.IsBackgroundEnabled
 	d.IsLocationMonitoringEnabled = proto.IsLocationMonitoringEnabled
-	d.IsBluetoothEnabled = proto.IsBluetoothEnabled
+
+	if proto.IsBluetoothEnabled != nil {
+		d.IsBluetoothEnabled = newBoolValue(proto.IsBluetoothEnabled.GetValue())
+	} else {
+		d.IsBluetoothEnabled.Unset()
+	}
+
 	d.AdvertisingId = proto.AdvertisingId
 
 	d.Ip = proto.Ip
@@ -273,8 +291,19 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.LocaleLanguage = d.LocaleLanguage
 	proto.LocaleRegion = d.LocaleRegion
 	proto.LocaleScript = d.LocaleScript
-	proto.IsWifiEnabled = d.IsWifiEnabled
-	proto.IsCellularEnabled = d.IsCellularEnabled
+
+	if d.IsWifiEnabled.Present() {
+		proto.IsWifiEnabled = wrappers.Bool(d.IsWifiEnabled.Value())
+	} else {
+		proto.IsWifiEnabled = nil
+	}
+
+	if d.IsCellularEnabled.Present() {
+		proto.IsCellularEnabled = wrappers.Bool(d.IsCellularEnabled.Value())
+	} else {
+		proto.IsCellularEnabled = nil
+	}
+
 	proto.ScreenWidth = d.ScreenWidth
 	proto.ScreenHeight = d.ScreenHeight
 	proto.CarrierName = d.CarrierName
@@ -292,7 +321,13 @@ func (d *Device) toProto(proto *audience.Device) error {
 
 	proto.IsBackgroundEnabled = d.IsBackgroundEnabled
 	proto.IsLocationMonitoringEnabled = d.IsLocationMonitoringEnabled
-	proto.IsBluetoothEnabled = d.IsBluetoothEnabled
+
+	if d.IsBluetoothEnabled.Present() {
+		proto.IsBluetoothEnabled = wrappers.Bool(d.IsBluetoothEnabled.Value())
+	} else {
+		proto.IsBluetoothEnabled = nil
+	}
+
 	proto.AdvertisingId = d.AdvertisingId
 
 	proto.Ip = d.Ip
@@ -551,8 +586,25 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 	update["locale_language"] = r.LocaleLanguage
 	update["locale_region"] = r.LocaleRegion
 	update["locale_script"] = r.LocaleScript
-	update["is_wifi_enabled"] = r.IsWifiEnabled
-	update["is_cellular_enabled"] = r.IsCellularEnabled
+
+	if r.IsWifiEnabled != nil {
+		update["is_wifi_enabled"] = r.IsWifiEnabled.GetValue()
+	} else {
+		update["is_wifi_enabled"] = nil
+	}
+
+	if r.IsCellularEnabled != nil {
+		update["is_cellular_enabled"] = r.IsCellularEnabled.GetValue()
+	} else {
+		update["is_cellular_enabled"] = nil
+	}
+
+	if r.IsBluetoothEnabled != nil {
+		update["is_bluetooth_enabled"] = r.IsBluetoothEnabled.GetValue()
+	} else {
+		update["is_bluetooth_enabled"] = nil
+	}
+
 	update["screen_width"] = r.ScreenWidth
 	update["screen_height"] = r.ScreenHeight
 	update["carrier_name"] = r.CarrierName
@@ -560,7 +612,6 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 	update["time_zone"] = r.TimeZone
 	update["is_background_enabled"] = r.IsBackgroundEnabled
 	update["is_location_monitoring_enabled"] = r.IsLocationMonitoringEnabled
-	update["is_bluetooth_enabled"] = r.IsBluetoothEnabled
 	update["advertising_id"] = r.AdvertisingId
 	update["ip"] = r.Ip
 	update["notification_authorization"] = r.NotificationAuthorization.String()

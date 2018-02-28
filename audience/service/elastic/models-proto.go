@@ -5,33 +5,35 @@ import (
 	"time"
 
 	"github.com/roverplatform/rover/apis/go/audience/v1"
+	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
+	"github.com/roverplatform/rover/go/optional"
 )
 
 type Device struct {
-	AccountID                   int32      `json:"account_id"`
-	Attributes                  M          `json:"attributes"`
-	AdvertisingID               string     `json:"advertising_id"`
-	AppBuild                    string     `json:"app_build"`
-	AppName                     string     `json:"app_name"`
-	AppNamespace                string     `json:"app_namespace"`
-	AppVersion                  string     `json:"app_version"`
-	CarrierName                 string     `json:"carrier_name"`
-	CreatedAt                   *time.Time `json:"created_at"`
-	DeviceID                    string     `json:"device_id"`
-	DeviceManufacturer          string     `json:"device_manufacturer"`
-	DeviceModel                 string     `json:"device_model"`
-	IP                          string     `json:"ip"`
-	NotificationAuthorization   string     `json:"notification_authorization"`
-	IsBackgroundEnabled         bool       `json:"is_background_enabled"`
-	IsBluetoothEnabled          bool       `json:"is_bluetooth_enabled"`
-	IsCellularEnabled           bool       `json:"is_cellular_enabled"`
-	IsLocationMonitoringEnabled bool       `json:"is_location_monitoring_enabled"`
-	IsTestDevice                bool       `json:"is_test_device"`
-	IsWifiEnabled               bool       `json:"is_wifi_enabled"`
-	Label                       string     `json:"label"`
-	LocaleLanguage              string     `json:"locale_language"`
-	LocaleRegion                string     `json:"locale_region"`
-	LocaleScript                string     `json:"locale_script"`
+	AccountID                   int32         `json:"account_id"`
+	Attributes                  M             `json:"attributes"`
+	AdvertisingID               string        `json:"advertising_id"`
+	AppBuild                    string        `json:"app_build"`
+	AppName                     string        `json:"app_name"`
+	AppNamespace                string        `json:"app_namespace"`
+	AppVersion                  string        `json:"app_version"`
+	CarrierName                 string        `json:"carrier_name"`
+	CreatedAt                   *time.Time    `json:"created_at"`
+	DeviceID                    string        `json:"device_id"`
+	DeviceManufacturer          string        `json:"device_manufacturer"`
+	DeviceModel                 string        `json:"device_model"`
+	IP                          string        `json:"ip"`
+	NotificationAuthorization   string        `json:"notification_authorization"`
+	IsBackgroundEnabled         bool          `json:"is_background_enabled"`
+	IsBluetoothEnabled          optional.Bool `json:"is_bluetooth_enabled"`
+	IsCellularEnabled           optional.Bool `json:"is_cellular_enabled"`
+	IsLocationMonitoringEnabled bool          `json:"is_location_monitoring_enabled"`
+	IsTestDevice                bool          `json:"is_test_device"`
+	IsWifiEnabled               optional.Bool `json:"is_wifi_enabled"`
+	Label                       string        `json:"label"`
+	LocaleLanguage              string        `json:"locale_language"`
+	LocaleRegion                string        `json:"locale_region"`
+	LocaleScript                string        `json:"locale_script"`
 	Location                    *struct {
 		Lat float64 `json:"lat"`
 		Lon float64 `json:"lon"`
@@ -137,8 +139,19 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.LocaleLanguage = d.LocaleLanguage
 	proto.LocaleRegion = d.LocaleRegion
 	proto.LocaleScript = d.LocaleScript
-	proto.IsWifiEnabled = d.IsWifiEnabled
-	proto.IsCellularEnabled = d.IsCellularEnabled
+
+	if d.IsWifiEnabled.Present() {
+		proto.IsWifiEnabled = wrappers.Bool(d.IsWifiEnabled.Value())
+	}
+
+	if d.IsCellularEnabled.Present() {
+		proto.IsCellularEnabled = wrappers.Bool(d.IsCellularEnabled.Value())
+	}
+
+	if d.IsBluetoothEnabled.Present() {
+		proto.IsBluetoothEnabled = wrappers.Bool(d.IsBluetoothEnabled.Value())
+	}
+
 	proto.ScreenWidth = d.ScreenWidth
 	proto.ScreenHeight = d.ScreenHeight
 	proto.CarrierName = d.CarrierName
@@ -156,7 +169,6 @@ func (d *Device) toProto(proto *audience.Device) error {
 
 	proto.IsBackgroundEnabled = d.IsBackgroundEnabled
 	proto.IsLocationMonitoringEnabled = d.IsLocationMonitoringEnabled
-	proto.IsBluetoothEnabled = d.IsBluetoothEnabled
 
 	proto.Ip = d.IP
 
