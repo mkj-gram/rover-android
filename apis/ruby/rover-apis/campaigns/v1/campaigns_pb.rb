@@ -250,6 +250,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE, 0
     value :NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP, 1
     value :NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK, 2
+    value :NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_WEBSITE, 3
   end
   add_enum "rover.campaigns.v1.NotificationTapPresentationType" do
     value :NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN, 0
