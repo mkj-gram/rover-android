@@ -8,6 +8,15 @@ It is generated from these files:
 	campaigns/v1/campaigns.proto
 
 It has these top-level messages:
+	CampaignType
+	CampaignStatus
+	SegmentCondition
+	NotificationTapBehaviorType
+	NotificationTapPresentationType
+	ScheduledType
+	ScheduledDeliveryStatus
+	NotificationAttachmentType
+	RateLimit
 	Campaign
 	CreateRequest
 	CreateResponse
@@ -29,7 +38,6 @@ It has these top-level messages:
 	UpdateScheduledDeliverySettingsResponse
 	UpdateAutomatedDeliverySettingsRequest
 	UpdateAutomatedDeliverySettingsResponse
-	RateLimit
 	ScheduledNotificationCampaign
 	AutomatedNotificationCampaign
 */
@@ -58,205 +66,211 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type CampaignType int32
+type CampaignType_Enum int32
 
 const (
-	CampaignType_CAMPAIGN_TYPE_UNDEFINED              CampaignType = 0
-	CampaignType_CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION CampaignType = 1
-	CampaignType_CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION CampaignType = 2
+	CampaignType_UNKNOWN                CampaignType_Enum = 0
+	CampaignType_SCHEDULED_NOTIFICATION CampaignType_Enum = 1
+	CampaignType_AUTOMATED_NOTIFICATION CampaignType_Enum = 2
 )
 
-var CampaignType_name = map[int32]string{
-	0: "CAMPAIGN_TYPE_UNDEFINED",
-	1: "CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION",
-	2: "CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION",
+var CampaignType_Enum_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "SCHEDULED_NOTIFICATION",
+	2: "AUTOMATED_NOTIFICATION",
 }
-var CampaignType_value = map[string]int32{
-	"CAMPAIGN_TYPE_UNDEFINED":              0,
-	"CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION": 1,
-	"CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION": 2,
+var CampaignType_Enum_value = map[string]int32{
+	"UNKNOWN":                0,
+	"SCHEDULED_NOTIFICATION": 1,
+	"AUTOMATED_NOTIFICATION": 2,
 }
 
-func (x CampaignType) String() string {
-	return proto.EnumName(CampaignType_name, int32(x))
+func (x CampaignType_Enum) String() string {
+	return proto.EnumName(CampaignType_Enum_name, int32(x))
 }
-func (CampaignType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (CampaignType_Enum) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 0} }
 
-type CampaignStatus int32
+type CampaignStatus_Enum int32
 
 const (
-	CampaignStatus_CAMPAIGN_STATUS_UNDEFINED CampaignStatus = 0
-	CampaignStatus_CAMPAIGN_STATUS_DRAFT     CampaignStatus = 1
-	CampaignStatus_CAMPAIGN_STATUS_PUBLISHED CampaignStatus = 2
-	CampaignStatus_CAMPAIGN_STATUS_ARCHIVED  CampaignStatus = 3
+	CampaignStatus_UNKNOWN   CampaignStatus_Enum = 0
+	CampaignStatus_DRAFT     CampaignStatus_Enum = 1
+	CampaignStatus_PUBLISHED CampaignStatus_Enum = 2
+	CampaignStatus_ARCHIVED  CampaignStatus_Enum = 3
 )
 
-var CampaignStatus_name = map[int32]string{
-	0: "CAMPAIGN_STATUS_UNDEFINED",
-	1: "CAMPAIGN_STATUS_DRAFT",
-	2: "CAMPAIGN_STATUS_PUBLISHED",
-	3: "CAMPAIGN_STATUS_ARCHIVED",
+var CampaignStatus_Enum_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "DRAFT",
+	2: "PUBLISHED",
+	3: "ARCHIVED",
 }
-var CampaignStatus_value = map[string]int32{
-	"CAMPAIGN_STATUS_UNDEFINED": 0,
-	"CAMPAIGN_STATUS_DRAFT":     1,
-	"CAMPAIGN_STATUS_PUBLISHED": 2,
-	"CAMPAIGN_STATUS_ARCHIVED":  3,
+var CampaignStatus_Enum_value = map[string]int32{
+	"UNKNOWN":   0,
+	"DRAFT":     1,
+	"PUBLISHED": 2,
+	"ARCHIVED":  3,
 }
 
-func (x CampaignStatus) String() string {
-	return proto.EnumName(CampaignStatus_name, int32(x))
+func (x CampaignStatus_Enum) String() string {
+	return proto.EnumName(CampaignStatus_Enum_name, int32(x))
 }
-func (CampaignStatus) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (CampaignStatus_Enum) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{1, 0} }
 
-type SegmentCondition int32
+type SegmentCondition_Enum int32
 
 const (
-	SegmentCondition_SEGMENT_CONDITION_ANY SegmentCondition = 0
-	SegmentCondition_SEGMENT_CONDITION_ALL SegmentCondition = 1
+	SegmentCondition_ANY SegmentCondition_Enum = 0
+	SegmentCondition_ALL SegmentCondition_Enum = 1
 )
 
-var SegmentCondition_name = map[int32]string{
-	0: "SEGMENT_CONDITION_ANY",
-	1: "SEGMENT_CONDITION_ALL",
+var SegmentCondition_Enum_name = map[int32]string{
+	0: "ANY",
+	1: "ALL",
 }
-var SegmentCondition_value = map[string]int32{
-	"SEGMENT_CONDITION_ANY": 0,
-	"SEGMENT_CONDITION_ALL": 1,
+var SegmentCondition_Enum_value = map[string]int32{
+	"ANY": 0,
+	"ALL": 1,
 }
 
-func (x SegmentCondition) String() string {
-	return proto.EnumName(SegmentCondition_name, int32(x))
+func (x SegmentCondition_Enum) String() string {
+	return proto.EnumName(SegmentCondition_Enum_name, int32(x))
 }
-func (SegmentCondition) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (SegmentCondition_Enum) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{2, 0} }
 
-type NotificationAttachmentType int32
+type NotificationTapBehaviorType_Enum int32
 
 const (
-	NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN NotificationAttachmentType = 0
-	NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_IMAGE   NotificationAttachmentType = 1
-	NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_AUDIO   NotificationAttachmentType = 2
-	NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_VIDEO   NotificationAttachmentType = 3
+	NotificationTapBehaviorType_OPEN_EXPERIENCE NotificationTapBehaviorType_Enum = 0
+	NotificationTapBehaviorType_OPEN_APP        NotificationTapBehaviorType_Enum = 1
+	NotificationTapBehaviorType_OPEN_DEEP_LINK  NotificationTapBehaviorType_Enum = 2
+	NotificationTapBehaviorType_OPEN_WEBSITE    NotificationTapBehaviorType_Enum = 3
 )
 
-var NotificationAttachmentType_name = map[int32]string{
-	0: "NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN",
-	1: "NOTIFICATION_ATTACHMENT_TYPE_IMAGE",
-	2: "NOTIFICATION_ATTACHMENT_TYPE_AUDIO",
-	3: "NOTIFICATION_ATTACHMENT_TYPE_VIDEO",
+var NotificationTapBehaviorType_Enum_name = map[int32]string{
+	0: "OPEN_EXPERIENCE",
+	1: "OPEN_APP",
+	2: "OPEN_DEEP_LINK",
+	3: "OPEN_WEBSITE",
 }
-var NotificationAttachmentType_value = map[string]int32{
-	"NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN": 0,
-	"NOTIFICATION_ATTACHMENT_TYPE_IMAGE":   1,
-	"NOTIFICATION_ATTACHMENT_TYPE_AUDIO":   2,
-	"NOTIFICATION_ATTACHMENT_TYPE_VIDEO":   3,
+var NotificationTapBehaviorType_Enum_value = map[string]int32{
+	"OPEN_EXPERIENCE": 0,
+	"OPEN_APP":        1,
+	"OPEN_DEEP_LINK":  2,
+	"OPEN_WEBSITE":    3,
 }
 
-func (x NotificationAttachmentType) String() string {
-	return proto.EnumName(NotificationAttachmentType_name, int32(x))
+func (x NotificationTapBehaviorType_Enum) String() string {
+	return proto.EnumName(NotificationTapBehaviorType_Enum_name, int32(x))
 }
-func (NotificationAttachmentType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (NotificationTapBehaviorType_Enum) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{3, 0}
+}
 
-type NotificationTapBehaviorType int32
+type NotificationTapPresentationType_Enum int32
 
 const (
-	NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE NotificationTapBehaviorType = 0
-	NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP        NotificationTapBehaviorType = 1
-	NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK  NotificationTapBehaviorType = 2
-	NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_WEBSITE    NotificationTapBehaviorType = 3
+	NotificationTapPresentationType_UNKNOWN    NotificationTapPresentationType_Enum = 0
+	NotificationTapPresentationType_IN_APP     NotificationTapPresentationType_Enum = 1
+	NotificationTapPresentationType_IN_BROWSER NotificationTapPresentationType_Enum = 2
 )
 
-var NotificationTapBehaviorType_name = map[int32]string{
-	0: "NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE",
-	1: "NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP",
-	2: "NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK",
-	3: "NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_WEBSITE",
+var NotificationTapPresentationType_Enum_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "IN_APP",
+	2: "IN_BROWSER",
 }
-var NotificationTapBehaviorType_value = map[string]int32{
-	"NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE": 0,
-	"NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP":        1,
-	"NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK":  2,
-	"NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_WEBSITE":    3,
+var NotificationTapPresentationType_Enum_value = map[string]int32{
+	"UNKNOWN":    0,
+	"IN_APP":     1,
+	"IN_BROWSER": 2,
 }
 
-func (x NotificationTapBehaviorType) String() string {
-	return proto.EnumName(NotificationTapBehaviorType_name, int32(x))
+func (x NotificationTapPresentationType_Enum) String() string {
+	return proto.EnumName(NotificationTapPresentationType_Enum_name, int32(x))
 }
-func (NotificationTapBehaviorType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (NotificationTapPresentationType_Enum) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{4, 0}
+}
 
-type NotificationTapPresentationType int32
+type ScheduledType_Enum int32
 
 const (
-	NotificationTapPresentationType_NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN    NotificationTapPresentationType = 0
-	NotificationTapPresentationType_NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP     NotificationTapPresentationType = 1
-	NotificationTapPresentationType_NOTIFICATION_TAP_PRESENTATION_TYPE_IN_BROWSER NotificationTapPresentationType = 2
+	ScheduledType_NOW       ScheduledType_Enum = 0
+	ScheduledType_SCHEDULED ScheduledType_Enum = 1
 )
 
-var NotificationTapPresentationType_name = map[int32]string{
-	0: "NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN",
-	1: "NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP",
-	2: "NOTIFICATION_TAP_PRESENTATION_TYPE_IN_BROWSER",
+var ScheduledType_Enum_name = map[int32]string{
+	0: "NOW",
+	1: "SCHEDULED",
 }
-var NotificationTapPresentationType_value = map[string]int32{
-	"NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN":    0,
-	"NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP":     1,
-	"NOTIFICATION_TAP_PRESENTATION_TYPE_IN_BROWSER": 2,
+var ScheduledType_Enum_value = map[string]int32{
+	"NOW":       0,
+	"SCHEDULED": 1,
 }
 
-func (x NotificationTapPresentationType) String() string {
-	return proto.EnumName(NotificationTapPresentationType_name, int32(x))
+func (x ScheduledType_Enum) String() string {
+	return proto.EnumName(ScheduledType_Enum_name, int32(x))
 }
-func (NotificationTapPresentationType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{5}
-}
+func (ScheduledType_Enum) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{5, 0} }
 
-type ScheduledType int32
+type ScheduledDeliveryStatus_Enum int32
 
 const (
-	ScheduledType_SCHEDULED_TYPE_NOW       ScheduledType = 0
-	ScheduledType_SCHEDULED_TYPE_SCHEDULED ScheduledType = 1
+	ScheduledDeliveryStatus_UNKNOWN    ScheduledDeliveryStatus_Enum = 0
+	ScheduledDeliveryStatus_SCHEDULED  ScheduledDeliveryStatus_Enum = 1
+	ScheduledDeliveryStatus_INPROGRESS ScheduledDeliveryStatus_Enum = 2
+	ScheduledDeliveryStatus_FINISHED   ScheduledDeliveryStatus_Enum = 3
 )
 
-var ScheduledType_name = map[int32]string{
-	0: "SCHEDULED_TYPE_NOW",
-	1: "SCHEDULED_TYPE_SCHEDULED",
+var ScheduledDeliveryStatus_Enum_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "SCHEDULED",
+	2: "INPROGRESS",
+	3: "FINISHED",
 }
-var ScheduledType_value = map[string]int32{
-	"SCHEDULED_TYPE_NOW":       0,
-	"SCHEDULED_TYPE_SCHEDULED": 1,
+var ScheduledDeliveryStatus_Enum_value = map[string]int32{
+	"UNKNOWN":    0,
+	"SCHEDULED":  1,
+	"INPROGRESS": 2,
+	"FINISHED":   3,
 }
 
-func (x ScheduledType) String() string {
-	return proto.EnumName(ScheduledType_name, int32(x))
+func (x ScheduledDeliveryStatus_Enum) String() string {
+	return proto.EnumName(ScheduledDeliveryStatus_Enum_name, int32(x))
 }
-func (ScheduledType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (ScheduledDeliveryStatus_Enum) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{6, 0}
+}
 
-type ScheduledDeliveryStatus int32
+type NotificationAttachmentType_Enum int32
 
 const (
-	ScheduledDeliveryStatus_SCHEDULED_DELIVERY_STATUS_UNKNOWN    ScheduledDeliveryStatus = 0
-	ScheduledDeliveryStatus_SCHEDULED_DELIVERY_STATUS_SCHEDULED  ScheduledDeliveryStatus = 1
-	ScheduledDeliveryStatus_SCHEDULED_DELIVERY_STATUS_INPROGRESS ScheduledDeliveryStatus = 2
-	ScheduledDeliveryStatus_SCHEDULED_DELIVERY_STATUS_FINISHED   ScheduledDeliveryStatus = 3
+	NotificationAttachmentType_UNKNOWN NotificationAttachmentType_Enum = 0
+	NotificationAttachmentType_IMAGE   NotificationAttachmentType_Enum = 1
+	NotificationAttachmentType_AUDIO   NotificationAttachmentType_Enum = 2
+	NotificationAttachmentType_VIDEO   NotificationAttachmentType_Enum = 3
 )
 
-var ScheduledDeliveryStatus_name = map[int32]string{
-	0: "SCHEDULED_DELIVERY_STATUS_UNKNOWN",
-	1: "SCHEDULED_DELIVERY_STATUS_SCHEDULED",
-	2: "SCHEDULED_DELIVERY_STATUS_INPROGRESS",
-	3: "SCHEDULED_DELIVERY_STATUS_FINISHED",
+var NotificationAttachmentType_Enum_name = map[int32]string{
+	0: "UNKNOWN",
+	1: "IMAGE",
+	2: "AUDIO",
+	3: "VIDEO",
 }
-var ScheduledDeliveryStatus_value = map[string]int32{
-	"SCHEDULED_DELIVERY_STATUS_UNKNOWN":    0,
-	"SCHEDULED_DELIVERY_STATUS_SCHEDULED":  1,
-	"SCHEDULED_DELIVERY_STATUS_INPROGRESS": 2,
-	"SCHEDULED_DELIVERY_STATUS_FINISHED":   3,
+var NotificationAttachmentType_Enum_value = map[string]int32{
+	"UNKNOWN": 0,
+	"IMAGE":   1,
+	"AUDIO":   2,
+	"VIDEO":   3,
 }
 
-func (x ScheduledDeliveryStatus) String() string {
-	return proto.EnumName(ScheduledDeliveryStatus_name, int32(x))
+func (x NotificationAttachmentType_Enum) String() string {
+	return proto.EnumName(NotificationAttachmentType_Enum_name, int32(x))
 }
-func (ScheduledDeliveryStatus) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (NotificationAttachmentType_Enum) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{7, 0}
+}
 
 type RateLimit_Unit int32
 
@@ -277,7 +291,103 @@ var RateLimit_Unit_value = map[string]int32{
 func (x RateLimit_Unit) String() string {
 	return proto.EnumName(RateLimit_Unit_name, int32(x))
 }
-func (RateLimit_Unit) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{21, 0} }
+func (RateLimit_Unit) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{8, 0} }
+
+type CampaignType struct {
+}
+
+func (m *CampaignType) Reset()                    { *m = CampaignType{} }
+func (m *CampaignType) String() string            { return proto.CompactTextString(m) }
+func (*CampaignType) ProtoMessage()               {}
+func (*CampaignType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+type CampaignStatus struct {
+}
+
+func (m *CampaignStatus) Reset()                    { *m = CampaignStatus{} }
+func (m *CampaignStatus) String() string            { return proto.CompactTextString(m) }
+func (*CampaignStatus) ProtoMessage()               {}
+func (*CampaignStatus) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+type SegmentCondition struct {
+}
+
+func (m *SegmentCondition) Reset()                    { *m = SegmentCondition{} }
+func (m *SegmentCondition) String() string            { return proto.CompactTextString(m) }
+func (*SegmentCondition) ProtoMessage()               {}
+func (*SegmentCondition) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+type NotificationTapBehaviorType struct {
+}
+
+func (m *NotificationTapBehaviorType) Reset()                    { *m = NotificationTapBehaviorType{} }
+func (m *NotificationTapBehaviorType) String() string            { return proto.CompactTextString(m) }
+func (*NotificationTapBehaviorType) ProtoMessage()               {}
+func (*NotificationTapBehaviorType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+type NotificationTapPresentationType struct {
+}
+
+func (m *NotificationTapPresentationType) Reset()                    { *m = NotificationTapPresentationType{} }
+func (m *NotificationTapPresentationType) String() string            { return proto.CompactTextString(m) }
+func (*NotificationTapPresentationType) ProtoMessage()               {}
+func (*NotificationTapPresentationType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+type ScheduledType struct {
+}
+
+func (m *ScheduledType) Reset()                    { *m = ScheduledType{} }
+func (m *ScheduledType) String() string            { return proto.CompactTextString(m) }
+func (*ScheduledType) ProtoMessage()               {}
+func (*ScheduledType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+type ScheduledDeliveryStatus struct {
+}
+
+func (m *ScheduledDeliveryStatus) Reset()                    { *m = ScheduledDeliveryStatus{} }
+func (m *ScheduledDeliveryStatus) String() string            { return proto.CompactTextString(m) }
+func (*ScheduledDeliveryStatus) ProtoMessage()               {}
+func (*ScheduledDeliveryStatus) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+
+type NotificationAttachmentType struct {
+}
+
+func (m *NotificationAttachmentType) Reset()                    { *m = NotificationAttachmentType{} }
+func (m *NotificationAttachmentType) String() string            { return proto.CompactTextString(m) }
+func (*NotificationAttachmentType) ProtoMessage()               {}
+func (*NotificationAttachmentType) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+
+type RateLimit struct {
+	Limit         int32          `protobuf:"varint,1,opt,name=limit" json:"limit,omitempty"`
+	IntervalCount int32          `protobuf:"varint,2,opt,name=interval_count,json=intervalCount" json:"interval_count,omitempty"`
+	IntervalUnit  RateLimit_Unit `protobuf:"varint,3,opt,name=interval_unit,json=intervalUnit,enum=rover.campaigns.v1.RateLimit_Unit" json:"interval_unit,omitempty"`
+}
+
+func (m *RateLimit) Reset()                    { *m = RateLimit{} }
+func (m *RateLimit) String() string            { return proto.CompactTextString(m) }
+func (*RateLimit) ProtoMessage()               {}
+func (*RateLimit) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+
+func (m *RateLimit) GetLimit() int32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *RateLimit) GetIntervalCount() int32 {
+	if m != nil {
+		return m.IntervalCount
+	}
+	return 0
+}
+
+func (m *RateLimit) GetIntervalUnit() RateLimit_Unit {
+	if m != nil {
+		return m.IntervalUnit
+	}
+	return RateLimit_HOUR
+}
 
 type Campaign struct {
 	// Types that are valid to be assigned to Campaign:
@@ -289,7 +399,7 @@ type Campaign struct {
 func (m *Campaign) Reset()                    { *m = Campaign{} }
 func (m *Campaign) String() string            { return proto.CompactTextString(m) }
 func (*Campaign) ProtoMessage()               {}
-func (*Campaign) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*Campaign) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
 type isCampaign_Campaign interface {
 	isCampaign_Campaign()
@@ -403,13 +513,13 @@ func _Campaign_OneofSizer(msg proto.Message) (n int) {
 type CreateRequest struct {
 	AuthContext  *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
 	Name         string                     `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	CampaignType CampaignType               `protobuf:"varint,3,opt,name=campaign_type,json=campaignType,enum=rover.campaigns.v1.CampaignType" json:"campaign_type,omitempty"`
+	CampaignType CampaignType_Enum          `protobuf:"varint,3,opt,name=campaign_type,json=campaignType,enum=rover.campaigns.v1.CampaignType_Enum" json:"campaign_type,omitempty"`
 }
 
 func (m *CreateRequest) Reset()                    { *m = CreateRequest{} }
 func (m *CreateRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateRequest) ProtoMessage()               {}
-func (*CreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*CreateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
 func (m *CreateRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -425,11 +535,11 @@ func (m *CreateRequest) GetName() string {
 	return ""
 }
 
-func (m *CreateRequest) GetCampaignType() CampaignType {
+func (m *CreateRequest) GetCampaignType() CampaignType_Enum {
 	if m != nil {
 		return m.CampaignType
 	}
-	return CampaignType_CAMPAIGN_TYPE_UNDEFINED
+	return CampaignType_UNKNOWN
 }
 
 type CreateResponse struct {
@@ -439,7 +549,7 @@ type CreateResponse struct {
 func (m *CreateResponse) Reset()                    { *m = CreateResponse{} }
 func (m *CreateResponse) String() string            { return proto.CompactTextString(m) }
 func (*CreateResponse) ProtoMessage()               {}
-func (*CreateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*CreateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
 func (m *CreateResponse) GetCampaign() *Campaign {
 	if m != nil {
@@ -450,8 +560,8 @@ func (m *CreateResponse) GetCampaign() *Campaign {
 
 type ListRequest struct {
 	AuthContext    *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
-	CampaignType   CampaignType               `protobuf:"varint,5,opt,name=campaign_type,json=campaignType,enum=rover.campaigns.v1.CampaignType" json:"campaign_type,omitempty"`
-	CampaignStatus CampaignStatus             `protobuf:"varint,6,opt,name=campaign_status,json=campaignStatus,enum=rover.campaigns.v1.CampaignStatus" json:"campaign_status,omitempty"`
+	CampaignType   CampaignType_Enum          `protobuf:"varint,5,opt,name=campaign_type,json=campaignType,enum=rover.campaigns.v1.CampaignType_Enum" json:"campaign_type,omitempty"`
+	CampaignStatus CampaignStatus_Enum        `protobuf:"varint,6,opt,name=campaign_status,json=campaignStatus,enum=rover.campaigns.v1.CampaignStatus_Enum" json:"campaign_status,omitempty"`
 	// filter
 	Keyword string `protobuf:"bytes,7,opt,name=keyword" json:"keyword,omitempty"`
 	// paging
@@ -462,7 +572,7 @@ type ListRequest struct {
 func (m *ListRequest) Reset()                    { *m = ListRequest{} }
 func (m *ListRequest) String() string            { return proto.CompactTextString(m) }
 func (*ListRequest) ProtoMessage()               {}
-func (*ListRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*ListRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
 func (m *ListRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -471,18 +581,18 @@ func (m *ListRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	return nil
 }
 
-func (m *ListRequest) GetCampaignType() CampaignType {
+func (m *ListRequest) GetCampaignType() CampaignType_Enum {
 	if m != nil {
 		return m.CampaignType
 	}
-	return CampaignType_CAMPAIGN_TYPE_UNDEFINED
+	return CampaignType_UNKNOWN
 }
 
-func (m *ListRequest) GetCampaignStatus() CampaignStatus {
+func (m *ListRequest) GetCampaignStatus() CampaignStatus_Enum {
 	if m != nil {
 		return m.CampaignStatus
 	}
-	return CampaignStatus_CAMPAIGN_STATUS_UNDEFINED
+	return CampaignStatus_UNKNOWN
 }
 
 func (m *ListRequest) GetKeyword() string {
@@ -513,7 +623,7 @@ type ListResponse struct {
 func (m *ListResponse) Reset()                    { *m = ListResponse{} }
 func (m *ListResponse) String() string            { return proto.CompactTextString(m) }
 func (*ListResponse) ProtoMessage()               {}
-func (*ListResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*ListResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
 func (m *ListResponse) GetCampaigns() []*Campaign {
 	if m != nil {
@@ -530,7 +640,7 @@ type ArchiveRequest struct {
 func (m *ArchiveRequest) Reset()                    { *m = ArchiveRequest{} }
 func (m *ArchiveRequest) String() string            { return proto.CompactTextString(m) }
 func (*ArchiveRequest) ProtoMessage()               {}
-func (*ArchiveRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+func (*ArchiveRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
 func (m *ArchiveRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -552,7 +662,7 @@ type ArchiveResponse struct {
 func (m *ArchiveResponse) Reset()                    { *m = ArchiveResponse{} }
 func (m *ArchiveResponse) String() string            { return proto.CompactTextString(m) }
 func (*ArchiveResponse) ProtoMessage()               {}
-func (*ArchiveResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*ArchiveResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
 type DuplicateRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
@@ -563,7 +673,7 @@ type DuplicateRequest struct {
 func (m *DuplicateRequest) Reset()                    { *m = DuplicateRequest{} }
 func (m *DuplicateRequest) String() string            { return proto.CompactTextString(m) }
 func (*DuplicateRequest) ProtoMessage()               {}
-func (*DuplicateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+func (*DuplicateRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
 func (m *DuplicateRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -593,7 +703,7 @@ type DuplicateResponse struct {
 func (m *DuplicateResponse) Reset()                    { *m = DuplicateResponse{} }
 func (m *DuplicateResponse) String() string            { return proto.CompactTextString(m) }
 func (*DuplicateResponse) ProtoMessage()               {}
-func (*DuplicateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+func (*DuplicateResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
 func (m *DuplicateResponse) GetCampaign() *Campaign {
 	if m != nil {
@@ -611,7 +721,7 @@ type RenameRequest struct {
 func (m *RenameRequest) Reset()                    { *m = RenameRequest{} }
 func (m *RenameRequest) String() string            { return proto.CompactTextString(m) }
 func (*RenameRequest) ProtoMessage()               {}
-func (*RenameRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+func (*RenameRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
 func (m *RenameRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -640,7 +750,7 @@ type RenameResponse struct {
 func (m *RenameResponse) Reset()                    { *m = RenameResponse{} }
 func (m *RenameResponse) String() string            { return proto.CompactTextString(m) }
 func (*RenameResponse) ProtoMessage()               {}
-func (*RenameResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+func (*RenameResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
 type PublishRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
@@ -650,7 +760,7 @@ type PublishRequest struct {
 func (m *PublishRequest) Reset()                    { *m = PublishRequest{} }
 func (m *PublishRequest) String() string            { return proto.CompactTextString(m) }
 func (*PublishRequest) ProtoMessage()               {}
-func (*PublishRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+func (*PublishRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
 
 func (m *PublishRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -672,7 +782,7 @@ type PublishResponse struct {
 func (m *PublishResponse) Reset()                    { *m = PublishResponse{} }
 func (m *PublishResponse) String() string            { return proto.CompactTextString(m) }
 func (*PublishResponse) ProtoMessage()               {}
-func (*PublishResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
+func (*PublishResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
 
 type SendTestRequest struct {
 	AuthContext *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
@@ -682,7 +792,7 @@ type SendTestRequest struct {
 func (m *SendTestRequest) Reset()                    { *m = SendTestRequest{} }
 func (m *SendTestRequest) String() string            { return proto.CompactTextString(m) }
 func (*SendTestRequest) ProtoMessage()               {}
-func (*SendTestRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
+func (*SendTestRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
 
 func (m *SendTestRequest) GetAuthContext() *rover_auth_v1.AuthContext {
 	if m != nil {
@@ -704,40 +814,40 @@ type SendTestResponse struct {
 func (m *SendTestResponse) Reset()                    { *m = SendTestResponse{} }
 func (m *SendTestResponse) String() string            { return proto.CompactTextString(m) }
 func (*SendTestResponse) ProtoMessage()               {}
-func (*SendTestResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
+func (*SendTestResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
 
 type UpdateNotificationSettingsRequest struct {
-	AuthContext                               *rover_auth_v1.AuthContext      `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
-	CampaignId                                int32                           `protobuf:"varint,5,opt,name=campaign_id,json=campaignId" json:"campaign_id,omitempty"`
-	ExperienceId                              string                          `protobuf:"bytes,6,opt,name=experience_id,json=experienceId" json:"experience_id,omitempty"`
-	UiState                                   string                          `protobuf:"bytes,10,opt,name=ui_state,json=uiState" json:"ui_state,omitempty"`
-	NotificationBody                          string                          `protobuf:"bytes,11,opt,name=notification_body,json=notificationBody" json:"notification_body,omitempty"`
-	NotificationTitle                         string                          `protobuf:"bytes,12,opt,name=notification_title,json=notificationTitle" json:"notification_title,omitempty"`
-	NotificationAttachmentUrl                 string                          `protobuf:"bytes,13,opt,name=notification_attachment_url,json=notificationAttachmentUrl" json:"notification_attachment_url,omitempty"`
-	NotificationAttachmentType                NotificationAttachmentType      `protobuf:"varint,14,opt,name=notification_attachment_type,json=notificationAttachmentType,enum=rover.campaigns.v1.NotificationAttachmentType" json:"notification_attachment_type,omitempty"`
-	NotificationTapBehaviorType               NotificationTapBehaviorType     `protobuf:"varint,15,opt,name=notification_tap_behavior_type,json=notificationTapBehaviorType,enum=rover.campaigns.v1.NotificationTapBehaviorType" json:"notification_tap_behavior_type,omitempty"`
-	NotificationTapBehaviorPresentationType   NotificationTapPresentationType `protobuf:"varint,16,opt,name=notification_tap_behavior_presentation_type,json=notificationTapBehaviorPresentationType,enum=rover.campaigns.v1.NotificationTapPresentationType" json:"notification_tap_behavior_presentation_type,omitempty"`
-	NotificationTapBehaviorUrl                string                          `protobuf:"bytes,17,opt,name=notification_tap_behavior_url,json=notificationTapBehaviorUrl" json:"notification_tap_behavior_url,omitempty"`
-	NotificationIosContentAvailable           bool                            `protobuf:"varint,18,opt,name=notification_ios_content_available,json=notificationIosContentAvailable" json:"notification_ios_content_available,omitempty"`
-	NotificationIosMutableContent             bool                            `protobuf:"varint,19,opt,name=notification_ios_mutable_content,json=notificationIosMutableContent" json:"notification_ios_mutable_content,omitempty"`
-	NotificationIosSound                      string                          `protobuf:"bytes,20,opt,name=notification_ios_sound,json=notificationIosSound" json:"notification_ios_sound,omitempty"`
-	NotificationIosCategoryIdentifier         string                          `protobuf:"bytes,21,opt,name=notification_ios_category_identifier,json=notificationIosCategoryIdentifier" json:"notification_ios_category_identifier,omitempty"`
-	NotificationIosThreadIdentifier           string                          `protobuf:"bytes,22,opt,name=notification_ios_thread_identifier,json=notificationIosThreadIdentifier" json:"notification_ios_thread_identifier,omitempty"`
-	NotificationAndroidChannelId              string                          `protobuf:"bytes,23,opt,name=notification_android_channel_id,json=notificationAndroidChannelId" json:"notification_android_channel_id,omitempty"`
-	NotificationAndroidSound                  string                          `protobuf:"bytes,24,opt,name=notification_android_sound,json=notificationAndroidSound" json:"notification_android_sound,omitempty"`
-	NotificationAndroidTag                    string                          `protobuf:"bytes,25,opt,name=notification_android_tag,json=notificationAndroidTag" json:"notification_android_tag,omitempty"`
-	NotificationExpiration                    int32                           `protobuf:"varint,26,opt,name=notification_expiration,json=notificationExpiration" json:"notification_expiration,omitempty"`
-	NotificationAttributes                    map[string]string               `protobuf:"bytes,27,rep,name=notification_attributes,json=notificationAttributes" json:"notification_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	NotificationAlertOptionPushNotification   bool                            `protobuf:"varint,28,opt,name=notification_alert_option_push_notification,json=notificationAlertOptionPushNotification" json:"notification_alert_option_push_notification,omitempty"`
-	NotificationAlertOptionNotificationCenter bool                            `protobuf:"varint,29,opt,name=notification_alert_option_notification_center,json=notificationAlertOptionNotificationCenter" json:"notification_alert_option_notification_center,omitempty"`
-	NotificationAlertOptionBadgeNumber        bool                            `protobuf:"varint,30,opt,name=notification_alert_option_badge_number,json=notificationAlertOptionBadgeNumber" json:"notification_alert_option_badge_number,omitempty"`
+	AuthContext                               *rover_auth_v1.AuthContext           `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
+	CampaignId                                int32                                `protobuf:"varint,5,opt,name=campaign_id,json=campaignId" json:"campaign_id,omitempty"`
+	ExperienceId                              string                               `protobuf:"bytes,6,opt,name=experience_id,json=experienceId" json:"experience_id,omitempty"`
+	UiState                                   string                               `protobuf:"bytes,10,opt,name=ui_state,json=uiState" json:"ui_state,omitempty"`
+	NotificationBody                          string                               `protobuf:"bytes,11,opt,name=notification_body,json=notificationBody" json:"notification_body,omitempty"`
+	NotificationTitle                         string                               `protobuf:"bytes,12,opt,name=notification_title,json=notificationTitle" json:"notification_title,omitempty"`
+	NotificationAttachmentUrl                 string                               `protobuf:"bytes,13,opt,name=notification_attachment_url,json=notificationAttachmentUrl" json:"notification_attachment_url,omitempty"`
+	NotificationAttachmentType                NotificationAttachmentType_Enum      `protobuf:"varint,14,opt,name=notification_attachment_type,json=notificationAttachmentType,enum=rover.campaigns.v1.NotificationAttachmentType_Enum" json:"notification_attachment_type,omitempty"`
+	NotificationTapBehaviorType               NotificationTapBehaviorType_Enum     `protobuf:"varint,15,opt,name=notification_tap_behavior_type,json=notificationTapBehaviorType,enum=rover.campaigns.v1.NotificationTapBehaviorType_Enum" json:"notification_tap_behavior_type,omitempty"`
+	NotificationTapBehaviorPresentationType   NotificationTapPresentationType_Enum `protobuf:"varint,16,opt,name=notification_tap_behavior_presentation_type,json=notificationTapBehaviorPresentationType,enum=rover.campaigns.v1.NotificationTapPresentationType_Enum" json:"notification_tap_behavior_presentation_type,omitempty"`
+	NotificationTapBehaviorUrl                string                               `protobuf:"bytes,17,opt,name=notification_tap_behavior_url,json=notificationTapBehaviorUrl" json:"notification_tap_behavior_url,omitempty"`
+	NotificationIosContentAvailable           bool                                 `protobuf:"varint,18,opt,name=notification_ios_content_available,json=notificationIosContentAvailable" json:"notification_ios_content_available,omitempty"`
+	NotificationIosMutableContent             bool                                 `protobuf:"varint,19,opt,name=notification_ios_mutable_content,json=notificationIosMutableContent" json:"notification_ios_mutable_content,omitempty"`
+	NotificationIosSound                      string                               `protobuf:"bytes,20,opt,name=notification_ios_sound,json=notificationIosSound" json:"notification_ios_sound,omitempty"`
+	NotificationIosCategoryIdentifier         string                               `protobuf:"bytes,21,opt,name=notification_ios_category_identifier,json=notificationIosCategoryIdentifier" json:"notification_ios_category_identifier,omitempty"`
+	NotificationIosThreadIdentifier           string                               `protobuf:"bytes,22,opt,name=notification_ios_thread_identifier,json=notificationIosThreadIdentifier" json:"notification_ios_thread_identifier,omitempty"`
+	NotificationAndroidChannelId              string                               `protobuf:"bytes,23,opt,name=notification_android_channel_id,json=notificationAndroidChannelId" json:"notification_android_channel_id,omitempty"`
+	NotificationAndroidSound                  string                               `protobuf:"bytes,24,opt,name=notification_android_sound,json=notificationAndroidSound" json:"notification_android_sound,omitempty"`
+	NotificationAndroidTag                    string                               `protobuf:"bytes,25,opt,name=notification_android_tag,json=notificationAndroidTag" json:"notification_android_tag,omitempty"`
+	NotificationExpiration                    int32                                `protobuf:"varint,26,opt,name=notification_expiration,json=notificationExpiration" json:"notification_expiration,omitempty"`
+	NotificationAttributes                    map[string]string                    `protobuf:"bytes,27,rep,name=notification_attributes,json=notificationAttributes" json:"notification_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	NotificationAlertOptionPushNotification   bool                                 `protobuf:"varint,28,opt,name=notification_alert_option_push_notification,json=notificationAlertOptionPushNotification" json:"notification_alert_option_push_notification,omitempty"`
+	NotificationAlertOptionNotificationCenter bool                                 `protobuf:"varint,29,opt,name=notification_alert_option_notification_center,json=notificationAlertOptionNotificationCenter" json:"notification_alert_option_notification_center,omitempty"`
+	NotificationAlertOptionBadgeNumber        bool                                 `protobuf:"varint,30,opt,name=notification_alert_option_badge_number,json=notificationAlertOptionBadgeNumber" json:"notification_alert_option_badge_number,omitempty"`
 }
 
 func (m *UpdateNotificationSettingsRequest) Reset()         { *m = UpdateNotificationSettingsRequest{} }
 func (m *UpdateNotificationSettingsRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateNotificationSettingsRequest) ProtoMessage()    {}
 func (*UpdateNotificationSettingsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{15}
+	return fileDescriptor0, []int{24}
 }
 
 func (m *UpdateNotificationSettingsRequest) GetAuthContext() *rover_auth_v1.AuthContext {
@@ -789,25 +899,25 @@ func (m *UpdateNotificationSettingsRequest) GetNotificationAttachmentUrl() strin
 	return ""
 }
 
-func (m *UpdateNotificationSettingsRequest) GetNotificationAttachmentType() NotificationAttachmentType {
+func (m *UpdateNotificationSettingsRequest) GetNotificationAttachmentType() NotificationAttachmentType_Enum {
 	if m != nil {
 		return m.NotificationAttachmentType
 	}
-	return NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN
+	return NotificationAttachmentType_UNKNOWN
 }
 
-func (m *UpdateNotificationSettingsRequest) GetNotificationTapBehaviorType() NotificationTapBehaviorType {
+func (m *UpdateNotificationSettingsRequest) GetNotificationTapBehaviorType() NotificationTapBehaviorType_Enum {
 	if m != nil {
 		return m.NotificationTapBehaviorType
 	}
-	return NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE
+	return NotificationTapBehaviorType_OPEN_EXPERIENCE
 }
 
-func (m *UpdateNotificationSettingsRequest) GetNotificationTapBehaviorPresentationType() NotificationTapPresentationType {
+func (m *UpdateNotificationSettingsRequest) GetNotificationTapBehaviorPresentationType() NotificationTapPresentationType_Enum {
 	if m != nil {
 		return m.NotificationTapBehaviorPresentationType
 	}
-	return NotificationTapPresentationType_NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN
+	return NotificationTapPresentationType_UNKNOWN
 }
 
 func (m *UpdateNotificationSettingsRequest) GetNotificationTapBehaviorUrl() string {
@@ -915,16 +1025,16 @@ func (m *UpdateNotificationSettingsResponse) Reset()         { *m = UpdateNotifi
 func (m *UpdateNotificationSettingsResponse) String() string { return proto.CompactTextString(m) }
 func (*UpdateNotificationSettingsResponse) ProtoMessage()    {}
 func (*UpdateNotificationSettingsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{16}
+	return fileDescriptor0, []int{25}
 }
 
 type UpdateScheduledDeliverySettingsRequest struct {
 	AuthContext                 *rover_auth_v1.AuthContext `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
 	CampaignId                  int32                      `protobuf:"varint,5,opt,name=campaign_id,json=campaignId" json:"campaign_id,omitempty"`
 	UiState                     string                     `protobuf:"bytes,10,opt,name=ui_state,json=uiState" json:"ui_state,omitempty"`
-	SegmentCondition            SegmentCondition           `protobuf:"varint,11,opt,name=segment_condition,json=segmentCondition,enum=rover.campaigns.v1.SegmentCondition" json:"segment_condition,omitempty"`
+	SegmentCondition            SegmentCondition_Enum      `protobuf:"varint,11,opt,name=segment_condition,json=segmentCondition,enum=rover.campaigns.v1.SegmentCondition_Enum" json:"segment_condition,omitempty"`
 	SegmentIds                  []string                   `protobuf:"bytes,12,rep,name=segment_ids,json=segmentIds" json:"segment_ids,omitempty"`
-	ScheduledType               ScheduledType              `protobuf:"varint,13,opt,name=scheduled_type,json=scheduledType,enum=rover.campaigns.v1.ScheduledType" json:"scheduled_type,omitempty"`
+	ScheduledType               ScheduledType_Enum         `protobuf:"varint,13,opt,name=scheduled_type,json=scheduledType,enum=rover.campaigns.v1.ScheduledType_Enum" json:"scheduled_type,omitempty"`
 	ScheduledTimestamp          *google_protobuf.Timestamp `protobuf:"bytes,14,opt,name=scheduled_timestamp,json=scheduledTimestamp" json:"scheduled_timestamp,omitempty"`
 	ScheduledTimeZone           string                     `protobuf:"bytes,15,opt,name=scheduled_time_zone,json=scheduledTimeZone" json:"scheduled_time_zone,omitempty"`
 	ScheduledUseLocalDeviceTime bool                       `protobuf:"varint,16,opt,name=scheduled_use_local_device_time,json=scheduledUseLocalDeviceTime" json:"scheduled_use_local_device_time,omitempty"`
@@ -936,7 +1046,7 @@ func (m *UpdateScheduledDeliverySettingsRequest) Reset() {
 func (m *UpdateScheduledDeliverySettingsRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateScheduledDeliverySettingsRequest) ProtoMessage()    {}
 func (*UpdateScheduledDeliverySettingsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{17}
+	return fileDescriptor0, []int{26}
 }
 
 func (m *UpdateScheduledDeliverySettingsRequest) GetAuthContext() *rover_auth_v1.AuthContext {
@@ -960,11 +1070,11 @@ func (m *UpdateScheduledDeliverySettingsRequest) GetUiState() string {
 	return ""
 }
 
-func (m *UpdateScheduledDeliverySettingsRequest) GetSegmentCondition() SegmentCondition {
+func (m *UpdateScheduledDeliverySettingsRequest) GetSegmentCondition() SegmentCondition_Enum {
 	if m != nil {
 		return m.SegmentCondition
 	}
-	return SegmentCondition_SEGMENT_CONDITION_ANY
+	return SegmentCondition_ANY
 }
 
 func (m *UpdateScheduledDeliverySettingsRequest) GetSegmentIds() []string {
@@ -974,11 +1084,11 @@ func (m *UpdateScheduledDeliverySettingsRequest) GetSegmentIds() []string {
 	return nil
 }
 
-func (m *UpdateScheduledDeliverySettingsRequest) GetScheduledType() ScheduledType {
+func (m *UpdateScheduledDeliverySettingsRequest) GetScheduledType() ScheduledType_Enum {
 	if m != nil {
 		return m.ScheduledType
 	}
-	return ScheduledType_SCHEDULED_TYPE_NOW
+	return ScheduledType_NOW
 }
 
 func (m *UpdateScheduledDeliverySettingsRequest) GetScheduledTimestamp() *google_protobuf.Timestamp {
@@ -1011,14 +1121,14 @@ func (m *UpdateScheduledDeliverySettingsResponse) Reset() {
 func (m *UpdateScheduledDeliverySettingsResponse) String() string { return proto.CompactTextString(m) }
 func (*UpdateScheduledDeliverySettingsResponse) ProtoMessage()    {}
 func (*UpdateScheduledDeliverySettingsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{18}
+	return fileDescriptor0, []int{27}
 }
 
 type UpdateAutomatedDeliverySettingsRequest struct {
 	AuthContext                 *rover_auth_v1.AuthContext          `protobuf:"bytes,1,opt,name=auth_context,json=authContext" json:"auth_context,omitempty"`
 	CampaignId                  int32                               `protobuf:"varint,5,opt,name=campaign_id,json=campaignId" json:"campaign_id,omitempty"`
 	UiState                     string                              `protobuf:"bytes,10,opt,name=ui_state,json=uiState" json:"ui_state,omitempty"`
-	SegmentCondition            SegmentCondition                    `protobuf:"varint,11,opt,name=segment_condition,json=segmentCondition,enum=rover.campaigns.v1.SegmentCondition" json:"segment_condition,omitempty"`
+	SegmentCondition            SegmentCondition_Enum               `protobuf:"varint,11,opt,name=segment_condition,json=segmentCondition,enum=rover.campaigns.v1.SegmentCondition_Enum" json:"segment_condition,omitempty"`
 	SegmentIds                  []string                            `protobuf:"bytes,12,rep,name=segment_ids,json=segmentIds" json:"segment_ids,omitempty"`
 	AutomatedMonday             bool                                `protobuf:"varint,13,opt,name=automated_monday,json=automatedMonday" json:"automated_monday,omitempty"`
 	AutomatedTuesday            bool                                `protobuf:"varint,14,opt,name=automated_tuesday,json=automatedTuesday" json:"automated_tuesday,omitempty"`
@@ -1045,7 +1155,7 @@ func (m *UpdateAutomatedDeliverySettingsRequest) Reset() {
 func (m *UpdateAutomatedDeliverySettingsRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateAutomatedDeliverySettingsRequest) ProtoMessage()    {}
 func (*UpdateAutomatedDeliverySettingsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{19}
+	return fileDescriptor0, []int{28}
 }
 
 func (m *UpdateAutomatedDeliverySettingsRequest) GetAuthContext() *rover_auth_v1.AuthContext {
@@ -1069,11 +1179,11 @@ func (m *UpdateAutomatedDeliverySettingsRequest) GetUiState() string {
 	return ""
 }
 
-func (m *UpdateAutomatedDeliverySettingsRequest) GetSegmentCondition() SegmentCondition {
+func (m *UpdateAutomatedDeliverySettingsRequest) GetSegmentCondition() SegmentCondition_Enum {
 	if m != nil {
 		return m.SegmentCondition
 	}
-	return SegmentCondition_SEGMENT_CONDITION_ANY
+	return SegmentCondition_ANY
 }
 
 func (m *UpdateAutomatedDeliverySettingsRequest) GetSegmentIds() []string {
@@ -1211,85 +1321,53 @@ func (m *UpdateAutomatedDeliverySettingsResponse) Reset() {
 func (m *UpdateAutomatedDeliverySettingsResponse) String() string { return proto.CompactTextString(m) }
 func (*UpdateAutomatedDeliverySettingsResponse) ProtoMessage()    {}
 func (*UpdateAutomatedDeliverySettingsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{20}
-}
-
-type RateLimit struct {
-	Limit         int32          `protobuf:"varint,1,opt,name=limit" json:"limit,omitempty"`
-	IntervalCount int32          `protobuf:"varint,2,opt,name=interval_count,json=intervalCount" json:"interval_count,omitempty"`
-	IntervalUnit  RateLimit_Unit `protobuf:"varint,3,opt,name=interval_unit,json=intervalUnit,enum=rover.campaigns.v1.RateLimit_Unit" json:"interval_unit,omitempty"`
-}
-
-func (m *RateLimit) Reset()                    { *m = RateLimit{} }
-func (m *RateLimit) String() string            { return proto.CompactTextString(m) }
-func (*RateLimit) ProtoMessage()               {}
-func (*RateLimit) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
-
-func (m *RateLimit) GetLimit() int32 {
-	if m != nil {
-		return m.Limit
-	}
-	return 0
-}
-
-func (m *RateLimit) GetIntervalCount() int32 {
-	if m != nil {
-		return m.IntervalCount
-	}
-	return 0
-}
-
-func (m *RateLimit) GetIntervalUnit() RateLimit_Unit {
-	if m != nil {
-		return m.IntervalUnit
-	}
-	return RateLimit_HOUR
+	return fileDescriptor0, []int{29}
 }
 
 //
 // for more, see https://paper.dropbox.com/doc/Campaign-Model-iDaks5RstsRN0X2SDCWsv
 //
 type ScheduledNotificationCampaign struct {
-	CampaignId                                int32                           `protobuf:"varint,1,opt,name=campaign_id,json=campaignId" json:"campaign_id,omitempty"`
-	Name                                      string                          `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	CampaignStatus                            CampaignStatus                  `protobuf:"varint,3,opt,name=campaign_status,json=campaignStatus,enum=rover.campaigns.v1.CampaignStatus" json:"campaign_status,omitempty"`
-	ExperienceId                              string                          `protobuf:"bytes,4,opt,name=experience_id,json=experienceId" json:"experience_id,omitempty"`
-	CreatedAt                                 *google_protobuf.Timestamp      `protobuf:"bytes,8,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
-	UpdatedAt                                 *google_protobuf.Timestamp      `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
-	UiState                                   string                          `protobuf:"bytes,10,opt,name=ui_state,json=uiState" json:"ui_state,omitempty"`
-	SegmentCondition                          SegmentCondition                `protobuf:"varint,11,opt,name=segment_condition,json=segmentCondition,enum=rover.campaigns.v1.SegmentCondition" json:"segment_condition,omitempty"`
-	SegmentIds                                []string                        `protobuf:"bytes,12,rep,name=segment_ids,json=segmentIds" json:"segment_ids,omitempty"`
-	NotificationBody                          string                          `protobuf:"bytes,20,opt,name=notification_body,json=notificationBody" json:"notification_body,omitempty"`
-	NotificationTitle                         string                          `protobuf:"bytes,21,opt,name=notification_title,json=notificationTitle" json:"notification_title,omitempty"`
-	NotificationAttachmentUrl                 string                          `protobuf:"bytes,22,opt,name=notification_attachment_url,json=notificationAttachmentUrl" json:"notification_attachment_url,omitempty"`
-	NotificationAttachmentType                NotificationAttachmentType      `protobuf:"varint,23,opt,name=notification_attachment_type,json=notificationAttachmentType,enum=rover.campaigns.v1.NotificationAttachmentType" json:"notification_attachment_type,omitempty"`
-	NotificationTapBehaviorType               NotificationTapBehaviorType     `protobuf:"varint,24,opt,name=notification_tap_behavior_type,json=notificationTapBehaviorType,enum=rover.campaigns.v1.NotificationTapBehaviorType" json:"notification_tap_behavior_type,omitempty"`
-	NotificationTapBehaviorPresentationType   NotificationTapPresentationType `protobuf:"varint,25,opt,name=notification_tap_behavior_presentation_type,json=notificationTapBehaviorPresentationType,enum=rover.campaigns.v1.NotificationTapPresentationType" json:"notification_tap_behavior_presentation_type,omitempty"`
-	NotificationTapBehaviorUrl                string                          `protobuf:"bytes,26,opt,name=notification_tap_behavior_url,json=notificationTapBehaviorUrl" json:"notification_tap_behavior_url,omitempty"`
-	NotificationIosContentAvailable           bool                            `protobuf:"varint,27,opt,name=notification_ios_content_available,json=notificationIosContentAvailable" json:"notification_ios_content_available,omitempty"`
-	NotificationIosMutableContent             bool                            `protobuf:"varint,28,opt,name=notification_ios_mutable_content,json=notificationIosMutableContent" json:"notification_ios_mutable_content,omitempty"`
-	NotificationIosSound                      string                          `protobuf:"bytes,29,opt,name=notification_ios_sound,json=notificationIosSound" json:"notification_ios_sound,omitempty"`
-	NotificationIosCategoryIdentifier         string                          `protobuf:"bytes,30,opt,name=notification_ios_category_identifier,json=notificationIosCategoryIdentifier" json:"notification_ios_category_identifier,omitempty"`
-	NotificationIosThreadIdentifier           string                          `protobuf:"bytes,31,opt,name=notification_ios_thread_identifier,json=notificationIosThreadIdentifier" json:"notification_ios_thread_identifier,omitempty"`
-	NotificationAndroidChannelId              string                          `protobuf:"bytes,32,opt,name=notification_android_channel_id,json=notificationAndroidChannelId" json:"notification_android_channel_id,omitempty"`
-	NotificationAndroidSound                  string                          `protobuf:"bytes,33,opt,name=notification_android_sound,json=notificationAndroidSound" json:"notification_android_sound,omitempty"`
-	NotificationAndroidTag                    string                          `protobuf:"bytes,34,opt,name=notification_android_tag,json=notificationAndroidTag" json:"notification_android_tag,omitempty"`
-	NotificationExpiration                    int32                           `protobuf:"varint,35,opt,name=notification_expiration,json=notificationExpiration" json:"notification_expiration,omitempty"`
-	NotificationAttributes                    map[string]string               `protobuf:"bytes,36,rep,name=notification_attributes,json=notificationAttributes" json:"notification_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	NotificationAlertOptionPushNotification   bool                            `protobuf:"varint,37,opt,name=notification_alert_option_push_notification,json=notificationAlertOptionPushNotification" json:"notification_alert_option_push_notification,omitempty"`
-	NotificationAlertOptionNotificationCenter bool                            `protobuf:"varint,38,opt,name=notification_alert_option_notification_center,json=notificationAlertOptionNotificationCenter" json:"notification_alert_option_notification_center,omitempty"`
-	NotificationAlertOptionBadgeNumber        bool                            `protobuf:"varint,39,opt,name=notification_alert_option_badge_number,json=notificationAlertOptionBadgeNumber" json:"notification_alert_option_badge_number,omitempty"`
-	ScheduledType                             ScheduledType                   `protobuf:"varint,40,opt,name=scheduled_type,json=scheduledType,enum=rover.campaigns.v1.ScheduledType" json:"scheduled_type,omitempty"`
-	ScheduledTimestamp                        *google_protobuf.Timestamp      `protobuf:"bytes,41,opt,name=scheduled_timestamp,json=scheduledTimestamp" json:"scheduled_timestamp,omitempty"`
-	ScheduledTimeZone                         string                          `protobuf:"bytes,42,opt,name=scheduled_time_zone,json=scheduledTimeZone" json:"scheduled_time_zone,omitempty"`
-	ScheduledUseLocalDeviceTime               bool                            `protobuf:"varint,43,opt,name=scheduled_use_local_device_time,json=scheduledUseLocalDeviceTime" json:"scheduled_use_local_device_time,omitempty"`
-	ScheduledDeliveryStatus                   ScheduledDeliveryStatus         `protobuf:"varint,44,opt,name=scheduled_delivery_status,json=scheduledDeliveryStatus,enum=rover.campaigns.v1.ScheduledDeliveryStatus" json:"scheduled_delivery_status,omitempty"`
+	CampaignId                                int32                                `protobuf:"varint,1,opt,name=campaign_id,json=campaignId" json:"campaign_id,omitempty"`
+	Name                                      string                               `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	CampaignStatus                            CampaignStatus_Enum                  `protobuf:"varint,3,opt,name=campaign_status,json=campaignStatus,enum=rover.campaigns.v1.CampaignStatus_Enum" json:"campaign_status,omitempty"`
+	ExperienceId                              string                               `protobuf:"bytes,4,opt,name=experience_id,json=experienceId" json:"experience_id,omitempty"`
+	CreatedAt                                 *google_protobuf.Timestamp           `protobuf:"bytes,8,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	UpdatedAt                                 *google_protobuf.Timestamp           `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
+	UiState                                   string                               `protobuf:"bytes,10,opt,name=ui_state,json=uiState" json:"ui_state,omitempty"`
+	SegmentCondition                          SegmentCondition_Enum                `protobuf:"varint,11,opt,name=segment_condition,json=segmentCondition,enum=rover.campaigns.v1.SegmentCondition_Enum" json:"segment_condition,omitempty"`
+	SegmentIds                                []string                             `protobuf:"bytes,12,rep,name=segment_ids,json=segmentIds" json:"segment_ids,omitempty"`
+	NotificationBody                          string                               `protobuf:"bytes,20,opt,name=notification_body,json=notificationBody" json:"notification_body,omitempty"`
+	NotificationTitle                         string                               `protobuf:"bytes,21,opt,name=notification_title,json=notificationTitle" json:"notification_title,omitempty"`
+	NotificationAttachmentUrl                 string                               `protobuf:"bytes,22,opt,name=notification_attachment_url,json=notificationAttachmentUrl" json:"notification_attachment_url,omitempty"`
+	NotificationAttachmentType                NotificationAttachmentType_Enum      `protobuf:"varint,23,opt,name=notification_attachment_type,json=notificationAttachmentType,enum=rover.campaigns.v1.NotificationAttachmentType_Enum" json:"notification_attachment_type,omitempty"`
+	NotificationTapBehaviorType               NotificationTapBehaviorType_Enum     `protobuf:"varint,24,opt,name=notification_tap_behavior_type,json=notificationTapBehaviorType,enum=rover.campaigns.v1.NotificationTapBehaviorType_Enum" json:"notification_tap_behavior_type,omitempty"`
+	NotificationTapBehaviorPresentationType   NotificationTapPresentationType_Enum `protobuf:"varint,25,opt,name=notification_tap_behavior_presentation_type,json=notificationTapBehaviorPresentationType,enum=rover.campaigns.v1.NotificationTapPresentationType_Enum" json:"notification_tap_behavior_presentation_type,omitempty"`
+	NotificationTapBehaviorUrl                string                               `protobuf:"bytes,26,opt,name=notification_tap_behavior_url,json=notificationTapBehaviorUrl" json:"notification_tap_behavior_url,omitempty"`
+	NotificationIosContentAvailable           bool                                 `protobuf:"varint,27,opt,name=notification_ios_content_available,json=notificationIosContentAvailable" json:"notification_ios_content_available,omitempty"`
+	NotificationIosMutableContent             bool                                 `protobuf:"varint,28,opt,name=notification_ios_mutable_content,json=notificationIosMutableContent" json:"notification_ios_mutable_content,omitempty"`
+	NotificationIosSound                      string                               `protobuf:"bytes,29,opt,name=notification_ios_sound,json=notificationIosSound" json:"notification_ios_sound,omitempty"`
+	NotificationIosCategoryIdentifier         string                               `protobuf:"bytes,30,opt,name=notification_ios_category_identifier,json=notificationIosCategoryIdentifier" json:"notification_ios_category_identifier,omitempty"`
+	NotificationIosThreadIdentifier           string                               `protobuf:"bytes,31,opt,name=notification_ios_thread_identifier,json=notificationIosThreadIdentifier" json:"notification_ios_thread_identifier,omitempty"`
+	NotificationAndroidChannelId              string                               `protobuf:"bytes,32,opt,name=notification_android_channel_id,json=notificationAndroidChannelId" json:"notification_android_channel_id,omitempty"`
+	NotificationAndroidSound                  string                               `protobuf:"bytes,33,opt,name=notification_android_sound,json=notificationAndroidSound" json:"notification_android_sound,omitempty"`
+	NotificationAndroidTag                    string                               `protobuf:"bytes,34,opt,name=notification_android_tag,json=notificationAndroidTag" json:"notification_android_tag,omitempty"`
+	NotificationExpiration                    int32                                `protobuf:"varint,35,opt,name=notification_expiration,json=notificationExpiration" json:"notification_expiration,omitempty"`
+	NotificationAttributes                    map[string]string                    `protobuf:"bytes,36,rep,name=notification_attributes,json=notificationAttributes" json:"notification_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	NotificationAlertOptionPushNotification   bool                                 `protobuf:"varint,37,opt,name=notification_alert_option_push_notification,json=notificationAlertOptionPushNotification" json:"notification_alert_option_push_notification,omitempty"`
+	NotificationAlertOptionNotificationCenter bool                                 `protobuf:"varint,38,opt,name=notification_alert_option_notification_center,json=notificationAlertOptionNotificationCenter" json:"notification_alert_option_notification_center,omitempty"`
+	NotificationAlertOptionBadgeNumber        bool                                 `protobuf:"varint,39,opt,name=notification_alert_option_badge_number,json=notificationAlertOptionBadgeNumber" json:"notification_alert_option_badge_number,omitempty"`
+	ScheduledType                             ScheduledType_Enum                   `protobuf:"varint,40,opt,name=scheduled_type,json=scheduledType,enum=rover.campaigns.v1.ScheduledType_Enum" json:"scheduled_type,omitempty"`
+	ScheduledTimestamp                        *google_protobuf.Timestamp           `protobuf:"bytes,41,opt,name=scheduled_timestamp,json=scheduledTimestamp" json:"scheduled_timestamp,omitempty"`
+	ScheduledTimeZone                         string                               `protobuf:"bytes,42,opt,name=scheduled_time_zone,json=scheduledTimeZone" json:"scheduled_time_zone,omitempty"`
+	ScheduledUseLocalDeviceTime               bool                                 `protobuf:"varint,43,opt,name=scheduled_use_local_device_time,json=scheduledUseLocalDeviceTime" json:"scheduled_use_local_device_time,omitempty"`
+	ScheduledDeliveryStatus                   ScheduledDeliveryStatus_Enum         `protobuf:"varint,44,opt,name=scheduled_delivery_status,json=scheduledDeliveryStatus,enum=rover.campaigns.v1.ScheduledDeliveryStatus_Enum" json:"scheduled_delivery_status,omitempty"`
 }
 
 func (m *ScheduledNotificationCampaign) Reset()                    { *m = ScheduledNotificationCampaign{} }
 func (m *ScheduledNotificationCampaign) String() string            { return proto.CompactTextString(m) }
 func (*ScheduledNotificationCampaign) ProtoMessage()               {}
-func (*ScheduledNotificationCampaign) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
+func (*ScheduledNotificationCampaign) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{30} }
 
 func (m *ScheduledNotificationCampaign) GetCampaignId() int32 {
 	if m != nil {
@@ -1305,11 +1383,11 @@ func (m *ScheduledNotificationCampaign) GetName() string {
 	return ""
 }
 
-func (m *ScheduledNotificationCampaign) GetCampaignStatus() CampaignStatus {
+func (m *ScheduledNotificationCampaign) GetCampaignStatus() CampaignStatus_Enum {
 	if m != nil {
 		return m.CampaignStatus
 	}
-	return CampaignStatus_CAMPAIGN_STATUS_UNDEFINED
+	return CampaignStatus_UNKNOWN
 }
 
 func (m *ScheduledNotificationCampaign) GetExperienceId() string {
@@ -1340,11 +1418,11 @@ func (m *ScheduledNotificationCampaign) GetUiState() string {
 	return ""
 }
 
-func (m *ScheduledNotificationCampaign) GetSegmentCondition() SegmentCondition {
+func (m *ScheduledNotificationCampaign) GetSegmentCondition() SegmentCondition_Enum {
 	if m != nil {
 		return m.SegmentCondition
 	}
-	return SegmentCondition_SEGMENT_CONDITION_ANY
+	return SegmentCondition_ANY
 }
 
 func (m *ScheduledNotificationCampaign) GetSegmentIds() []string {
@@ -1375,25 +1453,25 @@ func (m *ScheduledNotificationCampaign) GetNotificationAttachmentUrl() string {
 	return ""
 }
 
-func (m *ScheduledNotificationCampaign) GetNotificationAttachmentType() NotificationAttachmentType {
+func (m *ScheduledNotificationCampaign) GetNotificationAttachmentType() NotificationAttachmentType_Enum {
 	if m != nil {
 		return m.NotificationAttachmentType
 	}
-	return NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN
+	return NotificationAttachmentType_UNKNOWN
 }
 
-func (m *ScheduledNotificationCampaign) GetNotificationTapBehaviorType() NotificationTapBehaviorType {
+func (m *ScheduledNotificationCampaign) GetNotificationTapBehaviorType() NotificationTapBehaviorType_Enum {
 	if m != nil {
 		return m.NotificationTapBehaviorType
 	}
-	return NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE
+	return NotificationTapBehaviorType_OPEN_EXPERIENCE
 }
 
-func (m *ScheduledNotificationCampaign) GetNotificationTapBehaviorPresentationType() NotificationTapPresentationType {
+func (m *ScheduledNotificationCampaign) GetNotificationTapBehaviorPresentationType() NotificationTapPresentationType_Enum {
 	if m != nil {
 		return m.NotificationTapBehaviorPresentationType
 	}
-	return NotificationTapPresentationType_NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN
+	return NotificationTapPresentationType_UNKNOWN
 }
 
 func (m *ScheduledNotificationCampaign) GetNotificationTapBehaviorUrl() string {
@@ -1494,11 +1572,11 @@ func (m *ScheduledNotificationCampaign) GetNotificationAlertOptionBadgeNumber() 
 	return false
 }
 
-func (m *ScheduledNotificationCampaign) GetScheduledType() ScheduledType {
+func (m *ScheduledNotificationCampaign) GetScheduledType() ScheduledType_Enum {
 	if m != nil {
 		return m.ScheduledType
 	}
-	return ScheduledType_SCHEDULED_TYPE_NOW
+	return ScheduledType_NOW
 }
 
 func (m *ScheduledNotificationCampaign) GetScheduledTimestamp() *google_protobuf.Timestamp {
@@ -1522,50 +1600,50 @@ func (m *ScheduledNotificationCampaign) GetScheduledUseLocalDeviceTime() bool {
 	return false
 }
 
-func (m *ScheduledNotificationCampaign) GetScheduledDeliveryStatus() ScheduledDeliveryStatus {
+func (m *ScheduledNotificationCampaign) GetScheduledDeliveryStatus() ScheduledDeliveryStatus_Enum {
 	if m != nil {
 		return m.ScheduledDeliveryStatus
 	}
-	return ScheduledDeliveryStatus_SCHEDULED_DELIVERY_STATUS_UNKNOWN
+	return ScheduledDeliveryStatus_UNKNOWN
 }
 
 type AutomatedNotificationCampaign struct {
-	CampaignId                                int32                           `protobuf:"varint,1,opt,name=campaign_id,json=campaignId" json:"campaign_id,omitempty"`
-	Name                                      string                          `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	CampaignStatus                            CampaignStatus                  `protobuf:"varint,3,opt,name=campaign_status,json=campaignStatus,enum=rover.campaigns.v1.CampaignStatus" json:"campaign_status,omitempty"`
-	ExperienceId                              string                          `protobuf:"bytes,4,opt,name=experience_id,json=experienceId" json:"experience_id,omitempty"`
-	CreatedAt                                 *google_protobuf.Timestamp      `protobuf:"bytes,8,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
-	UpdatedAt                                 *google_protobuf.Timestamp      `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
-	UiState                                   string                          `protobuf:"bytes,10,opt,name=ui_state,json=uiState" json:"ui_state,omitempty"`
-	SegmentCondition                          SegmentCondition                `protobuf:"varint,11,opt,name=segment_condition,json=segmentCondition,enum=rover.campaigns.v1.SegmentCondition" json:"segment_condition,omitempty"`
-	SegmentIds                                []string                        `protobuf:"bytes,12,rep,name=segment_ids,json=segmentIds" json:"segment_ids,omitempty"`
-	NotificationBody                          string                          `protobuf:"bytes,20,opt,name=notification_body,json=notificationBody" json:"notification_body,omitempty"`
-	NotificationTitle                         string                          `protobuf:"bytes,21,opt,name=notification_title,json=notificationTitle" json:"notification_title,omitempty"`
-	NotificationAttachmentUrl                 string                          `protobuf:"bytes,22,opt,name=notification_attachment_url,json=notificationAttachmentUrl" json:"notification_attachment_url,omitempty"`
-	NotificationAttachmentType                NotificationAttachmentType      `protobuf:"varint,23,opt,name=notification_attachment_type,json=notificationAttachmentType,enum=rover.campaigns.v1.NotificationAttachmentType" json:"notification_attachment_type,omitempty"`
-	NotificationTapBehaviorType               NotificationTapBehaviorType     `protobuf:"varint,24,opt,name=notification_tap_behavior_type,json=notificationTapBehaviorType,enum=rover.campaigns.v1.NotificationTapBehaviorType" json:"notification_tap_behavior_type,omitempty"`
-	NotificationTapBehaviorPresentationType   NotificationTapPresentationType `protobuf:"varint,25,opt,name=notification_tap_behavior_presentation_type,json=notificationTapBehaviorPresentationType,enum=rover.campaigns.v1.NotificationTapPresentationType" json:"notification_tap_behavior_presentation_type,omitempty"`
-	NotificationTapBehaviorUrl                string                          `protobuf:"bytes,26,opt,name=notification_tap_behavior_url,json=notificationTapBehaviorUrl" json:"notification_tap_behavior_url,omitempty"`
-	NotificationIosContentAvailable           bool                            `protobuf:"varint,27,opt,name=notification_ios_content_available,json=notificationIosContentAvailable" json:"notification_ios_content_available,omitempty"`
-	NotificationIosMutableContent             bool                            `protobuf:"varint,28,opt,name=notification_ios_mutable_content,json=notificationIosMutableContent" json:"notification_ios_mutable_content,omitempty"`
-	NotificationIosSound                      string                          `protobuf:"bytes,29,opt,name=notification_ios_sound,json=notificationIosSound" json:"notification_ios_sound,omitempty"`
-	NotificationIosCategoryIdentifier         string                          `protobuf:"bytes,30,opt,name=notification_ios_category_identifier,json=notificationIosCategoryIdentifier" json:"notification_ios_category_identifier,omitempty"`
-	NotificationIosThreadIdentifier           string                          `protobuf:"bytes,31,opt,name=notification_ios_thread_identifier,json=notificationIosThreadIdentifier" json:"notification_ios_thread_identifier,omitempty"`
-	NotificationAndroidChannelId              string                          `protobuf:"bytes,32,opt,name=notification_android_channel_id,json=notificationAndroidChannelId" json:"notification_android_channel_id,omitempty"`
-	NotificationAndroidSound                  string                          `protobuf:"bytes,33,opt,name=notification_android_sound,json=notificationAndroidSound" json:"notification_android_sound,omitempty"`
-	NotificationAndroidTag                    string                          `protobuf:"bytes,34,opt,name=notification_android_tag,json=notificationAndroidTag" json:"notification_android_tag,omitempty"`
-	NotificationExpiration                    int32                           `protobuf:"varint,35,opt,name=notification_expiration,json=notificationExpiration" json:"notification_expiration,omitempty"`
-	NotificationAttributes                    map[string]string               `protobuf:"bytes,36,rep,name=notification_attributes,json=notificationAttributes" json:"notification_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	NotificationAlertOptionPushNotification   bool                            `protobuf:"varint,37,opt,name=notification_alert_option_push_notification,json=notificationAlertOptionPushNotification" json:"notification_alert_option_push_notification,omitempty"`
-	NotificationAlertOptionNotificationCenter bool                            `protobuf:"varint,38,opt,name=notification_alert_option_notification_center,json=notificationAlertOptionNotificationCenter" json:"notification_alert_option_notification_center,omitempty"`
-	NotificationAlertOptionBadgeNumber        bool                            `protobuf:"varint,39,opt,name=notification_alert_option_badge_number,json=notificationAlertOptionBadgeNumber" json:"notification_alert_option_badge_number,omitempty"`
-	AutomatedMonday                           bool                            `protobuf:"varint,46,opt,name=automated_monday,json=automatedMonday" json:"automated_monday,omitempty"`
-	AutomatedTuesday                          bool                            `protobuf:"varint,47,opt,name=automated_tuesday,json=automatedTuesday" json:"automated_tuesday,omitempty"`
-	AutomatedWednesday                        bool                            `protobuf:"varint,48,opt,name=automated_wednesday,json=automatedWednesday" json:"automated_wednesday,omitempty"`
-	AutomatedThursday                         bool                            `protobuf:"varint,49,opt,name=automated_thursday,json=automatedThursday" json:"automated_thursday,omitempty"`
-	AutomatedFriday                           bool                            `protobuf:"varint,50,opt,name=automated_friday,json=automatedFriday" json:"automated_friday,omitempty"`
-	AutomatedSaturday                         bool                            `protobuf:"varint,51,opt,name=automated_saturday,json=automatedSaturday" json:"automated_saturday,omitempty"`
-	AutomatedSunday                           bool                            `protobuf:"varint,52,opt,name=automated_sunday,json=automatedSunday" json:"automated_sunday,omitempty"`
+	CampaignId                                int32                                `protobuf:"varint,1,opt,name=campaign_id,json=campaignId" json:"campaign_id,omitempty"`
+	Name                                      string                               `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	CampaignStatus                            CampaignStatus_Enum                  `protobuf:"varint,3,opt,name=campaign_status,json=campaignStatus,enum=rover.campaigns.v1.CampaignStatus_Enum" json:"campaign_status,omitempty"`
+	ExperienceId                              string                               `protobuf:"bytes,4,opt,name=experience_id,json=experienceId" json:"experience_id,omitempty"`
+	CreatedAt                                 *google_protobuf.Timestamp           `protobuf:"bytes,8,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
+	UpdatedAt                                 *google_protobuf.Timestamp           `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
+	UiState                                   string                               `protobuf:"bytes,10,opt,name=ui_state,json=uiState" json:"ui_state,omitempty"`
+	SegmentCondition                          SegmentCondition_Enum                `protobuf:"varint,11,opt,name=segment_condition,json=segmentCondition,enum=rover.campaigns.v1.SegmentCondition_Enum" json:"segment_condition,omitempty"`
+	SegmentIds                                []string                             `protobuf:"bytes,12,rep,name=segment_ids,json=segmentIds" json:"segment_ids,omitempty"`
+	NotificationBody                          string                               `protobuf:"bytes,20,opt,name=notification_body,json=notificationBody" json:"notification_body,omitempty"`
+	NotificationTitle                         string                               `protobuf:"bytes,21,opt,name=notification_title,json=notificationTitle" json:"notification_title,omitempty"`
+	NotificationAttachmentUrl                 string                               `protobuf:"bytes,22,opt,name=notification_attachment_url,json=notificationAttachmentUrl" json:"notification_attachment_url,omitempty"`
+	NotificationAttachmentType                NotificationAttachmentType_Enum      `protobuf:"varint,23,opt,name=notification_attachment_type,json=notificationAttachmentType,enum=rover.campaigns.v1.NotificationAttachmentType_Enum" json:"notification_attachment_type,omitempty"`
+	NotificationTapBehaviorType               NotificationTapBehaviorType_Enum     `protobuf:"varint,24,opt,name=notification_tap_behavior_type,json=notificationTapBehaviorType,enum=rover.campaigns.v1.NotificationTapBehaviorType_Enum" json:"notification_tap_behavior_type,omitempty"`
+	NotificationTapBehaviorPresentationType   NotificationTapPresentationType_Enum `protobuf:"varint,25,opt,name=notification_tap_behavior_presentation_type,json=notificationTapBehaviorPresentationType,enum=rover.campaigns.v1.NotificationTapPresentationType_Enum" json:"notification_tap_behavior_presentation_type,omitempty"`
+	NotificationTapBehaviorUrl                string                               `protobuf:"bytes,26,opt,name=notification_tap_behavior_url,json=notificationTapBehaviorUrl" json:"notification_tap_behavior_url,omitempty"`
+	NotificationIosContentAvailable           bool                                 `protobuf:"varint,27,opt,name=notification_ios_content_available,json=notificationIosContentAvailable" json:"notification_ios_content_available,omitempty"`
+	NotificationIosMutableContent             bool                                 `protobuf:"varint,28,opt,name=notification_ios_mutable_content,json=notificationIosMutableContent" json:"notification_ios_mutable_content,omitempty"`
+	NotificationIosSound                      string                               `protobuf:"bytes,29,opt,name=notification_ios_sound,json=notificationIosSound" json:"notification_ios_sound,omitempty"`
+	NotificationIosCategoryIdentifier         string                               `protobuf:"bytes,30,opt,name=notification_ios_category_identifier,json=notificationIosCategoryIdentifier" json:"notification_ios_category_identifier,omitempty"`
+	NotificationIosThreadIdentifier           string                               `protobuf:"bytes,31,opt,name=notification_ios_thread_identifier,json=notificationIosThreadIdentifier" json:"notification_ios_thread_identifier,omitempty"`
+	NotificationAndroidChannelId              string                               `protobuf:"bytes,32,opt,name=notification_android_channel_id,json=notificationAndroidChannelId" json:"notification_android_channel_id,omitempty"`
+	NotificationAndroidSound                  string                               `protobuf:"bytes,33,opt,name=notification_android_sound,json=notificationAndroidSound" json:"notification_android_sound,omitempty"`
+	NotificationAndroidTag                    string                               `protobuf:"bytes,34,opt,name=notification_android_tag,json=notificationAndroidTag" json:"notification_android_tag,omitempty"`
+	NotificationExpiration                    int32                                `protobuf:"varint,35,opt,name=notification_expiration,json=notificationExpiration" json:"notification_expiration,omitempty"`
+	NotificationAttributes                    map[string]string                    `protobuf:"bytes,36,rep,name=notification_attributes,json=notificationAttributes" json:"notification_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	NotificationAlertOptionPushNotification   bool                                 `protobuf:"varint,37,opt,name=notification_alert_option_push_notification,json=notificationAlertOptionPushNotification" json:"notification_alert_option_push_notification,omitempty"`
+	NotificationAlertOptionNotificationCenter bool                                 `protobuf:"varint,38,opt,name=notification_alert_option_notification_center,json=notificationAlertOptionNotificationCenter" json:"notification_alert_option_notification_center,omitempty"`
+	NotificationAlertOptionBadgeNumber        bool                                 `protobuf:"varint,39,opt,name=notification_alert_option_badge_number,json=notificationAlertOptionBadgeNumber" json:"notification_alert_option_badge_number,omitempty"`
+	AutomatedMonday                           bool                                 `protobuf:"varint,46,opt,name=automated_monday,json=automatedMonday" json:"automated_monday,omitempty"`
+	AutomatedTuesday                          bool                                 `protobuf:"varint,47,opt,name=automated_tuesday,json=automatedTuesday" json:"automated_tuesday,omitempty"`
+	AutomatedWednesday                        bool                                 `protobuf:"varint,48,opt,name=automated_wednesday,json=automatedWednesday" json:"automated_wednesday,omitempty"`
+	AutomatedThursday                         bool                                 `protobuf:"varint,49,opt,name=automated_thursday,json=automatedThursday" json:"automated_thursday,omitempty"`
+	AutomatedFriday                           bool                                 `protobuf:"varint,50,opt,name=automated_friday,json=automatedFriday" json:"automated_friday,omitempty"`
+	AutomatedSaturday                         bool                                 `protobuf:"varint,51,opt,name=automated_saturday,json=automatedSaturday" json:"automated_saturday,omitempty"`
+	AutomatedSunday                           bool                                 `protobuf:"varint,52,opt,name=automated_sunday,json=automatedSunday" json:"automated_sunday,omitempty"`
 	// start/end dates yyyy-mm-dd
 	AutomatedStartDate          string                              `protobuf:"bytes,53,opt,name=automated_start_date,json=automatedStartDate" json:"automated_start_date,omitempty"`
 	AutomatedEndDate            string                              `protobuf:"bytes,54,opt,name=automated_end_date,json=automatedEndDate" json:"automated_end_date,omitempty"`
@@ -1582,7 +1660,7 @@ type AutomatedNotificationCampaign struct {
 func (m *AutomatedNotificationCampaign) Reset()                    { *m = AutomatedNotificationCampaign{} }
 func (m *AutomatedNotificationCampaign) String() string            { return proto.CompactTextString(m) }
 func (*AutomatedNotificationCampaign) ProtoMessage()               {}
-func (*AutomatedNotificationCampaign) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
+func (*AutomatedNotificationCampaign) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{31} }
 
 func (m *AutomatedNotificationCampaign) GetCampaignId() int32 {
 	if m != nil {
@@ -1598,11 +1676,11 @@ func (m *AutomatedNotificationCampaign) GetName() string {
 	return ""
 }
 
-func (m *AutomatedNotificationCampaign) GetCampaignStatus() CampaignStatus {
+func (m *AutomatedNotificationCampaign) GetCampaignStatus() CampaignStatus_Enum {
 	if m != nil {
 		return m.CampaignStatus
 	}
-	return CampaignStatus_CAMPAIGN_STATUS_UNDEFINED
+	return CampaignStatus_UNKNOWN
 }
 
 func (m *AutomatedNotificationCampaign) GetExperienceId() string {
@@ -1633,11 +1711,11 @@ func (m *AutomatedNotificationCampaign) GetUiState() string {
 	return ""
 }
 
-func (m *AutomatedNotificationCampaign) GetSegmentCondition() SegmentCondition {
+func (m *AutomatedNotificationCampaign) GetSegmentCondition() SegmentCondition_Enum {
 	if m != nil {
 		return m.SegmentCondition
 	}
-	return SegmentCondition_SEGMENT_CONDITION_ANY
+	return SegmentCondition_ANY
 }
 
 func (m *AutomatedNotificationCampaign) GetSegmentIds() []string {
@@ -1668,25 +1746,25 @@ func (m *AutomatedNotificationCampaign) GetNotificationAttachmentUrl() string {
 	return ""
 }
 
-func (m *AutomatedNotificationCampaign) GetNotificationAttachmentType() NotificationAttachmentType {
+func (m *AutomatedNotificationCampaign) GetNotificationAttachmentType() NotificationAttachmentType_Enum {
 	if m != nil {
 		return m.NotificationAttachmentType
 	}
-	return NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN
+	return NotificationAttachmentType_UNKNOWN
 }
 
-func (m *AutomatedNotificationCampaign) GetNotificationTapBehaviorType() NotificationTapBehaviorType {
+func (m *AutomatedNotificationCampaign) GetNotificationTapBehaviorType() NotificationTapBehaviorType_Enum {
 	if m != nil {
 		return m.NotificationTapBehaviorType
 	}
-	return NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE
+	return NotificationTapBehaviorType_OPEN_EXPERIENCE
 }
 
-func (m *AutomatedNotificationCampaign) GetNotificationTapBehaviorPresentationType() NotificationTapPresentationType {
+func (m *AutomatedNotificationCampaign) GetNotificationTapBehaviorPresentationType() NotificationTapPresentationType_Enum {
 	if m != nil {
 		return m.NotificationTapBehaviorPresentationType
 	}
-	return NotificationTapPresentationType_NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN
+	return NotificationTapPresentationType_UNKNOWN
 }
 
 func (m *AutomatedNotificationCampaign) GetNotificationTapBehaviorUrl() string {
@@ -1907,6 +1985,15 @@ func (m *AutomatedNotificationCampaign) GetAutomatedFrequencyLimits() []*RateLim
 }
 
 func init() {
+	proto.RegisterType((*CampaignType)(nil), "rover.campaigns.v1.CampaignType")
+	proto.RegisterType((*CampaignStatus)(nil), "rover.campaigns.v1.CampaignStatus")
+	proto.RegisterType((*SegmentCondition)(nil), "rover.campaigns.v1.SegmentCondition")
+	proto.RegisterType((*NotificationTapBehaviorType)(nil), "rover.campaigns.v1.NotificationTapBehaviorType")
+	proto.RegisterType((*NotificationTapPresentationType)(nil), "rover.campaigns.v1.NotificationTapPresentationType")
+	proto.RegisterType((*ScheduledType)(nil), "rover.campaigns.v1.ScheduledType")
+	proto.RegisterType((*ScheduledDeliveryStatus)(nil), "rover.campaigns.v1.ScheduledDeliveryStatus")
+	proto.RegisterType((*NotificationAttachmentType)(nil), "rover.campaigns.v1.NotificationAttachmentType")
+	proto.RegisterType((*RateLimit)(nil), "rover.campaigns.v1.RateLimit")
 	proto.RegisterType((*Campaign)(nil), "rover.campaigns.v1.Campaign")
 	proto.RegisterType((*CreateRequest)(nil), "rover.campaigns.v1.CreateRequest")
 	proto.RegisterType((*CreateResponse)(nil), "rover.campaigns.v1.CreateResponse")
@@ -1928,17 +2015,16 @@ func init() {
 	proto.RegisterType((*UpdateScheduledDeliverySettingsResponse)(nil), "rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse")
 	proto.RegisterType((*UpdateAutomatedDeliverySettingsRequest)(nil), "rover.campaigns.v1.UpdateAutomatedDeliverySettingsRequest")
 	proto.RegisterType((*UpdateAutomatedDeliverySettingsResponse)(nil), "rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse")
-	proto.RegisterType((*RateLimit)(nil), "rover.campaigns.v1.RateLimit")
 	proto.RegisterType((*ScheduledNotificationCampaign)(nil), "rover.campaigns.v1.ScheduledNotificationCampaign")
 	proto.RegisterType((*AutomatedNotificationCampaign)(nil), "rover.campaigns.v1.AutomatedNotificationCampaign")
-	proto.RegisterEnum("rover.campaigns.v1.CampaignType", CampaignType_name, CampaignType_value)
-	proto.RegisterEnum("rover.campaigns.v1.CampaignStatus", CampaignStatus_name, CampaignStatus_value)
-	proto.RegisterEnum("rover.campaigns.v1.SegmentCondition", SegmentCondition_name, SegmentCondition_value)
-	proto.RegisterEnum("rover.campaigns.v1.NotificationAttachmentType", NotificationAttachmentType_name, NotificationAttachmentType_value)
-	proto.RegisterEnum("rover.campaigns.v1.NotificationTapBehaviorType", NotificationTapBehaviorType_name, NotificationTapBehaviorType_value)
-	proto.RegisterEnum("rover.campaigns.v1.NotificationTapPresentationType", NotificationTapPresentationType_name, NotificationTapPresentationType_value)
-	proto.RegisterEnum("rover.campaigns.v1.ScheduledType", ScheduledType_name, ScheduledType_value)
-	proto.RegisterEnum("rover.campaigns.v1.ScheduledDeliveryStatus", ScheduledDeliveryStatus_name, ScheduledDeliveryStatus_value)
+	proto.RegisterEnum("rover.campaigns.v1.CampaignType_Enum", CampaignType_Enum_name, CampaignType_Enum_value)
+	proto.RegisterEnum("rover.campaigns.v1.CampaignStatus_Enum", CampaignStatus_Enum_name, CampaignStatus_Enum_value)
+	proto.RegisterEnum("rover.campaigns.v1.SegmentCondition_Enum", SegmentCondition_Enum_name, SegmentCondition_Enum_value)
+	proto.RegisterEnum("rover.campaigns.v1.NotificationTapBehaviorType_Enum", NotificationTapBehaviorType_Enum_name, NotificationTapBehaviorType_Enum_value)
+	proto.RegisterEnum("rover.campaigns.v1.NotificationTapPresentationType_Enum", NotificationTapPresentationType_Enum_name, NotificationTapPresentationType_Enum_value)
+	proto.RegisterEnum("rover.campaigns.v1.ScheduledType_Enum", ScheduledType_Enum_name, ScheduledType_Enum_value)
+	proto.RegisterEnum("rover.campaigns.v1.ScheduledDeliveryStatus_Enum", ScheduledDeliveryStatus_Enum_name, ScheduledDeliveryStatus_Enum_value)
+	proto.RegisterEnum("rover.campaigns.v1.NotificationAttachmentType_Enum", NotificationAttachmentType_Enum_name, NotificationAttachmentType_Enum_value)
 	proto.RegisterEnum("rover.campaigns.v1.RateLimit_Unit", RateLimit_Unit_name, RateLimit_Unit_value)
 }
 
@@ -2320,173 +2406,167 @@ var _Campaigns_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("campaigns/v1/campaigns.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 2679 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xec, 0x5b, 0xcd, 0x73, 0xdb, 0xc6,
-	0x15, 0x0f, 0x25, 0xd9, 0x96, 0x9e, 0xbe, 0xa8, 0xb5, 0x23, 0x41, 0x94, 0x64, 0xd9, 0xb4, 0xfc,
-	0x25, 0xc5, 0x54, 0x6c, 0xe7, 0xc3, 0xb1, 0x93, 0xcc, 0x40, 0x24, 0x6c, 0xa1, 0x96, 0x48, 0x06,
-	0x24, 0xed, 0x38, 0xed, 0x0c, 0x0a, 0x91, 0x30, 0x85, 0x29, 0x45, 0x32, 0x00, 0xa8, 0x44, 0xe9,
-	0xa1, 0x87, 0xce, 0xa4, 0x33, 0xed, 0xa5, 0x3d, 0xa6, 0xe7, 0x5e, 0x3a, 0xed, 0xad, 0xc7, 0xce,
-	0x74, 0xfa, 0xb7, 0xf4, 0xd0, 0x53, 0xff, 0x88, 0xbe, 0x5d, 0x7c, 0x43, 0x00, 0x28, 0x4a, 0x8c,
-	0xe3, 0x83, 0x4e, 0x12, 0x76, 0x7f, 0xef, 0xb7, 0x6f, 0xbf, 0xde, 0xbe, 0xfd, 0x69, 0x05, 0xcb,
-	0x75, 0xe5, 0xa0, 0xab, 0x68, 0xcd, 0xb6, 0xb1, 0x79, 0x78, 0x7f, 0xd3, 0xfd, 0xc8, 0x75, 0xf5,
-	0x8e, 0xd9, 0x21, 0x44, 0xef, 0x1c, 0xaa, 0x7a, 0xce, 0x2b, 0x3e, 0xbc, 0x9f, 0x21, 0x4a, 0xcf,
-	0xdc, 0xa7, 0x60, 0xfa, 0xd3, 0xc2, 0x65, 0x16, 0xd9, 0x8f, 0xbd, 0xde, 0xeb, 0xcd, 0xae, 0xae,
-	0x36, 0xb4, 0xba, 0x62, 0xaa, 0x36, 0x45, 0x66, 0xb5, 0xd9, 0xe9, 0x34, 0x5b, 0xea, 0xa6, 0x8b,
-	0x30, 0xb5, 0x03, 0xd5, 0x30, 0x91, 0xd1, 0x02, 0x64, 0xff, 0x38, 0x02, 0xe3, 0x79, 0xbb, 0x01,
-	0xf2, 0x6b, 0x58, 0x35, 0xea, 0xfb, 0x6a, 0xa3, 0xd7, 0x52, 0x1b, 0x72, 0xbb, 0x63, 0x6a, 0xaf,
-	0x29, 0x99, 0xd6, 0x69, 0xcb, 0x8e, 0x0f, 0x5c, 0xea, 0x5a, 0xea, 0xce, 0xe4, 0x83, 0xfb, 0xb9,
-	0xe3, 0xae, 0xe5, 0x2a, 0x8e, 0x69, 0xd1, 0x67, 0xe9, 0x70, 0x6f, 0xbf, 0x23, 0xad, 0x18, 0x49,
-	0x00, 0xda, 0x38, 0xf6, 0xa9, 0x73, 0x80, 0xde, 0xc7, 0x35, 0x3e, 0x12, 0xdf, 0x38, 0xef, 0x98,
-	0xc6, 0x35, 0xae, 0x24, 0x01, 0xb6, 0x00, 0xc6, 0x1d, 0xba, 0xec, 0x5f, 0x53, 0x30, 0x9d, 0xd7,
-	0x55, 0xc4, 0x4a, 0xea, 0xd7, 0x3d, 0x1c, 0x2d, 0xf2, 0x19, 0x4c, 0xd1, 0xe1, 0x96, 0xeb, 0x9d,
-	0xb6, 0xa9, 0x7e, 0x6b, 0xda, 0x83, 0x90, 0xb1, 0xfd, 0x60, 0x33, 0x61, 0xb9, 0xb0, 0x9f, 0xb7,
-	0x10, 0xd2, 0xa4, 0xe2, 0x7d, 0x10, 0x02, 0x63, 0x6d, 0xe5, 0x40, 0x65, 0xee, 0x4f, 0x48, 0xec,
-	0x77, 0x22, 0xc0, 0xb4, 0xd3, 0xa0, 0x6c, 0x1e, 0x75, 0x55, 0x6e, 0x14, 0x2b, 0x67, 0x1e, 0x5c,
-	0x8b, 0xea, 0x9b, 0xe3, 0x65, 0x15, 0x71, 0xd2, 0x54, 0xdd, 0xf7, 0x95, 0xfd, 0x19, 0xcc, 0x38,
-	0xae, 0x1a, 0xdd, 0x4e, 0xdb, 0x50, 0xc9, 0x23, 0xaf, 0x27, 0xb6, 0x9f, 0xcb, 0x49, 0x9c, 0x92,
-	0xd7, 0xef, 0xbf, 0x8d, 0xc0, 0xe4, 0x8e, 0x66, 0x98, 0x43, 0xea, 0xf5, 0xb1, 0x1e, 0x5e, 0x38,
-	0x4d, 0x0f, 0xc9, 0x73, 0x98, 0x75, 0x69, 0x70, 0xe1, 0x9a, 0x3d, 0x83, 0xbb, 0xc8, 0x88, 0xb2,
-	0x49, 0x44, 0x15, 0x86, 0x94, 0x66, 0xea, 0x81, 0x6f, 0xc2, 0xc1, 0xa5, 0x5f, 0xa9, 0x47, 0xdf,
-	0x74, 0xf4, 0x06, 0x77, 0x89, 0x4d, 0x86, 0xf3, 0x49, 0xe7, 0xa8, 0xab, 0x34, 0x55, 0x6e, 0x1c,
-	0x8b, 0x2f, 0x48, 0xec, 0x77, 0xb2, 0x04, 0x13, 0xf4, 0xa7, 0x6c, 0x68, 0xdf, 0xa9, 0xdc, 0x04,
-	0xab, 0x18, 0xa7, 0x05, 0x15, 0xfc, 0xc6, 0x91, 0x9f, 0xb2, 0x06, 0xcb, 0x1e, 0xf7, 0xc7, 0x30,
-	0xe1, 0x7a, 0x82, 0x43, 0x35, 0xda, 0x77, 0xe0, 0x3d, 0x78, 0xb6, 0x0b, 0x33, 0xbc, 0x5e, 0xdf,
-	0xd7, 0x0e, 0x87, 0xb5, 0xe2, 0x56, 0x61, 0xd2, 0x1d, 0x34, 0xad, 0xc1, 0x46, 0xfe, 0x82, 0x04,
-	0x4e, 0x91, 0xd8, 0xc8, 0xce, 0xc1, 0xac, 0xdb, 0xa2, 0xd5, 0x81, 0xec, 0xf7, 0x29, 0x48, 0x17,
-	0x7a, 0xdd, 0x16, 0x8b, 0x1f, 0x6f, 0xc8, 0x0f, 0x77, 0x6b, 0x5c, 0xf4, 0xb6, 0x46, 0x76, 0x17,
-	0xe6, 0x7c, 0x7e, 0x9c, 0x79, 0x59, 0xff, 0x16, 0xb7, 0xb3, 0xa4, 0x52, 0xe6, 0x9f, 0xb2, 0x53,
-	0x69, 0x98, 0x71, 0x9c, 0xb0, 0xc7, 0x1b, 0x27, 0xbd, 0xdc, 0xdb, 0x6b, 0x69, 0xc6, 0xfe, 0x1b,
-	0x9c, 0x74, 0xb7, 0x45, 0xdb, 0x89, 0xaf, 0x61, 0xb6, 0xa2, 0xb6, 0x1b, 0x55, 0x75, 0x68, 0xdb,
-	0xbe, 0xaf, 0x17, 0x04, 0xd2, 0x5e, 0x93, 0xb6, 0x1b, 0xff, 0x9b, 0x81, 0xeb, 0xb5, 0x6e, 0x03,
-	0x27, 0xdc, 0x1f, 0x9d, 0x2b, 0xaa, 0x69, 0x6a, 0xed, 0xa6, 0xf1, 0xa6, 0xe6, 0xed, 0x06, 0x4c,
-	0xab, 0xdf, 0x76, 0x55, 0x5d, 0x53, 0xdb, 0x75, 0x95, 0x42, 0xac, 0x09, 0x9c, 0xf2, 0x0a, 0x11,
-	0xb4, 0x08, 0xe3, 0x3d, 0x8d, 0x45, 0x22, 0x95, 0x03, 0x2b, 0x86, 0xf4, 0x34, 0x1a, 0x5e, 0x54,
-	0xb2, 0x01, 0x73, 0x81, 0x73, 0x6b, 0xaf, 0xd3, 0x38, 0xe2, 0x26, 0x19, 0x26, 0xed, 0xaf, 0xd8,
-	0xc2, 0x72, 0x72, 0x0f, 0x48, 0x00, 0x6c, 0x6a, 0x66, 0x4b, 0xe5, 0xa6, 0x18, 0x3a, 0x40, 0x53,
-	0xa5, 0x15, 0xe4, 0x73, 0x58, 0x0a, 0xc0, 0x15, 0xd3, 0x54, 0xea, 0xfb, 0x07, 0x6a, 0xdb, 0x94,
-	0x7b, 0x7a, 0x8b, 0x9b, 0x66, 0x76, 0x8b, 0x7e, 0x08, 0xef, 0x22, 0x6a, 0x7a, 0x8b, 0x74, 0x61,
-	0x39, 0xce, 0x9e, 0x05, 0xe7, 0x19, 0x16, 0x53, 0x73, 0x51, 0x7b, 0xaa, 0x18, 0x49, 0xca, 0x42,
-	0x75, 0xa6, 0x1d, 0x5b, 0x47, 0x4c, 0xb8, 0x1a, 0xec, 0xa0, 0xd2, 0x95, 0xf7, 0xd4, 0x7d, 0xe5,
-	0x50, 0xeb, 0xe8, 0x56, 0x9b, 0xb3, 0xac, 0xcd, 0xcd, 0x7e, 0x6d, 0x56, 0x95, 0xee, 0x96, 0x6d,
-	0xc7, 0x1a, 0x0d, 0x0c, 0x44, 0xa8, 0x92, 0xfc, 0x29, 0x05, 0x1b, 0xf1, 0xcd, 0x62, 0x7e, 0x64,
-	0xa0, 0x7f, 0x76, 0x0d, 0xf5, 0x21, 0xcd, 0x7c, 0x78, 0x78, 0x02, 0x1f, 0xca, 0x3e, 0x5b, 0xe6,
-	0xc7, 0xed, 0x18, 0x3f, 0xc2, 0x40, 0xc2, 0xc3, 0x4a, 0xbc, 0x4b, 0x74, 0xf6, 0xe6, 0xd8, 0xec,
-	0x65, 0x62, 0xf8, 0xe8, 0xf4, 0x3d, 0x87, 0x6c, 0x80, 0x42, 0xeb, 0x18, 0xd6, 0x36, 0xc0, 0xf9,
-	0x53, 0x0e, 0x15, 0xad, 0xa5, 0xec, 0xe1, 0xea, 0x21, 0xc8, 0x33, 0x2e, 0xad, 0xfa, 0x91, 0x62,
-	0xc7, 0xc8, 0x5b, 0x38, 0xde, 0x81, 0x91, 0x67, 0x70, 0xed, 0x18, 0xd9, 0x41, 0xcf, 0xa4, 0x75,
-	0x0e, 0x29, 0x77, 0x99, 0x51, 0xad, 0x84, 0xa8, 0x76, 0x2d, 0x94, 0xcd, 0x48, 0x3e, 0x80, 0xf9,
-	0x63, 0x44, 0x46, 0xa7, 0xd7, 0x6e, 0x70, 0x57, 0x58, 0x8f, 0xae, 0x84, 0xcc, 0x2b, 0xb4, 0x8e,
-	0x94, 0x60, 0xed, 0x78, 0x5f, 0x70, 0xff, 0x34, 0x3b, 0xfa, 0x11, 0xee, 0x3a, 0x24, 0xc6, 0x3a,
-	0x55, 0xe7, 0xde, 0x65, 0x1c, 0xd7, 0xc3, 0xbd, 0xb1, 0x91, 0xa2, 0x0b, 0x8c, 0x1c, 0x1c, 0x73,
-	0x1f, 0xd3, 0xa2, 0x86, 0x9f, 0x6e, 0x9e, 0xd1, 0x85, 0x07, 0xa7, 0xca, 0x70, 0x3e, 0x32, 0x01,
-	0x56, 0x83, 0x1b, 0xa5, 0xdd, 0xd0, 0x3b, 0x5a, 0x43, 0xae, 0xef, 0x2b, 0xed, 0xb6, 0xda, 0xa2,
-	0x61, 0x61, 0x81, 0x31, 0x05, 0xf6, 0x13, 0x6f, 0xa1, 0xf2, 0x16, 0x08, 0xc3, 0xc4, 0xa7, 0x90,
-	0x89, 0xa4, 0xb1, 0x86, 0x87, 0x63, 0x0c, 0x5c, 0x04, 0x83, 0x35, 0x44, 0x8f, 0x80, 0x8b, 0xb4,
-	0x36, 0x95, 0x26, 0xb7, 0xc8, 0x6c, 0xe7, 0x23, 0x6c, 0xab, 0x4a, 0x93, 0x7c, 0x0c, 0x0b, 0x01,
-	0x4b, 0x8c, 0x5d, 0x9a, 0xce, 0x7e, 0xe5, 0x32, 0x2c, 0xe0, 0x05, 0x0c, 0x05, 0xb7, 0x96, 0xfc,
-	0x3e, 0x15, 0xb2, 0xc4, 0x08, 0xa1, 0x6b, 0x7b, 0x3d, 0xbc, 0x4b, 0x70, 0x4b, 0x2c, 0x9d, 0xf9,
-	0x22, 0x6a, 0x93, 0xf4, 0x8d, 0xda, 0xe1, 0xf0, 0x61, 0x73, 0x0a, 0x6d, 0x53, 0x3f, 0x0a, 0xf5,
-	0xc2, 0xad, 0x24, 0xbf, 0x08, 0x6d, 0x62, 0xa5, 0xa5, 0xea, 0xa6, 0xdc, 0xe9, 0xb2, 0x8f, 0x6e,
-	0xcf, 0xd8, 0x0f, 0x5c, 0x10, 0xb8, 0x65, 0xb6, 0x58, 0x03, 0xfb, 0x91, 0xa7, 0x16, 0x25, 0x66,
-	0x50, 0x46, 0xbc, 0xdf, 0x09, 0xf2, 0x4b, 0xb8, 0x17, 0xcf, 0x1e, 0xbc, 0x79, 0xe0, 0xb2, 0xc0,
-	0xa5, 0xb3, 0xc2, 0xf8, 0xef, 0xc6, 0xf0, 0x07, 0x2e, 0x14, 0xcc, 0x80, 0x48, 0x70, 0x2b, 0xbe,
-	0x85, 0x3d, 0xa5, 0x81, 0x49, 0x65, 0xbb, 0x77, 0xb0, 0x87, 0xd4, 0x57, 0x19, 0x75, 0x36, 0x86,
-	0x7a, 0x8b, 0x42, 0x8b, 0x0c, 0x99, 0x11, 0x61, 0x29, 0x61, 0x28, 0x49, 0x1a, 0x46, 0x31, 0x97,
-	0x65, 0x67, 0xe2, 0x84, 0x44, 0x7f, 0x25, 0x57, 0xe0, 0xc2, 0xa1, 0xd2, 0xea, 0x39, 0xf7, 0x0e,
-	0xeb, 0xe3, 0xf1, 0xc8, 0xa3, 0x54, 0x76, 0x0d, 0xb2, 0x49, 0xf3, 0x66, 0x1f, 0xca, 0x7f, 0x19,
-	0x83, 0x5b, 0x16, 0xcc, 0xbd, 0xd9, 0x15, 0xd4, 0x16, 0xa6, 0x8c, 0xfa, 0xd1, 0x9b, 0x3e, 0x99,
-	0x13, 0x0e, 0xdd, 0x2f, 0x60, 0xce, 0x50, 0x9b, 0xec, 0x20, 0xc3, 0xd6, 0x1b, 0x1a, 0x5b, 0x10,
-	0x93, 0x2c, 0xaa, 0xaf, 0x45, 0xde, 0x52, 0x2d, 0x70, 0xde, 0xc1, 0x4a, 0x69, 0x23, 0x54, 0x42,
-	0xdd, 0x71, 0x28, 0xb5, 0x86, 0x81, 0x67, 0xf2, 0x28, 0x36, 0x08, 0x76, 0x91, 0xd8, 0x30, 0xc8,
-	0x36, 0xcc, 0x78, 0xf7, 0x64, 0x76, 0x8c, 0x4c, 0xb3, 0x06, 0xaf, 0x27, 0x5e, 0x8b, 0xd9, 0xa1,
-	0x31, 0x6d, 0xf8, 0x3f, 0x31, 0x74, 0x5d, 0xf6, 0x31, 0x39, 0x77, 0x73, 0x76, 0x1a, 0xd3, 0xf1,
-	0xb3, 0x6e, 0xef, 0x39, 0xe7, 0xf6, 0x9e, 0xab, 0x3a, 0x08, 0x89, 0x78, 0x3c, 0x4e, 0x19, 0xc9,
-	0x85, 0xc9, 0xe4, 0xef, 0x3a, 0x6d, 0xeb, 0x98, 0xc5, 0x9c, 0x22, 0x60, 0xf0, 0x15, 0x56, 0x90,
-	0x82, 0xff, 0xba, 0xdf, 0x33, 0x54, 0xb9, 0xd5, 0xa9, 0x2b, 0x2d, 0xb9, 0xa1, 0x1e, 0x6a, 0x98,
-	0xff, 0x50, 0x02, 0x76, 0x3c, 0x8e, 0x4b, 0x4b, 0x2e, 0xac, 0x66, 0xa8, 0x3b, 0x14, 0x54, 0x60,
-	0x18, 0xca, 0x94, 0xbd, 0x0b, 0xb7, 0xfb, 0xae, 0x12, 0x7b, 0x45, 0xfd, 0x7b, 0xc2, 0x59, 0x51,
-	0xee, 0x75, 0xfd, 0x7c, 0x45, 0xb1, 0x15, 0x75, 0x17, 0xd2, 0x9e, 0xf8, 0x71, 0x80, 0x76, 0xca,
-	0x11, 0x5b, 0x53, 0xe3, 0xd2, 0xac, 0x5b, 0xbe, 0xcb, 0x8a, 0x69, 0x96, 0xe9, 0x41, 0x4d, 0x1c,
-	0x2c, 0x8a, 0x9d, 0x61, 0x58, 0x8f, 0xa3, 0x6a, 0x95, 0x93, 0x4d, 0xb8, 0xec, 0x81, 0xbf, 0x51,
-	0x1b, 0x6d, 0x0b, 0x3e, 0xcb, 0xe0, 0xc4, 0xad, 0x7a, 0xe9, 0xd4, 0xd0, 0xb4, 0xd4, 0xc7, 0xbe,
-	0xdf, 0xd3, 0x19, 0xde, 0x5a, 0x06, 0x5e, 0xbb, 0x55, 0xbb, 0x22, 0xe8, 0xf7, 0x6b, 0x5d, 0xa3,
-	0xe0, 0xb9, 0x90, 0xdf, 0x4f, 0x59, 0x71, 0x90, 0xd9, 0xc0, 0xeb, 0xb8, 0x4e, 0xc1, 0x24, 0xc4,
-	0x5c, 0xb1, 0x2b, 0x82, 0xcc, 0x46, 0x8f, 0x8d, 0xc8, 0xe5, 0x10, 0x73, 0x85, 0x15, 0x93, 0xf7,
-	0xe1, 0x8a, 0x0f, 0x6a, 0x2a, 0x18, 0x6a, 0xe9, 0x1a, 0xb3, 0x93, 0x10, 0xaf, 0xd5, 0x0a, 0xad,
-	0x2a, 0xd0, 0x29, 0x7e, 0xcf, 0xef, 0x0b, 0x5e, 0x46, 0x2c, 0xbc, 0x95, 0x70, 0x78, 0xcd, 0x0a,
-	0xed, 0x06, 0x43, 0x47, 0xf0, 0xb3, 0xcd, 0x31, 0xcf, 0x56, 0x55, 0x88, 0x9f, 0xee, 0x89, 0xe3,
-	0xfc, 0x0c, 0xbf, 0xc0, 0xf0, 0x01, 0x7e, 0x86, 0xce, 0xf9, 0x27, 0xc9, 0xdb, 0xb7, 0x56, 0x92,
-	0xe0, 0x1b, 0x74, 0xdf, 0xbe, 0xf5, 0xf0, 0xd1, 0xfb, 0x76, 0xd1, 0xda, 0xb7, 0x2e, 0xec, 0xf8,
-	0xbe, 0x0d, 0xf6, 0x4a, 0x3d, 0xa4, 0x6b, 0x93, 0xdd, 0x5a, 0x33, 0xa1, 0x51, 0x13, 0x68, 0x55,
-	0x91, 0x6a, 0x56, 0x79, 0xb8, 0xea, 0x9f, 0x6c, 0xba, 0x53, 0xdb, 0xf5, 0x23, 0xd9, 0xc0, 0x7d,
-	0x8b, 0x99, 0x23, 0x3a, 0x62, 0x1f, 0x94, 0x4b, 0xbe, 0xa9, 0xb7, 0x41, 0x15, 0x86, 0x41, 0x2f,
-	0xf0, 0xf0, 0xcd, 0x84, 0x9b, 0xf5, 0x54, 0x4b, 0x76, 0x1c, 0x4e, 0xba, 0xd2, 0x8e, 0x1b, 0xf7,
-	0xca, 0x0e, 0x82, 0x6f, 0x36, 0x75, 0xb5, 0x49, 0x85, 0x01, 0x2e, 0xe8, 0xa0, 0x8b, 0x30, 0xc8,
-	0xcf, 0xfd, 0x2d, 0x78, 0x6e, 0xb6, 0xb4, 0x03, 0xcd, 0x34, 0xb8, 0x55, 0x96, 0xcb, 0xac, 0x44,
-	0x6d, 0x64, 0x09, 0x2d, 0x76, 0x28, 0xca, 0x47, 0xee, 0xf6, 0x80, 0x55, 0x18, 0x5e, 0xb4, 0x4b,
-	0x88, 0x60, 0x76, 0xb4, 0xfb, 0x7b, 0x0a, 0x26, 0x5c, 0x4a, 0x7a, 0x1a, 0x33, 0x0f, 0x58, 0x24,
-	0xbb, 0x20, 0x59, 0x1f, 0xe4, 0x26, 0xcc, 0x68, 0x34, 0x63, 0xc0, 0xb3, 0x19, 0x83, 0x4d, 0x0f,
-	0x13, 0xef, 0x11, 0x56, 0x3d, 0xed, 0x94, 0xe6, 0x69, 0x21, 0x66, 0xec, 0x6e, 0x81, 0xdc, 0x6b,
-	0x23, 0xc9, 0x68, 0xbc, 0x04, 0xe6, 0x36, 0x99, 0xab, 0x21, 0x52, 0x9a, 0x72, 0x0c, 0xe9, 0x57,
-	0x76, 0x11, 0xc6, 0xe8, 0x4f, 0x32, 0x0e, 0x63, 0xdb, 0xa5, 0x9a, 0x94, 0x7e, 0x87, 0x5c, 0x82,
-	0xd1, 0x02, 0xff, 0x2a, 0x9d, 0xca, 0xfe, 0xf7, 0x32, 0xac, 0x24, 0x4a, 0xb8, 0xe1, 0xa0, 0x9a,
-	0x8a, 0x15, 0x3e, 0xfc, 0x42, 0x67, 0x84, 0x7e, 0x37, 0x7a, 0x6a, 0xfd, 0xee, 0xd8, 0x0d, 0x7d,
-	0x2c, 0xe2, 0x86, 0xfe, 0x09, 0x40, 0x9d, 0x69, 0xa2, 0x0d, 0xcc, 0x61, 0x99, 0xa0, 0x97, 0x7c,
-	0x94, 0x4e, 0xd8, 0x68, 0xde, 0xa4, 0xa6, 0x3d, 0x36, 0xbb, 0xcc, 0x74, 0xa2, 0xbf, 0xa9, 0x8d,
-	0x46, 0xd3, 0xb7, 0xec, 0x40, 0x89, 0xd4, 0x22, 0xae, 0x0c, 0xa4, 0x45, 0xbc, 0x7b, 0x4a, 0x2d,
-	0x62, 0xfe, 0xac, 0x5a, 0xc4, 0xc2, 0x4f, 0xa0, 0x45, 0x70, 0x6f, 0x81, 0x16, 0xb1, 0xf8, 0x36,
-	0x68, 0x11, 0x99, 0x21, 0x69, 0x11, 0x4b, 0xc3, 0xd3, 0x22, 0x96, 0xcf, 0xa6, 0x45, 0xac, 0x0c,
-	0x41, 0x8b, 0xb8, 0x3a, 0x5c, 0x2d, 0x62, 0x75, 0x68, 0x5a, 0xc4, 0xb5, 0x33, 0x6b, 0x11, 0xd7,
-	0xcf, 0xa0, 0x45, 0x64, 0x4f, 0xab, 0x45, 0xdc, 0x48, 0xd4, 0x22, 0xbe, 0x4f, 0xd0, 0x22, 0xd6,
-	0xd8, 0xf9, 0xbd, 0x3b, 0xf0, 0x1f, 0x20, 0xdf, 0x84, 0x0e, 0x71, 0xf3, 0x47, 0xd6, 0x21, 0x6e,
-	0xfd, 0x78, 0x3a, 0xc4, 0xed, 0x93, 0xea, 0x10, 0x11, 0x97, 0xdf, 0x3b, 0xc3, 0xbd, 0xfc, 0xde,
-	0x1d, 0xe6, 0xe5, 0x77, 0xfd, 0x0c, 0x97, 0xdf, 0x8d, 0xbe, 0x97, 0x5f, 0xd2, 0x84, 0x45, 0x8f,
-	0xa5, 0x61, 0x67, 0x82, 0x4e, 0x9e, 0xf3, 0x1e, 0x1b, 0x97, 0x8d, 0xc4, 0x71, 0x71, 0xb3, 0x47,
-	0x2b, 0xe1, 0x59, 0x30, 0xa2, 0x2b, 0x86, 0xa9, 0xfe, 0xfc, 0xc0, 0xc1, 0x4a, 0xe2, 0x9f, 0xcb,
-	0xcf, 0x13, 0xbd, 0xf3, 0x44, 0xef, 0x3c, 0xd1, 0x3b, 0x4f, 0xf4, 0xce, 0x13, 0xbd, 0xf3, 0x44,
-	0xef, 0xad, 0x4c, 0xf4, 0x12, 0x4f, 0xaf, 0xf3, 0x44, 0x6f, 0x48, 0x89, 0x5e, 0x94, 0x26, 0x9d,
-	0x1b, 0x40, 0x93, 0xde, 0x1c, 0x4c, 0x93, 0x7e, 0x7f, 0x40, 0x4d, 0xfa, 0xfe, 0x20, 0x9a, 0xf4,
-	0x83, 0x41, 0x34, 0xe9, 0x87, 0x83, 0x68, 0xd2, 0x1f, 0x0c, 0xa6, 0x49, 0x7f, 0x38, 0xa0, 0x26,
-	0xfd, 0xd1, 0x80, 0x9a, 0xf4, 0xc7, 0x03, 0x6a, 0xd2, 0x8f, 0x06, 0xd3, 0xa4, 0x3f, 0x39, 0x83,
-	0x26, 0xfd, 0xf8, 0xf4, 0x9a, 0xf4, 0x93, 0x58, 0x4d, 0x3a, 0x59, 0x4e, 0xfe, 0x74, 0x08, 0x72,
-	0x72, 0x7f, 0xd5, 0xfb, 0xb3, 0xfe, 0xaa, 0x77, 0xb2, 0x26, 0xfd, 0xf9, 0x99, 0x34, 0xe9, 0x21,
-	0xde, 0x0d, 0xd6, 0x7f, 0x03, 0x53, 0xfe, 0xb7, 0x98, 0x64, 0x09, 0x16, 0xf2, 0xfc, 0x6e, 0x99,
-	0x17, 0x9f, 0x15, 0xe5, 0xea, 0xab, 0xb2, 0x20, 0xd7, 0x8a, 0x05, 0xe1, 0xa9, 0x58, 0x14, 0x0a,
-	0xe9, 0x77, 0xc8, 0x1d, 0x58, 0x0b, 0x56, 0x56, 0xf2, 0xdb, 0x42, 0xa1, 0xb6, 0x23, 0x14, 0xe4,
-	0x62, 0xa9, 0x2a, 0x3e, 0x15, 0xf3, 0x7c, 0x55, 0x2c, 0x15, 0xd3, 0xa9, 0xe3, 0x48, 0xbe, 0x56,
-	0x2d, 0xed, 0xf2, 0xd5, 0x30, 0x72, 0x64, 0xfd, 0x77, 0x29, 0x98, 0x09, 0xde, 0x0d, 0xc8, 0x0a,
-	0x2c, 0xba, 0xc6, 0x95, 0x2a, 0x5f, 0xad, 0x55, 0x02, 0x5e, 0x2c, 0xc2, 0xbb, 0xe1, 0xea, 0x82,
-	0xc4, 0x3f, 0xad, 0x62, 0xb3, 0x11, 0x96, 0xe5, 0xda, 0xd6, 0x8e, 0x58, 0x41, 0x37, 0xd3, 0x23,
-	0x64, 0x19, 0xb8, 0x70, 0x35, 0x2f, 0xe5, 0xb7, 0xc5, 0x17, 0x58, 0x3b, 0xba, 0xbe, 0x4d, 0xdf,
-	0xa9, 0x85, 0xb2, 0x71, 0x6c, 0xab, 0x22, 0x3c, 0xdb, 0x15, 0x8a, 0x55, 0x39, 0x5f, 0x2a, 0x16,
-	0x44, 0xea, 0xb4, 0xcc, 0x17, 0x5f, 0x59, 0x6e, 0x44, 0x54, 0xed, 0xec, 0xa4, 0x53, 0xeb, 0xff,
-	0x4a, 0x41, 0x26, 0x3e, 0x9f, 0xa5, 0x83, 0xe3, 0x1f, 0x04, 0x99, 0xaf, 0x56, 0xf9, 0xfc, 0x36,
-	0x63, 0xb2, 0x87, 0xfc, 0x79, 0xb1, 0xf4, 0xb2, 0x88, 0x6d, 0xdc, 0x82, 0x6c, 0x22, 0x52, 0xdc,
-	0xe5, 0x9f, 0x09, 0xd8, 0xef, 0x7e, 0x38, 0xbe, 0x56, 0x10, 0x4b, 0x38, 0x00, 0xfd, 0x70, 0x2f,
-	0xc4, 0x82, 0x50, 0xc2, 0xa1, 0xf8, 0x4f, 0x2a, 0xb8, 0xc2, 0xc2, 0xf9, 0xef, 0x03, 0xc8, 0x05,
-	0x78, 0xaa, 0x7c, 0x59, 0xde, 0x12, 0xb6, 0xf9, 0x17, 0x62, 0x49, 0xb2, 0x98, 0x4a, 0x65, 0xa1,
-	0x28, 0x0b, 0x5f, 0x96, 0x05, 0x49, 0x14, 0x8a, 0x79, 0x01, 0xfb, 0xb2, 0x01, 0xb7, 0x4f, 0x62,
-	0xc3, 0x97, 0xcb, 0xd8, 0xa1, 0xfb, 0x70, 0xef, 0x24, 0xe0, 0x82, 0x20, 0x94, 0xe5, 0x1d, 0xb1,
-	0xf8, 0x1c, 0xfb, 0xb6, 0x09, 0x1b, 0x27, 0x31, 0x79, 0x29, 0x6c, 0x55, 0xc4, 0xaa, 0x80, 0x9d,
-	0xfc, 0x47, 0x0a, 0x56, 0xfb, 0x64, 0xdf, 0x18, 0x15, 0xd7, 0x8f, 0x91, 0x96, 0x25, 0xa1, 0x82,
-	0x23, 0x66, 0x17, 0x04, 0x27, 0xec, 0x1e, 0xdc, 0x3d, 0x01, 0x5e, 0x4c, 0xea, 0x66, 0x24, 0x7c,
-	0x4b, 0x2a, 0xbd, 0xac, 0x08, 0x12, 0xee, 0x17, 0x01, 0xa6, 0x03, 0x1a, 0x0b, 0x99, 0x07, 0xe2,
-	0x6d, 0x43, 0x86, 0x47, 0x5f, 0xd0, 0x15, 0x5c, 0xec, 0xa1, 0x72, 0xf7, 0x13, 0x97, 0xe8, 0x3f,
-	0x31, 0x11, 0x8b, 0xd1, 0x24, 0xc8, 0x4d, 0xb8, 0xee, 0x59, 0x16, 0x84, 0x1d, 0xdc, 0x1f, 0xd2,
-	0x2b, 0x6f, 0x27, 0x3a, 0x7d, 0xbd, 0x0d, 0x37, 0xe2, 0x61, 0xbe, 0xb6, 0xe8, 0x7a, 0x8f, 0x07,
-	0x8a, 0xc5, 0xb2, 0x54, 0x7a, 0x86, 0x7d, 0xae, 0x58, 0xeb, 0x33, 0x1e, 0x89, 0xfb, 0xdf, 0xda,
-	0xc8, 0xa3, 0x0f, 0x7e, 0x18, 0x87, 0x09, 0x27, 0x68, 0x18, 0x44, 0x84, 0x31, 0xfa, 0x32, 0x9b,
-	0xac, 0x46, 0xc5, 0x53, 0xdf, 0x03, 0xf7, 0xcc, 0xb5, 0x78, 0x80, 0xfd, 0xea, 0xb8, 0x04, 0x17,
-	0xad, 0xe7, 0xf5, 0x24, 0x52, 0xdd, 0x0a, 0xfc, 0x97, 0x40, 0x26, 0x9b, 0x04, 0xb1, 0x09, 0x25,
-	0xb8, 0x64, 0xbf, 0xbb, 0x26, 0x91, 0xf0, 0xe0, 0x33, 0xf0, 0xcc, 0x8d, 0x44, 0x8c, 0xcd, 0xf9,
-	0x25, 0x4c, 0xb8, 0xef, 0xa5, 0x49, 0xa4, 0xce, 0x10, 0x7e, 0xd6, 0x9d, 0xb9, 0xd9, 0x07, 0xe5,
-	0x75, 0xdf, 0x7a, 0xb4, 0x1c, 0xdd, 0xfd, 0xc0, 0xab, 0xea, 0xe8, 0xee, 0x07, 0xdf, 0x3c, 0xd3,
-	0xee, 0xdb, 0x2f, 0x90, 0xa3, 0xbb, 0x1f, 0x7c, 0x10, 0x1d, 0xdd, 0xfd, 0xd0, 0x13, 0x66, 0x52,
-	0x83, 0x71, 0xe7, 0x3d, 0x31, 0xb9, 0x11, 0xad, 0xb2, 0x04, 0x1e, 0x38, 0x67, 0xd6, 0x92, 0x41,
-	0x36, 0xed, 0x1f, 0x30, 0x68, 0xc7, 0x3f, 0x92, 0x22, 0x1f, 0x9e, 0xea, 0x31, 0x5c, 0xe6, 0xa3,
-	0x41, 0xcd, 0x6c, 0x6f, 0xfe, 0x8c, 0xc1, 0xa9, 0xcf, 0x2b, 0x1b, 0xf2, 0x38, 0x9e, 0xbb, 0xdf,
-	0x03, 0xae, 0xcc, 0x93, 0x53, 0xd9, 0x1e, 0x73, 0x2e, 0xf6, 0x8f, 0xe2, 0x49, 0xce, 0xf5, 0x7b,
-	0x0b, 0x94, 0xe4, 0x5c, 0xdf, 0xbf, 0xc2, 0x6f, 0x65, 0xbe, 0xe2, 0xfc, 0xff, 0x64, 0xf5, 0xc4,
-	0xfd, 0xe8, 0xee, 0xed, 0x5d, 0x64, 0x19, 0xe1, 0xc3, 0xff, 0x07, 0x00, 0x00, 0xff, 0xff, 0xd2,
-	0x7b, 0xbc, 0xea, 0x87, 0x35, 0x00, 0x00,
+	// 2584 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xec, 0x5b, 0x5b, 0x73, 0xdb, 0xc6,
+	0x15, 0x0e, 0x25, 0xd9, 0x26, 0x8f, 0x24, 0x8a, 0x5a, 0x2b, 0x12, 0x04, 0x59, 0x96, 0x4d, 0xdf,
+	0xe2, 0xda, 0x91, 0x7c, 0x4b, 0xe2, 0xd8, 0x49, 0xa6, 0x14, 0x49, 0xdb, 0x8c, 0x25, 0x92, 0x05,
+	0x29, 0x3b, 0x89, 0x3b, 0xc3, 0x42, 0x04, 0x4c, 0x61, 0x4a, 0x81, 0x0c, 0x2e, 0x4a, 0x94, 0x3e,
+	0x76, 0x26, 0x33, 0x6d, 0x5f, 0xfa, 0xd4, 0x99, 0xf6, 0x37, 0x74, 0xf2, 0xd0, 0x99, 0xfe, 0x84,
+	0xfe, 0xaa, 0xbe, 0xf4, 0xec, 0x2e, 0xee, 0x02, 0xc1, 0x50, 0xa2, 0x1d, 0x77, 0x46, 0x4f, 0x02,
+	0x76, 0xbf, 0xfd, 0xce, 0xd9, 0x5d, 0xec, 0xd9, 0xb3, 0x1f, 0x57, 0x70, 0xa1, 0x2d, 0xef, 0xf7,
+	0x65, 0xad, 0xa3, 0x9b, 0x1b, 0x07, 0x77, 0x37, 0xbc, 0x97, 0xf5, 0xbe, 0xd1, 0xb3, 0x7a, 0x84,
+	0x18, 0xbd, 0x03, 0xd5, 0x58, 0xf7, 0x8b, 0x0f, 0xee, 0x8a, 0x44, 0xb6, 0xad, 0x3d, 0x0a, 0xa6,
+	0x7f, 0x39, 0x4e, 0x5c, 0x66, 0x7f, 0x76, 0xed, 0xd7, 0x1b, 0x7d, 0x43, 0x55, 0xb4, 0xb6, 0x6c,
+	0xa9, 0x0e, 0x85, 0xb8, 0xd6, 0xe9, 0xf5, 0x3a, 0x5d, 0x75, 0xc3, 0x43, 0x58, 0xda, 0xbe, 0x6a,
+	0x5a, 0xc8, 0xc8, 0x01, 0xf9, 0x57, 0x30, 0x53, 0x74, 0xf8, 0x9b, 0x87, 0x7d, 0x35, 0xff, 0x1c,
+	0xa6, 0xca, 0xba, 0xbd, 0x4f, 0xa6, 0xe1, 0xdc, 0x4e, 0xf5, 0x79, 0xb5, 0xf6, 0xb2, 0x9a, 0x7b,
+	0x8f, 0x88, 0xb0, 0xd8, 0x28, 0x3e, 0x2b, 0x97, 0x76, 0xb6, 0xca, 0xa5, 0x56, 0xb5, 0xd6, 0xac,
+	0x3c, 0xa9, 0x14, 0x0b, 0xcd, 0x4a, 0xad, 0x9a, 0x4b, 0xd1, 0xba, 0xc2, 0x4e, 0xb3, 0xb6, 0x5d,
+	0x68, 0x46, 0xeb, 0x26, 0xf2, 0xdb, 0x90, 0x75, 0xc9, 0x1b, 0x96, 0x6c, 0xd9, 0x66, 0xfe, 0x71,
+	0x1c, 0x7d, 0x06, 0xce, 0x94, 0xa4, 0xc2, 0x93, 0x26, 0xb2, 0xcd, 0x42, 0xa6, 0xbe, 0xb3, 0xb9,
+	0x55, 0x69, 0xa0, 0xb5, 0xdc, 0x04, 0x99, 0x81, 0x74, 0x41, 0x2a, 0x3e, 0xab, 0xbc, 0xc0, 0xb7,
+	0xc9, 0xfc, 0x6d, 0xc8, 0x35, 0xd4, 0xce, 0xbe, 0xaa, 0x5b, 0xc5, 0x9e, 0xae, 0x68, 0x96, 0xd6,
+	0xd3, 0xf3, 0x82, 0x43, 0x78, 0x0e, 0x26, 0x0b, 0xd5, 0xaf, 0x91, 0x8c, 0x3e, 0x6c, 0x6d, 0xe5,
+	0x52, 0x79, 0x1d, 0x56, 0xaa, 0x3d, 0x4b, 0x7b, 0x4d, 0xc7, 0x03, 0x91, 0x4d, 0xb9, 0xbf, 0xa9,
+	0xee, 0xc9, 0x07, 0x5a, 0xcf, 0x60, 0x1d, 0xad, 0x39, 0x0d, 0xcf, 0xc3, 0x5c, 0xad, 0x5e, 0xae,
+	0xb6, 0xca, 0x5f, 0xd5, 0xcb, 0x52, 0xa5, 0x5c, 0x2d, 0x96, 0x91, 0x04, 0xed, 0xb2, 0xc2, 0x42,
+	0xbd, 0x8e, 0x4e, 0x11, 0xc8, 0xb2, 0xb7, 0x52, 0xb9, 0x5c, 0x6f, 0x6d, 0x55, 0xaa, 0xcf, 0xd1,
+	0xb3, 0x1c, 0xcc, 0xb0, 0xb2, 0x97, 0xe5, 0xcd, 0x46, 0xa5, 0x59, 0x46, 0xef, 0x24, 0x58, 0x8b,
+	0xd8, 0xab, 0x1b, 0xaa, 0x89, 0xce, 0xf2, 0x57, 0x6a, 0x73, 0x23, 0xae, 0xf7, 0x00, 0x67, 0x2b,
+	0xae, 0xa5, 0x2c, 0x00, 0x3e, 0x6f, 0x4a, 0xb5, 0x97, 0x8d, 0xb2, 0x84, 0x03, 0xb8, 0x01, 0xb3,
+	0x8d, 0xf6, 0x9e, 0xaa, 0xd8, 0x5d, 0x55, 0x61, 0x0c, 0x17, 0xfd, 0xee, 0x62, 0x73, 0x6c, 0x8d,
+	0x03, 0xe6, 0x4d, 0x0d, 0x76, 0xfa, 0x15, 0x2c, 0x79, 0x0d, 0x4a, 0x6a, 0x57, 0xc3, 0xef, 0xe7,
+	0xd0, 0x19, 0xfa, 0x5f, 0xc7, 0x19, 0x0f, 0x37, 0xe7, 0xf6, 0xeb, 0x52, 0xed, 0xa9, 0x54, 0x6e,
+	0x34, 0xf8, 0xf8, 0x3f, 0xa9, 0x54, 0xf9, 0x6c, 0xd0, 0x1e, 0x8a, 0xc1, 0x1e, 0x16, 0x2c, 0x4b,
+	0x6e, 0xef, 0xd1, 0xe9, 0x60, 0xae, 0x3d, 0x18, 0x30, 0xb5, 0x95, 0xed, 0xc2, 0xd3, 0x32, 0x72,
+	0xe3, 0x63, 0x61, 0xa7, 0x54, 0xa9, 0x21, 0x2d, 0x3e, 0xbe, 0xa8, 0x94, 0xca, 0x35, 0xe4, 0xfc,
+	0x67, 0x0a, 0x32, 0x12, 0x7e, 0xb0, 0x5b, 0xda, 0xbe, 0x66, 0x91, 0x05, 0x38, 0xd3, 0xa5, 0x0f,
+	0x42, 0xea, 0x52, 0xea, 0x83, 0x33, 0x12, 0x7f, 0x21, 0xd7, 0x20, 0xab, 0xe9, 0x96, 0x6a, 0x1c,
+	0xc8, 0xdd, 0x56, 0xbb, 0x67, 0xeb, 0x96, 0x30, 0xc1, 0xaa, 0x67, 0xdd, 0xd2, 0x22, 0x2d, 0x24,
+	0x4f, 0xc1, 0x2b, 0x68, 0xd9, 0x3a, 0x92, 0x4c, 0x22, 0x2a, 0x7b, 0x2f, 0xbf, 0x7e, 0x74, 0x19,
+	0xad, 0x7b, 0x26, 0xd7, 0x77, 0x10, 0x29, 0xcd, 0xb8, 0x0d, 0xe9, 0x5b, 0x7e, 0x19, 0xa6, 0xe8,
+	0x5f, 0x92, 0x86, 0xa9, 0x67, 0xb5, 0x1d, 0x89, 0x7f, 0x54, 0xa5, 0xc2, 0xd7, 0x38, 0xbe, 0x7f,
+	0x9d, 0x80, 0xb4, 0xfb, 0x49, 0x93, 0x3f, 0xc0, 0x9a, 0xe9, 0x0e, 0x76, 0x4b, 0x0f, 0x8c, 0x4c,
+	0xcb, 0xb5, 0xc5, 0xfa, 0x31, 0x7d, 0xef, 0x6e, 0x9c, 0x0b, 0xde, 0x3c, 0x05, 0xc7, 0xd4, 0xe5,
+	0x7e, 0xf6, 0x9e, 0xb4, 0x6a, 0x26, 0x01, 0xa8, 0x71, 0x0c, 0x01, 0xbd, 0x7d, 0xec, 0xc8, 0x20,
+	0xe3, 0x13, 0x83, 0x8d, 0x17, 0xdc, 0xa6, 0x83, 0x8c, 0xcb, 0x49, 0x80, 0x4d, 0x80, 0xb4, 0x4b,
+	0x97, 0xff, 0x29, 0x05, 0xb3, 0x45, 0x43, 0x45, 0xac, 0xa4, 0x7e, 0x6b, 0x63, 0x70, 0x21, 0x9f,
+	0xc3, 0x0c, 0x8d, 0x4e, 0x38, 0x57, 0x38, 0xaa, 0xdf, 0x5b, 0xce, 0x20, 0x88, 0x8e, 0x1f, 0x2c,
+	0x70, 0x71, 0x17, 0xf6, 0x8a, 0x1c, 0x21, 0x4d, 0xcb, 0xfe, 0x0b, 0x2e, 0xb7, 0x29, 0x5d, 0xde,
+	0x57, 0x99, 0xfb, 0x19, 0x89, 0x3d, 0x93, 0x2f, 0x61, 0xd6, 0x35, 0xd8, 0xb2, 0xf0, 0x6b, 0x73,
+	0xe6, 0xf6, 0x5a, 0x5c, 0xdf, 0x82, 0xf1, 0x6c, 0x9d, 0x7e, 0x92, 0xd2, 0x4c, 0x3b, 0x18, 0xe2,
+	0xbe, 0xc4, 0xa8, 0xe4, 0xf8, 0x6b, 0xf6, 0x7b, 0xba, 0xa9, 0x92, 0x87, 0x7e, 0x77, 0x1c, 0x67,
+	0x2f, 0x24, 0x11, 0x4b, 0x7e, 0xe7, 0xff, 0x3d, 0x01, 0xd3, 0x5b, 0x9a, 0x69, 0x8d, 0xa9, 0xeb,
+	0x47, 0xba, 0x79, 0xe6, 0xd8, 0xdd, 0x24, 0x75, 0x98, 0xf3, 0xb8, 0x4c, 0x16, 0x02, 0x84, 0xb3,
+	0x8c, 0xed, 0x46, 0x12, 0x1b, 0x0f, 0x16, 0x9c, 0x2f, 0xdb, 0x0e, 0x15, 0x12, 0x01, 0xce, 0xfd,
+	0x5e, 0x3d, 0xfc, 0xae, 0x67, 0x28, 0xc2, 0x39, 0x36, 0x37, 0xee, 0x2b, 0x9d, 0xb2, 0xbe, 0xdc,
+	0x51, 0x85, 0x34, 0x5b, 0x97, 0xec, 0x99, 0xac, 0x40, 0x86, 0xfe, 0x6d, 0x99, 0xda, 0x0f, 0xaa,
+	0x90, 0x61, 0x15, 0x69, 0x5a, 0xd0, 0xc0, 0x77, 0x9c, 0x83, 0x19, 0x3e, 0x6c, 0xce, 0x0c, 0x3c,
+	0x82, 0x8c, 0xe7, 0x0e, 0x0e, 0xda, 0xe4, 0xd0, 0x29, 0xf0, 0xe1, 0xf9, 0x3e, 0x64, 0x0b, 0x46,
+	0x7b, 0x0f, 0x63, 0xdd, 0x98, 0x66, 0x61, 0x0d, 0xa6, 0xbd, 0x91, 0xd3, 0x14, 0x36, 0x07, 0x67,
+	0x24, 0x70, 0x8b, 0x2a, 0x4a, 0x7e, 0x1e, 0xe6, 0x3c, 0x8b, 0xbc, 0x03, 0xf9, 0x1f, 0x53, 0x90,
+	0x2b, 0xd9, 0xfd, 0x2e, 0xdb, 0x7d, 0xdf, 0x92, 0x1f, 0xde, 0x4a, 0x39, 0xeb, 0xaf, 0x14, 0xdc,
+	0x73, 0xe7, 0x03, 0x7e, 0x9c, 0xf8, 0x03, 0xff, 0x23, 0xae, 0x6e, 0x49, 0xa5, 0xcc, 0xbf, 0x64,
+	0xa7, 0x72, 0x90, 0x75, 0x9d, 0x70, 0xc6, 0x1b, 0x27, 0xbd, 0x6e, 0xef, 0x76, 0x35, 0x73, 0xef,
+	0x2d, 0x4e, 0xba, 0x67, 0xd1, 0x71, 0xe2, 0x5b, 0x98, 0x6b, 0xa8, 0xba, 0xd2, 0x54, 0xc7, 0x16,
+	0x00, 0x86, 0x7a, 0x41, 0x68, 0x0e, 0xe4, 0x9a, 0x74, 0xdc, 0xf8, 0x6f, 0x16, 0x2e, 0xef, 0xf4,
+	0x15, 0x9c, 0xf0, 0x60, 0xb0, 0x6e, 0xa8, 0x96, 0xa5, 0xe9, 0x1d, 0xf3, 0x6d, 0xcd, 0xdb, 0x15,
+	0x98, 0x55, 0xbf, 0xef, 0xab, 0x86, 0xa6, 0xea, 0x6d, 0x95, 0x42, 0xf8, 0x04, 0xce, 0xf8, 0x85,
+	0x08, 0x5a, 0x86, 0xb4, 0xad, 0xb1, 0x70, 0xa4, 0x0a, 0xc0, 0x63, 0x88, 0xad, 0xd1, 0xf0, 0xa2,
+	0x92, 0x5b, 0x30, 0x1f, 0xda, 0xc6, 0x76, 0x7b, 0xca, 0xa1, 0x30, 0xcd, 0x30, 0xb9, 0x60, 0xc5,
+	0x26, 0x96, 0x93, 0x0f, 0x81, 0x84, 0xc0, 0x96, 0x66, 0x75, 0x55, 0x61, 0x86, 0xa1, 0x43, 0x34,
+	0x4d, 0x5a, 0x41, 0xbe, 0x80, 0x95, 0x10, 0x5c, 0xf6, 0x52, 0x97, 0x96, 0x6d, 0x74, 0x85, 0x59,
+	0xd6, 0x6e, 0x59, 0x8f, 0x4d, 0x6e, 0x76, 0x8c, 0x2e, 0xb1, 0xe1, 0xc2, 0xa0, 0xf6, 0x2c, 0x4c,
+	0x67, 0x59, 0x60, 0xbd, 0x1f, 0xb7, 0xa6, 0x06, 0x67, 0x4c, 0x3c, 0xc8, 0x8a, 0xfa, 0x40, 0x00,
+	0x39, 0x84, 0x8b, 0xe1, 0x5e, 0xca, 0xfd, 0xd6, 0xae, 0x93, 0xc4, 0x72, 0xc3, 0x73, 0xcc, 0xf0,
+	0x83, 0x61, 0x86, 0x23, 0xc9, 0x2f, 0xb7, 0x1c, 0x1a, 0x92, 0x08, 0x82, 0xfc, 0x2d, 0x05, 0xb7,
+	0x06, 0xdb, 0xee, 0x07, 0x32, 0x5b, 0xee, 0x48, 0x8e, 0x39, 0xf2, 0xf0, 0x67, 0x38, 0x12, 0xcd,
+	0x8a, 0xb9, 0x33, 0x37, 0x06, 0x38, 0x13, 0x45, 0x93, 0x02, 0xac, 0x0e, 0xf6, 0x8b, 0x4e, 0xe6,
+	0x3c, 0x9b, 0x4c, 0x71, 0x00, 0x1f, 0x9d, 0xcd, 0xe7, 0x90, 0x0f, 0x51, 0x68, 0x3d, 0x93, 0xaf,
+	0x0a, 0x9c, 0x4e, 0xf9, 0x40, 0xd6, 0xba, 0xf2, 0x2e, 0x7e, 0x4c, 0x04, 0x79, 0xd2, 0xd2, 0x5a,
+	0x10, 0x59, 0xe9, 0x99, 0x45, 0x8e, 0x2b, 0xb8, 0x30, 0xcc, 0x3a, 0x2f, 0x1d, 0x21, 0xdb, 0xb7,
+	0x2d, 0x5a, 0xe7, 0x92, 0x0a, 0xe7, 0x19, 0xd5, 0x6a, 0x84, 0x6a, 0x9b, 0xa3, 0x1c, 0x46, 0xf2,
+	0x00, 0x16, 0x8f, 0x10, 0x99, 0x98, 0xd8, 0x2a, 0xc2, 0x02, 0xeb, 0xd1, 0x42, 0xa4, 0x79, 0x83,
+	0xd6, 0x91, 0x1a, 0x5c, 0x3d, 0xda, 0x17, 0x5c, 0x4e, 0x9d, 0x9e, 0x71, 0x88, 0x8b, 0x10, 0x89,
+	0xb1, 0x4e, 0x35, 0x84, 0xf7, 0x19, 0xc7, 0xe5, 0x68, 0x6f, 0x1c, 0x64, 0xc5, 0x03, 0xc6, 0x0e,
+	0x8e, 0xb5, 0x87, 0xf9, 0x92, 0x12, 0xa4, 0x5b, 0x64, 0x74, 0xd1, 0xc1, 0x69, 0x32, 0x5c, 0x80,
+	0xac, 0x0c, 0x6b, 0xe1, 0x75, 0xa3, 0x2b, 0x46, 0x4f, 0x53, 0x5a, 0xed, 0x3d, 0x59, 0xd7, 0xd5,
+	0x2e, 0x8d, 0x12, 0x4b, 0x8c, 0x29, 0xb4, 0xbc, 0x0a, 0x1c, 0x55, 0xe4, 0x20, 0x8c, 0x1a, 0x9f,
+	0x81, 0x18, 0x4b, 0xc3, 0x87, 0x47, 0x60, 0x0c, 0x42, 0x0c, 0x03, 0x1f, 0xa2, 0x87, 0x20, 0xc4,
+	0xb6, 0xb6, 0xe4, 0x8e, 0xb0, 0xcc, 0xda, 0x2e, 0xc6, 0xb4, 0x6d, 0xca, 0x1d, 0xf2, 0x09, 0x2c,
+	0x85, 0x5a, 0x62, 0x28, 0xd3, 0x0c, 0xf6, 0x28, 0x88, 0x2c, 0xfe, 0x85, 0x1a, 0x96, 0xbd, 0x5a,
+	0xf2, 0xe7, 0x54, 0xa4, 0x25, 0x06, 0x0c, 0x43, 0xdb, 0xb5, 0xf1, 0x60, 0x2e, 0xac, 0xb0, 0xec,
+	0xe6, 0x37, 0x71, 0x2b, 0x65, 0x68, 0x10, 0x8f, 0x46, 0x13, 0x87, 0xb3, 0xac, 0x5b, 0xc6, 0x61,
+	0xa4, 0x17, 0x5e, 0x25, 0xf9, 0x6d, 0x64, 0x25, 0xcb, 0x5d, 0xd5, 0xb0, 0x5a, 0xbd, 0x3e, 0x7b,
+	0xe9, 0xdb, 0xe6, 0x5e, 0xe8, 0xf8, 0x20, 0x5c, 0x60, 0x1f, 0x6b, 0x68, 0x3d, 0x16, 0x68, 0x8b,
+	0x1a, 0x6b, 0x50, 0x47, 0x7c, 0xd0, 0x09, 0xf2, 0x3b, 0xf8, 0x70, 0x30, 0x7b, 0xf8, 0x5c, 0xa2,
+	0xd2, 0x43, 0x96, 0xb0, 0xca, 0xf8, 0x6f, 0x0e, 0xe0, 0x0f, 0x1d, 0x37, 0x58, 0x03, 0x22, 0xc1,
+	0xf5, 0xc1, 0x16, 0x76, 0x65, 0x05, 0x73, 0x4c, 0x8c, 0x20, 0xbb, 0x48, 0x7d, 0x91, 0x51, 0xe7,
+	0x07, 0x50, 0x6f, 0x52, 0x68, 0x95, 0x21, 0xc5, 0x4a, 0x58, 0x1c, 0x88, 0x0c, 0x25, 0x9e, 0xee,
+	0x27, 0x31, 0xb5, 0x65, 0x5b, 0x64, 0x46, 0xa2, 0x8f, 0xf4, 0x64, 0x8a, 0xc7, 0x43, 0xdb, 0x3d,
+	0x95, 0xf0, 0x97, 0x47, 0x13, 0x0f, 0x53, 0xf9, 0xab, 0x90, 0x4f, 0x9a, 0x37, 0x67, 0x8f, 0xfe,
+	0x69, 0x0a, 0xae, 0x73, 0xd8, 0xd1, 0xf3, 0xf9, 0x5b, 0xde, 0xa8, 0x13, 0xf6, 0xe0, 0x17, 0x30,
+	0x6f, 0x72, 0x85, 0x85, 0x5a, 0xe7, 0x12, 0x0b, 0xdb, 0x83, 0xb3, 0xf7, 0x6e, 0xc6, 0x9e, 0x61,
+	0x23, 0x72, 0x0c, 0x8f, 0xe5, 0x39, 0x33, 0x52, 0x4c, 0x7d, 0x72, 0x79, 0x35, 0xc5, 0xc4, 0x7d,
+	0x7a, 0x12, 0xad, 0x82, 0x53, 0x54, 0x51, 0x4c, 0xb2, 0x0d, 0x59, 0xff, 0x28, 0xcd, 0x36, 0x94,
+	0x59, 0x66, 0xf5, 0x7a, 0xe2, 0xc9, 0xd9, 0xdf, 0x3e, 0x66, 0xcd, 0x60, 0x19, 0x06, 0xb1, 0xf3,
+	0x01, 0x3a, 0x57, 0xf2, 0x62, 0xdb, 0x34, 0x1d, 0x49, 0x2e, 0x8a, 0xad, 0xbb, 0xa2, 0xd8, 0x7a,
+	0xd3, 0x45, 0x48, 0xc4, 0xe7, 0x71, 0xcb, 0xc8, 0x7a, 0x94, 0xac, 0xf5, 0x43, 0x4f, 0xe7, 0x5b,
+	0x2f, 0x26, 0x1b, 0xa1, 0x06, 0xdf, 0x60, 0x05, 0x29, 0x05, 0x65, 0x01, 0xdb, 0x54, 0x5b, 0xdd,
+	0x5e, 0x5b, 0xee, 0xb6, 0x14, 0xf5, 0x40, 0xc3, 0xc4, 0x88, 0x12, 0xb0, 0xdd, 0x32, 0x2d, 0xad,
+	0x78, 0xb0, 0x1d, 0x53, 0xdd, 0xa2, 0xa0, 0x12, 0xc3, 0x50, 0xa6, 0xfc, 0x4d, 0xb8, 0x31, 0xf4,
+	0x7b, 0x71, 0xbe, 0xad, 0xff, 0x64, 0xdc, 0x6f, 0xcb, 0x3b, 0xd6, 0x9f, 0x7e, 0x5b, 0xfe, 0xb7,
+	0x75, 0x13, 0x72, 0xbe, 0x52, 0xb2, 0x8f, 0xed, 0xe4, 0x43, 0xf6, 0x75, 0xa5, 0xa5, 0x39, 0xaf,
+	0x7c, 0x9b, 0x15, 0xd3, 0x1c, 0xd4, 0x87, 0x5a, 0x38, 0x62, 0x14, 0x9b, 0x65, 0x58, 0x9f, 0xa3,
+	0xc9, 0xcb, 0xc9, 0x06, 0x9c, 0xf7, 0xc1, 0xdf, 0xa9, 0x8a, 0xce, 0xe1, 0x73, 0x0c, 0x4e, 0xbc,
+	0xaa, 0x97, 0x6e, 0x0d, 0x4d, 0x5a, 0x03, 0xec, 0x7b, 0xb6, 0xc1, 0xf0, 0xfc, 0x5b, 0xf0, 0xed,
+	0x36, 0x9d, 0x8a, 0xb0, 0xdf, 0xaf, 0x0d, 0x8d, 0x82, 0xe7, 0x23, 0x7e, 0x3f, 0x61, 0xc5, 0x61,
+	0x66, 0x13, 0x0f, 0xeb, 0x06, 0x05, 0x93, 0x08, 0x73, 0xc3, 0xa9, 0x08, 0x33, 0x9b, 0x36, 0x1b,
+	0x91, 0xf3, 0x11, 0xe6, 0x06, 0x2b, 0x26, 0x77, 0x60, 0x21, 0x00, 0xb5, 0x64, 0x8c, 0xbc, 0xf4,
+	0x43, 0x73, 0x72, 0x12, 0xdf, 0x6a, 0x83, 0x56, 0x95, 0xe8, 0x3c, 0xdf, 0x0e, 0xfa, 0x82, 0x47,
+	0x15, 0x8e, 0xe7, 0xf9, 0x87, 0x6f, 0xb6, 0xac, 0x2b, 0x0c, 0x1d, 0xc3, 0xcf, 0x56, 0xc8, 0x22,
+	0xfb, 0xb4, 0x22, 0xfc, 0x74, 0x61, 0x1c, 0xe5, 0x67, 0xf8, 0x25, 0x86, 0x0f, 0xf1, 0x33, 0xf4,
+	0x7a, 0x70, 0x92, 0xfc, 0xc5, 0xcb, 0x73, 0x86, 0xc0, 0xa0, 0x07, 0x16, 0xaf, 0x8f, 0x8f, 0x5f,
+	0xbc, 0xcb, 0x7c, 0xf1, 0x7a, 0xb0, 0xa3, 0x8b, 0x37, 0xdc, 0x2b, 0xf5, 0x80, 0x7e, 0x9b, 0xec,
+	0x4c, 0x2b, 0x46, 0x46, 0xad, 0x4c, 0xab, 0xaa, 0x54, 0xe0, 0x2a, 0xc2, 0xc5, 0xe0, 0x64, 0xd3,
+	0xe5, 0xaa, 0xb7, 0x0f, 0x5b, 0x26, 0x2e, 0x5e, 0x4c, 0x24, 0xd1, 0x11, 0x67, 0xdf, 0x5c, 0x09,
+	0x4c, 0xbd, 0x03, 0x6a, 0x30, 0x0c, 0x7a, 0x81, 0x7b, 0xb1, 0x18, 0x35, 0xeb, 0xff, 0x22, 0xc0,
+	0x76, 0xc7, 0x69, 0x4f, 0x0e, 0xf5, 0x82, 0x5f, 0xdd, 0x45, 0x14, 0x3a, 0x1d, 0x43, 0xed, 0x50,
+	0xd9, 0x40, 0x08, 0x3b, 0xe8, 0x21, 0x4c, 0xf2, 0x2a, 0x68, 0xc1, 0x77, 0x93, 0xe9, 0xb4, 0xa6,
+	0xb0, 0xc6, 0x52, 0x9b, 0xd5, 0x44, 0xc1, 0x35, 0x40, 0xee, 0xf5, 0x80, 0x55, 0x98, 0x7e, 0xc8,
+	0x4b, 0x08, 0x63, 0x4e, 0xc8, 0xfb, 0xd3, 0x02, 0xac, 0x26, 0x0a, 0xa8, 0xd1, 0x50, 0x95, 0x1a,
+	0xa8, 0x33, 0x04, 0x65, 0xc6, 0x18, 0xcd, 0x6c, 0xf2, 0x64, 0x9a, 0xd9, 0x91, 0x53, 0xf1, 0x54,
+	0xcc, 0xa9, 0xf8, 0x53, 0x80, 0x36, 0x53, 0x24, 0x15, 0x4c, 0x14, 0x99, 0x88, 0x96, 0xbc, 0x4b,
+	0x65, 0x1c, 0x74, 0xc1, 0xa2, 0x4d, 0x6d, 0x36, 0x66, 0xac, 0x69, 0x66, 0x78, 0x53, 0x07, 0x8d,
+	0x4d, 0xdf, 0xc5, 0x58, 0x1d, 0x2b, 0x02, 0x2c, 0x8c, 0x24, 0x02, 0xbc, 0x7f, 0x4c, 0x11, 0x60,
+	0xf1, 0xa4, 0x22, 0xc0, 0xd2, 0x2f, 0x25, 0x02, 0x08, 0xef, 0x8a, 0x08, 0xb0, 0xfc, 0xce, 0x88,
+	0x00, 0xe2, 0x98, 0x44, 0x80, 0x95, 0xf1, 0x89, 0x00, 0x17, 0x4e, 0x26, 0x02, 0xac, 0x8e, 0x41,
+	0x04, 0xb8, 0x38, 0x5e, 0x11, 0x60, 0x6d, 0x6c, 0x22, 0xc0, 0xa5, 0x13, 0x8b, 0x00, 0x97, 0x4f,
+	0x20, 0x02, 0xe4, 0x8f, 0x2b, 0x02, 0x5c, 0x49, 0x14, 0x01, 0x7e, 0x4c, 0x10, 0x01, 0xae, 0xb2,
+	0x9d, 0x72, 0x7b, 0xe4, 0xdf, 0x05, 0xdf, 0x86, 0x00, 0x70, 0xed, 0x0d, 0x0b, 0x00, 0xd7, 0xdf,
+	0x9c, 0x00, 0x70, 0xe3, 0xe7, 0x0a, 0x00, 0x31, 0x07, 0xce, 0x0f, 0xde, 0xc0, 0x81, 0xf3, 0xe6,
+	0x38, 0x0f, 0x9c, 0xbf, 0x3a, 0xc1, 0x81, 0xf3, 0xd6, 0xd0, 0x03, 0x27, 0xe9, 0xc2, 0xb2, 0xcf,
+	0xa2, 0x38, 0x89, 0x97, 0x9b, 0x05, 0xdd, 0x66, 0x83, 0x73, 0x27, 0x71, 0x70, 0xc2, 0xf7, 0x0d,
+	0xf8, 0x30, 0x2d, 0x99, 0xf1, 0xb5, 0xe3, 0x14, 0x60, 0xfe, 0x25, 0xc0, 0x6a, 0xe2, 0xef, 0xd9,
+	0xa7, 0xb9, 0xe0, 0x69, 0x2e, 0x78, 0x9a, 0x0b, 0x9e, 0xe6, 0x82, 0xa7, 0xb9, 0xe0, 0x69, 0x2e,
+	0xf8, 0xff, 0x95, 0x0b, 0x26, 0x6e, 0x6b, 0xa7, 0xb9, 0xe0, 0x98, 0x72, 0xc1, 0x38, 0x81, 0x78,
+	0x7d, 0x04, 0x81, 0x78, 0x63, 0x34, 0x81, 0xf8, 0xce, 0x88, 0x02, 0xf1, 0xdd, 0x51, 0x04, 0xe2,
+	0x7b, 0xa3, 0x08, 0xc4, 0xf7, 0x47, 0x11, 0x88, 0x1f, 0x8c, 0x26, 0x10, 0x7f, 0x34, 0xa2, 0x40,
+	0xfc, 0xf1, 0x88, 0x02, 0xf1, 0x27, 0x23, 0x0a, 0xc4, 0x0f, 0x47, 0x13, 0x88, 0x3f, 0x3d, 0x81,
+	0x40, 0xfc, 0xe8, 0xf8, 0x02, 0xf1, 0xe3, 0x81, 0x02, 0x71, 0xb2, 0xb6, 0xfb, 0xd9, 0x18, 0xb4,
+	0xdd, 0xe1, 0x12, 0xf4, 0xe7, 0xc3, 0x25, 0xe8, 0x64, 0x81, 0xf8, 0x8b, 0x13, 0x09, 0xc4, 0x63,
+	0x3c, 0x34, 0xdc, 0xfb, 0x7b, 0x1a, 0x32, 0x6e, 0x20, 0x35, 0x49, 0x05, 0xa6, 0xe8, 0x75, 0x44,
+	0xb2, 0x16, 0xe7, 0x59, 0xe0, 0x7e, 0xa7, 0x78, 0x69, 0x30, 0xc0, 0xb9, 0x6a, 0x57, 0x83, 0xb3,
+	0xfc, 0x76, 0x29, 0xb9, 0x1c, 0x7b, 0x4e, 0x08, 0xde, 0x94, 0x15, 0xf3, 0x49, 0x10, 0x87, 0x50,
+	0x82, 0x73, 0xce, 0x65, 0x43, 0x12, 0x0b, 0x0f, 0xdf, 0x7d, 0x14, 0xaf, 0x24, 0x62, 0x1c, 0xce,
+	0xaf, 0x20, 0xe3, 0x5d, 0x12, 0x24, 0x57, 0xe3, 0x5a, 0x44, 0xef, 0x32, 0x8a, 0xd7, 0x86, 0xa0,
+	0xfc, 0xee, 0xf3, 0x9b, 0x7a, 0xf1, 0xdd, 0x0f, 0x5d, 0x25, 0x8c, 0xef, 0x7e, 0xf8, 0xa2, 0x1f,
+	0xed, 0xbe, 0x73, 0xed, 0x2e, 0xbe, 0xfb, 0xe1, 0x5b, 0x80, 0xf1, 0xdd, 0x8f, 0xdc, 0xdb, 0x23,
+	0x3b, 0x90, 0x76, 0x2f, 0xd1, 0x91, 0x2b, 0xf1, 0x67, 0x98, 0xd0, 0xad, 0x3e, 0xf1, 0x6a, 0x32,
+	0xc8, 0xa1, 0xfd, 0x4b, 0x0a, 0xc4, 0xc1, 0x57, 0x01, 0xc8, 0x47, 0xc7, 0xba, 0xf2, 0x21, 0x7e,
+	0x3c, 0x6a, 0x33, 0xc7, 0x9b, 0x7f, 0xa4, 0x60, 0x6d, 0xc8, 0x2f, 0xc8, 0xe4, 0xd1, 0x60, 0xee,
+	0x61, 0xd7, 0x14, 0xc4, 0xc7, 0xc7, 0x6a, 0x7b, 0xc4, 0xb9, 0x81, 0xbf, 0xf5, 0x24, 0x39, 0x37,
+	0xec, 0x77, 0xee, 0x24, 0xe7, 0x86, 0xfe, 0xb8, 0xb4, 0x29, 0x7e, 0x23, 0x04, 0xff, 0x2f, 0xe7,
+	0xb1, 0xf7, 0xd2, 0xdf, 0xdd, 0x3d, 0xcb, 0x62, 0xeb, 0xfd, 0xff, 0x05, 0x00, 0x00, 0xff, 0xff,
+	0x90, 0x0f, 0xe1, 0x8d, 0xba, 0x33, 0x00, 0x00,
 }

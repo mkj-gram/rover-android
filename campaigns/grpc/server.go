@@ -156,7 +156,7 @@ func (s *Server) Archive(ctx context.Context, req *campaignspb.ArchiveRequest) (
 	}
 
 	var (
-		cStatus = int32(campaignspb.CampaignStatus_CAMPAIGN_STATUS_ARCHIVED)
+		cStatus = int32(campaignspb.CampaignStatus_ARCHIVED)
 	)
 
 	if err := s.DB.UpdateStatus(ctx, acctId, req.CampaignId, cStatus); err != nil {
@@ -177,7 +177,7 @@ func (s *Server) Publish(ctx context.Context, req *campaignspb.PublishRequest) (
 	}
 
 	var (
-		cStatus = int32(campaignspb.CampaignStatus_CAMPAIGN_STATUS_PUBLISHED)
+		cStatus = int32(campaignspb.CampaignStatus_PUBLISHED)
 	)
 
 	if err := s.DB.UpdateStatus(ctx, acctId, req.CampaignId, cStatus); err != nil {

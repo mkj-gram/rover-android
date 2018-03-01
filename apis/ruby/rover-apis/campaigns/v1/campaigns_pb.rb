@@ -7,6 +7,73 @@ require 'auth/v1/auth_pb'
 require 'protobuf/predicates_pb'
 require 'google/protobuf/timestamp_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
+  add_message "rover.campaigns.v1.CampaignType" do
+  end
+  add_enum "rover.campaigns.v1.CampaignType.Enum" do
+    value :UNKNOWN, 0
+    value :SCHEDULED_NOTIFICATION, 1
+    value :AUTOMATED_NOTIFICATION, 2
+  end
+  add_message "rover.campaigns.v1.CampaignStatus" do
+  end
+  add_enum "rover.campaigns.v1.CampaignStatus.Enum" do
+    value :UNKNOWN, 0
+    value :DRAFT, 1
+    value :PUBLISHED, 2
+    value :ARCHIVED, 3
+  end
+  add_message "rover.campaigns.v1.SegmentCondition" do
+  end
+  add_enum "rover.campaigns.v1.SegmentCondition.Enum" do
+    value :ANY, 0
+    value :ALL, 1
+  end
+  add_message "rover.campaigns.v1.NotificationTapBehaviorType" do
+  end
+  add_enum "rover.campaigns.v1.NotificationTapBehaviorType.Enum" do
+    value :OPEN_EXPERIENCE, 0
+    value :OPEN_APP, 1
+    value :OPEN_DEEP_LINK, 2
+    value :OPEN_WEBSITE, 3
+  end
+  add_message "rover.campaigns.v1.NotificationTapPresentationType" do
+  end
+  add_enum "rover.campaigns.v1.NotificationTapPresentationType.Enum" do
+    value :UNKNOWN, 0
+    value :IN_APP, 1
+    value :IN_BROWSER, 2
+  end
+  add_message "rover.campaigns.v1.ScheduledType" do
+  end
+  add_enum "rover.campaigns.v1.ScheduledType.Enum" do
+    value :NOW, 0
+    value :SCHEDULED, 1
+  end
+  add_message "rover.campaigns.v1.ScheduledDeliveryStatus" do
+  end
+  add_enum "rover.campaigns.v1.ScheduledDeliveryStatus.Enum" do
+    value :UNKNOWN, 0
+    value :SCHEDULED, 1
+    value :INPROGRESS, 2
+    value :FINISHED, 3
+  end
+  add_message "rover.campaigns.v1.NotificationAttachmentType" do
+  end
+  add_enum "rover.campaigns.v1.NotificationAttachmentType.Enum" do
+    value :UNKNOWN, 0
+    value :IMAGE, 1
+    value :AUDIO, 2
+    value :VIDEO, 3
+  end
+  add_message "rover.campaigns.v1.RateLimit" do
+    optional :limit, :int32, 1
+    optional :interval_count, :int32, 2
+    optional :interval_unit, :enum, 3, "rover.campaigns.v1.RateLimit.Unit"
+  end
+  add_enum "rover.campaigns.v1.RateLimit.Unit" do
+    value :HOUR, 0
+    value :DAY, 1
+  end
   add_message "rover.campaigns.v1.Campaign" do
     oneof :campaign do
       optional :scheduled_notification_campaign, :message, 1, "rover.campaigns.v1.ScheduledNotificationCampaign"
@@ -16,15 +83,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.campaigns.v1.CreateRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :name, :string, 2
-    optional :campaign_type, :enum, 3, "rover.campaigns.v1.CampaignType"
+    optional :campaign_type, :enum, 3, "rover.campaigns.v1.CampaignType.Enum"
   end
   add_message "rover.campaigns.v1.CreateResponse" do
     optional :campaign, :message, 1, "rover.campaigns.v1.Campaign"
   end
   add_message "rover.campaigns.v1.ListRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :campaign_type, :enum, 5, "rover.campaigns.v1.CampaignType"
-    optional :campaign_status, :enum, 6, "rover.campaigns.v1.CampaignStatus"
+    optional :campaign_type, :enum, 5, "rover.campaigns.v1.CampaignType.Enum"
+    optional :campaign_status, :enum, 6, "rover.campaigns.v1.CampaignStatus.Enum"
     optional :keyword, :string, 7
     optional :page, :int32, 8
     optional :page_size, :int32, 9
@@ -73,9 +140,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :notification_body, :string, 11
     optional :notification_title, :string, 12
     optional :notification_attachment_url, :string, 13
-    optional :notification_attachment_type, :enum, 14, "rover.campaigns.v1.NotificationAttachmentType"
-    optional :notification_tap_behavior_type, :enum, 15, "rover.campaigns.v1.NotificationTapBehaviorType"
-    optional :notification_tap_behavior_presentation_type, :enum, 16, "rover.campaigns.v1.NotificationTapPresentationType"
+    optional :notification_attachment_type, :enum, 14, "rover.campaigns.v1.NotificationAttachmentType.Enum"
+    optional :notification_tap_behavior_type, :enum, 15, "rover.campaigns.v1.NotificationTapBehaviorType.Enum"
+    optional :notification_tap_behavior_presentation_type, :enum, 16, "rover.campaigns.v1.NotificationTapPresentationType.Enum"
     optional :notification_tap_behavior_url, :string, 17
     optional :notification_ios_content_available, :bool, 18
     optional :notification_ios_mutable_content, :bool, 19
@@ -97,9 +164,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :campaign_id, :int32, 5
     optional :ui_state, :string, 10
-    optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition"
+    optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition.Enum"
     repeated :segment_ids, :string, 12
-    optional :scheduled_type, :enum, 13, "rover.campaigns.v1.ScheduledType"
+    optional :scheduled_type, :enum, 13, "rover.campaigns.v1.ScheduledType.Enum"
     optional :scheduled_timestamp, :message, 14, "google.protobuf.Timestamp"
     optional :scheduled_time_zone, :string, 15
     optional :scheduled_use_local_device_time, :bool, 16
@@ -110,7 +177,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :campaign_id, :int32, 5
     optional :ui_state, :string, 10
-    optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition"
+    optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition.Enum"
     repeated :segment_ids, :string, 12
     optional :automated_monday, :bool, 13
     optional :automated_tuesday, :bool, 14
@@ -132,31 +199,22 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse" do
   end
-  add_message "rover.campaigns.v1.RateLimit" do
-    optional :limit, :int32, 1
-    optional :interval_count, :int32, 2
-    optional :interval_unit, :enum, 3, "rover.campaigns.v1.RateLimit.Unit"
-  end
-  add_enum "rover.campaigns.v1.RateLimit.Unit" do
-    value :HOUR, 0
-    value :DAY, 1
-  end
   add_message "rover.campaigns.v1.ScheduledNotificationCampaign" do
     optional :campaign_id, :int32, 1
     optional :name, :string, 2
-    optional :campaign_status, :enum, 3, "rover.campaigns.v1.CampaignStatus"
+    optional :campaign_status, :enum, 3, "rover.campaigns.v1.CampaignStatus.Enum"
     optional :experience_id, :string, 4
     optional :created_at, :message, 8, "google.protobuf.Timestamp"
     optional :updated_at, :message, 9, "google.protobuf.Timestamp"
     optional :ui_state, :string, 10
-    optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition"
+    optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition.Enum"
     repeated :segment_ids, :string, 12
     optional :notification_body, :string, 20
     optional :notification_title, :string, 21
     optional :notification_attachment_url, :string, 22
-    optional :notification_attachment_type, :enum, 23, "rover.campaigns.v1.NotificationAttachmentType"
-    optional :notification_tap_behavior_type, :enum, 24, "rover.campaigns.v1.NotificationTapBehaviorType"
-    optional :notification_tap_behavior_presentation_type, :enum, 25, "rover.campaigns.v1.NotificationTapPresentationType"
+    optional :notification_attachment_type, :enum, 23, "rover.campaigns.v1.NotificationAttachmentType.Enum"
+    optional :notification_tap_behavior_type, :enum, 24, "rover.campaigns.v1.NotificationTapBehaviorType.Enum"
+    optional :notification_tap_behavior_presentation_type, :enum, 25, "rover.campaigns.v1.NotificationTapPresentationType.Enum"
     optional :notification_tap_behavior_url, :string, 26
     optional :notification_ios_content_available, :bool, 27
     optional :notification_ios_mutable_content, :bool, 28
@@ -171,28 +229,28 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :notification_alert_option_push_notification, :bool, 37
     optional :notification_alert_option_notification_center, :bool, 38
     optional :notification_alert_option_badge_number, :bool, 39
-    optional :scheduled_type, :enum, 40, "rover.campaigns.v1.ScheduledType"
+    optional :scheduled_type, :enum, 40, "rover.campaigns.v1.ScheduledType.Enum"
     optional :scheduled_timestamp, :message, 41, "google.protobuf.Timestamp"
     optional :scheduled_time_zone, :string, 42
     optional :scheduled_use_local_device_time, :bool, 43
-    optional :scheduled_delivery_status, :enum, 44, "rover.campaigns.v1.ScheduledDeliveryStatus"
+    optional :scheduled_delivery_status, :enum, 44, "rover.campaigns.v1.ScheduledDeliveryStatus.Enum"
   end
   add_message "rover.campaigns.v1.AutomatedNotificationCampaign" do
     optional :campaign_id, :int32, 1
     optional :name, :string, 2
-    optional :campaign_status, :enum, 3, "rover.campaigns.v1.CampaignStatus"
+    optional :campaign_status, :enum, 3, "rover.campaigns.v1.CampaignStatus.Enum"
     optional :experience_id, :string, 4
     optional :created_at, :message, 8, "google.protobuf.Timestamp"
     optional :updated_at, :message, 9, "google.protobuf.Timestamp"
     optional :ui_state, :string, 10
-    optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition"
+    optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition.Enum"
     repeated :segment_ids, :string, 12
     optional :notification_body, :string, 20
     optional :notification_title, :string, 21
     optional :notification_attachment_url, :string, 22
-    optional :notification_attachment_type, :enum, 23, "rover.campaigns.v1.NotificationAttachmentType"
-    optional :notification_tap_behavior_type, :enum, 24, "rover.campaigns.v1.NotificationTapBehaviorType"
-    optional :notification_tap_behavior_presentation_type, :enum, 25, "rover.campaigns.v1.NotificationTapPresentationType"
+    optional :notification_attachment_type, :enum, 23, "rover.campaigns.v1.NotificationAttachmentType.Enum"
+    optional :notification_tap_behavior_type, :enum, 24, "rover.campaigns.v1.NotificationTapBehaviorType.Enum"
+    optional :notification_tap_behavior_presentation_type, :enum, 25, "rover.campaigns.v1.NotificationTapPresentationType.Enum"
     optional :notification_tap_behavior_url, :string, 26
     optional :notification_ios_content_available, :bool, 27
     optional :notification_ios_mutable_content, :bool, 28
@@ -225,53 +283,29 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :automated_frequency_single_use, :bool, 61
     repeated :automated_frequency_limits, :message, 62, "rover.campaigns.v1.RateLimit"
   end
-  add_enum "rover.campaigns.v1.CampaignType" do
-    value :CAMPAIGN_TYPE_UNDEFINED, 0
-    value :CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION, 1
-    value :CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION, 2
-  end
-  add_enum "rover.campaigns.v1.CampaignStatus" do
-    value :CAMPAIGN_STATUS_UNDEFINED, 0
-    value :CAMPAIGN_STATUS_DRAFT, 1
-    value :CAMPAIGN_STATUS_PUBLISHED, 2
-    value :CAMPAIGN_STATUS_ARCHIVED, 3
-  end
-  add_enum "rover.campaigns.v1.SegmentCondition" do
-    value :SEGMENT_CONDITION_ANY, 0
-    value :SEGMENT_CONDITION_ALL, 1
-  end
-  add_enum "rover.campaigns.v1.NotificationAttachmentType" do
-    value :NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN, 0
-    value :NOTIFICATION_ATTACHMENT_TYPE_IMAGE, 1
-    value :NOTIFICATION_ATTACHMENT_TYPE_AUDIO, 2
-    value :NOTIFICATION_ATTACHMENT_TYPE_VIDEO, 3
-  end
-  add_enum "rover.campaigns.v1.NotificationTapBehaviorType" do
-    value :NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE, 0
-    value :NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP, 1
-    value :NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK, 2
-    value :NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_WEBSITE, 3
-  end
-  add_enum "rover.campaigns.v1.NotificationTapPresentationType" do
-    value :NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN, 0
-    value :NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP, 1
-    value :NOTIFICATION_TAP_PRESENTATION_TYPE_IN_BROWSER, 2
-  end
-  add_enum "rover.campaigns.v1.ScheduledType" do
-    value :SCHEDULED_TYPE_NOW, 0
-    value :SCHEDULED_TYPE_SCHEDULED, 1
-  end
-  add_enum "rover.campaigns.v1.ScheduledDeliveryStatus" do
-    value :SCHEDULED_DELIVERY_STATUS_UNKNOWN, 0
-    value :SCHEDULED_DELIVERY_STATUS_SCHEDULED, 1
-    value :SCHEDULED_DELIVERY_STATUS_INPROGRESS, 2
-    value :SCHEDULED_DELIVERY_STATUS_FINISHED, 3
-  end
 end
 
 module Rover
   module Campaigns
     module V1
+      CampaignType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CampaignType").msgclass
+      CampaignType::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CampaignType.Enum").enummodule
+      CampaignStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CampaignStatus").msgclass
+      CampaignStatus::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CampaignStatus.Enum").enummodule
+      SegmentCondition = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.SegmentCondition").msgclass
+      SegmentCondition::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.SegmentCondition.Enum").enummodule
+      NotificationTapBehaviorType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationTapBehaviorType").msgclass
+      NotificationTapBehaviorType::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationTapBehaviorType.Enum").enummodule
+      NotificationTapPresentationType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationTapPresentationType").msgclass
+      NotificationTapPresentationType::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationTapPresentationType.Enum").enummodule
+      ScheduledType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ScheduledType").msgclass
+      ScheduledType::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ScheduledType.Enum").enummodule
+      ScheduledDeliveryStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ScheduledDeliveryStatus").msgclass
+      ScheduledDeliveryStatus::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ScheduledDeliveryStatus.Enum").enummodule
+      NotificationAttachmentType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationAttachmentType").msgclass
+      NotificationAttachmentType::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationAttachmentType.Enum").enummodule
+      RateLimit = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.RateLimit").msgclass
+      RateLimit::Unit = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.RateLimit.Unit").enummodule
       Campaign = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.Campaign").msgclass
       CreateRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CreateRequest").msgclass
       CreateResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CreateResponse").msgclass
@@ -293,18 +327,8 @@ module Rover
       UpdateScheduledDeliverySettingsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse").msgclass
       UpdateAutomatedDeliverySettingsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.UpdateAutomatedDeliverySettingsRequest").msgclass
       UpdateAutomatedDeliverySettingsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse").msgclass
-      RateLimit = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.RateLimit").msgclass
-      RateLimit::Unit = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.RateLimit.Unit").enummodule
       ScheduledNotificationCampaign = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ScheduledNotificationCampaign").msgclass
       AutomatedNotificationCampaign = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.AutomatedNotificationCampaign").msgclass
-      CampaignType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CampaignType").enummodule
-      CampaignStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CampaignStatus").enummodule
-      SegmentCondition = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.SegmentCondition").enummodule
-      NotificationAttachmentType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationAttachmentType").enummodule
-      NotificationTapBehaviorType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationTapBehaviorType").enummodule
-      NotificationTapPresentationType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationTapPresentationType").enummodule
-      ScheduledType = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ScheduledType").enummodule
-      ScheduledDeliveryStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ScheduledDeliveryStatus").enummodule
     end
   end
 end

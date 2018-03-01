@@ -316,9 +316,9 @@ func test_List(t *testing.T) {
 
 								CampaignId:     3,
 								Name:           "c3",
-								CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -333,9 +333,9 @@ func test_List(t *testing.T) {
 
 								CampaignId:     2,
 								Name:           "c2",
-								CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -360,9 +360,9 @@ func test_List(t *testing.T) {
 
 								CampaignId:     1,
 								Name:           "c1",
-								CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -431,7 +431,7 @@ func test_Create(t *testing.T) {
 			name: "creates automated campaign",
 			req: &campaignspb.CreateRequest{
 				AuthContext:  &auth.AuthContext{AccountId: 1},
-				CampaignType: campaignspb.CampaignType_CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION,
+				CampaignType: campaignspb.CampaignType_AUTOMATED_NOTIFICATION,
 				Name:         "an automated campaign",
 			},
 
@@ -444,7 +444,7 @@ func test_Create(t *testing.T) {
 
 							CampaignId:     10000,
 							Name:           "an automated campaign",
-							CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 						},
 					},
 				},
@@ -455,7 +455,7 @@ func test_Create(t *testing.T) {
 			name: "creates scheduled campaign",
 			req: &campaignspb.CreateRequest{
 				AuthContext:  &auth.AuthContext{AccountId: 1},
-				CampaignType: campaignspb.CampaignType_CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION,
+				CampaignType: campaignspb.CampaignType_SCHEDULED_NOTIFICATION,
 				Name:         "a scheduled campaign",
 			},
 
@@ -468,7 +468,7 @@ func test_Create(t *testing.T) {
 
 							CampaignId:     10001,
 							Name:           "a scheduled campaign",
-							CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 						},
 					},
 				},
@@ -555,9 +555,9 @@ func test_Rename(t *testing.T) {
 								UpdatedAt: updatedAt,
 
 								CampaignId:       10000,
-								CampaignStatus:   campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
 								Name:             "an automated campaign",
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -587,9 +587,9 @@ func test_Rename(t *testing.T) {
 								UpdatedAt: updatedAt,
 
 								CampaignId:       10000,
-								CampaignStatus:   campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
 								Name:             "A renamed campaign",
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -712,9 +712,9 @@ func test_Duplicate(t *testing.T) {
 
 							CampaignId:     10002,
 							Name:           "a duplicated automated campaign",
-							CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
-							SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
@@ -751,9 +751,9 @@ func test_Duplicate(t *testing.T) {
 
 							CampaignId:     10003,
 							Name:           "a duplicated scheduled campaign",
-							CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
-							SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
@@ -838,11 +838,11 @@ func test_Archive(t *testing.T) {
 						&campaignspb.Campaign_AutomatedNotificationCampaign{
 							&campaignspb.AutomatedNotificationCampaign{
 								CampaignId:       1,
-								CampaignStatus:   campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
 								Name:             "c1",
 								CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -869,11 +869,11 @@ func test_Archive(t *testing.T) {
 						&campaignspb.Campaign_AutomatedNotificationCampaign{
 							&campaignspb.AutomatedNotificationCampaign{
 								CampaignId:       1,
-								CampaignStatus:   campaignspb.CampaignStatus_CAMPAIGN_STATUS_ARCHIVED,
+								CampaignStatus:   campaignspb.CampaignStatus_ARCHIVED,
 								Name:             "c1",
 								CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt:        updatedAt,
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -1001,10 +1001,10 @@ func test_Publish(t *testing.T) {
 								UpdatedAt: updatedAt,
 
 								CampaignId:     1,
-								CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_ARCHIVED,
+								CampaignStatus: campaignspb.CampaignStatus_ARCHIVED,
 								Name:           "c1",
 
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -1034,9 +1034,9 @@ func test_Publish(t *testing.T) {
 								UpdatedAt: updatedAt,
 
 								CampaignId:       1,
-								CampaignStatus:   campaignspb.CampaignStatus_CAMPAIGN_STATUS_PUBLISHED,
+								CampaignStatus:   campaignspb.CampaignStatus_PUBLISHED,
 								Name:             "c1",
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -1170,10 +1170,10 @@ func test_UpdateNotificationSettings(t *testing.T) {
 								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 
 								CampaignId: 2,
-								// CampaignType:     int32(campaignspb.CampaignType_CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION),
-								CampaignStatus:   campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								// CampaignType:     int32(campaignspb.CampaignType_AUTOMATED_NOTIFICATION),
+								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
 								Name:             "c2",
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -1200,11 +1200,11 @@ func test_UpdateNotificationSettings(t *testing.T) {
 						&campaignspb.Campaign_AutomatedNotificationCampaign{
 							&campaignspb.AutomatedNotificationCampaign{
 								CampaignId:       2,
-								CampaignStatus:   campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
 								Name:             "c2",
 								CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt:        updatedAt,
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationAndroidChannelId: "1",
 								NotificationAttributes:       nil,
@@ -1326,7 +1326,7 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 
 				UiState: `{"progres_percentage": 90}`,
 
-				SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+				SegmentCondition: campaignspb.SegmentCondition_ALL,
 				SegmentIds:       []string{"1", "2", "3"},
 
 				AutomatedMonday:    true,
@@ -1378,12 +1378,12 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 						&campaignspb.Campaign_AutomatedNotificationCampaign{
 							&campaignspb.AutomatedNotificationCampaign{
 								CampaignId:     4,
-								CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 								Name:           "c4",
 								CreatedAt:      ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt:      ts(t, "2017-05-04T16:26:25.445494+00:00"),
 
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -1413,12 +1413,12 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 								UpdatedAt: updatedAt,
 
 								CampaignId:     4,
-								CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 								Name:           "c4",
 
 								UiState: `{"progres_percentage": 90}`,
 
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 								SegmentIds:       []string{"1", "2", "3"},
 
 								NotificationExpiration:                  -1,
@@ -1566,11 +1566,11 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 				CampaignId:  5,
 
 				SegmentIds:       []string{"1", "2"},
-				SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+				SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 				UiState: `{"hello": "world"}`,
 
-				ScheduledType:               campaignspb.ScheduledType_SCHEDULED_TYPE_SCHEDULED,
+				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
 				ScheduledTimestamp:          nil,
 				ScheduledTimeZone:           "America/Toronto",
 				ScheduledUseLocalDeviceTime: true,
@@ -1586,15 +1586,15 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 
 								CampaignId:     5,
-								CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 								Name:           "c5",
 
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
 
-								ScheduledType: campaignspb.ScheduledType_SCHEDULED_TYPE_NOW,
+								ScheduledType: campaignspb.ScheduledType_NOW,
 							},
 						},
 					},
@@ -1611,18 +1611,18 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 								UpdatedAt: updatedAt,
 
 								CampaignId:     5,
-								CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 								Name:           "c5",
 
 								SegmentIds:       []string{"1", "2"},
-								SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								UiState: `{"hello": "world"}`,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
 
-								ScheduledType:               campaignspb.ScheduledType_SCHEDULED_TYPE_SCHEDULED,
+								ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
 								ScheduledTimeZone:           "America/Toronto",
 								ScheduledUseLocalDeviceTime: true,
 							},
@@ -1714,9 +1714,9 @@ func test_LoadCampaign(t *testing.T) {
 
 							Name: "c10",
 
-							CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
-							SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
 							SegmentIds:       []string{"1", "2", "3"},
 
 							UiState: `{"progres_percentage": 90}`,
@@ -1727,11 +1727,11 @@ func test_LoadCampaign(t *testing.T) {
 							NotificationTitle: "notification title",
 
 							NotificationAttachmentUrl:   "http://example.com/id.png",
-							NotificationAttachmentType:  campaignspb.NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_IMAGE,
-							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP,
+							NotificationAttachmentType:  campaignspb.NotificationAttachmentType_IMAGE,
+							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
 							NotificationTapBehaviorUrl:  "http://rover.io/homepage",
 
-							NotificationTapBehaviorPresentationType: campaignspb.NotificationTapPresentationType_NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP,
+							NotificationTapBehaviorPresentationType: campaignspb.NotificationTapPresentationType_IN_APP,
 							NotificationIosContentAvailable:         true,
 
 							NotificationIosMutableContent:     true,
@@ -1753,7 +1753,7 @@ func test_LoadCampaign(t *testing.T) {
 							NotificationAlertOptionNotificationCenter: true,
 							NotificationAlertOptionBadgeNumber:        true,
 
-							ScheduledType:               campaignspb.ScheduledType_SCHEDULED_TYPE_SCHEDULED,
+							ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
 							ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494+00:00"),
 							ScheduledTimeZone:           "America/Toronto",
 							ScheduledUseLocalDeviceTime: true,
@@ -1780,9 +1780,9 @@ func test_LoadCampaign(t *testing.T) {
 
 							Name: "c10",
 
-							CampaignStatus: campaignspb.CampaignStatus_CAMPAIGN_STATUS_DRAFT,
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
-							SegmentCondition: campaignspb.SegmentCondition_SEGMENT_CONDITION_ALL,
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
 							SegmentIds:       []string{"1", "2", "3"},
 
 							UiState: `{"progres_percentage": 90}`,
@@ -1793,11 +1793,11 @@ func test_LoadCampaign(t *testing.T) {
 							NotificationTitle: "notification title",
 
 							NotificationAttachmentUrl:   "http://example.com/id.png",
-							NotificationAttachmentType:  campaignspb.NotificationAttachmentType_NOTIFICATION_ATTACHMENT_TYPE_IMAGE,
-							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP,
+							NotificationAttachmentType:  campaignspb.NotificationAttachmentType_IMAGE,
+							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
 							NotificationTapBehaviorUrl:  "http://rover.io/homepage",
 
-							NotificationTapBehaviorPresentationType: campaignspb.NotificationTapPresentationType_NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP,
+							NotificationTapBehaviorPresentationType: campaignspb.NotificationTapPresentationType_IN_APP,
 							NotificationIosContentAvailable:         true,
 
 							NotificationIosMutableContent:     true,

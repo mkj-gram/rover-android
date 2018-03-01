@@ -29,30 +29,93 @@ service Campaigns {
   rpc UpdateAutomatedDeliverySettings(UpdateAutomatedDeliverySettingsRequest) returns (UpdateAutomatedDeliverySettingsResponse);
 }
 
-enum CampaignType {
-  CAMPAIGN_TYPE_UNDEFINED = 0;
-
-  CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION = 1;
-  CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION = 2;
+message CampaignType {
+  enum Enum {
+    UNKNOWN = 0;
+    SCHEDULED_NOTIFICATION = 1;
+    AUTOMATED_NOTIFICATION = 2;
+  }
 }
 
-enum CampaignStatus {
-  CAMPAIGN_STATUS_UNDEFINED = 0;
-
-  CAMPAIGN_STATUS_DRAFT     = 1;
-  CAMPAIGN_STATUS_PUBLISHED = 2;
-  CAMPAIGN_STATUS_ARCHIVED  = 3;
+message CampaignStatus {
+  enum Enum {
+    UNKNOWN = 0;
+    DRAFT     = 1;
+    PUBLISHED = 2;
+    ARCHIVED  = 3;
+  }
 }
 
-enum SegmentCondition {
-  SEGMENT_CONDITION_ANY = 0;
-  SEGMENT_CONDITION_ALL = 1;
+message SegmentCondition {
+  enum Enum {
+    ANY = 0;
+    ALL = 1;
+  }
 }
+
+message NotificationTapBehaviorType {
+  enum Enum {
+    OPEN_EXPERIENCE = 0;
+    OPEN_APP        = 1;
+    OPEN_DEEP_LINK  = 2;
+    OPEN_WEBSITE    = 3;
+  }
+}
+
+message NotificationTapPresentationType {
+  enum Enum {
+    UNKNOWN       = 0;
+    IN_APP        = 1;
+    IN_BROWSER    = 2;
+  }
+}
+
+message ScheduledType {
+  enum Enum {
+    NOW          = 0;
+    SCHEDULED    = 1;
+  }
+}
+
+
+message ScheduledDeliveryStatus {
+  enum Enum {
+    UNKNOWN = 0;
+
+    SCHEDULED   = 1;
+    INPROGRESS  = 2;
+    FINISHED    = 3;
+  }
+}
+
+
+message NotificationAttachmentType {
+  enum Enum {
+    UNKNOWN = 0;
+
+    IMAGE = 1;
+    AUDIO = 2;
+    VIDEO = 3;
+  }
+}
+
+
+message RateLimit {
+  int32 limit           = 1;
+  int32 interval_count  = 2;
+  Unit  interval_unit   = 3;
+
+  enum Unit {
+    HOUR = 0;
+    DAY = 1;
+  }
+}
+
 
 message Campaign {
   oneof campaign {
-    ScheduledNotificationCampaign     scheduled_notification_campaign      = 1;
-    AutomatedNotificationCampaign     automated_notification_campaign      = 2;
+    ScheduledNotificationCampaign     scheduled_notification_campaign  = 1;
+    AutomatedNotificationCampaign     automated_notification_campaign  = 2;
   }
 }
 
@@ -60,7 +123,7 @@ message CreateRequest {
   auth.v1.AuthContext auth_context = 1;
 
   string name = 2;
-  CampaignType campaign_type = 3;
+  CampaignType.Enum campaign_type = 3;
 }
 message CreateResponse {
   Campaign campaign = 1;
@@ -69,8 +132,8 @@ message CreateResponse {
 message ListRequest {
   auth.v1.AuthContext auth_context = 1;
 
-  CampaignType   campaign_type    = 5;
-  CampaignStatus campaign_status  = 6;
+  CampaignType.Enum   campaign_type    = 5;
+  CampaignStatus.Enum campaign_status  = 6;
 
   // filter
   string keyword   = 7;
@@ -148,11 +211,11 @@ message UpdateNotificationSettingsRequest{
   string              notification_title                              = 12;
 
   string              notification_attachment_url                     = 13;
-  NotificationAttachmentType      notification_attachment_type        = 14;
+  NotificationAttachmentType.Enum      notification_attachment_type  = 14;
 
-  NotificationTapBehaviorType     notification_tap_behavior_type              = 15;
-  NotificationTapPresentationType notification_tap_behavior_presentation_type = 16;
-  string                          notification_tap_behavior_url               = 17;
+  NotificationTapBehaviorType.Enum     notification_tap_behavior_type = 15;
+  NotificationTapPresentationType.Enum notification_tap_behavior_presentation_type = 16;
+  string                          notification_tap_behavior_url       = 17;
 
   bool                notification_ios_content_available              = 18;
   bool                notification_ios_mutable_content                = 19;
@@ -182,10 +245,10 @@ message UpdateScheduledDeliverySettingsRequest{
 
   string ui_state                                                     = 10;
 
-  SegmentCondition          segment_condition                         = 11;
+  SegmentCondition.Enum    segment_condition                         = 11;
   repeated string           segment_ids                               = 12;
 
-  ScheduledType             scheduled_type                            = 13;
+  ScheduledType.Enum       scheduled_type                            = 13;
   google.protobuf.Timestamp scheduled_timestamp                       = 14;
   string                    scheduled_time_zone                       = 15;
   bool                      scheduled_use_local_device_time           = 16;
@@ -200,7 +263,7 @@ message UpdateAutomatedDeliverySettingsRequest{
 
   string ui_state                                                     = 10;
 
-  SegmentCondition    segment_condition                               = 11;
+  SegmentCondition.Enum segment_condition                            = 11;
   repeated string     segment_ids                                     = 12;
 
   bool                automated_monday                                = 13;
@@ -227,53 +290,6 @@ message UpdateAutomatedDeliverySettingsRequest{
 message UpdateAutomatedDeliverySettingsResponse{ }
 
 
-enum NotificationAttachmentType {
-  NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN = 0;
-
-  NOTIFICATION_ATTACHMENT_TYPE_IMAGE = 1;
-  NOTIFICATION_ATTACHMENT_TYPE_AUDIO = 2;
-  NOTIFICATION_ATTACHMENT_TYPE_VIDEO = 3;
-}
-
-enum NotificationTapBehaviorType {
-  NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE = 0;
-  NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP        = 1;
-  NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK  = 2;
-  NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_WEBSITE    = 3;
-}
-
-enum NotificationTapPresentationType {
-  NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN       = 0;
-
-  NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP        = 1;
-  NOTIFICATION_TAP_PRESENTATION_TYPE_IN_BROWSER    = 2;
-}
-
-enum ScheduledType {
-  SCHEDULED_TYPE_NOW          = 0;
-  SCHEDULED_TYPE_SCHEDULED    = 1;
-}
-
-
-enum ScheduledDeliveryStatus {
-  SCHEDULED_DELIVERY_STATUS_UNKNOWN = 0;
-
-  SCHEDULED_DELIVERY_STATUS_SCHEDULED   = 1;
-  SCHEDULED_DELIVERY_STATUS_INPROGRESS  = 2;
-  SCHEDULED_DELIVERY_STATUS_FINISHED    = 3;
-}
-
-message RateLimit {
-  int32 limit           = 1;
-  int32 interval_count  = 2;
-  Unit  interval_unit   = 3;
-
-  enum Unit {
-    HOUR = 0;
-    DAY = 1;
-  }
-}
-
 //
 // for more, see https://paper.dropbox.com/doc/Campaign-Model-iDaks5RstsRN0X2SDCWsv
 //
@@ -282,7 +298,7 @@ message ScheduledNotificationCampaign {
 
   string              name                                            = 2;
 
-  CampaignStatus      campaign_status                                 = 3;
+  CampaignStatus.Enum campaign_status                                = 3;
 
   string experience_id                                                = 4;
 
@@ -291,18 +307,18 @@ message ScheduledNotificationCampaign {
 
   string ui_state                                                     = 10;
 
-  SegmentCondition    segment_condition                               = 11;
+  SegmentCondition.Enum segment_condition                            = 11;
   repeated string     segment_ids                                     = 12;
 
   string              notification_body                               = 20;
   string              notification_title                              = 21;
 
   string                     notification_attachment_url              = 22;
-  NotificationAttachmentType notification_attachment_type             = 23;
+  NotificationAttachmentType.Enum notification_attachment_type             = 23;
 
-  NotificationTapBehaviorType     notification_tap_behavior_type                  = 24;
-  NotificationTapPresentationType notification_tap_behavior_presentation_type     = 25;
-  string                          notification_tap_behavior_url                   = 26;
+  NotificationTapBehaviorType.Enum     notification_tap_behavior_type = 24;
+  NotificationTapPresentationType.Enum notification_tap_behavior_presentation_type     = 25;
+  string                          notification_tap_behavior_url       = 26;
 
   bool                notification_ios_content_available              = 27;
   bool                notification_ios_mutable_content                = 28;
@@ -322,18 +338,18 @@ message ScheduledNotificationCampaign {
   bool                notification_alert_option_notification_center   = 38;
   bool                notification_alert_option_badge_number          = 39;
 
-  ScheduledType           scheduled_type                              = 40;
+  ScheduledType.Enum           scheduled_type                        = 40;
   google.protobuf.Timestamp scheduled_timestamp                       = 41;
   string                  scheduled_time_zone                         = 42;
   bool                    scheduled_use_local_device_time             = 43;
-  ScheduledDeliveryStatus scheduled_delivery_status                   = 44;
+  ScheduledDeliveryStatus.Enum scheduled_delivery_status                   = 44;
 }
 
 message AutomatedNotificationCampaign {
   int32               campaign_id                                     = 1;
   string              name                                            = 2;
 
-  CampaignStatus      campaign_status                                 = 3;
+  CampaignStatus.Enum campaign_status                                = 3;
 
   string              experience_id                                   = 4;
 
@@ -342,18 +358,18 @@ message AutomatedNotificationCampaign {
 
   string ui_state                                                     = 10;
 
-  SegmentCondition    segment_condition                               = 11;
+  SegmentCondition.Enum segment_condition                            = 11;
   repeated string     segment_ids                                     = 12;
 
   string              notification_body                               = 20;
   string              notification_title                              = 21;
 
   string                      notification_attachment_url             = 22;
-  NotificationAttachmentType  notification_attachment_type            = 23;
+  NotificationAttachmentType.Enum  notification_attachment_type      = 23;
 
-  NotificationTapBehaviorType     notification_tap_behavior_type              = 24;
-  NotificationTapPresentationType notification_tap_behavior_presentation_type = 25;
-  string                          notification_tap_behavior_url               = 26;
+  NotificationTapBehaviorType.Enum     notification_tap_behavior_type = 24;
+  NotificationTapPresentationType.Enum notification_tap_behavior_presentation_type = 25;
+  string                          notification_tap_behavior_url       = 26;
 
   bool                notification_ios_content_available              = 27;
   bool                notification_ios_mutable_content                = 28;
@@ -394,5 +410,4 @@ message AutomatedNotificationCampaign {
 
   bool                automated_frequency_single_use                  = 61;
   repeated RateLimit  automated_frequency_limits                      = 62;
-
 }
