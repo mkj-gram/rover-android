@@ -1149,20 +1149,10 @@ storiesOf('TabBar', module)
     })
 
 storiesOf('Text', module)
-    .add('h1', () => <Text text="Header 1" size="h1" />)
-    .add('h1-editable', () => (
-        <Text
-            text="Header 1- Editable"
-            size="h1"
-            contentEditable={true}
-            handleChange={() => null}
-            id="the"
-        />
-    ))
-    .add('Text editable test', () => {
+    .add('Text editable- onBlur triggers no change', () => {
         interface ZState {
             edittable: boolean
-            text: string
+            ts: string
         }
         class T extends React.Component<{}, ZState> {
             // tslint:disable-next-line:no-any
@@ -1170,7 +1160,7 @@ storiesOf('Text', module)
                 super(props)
                 this.state = {
                     edittable: false,
-                    text: 'Lorem ipsum sit dolor amet     a   s '
+                    ts: 'Lorem ipsum sit dolor amet'
                 }
                 this.onClick = this.onClick.bind(this)
                 this.handleChange = this.handleChange.bind(this)
@@ -1182,10 +1172,10 @@ storiesOf('Text', module)
                 })
             }
 
-            handleChange(text: string) {
+            handleChange(val: string) {
                 this.setState({
-                    edittable: !this.state.edittable,
-                    text
+                    ts: val,
+                    edittable: !this.state.edittable
                 })
             }
 
@@ -1198,11 +1188,12 @@ storiesOf('Text', module)
                         }}
                     >
                         <Text
-                            text={this.state.text}
+                            text={this.state.ts}
                             size="h1"
                             contentEditable={this.state.edittable}
                             handleChange={this.handleChange}
                             id="thy"
+                            onBlurChange={false}
                         />
                         <div
                             style={{
@@ -1221,14 +1212,176 @@ storiesOf('Text', module)
 
         return <T />
     })
+    .add('Text editable- onBlur triggers onChange', () => {
+        interface ZState {
+            edittable: boolean
+            ts: string
+        }
+        class T extends React.Component<{}, ZState> {
+            // tslint:disable-next-line:no-any
+            constructor(props: any) {
+                super(props)
+                this.state = {
+                    edittable: false,
+                    ts: 'Lorem ipsum sit dolor amet'
+                }
+                this.onClick = this.onClick.bind(this)
+                this.handleChange = this.handleChange.bind(this)
+            }
+
+            onClick() {
+                this.setState({
+                    edittable: !this.state.edittable
+                })
+            }
+
+            handleChange(val: string) {
+                this.setState({
+                    ts: val,
+                    edittable: !this.state.edittable
+                })
+            }
+
+            render() {
+                return (
+                    <div
+                        style={{
+                            width: 300,
+                            height: 200
+                        }}
+                    >
+                        <Text
+                            text={this.state.ts}
+                            size="h1"
+                            contentEditable={this.state.edittable}
+                            handleChange={this.handleChange}
+                            id="thy"
+                            onBlurChange={true}
+                        />
+                        <div
+                            style={{
+                                width: 500,
+                                height: 500,
+                                background: red
+                            }}
+                            onClick={this.onClick}
+                        >
+                            clickMe
+                        </div>
+                    </div>
+                )
+            }
+        }
+
+        return <T />
+    })
+
+    .add('Text Placeholder editable w/ onBlur change', () => {
+        interface ZState {
+            edittable: boolean
+            ts: string
+
+            ts1: string
+            edittable1: boolean
+        }
+        class T extends React.Component<{}, ZState> {
+            // tslint:disable-next-line:no-any
+            constructor(props: any) {
+                super(props)
+                this.state = {
+                    edittable: false,
+                    edittable1: false,
+                    ts: '',
+                    ts1: ''
+                }
+                this.onClick = this.onClick.bind(this)
+                this.handleChange = this.handleChange.bind(this)
+                this.handleChange1 = this.handleChange1.bind(this)
+            }
+
+            onClick() {
+                this.setState({
+                    edittable: !this.state.edittable
+                })
+            }
+
+            handleChange(val: string) {
+                this.setState({
+                    ts: val,
+                    edittable: !this.state.edittable
+                })
+            }
+
+            handleChange1(val: string) {
+                this.setState({
+                    ts1: val
+                })
+            }
+
+            render() {
+                return (
+                    <div
+                        style={{
+                            width: 300,
+                            height: 200
+                        }}
+                    >
+                        <Text
+                            text={this.state.ts}
+                            size="h1"
+                            contentEditable={this.state.edittable}
+                            handleChange={this.handleChange}
+                            id="text12"
+                            onBlurChange={true}
+                            placeholder={true}
+                            placeholderText="Lorem Ipsum Things"
+                        />
+                        <Text
+                            text={this.state.ts1}
+                            size="h1"
+                            contentEditable={this.state.edittable1}
+                            handleChange={this.handleChange1}
+                            id="text13"
+                            onBlurChange={true}
+                            placeholder={true}
+                            placeholderText="Lorem Ipsum Things"
+                        />
+                        <div
+                            style={{
+                                width: 100,
+                                height: 50,
+                                background: red
+                            }}
+                            onClick={this.onClick}
+                        >
+                            clickMe
+                        </div>
+                    </div>
+                )
+            }
+        }
+
+        return <T />
+    })
+    .add('h1', () => <Text text="Header 1" size="h1" />)
+    .add('h1-editable', () => (
+        <Text
+            text="Header 1- Editable"
+            size="h1"
+            contentEditable={true}
+            handleChange={() => null}
+            id="ok"
+        />
+    ))
+
     .add('h2', () => <Text text="Header 2" size="h2" />)
     .add('h2-editable', () => (
         <Text
             text="Header 2- Editable"
             size="h2"
             contentEditable={true}
-            handleChange={() => null}
-            id="this"
+            handleChange={(v: string) => console.log(`v: ${v}`)}
+            id="b"
         />
     ))
 
@@ -1251,7 +1404,7 @@ storiesOf('Text', module)
             contentEditable={true}
             handleChange={() => null}
             placeholder={true}
-            id="that"
+            id="c"
         />
     ))
     .add('text-large-left-non-editable-placeholder', () => (
@@ -1274,7 +1427,7 @@ storiesOf('Text', module)
             contentEditable={true}
             handleChange={() => null}
             placeholder={true}
-            id="they"
+            id="d"
         />
     ))
 
@@ -1283,7 +1436,7 @@ storiesOf('Text', module)
             text="Lorem ipsum sit dolor amet"
             size="small"
             contentEditable={true}
-            id="thiz"
+            id="e"
         />
     ))
     .add('text-small-center-editable', () => (
@@ -1292,7 +1445,7 @@ storiesOf('Text', module)
             size="small"
             position="center"
             contentEditable={true}
-            id="there"
+            id="f"
         />
     ))
 

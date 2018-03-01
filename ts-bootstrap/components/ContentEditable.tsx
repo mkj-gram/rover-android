@@ -11,8 +11,10 @@ export interface Props
     onChange: (val: string) => void
     onBlur?: (evt: any) => void
     style?: StringMap<string | number>
+    id?: string
+    onBlurChange?: boolean
+    handlePlaceholderChange?: (val: string) => void
     placeholder?: boolean
-    id: string
 }
 
 class ContentEditable extends React.Component<Props, {}> {
@@ -22,23 +24,20 @@ class ContentEditable extends React.Component<Props, {}> {
     constructor(props: Props) {
         super(props)
         this.emitChange = this.emitChange.bind(this)
-        this.onFocus = this.onFocus.bind(this)
         this.onPaste = this.onPaste.bind(this)
         this.placeCaretAtEnd = this.placeCaretAtEnd.bind(this)
         this.handleKeyPress = this.handleKeyPress.bind(this)
+        this.onInput = this.onInput.bind(this)
+        this.onFocus = this.onFocus.bind(this)
     }
 
     shouldComponentUpdate(nextProps: Props) {
         let { props, htmlEl } = this
 
-        // We need not rerender if the change of props simply reflects the user's edits.
-        // Rerendering in this case would make the cursor/caret jump
-        // Rerender if there is no element yet... (somehow?)
         if (!htmlEl) {
             return true
         }
 
-        // ...or if html really changed... (programmatically, not by user edit)
         if (
             nextProps.html !== htmlEl.innerHTML &&
             nextProps.html !== props.html
@@ -54,17 +53,13 @@ class ContentEditable extends React.Component<Props, {}> {
 
     componentDidUpdate() {
         if (this.htmlEl && this.props.html !== this.htmlEl.innerHTML) {
-            // Perhaps React (whose VDOM gets outdated because we often prevent
-            // rerendering) did not update the DOM. So we update it manually now.
             this.htmlEl.innerHTML = this.props.html
         }
     }
 
     componentDidMount() {
         document.addEventListener('keydown', this.handleKeyPress, false)
-        if (!this.props.placeholder) {
-            this.placeCaretAtEnd(document.getElementById(this.props.id))
-        }
+        this.placeCaretAtEnd(document.getElementById(this.props.id))
     }
 
     componentWillUnmount() {
@@ -73,7 +68,9 @@ class ContentEditable extends React.Component<Props, {}> {
 
     handleKeyPress(e: KeyboardEvent) {
         if (e.keyCode === 13) {
-            this.props.onChange(this.htmlEl.innerHTML.replace(/&nbsp;/g," ").replace(/\s*$/,'') as string)
+            this.props.onChange(this.htmlEl.innerHTML
+                .replace(/&nbsp;/g, ' ')
+                .replace(/\s*$/, '') as string)
         }
     }
 
@@ -98,11 +95,15 @@ class ContentEditable extends React.Component<Props, {}> {
     }
 
     emitChange(evt: any) {
-        if (!this.htmlEl) {
+        if (!this.htmlEl || !this.props.onBlurChange) {
+            evt.target = { value: this.props.html }
+            this.props.onChange(this.props.html as string)
             return
         }
 
-        var html = this.htmlEl.innerHTML.replace(/&nbsp;/g," ").replace(/\s*$/,'')
+        var html = this.htmlEl.innerHTML
+            .replace(/&nbsp;/g, ' ')
+            .replace(/\s*$/, '')
 
         if (this.props.onChange && html !== this.lastHtml) {
             evt.target = { value: html }
@@ -111,19 +112,15 @@ class ContentEditable extends React.Component<Props, {}> {
         this.lastHtml = html
     }
 
-    onFocus(evt: any) {
+    onInput(evt: any) {
         if (!this.htmlEl) {
             return
         }
 
-        if (this.props.placeholder && this.lastHtml === undefined) {
-            this.htmlEl.innerHTML = ''
-            var html = this.htmlEl.innerHTML
-
-            evt.target = { value: html }
-            // this.props.onChange(html as string)
-            this.lastHtml = html
-            this.htmlEl.style.color = charcoal
+        if (this.props.handlePlaceholderChange !== undefined) {
+            this.props.handlePlaceholderChange(this.htmlEl.innerHTML
+                .replace(/&nbsp;/g, ' ')
+                .replace(/\s*$/, '') as string)
         }
     }
 
@@ -133,8 +130,16 @@ class ContentEditable extends React.Component<Props, {}> {
         document.execCommand('insertText', false, text)
     }
 
+    onFocus(evt: any) {
+        if (!this.htmlEl) {
+            return
+        }
+        this.htmlEl.style.color = 'black'
+    }
+
     render() {
         var { html, id, ...props } = this.props
+
         return (
             <div>
                 <style type="text/css">
@@ -147,13 +152,13 @@ class ContentEditable extends React.Component<Props, {}> {
                     {
                         style: props.style,
                         ref: (e: HTMLElement) => (this.htmlEl = e),
-                        // onInput: this.emitChange,
-                        onBlur: this.props.onBlur || this.emitChange,
+                        onInput: this.onInput,
+                        onBlur: this.emitChange,
                         onPaste: this.onPaste,
-                        onFocus: this.onFocus,
                         contentEditable: true,
                         dangerouslySetInnerHTML: { __html: html },
-                        id: id
+                        id: id,
+                        onFocus: this.onFocus
                     },
                     this.props.children
                 )}

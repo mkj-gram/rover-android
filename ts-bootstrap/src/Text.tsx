@@ -6,6 +6,7 @@ import { text as typographyText, semibold, regular } from '../styles/typography'
 import { silver, graphite, charcoal } from '../styles/colors'
 
 import ContentEditable from '../components/ContentEditable'
+import PlaceholderComponent from '../components/PlaceholderComponent'
 
 export interface TextProps {
     text: string
@@ -17,6 +18,8 @@ export interface TextProps {
     handleChange?: (evt: string) => void
     textStyle?: React.CSSProperties
     id?: string
+    onBlurChange?: boolean
+    placeholderText?: string
 }
 
 const Text: React.SFC<TextProps> = ({
@@ -28,7 +31,9 @@ const Text: React.SFC<TextProps> = ({
     contentEditable,
     handleChange,
     textStyle,
-    id
+    id,
+    onBlurChange,
+    placeholderText
 }) => {
     let style: StringMap<string | number> = {
         ...typographyText,
@@ -75,12 +80,7 @@ const Text: React.SFC<TextProps> = ({
             break
     }
 
-    if (placeholder === true) {
-        style = {
-            ...style,
-            color: silver
-        }
-    } else if (position === 'center') {
+    if (position === 'center') {
         style = {
             ...style,
             textAlign: 'center'
@@ -99,24 +99,41 @@ const Text: React.SFC<TextProps> = ({
         ...textStyle
     }
 
-    let ret
-    if (contentEditable === false) {
-        ret = <div style={style}>{text}</div>
-    } else {
-        const html = `${text}`
-        ret = (
+    const html = `${text}`
+
+    if (
+        !contentEditable &&
+        (!placeholder || (placeholder && text.length !== 0))
+    ) {
+        return <div style={style}>{text}</div>
+    } else if (!placeholder || (placeholder && text.length !== 0)) {
+        return (
             <ContentEditable
-                placeholder={placeholder}
                 html={html}
                 onChange={handleChange}
                 style={style}
                 id={id}
+                onBlurChange={onBlurChange}
+            />
+        )
+    } else {
+        style = {
+            ...style,
+            color: silver
+        }
+
+        return (
+            <PlaceholderComponent
+                html={html}
+                placeholderText={placeholderText}
+                style={style}
+                onChange={handleChange}
+                id={id}
+                contentEditable={contentEditable}
             />
         )
     }
-    return ret
 }
-
 Text.defaultProps = {
     text: '',
     size: 'medium',
@@ -124,7 +141,8 @@ Text.defaultProps = {
     placeholder: false,
     contentEditable: false,
     handleChange: () => null,
-    label: false
+    label: false,
+    onBlurChange: false
 }
 
 export default Text
