@@ -12,36 +12,6 @@ import { GraphQLDateTime } from 'graphql-iso-date'
 
 import GraphQLJSON from 'graphql-type-json'
 
-const OpenURLNotificationAction = new GraphQLObjectType({
-    name: 'OpenURLNotificationAction',
-    fields: {
-        url: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: data => data['url']
-        }
-    }
-})
-
-const PresentExperienceNotificationAction = new GraphQLObjectType({
-    name: 'PresentExperienceNotificationAction',
-    fields: {
-        experienceId: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: data => data['experienceId']
-        }
-    }
-})
-
-const PresentWebsiteNotificationAction = new GraphQLObjectType({
-    name: 'PresentWebsiteNotificationAction',
-    fields: {
-        url: {
-            type: new GraphQLNonNull(GraphQLString),
-            resolve: data => data['url']
-        }
-    }
-})
-
 const Notification = new GraphQLObjectType({
     name: 'Notification',
     fields: () => ({
@@ -81,23 +51,28 @@ const Notification = new GraphQLObjectType({
     })
 })
 
-const NotificationAction = new GraphQLUnionType({
+const NotificationAction = new GraphQLObjectType({
     name: 'NotificationAction',
-    types: () => [OpenURLNotificationAction, PresentExperienceNotificationAction, PresentWebsiteNotificationAction],
-    resolveType: data => {
-        switch (data['__className']) {
-            case 'OpenURLNotificationAction':
-                return OpenURLNotificationAction
-                break
-            case 'PresentExperienceNotificationAction':
-                return PresentExperienceNotificationAction
-                break
-            case 'PresentWebsiteNotificationAction':
-                return PresentWebsiteNotificationAction
-                break
-            default:
-                return null
+    fields: () => ({
+        experienceId: {
+            type: GraphQLString
+        },
+        type: {
+            type: new GraphQLNonNull(NotificationActionType)
+        },
+        url: {
+            type: GraphQLString
         }
+    })
+})
+
+const NotificationActionType = new GraphQLEnumType({
+    name: 'NotificationActionType',
+    values: {
+        OPEN_APP: { value: 'openApp' },
+        OPEN_URL: { value: 'openUrl' },
+        PRESENT_EXPERIENCE: { value: 'presentExperience' },
+        PRESENT_WEBSITE: { value: 'presentWebsite' }
     }
 })
 
