@@ -389,6 +389,25 @@ storiesOf('Dialog', module)
         return <WholeScreen />
     })
 
+storiesOf('Navbar', module).add('multi cases', () => {
+    return (
+        <div style={{ height: '100%', width: '100%' }}>
+            <NavBar buttonLeft="ok" />
+            <br />
+            <NavBar buttonLeft="left" title="this title" />
+            <br />
+            <NavBar buttonLeft="left" title="this title" buttonRight="Right" />
+            <br />
+            <NavBar
+                buttonLeft="left"
+                title="this title"
+                buttonRight="Right"
+                chevronLeft={true}
+            />
+        </div>
+    )
+})
+
 storiesOf('PopoverContainer', module).add('cases', () => {
     interface XState {
         switched: boolean
@@ -1151,7 +1170,7 @@ storiesOf('Text', module)
                 super(props)
                 this.state = {
                     edittable: false,
-                    text: "Lorem ipsum sit dolor amet     a   s "
+                    text: 'Lorem ipsum sit dolor amet     a   s '
                 }
                 this.onClick = this.onClick.bind(this)
                 this.handleChange = this.handleChange.bind(this)

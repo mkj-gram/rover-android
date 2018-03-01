@@ -1,5 +1,6 @@
 import * as React from 'react'
 import Button from './Button'
+import ChevronLeftIcon from './Icons/ChevronLeftIcon'
 import { cloud } from '../styles/colors'
 import { text, medium } from '../styles/typography'
 
@@ -17,6 +18,7 @@ export interface NavBarProps {
     }
     id?: string
     getElement?: (val: string, val1: string) => void
+    chevronLeft?: boolean
 }
 
 class NavBar extends React.Component<NavBarProps, {}> {
@@ -51,7 +53,8 @@ class NavBar extends React.Component<NavBarProps, {}> {
             style,
             id,
             buttonLeftCallback,
-            buttonRightCallback
+            buttonRightCallback,
+            chevronLeft
         } = this.props
 
         const container: React.CSSProperties = {
@@ -59,11 +62,9 @@ class NavBar extends React.Component<NavBarProps, {}> {
             height: 56,
             width: '100%',
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
             ...style.containerStyle
         }
-        const buttonLeftStyle: StringMap<
+        let buttonLeftStyle: StringMap<
             string | number | React.CSSProperties
         > = {
             outerStyle: {
@@ -80,29 +81,96 @@ class NavBar extends React.Component<NavBarProps, {}> {
             ...style.buttonLeftStyle
         }
 
+        let innerStyle: StringMap<number | string> = {
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center'
+        }
+
+        if (chevronLeft) {
+            buttonLeftStyle = {
+                ...buttonLeftStyle,
+                outerStyle: {
+                    marginLeft: 0
+                }
+            }
+        }
+
+        const renderLeftNavbar = () => {
+            if (chevronLeft) {
+                buttonLeftStyle = {
+                    ...buttonLeftStyle,
+                    outerStyle: {
+                        marginLeft: 0
+                    }
+                }
+                return (
+                    <div
+                        onClick={buttonLeftCallback}
+                        style={{
+                            ...innerStyle,
+                            flex: 'none'
+                        }}
+                    >
+                        {chevronLeft && (
+                            <ChevronLeftIcon
+                                fill="#000"
+                                style={{ marginLeft: 8 }}
+                            />
+                        )}
+                        <Button
+                            text={buttonLeft}
+                            type="regular"
+                            style={buttonLeftStyle}
+                        />
+                    </div>
+                )
+            } else {
+                return (
+                    <Button
+                        text={buttonLeft}
+                        type="regular"
+                        style={buttonLeftStyle}
+                        onClick={buttonLeftCallback}
+                    />
+                )
+            }
+        }
+
         return (
             <div style={container} id={id}>
-                <Button
-                    text={buttonLeft}
-                    type="regular"
-                    style={buttonLeftStyle}
-                    onClick={buttonLeftCallback}
-                />
+                <div
+                    style={{
+                        ...innerStyle
+                    }}
+                >
+                    {renderLeftNavbar()}
+                </div>
                 <div
                     style={{
                         ...text,
                         ...medium,
-                        ...style.titleStyle
+                        ...style.titleStyle,
+                        ...innerStyle,
+                        flex: 2,
+                        justifyContent: 'center'
                     }}
                 >
                     {title}
                 </div>
-                <Button
-                    text={buttonRight}
-                    type="regular"
-                    style={{ ...buttonRightStyle }}
-                    onClick={buttonRightCallback}
-                />
+                <div
+                    style={{
+                        ...innerStyle,
+                        justifyContent: 'flex-end'
+                    }}
+                >
+                    <Button
+                        text={buttonRight}
+                        type="regular"
+                        style={{ ...buttonRightStyle }}
+                        onClick={buttonRightCallback}
+                    />
+                </div>
             </div>
         )
     }

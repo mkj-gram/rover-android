@@ -8,6 +8,7 @@ import PhoneIcon from './PhoneIcon'
 import ZapIcon from './ZapIcon'
 import ArchiveIcon from './ArchiveIcon'
 import CheckCircleIcon from './CheckCircleIcon'
+import ChevronLeftIcon from './ChevronLeftIcon'
 import ChevronRightIcon from './ChevronRightIcon'
 import CloseIcon from './CloseIcon'
 import DuplicateIcon from './DuplicateIcon'
@@ -25,6 +26,7 @@ export {
     ZapIcon,
     ArchiveIcon,
     CheckCircleIcon,
+    ChevronLeftIcon,
     ChevronRightIcon,
     DuplicateIcon,
     CloseIcon,
