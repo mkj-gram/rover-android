@@ -90,8 +90,8 @@ func (cmd *cmdIndexCreate) Run(ctx context.Context) error {
 					{
 					"settings" : {
 						"index" : {
-							"number_of_shards" : 5,
-							"number_of_replicas" : 0
+							"number_of_shards" : 3,
+							"number_of_replicas" : 1
 						}
 					}
 				}

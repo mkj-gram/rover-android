@@ -129,6 +129,7 @@ func (cmd *cmdIndexPopulate) Run(ctx context.Context) error {
 					devices = append(devices, &device)
 				} else {
 					stderr.Println("iter.Next failed")
+					break
 				}
 			}
 
