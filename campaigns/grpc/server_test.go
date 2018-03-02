@@ -68,7 +68,7 @@ func dbOpen(t testing.TB, dsn string) (*db.DB, func() error) {
 	}
 
 	if _, err := pgdb.DB().Exec(`SELECT set_config('log_statement', 'all', false)`); err != nil {
-		t.Fatalf("Enable logging:", err)
+		t.Fatal("Enable logging:", err)
 	}
 
 	return pgdb, pgdb.Close

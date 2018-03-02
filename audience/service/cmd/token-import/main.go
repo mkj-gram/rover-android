@@ -130,14 +130,14 @@ func main() {
 
 		err = db.C("devices").Insert(device)
 		if err != nil {
-			stderr.Printf("Row: [%d] failed to be inserted: %v", err)
+			stderr.Printf("Row: [%d] failed to be inserted: %v", linecount, err)
 			errored++
 		} else {
 			inserted++
 		}
 
 		if linecount%1000 == 0 {
-			stdout.Println("Read: %d", linecount)
+			stdout.Println("Read:", linecount)
 		}
 	}
 

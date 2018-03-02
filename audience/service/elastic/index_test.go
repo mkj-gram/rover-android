@@ -395,7 +395,7 @@ func jsonFixture(t *testing.T, val interface{}, fixturePath string) {
 	)
 
 	if err := dec.Decode(&val); err != nil {
-		t.Fatalf("decode:", err)
+		t.Fatal("decode:", err)
 	}
 }
 

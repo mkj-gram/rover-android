@@ -55,7 +55,7 @@ func main() {
 		var data map[string]interface{}
 		if !iter.Next(&data) {
 			if err := iter.Err(); err != nil {
-				stderr.Fatalf("iter.Next:", err)
+				stderr.Fatalln("iter.Next:", err)
 				break
 			}
 		}

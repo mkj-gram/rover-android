@@ -1295,7 +1295,7 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 				got, err := svc.DB.FindSessionByKey(tt.args.ctx, tt.args.r.Key)
 
 				if err != nil {
-					t.Fatalf("unexpected:", err)
+					t.Fatal("unexpected:", err)
 				}
 
 				if diff := deep.Equal(tt.wantSession, got); diff != nil {
@@ -1380,9 +1380,8 @@ func testAuthsvc_AuthenticateToken(t *testing.T) {
 
 			{
 				got, err := svc.DB.FindTokenByKey(tt.args.ctx, tt.args.r.Key)
-
 				if err != nil {
-					t.Fatalf("unexpected:", err)
+					t.Fatal("unexpected:", err)
 				}
 
 				if diff := deep.Equal(tt.wantToken, got); diff != nil {
