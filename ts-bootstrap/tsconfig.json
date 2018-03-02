@@ -2,6 +2,7 @@
     "compilerOptions": {
         "declaration": true,
         "jsx": "react",
+        "lib": ["es2016", "dom", "dom.iterable", "es7"],
         "module": "commonjs",
         "noImplicitAny": true,
         "outDir": "./dist",

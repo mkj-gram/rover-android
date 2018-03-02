@@ -5,8 +5,10 @@ import * as testDevicesActions from './testDevices'
 import * as modalActions from './modal'
 import * as H from 'history'
 
-import { Action, Dispatch } from 'redux'
+import { Action, ActionCreator, Dispatch } from 'redux'
+import { ThunkAction } from 'redux-thunk'
 
+// Overview Modal
 export const handleSendTestModalDisplay = (on?: boolean) =>
     modalActions.handleSendTestModalDisplay(on)
 
@@ -26,6 +28,7 @@ export const fetchTestDevices = (
         condition
     )
 
+// Campaigns
 export const fetchCampaigns = (
     campaignStatus?: CampaignStatus,
     campaignType?: CampaignType,
@@ -50,3 +53,34 @@ export const duplicateCampaign = (name: string, campaignId: number) =>
 
 export const archiveCampaign = (campaignId: number) =>
     campaignsActions.archiveCampaign(campaignId)
+
+// Home
+export const openNewCampaignPopover: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'OPEN_NEW_CAMPAIGN_POPOVER' })
+}
+
+export const closeNewCampaignPopover: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'CLOSE_NEW_CAMPAIGN_POPOVER' })
+}
+
+export const openCampaignTypeSelector: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'OPEN_CAMPAIGN_TYPE_SELECTOR' })
+}
+
+export const startClosingCampaignTypeSelector: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'START_CLOSING_CAMPAIGN_TYPE_SELECTOR' })
+}
+
+export const closeCampaignTypeSelector: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'CLOSE_CAMPAIGN_TYPE_SELECTOR' })
+}

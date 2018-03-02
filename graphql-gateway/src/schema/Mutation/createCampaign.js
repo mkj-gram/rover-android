@@ -23,7 +23,9 @@ const createCampaign = {
         const request = new RoverApis.campaigns.v1.Models.CreateRequest()
         request.setAuthContext(authContext)
         request.setName(name)
-        request.setCampaignType(2)
+        request.setCampaignType(
+            RoverApis.campaigns.v1.Models.CampaignType[campaignType]
+        )
         const response = await campaignsClient.create(request)
 
         const campaign = response.getCampaign()

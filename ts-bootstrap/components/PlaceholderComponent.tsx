@@ -1,6 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 import * as React from 'react'
 import ContentEditable from './ContentEditable'
+import { silver } from '../styles/colors'
 
 export interface Props {
     html?: string
@@ -9,6 +10,8 @@ export interface Props {
     onChange: (val: string) => void
     id?: string
     contentEditable?: boolean
+    onBlurChange?: boolean
+    handleBlurChange?: (val: string) => void
 }
 
 export interface State {
@@ -16,6 +19,9 @@ export interface State {
 }
 
 class PlaceholderComponent extends React.Component<Props, State> {
+    static defaultProps: Partial<Props> = {
+        onBlurChange: true
+    }
     constructor(props: Props) {
         super(props)
         this.state = {
@@ -37,7 +43,9 @@ class PlaceholderComponent extends React.Component<Props, State> {
             style,
             onChange,
             id,
-            contentEditable
+            contentEditable,
+            onBlurChange,
+            handleBlurChange
         } = this.props
         const { hidePlaceholder } = this.state
 
@@ -54,7 +62,8 @@ class PlaceholderComponent extends React.Component<Props, State> {
                             position: 'absolute',
                             top: 0,
                             left: 0,
-                            ...this.props.style
+                            ...this.props.style,
+                            color: silver
                         }}
                     >
                         {placeholderText}
@@ -65,10 +74,11 @@ class PlaceholderComponent extends React.Component<Props, State> {
                         html={html}
                         onChange={onChange}
                         id={id}
-                        onBlurChange={true}
+                        onBlurChange={onBlurChange}
                         style={this.props.style}
                         handlePlaceholderChange={this.handlePlaceholderChange}
                         placeholder={true}
+                        handleBlurChange={handleBlurChange}
                     />
                 )}
             </div>

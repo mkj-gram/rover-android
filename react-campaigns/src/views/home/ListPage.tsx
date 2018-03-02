@@ -1,28 +1,23 @@
+/// <reference path="../../../typings/index.d.ts"/>
+
 import * as React from 'react'
-import { createCampaign, fetchCampaigns } from '../../actions'
-import { getAllCampaigns } from '../../reducers'
 import { connect, Dispatch } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps, match as Match } from 'react-router'
 import { Route, Link, Switch } from 'react-router-dom'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
-
-import { ThunkAction } from 'redux-thunk'
-import MediaQuery from 'react-responsive'
 import * as H from 'history'
+import { parse, stringify } from 'qs'
+
+import { createCampaign, fetchCampaigns } from '../../actions'
+import { getAllCampaigns } from '../../reducers'
 
 import NavBar from './NavBar'
 import CampaignsList from './CampaignsList'
 import OverviewContainer from '../wizards/overview/OverviewContainer'
 import ResponsiveContainer from '../utils/ResponsiveContainer'
+import ToolBar from './ToolBar'
 
-export interface OwnProps {
-    campaignStatus: CampaignStatus
-    campaignType: CampaignType
-    pageNumber: number
-    keyword: string
-}
-
-export interface routerProps {
+export interface RouterProps {
     history: H.History
     location: H.Location
 }
@@ -39,127 +34,179 @@ export interface StateProps {
 export interface ListPageState {}
 
 class ListPage extends React.PureComponent<
-    StateProps & DispatchProps & OwnProps & RouteComponentProps<any>,
-    ListPageState
+    StateProps &
+        DispatchProps &
+        ResponsiveContainerProps &
+        RouteComponentProps<RouterProps>,
+    {}
 > {
     constructor(
-        props: StateProps & DispatchProps & OwnProps & RouteComponentProps<any>
+        props: StateProps &
+            DispatchProps &
+            ResponsiveContainerProps &
+            RouteComponentProps<RouterProps>
     ) {
         super(props)
-
-        this.handleCreateClick = this.handleCreateClick.bind(this)
+        this.createNewCampaign = this.createNewCampaign.bind(this)
+        this.pushToOverview = this.pushToOverview.bind(this)
     }
+
     componentDidMount() {
         this.props.fetchCampaigns()
     }
-    handleCreateClick() {
-        this.props.createCampaign(
-            'newCampaign',
-            'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION'
-        )
+
+    componentDidUpdate(
+        nextProps: StateProps &
+            DispatchProps &
+            ResponsiveContainerProps &
+            RouterProps
+    ) {
+        // tslint:disable-next-line:no-shadowed-variable
+        const { fetchCampaigns, location } = this.props
+        const nextSearch = nextProps.location.search
+
+        if (location.search !== nextSearch) {
+            fetchCampaigns()
+        }
     }
 
-    render() {
-        const Fragment = React.Fragment
-        const { match, location } = this.props
+    createNewCampaign(name: string, type: CampaignType) {
+        this.props.createCampaign(name, type)
+    }
+    getQueryParams(): QueryParams {
+        const { location } = this.props
+        return parse(location.search.substring(1))
+    }
+    setListStatus(nextStatus: string) {
+        const { history } = this.props
 
-        const Overview = ResponsiveContainer()(OverviewContainer)
+        const newQuery = stringify({
+            ...this.getQueryParams(),
+            campaignStatus: nextStatus
+        })
+        history.replace(`/campaigns/?${newQuery}`)
+    }
+    setListType(nextType: string) {
+        const { history } = this.props
+
+        const newQuery = stringify({
+            ...this.getQueryParams(),
+            campaignType: nextType
+        })
+
+        history.replace(`/campaigns/?${newQuery}`)
+    }
+    setKeyword(keyword: string) {
+        const { history } = this.props
+
+        const newQuery = stringify({
+            ...this.getQueryParams(),
+            keyword
+        })
+
+        history.replace(`/campaigns/?${newQuery}`)
+    }
+    setPageNumber(direction: string) {
+        const { history } = this.props
+        const params = this.getQueryParams()
+        const { pageNumber = '0' } = params
+
+        let nextPageNumber = parseInt(pageNumber, 10)
+        if (direction === 'forward') {
+            nextPageNumber += 1
+        }
+        if (direction === 'backward' && nextPageNumber > 0) {
+            nextPageNumber -= 1
+        }
+
+        const newQuery = stringify({
+            ...params,
+            pageNumber: nextPageNumber
+        })
+        history.replace(`/campaigns/?${newQuery}`)
+    }
+    pushToOverview(campaignId: string) {
+        const { history } = this.props
+        const params = this.getQueryParams()
+
+        const newQuery = stringify({
+            ...params,
+            campaignId
+        })
+
+        history.replace(`/campaigns/wizard/?${newQuery}`)
+    }
+    render() {
+        const { Fragment } = React
+        const { campaigns, device, history, location } = this.props
+        const {
+            campaignStatus = 'all',
+            campaignType = 'all',
+            pageNumber = '0',
+            keyword,
+            campaignId
+        } = this.getQueryParams()
+        const shouldShowWizard =
+            location.pathname === '/campaigns/wizard/' &&
+            Object.keys(campaigns).includes(campaignId)
         return (
-            <Fragment>
-                <TransitionGroup>
-                    <CSSTransition
-                        key={location.pathname}
-                        classNames="fade"
-                        timeout={300}
-                    >
-                        <Switch location={location}>
-                            <Route
-                                exact
-                                path={`${match.url}/wizard/`}
-                                component={Overview}
+            <Route
+                path={location.pathname}
+                render={() => (
+                    <Fragment>
+                        {shouldShowWizard && (
+                            <OverviewContainer device={device} />
+                        )}
+                        <div
+                            style={{
+                                width: '100vw',
+                                height: '100vh',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                position: 'absolute',
+                                top: 0,
+                                zIndex: 1
+                            }}
+                        >
+                            <NavBar
+                                media={device}
+                                onCreate={(name: string, type: CampaignType) =>
+                                    this.createNewCampaign(name, type)
+                                }
+                                style={{ flex: '0 0 auto' }}
+                                setListStatus={status =>
+                                    this.setListStatus(status)
+                                }
+                                listStatus={campaignStatus}
+                                setListType={type => this.setListType(type)}
+                                listType={campaignType}
+                                setKeyword={(keyword: string) =>
+                                    this.setKeyword(keyword)
+                                }
                             />
-                            <Route
-                                exact
-                                path={match.url}
-                                render={() => (
-                                    <div>
-                                        {/*Desktop*/}
-                                        <MediaQuery
-                                            minDeviceWidth={769}
-                                            minWidth={769}
-                                        >
-                                            <div
-                                                style={{
-                                                    width: '100vw',
-                                                    height: '100vh',
-                                                    display: 'flex',
-                                                    flexDirection: 'column'
-                                                }}
-                                            >
-                                                <NavBar
-                                                    media="Desktop"
-                                                    onCreate={
-                                                        this.handleCreateClick
-                                                    }
-                                                    style={{ flex: '0 0 auto' }}
-                                                />
-                                                <CampaignsList
-                                                    media="Desktop"
-                                                    campaigns={
-                                                        this.props.campaigns
-                                                    }
-                                                    style={{
-                                                        flex: '1 1 auto'
-                                                    }}
-                                                />
-                                            </div>
-                                        </MediaQuery>
-                                        {/*Tablet*/}
-                                        <MediaQuery
-                                            maxDeviceWidth={768}
-                                            maxWidth={768}
-                                            minDeviceWidth={376}
-                                            minWidth={376}
-                                        >
-                                            <NavBar
-                                                media="Tablet"
-                                                onCreate={
-                                                    this.handleCreateClick
-                                                }
-                                            />
-                                            <CampaignsList
-                                                media="Tablet"
-                                                campaigns={this.props.campaigns}
-                                            />
-                                        </MediaQuery>
-                                        {/*Mobile*/}
-                                        <MediaQuery
-                                            maxDeviceWidth={375}
-                                            maxWidth={375}
-                                        >
-                                            <NavBar
-                                                media="Mobile"
-                                                onCreate={
-                                                    this.handleCreateClick
-                                                }
-                                            />
-                                            <CampaignsList
-                                                media="Mobile"
-                                                campaigns={this.props.campaigns}
-                                            />
-                                        </MediaQuery>
-                                        {/* {Object.keys(this.props.campaigns).map((campaignId, index) => (
-                    <div key={index}>
-                        {JSON.stringify(this.props.campaigns[campaignId])}
-                    </div>
-                ))} */}
-                                    </div>
-                                )}
+                            <CampaignsList
+                                media={device}
+                                campaigns={this.props.campaigns}
+                                pushToOverview={this.pushToOverview}
+                                style={{
+                                    flex: '1 1 auto'
+                                }}
                             />
-                        </Switch>
-                    </CSSTransition>
-                </TransitionGroup>
-            </Fragment>
+                            <ToolBar
+                                currentPage={parseInt(pageNumber, 10)}
+                                totalCount={623}
+                                media={device}
+                                onClick={direction =>
+                                    this.setPageNumber(direction)
+                                }
+                                onCreate={(name: string, type: CampaignType) =>
+                                    this.createNewCampaign(name, type)
+                                }
+                            />
+                        </div>
+                    </Fragment>
+                )}
+            />
         )
     }
 }
@@ -167,14 +214,47 @@ class ListPage extends React.PureComponent<
 const mapDispatchToProps = (
     // tslint:disable-next-line:no-any
     dispatch: Dispatch<any>,
-    ownProps: OwnProps & routerProps
+    ownProps: RouterProps
 ): DispatchProps => {
-    const { campaignStatus, campaignType, pageNumber, keyword } = ownProps
+    const {
+        campaignStatus = 'all',
+        campaignType = 'all',
+        pageNumber,
+        keyword
+    } = parse(location.search.substring(1))
+    let nextStatus: CampaignStatus
+
+    switch (campaignStatus) {
+        case 'drafts':
+            nextStatus = 'CAMPAIGN_STATUS_DRAFT'
+            break
+        case 'published':
+            nextStatus = 'CAMPAIGN_STATUS_PUBLISHED'
+            break
+        case 'all':
+            nextStatus = 'CAMPAIGN_STATUS_UNDEFINED'
+            break
+        default:
+            nextStatus = null
+            break
+    }
+    let nextType: CampaignType
+    switch (campaignType) {
+        case 'scheduled':
+            nextType = 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION'
+            break
+        case 'automated':
+            nextType = 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION'
+            break
+        case 'all':
+        default:
+            nextType = 'CAMPAIGN_TYPE_UNDEFINED'
+            break
+    }
+
     return {
         createCampaign: (name, cType) => {
             dispatch(createCampaign(name, cType)).then(campaignId => {
-                // Temp workaround for location.search not having any values
-                // ?campaignStatus=all&campaignType=all&pageNumber=1&keyword=test
                 let path
                 if (!ownProps.location.search.includes('?')) {
                     path = `${ownProps.location.pathname}wizard/${
@@ -192,9 +272,9 @@ const mapDispatchToProps = (
         fetchCampaigns: () => {
             dispatch(
                 fetchCampaigns(
-                    campaignStatus,
-                    campaignType,
-                    pageNumber,
+                    nextStatus,
+                    nextType,
+                    parseInt(pageNumber, 10) || 0,
                     keyword
                 )
             )
@@ -205,6 +285,6 @@ const mapStateToProps = (state: State): StateProps => ({
     campaigns: state.campaigns
 })
 
-export default withRouter(
-    connect(mapStateToProps, mapDispatchToProps)(ListPage)
+export default ResponsiveContainer()(
+    withRouter(connect(mapStateToProps, mapDispatchToProps)(ListPage))
 )

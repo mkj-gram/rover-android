@@ -2,10 +2,9 @@
 import gql from 'graphql-tag'
 import { Action, ActionCreator, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
-import Environment from '../Environment'
-
 import { GraphQLRequest } from 'apollo-link'
 import { DocumentNode } from 'graphql'
+import Environment from '../Environment'
 
 export const duplicateCampaign: ActionCreator<
     ThunkAction<Promise<Action>, State, void>
@@ -23,7 +22,10 @@ export const duplicateCampaign: ActionCreator<
                 UIState
                 ... on NotificationCampaign {
                     notificationTitle
-                    notificationAttachmentUrl
+                    notificationAttachment {
+                        type
+                        url
+                    }
                     notificationTapBehaviorType
                     notificationTapPresentationType
                     notificationTapBehaviorUrl
@@ -206,11 +208,20 @@ export const fetchCampaigns: ActionCreator<
     pageNumber: number,
     keyword: string
 ) => (dispatch: Dispatch<State>): Promise<Action> => {
-    dispatch({ type: 'FETCH_CAMPAIGNS_REQUEST' })
-
+    // dispatch({ type: 'FETCH_CAMPAIGNS_REQUEST' })
     const query: DocumentNode = gql`
-        query FetchCampaigns {
-            campaigns {
+        query FetchCampaigns(
+            $campaignStatus: String
+            $campaignType: String
+            $pageNumber: Int!
+            $keyword: String
+        ) {
+            campaigns(
+                campaignStatus: $campaignStatus
+                campaignType: $campaignType
+                pageNumber: $pageNumber
+                keyword: $keyword
+            ) {
                 campaignId
                 name
                 campaignType
@@ -218,7 +229,10 @@ export const fetchCampaigns: ActionCreator<
                 UIState
                 ... on NotificationCampaign {
                     notificationTitle
-                    notificationAttachmentUrl
+                    notificationAttachment {
+                        type
+                        url
+                    }
                     notificationTapBehaviorType
                     notificationTapPresentationType
                     notificationTapBehaviorUrl
@@ -269,7 +283,18 @@ export const fetchCampaigns: ActionCreator<
 
     const request = {
         query: query,
-        variables: {}
+        variables: {
+            campaignStatus:
+                campaignStatus === 'CAMPAIGN_STATUS_UNDEFINED'
+                    ? null
+                    : campaignStatus,
+            campaignType:
+                campaignType === 'CAMPAIGN_TYPE_UNDEFINED'
+                    ? null
+                    : campaignType,
+            pageNumber: pageNumber || 0,
+            keyword: keyword || null
+        }
     }
     return Environment(request).then(
         ({ data }) => {
@@ -316,7 +341,10 @@ export const createCampaign: ActionCreator<
                 UIState
                 ... on NotificationCampaign {
                     notificationTitle
-                    notificationAttachmentUrl
+                    notificationAttachment {
+                        type
+                        url
+                    }
                     notificationTapBehaviorType
                     notificationTapPresentationType
                     notificationTapBehaviorUrl
@@ -375,22 +403,19 @@ export const createCampaign: ActionCreator<
 
     return Environment(request).then(
         ({ data }) => {
-            const campaign = {
-                [data.createCampaign.campaignId]: {
-                    ...data.createCampaign
-                }
+            const campaigns = {
+                ...getState().campaigns,
+                [data.createCampaign.campaignId]: { ...data.createCampaign }
             }
-
             dispatch({
                 type: 'CREATE_CAMPAIGN_SUCCESS',
-                campaigns: {
-                    ...getState().campaigns,
-                    ...campaign
-                }
+                campaigns
             })
+            dispatch({ type: `CLOSE_NEW_CAMPAIGN_POPOVER` })
             return Promise.resolve(data.createCampaign.campaignId)
         },
         error => {
+            dispatch({ type: `CLOSE_NEW_CAMPAIGN_POPOVER` })
             return dispatch({
                 type: 'CREATE_CAMPAIGN_FAILURE',
                 message: error.message

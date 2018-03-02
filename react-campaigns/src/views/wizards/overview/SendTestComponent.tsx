@@ -46,7 +46,7 @@ class SendTestComponent extends React.Component<
             handleCheck
         } = this.props
         let style: React.CSSProperties[] | textSize[] = []
-        if (device !== 'mobile') {
+        if (device !== 'Mobile') {
             style[0] = {
                 display: 'flex',
                 height: 55,
@@ -105,7 +105,7 @@ class SendTestComponent extends React.Component<
         } = this.props
 
         let ret
-        if (device !== 'mobile') {
+        if (device !== 'Mobile') {
             ret = (
                 <div
                     style={{
@@ -119,7 +119,7 @@ class SendTestComponent extends React.Component<
                             flexDirection: 'column'
                         }}
                     >
-                        {this.renderDeviceList('desktop')}
+                        {this.renderDeviceList('Desktop')}
                     </div>
                 </div>
             )
@@ -168,7 +168,7 @@ class SendTestComponent extends React.Component<
                             }}
                         >
                             <Text text="Send a Test" size="h1" />
-                            {this.renderDeviceList('mobile')}
+                            {this.renderDeviceList('Mobile')}
                         </div>
                     </div>
                 </div>

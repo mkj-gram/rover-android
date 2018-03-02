@@ -2,7 +2,12 @@
 
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import {
+    BrowserRouter as Router,
+    Redirect,
+    Route,
+    Link
+} from 'react-router-dom'
 import { Store } from 'redux'
 
 import configureStore from './configureStore'

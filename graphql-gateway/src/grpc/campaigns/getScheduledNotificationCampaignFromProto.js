@@ -64,10 +64,10 @@ export default c => ({
         c.getScheduledTimestamp()
     ),
     scheduledTimeZone: c.getScheduledTimeZone(),
-    scheduledUseLocalDevicetime: c.getScheduledUseLocalDeviceTime(),
-    deliveryStatus: grpcEnumMap(
+    scheduledUseLocalDeviceTime: c.getScheduledUseLocalDeviceTime(),
+    scheduledDeliveryStatus: grpcEnumMap(
         RoverApis.campaigns.v1.Models.ScheduledDeliveryStatus
-    )[c.getScheduledDeliveryStatus],
+    )[c.getScheduledDeliveryStatus()],
     segmentCondition: grpcEnumMap(
         RoverApis.campaigns.v1.Models.SegmentCondition
     )[c.getSegmentCondition()],

@@ -3,6 +3,7 @@ import { AnyAction } from 'redux'
 
 export default (
     state: StringMap<string | boolean> = {
+        overviewContainerAnimation: 'fade',
         overviewModalDisplay: 'open',
         overviewModalDisplayReset: false,
         sendTestModalDisplay: 'open'
@@ -16,12 +17,14 @@ export default (
     if (action.type === 'SET_OVERVIEW_MODAL_CLOSE') {
         return {
             ...tempState,
-            overviewModalDisplay: 'close'
+            overviewModalDisplay: 'close',
+            overviewContainerAnimation: 'fadeOut'
         }
     } else if (action.type === 'SET_OVERVIEW_MODAL_OPEN') {
         return {
             ...tempState,
-            overviewModalDisplay: 'open'
+            overviewModalDisplay: 'open',
+            overviewContainerAnimation: 'fade'
         }
     } else if (action.type === 'SET_OVERVIEW_MODAL_NO_ANIMATION') {
         return {
@@ -32,7 +35,8 @@ export default (
         return {
             ...tempState,
             overviewModalDisplayReset: true,
-            overviewModalDisplay: 'open'
+            overviewModalDisplay: 'open',
+            overviewContainerAnimation: 'fade'
         }
     } else if (action.type === 'SET_SEND_TEST_MODAL_OPEN') {
         return {

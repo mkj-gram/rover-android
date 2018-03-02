@@ -64,7 +64,7 @@ class OverviewModalFooter extends React.Component<
 
     handleSendTestToggle(device?: string, on?: boolean) {
         if (this.props.sendTest) {
-            if (device !== 'mobile') {
+            if (device !== 'Mobile') {
                 this.setState({
                     toggleSendTest: !this.state.toggleSendTest
                 })
@@ -139,7 +139,7 @@ class OverviewModalFooter extends React.Component<
         }
 
         const handleSendTest = () => {
-            if (device !== 'mobile') {
+            if (device !== 'Mobile') {
                 return (
                     <PopoverContainer
                         id="sendTest"
@@ -159,7 +159,7 @@ class OverviewModalFooter extends React.Component<
                             />,
                             <SendTestComponent
                                 key="sendTest2"
-                                device="tablet"
+                                device="Tablet"
                                 selectedTestDevices={selectedTestDevices}
                                 listOfTestDevices={this.props.testDevices}
                                 handleCheck={this.handleCheck}
@@ -178,7 +178,7 @@ class OverviewModalFooter extends React.Component<
                             style={{ outerStyle: { marginRight: 16 } }}
                             key="sendTest1"
                             onClick={() =>
-                                this.handleSendTestToggle('mobile', true)
+                                this.handleSendTestToggle('Mobile', true)
                             }
                         />
                     )
@@ -186,9 +186,9 @@ class OverviewModalFooter extends React.Component<
                     let node = (
                         <SendTestComponent
                             key="sendTest2"
-                            device="mobile"
+                            device="Mobile"
                             buttonLeftCallback={() =>
-                                this.handleSendTestToggle('mobile', false)
+                                this.handleSendTestToggle('Mobile', false)
                             }
                             selectedTestDevices={selectedTestDevices}
                             listOfTestDevices={this.props.testDevices}

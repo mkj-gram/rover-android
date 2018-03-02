@@ -22,7 +22,6 @@ const link = new HttpLink({
     headers: {
         accept: 'application/json',
         Authorization: `Bearer ${getToken()}`
-        // 'x-rover-api-key': getToken()
     },
     uri
 })

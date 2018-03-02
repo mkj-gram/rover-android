@@ -7,6 +7,7 @@ import {
     duplicateCampaign,
     archiveCampaign
 } from '../../../actions/campaigns'
+import { getCampaign } from '../../../reducers'
 import { handleOverviewModalDisplay } from '../../../actions/modal'
 import { Link } from 'react-router-dom'
 import * as H from 'history'
@@ -24,8 +25,6 @@ import {
 import ShowMorePopoverChildren from '../../utils/ShowMorePopoverChildren'
 
 export type OverviewModalHeaderProps = {
-    campaignName: string
-    campaignType: string
     onExit?: () => void
     onMore?: () => void
     campaignId: string
@@ -48,9 +47,15 @@ export interface DispatchProps {
     handleOverviewModalDisplay: (history: H.History) => void
 }
 
+export type StateProps = {
+    campaignName: string
+    campaignType: string
+}
+
 class OverviewModalHeader extends React.Component<
     OverviewModalHeaderProps &
         DispatchProps &
+        StateProps &
         routerProps &
         // tslint:disable-next-line:no-any
         RouteComponentProps<any>,
@@ -59,6 +64,7 @@ class OverviewModalHeader extends React.Component<
     constructor(
         props: OverviewModalHeaderProps &
             DispatchProps &
+            StateProps &
             routerProps &
             // tslint:disable-next-line:no-any
             RouteComponentProps<any>
@@ -217,7 +223,7 @@ class OverviewModalHeader extends React.Component<
 const mapDispatchToProps = (
     // tslint:disable-next-line:no-any
     dispatch: Dispatch<any>,
-    props: routerProps
+    props: routerProps & OverviewModalHeaderProps
 ): DispatchProps => {
     const { location, history } = props
     return {
@@ -247,7 +253,16 @@ const mapDispatchToProps = (
     }
 }
 
-const mapStateToProps = (state: State): {} => ({})
+const mapStateToProps = (
+    state: State,
+    ownProps: OverviewModalHeaderProps
+): StateProps => {
+    const campaign = getCampaign(state, ownProps.campaignId)
+    return {
+        campaignName: campaign.name,
+        campaignType: campaign.campaignType
+    }
+}
 
 export default withRouter(
     connect(mapStateToProps, mapDispatchToProps)(OverviewModalHeader)

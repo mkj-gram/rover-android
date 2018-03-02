@@ -12,8 +12,8 @@ import {
 import { text as typographyText, semibold } from '../styles/typography'
 
 export type propStyle = {
-    innerStyle?: StringMap<string | number>
-    outerStyle?: StringMap<string | number>
+    innerStyle?: React.CSSProperties
+    outerStyle?: React.CSSProperties
 }
 
 export interface ButtonProps {
@@ -52,7 +52,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
         this.setState({
             mouseDown: !this.state.mouseDown
         })
-        if (val === 'down') {
+        if (val === 'up') {
             this.props.onClick()
         }
     }
@@ -154,6 +154,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
         }
 
         let ret
+
         if (type !== 'disabled') {
             ret = (
                 <div

@@ -1,12 +1,10 @@
 /// <reference path="../../../typings/index.d.ts"/>
-
 import * as React from 'react'
 import Responsive from 'react-responsive'
 
 // 767 max for mobile
 // 768 - 1280 for tablet
 // 1281 ~ max for desktop
-
 // tslint:disable-next-line:no-any
 const Desktop = (props: any) => <Responsive {...props} minDeviceWidth={1281} />
 // tslint:disable-next-line:no-any
@@ -16,11 +14,11 @@ const Tablet = (props: any) => (
 // tslint:disable-next-line:no-any
 const Mobile = (props: any) => <Responsive {...props} maxDeviceWidth={767} />
 
+type funcType = () => void
+
 export interface InjectedProps {
     device?: string
 }
-
-type funcType = () => void
 
 const responsiveContainer = (
     wrappedComponentProps: StringMap<string | boolean | number | funcType> = {}
@@ -39,14 +37,14 @@ const responsiveContainer = (
                     <Desktop>
                         <Component
                             {...wrappedComponentProps}
-                            device="desktop"
+                            device="Desktop"
                         />
                     </Desktop>
                     <Tablet>
-                        <Component {...wrappedComponentProps} device="tablet" />
+                        <Component {...wrappedComponentProps} device="Tablet" />
                     </Tablet>
                     <Mobile>
-                        <Component {...wrappedComponentProps} device="mobile" />
+                        <Component {...wrappedComponentProps} device="Mobile" />
                     </Mobile>
                 </Fragment>
             )

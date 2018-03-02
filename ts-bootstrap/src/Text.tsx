@@ -20,6 +20,7 @@ export interface TextProps {
     id?: string
     onBlurChange?: boolean
     placeholderText?: string
+    handleBlurChange?: (evt: string) => void
 }
 
 const Text: React.SFC<TextProps> = ({
@@ -33,7 +34,8 @@ const Text: React.SFC<TextProps> = ({
     textStyle,
     id,
     onBlurChange,
-    placeholderText
+    placeholderText,
+    handleBlurChange
 }) => {
     let style: StringMap<string | number> = {
         ...typographyText,
@@ -114,14 +116,10 @@ const Text: React.SFC<TextProps> = ({
                 style={style}
                 id={id}
                 onBlurChange={onBlurChange}
+                handleBlurChange={handleBlurChange}
             />
         )
     } else {
-        style = {
-            ...style,
-            color: silver
-        }
-
         return (
             <PlaceholderComponent
                 html={html}
@@ -130,6 +128,8 @@ const Text: React.SFC<TextProps> = ({
                 onChange={handleChange}
                 id={id}
                 contentEditable={contentEditable}
+                onBlurChange={onBlurChange}
+                handleBlurChange={handleBlurChange}
             />
         )
     }

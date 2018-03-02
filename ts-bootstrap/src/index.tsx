@@ -9,6 +9,7 @@ import PopoverContainer from './PopoverContainer'
 import ProgressBar from './ProgressBar'
 import ProgressBarThin from './ProgressBarThin'
 import RadioButton from './RadioButton'
+import SegmentControl from './SegmentControl'
 import SliderComponent from './SliderComponent'
 import Switch from './Switch'
 import Tab from './Tab'
@@ -53,17 +54,28 @@ import {
     AlertErrorIcon,
     AlertInfoIcon,
     AlertWarnIcon,
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    BarChartIcon,
     CalendarIcon,
-    LinkIcon,
-    PhoneIcon,
-    ZapIcon,
-    MoreIcon,
-    CloseIcon,
+    CheckIcon,
     ChevronRightIcon,
+    ChevronLeftIcon,
+    FilterArrowIcon,
+    GearIcon,
+    GridIcon,
+    LinkIcon,
+    MoreIcon,
+    PhoneIcon,
+    CloseIcon,
     CheckCircleIcon,
     RenameIcon,
     DuplicateIcon,
-    ArchiveIcon
+    ArchiveIcon,
+    PlusSquareIcon,
+    SearchIcon,
+    UserIcon,
+    ZapIcon
 } from './Icons'
 
 export {
@@ -88,6 +100,13 @@ export {
     turquoise,
     white,
     yellow,
+    text,
+    regular,
+    semibold,
+    bold,
+    large,
+    medium,
+    small,
     Alert,
     Badge,
     Button,
@@ -97,6 +116,7 @@ export {
     ProgressBar,
     ProgressBarThin,
     RadioButton,
+    SegmentControl,
     SliderComponent,
     Switch,
     Tab,
@@ -105,17 +125,28 @@ export {
     AlertErrorIcon,
     AlertInfoIcon,
     AlertWarnIcon,
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    BarChartIcon,
     CalendarIcon,
+    CheckIcon,
+    FilterArrowIcon,
+    GearIcon,
+    GridIcon,
     LinkIcon,
     PhoneIcon,
-    ZapIcon,
     MoreIcon,
     CloseIcon,
     ChevronRightIcon,
+    ChevronLeftIcon,
     CheckCircleIcon,
     PopoverContainer,
     RenameIcon,
     DuplicateIcon,
     ArchiveIcon,
-    CheckBox
+    CheckBox,
+    PlusSquareIcon,
+    SearchIcon,
+    UserIcon,
+    ZapIcon
 }

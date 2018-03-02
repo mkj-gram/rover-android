@@ -71,7 +71,7 @@ class OverviewModalRow extends React.Component<
                                     backgroundColor: turquoise
                                 },
                                 barStyle: {
-                                    width: device === 'desktop' ? 240 : 176
+                                    width: device === 'Desktop' ? 240 : 176
                                 }
                             }}
                         />
@@ -110,14 +110,14 @@ class OverviewModalRow extends React.Component<
 
         let textStyle = experienceOff ? { color: silver } : { color: black }
 
-        if (device === 'mobile') {
+        if (device === 'Mobile') {
             outerStyle = {
                 ...outerStyle,
                 padding: '32px 16px 0 16px'
             }
         }
 
-        if (device !== 'desktop') {
+        if (device !== 'Desktop') {
             button = (
                 <div style={{ marginLeft: 16 }}>
                     <ChevronRightIcon fill={silver} />
@@ -133,7 +133,7 @@ class OverviewModalRow extends React.Component<
                 <div
                     style={{ background: white, width: '100%' }}
                     onClick={
-                        device !== 'desktop' && !experienceOff
+                        device !== 'Desktop' && !experienceOff
                             ? this.handleClick
                             : () => null
                     }

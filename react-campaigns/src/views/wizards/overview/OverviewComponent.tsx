@@ -121,11 +121,7 @@ class OverviewComponent extends React.Component<
                     }}
                     id="overviewComponentRoot"
                 >
-                    <OverviewModalHeader
-                        campaignName={campaign.name}
-                        campaignType={campaign.campaignType}
-                        campaignId={campaign.campaignId}
-                    />
+                    <OverviewModalHeader campaignId={campaign.campaignId} />
                     <OverviewModalBodyContainer
                         showExperience={showExperience}
                         notificationComplete={notificationComplete}
@@ -136,7 +132,7 @@ class OverviewComponent extends React.Component<
                 </div>
             )
         } else {
-            return <div />
+            return <div>Campaign Not Found</div>
         }
     }
 }

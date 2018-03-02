@@ -8,12 +8,7 @@ import {
     getAutomatedNotificationCampaignFromProto
 } from '../../grpc/campaigns'
 
-import {
-    GraphQLInt,
-    GraphQLList,
-    GraphQLNonNull,
-    GraphQLString
-} from 'graphql'
+import { GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLString } from 'graphql'
 
 import Campaign from '../Campaign'
 
@@ -31,18 +26,16 @@ const campaigns = {
         { campaignStatus, campaignType, keyword, pageNumber, pageSize },
         { authContext }
     ) => {
-        console.log('we in ??')
+        const Models = RoverApis.campaigns.v1.Models
         const request = new RoverApis.campaigns.v1.Models.ListRequest()
         request.setAuthContext(authContext)
-        request.setCampaignStatus()
-        request.setCampaignType()
-        request.setKeyword()
-        request.setPage()
-        request.setPageSize()
-        console.log('we fget here')
+        request.setCampaignStatus(Models.CampaignStatus[campaignStatus])
+        request.setCampaignType(Models.CampaignType[campaignType])
+        request.setKeyword(keyword)
+        request.setPage(pageNumber)
+        request.setPageSize(50)
+
         const response = await campaignsClient.list(request)
-        console.log('in here?')
-        console.log(response)
         return response.getCampaignsList().map(campaign => {
             if (campaign.hasAutomatedNotificationCampaign())
                 return getAutomatedNotificationCampaignFromProto(

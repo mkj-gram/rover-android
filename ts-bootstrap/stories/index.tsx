@@ -17,7 +17,8 @@ import {
     SliderComponent,
     Switch,
     Tab,
-    TabBar
+    TabBar,
+    SegmentControl
 } from '../src'
 
 import {
@@ -486,6 +487,46 @@ storiesOf('PopoverContainer', module).add('cases', () => {
     return <X />
 })
 
+storiesOf('SegmentControl', module).add('Buttons', () => {
+    const segmentControlButtonStyle = {
+        ...text,
+        color: turquoise,
+        width: 98,
+        height: 24,
+        textAlign: 'center'
+    }
+    return (
+        <SegmentControl>
+            <div
+                style={{
+                    ...segmentControlButtonStyle,
+                    color: 'white',
+                    backgroundColor: turquoise
+                }}
+                onClick={() => window.console.log('selected')}
+            >
+                Selected
+            </div>
+            <div
+                style={{
+                    ...segmentControlButtonStyle,
+                    borderLeft: `2px solid ${turquoise}`,
+                    borderRight: `2px solid ${turquoise}`
+                }}
+                onClick={() => window.console.log('normal')}
+            >
+                Normal
+            </div>
+            <div
+                style={segmentControlButtonStyle}
+                onClick={() => window.console.log('normal')}
+            >
+                Normal
+            </div>
+        </SegmentControl>
+    )
+})
+
 storiesOf('Popover', module).add('various cases', () => {
     interface ReactstrapState {
         popoverOpen: boolean
@@ -562,6 +603,7 @@ storiesOf('Popover', module).add('various cases', () => {
                         flexDirection: 'column',
                         justifyContent: 'space-between'
                     }}
+                    id="herez"
                 >
                     <div
                         style={{
@@ -572,16 +614,16 @@ storiesOf('Popover', module).add('various cases', () => {
                         <div>
                             <Manager>
                                 <Target>
-                                    <div
-                                        id="target5"
-                                        onClick={() => this.toggle2()}
-                                        style={{
-                                            height: 100,
-                                            width: 100,
-                                            background: 'yellow'
-                                        }}
-                                    >
-                                        TabBar
+                                    <div id="target5">
+                                        <Button
+                                            text="Next"
+                                            size="large"
+                                            type="primary"
+                                            style={{
+                                                outerStyle: { marginRight: 10 }
+                                            }}
+                                            onClick={() => this.toggle2()}
+                                        />
                                     </div>
                                 </Target>
                                 {this.state.popoverOpen2 && (
@@ -597,6 +639,7 @@ storiesOf('Popover', module).add('various cases', () => {
                                         }}
                                         toggle={this.toggle2}
                                         targetId="target5"
+                                        targetParent="herez"
                                     >
                                         <div
                                             style={{
@@ -1297,6 +1340,7 @@ storiesOf('Text', module)
                 this.onClick = this.onClick.bind(this)
                 this.handleChange = this.handleChange.bind(this)
                 this.handleChange1 = this.handleChange1.bind(this)
+                this.handleBlurChange = this.handleBlurChange.bind(this)
             }
 
             onClick() {
@@ -1308,6 +1352,14 @@ storiesOf('Text', module)
             handleChange(val: string) {
                 this.setState({
                     ts: val,
+                    edittable: !this.state.edittable
+                })
+            }
+
+            handleBlurChange(val: string) {
+                const ts = `${val}+BLUR`
+                this.setState({
+                    ts,
                     edittable: !this.state.edittable
                 })
             }
@@ -1333,6 +1385,7 @@ storiesOf('Text', module)
                             handleChange={this.handleChange}
                             id="text12"
                             onBlurChange={true}
+                            handleBlurChange={this.handleBlurChange}
                             placeholder={true}
                             placeholderText="Lorem Ipsum Things"
                         />
@@ -1342,7 +1395,10 @@ storiesOf('Text', module)
                             contentEditable={this.state.edittable1}
                             handleChange={this.handleChange1}
                             id="text13"
-                            onBlurChange={true}
+                            onBlurChange={false}
+                            handleBlurChange={() =>
+                                console.log('in handle blur change')
+                            }
                             placeholder={true}
                             placeholderText="Lorem Ipsum Things"
                         />

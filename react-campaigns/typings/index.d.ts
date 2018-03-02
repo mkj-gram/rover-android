@@ -2,48 +2,50 @@ type CampaignStatus =
     | 'CAMPAIGN_STATUS_DRAFT'
     | 'CAMPAIGN_STATUS_PUBLISHED'
     | 'CAMPAIGN_STATUS_ARCHIVED'
+    | 'CAMPAIGN_STATUS_UNDEFINED'
 
 type CampaignType =
     | 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION'
     | 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION'
+    | 'CAMPAIGN_TYPE_INTERSTITIAL'
+    | 'CAMPAIGN_TYPE_WEB'
+    | 'CAMPAIGN_TYPE_UNDEFINED'
 
-declare enum NotificationAttachmentType {
-    image = 'NOTIFICATION_ATTACHMENT_TYPE_IMAGE',
-    audio = 'NOTIFICATION_ATTACHMENT_TYPE_AUDIO',
-    video = 'NOTIFICATION_ATTACHMENT_TYPE_VIDEO',
-    unknown = 'NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN'
-}
+type NotificationAttachmentType =
+    | 'NOTIFICATION_ATTACHMENT_TYPE_IMAGE'
+    | 'NOTIICATION_ATTACHMENT_TYPE_AUDIO'
+    | 'NOTIFICATION_ATTACHMENT_TYPE_VIDEO'
+    | 'NOTIFICATION_ATTACHMENT_TYPE_UNKNOWN'
 
-declare enum NotificationTapBehaviorType {
-    unknown = 'NOTIFICATION_TAP_BEHAVIOR_TYPE_UNKNOWN',
-    app = 'NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP',
-    experience = 'NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE',
-    deeplink = 'NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK'
-}
+type NotificationTapBehaviorType =
+    | 'NOTIFICATION_TAP_BEHAVIOR_TYPE_UNKNOWN'
+    | 'NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP'
+    | 'NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE'
+    | 'NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK'
 
-declare enum NotificationTapPresentationType {
-    unknown = 'NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN',
-    app = 'NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP',
-    browser = 'NOTIFICATION_TAP_PRESENTATION_TYPE_IN_BROWSER'
-}
+type NotificationTapPresentationType =
+    | 'NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN'
+    | 'NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP'
+    | 'NOTIFICATION_TAP_PRESENTATION_TYPE_IN_BROWSER'
 
-declare enum ScheduledDeliveryStatus {
-    unknown = 'DELIVERY_STATUS_UNKNOWN',
-    scheduled = 'DELIVERY_STATUS_SCHEDULED',
-    inprogress = 'DELIVERY_STATUS_INPROGRESS',
-    finished = 'DELIVERY_STATUS_FINISHED'
-}
+type ScheduledDeliveryStatus =
+    | 'SCHEDULED_DELIVERY_STATUS_UNKNOWN'
+    | 'SCHEDULED_DELIVERY_STATUS_SCHEDULED'
+    | 'SCHEDULED_DELIVERY_STATUS_INPROGRESS'
+    | 'SCHEDULED_DELIVERY_STATUS_FINISHED'
 
-declare enum ScheduledType {
-    unknown = 'SCHEDULED_TYPE_UNKNOWN',
-    now = 'SCHEDULED_TYPE_NOW',
-    scheduled = 'SCHEDULED_TYPE_SCHEDULED'
-}
+type ScheduledType =
+    | 'SCHEDULED_TYPE_UNKNOWN'
+    | 'SCHEDULED_TYPE_NOW'
+    | 'SCHEDULED_TYPE_SCHEDULED'
 
-declare enum SegmentCondition {
-    any = 'ANY',
-    all = 'ALL'
-}
+type AutomatedActiveStatus =
+    | 'AUTOMATED_ACTIVE_STATUS_UNKNOWN'
+    | 'AUTOMATED_ACTIVE_STATUS_ACTIVE'
+    | 'AUTOMATED_ACTIVE_STATUS_UPCOMING'
+    | 'AUTOMATED_ACTIVE_STATUS_EXPIRED'
+
+type SegmentCondition = 'ANY' | 'ALL'
 
 interface StringMap<T> {
     [x: string]: T
@@ -133,6 +135,19 @@ type State = {
     readonly campaigns: StringMap<Campaign>
     readonly testDevices: StringMap<string>
     readonly modal: StringMap<string | boolean>
+    readonly app: AppState
+}
+
+type AppState = {
+    home: HomeState
+}
+
+type HomeState = {
+    readonly isCreatingCampaign: boolean
+    readonly isFetching: boolean
+    readonly isNewCampaignPopoverOpen: boolean
+    readonly isCampaignTypeSelectorOpen: boolean
+    readonly isCampaignTypeSelectorClosing: boolean
 }
 
 type Media = 'Mobile' | 'Tablet' | 'Desktop'
@@ -148,7 +163,19 @@ interface OverviewModalRowContainerProps {
     val: number | boolean
 }
 
-type RoverSVGProps = {
-    fill?: string
-    style?: StringMap<string | number>
+// type RoverSVGProps = {
+//     fill?: string
+//     style?: StringMap<string | number>
+// }
+
+interface ResponsiveContainerProps {
+    device?: Media
+}
+
+type QueryParams = {
+    campaignId: string
+    campaignStatus: 'all' | 'drafts' | 'published' | 'archived'
+    campaignType: 'all' | 'scheduled' | 'automated' | 'web' | 'interstitial'
+    pageNumber: string
+    keyword: string
 }

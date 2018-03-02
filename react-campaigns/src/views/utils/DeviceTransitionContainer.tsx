@@ -31,7 +31,7 @@ class DeviceTransitionContainer extends React.Component<
         const { children, device, overviewModal } = this.props
         const Fragment = React.Fragment
 
-        if (device === 'desktop') {
+        if (device === 'Desktop') {
             return (
                 <div
                     style={{
@@ -39,7 +39,12 @@ class DeviceTransitionContainer extends React.Component<
                         width: '100%',
                         backgroundColor: cloud,
                         display: 'flex',
-                        overflowY: 'hidden'
+                        overflowY: 'hidden',
+                        animation: `${
+                            overviewModal.overviewContainerAnimation
+                        } 600ms ease`,
+                        position: 'absolute',
+                        zIndex: 2
                     }}
                 >
                     <div
@@ -64,7 +69,9 @@ class DeviceTransitionContainer extends React.Component<
                         display: 'flex',
                         animation: `${
                             overviewModal.overviewModalDisplay
-                        } 500ms ease`
+                        } 500ms ease`,
+                        position: 'absolute',
+                        zIndex: 2
                     }}
                 >
                     {children}

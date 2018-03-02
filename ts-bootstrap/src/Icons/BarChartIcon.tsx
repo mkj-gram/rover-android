@@ -6,8 +6,7 @@ export default ({ fill, style, onClick }: RoverSVGProps) => (
         <g fill={fill} fillRule="nonzero">
             <path
                 // tslint:disable-next-line:max-line-length
-                d="M20 9V6a1 1 0 0 0-1-1h-2v1a1 1 0 0 1-2 0V5H9v1a1 1 0 1 1-2 0V5H5a1 1 0 0 0-1 1v3h16zm0 2H4v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-9zM9 3h6V2a1 1 0 0 1 2 0v1h2a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h2V2a1 1 0 1 1 2 0v1z"
-                id="a"
+                d="M19 20a1 1 0 0 1-2 0V10a1 1 0 0 1 2 0v10zm-6 0a1 1 0 0 1-2 0V4a1 1 0 0 1 2 0v16zm-6 0a1 1 0 0 1-2 0v-6a1 1 0 0 1 2 0v6z"
             />
         </g>
     </svg>

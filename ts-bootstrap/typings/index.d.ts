@@ -5,6 +5,7 @@ interface StringMap<T> {
 type RoverSVGProps = {
     fill?: string
     style?: StringMap<string | number>
+    onClick?: React.MouseEventHandler<SVGSVGElement>
 }
 
 declare module 'react-rangeslider' {

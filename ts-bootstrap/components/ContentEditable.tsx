@@ -15,6 +15,7 @@ export interface Props
     onBlurChange?: boolean
     handlePlaceholderChange?: (val: string) => void
     placeholder?: boolean
+    handleBlurChange?: (val: string) => void
 }
 
 class ContentEditable extends React.Component<Props, {}> {
@@ -97,7 +98,12 @@ class ContentEditable extends React.Component<Props, {}> {
     emitChange(evt: any) {
         if (!this.htmlEl || !this.props.onBlurChange) {
             evt.target = { value: this.props.html }
-            this.props.onChange(this.props.html as string)
+            if (this.props.handleBlurChange) {
+                this.props.handleBlurChange(this.props.html as string)
+            } else {
+                this.props.onChange(this.props.html as string)
+            }
+
             return
         }
 
@@ -105,9 +111,16 @@ class ContentEditable extends React.Component<Props, {}> {
             .replace(/&nbsp;/g, ' ')
             .replace(/\s*$/, '')
 
-        if (this.props.onChange && html !== this.lastHtml) {
+        if (
+            (this.props.onChange || this.props.handleBlurChange) &&
+            html !== this.lastHtml
+        ) {
             evt.target = { value: html }
-            this.props.onChange(html as string)
+            if (this.props.handleBlurChange) {
+                this.props.handleBlurChange(html as string)
+            } else {
+                this.props.onChange(html as string)
+            }
         }
         this.lastHtml = html
     }
@@ -134,7 +147,8 @@ class ContentEditable extends React.Component<Props, {}> {
         if (!this.htmlEl) {
             return
         }
-        this.htmlEl.style.color = 'black'
+
+        this.htmlEl.style.color = (this.props.style.color as string) || 'black'
     }
 
     render() {
