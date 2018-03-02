@@ -17,11 +17,14 @@ service Campaigns {
   rpc List(ListRequest) returns (ListResponse);
 
   rpc Create(CreateRequest) returns (CreateResponse);
-  rpc Archive(ArchiveRequest) returns (ArchiveResponse);
   rpc Duplicate(DuplicateRequest) returns (DuplicateResponse);
   rpc Rename(RenameRequest) returns (RenameResponse);
 
   rpc Publish(PublishRequest) returns (PublishResponse);
+  rpc Unpublish(UnpublishRequest) returns (UnpublishResponse);
+  rpc Archive(ArchiveRequest) returns (ArchiveResponse);
+  rpc Unarchive(UnarchiveRequest) returns (UnarchiveResponse);
+
   rpc SendTest(SendTestRequest) returns (SendTestResponse);
 
   rpc UpdateNotificationSettings(UpdateNotificationSettingsRequest) returns (UpdateNotificationSettingsResponse);
@@ -185,6 +188,26 @@ message PublishRequest {
   int32 campaign_id = 5;
 }
 message PublishResponse {
+}
+
+
+
+message UnpublishRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  int32 campaign_id = 5;
+}
+message UnpublishResponse {
+}
+
+
+
+message UnarchiveRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  int32 campaign_id = 5;
+}
+message UnarchiveResponse {
 }
 
 

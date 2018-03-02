@@ -166,6 +166,27 @@ func (s *Server) Archive(ctx context.Context, req *campaignspb.ArchiveRequest) (
 	return &campaignspb.ArchiveResponse{}, nil
 }
 
+func (s *Server) Unarchive(ctx context.Context, req *campaignspb.UnarchiveRequest) (*campaignspb.UnarchiveResponse, error) {
+	var acctId = req.GetAuthContext().GetAccountId()
+	if err := va.All(
+		va.Value("auth_context", va.Pointer(req.AuthContext), va.Require),
+		va.Value("account_id", acctId, va.Require),
+		va.Value("campaign_id", req.CampaignId, va.Require),
+	); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
+	}
+
+	var (
+		cStatus = int32(campaignspb.CampaignStatus_DRAFT)
+	)
+
+	if err := s.DB.UpdateStatus(ctx, acctId, req.CampaignId, cStatus); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "campaigns.UpdateStatus: %v", err)
+	}
+
+	return &campaignspb.UnarchiveResponse{}, nil
+}
+
 func (s *Server) Publish(ctx context.Context, req *campaignspb.PublishRequest) (*campaignspb.PublishResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
@@ -185,6 +206,31 @@ func (s *Server) Publish(ctx context.Context, req *campaignspb.PublishRequest) (
 	}
 
 	return &campaignspb.PublishResponse{}, nil
+}
+
+func (s *Server) Unpublish(ctx context.Context, req *campaignspb.UnpublishRequest) (*campaignspb.UnpublishResponse, error) {
+	var acctId = req.GetAuthContext().GetAccountId()
+	if err := va.All(
+		va.Value("auth_context", va.Pointer(req.AuthContext), va.Require),
+		va.Value("account_id", acctId, va.Require),
+		va.Value("campaign_id", req.CampaignId, va.Require),
+	); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
+	}
+
+	var (
+		cStatus = int32(campaignspb.CampaignStatus_DRAFT)
+	)
+
+	// TODO: first make sure the status of the campaign is published before
+	// we update the status. If the status matches we can safely update and
+	// apply the appropriate side affects. We might need to wrap this in a
+	// transaction to ensure we delete all tasks queued up for the campaign
+	if err := s.DB.UpdateStatus(ctx, acctId, req.CampaignId, cStatus); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "campaigns.UpdateStatus: %v", err)
+	}
+
+	return &campaignspb.UnpublishResponse{}, nil
 }
 
 func (s *Server) UpdateNotificationSettings(ctx context.Context, req *campaignspb.UpdateNotificationSettingsRequest) (*campaignspb.UpdateNotificationSettingsResponse, error) {

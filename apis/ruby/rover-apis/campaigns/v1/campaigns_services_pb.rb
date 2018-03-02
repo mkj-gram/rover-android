@@ -21,10 +21,12 @@ module Rover
           #
           rpc :List, ListRequest, ListResponse
           rpc :Create, CreateRequest, CreateResponse
-          rpc :Archive, ArchiveRequest, ArchiveResponse
           rpc :Duplicate, DuplicateRequest, DuplicateResponse
           rpc :Rename, RenameRequest, RenameResponse
           rpc :Publish, PublishRequest, PublishResponse
+          rpc :Unpublish, UnpublishRequest, UnpublishResponse
+          rpc :Archive, ArchiveRequest, ArchiveResponse
+          rpc :Unarchive, UnarchiveRequest, UnarchiveResponse
           rpc :SendTest, SendTestRequest, SendTestResponse
           rpc :UpdateNotificationSettings, UpdateNotificationSettingsRequest, UpdateNotificationSettingsResponse
           rpc :UpdateScheduledDeliverySettings, UpdateScheduledDeliverySettingsRequest, UpdateScheduledDeliverySettingsResponse

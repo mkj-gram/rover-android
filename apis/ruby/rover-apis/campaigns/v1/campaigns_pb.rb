@@ -126,6 +126,18 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.campaigns.v1.PublishResponse" do
   end
+  add_message "rover.campaigns.v1.UnpublishRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :campaign_id, :int32, 5
+  end
+  add_message "rover.campaigns.v1.UnpublishResponse" do
+  end
+  add_message "rover.campaigns.v1.UnarchiveRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :campaign_id, :int32, 5
+  end
+  add_message "rover.campaigns.v1.UnarchiveResponse" do
+  end
   add_message "rover.campaigns.v1.SendTestRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :campaign_id, :int32, 5
@@ -319,6 +331,10 @@ module Rover
       RenameResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.RenameResponse").msgclass
       PublishRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.PublishRequest").msgclass
       PublishResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.PublishResponse").msgclass
+      UnpublishRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.UnpublishRequest").msgclass
+      UnpublishResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.UnpublishResponse").msgclass
+      UnarchiveRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.UnarchiveRequest").msgclass
+      UnarchiveResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.UnarchiveResponse").msgclass
       SendTestRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.SendTestRequest").msgclass
       SendTestResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.SendTestResponse").msgclass
       UpdateNotificationSettingsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.UpdateNotificationSettingsRequest").msgclass

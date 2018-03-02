@@ -142,7 +142,10 @@ func TestCampaigns(t *testing.T) {
 	t.Run("Rename", test_Rename)
 	t.Run("Duplicate", test_Duplicate)
 	t.Run("Archive", test_Archive)
+	t.Run("Unarchive", test_Unarchive)
 	t.Run("Publish", test_Publish)
+	t.Run("Unpublish", test_Unpublish)
+
 	t.Run("UpdateNotificationSettings", test_UpdateNotificationSettings)
 
 	t.Run("UpdateAutomatedDeliverySettings", test_UpdateAutomatedDeliverySettings)
@@ -942,7 +945,332 @@ func test_Archive(t *testing.T) {
 	}
 }
 
+func test_Unarchive(t *testing.T) {
+	t.Skip("TODO")
+	var (
+		ctx         = context.Background()
+		db, closeDB = dbOpen(t, testDB.DSN)
+		svc         = campaigns_grpc.Server{DB: db}
+	)
+
+	defer closeDB()
+
+	type expect struct {
+		exp *campaign
+		err error
+	}
+
+	tests := []struct {
+		name string
+
+		req *campaignspb.ArchiveRequest
+		exp *campaignspb.ArchiveResponse
+
+		before, after *expect
+
+		expErr error
+	}{
+		{
+			name: "error: validation",
+			req:  &campaignspb.ArchiveRequest{},
+
+			expErr: status.Errorf(codes.InvalidArgument, "validate: auth_context: is required. account_id: is required. campaign_id: is required."),
+		},
+
+		{
+			name: "error: not found",
+
+			req: &campaignspb.ArchiveRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				CampaignId:  404,
+			},
+
+			expErr: status.Errorf(codes.NotFound, "db.UpdateStatus: db.Update: sql: no rows in result set"),
+		},
+
+		{
+			name: "archives the campaign",
+			req: &campaignspb.ArchiveRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				CampaignId:  1,
+			},
+
+			before: &expect{
+				exp: &campaign{
+					AccountId: 1,
+					Campaign: &campaignspb.Campaign{
+						&campaignspb.Campaign_AutomatedNotificationCampaign{
+							&campaignspb.AutomatedNotificationCampaign{
+								CampaignId:       1,
+								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
+								Name:             "c1",
+								CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+				},
+			},
+
+			after: &expect{
+				exp: &campaign{
+					AccountId: 1,
+					Campaign: &campaignspb.Campaign{
+						&campaignspb.Campaign_AutomatedNotificationCampaign{
+							&campaignspb.AutomatedNotificationCampaign{
+								CampaignId:       1,
+								CampaignStatus:   campaignspb.CampaignStatus_ARCHIVED,
+								Name:             "c1",
+								CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt:        updatedAt,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+				},
+			},
+
+			exp: &campaignspb.ArchiveResponse{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.req == nil {
+				t.Skip("TODO")
+			}
+
+			var (
+				acctId = tt.req.GetAuthContext().GetAccountId()
+				cId    = tt.req.CampaignId
+			)
+
+			if tt.before != nil {
+				var (
+					exp, expErr = tt.before.exp, tt.before.err
+					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
+				)
+
+				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+					t.Errorf("Before: Diff:\n%v", Difff(diff))
+				}
+			}
+
+			var (
+				exp, expErr = tt.exp, tt.expErr
+				got, gotErr = svc.Archive(ctx, tt.req)
+			)
+
+			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", Difff(diff))
+			}
+
+			if tt.after != nil {
+				var (
+					exp, expErr = tt.after.exp, tt.after.err
+					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
+				)
+
+				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+					t.Errorf("After: Diff:\n%v", Difff(diff))
+				}
+			}
+		})
+	}
+}
+
 func test_Publish(t *testing.T) {
+	var (
+		ctx         = context.Background()
+		db, closeDB = dbOpen(t, testDB.DSN)
+		svc         = campaigns_grpc.Server{DB: db}
+	)
+
+	defer closeDB()
+
+	type expect struct {
+		exp *campaign
+		err error
+	}
+
+	tests := []struct {
+		name string
+
+		req *campaignspb.PublishRequest
+		exp *campaignspb.PublishResponse
+
+		before, after *expect
+
+		expErr error
+	}{
+		{
+			name: "error: validation",
+			req:  &campaignspb.PublishRequest{},
+
+			expErr: status.Errorf(codes.InvalidArgument, "validate: auth_context: is required. account_id: is required. campaign_id: is required."),
+		},
+
+		{
+			name: "error: not found",
+
+			req: &campaignspb.PublishRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				CampaignId:  404,
+			},
+
+			expErr: status.Errorf(codes.NotFound, "db.UpdateStatus: db.Update: sql: no rows in result set"),
+		},
+
+		{
+			name: "publishes the campaign",
+			req: &campaignspb.PublishRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				CampaignId:  1,
+			},
+
+			before: &expect{
+				exp: &campaign{
+					AccountId: 1,
+					Campaign: &campaignspb.Campaign{
+						&campaignspb.Campaign_AutomatedNotificationCampaign{
+							&campaignspb.AutomatedNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: updatedAt,
+
+								CampaignId:     1,
+								CampaignStatus: campaignspb.CampaignStatus_ARCHIVED,
+								Name:           "c1",
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+				},
+			},
+
+			after: &expect{
+				exp: &campaign{
+					AccountId: 1,
+					Campaign: &campaignspb.Campaign{
+						&campaignspb.Campaign_AutomatedNotificationCampaign{
+							&campaignspb.AutomatedNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: updatedAt,
+
+								CampaignId:       1,
+								CampaignStatus:   campaignspb.CampaignStatus_PUBLISHED,
+								Name:             "c1",
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+				},
+			},
+
+			exp: &campaignspb.PublishResponse{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.req == nil {
+				t.Skip("TODO")
+			}
+
+			var (
+				acctId = tt.req.GetAuthContext().GetAccountId()
+				cId    = tt.req.CampaignId
+			)
+
+			if tt.before != nil {
+				var (
+					exp, expErr = tt.before.exp, tt.before.err
+					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
+				)
+
+				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+					t.Errorf("Before: Diff:\n%v", Difff(diff))
+				}
+			}
+
+			var (
+				exp, expErr = tt.exp, tt.expErr
+				got, gotErr = svc.Publish(ctx, tt.req)
+			)
+
+			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", Difff(diff))
+			}
+
+			if tt.after != nil {
+				var (
+					exp, expErr = tt.after.exp, tt.after.err
+					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
+				)
+
+				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+					t.Errorf("After: Diff:\n%v", Difff(diff))
+				}
+			}
+		})
+	}
+}
+
+func test_Unpublish(t *testing.T) {
+	t.Skip("TODO")
 	var (
 		ctx         = context.Background()
 		db, closeDB = dbOpen(t, testDB.DSN)
