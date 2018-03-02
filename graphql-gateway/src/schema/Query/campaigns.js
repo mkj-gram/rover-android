@@ -29,12 +29,12 @@ const campaigns = {
         const Models = RoverApis.campaigns.v1.Models
         const request = new RoverApis.campaigns.v1.Models.ListRequest()
         request.setAuthContext(authContext)
-        request.setCampaignStatus(Models.CampaignStatus[campaignStatus])
-        request.setCampaignType(Models.CampaignType[campaignType])
+        request.setCampaignStatus(Models.CampaignStatus.Enum[campaignStatus])
+        request.setCampaignType(Models.CampaignType.Enum[campaignType])
         request.setKeyword(keyword)
         request.setPage(pageNumber)
         request.setPageSize(50)
-
+      
         const response = await campaignsClient.list(request)
         return response.getCampaignsList().map(campaign => {
             if (campaign.hasAutomatedNotificationCampaign())

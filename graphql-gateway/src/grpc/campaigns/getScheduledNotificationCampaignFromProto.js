@@ -3,12 +3,12 @@ import grpcEnumMap from '../grpcEnumMap'
 
 export default c => ({
     campaignId: c.getCampaignId(),
-    campaignType: 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION',
+    campaignType: 'SCHEDULED_NOTIFICATION',
     name: c.getName(),
     experienceId: c.getExperienceId(),
-    campaignStatus: grpcEnumMap(RoverApis.campaigns.v1.Models.CampaignStatus)[
-        c.getCampaignStatus()
-    ],
+    campaignStatus: grpcEnumMap(
+        RoverApis.campaigns.v1.Models.CampaignStatus.Enum
+    )[c.getCampaignStatus()],
     UIState: c.getUiState(),
     notificationBody: c.getNotificationBody(),
     notificationTitle: c.getNotificationTitle(),
@@ -32,10 +32,10 @@ export default c => ({
         return attachment
     },
     notificationTapBehaviorType: grpcEnumMap(
-        RoverApis.campaigns.v1.Models.NotificationTapBehaviorType
+        RoverApis.campaigns.v1.Models.NotificationTapBehaviorType.Enum
     )[c.getNotificationTapBehaviorType()],
     notificationTapPresentationType: grpcEnumMap(
-        RoverApis.campaigns.v1.Models.NotificationTapPresentationType
+        RoverApis.campaigns.v1.Models.NotificationTapPresentationType.Enum
     )[c.getNotificationTapBehaviorPresentationType()],
     notificationTapBehaviorUrl: c.getNotificationTapBehaviorUrl(),
     notificationIosContentAvailable: c.getNotificationIosContentAvailable(),
@@ -57,19 +57,19 @@ export default c => ({
     notificationAlertOptionPushNotification: c.getNotificationAlertOptionPushNotification(),
     notificationAlertOptionNotificationCenter: c.getNotificationAlertOptionNotificationCenter(),
     notificationAlertOptionBadgeNumber: c.getNotificationAlertOptionBadgeNumber(),
-    scheduledType: grpcEnumMap(RoverApis.campaigns.v1.Models.ScheduledType)[
-        c.getScheduledType()
-    ],
+    scheduledType: grpcEnumMap(
+        RoverApis.campaigns.v1.Models.ScheduledType.Enum
+    )[c.getScheduledType()],
     scheduledTimestamp: RoverApis.Helpers.timestampFromProto(
         c.getScheduledTimestamp()
     ),
     scheduledTimeZone: c.getScheduledTimeZone(),
     scheduledUseLocalDeviceTime: c.getScheduledUseLocalDeviceTime(),
     scheduledDeliveryStatus: grpcEnumMap(
-        RoverApis.campaigns.v1.Models.ScheduledDeliveryStatus
+        RoverApis.campaigns.v1.Models.ScheduledDeliveryStatus.Enum
     )[c.getScheduledDeliveryStatus()],
     segmentCondition: grpcEnumMap(
-        RoverApis.campaigns.v1.Models.SegmentCondition
+        RoverApis.campaigns.v1.Models.SegmentCondition.Enum
     )[c.getSegmentCondition()],
     segmentIds: c.getSegmentIdsList(seg => map(seg.getSegmentId))
 })

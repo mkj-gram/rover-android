@@ -18,8 +18,7 @@ import { PredicateAggregate } from './Predicate'
 export const AutomatedNotificationCampaign = new GraphQLObjectType({
     name: 'AutomatedNotificationCampaign',
     interfaces: () => [Campaign, NotificationCampaign, SegmentableCampaign],
-    isTypeOf: ({ campaignType }) =>
-        campaignType === 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION',
+    isTypeOf: ({ campaignType }) => campaignType === 'AUTOMATED_NOTIFICATION',
     fields: () => ({
         // CAMPAIGN ATTRIBUTES
         campaignId: {
@@ -244,17 +243,17 @@ const Campaign = new GraphQLInterfaceType({
 const CampaignStatus = new GraphQLEnumType({
     name: 'CampaignStatus',
     values: {
-        CAMPAIGN_STATUS_DRAFT: {},
-        CAMPAIGN_STATUS_PUBLISHED: {},
-        CAMPAIGN_STATUS_ARCHIVED: {}
+        DRAFT: {},
+        PUBLISHED: {},
+        ARCHIVED: {}
     }
 })
 
 const CampaignType = new GraphQLEnumType({
     name: 'CampaignType',
     values: {
-        CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION: {},
-        CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION: {}
+        SCHEDULED_NOTIFICATION: {},
+        AUTOMATED_NOTIFICATION: {}
     }
 })
 
@@ -350,37 +349,36 @@ const NotificationCampaign = new GraphQLInterfaceType({
 const NotificationTapBehaviorType = new GraphQLEnumType({
     name: 'NotificationTapBehaviorType',
     values: {
-        NOTIFICATION_TAP_BEHAVIOR_TYPE_UNKNOWN: {},
-        NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_APP: {},
-        NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_EXPERIENCE: {},
-        NOTIFICATION_TAP_BEHAVIOR_TYPE_OPEN_DEEP_LINK: {}
+        OPEN_APP: {},
+        OPEN_EXPERIENCE: {},
+        OPEN_DEEP_LINK: {},
+        OPEN_WEBSITE: {}
     }
 })
 
 const NotificationTapPresentationType = new GraphQLEnumType({
     name: 'NotificationTapPresentationType',
     values: {
-        NOTIFICATION_TAP_PRESENTATION_TYPE_UNKNOWN: {},
-        NOTIFICATION_TAP_PRESENTATION_TYPE_IN_APP: {},
-        NOTIFICATION_TAP_PRESENTATION_TYPE_IN_BROWSER: {}
+        UNKNOWN: {},
+        APP: {},
+        BROWSER: {}
     }
 })
 
 const ScheduledDeliveryStatus = new GraphQLEnumType({
     name: 'ScheduledDeliveryStatus',
     values: {
-        DELIVERY_STATUS_UNKNOWN: {},
-        DELIVERY_STATUS_SCHEDULED: {},
-        DELIVERY_STATUS_INPROGRESS: {},
-        DELIVERY_STATUS_FINISHED: {}
+        UNKNOWN: {},
+        SCHEDULED: {},
+        INPROGRESS: {},
+        FINISHED: {}
     }
 })
 
 export const ScheduledNotificationCampaign = new GraphQLObjectType({
     name: 'ScheduledNotificationCampaign',
     interfaces: () => [Campaign, NotificationCampaign, SegmentableCampaign],
-    isTypeOf: ({ campaignType }) =>
-        campaignType === 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION',
+    isTypeOf: ({ campaignType }) => campaignType === 'SCHEDULED_NOTIFICATION',
     fields: () => ({
         // CAMPAIGN ATTRIBUTES
         campaignId: {
@@ -528,17 +526,16 @@ export const ScheduledNotificationCampaign = new GraphQLObjectType({
 const ScheduledType = new GraphQLEnumType({
     name: 'ScheduledType',
     values: {
-        SCHEDULED_TYPE_UNKNOWN: {},
-        SCHEDULED_TYPE_NOW: {},
-        SCHEDULED_TYPE_SCHEDULED: {}
+        NOW: {},
+        SCHEDULED: {}
     }
 })
 
 const SegmentCondition = new GraphQLEnumType({
     name: 'SegmentCondition',
     values: {
-        SEGMENT_CONDITION_ANY: {},
-        SEGMENT_CONDITION_ALL: {}
+        ANY: {},
+        ALL: {}
     }
 })
 

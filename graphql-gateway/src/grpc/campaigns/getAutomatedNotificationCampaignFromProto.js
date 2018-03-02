@@ -3,12 +3,12 @@ import grpcEnumMap from '../grpcEnumMap'
 
 export default c => ({
     campaignId: c.getCampaignId(),
-    campaignType: 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION',
+    campaignType: 'AUTOMATED_NOTIFICATION',
     name: c.getName(),
     experienceId: c.getExperienceId(),
-    campaignStatus: grpcEnumMap(RoverApis.campaigns.v1.Models.CampaignStatus)[
-        c.getCampaignStatus()
-    ],
+    campaignStatus: grpcEnumMap(
+        RoverApis.campaigns.v1.Models.CampaignStatus.Enum
+    )[c.getCampaignStatus()],
     UIState: c.getUiState(),
     notificationBody: c.getNotificationBody(),
     notificationTitle: c.getNotificationTitle(),
@@ -32,10 +32,10 @@ export default c => ({
         return attachment
     },
     notificationTapBehaviorType: grpcEnumMap(
-        RoverApis.campaigns.v1.Models.NotificationTapBehaviorType
+        RoverApis.campaigns.v1.Models.NotificationTapBehaviorType.Enum
     )[c.getNotificationTapBehaviorType()],
     notificationTapPresentationType: grpcEnumMap(
-        RoverApis.campaigns.v1.Models.NotificationTapPresentationType
+        RoverApis.campaigns.v1.Models.NotificationTapPresentationType.Enum
     )[c.getNotificationTapBehaviorPresentationType()],
     notificationTapBehaviorUrl: c.getNotificationTapBehaviorUrl(),
     notificationIosContentAvailable: c.getNotificationIosContentAvailable(),
@@ -77,7 +77,7 @@ export default c => ({
     automatedEventName: c.getAutomatedEventName(),
     automatedFrequencySingleUse: c.getAutomatedFrequencySingleUse(),
     segmentCondition: grpcEnumMap(
-        RoverApis.campaigns.v1.Models.SegmentCondition
+        RoverApis.campaigns.v1.Models.SegmentCondition.Enum
     )[c.getSegmentCondition()],
     segmentIds: c.getSegmentIdsList(seg => map(seg.getSegmentId))
 })
