@@ -178,3 +178,52 @@ describe('Wrappers', function() {
 		})
 	})
 })
+
+
+/**
+ *  rover.protobuf.Timestamp Tests
+ */
+const Timestamp = require("../protobuf/timestamp_pb.js").Timestamp
+require("../protobuf/timestamp_pb_ext.js")
+
+describe('Timestamp', function() {
+
+	describe('fromISOString', function() {
+
+		it('throws an error when value is not an ISO8601 string', function() {
+			expect(function() {
+				Timestamp.fromISOString("hi")
+			}).to.throw('invalid timestamp value')
+		})
+
+		it('parses valid ISO8601 string', function(){
+
+			const exp = {
+				seconds: 1519401951,
+				nanos: 110000000,
+				offset: -18000,
+			}
+
+			const timestamp = Timestamp.fromISOString("2018-02-23T11:05:51.11-05:00")
+
+			const got = {
+				seconds: timestamp.getSeconds(),
+				nanos: timestamp.getNanos(),
+				offset: timestamp.getUtcOffset()
+			}
+
+			expect(got).to.deep.equal(exp)
+		})
+	})
+
+	describe('toISOString', function() {
+		it('correctly formats to ISO8601 string', function() {
+			const timestamp = Timestamp.fromISOString("2018-02-23T11:05:51.11-05:00")
+			// IS08601 in js is always represented in UTC time
+			const exp = '2018-02-23T16:05:51.110Z'
+			const got = timestamp.toISOString()
+
+			expect(got).to.equal(exp)
+		})
+	})
+})

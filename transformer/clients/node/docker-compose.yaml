@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+
+  kafka:
+      image: spotify/kafka
+      environment:
+        - AUTO_CREATE_TOPICS=true
+        - ADVERTISED_HOST=kafka
+        - NUM_PARTITIONS=3
+
+  client:
+      image: node:7.5.0
+      depends_on:
+        - kafka
+      volumes:
+      - ../../../:/rover/
+      working_dir: /rover/transformer/clients/node
+      environment:
+        KAFKA_DSN: kafka
+        NODE_ENV: development
