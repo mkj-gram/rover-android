@@ -130,7 +130,7 @@ export const archiveCampaign: ActionCreator<
                 ...getState().campaigns,
                 [campaignId]: {
                     ...getState().campaigns[campaignId],
-                    campaignStatus: 'CAMPAIGN_STATUS_ARCHIVED'
+                    campaignStatus: 'ARCHIVED'
                 }
             }
             dispatch({
@@ -285,13 +285,8 @@ export const fetchCampaigns: ActionCreator<
         query: query,
         variables: {
             campaignStatus:
-                campaignStatus === 'CAMPAIGN_STATUS_UNDEFINED'
-                    ? null
-                    : campaignStatus,
-            campaignType:
-                campaignType === 'CAMPAIGN_TYPE_UNDEFINED'
-                    ? null
-                    : campaignType,
+                campaignStatus === 'UNKNOWN' ? null : campaignStatus,
+            campaignType: campaignType === 'UNKNOWN' ? null : campaignType,
             pageNumber: pageNumber || 0,
             keyword: keyword || null
         }

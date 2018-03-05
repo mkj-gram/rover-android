@@ -226,13 +226,13 @@ const mapDispatchToProps = (
 
     switch (campaignStatus) {
         case 'drafts':
-            nextStatus = 'CAMPAIGN_STATUS_DRAFT'
+            nextStatus = 'DRAFT'
             break
         case 'published':
-            nextStatus = 'CAMPAIGN_STATUS_PUBLISHED'
+            nextStatus = 'PUBLISHED'
             break
         case 'all':
-            nextStatus = 'CAMPAIGN_STATUS_UNDEFINED'
+            nextStatus = 'UNKNOWN'
             break
         default:
             nextStatus = null
@@ -241,14 +241,14 @@ const mapDispatchToProps = (
     let nextType: CampaignType
     switch (campaignType) {
         case 'scheduled':
-            nextType = 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION'
+            nextType = 'SCHEDULED_NOTIFICATION'
             break
         case 'automated':
-            nextType = 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION'
+            nextType = 'AUTOMATED_NOTIFICATION'
             break
         case 'all':
         default:
-            nextType = 'CAMPAIGN_TYPE_UNDEFINED'
+            nextType = 'UNKNOWN'
             break
     }
 

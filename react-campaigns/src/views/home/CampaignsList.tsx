@@ -44,23 +44,23 @@ const isAutomatedNotificationCampaign = (
 }
 
 const getCampaignIcon = (status: CampaignStatus, type: CampaignType) => {
-    if (type === 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION') {
+    if (type === 'SCHEDULED_NOTIFICATION') {
         switch (status) {
-            case 'CAMPAIGN_STATUS_DRAFT':
+            case 'DRAFT':
                 return (
                     <CalendarIcon
                         fill={titanium}
                         style={{ transform: `scale(${5 / 6})` }}
                     />
                 )
-            case 'CAMPAIGN_STATUS_PUBLISHED':
+            case 'PUBLISHED':
                 return (
                     <CalendarIcon
                         fill={steel}
                         style={{ transform: `scale(${5 / 6})` }}
                     />
                 )
-            case 'CAMPAIGN_STATUS_ARCHIVED':
+            case 'ARCHIVED':
                 return (
                     <CalendarIcon
                         fill={steel}
@@ -75,23 +75,23 @@ const getCampaignIcon = (status: CampaignStatus, type: CampaignType) => {
                     />
                 )
         }
-    } else if (type === 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION') {
+    } else if (type === 'AUTOMATED_NOTIFICATION') {
         switch (status) {
-            case 'CAMPAIGN_STATUS_DRAFT':
+            case 'DRAFT':
                 return (
                     <ZapIcon
                         fill={titanium}
                         style={{ transform: `scale(${5 / 6})` }}
                     />
                 )
-            case 'CAMPAIGN_STATUS_PUBLISHED':
+            case 'PUBLISHED':
                 return (
                     <ZapIcon
                         fill={steel}
                         style={{ transform: `scale(${5 / 6})` }}
                     />
                 )
-            case 'CAMPAIGN_STATUS_ARCHIVED':
+            case 'ARCHIVED':
                 return (
                     <ZapIcon
                         fill={steel}
@@ -133,10 +133,10 @@ const renderCampaign = (
                 {renderCampaignProgressState(campaign, media)}
             </div>
             {media !== 'Mobile' &&
-                campaignStatus !== 'CAMPAIGN_STATUS_DRAFT' &&
+                campaignStatus !== 'DRAFT' &&
                 renderStat(19302, 'Delivered')}
             {media !== 'Mobile' &&
-                campaignStatus !== 'CAMPAIGN_STATUS_DRAFT' &&
+                campaignStatus !== 'DRAFT' &&
                 media === 'Desktop' &&
                 renderStat(1277, 'Opened')}
             {media === 'Desktop' ? (
@@ -162,7 +162,7 @@ const renderCampaignIcon = (campaign: Campaign) => {
         alignItems: 'center',
         justifyContent: 'center'
     }
-    if (campaignStatus === 'CAMPAIGN_STATUS_DRAFT') {
+    if (campaignStatus === 'DRAFT') {
         style = {
             ...style,
             background: undefined,
@@ -178,7 +178,7 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
     if (isScheduledCampaign(campaign)) {
         // tslint:disable-next-line:switch-default
         switch (campaign.scheduledDeliveryStatus) {
-            case 'SCHEDULED_DELIVERY_STATUS_UNKNOWN':
+            case 'UNKNOWN':
                 return (
                     <div
                         style={{
@@ -207,8 +207,8 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                         )}
                     </div>
                 )
-            case 'SCHEDULED_DELIVERY_STATUS_SCHEDULED':
-            case 'SCHEDULED_DELIVERY_STATUS_INPROGRESS':
+            case 'SCHEDULED':
+            case 'INPROGRESS':
                 return (
                     <div
                         style={{
@@ -228,7 +228,7 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                         />
                     </div>
                 )
-            case 'SCHEDULED_DELIVERY_STATUS_FINISHED':
+            case 'FINISHED':
                 return (
                     <div
                         style={{
@@ -260,7 +260,7 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
         // tslint:disable-next-line:switch-default
         switch (activeState) {
             default:
-            case 'AUTOMATED_ACTIVE_STATUS_UNKNOWN':
+            case 'UNKNOWN':
                 return (
                     <div
                         style={{
@@ -289,7 +289,7 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                         )}
                     </div>
                 )
-            case 'AUTOMATED_ACTIVE_STATUS_UPCOMING':
+            case 'UPCOMING':
                 return (
                     <div
                         style={{
@@ -309,7 +309,7 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                         />
                     </div>
                 )
-            case 'AUTOMATED_ACTIVE_STATUS_ACTIVE':
+            case 'ACTIVE':
                 return (
                     <div
                         style={{
@@ -329,7 +329,7 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                         />
                     </div>
                 )
-            case 'AUTOMATED_ACTIVE_STATUS_EXPIRED':
+            case 'EXPIRED':
                 return (
                     <div
                         style={{
@@ -358,7 +358,7 @@ const renderListButtons = (
     pushToOverview: (campaignId: string) => void
 ) => {
     const { campaignId, campaignStatus } = campaign
-    if (campaignStatus === 'CAMPAIGN_STATUS_DRAFT') {
+    if (campaignStatus === 'DRAFT') {
         return (
             <Button
                 text="Edit"
@@ -370,7 +370,7 @@ const renderListButtons = (
     }
     let icon
     if (isScheduledCampaign(campaign)) {
-        campaign.scheduledDeliveryStatus !== 'SCHEDULED_DELIVERY_STATUS_UNKNOWN'
+        campaign.scheduledDeliveryStatus !== 'UNKNOWN'
             ? (icon = (
                   <GearIcon
                       fill={charcoal}

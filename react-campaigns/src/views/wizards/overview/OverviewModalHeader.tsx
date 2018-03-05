@@ -89,10 +89,10 @@ class OverviewModalHeader extends React.Component<
 
     getCampaignType(val: string) {
         switch (val) {
-            case 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION': {
+            case 'SCHEDULED_NOTIFICATION': {
                 return 'Scheduled Notification Campaign'
             }
-            case 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION': {
+            case 'AUTOMATED_NOTIFICATION': {
                 return 'Automated Notification Campaign'
             }
             default: {

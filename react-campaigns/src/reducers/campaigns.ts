@@ -32,17 +32,11 @@ export const getFilteredCampaigns = (
     const allCampaigns = getAllCampaigns(state)
     switch (filter) {
         case 'drafts':
-            return allCampaigns.filter(
-                e => e.campaignStatus === 'CAMPAIGN_STATUS_DRAFT'
-            )
+            return allCampaigns.filter(e => e.campaignStatus === 'DRAFT')
         case 'published':
-            return allCampaigns.filter(
-                e => e.campaignStatus === 'CAMPAIGN_STATUS_PUBLISHED'
-            )
+            return allCampaigns.filter(e => e.campaignStatus === 'PUBLISHED')
         case 'archived':
-            return allCampaigns.filter(
-                e => e.campaignStatus === 'CAMPAIGN_STATUS_ARCHIVED'
-            )
+            return allCampaigns.filter(e => e.campaignStatus === 'ARCHIVED')
         default:
             throw new Error(`Unknown filter: ${filter}`)
     }

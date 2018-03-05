@@ -154,13 +154,13 @@ class NewCampaignPopover extends React.PureComponent<
     getCampaignSubtext(type: CampaignType): string {
         // tslint:disable-next-line:switch-default
         switch (type) {
-            case 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION':
+            case 'SCHEDULED_NOTIFICATION':
                 return 'Delivered at a given date and time'
-            case 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION':
+            case 'AUTOMATED_NOTIFICATION':
                 return 'Delivered when a specific event occurs'
-            case 'CAMPAIGN_TYPE_INTERSTITIAL':
+            case 'INTERSTITIAL':
                 return 'Presented when the app is opened'
-            case 'CAMPAIGN_TYPE_WEB':
+            case 'WEB':
                 return 'Presented manually through other channels'
         }
     }
@@ -184,13 +184,13 @@ class NewCampaignPopover extends React.PureComponent<
     getCampaignIcon(type: CampaignType): JSX.Element {
         // tslint:disable-next-line:switch-default
         switch (type) {
-            case 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION':
+            case 'SCHEDULED_NOTIFICATION':
                 return <CalendarIcon fill={steel} />
-            case 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION':
+            case 'AUTOMATED_NOTIFICATION':
                 return <ZapIcon fill={steel} />
-            case 'CAMPAIGN_TYPE_INTERSTITIAL':
+            case 'INTERSTITIAL':
                 return <PhoneIcon fill={steel} />
-            case 'CAMPAIGN_TYPE_WEB':
+            case 'WEB':
                 return <LinkIcon fill={steel} />
         }
     }
@@ -198,13 +198,13 @@ class NewCampaignPopover extends React.PureComponent<
     getReadableCampaignName(type: CampaignType): string {
         // tslint:disable-next-line:switch-default
         switch (type) {
-            case 'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION':
+            case 'SCHEDULED_NOTIFICATION':
                 return 'Scheduled Notification'
-            case 'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION':
+            case 'AUTOMATED_NOTIFICATION':
                 return 'Automated Notification'
-            case 'CAMPAIGN_TYPE_INTERSTITIAL':
+            case 'INTERSTITIAL':
                 return 'Interstitial Experience'
-            case 'CAMPAIGN_TYPE_WEB':
+            case 'WEB':
                 return 'Web/Social Experience'
         }
     }
@@ -253,8 +253,7 @@ class NewCampaignPopover extends React.PureComponent<
                         width: '100%',
                         height: 79,
                         borderBottom:
-                            (type !== 'CAMPAIGN_TYPE_WEB' ||
-                                media === 'Mobile') &&
+                            (type !== 'WEB' || media === 'Mobile') &&
                             `1px solid ${cloud}`,
                         display: 'flex',
                         alignItems: 'center',
@@ -299,15 +298,13 @@ class NewCampaignPopover extends React.PureComponent<
                 {contentState === 'campaign-types' && (
                     <div>
                         {this.renderCampaignListElement(
-                            'CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION'
+                            'SCHEDULED_NOTIFICATION'
                         )}
                         {this.renderCampaignListElement(
-                            'CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION'
+                            'AUTOMATED_NOTIFICATION'
                         )}
-                        {this.renderCampaignListElement(
-                            'CAMPAIGN_TYPE_INTERSTITIAL'
-                        )}
-                        {this.renderCampaignListElement('CAMPAIGN_TYPE_WEB')}
+                        {this.renderCampaignListElement('INTERSTITIAL')}
+                        {this.renderCampaignListElement('WEB')}
                     </div>
                 )}
                 {contentState === 'name-campaign' && (
