@@ -18,13 +18,15 @@ const trackEvents = {
     resolve: requireAuthentication(async (_, { events }, { clients, authContext, deviceIdentifier }) => {
         const transformer = clients.transformer
 
-        events.forEach(async(event, index) => {
+        for (let i = 0; i < events.length; i++) {
+            const event = events[i]
+
             try {
                 await transformer.submit(authContext, deviceIdentifier, Constants.DEVICE_EVENT, event)
             } catch(err) {
-                throw new Error(`Failed to submit events[${index}]: ${err}`)
+                throw new Error(`Failed to submit events[${i}]: ${err}`)
             }
-        })
+        }
         
         return 'success'
     })
