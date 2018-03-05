@@ -2,9 +2,8 @@
  * 	Extensions added to proto.rover.protobuf.Version
  */
 
+const VersionRegex = /^(\d+\.\d+\.\d+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
 
-
-const VersionRegex = /^\d+\.\d+\.\d+$|^\d+\.\d+$/
 /**
  * Converts this JavaScript value to a new Version proto.
  * @param {!proto.rover.protobuf.JavaScriptValue} value The value to
@@ -19,11 +18,13 @@ proto.rover.protobuf.Version.fromJavaScript = function(value) {
 	const ret = new proto.rover.protobuf.Version()
 
 	if (typeof value === 'string') {
-		if (value.match(VersionRegex)) {
-			const parts = value.split('.')
-			const major 	= parseInt(parts[0]) ? parseInt(parts[0]) : 0
-			const minor 	= parseInt(parts[1]) ? parseInt(parts[1]) : 0
-			const revision 	= parseInt(parts[2]) ? parseInt(parts[2]) : 0
+		const match = value.match(VersionRegex)
+
+		if (match) {
+			const parts = value.split('.').map(i => parseInt(i))
+			const major 	= parts[0]
+			const minor 	= parts[1]
+			const revision 	= parts[2]
 
 			ret.setMajor(major)
 			ret.setMinor(minor)
@@ -36,7 +37,7 @@ proto.rover.protobuf.Version.fromJavaScript = function(value) {
 	} else if(typeof value === 'object') {
 		const major 	= parseInt(value.major) 	? parseInt(value.major) : 0
 		const minor 	= parseInt(value.minor) 	? parseInt(value.minor) : 0
-		const revision 	= parseInt(value.revision) 	? parseInt(value.revision) : 0
+		const revision 	= parseInt(value.revision || value.patch) 	? parseInt(value.revision || value.patch) : 0
 
 		ret.setMajor(major)
 		ret.setMinor(minor)

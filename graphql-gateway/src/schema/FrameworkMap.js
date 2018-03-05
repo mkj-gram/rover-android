@@ -1,5 +1,5 @@
 import { GraphQLScalarType } from 'graphql'
-
+import GraphQLVersion from './Version'
 
 /**
  * Takes a map and converts its value based on the supplied function
@@ -37,9 +37,8 @@ const serialize = (value) => {
 	if (typeof value !== 'object') {
 		throw new TypeError('value must be an object')
 	}
-
-	// TODO when we have a Version type we need to supply map with Version.serialize
-	return map(value, (v) => v)
+	
+	return map(value, (v) => GraphQLVersion.serialize(v))
 }
 
 /**
@@ -52,8 +51,7 @@ const parseValue = (value) => {
 		throw new TypeError('value must be a map')
 	}
 
-	// TODO when we have a Version type we need to supply map with Version.parseValue
-	return map(value, (v) => v)
+	return map(value, (v) => GraphQLVersion.parseValue(v))
 }
 
 const parseLiteral = (value) => {

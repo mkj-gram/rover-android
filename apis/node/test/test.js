@@ -67,9 +67,10 @@ describe('Version', function() {
 	})
 
 	it('parses string values', function() {
-		const got = Version.fromJavaScript("1.3")
+		const got = Version.fromJavaScript("1.3.1")
 		expect(got.getMajor()).to.equal(1)
 		expect(got.getMinor()).to.equal(3)
+		expect(got.getRevision()).to.equal(1)
 
 		const got2 = Version.fromJavaScript("3.4.2")
 		expect(got2.getMajor()).to.equal(3)
@@ -86,6 +87,13 @@ describe('Version', function() {
 		expect(got2.getMajor()).to.equal(3)
 		expect(got2.getMinor()).to.equal(10)
 		expect(got2.getRevision()).to.equal(6)
+	})
+
+	it('accepts patch as well', function() {
+		const got = Version.fromJavaScript({ major: 4, minor: 3, patch: 3 })
+		expect(got.getMajor()).to.equal(4)
+		expect(got.getMinor()).to.equal(3)
+		expect(got.getRevision()).to.equal(3)
 	})
 
 	it('maps back to a version string', function() {
