@@ -1076,15 +1076,15 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.rover.event.v1.EventInput.oneofGroups_ = [[7,8]];
+proto.rover.event.v1.EventInput.oneofGroups_ = [[8,9]];
 
 /**
  * @enum {number}
  */
 proto.rover.event.v1.EventInput.TypeCase = {
   TYPE_NOT_SET: 0,
-  DEVICE_EVENT_INPUT: 7,
-  PROFILE_EVENT_INPUT: 8
+  DEVICE_EVENT_INPUT: 8,
+  PROFILE_EVENT_INPUT: 9
 };
 
 /**
@@ -1123,8 +1123,9 @@ proto.rover.event.v1.EventInput.prototype.toObject = function(opt_includeInstanc
 proto.rover.event.v1.EventInput.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    id: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    name: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    namespace: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    id: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 4, ""),
     timestamp: (f = msg.getTimestamp()) && protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     receivedAt: (f = msg.getReceivedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     attributes: (f = msg.getAttributes()) && protobuf_struct_pb.Struct.toObject(includeInstance, f),
@@ -1173,33 +1174,37 @@ proto.rover.event.v1.EventInput.deserializeBinaryFromReader = function(msg, read
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setId(value);
+      msg.setNamespace(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
-      msg.setName(value);
+      msg.setId(value);
       break;
     case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
+      break;
+    case 5:
       var value = new protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setTimestamp(value);
       break;
-    case 5:
+    case 6:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setReceivedAt(value);
       break;
-    case 6:
+    case 7:
       var value = new protobuf_struct_pb.Struct;
       reader.readMessage(value,protobuf_struct_pb.Struct.deserializeBinaryFromReader);
       msg.setAttributes(value);
       break;
-    case 7:
+    case 8:
       var value = new proto.rover.event.v1.DeviceEventInput;
       reader.readMessage(value,proto.rover.event.v1.DeviceEventInput.deserializeBinaryFromReader);
       msg.setDeviceEventInput(value);
       break;
-    case 8:
+    case 9:
       var value = new proto.rover.event.v1.ProfileEventInput;
       reader.readMessage(value,proto.rover.event.v1.ProfileEventInput.deserializeBinaryFromReader);
       msg.setProfileEventInput(value);
@@ -1240,24 +1245,31 @@ proto.rover.event.v1.EventInput.serializeBinaryToWriter = function(message, writ
       auth_v1_auth_pb.AuthContext.serializeBinaryToWriter
     );
   }
-  f = message.getId();
+  f = message.getNamespace();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
-  f = message.getName();
+  f = message.getId();
   if (f.length > 0) {
     writer.writeString(
       3,
       f
     );
   }
+  f = message.getName();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
   f = message.getTimestamp();
   if (f != null) {
     writer.writeMessage(
-      4,
+      5,
       f,
       protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -1265,7 +1277,7 @@ proto.rover.event.v1.EventInput.serializeBinaryToWriter = function(message, writ
   f = message.getReceivedAt();
   if (f != null) {
     writer.writeMessage(
-      5,
+      6,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -1273,7 +1285,7 @@ proto.rover.event.v1.EventInput.serializeBinaryToWriter = function(message, writ
   f = message.getAttributes();
   if (f != null) {
     writer.writeMessage(
-      6,
+      7,
       f,
       protobuf_struct_pb.Struct.serializeBinaryToWriter
     );
@@ -1281,7 +1293,7 @@ proto.rover.event.v1.EventInput.serializeBinaryToWriter = function(message, writ
   f = message.getDeviceEventInput();
   if (f != null) {
     writer.writeMessage(
-      7,
+      8,
       f,
       proto.rover.event.v1.DeviceEventInput.serializeBinaryToWriter
     );
@@ -1289,7 +1301,7 @@ proto.rover.event.v1.EventInput.serializeBinaryToWriter = function(message, writ
   f = message.getProfileEventInput();
   if (f != null) {
     writer.writeMessage(
-      8,
+      9,
       f,
       proto.rover.event.v1.ProfileEventInput.serializeBinaryToWriter
     );
@@ -1328,48 +1340,63 @@ proto.rover.event.v1.EventInput.prototype.hasAuthContext = function() {
 
 
 /**
- * optional string id = 2;
+ * optional string namespace = 2;
  * @return {string}
  */
-proto.rover.event.v1.EventInput.prototype.getId = function() {
+proto.rover.event.v1.EventInput.prototype.getNamespace = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.event.v1.EventInput.prototype.setId = function(value) {
+proto.rover.event.v1.EventInput.prototype.setNamespace = function(value) {
   jspb.Message.setField(this, 2, value);
 };
 
 
 /**
- * optional string name = 3;
+ * optional string id = 3;
  * @return {string}
  */
-proto.rover.event.v1.EventInput.prototype.getName = function() {
+proto.rover.event.v1.EventInput.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.event.v1.EventInput.prototype.setName = function(value) {
+proto.rover.event.v1.EventInput.prototype.setId = function(value) {
   jspb.Message.setField(this, 3, value);
 };
 
 
 /**
- * optional rover.protobuf.Timestamp timestamp = 4;
+ * optional string name = 4;
+ * @return {string}
+ */
+proto.rover.event.v1.EventInput.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.event.v1.EventInput.prototype.setName = function(value) {
+  jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional rover.protobuf.Timestamp timestamp = 5;
  * @return {?proto.rover.protobuf.Timestamp}
  */
 proto.rover.event.v1.EventInput.prototype.getTimestamp = function() {
   return /** @type{?proto.rover.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, protobuf_timestamp_pb.Timestamp, 4));
+    jspb.Message.getWrapperField(this, protobuf_timestamp_pb.Timestamp, 5));
 };
 
 
 /** @param {?proto.rover.protobuf.Timestamp|undefined} value */
 proto.rover.event.v1.EventInput.prototype.setTimestamp = function(value) {
-  jspb.Message.setWrapperField(this, 4, value);
+  jspb.Message.setWrapperField(this, 5, value);
 };
 
 
@@ -1383,23 +1410,23 @@ proto.rover.event.v1.EventInput.prototype.clearTimestamp = function() {
  * @return {!boolean}
  */
 proto.rover.event.v1.EventInput.prototype.hasTimestamp = function() {
-  return jspb.Message.getField(this, 4) != null;
+  return jspb.Message.getField(this, 5) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp received_at = 5;
+ * optional google.protobuf.Timestamp received_at = 6;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.rover.event.v1.EventInput.prototype.getReceivedAt = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 5));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.rover.event.v1.EventInput.prototype.setReceivedAt = function(value) {
-  jspb.Message.setWrapperField(this, 5, value);
+  jspb.Message.setWrapperField(this, 6, value);
 };
 
 
@@ -1413,23 +1440,23 @@ proto.rover.event.v1.EventInput.prototype.clearReceivedAt = function() {
  * @return {!boolean}
  */
 proto.rover.event.v1.EventInput.prototype.hasReceivedAt = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 6) != null;
 };
 
 
 /**
- * optional rover.protobuf.Struct attributes = 6;
+ * optional rover.protobuf.Struct attributes = 7;
  * @return {?proto.rover.protobuf.Struct}
  */
 proto.rover.event.v1.EventInput.prototype.getAttributes = function() {
   return /** @type{?proto.rover.protobuf.Struct} */ (
-    jspb.Message.getWrapperField(this, protobuf_struct_pb.Struct, 6));
+    jspb.Message.getWrapperField(this, protobuf_struct_pb.Struct, 7));
 };
 
 
 /** @param {?proto.rover.protobuf.Struct|undefined} value */
 proto.rover.event.v1.EventInput.prototype.setAttributes = function(value) {
-  jspb.Message.setWrapperField(this, 6, value);
+  jspb.Message.setWrapperField(this, 7, value);
 };
 
 
@@ -1443,23 +1470,23 @@ proto.rover.event.v1.EventInput.prototype.clearAttributes = function() {
  * @return {!boolean}
  */
 proto.rover.event.v1.EventInput.prototype.hasAttributes = function() {
-  return jspb.Message.getField(this, 6) != null;
+  return jspb.Message.getField(this, 7) != null;
 };
 
 
 /**
- * optional DeviceEventInput device_event_input = 7;
+ * optional DeviceEventInput device_event_input = 8;
  * @return {?proto.rover.event.v1.DeviceEventInput}
  */
 proto.rover.event.v1.EventInput.prototype.getDeviceEventInput = function() {
   return /** @type{?proto.rover.event.v1.DeviceEventInput} */ (
-    jspb.Message.getWrapperField(this, proto.rover.event.v1.DeviceEventInput, 7));
+    jspb.Message.getWrapperField(this, proto.rover.event.v1.DeviceEventInput, 8));
 };
 
 
 /** @param {?proto.rover.event.v1.DeviceEventInput|undefined} value */
 proto.rover.event.v1.EventInput.prototype.setDeviceEventInput = function(value) {
-  jspb.Message.setOneofWrapperField(this, 7, proto.rover.event.v1.EventInput.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 8, proto.rover.event.v1.EventInput.oneofGroups_[0], value);
 };
 
 
@@ -1473,23 +1500,23 @@ proto.rover.event.v1.EventInput.prototype.clearDeviceEventInput = function() {
  * @return {!boolean}
  */
 proto.rover.event.v1.EventInput.prototype.hasDeviceEventInput = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 8) != null;
 };
 
 
 /**
- * optional ProfileEventInput profile_event_input = 8;
+ * optional ProfileEventInput profile_event_input = 9;
  * @return {?proto.rover.event.v1.ProfileEventInput}
  */
 proto.rover.event.v1.EventInput.prototype.getProfileEventInput = function() {
   return /** @type{?proto.rover.event.v1.ProfileEventInput} */ (
-    jspb.Message.getWrapperField(this, proto.rover.event.v1.ProfileEventInput, 8));
+    jspb.Message.getWrapperField(this, proto.rover.event.v1.ProfileEventInput, 9));
 };
 
 
 /** @param {?proto.rover.event.v1.ProfileEventInput|undefined} value */
 proto.rover.event.v1.EventInput.prototype.setProfileEventInput = function(value) {
-  jspb.Message.setOneofWrapperField(this, 8, proto.rover.event.v1.EventInput.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 9, proto.rover.event.v1.EventInput.oneofGroups_[0], value);
 };
 
 
@@ -1503,7 +1530,7 @@ proto.rover.event.v1.EventInput.prototype.clearProfileEventInput = function() {
  * @return {!boolean}
  */
 proto.rover.event.v1.EventInput.prototype.hasProfileEventInput = function() {
-  return jspb.Message.getField(this, 8) != null;
+  return jspb.Message.getField(this, 9) != null;
 };
 
 

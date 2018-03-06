@@ -119,6 +119,7 @@ function serializeEventInput(auth, event) {
 	
 	e.setAuthContext(auth)
 
+	e.setNamespace(event.namespace)
 	e.setId(event.id)
 	e.setName(event.name)
 
@@ -146,11 +147,6 @@ function serializeDeviceEvent(auth, event, deviceId, deviceContext) {
 	
 	return e
 }
-
-
-
-
-
 
 module.exports = {
 	serializeDeviceEvent: serializeDeviceEvent

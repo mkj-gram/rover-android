@@ -104,6 +104,10 @@ const Event = new GraphQLInputObjectType({
         id: {
             type: new GraphQLNonNull(GraphQLID)
         },
+        namespace: {
+            type: GraphQLString,
+            description: 'Grouping of related events'
+        },
         name: {
             type: new GraphQLNonNull(GraphQLString)
         },

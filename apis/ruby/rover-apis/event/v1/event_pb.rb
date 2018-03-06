@@ -45,14 +45,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.event.v1.EventInput" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :id, :string, 2
-    optional :name, :string, 3
-    optional :timestamp, :message, 4, "rover.protobuf.Timestamp"
-    optional :received_at, :message, 5, "google.protobuf.Timestamp"
-    optional :attributes, :message, 6, "rover.protobuf.Struct"
+    optional :namespace, :string, 2
+    optional :id, :string, 3
+    optional :name, :string, 4
+    optional :timestamp, :message, 5, "rover.protobuf.Timestamp"
+    optional :received_at, :message, 6, "google.protobuf.Timestamp"
+    optional :attributes, :message, 7, "rover.protobuf.Struct"
     oneof :type do
-      optional :device_event_input, :message, 7, "rover.event.v1.DeviceEventInput"
-      optional :profile_event_input, :message, 8, "rover.event.v1.ProfileEventInput"
+      optional :device_event_input, :message, 8, "rover.event.v1.DeviceEventInput"
+      optional :profile_event_input, :message, 9, "rover.event.v1.ProfileEventInput"
     end
   end
   add_message "rover.event.v1.DeviceEventInput" do

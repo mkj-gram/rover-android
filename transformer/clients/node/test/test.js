@@ -87,6 +87,7 @@ describe('Client', function() {
 
 			const input = {
 				id: eventId,
+				namespace: "rover",
 				name: "location update",
 				timestamp: "2018-02-19T16:00:59Z",
 				attributes: {
@@ -155,6 +156,7 @@ describe('Client', function() {
 
 					const exp = {
 						id: eventId,
+						namespace: "rover",
 						name: 'location update',
 						attributes: { accuracy: 200, latitude: 43.111, longitude: -71.3621 },
 						timestamp: new Date("2018-02-19T16:00:59.000Z"),
@@ -201,6 +203,7 @@ describe('Client', function() {
 
 					const got = {
 						id: proto.getId(),
+						namespace: proto.getNamespace(),
 						name: proto.getName(),
 						attributes: proto.getAttributes().toJavaScript(),
 						timestamp: proto.getTimestamp().toDate(),
@@ -232,9 +235,6 @@ describe('Client', function() {
 							timeZone: dctx.getTimeZone(),
 						}
 					}
-
-					
-
 
 					expect(exp).to.deep.equal(got)
 
