@@ -18,62 +18,70 @@ const experience = {
             type: GraphQLString
         }
     },
-    resolve: (_, { id: experienceId, url: campaignUrl }, { accountToken }) => {
-        return new Promise((resolve, reject) => {
-            let identifier
-            if (experienceId !== null && experienceId !== undefined) {
-                identifier = experienceId
-            } else if (campaignUrl !== null && campaignUrl !== undefined) {
-                identifier = new URL(campaignUrl).pathname.replace('/', '')
-            } else {
-                return reject('Field "experience" argument "id" of type "ID" or argument "url" of type "String" is required but neither were provided.')
-            }
-
-            let baseUrl = 'https://api.rover.io'
-            const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST
-            const port = process.env.CONTENT_API_SERVICE_SERVICE_PORT
-            if (host && port) {
-                baseUrl = `http://${host}:${port}`
-            }
-
-            const options = {
-                url: `${baseUrl}/v1/experiences/${identifier}`,
-                headers: {
-                    accept: 'application/json',
-                    'x-rover-api-key': accountToken
-                }
-            }
-
-            request(options, (err, response, body) => {
-                const error = err || errorFromResponse(response)
-                if (error) {
-                    return reject(error)
-                }
-
-                try {
-                    const json = JSON.parse(body)
-                    const data = json['data']
-
-                    if (!data) {
-                        return null
-                    }
-
-                    const attributes = data['attributes']
-
-                    if (!attributes) {
-                        return null
-                    }
-
-                    resolve({
-                        ...attributes,
-                        id: data['id']
-                    })
-                } catch (err) {
-                    reject(err)
-                }
-            })
-        })
+    resolve: (_, { id: experienceId, campaignId, url: campaignUrl }, { accountToken }) => {
+        if (experienceId !== null && experienceId !== undefined) {
+            return fetchExperience(experienceId, accountToken).then(experience => ({
+                ...experience,
+                campaignId
+            }))
+        } else if (campaignUrl !== null && campaignUrl !== undefined) {
+            let shortUrl = new URL(campaignUrl).pathname.replace('/', '')
+            return fetchExperience(shortUrl, accountToken).then(experience => ({
+                ...experience,
+                campaignId: shortUrl
+            }))
+        } else {
+            throw new TypeError('Field "experience" argument "id" of type "ID" or argument "url" of type "String" is required but neither were provided.')
+        }
     }
+}
+
+const fetchExperience = (identifier, accountToken) => {
+    return new Promise((resolve, reject) => {
+        let baseUrl = 'https://api.rover.io'
+        const host = process.env.CONTENT_API_SERVICE_SERVICE_HOST
+        const port = process.env.CONTENT_API_SERVICE_SERVICE_PORT
+        if (host && port) {
+            baseUrl = `http://${host}:${port}`
+        }
+
+        const options = {
+            url: `${baseUrl}/v1/experiences/${identifier}`,
+            headers: {
+                accept: 'application/json',
+                'x-rover-api-key': accountToken
+            }
+        }
+
+        request(options, (err, response, body) => {
+            const error = err || errorFromResponse(response)
+            if (error) {
+                return reject(error)
+            }
+
+            try {
+                const json = JSON.parse(body)
+                const data = json['data']
+
+                if (!data) {
+                    return null
+                }
+
+                const attributes = data['attributes']
+
+                if (!attributes) {
+                    return null
+                }
+
+                resolve({
+                    ...attributes,
+                    id: data['id']
+                })
+            } catch (err) {
+                reject(err)
+            }
+        })
+    })
 }
 
 const errorFromResponse = response => {

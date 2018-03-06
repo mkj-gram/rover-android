@@ -559,6 +559,9 @@ const Color = new GraphQLObjectType({
 const Experience = new GraphQLObjectType({
     name: 'Experience',
     fields: () => ({
+        campaignId: {
+            type: GraphQLID
+        },
         hasUnpublishedChanges: {
             type: new GraphQLNonNull(GraphQLBoolean),
             resolve: requireScope('admin', data => {
