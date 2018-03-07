@@ -5891,7 +5891,7 @@ proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.prototype.toObj
  */
 proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-
+    campaign: (f = msg.getCampaign()) && proto.rover.campaigns.v1.Campaign.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -5928,6 +5928,11 @@ proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.deserializeBina
     }
     var field = reader.getFieldNumber();
     switch (field) {
+    case 1:
+      var value = new proto.rover.campaigns.v1.Campaign;
+      reader.readMessage(value,proto.rover.campaigns.v1.Campaign.deserializeBinaryFromReader);
+      msg.setCampaign(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -5956,6 +5961,44 @@ proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.prototype.seria
  */
 proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getCampaign();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      proto.rover.campaigns.v1.Campaign.serializeBinaryToWriter
+    );
+  }
+};
+
+
+/**
+ * optional Campaign campaign = 1;
+ * @return {?proto.rover.campaigns.v1.Campaign}
+ */
+proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.prototype.getCampaign = function() {
+  return /** @type{?proto.rover.campaigns.v1.Campaign} */ (
+    jspb.Message.getWrapperField(this, proto.rover.campaigns.v1.Campaign, 1));
+};
+
+
+/** @param {?proto.rover.campaigns.v1.Campaign|undefined} value */
+proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.prototype.setCampaign = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.prototype.clearCampaign = function() {
+  this.setCampaign(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse.prototype.hasCampaign = function() {
+  return jspb.Message.getField(this, 1) != null;
 };
 
 
@@ -6808,7 +6851,7 @@ proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.prototype.toObj
  */
 proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-
+    campaign: (f = msg.getCampaign()) && proto.rover.campaigns.v1.Campaign.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -6845,6 +6888,11 @@ proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.deserializeBina
     }
     var field = reader.getFieldNumber();
     switch (field) {
+    case 1:
+      var value = new proto.rover.campaigns.v1.Campaign;
+      reader.readMessage(value,proto.rover.campaigns.v1.Campaign.deserializeBinaryFromReader);
+      msg.setCampaign(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -6873,6 +6921,44 @@ proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.prototype.seria
  */
 proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getCampaign();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      proto.rover.campaigns.v1.Campaign.serializeBinaryToWriter
+    );
+  }
+};
+
+
+/**
+ * optional Campaign campaign = 1;
+ * @return {?proto.rover.campaigns.v1.Campaign}
+ */
+proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.prototype.getCampaign = function() {
+  return /** @type{?proto.rover.campaigns.v1.Campaign} */ (
+    jspb.Message.getWrapperField(this, proto.rover.campaigns.v1.Campaign, 1));
+};
+
+
+/** @param {?proto.rover.campaigns.v1.Campaign|undefined} value */
+proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.prototype.setCampaign = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.prototype.clearCampaign = function() {
+  this.setCampaign(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse.prototype.hasCampaign = function() {
+  return jspb.Message.getField(this, 1) != null;
 };
 
 

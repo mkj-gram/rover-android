@@ -1641,7 +1641,7 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 		req *campaignspb.UpdateAutomatedDeliverySettingsRequest
 		exp *campaignspb.UpdateAutomatedDeliverySettingsResponse
 
-		before, after *expect
+		before *expect
 
 		expErr error
 	}{
@@ -1660,7 +1660,7 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.UpdateAutomatedDeliverySettings: db.Update: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateAutomatedDeliverySettings: rows.Next: sql: no rows in result set"),
 		},
 
 		{
@@ -1669,7 +1669,7 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 2},
 				CampaignId:  4,
 
-				UiState: `{"progres_percentage": 90}`,
+				UiState: `{"progress_percentage": 90}`,
 
 				SegmentCondition: campaignspb.SegmentCondition_ALL,
 				SegmentIds:       []string{"1", "2", "3"},
@@ -1695,9 +1695,9 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 				AutomatedEventPredicates: &predicates.PredicateAggregate{
 					Condition: predicates.PredicateAggregate_ALL,
 					Predicates: []*predicates.Predicate{
-						&predicates.Predicate{
-							&predicates.Predicate_StringPredicate{
-								&predicates.StringPredicate{
+						{
+							Value: &predicates.Predicate_StringPredicate{
+								StringPredicate: &predicates.StringPredicate{
 									Selector:      "profile",
 									AttributeName: "hello",
 									Op:            predicates.StringPredicate_CONTAINS,
@@ -1720,8 +1720,8 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 				exp: &campaign{
 					AccountId: 2,
 					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
+						Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+							AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
 								CampaignId:     4,
 								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 								Name:           "c4",
@@ -1748,72 +1748,67 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 				},
 			},
 
-			after: &expect{
-				exp: &campaign{
-					AccountId: 2,
-					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
-								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								UpdatedAt: updatedAt,
+			exp: &campaignspb.UpdateAutomatedDeliverySettingsResponse{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+						AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+							CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt: updatedAt,
 
-								CampaignId:     4,
-								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
-								Name:           "c4",
+							CampaignId:     4,
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
+							Name:           "c4",
 
-								UiState: `{"progres_percentage": 90}`,
+							UiState: `{"progress_percentage": 90}`,
 
-								SegmentCondition: campaignspb.SegmentCondition_ALL,
-								SegmentIds:       []string{"1", "2", "3"},
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
+							SegmentIds:       []string{"1", "2", "3"},
 
-								NotificationExpiration:                  -1,
-								NotificationAlertOptionPushNotification: true,
+							NotificationExpiration:                  -1,
+							NotificationAlertOptionPushNotification: true,
 
-								AutomatedMonday:    true,
-								AutomatedTuesday:   true,
-								AutomatedWednesday: true,
-								AutomatedThursday:  true,
-								AutomatedFriday:    true,
-								AutomatedSaturday:  true,
-								AutomatedSunday:    true,
+							AutomatedMonday:    true,
+							AutomatedTuesday:   true,
+							AutomatedWednesday: true,
+							AutomatedThursday:  true,
+							AutomatedFriday:    true,
+							AutomatedSaturday:  true,
+							AutomatedSunday:    true,
 
-								AutomatedStartDate:          "2018-01-01",
-								AutomatedEndDate:            "2019-01-01",
-								AutomatedStartTime:          1,
-								AutomatedEndTime:            2,
-								AutomatedTimeZone:           "America/Toronto",
-								AutomatedUseLocalDeviceTime: true,
-								AutomatedEventName:          "test event",
+							AutomatedStartDate:          "2018-01-01",
+							AutomatedEndDate:            "2019-01-01",
+							AutomatedStartTime:          1,
+							AutomatedEndTime:            2,
+							AutomatedTimeZone:           "America/Toronto",
+							AutomatedUseLocalDeviceTime: true,
+							AutomatedEventName:          "test event",
 
-								AutomatedEventPredicates: &predicates.PredicateAggregate{
-									Condition: predicates.PredicateAggregate_ALL,
-									Predicates: []*predicates.Predicate{
-										&predicates.Predicate{
-											&predicates.Predicate_StringPredicate{
-												&predicates.StringPredicate{
-													Selector:      "profile",
-													AttributeName: "hello",
-													Op:            predicates.StringPredicate_CONTAINS,
-													Value:         "ello",
-												},
+							AutomatedEventPredicates: &predicates.PredicateAggregate{
+								Condition: predicates.PredicateAggregate_ALL,
+								Predicates: []*predicates.Predicate{
+									{
+										Value: &predicates.Predicate_StringPredicate{
+											StringPredicate: &predicates.StringPredicate{
+												Selector:      "profile",
+												AttributeName: "hello",
+												Op:            predicates.StringPredicate_CONTAINS,
+												Value:         "ello",
 											},
 										},
 									},
 								},
+							},
 
-								AutomatedFrequencySingleUse: true,
-								AutomatedFrequencyLimits: []*campaignspb.RateLimit{
-									{
-										IntervalUnit: campaignspb.RateLimit_DAY,
-									},
+							AutomatedFrequencySingleUse: true,
+							AutomatedFrequencyLimits: []*campaignspb.RateLimit{
+								{
+									IntervalUnit: campaignspb.RateLimit_DAY,
 								},
 							},
 						},
 					},
 				},
 			},
-
-			exp: &campaignspb.UpdateAutomatedDeliverySettingsResponse{},
 		},
 	}
 
@@ -1847,17 +1842,6 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", Difff(diff))
 			}
-
-			if tt.after != nil {
-				var (
-					exp, expErr = tt.after.exp, tt.after.err
-					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
-				)
-
-				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-					t.Errorf("After: Diff:\n%v", Difff(diff))
-				}
-			}
 		})
 	}
 }
@@ -1882,7 +1866,7 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 		req *campaignspb.UpdateScheduledDeliverySettingsRequest
 		exp *campaignspb.UpdateScheduledDeliverySettingsResponse
 
-		before, after *expect
+		before *expect
 
 		expErr error
 	}{
@@ -1901,7 +1885,7 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.UpdateScheduledDeliverySettings: db.Update: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateAutomatedDeliverySettings: rows.Next: sql: no rows in result set"),
 		},
 
 		{
@@ -1925,8 +1909,8 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 				exp: &campaign{
 					AccountId: 2,
 					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_ScheduledNotificationCampaign{
-							&campaignspb.ScheduledNotificationCampaign{
+						Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+							ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
 								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 
@@ -1946,37 +1930,33 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 				},
 			},
 
-			after: &expect{
-				exp: &campaign{
-					AccountId: 2,
-					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_ScheduledNotificationCampaign{
-							&campaignspb.ScheduledNotificationCampaign{
-								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								UpdatedAt: updatedAt,
+			exp: &campaignspb.UpdateScheduledDeliverySettingsResponse{
 
-								CampaignId:     5,
-								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
-								Name:           "c5",
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+						ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
+							CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt: updatedAt,
 
-								SegmentIds:       []string{"1", "2"},
-								SegmentCondition: campaignspb.SegmentCondition_ALL,
+							CampaignId:     5,
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
+							Name:           "c5",
 
-								UiState: `{"hello": "world"}`,
+							SegmentIds:       []string{"1", "2"},
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
 
-								NotificationExpiration:                  -1,
-								NotificationAlertOptionPushNotification: true,
+							UiState: `{"hello": "world"}`,
 
-								ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
-								ScheduledTimeZone:           "America/Toronto",
-								ScheduledUseLocalDeviceTime: true,
-							},
+							NotificationExpiration:                  -1,
+							NotificationAlertOptionPushNotification: true,
+
+							ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
+							ScheduledTimeZone:           "America/Toronto",
+							ScheduledUseLocalDeviceTime: true,
 						},
 					},
 				},
 			},
-
-			exp: &campaignspb.UpdateScheduledDeliverySettingsResponse{},
 		},
 	}
 
@@ -2011,16 +1991,6 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 				t.Errorf("Diff:\n%v", Difff(diff))
 			}
 
-			if tt.after != nil {
-				var (
-					exp, expErr = tt.after.exp, tt.after.err
-					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
-				)
-
-				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-					t.Errorf("After: Diff:\n%v", Difff(diff))
-				}
-			}
 		})
 	}
 }

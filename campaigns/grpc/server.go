@@ -265,28 +265,6 @@ func (s *Server) UpdateNotificationSettings(ctx context.Context, req *campaignsp
 	}, nil
 }
 
-func (s *Server) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaignspb.UpdateAutomatedDeliverySettingsRequest) (*campaignspb.UpdateAutomatedDeliverySettingsResponse, error) {
-	var acctId = req.GetAuthContext().GetAccountId()
-	if err := va.All(
-		va.Value("auth_context", va.Pointer(req.AuthContext), va.Require),
-		va.Value("account_id", acctId, va.Require),
-		va.Value("campaign_id", req.CampaignId, va.Require),
-	); err != nil {
-		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
-	}
-
-	var update campaigns.UpdateAutomatedDeliverySettingsRequest
-	if err := protoToUpdateAutomatedDeliverySettingsRequest(req, &update); err != nil {
-		return nil, status.Errorf(ErrorToStatus(err), "fromProto: %v", err)
-	}
-
-	if err := s.DB.UpdateAutomatedDeliverySettings(ctx, &update); err != nil {
-		return nil, status.Errorf(ErrorToStatus(err), "db.UpdateAutomatedDeliverySettings: %v", err)
-	}
-
-	return &campaignspb.UpdateAutomatedDeliverySettingsResponse{}, nil
-}
-
 func (s *Server) UpdateScheduledDeliverySettings(ctx context.Context, req *campaignspb.UpdateScheduledDeliverySettingsRequest) (*campaignspb.UpdateScheduledDeliverySettingsResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
@@ -302,11 +280,49 @@ func (s *Server) UpdateScheduledDeliverySettings(ctx context.Context, req *campa
 		return nil, status.Errorf(ErrorToStatus(err), "fromProto: %v", err)
 	}
 
-	if err := s.DB.UpdateScheduledDeliverySettings(ctx, &update); err != nil {
-		return nil, status.Errorf(ErrorToStatus(err), "db.UpdateScheduledDeliverySettings: %v", err)
+	campaign, err := s.DB.UpdateScheduledDeliverySettings(ctx, &update)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "db.UpdateAutomatedDeliverySettings: %v", err)
 	}
 
-	return &campaignspb.UpdateScheduledDeliverySettingsResponse{}, nil
+	var proto campaignspb.Campaign
+	if err := CampaignToProto(campaign, &proto); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "toProto: %v", err)
+	}
+
+	return &campaignspb.UpdateScheduledDeliverySettingsResponse{
+		Campaign: &proto,
+	}, nil
+}
+
+func (s *Server) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaignspb.UpdateAutomatedDeliverySettingsRequest) (*campaignspb.UpdateAutomatedDeliverySettingsResponse, error) {
+	var acctId = req.GetAuthContext().GetAccountId()
+	if err := va.All(
+		va.Value("auth_context", va.Pointer(req.AuthContext), va.Require),
+		va.Value("account_id", acctId, va.Require),
+		va.Value("campaign_id", req.CampaignId, va.Require),
+	); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
+	}
+
+	var update campaigns.UpdateAutomatedDeliverySettingsRequest
+	if err := protoToUpdateAutomatedDeliverySettingsRequest(req, &update); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "fromProto: %v", err)
+	}
+
+	campaign, err := s.DB.UpdateAutomatedDeliverySettings(ctx, &update)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "db.UpdateAutomatedDeliverySettings: %v", err)
+	}
+
+	var proto campaignspb.Campaign
+	if err := CampaignToProto(campaign, &proto); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "toProto: %v", err)
+	}
+
+	return &campaignspb.UpdateAutomatedDeliverySettingsResponse{
+		Campaign: &proto,
+	}, nil
 }
 
 func (s *Server) SendTest(context.Context, *campaignspb.SendTestRequest) (*campaignspb.SendTestResponse, error) {

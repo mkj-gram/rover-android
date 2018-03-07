@@ -278,7 +278,9 @@ message UpdateScheduledDeliverySettingsRequest{
   string                    scheduled_time_zone                       = 15;
   bool                      scheduled_use_local_device_time           = 16;
 }
-message UpdateScheduledDeliverySettingsResponse{ }
+message UpdateScheduledDeliverySettingsResponse{
+  Campaign campaign = 1;
+}
 
 
 message UpdateAutomatedDeliverySettingsRequest{
@@ -312,7 +314,9 @@ message UpdateAutomatedDeliverySettingsRequest{
 
   repeated RateLimit  automated_frequency_limits                      = 31;
 }
-message UpdateAutomatedDeliverySettingsResponse{ }
+message UpdateAutomatedDeliverySettingsResponse{ 
+  Campaign campaign = 1;
+}
 
 
 //

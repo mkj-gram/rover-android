@@ -185,6 +185,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :scheduled_use_local_device_time, :bool, 16
   end
   add_message "rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse" do
+    optional :campaign, :message, 1, "rover.campaigns.v1.Campaign"
   end
   add_message "rover.campaigns.v1.UpdateAutomatedDeliverySettingsRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
@@ -211,6 +212,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     repeated :automated_frequency_limits, :message, 31, "rover.campaigns.v1.RateLimit"
   end
   add_message "rover.campaigns.v1.UpdateAutomatedDeliverySettingsResponse" do
+    optional :campaign, :message, 1, "rover.campaigns.v1.Campaign"
   end
   add_message "rover.campaigns.v1.ScheduledNotificationCampaign" do
     optional :campaign_id, :int32, 1
