@@ -1266,7 +1266,7 @@ storiesOf('Text', module)
                 super(props)
                 this.state = {
                     edittable: false,
-                    ts: 'Lorem ipsum sit dolor amet'
+                    ts: 'Lorem'
                 }
                 this.onClick = this.onClick.bind(this)
                 this.handleChange = this.handleChange.bind(this)

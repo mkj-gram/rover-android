@@ -44,10 +44,12 @@ class Popover extends React.Component<PopoverProps, {}> {
 
     componentDidMount() {
         document.addEventListener('mousedown', this.handleClickOutside)
+        document.addEventListener('touchstart', this.handleClickOutside)
         document.addEventListener('keydown', this.handleKeyPress, false)
     }
     componentWillUnmount() {
         document.removeEventListener('mousedown', this.handleClickOutside)
+        document.removeEventListener('touchstart', this.handleClickOutside)
         document.removeEventListener('keydown', this.handleKeyPress, false)
     }
 

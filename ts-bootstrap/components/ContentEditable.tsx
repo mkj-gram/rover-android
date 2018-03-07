@@ -30,6 +30,7 @@ class ContentEditable extends React.Component<Props, {}> {
         this.handleKeyPress = this.handleKeyPress.bind(this)
         this.onInput = this.onInput.bind(this)
         this.onFocus = this.onFocus.bind(this)
+        this.handleTouchStart = this.handleTouchStart.bind(this)
     }
 
     shouldComponentUpdate(nextProps: Props) {
@@ -60,17 +61,25 @@ class ContentEditable extends React.Component<Props, {}> {
 
     componentDidMount() {
         document.addEventListener('keydown', this.handleKeyPress, false)
+        document.addEventListener('touchstart', this.handleTouchStart, false)
+
         this.placeCaretAtEnd(document.getElementById(this.props.id))
+    }
+
+    handleTouchStart(e: Event) {
+        this.emitChange(e, true)
     }
 
     componentWillUnmount() {
         document.removeEventListener('keydown', this.handleKeyPress, false)
+        document.removeEventListener('touchstart', this.handleTouchStart, false)
     }
 
     handleKeyPress(e: KeyboardEvent) {
         if (e.keyCode === 13) {
             this.props.onChange(this.htmlEl.innerHTML
                 .replace(/&nbsp;/g, ' ')
+                .replace(/<br>/g, '')
                 .replace(/\s*$/, '') as string)
         }
     }
@@ -95,9 +104,11 @@ class ContentEditable extends React.Component<Props, {}> {
         }
     }
 
-    emitChange(evt: any) {
+    emitChange(evt: any, byPassTargetSet: boolean = false) {
         if (!this.htmlEl || !this.props.onBlurChange) {
-            evt.target = { value: this.props.html }
+            if (!byPassTargetSet) {
+                evt.target = { value: this.props.html }
+            }
             if (this.props.handleBlurChange) {
                 this.props.handleBlurChange(this.props.html as string)
             } else {
@@ -109,13 +120,17 @@ class ContentEditable extends React.Component<Props, {}> {
 
         var html = this.htmlEl.innerHTML
             .replace(/&nbsp;/g, ' ')
+            .replace(/<br>/g, '')
             .replace(/\s*$/, '')
 
         if (
             (this.props.onChange || this.props.handleBlurChange) &&
             html !== this.lastHtml
         ) {
-            evt.target = { value: html }
+            if (!byPassTargetSet) {
+                evt.target = { value: html }
+            }
+
             if (this.props.handleBlurChange) {
                 this.props.handleBlurChange(html as string)
             } else {
@@ -133,6 +148,7 @@ class ContentEditable extends React.Component<Props, {}> {
         if (this.props.handlePlaceholderChange !== undefined) {
             this.props.handlePlaceholderChange(this.htmlEl.innerHTML
                 .replace(/&nbsp;/g, ' ')
+                .replace(/<br>/g, '')
                 .replace(/\s*$/, '') as string)
         }
     }

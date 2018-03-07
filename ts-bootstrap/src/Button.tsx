@@ -161,6 +161,8 @@ class Button extends React.Component<ButtonProps, ButtonState> {
                     style={outerStyle}
                     onMouseDown={() => this.handleMouseEvent('down')}
                     onMouseUp={() => this.handleMouseEvent('up')}
+                    onTouchStart={() => this.handleMouseEvent('down')}
+                    onTouchEnd={() => this.handleMouseEvent('up')}
                 >
                     <div style={innerStyle}>{text}</div>
                 </div>
