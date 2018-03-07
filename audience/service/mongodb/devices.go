@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/roverplatform/rover/apis/go/audience/v1"
@@ -535,7 +536,7 @@ func (s *devicesStore) CreateDevice(ctx context.Context, r *audience.CreateDevic
 	return &proto, nil
 }
 
-func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceRequest) error {
+func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceRequest) (*audience.Device, error) {
 	var (
 		now = s.timeNow()
 
@@ -547,9 +548,10 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 		device Device
 		Q      = bson.M{"account_id": accountId, "device_id": deviceId}
 	)
+
 	err := s.devices().Find(Q).One(&device)
 	if err != nil {
-		return wrapError(err, "devices.Find")
+		return nil, wrapError(err, "devices.Find")
 	}
 
 	var update = bson.M{}
@@ -635,15 +637,26 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 
 	update["region_monitoring_mode"] = r.RegionMonitoringMode.String()
 
-	err = s.devices().Update(bson.M{
+	// TODO can we avoid reading back the entire document and just modify values here locally?
+	_, err = s.devices().Find(bson.M{
 		"device_id":  deviceId,
 		"account_id": accountId,
-	}, bson.M{"$set": update})
+	}).Apply(mgo.Change{
+		Update:    bson.M{"$set": update},
+		ReturnNew: true,
+	}, &device)
+
 	if err != nil {
-		return wrapError(err, "devices.Update")
+		return nil, wrapError(err, "devices.Update")
 	}
 
-	return nil
+	var proto audience.Device
+	if err := device.toProto(&proto); err != nil {
+		return nil, wrapError(err, "devices.Update.toProto")
+	}
+
+	return &proto, nil
+
 }
 
 func (s *devicesStore) UpdateDeviceCustomAttributes(ctx context.Context, r *audience.UpdateDeviceCustomAttributesRequest) (bool, error) {

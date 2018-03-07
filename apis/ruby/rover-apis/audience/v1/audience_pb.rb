@@ -216,6 +216,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :notification_authorization, :enum, 39, "rover.audience.v1.NotificationAuthorization.Value"
   end
   add_message "rover.audience.v1.UpdateDeviceResponse" do
+    optional :device, :message, 1, "rover.audience.v1.Device"
   end
   add_message "rover.audience.v1.UpdateDeviceCustomAttributesRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"

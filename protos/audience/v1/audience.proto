@@ -384,7 +384,9 @@ message UpdateDeviceRequest {
   Device.RegionMonitoringMode region_monitoring_mode   = 37;
   NotificationAuthorization.Value notification_authorization = 39;
 }
-message UpdateDeviceResponse { }
+message UpdateDeviceResponse {
+  Device device = 1;
+}
 
 
 message UpdateDeviceCustomAttributesRequest {

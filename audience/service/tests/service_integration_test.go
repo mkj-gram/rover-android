@@ -2727,9 +2727,9 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 		req  *audience.UpdateDeviceRequest
 
 		expErr error
-		exp    *audience.Device
+		exp    *audience.UpdateDeviceResponse
 
-		before, after *expect
+		before *expect
 	}
 
 	tcases := []tCase{
@@ -2805,9 +2805,8 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				},
 			},
 
-			after: &expect{
-				expErr: nil,
-				exp: &audience.Device{
+			exp: &audience.UpdateDeviceResponse{
+				Device: &audience.Device{
 					Id:       "000000000000000000000dd1",
 					DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
 
@@ -2855,6 +2854,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				},
 			},
 		},
+
 		{
 			name: "updates device: push token: deactivation",
 			req: &audience.UpdateDeviceRequest{
@@ -2899,9 +2899,8 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 
 			expErr: nil,
 
-			after: &expect{
-				expErr: nil,
-				exp: &audience.Device{
+			exp: &audience.UpdateDeviceResponse{
+				Device: &audience.Device{
 					AccountId: 5,
 					Id:        "000000000000000000000dd1",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
@@ -2976,6 +2975,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				LocaleScript:                "",
 				IsWifiEnabled:               nil,
 				IsCellularEnabled:           nil,
+				IsBluetoothEnabled:          nil,
 				ScreenWidth:                 1024,
 				ScreenHeight:                768,
 				CarrierName:                 "Rogers",
@@ -2984,16 +2984,14 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				Platform:                    audience.Platform_WEB,
 				IsBackgroundEnabled:         true,
 				IsLocationMonitoringEnabled: true,
-				IsBluetoothEnabled:          wrappers.Bool(true),
 				AdvertisingId:               "123hello",
 				Ip:                          "1.2.3.4",
 			},
 
 			expErr: nil,
 
-			after: &expect{
-				expErr: nil,
-				exp: &audience.Device{
+			exp: &audience.UpdateDeviceResponse{
+				Device: &audience.Device{
 					AccountId: 5,
 					Id:        "000000000000000000000dd1",
 					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD1",
@@ -3024,6 +3022,7 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					LocaleScript:                "",
 					IsWifiEnabled:               nil,
 					IsCellularEnabled:           nil,
+					IsBluetoothEnabled:          nil,
 					ScreenWidth:                 1024,
 					ScreenHeight:                768,
 					CarrierName:                 "Rogers",
@@ -3032,7 +3031,6 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 					Platform:                    audience.Platform_WEB,
 					IsBackgroundEnabled:         true,
 					IsLocationMonitoringEnabled: true,
-					IsBluetoothEnabled:          wrappers.Bool(true),
 					AdvertisingId:               "123hello",
 					Ip:                          "1.2.3.4",
 				},
@@ -3049,16 +3047,9 @@ func testAudienceService_UpdateDevice(t *testing.T) {
 				}
 			}
 
-			var _, gotErr = client.UpdateDevice(ctx, tc.req)
-			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
+			var got, gotErr = client.UpdateDevice(ctx, tc.req)
+			if diff := Diff(tc.exp, got, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
-			}
-
-			if tc.after != nil {
-				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
-				if diff := Diff(tc.after.exp, got, tc.after.expErr, gotErr); diff != nil {
-					t.Errorf("After:\n%v", difff(diff))
-				}
 			}
 		})
 	}

@@ -109,13 +109,14 @@ func (s *Server) UpdateDevice(ctx context.Context, r *audience.UpdateDeviceReque
 	db := s.db.Copy()
 	defer db.Close()
 
-	if err := db.UpdateDevice(ctx, r); err != nil {
+	device, err := db.UpdateDevice(ctx, r)
+	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDevice: %v", err)
 	}
 
 	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
 
-	return &audience.UpdateDeviceResponse{}, nil
+	return &audience.UpdateDeviceResponse{Device: device}, nil
 }
 
 // UpdateDeviceCustomAttributes implements the corresponding rpc

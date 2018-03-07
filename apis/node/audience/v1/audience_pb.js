@@ -9500,7 +9500,7 @@ proto.rover.audience.v1.UpdateDeviceResponse.prototype.toObject = function(opt_i
  */
 proto.rover.audience.v1.UpdateDeviceResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-
+    device: (f = msg.getDevice()) && proto.rover.audience.v1.Device.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -9537,6 +9537,11 @@ proto.rover.audience.v1.UpdateDeviceResponse.deserializeBinaryFromReader = funct
     }
     var field = reader.getFieldNumber();
     switch (field) {
+    case 1:
+      var value = new proto.rover.audience.v1.Device;
+      reader.readMessage(value,proto.rover.audience.v1.Device.deserializeBinaryFromReader);
+      msg.setDevice(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -9565,6 +9570,44 @@ proto.rover.audience.v1.UpdateDeviceResponse.prototype.serializeBinary = functio
  */
 proto.rover.audience.v1.UpdateDeviceResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getDevice();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      proto.rover.audience.v1.Device.serializeBinaryToWriter
+    );
+  }
+};
+
+
+/**
+ * optional Device device = 1;
+ * @return {?proto.rover.audience.v1.Device}
+ */
+proto.rover.audience.v1.UpdateDeviceResponse.prototype.getDevice = function() {
+  return /** @type{?proto.rover.audience.v1.Device} */ (
+    jspb.Message.getWrapperField(this, proto.rover.audience.v1.Device, 1));
+};
+
+
+/** @param {?proto.rover.audience.v1.Device|undefined} value */
+proto.rover.audience.v1.UpdateDeviceResponse.prototype.setDevice = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceResponse.prototype.clearDevice = function() {
+  this.setDevice(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceResponse.prototype.hasDevice = function() {
+  return jspb.Message.getField(this, 1) != null;
 };
 
 

@@ -176,7 +176,7 @@ func TestMongodb_AddDeviceModelCommonName(t *testing.T) {
 				}
 			}
 
-			var gotErr = db.UpdateDevice(ctx, tc.req)
+			var _, gotErr = db.UpdateDevice(ctx, tc.req)
 			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}
