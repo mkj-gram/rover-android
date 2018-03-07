@@ -1,5 +1,7 @@
 /// <reference path="../../../typings/index.d.ts" />
 import * as React from 'react'
+import { parse } from 'qs'
+
 import {
     almostWhite,
     Button,
@@ -10,6 +12,7 @@ import {
     PlusSquareIcon,
     silver,
     SegmentControl,
+    semibold,
     SearchIcon,
     text as TypeographyText,
     Text,
@@ -60,15 +63,18 @@ const renderRightContent = (
             >
                 <GridIcon
                     fill={charcoal}
-                    style={{
-                        transform: `scale(${5 / 6})`
-                    }}
+                    style={
+                        media === 'Desktop' && {
+                            transform: `scale(${5 / 6})`
+                        }
+                    }
                     // onClick={() => window.console.log('grid icon')}
                 />
                 <UserIcon
                     fill={charcoal}
                     style={{
-                        transform: `scale(${5 / 6})`,
+                        transform:
+                            media === 'Desktop' ? `scale(${5 / 6})` : null,
                         pointerEvents: 'none'
                     }}
                 />
@@ -93,8 +99,10 @@ const renderSegmentControl = (
         width: 98,
         height: 20,
         textAlign: 'center',
-        paddingTop: 1,
-        flex: '1 1 auto'
+        paddingTop: media === 'Desktop' ? 2 : 1,
+        flex: '1 1 auto',
+        fontSize: media === 'Desktop' ? 15 : 17,
+        ...semibold
     }
     return (
         <SegmentControl
@@ -146,7 +154,7 @@ class NavBar extends React.PureComponent<Props, State> {
 
         this.state = {
             isSearchFocused: false,
-            keyword: ''
+            keyword: parse(window.location.search.slice(1)).keyword || ''
         }
         this.setState = this.setState.bind(this)
     }
@@ -225,9 +233,8 @@ class NavBar extends React.PureComponent<Props, State> {
                             borderRadius: 4,
                             marginTop: 14,
                             marginBottom: 14,
-                            paddingLeft: 8,
-                            paddingTop: 1,
-                            display: 'flex'
+                            display: 'flex',
+                            alignItems: 'center'
                         }}
                         onClick={() =>
                             this.setState({
@@ -238,7 +245,8 @@ class NavBar extends React.PureComponent<Props, State> {
                         <SearchIcon
                             fill={silver}
                             style={{
-                                transform: `scale(${2 / 3})`
+                                transform: `scale(${2 / 3})`,
+                                margin: '0 4px'
                             }}
                         />
                         <Text
@@ -251,9 +259,7 @@ class NavBar extends React.PureComponent<Props, State> {
                                     isSearchFocused: false,
                                     keyword: searchString
                                 })
-                                if (searchString !== '') {
-                                    setKeyword(searchString)
-                                }
+                                setKeyword(searchString)
                             }}
                             onBlurChange={true}
                             placeholder={true}

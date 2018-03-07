@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Button from './Button'
 import ChevronLeftIcon from './Icons/ChevronLeftIcon'
-import { cloud } from '../styles/colors'
+import { charcoal, cloud } from '../styles/colors'
 import { text, medium } from '../styles/typography'
 
 export interface NavBarProps {
@@ -153,7 +153,8 @@ class NavBar extends React.Component<NavBarProps, {}> {
                         ...style.titleStyle,
                         ...innerStyle,
                         flex: 2,
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        color: charcoal
                     }}
                 >
                     {title}

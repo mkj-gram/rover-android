@@ -63,7 +63,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
         const { mouseDown } = this.state
 
         let outerStyle: React.CSSProperties = {
-            borderRadius: 5,
+            borderRadius: 4,
             textAlign: 'center',
             display: 'inline-block'
         }

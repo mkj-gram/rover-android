@@ -43,35 +43,47 @@ const isAutomatedNotificationCampaign = (
     )
 }
 
-const getCampaignIcon = (status: CampaignStatus, type: CampaignType) => {
+const getCampaignIcon = (
+    status: CampaignStatus,
+    type: CampaignType,
+    media: Media
+) => {
     if (type === 'SCHEDULED_NOTIFICATION') {
         switch (status) {
             case 'DRAFT':
                 return (
                     <CalendarIcon
                         fill={titanium}
-                        style={{ transform: `scale(${5 / 6})` }}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
                     />
                 )
             case 'PUBLISHED':
                 return (
                     <CalendarIcon
                         fill={steel}
-                        style={{ transform: `scale(${5 / 6})` }}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
                     />
                 )
             case 'ARCHIVED':
                 return (
                     <CalendarIcon
                         fill={steel}
-                        style={{ transform: `scale(${5 / 6})` }}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
                     />
                 )
             default:
                 return (
                     <CalendarIcon
                         fill="red"
-                        style={{ transform: `scale(${5 / 6})` }}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
                     />
                 )
         }
@@ -81,28 +93,36 @@ const getCampaignIcon = (status: CampaignStatus, type: CampaignType) => {
                 return (
                     <ZapIcon
                         fill={titanium}
-                        style={{ transform: `scale(${5 / 6})` }}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
                     />
                 )
             case 'PUBLISHED':
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={{ transform: `scale(${5 / 6})` }}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
                     />
                 )
             case 'ARCHIVED':
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={{ transform: `scale(${5 / 6})` }}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
                     />
                 )
             default:
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={{ transform: `scale(${5 / 6})` }}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
                     />
                 )
         }
@@ -127,7 +147,7 @@ const renderCampaign = (
                 paddingRight: media === 'Desktop' ? 32 : 0
             }}
         >
-            {renderCampaignIcon(campaign)}
+            {renderCampaignIcon(campaign, media)}
             <div style={{ flex: '1 1 auto' }}>
                 <Text text={name} size="large" />
                 {renderCampaignProgressState(campaign, media)}
@@ -135,8 +155,7 @@ const renderCampaign = (
             {media !== 'Mobile' &&
                 campaignStatus !== 'DRAFT' &&
                 renderStat(19302, 'Delivered')}
-            {media !== 'Mobile' &&
-                campaignStatus !== 'DRAFT' &&
+            {campaignStatus !== 'DRAFT' &&
                 media === 'Desktop' &&
                 renderStat(1277, 'Opened')}
             {media === 'Desktop' ? (
@@ -148,7 +167,7 @@ const renderCampaign = (
     )
 }
 
-const renderCampaignIcon = (campaign: Campaign) => {
+const renderCampaignIcon = (campaign: Campaign, media: Media) => {
     const { campaignStatus, campaignType } = campaign
     let style: React.CSSProperties = {
         height: 40,
@@ -170,7 +189,9 @@ const renderCampaignIcon = (campaign: Campaign) => {
         }
     }
     return (
-        <div style={style}>{getCampaignIcon(campaignStatus, campaignType)}</div>
+        <div style={style}>
+            {getCampaignIcon(campaignStatus, campaignType, media)}
+        </div>
     )
 }
 

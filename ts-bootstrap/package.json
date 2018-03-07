@@ -35,10 +35,9 @@
         "@types/react-dom": "16.0.3",
         "@types/storybook__react": "3.0.6",
         "awesome-typescript-loader": "3.4.1",
-        "babel-core": "6.26.0",
-        "tslint": "5.7.0",
+        "tslint": "5.9.1",
         "tslint-react": "3.2.0",
-        "typescript": "2.5.3",
+        "typescript": "2.7.1",
         "ts-loader": "3.2.0",
         "webpack": "3.10.0"
     },

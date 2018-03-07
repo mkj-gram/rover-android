@@ -182,16 +182,45 @@ class NewCampaignPopover extends React.PureComponent<
     }
 
     getCampaignIcon(type: CampaignType): JSX.Element {
+        const { media } = this.props
         // tslint:disable-next-line:switch-default
         switch (type) {
             case 'SCHEDULED_NOTIFICATION':
-                return <CalendarIcon fill={steel} />
+                return (
+                    <CalendarIcon
+                        fill={steel}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
+                    />
+                )
             case 'AUTOMATED_NOTIFICATION':
-                return <ZapIcon fill={steel} />
+                return (
+                    <ZapIcon
+                        fill={steel}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
+                    />
+                )
             case 'INTERSTITIAL':
-                return <PhoneIcon fill={steel} />
+                return (
+                    <PhoneIcon
+                        fill={steel}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
+                    />
+                )
             case 'WEB':
-                return <LinkIcon fill={steel} />
+                return (
+                    <LinkIcon
+                        fill={steel}
+                        style={{
+                            transform: `scale(${5 / 6})`
+                        }}
+                    />
+                )
         }
     }
 
@@ -230,7 +259,10 @@ class NewCampaignPopover extends React.PureComponent<
         return (
             <div
                 id={`newCampaign-${type}`}
-                style={{ width: '100%', padding: '0 24px' }}
+                style={{
+                    width: '100%',
+                    padding: media === 'Mobile' ? '0 24px' : '0 16px'
+                }}
                 onMouseOver={() =>
                     (document.getElementById(
                         `newCampaign-${type}`
@@ -251,35 +283,41 @@ class NewCampaignPopover extends React.PureComponent<
                 <div
                     style={{
                         width: '100%',
-                        height: 79,
+                        height: media === 'Mobile' ? 96 : 80,
                         borderBottom:
                             (type !== 'WEB' || media === 'Mobile') &&
                             `1px solid ${cloud}`,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'flex-start'
+                        justifyContent: 'flex-start',
+                        boxSizing: 'border-box'
                     }}
                 >
                     {this.renderCampaignIcon(type)}
-                    <div>
+                    <div
+                        style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                        }}
+                    >
                         <Text
                             size="medium"
                             text={this.getReadableCampaignName(type)}
-                        />
-                        <ChevronRightIcon
-                            style={{
-                                transform: `scale(${5 / 6})`,
-                                position: 'absolute',
-                                right: 24
-                            }}
-                            fill={titanium}
                         />
                         <Text
                             size="small"
                             label={true}
                             text={this.getCampaignSubtext(type)}
+                            textStyle={{ whiteSpace: 'nowrap' }}
                         />
                     </div>
+                    <ChevronRightIcon
+                        style={{
+                            transform: `scale(${5 / 6})`,
+                            flex: 'none'
+                        }}
+                        fill={titanium}
+                    />
                 </div>
             </div>
         )
@@ -308,7 +346,12 @@ class NewCampaignPopover extends React.PureComponent<
                     </div>
                 )}
                 {contentState === 'name-campaign' && (
-                    <div style={{ padding: 16 }}>
+                    <div
+                        style={{
+                            padding: 16,
+                            paddingTop: media === 'Mobile' ? 0 : 16
+                        }}
+                    >
                         <div
                             style={{
                                 height: media === 'Mobile' ? 71 : 56,
@@ -429,10 +472,16 @@ class NewCampaignPopover extends React.PureComponent<
                                     buttonRightCallback={this.getRightButtonCallback()}
                                     style={{
                                         buttonLeftStyle: {
-                                            color: graphite
+                                            innerStyle: {
+                                                color: graphite,
+                                                marginTop: 3
+                                            }
                                         },
                                         buttonRightStyle: {
-                                            color: graphite
+                                            innerStyle: {
+                                                color: graphite,
+                                                marginTop: 3
+                                            }
                                         }
                                     }}
                                     title={this.getTitle()}

@@ -66,36 +66,44 @@ const CampaignTypeSelector: React.SFC<
                 return (
                     <CalendarIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        style={
+                            media === 'Desktop' && {
+                                transform: `scale(${5 / 6})`
+                            }
+                        }
                     />
                 )
             case 'automated':
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        style={
+                            media === 'Desktop' && {
+                                transform: `scale(${5 / 6})`
+                            }
+                        }
                     />
                 )
             case 'web':
                 return (
                     <LinkIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        style={
+                            media === 'Desktop' && {
+                                transform: `scale(${5 / 6})`
+                            }
+                        }
                     />
                 )
             case 'interstitial':
                 return (
                     <PhoneIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        style={
+                            media === 'Desktop' && {
+                                transform: `scale(${5 / 6})`
+                            }
+                        }
                     />
                 )
             case 'all':
@@ -103,9 +111,11 @@ const CampaignTypeSelector: React.SFC<
                 return (
                     <CheckIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        style={
+                            media === 'Desktop' && {
+                                transform: `scale(${5 / 6})`
+                            }
+                        }
                     />
                 )
         }
@@ -140,30 +150,23 @@ const CampaignTypeSelector: React.SFC<
         const style: React.CSSProperties = {
             display: 'flex',
             alignItems: 'center',
-            height: media === 'Mobile' ? 71 : 55,
+            height: media === 'Mobile' ? 72 : 56,
             width: '100%',
             borderBottom:
                 typeName !== 'Web/Social Experiences' || media === 'Mobile'
                     ? `1px solid ${titanium}`
-                    : 'none'
+                    : 'none',
+            boxSizing: 'border-box'
         }
         return (
-            <div
-                style={style}
-                onClick={() => media === 'Mobile' && setListType(type)}
-            >
-                <div style={{ marginLeft: 10, flex: 'none' }}>
+            <div style={style} onClick={() => setListType(type)}>
+                <div style={{ marginLeft: 10, flex: 'none', height: 24 }}>
                     {getCampaignTypeIcon(type)}
                 </div>
                 <div style={{ marginLeft: 26, flex: '1 1 auto' }}>
                     <Text text={typeName} size="medium" />
                 </div>
-                <div
-                    style={{ flex: 'none' }}
-                    onClick={() => {
-                        setListType(type)
-                    }}
-                >
+                <div style={{ flex: 'none' }} onClick={() => setListType(type)}>
                     <RadioButton
                         selected={type === listType}
                         style={{ outerStyle: { height: 18, width: 18 } }}
@@ -240,10 +243,16 @@ const CampaignTypeSelector: React.SFC<
                                     }
                                     style={{
                                         buttonLeftStyle: {
-                                            color: graphite
+                                            innerStyle: {
+                                                color: graphite,
+                                                marginTop: 3
+                                            }
                                         },
                                         buttonRightStyle: {
-                                            color: graphite
+                                            innerStyle: {
+                                                color: graphite,
+                                                marginTop: 3
+                                            }
                                         }
                                     }}
                                     title=""

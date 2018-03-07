@@ -4,11 +4,14 @@ import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 import { withRouter, RouteComponentProps, match as Match } from 'react-router'
 import { Route, Link, Switch } from 'react-router-dom'
-import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import * as H from 'history'
 import { parse, stringify } from 'qs'
 
-import { createCampaign, fetchCampaigns } from '../../actions'
+import {
+    closeCampaignTypeSelector,
+    createCampaign,
+    fetchCampaigns
+} from '../../actions'
 import { getAllCampaigns } from '../../reducers'
 
 import NavBar from './NavBar'
@@ -24,6 +27,7 @@ export interface RouterProps {
 
 export interface DispatchProps {
     fetchCampaigns: () => void
+    closeCampaignTypeSelector: () => void
     createCampaign: (name: string, campaignType: CampaignType) => void
 }
 
@@ -87,13 +91,14 @@ class ListPage extends React.PureComponent<
         history.replace(`/campaigns/?${newQuery}`)
     }
     setListType(nextType: string) {
-        const { history } = this.props
+        const { closeCampaignTypeSelector, history } = this.props
 
         const newQuery = stringify({
             ...this.getQueryParams(),
             campaignType: nextType
         })
 
+        closeCampaignTypeSelector()
         history.replace(`/campaigns/?${newQuery}`)
     }
     setKeyword(keyword: string) {
@@ -101,7 +106,7 @@ class ListPage extends React.PureComponent<
 
         const newQuery = stringify({
             ...this.getQueryParams(),
-            keyword
+            keyword: keyword !== '' ? keyword : undefined
         })
 
         history.replace(`/campaigns/?${newQuery}`)
@@ -160,7 +165,7 @@ class ListPage extends React.PureComponent<
                         <div
                             style={{
                                 width: '100vw',
-                                height: '100vh',
+                                height: '100%',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 position: 'absolute',
@@ -253,6 +258,10 @@ const mapDispatchToProps = (
     }
 
     return {
+        closeCampaignTypeSelector: () => {
+            dispatch({ type: 'START_CLOSING_CAMPAIGN_TYPE_SELECTOR' })
+            setTimeout(() => dispatch(closeCampaignTypeSelector()), 295)
+        },
         createCampaign: (name, cType) => {
             dispatch(createCampaign(name, cType)).then(campaignId => {
                 let path

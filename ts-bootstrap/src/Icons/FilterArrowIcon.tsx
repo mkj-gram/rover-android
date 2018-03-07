@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 export default ({ fill, style, onClick }: RoverSVGProps) => (
-    <svg width="16" height="16" {...style} onClick={onClick}>
+    <svg width="16" height="16" style={{ ...style }} onClick={onClick}>
         <g fill={fill} fillRule="nonzero">
             <path
                 // tslint:disable-next-line:max-line-length

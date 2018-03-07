@@ -82,8 +82,8 @@ const ToolBar: React.SFC<Props> = ({
         return (
             <div style={style}>
                 {renderCurrentPage()}
-                {renderLeftArrow()}
-                {renderRightArrow({ margin: 0 })}
+                {renderLeftArrow({ transform: `scale(${5 / 6})` })}
+                {renderRightArrow({ margin: 0, transform: `scale(${5 / 6})` })}
             </div>
         )
     }
