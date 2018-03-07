@@ -171,6 +171,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :notification_alert_option_badge_number, :bool, 30
   end
   add_message "rover.campaigns.v1.UpdateNotificationSettingsResponse" do
+    optional :campaign, :message, 1, "rover.campaigns.v1.Campaign"
   end
   add_message "rover.campaigns.v1.UpdateScheduledDeliverySettingsRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"

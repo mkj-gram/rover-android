@@ -318,7 +318,7 @@ func (db *DB) Insert(ctx context.Context, c campaigns.Campaign) (*campaigns.Camp
 	return &inserted.Campaign, nil
 }
 
-func (db *DB) UpdateNotificationSettings(ctx context.Context, req *campaigns.UpdateNotificationSettingsRequest) error {
+func (db *DB) UpdateNotificationSettings(ctx context.Context, req *campaigns.UpdateNotificationSettingsRequest) (*campaigns.Campaign, error) {
 	var (
 		now = TimeNow()
 
@@ -368,24 +368,28 @@ func (db *DB) UpdateNotificationSettings(ctx context.Context, req *campaigns.Upd
 			WHERE
 				account_id = :account_id
 				AND id = :campaign_id
-`
+
+		RETURNING *
+	`
 	)
 
-	res, err := db.db.NamedExecContext(ctx, q, update)
+	rows, err := db.db.NamedQueryContext(ctx, q, update)
 	if err != nil {
-		return wrapError(err, "db.Exec")
+		return nil, wrapError(err, "db.Exec")
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return nil, wrapError(sql.ErrNoRows, "rows.Next")
 	}
 
-	n, err := res.RowsAffected()
-	if err != nil {
-		return wrapError(err, "res.rowsAffected")
+	var updated campaign
+	if err := rows.StructScan(&updated); err != nil {
+		return nil, wrapError(err, "rows.StructScan")
 	}
 
-	if n == 0 {
-		return wrapError(sql.ErrNoRows, "db.Update")
-	}
+	return &updated.Campaign, nil
 
-	return nil
 }
 
 func (db *DB) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaigns.UpdateAutomatedDeliverySettingsRequest) error {

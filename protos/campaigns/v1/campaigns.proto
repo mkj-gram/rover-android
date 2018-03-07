@@ -258,7 +258,9 @@ message UpdateNotificationSettingsRequest{
   bool                notification_alert_option_notification_center   = 29;
   bool                notification_alert_option_badge_number          = 30;
 }
-message UpdateNotificationSettingsResponse{}
+message UpdateNotificationSettingsResponse{
+  Campaign campaign = 1;
+}
 
 
 message UpdateScheduledDeliverySettingsRequest{

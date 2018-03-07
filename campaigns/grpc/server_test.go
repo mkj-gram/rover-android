@@ -1453,7 +1453,7 @@ func test_UpdateNotificationSettings(t *testing.T) {
 		req *campaignspb.UpdateNotificationSettingsRequest
 		exp *campaignspb.UpdateNotificationSettingsResponse
 
-		before, after *expect
+		before *expect
 
 		expErr error
 	}{
@@ -1472,7 +1472,7 @@ func test_UpdateNotificationSettings(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.UpdateNotificationSettings: db.Update: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "db.UpdateNotificationSettings: rows.Next: sql: no rows in result set"),
 		},
 
 		{
@@ -1481,19 +1481,35 @@ func test_UpdateNotificationSettings(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				CampaignId:  2,
 
-				// TODO: add more props
-				NotificationAndroidChannelId: "1",
-
-				NotificationExpiration:                  2,
-				NotificationAlertOptionPushNotification: true,
+				UiState:                                   "this is my state",
+				NotificationBody:                          "body",
+				NotificationTitle:                         "title",
+				NotificationAttachmentUrl:                 "https://www.rover.io/logo.png",
+				NotificationAttachmentType:                campaignspb.NotificationAttachmentType_IMAGE,
+				NotificationTapBehaviorType:               campaignspb.NotificationTapBehaviorType_OPEN_APP,
+				NotificationTapBehaviorPresentationType:   campaignspb.NotificationTapPresentationType_UNKNOWN,
+				NotificationTapBehaviorUrl:                "https://google.ca",
+				NotificationIosContentAvailable:           false,
+				NotificationIosMutableContent:             false,
+				NotificationIosSound:                      "default",
+				NotificationIosCategoryIdentifier:         "ios-id",
+				NotificationIosThreadIdentifier:           "ios-thread-id",
+				NotificationAndroidChannelId:              "android-channel-id",
+				NotificationAndroidSound:                  "default",
+				NotificationAndroidTag:                    "android-tag",
+				NotificationExpiration:                    3600,
+				NotificationAttributes:                    map[string]string{"my-custom-attr": "hi"},
+				NotificationAlertOptionPushNotification:   true,
+				NotificationAlertOptionNotificationCenter: true,
+				NotificationAlertOptionBadgeNumber:        false,
 			},
 
 			before: &expect{
 				exp: &campaign{
 					AccountId: 1,
 					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
+						Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+							AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
 								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 
@@ -1521,41 +1537,53 @@ func test_UpdateNotificationSettings(t *testing.T) {
 				},
 			},
 
-			after: &expect{
-				exp: &campaign{
-					AccountId: 1,
-					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
-								CampaignId:       2,
-								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
-								Name:             "c2",
-								CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								UpdatedAt:        updatedAt,
-								SegmentCondition: campaignspb.SegmentCondition_ALL,
+			exp: &campaignspb.UpdateNotificationSettingsResponse{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+						AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+							CampaignId:       2,
+							CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
+							Name:             "c2",
+							CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt:        updatedAt,
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
 
-								NotificationAndroidChannelId: "1",
-								NotificationAttributes:       nil,
+							UiState: "this is my state",
 
-								NotificationExpiration:                  2,
-								NotificationAlertOptionPushNotification: true,
+							NotificationBody:                          "body",
+							NotificationTitle:                         "title",
+							NotificationAttachmentUrl:                 "https://www.rover.io/logo.png",
+							NotificationAttachmentType:                campaignspb.NotificationAttachmentType_IMAGE,
+							NotificationTapBehaviorType:               campaignspb.NotificationTapBehaviorType_OPEN_APP,
+							NotificationTapBehaviorPresentationType:   campaignspb.NotificationTapPresentationType_UNKNOWN,
+							NotificationTapBehaviorUrl:                "https://google.ca",
+							NotificationIosContentAvailable:           false,
+							NotificationIosMutableContent:             false,
+							NotificationIosSound:                      "default",
+							NotificationIosCategoryIdentifier:         "ios-id",
+							NotificationIosThreadIdentifier:           "ios-thread-id",
+							NotificationAndroidChannelId:              "android-channel-id",
+							NotificationAndroidSound:                  "default",
+							NotificationAndroidTag:                    "android-tag",
+							NotificationExpiration:                    3600,
+							NotificationAttributes:                    map[string]string{"my-custom-attr": "hi"},
+							NotificationAlertOptionPushNotification:   true,
+							NotificationAlertOptionNotificationCenter: true,
+							NotificationAlertOptionBadgeNumber:        false,
 
-								AutomatedMonday:    true,
-								AutomatedTuesday:   true,
-								AutomatedWednesday: true,
-								AutomatedThursday:  true,
-								AutomatedFriday:    true,
-								AutomatedSaturday:  true,
-								AutomatedSunday:    true,
+							AutomatedMonday:    true,
+							AutomatedTuesday:   true,
+							AutomatedWednesday: true,
+							AutomatedThursday:  true,
+							AutomatedFriday:    true,
+							AutomatedSaturday:  true,
+							AutomatedSunday:    true,
 
-								AutomatedFrequencySingleUse: true,
-							},
+							AutomatedFrequencySingleUse: true,
 						},
 					},
 				},
 			},
-
-			exp: &campaignspb.UpdateNotificationSettingsResponse{},
 		},
 	}
 
@@ -1588,17 +1616,6 @@ func test_UpdateNotificationSettings(t *testing.T) {
 
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", Difff(diff))
-			}
-
-			if tt.after != nil {
-				var (
-					exp, expErr = tt.after.exp, tt.after.err
-					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
-				)
-
-				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-					t.Errorf("After: Diff:\n%v", Difff(diff))
-				}
 			}
 		})
 	}

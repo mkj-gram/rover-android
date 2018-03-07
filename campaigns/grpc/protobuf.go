@@ -99,6 +99,8 @@ func protoToUpdateNotificationSettingsRequest(req *campaignspb.UpdateNotificatio
 	update.CampaignId = req.CampaignId
 	update.ExperienceId = req.ExperienceId
 
+	update.UiState = req.UiState
+
 	update.NotificationAndroidChannelId = req.NotificationAndroidChannelId
 	update.NotificationBody = req.NotificationBody
 	update.NotificationTitle = req.NotificationTitle

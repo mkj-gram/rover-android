@@ -249,11 +249,20 @@ func (s *Server) UpdateNotificationSettings(ctx context.Context, req *campaignsp
 		return nil, status.Errorf(ErrorToStatus(err), "fromProto: %v", err)
 	}
 
-	if err := s.DB.UpdateNotificationSettings(ctx, &update); err != nil {
+	campaign, err := s.DB.UpdateNotificationSettings(ctx, &update)
+
+	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "db.UpdateNotificationSettings: %v", err)
 	}
 
-	return &campaignspb.UpdateNotificationSettingsResponse{}, nil
+	var proto campaignspb.Campaign
+	if err := CampaignToProto(campaign, &proto); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "toProto: %v", err)
+	}
+
+	return &campaignspb.UpdateNotificationSettingsResponse{
+		Campaign: &proto,
+	}, nil
 }
 
 func (s *Server) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaignspb.UpdateAutomatedDeliverySettingsRequest) (*campaignspb.UpdateAutomatedDeliverySettingsResponse, error) {
