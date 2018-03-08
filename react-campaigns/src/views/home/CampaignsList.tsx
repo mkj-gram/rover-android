@@ -465,7 +465,7 @@ const CampaignsList: React.SFC<Props> = ({
     }
     return (
         <div style={baseStyle}>
-            {Object.keys(campaigns).map((campaignId, index) => (
+            {Object.keys(campaigns).slice(0).reverse().map((campaignId, index) => (
                 <div
                     key={index}
                     style={{
