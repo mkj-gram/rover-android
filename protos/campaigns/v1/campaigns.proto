@@ -216,6 +216,8 @@ message SendTestRequest {
   auth.v1.AuthContext auth_context = 1;
 
   int32 campaign_id = 5;
+
+  repeated string device_ids = 6;
 }
 message SendTestResponse {
 }

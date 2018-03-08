@@ -141,6 +141,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.campaigns.v1.SendTestRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :campaign_id, :int32, 5
+    repeated :device_ids, :string, 6
   end
   add_message "rover.campaigns.v1.SendTestResponse" do
   end

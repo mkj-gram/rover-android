@@ -4197,12 +4197,19 @@ proto.rover.campaigns.v1.UnarchiveResponse.serializeBinaryToWriter = function(me
  * @constructor
  */
 proto.rover.campaigns.v1.SendTestRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.campaigns.v1.SendTestRequest.repeatedFields_, null);
 };
 goog.inherits(proto.rover.campaigns.v1.SendTestRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   proto.rover.campaigns.v1.SendTestRequest.displayName = 'proto.rover.campaigns.v1.SendTestRequest';
 }
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.rover.campaigns.v1.SendTestRequest.repeatedFields_ = [6];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -4232,7 +4239,8 @@ proto.rover.campaigns.v1.SendTestRequest.prototype.toObject = function(opt_inclu
 proto.rover.campaigns.v1.SendTestRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     authContext: (f = msg.getAuthContext()) && auth_v1_auth_pb.AuthContext.toObject(includeInstance, f),
-    campaignId: jspb.Message.getFieldWithDefault(msg, 5, 0)
+    campaignId: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    deviceIdsList: jspb.Message.getField(msg, 6)
   };
 
   if (includeInstance) {
@@ -4278,6 +4286,10 @@ proto.rover.campaigns.v1.SendTestRequest.deserializeBinaryFromReader = function(
       var value = /** @type {number} */ (reader.readInt32());
       msg.setCampaignId(value);
       break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addDeviceIds(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -4318,6 +4330,13 @@ proto.rover.campaigns.v1.SendTestRequest.serializeBinaryToWriter = function(mess
   if (f !== 0) {
     writer.writeInt32(
       5,
+      f
+    );
+  }
+  f = message.getDeviceIdsList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      6,
       f
     );
   }
@@ -4366,6 +4385,37 @@ proto.rover.campaigns.v1.SendTestRequest.prototype.getCampaignId = function() {
 /** @param {number} value */
 proto.rover.campaigns.v1.SendTestRequest.prototype.setCampaignId = function(value) {
   jspb.Message.setField(this, 5, value);
+};
+
+
+/**
+ * repeated string device_ids = 6;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<string>}
+ */
+proto.rover.campaigns.v1.SendTestRequest.prototype.getDeviceIdsList = function() {
+  return /** @type {!Array.<string>} */ (jspb.Message.getField(this, 6));
+};
+
+
+/** @param {!Array.<string>} value */
+proto.rover.campaigns.v1.SendTestRequest.prototype.setDeviceIdsList = function(value) {
+  jspb.Message.setField(this, 6, value || []);
+};
+
+
+/**
+ * @param {!string} value
+ * @param {number=} opt_index
+ */
+proto.rover.campaigns.v1.SendTestRequest.prototype.addDeviceIds = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+};
+
+
+proto.rover.campaigns.v1.SendTestRequest.prototype.clearDeviceIdsList = function() {
+  this.setDeviceIdsList([]);
 };
 
 
