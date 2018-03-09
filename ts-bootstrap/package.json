@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "@types/react-responsive": "3.0.0",
+        "moment": "^2.20.1",
         "popper.js": "^1.12.9",
         "react": "16.2.0",
         "react-dev-utils": "4.0.1",

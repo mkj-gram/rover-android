@@ -24,8 +24,16 @@ import CloseIcon from './CloseIcon'
 import DuplicateIcon from './DuplicateIcon'
 import MoreIcon from './MoreIcon'
 import RenameIcon from './RenameIcon'
+import AlertOptionsPushNotification from './AlertOptionsPushNotification'
+import AlertOptionsNotificationCenter from './AlertOptionsNotificationCenter'
+import AlertOptionsBadgeNumber from './AlertOptionsBadgeNumber'
+
+import Phone from './Phone'
 
 export {
+    AlertOptionsPushNotification,
+    AlertOptionsNotificationCenter,
+    AlertOptionsBadgeNumber,
     AlertInfoIcon,
     AlertWarnIcon,
     ArrowLeftIcon,
@@ -51,5 +59,6 @@ export {
     PlusSquareIcon,
     SearchIcon,
     UserIcon,
-    ZapIcon
+    ZapIcon,
+    Phone
 }

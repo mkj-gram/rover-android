@@ -6,7 +6,8 @@ export default (
         overviewContainerAnimation: 'fade',
         overviewModalDisplay: 'open',
         overviewModalDisplayReset: false,
-        sendTestModalDisplay: 'open'
+        sendTestModalDisplay: 'open',
+        deviceInfoSelected: ''
     },
     action: AnyAction
 ): StringMap<string | boolean> | null => {
@@ -47,6 +48,15 @@ export default (
         return {
             ...tempState,
             sendTestModalDisplay: 'close'
+        }
+    } else if (
+        action.type === 'SET_ALERT_OPTIONS_MODAL_OPEN' ||
+        action.type === 'SET_ALERT_OPTIONS_MODAL_CLOSING' ||
+        action.type === 'SET_ALERT_OPTIONS_MODAL_CLOSED'
+    ) {
+        return {
+            ...tempState,
+            deviceInfoSelected: action.deviceInfoSelected
         }
     }
     return state

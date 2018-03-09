@@ -49,7 +49,7 @@ export default c => ({
     notificationExpiration: c.getNotificationExpiration(),
     notificationAttributesMap: () => {
         const attributes = c.getNotificationAttributesMap()
-        attributes.keys().arr_.reduce((acc, key) => {
+        return attributes.keys().arr_.reduce((acc, key) => {
             acc[key] = attributes.get(key)
             return acc
         }, {})

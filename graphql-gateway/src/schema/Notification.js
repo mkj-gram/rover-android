@@ -5,7 +5,8 @@ import {
     GraphQLNonNull,
     GraphQLString,
     GraphQLObjectType,
-    GraphQLUnionType
+    GraphQLUnionType,
+    GraphQLInputObjectType
 } from 'graphql'
 
 import { GraphQLDateTime } from 'graphql-iso-date'
@@ -40,10 +41,10 @@ const Notification = new GraphQLObjectType({
             type: GraphQLDateTime
         },
         isRead: {
-            type: new  GraphQLNonNull(GraphQLBoolean)
+            type: new GraphQLNonNull(GraphQLBoolean)
         },
         isNotificationCenterEnabled: {
-            type: new  GraphQLNonNull(GraphQLBoolean)
+            type: new GraphQLNonNull(GraphQLBoolean)
         },
         isDeleted: {
             type: new GraphQLNonNull(GraphQLBoolean)
@@ -78,6 +79,18 @@ const NotificationActionType = new GraphQLEnumType({
 
 export const NotificationAttachment = new GraphQLObjectType({
     name: 'NotificationAttachment',
+    fields: () => ({
+        type: {
+            type: new GraphQLNonNull(NotificationAttachmentType)
+        },
+        url: {
+            type: new GraphQLNonNull(GraphQLString)
+        }
+    })
+})
+
+export const NotificationAttachmentInput = new GraphQLInputObjectType({
+    name: 'NotificationAttachmentInput',
     fields: () => ({
         type: {
             type: new GraphQLNonNull(NotificationAttachmentType)

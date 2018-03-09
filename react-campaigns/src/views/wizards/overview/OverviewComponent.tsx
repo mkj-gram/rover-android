@@ -11,7 +11,11 @@ import OverviewModalHeader from './OverviewModalHeader'
 import OverviewModalFooter from './OverviewModalFooter'
 import OverviewModalBodyContainer from './OverviewModalBodyContainer'
 import ResponsiveContainer from '../../utils/ResponsiveContainer'
+
 import { getCampaign } from '../../../reducers/campaigns'
+import { shouldCreateEditableCampaign } from '../../../reducers'
+
+import { createEditableCampaign } from '../../../actions'
 
 export interface OwnProps {
     deliveryComplete?: number
@@ -19,9 +23,14 @@ export interface OwnProps {
 
 export interface StateProps {
     campaigns: StringMap<Campaign>
+    shouldCreateEditableCampaign: boolean
 }
 
-export type OverviewComponentProps = OwnProps & StateProps
+export interface DispatchProps {
+    createEditableCampaign: (campaign: Campaign) => void
+}
+
+export type OverviewComponentProps = OwnProps & StateProps & DispatchProps
 
 export interface OverviewComponentState {
     campaign: Campaign
@@ -44,15 +53,30 @@ class OverviewComponent extends React.Component<
         }
         this.getNotificationComplete = this.getNotificationComplete.bind(this)
         this.getShowExperience = this.getShowExperience.bind(this)
+        this.updateCampaignStatus = this.updateCampaignStatus.bind(this)
     }
 
     componentDidMount() {
-        const { campaigns, location } = this.props
+        const { campaigns, shouldCreateEditableCampaign } = this.props
+        this.updateCampaignStatus(campaigns, shouldCreateEditableCampaign)
+    }
+
+    componentWillReceiveProps(nextProps: OverviewComponentProps) {
+        const { campaigns, shouldCreateEditableCampaign } = nextProps
+        this.updateCampaignStatus(campaigns, shouldCreateEditableCampaign)
+    }
+
+    updateCampaignStatus(
+        campaigns: StringMap<Campaign>,
+        shouldCreateEditableCampaign: boolean
+    ) {
+        const { createEditableCampaign, location } = this.props
         if (Object.keys(campaigns).length !== 0) {
             const campaignId = parse(location.search.substring(1)).campaignId
 
             const campaign = getCampaign(campaigns, campaignId)
 
+            createEditableCampaign(campaign)
             const notificationComplete = this.getNotificationComplete(
                 campaign.UIState
             )
@@ -105,7 +129,8 @@ class OverviewComponent extends React.Component<
         } = this.state
 
         const OverviewModalFooterComponent = ResponsiveContainer({
-            sendTest: notificationComplete === 100,
+            // sendTest: notificationComplete === 100,
+            sendTest: true,
             publish: deliveryComplete === 100
         })(OverviewModalFooter)
 
@@ -138,7 +163,23 @@ class OverviewComponent extends React.Component<
 }
 
 const mapStateToProps = (state: State): StateProps => ({
-    campaigns: state.campaigns
+    campaigns: state.campaigns,
+    shouldCreateEditableCampaign: shouldCreateEditableCampaign(state)
 })
 
-export default withRouter(connect(mapStateToProps, {})(OverviewComponent))
+// tslint:disable-next-line:no-any
+const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
+    return {
+        createEditableCampaign: campaign => {
+            dispatch(
+                createEditableCampaign(campaign as
+                    | ScheduledCampaign
+                    | AutomatedNotificationCampaign)
+            )
+        }
+    }
+}
+
+export default withRouter(
+    connect(mapStateToProps, mapDispatchToProps)(OverviewComponent)
+)

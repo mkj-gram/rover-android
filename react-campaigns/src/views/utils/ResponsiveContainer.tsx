@@ -20,9 +20,10 @@ export interface InjectedProps {
     device?: string
 }
 
-const responsiveContainer = (
-    wrappedComponentProps: StringMap<string | boolean | number | funcType> = {}
-) => <TOriginalProps extends {}>(
+// tslint:disable-next-line:no-any
+const responsiveContainer = (wrappedComponentProps: StringMap<any> = {}) => <
+    TOriginalProps extends {}
+>(
     Component: React.ComponentType<TOriginalProps & InjectedProps>
 ) => {
     const res = class ResponsiveContainer extends React.Component<

@@ -1,14 +1,19 @@
 import * as React from 'react'
 import { Manager, Target } from 'react-popper'
+import * as moment from 'moment'
 
 import {
     Alert,
+    AlertOptionsPushNotification,
+    AlertOptionsBadgeNumber,
+    AlertOptionsNotificationCenter,
     Text,
     Badge,
     Button,
     CheckBox,
     Dialog,
     NavBar,
+    PhoneComponent,
     Popover,
     PopoverContainer,
     ProgressBar,
@@ -409,6 +414,64 @@ storiesOf('Navbar', module).add('multi cases', () => {
     )
 })
 
+storiesOf('PhoneComponent', module)
+    .add('Badge Number', () => {
+        return (
+            <div style={{ display: 'flex' }}>
+                <PhoneComponent
+                    notificationType="notificationAlertOptionBadgeNumber"
+                    device="Mobile"
+                />
+                <PhoneComponent
+                    notificationType="notificationAlertOptionBadgeNumber"
+                    device="Desktop"
+                />
+                <PhoneComponent
+                    notificationType="notificationAlertOptionBadgeNumber"
+                    device="Tablet"
+                />
+            </div>
+        )
+    })
+    .add('Notification Center', () => {
+        return (
+            <div style={{ display: 'flex' }}>
+                <PhoneComponent
+                    notificationType="notificationAlertOptionNotificationCenter"
+                    device="Mobile"
+                />
+                <PhoneComponent
+                    notificationType="notificationAlertOptionNotificationCenter"
+                    device="Desktop"
+                />
+                <PhoneComponent
+                    notificationType="notificationAlertOptionNotificationCenter"
+                    device="Tablet"
+                />
+            </div>
+        )
+    })
+    .add('Push Notification', () => {
+        const currTime = moment().format('H mm')
+
+        return (
+            <div style={{ display: 'flex' }}>
+                <PhoneComponent
+                    notificationType="notificationAlertOptionPushNotification"
+                    device="Mobile"
+                />
+                <PhoneComponent
+                    notificationType="notificationAlertOptionPushNotification"
+                    device="Desktop"
+                />
+                <PhoneComponent
+                    notificationType="notificationAlertOptionPushNotification"
+                    device="Tablet"
+                />
+            </div>
+        )
+    })
+
 storiesOf('PopoverContainer', module).add('cases', () => {
     interface XState {
         switched: boolean
@@ -638,8 +701,8 @@ storiesOf('Popover', module).add('various cases', () => {
                                             border: `1px solid ${titanium}`
                                         }}
                                         toggle={this.toggle2}
+                                        targetParent="root"
                                         targetId="target5"
-                                        targetParent="herez"
                                     >
                                         <div
                                             style={{
@@ -715,6 +778,7 @@ storiesOf('Popover', module).add('various cases', () => {
                                             border: titanium
                                         }}
                                         toggleable={false}
+                                        targetParent="root"
                                         targetId="target4"
                                     />
                                 )}
@@ -780,6 +844,7 @@ storiesOf('Popover', module).add('various cases', () => {
                                         }}
                                         toggleable={true}
                                         targetId="target1"
+                                        targetParent="root"
                                     />
                                 )}
                             </Manager>
@@ -827,6 +892,7 @@ storiesOf('Popover', module).add('various cases', () => {
                                         }}
                                         toggleable={true}
                                         targetId="target2"
+                                        targetParent="root"
                                     />
                                 )}
                             </Manager>
@@ -878,6 +944,7 @@ storiesOf('Popover', module).add('various cases', () => {
                                         }}
                                         toggleable={true}
                                         targetId="target3"
+                                        targetParent="root"
                                     />
                                 )}
                             </Manager>

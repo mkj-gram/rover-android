@@ -9,6 +9,7 @@ import renameCampaign from './renameCampaign'
 import trackEvents from './trackEvents'
 import updateDeviceTestLabelProperty from './updateDeviceTestLabelProperty'
 import updateDynamicSegmentPredicates from './updateDynamicSegmentPredicates'
+import updateNotificationSettings from './updateNotificationSettings'
 import updateSegmentName from './updateSegmentName'
 
 const Mutation = new GraphQLObjectType({
@@ -23,6 +24,7 @@ const Mutation = new GraphQLObjectType({
         trackEvents,
         updateDeviceTestLabelProperty,
         updateDynamicSegmentPredicates,
+        updateNotificationSettings,
         updateSegmentName
     }
 })

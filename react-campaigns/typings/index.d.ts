@@ -7,7 +7,10 @@ type CampaignType =
     | 'WEB'
     | 'UNKNOWN'
 
-type NotificationAttachmentType = 'IMAGE' | 'AUDIO' | 'VIDEO' | 'UNKNOWN'
+type NotificationAttachment = {
+    type: 'IMAGE' | 'AUDIO' | 'VIDEO' | 'UNKNOWN'
+    url: string
+}
 
 type NotificationTapBehaviorType =
     | 'UNKNOWN'
@@ -44,8 +47,7 @@ declare abstract class Campaign {
 declare class ScheduledCampaign extends Campaign {
     notificationBody: string
     notificationTitle: string
-    notificationAttachmentUrl: string
-    notificationAttachmentType: NotificationAttachmentType
+    notificationAttachment: NotificationAttachment
     notificationTapBehaviorType: NotificationTapBehaviorType
     notificationTapBehaviorExperienceId: string
     notificationTapBehaviorUrl: string
@@ -75,8 +77,7 @@ declare class ScheduledCampaign extends Campaign {
 declare class AutomatedNotificationCampaign extends Campaign {
     notificationBody: string
     notificationTitle: string
-    notificationAttachmentUrl: string
-    notificationAttachmentType: NotificationAttachmentType
+    notificationAttachment: NotificationAttachment
     notificationTapBehaviorType: NotificationTapBehaviorType
     notificationTapBehaviorExperienceId: string
     notificationTapBehaviorUrl: string
@@ -117,11 +118,8 @@ type State = {
     readonly campaigns: StringMap<Campaign>
     readonly testDevices: StringMap<string>
     readonly modal: StringMap<string | boolean>
+    readonly editableCampaign: AutomatedNotificationCampaign | ScheduledCampaign
     readonly app: AppState
-}
-
-type AppState = {
-    home: HomeState
 }
 
 type HomeState = {
@@ -160,4 +158,23 @@ type QueryParams = {
     campaignType: 'all' | 'scheduled' | 'automated' | 'web' | 'interstitial'
     pageNumber: string
     keyword: string
+}
+
+type AppState = {
+    home: HomeState
+    notificationDelivery: NotificationDeliveryState
+    notification: AlertOptionsHoverState
+}
+
+type NotificationDeliveryState = {
+    readonly isNotificationDeliveryModalOpen: string
+    readonly lastViewPage: string
+}
+
+type AlertOptionsHoverState = {
+    readonly alertOptionsHoverValue: string
+}
+
+interface InjectedProps {
+    device?: string
 }

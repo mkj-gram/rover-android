@@ -3,14 +3,17 @@
 import { combineReducers, AnyAction } from 'redux'
 
 import app, * as appSelector from './app'
+import editableCampaign, * as editableCampaignSelector from './editableCampaign'
 import campaigns, * as campaignsSelector from './campaigns'
 import testDevices from './testDevices'
 import modal from './modal'
+
 export default combineReducers({
     app,
     campaigns,
     testDevices,
-    modal
+    modal,
+    editableCampaign
 })
 
 // App
@@ -29,6 +32,18 @@ export const getIsCampaignTypeSelectorOpen = (state: State) =>
 export const getIsCampaignTypeSelectorClosing = (state: State) =>
     appSelector.getIsCampaignTypeSelectorClosing(state.app)
 
+// Notification Delivery
+export const getIsNotificationDeliveryModalOpen = (state: State) =>
+    appSelector.getIsNotificationDeliveryModalOpen(state.app)
+
+// Notification: Alert Options
+export const getAlertOptionHoverValue = (state: State) =>
+    appSelector.getAlertOptionHoverValue(state.app)
+
+// Notification: Get Last View Page
+export const getLastViewPage = (state: State) =>
+    appSelector.getLastViewPage(state.app)
+
 // Campaigns
 export const getCampaign = (state: State, id: string) =>
     campaignsSelector.getCampaign(state.campaigns, id)
@@ -38,3 +53,9 @@ export const getAllCampaigns = (state: State) =>
 
 export const getFilteredCampaigns = (state: State, filter: CampaignStatus) =>
     campaignsSelector.getFilteredCampaigns(state.campaigns, filter)
+
+// Editable Campaign
+export const shouldCreateEditableCampaign = (state: State) =>
+    editableCampaignSelector.shouldCreateEditableCampaign(
+        state.editableCampaign
+    )

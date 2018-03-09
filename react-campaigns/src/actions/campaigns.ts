@@ -6,6 +6,152 @@ import { GraphQLRequest } from 'apollo-link'
 import { DocumentNode } from 'graphql'
 import Environment from '../Environment'
 
+export const updateNotificationSettings: ActionCreator<
+    ThunkAction<Promise<Action>, State, void>
+> = (
+    campaign: ScheduledCampaign | AutomatedNotificationCampaign,
+    campaignId: string
+) => (dispatch: Dispatch<State>, getState: () => State): Promise<Action> => {
+    const query: DocumentNode = gql`
+        mutation UpdateNotificationSetting(
+            $campaignId: Int!
+            $experienceId: String
+            $UIState: String!
+            $notificationBody: String!
+            $notificationTitle: String
+            $notificationAttachment: NotificationAttachmentInput
+            $notificationTapBehaviorType: String
+            $notificationTapPresentationType: String
+            $notificationTapBehaviorUrl: String
+            $notificationIosContentAvailable: Boolean!
+            $notificationIosMutableContent: Boolean!
+            $notificationIosSound: String
+            $notificationIosCategoryIdentifier: String
+            $notificationIosThreadIdentifier: String
+            $notificationAndroidChannelId: String
+            $notificationAndroidSound: String
+            $notificationAndroidTag: String
+            $notificationExpiration: Int
+            $notificationAttributesMap: JSON
+            $notificationAlertOptionPushNotification: Boolean!
+            $notificationAlertOptionNotificationCenter: Boolean!
+            $notificationAlertOptionBadgeNumber: Boolean!
+        ) {
+            updateNotificationSettings(
+                campaignId: $campaignId
+                experienceId: $experienceId
+                UIState: $UIState
+                notificationBody: $notificationBody
+                notificationTitle: $notificationTitle
+                notificationAttachment: $notificationAttachment
+                notificationTapBehaviorType: $notificationTapBehaviorType
+                notificationTapPresentationType: $notificationTapPresentationType
+                notificationTapBehaviorUrl: $notificationTapBehaviorUrl
+                notificationIosContentAvailable: $notificationIosContentAvailable
+                notificationIosMutableContent: $notificationIosMutableContent
+                notificationIosSound: $notificationIosSound
+                notificationIosCategoryIdentifier: $notificationIosCategoryIdentifier
+                notificationIosThreadIdentifier: $notificationIosThreadIdentifier
+                notificationAndroidChannelId: $notificationAndroidChannelId
+                notificationAndroidSound: $notificationAndroidSound
+                notificationAndroidTag: $notificationAndroidTag
+                notificationExpiration: $notificationExpiration
+                notificationAttributesMap: $notificationAttributesMap
+                notificationAlertOptionPushNotification: $notificationAlertOptionPushNotification
+                notificationAlertOptionNotificationCenter: $notificationAlertOptionNotificationCenter
+                notificationAlertOptionBadgeNumber: $notificationAlertOptionBadgeNumber
+            ) {
+                campaignId
+                name
+                campaignType
+                campaignStatus
+                UIState
+                ... on NotificationCampaign {
+                    notificationTitle
+                    notificationBody
+                    notificationAttachment {
+                        type
+                        url
+                    }
+                    notificationTapBehaviorType
+                    notificationTapPresentationType
+                    notificationTapBehaviorUrl
+                    notificationIosContentAvailable
+                    notificationIosMutableContent
+                    notificationIosSound
+                    notificationIosCategoryIdentifier
+                    notificationIosThreadIdentifier
+                    notificationAndroidChannelId
+                    notificationAndroidSound
+                    notificationAndroidTag
+                    notificationExpiration
+                    notificationAttributesMap
+                    notificationAlertOptionPushNotification
+                    notificationAlertOptionNotificationCenter
+                    notificationAlertOptionBadgeNumber
+                }
+                ... on ScheduledNotificationCampaign {
+                    scheduledType
+                    scheduledTimeZone
+                    scheduledTimestamp
+                    scheduledUseLocalDeviceTime
+                    scheduledDeliveryStatus
+                }
+                ... on SegmentableCampaign {
+                    segmentIds
+                    segmentCondition
+                }
+                ... on AutomatedNotificationCampaign {
+                    automatedMonday
+                    automatedTuesday
+                    automatedWednesday
+                    automatedThursday
+                    automatedFriday
+                    automatedSaturday
+                    automatedSunday
+                    automatedStartDate
+                    automatedEndDate
+                    automatedStartTime
+                    automatedEndTime
+                    automatedTimeZone
+                    automatedUseLocalDeviceTime
+                    automatedEventName
+                }
+            }
+        }
+    `
+
+    const request = {
+        query,
+        variables: {
+            ...campaign
+        }
+    }
+
+    return Environment(request).then(
+        ({ data }) => {
+            const campaign = data.updateNotificationSettings
+            const campaigns = {
+                ...getState().campaigns,
+                [campaign.campaignId]: {
+                    ...campaign
+                }
+            }
+            dispatch({
+                type: 'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_SUCCESS',
+                campaigns
+            })
+            return Promise.resolve(data)
+        },
+        error => {
+            return dispatch({
+                type: 'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_FAILURE',
+                message: error.message
+            })
+        }
+    )
+}
+
 export const duplicateCampaign: ActionCreator<
     ThunkAction<Promise<Action>, State, void>
 > = (name: string, campaignId: number) => (
@@ -22,6 +168,7 @@ export const duplicateCampaign: ActionCreator<
                 UIState
                 ... on NotificationCampaign {
                     notificationTitle
+                    notificationBody
                     notificationAttachment {
                         type
                         url
@@ -229,6 +376,7 @@ export const fetchCampaigns: ActionCreator<
                 UIState
                 ... on NotificationCampaign {
                     notificationTitle
+                    notificationBody
                     notificationAttachment {
                         type
                         url
@@ -336,6 +484,7 @@ export const createCampaign: ActionCreator<
                 UIState
                 ... on NotificationCampaign {
                     notificationTitle
+                    notificationBody
                     notificationAttachment {
                         type
                         url

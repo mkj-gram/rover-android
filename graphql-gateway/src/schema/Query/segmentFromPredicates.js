@@ -1,17 +1,12 @@
 import RoverApis from '@rover/apis'
 import { audienceClient } from '../../grpcClients'
 import buildPredicateAggregate from '../../grpc/audience/buildPredicateAggregate'
-import getProfileFromProto, { getEmptyProfileValues } from '../../grpc/audience/getProfileFromProto'
+import getProfileFromProto from '../../grpc/audience/getProfileFromProto'
 import getDeviceFromProto from '../../grpc/audience/getDeviceFromProto'
 import promisify from '@rover-common/grpc-promisify'
 promisify(audienceClient)
 
-import {
-    GraphQLList,
-    GraphQLNonNull,
-    GraphQLString,
-    GraphQLInt
-} from 'graphql'
+import { GraphQLList, GraphQLNonNull, GraphQLString, GraphQLInt } from 'graphql'
 
 import { SegmentData } from '../Segment'
 

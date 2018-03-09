@@ -1,5 +1,6 @@
 /// <reference path="../../../../typings/index.d.ts"/>
 import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 import { Redirect } from 'react-router'
 import {
     black,
@@ -21,29 +22,14 @@ export interface OverviewModalRowProps extends InjectedProps {
     name?: string
     text?: string
     val?: boolean | number
+    handlePageDirect?: (val?: string) => void
 }
 
-export interface OverviewModalRowState {
-    redirect: boolean
-}
-
-class OverviewModalRow extends React.Component<
-    OverviewModalRowProps,
-    OverviewModalRowState
-> {
+class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
     constructor(props: OverviewModalRowProps) {
         super(props)
-        this.state = {
-            redirect: false
-        }
-        this.handleClick = this.handleClick.bind(this)
-        this.getProgress = this.getProgress.bind(this)
-    }
 
-    handleClick() {
-        this.setState({
-            redirect: true
-        })
+        this.getProgress = this.getProgress.bind(this)
     }
 
     getProgress() {
@@ -71,7 +57,7 @@ class OverviewModalRow extends React.Component<
                                     backgroundColor: turquoise
                                 },
                                 barStyle: {
-                                    width: device === 'Desktop' ? 240 : 176
+                                    width: device === 'desktop' ? 240 : 176
                                 }
                             }}
                         />
@@ -83,13 +69,10 @@ class OverviewModalRow extends React.Component<
                 )
             }
         }
-
         return ret
     }
-
     render() {
-        let { device, name, text, val } = this.props
-
+        let { device, name, text, val, handlePageDirect } = this.props
         // Desktop as default
         let outerStyle: React.CSSProperties = {
             padding: '32px 32px 0 32px',
@@ -101,98 +84,82 @@ class OverviewModalRow extends React.Component<
                 text="Next"
                 size="small"
                 type="primary"
-                onClick={this.handleClick}
+                onClick={() => handlePageDirect(name)}
                 style={{ outerStyle: { marginLeft: 32 } }}
             />
         )
-
         const experienceOff = name === 'Experience' && val === false
-
         let textStyle = experienceOff ? { color: silver } : { color: black }
-
-        if (device === 'Mobile') {
+        if (device === 'mobile') {
             outerStyle = {
                 ...outerStyle,
                 padding: '32px 16px 0 16px'
             }
         }
-
-        if (device !== 'Desktop') {
+        if (device !== 'desktop') {
             button = (
                 <div style={{ marginLeft: 16 }}>
                     <ChevronRightIcon fill={silver} />
                 </div>
             )
         }
-
-        if (this.state.redirect) {
-            const link = `/campaigns/wizards/${name}`
-            return <Redirect to={link} />
-        } else {
-            return (
-                <div
-                    style={{ background: white, width: '100%' }}
-                    onClick={
-                        device !== 'Desktop' && !experienceOff
-                            ? this.handleClick
-                            : () => null
-                    }
-                    key={name}
-                >
-                    <div style={outerStyle}>
-                        <Text text={name} size="h2" textStyle={textStyle} />
+        return (
+            <div
+                style={{ background: white, width: '100%' }}
+                onClick={
+                    device !== 'desktop' && !experienceOff
+                        ? () => handlePageDirect(name)
+                        : () => null
+                }
+                key={name}
+            >
+                <div style={outerStyle}>
+                    <Text text={name} size="h2" textStyle={textStyle} />
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Text text={text} size="medium" textStyle={textStyle} />
+                        {experienceOff ? (
+                            <div
+                                style={{
+                                    width: 100,
+                                    height: 28,
+                                    marginLeft: 16
+                                }}
+                            />
+                        ) : (
+                            button
+                        )}
+                    </div>
+                    {name !== 'Experience' && this.getProgress()}
+                    {experienceOff && (
                         <div
                             style={{
                                 display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
+                                marginTop: 16
                             }}
                         >
-                            <Text
-                                text={text}
-                                size="medium"
-                                textStyle={textStyle}
+                            <Alert
+                                message="Tap behavior is set to present website"
+                                type="info"
                             />
-
-                            {experienceOff ? (
-                                <div
-                                    style={{
-                                        width: 100,
-                                        height: 28,
-                                        marginLeft: 16
-                                    }}
-                                />
-                            ) : (
-                                button
-                            )}
                         </div>
-                        {name !== 'Experience' && this.getProgress()}
-                        {experienceOff && (
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    marginTop: 16
-                                }}
-                            >
-                                <Alert
-                                    message="Tap behavior is set to present website"
-                                    type="info"
-                                />
-                            </div>
-                        )}
-                        <div
-                            style={{
-                                marginTop: 24,
-                                height: 1,
-                                width: '100%',
-                                background: titanium
-                            }}
-                        />
-                    </div>
+                    )}
+                    <div
+                        style={{
+                            marginTop: 24,
+                            height: 1,
+                            width: '100%',
+                            background: titanium
+                        }}
+                    />
                 </div>
-            )
-        }
+            </div>
+        )
     }
 }
-
 export default OverviewModalRow

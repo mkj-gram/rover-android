@@ -4,6 +4,7 @@ import Button from './Button'
 import CheckBox from './CheckBox'
 import Dialog from './Dialog'
 import NavBar from './NavBar'
+import PhoneComponent from './PhoneComponent'
 import Popover from './Popover'
 import PopoverContainer from './PopoverContainer'
 import ProgressBar from './ProgressBar'
@@ -75,7 +76,10 @@ import {
     PlusSquareIcon,
     SearchIcon,
     UserIcon,
-    ZapIcon
+    ZapIcon,
+    AlertOptionsPushNotification,
+    AlertOptionsNotificationCenter,
+    AlertOptionsBadgeNumber
 } from './Icons'
 
 export {
@@ -148,5 +152,9 @@ export {
     PlusSquareIcon,
     SearchIcon,
     UserIcon,
-    ZapIcon
+    ZapIcon,
+    AlertOptionsPushNotification,
+    AlertOptionsNotificationCenter,
+    AlertOptionsBadgeNumber,
+    PhoneComponent
 }

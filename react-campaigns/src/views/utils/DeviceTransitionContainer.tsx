@@ -46,18 +46,34 @@ class DeviceTransitionContainer extends React.Component<
                         position: 'absolute',
                         zIndex: 2
                     }}
+                    id="mainModalView"
                 >
                     <div
                         style={{
+                            flex: '1 1 769px',
                             display: 'flex',
                             animation: `${
                                 overviewModal.overviewModalDisplay
                             } 500ms ease`,
-                            maxWidth: 769
+                            maxWidth: 769,
+                            position: 'relative'
                         }}
+                        id="mainModalLeft"
                     >
                         {children}
                     </div>
+                    <div
+                        style={{
+                            flex: '1 1 auto',
+                            height: '100vh',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            flexDirection: 'column',
+                            position: 'relative'
+                        }}
+                        id="mainModalRight"
+                    />
                 </div>
             )
         } else {
@@ -73,6 +89,7 @@ class DeviceTransitionContainer extends React.Component<
                         position: 'absolute',
                         zIndex: 2
                     }}
+                    id="mainModalLeft"
                 >
                     {children}
                 </div>
