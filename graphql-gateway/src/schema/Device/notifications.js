@@ -20,6 +20,7 @@ const notifications = {
                     type: "openUrl",
                     url: "twitter://status?id=12345"
                 },
+                uri: "twitter://status?id=12345&utm_source=rover&utm_medium=notification&utm_campaign=5555",
                 deliveredAt: "2018-02-01T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -35,6 +36,7 @@ const notifications = {
                     type: "presentExperience",
                     experienceId: "59023009312e7a001f0b963a"
                 },
+                uri: "rv-inbox://experience?id=59023009312e7a001f0b963a&campaignID=5556",
                 deliveredAt: "2018-02-02T14:00:00-05:00",
                 expiresAt: null,
                 isRead: true,
@@ -50,6 +52,7 @@ const notifications = {
                     type: "presentWebsite",
                     url: "https://www.rover.io"
                 },
+                uri: "rv-inbox://website?url=https%3A%2F%2Fwww.rover.io%3Futm_source%3Drover%26utm_medium%3Dnotification%26utm_campaign%3D5557",
                 deliveredAt: "2018-02-03T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -64,6 +67,7 @@ const notifications = {
                 action: {
                     type: "openApp"
                 },
+                uri: "rv-inbox://",
                 deliveredAt: "2018-02-04T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -79,6 +83,7 @@ const notifications = {
                     type: "openUrl",
                     url: "http://www.google.com/"
                 },
+                uri: "https://www.google.com?utm_source=rover&utm_medium=notification&utm_campaign=5559",
                 deliveredAt: "2018-02-05T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -93,6 +98,7 @@ const notifications = {
                 action: {
                     type: "openApp"
                 },
+                uri: "rv-inbox://",
                 deliveredAt: "2018-02-06T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -107,6 +113,7 @@ const notifications = {
                 action: {
                     type: "openApp"
                 },
+                uri: "rv-inbox://",
                 deliveredAt: "2018-02-07T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -121,6 +128,7 @@ const notifications = {
                 action: {
                     type: "openApp"
                 },
+                uri: "rv-inbox://",
                 deliveredAt: "2018-02-09T14:00:00-05:00",
                 expiresAt: "2018-02-08T14:00:00-05:00",
                 isRead: false,

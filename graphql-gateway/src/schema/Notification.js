@@ -34,6 +34,9 @@ const Notification = new GraphQLObjectType({
         action: {
             type: new GraphQLNonNull(NotificationAction)
         },
+        uri: {
+            type: GraphQLString
+        },
         deliveredAt: {
             type: new GraphQLNonNull(GraphQLDateTime)
         },
