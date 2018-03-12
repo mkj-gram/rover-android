@@ -17,3 +17,7 @@ declare module 'react-travel' {
     var a: any
     export default a
 }
+
+interface InjectedProps {
+    device?: string
+}

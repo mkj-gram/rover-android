@@ -11,14 +11,16 @@ import {
 
 import { text as typographyText, semibold } from '../styles/typography'
 
+import ResponsiveContainer from '../components/ResponsiveContainer'
+
 export type propStyle = {
     innerStyle?: React.CSSProperties
     outerStyle?: React.CSSProperties
 }
 
-export interface ButtonProps {
-    text: string
-    type: 'primary' | 'secondary' | 'disabled' | 'regular'
+export interface ButtonProps extends InjectedProps {
+    text?: string
+    type?: 'primary' | 'secondary' | 'disabled' | 'regular'
     size?: 'large' | 'small'
     overrideWidth?: number
     onClick?: () => void
@@ -29,7 +31,7 @@ export interface ButtonState {
     mouseDown: boolean
 }
 
-class Button extends React.Component<ButtonProps, ButtonState> {
+class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
     static defaultProps: Partial<ButtonProps> = {
         text: '',
         type: 'primary',
@@ -48,17 +50,29 @@ class Button extends React.Component<ButtonProps, ButtonState> {
         this.handleMouseEvent = this.handleMouseEvent.bind(this)
     }
 
-    handleMouseEvent(val: string) {
-        this.setState({
-            mouseDown: !this.state.mouseDown
-        })
-        if (val === 'up') {
-            this.props.onClick()
+    handleMouseEvent(val: string, eventType: string) {
+        const { device } = this.props
+        if (eventType === 'touch' && device !== 'Desktop') {
+            this.setState({
+                mouseDown: !this.state.mouseDown
+            })
+
+            if (val === 'up') {
+                this.props.onClick()
+            }
+        } else if (eventType === 'mouse' && device === 'Desktop') {
+            this.setState({
+                mouseDown: !this.state.mouseDown
+            })
+
+            if (val === 'up') {
+                this.props.onClick()
+            }
         }
     }
 
     render() {
-        const { text, size, type, overrideWidth, style } = this.props
+        const { text, size, type, overrideWidth, style, device } = this.props
 
         const { mouseDown } = this.state
 
@@ -159,10 +173,10 @@ class Button extends React.Component<ButtonProps, ButtonState> {
             ret = (
                 <div
                     style={outerStyle}
-                    onMouseDown={() => this.handleMouseEvent('down')}
-                    onMouseUp={() => this.handleMouseEvent('up')}
-                    onTouchStart={() => this.handleMouseEvent('down')}
-                    onTouchEnd={() => this.handleMouseEvent('up')}
+                    onMouseDown={() => this.handleMouseEvent('down', 'mouse')}
+                    onMouseUp={() => this.handleMouseEvent('up', 'mouse')}
+                    onTouchStart={() => this.handleMouseEvent('down', 'touch')}
+                    onTouchEnd={() => this.handleMouseEvent('up', 'touch')}
                 >
                     <div style={innerStyle}>{text}</div>
                 </div>
@@ -175,6 +189,19 @@ class Button extends React.Component<ButtonProps, ButtonState> {
             )
         }
         return ret
+    }
+}
+
+class Button extends React.Component<ButtonProps, ButtonState> {
+    constructor(props: ButtonProps) {
+        super(props)
+    }
+
+    render() {
+        const ResponsiveButtonContainer = ResponsiveContainer(this.props)(
+            ButtonComponent
+        )
+        return <ResponsiveButtonContainer />
     }
 }
 
