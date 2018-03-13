@@ -126,9 +126,9 @@ func (h *Worker) handleDevicesCreated(ctx context.Context, msgs []service.Messag
 		devices  []mongodb.Device
 		profiles []mongodb.Profile
 
-		profileQueries                  []bson.M
-		identifiersByAccountId          = map[int32][]string{}
-		profilesByIdentifierByAccountId = map[int32]map[string]*mongodb.Profile{}
+		profileQueries                 []bson.M
+		identifiersByAccountId         = map[int32][]string{}
+		profileByIdentifierByAccountId map[int]map[string]*mongodb.Profile
 
 		Q = bson.M{"$or": queries}
 
@@ -160,26 +160,14 @@ func (h *Worker) handleDevicesCreated(ctx context.Context, msgs []service.Messag
 		}
 	}
 
-	for _, profile := range profiles {
-		if profile.Identifier == "" {
-			continue
-		}
-
-		accountId := profile.AccountId
-		identifier := profile.Identifier
-		// ensure the sub-map is initialized
-		if _, ok := profilesByIdentifierByAccountId[accountId]; !ok {
-			profilesByIdentifierByAccountId[accountId] = map[string]*mongodb.Profile{}
-		}
-		profilesByIdentifierByAccountId[accountId][identifier] = &profile
-	}
+	profileByIdentifierByAccountId = h.profileByIdentifierByAccountId(profiles)
 
 	var ops = make([]*elastic.BulkOp, len(devices))
 	for i, device := range devices {
 		// only grab device attributes
 		var doc elastic.M
 		if device.ProfileIdentifier != "" {
-			profile := profilesByIdentifierByAccountId[device.AccountId][device.ProfileIdentifier]
+			profile := profileByIdentifierByAccountId[int(device.AccountId)][device.ProfileIdentifier]
 			doc = elastic.DeviceV2Doc(&device, profile)
 		} else {
 			doc = elastic.DeviceV2Doc(&device, nil)

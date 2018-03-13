@@ -164,7 +164,10 @@ func (h *Worker) profileIdentifiersByAccountId(msgs []service.Message) map[int32
 func (h *Worker) profileByIdentifierByAccountId(profiles []mongodb.Profile) map[int]map[string]*mongodb.Profile {
 	var profileByIdentifierByAccountId = make(map[int]map[string]*mongodb.Profile)
 
-	for _, profile := range profiles {
+	for index := range profiles {
+
+		var profile = &profiles[index]
+
 		if profile.Identifier == "" {
 			continue
 		}
@@ -174,7 +177,7 @@ func (h *Worker) profileByIdentifierByAccountId(profiles []mongodb.Profile) map[
 			profileByIdentifierByAccountId[int(profile.AccountId)] = make(map[string]*mongodb.Profile)
 		}
 
-		profileByIdentifierByAccountId[int(profile.AccountId)][profile.Identifier] = &profile
+		profileByIdentifierByAccountId[int(profile.AccountId)][profile.Identifier] = profile
 
 	}
 

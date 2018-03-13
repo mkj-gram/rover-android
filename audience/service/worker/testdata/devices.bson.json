@@ -71,3 +71,23 @@
   "is_bluetooth_enabled": true
 }
 
+{
+  "_id":{"$oid":"D00000000000000000000006"},
+  "account_id":1,
+  "profile_identifier": "p2",
+  "device_id":"MULTI01",
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {}
+}
+
+
+{
+  "_id":{"$oid":"D00000000000000000000007"},
+  "account_id":1,
+  "profile_identifier": "p3",
+  "device_id":"MULTI02",
+  "created_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
+  "attributes": {}
+}

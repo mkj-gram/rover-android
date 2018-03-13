@@ -119,6 +119,7 @@ func TestWorker(t *testing.T) {
 		err  error
 		val  interface{}
 		path string
+		body []byte
 	}
 
 	type response struct {
@@ -1967,9 +1968,176 @@ func TestWorker(t *testing.T) {
 
 			exp: &expect{},
 		},
-	}
 
-	// TODO add more test cases where the service messages is more than just 1
+		{
+			desc: "multiple devices created with multiple profiles",
+
+			req: &pubsub.Message{
+				Data: toJSON(t, []service.Message{
+					{
+						"event":      "created",
+						"model":      "device",
+						"device_id":  "MULTI01",
+						"account_id": "1",
+					},
+					{
+						"event":      "created",
+						"model":      "device",
+						"device_id":  "MULTI02",
+						"account_id": "1",
+					},
+				}),
+			},
+
+			after: &expect{
+				path: "/test_account_1/device/_mget",
+				body: toJSON(t, M{
+					"ids": []string{"MULTI01", "MULTI02"},
+				}),
+				val: response{
+					Code: 200,
+					Body: M{
+						"docs": []interface{}{
+							M{
+								"_index":   "test_account_1",
+								"_type":    "device",
+								"_id":      "MULTI01",
+								"_version": 2.0, // Version 2.0 because p2 was created in earlier test which triggered an index of this device
+								"found":    true,
+								"_source": M{
+									"account_id":                     1.0,
+									"advertising_id":                 "",
+									"app_build":                      "",
+									"app_name":                       "",
+									"app_namespace":                  "",
+									"app_version":                    "",
+									"attributes":                     M{},
+									"carrier_name":                   "",
+									"created_at":                     "2017-10-14T15:44:18Z",
+									"device_id":                      "MULTI01",
+									"device_manufacturer":            "",
+									"device_model":                   "",
+									"is_background_enabled":          false,
+									"is_bluetooth_enabled":           nil,
+									"is_cellular_enabled":            nil,
+									"is_location_monitoring_enabled": false,
+									"is_test_device":                 false,
+									"is_wifi_enabled":                nil,
+									"label":                          "",
+									"locale_language":                "",
+									"locale_region":                  "",
+									"locale_script":                  "",
+									"location_accuracy":              0.0,
+									"location_city":                  "",
+									"location_country":               "",
+									"location_latitude":              0.0,
+									"location_longitude":             0.0,
+									"location_state":                 "",
+									"location_updated_at":            nil,
+									"notification_authorization":     "UNKNOWN",
+									"os_name":                        "",
+									"os_version":                     nil,
+									"platform":                       "",
+									"profile": M{
+										"account_id": 1.0,
+										"attributes": M{
+											"arr":     []interface{}{"bose", "qc35"},
+											"bool":    true,
+											"double":  42.42,
+											"integer": 42.0,
+											"null":    nil,
+											"string":  "let's dance",
+											"ts":      "2016-08-22T19:05:53.102Z",
+										},
+										"created_at": "2016-08-22T19:05:53Z",
+										"id":         "d00000000000000000000001",
+										"identifier": "p2",
+										"updated_at": "2016-08-22T19:05:53Z",
+									},
+									"profile_identifier":         "p2",
+									"push_environment":           "",
+									"push_token_created_at":      nil,
+									"push_token_is_active":       false,
+									"push_token_key":             "",
+									"push_token_unregistered_at": nil,
+									"push_token_updated_at":      nil,
+									"radio":                      "",
+									"screen_height":              0.0,
+									"screen_width":               0.0,
+									"time_zone":                  "",
+									"updated_at":                 "2017-10-14T15:44:18Z",
+								},
+							},
+							M{
+								"_index":   "test_account_1",
+								"_type":    "device",
+								"_id":      "MULTI02",
+								"_version": 1.0,
+								"found":    true,
+								"_source": M{
+									"account_id":                     1.0,
+									"advertising_id":                 "",
+									"app_build":                      "",
+									"app_name":                       "",
+									"app_namespace":                  "",
+									"app_version":                    "",
+									"attributes":                     M{},
+									"carrier_name":                   "",
+									"created_at":                     "2017-10-14T15:44:18Z",
+									"device_id":                      "MULTI02",
+									"device_manufacturer":            "",
+									"device_model":                   "",
+									"is_background_enabled":          false,
+									"is_bluetooth_enabled":           nil,
+									"is_cellular_enabled":            nil,
+									"is_location_monitoring_enabled": false,
+									"is_test_device":                 false,
+									"is_wifi_enabled":                nil,
+									"label":                          "",
+									"locale_language":                "",
+									"locale_region":                  "",
+									"locale_script":                  "",
+									"location_accuracy":              0.0,
+									"location_city":                  "",
+									"location_country":               "",
+									"location_latitude":              0.0,
+									"location_longitude":             0.0,
+									"location_state":                 "",
+									"location_updated_at":            nil,
+									"notification_authorization":     "UNKNOWN",
+									"os_name":                        "",
+									"os_version":                     nil,
+									"platform":                       "",
+									"profile": M{
+										"account_id": 1.0,
+										"attributes": M{},
+										"created_at": "2016-08-22T19:05:53Z",
+										"id":         "d00000000000000000000002",
+										"identifier": "p3",
+										"updated_at": "2016-08-22T19:05:53Z",
+									},
+									"profile_identifier":         "p3",
+									"push_environment":           "",
+									"push_token_created_at":      nil,
+									"push_token_is_active":       false,
+									"push_token_key":             "",
+									"push_token_unregistered_at": nil,
+									"push_token_updated_at":      nil,
+									"radio":                      "",
+									"screen_height":              0.0,
+									"screen_width":               0.0,
+									"time_zone":                  "",
+									"updated_at":                 "2017-10-14T15:44:18Z",
+								},
+							},
+						},
+					},
+				},
+			},
+
+			exp: &expect{},
+		},
+	}
 
 	for _, tc := range tcases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -2009,7 +2177,7 @@ func TestWorker(t *testing.T) {
 			if e := tc.after; e != nil {
 				var (
 					exp, expErr  = e.val, e.err
-					resp, gotErr = esClient.PerformRequest(ctx, "GET", e.path, nil, nil)
+					resp, gotErr = esClient.PerformRequest(ctx, "GET", e.path, nil, string(e.body))
 					got          = response{
 						Code: resp.StatusCode,
 					}
