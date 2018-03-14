@@ -114,7 +114,7 @@ func (db *DB) List(ctx context.Context, params ListParams) ([]*campaigns.Campaig
 
 	if params.Page > 0 {
 		q += ` OFFSET :offset`
-		args["offset"] = pageSize * (params.Page - 1)
+		args["offset"] = pageSize * params.Page
 	}
 
 	rows, err := db.db.NamedQueryContext(ctx, q, args)

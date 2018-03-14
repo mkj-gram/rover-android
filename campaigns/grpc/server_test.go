@@ -196,26 +196,26 @@ func test_List_Options(t *testing.T) {
 				PageSize:    1,
 				Page:        2,
 			},
-			exp: []int{2},
+			exp: []int{1},
 		},
 
 		{
-			name: "limit:2 +page:1",
+			name: "limit:2 +page:0",
 			req: &campaignspb.ListRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				PageSize:    2,
-				Page:        1,
+				Page:        0,
 			},
 			exp: []int{3, 2},
 		},
 		{
-			name: "limit:2 +page:2",
+			name: "limit:1 +page:1",
 			req: &campaignspb.ListRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
-				PageSize:    2,
-				Page:        2,
+				PageSize:    1,
+				Page:        1,
 			},
-			exp: []int{1},
+			exp: []int{2},
 		},
 		{
 			name: "limit: +account id",
@@ -274,6 +274,7 @@ func test_List_Options(t *testing.T) {
 
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 				t.Fatalf("\nDiff:\n%v", Difff(diff))
+
 			}
 		})
 	}
