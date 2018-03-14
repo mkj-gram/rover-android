@@ -40,6 +40,7 @@ export interface CampaignTypeSelectorProps {
 export interface DispatchProps {
     openCampaignTypeSelector: () => void
     closeCampaignTypeSelector: () => void
+    closeMobileCampaignTypeSelector: () => void
 }
 
 export interface StateProps {
@@ -51,6 +52,7 @@ const CampaignTypeSelector: React.SFC<
     CampaignTypeSelectorProps & DispatchProps & StateProps
 > = ({
     closeCampaignTypeSelector,
+    closeMobileCampaignTypeSelector,
     isCampaignTypeSelectorClosing,
     isCampaignTypeSelectorOpen,
     listType,
@@ -236,7 +238,7 @@ const CampaignTypeSelector: React.SFC<
                                     buttonRight="Done"
                                     buttonLeft="Cancel"
                                     buttonLeftCallback={
-                                        closeCampaignTypeSelector
+                                        closeMobileCampaignTypeSelector
                                     }
                                     buttonRightCallback={
                                         closeCampaignTypeSelector
@@ -315,11 +317,13 @@ const CampaignTypeSelector: React.SFC<
     )
 }
 
+// tslint:disable-next-line:no-any
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-    closeCampaignTypeSelector: () => {
+    closeMobileCampaignTypeSelector: () => {
         dispatch({ type: 'START_CLOSING_CAMPAIGN_TYPE_SELECTOR' })
         setTimeout(() => dispatch(closeCampaignTypeSelector()), 295)
     },
+    closeCampaignTypeSelector: () => dispatch(closeCampaignTypeSelector()),
     openCampaignTypeSelector: () => dispatch(openCampaignTypeSelector())
 })
 

@@ -219,14 +219,12 @@ class ListPage extends React.PureComponent<
 const mapDispatchToProps = (
     // tslint:disable-next-line:no-any
     dispatch: Dispatch<any>,
-    ownProps: RouterProps
+    ownProps: RouterProps & ResponsiveContainerProps
 ): DispatchProps => {
-    const {
-        campaignStatus = 'all',
-        campaignType = 'all',
-        pageNumber,
-        keyword
-    } = parse(location.search.substring(1))
+    const { device } = ownProps
+    const { campaignStatus, campaignType, pageNumber, keyword } = parse(
+        location.search.substring(1)
+    )
     let nextStatus: CampaignStatus
 
     switch (campaignStatus) {
@@ -237,10 +235,8 @@ const mapDispatchToProps = (
             nextStatus = 'PUBLISHED'
             break
         case 'all':
-            nextStatus = 'UNKNOWN'
-            break
         default:
-            nextStatus = null
+            nextStatus = 'UNKNOWN'
             break
     }
     let nextType: CampaignType
@@ -259,8 +255,12 @@ const mapDispatchToProps = (
 
     return {
         closeCampaignTypeSelector: () => {
-            dispatch({ type: 'START_CLOSING_CAMPAIGN_TYPE_SELECTOR' })
-            setTimeout(() => dispatch(closeCampaignTypeSelector()), 295)
+            if (device === 'Mobile') {
+                dispatch({ type: 'START_CLOSING_CAMPAIGN_TYPE_SELECTOR' })
+                setTimeout(() => dispatch(closeCampaignTypeSelector()), 295)
+            } else {
+                dispatch(closeCampaignTypeSelector())
+            }
         },
         createCampaign: (name, cType) => {
             dispatch(createCampaign(name, cType)).then(campaignId => {
