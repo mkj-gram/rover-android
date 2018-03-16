@@ -136,6 +136,40 @@ const createProfileLoadJob = function(call, callback) {
 }
 
 /**
+ * Creates a new job to tag a list of profiles
+ * @param  {Object}   call     
+ * @param  {Function} callback
+ */
+const createProfileTagJob = function(call, callback) {
+    const request = call.request
+    const queue = this.queues.loadJob
+    const AuthContext = request.getAuthContext()
+    const profileTagJob = request.getProfileTagJobConfig()
+    
+    let jobData = {
+        type: JobType.PROFILE_TAG,
+        auth_context: {
+            account_id: AuthContext.getAccountId(),
+            user_id: AuthContext.getUserId(),
+            scopes: AuthContext.getPermissionScopesList()
+        },
+        arguments: {
+            csv_file_id: profileTagJob.getCsvFileId(),
+            tags: profileTagJob.getTagsList()
+        }
+    }
+
+    queue.add(jobData)
+        .then(function(job) {
+            let reply = buildCreateLoadJobReply(job, profileTagJob.getAccountId(), JobType.PROFILE_TAG)
+            return callback(null, reply)
+        })
+        .catch(function(err) {
+            return callback(err)
+        })
+}
+
+/**
  * Creates a new job of type load-static-segment-with-csv
  * @param  {Object}   call     grpc call
  * @param  {Function} callback 
@@ -309,6 +343,9 @@ const createLoadJob = function(call, callback) {
             break
         case CsvProcessor.v1.Models.JobType.PROFILE_IMPORT:
             return createProfileLoadJob.bind(this)(call, callback)
+            break
+        case CsvProcessor.v1.Models.JobType.PROFILE_TAG:
+            return createProfileTagJob.bind(this)(call, callback)
             break
         default:
             return callback({message: "Unknown job type", status: grpcCodes.status.INVALID_ARGUMENT })

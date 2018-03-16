@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+
+  bulk-gateway:
+      image: node:7.10.1
+      volumes:
+        - ../:/rover/
+      working_dir: /rover/bulk-gateway
+      command: bash -c "npm run"
+      depends_on:
+        # - files-service
+        - auth-service
+      environment:
+        # FILES_V1_SERVICE_HOST: files-service
+        AUTH_V1_SERVICE_HOST: auth-service
+      

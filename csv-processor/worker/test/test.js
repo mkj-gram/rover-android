@@ -3,7 +3,7 @@ var Promise = require('bluebird')
 var expect = chai.expect
 var sinon = require('sinon')
 var assert = require('assert')
-var Worker = require('../workers/profile-import-worker')
+
 var csv = require('fast-csv')
 var fs = require('fs')
 const { Readable } = require('stream');
@@ -21,6 +21,8 @@ function stubClient(funcName, returnFunc) {
 }
 
 describe('ProfileImportJob', function() {
+
+	var Worker = require('../workers/profile-import-worker')
 
 	const logger = {
 		info: function(...args) {
@@ -350,6 +352,174 @@ describe('ProfileImportJob', function() {
 			let worker = Worker(fclient, aclient)
 			worker.loadProfiles(job, logger)
 				.then(_ => done())
+				.catch(e => done(e))
+		})
+	})
+})
+
+
+describe('ProfileTagJob', function() {
+	
+	var Worker = require('../workers/profile-tag-worker')
+
+	const logger = {
+		info: function(...args) {
+			// do nothing
+		}
+	}
+
+	function newFilesClient() {
+		return {
+			getCsvFile: function() {}
+		}
+	}
+
+	describe('tagProfiles', function() {
+
+		it('should return a promise', function() {
+			let worker = Worker({}, {})
+			let res = worker.tagProfiles(null, null)
+			// Silent Unhandled promise rejections
+			res.catch(_ => {})
+
+			expect(Promise.resolve(res)).to.equal(res)
+		})
+
+
+		it('calls updateProfile with the correctly parsed line', function(done) {
+			let tagProfileCalled = false
+
+			let job = {
+				data: {
+					auth_context: {
+						account_id: 1
+					},
+					arguments: {
+						csv_file_id: 1,
+						tags: ["a", "b", "c"]
+					}
+				},
+				progress: function() {}
+			}
+
+			var fclient = {
+
+				getCsvFile: function(request, callback) {
+					let res = new Files.GetCsvFileResponse()
+					let file = new Files.CsvFile()
+
+					file.setId(1)
+					file.setAccountId(1)
+					file.setFilename("example.csv")
+					file.setNumRows(1)
+					file.setNumColumns(3)
+					file.setFileSize(1024)
+
+					res.setCsvFile(file)
+					return callback(null, res)
+				},
+
+				readCsvFile: function(request) {
+					let s = new Readable({ objectMode: true })
+					let res = new Files.ReadCsvFileResponse()
+					res.setLinesList(['McCafe'])
+
+					s.push(res)
+					s.push(null)
+					
+					return s
+				}
+			}
+
+			var aclient = {
+				tagProfile: async function(request) {
+					tagProfileCalled = true
+					expect(request).to.be.an.instanceof(Audience.TagProfileRequest)
+					expect(request.getIdentifier()).to.equal("McCafe")
+					expect(request.getTagsList()).to.deep.equal(["a", "b", "c"])
+
+					return null
+				}
+			}
+
+			let worker = Worker(fclient, aclient)
+			worker.tagProfiles(job, logger)
+				.then(_ => {
+					expect(tagProfileCalled).to.equal(true)
+					done()
+				})
+				.catch(done)
+		})
+
+
+		it('calls createprofile when the profile is not found', function(done) {
+			let job = {
+				data: {
+					auth_context: {
+						account_id: 1
+					},
+					arguments: {
+						csv_file_id: 1,
+						tags: ["1", "2", "3"]
+					}
+				},
+				progress: function() {}
+			}
+
+			var fclient = {
+
+				getCsvFile: function(request, callback) {
+					let res = new Files.GetCsvFileResponse()
+					let file = new Files.CsvFile()
+
+					file.setId(1)
+					file.setAccountId(1)
+					file.setFilename("example.csv")
+					file.setNumRows(1)
+					file.setNumColumns(3)
+					file.setFileSize(1024)
+
+					res.setCsvFile(file)
+					return callback(null, res)
+				},
+
+				readCsvFile: function(request) {
+					let s = new Readable({ objectMode: true })
+					let res = new Files.ReadCsvFileResponse()
+					res.setLinesList(['Miel'])
+
+					s.push(res)
+					s.push(null)
+					
+					return s
+				}
+			}
+
+			var tagProfileCalled = 0
+			var aclient = {
+				tagProfile: async function(request) {
+					tagProfileCalled += 1
+					// TODO use sinon
+					// first call throws a not found error
+					if (tagProfileCalled == 1) {
+						throw { code: 5, message: "Not Found"}
+					}
+
+					return null
+				},
+				createProfile: async function(request) {
+					expect(request).to.be.an.instanceof(Audience.CreateProfileRequest)
+					expect(request.getIdentifier()).to.equal("Miel")
+					return null
+				}
+			}
+
+			let worker = Worker(fclient, aclient)
+			worker.tagProfiles(job, logger)
+				.then(_ => {
+					expect(tagProfileCalled).to.equal(2)
+					done()
+				})
 				.catch(e => done(e))
 		})
 	})

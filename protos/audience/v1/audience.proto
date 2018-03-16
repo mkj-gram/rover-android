@@ -23,6 +23,8 @@ service Audience {
   rpc DeleteProfile(DeleteProfileRequest) returns (DeleteProfileResponse);
   // UpdateProfile updates profile with provided subset of attributes
   rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  // Append a list of tags to the profiles `tags` attribute
+  rpc TagProfile(TagProfileRequest) returns (TagProfileResponse);
 
   // GetProfileByDeviceId returns a profile which is associated to the device id
   rpc GetProfileByDeviceId(GetProfileByDeviceIdRequest) returns (GetProfileByDeviceIdResponse);
@@ -152,6 +154,15 @@ message UpdateProfileRequest {
   string identifier = 6;
 }
 message UpdateProfileResponse {}
+
+message TagProfileRequest {
+  auth.v1.AuthContext auth_context = 1;
+
+  string identifier = 2;
+
+  repeated string tags = 3;
+}
+message TagProfileResponse {}
 
 message GetProfileByDeviceIdRequest {
   auth.v1.AuthContext auth_context = 1;

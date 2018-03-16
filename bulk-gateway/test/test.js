@@ -11,6 +11,7 @@ describe('routes', function() {
 
 	describe('v2', function() {
 		require('./routes/v2/profile-imports/test')
+		require('./routes/v2/profile-tag/test')
 	})
 })
 

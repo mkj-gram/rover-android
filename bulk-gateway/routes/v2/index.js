@@ -11,6 +11,7 @@ module.exports = function(CsvProcessorClient, FilesClient, SegmentClient) {
 	router.use(require('./load-jobs')(CsvProcessorClient))
 	router.use(require('./static-segments')(CsvProcessorClient, FilesClient, SegmentClient))
 	router.use(require('./profile-imports')(CsvProcessorClient, FilesClient))
+	router.use(require('./profile-tag')(CsvProcessorClient, FilesClient))
 	
 	return router
 }

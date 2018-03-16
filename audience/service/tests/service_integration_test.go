@@ -72,6 +72,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("CreateProfile", testAudienceService_CreateProfile)
 	t.Run("DeleteProfile", testAudienceService_DeleteProfile)
 	t.Run("UpdateProfile", testAudienceService_UpdateProfile)
+	t.Run("TagProfile", testAudienceService_TagProfile)
 
 	t.Run("GetProfile", testAudienceService_GetProfile)
 	t.Run("GetProfileByDeviceId", testAudienceService_GetProfileByDeviceId)
@@ -1058,6 +1059,285 @@ func testAudienceService_UpdateProfile(t *testing.T) {
 			}
 
 			var _, gotErr = client.UpdateProfile(ctx, tc.req)
+			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+
+			if tc.after != nil {
+				got, gotErr := db.FindProfileByIdentifier(ctx, tc.req.AuthContext.AccountId, tc.req.GetIdentifier())
+				exp, expErr := tc.after.exp, tc.after.expErr
+				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+					t.Errorf("After:\n%v", difff(diff))
+				}
+
+				if tc.after.expSchema != nil {
+					exp, expErr := tc.after.expSchema, (error)(nil)
+					got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
+					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+						t.Errorf("After:Schema\n%v", difff(diff))
+					}
+				}
+			}
+		})
+	}
+}
+
+func testAudienceService_TagProfile(t *testing.T) {
+
+	var (
+		ctx = context.TODO()
+
+		// TODO: updatedAt should be actually updated
+		updatedAt = parseTime(t, "2016-08-22T19:05:53.102Z")
+		//aTime     = protoTs(t, updatedAt)
+
+		db = mongodb.New(
+			dialMongo(t, *tMongoDSN),
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 5)),
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
+		)
+
+		svc = service.New(db, nil, logNotifier(t))
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	type expect struct {
+		expErr         error
+		exp, expSchema interface{}
+	}
+
+	tcases := []struct {
+		name      string
+		req       *audience.TagProfileRequest
+		schemaReq *audience.TagProfileResponse
+
+		expErr error
+
+		before, after *expect
+	}{
+		{
+			name: "error: identifier: blank",
+
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: identifier cannot be blank"),
+
+			req: &audience.TagProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Identifier:  "",
+			},
+		},
+		{
+			name: "error: tags: empty",
+
+			expErr: status.Errorf(codes.InvalidArgument, "Validation: tags cannot be empty"),
+
+			req: &audience.TagProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Identifier:  "123",
+				Tags:        []string{},
+			},
+		},
+
+		{
+			name: "error: profile: not found",
+
+			expErr: status.Errorf(codes.NotFound, "db.TagProfile: profiles.Update: not found"),
+
+			req: &audience.TagProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Identifier:  "xbxbxbxbxbx",
+				Tags:        []string{"a"},
+			},
+		},
+
+		{
+			name: "adds tags to empty tags",
+			req: &audience.TagProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 66},
+				Identifier:  "no-tags",
+				Tags:        []string{"a", "b", "c"},
+			},
+
+			before: &expect{
+				exp: &audience.Profile{
+					Id:         "5aa89e400000a00000000000",
+					AccountId:  66,
+					Identifier: "no-tags",
+					Attributes: nil,
+					CreatedAt:  protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+					UpdatedAt:  protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+				},
+				expSchema: &audience.ProfileSchema{
+					Attributes: nil,
+				},
+			},
+
+			after: &expect{
+				exp: &audience.Profile{
+					Id:         "5aa89e400000a00000000000",
+					AccountId:  66,
+					Identifier: "no-tags",
+					Attributes: map[string]*audience.Value{
+						"tags": audience.StringArrayVal("a", "b", "c"),
+					},
+					CreatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+				},
+				expSchema: &audience.ProfileSchema{
+					Attributes: []*audience.SchemaAttribute{
+						{
+							AccountId:     66,
+							Id:            "e282fad85af699815c18c595",
+							Attribute:     "tags",
+							AttributeType: "array[string]",
+							Label:         "tags",
+							CreatedAt:     protoTs(t, updatedAt),
+						},
+					},
+				},
+			},
+		},
+
+		{
+			name: "appends tags to existing tags",
+			req: &audience.TagProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 66},
+				Identifier:  "tags",
+				Tags:        []string{"a", "b", "c"},
+			},
+
+			before: &expect{
+				exp: &audience.Profile{
+					Id:         "6325d3d40000000000000000",
+					AccountId:  66,
+					Identifier: "tags",
+					Attributes: map[string]*audience.Value{
+						"tags": audience.StringArrayVal("1", "2", "3"),
+					},
+					CreatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+				},
+				expSchema: &audience.ProfileSchema{
+					Attributes: []*audience.SchemaAttribute{
+						{
+							AccountId:     66,
+							Id:            "e282fad85af699815c18c595",
+							Attribute:     "tags",
+							AttributeType: "array[string]",
+							Label:         "tags",
+							CreatedAt:     protoTs(t, updatedAt),
+						},
+					},
+				},
+			},
+
+			after: &expect{
+				exp: &audience.Profile{
+					Id:         "6325d3d40000000000000000",
+					AccountId:  66,
+					Identifier: "tags",
+					Attributes: map[string]*audience.Value{
+						"tags": audience.StringArrayVal("1", "2", "3", "a", "b", "c"),
+					},
+					CreatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+				},
+				expSchema: &audience.ProfileSchema{
+					Attributes: []*audience.SchemaAttribute{
+						{
+							AccountId:     66,
+							Id:            "e282fad85af699815c18c595",
+							Attribute:     "tags",
+							AttributeType: "array[string]",
+							Label:         "tags",
+							CreatedAt:     protoTs(t, updatedAt),
+						},
+					},
+				},
+			},
+		},
+
+		{
+			name: "appends tags ensuring uniqueness",
+			req: &audience.TagProfileRequest{
+				AuthContext: &auth.AuthContext{AccountId: 66},
+				Identifier:  "tags",
+				Tags:        []string{"1", "2", "3", "a", "b", "c"},
+			},
+
+			before: &expect{
+				exp: &audience.Profile{
+					Id:         "6325d3d40000000000000000",
+					AccountId:  66,
+					Identifier: "tags",
+					Attributes: map[string]*audience.Value{
+						"tags": audience.StringArrayVal("1", "2", "3", "a", "b", "c"),
+					},
+					CreatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+				},
+				expSchema: &audience.ProfileSchema{
+					Attributes: []*audience.SchemaAttribute{
+						{
+							AccountId:     66,
+							Id:            "e282fad85af699815c18c595",
+							Attribute:     "tags",
+							AttributeType: "array[string]",
+							Label:         "tags",
+							CreatedAt:     protoTs(t, updatedAt),
+						},
+					},
+				},
+			},
+
+			after: &expect{
+				exp: &audience.Profile{
+					Id:         "6325d3d40000000000000000",
+					AccountId:  66,
+					Identifier: "tags",
+					Attributes: map[string]*audience.Value{
+						"tags": audience.StringArrayVal("1", "2", "3", "a", "b", "c"),
+					},
+					CreatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-10-30T14:05:53.102Z")),
+				},
+				expSchema: &audience.ProfileSchema{
+					Attributes: []*audience.SchemaAttribute{
+						{
+							AccountId:     66,
+							Id:            "e282fad85af699815c18c595",
+							Attribute:     "tags",
+							AttributeType: "array[string]",
+							Label:         "tags",
+							CreatedAt:     protoTs(t, updatedAt),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			if tc.before != nil {
+				got, gotErr := db.FindProfileByIdentifier(ctx, tc.req.AuthContext.AccountId, tc.req.GetIdentifier())
+				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
+					t.Errorf("Before:\n%v", difff(diff))
+				}
+
+				if tc.before.expSchema != nil {
+					exp, expErr := tc.before.expSchema, (error)(nil)
+					got, gotErr := db.GetProfileSchema(ctx, &audience.GetProfileSchemaRequest{tc.req.AuthContext})
+					if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+						t.Errorf("Before:Schema:\n%v", difff(diff))
+					}
+				}
+			}
+
+			var _, gotErr = client.TagProfile(ctx, tc.req)
 			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}

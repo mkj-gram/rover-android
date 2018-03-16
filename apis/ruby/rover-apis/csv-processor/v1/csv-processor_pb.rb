@@ -40,6 +40,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :field, :string, 2
     optional :description, :string, 3
   end
+  add_message "rover.csv_processor.v1.ProfileTagJobConfig" do
+    optional :account_id, :int32, 1
+    optional :csv_file_id, :int32, 2
+    repeated :tags, :string, 3
+  end
   add_message "rover.csv_processor.v1.GetLoadJobRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :load_job_id, :int32, 2
@@ -55,6 +60,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :segment_load_job_config, :message, 3, "rover.csv_processor.v1.SegmentLoadJobConfig"
       optional :segment_load_job_with_csv_file_config, :message, 4, "rover.csv_processor.v1.SegmentLoadJobWithCsvFileConfig"
       optional :profile_load_job_config, :message, 5, "rover.csv_processor.v1.ProfileLoadJobConfig"
+      optional :profile_tag_job_config, :message, 6, "rover.csv_processor.v1.ProfileTagJobConfig"
     end
   end
   add_message "rover.csv_processor.v1.CreateLoadJobReply" do
@@ -64,6 +70,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     value :SEGMENT, 0
     value :SEGMENT_WITH_CSV_FILE, 1
     value :PROFILE_IMPORT, 2
+    value :PROFILE_TAG, 3
   end
   add_enum "rover.csv_processor.v1.JobStatus" do
     value :UNKNOWN, 0
@@ -83,6 +90,7 @@ module Rover
       SegmentLoadJobWithCsvFileConfig = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.csv_processor.v1.SegmentLoadJobWithCsvFileConfig").msgclass
       ProfileLoadJobConfig = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.csv_processor.v1.ProfileLoadJobConfig").msgclass
       ProfileLoadJobConfig::Schema = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.csv_processor.v1.ProfileLoadJobConfig.Schema").msgclass
+      ProfileTagJobConfig = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.csv_processor.v1.ProfileTagJobConfig").msgclass
       GetLoadJobRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.csv_processor.v1.GetLoadJobRequest").msgclass
       GetLoadJobReply = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.csv_processor.v1.GetLoadJobReply").msgclass
       CreateLoadJobRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.csv_processor.v1.CreateLoadJobRequest").msgclass

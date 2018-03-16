@@ -3,6 +3,8 @@ const RoverApis = require('@rover/apis')
 const JobTypes = RoverApis.csv_processor.v1.Models.JobType
 const Errors = require('../lib/errors')
 const PrefixedLogger = require('@rover-common/prefixed-logger')
+const retryify = require('@rover-common/grpc-retryify')
+const promisify = require('@rover-common/grpc-promisify')
 const Promise = require('bluebird')
 
 const JOB_DEFAULT_TIMEOUT = Config.get('/job/timeout')
@@ -26,14 +28,19 @@ module.exports = function(context) {
 	const FilesClient = require('@rover/files-client').v1.Client()
     const AudienceClient = require('@rover/audience-client').v1.Client()
 
+    retryify(FilesClient)
+    retryify(AudienceClient)
+    promisify(AudienceClient)
 
 	const SegmentWorker = require('./segment-worker')
-	const ProfileWorker = require('./profile-import-worker')(FilesClient, AudienceClient)
+	const ProfileImportWorker = require('./profile-import-worker')(FilesClient, AudienceClient)
+    const ProfileTagWorker = require('./profile-tag-worker')(FilesClient, AudienceClient)
 
 	const jobFunctions = {}
     jobFunctions[JobTypes.SEGMENT] = SegmentWorker.loadStaticSegment
     jobFunctions[JobTypes.SEGMENT_WITH_CSV_FILE] = SegmentWorker.loadStaticSegmentWithCsvFile
-    jobFunctions[JobTypes.PROFILE_IMPORT] = ProfileWorker.loadProfiles
+    jobFunctions[JobTypes.PROFILE_IMPORT] = ProfileImportWorker.loadProfiles
+    jobFunctions[JobTypes.PROFILE_TAG] = ProfileTagWorker.tagProfiles
 
 
     console.info("Work map initialized", jobFunctions)

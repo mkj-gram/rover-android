@@ -8,9 +8,10 @@ import "google/protobuf/timestamp.proto";
 import "auth/v1/auth.proto";
 
 enum JobType {
-    SEGMENT = 0;
-    SEGMENT_WITH_CSV_FILE = 1;
-    PROFILE_IMPORT = 2;
+    SEGMENT                 = 0;
+    SEGMENT_WITH_CSV_FILE   = 1;
+    PROFILE_IMPORT          = 2;
+    PROFILE_TAG             = 3;
 }
 
 enum JobStatus {
@@ -70,6 +71,13 @@ message ProfileLoadJobConfig {
     repeated Schema schema = 3;
 }
 
+message ProfileTagJobConfig {
+    int32 account_id    = 1;
+    int32 csv_file_id   = 2;
+
+    repeated string tags = 3;
+}
+
 message GetLoadJobRequest {
     rover.auth.v1.AuthContext auth_context = 1;
 
@@ -97,6 +105,7 @@ message CreateLoadJobRequest {
         SegmentLoadJobConfig segment_load_job_config = 3;
         SegmentLoadJobWithCsvFileConfig segment_load_job_with_csv_file_config = 4;
         ProfileLoadJobConfig profile_load_job_config = 5;
+        ProfileTagJobConfig profile_tag_job_config = 6;
     }
 
 }

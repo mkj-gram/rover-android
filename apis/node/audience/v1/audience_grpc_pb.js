@@ -513,6 +513,28 @@ function deserialize_rover_audience_v1_SetDeviceProfileIdentifierResponse(buffer
   return audience_v1_audience_pb.SetDeviceProfileIdentifierResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_TagProfileRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.TagProfileRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.TagProfileRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_TagProfileRequest(buffer_arg) {
+  return audience_v1_audience_pb.TagProfileRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_TagProfileResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.TagProfileResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.TagProfileResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_TagProfileResponse(buffer_arg) {
+  return audience_v1_audience_pb.TagProfileResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_UpdateDeviceCustomAttributesRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceCustomAttributesRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceCustomAttributesRequest');
@@ -852,6 +874,18 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_UpdateProfileRequest,
     responseSerialize: serialize_rover_audience_v1_UpdateProfileResponse,
     responseDeserialize: deserialize_rover_audience_v1_UpdateProfileResponse,
+  },
+  // Append a list of tags to the profiles `tags` attribute
+  tagProfile: {
+    path: '/rover.audience.v1.Audience/TagProfile',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.TagProfileRequest,
+    responseType: audience_v1_audience_pb.TagProfileResponse,
+    requestSerialize: serialize_rover_audience_v1_TagProfileRequest,
+    requestDeserialize: deserialize_rover_audience_v1_TagProfileRequest,
+    responseSerialize: serialize_rover_audience_v1_TagProfileResponse,
+    responseDeserialize: deserialize_rover_audience_v1_TagProfileResponse,
   },
   // GetProfileByDeviceId returns a profile which is associated to the device id
   getProfileByDeviceId: {

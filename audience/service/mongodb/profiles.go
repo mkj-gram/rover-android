@@ -1,18 +1,27 @@
 package mongodb
 
 import (
+	"sync"
 	"time"
 
 	"golang.org/x/net/context"
 
 	"gopkg.in/mgo.v2/bson"
 
+	"github.com/pkg/errors"
 	audience "github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
 
 type profilesStore struct {
 	*mongoStore
+}
+
+var schemaCache = struct {
+	cache map[int32][]*SchemaAttribute
+	sync.Mutex
+}{
+	cache: make(map[int32][]*SchemaAttribute),
 }
 
 type Profile struct {
@@ -416,6 +425,51 @@ func (s *profilesStore) UpdateProfile(ctx context.Context, r *audience.UpdatePro
 	return len(schemaLess) > 0, nil
 }
 
+func (s *profilesStore) TagProfile(ctx context.Context, r *audience.TagProfileRequest) (bool, error) {
+
+	var (
+		accountId  = r.GetAuthContext().GetAccountId()
+		identifier = r.GetIdentifier()
+		tags       = r.GetTags()
+
+		didUpdateSchema = false
+	)
+
+	ok, err := s.hasProfileSchemaAttribute(ctx, accountId, "tags")
+	if err != nil {
+		return false, wrapError(err, "hasProfileSchemaAttribute: tags")
+	}
+
+	if !ok {
+		update := []*SchemaAttribute{{
+			Id:            s.newObjectId(),
+			AccountId:     accountId,
+			Attribute:     "tags",
+			AttributeType: "array[string]",
+			Label:         "",
+			CreatedAt:     s.timeNow(),
+		}}
+		if err := updateSchema(ctx, s.profiles_schemas(), update); err != nil {
+			return false, wrapError(err, "updateSchema")
+		}
+
+		didUpdateSchema = true
+	}
+
+	err = s.profiles().Update(bson.M{
+		"account_id": accountId,
+		"identifier": identifier,
+	}, bson.M{
+		"$addToSet": bson.M{"attributes.tags": bson.M{"$each": tags}},
+	})
+
+	if err != nil {
+		return false, wrapError(err, "profiles.Update")
+	}
+
+	return didUpdateSchema, nil
+}
+
 func (s *profilesStore) getProfileSchema(ctx context.Context, account_id int32) (*ProfileSchema, error) {
 	var (
 		schema ProfileSchema
@@ -427,4 +481,50 @@ func (s *profilesStore) getProfileSchema(ctx context.Context, account_id int32) 
 		All(&schema.Attributes)
 
 	return &schema, wrapError(err, "profile_schemas.Find")
+}
+
+func (s *profilesStore) getProfileSchemaAttribute(ctx context.Context, accountId int32, attribute string) (*SchemaAttribute, error) {
+
+	schemaCache.Lock()
+	defer schemaCache.Unlock()
+
+	if schemaCache.cache[accountId] == nil {
+		schemaCache.cache[accountId] = []*SchemaAttribute{}
+	}
+
+	// check if it exists in cache
+	for i := range schemaCache.cache[accountId] {
+		var attr = schemaCache.cache[accountId][i]
+		if attr.Attribute == attribute {
+			return attr, nil
+		}
+	}
+
+	var schema SchemaAttribute
+
+	err := s.profiles_schemas().
+		Find(bson.M{"account_id": accountId, "attribute": attribute}).
+		One(&schema)
+
+	if err != nil {
+		return nil, wrapError(err, "profile_schemas.Find")
+	}
+
+	// place it in the cache
+	schemaCache.cache[accountId] = append(schemaCache.cache[accountId], &schema)
+
+	return &schema, nil
+}
+
+func (s *profilesStore) hasProfileSchemaAttribute(ctx context.Context, accountId int32, attribute string) (bool, error) {
+
+	_, err := s.getProfileSchemaAttribute(ctx, accountId, attribute)
+	if err != nil {
+		if _, ok := errors.Cause(err).(ErrorNotFound); ok {
+			return false, nil
+		}
+		return false, wrapError(err, "getProfileSchemaAttribute")
+	}
+
+	return true, nil
 }

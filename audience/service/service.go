@@ -462,6 +462,33 @@ func (s *Server) UpdateProfile(ctx context.Context, r *audience.UpdateProfileReq
 	return &audience.UpdateProfileResponse{}, nil
 }
 
+func (s *Server) TagProfile(ctx context.Context, r *audience.TagProfileRequest) (*audience.TagProfileResponse, error) {
+
+	if r.GetIdentifier() == "" {
+		return nil, status.Error(codes.InvalidArgument, "Validation: identifier cannot be blank")
+	}
+
+	if len(r.GetTags()) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "Validation: tags cannot be empty")
+	}
+
+	db := s.db.Copy()
+	defer db.Close()
+
+	didUpdateSchema, err := db.TagProfile(ctx, r)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.TagProfile: %v", err)
+	}
+
+	s.notify.profileUpdated(ctx, r.AuthContext.AccountId, r.Identifier)
+
+	if didUpdateSchema {
+		s.notify.profileSchemaUpdated(ctx, r.AuthContext.AccountId)
+	}
+
+	return &audience.TagProfileResponse{}, nil
+}
+
 //
 // DynamicSegments
 //

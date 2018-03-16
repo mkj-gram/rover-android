@@ -2,9 +2,6 @@ const Promise = require('bluebird')
 const RoverApis = require('@rover/apis')
 const through = require('through2')
 
-const retryify = require('@rover-common/grpc-retryify')
-const promisify = require('@rover-common/grpc-promisify')
-
 /**
  * Takes a single row in csv file and converts them to ValueUpdates to update the profile's attributes
  * @param  {Array} row       
@@ -103,9 +100,6 @@ module.exports = function(FilesClient, AudienceClient) {
     if (!AudienceClient) {
         throw new Error("Invalid Argument: AudienceClient must be defined")
     }
-
-    retryify(AudienceClient)
-    promisify(AudienceClient)
 
     const handlers = {}
 

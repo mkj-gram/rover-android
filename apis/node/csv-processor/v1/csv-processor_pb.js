@@ -21,6 +21,7 @@ goog.exportSymbol('proto.rover.csv_processor.v1.JobType', null, global);
 goog.exportSymbol('proto.rover.csv_processor.v1.LoadJob', null, global);
 goog.exportSymbol('proto.rover.csv_processor.v1.ProfileLoadJobConfig', null, global);
 goog.exportSymbol('proto.rover.csv_processor.v1.ProfileLoadJobConfig.Schema', null, global);
+goog.exportSymbol('proto.rover.csv_processor.v1.ProfileTagJobConfig', null, global);
 goog.exportSymbol('proto.rover.csv_processor.v1.SegmentLoadJobConfig', null, global);
 goog.exportSymbol('proto.rover.csv_processor.v1.SegmentLoadJobWithCsvFileConfig', null, global);
 
@@ -1368,6 +1369,223 @@ proto.rover.csv_processor.v1.ProfileLoadJobConfig.prototype.clearSchemaList = fu
  * @extends {jspb.Message}
  * @constructor
  */
+proto.rover.csv_processor.v1.ProfileTagJobConfig = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.csv_processor.v1.ProfileTagJobConfig.repeatedFields_, null);
+};
+goog.inherits(proto.rover.csv_processor.v1.ProfileTagJobConfig, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.csv_processor.v1.ProfileTagJobConfig.displayName = 'proto.rover.csv_processor.v1.ProfileTagJobConfig';
+}
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.repeatedFields_ = [3];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.csv_processor.v1.ProfileTagJobConfig.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.csv_processor.v1.ProfileTagJobConfig} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    accountId: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    csvFileId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    tagsList: jspb.Message.getField(msg, 3)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.csv_processor.v1.ProfileTagJobConfig}
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.csv_processor.v1.ProfileTagJobConfig;
+  return proto.rover.csv_processor.v1.ProfileTagJobConfig.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.csv_processor.v1.ProfileTagJobConfig} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.csv_processor.v1.ProfileTagJobConfig}
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setAccountId(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setCsvFileId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addTags(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.csv_processor.v1.ProfileTagJobConfig.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.csv_processor.v1.ProfileTagJobConfig} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getAccountId();
+  if (f !== 0) {
+    writer.writeInt32(
+      1,
+      f
+    );
+  }
+  f = message.getCsvFileId();
+  if (f !== 0) {
+    writer.writeInt32(
+      2,
+      f
+    );
+  }
+  f = message.getTagsList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      3,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional int32 account_id = 1;
+ * @return {number}
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.getAccountId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.setAccountId = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional int32 csv_file_id = 2;
+ * @return {number}
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.getCsvFileId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.setCsvFileId = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * repeated string tags = 3;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<string>}
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.getTagsList = function() {
+  return /** @type {!Array.<string>} */ (jspb.Message.getField(this, 3));
+};
+
+
+/** @param {!Array.<string>} value */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.setTagsList = function(value) {
+  jspb.Message.setField(this, 3, value || []);
+};
+
+
+/**
+ * @param {!string} value
+ * @param {number=} opt_index
+ */
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.addTags = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 3, value, opt_index);
+};
+
+
+proto.rover.csv_processor.v1.ProfileTagJobConfig.prototype.clearTagsList = function() {
+  this.setTagsList([]);
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.rover.csv_processor.v1.GetLoadJobRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
@@ -1751,7 +1969,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.rover.csv_processor.v1.CreateLoadJobRequest.oneofGroups_ = [[3,4,5]];
+proto.rover.csv_processor.v1.CreateLoadJobRequest.oneofGroups_ = [[3,4,5,6]];
 
 /**
  * @enum {number}
@@ -1760,7 +1978,8 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.JobConfigCase = {
   JOB_CONFIG_NOT_SET: 0,
   SEGMENT_LOAD_JOB_CONFIG: 3,
   SEGMENT_LOAD_JOB_WITH_CSV_FILE_CONFIG: 4,
-  PROFILE_LOAD_JOB_CONFIG: 5
+  PROFILE_LOAD_JOB_CONFIG: 5,
+  PROFILE_TAG_JOB_CONFIG: 6
 };
 
 /**
@@ -1802,7 +2021,8 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.toObject = function(includeIns
     type: jspb.Message.getFieldWithDefault(msg, 2, 0),
     segmentLoadJobConfig: (f = msg.getSegmentLoadJobConfig()) && proto.rover.csv_processor.v1.SegmentLoadJobConfig.toObject(includeInstance, f),
     segmentLoadJobWithCsvFileConfig: (f = msg.getSegmentLoadJobWithCsvFileConfig()) && proto.rover.csv_processor.v1.SegmentLoadJobWithCsvFileConfig.toObject(includeInstance, f),
-    profileLoadJobConfig: (f = msg.getProfileLoadJobConfig()) && proto.rover.csv_processor.v1.ProfileLoadJobConfig.toObject(includeInstance, f)
+    profileLoadJobConfig: (f = msg.getProfileLoadJobConfig()) && proto.rover.csv_processor.v1.ProfileLoadJobConfig.toObject(includeInstance, f),
+    profileTagJobConfig: (f = msg.getProfileTagJobConfig()) && proto.rover.csv_processor.v1.ProfileTagJobConfig.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1862,6 +2082,11 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.deserializeBinaryFromReader = 
       var value = new proto.rover.csv_processor.v1.ProfileLoadJobConfig;
       reader.readMessage(value,proto.rover.csv_processor.v1.ProfileLoadJobConfig.deserializeBinaryFromReader);
       msg.setProfileLoadJobConfig(value);
+      break;
+    case 6:
+      var value = new proto.rover.csv_processor.v1.ProfileTagJobConfig;
+      reader.readMessage(value,proto.rover.csv_processor.v1.ProfileTagJobConfig.deserializeBinaryFromReader);
+      msg.setProfileTagJobConfig(value);
       break;
     default:
       reader.skipField();
@@ -1928,6 +2153,14 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.serializeBinaryToWriter = func
       5,
       f,
       proto.rover.csv_processor.v1.ProfileLoadJobConfig.serializeBinaryToWriter
+    );
+  }
+  f = message.getProfileTagJobConfig();
+  if (f != null) {
+    writer.writeMessage(
+      6,
+      f,
+      proto.rover.csv_processor.v1.ProfileTagJobConfig.serializeBinaryToWriter
     );
   }
 };
@@ -2065,6 +2298,36 @@ proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.clearProfileLoadJobC
  */
 proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.hasProfileLoadJobConfig = function() {
   return jspb.Message.getField(this, 5) != null;
+};
+
+
+/**
+ * optional ProfileTagJobConfig profile_tag_job_config = 6;
+ * @return {?proto.rover.csv_processor.v1.ProfileTagJobConfig}
+ */
+proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.getProfileTagJobConfig = function() {
+  return /** @type{?proto.rover.csv_processor.v1.ProfileTagJobConfig} */ (
+    jspb.Message.getWrapperField(this, proto.rover.csv_processor.v1.ProfileTagJobConfig, 6));
+};
+
+
+/** @param {?proto.rover.csv_processor.v1.ProfileTagJobConfig|undefined} value */
+proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.setProfileTagJobConfig = function(value) {
+  jspb.Message.setOneofWrapperField(this, 6, proto.rover.csv_processor.v1.CreateLoadJobRequest.oneofGroups_[0], value);
+};
+
+
+proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.clearProfileTagJobConfig = function() {
+  this.setProfileTagJobConfig(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.csv_processor.v1.CreateLoadJobRequest.prototype.hasProfileTagJobConfig = function() {
+  return jspb.Message.getField(this, 6) != null;
 };
 
 
@@ -2231,7 +2494,8 @@ proto.rover.csv_processor.v1.CreateLoadJobReply.prototype.hasJob = function() {
 proto.rover.csv_processor.v1.JobType = {
   SEGMENT: 0,
   SEGMENT_WITH_CSV_FILE: 1,
-  PROFILE_IMPORT: 2
+  PROFILE_IMPORT: 2,
+  PROFILE_TAG: 3
 };
 
 /**

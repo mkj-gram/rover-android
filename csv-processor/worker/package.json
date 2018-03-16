@@ -21,7 +21,8 @@
     "confidence": "^3.0.2",
     "fast-csv": "^2.4.0",
     "raven": "^2.1.0",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "through2-concurrent": "^1.1.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",

@@ -28,6 +28,8 @@ module Rover
           rpc :DeleteProfile, DeleteProfileRequest, DeleteProfileResponse
           # UpdateProfile updates profile with provided subset of attributes
           rpc :UpdateProfile, UpdateProfileRequest, UpdateProfileResponse
+          # Append a list of tags to the profiles `tags` attribute
+          rpc :TagProfile, TagProfileRequest, TagProfileResponse
           # GetProfileByDeviceId returns a profile which is associated to the device id
           rpc :GetProfileByDeviceId, GetProfileByDeviceIdRequest, GetProfileByDeviceIdResponse
           # deprecated (use GetProfile)

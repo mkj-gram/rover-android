@@ -265,3 +265,25 @@
   "attributes": {
   }
 }
+
+
+{
+  "account_id": 66,
+  "_id": { "$oid": "5aa89e400000a00000000000" },
+  "identifier": "no-tags",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": {
+  }
+}
+
+{
+  "account_id": 66,
+  "_id": { "$oid": "6325d3d40000000000000000" },
+  "identifier": "tags",
+  "created_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "updated_at": { "$date": "2017-10-30T14:05:53.102Z" },
+  "attributes": {
+    "tags": ["1", "2", "3"]
+  }
+}
