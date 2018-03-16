@@ -63,20 +63,15 @@ const renderRightContent = (
             >
                 <GridIcon
                     fill={charcoal}
-                    style={
-                        media === 'Desktop' && {
-                            transform: `scale(${5 / 6})`
-                        }
-                    }
-                    // onClick={() => window.console.log('grid icon')}
+                    height={media === 'Desktop' ? '20' : '24'}
+                    width={media === 'Desktop' ? '20' : '24'}
+                    viewBox="0 0 24 24"
                 />
                 <UserIcon
                     fill={charcoal}
-                    style={{
-                        transform:
-                            media === 'Desktop' ? `scale(${5 / 6})` : null,
-                        pointerEvents: 'none'
-                    }}
+                    height={media === 'Desktop' ? '20' : '24'}
+                    width={media === 'Desktop' ? '20' : '24'}
+                    viewBox="0 0 24 24"
                 />
             </div>
         )
@@ -244,10 +239,10 @@ class NavBar extends React.PureComponent<Props, State> {
                     >
                         <SearchIcon
                             fill={silver}
-                            style={{
-                                transform: `scale(${2 / 3})`,
-                                margin: '0 4px'
-                            }}
+                            height="16"
+                            width="16"
+                            viewBox="0 0 24 24"
+                            style={{ margin: '0 8px' }}
                         />
                         <Text
                             id="list-page-search"

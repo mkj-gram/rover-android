@@ -6,6 +6,7 @@ import { connect, Dispatch } from 'react-redux'
 import { closeNewCampaignPopover, openNewCampaignPopover } from '../../actions'
 import {
     getIsCreatingCampaign,
+    getIsNewCampaignPopoverClosing,
     getIsNewCampaignPopoverOpen
 } from '../../reducers'
 import LoadingIndicator from './LoadingIndicator'
@@ -51,6 +52,7 @@ export interface DispatchProps {
 
 export interface StateProps {
     isNewCampaignPopoverOpen: boolean
+    isNewCampaignPopoverClosing: boolean
 }
 
 class NewCampaignPopover extends React.PureComponent<
@@ -189,36 +191,36 @@ class NewCampaignPopover extends React.PureComponent<
                 return (
                     <CalendarIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             case 'AUTOMATED_NOTIFICATION':
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             case 'INTERSTITIAL':
                 return (
                     <PhoneIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             case 'WEB':
                 return (
                     <LinkIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
         }
@@ -308,7 +310,14 @@ class NewCampaignPopover extends React.PureComponent<
                             size="small"
                             label={true}
                             text={this.getCampaignSubtext(type)}
-                            textStyle={{ whiteSpace: 'nowrap' }}
+                            textStyle={{
+                                display: 'block',
+                                width: 270,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                overflowWrap: 'break-word',
+                                textOverflow: 'ellipsis'
+                            }}
                         />
                     </div>
                     <ChevronRightIcon
@@ -348,8 +357,7 @@ class NewCampaignPopover extends React.PureComponent<
                 {contentState === 'name-campaign' && (
                     <div
                         style={{
-                            padding: 16,
-                            paddingTop: media === 'Mobile' ? 0 : 16
+                            padding: '0 16px'
                         }}
                     >
                         <div
@@ -417,7 +425,12 @@ class NewCampaignPopover extends React.PureComponent<
     }
 
     render() {
-        const { media, onCreate, isNewCampaignPopoverOpen } = this.props
+        const {
+            media,
+            onCreate,
+            isNewCampaignPopoverOpen,
+            isNewCampaignPopoverClosing
+        } = this.props
         const { contentState, newCampaignName, newCampaignType } = this.state
         return (
             <Manager>
@@ -453,7 +466,11 @@ class NewCampaignPopover extends React.PureComponent<
                                 background: white,
                                 top: 0,
                                 left: 0,
-                                animation: `open 300ms ease`,
+                                animation: `${
+                                    isNewCampaignPopoverClosing
+                                        ? 'close'
+                                        : 'open'
+                                } 300ms ease`,
                                 overflowY: 'scroll'
                             }}
                         >
@@ -555,12 +572,26 @@ class NewCampaignPopover extends React.PureComponent<
     }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-    closeNewCampaignPopover: () => dispatch(closeNewCampaignPopover()),
-    openNewCampaignPopover: () => dispatch(openNewCampaignPopover())
-})
+const mapDispatchToProps = (
+    dispatch: Dispatch<any>,
+    ownProps: NewCampaignPopoverProps
+): DispatchProps => {
+    const { media } = ownProps
+    return {
+        closeNewCampaignPopover: () => {
+            if (media === 'Mobile') {
+                dispatch({ type: 'START_CLOSING_NEW_CAMPAIGN_POPOVER' })
+                setTimeout(() => dispatch(closeNewCampaignPopover()), 295)
+            } else {
+                dispatch(closeNewCampaignPopover())
+            }
+        },
+        openNewCampaignPopover: () => dispatch(openNewCampaignPopover())
+    }
+}
 
 const mapStateToProps = (state: State): StateProps => ({
+    isNewCampaignPopoverClosing: getIsNewCampaignPopoverClosing(state),
     isNewCampaignPopoverOpen: getIsNewCampaignPopoverOpen(state)
 })
 

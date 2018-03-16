@@ -126,6 +126,7 @@ type HomeState = {
     readonly isCreatingCampaign: boolean
     readonly isFetching: boolean
     readonly isNewCampaignPopoverOpen: boolean
+    readonly isNewCampaignPopoverClosing: boolean
     readonly isCampaignTypeSelectorOpen: boolean
     readonly isCampaignTypeSelectorClosing: boolean
 }

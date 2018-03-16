@@ -62,37 +62,49 @@ const ToolBar: React.SFC<Props> = ({
     )
 
     const renderLeftArrow = (leftArrowStyle?: React.CSSProperties) => (
-        <div onClick={() => onClick('backward')}>
-            <ArrowLeftIcon
-                fill={getLeftIconFill()}
-                style={{ margin: '0 8', ...leftArrowStyle }}
-            />
-        </div>
+        <ArrowLeftIcon
+            fill={getLeftIconFill()}
+            height={media === 'Desktop' ? '20' : '24'}
+            width={media === 'Desktop' ? '20' : '24'}
+            viewBox="0 0 24 24"
+            style={{ margin: '0 8', ...leftArrowStyle }}
+            onClick={() => onClick('backward')}
+        />
     )
+
     const renderRightArrow = (rightArrowStyle?: React.CSSProperties) => (
-        <div onClick={() => onClick('forward')}>
-            <ArrowRightIcon
-                fill={getRightIconFill()}
-                style={{ margin: '0 8', ...rightArrowStyle }}
-            />
-        </div>
+        <ArrowRightIcon
+            fill={getRightIconFill()}
+            height={media === 'Desktop' ? '20' : '24'}
+            width={media === 'Desktop' ? '20' : '24'}
+            viewBox="0 0 24 24"
+            style={{ margin: '0 8', ...rightArrowStyle }}
+            onClick={() => onClick('forward')}
+        />
     )
 
     if (media === 'Desktop') {
         return (
             <div style={style}>
                 {renderCurrentPage()}
-                {renderLeftArrow({ transform: `scale(${5 / 6})` })}
-                {renderRightArrow({ margin: 0, transform: `scale(${5 / 6})` })}
+                {renderLeftArrow()}
+                {renderRightArrow({ margin: 0 })}
             </div>
         )
     }
 
     if (media === 'Tablet') {
         return (
-            <div style={{ ...style, justifyContent: 'flex-start' }}>
-                {renderLeftArrow({ margin: 0 })}
-                {renderRightArrow()}
+            <div
+                style={{
+                    ...style,
+                    justifyContent: 'flex-start',
+                    paddingLeft: 24,
+                    paddingRight: 0
+                }}
+            >
+                {renderLeftArrow()}
+                {renderRightArrow({ marginLeft: 0 })}
                 {renderCurrentPage()}
             </div>
         )

@@ -54,36 +54,36 @@ const getCampaignIcon = (
                 return (
                     <CalendarIcon
                         fill={titanium}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             case 'PUBLISHED':
                 return (
                     <CalendarIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             case 'ARCHIVED':
                 return (
                     <CalendarIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             default:
                 return (
                     <CalendarIcon
                         fill="red"
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
         }
@@ -93,36 +93,36 @@ const getCampaignIcon = (
                 return (
                     <ZapIcon
                         fill={titanium}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             case 'PUBLISHED':
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             case 'ARCHIVED':
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
             default:
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={{
-                            transform: `scale(${5 / 6})`
-                        }}
+                        height="20"
+                        width="20"
+                        viewBox="0 0 24 24"
                     />
                 )
         }
@@ -395,13 +395,17 @@ const renderListButtons = (
             ? (icon = (
                   <GearIcon
                       fill={charcoal}
-                      style={{ transform: `scale(${5 / 6})` }}
+                      height="20"
+                      width="20"
+                      viewBox="0 0 24 24"
                   />
               ))
             : (icon = (
                   <BarChartIcon
                       fill={charcoal}
-                      style={{ transform: `scale(${5 / 6})` }}
+                      height="20"
+                      width="20"
+                      viewBox="0 0 24 24"
                   />
               ))
     }
@@ -411,13 +415,17 @@ const renderListButtons = (
             ? (icon = (
                   <GearIcon
                       fill={charcoal}
-                      style={{ transform: `scale(${5 / 6})` }}
+                      height="20"
+                      width="20"
+                      viewBox="0 0 24 24"
                   />
               ))
             : (icon = (
                   <BarChartIcon
                       fill={charcoal}
-                      style={{ transform: `scale(${5 / 6})` }}
+                      height="20"
+                      width="20"
+                      viewBox="0 0 24 24"
                   />
               ))
     }
@@ -426,7 +434,9 @@ const renderListButtons = (
             {icon}
             <MoreIcon
                 fill={charcoal}
-                style={{ transform: `scale(${5 / 6})` }}
+                height="20"
+                width="20"
+                viewBox="0 0 24 24"
             />
         </div>
     )
@@ -465,30 +475,32 @@ const CampaignsList: React.SFC<Props> = ({
     }
     return (
         <div style={baseStyle}>
-            {Object.keys(campaigns).slice(0).reverse().map((campaignId, index) => (
-                <div
-                    key={index}
-                    style={{
-                        width: '100%',
-                        height: 95,
-                        backgroundColor: 'white',
-                        flex: '0 0 auto',
-                        borderBottom:
-                            index === Object.keys(campaigns).length - 1
-                                ? 'none'
-                                : `1px solid ${titanium}`
-                    }}
-                    onClick={() =>
-                        media === 'Desktop' ? null : pushToOverview(campaignId)
-                    }
-                >
-                    {renderCampaign(
-                        campaigns[campaignId],
-                        media,
-                        pushToOverview
-                    )}
-                </div>
-            ))}
+            {Object.keys(campaigns)
+                .slice(0)
+                .reverse()
+                .map((campaignId, index) => (
+                    <div
+                        key={index}
+                        style={{
+                            width: '100%',
+                            height: 95,
+                            backgroundColor: 'white',
+                            flex: '0 0 auto',
+                            borderBottom: `1px solid ${titanium}`
+                        }}
+                        onClick={() =>
+                            media === 'Desktop'
+                                ? null
+                                : pushToOverview(campaignId)
+                        }
+                    >
+                        {renderCampaign(
+                            campaigns[campaignId],
+                            media,
+                            pushToOverview
+                        )}
+                    </div>
+                ))}
         </div>
     )
 }

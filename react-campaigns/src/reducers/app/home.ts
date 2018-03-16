@@ -35,6 +35,18 @@ const isNewCampaignPopoverOpen = (state = false, action: AnyAction) => {
     }
 }
 
+const isNewCampaignPopoverClosing = (state = false, action: AnyAction) => {
+    switch (action.type) {
+        case 'START_CLOSING_NEW_CAMPAIGN_POPOVER':
+            return true
+        case 'OPEN_NEW_CAMPAIGN_POPOVER':
+        case 'CLOSE_NEW_CAMPAIGN_POPOVER':
+            return false
+        default:
+            return state
+    }
+}
+
 const isCampaignTypeSelectorOpen = (state = false, action: AnyAction) => {
     switch (action.type) {
         case 'OPEN_CAMPAIGN_TYPE_SELECTOR':
@@ -63,6 +75,7 @@ export default combineReducers({
     isCreatingCampaign,
     isFetching,
     isNewCampaignPopoverOpen,
+    isNewCampaignPopoverClosing,
     isCampaignTypeSelectorOpen,
     isCampaignTypeSelectorClosing
 })
@@ -74,6 +87,9 @@ export const getIsFetching = (state: HomeState) => state.isFetching
 
 export const getIsNewCampaignPopoverOpen = (state: HomeState) =>
     state.isNewCampaignPopoverOpen
+
+export const getIsNewCampaignPopoverClosing = (state: HomeState) =>
+    state.isNewCampaignPopoverClosing
 
 export const getIsCampaignTypeSelectorOpen = (state: HomeState) =>
     state.isCampaignTypeSelectorOpen

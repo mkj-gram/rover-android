@@ -101,7 +101,7 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
         )
         styleElem.setAttribute('id', 'popoverCustomStyle')
         const { primary, secondary, border } = this.props.arrowColors
-        if (['left', 'right'].includes(placement)) {
+        if (placement === 'left' || placement === 'right') {
             if (parseInt(navBarHeight, 10) > parseInt(arrowPosition, 10)) {
                 styleElem.innerHTML = `
                 .popper[data-placement^='right'] .popper__arrow {

@@ -1,8 +1,21 @@
 /// <reference path="../../typings/index.d.ts"/>
 import * as React from 'react'
 
-export default ({ fill, style }: RoverSVGProps) => (
-    <svg width="24" height="24" style={{ ...style }}>
+export default ({
+    fill,
+    height = '24',
+    onClick,
+    style,
+    width = '24',
+    viewBox
+}: RoverSVGProps) => (
+    <svg
+        width={width}
+        height={height}
+        viewBox={viewBox}
+        onClick={onClick}
+        style={{ ...style }}
+    >
         <g fill={fill} fillRule="nonzero">
             <path
                 // tslint:disable-next-line:max-line-length

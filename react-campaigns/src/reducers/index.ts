@@ -24,6 +24,9 @@ export const getIsFetching = (state: State) =>
 export const getIsNewCampaignPopoverOpen = (state: State) =>
     appSelector.getIsNewCampaignPopoverOpen(state.app)
 
+export const getIsNewCampaignPopoverClosing = (state: State) =>
+    appSelector.getIsNewCampaignPopoverClosing(state.app)
+
 export const getIsCampaignTypeSelectorOpen = (state: State) =>
     appSelector.getIsCampaignTypeSelectorOpen(state.app)
 

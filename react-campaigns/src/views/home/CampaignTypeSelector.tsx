@@ -63,49 +63,46 @@ const CampaignTypeSelector: React.SFC<
     const getCampaignTypeIcon = (
         type: QueryParams['campaignType']
     ): JSX.Element => {
+        const iconStyle = { marginLeft: 10 }
         switch (type) {
             case 'scheduled':
                 return (
                     <CalendarIcon
                         fill={steel}
-                        style={
-                            media === 'Desktop' && {
-                                transform: `scale(${5 / 6})`
-                            }
-                        }
+                        height={media === 'Desktop' ? '20' : '24'}
+                        width={media === 'Desktop' ? '20' : '24'}
+                        viewBox="0 0 24 24"
+                        style={iconStyle}
                     />
                 )
             case 'automated':
                 return (
                     <ZapIcon
                         fill={steel}
-                        style={
-                            media === 'Desktop' && {
-                                transform: `scale(${5 / 6})`
-                            }
-                        }
+                        height={media === 'Desktop' ? '20' : '24'}
+                        width={media === 'Desktop' ? '20' : '24'}
+                        viewBox="0 0 24 24"
+                        style={iconStyle}
                     />
                 )
             case 'web':
                 return (
                     <LinkIcon
                         fill={steel}
-                        style={
-                            media === 'Desktop' && {
-                                transform: `scale(${5 / 6})`
-                            }
-                        }
+                        height={media === 'Desktop' ? '20' : '24'}
+                        width={media === 'Desktop' ? '20' : '24'}
+                        viewBox="0 0 24 24"
+                        style={iconStyle}
                     />
                 )
             case 'interstitial':
                 return (
                     <PhoneIcon
                         fill={steel}
-                        style={
-                            media === 'Desktop' && {
-                                transform: `scale(${5 / 6})`
-                            }
-                        }
+                        height={media === 'Desktop' ? '20' : '24'}
+                        width={media === 'Desktop' ? '20' : '24'}
+                        viewBox="0 0 24 24"
+                        style={iconStyle}
                     />
                 )
             case 'all':
@@ -113,11 +110,10 @@ const CampaignTypeSelector: React.SFC<
                 return (
                     <CheckIcon
                         fill={steel}
-                        style={
-                            media === 'Desktop' && {
-                                transform: `scale(${5 / 6})`
-                            }
-                        }
+                        height={media === 'Desktop' ? '20' : '24'}
+                        width={media === 'Desktop' ? '20' : '24'}
+                        viewBox="0 0 24 24"
+                        style={iconStyle}
                     />
                 )
         }
@@ -162,9 +158,7 @@ const CampaignTypeSelector: React.SFC<
         }
         return (
             <div style={style} onClick={() => setListType(type)}>
-                <div style={{ marginLeft: 10, flex: 'none', height: 24 }}>
-                    {getCampaignTypeIcon(type)}
-                </div>
+                {getCampaignTypeIcon(type)}
                 <div style={{ marginLeft: 26, flex: '1 1 auto' }}>
                     <Text text={typeName} size="medium" />
                 </div>
@@ -189,14 +183,11 @@ const CampaignTypeSelector: React.SFC<
                             alignItems: 'center'
                         }}
                     >
-                        {listType !== 'all' && (
-                            <div style={{ height: 24, marginRight: 8 }}>
-                                {getCampaignTypeIcon(listType)}
-                            </div>
-                        )}
+                        {listType !== 'all' && getCampaignTypeIcon(listType)}
                         <Text
                             text={getFormattedListType(listType)}
                             size="medium"
+                            textStyle={{ marginLeft: 8 }}
                         />
                         <div style={{ height: 16, marginLeft: 4 }}>
                             <FilterArrowIcon />
