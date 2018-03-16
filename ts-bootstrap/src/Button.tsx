@@ -50,7 +50,7 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
         this.handleMouseEvent = this.handleMouseEvent.bind(this)
     }
 
-    handleMouseEvent(val: string, eventType: string) {
+    handleMouseEvent(e: any, val: string, eventType: string) {
         const { device } = this.props
         if (eventType === 'touch' && device !== 'Desktop') {
             this.setState({
@@ -58,6 +58,8 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
             })
 
             if (val === 'up') {
+                e.preventDefault()
+
                 this.props.onClick()
             }
         } else if (eventType === 'mouse' && device === 'Desktop') {
@@ -173,10 +175,12 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
             ret = (
                 <div
                     style={outerStyle}
-                    onMouseDown={() => this.handleMouseEvent('down', 'mouse')}
-                    onMouseUp={() => this.handleMouseEvent('up', 'mouse')}
-                    onTouchStart={() => this.handleMouseEvent('down', 'touch')}
-                    onTouchEnd={() => this.handleMouseEvent('up', 'touch')}
+                    onMouseDown={e => this.handleMouseEvent(e, 'down', 'mouse')}
+                    onMouseUp={e => this.handleMouseEvent(e, 'up', 'mouse')}
+                    onTouchStart={e =>
+                        this.handleMouseEvent(e, 'down', 'touch')
+                    }
+                    onTouchEnd={e => this.handleMouseEvent(e, 'up', 'touch')}
                 >
                     <div style={innerStyle}>{text}</div>
                 </div>

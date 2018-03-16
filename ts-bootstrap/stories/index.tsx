@@ -650,10 +650,8 @@ storiesOf('Popover', module).add('various cases', () => {
             })
         }
 
-        onClick(selected: string) {
-            this.setState({
-                selected
-            })
+        onClick() {
+            this.toggle2()
         }
 
         render() {
@@ -703,34 +701,33 @@ storiesOf('Popover', module).add('various cases', () => {
                                         toggle={this.toggle2}
                                         targetParent="root"
                                         targetId="target5"
-                                    >
-                                        <div
-                                            style={{
-                                                width: '100%',
-                                                height: 56
-                                            }}
-                                        >
-                                            <TabBar>
-                                                {['one', 'two', 'three'].map(
-                                                    tab => (
-                                                        <Tab
-                                                            val={tab}
-                                                            selected={
-                                                                this.state
-                                                                    .selected
-                                                            }
-                                                            onClick={
-                                                                this.onClick
-                                                            }
-                                                            key={tab}
-                                                        />
-                                                    )
-                                                )}
-                                            </TabBar>
-                                        </div>
-                                    </Popover>
+                                        navBarProperties={{
+                                            buttonLeft: 'Button',
+                                            title: 'Title',
+                                            buttonRight: 'Button',
+                                            buttonRightCallback: () =>
+                                                this.toggle2(),
+                                            id: 'navBarId',
+                                            style: {
+                                                containerStyle: {
+                                                    borderRadius:
+                                                        '3px 3px 0px 0px'
+                                                }
+                                            }
+                                        }}
+                                    />
                                 )}
                             </Manager>
+                        </div>
+                        <div
+                            onClick={() => null}
+                            style={{
+                                width: 300,
+                                height: 100,
+                                background: 'yellow'
+                            }}
+                        >
+                            okahy
                         </div>
 
                         <div>

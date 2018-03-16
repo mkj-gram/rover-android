@@ -5,10 +5,11 @@ import NavBar from './NavBar'
 import { titanium, white } from '../styles/colors'
 import { Popper, Arrow } from 'react-popper'
 import PopperJS from 'popper.js'
+import ResponsiveContainer from '../components/ResponsiveContainer'
 
 export type func = () => void
 
-export interface PopoverProps {
+export interface PopoverProps extends InjectedProps {
     placement?: PopperJS.Placement
     children?: JSX.Element
     containerStyle?: React.CSSProperties
@@ -17,11 +18,11 @@ export interface PopoverProps {
     navBarProperties?: StringMap<string | number | object | func>
 
     toggleable?: boolean
-    targetId: string
+    targetId?: string
     targetParent?: string
 }
 
-class Popover extends React.Component<PopoverProps, {}> {
+class PopoverComponent extends React.Component<PopoverProps, {}> {
     static defaultProps: Partial<PopoverProps> = {
         placement: 'left',
         arrowColors: {
@@ -43,14 +44,39 @@ class Popover extends React.Component<PopoverProps, {}> {
     }
 
     componentDidMount() {
-        document.addEventListener('mousedown', this.handleClickOutside)
-        document.addEventListener('touchstart', this.handleClickOutside)
-        document.addEventListener('keydown', this.handleKeyPress, false)
+        const { device } = this.props
+        switch (device) {
+            case 'Desktop':
+                document.addEventListener('mouseup', this.handleClickOutside)
+                document.addEventListener('keydown', this.handleKeyPress, false)
+                break
+            case 'Tablet':
+            case 'Mobile':
+            default:
+                document.addEventListener('touchend', this.handleClickOutside)
+                break
+        }
     }
     componentWillUnmount() {
-        document.removeEventListener('mousedown', this.handleClickOutside)
-        document.removeEventListener('touchstart', this.handleClickOutside)
-        document.removeEventListener('keydown', this.handleKeyPress, false)
+        const { device } = this.props
+        switch (device) {
+            case 'Desktop':
+                document.removeEventListener('mouseup', this.handleClickOutside)
+                document.removeEventListener(
+                    'keydown',
+                    this.handleKeyPress,
+                    false
+                )
+                break
+            case 'Tablet':
+            case 'Mobile':
+            default:
+                document.removeEventListener(
+                    'touchend',
+                    this.handleClickOutside
+                )
+                break
+        }
     }
 
     handleKeyPress(e: KeyboardEvent) {
@@ -164,6 +190,7 @@ class Popover extends React.Component<PopoverProps, {}> {
                 .contains(e.target as HTMLElement) &&
             this.props.toggleable
         ) {
+            e.preventDefault()
             this.props.toggle()
         }
     }
@@ -309,6 +336,14 @@ class Popover extends React.Component<PopoverProps, {}> {
             document.getElementById(targetParent)
         )
     }
+}
+
+const Popover: React.SFC<PopoverProps> = props => {
+    const ResponsivePopoverContainer = ResponsiveContainer(props)(
+        PopoverComponent
+    )
+
+    return <ResponsivePopoverContainer />
 }
 
 export default Popover
