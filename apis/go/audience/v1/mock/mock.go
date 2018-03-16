@@ -449,6 +449,24 @@ func (mr *MockAudienceClientMockRecorder) SetDeviceProfileIdentifier(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetDeviceProfileIdentifier", reflect.TypeOf((*MockAudienceClient)(nil).SetDeviceProfileIdentifier), varargs...)
 }
 
+// TagProfile mocks base method
+func (m *MockAudienceClient) TagProfile(arg0 context.Context, arg1 *v1.TagProfileRequest, arg2 ...grpc.CallOption) (*v1.TagProfileResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "TagProfile", varargs...)
+	ret0, _ := ret[0].(*v1.TagProfileResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TagProfile indicates an expected call of TagProfile
+func (mr *MockAudienceClientMockRecorder) TagProfile(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TagProfile", reflect.TypeOf((*MockAudienceClient)(nil).TagProfile), varargs...)
+}
+
 // UpdateDevice mocks base method
 func (m *MockAudienceClient) UpdateDevice(arg0 context.Context, arg1 *v1.UpdateDeviceRequest, arg2 ...grpc.CallOption) (*v1.UpdateDeviceResponse, error) {
 	varargs := []interface{}{arg0, arg1}

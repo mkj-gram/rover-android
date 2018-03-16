@@ -3,6 +3,7 @@
 set -e
 
 export PATH=/go/bin:$PATH
+export WORKDIR=/go/src/github.com/roverplatform/rover
 
 mkdir -p /go/bin
 mkdir -p /go/src/github.com/golang
