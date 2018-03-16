@@ -25,7 +25,10 @@ import {
 } from '@rover/ts-bootstrap/dist/src'
 import { turquoise } from '@rover/ts-bootstrap/dist/styles/colors'
 
-import { getAlertOptionHoverValue } from '../../../reducers'
+import {
+    getAlertOptionHoverValue,
+    getIsAlertOptionsOpen
+} from '../../../reducers'
 
 export interface AlertOptionsRowsProps {
     device?: string
@@ -33,7 +36,7 @@ export interface AlertOptionsRowsProps {
 }
 
 export interface StateProps {
-    alertOptionModal?: StringMap<string | boolean>
+    deviceInfoSelected: string
     editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
     hoverValue?: string
 }
@@ -52,7 +55,7 @@ type alertType =
 const AlertOptionsRows: React.SFC<
     AlertOptionsRowsProps & StateProps & DispatchProps
 > = ({
-    alertOptionModal,
+    deviceInfoSelected,
     editableCampaign,
     hoverValue,
     device,
@@ -194,8 +197,6 @@ const AlertOptionsRows: React.SFC<
         }
     }
 
-    const { deviceInfoSelected } = alertOptionModal
-
     const matchName: StringMap<string> = {
         'Push Notification': 'notificationAlertOptionPushNotification',
         'Notification Center': 'notificationAlertOptionNotificationCenter',
@@ -305,7 +306,7 @@ const AlertOptionsRows: React.SFC<
 }
 
 const mapStateToProps = (state: State): StateProps => ({
-    alertOptionModal: state.modal,
+    deviceInfoSelected: getIsAlertOptionsOpen(state),
     editableCampaign: state.editableCampaign,
     hoverValue: getAlertOptionHoverValue(state)
 })

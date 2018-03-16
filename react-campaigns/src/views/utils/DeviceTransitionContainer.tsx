@@ -3,13 +3,15 @@ import * as React from 'react'
 import { cloud } from '@rover/ts-bootstrap/dist/src'
 import { connect } from 'react-redux'
 
+import { getIsOverviewModalOpen } from '../../reducers'
+
 export interface DeviceTransitionContainerProps {
     children?: JSX.Element
     device: string
 }
 
 export interface OwnProps {
-    overviewModal?: StringMap<string | boolean>
+    displayOverviewModal?: string
 }
 
 class DeviceTransitionContainer extends React.Component<
@@ -20,16 +22,12 @@ class DeviceTransitionContainer extends React.Component<
         super(props)
     }
 
-    shouldComponentUpdate(
-        nextProps: DeviceTransitionContainerProps & OwnProps,
-        nextState: {}
-    ) {
-        return !nextProps.overviewModal.overviewModalDisplayReset
-    }
-
     render() {
-        const { children, device, overviewModal } = this.props
+        const { children, device, displayOverviewModal } = this.props
         const Fragment = React.Fragment
+
+        const overviewContainerAnimation =
+            displayOverviewModal === 'close' ? 'fadeOut' : 'fade'
 
         if (device === 'Desktop') {
             return (
@@ -40,9 +38,7 @@ class DeviceTransitionContainer extends React.Component<
                         backgroundColor: cloud,
                         display: 'flex',
                         overflowY: 'hidden',
-                        animation: `${
-                            overviewModal.overviewContainerAnimation
-                        } 600ms ease`,
+                        animation: `${overviewContainerAnimation} 600ms ease`,
                         position: 'absolute',
                         zIndex: 2
                     }}
@@ -52,9 +48,7 @@ class DeviceTransitionContainer extends React.Component<
                         style={{
                             flex: '1 1 769px',
                             display: 'flex',
-                            animation: `${
-                                overviewModal.overviewModalDisplay
-                            } 500ms ease`,
+                            animation: `${displayOverviewModal} 500ms ease`,
                             maxWidth: 769,
                             position: 'relative'
                         }}
@@ -83,9 +77,7 @@ class DeviceTransitionContainer extends React.Component<
                         height: '100vh',
                         width: '100%',
                         display: 'flex',
-                        animation: `${
-                            overviewModal.overviewModalDisplay
-                        } 500ms ease`,
+                        animation: `${displayOverviewModal} 500ms ease`,
                         position: 'absolute',
                         zIndex: 2
                     }}
@@ -99,7 +91,7 @@ class DeviceTransitionContainer extends React.Component<
 }
 
 const mapStateToProps = (state: State): OwnProps => ({
-    overviewModal: state.modal
+    displayOverviewModal: getIsOverviewModalOpen(state)
 })
 
 export default connect(mapStateToProps, {})(DeviceTransitionContainer)

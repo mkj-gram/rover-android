@@ -164,6 +164,12 @@ type AppState = {
     home: HomeState
     notificationDelivery: NotificationDeliveryState
     notification: AlertOptionsHoverState
+    overview: OverviewModalState
+}
+
+type OverviewModalState = {
+    readonly isOverviewModalOpen: string
+    readonly isSendTestModalOpen: string
 }
 
 type NotificationDeliveryState = {
@@ -173,6 +179,7 @@ type NotificationDeliveryState = {
 
 type AlertOptionsHoverState = {
     readonly alertOptionsHoverValue: string
+    readonly isAlertOptionsOpen: string
 }
 
 interface InjectedProps {

@@ -3,7 +3,9 @@
 import * as editableCampaignActions from './editableCampaign'
 import * as campaignsActions from './campaigns'
 import * as testDevicesActions from './testDevices'
-import * as modalActions from './modal'
+import * as notificationActions from './notification'
+
+import * as overviewActions from './overview'
 import * as H from 'history'
 
 import { Action, Dispatch, ActionCreator } from 'redux'
@@ -11,13 +13,10 @@ import { ThunkAction } from 'redux-thunk'
 
 // Overview Modal
 export const handleSendTestModalDisplay = (on?: boolean) =>
-    modalActions.handleSendTestModalDisplay(on)
+    overviewActions.handleSendTestModalDisplay(on)
 
-export const handleOverviewModalDisplay = (history: H.History) =>
-    modalActions.handleOverviewModalDisplay(history)
-
-export const handleAlertOptionsModalDisplay = (deviceInfoSelected?: string) =>
-    modalActions.handleAlertOptionsModalDisplay(deviceInfoSelected)
+export const handleOverviewModalDisplay = (history: H.History, open: boolean) =>
+    overviewActions.handleOverviewModalDisplay(history, open)
 
 export const fetchTestDevices = (
     predicates?: string,
@@ -132,3 +131,6 @@ export const setHoverOption: ActionCreator<ThunkAction<void, State, void>> = (
 ) => (dispatch: Dispatch<State>): void => {
     dispatch({ type: 'SET_HOVER_OPTION', hover })
 }
+
+export const handleAlertOptionsModalDisplay = (deviceInfoSelected?: string) =>
+    notificationActions.handleAlertOptionsModalDisplay(deviceInfoSelected)

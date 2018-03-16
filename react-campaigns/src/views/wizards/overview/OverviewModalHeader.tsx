@@ -8,7 +8,7 @@ import {
     archiveCampaign
 } from '../../../actions/campaigns'
 import { getCampaign } from '../../../reducers'
-import { handleOverviewModalDisplay } from '../../../actions/modal'
+import { handleOverviewModalDisplay } from '../../../actions'
 import { Link } from 'react-router-dom'
 import * as H from 'history'
 
@@ -44,7 +44,7 @@ export interface DispatchProps {
     renameCampaign: (name: string, campaignId: number) => void
     duplicateCampaign: (name: string, campaignId: number) => void
     archiveCampaign: (campaignId: number) => void
-    handleOverviewModalDisplay: (history: H.History) => void
+    handleOverviewModalDisplay: (history: H.History, open: boolean) => void
 }
 
 export type StateProps = {
@@ -115,15 +115,23 @@ class OverviewModalHeader extends React.Component<
                 showPopover: false
             })
         } else if (val === 'Duplicate') {
-            duplicateCampaign(`${campaignName}- Copy`, parseInt(campaignId, 10))
-            this.setState({
-                showPopover: false
-            })
+            this.setState(
+                {
+                    showPopover: false
+                },
+                () =>
+                    duplicateCampaign(
+                        `${campaignName}- Copy`,
+                        parseInt(campaignId, 10)
+                    )
+            )
         } else if (val === 'Archive') {
-            archiveCampaign(parseInt(campaignId, 10))
-            this.setState({
-                showPopover: false
-            })
+            this.setState(
+                {
+                    showPopover: false
+                },
+                () => archiveCampaign(parseInt(campaignId, 10))
+            )
         }
     }
 
@@ -135,7 +143,7 @@ class OverviewModalHeader extends React.Component<
     }
 
     handleClose() {
-        this.props.handleOverviewModalDisplay(this.props.history)
+        this.props.handleOverviewModalDisplay(this.props.history, false)
     }
 
     render() {
@@ -231,24 +239,40 @@ const mapDispatchToProps = (
             dispatch(renameCampaign(name, campaignId))
         },
         duplicateCampaign: (name, campaignId) => {
-            dispatch(duplicateCampaign(name, campaignId)).then(id => {
-                let params = location.search.replace(
-                    `campaignId=${campaignId}`,
-                    `campaignId=${id}`
-                )
-
-                history.push(`${location.pathname}${params}`)
+            dispatch({
+                type: 'CLOSE_OVERVIEW_MODAL'
             })
+            setTimeout(() => {
+                dispatch(duplicateCampaign(name, campaignId)).then(id => {
+                    dispatch({
+                        type: 'OPEN_OVERVIEW_MODAL'
+                    })
+                    let params = location.search.replace(
+                        `campaignId=${campaignId}`,
+                        `campaignId=${id}`
+                    )
+
+                    history.push(`${location.pathname}${params}`)
+                })
+            }, 500)
         },
         archiveCampaign: campaignId => {
-            dispatch(archiveCampaign(campaignId)).then(complete => {
-                if (complete) {
-                    history.push(`/campaigns/`)
-                }
+            dispatch({
+                type: 'CLOSE_OVERVIEW_MODAL'
             })
+            setTimeout(() => {
+                dispatch(archiveCampaign(campaignId)).then(complete => {
+                    dispatch({
+                        type: 'OPEN_OVERVIEW_MODAL'
+                    })
+                    if (complete) {
+                        history.push(`/campaigns/`)
+                    }
+                })
+            }, 500)
         },
-        handleOverviewModalDisplay: () => {
-            dispatch(handleOverviewModalDisplay(history))
+        handleOverviewModalDisplay: (_, open) => {
+            dispatch(handleOverviewModalDisplay(history, open))
         }
     }
 }
@@ -258,6 +282,7 @@ const mapStateToProps = (
     ownProps: OverviewModalHeaderProps
 ): StateProps => {
     const campaign = getCampaign(state, ownProps.campaignId)
+
     return {
         campaignName: campaign.name,
         campaignType: campaign.campaignType

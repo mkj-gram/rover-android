@@ -5,8 +5,14 @@ import { combineReducers } from 'redux'
 import home, * as homeSelector from './home'
 import notificationDelivery, * as notificationDeliverySelector from './notificationDelivery'
 import notification, * as notificationSelector from './notification'
+import overview, * as overviewSelector from './overview'
 
-export default combineReducers({ notification, home, notificationDelivery })
+export default combineReducers({
+    notification,
+    home,
+    notificationDelivery,
+    overview
+})
 
 export const getIsCreatingCampaign = (state: AppState) =>
     homeSelector.getIsCreatingCampaign(state.home)
@@ -33,3 +39,12 @@ export const getLastViewPage = (state: AppState) =>
 
 export const getAlertOptionHoverValue = (state: AppState) =>
     notificationSelector.getAlertOptionHoverValue(state.notification)
+
+export const getIsAlertOptionsOpen = (state: AppState) =>
+    notificationSelector.getIsAlertOptionsOpen(state.notification)
+
+export const getIsOverviewModalOpen = (state: AppState) =>
+    overviewSelector.getIsOverviewModalOpen(state.overview)
+
+export const getIsSendTestModalOpen = (state: AppState) =>
+    overviewSelector.getIsSendTestModalOpen(state.overview)

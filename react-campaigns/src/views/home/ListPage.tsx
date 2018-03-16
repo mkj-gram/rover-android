@@ -10,7 +10,8 @@ import { parse, stringify } from 'qs'
 import {
     closeCampaignTypeSelector,
     createCampaign,
-    fetchCampaigns
+    fetchCampaigns,
+    handleOverviewModalDisplay
 } from '../../actions'
 import { getAllCampaigns } from '../../reducers'
 
@@ -29,6 +30,7 @@ export interface DispatchProps {
     fetchCampaigns: () => void
     closeCampaignTypeSelector: () => void
     createCampaign: (name: string, campaignType: CampaignType) => void
+    handleOverviewModalDisplay: (history: H.History, open: boolean) => void
 }
 
 export interface StateProps {
@@ -140,6 +142,7 @@ class ListPage extends React.PureComponent<
         })
 
         history.replace(`/campaigns/wizard/?${newQuery}`)
+        this.props.handleOverviewModalDisplay(history, true)
     }
     render() {
         const { Fragment } = React
@@ -287,6 +290,9 @@ const mapDispatchToProps = (
                     keyword
                 )
             )
+        },
+        handleOverviewModalDisplay: (_, open) => {
+            dispatch(handleOverviewModalDisplay(ownProps.history, open))
         }
     }
 }

@@ -6,13 +6,11 @@ import app, * as appSelector from './app'
 import editableCampaign, * as editableCampaignSelector from './editableCampaign'
 import campaigns, * as campaignsSelector from './campaigns'
 import testDevices from './testDevices'
-import modal from './modal'
 
 export default combineReducers({
     app,
     campaigns,
     testDevices,
-    modal,
     editableCampaign
 })
 
@@ -32,6 +30,13 @@ export const getIsCampaignTypeSelectorOpen = (state: State) =>
 export const getIsCampaignTypeSelectorClosing = (state: State) =>
     appSelector.getIsCampaignTypeSelectorClosing(state.app)
 
+// Overview
+export const getIsOverviewModalOpen = (state: State) =>
+    appSelector.getIsOverviewModalOpen(state.app)
+
+export const getIsSendTestModalOpen = (state: State) =>
+    appSelector.getIsSendTestModalOpen(state.app)
+
 // Notification Delivery
 export const getIsNotificationDeliveryModalOpen = (state: State) =>
     appSelector.getIsNotificationDeliveryModalOpen(state.app)
@@ -39,6 +44,9 @@ export const getIsNotificationDeliveryModalOpen = (state: State) =>
 // Notification: Alert Options
 export const getAlertOptionHoverValue = (state: State) =>
     appSelector.getAlertOptionHoverValue(state.app)
+
+export const getIsAlertOptionsOpen = (state: State) =>
+    appSelector.getIsAlertOptionsOpen(state.app)
 
 // Notification: Get Last View Page
 export const getLastViewPage = (state: State) =>

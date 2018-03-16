@@ -9,6 +9,8 @@ import {
     white
 } from '@rover/ts-bootstrap/dist/src'
 
+import { getIsSendTestModalOpen } from '../../../reducers'
+
 export interface SendTestPopoverProps {
     device?: string
     buttonLeftCallback?: () => void
@@ -19,7 +21,7 @@ export interface SendTestPopoverProps {
 }
 
 export interface OwnProps {
-    overviewModal?: StringMap<string | boolean>
+    sendTestModalDisplay?: string
 }
 
 export type textSize = 'h1' | 'h2' | 'large' | 'medium' | 'small'
@@ -101,7 +103,8 @@ class SendTestComponent extends React.Component<
             device,
             buttonLeftCallback,
             buttonRightCallback,
-            selectedTestDevices
+            selectedTestDevices,
+            sendTestModalDisplay
         } = this.props
 
         let ret
@@ -138,9 +141,7 @@ class SendTestComponent extends React.Component<
                         background: white,
                         top: 0,
                         left: 0,
-                        animation: `${
-                            this.props.overviewModal.sendTestModalDisplay
-                        } 300ms ease`,
+                        animation: `${sendTestModalDisplay} 300ms ease`,
                         overflowY: 'scroll'
                     }}
                 >
@@ -179,7 +180,7 @@ class SendTestComponent extends React.Component<
 }
 
 const mapStateToProps = (state: State): OwnProps => ({
-    overviewModal: state.modal
+    sendTestModalDisplay: getIsSendTestModalOpen(state)
 })
 
 export default connect(mapStateToProps, {})(SendTestComponent)

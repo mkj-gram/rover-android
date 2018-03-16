@@ -241,6 +241,7 @@ export const duplicateCampaign: ActionCreator<
                 type: 'DUPLICATE_CAMPAIGN_SUCCESS',
                 campaigns
             })
+
             return Promise.resolve(data.duplicateCampaign.campaignId)
         },
         error => {
@@ -301,9 +302,6 @@ export const renameCampaign: ActionCreator<
     dispatch: Dispatch<State>,
     getState: () => State
 ): Promise<Action> => {
-    dispatch({
-        type: 'SET_OVERVIEW_MODAL_NO_ANIMATION'
-    })
     const query: DocumentNode = gql`
         mutation RenameCampaign($name: String!, $campaignId: Int!) {
             renameCampaign(name: $name, campaignId: $campaignId)
@@ -318,33 +316,27 @@ export const renameCampaign: ActionCreator<
         }
     }
 
-    return Environment(request)
-        .then(
-            ({ data }) => {
-                const campaigns = {
-                    ...getState().campaigns,
-                    [campaignId]: {
-                        ...getState().campaigns[campaignId],
-                        name
-                    }
+    return Environment(request).then(
+        ({ data }) => {
+            const campaigns = {
+                ...getState().campaigns,
+                [campaignId]: {
+                    ...getState().campaigns[campaignId],
+                    name
                 }
-                return dispatch({
-                    type: 'RENAME_CAMPAIGN_SUCCESS',
-                    campaigns
-                })
-            },
-            error => {
-                return dispatch({
-                    type: ' RENAME_CAMPAIGN_FAILURE',
-                    message: error.message
-                })
             }
-        )
-        .then(() => {
             return dispatch({
-                type: 'SET_OVERVIEW_MODAL_RESET'
+                type: 'RENAME_CAMPAIGN_SUCCESS',
+                campaigns
             })
-        })
+        },
+        error => {
+            return dispatch({
+                type: ' RENAME_CAMPAIGN_FAILURE',
+                message: error.message
+            })
+        }
+    )
 }
 
 export const fetchCampaigns: ActionCreator<

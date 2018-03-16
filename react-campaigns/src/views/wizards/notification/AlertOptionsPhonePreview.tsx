@@ -3,6 +3,7 @@ import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
 import { handleAlertOptionsModalDisplay } from '../../../actions'
+import { getIsAlertOptionsOpen } from '../../../reducers'
 
 import {
     PhoneComponent,
@@ -12,7 +13,7 @@ import {
 } from '@rover/ts-bootstrap/dist/src'
 
 export interface StateProps {
-    alertOptionModal?: StringMap<string | boolean>
+    deviceInfoSelected: string
 }
 
 export interface AlertOptionsPhonePreviewProps {
@@ -84,7 +85,7 @@ class AlertOptionsPhonePreview extends React.Component<
         if (device === 'Desktop') {
             return view
         } else {
-            const { deviceInfoSelected } = this.props.alertOptionModal
+            const { deviceInfoSelected } = this.props
             let animationVal = 'close'
             if ((deviceInfoSelected as string).length !== 0) {
                 animationVal = deviceInfoSelected === 'close' ? 'close' : 'open'
@@ -111,6 +112,13 @@ class AlertOptionsPhonePreview extends React.Component<
                         buttonLeftCallback={() =>
                             this.props.handleAlertOptionsModalDisplay('')
                         }
+                        style={{
+                            buttonLeftStyle: {
+                                outerStyle: {
+                                    marginLeft: 24
+                                }
+                            }
+                        }}
                     />
                     <div
                         style={{
@@ -133,7 +141,7 @@ class AlertOptionsPhonePreview extends React.Component<
 }
 
 const mapStateToProps = (state: State): StateProps => ({
-    alertOptionModal: state.modal
+    deviceInfoSelected: getIsAlertOptionsOpen(state)
 })
 
 const mapDispatchToProps = (
