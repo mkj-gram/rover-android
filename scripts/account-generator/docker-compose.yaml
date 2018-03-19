@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+
+  account-generator:
+    image: node:7.10.1
+    depends_on:
+      - audience-service
+    working_dir: /rover/scripts/account-generator/
+    volumes:
+      - ../:/rover
+    command: node index.js
+    environment:
+      AUDIENCE_V1_SERVICE_HOST: audience-service

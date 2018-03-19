@@ -1,0 +1,19 @@
+{
+  "name": "account-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@rover-common/grpc-promisify": "../../node/grpc-promisify",
+    "@rover/audience-client": "../../audience/clients/node",
+    "faker": "^4.1.0",
+    "through2": "^2.0.3",
+    "through2-concurrent": "^1.1.1",
+    "uuid": "^3.2.1"
+  },
+  "author": "",
+  "license": "ISC"
+}
