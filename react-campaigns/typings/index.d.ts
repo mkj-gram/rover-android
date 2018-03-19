@@ -17,6 +17,7 @@ type NotificationTapBehaviorType =
     | 'OPEN_APP'
     | 'OPEN_EXPERIENCE'
     | 'OPEN_DEEP_LINK'
+    | 'OPEN_WEBSITE'
 
 type NotificationTapPresentationType = 'UNKNOWN' | 'IN_APP' | 'IN_BROWSER'
 
@@ -36,12 +37,19 @@ interface StringMap<T> {
     [x: string]: T
 }
 
+interface UIStateInterface {
+    notification: StringMap<StringMap<boolean>>
+    showExperience: boolean // Deprecate when updating overview page
+}
+
+type UIStateType = 'notification'
+
 declare abstract class Campaign {
     name: string
     campaignId: string
     campaignType: CampaignType
     campaignStatus: CampaignStatus
-    UIState: string
+    UIState: UIStateInterface | string
 }
 
 declare class ScheduledCampaign extends Campaign {
@@ -164,7 +172,7 @@ type QueryParams = {
 type AppState = {
     home: HomeState
     notificationDelivery: NotificationDeliveryState
-    notification: AlertOptionsHoverState
+    notification: NotificationState
     overview: OverviewModalState
 }
 
@@ -178,7 +186,9 @@ type NotificationDeliveryState = {
     readonly lastViewPage: string
 }
 
-type AlertOptionsHoverState = {
+type NotificationState = {
+    readonly isTapBehaviorSelectorOpen: string
+    readonly isTapBehaviorWebsitePresentationOpen: string
     readonly alertOptionsHoverValue: string
     readonly isAlertOptionsOpen: string
 }

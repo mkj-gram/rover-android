@@ -51,3 +51,10 @@ export const getIsOverviewModalOpen = (state: AppState) =>
 
 export const getIsSendTestModalOpen = (state: AppState) =>
     overviewSelector.getIsSendTestModalOpen(state.overview)
+export const getIsTapBehaviorSelectorOpen = (state: AppState) =>
+    notificationSelector.getIsTapBehaviorSelectorOpen(state.notification)
+
+export const getIsTapBehaviorWebsitePresentationOpen = (state: AppState) =>
+    notificationSelector.getIsTapBehaviorWebsitePresentationOpen(
+        state.notification
+    )

@@ -14,8 +14,8 @@ import { text as typographyText, semibold } from '../styles/typography'
 import ResponsiveContainer from '../components/ResponsiveContainer'
 
 export type propStyle = {
-    innerStyle?: React.CSSProperties
-    outerStyle?: React.CSSProperties
+    innerStyle?: StringMap<string | number>
+    outerStyle?: StringMap<string | number>
 }
 
 export interface ButtonProps extends InjectedProps {
@@ -25,6 +25,7 @@ export interface ButtonProps extends InjectedProps {
     overrideWidth?: number
     onClick?: () => void
     style?: propStyle
+    mouseDownColors?: StringMap<string>
 }
 
 export interface ButtonState {
@@ -74,12 +75,20 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
     }
 
     render() {
-        const { text, size, type, overrideWidth, style, device } = this.props
+        const {
+            text,
+            size,
+            type,
+            overrideWidth,
+            style,
+            mouseDownColors,
+            device
+        } = this.props
 
         const { mouseDown } = this.state
 
         let outerStyle: React.CSSProperties = {
-            borderRadius: 4,
+            borderRadius: 5,
             textAlign: 'center',
             display: 'inline-block'
         }
@@ -126,17 +135,35 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
             }
         }
 
+        let mouseStateColors: StringMap<string> = {}
+
         switch (type) {
             case 'primary':
+                mouseStateColors = {
+                    active: turquoise,
+                    inactive: aquamarine,
+                    ...mouseDownColors
+                }
                 outerStyle = {
                     ...outerStyle,
-                    background: mouseDown === true ? aquamarine : turquoise
+                    background:
+                        mouseDown === true
+                            ? mouseStateColors.inactive
+                            : mouseStateColors.active
                 }
                 break
             case 'secondary':
+                mouseStateColors = {
+                    active: steel,
+                    inactive: graphite,
+                    ...mouseDownColors
+                }
                 outerStyle = {
                     ...outerStyle,
-                    background: mouseDown === true ? graphite : steel
+                    background:
+                        mouseDown === true
+                            ? mouseStateColors.inactive
+                            : mouseStateColors.active
                 }
                 break
             case 'disabled':
@@ -146,9 +173,17 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
                 }
                 break
             case 'regular':
+                mouseStateColors = {
+                    active: steel,
+                    inactive: graphite,
+                    ...mouseDownColors
+                }
                 innerStyle = {
                     ...innerStyle,
-                    color: mouseDown === true ? graphite : steel,
+                    color:
+                        mouseDown === true
+                            ? mouseStateColors.inactive
+                            : mouseStateColors.active,
                     fontSize: 17,
                     padding: '1px 0px 1px 0px'
                 }
@@ -170,7 +205,6 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
         }
 
         let ret
-
         if (type !== 'disabled') {
             ret = (
                 <div

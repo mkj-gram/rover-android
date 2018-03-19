@@ -6,6 +6,7 @@ import { white, Button } from '@rover/ts-bootstrap/dist/src'
 
 import { getCampaign } from '../../reducers/campaigns'
 import WizardModal from './WizardModal'
+import UpdateEditableUIStateProperty from './UpdateEditableUIStateProperty'
 
 import {
     openNotificationDeliveryModal,
@@ -18,9 +19,10 @@ import {
 import { getLastViewPage } from '../../reducers'
 
 export interface FormComponentProps {
-    type: string
+    type: UIStateType
     jsxPages: StringMap<JSX.Element>
     isNotificationDeliveryModalOpen: string
+    device: string
 }
 
 export interface StateProps {
@@ -70,7 +72,8 @@ class FormComponent extends React.Component<
             lastViewedPage: props.lastViewPage
         }
 
-        this.getNextPrevious = this.getNextPrevious.bind(this)
+        this.getNext = this.getNext.bind(this)
+        this.getPrevious = this.getPrevious.bind(this)
         this.calculateNewUiState = this.calculateNewUiState.bind(this)
         this.updateLocalUIStateProgress = this.updateLocalUIStateProgress.bind(
             this
@@ -80,10 +83,6 @@ class FormComponent extends React.Component<
         )
         this.getLeftHeader = this.getLeftHeader.bind(this)
         this.getRightHeader = this.getRightHeader.bind(this)
-        this.getORValue = this.getORValue.bind(this)
-        this.calculateSaveCloseUiState = this.calculateSaveCloseUiState.bind(
-            this
-        )
     }
 
     componentDidMount() {
@@ -94,18 +93,28 @@ class FormComponent extends React.Component<
         } = this.props
         const { pages, lastViewedPage } = this.state
 
+        const { UIState } = editableCampaign
+
         if (
-            editableCampaign.UIState.length === 0 ||
-            JSON.parse(editableCampaign.UIState)[type] === undefined
+            Object.keys(UIState).length === 0 ||
+            (UIState as UIStateInterface)[type] === undefined
         ) {
             this.setState({
                 progress: 0
             })
         } else {
-            let parsedState = JSON.parse(editableCampaign.UIState)
             let foundPage = false
-            Object.keys(parsedState[type]).forEach((page, index) => {
-                if (parsedState[type][page] === false && !foundPage) {
+            Object.keys(
+                (editableCampaign.UIState as UIStateInterface)[type]
+            ).forEach((page, index) => {
+                let obj = (editableCampaign.UIState as UIStateInterface)[type][
+                    page
+                ]
+
+                if (
+                    (obj.seen === false || obj.isValidContent === false) &&
+                    !foundPage
+                ) {
                     foundPage = true
                     this.setState({
                         page,
@@ -129,111 +138,40 @@ class FormComponent extends React.Component<
         const { type } = this.props
         const { pages, page } = this.state
 
-        let parsedState = JSON.parse(nextProps.editableCampaign.UIState)
-        if (parsedState !== JSON.parse(this.props.editableCampaign.UIState)) {
-            const denominator: number = Object.keys(parsedState[type]).length
-            let numerator: number = Object.values(
-                parsedState[type]
-                // tslint:disable-next-line:no-any
-            ).filter((v: any) => v).length
-            let progress
-            if (numerator % denominator === 0) {
-                // In 100% completion state
-                numerator = pages.indexOf(page)
-            }
+        if (Object.keys(nextProps.editableCampaign.UIState).length !== 0) {
+            const denominator: number = Object.keys(
+                (nextProps.editableCampaign.UIState as UIStateInterface)[type]
+            ).length
+
+            const numerator = pages.indexOf(page)
+
             this.setState({
                 progress: Math.round(numerator / denominator * 100)
             })
         }
     }
 
-    calculateNewUiState(
-        pageIndex: number,
-        value: boolean,
-        onFinish: boolean = false
-    ) {
-        const { pages, campaign } = this.state
+    calculateNewUiState(pageIndex: number, value: boolean) {
+        const { pages } = this.state
         const { editableCampaign, type } = this.props
 
-        let editableUIState = JSON.parse(editableCampaign.UIState)
-        let campaignUIState
-        if (campaign.UIState.length !== 0) {
-            campaignUIState = JSON.parse(campaign.UIState)
-        }
-
-        let UIState
-        if (!onFinish || campaignUIState == undefined) {
-            UIState = JSON.stringify({
-                ...editableUIState,
-                [type]: {
-                    ...editableUIState[type],
-                    [pages[pageIndex]]: value
-                }
-            })
-        } else {
-            UIState = JSON.stringify({
-                ...editableUIState,
-                [type]: {
-                    ...this.getORValue(
-                        campaignUIState[type],
-                        editableUIState[type]
-                    ),
-                    [pages[pageIndex]]:
-                        value || campaignUIState.notification[pages[pageIndex]]
-                }
-            })
-        }
-
-        return UIState
+        return UpdateEditableUIStateProperty(
+            type,
+            editableCampaign.UIState as UIStateInterface,
+            'seen',
+            pages[pageIndex],
+            (editableCampaign.UIState as UIStateInterface)[type][
+                pages[pageIndex]
+            ].seen || value
+        )
     }
 
     updateLocalUIStateProgress(pageIndex: number, value: boolean) {
-        let UIState = this.calculateNewUiState(pageIndex, value)
+        const UIState = this.calculateNewUiState(pageIndex, value)
 
         this.props.updateEditableCampaign({
             UIState
         })
-    }
-
-    getORValue(
-        campaignNotificationDelivery: StringMap<boolean>,
-        uiStateNotificationDelivery: StringMap<boolean>
-    ): object {
-        let obj: StringMap<boolean> = {}
-        Object.keys(campaignNotificationDelivery).forEach(item => {
-            obj[item] =
-                campaignNotificationDelivery[item] ||
-                uiStateNotificationDelivery[item]
-        })
-        return obj
-    }
-
-    calculateSaveCloseUiState() {
-        const { campaign } = this.state
-        const { editableCampaign, type } = this.props
-        const editableUIState = JSON.parse(editableCampaign.UIState)
-        const campaignUIState =
-            campaign.UIState.length !== 0
-                ? JSON.parse(campaign.UIState)
-                : undefined
-
-        let UIState
-        if (campaignUIState === undefined) {
-            UIState = JSON.stringify({
-                ...editableUIState
-            })
-        } else {
-            UIState = JSON.stringify({
-                ...editableUIState,
-                [type]: {
-                    ...this.getORValue(
-                        campaignUIState[type],
-                        editableUIState[type]
-                    )
-                }
-            })
-        }
-        return UIState
     }
 
     handleNotificationDeliveryUpdate(
@@ -246,16 +184,21 @@ class FormComponent extends React.Component<
         const pageIndex = pages.indexOf(currPage)
         this.props.openNotificationDeliveryModal(false)
 
+        let UIState = JSON.stringify(
+            !saveAndClose
+                ? this.calculateNewUiState(pageIndex, true)
+                : editableCampaign.UIState
+        )
         const updatedEditableCampaign = {
             ...editableCampaign,
-            UIState: !saveAndClose
-                ? this.calculateNewUiState(pageIndex, true, true)
-                : this.calculateSaveCloseUiState()
+            UIState
         }
 
         if (type === 'notification') {
             this.props.updateNotificationSettings(
-                updatedEditableCampaign,
+                updatedEditableCampaign as
+                    | ScheduledCampaign
+                    | AutomatedNotificationCampaign,
                 campaignId
             )
         }
@@ -263,65 +206,68 @@ class FormComponent extends React.Component<
         this.props.updateEditableCampaign(updatedEditableCampaign, true)
     }
 
-    getNextPrevious(direction: string, currPage: string) {
-        const { editableCampaign } = this.props
-        const { pages } = this.state
+    getNext() {
+        const { page, pages } = this.state
+        const { editableCampaign, type } = this.props
 
-        const pageIndex = pages.indexOf(currPage)
-        let view
+        const pageIndex = pages.indexOf(page)
+        const isValidContent =
+            page.length !== 0
+                ? (editableCampaign.UIState as UIStateInterface)[type][page]
+                      .isValidContent
+                : false
 
-        if (direction === 'next') {
-            view = (
+        return (
+            <Button
+                text={pageIndex === pages.length - 1 ? 'Finish' : 'Next'}
+                size="large"
+                type={isValidContent ? 'primary' : 'disabled'}
+                overrideWidth={96}
+                onClick={() => {
+                    if (pageIndex !== pages.length - 1) {
+                        this.setState(
+                            {
+                                page: pages[pageIndex + 1]
+                            },
+                            () => {
+                                this.updateLocalUIStateProgress(pageIndex, true)
+                            }
+                        )
+                    } else {
+                        this.handleNotificationDeliveryUpdate(page)
+                    }
+                }}
+            />
+        )
+    }
+
+    getPrevious() {
+        const { page, pages } = this.state
+        const pageIndex = pages.indexOf(page)
+
+        if (pageIndex === 0) {
+            return <div />
+        } else {
+            return (
                 <Button
-                    text={pageIndex === pages.length - 1 ? 'Finish' : 'Next'}
+                    text="Back"
                     size="large"
-                    type="primary"
+                    type="secondary"
                     onClick={() => {
-                        if (pageIndex !== pages.length - 1) {
-                            this.setState(
-                                {
-                                    page: pages[pageIndex + 1]
-                                },
-                                () => {
-                                    this.updateLocalUIStateProgress(
-                                        pageIndex,
-                                        true
-                                    )
-                                }
-                            )
-                        } else {
-                            this.handleNotificationDeliveryUpdate(currPage)
-                        }
+                        this.setState(
+                            {
+                                page: pages[pageIndex - 1]
+                            },
+                            () =>
+                                this.updateLocalUIStateProgress(
+                                    pageIndex - 1,
+                                    false
+                                )
+                        )
                     }}
                 />
             )
-        } else {
-            if (pageIndex === 0) {
-                view = <div />
-            } else {
-                view = (
-                    <Button
-                        text="Back"
-                        size="large"
-                        type="secondary"
-                        onClick={() => {
-                            this.setState(
-                                {
-                                    page: pages[pageIndex - 1]
-                                },
-                                () =>
-                                    this.updateLocalUIStateProgress(
-                                        pageIndex - 1,
-                                        false
-                                    )
-                            )
-                        }}
-                    />
-                )
-            }
         }
-
-        return view
     }
 
     getLeftHeader() {
@@ -336,8 +282,9 @@ class FormComponent extends React.Component<
                     this.props.openNotificationDeliveryModal(false)
 
                     if (
-                        campaign.UIState.length === 0 ||
-                        JSON.parse(campaign.UIState)[type] === undefined
+                        Object.keys(campaign.UIState).length === 0 ||
+                        (campaign.UIState as UIStateInterface)[type] ===
+                            undefined
                     ) {
                         this.props.createEditableCampaign(campaign as
                             | ScheduledCampaign
@@ -350,32 +297,66 @@ class FormComponent extends React.Component<
         )
     }
 
-    getRightHeader(currPage: string) {
-        const { pages, page } = this.state
-        return (
-            <Button
-                text="Save and Close"
-                type="regular"
-                onClick={() => {
-                    this.props.updateLastVewPage(page)
+    getRightHeader() {
+        const { type, editableCampaign } = this.props
+        const { pages, page, campaign } = this.state
 
-                    this.handleNotificationDeliveryUpdate(currPage, true)
-                }}
-            />
-        )
+        const showSaveAndClose = () => {
+            const { UIState, ...rest } = campaign
+            let keys = Object.keys(rest)
+            for (let i = 0; i < keys.length; i++) {
+                if (
+                    ['string', 'number', 'boolean'].includes(
+                        typeof (campaign as any)[keys[i]]
+                    )
+                ) {
+                    if (
+                        (campaign as any)[keys[i]] !==
+                        (editableCampaign as any)[keys[i]]
+                    ) {
+                        return true
+                    }
+                } else {
+                    if (
+                        JSON.stringify((campaign as any)[keys[i]]) !==
+                        JSON.stringify((editableCampaign as any)[keys[i]])
+                    ) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+        let view
+        if (showSaveAndClose()) {
+            view = (
+                <Button
+                    text="Save and Close"
+                    type="regular"
+                    onClick={() => {
+                        this.props.updateLastVewPage(page)
+                        this.handleNotificationDeliveryUpdate(page, true)
+                    }}
+                />
+            )
+        } else {
+            view = <div />
+        }
+        return view
     }
 
     render() {
         const Fragment = React.Fragment
-        const { jsxPages } = this.props
+        const { jsxPages, device } = this.props
         const { progress, page } = this.state
 
         const wizardProps = {
             progress,
-            rightToolbarElement: this.getNextPrevious('next', page),
-            leftToolbarElement: this.getNextPrevious('back', page),
+            rightToolbarElement: this.getNext(),
+            leftToolbarElement: this.getPrevious(),
             leftHeaderElement: this.getLeftHeader(),
-            rightHeaderElement: this.getRightHeader(page)
+            rightHeaderElement: this.getRightHeader(),
+            device
         }
 
         return <WizardModal {...wizardProps}>{jsxPages[page]}</WizardModal>

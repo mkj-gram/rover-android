@@ -77,10 +77,13 @@ class OverviewComponent extends React.Component<
             const campaign = getCampaign(campaigns, campaignId)
 
             createEditableCampaign(campaign)
+
             const notificationComplete = this.getNotificationComplete(
-                campaign.UIState
+                campaign.UIState as any
             )
-            const showExperience = this.getShowExperience(campaign.UIState)
+            const showExperience = this.getShowExperience(
+                campaign.UIState as any
+            )
 
             this.setState({
                 campaign,
@@ -101,10 +104,25 @@ class OverviewComponent extends React.Component<
             let parsedState = JSON.parse(uiState)
             const denominator: number = Object.keys(parsedState.notification)
                 .length
-            const numerator: number = Object.values(
-                parsedState.notification
-                // tslint:disable-next-line:no-any
-            ).filter((v: any) => v).length
+
+            const numerator: number = (() => {
+                let count = 0
+                let firstFalse = false
+                Object.keys(parsedState.notification).forEach(page => {
+                    if (!firstFalse) {
+                        if (
+                            parsedState.notification[page].seen &&
+                            parsedState.notification[page].isValidContent
+                        ) {
+                            count += 1
+                        } else {
+                            firstFalse = true
+                        }
+                    }
+                })
+                return count
+            })()
+
             return Math.round(numerator / denominator * 100)
         }
     }
@@ -128,13 +146,16 @@ class OverviewComponent extends React.Component<
             campaign
         } = this.state
 
-        const OverviewModalFooterComponent = ResponsiveContainer({
-            // sendTest: notificationComplete === 100,
-            sendTest: true,
-            publish: deliveryComplete === 100
-        })(OverviewModalFooter)
-
         if (campaign !== null) {
+            const OverviewModalFooterComponent = ResponsiveContainer({
+                // sendTest: notificationComplete === 100,
+                sendTest: true,
+                publish: deliveryComplete === 100
+            })(OverviewModalFooter)
+
+            const OverviewModalHeaderComponent = ResponsiveContainer({
+                campaignId: campaign.campaignId
+            })(OverviewModalHeader)
             return (
                 <div
                     style={{
@@ -146,7 +167,7 @@ class OverviewComponent extends React.Component<
                     }}
                     id="overviewComponentRoot"
                 >
-                    <OverviewModalHeader campaignId={campaign.campaignId} />
+                    <OverviewModalHeaderComponent />
                     <OverviewModalBodyContainer
                         showExperience={showExperience}
                         notificationComplete={notificationComplete}

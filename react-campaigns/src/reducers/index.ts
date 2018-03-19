@@ -55,6 +55,13 @@ export const getIsAlertOptionsOpen = (state: State) =>
 export const getLastViewPage = (state: State) =>
     appSelector.getLastViewPage(state.app)
 
+// Notification: Tap Behavior
+export const getIsTapBehaviorSelectorOpen = (state: State) =>
+    appSelector.getIsTapBehaviorSelectorOpen(state.app)
+
+export const getIsTapBehaviorWebsitePresentationOpen = (state: State) =>
+    appSelector.getIsTapBehaviorWebsitePresentationOpen(state.app)
+
 // Campaigns
 export const getCampaign = (state: State, id: string) =>
     campaignsSelector.getCampaign(state.campaigns, id)

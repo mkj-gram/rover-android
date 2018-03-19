@@ -155,12 +155,7 @@ const AlertOptionsRows: React.SFC<
     }
 
     const getSwitchDisableStyle = (val: string) => {
-        const marginRight = device !== 'Mobile' ? 32 : 24
-        let ret: StringMap<StringMap<string | number>> = {
-            outerStyle: {
-                marginRight
-            }
-        }
+        let ret
         if (val === 'notificationAlertOptionBadgeNumber') {
             if (
                 editableCampaign.notificationAlertOptionNotificationCenter ===
@@ -168,8 +163,7 @@ const AlertOptionsRows: React.SFC<
             ) {
                 ret = {
                     outerStyle: {
-                        background: mercury,
-                        marginRight
+                        background: mercury
                     }
                 }
             } else {
@@ -177,8 +171,7 @@ const AlertOptionsRows: React.SFC<
                     outerStyle: {
                         background: editableCampaign.notificationAlertOptionBadgeNumber
                             ? turquoise
-                            : titanium,
-                        marginRight
+                            : titanium
                     }
                 }
             }

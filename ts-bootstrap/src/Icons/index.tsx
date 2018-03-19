@@ -17,6 +17,7 @@ import SearchIcon from './SearchIcon'
 import UserIcon from './UserIcon'
 import ZapIcon from './ZapIcon'
 import ArchiveIcon from './ArchiveIcon'
+import ChangeIcon from './ChangeIcon'
 import CheckCircleIcon from './CheckCircleIcon'
 import ChevronLeftIcon from './ChevronLeftIcon'
 import ChevronRightIcon from './ChevronRightIcon'
@@ -41,6 +42,7 @@ export {
     AlertErrorIcon,
     BarChartIcon,
     CalendarIcon,
+    ChangeIcon,
     CheckmarkIcon,
     CheckIcon,
     FilterArrowIcon,

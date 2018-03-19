@@ -24,10 +24,10 @@ import {
 
 import ShowMorePopoverChildren from '../../utils/ShowMorePopoverChildren'
 
-export type OverviewModalHeaderProps = {
+export interface OverviewModalHeaderProps extends InjectedProps {
     onExit?: () => void
     onMore?: () => void
-    campaignId: string
+    campaignId?: string
 }
 
 export type OverviewModalHeaderState = {
@@ -147,7 +147,13 @@ class OverviewModalHeader extends React.Component<
     }
 
     render() {
-        const { campaignName, campaignType, onExit, onMore } = this.props
+        const {
+            campaignName,
+            campaignType,
+            onExit,
+            onMore,
+            device
+        } = this.props
 
         const popoverProps = {
             placement: 'top-end',
@@ -171,7 +177,10 @@ class OverviewModalHeader extends React.Component<
             >
                 <div
                     style={{
-                        margin: '16px 32px 32px 32px'
+                        margin:
+                            device !== 'Mobile'
+                                ? '16px 32px 32px 32px'
+                                : '16px 24px 32px 24px'
                     }}
                 >
                     <div

@@ -4,10 +4,14 @@ import { parse } from 'qs'
 import { connect } from 'react-redux'
 import { white, Button } from '@rover/ts-bootstrap/dist/src'
 import { getCampaign } from '../../../reducers/campaigns'
+
 import AlertOptionsContainer from './AlertOptionsContainer'
+import TapBehaviorContainer from './TapBehaviorContainer'
 
 import FormComponent from '../../utils/FormComponent'
 import { getIsNotificationDeliveryModalOpen } from '../../../reducers'
+
+import TempMediaAndQuery from './TempMediaAndQuery'
 
 export interface NotificationContainerProps extends InjectedProps {
     campaigns: StringMap<Campaign>
@@ -39,7 +43,14 @@ class NotificationContainer extends React.Component<
                         alignItems: 'center'
                     }}
                 >
-                    Message And Media things
+                    <TempMediaAndQuery
+                        campaign={
+                            campaign as
+                                | ScheduledCampaign
+                                | AutomatedNotificationCampaign
+                        }
+                        device={device}
+                    />
                 </div>
             ),
             alertOptions: (
@@ -53,15 +64,14 @@ class NotificationContainer extends React.Component<
                 />
             ),
             tapBehavior: (
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                >
-                    Tap Behavior Page
-                </div>
+                <TapBehaviorContainer
+                    campaign={
+                        campaign as
+                            | ScheduledCampaign
+                            | AutomatedNotificationCampaign
+                    }
+                    device={device}
+                />
             ),
             advancedSettings: (
                 <div
@@ -75,6 +85,8 @@ class NotificationContainer extends React.Component<
                 </div>
             )
         }
+
+        const type: UIStateType = 'notification'
 
         return (
             <div
@@ -91,11 +103,12 @@ class NotificationContainer extends React.Component<
                 id="notificationContainer"
             >
                 <FormComponent
-                    type="notification"
+                    type={type}
                     jsxPages={pages}
                     isNotificationDeliveryModalOpen={
                         isNotificationDeliveryModalOpen
                     }
+                    device={device}
                 />
             </div>
         )

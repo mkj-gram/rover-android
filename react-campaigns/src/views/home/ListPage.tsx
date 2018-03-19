@@ -279,6 +279,7 @@ const mapDispatchToProps = (
                 }
 
                 ownProps.history.push(path)
+                dispatch(handleOverviewModalDisplay(ownProps.history, true))
             })
         },
         fetchCampaigns: () => {

@@ -360,8 +360,8 @@ const NotificationTapPresentationType = new GraphQLEnumType({
     name: 'NotificationTapPresentationType',
     values: {
         UNKNOWN: {},
-        APP: {},
-        BROWSER: {}
+        IN_APP: {},
+        IN_BROWSER: {}
     }
 })
 

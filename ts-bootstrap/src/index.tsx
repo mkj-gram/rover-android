@@ -79,7 +79,8 @@ import {
     ZapIcon,
     AlertOptionsPushNotification,
     AlertOptionsNotificationCenter,
-    AlertOptionsBadgeNumber
+    AlertOptionsBadgeNumber,
+    ChangeIcon
 } from './Icons'
 
 export {
@@ -156,5 +157,6 @@ export {
     AlertOptionsPushNotification,
     AlertOptionsNotificationCenter,
     AlertOptionsBadgeNumber,
-    PhoneComponent
+    PhoneComponent,
+    ChangeIcon
 }

@@ -19,13 +19,51 @@ const isAlertOptionsOpen = (state = '', action: AnyAction) => {
     }
 }
 
+const isTapBehaviorSelectorOpen = (state = 'close', action: AnyAction) => {
+    switch (action.type) {
+        case 'OPEN_TAP_BEHAVIOR_SELECTOR':
+            return 'open'
+        case 'CLOSE_TAP_BEHAVIOR_SELECTOR':
+            return 'close'
+        case 'CLOSING_TAP_BEHAVIOR_SELECTOR':
+            return 'closing'
+        default:
+            return state
+    }
+}
+
+const isTapBehaviorWebsitePresentationOpen = (
+    state = 'close',
+    action: AnyAction
+) => {
+    switch (action.type) {
+        case 'OPEN_TAP_BEHAVIOR_WEBSITE_PRESENTATION':
+            return 'open'
+        case 'CLOSE_TAP_BEHAVIOR_WEBSITE_PRESENTATION':
+            return 'close'
+        case 'CLOSING_TAP_BEHAVIOR_WEBSITE_PRESENTATION':
+            return 'closing'
+        default:
+            return state
+    }
+}
+
 export default combineReducers({
     alertOptionsHoverValue,
-    isAlertOptionsOpen
+    isAlertOptionsOpen,
+    isTapBehaviorSelectorOpen,
+    isTapBehaviorWebsitePresentationOpen
 })
 
-export const getAlertOptionHoverValue = (state: AlertOptionsHoverState) =>
+export const getAlertOptionHoverValue = (state: NotificationState) =>
     state.alertOptionsHoverValue
 
-export const getIsAlertOptionsOpen = (state: AlertOptionsHoverState) =>
+export const getIsAlertOptionsOpen = (state: NotificationState) =>
     state.isAlertOptionsOpen
+
+export const getIsTapBehaviorSelectorOpen = (state: NotificationState) =>
+    state.isTapBehaviorSelectorOpen
+
+export const getIsTapBehaviorWebsitePresentationOpen = (
+    state: NotificationState
+) => state.isTapBehaviorWebsitePresentationOpen

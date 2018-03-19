@@ -17,19 +17,36 @@ export const createEditableCampaign: ActionCreator<
     let editableCampaign:
         | ScheduledCampaign
         | AutomatedNotificationCampaign = edCampaign
-    if (editableCampaign.UIState.length === 0) {
+
+    if ((editableCampaign.UIState as string).length === 0) {
         editableCampaign = {
             ...edCampaign,
-            UIState: JSON.stringify({
+            UIState: {
                 notification: {
-                    messageAndMedia: false,
-
-                    alertOptions: false,
-                    tapBehavior: false,
-                    advancedSettings: false
+                    messageAndMedia: {
+                        seen: false,
+                        isValidContent: false
+                    },
+                    alertOptions: {
+                        seen: false,
+                        isValidContent: true
+                    },
+                    tapBehavior: {
+                        seen: false,
+                        isValidContent: true
+                    },
+                    advancedSettings: {
+                        seen: false,
+                        isValidContent: true
+                    }
                 },
                 showExperience: false
-            })
+            }
+        }
+    } else {
+        editableCampaign = {
+            ...edCampaign,
+            UIState: JSON.parse(editableCampaign.UIState as string)
         }
     }
 

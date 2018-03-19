@@ -57,7 +57,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
                                     backgroundColor: turquoise
                                 },
                                 barStyle: {
-                                    width: device === 'desktop' ? 240 : 176
+                                    width: device === 'Desktop' ? 240 : 176
                                 }
                             }}
                         />
@@ -75,7 +75,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
         let { device, name, text, val, handlePageDirect } = this.props
         // Desktop as default
         let outerStyle: React.CSSProperties = {
-            padding: '32px 32px 0 32px',
+            padding: '24px 32px 0 32px',
             display: 'flex',
             flexDirection: 'column'
         }
@@ -90,13 +90,13 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
         )
         const experienceOff = name === 'Experience' && val === false
         let textStyle = experienceOff ? { color: silver } : { color: black }
-        if (device === 'mobile') {
+        if (device === 'Mobile') {
             outerStyle = {
                 ...outerStyle,
-                padding: '32px 16px 0 16px'
+                padding: '24px 24px 0 24px'
             }
         }
-        if (device !== 'desktop') {
+        if (device !== 'Desktop') {
             button = (
                 <div style={{ marginLeft: 16 }}>
                     <ChevronRightIcon fill={silver} />
@@ -107,7 +107,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
             <div
                 style={{ background: white, width: '100%' }}
                 onClick={
-                    device !== 'desktop' && !experienceOff
+                    device !== 'Desktop' && !experienceOff
                         ? () => handlePageDirect(name)
                         : () => null
                 }

@@ -134,3 +134,38 @@ export const setHoverOption: ActionCreator<ThunkAction<void, State, void>> = (
 
 export const handleAlertOptionsModalDisplay = (deviceInfoSelected?: string) =>
     notificationActions.handleAlertOptionsModalDisplay(deviceInfoSelected)
+
+// Notifications: Tap Behavior
+export const openTapBehaviorSelector: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'OPEN_TAP_BEHAVIOR_SELECTOR' })
+}
+
+export const closeTapBehaviorSelector: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'CLOSING_TAP_BEHAVIOR_SELECTOR' })
+    setTimeout(() => {
+        dispatch({
+            type: 'CLOSE_TAP_BEHAVIOR_SELECTOR'
+        })
+    }, 500)
+}
+
+export const openTapBehaviorWebsitePresentation: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'OPEN_TAP_BEHAVIOR_WEBSITE_PRESENTATION' })
+}
+
+export const closeTapBehaviorWebsitePresentation: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'CLOSING_TAP_BEHAVIOR_WEBSITE_PRESENTATION' })
+    setTimeout(() => {
+        dispatch({
+            type: 'CLOSE_TAP_BEHAVIOR_WEBSITE_PRESENTATION'
+        })
+    }, 500)
+}

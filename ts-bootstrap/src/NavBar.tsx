@@ -78,7 +78,7 @@ class NavBar extends React.Component<NavBarProps, {}> {
             outerStyle: {
                 marginRight: 16
             },
-            ...style.buttonLeftStyle
+            ...style.buttonRightStyle
         }
 
         let innerStyle: StringMap<number | string> = {
