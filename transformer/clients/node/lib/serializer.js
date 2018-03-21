@@ -68,6 +68,7 @@ function deviceContextToProto(context) {
 
 	dc.setDeviceManufacturer(context.deviceManufacturer)
 	dc.setDeviceModel(context.deviceModel)
+	dc.setDeviceName(context.deviceName)
 
 	dc.setIsLocationServicesEnabled(Protobuf.BoolValue.fromJavaScript(context.isLocationServicesEnabled))
 	dc.setLocationAuthorization(locationAuthorizationToProto(context.locationAuthorization))
@@ -103,7 +104,6 @@ function deviceContextToProto(context) {
 		})
 	}
 
-	dc.setLabel(context.label)
 	dc.setAdvertisingId(context.advertisingId)
 
 	return dc
@@ -111,12 +111,12 @@ function deviceContextToProto(context) {
 
 /**
  * Serializes a json representation of an event to the protobuf equivalent
- * @param  {Object} event 
+ * @param  {Object} event
  * @return {Protobuf<event.Event>}
  */
 function serializeEventInput(auth, event) {
 	let e = new EventInput()
-	
+
 	e.setAuthContext(auth)
 
 	e.setNamespace(event.namespace)
@@ -128,13 +128,13 @@ function serializeEventInput(auth, event) {
 	e.setReceivedAt(Helpers.timestampToProto(event.receivedAt || new Date()))
 
 	e.setAttributes(Struct.fromJavaScript(event.attributes || {}))
-	
+
 	return e
 }
 
 /**
  * Serializes a json representation of a device event to the protobuf equivalent
- * @param  {Object} event 
+ * @param  {Object} event
  * @return {Protobuf<event.Event>}
  */
 function serializeDeviceEvent(auth, event, deviceId, deviceContext) {
@@ -144,7 +144,7 @@ function serializeDeviceEvent(auth, event, deviceId, deviceContext) {
 	input.setDeviceId(deviceId)
 	input.setContext(deviceContextToProto(deviceContext || {}))
 	e.setDeviceEventInput(input)
-	
+
 	return e
 }
 

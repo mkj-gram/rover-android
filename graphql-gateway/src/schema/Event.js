@@ -41,6 +41,9 @@ const Context = new GraphQLInputObjectType({
         deviceModel: {
             type: GraphQLString
         },
+        deviceName: {
+            type: GraphQLString
+        },
         frameworks: {
             type: GraphQLFrameworkMap
         },

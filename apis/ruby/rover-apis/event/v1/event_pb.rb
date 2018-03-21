@@ -40,7 +40,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :screen_width, :int32, 27
     optional :screen_height, :int32, 28
     map :frameworks, :string, :message, 29, "rover.protobuf.Version"
-    optional :label, :string, 30
+    optional :device_name, :string, 30
     optional :advertising_id, :string, 31
   end
   add_message "rover.event.v1.EventInput" do

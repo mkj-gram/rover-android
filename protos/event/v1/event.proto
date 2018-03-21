@@ -61,7 +61,7 @@ message DeviceContext {
 
 	map<string,rover.protobuf.Version> frameworks = 29;
 
-	string label = 30;
+	string device_name = 30;
 	string advertising_id = 31;
 
 }
@@ -94,7 +94,7 @@ message EventInput {
 	}
 }
 
-// A SDK (device) generated event 
+// A SDK (device) generated event
 message DeviceEventInput {
 	string 	device_id			= 1;
 	DeviceContext context 		= 2;
@@ -128,4 +128,3 @@ message ProfileSource {
 	audience.v1.Profile         profile            = 1;
 	repeated audience.v1.Device associated_devices = 2;
 }
-

@@ -97,7 +97,7 @@ proto.rover.event.v1.DeviceContext.toObject = function(includeInstance, msg) {
     screenWidth: jspb.Message.getFieldWithDefault(msg, 27, 0),
     screenHeight: jspb.Message.getFieldWithDefault(msg, 28, 0),
     frameworksMap: (f = msg.getFrameworksMap()) ? f.toObject(includeInstance, proto.rover.protobuf.Version.toObject) : [],
-    label: jspb.Message.getFieldWithDefault(msg, 30, ""),
+    deviceName: jspb.Message.getFieldWithDefault(msg, 30, ""),
     advertisingId: jspb.Message.getFieldWithDefault(msg, 31, "")
   };
 
@@ -257,7 +257,7 @@ proto.rover.event.v1.DeviceContext.deserializeBinaryFromReader = function(msg, r
       break;
     case 30:
       var value = /** @type {string} */ (reader.readString());
-      msg.setLabel(value);
+      msg.setDeviceName(value);
       break;
     case 31:
       var value = /** @type {string} */ (reader.readString());
@@ -490,7 +490,7 @@ proto.rover.event.v1.DeviceContext.serializeBinaryToWriter = function(message, w
   if (f && f.getLength() > 0) {
     f.serializeBinary(29, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.protobuf.Version.serializeBinaryToWriter);
   }
-  f = message.getLabel();
+  f = message.getDeviceName();
   if (f.length > 0) {
     writer.writeString(
       30,
@@ -1021,16 +1021,16 @@ proto.rover.event.v1.DeviceContext.prototype.clearFrameworksMap = function() {
 
 
 /**
- * optional string label = 30;
+ * optional string device_name = 30;
  * @return {string}
  */
-proto.rover.event.v1.DeviceContext.prototype.getLabel = function() {
+proto.rover.event.v1.DeviceContext.prototype.getDeviceName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 30, ""));
 };
 
 
 /** @param {string} value */
-proto.rover.event.v1.DeviceContext.prototype.setLabel = function(value) {
+proto.rover.event.v1.DeviceContext.prototype.setDeviceName = function(value) {
   jspb.Message.setField(this, 30, value);
 };
 
