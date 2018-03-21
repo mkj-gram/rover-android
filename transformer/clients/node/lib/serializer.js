@@ -105,6 +105,7 @@ function deviceContextToProto(context) {
 	}
 
 	dc.setAdvertisingId(context.advertisingId)
+	dc.setIsBluetoothEnabled(Protobuf.BoolValue.fromJavaScript(context.isBluetoothEnabled))
 
 	return dc
 }

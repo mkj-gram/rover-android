@@ -47,6 +47,9 @@ const Context = new GraphQLInputObjectType({
         frameworks: {
             type: GraphQLFrameworkMap
         },
+        isBluetoothEnabled: {
+            type: GraphQLBoolean
+        },
         isCellularEnabled: {
             type: GraphQLBoolean
         },

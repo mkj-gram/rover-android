@@ -98,7 +98,8 @@ proto.rover.event.v1.DeviceContext.toObject = function(includeInstance, msg) {
     screenHeight: jspb.Message.getFieldWithDefault(msg, 28, 0),
     frameworksMap: (f = msg.getFrameworksMap()) ? f.toObject(includeInstance, proto.rover.protobuf.Version.toObject) : [],
     deviceName: jspb.Message.getFieldWithDefault(msg, 30, ""),
-    advertisingId: jspb.Message.getFieldWithDefault(msg, 31, "")
+    advertisingId: jspb.Message.getFieldWithDefault(msg, 31, ""),
+    isBluetoothEnabled: (f = msg.getIsBluetoothEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -262,6 +263,11 @@ proto.rover.event.v1.DeviceContext.deserializeBinaryFromReader = function(msg, r
     case 31:
       var value = /** @type {string} */ (reader.readString());
       msg.setAdvertisingId(value);
+      break;
+    case 32:
+      var value = new protobuf_wrappers_pb.BoolValue;
+      reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
+      msg.setIsBluetoothEnabled(value);
       break;
     default:
       reader.skipField();
@@ -502,6 +508,14 @@ proto.rover.event.v1.DeviceContext.serializeBinaryToWriter = function(message, w
     writer.writeString(
       31,
       f
+    );
+  }
+  f = message.getIsBluetoothEnabled();
+  if (f != null) {
+    writer.writeMessage(
+      32,
+      f,
+      protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
     );
   }
 };
@@ -1047,6 +1061,36 @@ proto.rover.event.v1.DeviceContext.prototype.getAdvertisingId = function() {
 /** @param {string} value */
 proto.rover.event.v1.DeviceContext.prototype.setAdvertisingId = function(value) {
   jspb.Message.setField(this, 31, value);
+};
+
+
+/**
+ * optional rover.protobuf.BoolValue is_bluetooth_enabled = 32;
+ * @return {?proto.rover.protobuf.BoolValue}
+ */
+proto.rover.event.v1.DeviceContext.prototype.getIsBluetoothEnabled = function() {
+  return /** @type{?proto.rover.protobuf.BoolValue} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.BoolValue, 32));
+};
+
+
+/** @param {?proto.rover.protobuf.BoolValue|undefined} value */
+proto.rover.event.v1.DeviceContext.prototype.setIsBluetoothEnabled = function(value) {
+  jspb.Message.setWrapperField(this, 32, value);
+};
+
+
+proto.rover.event.v1.DeviceContext.prototype.clearIsBluetoothEnabled = function() {
+  this.setIsBluetoothEnabled(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.event.v1.DeviceContext.prototype.hasIsBluetoothEnabled = function() {
+  return jspb.Message.getField(this, 32) != null;
 };
 
 

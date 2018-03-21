@@ -42,6 +42,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     map :frameworks, :string, :message, 29, "rover.protobuf.Version"
     optional :device_name, :string, 30
     optional :advertising_id, :string, 31
+    optional :is_bluetooth_enabled, :message, 32, "rover.protobuf.BoolValue"
   end
   add_message "rover.event.v1.EventInput" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
