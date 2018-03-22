@@ -16,6 +16,7 @@ import Switch from './Switch'
 import Tab from './Tab'
 import TabBar from './TabBar'
 import Text from './Text'
+import TextInput from './TextInput'
 
 import {
     aquamarine,
@@ -127,6 +128,7 @@ export {
     Tab,
     TabBar,
     Text,
+    TextInput,
     AlertErrorIcon,
     AlertInfoIcon,
     AlertWarnIcon,

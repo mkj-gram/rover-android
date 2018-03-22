@@ -15,7 +15,7 @@ export interface TextProps {
     contentEditable?: boolean
     placeholder?: boolean
     label?: boolean
-    handleChange?: (evt: string) => void
+    handleChange?: (val: string) => void
     textStyle?: React.CSSProperties
     id?: string
     onBlurChange?: boolean

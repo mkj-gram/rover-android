@@ -23,6 +23,7 @@ import {
     Switch,
     Tab,
     TabBar,
+    TextInput,
     SegmentControl
 } from '../src'
 
@@ -1580,3 +1581,156 @@ storiesOf('Text', module)
             position="center"
         />
     ))
+
+storiesOf('TextInput', module).add('Removable Text', () => {
+    interface TextInputState {
+        text: string
+        isEditingText: boolean
+        text2: string
+        isEditingText2: boolean
+        text3: string
+        isEditingText3: boolean
+    }
+    class TextInputExample extends React.Component<{}, TextInputState> {
+        constructor(props: {}) {
+            super(props)
+            this.state = {
+                text: undefined,
+                isEditingText: false,
+                text2: undefined,
+                isEditingText2: false,
+                text3: undefined,
+                isEditingText3: false
+            }
+            this.setState = this.setState.bind(this)
+        }
+
+        render() {
+            const {
+                text,
+                isEditingText,
+                text2,
+                isEditingText2,
+                text3,
+                isEditingText3
+            } = this.state
+
+            return (
+                <div style={{ width: 300 }}>
+                    <div style={{ width: '100%', background: beige }}>
+                        <TextInput
+                            id="removable-text"
+                            deleteText={() =>
+                                this.setState({ text: undefined })
+                            }
+                            isEditingText={isEditingText}
+                            label="Text Input Desktop"
+                            media="Desktop"
+                            startEditingText={() =>
+                                this.setState({ isEditingText: true })
+                            }
+                            text={text}
+                            updateText={(text: string) =>
+                                this.setState({ text, isEditingText: false })
+                            }
+                            fieldStyle={{
+                                height: 100
+                            }}
+                        />
+                    </div>
+                    <TextInput
+                        id="removable-text-mobile"
+                        deleteText={() =>
+                            this.setState({
+                                isEditingText2: false,
+                                text2: undefined
+                            })
+                        }
+                        isEditingText={this.state.isEditingText2}
+                        label="Text Input Mobile"
+                        media="Mobile"
+                        startEditingText={() => {
+                            this.setState({
+                                isEditingText2: true
+                            })
+                        }}
+                        text={text2}
+                        updateText={(text: string) => {
+                            this.setState({
+                                text2: text,
+                                isEditingText2: false
+                            })
+                        }}
+                    />
+                    <TextInput
+                        id="removable-text-tablet"
+                        deleteText={() =>
+                            this.setState({
+                                text3: undefined,
+                                isEditingText3: false
+                            })
+                        }
+                        isEditingText={isEditingText3}
+                        label="Text Input Tabletl"
+                        media="Tablet"
+                        startEditingText={() =>
+                            this.setState({
+                                isEditingText3: true
+                            })
+                        }
+                        text={text3}
+                        updateText={(text: string) =>
+                            this.setState({
+                                text3: text,
+                                isEditingText3: false
+                            })
+                        }
+                    />
+                </div>
+            )
+        }
+    }
+
+    return <TextInputExample />
+})
+
+storiesOf('TextInput', module).add('Required Text', () => {
+    interface TextInputState {
+        text: string
+        isEditingText: boolean
+    }
+    class TextInputExample extends React.Component<{}, TextInputState> {
+        constructor(props: {}) {
+            super(props)
+            this.state = {
+                text: undefined,
+                isEditingText: false
+            }
+            this.setState = this.setState.bind(this)
+        }
+        render() {
+            const { text, isEditingText } = this.state
+            return (
+                <div style={{ width: 300 }}>
+                    <TextInput
+                        id="required-text"
+                        deleteText={() => this.setState({ text: undefined })}
+                        isEditingText={isEditingText}
+                        label="Text Input Sample Label"
+                        media="Desktop"
+                        startEditingText={() =>
+                            this.setState({ isEditingText: true })
+                        }
+                        text={text}
+                        updateText={(text: string) =>
+                            this.setState({ text, isEditingText: false })
+                        }
+                        placeholder="This is a placeholder"
+                    />
+                </div>
+            )
+        }
+    }
+
+    return <TextInputExample />
+})
