@@ -67,7 +67,7 @@ const notifications = {
                 action: {
                     type: "openApp"
                 },
-                uri: "rv-inbox://",
+                uri: "rv-inbox://open",
                 deliveredAt: "2018-02-04T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -98,7 +98,7 @@ const notifications = {
                 action: {
                     type: "openApp"
                 },
-                uri: "rv-inbox://",
+                uri: "rv-inbox://open",
                 deliveredAt: "2018-02-06T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -113,7 +113,7 @@ const notifications = {
                 action: {
                     type: "openApp"
                 },
-                uri: "rv-inbox://",
+                uri: "rv-inbox://open",
                 deliveredAt: "2018-02-07T14:00:00-05:00",
                 expiresAt: null,
                 isRead: false,
@@ -128,7 +128,7 @@ const notifications = {
                 action: {
                     type: "openApp"
                 },
-                uri: "rv-inbox://",
+                uri: "rv-inbox://open",
                 deliveredAt: "2018-02-09T14:00:00-05:00",
                 expiresAt: "2018-02-08T14:00:00-05:00",
                 isRead: false,
