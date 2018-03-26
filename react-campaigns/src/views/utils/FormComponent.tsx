@@ -356,7 +356,10 @@ class FormComponent extends React.Component<
             leftToolbarElement: this.getPrevious(),
             leftHeaderElement: this.getLeftHeader(),
             rightHeaderElement: this.getRightHeader(),
-            device
+            device,
+            progressPropStyle: {
+                transition: 'width 500ms ease'
+            }
         }
 
         return <WizardModal {...wizardProps}>{jsxPages[page]}</WizardModal>
