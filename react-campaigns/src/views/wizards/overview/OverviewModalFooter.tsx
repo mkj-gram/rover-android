@@ -1,7 +1,11 @@
 /// <reference path="../../../../typings/index.d.ts"/>
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { fetchTestDevices, handleSendTestModalDisplay } from '../../../actions'
+import {
+    fetchTestDevices,
+    handleSendTestModalDisplay,
+    sendTest
+} from '../../../actions'
 
 import { connect, Dispatch } from 'react-redux'
 import {
@@ -23,6 +27,7 @@ export interface OverviewModalFooterProps extends InjectedProps {
     publish?: boolean
     sendTestClick?: () => void
     publishClick?: () => void
+    campaignId?: number
 }
 
 export interface OverviewModalFooterState {
@@ -34,6 +39,7 @@ export interface OverviewModalFooterState {
 export interface DispatchProps {
     fetchTestDevices: () => void
     handleSendTestModalDisplay: (on?: boolean) => void
+    sendTestNotification: (campaignId: number, deviceIds: string[]) => void
 }
 
 export interface TestDeviceStateProps {
@@ -70,11 +76,17 @@ class OverviewModalFooter extends React.Component<
                 })
             } else {
                 this.props.handleSendTestModalDisplay(on)
-                setTimeout(() => {
+                if (on) {
                     this.setState({
                         toggleSendTest: !this.state.toggleSendTest
                     })
-                }, 300)
+                } else {
+                    setTimeout(() => {
+                        this.setState({
+                            toggleSendTest: !this.state.toggleSendTest
+                        })
+                    }, 300)
+                }
             }
         }
     }
@@ -155,11 +167,12 @@ class OverviewModalFooter extends React.Component<
                                 type={sendTest ? 'secondary' : 'disabled'}
                                 overrideWidth={114}
                                 style={{ outerStyle: { marginRight: 16 } }}
+                                onClick={this.handleSendTestToggle}
                                 key="sendTest1"
                             />,
                             <SendTestComponent
                                 key="sendTest2"
-                                device="Tablet"
+                                device={device}
                                 selectedTestDevices={selectedTestDevices}
                                 listOfTestDevices={this.props.testDevices}
                                 handleCheck={this.handleCheck}
@@ -168,8 +181,23 @@ class OverviewModalFooter extends React.Component<
                     </PopoverContainer>
                 )
             } else {
-                if (!toggleSendTest) {
-                    return (
+                const Fragment = React.Fragment
+                let node = (
+                    <SendTestComponent
+                        key="sendTest2"
+                        device={device}
+                        buttonLeftCallback={() =>
+                            this.handleSendTestToggle('Mobile', false)
+                        }
+                        selectedTestDevices={selectedTestDevices}
+                        listOfTestDevices={this.props.testDevices}
+                        handleCheck={this.handleCheck}
+                        buttonRightCallback={this.handleSendTestPrompt}
+                    />
+                )
+
+                return (
+                    <Fragment>
                         <Button
                             text="Send a Test"
                             size="large"
@@ -181,31 +209,18 @@ class OverviewModalFooter extends React.Component<
                                 this.handleSendTestToggle('Mobile', true)
                             }
                         />
-                    )
-                } else {
-                    let node = (
-                        <SendTestComponent
-                            key="sendTest2"
-                            device="Mobile"
-                            buttonLeftCallback={() =>
-                                this.handleSendTestToggle('Mobile', false)
-                            }
-                            selectedTestDevices={selectedTestDevices}
-                            listOfTestDevices={this.props.testDevices}
-                            handleCheck={this.handleCheck}
-                            buttonRightCallback={this.handleSendTestPrompt}
-                        />
-                    )
-                    return ReactDOM.createPortal(
-                        node,
-                        document.getElementById('overviewComponentRoot')
-                    )
-                }
+                        {toggleSendTest &&
+                            ReactDOM.createPortal(
+                                node,
+                                document.getElementById('overviewComponentRoot')
+                            )}
+                    </Fragment>
+                )
             }
         }
         const promptStr = `You’re about to send a test version of this campaign to ${
             selectedTestDevices.length
-        } devices. Continue?`
+        } ${selectedTestDevices.length > 1 ? 'devices' : 'device'}. Continue?`
 
         return (
             <div
@@ -233,12 +248,19 @@ class OverviewModalFooter extends React.Component<
                             buttonPrimaryText="Cancel"
                             buttonSecondaryText="Send Test"
                             primaryOnClick={this.handleSendTestPrompt}
-                            secondaryOnClick={() =>
-                                console.log('send test action')
-                            }
+                            secondaryOnClick={() => {
+                                this.props.sendTestNotification(
+                                    this.props.campaignId,
+                                    selectedTestDevices
+                                )
+                                this.handleSendTestPrompt()
+                            }}
                             isOpen={sendTestPrompt}
                             targetParent="overviewComponentRoot"
                             dialogText={promptStr}
+                            childStyle={{
+                                marginBottom: 32
+                            }}
                         />
                     )}
                     <Button
@@ -262,6 +284,9 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
         },
         handleSendTestModalDisplay: on => {
             dispatch(handleSendTestModalDisplay(on))
+        },
+        sendTestNotification: (campaignId, deviceIds) => {
+            dispatch(sendTest(campaignId, deviceIds))
         }
     }
 }

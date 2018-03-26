@@ -6,6 +6,7 @@ import createCampaign from './createCampaign'
 import createSegment from './createSegment'
 import duplicateCampaign from './duplicateCampaign'
 import renameCampaign from './renameCampaign'
+import sendTestCampaign from './sendTestCampaign'
 import trackEvents from './trackEvents'
 import updateDeviceTestLabelProperty from './updateDeviceTestLabelProperty'
 import updateDynamicSegmentPredicates from './updateDynamicSegmentPredicates'
@@ -21,6 +22,7 @@ const Mutation = new GraphQLObjectType({
         createSegment,
         duplicateCampaign,
         renameCampaign,
+        sendTestCampaign,
         trackEvents,
         updateDeviceTestLabelProperty,
         updateDynamicSegmentPredicates,

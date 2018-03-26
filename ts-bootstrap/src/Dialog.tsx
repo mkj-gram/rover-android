@@ -65,7 +65,7 @@ class Dialog extends React.Component<DialogProps, {}> {
 
         this.node = (
             <Fragment>
-                <MediaQuery maxWidth={375}>
+                <MediaQuery maxDeviceWidth={767}>
                     {matches => {
                         if (matches) {
                             child = {

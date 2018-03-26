@@ -47,32 +47,42 @@ class SendTestComponent extends React.Component<
             selectedTestDevices,
             handleCheck
         } = this.props
-        let style: React.CSSProperties[] | textSize[] = []
-        if (device !== 'Mobile') {
-            style[0] = {
-                display: 'flex',
-                height: 55,
-                marginRight: 16,
-                marginLeft: 16,
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                borderBottom: `1px solid ${titanium}`
+
+        const getRowStyle = () => {
+            switch (device) {
+                case 'Mobile':
+                    return {
+                        height: 72,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingTop: 24,
+                        paddingBottom: 23,
+                        borderBottom: `1px solid ${titanium}`
+                    }
+                case 'Tablet':
+                case 'Desktop':
+                default:
+                    return {
+                        display: 'flex',
+                        height: 55,
+                        marginRight: 16,
+                        marginLeft: 16,
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderBottom: `1px solid ${titanium}`
+                    }
             }
-            style[1] = 'medium'
-        } else {
-            style[0] = {
-                height: 72,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingTop: 24,
-                paddingBottom: 23,
-                borderBottom: `1px solid ${titanium}`
-            }
-            style[1] = 'large'
         }
+
         return Object.keys(listOfTestDevices).map((dev, index) => (
-            <div style={style[0] as React.CSSProperties} key={index}>
+            <div
+                style={getRowStyle() as React.CSSProperties}
+                key={index}
+                onClick={
+                    device !== 'Desktop' ? () => handleCheck(dev) : () => null
+                }
+            >
                 <div
                     style={{
                         overflow: 'hidden',
@@ -82,16 +92,14 @@ class SendTestComponent extends React.Component<
                 >
                     <Text
                         text={this.getDeviceText(listOfTestDevices, dev)}
-                        size={style[1] as textSize}
+                        size={device !== 'Mobile' ? 'medium' : 'large'}
                     />
                 </div>
                 <div style={{ marginLeft: 10 }}>
                     <CheckBox
-                        checked={selectedTestDevices.includes(
-                            this.getDeviceText(listOfTestDevices, dev)
-                        )}
+                        checked={selectedTestDevices.includes(dev)}
                         onClick={handleCheck}
-                        value={this.getDeviceText(listOfTestDevices, dev)}
+                        value={dev}
                     />
                 </div>
             </div>
@@ -122,7 +130,7 @@ class SendTestComponent extends React.Component<
                             flexDirection: 'column'
                         }}
                     >
-                        {this.renderDeviceList('Desktop')}
+                        {this.renderDeviceList(device)}
                     </div>
                 </div>
             )
@@ -160,6 +168,18 @@ class SendTestComponent extends React.Component<
                             }
                             buttonLeftCallback={buttonLeftCallback}
                             buttonRightCallback={buttonRightCallback}
+                            style={{
+                                buttonLeftStyle: {
+                                    outerStyle: {
+                                        marginLeft: 24
+                                    }
+                                },
+                                buttonRightStyle: {
+                                    outerStyle: {
+                                        marginRight: 24
+                                    }
+                                }
+                            }}
                         />
                         <div
                             style={{
@@ -169,7 +189,7 @@ class SendTestComponent extends React.Component<
                             }}
                         >
                             <Text text="Send a Test" size="h1" />
-                            {this.renderDeviceList('Mobile')}
+                            {this.renderDeviceList(device)}
                         </div>
                     </div>
                 </div>

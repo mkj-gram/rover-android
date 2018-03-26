@@ -148,9 +148,9 @@ class OverviewComponent extends React.Component<
 
         if (campaign !== null) {
             const OverviewModalFooterComponent = ResponsiveContainer({
-                // sendTest: notificationComplete === 100,
-                sendTest: true,
-                publish: deliveryComplete === 100
+                sendTest: notificationComplete === 100,
+                publish: deliveryComplete === 100,
+                campaignId: parseInt(campaign.campaignId, 10)
             })(OverviewModalFooter)
 
             const OverviewModalHeaderComponent = ResponsiveContainer({

@@ -4,6 +4,7 @@ import * as editableCampaignActions from './editableCampaign'
 import * as campaignsActions from './campaigns'
 import * as testDevicesActions from './testDevices'
 import * as notificationActions from './notification'
+import * as sendTestActions from './sendTest'
 
 import * as overviewActions from './overview'
 import * as H from 'history'
@@ -61,6 +62,9 @@ export const updateNotificationSettings = (
     campaign: ScheduledCampaign | AutomatedNotificationCampaign,
     campaignId: string
 ) => campaignsActions.updateNotificationSettings(campaign, campaignId)
+
+export const sendTest = (campaignId: number, deviceIds: string[]) =>
+    sendTestActions.sendTest(campaignId, deviceIds)
 
 // Home
 export const openNewCampaignPopover: ActionCreator<
