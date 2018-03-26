@@ -4,6 +4,7 @@ import * as ReactDOM from 'react-dom'
 import { InjectedProps } from '../../utils/ResponsiveContainer'
 import { Text } from '@rover/ts-bootstrap/dist/src'
 import AlertOptionsRows from './AlertOptionsRows'
+import FormSection from '../../utils/FormSection'
 
 export interface AlertsOptionsProps extends InjectedProps {
     campaign?: ScheduledCampaign | AutomatedNotificationCampaign
@@ -18,15 +19,7 @@ class AlertOptionsContainer extends React.Component<AlertsOptionsProps, {}> {
         const { device, campaign } = this.props
 
         return (
-            <div
-                style={{
-                    height: '100%',
-                    width: '100%',
-
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}
-            >
+            <FormSection>
                 <div
                     style={{
                         padding:
@@ -51,7 +44,7 @@ class AlertOptionsContainer extends React.Component<AlertsOptionsProps, {}> {
                     />
                 </div>
                 <AlertOptionsRows device={device} campaign={campaign} />
-            </div>
+            </FormSection>
         )
     }
 }

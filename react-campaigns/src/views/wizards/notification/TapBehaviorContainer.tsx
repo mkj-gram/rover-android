@@ -24,6 +24,7 @@ import TapBehaviorBody from './TapBehaviorBody'
 import TapBehaviorRow from './TapBehaviorRow'
 import NotificationMobilePopoverContainer from './NotificationMobilePopoverContainer'
 import UpdateEditableUIStateProperty from '../../utils/UpdateEditableUIStateProperty'
+import FormSection from '../../utils/FormSection'
 
 import {
     updateEditableCampaign,
@@ -293,39 +294,38 @@ class TapBehaviorContainer extends React.Component<
         const { device, campaign, editableCampaign } = this.props
 
         const { notificationTapBehaviorType } = editableCampaign
-
+        const { Fragment } = React
         return (
-            <div
-                style={{
-                    height: '100%',
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    padding: device !== 'Mobile' ? '24px 32px' : 24
-                }}
-            >
+            <FormSection>
                 <div
                     style={{
-                        paddingBottom: 24
+                        padding: device !== 'Mobile' ? '24px 32px' : 24,
+                        paddingBottom: 0
                     }}
                 >
-                    <Text text="Tap Behavior" size="h1" />
+                    <div
+                        style={{
+                            paddingBottom: 24
+                        }}
+                    >
+                        <Text text="Tap Behavior" size="h1" />
+                    </div>
+                    <TapBehaviorRow
+                        handleClick={
+                            device === 'Tablet'
+                                ? this.handleShowNotificationOptions
+                                : () => null
+                        }
+                    >
+                        {this.tapNotificationRow()}
+                    </TapBehaviorRow>
+                    <TapBehaviorBody
+                        device={device}
+                        selectedTapOption={notificationTapBehaviorType}
+                        campaign={campaign}
+                    />
                 </div>
-                <TapBehaviorRow
-                    handleClick={
-                        device === 'Tablet'
-                            ? this.handleShowNotificationOptions
-                            : () => null
-                    }
-                >
-                    {this.tapNotificationRow()}
-                </TapBehaviorRow>
-                <TapBehaviorBody
-                    device={device}
-                    selectedTapOption={notificationTapBehaviorType}
-                    campaign={campaign}
-                />
-            </div>
+            </FormSection>
         )
     }
 }
