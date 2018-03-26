@@ -50,6 +50,31 @@ func (s *Server) Create(ctx context.Context, req *campaignspb.CreateRequest) (*c
 	}, nil
 }
 
+func (s *Server) Get(ctx context.Context, req *campaignspb.GetRequest) (*campaignspb.GetResponse, error) {
+	var acctId = req.GetAuthContext().GetAccountId()
+	if err := va.All(
+		va.Value("auth_context", va.Pointer(req.AuthContext), va.Require),
+		va.Value("account_id", acctId, va.Require),
+		va.Value("campaign_id", req.CampaignId, va.Require),
+	); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
+	}
+
+	var campaign, err = s.DB.OneById(ctx, acctId, req.CampaignId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "db.OneById: %v", err)
+	}
+
+	var proto campaignspb.Campaign
+	if err := CampaignToProto(campaign, &proto); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "toProto: %v", err)
+	}
+
+	return &campaignspb.GetResponse{
+		Campaign: &proto,
+	}, nil
+}
+
 func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campaignspb.ListResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 

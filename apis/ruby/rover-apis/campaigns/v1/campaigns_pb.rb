@@ -99,6 +99,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.campaigns.v1.ListResponse" do
     repeated :campaigns, :message, 1, "rover.campaigns.v1.Campaign"
   end
+  add_message "rover.campaigns.v1.GetRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :campaign_id, :int32, 2
+  end
+  add_message "rover.campaigns.v1.GetResponse" do
+    optional :campaign, :message, 1, "rover.campaigns.v1.Campaign"
+  end
   add_message "rover.campaigns.v1.ArchiveRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :campaign_id, :int32, 5
@@ -327,6 +334,8 @@ module Rover
       CreateResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CreateResponse").msgclass
       ListRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ListRequest").msgclass
       ListResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ListResponse").msgclass
+      GetRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.GetRequest").msgclass
+      GetResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.GetResponse").msgclass
       ArchiveRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ArchiveRequest").msgclass
       ArchiveResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ArchiveResponse").msgclass
       DuplicateRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.DuplicateRequest").msgclass

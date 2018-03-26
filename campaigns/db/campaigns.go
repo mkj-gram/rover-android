@@ -46,7 +46,7 @@ func (c *campaign) fromDB() error {
 	return nil
 }
 
-func (db *DB) OneById(ctx context.Context, account_id, id int32) (*campaigns.Campaign, error) {
+func (db *DB) OneById(ctx context.Context, accountId, id int32) (*campaigns.Campaign, error) {
 	var c campaign
 
 	err := db.db.GetContext(ctx,
@@ -57,7 +57,7 @@ func (db *DB) OneById(ctx context.Context, account_id, id int32) (*campaigns.Cam
 				id = $1
 				and account_id = $2
 		`,
-		id, account_id)
+		id, accountId)
 
 	if err != nil {
 		return nil, wrapError(err, "db.Get")

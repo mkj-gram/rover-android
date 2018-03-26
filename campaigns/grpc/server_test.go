@@ -138,6 +138,7 @@ func TestCampaigns(t *testing.T) {
 
 	t.Run("List", test_List)
 	t.Run("List_Options", test_List_Options)
+	t.Run("Get", test_Get)
 	t.Run("Create", test_Create)
 	t.Run("Rename", test_Rename)
 	t.Run("Duplicate", test_Duplicate)
@@ -404,6 +405,100 @@ func test_List(t *testing.T) {
 			}
 		})
 	}
+}
+
+func test_Get(t *testing.T) {
+	var (
+		ctx         = context.Background()
+		db, closeDB = dbOpen(t, testDB.DSN)
+		svc         = campaigns_grpc.Server{DB: db}
+	)
+
+	defer closeDB()
+
+	tests := []struct {
+		desc string
+
+		req *campaignspb.GetRequest
+		exp *campaignspb.GetResponse
+
+		expErr error
+	}{
+
+		{
+			desc: "error: validation",
+			req:  &campaignspb.GetRequest{},
+
+			expErr: status.Errorf(codes.InvalidArgument, "validate: auth_context: is required. account_id: is required. campaign_id: is required."),
+		},
+		{
+			desc: "error: not found",
+
+			req: &campaignspb.GetRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				CampaignId:  404,
+			},
+
+			expErr: status.Errorf(codes.NotFound, "db.OneById: db.Get: sql: no rows in result set"),
+		},
+		{
+			desc: "returns campaign",
+
+			req: &campaignspb.GetRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				CampaignId:  1,
+			},
+
+			expErr: nil,
+			exp: &campaignspb.GetResponse{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+						AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+							CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+
+							CampaignId:     1,
+							Name:           "c1",
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
+
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+							NotificationExpiration:                  -1,
+							NotificationAlertOptionPushNotification: true,
+
+							AutomatedMonday:    true,
+							AutomatedTuesday:   true,
+							AutomatedWednesday: true,
+							AutomatedThursday:  true,
+							AutomatedFriday:    true,
+							AutomatedSaturday:  true,
+							AutomatedSunday:    true,
+
+							AutomatedFrequencySingleUse: true,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			if tt.req == nil {
+				t.Skip("TODO")
+			}
+
+			var (
+				exp, expErr = tt.exp, tt.expErr
+				got, gotErr = svc.Get(ctx, tt.req)
+			)
+
+			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+				t.Fatalf("\nDiff:\n%v", Difff(diff))
+			}
+		})
+	}
+
 }
 
 func test_Create(t *testing.T) {

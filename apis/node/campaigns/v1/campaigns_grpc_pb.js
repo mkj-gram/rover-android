@@ -73,6 +73,28 @@ function deserialize_rover_campaigns_v1_DuplicateResponse(buffer_arg) {
   return campaigns_v1_campaigns_pb.DuplicateResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_campaigns_v1_GetRequest(arg) {
+  if (!(arg instanceof campaigns_v1_campaigns_pb.GetRequest)) {
+    throw new Error('Expected argument of type rover.campaigns.v1.GetRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_campaigns_v1_GetRequest(buffer_arg) {
+  return campaigns_v1_campaigns_pb.GetRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_campaigns_v1_GetResponse(arg) {
+  if (!(arg instanceof campaigns_v1_campaigns_pb.GetResponse)) {
+    throw new Error('Expected argument of type rover.campaigns.v1.GetResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_campaigns_v1_GetResponse(buffer_arg) {
+  return campaigns_v1_campaigns_pb.GetResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_campaigns_v1_ListRequest(arg) {
   if (!(arg instanceof campaigns_v1_campaigns_pb.ListRequest)) {
     throw new Error('Expected argument of type rover.campaigns.v1.ListRequest');
@@ -286,6 +308,17 @@ var CampaignsService = exports.CampaignsService = {
     requestDeserialize: deserialize_rover_campaigns_v1_ListRequest,
     responseSerialize: serialize_rover_campaigns_v1_ListResponse,
     responseDeserialize: deserialize_rover_campaigns_v1_ListResponse,
+  },
+  get: {
+    path: '/rover.campaigns.v1.Campaigns/Get',
+    requestStream: false,
+    responseStream: false,
+    requestType: campaigns_v1_campaigns_pb.GetRequest,
+    responseType: campaigns_v1_campaigns_pb.GetResponse,
+    requestSerialize: serialize_rover_campaigns_v1_GetRequest,
+    requestDeserialize: deserialize_rover_campaigns_v1_GetRequest,
+    responseSerialize: serialize_rover_campaigns_v1_GetResponse,
+    responseDeserialize: deserialize_rover_campaigns_v1_GetResponse,
   },
   create: {
     path: '/rover.campaigns.v1.Campaigns/Create',

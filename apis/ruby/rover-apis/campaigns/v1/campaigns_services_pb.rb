@@ -20,6 +20,7 @@ module Rover
           # CRUD
           #
           rpc :List, ListRequest, ListResponse
+          rpc :Get, GetRequest, GetResponse
           rpc :Create, CreateRequest, CreateResponse
           rpc :Duplicate, DuplicateRequest, DuplicateResponse
           rpc :Rename, RenameRequest, RenameResponse
