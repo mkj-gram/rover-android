@@ -10,12 +10,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.protobuf.Value" do
     oneof :kind do
       optional :null_value, :enum, 1, "rover.protobuf.NullValue"
-      optional :number_value, :int64, 2
-      optional :double_value, :double, 3
-      optional :string_value, :string, 4
-      optional :bool_value, :bool, 5
-      optional :struct_value, :message, 6, "rover.protobuf.Struct"
-      optional :list_value, :message, 7, "rover.protobuf.ListValue"
+      optional :number_value, :double, 2
+      optional :string_value, :string, 3
+      optional :bool_value, :bool, 4
+      optional :struct_value, :message, 5, "rover.protobuf.Struct"
+      optional :list_value, :message, 6, "rover.protobuf.ListValue"
     end
   end
   add_message "rover.protobuf.ListValue" do

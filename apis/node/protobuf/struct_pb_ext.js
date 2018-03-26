@@ -1,18 +1,5 @@
 const goog = require('google-protobuf');
 
-function typeOf(value) {
-	const type = goog.typeOf(value)
-	if (type === 'number') {
-		if (Number.isInteger(value)) {
-			return 'number'
-		} else {
-			return 'float'
-		}
-	}
-
-	return type
-}
-
 /**
  * Converts this Value object to a plain JavaScript value.
  * @return {?proto.rover.protobuf.JavaScriptValue} a plain JavaScript
@@ -48,15 +35,12 @@ proto.rover.protobuf.Value.prototype.toJavaScript = function() {
  */
 proto.rover.protobuf.Value.fromJavaScript = function(value) {
   var ret = new proto.rover.protobuf.Value();
-  switch (typeOf(value)) {
+  switch (goog.typeOf(value)) {
     case 'string':
       ret.setStringValue(/** @type {string} */ (value));
       break;
     case 'number':
       ret.setNumberValue(/** @type {number} */ (value));
-      break;
-    case 'float':
-      ret.setDoubleValue(/** @type {double} */ (value));
       break;
     case 'boolean':
       ret.setBoolValue(/** @type {boolean} */ (value));

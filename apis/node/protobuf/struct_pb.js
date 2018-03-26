@@ -181,7 +181,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.rover.protobuf.Value.oneofGroups_ = [[1,2,3,4,5,6,7]];
+proto.rover.protobuf.Value.oneofGroups_ = [[1,2,3,4,5,6]];
 
 /**
  * @enum {number}
@@ -190,11 +190,10 @@ proto.rover.protobuf.Value.KindCase = {
   KIND_NOT_SET: 0,
   NULL_VALUE: 1,
   NUMBER_VALUE: 2,
-  DOUBLE_VALUE: 3,
-  STRING_VALUE: 4,
-  BOOL_VALUE: 5,
-  STRUCT_VALUE: 6,
-  LIST_VALUE: 7
+  STRING_VALUE: 3,
+  BOOL_VALUE: 4,
+  STRUCT_VALUE: 5,
+  LIST_VALUE: 6
 };
 
 /**
@@ -233,10 +232,9 @@ proto.rover.protobuf.Value.prototype.toObject = function(opt_includeInstance) {
 proto.rover.protobuf.Value.toObject = function(includeInstance, msg) {
   var f, obj = {
     nullValue: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    numberValue: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    doubleValue: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
-    stringValue: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    boolValue: jspb.Message.getFieldWithDefault(msg, 5, false),
+    numberValue: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
+    stringValue: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    boolValue: jspb.Message.getFieldWithDefault(msg, 4, false),
     structValue: (f = msg.getStructValue()) && proto.rover.protobuf.Struct.toObject(includeInstance, f),
     listValue: (f = msg.getListValue()) && proto.rover.protobuf.ListValue.toObject(includeInstance, f)
   };
@@ -280,27 +278,23 @@ proto.rover.protobuf.Value.deserializeBinaryFromReader = function(msg, reader) {
       msg.setNullValue(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt64());
+      var value = /** @type {number} */ (reader.readDouble());
       msg.setNumberValue(value);
       break;
     case 3:
-      var value = /** @type {number} */ (reader.readDouble());
-      msg.setDoubleValue(value);
-      break;
-    case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setStringValue(value);
       break;
-    case 5:
+    case 4:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setBoolValue(value);
       break;
-    case 6:
+    case 5:
       var value = new proto.rover.protobuf.Struct;
       reader.readMessage(value,proto.rover.protobuf.Struct.deserializeBinaryFromReader);
       msg.setStructValue(value);
       break;
-    case 7:
+    case 6:
       var value = new proto.rover.protobuf.ListValue;
       reader.readMessage(value,proto.rover.protobuf.ListValue.deserializeBinaryFromReader);
       msg.setListValue(value);
@@ -342,36 +336,29 @@ proto.rover.protobuf.Value.serializeBinaryToWriter = function(message, writer) {
   }
   f = /** @type {number} */ (jspb.Message.getField(message, 2));
   if (f != null) {
-    writer.writeInt64(
+    writer.writeDouble(
       2,
       f
     );
   }
-  f = /** @type {number} */ (jspb.Message.getField(message, 3));
+  f = /** @type {string} */ (jspb.Message.getField(message, 3));
   if (f != null) {
-    writer.writeDouble(
+    writer.writeString(
       3,
       f
     );
   }
-  f = /** @type {string} */ (jspb.Message.getField(message, 4));
-  if (f != null) {
-    writer.writeString(
-      4,
-      f
-    );
-  }
-  f = /** @type {boolean} */ (jspb.Message.getField(message, 5));
+  f = /** @type {boolean} */ (jspb.Message.getField(message, 4));
   if (f != null) {
     writer.writeBool(
-      5,
+      4,
       f
     );
   }
   f = message.getStructValue();
   if (f != null) {
     writer.writeMessage(
-      6,
+      5,
       f,
       proto.rover.protobuf.Struct.serializeBinaryToWriter
     );
@@ -379,7 +366,7 @@ proto.rover.protobuf.Value.serializeBinaryToWriter = function(message, writer) {
   f = message.getListValue();
   if (f != null) {
     writer.writeMessage(
-      7,
+      6,
       f,
       proto.rover.protobuf.ListValue.serializeBinaryToWriter
     );
@@ -417,11 +404,11 @@ proto.rover.protobuf.Value.prototype.hasNullValue = function() {
 
 
 /**
- * optional int64 number_value = 2;
+ * optional double number_value = 2;
  * @return {number}
  */
 proto.rover.protobuf.Value.prototype.getNumberValue = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 2, 0.0));
 };
 
 
@@ -446,21 +433,21 @@ proto.rover.protobuf.Value.prototype.hasNumberValue = function() {
 
 
 /**
- * optional double double_value = 3;
- * @return {number}
+ * optional string string_value = 3;
+ * @return {string}
  */
-proto.rover.protobuf.Value.prototype.getDoubleValue = function() {
-  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 3, 0.0));
+proto.rover.protobuf.Value.prototype.getStringValue = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
-/** @param {number} value */
-proto.rover.protobuf.Value.prototype.setDoubleValue = function(value) {
+/** @param {string} value */
+proto.rover.protobuf.Value.prototype.setStringValue = function(value) {
   jspb.Message.setOneofField(this, 3, proto.rover.protobuf.Value.oneofGroups_[0], value);
 };
 
 
-proto.rover.protobuf.Value.prototype.clearDoubleValue = function() {
+proto.rover.protobuf.Value.prototype.clearStringValue = function() {
   jspb.Message.setOneofField(this, 3, proto.rover.protobuf.Value.oneofGroups_[0], undefined);
 };
 
@@ -469,27 +456,29 @@ proto.rover.protobuf.Value.prototype.clearDoubleValue = function() {
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.protobuf.Value.prototype.hasDoubleValue = function() {
+proto.rover.protobuf.Value.prototype.hasStringValue = function() {
   return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * optional string string_value = 4;
- * @return {string}
+ * optional bool bool_value = 4;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
  */
-proto.rover.protobuf.Value.prototype.getStringValue = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+proto.rover.protobuf.Value.prototype.getBoolValue = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 4, false));
 };
 
 
-/** @param {string} value */
-proto.rover.protobuf.Value.prototype.setStringValue = function(value) {
+/** @param {boolean} value */
+proto.rover.protobuf.Value.prototype.setBoolValue = function(value) {
   jspb.Message.setOneofField(this, 4, proto.rover.protobuf.Value.oneofGroups_[0], value);
 };
 
 
-proto.rover.protobuf.Value.prototype.clearStringValue = function() {
+proto.rover.protobuf.Value.prototype.clearBoolValue = function() {
   jspb.Message.setOneofField(this, 4, proto.rover.protobuf.Value.oneofGroups_[0], undefined);
 };
 
@@ -498,55 +487,24 @@ proto.rover.protobuf.Value.prototype.clearStringValue = function() {
  * Returns whether this field is set.
  * @return {!boolean}
  */
-proto.rover.protobuf.Value.prototype.hasStringValue = function() {
+proto.rover.protobuf.Value.prototype.hasBoolValue = function() {
   return jspb.Message.getField(this, 4) != null;
 };
 
 
 /**
- * optional bool bool_value = 5;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.rover.protobuf.Value.prototype.getBoolValue = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 5, false));
-};
-
-
-/** @param {boolean} value */
-proto.rover.protobuf.Value.prototype.setBoolValue = function(value) {
-  jspb.Message.setOneofField(this, 5, proto.rover.protobuf.Value.oneofGroups_[0], value);
-};
-
-
-proto.rover.protobuf.Value.prototype.clearBoolValue = function() {
-  jspb.Message.setOneofField(this, 5, proto.rover.protobuf.Value.oneofGroups_[0], undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {!boolean}
- */
-proto.rover.protobuf.Value.prototype.hasBoolValue = function() {
-  return jspb.Message.getField(this, 5) != null;
-};
-
-
-/**
- * optional Struct struct_value = 6;
+ * optional Struct struct_value = 5;
  * @return {?proto.rover.protobuf.Struct}
  */
 proto.rover.protobuf.Value.prototype.getStructValue = function() {
   return /** @type{?proto.rover.protobuf.Struct} */ (
-    jspb.Message.getWrapperField(this, proto.rover.protobuf.Struct, 6));
+    jspb.Message.getWrapperField(this, proto.rover.protobuf.Struct, 5));
 };
 
 
 /** @param {?proto.rover.protobuf.Struct|undefined} value */
 proto.rover.protobuf.Value.prototype.setStructValue = function(value) {
-  jspb.Message.setOneofWrapperField(this, 6, proto.rover.protobuf.Value.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 5, proto.rover.protobuf.Value.oneofGroups_[0], value);
 };
 
 
@@ -560,23 +518,23 @@ proto.rover.protobuf.Value.prototype.clearStructValue = function() {
  * @return {!boolean}
  */
 proto.rover.protobuf.Value.prototype.hasStructValue = function() {
-  return jspb.Message.getField(this, 6) != null;
+  return jspb.Message.getField(this, 5) != null;
 };
 
 
 /**
- * optional ListValue list_value = 7;
+ * optional ListValue list_value = 6;
  * @return {?proto.rover.protobuf.ListValue}
  */
 proto.rover.protobuf.Value.prototype.getListValue = function() {
   return /** @type{?proto.rover.protobuf.ListValue} */ (
-    jspb.Message.getWrapperField(this, proto.rover.protobuf.ListValue, 7));
+    jspb.Message.getWrapperField(this, proto.rover.protobuf.ListValue, 6));
 };
 
 
 /** @param {?proto.rover.protobuf.ListValue|undefined} value */
 proto.rover.protobuf.Value.prototype.setListValue = function(value) {
-  jspb.Message.setOneofWrapperField(this, 7, proto.rover.protobuf.Value.oneofGroups_[0], value);
+  jspb.Message.setOneofWrapperField(this, 6, proto.rover.protobuf.Value.oneofGroups_[0], value);
 };
 
 
@@ -590,7 +548,7 @@ proto.rover.protobuf.Value.prototype.clearListValue = function() {
  * @return {!boolean}
  */
 proto.rover.protobuf.Value.prototype.hasListValue = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 6) != null;
 };
 
 
