@@ -36,7 +36,7 @@ var (
 	}
 
 	mongoDSN = "mongodb://mongo:27017/audience_worker_test"
-	esDSN    = "http://elastic5:9200/"
+	esDSN    = "http://elastic:9200/"
 
 	difff = rtesting.Difff
 	Diff  = rtesting.Diff

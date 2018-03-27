@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lib/pq"
 	"github.com/namsral/flag"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,13 +19,18 @@ import (
 	campaigns_grpc "github.com/roverplatform/rover/campaigns/grpc"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	rtesting "github.com/roverplatform/rover/go/testing"
+	"github.com/roverplatform/rover/go/zoneinfo"
+)
+
+type (
+	Task = db.ScheduledNotificationTask
 )
 
 var (
 	Diff  = rtesting.Diff
 	Difff = rtesting.Difff
 
-	testDB struct {
+	tCfg struct {
 		DSN string
 
 		migration struct {
@@ -49,13 +55,13 @@ var (
 )
 
 func init() {
-	flag.StringVar(&testDB.DSN, "test-dsn", ``, "test DSN")
+	flag.StringVar(&tCfg.DSN, "test-db-dsn", ``, "test DSN")
 
-	flag.StringVar(&testDB.fixtures.Path, "fixtures-path", `../db/testdata/fixtures.sql`, "path to migrations")
+	flag.StringVar(&tCfg.fixtures.Path, "fixtures-path", `../db/testdata/fixtures.sql`, "path to migrations")
 
-	flag.StringVar(&testDB.migration.Path, "migration-path", `../db/migrations`, "path to migrations")
-	flag.StringVar(&testDB.migration.Cmd, "migration-cmd", `up`, "migration cmd")
-	flag.StringVar(&testDB.migration.Args, "migration-args", ``, "migration args")
+	flag.StringVar(&tCfg.migration.Path, "migration-path", `../db/migrations`, "path to migrations")
+	flag.StringVar(&tCfg.migration.Cmd, "migration-cmd", `up`, "migration cmd")
+	flag.StringVar(&tCfg.migration.Args, "migration-args", ``, "migration args")
 
 	flag.Parse()
 }
@@ -89,14 +95,16 @@ func ts(t testing.TB, ts string) *timestamp.Timestamp {
 	return protoTs
 }
 
-// func ts(t *testing.T, ti time.Time) *timestamp.Timestamp {
-// 	ts, err := timestamp.TimestampProto(ti)
-// 	if err != nil {
-// 		t.Fatal("timestamp:", err)
-// 	}
-//
-// 	return ts
-// }
+func ts2(t *testing.T, s string) time.Time {
+	t.Helper()
+
+	tsv, err := time.Parse(time.RFC3339, s)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return tsv
+}
 
 func readFile(t *testing.T, path string) []byte {
 	t.Helper()
@@ -109,16 +117,16 @@ func readFile(t *testing.T, path string) []byte {
 }
 
 func TestCampaigns(t *testing.T) {
-	var pgdb, closeDB = dbOpen(t, testDB.DSN)
+	var pgdb, closeDB = dbOpen(t, tCfg.DSN)
 	defer closeDB()
 
 	tDb := testdb.DB{
-		MigrationPath: testDB.migration.Path,
+		MigrationPath: tCfg.migration.Path,
 		DB:            pgdb.DB(),
 		TB:            t,
 	}
 
-	var m = testDB.migration
+	var m = tCfg.migration
 	t.Logf("Migrations: cmd=%q path=%q", m.Cmd, m.Path)
 	tDb.MigrationStatus()
 	if m.Path != "" && m.Cmd != "" {
@@ -130,35 +138,38 @@ func TestCampaigns(t *testing.T) {
 	}
 
 	// tDb.Exec(`SELECT set_config('log_statement', 'all', false)`)
-	tDb.Exec(`TRUNCATE table campaigns RESTART IDENTITY;`)
+	tDb.Exec(`TRUNCATE table campaigns, scheduled_notification_tasks RESTART IDENTITY;`)
 	tDb.Exec(`SELECT pg_catalog.setval('campaigns_id_seq', 9999, true);`)
-	tDb.Exec(string(readFile(t, testDB.fixtures.Path)))
+	tDb.Exec(string(readFile(t, tCfg.fixtures.Path)))
 
 	db.TimeNow = func() time.Time { return timeCreatedAt }
 
+	t.Run("List+Options", test_List_Options)
 	t.Run("List", test_List)
-	t.Run("List_Options", test_List_Options)
 	t.Run("Get", test_Get)
 	t.Run("Create", test_Create)
 	t.Run("Rename", test_Rename)
 	t.Run("Duplicate", test_Duplicate)
+
 	t.Run("Archive", test_Archive)
-	t.Run("Unarchive", test_Unarchive)
 	t.Run("Publish", test_Publish)
-	t.Run("Unpublish", test_Unpublish)
+
+	t.Run("SendTest", test_SendTest)
 
 	t.Run("UpdateNotificationSettings", test_UpdateNotificationSettings)
 
 	t.Run("UpdateAutomatedDeliverySettings", test_UpdateAutomatedDeliverySettings)
-	t.Run("UpdateScheduledDeliverySettings", test_UpdateScheduledDeliverySettings)
 
-	t.Run("LoadCampaign", test_LoadCampaign)
+	t.Run("UpdateScheduledDeliverySettings", test_UpdateScheduledDeliverySettings)
+	t.Run("UpdateScheduledDeliverySettings/Published", test_UpdateScheduledDeliverySettings_Published)
+
+	t.Run("Load", test_LoadCampaign)
 }
 
 func test_List_Options(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
@@ -284,7 +295,7 @@ func test_List_Options(t *testing.T) {
 func test_List(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
@@ -324,6 +335,9 @@ func test_List(t *testing.T) {
 								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
 								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								// TODO
+								// ScheduledDeliveryStatus: 1,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
@@ -410,7 +424,7 @@ func test_List(t *testing.T) {
 func test_Get(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
@@ -505,7 +519,7 @@ func test_Create(t *testing.T) {
 	var (
 		ctx = context.Background()
 
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 
 		svc = campaigns_grpc.Server{DB: db}
 	)
@@ -596,7 +610,7 @@ func test_Create(t *testing.T) {
 func test_Rename(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
@@ -761,7 +775,7 @@ func test_Duplicate(t *testing.T) {
 	var (
 		ctx = context.Background()
 
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 
 		svc = campaigns_grpc.Server{DB: db}
 	)
@@ -884,7 +898,7 @@ func test_Duplicate(t *testing.T) {
 func test_Archive(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
@@ -920,168 +934,7 @@ func test_Archive(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.UpdateStatus: db.Update: sql: no rows in result set"),
-		},
-
-		{
-			name: "archives the campaign",
-			req: &campaignspb.ArchiveRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				CampaignId:  1,
-			},
-
-			before: &expect{
-				exp: &campaign{
-					AccountId: 1,
-					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
-								CampaignId:       1,
-								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
-								Name:             "c1",
-								CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								UpdatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								SegmentCondition: campaignspb.SegmentCondition_ALL,
-
-								NotificationExpiration:                  -1,
-								NotificationAlertOptionPushNotification: true,
-
-								AutomatedMonday:    true,
-								AutomatedTuesday:   true,
-								AutomatedWednesday: true,
-								AutomatedThursday:  true,
-								AutomatedFriday:    true,
-								AutomatedSaturday:  true,
-								AutomatedSunday:    true,
-
-								AutomatedFrequencySingleUse: true,
-							},
-						},
-					},
-				},
-			},
-
-			after: &expect{
-				exp: &campaign{
-					AccountId: 1,
-					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
-								CampaignId:       1,
-								CampaignStatus:   campaignspb.CampaignStatus_ARCHIVED,
-								Name:             "c1",
-								CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								UpdatedAt:        updatedAt,
-								SegmentCondition: campaignspb.SegmentCondition_ALL,
-
-								NotificationExpiration:                  -1,
-								NotificationAlertOptionPushNotification: true,
-
-								AutomatedMonday:    true,
-								AutomatedTuesday:   true,
-								AutomatedWednesday: true,
-								AutomatedThursday:  true,
-								AutomatedFriday:    true,
-								AutomatedSaturday:  true,
-								AutomatedSunday:    true,
-
-								AutomatedFrequencySingleUse: true,
-							},
-						},
-					},
-				},
-			},
-
-			exp: &campaignspb.ArchiveResponse{},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.req == nil {
-				t.Skip("TODO")
-			}
-
-			var (
-				acctId = tt.req.GetAuthContext().GetAccountId()
-				cId    = tt.req.CampaignId
-			)
-
-			if tt.before != nil {
-				var (
-					exp, expErr = tt.before.exp, tt.before.err
-					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
-				)
-
-				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-					t.Errorf("Before: Diff:\n%v", Difff(diff))
-				}
-			}
-
-			var (
-				exp, expErr = tt.exp, tt.expErr
-				got, gotErr = svc.Archive(ctx, tt.req)
-			)
-
-			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-				t.Errorf("Diff:\n%v", Difff(diff))
-			}
-
-			if tt.after != nil {
-				var (
-					exp, expErr = tt.after.exp, tt.after.err
-					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
-				)
-
-				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-					t.Errorf("After: Diff:\n%v", Difff(diff))
-				}
-			}
-		})
-	}
-}
-
-func test_Unarchive(t *testing.T) {
-	t.Skip("TODO")
-	var (
-		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
-		svc         = campaigns_grpc.Server{DB: db}
-	)
-
-	defer closeDB()
-
-	type expect struct {
-		exp *campaign
-		err error
-	}
-
-	tests := []struct {
-		name string
-
-		req *campaignspb.ArchiveRequest
-		exp *campaignspb.ArchiveResponse
-
-		before, after *expect
-
-		expErr error
-	}{
-		{
-			name: "error: validation",
-			req:  &campaignspb.ArchiveRequest{},
-
-			expErr: status.Errorf(codes.InvalidArgument, "validate: auth_context: is required. account_id: is required. campaign_id: is required."),
-		},
-
-		{
-			name: "error: not found",
-
-			req: &campaignspb.ArchiveRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				CampaignId:  404,
-			},
-
-			expErr: status.Errorf(codes.NotFound, "db.UpdateStatus: db.Update: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "campaigns.UpdateStatus: db.Update: sql: no rows in result set"),
 		},
 
 		{
@@ -1205,7 +1058,7 @@ func test_Unarchive(t *testing.T) {
 func test_Publish(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
@@ -1241,43 +1094,37 @@ func test_Publish(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.UpdateStatus: db.Update: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "campaigns.UpdateStatus: db.Update: sql: no rows in result set"),
 		},
 
 		{
-			name: "publishes the campaign",
+			name: "automated: publishes",
+		},
+
+		{
+			name: "scheduled: publishes",
 			req: &campaignspb.PublishRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
-				CampaignId:  1,
+				CampaignId:  3,
 			},
 
 			before: &expect{
 				exp: &campaign{
 					AccountId: 1,
 					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
-								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								UpdatedAt: updatedAt,
+						&campaignspb.Campaign_ScheduledNotificationCampaign{
+							&campaignspb.ScheduledNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494Z"),
+								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494Z"),
 
-								CampaignId:     1,
-								CampaignStatus: campaignspb.CampaignStatus_ARCHIVED,
-								Name:           "c1",
+								CampaignId:     3,
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
+								Name:           "c3",
 
 								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
-
-								AutomatedMonday:    true,
-								AutomatedTuesday:   true,
-								AutomatedWednesday: true,
-								AutomatedThursday:  true,
-								AutomatedFriday:    true,
-								AutomatedSaturday:  true,
-								AutomatedSunday:    true,
-
-								AutomatedFrequencySingleUse: true,
 							},
 						},
 					},
@@ -1288,28 +1135,19 @@ func test_Publish(t *testing.T) {
 				exp: &campaign{
 					AccountId: 1,
 					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
+						&campaignspb.Campaign_ScheduledNotificationCampaign{
+							&campaignspb.ScheduledNotificationCampaign{
 								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt: updatedAt,
 
-								CampaignId:       1,
-								CampaignStatus:   campaignspb.CampaignStatus_PUBLISHED,
-								Name:             "c1",
+								CampaignId:     3,
+								CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+								Name:           "c3",
+
 								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
-
-								AutomatedMonday:    true,
-								AutomatedTuesday:   true,
-								AutomatedWednesday: true,
-								AutomatedThursday:  true,
-								AutomatedFriday:    true,
-								AutomatedSaturday:  true,
-								AutomatedSunday:    true,
-
-								AutomatedFrequencySingleUse: true,
 							},
 						},
 					},
@@ -1365,122 +1203,71 @@ func test_Publish(t *testing.T) {
 	}
 }
 
-func test_Unpublish(t *testing.T) {
-	t.Skip("TODO")
+func test_SendTest(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
 	defer closeDB()
 
 	type expect struct {
-		exp *campaign
-		err error
+		Tasks []*Task
+		err   error
 	}
 
 	tests := []struct {
 		name string
 
-		req *campaignspb.PublishRequest
-		exp *campaignspb.PublishResponse
+		req *campaignspb.SendTestRequest
+		exp *campaignspb.SendTestResponse
 
-		before, after *expect
+		after *expect
 
 		expErr error
 	}{
 		{
 			name: "error: validation",
-			req:  &campaignspb.PublishRequest{},
+			req:  &campaignspb.SendTestRequest{},
 
 			expErr: status.Errorf(codes.InvalidArgument, "validate: auth_context: is required. account_id: is required. campaign_id: is required."),
 		},
 
 		{
-			name: "error: not found",
-
-			req: &campaignspb.PublishRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				CampaignId:  404,
-			},
-
-			expErr: status.Errorf(codes.NotFound, "db.UpdateStatus: db.Update: sql: no rows in result set"),
-		},
-
-		{
-			name: "publishes the campaign",
-			req: &campaignspb.PublishRequest{
+			name: "error: validation: empty device_ids",
+			req: &campaignspb.SendTestRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				CampaignId:  1,
 			},
 
-			before: &expect{
-				exp: &campaign{
-					AccountId: 1,
-					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
-								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								UpdatedAt: updatedAt,
+			expErr: status.Errorf(codes.InvalidArgument, "validate: device_ids: must not be empty."),
+		},
 
-								CampaignId:     1,
-								CampaignStatus: campaignspb.CampaignStatus_ARCHIVED,
-								Name:           "c1",
-
-								SegmentCondition: campaignspb.SegmentCondition_ALL,
-
-								NotificationExpiration:                  -1,
-								NotificationAlertOptionPushNotification: true,
-
-								AutomatedMonday:    true,
-								AutomatedTuesday:   true,
-								AutomatedWednesday: true,
-								AutomatedThursday:  true,
-								AutomatedFriday:    true,
-								AutomatedSaturday:  true,
-								AutomatedSunday:    true,
-
-								AutomatedFrequencySingleUse: true,
-							},
-						},
-					},
-				},
+		{
+			name: "schedules task to publis",
+			req: &campaignspb.SendTestRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				CampaignId:  1,
+				DeviceIds:   []string{"a", "b", "c"},
 			},
 
 			after: &expect{
-				exp: &campaign{
-					AccountId: 1,
-					Campaign: &campaignspb.Campaign{
-						&campaignspb.Campaign_AutomatedNotificationCampaign{
-							&campaignspb.AutomatedNotificationCampaign{
-								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
-								UpdatedAt: updatedAt,
+				Tasks: []*Task{
+					&Task{
+						AccountId:  1,
+						CampaignId: 1,
 
-								CampaignId:       1,
-								CampaignStatus:   campaignspb.CampaignStatus_PUBLISHED,
-								Name:             "c1",
-								SegmentCondition: campaignspb.SegmentCondition_ALL,
+						IsTest: true,
 
-								NotificationExpiration:                  -1,
-								NotificationAlertOptionPushNotification: true,
-
-								AutomatedMonday:    true,
-								AutomatedTuesday:   true,
-								AutomatedWednesday: true,
-								AutomatedThursday:  true,
-								AutomatedFriday:    true,
-								AutomatedSaturday:  true,
-								AutomatedSunday:    true,
-
-								AutomatedFrequencySingleUse: true,
-							},
-						},
+						RunAt:     timeUpdatedAt,
+						State:     "queued",
+						DeviceIds: &pq.StringArray{"a", "b", "c"},
 					},
 				},
 			},
 
-			exp: &campaignspb.PublishResponse{},
+			exp: &campaignspb.SendTestResponse{},
 		},
 	}
 
@@ -1491,24 +1278,13 @@ func test_Unpublish(t *testing.T) {
 			}
 
 			var (
-				acctId = tt.req.GetAuthContext().GetAccountId()
-				cId    = tt.req.CampaignId
+				acctId     = tt.req.GetAuthContext().GetAccountId()
+				campaignId = tt.req.CampaignId
 			)
-
-			if tt.before != nil {
-				var (
-					exp, expErr = tt.before.exp, tt.before.err
-					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
-				)
-
-				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
-					t.Errorf("Before: Diff:\n%v", Difff(diff))
-				}
-			}
 
 			var (
 				exp, expErr = tt.exp, tt.expErr
-				got, gotErr = svc.Publish(ctx, tt.req)
+				got, gotErr = svc.SendTest(ctx, tt.req)
 			)
 
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
@@ -1517,8 +1293,8 @@ func test_Unpublish(t *testing.T) {
 
 			if tt.after != nil {
 				var (
-					exp, expErr = tt.after.exp, tt.after.err
-					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
+					exp, expErr = tt.after.Tasks, tt.after.err
+					got, gotErr = campaignTasks(context.TODO(), db, acctId, campaignId)
 				)
 
 				if diff := Diff(exp, got, expErr, gotErr); diff != nil {
@@ -1532,7 +1308,7 @@ func test_Unpublish(t *testing.T) {
 func test_UpdateNotificationSettings(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
@@ -1568,7 +1344,7 @@ func test_UpdateNotificationSettings(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.UpdateNotificationSettings: rows.Next: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "campaigns.OneById: db.Get: sql: no rows in result set"),
 		},
 
 		{
@@ -1720,7 +1496,7 @@ func test_UpdateNotificationSettings(t *testing.T) {
 func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 		svc         = campaigns_grpc.Server{DB: db}
 	)
 
@@ -1756,7 +1532,7 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.UpdateAutomatedDeliverySettings: rows.Next: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "campaigns.UpdateAutomatedDeliverySettings: rows.Next: sql: no rows in result set"),
 		},
 
 		{
@@ -1945,15 +1721,17 @@ func test_UpdateAutomatedDeliverySettings(t *testing.T) {
 func test_UpdateScheduledDeliverySettings(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
-		svc         = campaigns_grpc.Server{DB: db}
+		db, closeDB = dbOpen(t, tCfg.DSN)
+		svc         = campaigns_grpc.Server{
+			DB: db,
+		}
 	)
 
 	defer closeDB()
 
 	type expect struct {
-		exp *campaign
-		err error
+		Campaign *campaign
+		err      error
 	}
 
 	tests := []struct {
@@ -1981,11 +1759,37 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.UpdateAutomatedDeliverySettings: rows.Next: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "campaigns.OneById: db.Get: sql: no rows in result set"),
 		},
 
 		{
-			name: "updates the delivery settings",
+			name: "error: status=archived: update denied",
+
+			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  9,
+			},
+
+			expErr: status.Errorf(codes.FailedPrecondition, "CampaignStatus: ARCHIVED"),
+		},
+
+		{
+			name: "error: validates scheduled timestamp",
+			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  5,
+
+				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
+				ScheduledTimestamp:          nil,
+				ScheduledTimeZone:           "America/Toronto",
+				ScheduledUseLocalDeviceTime: false,
+			},
+
+			expErr: status.Errorf(codes.InvalidArgument, "validate: scheduled_timestamp: is required."),
+		},
+
+		{
+			name: "draft: updates the delivery settings",
 			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
 				AuthContext: &auth.AuthContext{AccountId: 2},
 				CampaignId:  5,
@@ -1996,13 +1800,13 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 				UiState: `{"hello": "world"}`,
 
 				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
-				ScheduledTimestamp:          nil,
+				ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494+00:00"),
 				ScheduledTimeZone:           "America/Toronto",
 				ScheduledUseLocalDeviceTime: true,
 			},
 
 			before: &expect{
-				exp: &campaign{
+				Campaign: &campaign{
 					AccountId: 2,
 					Campaign: &campaignspb.Campaign{
 						Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
@@ -2048,6 +1852,7 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 
 							ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
 							ScheduledTimeZone:           "America/Toronto",
+							ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494+00:00"),
 							ScheduledUseLocalDeviceTime: true,
 						},
 					},
@@ -2069,7 +1874,7 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 
 			if tt.before != nil {
 				var (
-					exp, expErr = tt.before.exp, tt.before.err
+					exp, expErr = tt.before.Campaign, tt.before.err
 					got, gotErr = campaignById(context.TODO(), db, acctId, cId)
 				)
 
@@ -2086,7 +1891,307 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", Difff(diff))
 			}
+		})
+	}
+}
 
+func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
+	var (
+		ctx         = context.Background()
+		db, closeDB = dbOpen(t, tCfg.DSN)
+		svc         = campaigns_grpc.Server{
+			DB: db,
+		}
+	)
+
+	defer closeDB()
+
+	type expect struct {
+		Campaign *campaignspb.Campaign
+		Tasks    []*Task
+		Err      error
+	}
+
+	tests := []struct {
+		name string
+
+		req    *campaignspb.UpdateScheduledDeliverySettingsRequest
+		expErr error
+
+		before, after *expect
+	}{
+
+		{
+			name: "use_local_device_time=false, sheduled_type=scheduled: updates the timestamp",
+			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  8,
+
+				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
+				ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494+00:00"),
+				ScheduledTimeZone:           "America/Toronto",
+				ScheduledUseLocalDeviceTime: false,
+			},
+
+			after: &expect{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+						ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
+							CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt: updatedAt,
+
+							CampaignId:     8,
+							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+							Name:           "c8",
+
+							NotificationExpiration:                  -1,
+							NotificationAlertOptionPushNotification: true,
+
+							ScheduledType:      campaignspb.ScheduledType_SCHEDULED,
+							ScheduledTimeZone:  "America/Toronto",
+							ScheduledTimestamp: ts(t, "2017-05-04T16:26:25.445494Z"),
+						},
+					},
+				},
+
+				Tasks: []*Task{
+					{
+						AccountId:  2,
+						CampaignId: 8,
+						DeviceIds:  nil,
+						RunAt:      ts2(t, "2017-05-04T16:26:25.445494Z"),
+						State:      "queued",
+					},
+				},
+			},
+		},
+
+		{
+			name: "use_local_device_time=false, sheduled_type=now: updates the timestamp",
+			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  8,
+
+				ScheduledType:               campaignspb.ScheduledType_NOW,
+				ScheduledTimeZone:           "America/Toronto",
+				ScheduledUseLocalDeviceTime: false,
+			},
+
+			after: &expect{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+						ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
+							CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt: updatedAt,
+
+							CampaignId:     8,
+							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+							Name:           "c8",
+
+							NotificationExpiration:                  -1,
+							NotificationAlertOptionPushNotification: true,
+
+							ScheduledType:               campaignspb.ScheduledType_NOW,
+							ScheduledTimeZone:           "America/Toronto",
+							ScheduledTimestamp:          nil,
+							ScheduledUseLocalDeviceTime: false,
+						},
+					},
+				},
+
+				Tasks: []*Task{
+					{
+						AccountId:  2,
+						CampaignId: 8,
+						DeviceIds:  nil,
+						RunAt:      timeUpdatedAt,
+						State:      "queued",
+					},
+				},
+			},
+		},
+
+		{
+			name: "use_local_device_time=true: scheduled_type=now: creates tasks scheduled for NOW",
+			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  8,
+
+				ScheduledType:               campaignspb.ScheduledType_NOW,
+				ScheduledTimeZone:           "America/Toronto",
+				ScheduledUseLocalDeviceTime: true,
+			},
+
+			after: &expect{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+						ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
+							CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt: updatedAt,
+
+							CampaignId:     8,
+							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+							Name:           "c8",
+
+							NotificationExpiration:                  -1,
+							NotificationAlertOptionPushNotification: true,
+
+							ScheduledType:               campaignspb.ScheduledType_NOW,
+							ScheduledTimeZone:           "America/Toronto",
+							ScheduledTimestamp:          nil,
+							ScheduledUseLocalDeviceTime: true,
+						},
+					},
+				},
+
+				Tasks: tasksInTimezones(timeUpdatedAt, zoneinfo.UniqueOffsets, 2, 8),
+			},
+		},
+
+		{
+			name: "use_local_device_time=true, scheduled_type=scheduled: creates tasks scheduled for ScheduledTimestamp",
+			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  8,
+
+				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
+				ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
+				ScheduledTimeZone:           "America/Toronto",
+				ScheduledUseLocalDeviceTime: true,
+			},
+
+			after: &expect{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+						ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
+							CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt: updatedAt,
+
+							Name:           "c8",
+							CampaignId:     8,
+							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+
+							NotificationExpiration:                  -1,
+							NotificationAlertOptionPushNotification: true,
+
+							ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
+							ScheduledTimeZone:           "America/Toronto",
+							ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
+							ScheduledUseLocalDeviceTime: true,
+						},
+					},
+				},
+
+				Tasks: tasksInTimezones(ts2(t, "2017-05-04T16:26:25.445494Z"), zoneinfo.UniqueOffsets, 2, 8),
+			},
+		},
+
+		{
+			name: "use_local_device_time=false: deletes in timezone and creates single task",
+			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  8,
+
+				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
+				ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
+				ScheduledTimeZone:           "America/Toronto",
+				ScheduledUseLocalDeviceTime: false,
+			},
+
+			after: &expect{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+						ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
+							CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt: updatedAt,
+
+							Name:           "c8",
+							CampaignId:     8,
+							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+
+							NotificationExpiration:                  -1,
+							NotificationAlertOptionPushNotification: true,
+
+							ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
+							ScheduledTimeZone:           "America/Toronto",
+							ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
+							ScheduledUseLocalDeviceTime: false,
+						},
+					},
+				},
+
+				Tasks: []*Task{
+					{
+						AccountId:      2,
+						CampaignId:     8,
+						RunAt:          ts2(t, "2017-05-04T16:26:25.445494Z"),
+						State:          "queued",
+						TimezoneOffset: 0,
+					},
+				},
+			},
+		},
+	}
+
+	_, err := svc.Publish(ctx, &campaignspb.PublishRequest{
+		AuthContext: &auth.AuthContext{AccountId: 2},
+		CampaignId:  8,
+	})
+
+	if err != nil {
+		t.Fatal("Publish:", err)
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.req == nil {
+				t.Skip("TODO")
+			}
+
+			var (
+				campaignId = tt.req.CampaignId
+				acctId     = tt.req.GetAuthContext().GetAccountId()
+
+				check = func(stage string, exp *expect) {
+					var (
+						got = &expect{}
+						err error
+						c   *campaign
+					)
+					c, err = campaignById(context.TODO(), db, acctId, campaignId)
+					if err != nil {
+						t.Fatal(err)
+					}
+
+					got.Campaign = c.Campaign
+
+					got.Tasks, err = campaignTasks(context.TODO(), db, acctId, campaignId)
+					if err != nil {
+						t.Fatal(err)
+					}
+
+					if diff := Diff(exp, got, nil, nil); diff != nil {
+						t.Errorf(stage+":Diff:\n%v", Difff(diff))
+					}
+				}
+			)
+
+			if tt.before != nil {
+				check("Before", tt.before)
+			}
+
+			var (
+				expErr    = tt.expErr
+				_, gotErr = svc.UpdateScheduledDeliverySettings(ctx, tt.req)
+			)
+
+			if diff := Diff(nil, nil, expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", Difff(diff))
+			}
+
+			if tt.after != nil {
+				check("After", tt.after)
+			}
 		})
 	}
 }
@@ -2094,7 +2199,7 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 func test_LoadCampaign(t *testing.T) {
 	var (
 		ctx         = context.Background()
-		db, closeDB = dbOpen(t, testDB.DSN)
+		db, closeDB = dbOpen(t, tCfg.DSN)
 	)
 
 	defer closeDB()
@@ -2290,7 +2395,7 @@ type campaign struct {
 // campaignById is a helper to return helper campaign value
 // the reason to have this helper is because there's no public API that returns single campaignspb.Campaign
 func campaignById(ctx context.Context, db *db.DB, accountId, campaignId int32) (*campaign, error) {
-	c, err := db.OneById(ctx, accountId, campaignId)
+	c, err := db.CampaignsStore().OneById(ctx, accountId, campaignId)
 	if err != nil {
 		return nil, err
 	}
@@ -2304,4 +2409,39 @@ func campaignById(ctx context.Context, db *db.DB, accountId, campaignId int32) (
 		AccountId: c.AccountId,
 		Campaign:  &got,
 	}, nil
+}
+
+// campaignById is a helper to return helper campaign value
+// the reason to have this helper is because there's no public API that returns single campaignspb.Campaign
+func campaignTasks(ctx context.Context, db *db.DB, accountId, campaignId int32) ([]*Task, error) {
+	tasks, err := db.ScheduledTasksStore().ListByCampaignId(ctx, int64(accountId), int64(campaignId))
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range tasks {
+		// unpredictable
+		tasks[i].JobId = 0
+	}
+
+	return tasks, nil
+}
+
+func tasksInTimezones(runAt time.Time, offsets []int, acctId, campaignId int32) []*Task {
+	var tasks []*Task
+	for _, offset := range zoneinfo.UniqueOffsets {
+
+		tasks = append(tasks, &Task{
+			AccountId:  int(acctId),
+			CampaignId: int(campaignId),
+
+			JobId: 0, //
+			State: "queued",
+
+			TimezoneOffset: int(offset),
+			RunAt:          runAt.Add(time.Duration(offset) * time.Second),
+		})
+	}
+
+	return tasks
 }

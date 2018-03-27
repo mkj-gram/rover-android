@@ -3,6 +3,7 @@ package mongodb
 import (
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/go/log"
 
 	"gopkg.in/mgo.v2"
@@ -29,6 +30,20 @@ type (
 		timeNow     func() time.Time
 	}
 )
+
+func Dial(dsn string) (*mgo.Session, *mgo.DialInfo, error) {
+	info, err := mgo.ParseURL(dsn)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "mgo.ParseURL")
+	}
+
+	sess, err := mgo.DialWithInfo(info)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "mgo.DialWithInfo")
+	}
+
+	return sess, info, nil
+}
 
 func New(db *mgo.Database, options ...Option) *DB {
 	sess := db.Session

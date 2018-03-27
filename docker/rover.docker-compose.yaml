@@ -14,7 +14,6 @@ services:
       - ../../rover:/rover
 
   elastic:
-    container_name: elastic5
     image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
     ports: [9200, 9300]
     volumes:
@@ -70,4 +69,4 @@ services:
     environment:
       CGO_ENABLED: 0
       AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_test"
-      AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic5:9200"
+      AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic:9200"

@@ -183,50 +183,6 @@ function deserialize_rover_campaigns_v1_SendTestResponse(buffer_arg) {
   return campaigns_v1_campaigns_pb.SendTestResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_rover_campaigns_v1_UnarchiveRequest(arg) {
-  if (!(arg instanceof campaigns_v1_campaigns_pb.UnarchiveRequest)) {
-    throw new Error('Expected argument of type rover.campaigns.v1.UnarchiveRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_campaigns_v1_UnarchiveRequest(buffer_arg) {
-  return campaigns_v1_campaigns_pb.UnarchiveRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_campaigns_v1_UnarchiveResponse(arg) {
-  if (!(arg instanceof campaigns_v1_campaigns_pb.UnarchiveResponse)) {
-    throw new Error('Expected argument of type rover.campaigns.v1.UnarchiveResponse');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_campaigns_v1_UnarchiveResponse(buffer_arg) {
-  return campaigns_v1_campaigns_pb.UnarchiveResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_campaigns_v1_UnpublishRequest(arg) {
-  if (!(arg instanceof campaigns_v1_campaigns_pb.UnpublishRequest)) {
-    throw new Error('Expected argument of type rover.campaigns.v1.UnpublishRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_campaigns_v1_UnpublishRequest(buffer_arg) {
-  return campaigns_v1_campaigns_pb.UnpublishRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_rover_campaigns_v1_UnpublishResponse(arg) {
-  if (!(arg instanceof campaigns_v1_campaigns_pb.UnpublishResponse)) {
-    throw new Error('Expected argument of type rover.campaigns.v1.UnpublishResponse');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_rover_campaigns_v1_UnpublishResponse(buffer_arg) {
-  return campaigns_v1_campaigns_pb.UnpublishResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_rover_campaigns_v1_UpdateAutomatedDeliverySettingsRequest(arg) {
   if (!(arg instanceof campaigns_v1_campaigns_pb.UpdateAutomatedDeliverySettingsRequest)) {
     throw new Error('Expected argument of type rover.campaigns.v1.UpdateAutomatedDeliverySettingsRequest');
@@ -364,17 +320,6 @@ var CampaignsService = exports.CampaignsService = {
     responseSerialize: serialize_rover_campaigns_v1_PublishResponse,
     responseDeserialize: deserialize_rover_campaigns_v1_PublishResponse,
   },
-  unpublish: {
-    path: '/rover.campaigns.v1.Campaigns/Unpublish',
-    requestStream: false,
-    responseStream: false,
-    requestType: campaigns_v1_campaigns_pb.UnpublishRequest,
-    responseType: campaigns_v1_campaigns_pb.UnpublishResponse,
-    requestSerialize: serialize_rover_campaigns_v1_UnpublishRequest,
-    requestDeserialize: deserialize_rover_campaigns_v1_UnpublishRequest,
-    responseSerialize: serialize_rover_campaigns_v1_UnpublishResponse,
-    responseDeserialize: deserialize_rover_campaigns_v1_UnpublishResponse,
-  },
   archive: {
     path: '/rover.campaigns.v1.Campaigns/Archive',
     requestStream: false,
@@ -385,17 +330,6 @@ var CampaignsService = exports.CampaignsService = {
     requestDeserialize: deserialize_rover_campaigns_v1_ArchiveRequest,
     responseSerialize: serialize_rover_campaigns_v1_ArchiveResponse,
     responseDeserialize: deserialize_rover_campaigns_v1_ArchiveResponse,
-  },
-  unarchive: {
-    path: '/rover.campaigns.v1.Campaigns/Unarchive',
-    requestStream: false,
-    responseStream: false,
-    requestType: campaigns_v1_campaigns_pb.UnarchiveRequest,
-    responseType: campaigns_v1_campaigns_pb.UnarchiveResponse,
-    requestSerialize: serialize_rover_campaigns_v1_UnarchiveRequest,
-    requestDeserialize: deserialize_rover_campaigns_v1_UnarchiveRequest,
-    responseSerialize: serialize_rover_campaigns_v1_UnarchiveResponse,
-    responseDeserialize: deserialize_rover_campaigns_v1_UnarchiveResponse,
   },
   sendTest: {
     path: '/rover.campaigns.v1.Campaigns/SendTest',

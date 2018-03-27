@@ -13,7 +13,7 @@ services:
     volumes:
       - ../../rover:/rover
     ports: 
-      - "8085:8085"
+      - "8085"
 
   # DATABASES
   mongo:
@@ -32,7 +32,6 @@ services:
         - NUM_PARTITIONS=3
 
   elastic:
-    container_name: elastic5
     image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
     ports:
       - 9200
@@ -64,7 +63,7 @@ services:
     build:
       context: ./vendor/rabbitmq
     ports:
-      - 15672:15672
+      - 15672
 
   # ROVER PROJECTS
   audience-frontend:
@@ -94,7 +93,7 @@ services:
       CGO_ENABLED: 0
       AUDIENCE_SERVICE_PUBSUB_TOPIC_NAME: "audience-service-dev-topic"
       AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_dev"
-      AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic5:9200"
+      AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic:9200"
       AUDIENCE_SERVICE_NOTIFIER_FLUSH_INTERVAL: 5s
       AUDIENCE_SERVICE_GCP_PROJECT_ID: "rover-development"
       PUBSUB_EMULATOR_HOST: "pubsub:8085"
@@ -114,15 +113,14 @@ services:
     working_dir: /go/src/github.com/roverplatform/rover
     environment: 
       SEGMENTS_WORKER_MONGO_DSN: "mongodb://mongo:27017/audience_service_dev"
-      SEGMENTS_WORKER_ELASTIC_DSN: "http://elastic5:9200"
+      SEGMENTS_WORKER_ELASTIC_DSN: "http://elastic:9200"
       SEGMENTS_WORKER_PUBSUB_SUBSCRIPTION: "audience-service-dev-subscription"
       SEGMENTS_WORKER_GCP_PROJECT_ID: "rover-development"
       PUBSUB_EMULATOR_HOST: "pubsub:8085"
       GCP_PROJECT_ID: "rover-development"
       PUBSUB_TOPIC_NAME: "audience-service-dev-topic"           # Used in pubsub-cli to configure the topic
       PUBSUB_SUBSCRIPTION: "audience-service-dev-subscription"  # Used in pubsub-cli to configure the topic
-      
-  
+
   auth-service:
     image: golang:1.10-alpine
     working_dir: /go/src/github.com/roverplatform/rover
@@ -141,13 +139,31 @@ services:
     working_dir: /go/src/github.com/roverplatform/rover
     depends_on:
       - postgres
+      - elastic
+      - mongo
+      - audience-service
+      - scheduled_notification_tasks-worker
     command: ./docker/campaigns-service/cmd migrate run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
       DB_DSN: "postgres://postgres:@postgres:5432/campaigns_dev?sslmode=disable"
-      TEST_DSN: "postgres://postgres:@postgres:5432/campaigns_test?sslmode=disable"
+      TEST_DB_DSN: "postgres://postgres:@postgres:5432/campaigns_test?sslmode=disable"
+
+  scheduled_notification_tasks-worker:
+    image: golang:1.10-alpine
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - postgres
+      - audience-service
+    command: ./docker/campaigns-service/scheduled_notifications/cmd migrate run
+    volumes:
+      - ../:/go/src/github.com/roverplatform/rover
+    environment:
+      CGO_ENABLED: 0
+      DB_DSN: "postgres://postgres:@postgres:5432/campaigns_dev?sslmode=disable"
+      AUDIENCE_SERVICE_URL: "audience-service:5100"
 
   campaigns-frontend:
     image: node:7.5.0
@@ -160,7 +176,7 @@ services:
     environment:
       NODE_ENV: development
       GRAPHQL_HOST: "http://graphql-gateway/graphql"
- 
+
   graphql-gateway:
     image: node:7.5.0
     depends_on:
@@ -228,7 +244,7 @@ services:
       - auth-service
       - geocoder-service
     working_dir: /rover/sdk-api
-    ports: ["3100:3100"]
+    ports: [3100]
     volumes:
       - ../:/rover
     command: bash -c "/rover/docker/scripts/wait.sh rabbitmq:5672 -- npm install && npm run dev"

@@ -91,9 +91,8 @@ func main() {
 		unaryMiddleware = []grpc.UnaryServerInterceptor{
 			grpc_prometheus.UnaryServerInterceptor,
 			grpc_middleware.UnaryPanicRecovery(grpc_middleware.DefaultPanicHandler),
-			grpc_middleware.UnaryLogger,
+			grpc_middleware.UnaryLog(stdout),
 		}
-
 	}
 
 	var opts = []grpc.ServerOption{
@@ -110,6 +109,10 @@ func main() {
 	}
 
 	//
+	// JobsQ
+	//
+
+	//
 	// Postgres
 	//
 	pgdb, err := db.Open(*dbDSN)
@@ -122,7 +125,9 @@ func main() {
 	// Service
 	//
 	var (
-		svc = &campaigns_grpc.Server{DB: pgdb}
+		svc = &campaigns_grpc.Server{
+			DB: pgdb,
+		}
 		srv = grpc.NewServer(opts...)
 	)
 

@@ -61,6 +61,8 @@ service Audience {
 
   // Lists
   rpc ListDevicesByProfileIdentifier(ListDevicesByProfileIdentifierRequest) returns (ListDevicesByProfileIdentifierResponse);
+  // TODO:
+  // rpc ListTestDevices(ListTestDevicesRequest) returns (ListTestDeviecesResponse);
 
   rpc SetDeviceProfileIdentifier(SetDeviceProfileIdentifierRequest) returns(SetDeviceProfileIdentifierResponse);
 

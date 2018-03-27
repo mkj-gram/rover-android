@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+# set -x
+
+
+SVC_HOME=./campaigns
+
+run() {
+	go run $SVC_HOME/cmd/scheduled_notification_tasks-worker/main.go
+}
+
+migrate() {
+  go run $SVC_HOME/cmd/migration-cli/main.go \
+    --migration-path=$SVC_HOME/db/migrations
+}
+
+for cmd in $@; do
+  $cmd
+done

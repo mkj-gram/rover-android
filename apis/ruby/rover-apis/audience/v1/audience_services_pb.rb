@@ -58,6 +58,8 @@ module Rover
           rpc :UpdateDeviceLabelProperty, UpdateDeviceLabelPropertyRequest, UpdateDeviceLabelPropertyResponse
           # Lists
           rpc :ListDevicesByProfileIdentifier, ListDevicesByProfileIdentifierRequest, ListDevicesByProfileIdentifierResponse
+          # TODO:
+          # rpc ListTestDevices(ListTestDevicesRequest) returns (ListTestDeviecesResponse);
           rpc :SetDeviceProfileIdentifier, SetDeviceProfileIdentifierRequest, SetDeviceProfileIdentifierResponse
           # DeleteDevice deletes device from the database and removes it from any segments
           rpc :DeleteDevice, DeleteDeviceRequest, DeleteDeviceResponse

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/roverplatform/rover/campaigns"
 )
@@ -46,7 +47,10 @@ func (c *campaign) fromDB() error {
 	return nil
 }
 
-func (db *DB) OneById(ctx context.Context, accountId, id int32) (*campaigns.Campaign, error) {
+type campaignsStore store
+type campaignsStoreTx storeTx
+
+func (db *campaignsStore) OneById(ctx context.Context, accountId, id int32) (*campaigns.Campaign, error) {
 	var c campaign
 
 	err := db.db.GetContext(ctx,
@@ -70,7 +74,7 @@ func (db *DB) OneById(ctx context.Context, accountId, id int32) (*campaigns.Camp
 	return &c.Campaign, nil
 }
 
-func (db *DB) List(ctx context.Context, params ListParams) ([]*campaigns.Campaign, error) {
+func (db *campaignsStore) List(ctx context.Context, params ListParams) ([]*campaigns.Campaign, error) {
 	var (
 		args = map[string]interface{}{
 			"account_id": params.AccountId,
@@ -141,7 +145,7 @@ func (db *DB) List(ctx context.Context, params ListParams) ([]*campaigns.Campaig
 	return cx, nil
 }
 
-func (db *DB) Create(ctx context.Context, accountId int32, name string, campaignType int32) (*campaigns.Campaign, error) {
+func (db *campaignsStore) Create(ctx context.Context, accountId int32, name string, campaignType int32) (*campaigns.Campaign, error) {
 	var (
 		now = TimeNow()
 
@@ -189,7 +193,19 @@ func (db *DB) Create(ctx context.Context, accountId int32, name string, campaign
 	return &c.Campaign, nil
 }
 
-func (db *DB) UpdateStatus(ctx context.Context, accountId, campaignId, status int32) error {
+func (db *campaignsStore) UpdateStatus(ctx context.Context, accountId, campaignId, status int32) error {
+	return CampaignUpdateStatus(db.db, ctx, accountId, campaignId, status)
+}
+
+func (tx *campaignsStoreTx) UpdateStatus(ctx context.Context, accountId, campaignId, status int32) error {
+	return CampaignUpdateStatus(tx.tx, ctx, accountId, campaignId, status)
+}
+
+type namedExecer interface {
+	NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
+}
+
+func CampaignUpdateStatus(dbCtx namedExecer, ctx context.Context, accountId, campaignId, status int32) error {
 	var (
 		now = TimeNow()
 
@@ -200,6 +216,7 @@ func (db *DB) UpdateStatus(ctx context.Context, accountId, campaignId, status in
 			"updated_at":      now,
 		}
 
+		// TODO: ensure publishing only drafts
 		q = `
 			UPDATE campaigns
 				SET
@@ -211,7 +228,7 @@ func (db *DB) UpdateStatus(ctx context.Context, accountId, campaignId, status in
 			`
 	)
 
-	res, err := db.db.NamedExecContext(ctx, q, args)
+	res, err := dbCtx.NamedExecContext(ctx, q, args)
 	if err != nil {
 		return wrapError(err, "db.Exec")
 	}
@@ -228,7 +245,7 @@ func (db *DB) UpdateStatus(ctx context.Context, accountId, campaignId, status in
 	return nil
 }
 
-func (db *DB) Rename(ctx context.Context, accountId int32, campaignId int32, name string) error {
+func (db *campaignsStore) Rename(ctx context.Context, accountId int32, campaignId int32, name string) error {
 	var (
 		now = TimeNow()
 
@@ -267,7 +284,7 @@ func (db *DB) Rename(ctx context.Context, accountId int32, campaignId int32, nam
 	return nil
 }
 
-func (db *DB) Insert(ctx context.Context, c campaigns.Campaign) (*campaigns.Campaign, error) {
+func (db *campaignsStore) Insert(ctx context.Context, c campaigns.Campaign) (*campaigns.Campaign, error) {
 	var (
 		now = TimeNow()
 
@@ -318,7 +335,7 @@ func (db *DB) Insert(ctx context.Context, c campaigns.Campaign) (*campaigns.Camp
 	return &inserted.Campaign, nil
 }
 
-func (db *DB) UpdateNotificationSettings(ctx context.Context, req *campaigns.UpdateNotificationSettingsRequest) (*campaigns.Campaign, error) {
+func (db *campaignsStore) UpdateNotificationSettings(ctx context.Context, req *campaigns.UpdateNotificationSettingsRequest) (*campaigns.Campaign, error) {
 	var (
 		now = TimeNow()
 
@@ -396,7 +413,7 @@ func (db *DB) UpdateNotificationSettings(ctx context.Context, req *campaigns.Upd
 
 }
 
-func (db *DB) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaigns.UpdateAutomatedDeliverySettingsRequest) (*campaigns.Campaign, error) {
+func (db *campaignsStore) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaigns.UpdateAutomatedDeliverySettingsRequest) (*campaigns.Campaign, error) {
 	var (
 		now = TimeNow()
 
@@ -474,7 +491,19 @@ func (db *DB) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaign
 	return &updated.Campaign, nil
 }
 
-func (db *DB) UpdateScheduledDeliverySettings(ctx context.Context, req *campaigns.UpdateScheduledDeliverySettingsRequest) (*campaigns.Campaign, error) {
+func (db *campaignsStore) UpdateScheduledDeliverySettings(ctx context.Context, req *campaigns.UpdateScheduledDeliverySettingsRequest) (*campaigns.Campaign, error) {
+	return UpdateScheduledDeliverySettings(db.db, ctx, req)
+}
+
+func (tx *campaignsStoreTx) UpdateScheduledDeliverySettings(ctx context.Context, req *campaigns.UpdateScheduledDeliverySettingsRequest) (*campaigns.Campaign, error) {
+	return UpdateScheduledDeliverySettings(tx.tx, ctx, req)
+}
+
+type namedQuerier interface {
+	NamedQuery(string, interface{}) (*sqlx.Rows, error)
+}
+
+func UpdateScheduledDeliverySettings(dbCtx namedQuerier, ctx context.Context, req *campaigns.UpdateScheduledDeliverySettingsRequest) (*campaigns.Campaign, error) {
 	var (
 		now = TimeNow()
 
@@ -511,7 +540,7 @@ func (db *DB) UpdateScheduledDeliverySettings(ctx context.Context, req *campaign
 		`
 	)
 
-	rows, err := db.db.NamedQueryContext(ctx, q, update)
+	rows, err := dbCtx.NamedQuery(q, update)
 	if err != nil {
 		return nil, wrapError(err, "db.Exec")
 	}

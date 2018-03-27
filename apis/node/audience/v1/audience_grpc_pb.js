@@ -1085,6 +1085,8 @@ var AudienceService = exports.AudienceService = {
     responseSerialize: serialize_rover_audience_v1_ListDevicesByProfileIdentifierResponse,
     responseDeserialize: deserialize_rover_audience_v1_ListDevicesByProfileIdentifierResponse,
   },
+  // TODO:
+  // rpc ListTestDevices(ListTestDevicesRequest) returns (ListTestDeviecesResponse);
   setDeviceProfileIdentifier: {
     path: '/rover.audience.v1.Audience/SetDeviceProfileIdentifier',
     requestStream: false,

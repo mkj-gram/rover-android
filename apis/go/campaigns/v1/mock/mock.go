@@ -89,6 +89,24 @@ func (mr *MockCampaignsClientMockRecorder) Duplicate(arg0, arg1 interface{}, arg
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Duplicate", reflect.TypeOf((*MockCampaignsClient)(nil).Duplicate), varargs...)
 }
 
+// Get mocks base method
+func (m *MockCampaignsClient) Get(arg0 context.Context, arg1 *v1.GetRequest, arg2 ...grpc.CallOption) (*v1.GetResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Get", varargs...)
+	ret0, _ := ret[0].(*v1.GetResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get
+func (mr *MockCampaignsClientMockRecorder) Get(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCampaignsClient)(nil).Get), varargs...)
+}
+
 // List mocks base method
 func (m *MockCampaignsClient) List(arg0 context.Context, arg1 *v1.ListRequest, arg2 ...grpc.CallOption) (*v1.ListResponse, error) {
 	varargs := []interface{}{arg0, arg1}
@@ -159,42 +177,6 @@ func (m *MockCampaignsClient) SendTest(arg0 context.Context, arg1 *v1.SendTestRe
 func (mr *MockCampaignsClientMockRecorder) SendTest(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendTest", reflect.TypeOf((*MockCampaignsClient)(nil).SendTest), varargs...)
-}
-
-// Unarchive mocks base method
-func (m *MockCampaignsClient) Unarchive(arg0 context.Context, arg1 *v1.UnarchiveRequest, arg2 ...grpc.CallOption) (*v1.UnarchiveResponse, error) {
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Unarchive", varargs...)
-	ret0, _ := ret[0].(*v1.UnarchiveResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Unarchive indicates an expected call of Unarchive
-func (mr *MockCampaignsClientMockRecorder) Unarchive(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unarchive", reflect.TypeOf((*MockCampaignsClient)(nil).Unarchive), varargs...)
-}
-
-// Unpublish mocks base method
-func (m *MockCampaignsClient) Unpublish(arg0 context.Context, arg1 *v1.UnpublishRequest, arg2 ...grpc.CallOption) (*v1.UnpublishResponse, error) {
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Unpublish", varargs...)
-	ret0, _ := ret[0].(*v1.UnpublishResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Unpublish indicates an expected call of Unpublish
-func (mr *MockCampaignsClientMockRecorder) Unpublish(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unpublish", reflect.TypeOf((*MockCampaignsClient)(nil).Unpublish), varargs...)
 }
 
 // UpdateAutomatedDeliverySettings mocks base method

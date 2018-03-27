@@ -8,9 +8,11 @@ CREATE DATABASE authsvc_dev;
 -- campaigns-service
 --
 CREATE DATABASE campaigns_test;
+CREATE DATABASE campaigns_tasks_test;
 CREATE DATABASE campaigns_dev;
 
 ALTER DATABASE campaigns_test SET log_statement = 'all';
+ALTER DATABASE campaigns_tasks_test SET log_statement = 'all';
 ALTER DATABASE campaigns_dev SET log_statement = 'all';
 
 --

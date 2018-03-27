@@ -1,0 +1,14 @@
+steps:
+- name: 'gcr.io/cloud-builders/go:alpine'
+  env:
+    - PROJECT_ROOT=github.com/roverplatform/rover
+  args:
+    - install
+    - github.com/roverplatform/rover/campaigns/cmd/scheduled_notification_tasks-worker/
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - build
+    - --tag=gcr.io/$PROJECT_ID/authsvc:$REVISION_ID
+    - -f=./docker/auth-service/Dockerfile
+    - .
+images: ['gcr.io/$PROJECT_ID/authsvc:$REVISION_ID']

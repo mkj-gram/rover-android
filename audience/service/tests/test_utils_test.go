@@ -19,7 +19,7 @@ var (
 	elasticLog = log.New(elasticOut, "", 0)
 	tracingLog = es5.SetTraceLog(elasticLog)
 
-	esDSN = "http://elastic5:9200/"
+	esDSN = "http://elastic:9200/"
 )
 
 type (

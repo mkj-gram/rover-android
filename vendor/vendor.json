@@ -87,6 +87,12 @@
 			"revisionTime": "2016-08-04T10:47:26Z"
 		},
 		{
+			"checksumSHA1": "Fx9xMI58lpBwwaGTxsI5rKeX3xw=",
+			"path": "github.com/bgentry/que-go",
+			"revision": "04623be4201ec7abb8d6cd0f172a4c612e216cc4",
+			"revisionTime": "2018-02-08T22:57:42Z"
+		},
+		{
 			"checksumSHA1": "PVJFTaYud+tJ/OHfHnmNXbeyxTo=",
 			"path": "github.com/go-redis/redis",
 			"revision": "b879d4e0b950159c63ec69d0ed4604dcd0d97bfd",
@@ -219,6 +225,42 @@
 			"revisionTime": "2017-03-30T21:24:24Z"
 		},
 		{
+			"checksumSHA1": "ecmoC8r7DjVnhBv31uX9UxnN79Y=",
+			"path": "github.com/jackc/pgx",
+			"revision": "606697ffdfe6603013560dbc171656de57b4f542",
+			"revisionTime": "2018-02-05T22:20:27Z"
+		},
+		{
+			"checksumSHA1": "rsDmBQ/jGFUN2t6G4c3ohkKGKdQ=",
+			"path": "github.com/jackc/pgx/chunkreader",
+			"revision": "606697ffdfe6603013560dbc171656de57b4f542",
+			"revisionTime": "2018-02-05T22:20:27Z"
+		},
+		{
+			"checksumSHA1": "wArf/u0cmHsLafG2tOcjVUUXQBw=",
+			"path": "github.com/jackc/pgx/internal/sanitize",
+			"revision": "606697ffdfe6603013560dbc171656de57b4f542",
+			"revisionTime": "2018-02-05T22:20:27Z"
+		},
+		{
+			"checksumSHA1": "OCtOmvS8BLHQAyQXJ/Ub8QxKz0s=",
+			"path": "github.com/jackc/pgx/pgio",
+			"revision": "606697ffdfe6603013560dbc171656de57b4f542",
+			"revisionTime": "2018-02-05T22:20:27Z"
+		},
+		{
+			"checksumSHA1": "Fj02uVXJiJ8K2DxAwU9zRTj5Ppo=",
+			"path": "github.com/jackc/pgx/pgproto3",
+			"revision": "606697ffdfe6603013560dbc171656de57b4f542",
+			"revisionTime": "2018-02-05T22:20:27Z"
+		},
+		{
+			"checksumSHA1": "R48SikoDGwiKdZ5th5VFI5bD07Y=",
+			"path": "github.com/jackc/pgx/pgtype",
+			"revision": "606697ffdfe6603013560dbc171656de57b4f542",
+			"revisionTime": "2018-02-05T22:20:27Z"
+		},
+		{
 			"checksumSHA1": "QmAzbypFddS3Tl/HDca0X0zXZ/M=",
 			"path": "github.com/jmoiron/sqlx",
 			"revision": "de8647470aafe4854c976707c431dbe1eb2822c6",
@@ -297,10 +339,10 @@
 			"revisionTime": "2017-04-18T16:35:58Z"
 		},
 		{
-			"checksumSHA1": "+alGamFQmcGTgPK66CpSfF4lYbk=",
+			"checksumSHA1": "ljd3FhYRJ91cLZz3wsH9BQQ2JbA=",
 			"path": "github.com/pkg/errors",
-			"revision": "c605e284fe17294bda444b34710735b29d1a9d90",
-			"revisionTime": "2017-05-05T04:36:39Z"
+			"revision": "30136e27e2ac8d167177e8a583aa4c3fea5be833",
+			"revisionTime": "2018-01-27T01:58:12Z"
 		},
 		{
 			"checksumSHA1": "DUs83smeFl26j2igDRRIHitcEVs=",
