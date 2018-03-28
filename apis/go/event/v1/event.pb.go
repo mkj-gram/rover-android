@@ -27,7 +27,7 @@ import rover_protobuf1 "github.com/roverplatform/rover/apis/go/protobuf"
 import rover_protobuf2 "github.com/roverplatform/rover/apis/go/protobuf/struct"
 import rover_protobuf3 "github.com/roverplatform/rover/apis/go/protobuf/timestamp"
 import rover_auth_v1 "github.com/roverplatform/rover/apis/go/auth/v1"
-import rover_audience_v1 "audience/v1"
+import rover_audience_v1 "github.com/roverplatform/rover/apis/go/audience/v1"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal

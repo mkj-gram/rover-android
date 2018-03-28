@@ -90,6 +90,7 @@ steps:
 #  Use this stage to import external packages eg. npm   #                                                    
 # ----------------------------------------------------- #
 
+
 # @rover/apis node module
   - id: 'install-rover-apis'
     name: 'node:7.10.1'
@@ -188,6 +189,8 @@ steps:
 # TODO figure out a clean way to use docker-compose for integration tests
 # Note use a uniq --project-name property so ensure each run does not interfere with others
 
+
+
 # Auth Service
   - id: 'test-auth-service'
     name: 'docker/compose:1.16.1'
@@ -229,6 +232,21 @@ steps:
       - run
       - campaigns-service
       - docker/campaigns-service/cmd
+      - test
+    waitFor:
+      - 'install-complete'
+
+# Transformer Service
+  - id: 'test-transformer-service'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -p
+      - test-transformer-service
+      - -f
+      - ./transformer/test.docker-compose.yaml
+      - run
+      - transformer
+      - docker/transformer/cmd
       - test
     waitFor:
       - 'install-complete'
@@ -275,6 +293,7 @@ steps:
         - 'test-auth-service'
         - 'test-audience-service'
         - 'test-campaigns-service'
+        - 'test-transformer-service'
         - 'test-rover-apis'
         - 'test-sdk-api'
         - 'test-bulk-gateway'
@@ -360,6 +379,29 @@ steps:
       - docker/campaigns-service/
     waitFor:
       - 'build-campaigns-service-executable'
+
+# Transformer Service
+  - id: 'build-transformer-service-executable'
+    name: 'gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -tags
+      - static_all
+      - -o
+      - docker/transformer/transformer-service
+      - github.com/roverplatform/rover/transformer/cmd/service
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - --tag=gcr.io/$PROJECT_ID/transformer-service:$REVISION_ID
+      - docker/transformer/
+    waitFor:
+      - 'build-transformer-service-executable'
 
 # Audience Segments Worker
   - id: 'build-audience-segments-worker-executable'
@@ -513,6 +555,7 @@ images:
   - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/campaigns-service:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/transformer-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID'

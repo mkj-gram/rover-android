@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+
+  kafka:
+    image: spotify/kafka
+    environment:
+      - AUTO_CREATE_TOPICS=true
+      - ADVERTISED_HOST=kafka
+      - NUM_PARTITIONS=3
+
+  transformer:
+    image: roverio/golang-rdkafka:1.10-alpine
+    command: ./docker/transformer/cmd test
+    volumes:
+      - ../:/go/src/github.com/roverplatform/rover
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - kafka
+    environment:
+      CGO_ENABLED: 1

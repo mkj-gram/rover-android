@@ -1,0 +1,12 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - --cache-from=gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine
+      - --tag=gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine
+      - --file=golang-1.10-rdkafka.Dockerfile
+      - .
+
+images:
+  - 'gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine'
+
