@@ -4,6 +4,7 @@ package service_test
 
 import (
 	"testing"
+	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
@@ -231,7 +232,7 @@ func test_Query(t *testing.T) {
 		},
 
 		{
-			desc: "timezone offset with empty query",
+			desc: "timezone offset with an empty query",
 			req: &audience.QueryRequest{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 
@@ -245,9 +246,17 @@ func test_Query(t *testing.T) {
 					},
 				},
 
-				// TODO stub out zoneinfo.TimeNow to ensure the device in America/Toronto is always returned
 				TimeZoneOffset: &audience.QueryRequest_TimeZoneOffset{
-					Seconds: -14400,
+					Seconds: func() int32 {
+						// Since offset changes with Daylight Savings Time
+						// calculate the offset of the named zone instead hardcoding offset
+						loc, err := time.LoadLocation("America/Toronto")
+						if err != nil {
+							t.Fatal(err)
+						}
+						_, offset := time.Now().In(loc).Zone()
+						return int32(offset)
+					}(),
 				},
 			},
 
