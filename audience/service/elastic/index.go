@@ -74,6 +74,15 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 				},
 			},
 		}
+
+		if r.GetTimeZoneOffset() != nil {
+			filter := TimeZoneOffsetToFilter(r.GetTimeZoneOffset().GetSeconds())
+			query = M{
+				"bool": M{
+					"filter": filter,
+				},
+			}
+		}
 	// single predicate aggregate
 	case *audience.QueryRequest_QueryPredicateAggregate:
 		rq, err := DeviceAndProfilePredicateAggregateToQuery(val.QueryPredicateAggregate, r.GetTimeZoneOffset())

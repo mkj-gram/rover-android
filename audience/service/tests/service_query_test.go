@@ -229,6 +229,39 @@ func test_Query(t *testing.T) {
 				},
 			},
 		},
+
+		{
+			desc: "timezone offset with empty query",
+			req: &audience.QueryRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+
+				Iterator: &audience.QueryRequest_ScrollIterator_{
+					ScrollIterator: &audience.QueryRequest_ScrollIterator{
+						Operation: &audience.QueryRequest_ScrollIterator_StartScroll_{
+							StartScroll: &audience.QueryRequest_ScrollIterator_StartScroll{
+								BatchSize: 1001,
+							},
+						},
+					},
+				},
+
+				// TODO stub out zoneinfo.TimeNow to ensure the device in America/Toronto is always returned
+				TimeZoneOffset: &audience.QueryRequest_TimeZoneOffset{
+					Seconds: -14400,
+				},
+			},
+
+			exp: expect{
+				exp: &audience.QueryResponse{
+					TotalSize: 1,
+					ScrollId:  "", // unpredictable
+					Devices: []*audience.Device{
+						{DeviceId: "d5", TimeZone: "America/Toronto"},
+					},
+					Profiles: nil,
+				},
+			},
+		},
 	}
 
 	for _, tc := range tcases {
@@ -336,7 +369,7 @@ func test_Query_Pager(t *testing.T) {
 					Profiles: []*audience.Profile{
 						{Identifier: "p1", AccountId: 1},
 					},
-					TotalSize: 4,
+					TotalSize: 5,
 				},
 			},
 		},
@@ -348,8 +381,9 @@ func test_Query_Pager(t *testing.T) {
 				exp: &audience.QueryResponse{
 					Devices: []*audience.Device{
 						{DeviceId: "d2", ProfileIdentifier: "frank"},
+						{DeviceId: "d5", TimeZone: "America/Toronto"},
 					},
-					TotalSize: 4,
+					TotalSize: 5,
 				},
 			},
 		},
@@ -405,7 +439,7 @@ func test_Query_Scroller(t *testing.T) {
 					Profiles: []*audience.Profile{
 						{Identifier: "p1", AccountId: 1},
 					},
-					TotalSize: 4,
+					TotalSize: 5,
 				},
 			},
 		},
@@ -417,8 +451,9 @@ func test_Query_Scroller(t *testing.T) {
 				exp: &audience.QueryResponse{
 					Devices: []*audience.Device{
 						{DeviceId: "d2", ProfileIdentifier: "frank"},
+						{DeviceId: "d5", TimeZone: "America/Toronto"},
 					},
-					TotalSize: 4,
+					TotalSize: 5,
 				},
 			},
 		},
@@ -487,7 +522,7 @@ func test_Query_ScrollerParallell(t *testing.T) {
 					Devices: []*audience.Device{
 						{DeviceId: "d4", ProfileIdentifier: ""},
 					},
-					TotalSize: 3,
+					TotalSize: 4,
 				},
 			},
 		},
@@ -501,9 +536,9 @@ func test_Query_ScrollerParallell(t *testing.T) {
 						{DeviceId: "d1", ProfileIdentifier: "p1"},
 					},
 					Profiles: []*audience.Profile{
-						{Identifier: "p1", AccountId: 1},
+						{AccountId: 1, Identifier: "p1"},
 					},
-					TotalSize: 3,
+					TotalSize: 4,
 				},
 			},
 		},
