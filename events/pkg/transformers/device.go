@@ -6,15 +6,15 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/event/v1"
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/apis/go/protobuf"
 	"github.com/roverplatform/rover/apis/go/protobuf/struct"
-	"github.com/roverplatform/rover/transformer/pipeline"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/roverplatform/rover/events/pkg/pipeline"
 )
 
 const roverEventNamespace = "rover"

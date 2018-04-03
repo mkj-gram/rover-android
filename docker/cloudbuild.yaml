@@ -236,17 +236,17 @@ steps:
     waitFor:
       - 'install-complete'
 
-# Transformer Service
-  - id: 'test-transformer-service'
+# Events Pipeline
+  - id: 'test-events-pipeline'
     name: 'docker/compose:1.16.1'
     args:
       - -p
-      - test-transformer-service
+      - test-events-pipeline
       - -f
-      - ./transformer/test.docker-compose.yaml
+      - ./events/test.docker-compose.yaml
       - run
-      - transformer
-      - docker/transformer/cmd
+      - events-pipeline
+      - docker/events/pipeline/cmd
       - test
     waitFor:
       - 'install-complete'
@@ -293,7 +293,7 @@ steps:
         - 'test-auth-service'
         - 'test-audience-service'
         - 'test-campaigns-service'
-        - 'test-transformer-service'
+        - 'test-events-pipeline'
         - 'test-rover-apis'
         - 'test-sdk-api'
         - 'test-bulk-gateway'
@@ -380,8 +380,8 @@ steps:
     waitFor:
       - 'build-campaigns-service-executable'
 
-# Transformer Service
-  - id: 'build-transformer-service-executable'
+# Events Pipeline
+  - id: 'build-events-pipeline-executable'
     name: 'gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
@@ -390,18 +390,18 @@ steps:
       - -tags
       - static_all
       - -o
-      - docker/transformer/transformer-service
-      - github.com/roverplatform/rover/transformer/cmd/service
+      - docker/events/pipeline/pipeline
+      - github.com/roverplatform/rover/events/cmd/pipeline
     waitFor:
       - 'test-complete'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/transformer-service:$REVISION_ID
-      - docker/transformer/
+      - --tag=gcr.io/$PROJECT_ID/events-pipeline:$REVISION_ID
+      - docker/events/pipeline
     waitFor:
-      - 'build-transformer-service-executable'
+      - 'build-events-pipeline-executable'
 
 # Audience Segments Worker
   - id: 'build-audience-segments-worker-executable'
@@ -555,7 +555,7 @@ images:
   - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/campaigns-service:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/transformer-service:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/events-pipeline:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID'

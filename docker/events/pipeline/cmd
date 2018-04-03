@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# TODO split tests by packages
+
+run() {
+	go run ./events/cmd/pipeline/main.go
+}
+
+test() {
+	go test github.com/roverplatform/rover/events/pkg/...
+}
+
+integration_test() {
+	# Wait for kafka to be up and running
+	while :
+	do
+		nc -z kafka 9092
+		result=$?
+		if [[ $result -eq 0 ]]; then
+			break
+		fi
+		sleep 1
+	done
+
+	go test -tags integration github.com/roverplatform/rover/events/pkg/...
+}
+
+
+for cmd in $*; do
+	$cmd
+done

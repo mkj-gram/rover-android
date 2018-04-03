@@ -203,7 +203,7 @@ services:
       AUDIENCE_V1_SERVICE_HOST: audience-service
       CAMPAIGNS_V1_SERVICE_HOST: campaigns-service
       KAFKA_DSN: kafka:9092
-      TRANSFORMER_INPUT_TOPIC: events.input
+      EVENTS_PIPELINE_INPUT_TOPIC: events.input
       NODE_ENV: development
 
   geocoder-service:
@@ -218,9 +218,9 @@ services:
       GEOCODER_SERVICE_GCP_API_KEY: "AIzaSyBNFTti0wKJ3J_FMw1tCpTB4bPyQ8j53bc"
       GEOCODER_SERVICE_REDIS_DSN: "redis://redis:6379/3"
 
-  transformer:
+  events-pipeline:
     image: roverio/golang-rdkafka:1.10-alpine
-    command: ./docker/transformer/cmd run
+    command: ./docker/events/pipeline/cmd run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover

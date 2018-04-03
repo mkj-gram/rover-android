@@ -6,7 +6,7 @@ import {
 
 import Event from '../Event'
 import { requireAuthentication } from '../../resolvers'
-import { Constants } from '@rover/transformer-client'
+import { Constants } from '@rover/events-pipeline-client'
 
 const trackEvents = {
     type: GraphQLString,

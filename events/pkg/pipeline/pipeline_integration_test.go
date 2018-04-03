@@ -14,8 +14,9 @@ import (
 
 	"github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/apis/go/event/v1"
+	"github.com/roverplatform/rover/events/pkg/pipeline"
+
 	rtesting "github.com/roverplatform/rover/go/testing"
-	"github.com/roverplatform/rover/transformer/pipeline"
 )
 
 var (

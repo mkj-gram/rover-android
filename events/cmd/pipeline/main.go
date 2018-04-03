@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -13,12 +14,10 @@ import (
 
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
+	"github.com/roverplatform/rover/events/pkg/middleware"
 
-	"syscall"
-
-	"github.com/roverplatform/rover/transformer/middleware"
-	"github.com/roverplatform/rover/transformer/pipeline"
-	"github.com/roverplatform/rover/transformer/transformers"
+	"github.com/roverplatform/rover/events/pkg/pipeline"
+	"github.com/roverplatform/rover/events/pkg/transformers"
 )
 
 var (
@@ -37,7 +36,7 @@ func main() {
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  *kafkaDSN,
 		"compression.codec":  "snappy",
-		"group.id":           "event-pipeline:consumer", // Must be stable cannot edit
+		"group.id":           "events:pipeline:consumer", // Must be stable cannot edit
 		"session.timeout.ms": 6000,
 		"auto.offset.reset":  "earliest",
 		"auto.commit.enable": false,
@@ -49,15 +48,16 @@ func main() {
 	producer, err := kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers":     *kafkaDSN,
 		"compression.codec":     "snappy",
-		"group.id":              "event-pipeline:consumer", // Must be stable cannot edit
+		"group.id":              "events:pipeline:producer", // Must be stable cannot edit
 		"session.timeout.ms":    6000,
 		"request.required.acks": -1,
-		"partitioner":           "consistent_random",
 		"auto.offset.reset":     "earliest",
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("Connected to kafka")
 
 	// TODO register prom and http endpoint
 
@@ -94,6 +94,7 @@ func main() {
 
 	go p.Run(ctx)
 
+	log.Println("[*] Pipeline running! To exit press CTRL+C")
 	sigc := make(chan os.Signal)
 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 

@@ -10,8 +10,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/roverplatform/rover/apis/go/event/v1"
+
+	"github.com/roverplatform/rover/events/pkg/pipeline/mocks"
 	rtesting "github.com/roverplatform/rover/go/testing"
-	"github.com/roverplatform/rover/transformer/pipeline/mocks"
 )
 
 var quickBackoff = &Backoff{MaxAttempts: 5, Min: 1 * time.Millisecond, Max: 1 * time.Millisecond, Factor: 1}

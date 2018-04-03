@@ -9,9 +9,9 @@ services:
       - ADVERTISED_HOST=kafka
       - NUM_PARTITIONS=3
 
-  transformer:
+  events-pipeline:
     image: roverio/golang-rdkafka:1.10-alpine
-    command: ./docker/transformer/cmd test
+    command: ./docker/events/pipeline/cmd test
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover

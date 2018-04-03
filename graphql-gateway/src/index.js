@@ -7,7 +7,7 @@ import schema from './schema'
 
 import RoverApis from '@rover/apis'
 import Auth from '@rover/auth-client'
-import Transformer from '@rover/transformer-client'
+import Transformer from '@rover/events-pipeline-client'
 import { authClient } from './grpcClients'
 
 import 'babel-polyfill'
@@ -67,7 +67,7 @@ process.on('SIGTERM', function() {
 
 async function main() {
 
-    const transformer = new Transformer.Client({ topic: process.env.TRANSFORMER_INPUT_TOPIC , kafka: { 'metadata.broker.list': process.env.KAFKA_DSN } })
+    const transformer = new Transformer.Client({ topic: process.env.EVENTS_PIPELINE_INPUT_TOPIC , kafka: { 'metadata.broker.list': process.env.KAFKA_DSN } })
     try {
         await transformer.connect()
     } catch (err) {

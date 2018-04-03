@@ -18,9 +18,10 @@ import (
 	"github.com/roverplatform/rover/apis/go/protobuf"
 	"github.com/roverplatform/rover/apis/go/protobuf/struct"
 	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
+	"github.com/roverplatform/rover/events/pkg/pipeline"
+
+	"github.com/roverplatform/rover/events/pkg/transformers"
 	rtesting "github.com/roverplatform/rover/go/testing"
-	"github.com/roverplatform/rover/transformer/pipeline"
-	"github.com/roverplatform/rover/transformer/transformers"
 )
 
 func TestFindDeviceTransformer(t *testing.T) {

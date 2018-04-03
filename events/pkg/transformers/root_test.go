@@ -6,6 +6,9 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/audience/v1/mock"
 	"github.com/roverplatform/rover/apis/go/auth/v1"
@@ -13,10 +16,9 @@ import (
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	gmock "github.com/roverplatform/rover/apis/go/geocoder/v1/mock"
 	"github.com/roverplatform/rover/apis/go/protobuf/struct"
+
+	"github.com/roverplatform/rover/events/pkg/transformers"
 	rtesting "github.com/roverplatform/rover/go/testing"
-	"github.com/roverplatform/rover/transformer/transformers"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func TestRoot(t *testing.T) {

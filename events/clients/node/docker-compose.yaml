@@ -15,7 +15,7 @@ services:
         - kafka
       volumes:
       - ../../../:/rover/
-      working_dir: /rover/transformer/clients/node
+      working_dir: /rover/events/clients/node
       environment:
         KAFKA_DSN: kafka
         NODE_ENV: development

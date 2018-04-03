@@ -1,4 +1,4 @@
-# Transformer
+# Events
 
 Transform events coming from outside our system into enhanced events for the rest of our backend to consume.
 

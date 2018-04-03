@@ -3,13 +3,13 @@ package transformers
 import (
 	"context"
 
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/event/v1"
-	"github.com/roverplatform/rover/transformer/pipeline"
+	"github.com/roverplatform/rover/events/pkg/pipeline"
 )
 
 func FindProfile(client audience.AudienceClient) pipeline.Handler {

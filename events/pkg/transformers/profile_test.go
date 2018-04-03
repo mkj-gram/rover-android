@@ -6,15 +6,17 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/audience/v1/mock"
 	"github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/apis/go/event/v1"
+
+	"github.com/roverplatform/rover/events/pkg/pipeline"
+	"github.com/roverplatform/rover/events/pkg/transformers"
 	rtesting "github.com/roverplatform/rover/go/testing"
-	"github.com/roverplatform/rover/transformer/pipeline"
-	"github.com/roverplatform/rover/transformer/transformers"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func TestFindProfile(t *testing.T) {
