@@ -4,6 +4,7 @@
 require 'google/protobuf'
 
 require 'auth/v1/auth_pb'
+require 'protobuf/version_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.notification.v1.PushEnvironment" do
   end
@@ -67,6 +68,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :device_push_token_environment, :enum, 12, "rover.notification.v1.PushEnvironment.Enum"
     optional :device_app_namespace, :string, 13
     optional :device_badge_count, :int32, 14
+    optional :os_name, :string, 15
+    optional :sdk_version, :message, 16, "rover.protobuf.Version"
   end
   add_message "rover.notification.v1.SendCampaignNotificationResponse" do
   end

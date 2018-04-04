@@ -5,6 +5,7 @@ package rover.notification.v1;
 option go_package = "notification/v1;notification";
 
 import "auth/v1/auth.proto";
+import "protobuf/version.proto";
 
 service Notification {
   rpc SendCampaignNotification(SendCampaignNotificationRequest) returns (SendCampaignNotificationResponse);
@@ -59,7 +60,7 @@ message SendCampaignNotificationRequest {
   NotificationTapBehaviorType.Enum     notification_tap_behavior_type              = 12;
   NotificationTapPresentationType.Enum notification_tap_behavior_presentation_type = 13;
 
-  string                          notification_tap_behavior_url                    = 14;
+  string              notification_tap_behavior_url                                = 14;
 
   bool                notification_ios_content_available                           = 15;
   bool                notification_ios_mutable_content                             = 16;
@@ -83,11 +84,15 @@ message SendCampaignNotificationRequest {
     string              notification_body              = 1;
     string              notification_title             = 2;
 
-    string device_id                                   = 10;
+    string               device_id                     = 10;
     string               device_push_token             = 11;
     PushEnvironment.Enum device_push_token_environment = 12;
     string               device_app_namespace          = 13;
     int32                device_badge_count            = 14;
+    // Either "iOS" or "Android"
+    string               os_name                       = 15;
+
+    rover.protobuf.Version sdk_version                 = 16;
   }
 
   repeated Message messages                                                        = 30;
