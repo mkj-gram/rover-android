@@ -7,6 +7,14 @@ import (
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
 
+func PredicateAggregate_Condition_FromString(str string) PredicateAggregate_Condition {
+	intVal, ok := PredicateAggregate_Condition_value[str]
+	if !ok {
+		panic(fmt.Sprintf("PredicateAggregate_Condition: unknown: %q", str))
+	}
+	return PredicateAggregate_Condition(intVal)
+}
+
 func (v *Value) Value() (interface{}, error) {
 	switch k := v.GetValueType().(type) {
 	case nil:

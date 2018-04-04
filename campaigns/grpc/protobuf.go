@@ -29,7 +29,7 @@ func protoToUpdateAutomatedDeliverySettingsRequest(req *campaignspb.UpdateAutoma
 	update.AccountId = req.AuthContext.AccountId
 	update.CampaignId = req.CampaignId
 
-	update.SegmentCondition = int32(req.SegmentCondition)
+	update.SegmentCondition = req.SegmentCondition.String()
 	update.SegmentIds = req.SegmentIds
 
 	update.UiState = req.UiState
@@ -78,12 +78,12 @@ func protoToUpdateScheduledDeliverySettingsRequest(req *campaignspb.UpdateSchedu
 	update.AccountId = req.AuthContext.AccountId
 	update.CampaignId = req.CampaignId
 
-	update.SegmentCondition = int32(req.SegmentCondition)
+	update.SegmentCondition = req.SegmentCondition.String()
 	update.SegmentIds = req.SegmentIds
 
 	update.UiState = req.UiState
 
-	update.ScheduledType = int32(req.ScheduledType)
+	update.ScheduledType = req.ScheduledType.String()
 	if req.ScheduledTimestamp != nil {
 		t, _ := timestamp.Time(req.ScheduledTimestamp)
 		update.ScheduledTimestamp = &t
@@ -105,9 +105,9 @@ func protoToUpdateNotificationSettingsRequest(req *campaignspb.UpdateNotificatio
 	update.NotificationBody = req.NotificationBody
 	update.NotificationTitle = req.NotificationTitle
 	update.NotificationAttachmentUrl = req.NotificationAttachmentUrl
-	update.NotificationAttachmentType = int32(req.NotificationAttachmentType)
-	update.NotificationTapBehaviorType = int32(req.NotificationTapBehaviorType)
-	update.NotificationTapBehaviorPresentationType = int32(req.NotificationTapBehaviorPresentationType)
+	update.NotificationAttachmentType = req.NotificationAttachmentType.String()
+	update.NotificationTapBehaviorType = req.NotificationTapBehaviorType.String()
+	update.NotificationTapBehaviorPresentationType = req.NotificationTapBehaviorPresentationType.String()
 	update.NotificationTapBehaviorUrl = req.NotificationTapBehaviorUrl
 	update.NotificationIosContentAvailable = req.NotificationIosContentAvailable
 	update.NotificationIosMutableContent = req.NotificationIosMutableContent
@@ -136,7 +136,7 @@ func protoToUpdateNotificationSettingsRequest(req *campaignspb.UpdateNotificatio
 }
 
 func CampaignToProto(c *campaigns.Campaign, proto *campaignspb.Campaign) error {
-	switch campaignspb.CampaignType_Enum(c.CampaignType) {
+	switch campaignspb.CampaignType_Enum_FromString(c.CampaignType) {
 	case campaignspb.CampaignType_SCHEDULED_NOTIFICATION:
 		var cc = &campaignspb.ScheduledNotificationCampaign{}
 		proto.Campaign = &campaignspb.Campaign_ScheduledNotificationCampaign{cc}
@@ -163,10 +163,10 @@ func campaignToProtoAutomatedNotification(c *campaigns.Campaign, proto *campaign
 	proto.CreatedAt, _ = timestamp.TimestampProto(c.CreatedAt)
 	proto.UpdatedAt, _ = timestamp.TimestampProto(c.UpdatedAt)
 
-	proto.CampaignStatus = campaignspb.CampaignStatus_Enum(c.CampaignStatus)
+	proto.CampaignStatus = campaignspb.CampaignStatus_Enum_FromString(c.CampaignStatus)
 	// proto.CampaignType = campaignspb.CampaignType_CAMPAIGN_TYPE_AUTOMATED_NOTIFICATION
 	proto.SegmentIds = c.SegmentIds
-	proto.SegmentCondition = campaignspb.SegmentCondition_Enum(c.SegmentCondition)
+	proto.SegmentCondition = campaignspb.SegmentCondition_Enum_FromString(c.SegmentCondition)
 
 	proto.UiState = c.UiState
 
@@ -174,10 +174,9 @@ func campaignToProtoAutomatedNotification(c *campaigns.Campaign, proto *campaign
 	proto.NotificationTitle = c.NotificationTitle
 	proto.NotificationAttachmentUrl = c.NotificationAttachmentUrl
 
-	proto.NotificationAttachmentType = campaignspb.NotificationAttachmentType_Enum(c.NotificationAttachmentType)
-	proto.NotificationTapBehaviorType = campaignspb.NotificationTapBehaviorType_Enum(c.NotificationTapBehaviorType)
-
-	proto.NotificationTapBehaviorPresentationType = campaignspb.NotificationTapPresentationType_Enum(c.NotificationTapBehaviorPresentationType)
+	proto.NotificationAttachmentType = campaignspb.NotificationAttachmentType_Enum_FromString(c.NotificationAttachmentType)
+	proto.NotificationTapBehaviorType = campaignspb.NotificationTapBehaviorType_Enum_FromString(c.NotificationTapBehaviorType)
+	proto.NotificationTapBehaviorPresentationType = campaignspb.NotificationTapPresentationType_Enum_FromString(c.NotificationTapBehaviorPresentationType)
 
 	proto.NotificationTapBehaviorUrl = c.NotificationTapBehaviorUrl
 	proto.NotificationIosContentAvailable = c.NotificationIosContentAvailable
@@ -255,11 +254,11 @@ func campaignToProtoScheduledNotification(c *campaigns.Campaign, proto *campaign
 	proto.CreatedAt, _ = timestamp.TimestampProto(c.CreatedAt)
 	proto.UpdatedAt, _ = timestamp.TimestampProto(c.UpdatedAt)
 
-	proto.CampaignStatus = campaignspb.CampaignStatus_Enum(c.CampaignStatus)
+	proto.CampaignStatus = campaignspb.CampaignStatus_Enum_FromString(c.CampaignStatus)
 	// proto.CampaignType = campaignspb.CampaignType_CAMPAIGN_TYPE_SCHEDULED_NOTIFICATION
 
 	proto.SegmentIds = c.SegmentIds
-	proto.SegmentCondition = campaignspb.SegmentCondition_Enum(c.SegmentCondition)
+	proto.SegmentCondition = campaignspb.SegmentCondition_Enum_FromString(c.SegmentCondition)
 
 	proto.UiState = c.UiState
 
@@ -267,10 +266,10 @@ func campaignToProtoScheduledNotification(c *campaigns.Campaign, proto *campaign
 	proto.NotificationTitle = c.NotificationTitle
 	proto.NotificationAttachmentUrl = c.NotificationAttachmentUrl
 
-	proto.NotificationAttachmentType = campaignspb.NotificationAttachmentType_Enum(c.NotificationAttachmentType)
-	proto.NotificationTapBehaviorType = campaignspb.NotificationTapBehaviorType_Enum(c.NotificationTapBehaviorType)
+	proto.NotificationAttachmentType = campaignspb.NotificationAttachmentType_Enum_FromString(c.NotificationAttachmentType)
+	proto.NotificationTapBehaviorType = campaignspb.NotificationTapBehaviorType_Enum_FromString(c.NotificationTapBehaviorType)
 
-	proto.NotificationTapBehaviorPresentationType = campaignspb.NotificationTapPresentationType_Enum(c.NotificationTapBehaviorPresentationType)
+	proto.NotificationTapBehaviorPresentationType = campaignspb.NotificationTapPresentationType_Enum_FromString(c.NotificationTapBehaviorPresentationType)
 
 	proto.NotificationTapBehaviorUrl = c.NotificationTapBehaviorUrl
 	proto.NotificationIosContentAvailable = c.NotificationIosContentAvailable
@@ -297,14 +296,14 @@ func campaignToProtoScheduledNotification(c *campaigns.Campaign, proto *campaign
 	proto.NotificationAlertOptionNotificationCenter = c.NotificationAlertOptionNotificationCenter
 	proto.NotificationAlertOptionBadgeNumber = c.NotificationAlertOptionBadgeNumber
 
-	proto.ScheduledType = campaignspb.ScheduledType_Enum(c.ScheduledType)
+	proto.ScheduledType = campaignspb.ScheduledType_Enum_FromString(c.ScheduledType)
 	if c.ScheduledTimestamp != nil {
 		// TODO: handle error
 		proto.ScheduledTimestamp, _ = timestamp.TimestampProto(*c.ScheduledTimestamp)
 	}
 	proto.ScheduledTimeZone = c.ScheduledTimeZone
 	proto.ScheduledUseLocalDeviceTime = c.ScheduledUseLocalDeviceTime
-	proto.ScheduledDeliveryStatus = campaignspb.ScheduledDeliveryStatus_Enum(c.ScheduledDeliveryStatus)
+	proto.ScheduledDeliveryStatus = campaignspb.ScheduledDeliveryStatus_Enum_FromString(c.ScheduledDeliveryStatus)
 
 	return nil
 }

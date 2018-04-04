@@ -10,7 +10,6 @@ import (
 
 	audiencepb "github.com/roverplatform/rover/apis/go/audience/v1"
 	auth "github.com/roverplatform/rover/apis/go/auth/v1"
-	campaignspb "github.com/roverplatform/rover/apis/go/campaigns/v1"
 	notificationpb "github.com/roverplatform/rover/apis/go/notification/v1"
 	"github.com/roverplatform/rover/campaigns"
 	sn "github.com/roverplatform/rover/campaigns/que/scheduled_notifications"
@@ -227,7 +226,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 		handleFirstBatch = func() error {
 
 			var req = buildQueryRequest(&audiencepb.QueryRequest_QuerySegments{
-				Condition: audiencepb.PredicateAggregate_Condition(campaign.SegmentCondition),
+				Condition: audiencepb.PredicateAggregate_Condition_FromString(campaign.SegmentCondition),
 				Ids:       campaign.SegmentIds,
 			})
 
@@ -367,7 +366,7 @@ func buildNotificationRequest(b Result, c *campaigns.Campaign) (*notificationpb.
 			// DeviceBadgeCount:				campaign.DeviceBadgeCount
 			DeviceId:                   d.DeviceId,
 			DevicePushToken:            d.PushTokenKey,
-			DevicePushTokenEnvironment: toPushEnvironment(d.PushEnvironment),
+			DevicePushTokenEnvironment: toPushEnvironment(d.PushEnvironment.String()),
 		}
 	}
 
@@ -404,38 +403,34 @@ func buildNotificationRequest(b Result, c *campaigns.Campaign) (*notificationpb.
 	return req, nil
 }
 
-func toPushEnvironment(val audiencepb.PushEnvironment_Value) notificationpb.PushEnvironment_Enum {
-	name := audiencepb.PushEnvironment_Value_name[int32(val)]
-	v, ok := notificationpb.PushEnvironment_Enum_value[name]
+func toPushEnvironment(str string) notificationpb.PushEnvironment_Enum {
+	v, ok := notificationpb.PushEnvironment_Enum_value[str]
 	if !ok {
-		panic(errors.Wrap(errors.Errorf("unknown: %q(%v)", val.String(), val), "PushEnvironment"))
+		panic(errors.Wrap(errors.Errorf("unknown: %q", str), "PushEnvironment"))
 	}
 	return notificationpb.PushEnvironment_Enum(v)
 }
 
-func toNotificationAttachementType(val int32) notificationpb.NotificationAttachmentType_Enum {
-	name := campaignspb.NotificationAttachmentType_Enum_name[val]
-	v, ok := notificationpb.NotificationAttachmentType_Enum_value[name]
+func toNotificationAttachementType(str string) notificationpb.NotificationAttachmentType_Enum {
+	v, ok := notificationpb.NotificationAttachmentType_Enum_value[str]
 	if !ok {
-		panic(errors.Wrap(errors.Errorf("unknown: %q(%v)", name, val), "NotificationAttachementType"))
+		panic(errors.Wrap(errors.Errorf("unknown: %q", str), "NotificationAttachementType"))
 	}
 	return notificationpb.NotificationAttachmentType_Enum(v)
 }
 
-func toNotificationTapBehaviorType(val int32) notificationpb.NotificationTapBehaviorType_Enum {
-	name := campaignspb.NotificationTapBehaviorType_Enum_name[val]
-	v, ok := notificationpb.NotificationTapBehaviorType_Enum_value[name]
+func toNotificationTapBehaviorType(str string) notificationpb.NotificationTapBehaviorType_Enum {
+	v, ok := notificationpb.NotificationTapBehaviorType_Enum_value[str]
 	if !ok {
-		panic(errors.Wrap(errors.Errorf("unknown: %q(%v)", name, val), "NotificationTapBehaviorType"))
+		panic(errors.Wrap(errors.Errorf("unknown: %q", str), "NotificationTapBehaviorType"))
 	}
 	return notificationpb.NotificationTapBehaviorType_Enum(v)
 }
 
-func toNotificationTapBehaviorPresentationType(val int32) notificationpb.NotificationTapPresentationType_Enum {
-	name := campaignspb.NotificationTapPresentationType_Enum_name[val]
-	v, ok := notificationpb.NotificationTapPresentationType_Enum_value[name]
+func toNotificationTapBehaviorPresentationType(str string) notificationpb.NotificationTapPresentationType_Enum {
+	v, ok := notificationpb.NotificationTapPresentationType_Enum_value[str]
 	if !ok {
-		panic(errors.Wrap(errors.Errorf("unknown: %q(%v)", name, val), "NotificationTapBehaviorPresentationType"))
+		panic(errors.Wrap(errors.Errorf("unknown: %q", str), "NotificationTapBehaviorPresentationType"))
 	}
 	return notificationpb.NotificationTapPresentationType_Enum(v)
 }

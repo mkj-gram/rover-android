@@ -17,6 +17,7 @@ import (
 	audiencepb "github.com/roverplatform/rover/apis/go/audience/v1"
 	audience_mocks "github.com/roverplatform/rover/apis/go/audience/v1/mock"
 	authpb "github.com/roverplatform/rover/apis/go/auth/v1"
+	campaignspb "github.com/roverplatform/rover/apis/go/campaigns/v1"
 	notificationpb "github.com/roverplatform/rover/apis/go/notification/v1"
 	notification_mocks "github.com/roverplatform/rover/apis/go/notification/v1/mock"
 	"github.com/roverplatform/rover/campaigns"
@@ -172,8 +173,13 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 
 		campaignWithSegments = &campaigns.Campaign{
 			CampaignId:       1,
-			SegmentCondition: int32(audiencepb.PredicateAggregate_ALL),
+			SegmentCondition: audiencepb.PredicateAggregate_ALL.String(),
 			SegmentIds:       []string{"abc", "efg"},
+			NotificationDetails: campaigns.NotificationDetails{
+				NotificationAttachmentType:              campaignspb.NotificationAttachmentType_IMAGE.String(),
+				NotificationTapBehaviorType:             campaignspb.NotificationTapBehaviorType_OPEN_APP.String(),
+				NotificationTapBehaviorPresentationType: campaignspb.NotificationTapPresentationType_IN_APP.String(),
+			},
 		}
 
 		notFoundErr = status.Errorf(codes.NotFound, "not found")
@@ -398,6 +404,11 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 								AuthContext:  authCtx,
 								CampaignId:   1,
 								ExperienceId: "",
+
+								NotificationAttachmentType:              notificationpb.NotificationAttachmentType_IMAGE,
+								NotificationTapBehaviorType:             notificationpb.NotificationTapBehaviorType_OPEN_APP,
+								NotificationTapBehaviorPresentationType: notificationpb.NotificationTapPresentationType_IN_APP,
+
 								Messages: []*notificationpb.SendCampaignNotificationRequest_Message{
 									&notificationpb.SendCampaignNotificationRequest_Message{DeviceId: "a"},
 									&notificationpb.SendCampaignNotificationRequest_Message{DeviceId: "b"},
@@ -488,6 +499,11 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 								AuthContext:  authCtx,
 								CampaignId:   1,
 								ExperienceId: "",
+
+								NotificationAttachmentType:              notificationpb.NotificationAttachmentType_IMAGE,
+								NotificationTapBehaviorType:             notificationpb.NotificationTapBehaviorType_OPEN_APP,
+								NotificationTapBehaviorPresentationType: notificationpb.NotificationTapPresentationType_IN_APP,
+
 								Messages: []*notificationpb.SendCampaignNotificationRequest_Message{
 									&notificationpb.SendCampaignNotificationRequest_Message{DeviceId: "a"},
 									&notificationpb.SendCampaignNotificationRequest_Message{DeviceId: "b"},
@@ -578,6 +594,11 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 								AuthContext:  authCtx,
 								CampaignId:   1,
 								ExperienceId: "",
+
+								NotificationAttachmentType:              notificationpb.NotificationAttachmentType_IMAGE,
+								NotificationTapBehaviorType:             notificationpb.NotificationTapBehaviorType_OPEN_APP,
+								NotificationTapBehaviorPresentationType: notificationpb.NotificationTapPresentationType_IN_APP,
+
 								Messages: []*notificationpb.SendCampaignNotificationRequest_Message{
 									&notificationpb.SendCampaignNotificationRequest_Message{DeviceId: "a"},
 									&notificationpb.SendCampaignNotificationRequest_Message{DeviceId: "b"},
@@ -673,6 +694,11 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 								AuthContext:  authCtx,
 								CampaignId:   1,
 								ExperienceId: "",
+
+								NotificationAttachmentType:              notificationpb.NotificationAttachmentType_IMAGE,
+								NotificationTapBehaviorType:             notificationpb.NotificationTapBehaviorType_OPEN_APP,
+								NotificationTapBehaviorPresentationType: notificationpb.NotificationTapPresentationType_IN_APP,
+
 								Messages: []*notificationpb.SendCampaignNotificationRequest_Message{
 									&notificationpb.SendCampaignNotificationRequest_Message{DeviceId: "a"},
 									&notificationpb.SendCampaignNotificationRequest_Message{DeviceId: "b"},

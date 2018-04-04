@@ -145,7 +145,7 @@ func (db *campaignsStore) List(ctx context.Context, params ListParams) ([]*campa
 	return cx, nil
 }
 
-func (db *campaignsStore) Create(ctx context.Context, accountId int32, name string, campaignType int32) (*campaigns.Campaign, error) {
+func (db *campaignsStore) Create(ctx context.Context, accountId int32, name string, campaignType string) (*campaigns.Campaign, error) {
 	var (
 		now = TimeNow()
 
@@ -173,8 +173,7 @@ func (db *campaignsStore) Create(ctx context.Context, accountId int32, name stri
 				:created_at, :updated_at
 			)
 
-			RETURNING
-				id, campaign_status
+			RETURNING *
 	`, c)
 
 	if err != nil {
@@ -186,18 +185,22 @@ func (db *campaignsStore) Create(ctx context.Context, accountId int32, name stri
 		return nil, wrapError(sql.ErrNoRows, "campaigns.Next")
 	}
 
-	if err := row.Scan(&c.CampaignId, &c.CampaignStatus); err != nil {
+	if err := row.StructScan(&c); err != nil {
 		return nil, wrapError(err, "row.Scan")
+	}
+
+	if err := c.fromDB(); err != nil {
+		return nil, wrapError(err, "fromDB")
 	}
 
 	return &c.Campaign, nil
 }
 
-func (db *campaignsStore) UpdateStatus(ctx context.Context, accountId, campaignId, status int32) error {
+func (db *campaignsStore) UpdateStatus(ctx context.Context, accountId, campaignId int32, status string) error {
 	return CampaignUpdateStatus(db.db, ctx, accountId, campaignId, status)
 }
 
-func (tx *campaignsStoreTx) UpdateStatus(ctx context.Context, accountId, campaignId, status int32) error {
+func (tx *campaignsStoreTx) UpdateStatus(ctx context.Context, accountId, campaignId int32, status string) error {
 	return CampaignUpdateStatus(tx.tx, ctx, accountId, campaignId, status)
 }
 
@@ -205,7 +208,7 @@ type namedExecer interface {
 	NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
 }
 
-func CampaignUpdateStatus(dbCtx namedExecer, ctx context.Context, accountId, campaignId, status int32) error {
+func CampaignUpdateStatus(dbCtx namedExecer, ctx context.Context, accountId, campaignId int32, status string) error {
 	var (
 		now = TimeNow()
 

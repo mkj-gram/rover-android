@@ -38,7 +38,7 @@ func (s *Server) Create(ctx context.Context, req *campaignspb.CreateRequest) (*c
 		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
 	}
 
-	var campaign, err = s.DB.CampaignsStore().Create(ctx, acctId, req.Name, int32(req.CampaignType))
+	var campaign, err = s.DB.CampaignsStore().Create(ctx, acctId, req.Name, req.CampaignType.String())
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "db.Create: %v", err)
 	}
@@ -99,7 +99,7 @@ func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campa
 		}
 
 		isScheduledType = func(c *campaigns.Campaign) bool {
-			return campaignspb.CampaignType_Enum(c.CampaignType) ==
+			return campaignspb.CampaignType_Enum_FromString(c.CampaignType) ==
 				campaignspb.CampaignType_SCHEDULED_NOTIFICATION
 		}
 	)
@@ -129,7 +129,7 @@ func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campa
 				continue
 			}
 			if s, ok := deliveryStatusByCampaignId[campaigns[i].CampaignId]; ok {
-				campaigns[i].ScheduledDeliveryStatus = int32(s)
+				campaigns[i].ScheduledDeliveryStatus = s.String()
 			}
 		}
 	}
@@ -214,7 +214,7 @@ func (s *Server) Archive(ctx context.Context, req *campaignspb.ArchiveRequest) (
 	}
 
 	var (
-		cStatus = int32(campaignspb.CampaignStatus_ARCHIVED)
+		cStatus = campaignspb.CampaignStatus_ARCHIVED.String()
 	)
 
 	if err := s.DB.CampaignsStore().UpdateStatus(ctx, acctId, req.CampaignId, cStatus); err != nil {
@@ -235,7 +235,7 @@ func (s *Server) Publish(ctx context.Context, req *campaignspb.PublishRequest) (
 	}
 
 	var (
-		cStatus = int32(campaignspb.CampaignStatus_PUBLISHED)
+		cStatus = campaignspb.CampaignStatus_PUBLISHED.String()
 	)
 
 	tx, err := s.DB.Begin()
@@ -273,7 +273,7 @@ func (s *Server) Publish(ctx context.Context, req *campaignspb.PublishRequest) (
 	)
 
 	if err := func() error {
-		switch campaignType := campaignspb.CampaignType_Enum(c.CampaignType); campaignType {
+		switch campaignType := campaignspb.CampaignType_Enum_FromString(c.CampaignType); campaignType {
 		case campaignspb.CampaignType_SCHEDULED_NOTIFICATION:
 			return publishScheduled()
 		case campaignspb.CampaignType_AUTOMATED_NOTIFICATION:
@@ -342,7 +342,7 @@ func (s *Server) scheduleTasks(ctx context.Context, tx *db.Tx, c *campaigns.Camp
 	)
 
 	var runAt time.Time
-	switch scheduledType := campaignspb.ScheduledType_Enum(c.ScheduledType); scheduledType {
+	switch scheduledType := campaignspb.ScheduledType_Enum_FromString(c.ScheduledType); scheduledType {
 	case campaignspb.ScheduledType_NOW:
 		runAt = db.TimeNow()
 	case campaignspb.ScheduledType_SCHEDULED:
@@ -401,13 +401,13 @@ func (s *Server) UpdateNotificationSettings(ctx context.Context, req *campaignsp
 }
 
 func (s *Server) canUpdateState(ctx context.Context, campaign *campaigns.Campaign) error {
-	switch campaignspb.CampaignType_Enum(campaign.CampaignType) {
+	switch campaignspb.CampaignType_Enum_FromString(campaign.CampaignType) {
 	case campaignspb.CampaignType_AUTOMATED_NOTIFICATION:
 		// TODO
 		return nil
 	case campaignspb.CampaignType_SCHEDULED_NOTIFICATION:
 		var (
-			campaignStatus     = campaignspb.CampaignStatus_Enum(campaign.CampaignStatus)
+			campaignStatus     = campaignspb.CampaignStatus_Enum_FromString(campaign.CampaignStatus)
 			isDraftOrPublished = campaignStatus == campaignspb.CampaignStatus_DRAFT ||
 				campaignStatus == campaignspb.CampaignStatus_PUBLISHED
 		)
@@ -499,7 +499,7 @@ func (s *Server) UpdateScheduledDeliverySettings(ctx context.Context, req *campa
 		}
 
 		isPublished = func() bool {
-			return campaignspb.CampaignStatus_Enum(campaign.CampaignStatus) == campaignspb.CampaignStatus_PUBLISHED
+			return campaignspb.CampaignStatus_Enum_FromString(campaign.CampaignStatus) == campaignspb.CampaignStatus_PUBLISHED
 		}
 	)
 

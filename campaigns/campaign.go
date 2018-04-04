@@ -13,7 +13,7 @@ type UpdateScheduledDeliverySettingsRequest struct {
 	AccountId  int32 `db:"account_id"`
 	CampaignId int32 `db:"campaign_id"`
 
-	SegmentCondition int32    `db:"segment_condition"`
+	SegmentCondition string   `db:"segment_condition"`
 	SegmentIds       []string `db:"-"`
 
 	UiState string `db:"ui_state"`
@@ -25,7 +25,7 @@ type UpdateAutomatedDeliverySettingsRequest struct {
 	AccountId  int32 `db:"account_id"`
 	CampaignId int32 `db:"campaign_id"`
 
-	SegmentCondition int32    `db:"segment_condition"`
+	SegmentCondition string   `db:"segment_condition"`
 	SegmentIds       []string `db:"-"`
 
 	UiState string `db:"ui_state"`
@@ -54,21 +54,21 @@ type Campaign struct {
 
 	Name string `db:"name"`
 
-	CampaignStatus int32 `db:"campaign_status"`
-	CampaignType   int32 `db:"campaign_type"`
+	CampaignStatus string `db:"campaign_status"`
+	CampaignType   string `db:"campaign_type"`
 
 	ExperienceId string `db:"experience_id"`
 
 	UiState string `db:"ui_state"`
 
-	SegmentCondition int32    `db:"segment_condition"`
+	SegmentCondition string   `db:"segment_condition"`
 	SegmentIds       []string `db:"-"`
 
 	AutomationDetails
 	NotificationDetails
 
 	ScheduleDetails
-	ScheduledDeliveryStatus int32 `db:"scheduled_delivery_status"`
+	ScheduledDeliveryStatus string `db:"scheduled_delivery_status"`
 }
 
 type NotificationDetails struct {
@@ -76,10 +76,10 @@ type NotificationDetails struct {
 	NotificationTitle string `db:"notification_title"`
 
 	NotificationAttachmentUrl  string `db:"notification_attachment_url"`
-	NotificationAttachmentType int32  `db:"notification_attachment_type"`
+	NotificationAttachmentType string `db:"notification_attachment_type"`
 
-	NotificationTapBehaviorType             int32  `db:"notification_tap_behavior_type"`
-	NotificationTapBehaviorPresentationType int32  `db:"notification_tap_behavior_presentation_type"`
+	NotificationTapBehaviorType             string `db:"notification_tap_behavior_type"`
+	NotificationTapBehaviorPresentationType string `db:"notification_tap_behavior_presentation_type"`
 	NotificationTapBehaviorUrl              string `db:"notification_tap_behavior_url"`
 
 	NotificationIosContentAvailable   bool   `db:"notification_ios_content_available"`
@@ -102,7 +102,7 @@ type NotificationDetails struct {
 }
 
 type ScheduleDetails struct {
-	ScheduledType               int32      `db:"scheduled_type"`
+	ScheduledType               string     `db:"scheduled_type"`
 	ScheduledTimestamp          *time.Time `db:"scheduled_timestamp"`
 	ScheduledTimeZone           string     `db:"scheduled_time_zone"`
 	ScheduledUseLocalDeviceTime bool       `db:"scheduled_use_local_device_time"`

@@ -3,18 +3,18 @@
 INSERT INTO campaigns
  (id, account_id, campaign_status, campaign_type, name, created_at, updated_at)
 VALUES
- (1, 1, 1, 2, 'c1', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
-,(2, 1, 1, 2, 'c2', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
-,(3, 1, 1, 1, 'c3', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+ (1, 1, 'DRAFT',    'AUTOMATED_NOTIFICATION', 'c1', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+,(2, 1, 'DRAFT',    'AUTOMATED_NOTIFICATION', 'c2', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+,(3, 1, 'DRAFT',    'SCHEDULED_NOTIFICATION', 'c3', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
 
-,(4, 2, 1, 2, 'c4', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
-,(5, 2, 1, 1, 'c5', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+,(4, 2, 'DRAFT',    'AUTOMATED_NOTIFICATION', 'c4', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+,(5, 2, 'DRAFT',    'SCHEDULED_NOTIFICATION', 'c5', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
 
-,(6, 2, 3, 2, 'c6', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
-,(7, 2, 1, 2, 'c7', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+,(6, 2, 'ARCHIVED', 'AUTOMATED_NOTIFICATION', 'c6', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+,(7, 2, 'DRAFT',    'AUTOMATED_NOTIFICATION', 'c7', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
 
-,(8, 2, 2, 1, 'c8', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
-,(9, 2, 3, 1, 'c9', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+,(8, 2, 'PUBLISHED','SCHEDULED_NOTIFICATION', 'c8', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
+,(9, 2, 'ARCHIVED', 'SCHEDULED_NOTIFICATION', 'c9', '2017-05-04T16:26:25.445494Z','2017-05-04T16:26:25.445494Z')
 ;
 
 
@@ -81,11 +81,11 @@ INSERT INTO campaigns
 ,'c10'
 --
 -- ,campaign_type
-,1
+,'SCHEDULED_NOTIFICATION'
 -- ,campaign_status                               aft
-,1
+,'DRAFT'
 -- ,segment_condition
-, 1
+, 'ALL'
 -- ,segment_ids
 ,'{1, 2, 3}'
 -- ,ui_state
@@ -99,13 +99,13 @@ INSERT INTO campaigns
 -- ,notification_attachment_url
 ,'http://example.com/id.png'
 -- ,notification_attachment_type
-,1
+,'IMAGE'
 -- ,notification_tap_behavior_type
-,1
+,'OPEN_APP'
 -- ,notification_tap_behavior_url
 ,'http://rover.io/homepage'
 -- ,notification_tap_behavior_presentation_type
-,1
+,'IN_APP'
 -- ,notification_ios_content_available
 , true
 -- ,notification_ios_mutable_content
@@ -136,7 +136,7 @@ INSERT INTO campaigns
 --
 --
 -- ,scheduled_type
-, 1
+, 'SCHEDULED'
 -- ,scheduled_timestamp
 , '2017-05-04T16:26:25.445494'
 -- ,scheduled_time_zone
@@ -144,7 +144,7 @@ INSERT INTO campaigns
 -- ,scheduled_use_local_device_time
 , true
 -- ,scheduled_delivery_status
-, 0
+, 'UNKNOWN'
 --
 --
 -- -- ,automated_monday
@@ -269,11 +269,11 @@ INSERT INTO campaigns
 ,'c10'
 --
 -- ,campaign_type
-,2
+,'AUTOMATED_NOTIFICATION'
 -- ,campaign_status
-,1
+,'DRAFT'
 -- ,segment_condition
-,1
+,'ALL'
 -- ,segment_ids
 ,'{1, 2, 3}'
 -- ,ui_state
@@ -287,13 +287,13 @@ INSERT INTO campaigns
 -- ,notification_attachment_url
 ,'http://example.com/id.png'
 -- ,notification_attachment_type
-,1
+,'IMAGE'
 -- ,notification_tap_behavior_type
-,1
+,'OPEN_APP'
 -- ,notification_tap_behavior_url
 ,'http://rover.io/homepage'
 -- ,notification_tap_behavior_presentation_type
-,1
+,'IN_APP'
 -- ,notification_ios_content_available
 , true
 -- ,notification_ios_mutable_content
