@@ -66,7 +66,7 @@ func Equal(a, b interface{}) []string {
 	if a == nil && b == nil {
 		return nil
 	} else if a == nil && b != nil {
-		c.saveDiff(b, "<nil pointer>")
+		c.saveDiff("<nil pointer>", b)
 	} else if a != nil && b == nil {
 		c.saveDiff(a, "<nil pointer>")
 	}
@@ -115,7 +115,6 @@ func (c *cmp) equals(a, b reflect.Value, level int) {
 		}
 	}
 
-
 	if aType != bType {
 		c.saveDiff(aType, bType)
 		logError(ErrTypeMismatch)
@@ -125,8 +124,6 @@ func (c *cmp) equals(a, b reflect.Value, level int) {
 	// Primitive https://golang.org/pkg/reflect/#Kind
 	aKind := a.Kind()
 	bKind := b.Kind()
-
-
 
 	// Dereference pointers and interface{}
 	if aElem, bElem := (aKind == reflect.Ptr || aKind == reflect.Interface),
