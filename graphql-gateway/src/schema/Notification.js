@@ -11,7 +11,7 @@ import {
 
 import { GraphQLDateTime } from 'graphql-iso-date'
 
-import GraphQLJSON from 'graphql-type-json'
+import ActionInfo from './ActionInfo'
 
 const Notification = new GraphQLObjectType({
     name: 'Notification',
@@ -19,7 +19,7 @@ const Notification = new GraphQLObjectType({
         id: {
             type: new GraphQLNonNull(GraphQLID)
         },
-        campaignId: {
+        campaignID: {
             type: new GraphQLNonNull(GraphQLID)
         },
         title: {
@@ -31,11 +31,8 @@ const Notification = new GraphQLObjectType({
         attachment: {
             type: NotificationAttachment
         },
-        action: {
-            type: new GraphQLNonNull(NotificationAction)
-        },
-        uri: {
-            type: GraphQLString
+        actionInfo: {
+            type: new GraphQLNonNull(ActionInfo)
         },
         deliveredAt: {
             type: new GraphQLNonNull(GraphQLDateTime)
@@ -53,31 +50,6 @@ const Notification = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLBoolean)
         }
     })
-})
-
-const NotificationAction = new GraphQLObjectType({
-    name: 'NotificationAction',
-    fields: () => ({
-        experienceId: {
-            type: GraphQLString
-        },
-        type: {
-            type: new GraphQLNonNull(NotificationActionType)
-        },
-        url: {
-            type: GraphQLString
-        }
-    })
-})
-
-const NotificationActionType = new GraphQLEnumType({
-    name: 'NotificationActionType',
-    values: {
-        OPEN_APP: { value: 'openApp' },
-        OPEN_URL: { value: 'openUrl' },
-        PRESENT_EXPERIENCE: { value: 'presentExperience' },
-        PRESENT_WEBSITE: { value: 'presentWebsite' }
-    }
 })
 
 export const NotificationAttachment = new GraphQLObjectType({

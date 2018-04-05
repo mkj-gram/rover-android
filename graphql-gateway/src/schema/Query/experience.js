@@ -11,27 +11,29 @@ const experience = {
         id: {
             type: GraphQLID
         },
-        campaignId: {
+        campaignID: {
             type: GraphQLID
         },
-        url: {
+        campaignURL: {
             type: GraphQLString
         }
     },
-    resolve: (_, { id: experienceId, campaignId, url: campaignUrl }, { accountToken }) => {
-        if (experienceId !== null && experienceId !== undefined) {
-            return fetchExperience(experienceId, accountToken).then(experience => ({
+    resolve: (_, { id: experienceID, campaignID, campaignURL }, { accountToken }) => {
+        if (experienceID !== null && experienceID !== undefined) {
+            return fetchExperience(experienceID, accountToken)
+        } else if (campaignID !== null && campaignID !== undefined) {
+            return fetchExperience("57b32c299514ac00271a7425", accountToken).then(experience => ({
                 ...experience,
-                campaignId
+                campaignID
             }))
-        } else if (campaignUrl !== null && campaignUrl !== undefined) {
-            let shortUrl = new URL(campaignUrl).pathname.replace('/', '')
-            return fetchExperience(shortUrl, accountToken).then(experience => ({
+        } else if (campaignURL !== null && campaignURL !== undefined) {
+            let shortURL = new URL(campaignURL).pathname.replace('/', '')
+            return fetchExperience(shortURL, accountToken).then(experience => ({
                 ...experience,
-                campaignId: shortUrl
+                campaignID: shortURL
             }))
         } else {
-            throw new TypeError('Field "experience" argument "id" of type "ID" or argument "url" of type "String" is required but neither were provided.')
+            throw new TypeError('Field "experience" argument "id" of type "ID" or argument "campaignID" of type "String" or argument "campaignURL" of type "String" is required but neither were provided.')
         }
     }
 }
@@ -62,26 +64,555 @@ const fetchExperience = (identifier, accountToken) => {
             try {
                 const json = JSON.parse(body)
                 const data = json['data']
-
-                if (!data) {
+                if (data === null || data === undefined) {
                     return null
                 }
 
                 const attributes = data['attributes']
 
-                if (!attributes) {
+                if (attributes === null || attributes === undefined) {
                     return null
                 }
 
-                resolve({
-                    ...attributes,
-                    id: data['id']
+                const experience = normalizeExperience({
+                    id: data['id'],
+                    ...attributes
                 })
+
+                resolve(experience)
             } catch (err) {
                 reject(err)
             }
         })
     })
+}
+
+const normalizeExperience = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        id: data['id'],
+        homeScreenID: data['home-screen-id'],
+        screens: normalizeScreens(data['screens']),
+        keys: normalizeKeys(data['custom-keys']),
+        tags: []
+    }
+}
+
+const normalizeScreens = data => {
+    if (Array.isArray(data)) {
+        return data.map(normalizeScreen)
+    }
+
+    return []
+}
+
+const normalizeScreen = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        ...normalizeBackground(data),
+        id: data['id'],
+        isStretchyHeaderEnabled: normalizeBoolean(data['is-stretchy-header-enabled'], true),
+        rows: normalizeRows(data['rows']),
+        statusBarStyle: normalizeStatusBarStyle(data['status-bar-style']),
+        statusBarColor: normalizeColor(data['status-bar-color']),
+        titleBarBackgroundColor: normalizeColor(data['title-bar-background-color']),
+        titleBarButtons: normalizeTitleBarButtons(data['title-bar-buttons']),
+        titleBarButtonColor: normalizeColor(data['title-bar-button-color']),
+        titleBarText: data['title'],
+        titleBarTextColor: normalizeColor(data['title-bar-text-color']),
+        useDefaultTitleBarStyle: normalizeBoolean(data['use-default-title-bar-style'], false),
+        keys: normalizeKeys(data['custom-keys']),
+        tags: []
+    }
+}
+
+const normalizeBackground = data => {
+    return {
+        backgroundColor: normalizeColor(data['background-color']),
+        backgroundContentMode: normalizeBackgroundContentMode(data['background-content-mode']),
+        backgroundImage: normalizeImage(data['background-image']),
+        backgroundScale: normalizeInteger(data['background-scale'], 1)
+    }
+}
+
+const normalizeTitleBarButtons = data => {
+    switch (data) {
+        case 'close':
+        case 'back':
+        case 'both':
+            return data
+        default:
+            return 'close'
+    }
+}
+
+const normalizeColor = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        red: normalizeNumber(data['red'], 0.0),
+        green: normalizeNumber(data['green'], 0.0),
+        blue: normalizeNumber(data['blue'], 0.0),
+        alpha: normalizeNumber(data['alpha'], 1.0)
+    }
+}
+
+const normalizeNumber = (data, fallback) => {
+    if (isNaN(data)) {
+        console.log('NaN', data, fallback)
+        return fallback
+    }
+
+    return data
+}
+
+const normalizeBackgroundContentMode = data => {
+    switch (data) {
+        case 'original':
+        case 'stretch':
+        case 'tile':
+        case 'fill':
+        case 'fit':
+            return data
+        default:
+            return 'original'
+    }
+}
+
+const normalizeImage = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        height: normalizeInteger(data['height'], 0),
+        isURLOptimizationEnabled: normalizeBoolean(data['is-url-optimization-enabled'], true),
+        name: data['name'],
+        size: normalizeInteger(data['size'], 0),
+        width: normalizeInteger(data['width'], 0),
+        url: data['url']
+    }
+}
+
+const normalizeInteger = (data, fallback) => {
+    if (Number.isInteger(data)) {
+        return data
+    }
+
+    return fallback
+}
+
+const normalizeBoolean = (data, fallback) => {
+    if (typeof data === 'boolean') {
+        return data
+    }
+
+    return fallback
+}
+
+const normalizeActionInfo = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    const url = data['url']
+    if (typeof url === 'string') {
+        return {
+            name: 'openURL',
+            attributes: {
+                url
+            }
+        }
+    }
+
+    const experienceID = data['experience-id']
+    const screenID = data['screen-id']
+    if (typeof experienceID === 'string' && typeof screenID === 'string') {
+        return {
+            name: 'goToScreen',
+            attributes: {
+                experienceID,
+                screenID
+            }
+        }
+    }
+
+    return null
+}
+
+const normalizeStatusBarStyle = data => {
+    switch (data) {
+        case 'light':
+        case 'dark':
+            return data
+        default:
+            return 'light'
+    }
+}
+
+const normalizeRows = data => {
+    if (Array.isArray(data)) {
+        return data.map(normalizeRow)
+    }
+
+    return []
+}
+
+const normalizeRow = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        autoHeight: normalizeBoolean(data['auto-height'], false),
+        ...normalizeBackground(data),
+        blocks: normalizeBlocks(data['blocks']),
+        height: normalizeLength(data['height']),
+        id: data['id'],
+        keys: normalizeKeys(data['custom-keys']),
+        tags: []
+    }
+}
+
+const normalizeLength = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        unit: normalizeUnit(data['unit']),
+        value: normalizeNumber(data['value'], 0.0)
+    }
+}
+
+const normalizeUnit = data => {
+    switch (data) {
+        case 'points':
+        case 'percentage':
+            return data
+        default:
+            return 'points'
+    }
+}
+
+const normalizeBlocks = data => {
+    if (Array.isArray(data)) {
+        return data.map(data => {
+            if (data === null || data === undefined) {
+                return null
+            }
+
+            if (data['barcode-scale']) {
+                return normalizeBarcodeBlock(data)
+            }
+
+            if (data['states']) {
+                return normalizeButtonBlock(data)
+            }
+
+            if (data['image']) {
+                return normalizeImageBlock(data)
+            }
+
+            if (data['text']) {
+                return normalizeTextBlock(data)
+            }
+
+            if (typeof data['scrollable'] !== 'undefined') {
+                return normalizeWebViewBlock(data)
+            }
+
+            return normalizeRectangleBlock(data)
+        })
+    }
+
+    return []
+}
+
+const normalizeBorder = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        borderColor: normalizeColor(data['border-color']),
+        borderRadius: normalizeInteger(data['border-radius'], 0),
+        borderWidth: normalizeInteger(data['border-width'], 0)
+    }
+}
+
+const normalizeHorizontalAlignment = data => {
+    if (data === null || data === undefined) {
+        return 'left'
+    }
+
+    let horizontal = data['horizontal']
+    switch (horizontal) {
+        case 'left':
+        case 'right':
+        case 'center':
+        case 'fill':
+            return horizontal
+        default:
+            return 'left'
+    }
+}
+
+const normalizeVerticalAlignment = data => {
+    if (data === null || data === undefined) {
+        return 'top'
+    }
+
+    let vertical = data['vertical']
+    switch (vertical) {
+        case 'top':
+        case 'bottom':
+        case 'middle':
+        case 'fill':
+            return vertical
+        default:
+            return 'top'
+    }
+}
+
+const normalizeInsets = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        bottom: normalizeInteger(data['bottom'], 0),
+        left: normalizeInteger(data['left'], 0),
+        right: normalizeInteger(data['right'], 0),
+        top: normalizeInteger(data['top'], 0)
+    }
+}
+
+const normalizeOffsets = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        bottom: normalizeLength(data['bottom']),
+        center: normalizeLength(data['center']),
+        left: normalizeLength(data['left']),
+        middle: normalizeLength(data['middle']),
+        right: normalizeLength(data['right']),
+        top: normalizeLength(data['top'])
+    }
+}
+
+const normalizePosition = data => {
+    switch (data) {
+        case 'stacked':
+        case 'floating':
+            return data
+        default:
+            return 'floating'
+    }
+}
+
+const normalizeBlock = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        actionInfo: normalizeActionInfo(data['action']),
+        autoHeight: normalizeBoolean(data['auto-height'], false),
+        height: normalizeLength(data['height']),
+        horizontalAlignment: normalizeHorizontalAlignment(data['alignment']),
+        id: data['id'],
+        insets: normalizeInsets(data['inset']),
+        offsets: normalizeOffsets(data['offset']),
+        opacity: normalizeNumber(data['opacity'], 1.0),
+        position: normalizePosition(data['position']),
+        verticalAlignment: normalizeVerticalAlignment(data['alignment']),
+        width: normalizeLength(data['width']),
+        keys: normalizeKeys(data['custom-keys']),
+        tags: []
+    }
+}
+
+const normalizeBarcodeBlock = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        ...normalizeBlock(data),
+        ...normalizeBackground(data),
+        ...normalizeBorder(data),
+        barcodeScale: normalizeInteger(data['barcode-scale'], 1),
+        barcodeText: data['barcode-text'],
+        barcodeFormat: normalizeBarcodeFormat(data['barcode-type'])
+    }
+}
+
+const normalizeBarcodeFormat = data => {
+    switch (data) {
+        case 'qrcode':
+        case 'azteccode':
+        case 'hibcpdf417':
+        case 'code128':
+            return data
+        default:
+            return 'hibcpdf417'
+    }
+}
+
+const normalizeButtonBlock = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        ...normalizeBlock(data),
+        disabled: normalizeButtonState(data, 'disabled'),
+        highlighted: normalizeButtonState(data, 'highlighted'),
+        normal: normalizeButtonState(data, 'normal'),
+        selected: normalizeButtonState(data, 'selected'),
+    }
+}
+
+const normalizeButtonState = (data, name) => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    data = {
+        'background-content-mode': data['background-content-mode'],
+        'background-image': data['background-image'],
+        'background-scale': data['background-scale'],
+        ...(data['states'] || {})[name]
+    }
+
+    return {
+        ...normalizeBackground(data),
+        ...normalizeBorder(data),
+        ...normalizeText(data)
+    }
+}
+
+const normalizeImageBlock = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        ...normalizeBlock(data),
+        ...normalizeBackground(data),
+        ...normalizeBorder(data),
+        image: normalizeImage(data['image'])
+    }
+}
+
+const normalizeTextBlock = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        ...normalizeBlock(data),
+        ...normalizeBackground(data),
+        ...normalizeBorder(data),
+        ...normalizeText(data)
+    }
+}
+
+const normalizeText = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        text: data['text'],
+        textAlignment: normalizeTextAlignment(data['text-alignment']),
+        textColor: normalizeColor(data['text-color']),
+        textFont: normalizeFont(data['text-font'])
+    }
+}
+
+const normalizeTextAlignment = data => {
+    switch (data) {
+        case 'left':
+        case 'right':
+        case 'center':
+            return data
+        default:
+            return 'left'
+    }
+}
+
+const normalizeFont = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        size: normalizeInteger(data['size'], 15),
+        weight: normalizeFontWeight(data['weight'])
+    }
+}
+
+const normalizeFontWeight = data => {
+    switch (data) {
+        case 100:
+        case 200:
+        case 300:
+        case 400:
+        case 500:
+        case 600:
+        case 700:
+        case 800:
+        case 900:
+            return data
+        default:
+            return 400
+    }
+}
+
+const normalizeWebViewBlock = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        ...normalizeBlock(data),
+        ...normalizeBackground(data),
+        ...normalizeBorder(data),
+        isScrollingEnabled: normalizeBoolean(data['scrollable'], true),
+        url: data['url']
+    }
+}
+
+const normalizeRectangleBlock = data => {
+    if (data === null || data === undefined) {
+        return null
+    }
+
+    return {
+        ...normalizeBlock(data),
+        ...normalizeBackground(data),
+        ...normalizeBorder(data)
+    }
+}
+
+const normalizeKeys = data => {
+    if (typeof data === 'object') {
+        return data
+    }
+
+    return {}
 }
 
 const errorFromResponse = response => {
