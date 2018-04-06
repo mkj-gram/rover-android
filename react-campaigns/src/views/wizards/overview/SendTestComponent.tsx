@@ -6,7 +6,8 @@ import {
     titanium,
     Text,
     CheckBox,
-    white
+    white,
+    graphite
 } from '@rover/ts-bootstrap/dist/src'
 
 import { getIsSendTestModalOpen } from '../../../reducers'
@@ -172,11 +173,17 @@ class SendTestComponent extends React.Component<
                                 buttonLeftStyle: {
                                     outerStyle: {
                                         marginLeft: 24
+                                    },
+                                    innerStyle: {
+                                        color: graphite
                                     }
                                 },
                                 buttonRightStyle: {
                                     outerStyle: {
                                         marginRight: 24
+                                    },
+                                    innerStyle: {
+                                        color: graphite
                                     }
                                 }
                             }}

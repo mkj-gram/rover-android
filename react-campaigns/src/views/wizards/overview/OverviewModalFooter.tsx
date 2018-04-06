@@ -138,6 +138,16 @@ class OverviewModalFooter extends React.Component<
                 style: {
                     containerStyle: {
                         borderRadius: '3px 3px 0px 0px'
+                    },
+                    buttonLeftStyle: {
+                        innerStyle: {
+                            color: graphite
+                        }
+                    },
+                    buttonRightStyle: {
+                        innerStyle: {
+                            color: graphite
+                        }
                     }
                 },
                 buttonLeftCallback: this.handleSendTestToggle,
