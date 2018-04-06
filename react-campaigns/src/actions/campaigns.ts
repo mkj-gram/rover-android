@@ -2,16 +2,19 @@
 import gql from 'graphql-tag'
 import { Action, ActionCreator, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
-import { GraphQLRequest } from 'apollo-link'
 import { DocumentNode } from 'graphql'
 import Environment from '../Environment'
+import { setTimeout } from 'timers'
 
 export const updateNotificationSettings: ActionCreator<
-    ThunkAction<Promise<Action>, State, void>
+    ThunkAction<Promise<Action | void>, State, void>
 > = (
     campaign: ScheduledCampaign | AutomatedNotificationCampaign,
     campaignId: string
-) => (dispatch: Dispatch<State>, getState: () => State): Promise<Action> => {
+) => (
+    dispatch: Dispatch<State>,
+    getState: () => State
+): Promise<Action | void> => {
     const query: DocumentNode = gql`
         mutation UpdateNotificationSetting(
             $campaignId: Int!
@@ -129,35 +132,47 @@ export const updateNotificationSettings: ActionCreator<
     }
 
     return Environment(request).then(
-        ({ data }) => {
-            const campaign = data.updateNotificationSettings
-            const campaigns = {
-                ...getState().campaigns,
-                [campaign.campaignId]: {
-                    ...campaign
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: 'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                const campaign = data.updateNotificationSettings
+                const campaigns = {
+                    ...getState().campaigns,
+                    [campaign.campaignId]: {
+                        ...campaign
+                    }
                 }
+                return dispatch({
+                    type: 'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_SUCCESS',
+                    campaigns
+                })
             }
-            dispatch({
-                type: 'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_SUCCESS',
-                campaigns
-            })
-            return Promise.resolve(data)
         },
-        error => {
-            return dispatch({
+        ({ result }) => {
+            dispatch({
                 type: 'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_FAILURE',
-                message: error.message
+                message: result.errors[0].message
             })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
         }
     )
 }
 
 export const duplicateCampaign: ActionCreator<
-    ThunkAction<Promise<Action>, State, void>
+    ThunkAction<Promise<Action | void>, State, void>
 > = (name: string, campaignId: number) => (
     dispatch: Dispatch<State>,
     getState: () => State
-): Promise<Action> => {
+): Promise<Action | void> => {
     const query: DocumentNode = gql`
         mutation DuplicateCampaign($name: String!, $campaignId: Int!) {
             duplicateCampaign(name: $name, campaignId: $campaignId) {
@@ -230,35 +245,49 @@ export const duplicateCampaign: ActionCreator<
     }
 
     return Environment(request).then(
-        ({ data }) => {
-            const campaigns = {
-                ...getState().campaigns,
-                [data.duplicateCampaign.campaignId]: {
-                    ...data.duplicateCampaign
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: 'DUPLICATE_CAMPAIGN_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+                return Promise.resolve(campaignId)
+            } else {
+                const campaigns = {
+                    ...getState().campaigns,
+                    [data.duplicateCampaign.campaignId]: {
+                        ...data.duplicateCampaign
+                    }
                 }
-            }
-            dispatch({
-                type: 'DUPLICATE_CAMPAIGN_SUCCESS',
-                campaigns
-            })
+                dispatch({
+                    type: 'DUPLICATE_CAMPAIGN_SUCCESS',
+                    campaigns
+                })
 
-            return Promise.resolve(data.duplicateCampaign.campaignId)
+                return Promise.resolve(data.duplicateCampaign.campaignId)
+            }
         },
-        error => {
-            return dispatch({
+        ({ result }) => {
+            dispatch({
                 type: 'DUPLICATE_CAMPAIGN_FAILURE',
-                message: error.message
+                message: result.errors[0].message
             })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
         }
     )
 }
 
 export const archiveCampaign: ActionCreator<
-    ThunkAction<Promise<Action>, State, void>
+    ThunkAction<Promise<Action | void>, State, void>
 > = (campaignId: number) => (
     dispatch: Dispatch<State>,
     getState: () => State
-): Promise<Action> => {
+): Promise<Action | void> => {
     const query: DocumentNode = gql`
         mutation ArchiveCampaign($campaignId: Int!) {
             archiveCampaign(campaignId: $campaignId)
@@ -273,35 +302,48 @@ export const archiveCampaign: ActionCreator<
     }
 
     return Environment(request).then(
-        ({ data }) => {
-            const campaigns = {
-                ...getState().campaigns,
-                [campaignId]: {
-                    ...getState().campaigns[campaignId],
-                    campaignStatus: 'ARCHIVED'
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: ' ARCHIVE_CAMPAIGN_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                const campaigns = {
+                    ...getState().campaigns,
+                    [campaignId]: {
+                        ...getState().campaigns[campaignId],
+                        campaignStatus: 'ARCHIVED'
+                    }
                 }
+                dispatch({
+                    type: 'ARCHIVE_CAMPAIGN_SUCCESS',
+                    campaigns
+                })
+                return Promise.resolve(data.archiveCampaign)
             }
-            dispatch({
-                type: 'ARCHIVE_CAMPAIGN_SUCCESS',
-                campaigns
-            })
-            return Promise.resolve(data.archiveCampaign)
         },
-        error => {
-            return dispatch({
+        ({ result }) => {
+            dispatch({
                 type: ' ARCHIVE_CAMPAIGN_FAILURE',
-                message: error.message
+                message: result.errors[0].message
             })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
         }
     )
 }
 
 export const renameCampaign: ActionCreator<
-    ThunkAction<Promise<Action>, State, void>
+    ThunkAction<Promise<Action | void>, State, void>
 > = (name: string, campaignId: number) => (
     dispatch: Dispatch<State>,
     getState: () => State
-): Promise<Action> => {
+): Promise<Action | void> => {
     const query: DocumentNode = gql`
         mutation RenameCampaign($name: String!, $campaignId: Int!) {
             renameCampaign(name: $name, campaignId: $campaignId)
@@ -317,36 +359,49 @@ export const renameCampaign: ActionCreator<
     }
 
     return Environment(request).then(
-        ({ data }) => {
-            const campaigns = {
-                ...getState().campaigns,
-                [campaignId]: {
-                    ...getState().campaigns[campaignId],
-                    name
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: ' RENAME_CAMPAIGN_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                const campaigns = {
+                    ...getState().campaigns,
+                    [campaignId]: {
+                        ...getState().campaigns[campaignId],
+                        name
+                    }
                 }
+                return dispatch({
+                    type: 'RENAME_CAMPAIGN_SUCCESS',
+                    campaigns
+                })
             }
-            return dispatch({
-                type: 'RENAME_CAMPAIGN_SUCCESS',
-                campaigns
-            })
         },
-        error => {
-            return dispatch({
+        ({ result }) => {
+            dispatch({
                 type: ' RENAME_CAMPAIGN_FAILURE',
-                message: error.message
+                message: result.errors[0].message
             })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
         }
     )
 }
 
 export const fetchCampaigns: ActionCreator<
-    ThunkAction<Promise<Action>, State, void>
+    ThunkAction<Promise<Action | void>, State, void>
 > = (
     campaignStatus: CampaignStatus,
     campaignType: CampaignType,
     pageNumber: number,
     keyword: string
-) => (dispatch: Dispatch<State>): Promise<Action> => {
+) => (dispatch: Dispatch<State>): Promise<Action | void> => {
     // dispatch({ type: 'FETCH_CAMPAIGNS_REQUEST' })
     const query: DocumentNode = gql`
         query FetchCampaigns(
@@ -432,38 +487,51 @@ export const fetchCampaigns: ActionCreator<
         }
     }
     return Environment(request).then(
-        ({ data }) => {
-            let campaigns = null
-            if (data.campaigns) {
-                campaigns = data.campaigns.reduce(
-                    (prev: Campaign, next: Campaign) => {
-                        return { [next.campaignId]: next, ...prev }
-                        // tslint:disable-next-line:align
-                    },
-                    {}
-                )
-            }
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: 'FETCH_CAMPAIGNS_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                let campaigns = null
+                if (data.campaigns) {
+                    campaigns = data.campaigns.reduce(
+                        (prev: Campaign, next: Campaign) => {
+                            return { [next.campaignId]: next, ...prev }
+                            // tslint:disable-next-line:align
+                        },
+                        {}
+                    )
+                }
 
-            return dispatch({
-                type: 'FETCH_CAMPAIGNS_SUCCESS',
-                campaigns
-            })
+                return dispatch({
+                    type: 'FETCH_CAMPAIGNS_SUCCESS',
+                    campaigns
+                })
+            }
         },
-        error => {
-            return dispatch({
+        ({ result }) => {
+            dispatch({
                 type: 'FETCH_CAMPAIGNS_FAILURE',
-                message: error.message
+                message: result.errors[0].message
             })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
         }
     )
 }
 
 export const createCampaign: ActionCreator<
-    ThunkAction<Promise<Action>, State, void>
+    ThunkAction<Promise<Action | void>, State, void>
 > = (name: string, campaignType: CampaignType) => (
     dispatch: Dispatch<State>,
     getState: () => State
-): Promise<Action> => {
+): Promise<Action | void> => {
     dispatch({ type: `CREATE_CAMPAIGN_REQUEST` })
 
     const query = gql`
@@ -538,24 +606,40 @@ export const createCampaign: ActionCreator<
     }
 
     return Environment(request).then(
-        ({ data }) => {
-            const campaigns = {
-                ...getState().campaigns,
-                [data.createCampaign.campaignId]: { ...data.createCampaign }
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({ type: `CLOSE_NEW_CAMPAIGN_POPOVER` })
+                dispatch({
+                    type: 'CREATE_CAMPAIGN_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                const campaigns = {
+                    ...getState().campaigns,
+                    [data.createCampaign.campaignId]: {
+                        ...data.createCampaign
+                    }
+                }
+                dispatch({
+                    type: 'CREATE_CAMPAIGN_SUCCESS',
+                    campaigns
+                })
+                dispatch({ type: `CLOSE_NEW_CAMPAIGN_POPOVER` })
+                return Promise.resolve(data.createCampaign.campaignId)
             }
-            dispatch({
-                type: 'CREATE_CAMPAIGN_SUCCESS',
-                campaigns
-            })
-            dispatch({ type: `CLOSE_NEW_CAMPAIGN_POPOVER` })
-            return Promise.resolve(data.createCampaign.campaignId)
         },
-        error => {
+        ({ result }) => {
             dispatch({ type: `CLOSE_NEW_CAMPAIGN_POPOVER` })
-            return dispatch({
+            dispatch({
                 type: 'CREATE_CAMPAIGN_FAILURE',
-                message: error.message
+                message: result.errors[0].message
             })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
         }
     )
 }

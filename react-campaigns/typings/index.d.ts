@@ -174,7 +174,10 @@ type AppState = {
     notificationDelivery: NotificationDeliveryState
     notification: NotificationState
     overview: OverviewModalState
+    error: ErrorState
 }
+
+type ErrorState = StringMap<string | boolean>
 
 type OverviewModalState = {
     readonly isOverviewModalOpen: string

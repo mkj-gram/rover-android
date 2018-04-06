@@ -28,6 +28,4 @@ const link = new HttpLink({
 
 export default (operation: GraphQLRequest) => {
     return makePromise(execute(link, operation))
-        .then(data => data)
-        .catch(error => error)
 }

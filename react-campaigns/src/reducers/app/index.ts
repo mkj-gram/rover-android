@@ -6,12 +6,14 @@ import home, * as homeSelector from './home'
 import notificationDelivery, * as notificationDeliverySelector from './notificationDelivery'
 import notification, * as notificationSelector from './notification'
 import overview, * as overviewSelector from './overview'
+import error, * as errorSelector from './error'
 
 export default combineReducers({
     notification,
     home,
     notificationDelivery,
-    overview
+    overview,
+    error
 })
 
 export const getIsCreatingCampaign = (state: AppState) =>
@@ -58,3 +60,6 @@ export const getIsTapBehaviorWebsitePresentationOpen = (state: AppState) =>
     notificationSelector.getIsTapBehaviorWebsitePresentationOpen(
         state.notification
     )
+
+export const getIsError = (state: AppState) =>
+    errorSelector.getIsError(state.error)

@@ -8,13 +8,13 @@ import { GraphQLRequest } from 'apollo-link'
 import { DocumentNode } from 'graphql'
 
 export const sendTest: ActionCreator<
-    ThunkAction<Promise<Action>, State, void>
+    ThunkAction<Promise<Action | void>, State, void>
 > = (campaignId: number, deviceIds: string[]) => (
     dispatch: Dispatch<State>
-): Promise<Action> => {
+): Promise<Action | void> => {
     const query: DocumentNode = gql`
-        mutation SendTest($campaignId: Int!, $deviceIds: [String]) {
-            sendTest(campaignId: $campaignId, deviceIds: $deviceIds)
+        mutation SendTestCampaign($campaignId: Int!, $deviceIds: [String]) {
+            sendTestCampaign(campaignId: $campaignId, deviceIds: $deviceIds)
         }
     `
 
@@ -26,16 +26,30 @@ export const sendTest: ActionCreator<
         }
     }
 
-    return Environment(request).then(({ data, errors }) => {
-        if (errors) {
-            return dispatch({
+    return Environment(request).then(
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: 'SEND_TEST_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                return dispatch({
+                    type: 'SEND_TEST_SUCCESS'
+                })
+            }
+        },
+        ({ result }) => {
+            dispatch({
                 type: 'SEND_TEST_FAILURE',
-                message: errors.message
+                message: result.errors[0].message
             })
-        } else {
-            return dispatch({
-                type: 'SEND_TEST_SUCCESS'
-            })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
         }
-    })
+    )
 }

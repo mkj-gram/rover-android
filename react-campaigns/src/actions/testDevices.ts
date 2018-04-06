@@ -8,8 +8,8 @@ import { GraphQLRequest } from 'apollo-link'
 import { DocumentNode } from 'graphql'
 
 export const fetchTestDevices: ActionCreator<
-    ThunkAction<Promise<Action>, State, void>
-> = () => (dispatch: Dispatch<State>): Promise<Action> => {
+    ThunkAction<Promise<Action | void>, State, void>
+> = () => (dispatch: Dispatch<State>): Promise<Action | void> => {
     const query: DocumentNode = gql`
         query FetchTestDevices(
             $predicates: String!
@@ -42,29 +42,44 @@ export const fetchTestDevices: ActionCreator<
     }
 
     return Environment(request).then(
-        ({ data }) => {
-            let testDevices: StringMap<string> = {}
-            // tslint:disable-next-line:no-any
-            data.segmentFromPredicates.dataGridRows.forEach((elem: any) => {
-                testDevices[
-                    elem.filter(
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: 'FETCH_TEST_DEVICES_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                let testDevices: StringMap<string> = {}
+                // tslint:disable-next-line:no-any
+                data.segmentFromPredicates.dataGridRows.forEach((elem: any) => {
+                    testDevices[
+                        elem.filter(
+                            // tslint:disable-next-line:no-any
+                            (v: any) => v.attribute === 'device_id'
+                        )[0].value
                         // tslint:disable-next-line:no-any
-                        (v: any) => v.attribute === 'device_id'
+                    ] = elem.filter(
+                        (v: any) => v.attribute === 'label'
                     )[0].value
-                    // tslint:disable-next-line:no-any
-                ] = elem.filter((v: any) => v.attribute === 'label')[0].value
-            })
+                })
 
-            return dispatch({
-                type: 'FETCH_TEST_DEVICES_SUCCESS',
-                testDevices
-            })
+                return dispatch({
+                    type: 'FETCH_TEST_DEVICES_SUCCESS',
+                    testDevices
+                })
+            }
         },
-        error => {
-            return dispatch({
+        ({ result }) => {
+            dispatch({
                 type: 'FETCH_TEST_DEVICES_FAILURE',
-                message: error.message
+                message: result.errors[0].message
             })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
         }
     )
 }

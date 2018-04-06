@@ -14,6 +14,9 @@ export default combineReducers({
     editableCampaign
 })
 
+// Error
+export const getIsError = (state: State) => appSelector.getIsError(state.app)
+
 // App
 export const getIsCreatingCampaign = (state: State) =>
     appSelector.getIsCreatingCampaign(state.app)

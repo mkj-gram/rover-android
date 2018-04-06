@@ -1,11 +1,14 @@
 /// <reference path="../../../typings/index.d.ts"/>
 
 import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 import { connect, Dispatch } from 'react-redux'
 import { withRouter, RouteComponentProps, match as Match } from 'react-router'
 import { Route, Link, Switch } from 'react-router-dom'
 import * as H from 'history'
 import { parse, stringify } from 'qs'
+
+import { Alert } from '@rover/ts-bootstrap/dist/src'
 
 import {
     closeCampaignTypeSelector,
@@ -13,7 +16,7 @@ import {
     fetchCampaigns,
     handleOverviewModalDisplay
 } from '../../actions'
-import { getAllCampaigns } from '../../reducers'
+import { getAllCampaigns, getIsError } from '../../reducers'
 
 import NavBar from './NavBar'
 import CampaignsList from './CampaignsList'
@@ -35,6 +38,7 @@ export interface DispatchProps {
 
 export interface StateProps {
     campaigns: StringMap<Campaign>
+    isError: StringMap<boolean | string>
 }
 
 export interface ListPageState {}
@@ -157,6 +161,7 @@ class ListPage extends React.PureComponent<
         const shouldShowWizard =
             location.pathname === '/campaigns/wizard/' &&
             Object.keys(campaigns).includes(campaignId)
+
         return (
             <Route
                 path={location.pathname}
@@ -212,6 +217,26 @@ class ListPage extends React.PureComponent<
                                 }
                             />
                         </div>
+                        {this.props.isError.error &&
+                            ReactDOM.createPortal(
+                                <div
+                                    style={{
+                                        zIndex: 20,
+                                        justifyContent: 'center',
+                                        position: 'absolute',
+                                        width: 300,
+                                        top: 5,
+                                        left: 'calc(50% - 150px)',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    <Alert
+                                        message="Oops! Something went wrong."
+                                        type="error"
+                                    />
+                                </div>,
+                                document.getElementById('root')
+                            )}
                     </Fragment>
                 )}
             />
@@ -268,14 +293,18 @@ const mapDispatchToProps = (
         createCampaign: (name, cType) => {
             dispatch(createCampaign(name, cType)).then(campaignId => {
                 let path
-                if (!ownProps.location.search.includes('?')) {
-                    path = `${ownProps.location.pathname}wizard/${
-                        ownProps.location.search
-                    }?campaignId=${campaignId}`
+                if (campaignId === undefined) {
+                    path = ownProps.location.pathname
                 } else {
-                    path = `${ownProps.location.pathname}wizard/${
-                        ownProps.location.search
-                    }&campaignId=${campaignId}`
+                    if (!ownProps.location.search.includes('?')) {
+                        path = `${ownProps.location.pathname}wizard/${
+                            ownProps.location.search
+                        }?campaignId=${campaignId}`
+                    } else {
+                        path = `${ownProps.location.pathname}wizard/${
+                            ownProps.location.search
+                        }&campaignId=${campaignId}`
+                    }
                 }
 
                 ownProps.history.push(path)
@@ -298,7 +327,8 @@ const mapDispatchToProps = (
     }
 }
 const mapStateToProps = (state: State): StateProps => ({
-    campaigns: state.campaigns
+    campaigns: state.campaigns,
+    isError: getIsError(state)
 })
 
 export default ResponsiveContainer()(
