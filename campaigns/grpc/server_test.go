@@ -401,6 +401,223 @@ func test_List(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "list draft automated notification campaigns",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 3},
+
+				CampaignStatus: campaignspb.CampaignStatus_DRAFT,
+				CampaignType:   campaignspb.CampaignType_AUTOMATED_NOTIFICATION,
+			},
+
+			exp: &campaignspb.ListResponse{
+				Campaigns: []*campaignspb.Campaign{
+					{
+						Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+							AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+
+								CampaignId:     10,
+								Name:           "c10",
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list published automated notification campaigns",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 3},
+
+				CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+				CampaignType:   campaignspb.CampaignType_AUTOMATED_NOTIFICATION,
+			},
+
+			exp: &campaignspb.ListResponse{
+				Campaigns: []*campaignspb.Campaign{
+					{
+						Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+							AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+
+								CampaignId:     11,
+								Name:           "c11",
+								CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list archived automated notification campaigns",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 3},
+
+				CampaignStatus: campaignspb.CampaignStatus_ARCHIVED,
+				CampaignType:   campaignspb.CampaignType_AUTOMATED_NOTIFICATION,
+			},
+
+			exp: &campaignspb.ListResponse{
+				Campaigns: []*campaignspb.Campaign{
+					{
+						Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+							AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+
+								CampaignId:     12,
+								Name:           "c12",
+								CampaignStatus: campaignspb.CampaignStatus_ARCHIVED,
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list all automated notification campaigns",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 3},
+
+				CampaignType: campaignspb.CampaignType_AUTOMATED_NOTIFICATION,
+			},
+
+			exp: &campaignspb.ListResponse{
+				Campaigns: []*campaignspb.Campaign{
+					{
+						Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+							AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+
+								CampaignId:     12,
+								Name:           "c12",
+								CampaignStatus: campaignspb.CampaignStatus_ARCHIVED,
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+					{
+						Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+							AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+
+								CampaignId:     11,
+								Name:           "c11",
+								CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+					{
+						Campaign: &campaignspb.Campaign_AutomatedNotificationCampaign{
+							AutomatedNotificationCampaign: &campaignspb.AutomatedNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+
+								CampaignId:     10,
+								Name:           "c10",
+								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+
+								AutomatedMonday:    true,
+								AutomatedTuesday:   true,
+								AutomatedWednesday: true,
+								AutomatedThursday:  true,
+								AutomatedFriday:    true,
+								AutomatedSaturday:  true,
+								AutomatedSunday:    true,
+
+								AutomatedFrequencySingleUse: true,
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {

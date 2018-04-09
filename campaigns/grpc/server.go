@@ -91,8 +91,8 @@ func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campa
 	var (
 		params = db.ListParams{
 			AccountId:      req.AuthContext.AccountId,
-			CampaignStatus: int32(req.CampaignStatus),
-			CampaignType:   int32(req.CampaignType),
+			CampaignStatus: req.CampaignStatus.String(),
+			CampaignType:   req.CampaignType.String(),
 			Keyword:        req.Keyword,
 			PageSize:       req.PageSize,
 			Page:           req.Page,

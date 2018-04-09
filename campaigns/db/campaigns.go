@@ -29,8 +29,8 @@ type (
 
 	ListParams struct {
 		AccountId      int32
-		CampaignType   int32
-		CampaignStatus int32
+		CampaignType   string
+		CampaignStatus string
 		// filter
 		Keyword string
 
@@ -88,12 +88,12 @@ func (db *campaignsStore) List(ctx context.Context, params ListParams) ([]*campa
 		`
 	)
 
-	if params.CampaignStatus > 0 {
+	if params.CampaignStatus != "UNKNOWN" {
 		q += ` AND campaign_status = :campaign_status`
 		args["campaign_status"] = params.CampaignStatus
 	}
 
-	if params.CampaignType > 0 {
+	if params.CampaignType != "UNKNOWN" {
 		q += ` AND campaign_type = :campaign_type `
 		args["campaign_type"] = params.CampaignType
 	}

@@ -8,7 +8,7 @@ ROVER ?= github.com/roverplatform/rover
 ROVER_GOPATH ?= /go/src/${ROVER}
 
 test:
-	${RUN} go test -tags integration -v ${ROVER}/campaigns/...
+	${RUN} go test -tags integration ${ROVER}/campaigns/...
 
 run:
 	${RUN}
