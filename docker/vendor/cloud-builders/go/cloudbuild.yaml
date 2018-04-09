@@ -7,6 +7,15 @@ steps:
       - --file=docker/vendor/cloud-builders/go/golang-1.9-alpine.Dockerfile
       - docker/vendor/cloud-builders/go/
 
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - --cache-from=gcr.io/$PROJECT_ID/golang:1.10-alpine
+      - --tag=gcr.io/$PROJECT_ID/golang:1.10-alpine
+      - --file=docker/vendor/cloud-builders/go/golang-1.10-alpine.Dockerfile
+      - docker/vendor/cloud-builders/go/
+
 images:
   - 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
+  - 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
 

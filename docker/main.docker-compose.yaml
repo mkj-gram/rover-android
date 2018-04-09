@@ -173,6 +173,19 @@ services:
       DB_DSN: "postgres://postgres:@postgres:5432/campaigns_dev?sslmode=disable"
       AUDIENCE_SERVICE_URL: "audience-service:5100"
 
+  notification-service:
+    image: golang:1.10-alpine
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - postgres
+    command: ./docker/notification-service/cmd migrate run
+    volumes:
+      - ../:/go/src/github.com/roverplatform/rover
+    environment:
+      CGO_ENABLED: 0
+      DB_DSN: "postgres://postgres:@postgres:5432/notification_dev?sslmode=disable"
+      TEST_DB_DSN: "postgres://postgres:@postgres:5432/notification_test?sslmode=disable"
+
   campaigns-frontend:
     image: node:7.5.0
     depends_on:

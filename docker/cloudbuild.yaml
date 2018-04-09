@@ -3,8 +3,8 @@ steps:
 # ----------------------------------------------------- #
 #                   Container Cache                     #
 #                                                       #
-#     Fetch and cache images used to build and test     #   
-#    Allows for parallel steps to reuse cache images    #                                                
+#     Fetch and cache images used to build and test     #
+#    Allows for parallel steps to reuse cache images    #
 # ----------------------------------------------------- #
 
   - id: 'container-cache-docker-compose-1.16.1'
@@ -34,7 +34,7 @@ steps:
 # ----------------------------------------------------- #
 #                Formatting & Linting                   #
 #                                                       #
-# Run lint and formatting checkers before installation  #                                                    
+# Run lint and formatting checkers before installation  #
 # ----------------------------------------------------- #
   
   # TODO turn this into a prebuilt go-fmt container with more
@@ -87,7 +87,7 @@ steps:
 # ----------------------------------------------------- #
 #                    Installation                       #
 #                                                       #
-#  Use this stage to import external packages eg. npm   #                                                    
+#  Use this stage to import external packages eg. npm   #
 # ----------------------------------------------------- #
 
 
@@ -236,6 +236,21 @@ steps:
     waitFor:
       - 'install-complete'
 
+# Notification Service
+  - id: 'test-notification-service'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -p
+      - test-notification-service
+      - -f
+      - ./docker/main.docker-compose.yaml
+      - run
+      - notification-service
+      - docker/notification-service/cmd
+      - test
+    waitFor:
+      - 'install-complete'
+
 # Events Pipeline
   - id: 'test-events-pipeline'
     name: 'docker/compose:1.16.1'
@@ -270,7 +285,7 @@ steps:
     dir: 'sdk-api'
     waitFor:
       - 'install-complete'
-      
+
 # Bulk Gateway
   - id: 'test-bulk-gateway'
     name: 'node:7.10.1'
@@ -372,6 +387,7 @@ steps:
     waitFor:
       - 'test-complete'
 
+
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
@@ -379,6 +395,51 @@ steps:
       - docker/campaigns-service/
     waitFor:
       - 'build-campaigns-service-executable'
+
+
+# Notification Service
+  - id: 'build-notification-service-executable'
+    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/notification-service/notification-service
+      - ./notification/cmd/notification-service
+    waitFor:
+      - 'test-complete'
+
+  - id: 'build-notification-postgres-cli'
+    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/notification-service/postgres-cli
+      - ./go/cmd/postgres-cli
+    waitFor:
+      - 'test-complete'
+
+  - id: 'build-notification-migrations'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - -c
+      - cp -r notification/postgres/migrations docker/notification-service/
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - --tag=gcr.io/$PROJECT_ID/notification-service:$REVISION_ID
+      - docker/notification-service/
+    waitFor:
+      - 'build-notification-service-executable'
+      - 'build-notification-postgres-cli'
+      - 'build-notification-migrations'
 
 # Events Pipeline
   - id: 'build-events-pipeline-executable'
@@ -555,6 +616,7 @@ images:
   - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/campaigns-service:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/notification-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/events-pipeline:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'

@@ -5,6 +5,7 @@ require 'google/protobuf'
 
 require 'auth/v1/auth_pb'
 require 'protobuf/version_pb'
+require 'google/protobuf/timestamp_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.notification.v1.PushEnvironment" do
   end
@@ -73,6 +74,87 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.notification.v1.SendCampaignNotificationResponse" do
   end
+  add_message "rover.notification.v1.Platform" do
+    oneof :paltform do
+      optional :ios_platform, :message, 1, "rover.notification.v1.IosPlatform"
+      optional :android_platform, :message, 2, "rover.notification.v1.AndroidPlatform"
+    end
+  end
+  add_message "rover.notification.v1.IosPlatform" do
+    optional :id, :int32, 1
+    optional :account_id, :int32, 2
+    optional :title, :string, 3
+    optional :bundle_id, :string, 4
+    optional :certificate_data, :bytes, 5
+    optional :certificate_passphrase, :string, 6
+    optional :certificate_filename, :string, 7
+    optional :certificate_expires_at, :message, 8, "google.protobuf.Timestamp"
+    optional :certificate_updated_at, :message, 9, "google.protobuf.Timestamp"
+    optional :updated_at, :message, 18, "google.protobuf.Timestamp"
+    optional :created_at, :message, 19, "google.protobuf.Timestamp"
+  end
+  add_message "rover.notification.v1.AndroidPlatform" do
+    optional :id, :int32, 1
+    optional :account_id, :int32, 2
+    optional :title, :string, 3
+    optional :push_credentials_server_key, :string, 5
+    optional :push_credentials_sender_id, :string, 6
+    optional :push_credentials_updated_at, :message, 7, "google.protobuf.Timestamp"
+    optional :updated_at, :message, 10, "google.protobuf.Timestamp"
+    optional :created_at, :message, 11, "google.protobuf.Timestamp"
+  end
+  add_message "rover.notification.v1.CreateIosPlatformRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :title, :string, 3
+    optional :certificate_data, :bytes, 5
+    optional :certificate_passphrase, :string, 6
+    optional :certificate_filename, :string, 7
+  end
+  add_message "rover.notification.v1.CreateIosPlatformResponse" do
+    optional :ios_platform, :message, 1, "rover.notification.v1.IosPlatform"
+  end
+  add_message "rover.notification.v1.GetIosPlatformRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :ios_platform_id, :int32, 2
+  end
+  add_message "rover.notification.v1.GetIosPlatformResponse" do
+    optional :ios_platform, :message, 1, "rover.notification.v1.IosPlatform"
+  end
+  add_message "rover.notification.v1.UpdateIosPlatformPushCertificateRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :ios_platform_id, :int32, 2
+    optional :certificate_data, :bytes, 3
+    optional :certificate_passphrase, :string, 4
+    optional :certificate_filename, :string, 5
+  end
+  add_message "rover.notification.v1.UpdateIosPlatformPushCertificateResponse" do
+    optional :ios_platform, :message, 1, "rover.notification.v1.IosPlatform"
+  end
+  add_message "rover.notification.v1.CreateAndroidPlatformRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :title, :string, 3
+    optional :push_credentials_server_key, :string, 4
+    optional :push_credentials_sender_id, :string, 5
+  end
+  add_message "rover.notification.v1.CreateAndroidPlatformResponse" do
+    optional :android_platform, :message, 1, "rover.notification.v1.AndroidPlatform"
+  end
+  add_message "rover.notification.v1.GetAndroidPlatformRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :android_platform_id, :int32, 2
+  end
+  add_message "rover.notification.v1.GetAndroidPlatformResponse" do
+    optional :android_platform, :message, 1, "rover.notification.v1.AndroidPlatform"
+  end
+  add_message "rover.notification.v1.UpdateAndroidPlatformPushCredentialsRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :android_platform_id, :int32, 2
+    optional :push_credentials_server_key, :string, 3
+    optional :push_credentials_sender_id, :string, 4
+  end
+  add_message "rover.notification.v1.UpdateAndroidPlatformPushCredentialsResponse" do
+    optional :android_platform, :message, 1, "rover.notification.v1.AndroidPlatform"
+  end
 end
 
 module Rover
@@ -89,6 +171,21 @@ module Rover
       SendCampaignNotificationRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationRequest").msgclass
       SendCampaignNotificationRequest::Message = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationRequest.Message").msgclass
       SendCampaignNotificationResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationResponse").msgclass
+      Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.Platform").msgclass
+      IosPlatform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.IosPlatform").msgclass
+      AndroidPlatform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.AndroidPlatform").msgclass
+      CreateIosPlatformRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.CreateIosPlatformRequest").msgclass
+      CreateIosPlatformResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.CreateIosPlatformResponse").msgclass
+      GetIosPlatformRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.GetIosPlatformRequest").msgclass
+      GetIosPlatformResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.GetIosPlatformResponse").msgclass
+      UpdateIosPlatformPushCertificateRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.UpdateIosPlatformPushCertificateRequest").msgclass
+      UpdateIosPlatformPushCertificateResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.UpdateIosPlatformPushCertificateResponse").msgclass
+      CreateAndroidPlatformRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.CreateAndroidPlatformRequest").msgclass
+      CreateAndroidPlatformResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.CreateAndroidPlatformResponse").msgclass
+      GetAndroidPlatformRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.GetAndroidPlatformRequest").msgclass
+      GetAndroidPlatformResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.GetAndroidPlatformResponse").msgclass
+      UpdateAndroidPlatformPushCredentialsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.UpdateAndroidPlatformPushCredentialsRequest").msgclass
+      UpdateAndroidPlatformPushCredentialsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.UpdateAndroidPlatformPushCredentialsResponse").msgclass
     end
   end
 end

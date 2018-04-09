@@ -175,11 +175,13 @@ func main() {
 		snw = campaignjobs.ScheduledNotificationJob{
 			AudienceClient: audienceClient,
 			CampaignsStore: pgdb.CampaignsStore(),
-			NotificationClient: printer(func(ctx context.Context, req *notification.SendCampaignNotificationRequest) (*notification.SendCampaignNotificationResponse, error) {
-				log.Printf("notification: %v", req)
-				var notification_err error // == do notification
-				return &notification.SendCampaignNotificationResponse{}, notification_err
-			}),
+			NotificationClient: &printer{
+				fn: func(ctx context.Context, req *notification.SendCampaignNotificationRequest) (*notification.SendCampaignNotificationResponse, error) {
+					log.Printf("notification: %v", req)
+					var notification_err error // == do notification
+					return &notification.SendCampaignNotificationResponse{}, notification_err
+				},
+			},
 		}
 
 		worker = func(n int) {
@@ -327,8 +329,11 @@ func statusOk(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(r.URL.Path + ":ok\n"))
 }
 
-type printer func(context.Context, *notification.SendCampaignNotificationRequest) (*notification.SendCampaignNotificationResponse, error)
+type printer struct {
+	notification.NotificationClient
+	fn func(context.Context, *notification.SendCampaignNotificationRequest) (*notification.SendCampaignNotificationResponse, error)
+}
 
-func (fn printer) SendCampaignNotification(ctx context.Context, req *notification.SendCampaignNotificationRequest, opts ...grpc.CallOption) (*notification.SendCampaignNotificationResponse, error) {
-	return fn(ctx, req)
+func (p printer) SendCampaignNotification(ctx context.Context, req *notification.SendCampaignNotificationRequest, opts ...grpc.CallOption) (*notification.SendCampaignNotificationResponse, error) {
+	return p.fn(ctx, req)
 }

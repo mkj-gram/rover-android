@@ -15,6 +15,7 @@ PROTO_PATH=$GOPATH/src/
 GO_MAPS="Mgoogle/protobuf/timestamp.proto=github.com/roverplatform/rover/go/protobuf/ptypes/timestamp\
 ,Mauth/v1/auth.proto=github.com/roverplatform/rover/apis/go/auth/v1\
 ,Maudience/v1/audience.proto=github.com/roverplatform/rover/apis/go/audience/v1\
+,Mnotification/v1/notification.proto=github.com/roverplatform/rover/apis/go/notification/v1\
 ,Mprotobuf/predicates.proto=github.com/roverplatform/rover/apis/go/protobuf/predicates\
 ,Mprotobuf/version.proto=github.com/roverplatform/rover/apis/go/protobuf\
 ,Mprotobuf/wrappers.proto=github.com/roverplatform/rover/apis/go/protobuf/wrappers\

@@ -17,6 +17,17 @@ module Rover
           self.service_name = 'rover.notification.v1.Notification'
 
           rpc :SendCampaignNotification, SendCampaignNotificationRequest, SendCampaignNotificationResponse
+          # Crud
+          # rpc ListPlatforms(ListPlatformsRequest) returns (ListPlatformResponse);
+          #
+          # rpc ListIosPlatforms(ListIosPlatformsRequest) returns (ListIosPlatformsResponse);
+          rpc :GetIosPlatform, GetIosPlatformRequest, GetIosPlatformResponse
+          rpc :CreateIosPlatform, CreateIosPlatformRequest, CreateIosPlatformResponse
+          rpc :UpdateIosPlatformPushCertificate, UpdateIosPlatformPushCertificateRequest, UpdateIosPlatformPushCertificateResponse
+          # rpc ListAndroidPlatform(ListAndroidPlatformRequest) returns(ListAndroidPlatformResponse);
+          rpc :CreateAndroidPlatform, CreateAndroidPlatformRequest, CreateAndroidPlatformResponse
+          rpc :GetAndroidPlatform, GetAndroidPlatformRequest, GetAndroidPlatformResponse
+          rpc :UpdateAndroidPlatformPushCredentials, UpdateAndroidPlatformPushCredentialsRequest, UpdateAndroidPlatformPushCredentialsResponse
         end
 
         Stub = Service.rpc_stub_class

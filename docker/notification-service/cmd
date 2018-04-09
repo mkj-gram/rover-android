@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+# set -x
+
+
+SVC_HOME=./notification
+
+run() {
+	go run $SVC_HOME/cmd/notification-service/main.go
+}
+
+test() {
+  go test $SVC_HOME/...
+}
+
+migrate() {
+  go run ./go/cmd/postgres-cli/main.go \
+    --migration-path=$SVC_HOME/postgres/migrations
+}
+
+for cmd in $@; do
+  $cmd
+done

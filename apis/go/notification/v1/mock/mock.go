@@ -35,6 +35,78 @@ func (m *MockNotificationClient) EXPECT() *MockNotificationClientMockRecorder {
 	return m.recorder
 }
 
+// CreateAndroidPlatform mocks base method
+func (m *MockNotificationClient) CreateAndroidPlatform(arg0 context.Context, arg1 *v1.CreateAndroidPlatformRequest, arg2 ...grpc.CallOption) (*v1.CreateAndroidPlatformResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateAndroidPlatform", varargs...)
+	ret0, _ := ret[0].(*v1.CreateAndroidPlatformResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateAndroidPlatform indicates an expected call of CreateAndroidPlatform
+func (mr *MockNotificationClientMockRecorder) CreateAndroidPlatform(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAndroidPlatform", reflect.TypeOf((*MockNotificationClient)(nil).CreateAndroidPlatform), varargs...)
+}
+
+// CreateIosPlatform mocks base method
+func (m *MockNotificationClient) CreateIosPlatform(arg0 context.Context, arg1 *v1.CreateIosPlatformRequest, arg2 ...grpc.CallOption) (*v1.CreateIosPlatformResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateIosPlatform", varargs...)
+	ret0, _ := ret[0].(*v1.CreateIosPlatformResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateIosPlatform indicates an expected call of CreateIosPlatform
+func (mr *MockNotificationClientMockRecorder) CreateIosPlatform(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIosPlatform", reflect.TypeOf((*MockNotificationClient)(nil).CreateIosPlatform), varargs...)
+}
+
+// GetAndroidPlatform mocks base method
+func (m *MockNotificationClient) GetAndroidPlatform(arg0 context.Context, arg1 *v1.GetAndroidPlatformRequest, arg2 ...grpc.CallOption) (*v1.GetAndroidPlatformResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetAndroidPlatform", varargs...)
+	ret0, _ := ret[0].(*v1.GetAndroidPlatformResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAndroidPlatform indicates an expected call of GetAndroidPlatform
+func (mr *MockNotificationClientMockRecorder) GetAndroidPlatform(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAndroidPlatform", reflect.TypeOf((*MockNotificationClient)(nil).GetAndroidPlatform), varargs...)
+}
+
+// GetIosPlatform mocks base method
+func (m *MockNotificationClient) GetIosPlatform(arg0 context.Context, arg1 *v1.GetIosPlatformRequest, arg2 ...grpc.CallOption) (*v1.GetIosPlatformResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetIosPlatform", varargs...)
+	ret0, _ := ret[0].(*v1.GetIosPlatformResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetIosPlatform indicates an expected call of GetIosPlatform
+func (mr *MockNotificationClientMockRecorder) GetIosPlatform(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIosPlatform", reflect.TypeOf((*MockNotificationClient)(nil).GetIosPlatform), varargs...)
+}
+
 // SendCampaignNotification mocks base method
 func (m *MockNotificationClient) SendCampaignNotification(arg0 context.Context, arg1 *v1.SendCampaignNotificationRequest, arg2 ...grpc.CallOption) (*v1.SendCampaignNotificationResponse, error) {
 	varargs := []interface{}{arg0, arg1}
@@ -51,4 +123,40 @@ func (m *MockNotificationClient) SendCampaignNotification(arg0 context.Context, 
 func (mr *MockNotificationClientMockRecorder) SendCampaignNotification(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendCampaignNotification", reflect.TypeOf((*MockNotificationClient)(nil).SendCampaignNotification), varargs...)
+}
+
+// UpdateAndroidPlatformPushCredentials mocks base method
+func (m *MockNotificationClient) UpdateAndroidPlatformPushCredentials(arg0 context.Context, arg1 *v1.UpdateAndroidPlatformPushCredentialsRequest, arg2 ...grpc.CallOption) (*v1.UpdateAndroidPlatformPushCredentialsResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateAndroidPlatformPushCredentials", varargs...)
+	ret0, _ := ret[0].(*v1.UpdateAndroidPlatformPushCredentialsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateAndroidPlatformPushCredentials indicates an expected call of UpdateAndroidPlatformPushCredentials
+func (mr *MockNotificationClientMockRecorder) UpdateAndroidPlatformPushCredentials(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAndroidPlatformPushCredentials", reflect.TypeOf((*MockNotificationClient)(nil).UpdateAndroidPlatformPushCredentials), varargs...)
+}
+
+// UpdateIosPlatformPushCertificate mocks base method
+func (m *MockNotificationClient) UpdateIosPlatformPushCertificate(arg0 context.Context, arg1 *v1.UpdateIosPlatformPushCertificateRequest, arg2 ...grpc.CallOption) (*v1.UpdateIosPlatformPushCertificateResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateIosPlatformPushCertificate", varargs...)
+	ret0, _ := ret[0].(*v1.UpdateIosPlatformPushCertificateResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateIosPlatformPushCertificate indicates an expected call of UpdateIosPlatformPushCertificate
+func (mr *MockNotificationClientMockRecorder) UpdateIosPlatformPushCertificate(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateIosPlatformPushCertificate", reflect.TypeOf((*MockNotificationClient)(nil).UpdateIosPlatformPushCertificate), varargs...)
 }

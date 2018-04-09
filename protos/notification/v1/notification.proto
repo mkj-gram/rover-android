@@ -6,11 +6,31 @@ option go_package = "notification/v1;notification";
 
 import "auth/v1/auth.proto";
 import "protobuf/version.proto";
+import "google/protobuf/timestamp.proto";
 
 service Notification {
   rpc SendCampaignNotification(SendCampaignNotificationRequest) returns (SendCampaignNotificationResponse);
+
+  // Crud
+  // rpc ListPlatforms(ListPlatformsRequest) returns (ListPlatformResponse);
+
+  // rpc ListIosPlatforms(ListIosPlatformsRequest) returns (ListIosPlatformsResponse);
+  rpc GetIosPlatform(GetIosPlatformRequest) returns (GetIosPlatformResponse);
+  rpc CreateIosPlatform(CreateIosPlatformRequest) returns (CreateIosPlatformResponse);
+  rpc UpdateIosPlatformPushCertificate(UpdateIosPlatformPushCertificateRequest) returns (UpdateIosPlatformPushCertificateResponse);
+
+  // rpc ListAndroidPlatform(ListAndroidPlatformRequest) returns(ListAndroidPlatformResponse);
+  rpc CreateAndroidPlatform(CreateAndroidPlatformRequest) returns(CreateAndroidPlatformResponse);
+  rpc GetAndroidPlatform(GetAndroidPlatformRequest) returns(GetAndroidPlatformResponse);
+  rpc UpdateAndroidPlatformPushCredentials(UpdateAndroidPlatformPushCredentialsRequest) returns (UpdateAndroidPlatformPushCredentialsResponse);
+
 }
 
+/*
+
+  Notifications
+
+*/
 
 message PushEnvironment {
   enum Enum {
@@ -100,3 +120,119 @@ message SendCampaignNotificationRequest {
 
 
 message SendCampaignNotificationResponse {}
+
+
+/*
+    Platform
+*/ 
+
+message Platform {
+    oneof paltform {
+        IosPlatform ios_platform            = 1;
+        AndroidPlatform android_platform    = 2;
+    }
+}
+
+message IosPlatform {
+    int32 id            = 1;
+    int32 account_id    = 2;
+    string title        = 3;
+
+    string bundle_id                = 4;
+    bytes certificate_data          = 5;
+    string certificate_passphrase   = 6;
+    string certificate_filename     = 7;
+    google.protobuf.Timestamp certificate_expires_at = 8;
+    google.protobuf.Timestamp certificate_updated_at = 9;
+
+    google.protobuf.Timestamp updated_at = 18;
+    google.protobuf.Timestamp created_at = 19;
+}
+
+message AndroidPlatform {
+    int32 id            = 1;
+    int32 account_id    = 2;
+    string title        = 3;
+
+    string push_credentials_server_key = 5;
+    string push_credentials_sender_id = 6;
+    google.protobuf.Timestamp push_credentials_updated_at = 7;
+
+    google.protobuf.Timestamp updated_at = 10;
+    google.protobuf.Timestamp created_at = 11;
+}
+
+/*
+    RPC request & response
+ */
+message CreateIosPlatformRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    string title = 3;
+
+    bytes certificate_data          = 5;
+    string certificate_passphrase   = 6;
+    string certificate_filename     = 7;
+}
+
+message CreateIosPlatformResponse {
+    IosPlatform ios_platform = 1;
+}
+
+message GetIosPlatformRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+    int32 ios_platform_id = 2;
+}
+
+message GetIosPlatformResponse {
+    IosPlatform ios_platform = 1;
+}
+
+message UpdateIosPlatformPushCertificateRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+    int32 ios_platform_id = 2;
+
+    bytes certificate_data = 3;
+    string certificate_passphrase = 4;
+    string certificate_filename = 5;
+}
+
+message UpdateIosPlatformPushCertificateResponse {
+    IosPlatform ios_platform = 1;
+}
+
+
+message CreateAndroidPlatformRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    string title = 3;
+
+    string push_credentials_server_key = 4;
+    string push_credentials_sender_id  = 5;
+}
+
+message CreateAndroidPlatformResponse {
+    AndroidPlatform android_platform = 1;
+}
+
+message GetAndroidPlatformRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+    int32 android_platform_id = 2;
+}
+
+message GetAndroidPlatformResponse {
+    AndroidPlatform android_platform = 1;
+}
+
+message UpdateAndroidPlatformPushCredentialsRequest {
+    rover.auth.v1.AuthContext auth_context = 1;
+
+    int32 android_platform_id = 2;
+
+    string push_credentials_server_key = 3;
+    string push_credentials_sender_id  = 4;
+}
+
+message UpdateAndroidPlatformPushCredentialsResponse {
+    AndroidPlatform android_platform = 1;
+}

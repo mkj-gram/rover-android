@@ -16,6 +16,15 @@ ALTER DATABASE campaigns_tasks_test SET log_statement = 'all';
 ALTER DATABASE campaigns_dev SET log_statement = 'all';
 
 --
+-- notification-service
+--
+CREATE DATABASE notification_test;
+CREATE DATABASE notification_dev;
+
+ALTER DATABASE notification_test SET log_statement = 'all';
+ALTER DATABASE notification_dev SET log_statement = 'all';
+
+--
 -- test-service
 --
 CREATE DATABASE test_test;
