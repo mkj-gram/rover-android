@@ -79,7 +79,7 @@ services:
     depends_on:
       - graphql-gateway
     volumes:
-      - ../:/rover/
+      - ../:/rover:delegated
     working_dir: /rover/react-audience
     command: bash -c "/rover/docker/scripts/wait.sh graphql-gateway:80 -t 60 -- npm install && npm run schema && npm run relay && npm start"
     environment:
@@ -191,7 +191,7 @@ services:
     depends_on:
       - graphql-gateway
     volumes:
-      - ../:/rover/
+      - ../:/rover:delegated
     working_dir: /rover/react-campaigns
     command: bash -c "npm install && npm start"
     environment:
@@ -209,7 +209,7 @@ services:
       - "4000:80"
     command: bash -c "rm -rf node_modules/@rover && npm install && npm run build && npm start"
     volumes:
-      - ../:/rover/
+      - ../:/rover:delegated
     working_dir: /rover/graphql-gateway
     environment:
       AUTH_V1_SERVICE_HOST: auth-service
