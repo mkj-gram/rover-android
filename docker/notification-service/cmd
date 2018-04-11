@@ -1,17 +1,32 @@
 #!/bin/sh
 
-set -e
+# set -e
 # set -x
 
 
 SVC_HOME=./notification
+
+waiton() {
+	while :
+	do
+		nc -z $1 $2
+		result=$?
+		if [[ $result -eq 0 ]]; then
+			break
+		fi
+		sleep 1
+	done
+}
 
 run() {
 	go run $SVC_HOME/cmd/notification-service/main.go
 }
 
 test() {
-  go test $SVC_HOME/...
+	waiton postgres 5432
+	waiton scylla 9042
+	
+  	go test $SVC_HOME/...
 }
 
 migrate() {

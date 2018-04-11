@@ -8,7 +8,7 @@ ROVER ?= github.com/roverplatform/rover
 ROVER_GOPATH ?= /go/src/${ROVER}
 
 test:
-	${RUN} go test -v ${ROVER}/notification/...
+	${RUN} ./docker/notification-service/cmd test
 
 run:
 	${RUN}

@@ -236,21 +236,6 @@ steps:
     waitFor:
       - 'install-complete'
 
-# Notification Service
-  - id: 'test-notification-service'
-    name: 'docker/compose:1.16.1'
-    args:
-      - -p
-      - test-notification-service
-      - -f
-      - ./docker/main.docker-compose.yaml
-      - run
-      - notification-service
-      - docker/notification-service/cmd
-      - test
-    waitFor:
-      - 'install-complete'
-
 # Events Pipeline
   - id: 'test-events-pipeline'
     name: 'docker/compose:1.16.1'
@@ -296,6 +281,22 @@ steps:
     waitFor:
       - 'install-complete'
 
+# Notification Service
+  - id: 'test-notification-service'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -p
+      - test-notification-service
+      - -f
+      - ./docker/main.docker-compose.yaml
+      - run
+      - notification-service
+      - docker/notification-service/cmd
+      - test
+    waitFor:
+      - 'install-complete'
+      - 'test-audience-service'
+      - 'test-campaigns-service'
 
 # Clean up the images running. This frees memory from the cloudbuilder server
   - id: 'test-cleanup-docker-compose'
@@ -308,6 +309,7 @@ steps:
         - 'test-auth-service'
         - 'test-audience-service'
         - 'test-campaigns-service'
+        - 'test-notification-service'
         - 'test-events-pipeline'
         - 'test-rover-apis'
         - 'test-sdk-api'

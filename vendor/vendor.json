@@ -141,6 +141,30 @@
 			"revisionTime": "2017-04-29T20:15:29Z"
 		},
 		{
+			"checksumSHA1": "mmuwmJb/5JzrfQbZbkR8wPKyuIQ=",
+			"path": "github.com/gocql/gocql",
+			"revision": "12e3a8c05db483441932e84ab6c35c339fb01de7",
+			"revisionTime": "2018-03-20T11:30:12Z"
+		},
+		{
+			"checksumSHA1": "7RlYIbPYgPkxDDCSEuE6bvYEEeU=",
+			"path": "github.com/gocql/gocql/internal/lru",
+			"revision": "12e3a8c05db483441932e84ab6c35c339fb01de7",
+			"revisionTime": "2018-03-20T11:30:12Z"
+		},
+		{
+			"checksumSHA1": "puCAbQOdeajpTEFssPsgeskXB+8=",
+			"path": "github.com/gocql/gocql/internal/murmur",
+			"revision": "12e3a8c05db483441932e84ab6c35c339fb01de7",
+			"revisionTime": "2018-03-20T11:30:12Z"
+		},
+		{
+			"checksumSHA1": "tZQDfMMTKrYMXqen0zjJWLtOf1A=",
+			"path": "github.com/gocql/gocql/internal/streams",
+			"revision": "12e3a8c05db483441932e84ab6c35c339fb01de7",
+			"revisionTime": "2018-03-20T11:30:12Z"
+		},
+		{
 			"checksumSHA1": "/5JpULDw51Em+1+OJHcfDkbw/e0=",
 			"path": "github.com/golang/mock/gomock",
 			"revision": "58cd061d09382b6011f84c1291ebe50ef2e25bab",
@@ -219,6 +243,12 @@
 			"revisionTime": "2017-08-08T02:16:21Z"
 		},
 		{
+			"checksumSHA1": "p/8vSviYF91gFflhrt5vkyksroo=",
+			"path": "github.com/golang/snappy",
+			"revision": "553a641470496b2327abcac10b36396bd98e45c9",
+			"revisionTime": "2017-02-15T23:32:05Z"
+		},
+		{
 			"checksumSHA1": "YrR/d1vgCwi8Xax7TsJNGuh2Aks=",
 			"path": "github.com/googleapis/gax-go",
 			"revision": "84ed26760e7f6f80887a2fbfb50db3cc415d2cea",
@@ -229,6 +259,12 @@
 			"path": "github.com/grpc-ecosystem/go-grpc-prometheus",
 			"revision": "2500245aa6110c562d17020fb31a2c133d737799",
 			"revisionTime": "2017-03-30T21:24:24Z"
+		},
+		{
+			"checksumSHA1": "O0r0hj4YL+jSRNjnshkeH4GY+4s=",
+			"path": "github.com/hailocab/go-hostpool",
+			"revision": "e80d13ce29ede4452c43dea11e79b9bc8a15b478",
+			"revisionTime": "2016-01-25T11:53:50Z"
 		},
 		{
 			"checksumSHA1": "ecmoC8r7DjVnhBv31uX9UxnN79Y=",
@@ -403,6 +439,24 @@
 			"path": "github.com/prometheus/procfs/xfs",
 			"revision": "65c1f6f8f0fc1e2185eb9863a3bc751496404259",
 			"revisionTime": "2017-05-19T19:08:37Z"
+		},
+		{
+			"checksumSHA1": "w/kX7JrYnoLDEDnVebguFwnzAkg=",
+			"path": "github.com/scylladb/gocqlx",
+			"revision": "9fa5432a65524efe309950bfe3771f3b37decd55",
+			"revisionTime": "2017-12-27T15:19:38Z"
+		},
+		{
+			"checksumSHA1": "opD6e6fGFtcCfsdHUsnd2DTkug0=",
+			"path": "github.com/scylladb/gocqlx/migrate",
+			"revision": "9fa5432a65524efe309950bfe3771f3b37decd55",
+			"revisionTime": "2017-12-27T15:19:38Z"
+		},
+		{
+			"checksumSHA1": "xoJ0R4d4oyk2dXIeMP6R6CJiEEI=",
+			"path": "github.com/scylladb/gocqlx/qb",
+			"revision": "9fa5432a65524efe309950bfe3771f3b37decd55",
+			"revisionTime": "2017-12-27T15:19:38Z"
 		},
 		{
 			"checksumSHA1": "vE43s37+4CJ2CDU6TlOUOYE0K9c=",
@@ -883,6 +937,12 @@
 			"path": "googlemaps.github.io/maps/internal",
 			"revision": "35da55b7ef7abd788b772cd2d33b1727b384b81c",
 			"revisionTime": "2017-11-14T04:54:49Z"
+		},
+		{
+			"checksumSHA1": "COfXAfInbcFT/YRsvLUQnNKHzF0=",
+			"path": "gopkg.in/inf.v0",
+			"revision": "d2d2541c53f18d2a059457998ce2876cc8e67cbf",
+			"revisionTime": "2018-03-26T17:23:32Z"
 		},
 		{
 			"checksumSHA1": "XQsrqoNT1U0KzLxOFcAZVvqhLfk=",
