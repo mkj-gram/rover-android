@@ -19,7 +19,6 @@ func (p *Publisher) Publish(ctx context.Context, messages ...Message) []error {
 	for i, message := range messages {
 		var pm pubsub.Message
 
-		// TODO grab all errors don't terminate early
 		if err := Marshal(message, &pm); err != nil {
 			errs[i] = errors.Wrap(err, "Marshal")
 			continue
@@ -28,7 +27,6 @@ func (p *Publisher) Publish(ctx context.Context, messages ...Message) []error {
 		results[i] = p.Topic.Publish(ctx, &pm)
 	}
 
-	// TODO grab all results to terminate early
 	for i, result := range results {
 		if result == nil {
 			continue

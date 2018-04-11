@@ -1,35 +1,41 @@
 package pubsub
 
+type Version struct {
+	Major    int32 `json:"major"`
+	Minor    int32 `json:"minor"`
+	Revision int32 `json:"revision"`
+}
+
+type Device struct {
+	AccountID            int    `json:"account_id"`
+	ID                   string `json:"id"`
+	PushToken            string `json:"push_token"`
+	PushTokenEnvironment string `json:"push_token_environment"`
+	AppNamespace         string `json:"app_namespace"`
+	BadgeCount           int    `json:"badge_count"`
+
+	OsName     string  `json:"os_name"`
+	SdkVersion Version `json:"sdk_version"`
+}
+
 type Message interface {
 	notification()
 }
 
 type SilentPush struct {
+	Device  Device            `json:"device"`
 	Payload map[string]string `json:"payload"`
 }
 
 func (m *SilentPush) notification() {}
 
 type PushMessage struct {
+	Device Device `json:"device"`
+
+	// Used to lookup notification settings
+	CampaignID        int    `json:"campaign_id"`
 	NotificationBody  string `json:"notification_body"`
 	NotificationTitle string `json:"notification_title"`
-
-	DeviceId                   string `json:"device_id"`
-	DevicePushToken            string `json:"device_push_token"`
-	DevicePushTokenEnvironment string `json:"device_push_token_environment"`
-	DeviceAppNamespace         string `json:"device_app_namespace"`
-	DeviceBadgeCount           string `json:"device_badge_count"`
-
-	// Either "iOS" or "Android"
-	OsName string `json:"os_name"`
-
-	SdkVersion Version `json:"sdk_version"`
 }
 
 func (m *PushMessage) notification() {}
-
-type Version struct {
-	Major    int32 `json:"major"`
-	Minor    int32 `json:"minor"`
-	Revision int32 `json:"revision"`
-}

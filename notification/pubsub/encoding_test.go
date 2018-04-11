@@ -21,27 +21,43 @@ func Test_Marshall(t *testing.T) {
 	}{
 		{
 			in: &PushMessage{
-				DeviceId:                   "id",
-				DeviceAppNamespace:         "app_ns",
-				DeviceBadgeCount:           "1",
-				DevicePushToken:            "token",
-				DevicePushTokenEnvironment: "prod",
-				NotificationBody:           "hello world",
-				NotificationTitle:          "a title",
-				OsName:                     "ios",
-				SdkVersion:                 Version{1, 2, 3},
+				Device: Device{
+					ID:                   "id",
+					AccountID:            2,
+					AppNamespace:         "app_ns",
+					BadgeCount:           1,
+					PushToken:            "token",
+					PushTokenEnvironment: "production",
+					OsName:               "iOS",
+					SdkVersion:           Version{1, 2, 3},
+				},
+
+				NotificationBody:  "hello world",
+				NotificationTitle: "a title",
+
+				CampaignID: 4,
 			},
 
 			exp: testMsg{
 				Attrs: map[string]string{
 					"notification_kind": "message",
 				},
-				Data: `{"notification_body":"hello world","notification_title":"a title","device_id":"id","device_push_token":"token","device_push_token_environment":"prod","device_app_namespace":"app_ns","device_badge_count":"1","os_name":"ios","sdk_version":{"major":1,"minor":2,"revision":3}}`,
+				Data: `{"device":{"account_id":2,"id":"id","push_token":"token","push_token_environment":"production","app_namespace":"app_ns","badge_count":1,"os_name":"iOS","sdk_version":{"major":1,"minor":2,"revision":3}},"campaign_id":4,"notification_body":"hello world","notification_title":"a title"}`,
 			},
 		},
 
 		{
 			in: &SilentPush{
+				Device: Device{
+					ID:                   "id",
+					AccountID:            2,
+					AppNamespace:         "app_ns",
+					BadgeCount:           1,
+					PushToken:            "token",
+					PushTokenEnvironment: "production",
+					OsName:               "iOS",
+					SdkVersion:           Version{1, 2, 3},
+				},
 				Payload: map[string]string{
 					"hello": "world",
 				},
@@ -51,7 +67,7 @@ func Test_Marshall(t *testing.T) {
 				Attrs: map[string]string{
 					"notification_kind": "silent",
 				},
-				Data: `{"payload":{"hello":"world"}}`,
+				Data: `{"device":{"account_id":2,"id":"id","push_token":"token","push_token_environment":"production","app_namespace":"app_ns","badge_count":1,"os_name":"iOS","sdk_version":{"major":1,"minor":2,"revision":3}},"payload":{"hello":"world"}}`,
 			},
 		},
 	}
@@ -93,24 +109,40 @@ func Test_Unmarshal(t *testing.T) {
 				Attributes: map[string]string{
 					"notification_kind": "message",
 				},
-				Data: []byte(`{"notification_body":"hello world","notification_title":"a title","device_id":"id","device_push_token":"token","device_push_token_environment":"prod","device_app_namespace":"app_ns","device_badge_count":"1","os_name":"ios","sdk_version":{"major":1,"minor":2,"revision":3}}`),
+				Data: []byte(`{"device":{"account_id":2,"id":"id","push_token":"token","push_token_environment":"production","app_namespace":"app_ns","badge_count":1,"os_name":"iOS","sdk_version":{"major":1,"minor":2,"revision":3}},"campaign_id":4,"notification_body":"hello world","notification_title":"a title"}`),
 			},
 
 			exp: &PushMessage{
-				DeviceId:                   "id",
-				DeviceAppNamespace:         "app_ns",
-				DeviceBadgeCount:           "1",
-				DevicePushToken:            "token",
-				DevicePushTokenEnvironment: "prod",
-				NotificationBody:           "hello world",
-				NotificationTitle:          "a title",
-				OsName:                     "ios",
-				SdkVersion:                 Version{1, 2, 3},
+				Device: Device{
+					ID:                   "id",
+					AccountID:            2,
+					AppNamespace:         "app_ns",
+					BadgeCount:           1,
+					PushToken:            "token",
+					PushTokenEnvironment: "production",
+					OsName:               "iOS",
+					SdkVersion:           Version{1, 2, 3},
+				},
+
+				NotificationBody:  "hello world",
+				NotificationTitle: "a title",
+
+				CampaignID: 4,
 			},
 		},
 
 		{
 			exp: &SilentPush{
+				Device: Device{
+					ID:                   "id",
+					AccountID:            2,
+					AppNamespace:         "app_ns",
+					BadgeCount:           1,
+					PushToken:            "token",
+					PushTokenEnvironment: "production",
+					OsName:               "iOS",
+					SdkVersion:           Version{1, 2, 3},
+				},
 				Payload: map[string]string{
 					"hello": "world",
 				},
@@ -120,7 +152,7 @@ func Test_Unmarshal(t *testing.T) {
 				Attributes: map[string]string{
 					"notification_kind": "silent",
 				},
-				Data: []byte(`{"payload":{"hello":"world"}}`),
+				Data: []byte(`{"device":{"account_id":2,"id":"id","push_token":"token","push_token_environment":"production","app_namespace":"app_ns","badge_count":1,"os_name":"iOS","sdk_version":{"major":1,"minor":2,"revision":3}},"payload":{"hello":"world"}}`),
 			},
 		},
 	}
