@@ -313,6 +313,7 @@ class TapBehaviorBody extends React.Component<
                         id="websiteURL"
                         onBlurChange={true}
                         placeholderText="Enter website URL"
+                        textStyle={{ width: '100%' }}
                     />
                 </div>
             </div>
@@ -334,7 +335,9 @@ class TapBehaviorBody extends React.Component<
                     {websiteURLRow}
                 </TapBehaviorRow>
                 <TapBehaviorRow
-                    handleClick={this.getWebsitePresentRowClickable(device)}
+                    handleClick={() =>
+                        this.getWebsitePresentRowClickable(device)
+                    }
                 >
                     {this.websitePresentRow()}
                 </TapBehaviorRow>
@@ -386,6 +389,7 @@ class TapBehaviorBody extends React.Component<
                         id="deeplinkView"
                         onBlurChange={true}
                         placeholderText="Enter deep link URL"
+                        textStyle={{ width: '100%' }}
                     />
                 </div>
             </div>
