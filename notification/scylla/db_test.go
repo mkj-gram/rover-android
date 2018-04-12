@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/namsral/flag"
@@ -88,6 +89,7 @@ func DefaultClusterConfig(t *testing.T) (*gocql.ClusterConfig, string) {
 func NewClusterConfig(hosts []string, keyspace string) *gocql.ClusterConfig {
 	cluster := gocql.NewCluster(hosts...)
 	cluster.Consistency = gocql.Quorum
+	cluster.Timeout = time.Duration(5 * time.Second)
 
 	if keyspace != "" {
 		cluster.Keyspace = keyspace
@@ -130,6 +132,8 @@ func InsertFixtures(t *testing.T, session *gocql.Session, dir string) {
 }
 
 func runFixture(t *testing.T, session *gocql.Session, fixture []byte) {
+	t.Helper()
+
 	r := bytes.NewBuffer(fixture)
 	for {
 		stmt, err := r.ReadString(';')
@@ -143,6 +147,5 @@ func runFixture(t *testing.T, session *gocql.Session, fixture []byte) {
 		if err := session.Query(stmt).Exec(); err != nil {
 			t.Fatal(err)
 		}
-
 	}
 }

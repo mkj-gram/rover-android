@@ -5,6 +5,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var TimeUUID = gocql.TimeUUID
+
 type store struct {
 	session *gocql.Session
 }
@@ -12,7 +14,8 @@ type store struct {
 type DB struct {
 	session *gocql.Session
 
-	notificationSettingStore *notificationSettingsStore
+	notificationSettingsStore *notificationSettingsStore
+	notificationsStore        *notificationsStore
 }
 
 func New(hosts []string, clusterOptions []ClusterOption) (*DB, error) {
@@ -34,8 +37,9 @@ func New(hosts []string, clusterOptions []ClusterOption) (*DB, error) {
 
 func NewFromSession(session *gocql.Session) *DB {
 	return &DB{
-		session:                  session,
-		notificationSettingStore: &notificationSettingsStore{session: session},
+		session:                   session,
+		notificationSettingsStore: &notificationSettingsStore{session: session},
+		notificationsStore:        &notificationsStore{session: session},
 	}
 }
 
@@ -49,5 +53,9 @@ func (db *DB) Close() error {
 }
 
 func (db *DB) NotificationSettingsStore() *notificationSettingsStore {
-	return db.notificationSettingStore
+	return db.notificationSettingsStore
+}
+
+func (db *DB) NotificationsStore() *notificationsStore {
+	return db.notificationsStore
 }

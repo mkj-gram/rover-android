@@ -21,6 +21,7 @@ func TestNotificationSettingsStore(t *testing.T) {
 	}
 
 	reset()
+
 	t.Run("TestNotificationSettingsStore_OneById", testNotificationSettingsStore_OneById)
 }
 
