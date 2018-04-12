@@ -89,7 +89,7 @@ const renderSegmentControl = (
     update: (status: QueryParams['campaignStatus']) => void,
     media: Media
 ) => {
-    const segmentControlButtonStyle = {
+    const segmentControlButtonStyle: React.CSSProperties = {
         ...TypeographyText,
         width: 98,
         height: 20,
