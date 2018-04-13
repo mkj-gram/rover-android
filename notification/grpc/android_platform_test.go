@@ -18,7 +18,7 @@ func test_Android_GetPlatform(t *testing.T) {
 	var (
 		ctx         = context.Background()
 		db, closeDB = dbOpen(t, tCfg.DSN)
-		svc         = notification_grpc.Server{DB: db}
+		svc         = notification_grpc.Server{PlatformServer: notification_grpc.PlatformServer{DB: db}}
 	)
 
 	defer closeDB()
@@ -111,7 +111,7 @@ func test_Android_CreatePlatform(t *testing.T) {
 	var (
 		ctx         = context.Background()
 		db, closeDB = dbOpen(t, tCfg.DSN)
-		svc         = notification_grpc.Server{DB: db}
+		svc         = notification_grpc.Server{PlatformServer: notification_grpc.PlatformServer{DB: db}}
 	)
 
 	defer closeDB()
@@ -213,7 +213,7 @@ func test_Android_UpdatePushCredentials(t *testing.T) {
 	var (
 		ctx         = context.Background()
 		db, closeDB = dbOpen(t, tCfg.DSN)
-		svc         = notification_grpc.Server{DB: db}
+		svc         = notification_grpc.Server{PlatformServer: notification_grpc.PlatformServer{DB: db}}
 	)
 
 	defer closeDB()

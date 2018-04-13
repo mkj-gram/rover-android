@@ -18,7 +18,7 @@ func test_Ios_GetIosPlatform(t *testing.T) {
 	var (
 		ctx         = context.Background()
 		db, closeDB = dbOpen(t, tCfg.DSN)
-		svc         = notification_grpc.Server{DB: db}
+		svc         = notification_grpc.Server{PlatformServer: notification_grpc.PlatformServer{DB: db}}
 	)
 
 	defer closeDB()
@@ -112,7 +112,7 @@ func test_Ios_CreateIosPlatform(t *testing.T) {
 	var (
 		ctx         = context.Background()
 		db, closeDB = dbOpen(t, tCfg.DSN)
-		svc         = notification_grpc.Server{DB: db}
+		svc         = notification_grpc.Server{PlatformServer: notification_grpc.PlatformServer{DB: db}}
 	)
 
 	defer closeDB()
@@ -232,7 +232,7 @@ func test_Ios_UpdatePushCredentials(t *testing.T) {
 	var (
 		ctx         = context.Background()
 		db, closeDB = dbOpen(t, tCfg.DSN)
-		svc         = notification_grpc.Server{DB: db}
+		svc         = notification_grpc.Server{PlatformServer: notification_grpc.PlatformServer{DB: db}}
 	)
 
 	defer closeDB()

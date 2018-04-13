@@ -101,6 +101,7 @@ message SendCampaignNotificationRequest {
   bool                notification_alert_option_badge_number                       = 27;
 
   message Message {
+    
     string              notification_body              = 1;
     string              notification_title             = 2;
 
@@ -119,7 +120,17 @@ message SendCampaignNotificationRequest {
 }
 
 
-message SendCampaignNotificationResponse {}
+message SendCampaignNotificationResponse {
+
+  message Result {
+    // indicates if there was an error
+    bool error = 1;
+
+    string message = 2;
+  }
+  
+  repeated Result results = 1;
+}
 
 
 /*

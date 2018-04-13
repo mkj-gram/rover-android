@@ -10,7 +10,7 @@ import (
 	"github.com/roverplatform/rover/notification/postgres"
 )
 
-func (p *Server) CreateAndroidPlatform(ctx context.Context, req *notification.CreateAndroidPlatformRequest) (*notification.CreateAndroidPlatformResponse, error) {
+func (p *PlatformServer) CreateAndroidPlatform(ctx context.Context, req *notification.CreateAndroidPlatformRequest) (*notification.CreateAndroidPlatformResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
@@ -52,7 +52,7 @@ func (p *Server) CreateAndroidPlatform(ctx context.Context, req *notification.Cr
 	}, nil
 }
 
-func (s *Server) GetAndroidPlatform(ctx context.Context, req *notification.GetAndroidPlatformRequest) (*notification.GetAndroidPlatformResponse, error) {
+func (s *PlatformServer) GetAndroidPlatform(ctx context.Context, req *notification.GetAndroidPlatformRequest) (*notification.GetAndroidPlatformResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
@@ -80,7 +80,7 @@ func (s *Server) GetAndroidPlatform(ctx context.Context, req *notification.GetAn
 	}, nil
 }
 
-func (s *Server) UpdateAndroidPlatformPushCredentials(ctx context.Context, req *notification.UpdateAndroidPlatformPushCredentialsRequest) (*notification.UpdateAndroidPlatformPushCredentialsResponse, error) {
+func (s *PlatformServer) UpdateAndroidPlatformPushCredentials(ctx context.Context, req *notification.UpdateAndroidPlatformPushCredentialsRequest) (*notification.UpdateAndroidPlatformPushCredentialsResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),

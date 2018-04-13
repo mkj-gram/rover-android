@@ -71,6 +71,20 @@ func ResetDB(t *testing.T, config gocql.ClusterConfig, keyspace string, migratio
 	globalSession.Close()
 }
 
+// ClearDB resets the default db by truncating tables used for tests
+func ClearDB(t *testing.T) *gocql.Session {
+	config, _ := DefaultClusterConfig(t)
+	session := NewTestSession(t, config)
+	// TODO find all tables first then truncate
+	TruncateTables(t, session, ListTables(t, session)...)
+	return session
+}
+
+// ClearDBWithFixtures resets the db and then applies the given fixtures
+func ClearDBWithFixtures(t *testing.T, files string) {
+	InsertFixtures(t, ClearDB(t), files)
+}
+
 func DefaultClusterConfig(t *testing.T) (*gocql.ClusterConfig, string) {
 
 	info, err := scylla.ParseDSN(*testDSN)
@@ -108,11 +122,56 @@ func NewTestSession(t *testing.T, config *gocql.ClusterConfig) *gocql.Session {
 	return session
 }
 
-func InsertFixtures(t *testing.T, session *gocql.Session, dir string) {
+func ListTables(t *testing.T, session *gocql.Session) []string {
 
-	files, err := filepath.Glob(filepath.Join(dir, "*.cql"))
+	var tables []string
+
+	_, keyspace := DefaultClusterConfig(t)
+
+	meta, err := session.KeyspaceMetadata(keyspace)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	for _, table := range meta.Tables {
+		tables = append(tables, table.Name)
+	}
+
+	return tables
+
+}
+
+func TruncateTables(t *testing.T, session *gocql.Session, tables ...string) {
+	for _, table := range tables {
+		if table == "gocqlx_migrate" {
+			continue
+		}
+		stmt := fmt.Sprintf(`TRUNCATE TABLE %s`, table)
+		if err := session.Query(stmt).Exec(); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// InsertFixtures reads an array of matches or files and runs the cql commands against the provided session
+func InsertFixtures(t *testing.T, session *gocql.Session, matches ...string) {
+
+	var files []string
+
+	for _, match := range matches {
+		var lookup string
+		if strings.HasSuffix(match, ".cql") == true {
+			lookup = match
+		} else {
+			lookup = filepath.Join(match, "*.cql")
+		}
+
+		f, err := filepath.Glob(lookup)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		files = append(files, f...)
 	}
 
 	for _, file := range files {

@@ -49,8 +49,13 @@ func main() {
 	// Notification Server
 	//
 
-	notificationServer := &notification_grpc.Server{
-		DB: db,
+	server := &notification_grpc.Server{
+		PlatformServer: notification_grpc.PlatformServer{
+			DB: db,
+		},
+		NotificationServer: notification_grpc.NotificationServer{
+			DB: nil,
+		},
 	}
 
 	//
@@ -60,7 +65,7 @@ func main() {
 		grpcServer = grpc.NewServer()
 	)
 
-	notification.RegisterNotificationServer(grpcServer, notificationServer)
+	notification.RegisterNotificationServer(grpcServer, server)
 
 	go func() {
 		lis, err := net.Listen("tcp", *rpcAddr)

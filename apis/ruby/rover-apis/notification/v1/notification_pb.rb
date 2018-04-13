@@ -73,6 +73,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :sdk_version, :message, 16, "rover.protobuf.Version"
   end
   add_message "rover.notification.v1.SendCampaignNotificationResponse" do
+    repeated :results, :message, 1, "rover.notification.v1.SendCampaignNotificationResponse.Result"
+  end
+  add_message "rover.notification.v1.SendCampaignNotificationResponse.Result" do
+    optional :error, :bool, 1
+    optional :message, :string, 2
   end
   add_message "rover.notification.v1.Platform" do
     oneof :paltform do
@@ -171,6 +176,7 @@ module Rover
       SendCampaignNotificationRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationRequest").msgclass
       SendCampaignNotificationRequest::Message = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationRequest.Message").msgclass
       SendCampaignNotificationResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationResponse").msgclass
+      SendCampaignNotificationResponse::Result = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationResponse.Result").msgclass
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.Platform").msgclass
       IosPlatform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.IosPlatform").msgclass
       AndroidPlatform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.AndroidPlatform").msgclass

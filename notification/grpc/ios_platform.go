@@ -45,7 +45,7 @@ func validateCertIsNotExpired(val interface{}) error {
 	return nil
 }
 
-func (s *Server) CreateIosPlatform(ctx context.Context, req *notification.CreateIosPlatformRequest) (*notification.CreateIosPlatformResponse, error) {
+func (s *PlatformServer) CreateIosPlatform(ctx context.Context, req *notification.CreateIosPlatformRequest) (*notification.CreateIosPlatformResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
@@ -103,7 +103,7 @@ func (s *Server) CreateIosPlatform(ctx context.Context, req *notification.Create
 	}, nil
 }
 
-func (s *Server) GetIosPlatform(ctx context.Context, req *notification.GetIosPlatformRequest) (*notification.GetIosPlatformResponse, error) {
+func (s *PlatformServer) GetIosPlatform(ctx context.Context, req *notification.GetIosPlatformRequest) (*notification.GetIosPlatformResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
@@ -131,7 +131,7 @@ func (s *Server) GetIosPlatform(ctx context.Context, req *notification.GetIosPla
 	}, nil
 }
 
-func (s *Server) UpdateIosPlatformPushCertificate(ctx context.Context, req *notification.UpdateIosPlatformPushCertificateRequest) (*notification.UpdateIosPlatformPushCertificateResponse, error) {
+func (s *PlatformServer) UpdateIosPlatformPushCertificate(ctx context.Context, req *notification.UpdateIosPlatformPushCertificateRequest) (*notification.UpdateIosPlatformPushCertificateResponse, error) {
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
