@@ -22,7 +22,7 @@ import {
 import PopoverTextRadioButtonComponent from '../../utils/PopoverTextRadioButtonComponent'
 import TapBehaviorBody from './TapBehaviorBody'
 import TapBehaviorRow from './TapBehaviorRow'
-import NotificationMobilePopoverContainer from './NotificationMobilePopoverContainer'
+import MobilePopover from '../components/MobilePopover'
 import UpdateEditableUIStateProperty from '../../utils/UpdateEditableUIStateProperty'
 import FormSection from '../../utils/FormSection'
 
@@ -152,14 +152,7 @@ class TapBehaviorContainer extends React.Component<
         const { showTapNotificationOptions, displayName } = this.state
 
         const popoverProps = {
-            placement: 'left',
-            containerStyle: {
-                width: 384,
-                background: white,
-                flexDirection: 'column',
-                borderRadius: 3,
-                border: `1px solid ${titanium}`
-            }
+            placement: 'left'
         }
 
         const getClickable = () => {
@@ -196,21 +189,27 @@ class TapBehaviorContainer extends React.Component<
             >
                 {[
                     getClickable(),
-                    <PopoverTextRadioButtonComponent
+                    <div
+                        style={{
+                            width: 384
+                        }}
                         key="tapBehavior2"
-                        names={[
-                            'OPEN_EXPERIENCE',
-                            'OPEN_WEBSITE',
-                            'OPEN_DEEP_LINK',
-                            'OPEN_APP'
-                        ]}
-                        onClick={this.handleSelectTapOption}
-                        selectedTapOption={
-                            editableCampaign.notificationTapBehaviorType
-                        }
-                        displayName={displayName}
-                        device={device}
-                    />
+                    >
+                        <PopoverTextRadioButtonComponent
+                            names={[
+                                'OPEN_EXPERIENCE',
+                                'OPEN_WEBSITE',
+                                'OPEN_DEEP_LINK',
+                                'OPEN_APP'
+                            ]}
+                            onClick={this.handleSelectTapOption}
+                            selectedTapOption={
+                                editableCampaign.notificationTapBehaviorType
+                            }
+                            displayName={displayName}
+                            device={device}
+                        />
+                    </div>
                 ]}
             </PopoverContainer>
         )
@@ -271,7 +270,7 @@ class TapBehaviorContainer extends React.Component<
                         </div>
                         {isTapBehaviorSelectorOpen !== 'close' &&
                             ReactDOM.createPortal(
-                                <NotificationMobilePopoverContainer
+                                <MobilePopover
                                     title="What happens when the notification is tapped?"
                                     child={child}
                                     onClose={() =>

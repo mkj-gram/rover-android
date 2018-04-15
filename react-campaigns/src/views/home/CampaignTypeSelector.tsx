@@ -273,17 +273,6 @@ const CampaignTypeSelector: React.SFC<
                     isCampaignTypeSelectorOpen && (
                         <Popover
                             placement="top"
-                            containerStyle={{
-                                height: 280,
-                                width: 384,
-                                background: 'white',
-                                flexDirection: 'column',
-                                borderRadius: 3,
-                                border: `1px solid ${titanium}`,
-                                paddingLeft: 16,
-                                paddingRight: 16,
-                                zIndex: 1
-                            }}
                             toggle={handleOpenClose}
                             arrowColors={{
                                 primary: 'white',
@@ -294,7 +283,15 @@ const CampaignTypeSelector: React.SFC<
                             targetId="campaign-type-selector"
                             targetParent="root"
                         >
-                            <div>
+                            <div
+                                style={{
+                                    height: 280,
+                                    width: 384,
+                                    flexDirection: 'column',
+                                    paddingLeft: 16,
+                                    paddingRight: 16
+                                }}
+                            >
                                 {renderCampaignTypeRow('all')}
                                 {renderCampaignTypeRow('scheduled')}
                                 {renderCampaignTypeRow('automated')}

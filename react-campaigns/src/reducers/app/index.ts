@@ -7,13 +7,15 @@ import notificationDelivery, * as notificationDeliverySelector from './notificat
 import notification, * as notificationSelector from './notification'
 import overview, * as overviewSelector from './overview'
 import error, * as errorSelector from './error'
+import activePopover, * as activePopoverSelector from './activePopover'
 
 export default combineReducers({
     notification,
     home,
     notificationDelivery,
     overview,
-    error
+    error,
+    activePopover
 })
 
 export const getIsCreatingCampaign = (state: AppState) =>
@@ -63,3 +65,9 @@ export const getIsTapBehaviorWebsitePresentationOpen = (state: AppState) =>
 
 export const getIsError = (state: AppState) =>
     errorSelector.getIsError(state.error)
+
+export const getIsPopoverModalFormOpen = (state: AppState) =>
+    activePopoverSelector.getIsPopoverModalFormOpen(state.activePopover)
+
+export const getActivePopover = (state: AppState) =>
+    activePopoverSelector.getActivePopover(state.activePopover)

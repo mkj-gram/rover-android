@@ -7,6 +7,7 @@ import { getCampaign } from '../../../reducers/campaigns'
 
 import AlertOptionsContainer from './AlertOptionsContainer'
 import TapBehaviorContainer from './TapBehaviorContainer'
+import AdvancedSettingsContainer from './AdvancedSettingsContainer'
 
 import FormComponent from '../../utils/FormComponent'
 import { getIsNotificationDeliveryModalOpen } from '../../../reducers'
@@ -73,17 +74,7 @@ class NotificationContainer extends React.Component<
                     device={device}
                 />
             ),
-            advancedSettings: (
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                >
-                    Advanced Settings things
-                </div>
-            )
+            advancedSettings: <AdvancedSettingsContainer device={device} />
         }
 
         const type: UIStateType = 'notification'

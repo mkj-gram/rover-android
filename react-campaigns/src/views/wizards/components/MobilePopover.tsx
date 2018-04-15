@@ -1,19 +1,21 @@
-/// <reference path="../../../../typings/index.d.ts"/>
+/// <reference path="../../../../typings/index.d.ts" />
 import * as React from 'react'
-import { NavBar, white, Text } from '@rover/ts-bootstrap/dist/src'
+import { NavBar, white, Text, graphite } from '@rover/ts-bootstrap/dist/src'
 
-export interface OwnProps {
-    child: JSX.Element
-    onClose: () => void
+export interface MobilePopoverProps {
+    child: JSX.Element | JSX.Element[]
+    onClose?: () => void
     animation: string
     title?: string
+    navbarProps?: object
 }
 
-const NotificationMobilePopoverContainer: React.SFC<OwnProps> = ({
+const MobilePopover: React.SFC<MobilePopoverProps> = ({
     animation,
     child,
     title,
-    onClose
+    onClose,
+    navbarProps
 }) => {
     return (
         <div
@@ -37,9 +39,21 @@ const NotificationMobilePopoverContainer: React.SFC<OwnProps> = ({
                     buttonLeftStyle: {
                         outerStyle: {
                             marginLeft: 24
+                        },
+                        innerStyle: {
+                            color: graphite
+                        }
+                    },
+                    buttonRightStyle: {
+                        outerStyle: {
+                            marginRight: 24
+                        },
+                        innerStyle: {
+                            color: graphite
                         }
                     }
                 }}
+                {...navbarProps}
             />
             {title !== undefined && (
                 <div
@@ -55,4 +69,4 @@ const NotificationMobilePopoverContainer: React.SFC<OwnProps> = ({
     )
 }
 
-export default NotificationMobilePopoverContainer
+export default MobilePopover

@@ -156,14 +156,7 @@ class OverviewModalHeader extends React.Component<
         } = this.props
 
         const popoverProps = {
-            placement: 'top-end',
-            containerStyle: {
-                width: 320,
-                background: white,
-                flexDirection: 'column',
-                borderRadius: 3,
-                border: `1px solid ${titanium}`
-            }
+            placement: 'top-end'
         }
 
         return (
@@ -202,11 +195,21 @@ class OverviewModalHeader extends React.Component<
                         >
                             {[
                                 <MoreIcon fill={white} key="moreIcon1" />,
-                                <ShowMorePopoverChildren
+                                <div
+                                    style={{
+                                        width: 320
+                                    }}
                                     key="moreIcon2"
-                                    names={['Rename', 'Duplicate', 'Archive']}
-                                    onClick={this.handleShowMoreSelection}
-                                />
+                                >
+                                    <ShowMorePopoverChildren
+                                        names={[
+                                            'Rename',
+                                            'Duplicate',
+                                            'Archive'
+                                        ]}
+                                        onClick={this.handleShowMoreSelection}
+                                    />
+                                </div>
                             ]}
                         </PopoverContainer>
                     </div>

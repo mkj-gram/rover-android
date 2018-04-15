@@ -12,7 +12,7 @@ export type func = () => void
 export interface PopoverProps extends InjectedProps {
     placement?: PopperJS.Placement
     children?: JSX.Element
-    containerStyle?: React.CSSProperties
+
     toggle?: () => void
     arrowColors?: StringMap<string>
     navBarProperties?: StringMap<string | number | object | func>
@@ -205,8 +205,7 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
                 // tslint:disable-next-line:no-any
                 fn: (data: any) => {
                     data.styles = {
-                        ...data.styles,
-                        ...this.props.containerStyle
+                        ...data.styles
                     }
                     data.arrowElement = <div className="popper__arrow" />
                     return data
@@ -228,9 +227,10 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
             >
                 <div ref={this.setWrapperRef}>
                     <style type="text/css">{`
-                    .popper {                        
-                        width: 150px;
-                        border-radius: 2px;
+                    .popper {                                            
+                        background: ${white};
+                        border: 1px solid ${titanium};
+                        border-radius: 3px;
                     }
                     
                     .popper .popper__arrow {

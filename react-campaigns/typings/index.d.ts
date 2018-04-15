@@ -60,11 +60,11 @@ declare class ScheduledCampaign extends Campaign {
     notificationTapBehaviorExperienceId: string
     notificationTapBehaviorUrl: string
     notificationTapPresentationType: NotificationTapPresentationType
-    notificationIOSContentAvailable: boolean
-    notificationIOSMutableContent: boolean
-    notificationIOSSound: string
-    notificationIOSCategoryIdentifier: string
-    notificationIOSThreadIdentifier: string
+    notificationIosContentAvailable: boolean
+    notificationIosMutableContent: boolean
+    notificationIosSound: string
+    notificationIosCategoryIdentifier: string
+    notificationIosThreadIdentifier: string
     notificationAndroidChannelId: string
     notificationAndroidSound: string
     notificationAndroidTag: string
@@ -90,11 +90,11 @@ declare class AutomatedNotificationCampaign extends Campaign {
     notificationTapBehaviorExperienceId: string
     notificationTapBehaviorUrl: string
     notificationTapPresentationType: NotificationTapPresentationType
-    notificationIOSContentAvailable: boolean
-    notificationIOSMutableContent: boolean
-    notificationIOSSound: string
-    notificationIOSCategoryIdentifier: string
-    notificationIOSThreadIdentifier: string
+    notificationIosContentAvailable: boolean
+    notificationIosMutableContent: boolean
+    notificationIosSound: string
+    notificationIosCategoryIdentifier: string
+    notificationIosThreadIdentifier: string
     notificationAndroidChannelId: string
     notificationAndroidSound: string
     notificationAndroidTag: string
@@ -175,6 +175,12 @@ type AppState = {
     notification: NotificationState
     overview: OverviewModalState
     error: ErrorState
+    activePopover: PopoverState
+}
+
+type PopoverState = {
+    readonly activePopover: string
+    readonly isPopoverModalFormOpen: string
 }
 
 type ErrorState = StringMap<string | boolean>

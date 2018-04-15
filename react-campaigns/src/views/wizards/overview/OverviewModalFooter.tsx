@@ -123,14 +123,7 @@ class OverviewModalFooter extends React.Component<
 
         const popoverProps = {
             placement: 'bottom',
-            containerStyle: {
-                height: 312,
-                width: 384,
-                background: white,
-                flexDirection: 'column',
-                borderRadius: 3,
-                border: `1px solid ${titanium}`
-            },
+
             navBarProperties: {
                 buttonLeft: 'Cancel',
                 buttonRight: selectedTestDevices.length !== 0 ? 'Send' : '',
@@ -180,13 +173,19 @@ class OverviewModalFooter extends React.Component<
                                 onClick={this.handleSendTestToggle}
                                 key="sendTest1"
                             />,
-                            <SendTestComponent
-                                key="sendTest2"
-                                device={device}
-                                selectedTestDevices={selectedTestDevices}
-                                listOfTestDevices={this.props.testDevices}
-                                handleCheck={this.handleCheck}
-                            />
+                            <div
+                                style={{
+                                    width: 384
+                                }}
+                            >
+                                <SendTestComponent
+                                    key="sendTest2"
+                                    device={device}
+                                    selectedTestDevices={selectedTestDevices}
+                                    listOfTestDevices={this.props.testDevices}
+                                    handleCheck={this.handleCheck}
+                                />
+                            </div>
                         ]}
                     </PopoverContainer>
                 )

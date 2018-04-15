@@ -16,3 +16,7 @@ export default (
 export const shouldCreateEditableCampaign = (
     state: ScheduledCampaign | AutomatedNotificationCampaign
 ) => state === null
+
+export const getEditableCampaign = (
+    state: ScheduledCampaign | AutomatedNotificationCampaign
+): ScheduledCampaign | AutomatedNotificationCampaign | null => state

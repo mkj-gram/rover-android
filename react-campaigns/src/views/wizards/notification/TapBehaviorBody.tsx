@@ -16,7 +16,7 @@ import {
 } from '@rover/ts-bootstrap/dist/src'
 import TapBehaviorRow from './TapBehaviorRow'
 import PopoverTextRadioButtonComponent from '../../utils/PopoverTextRadioButtonComponent'
-import NotificationMobilePopoverContainer from './NotificationMobilePopoverContainer'
+import MobilePopover from '../components/MobilePopover'
 
 import {
     updateEditableCampaign,
@@ -140,14 +140,7 @@ class TapBehaviorBody extends React.Component<
         const { showWebsitePresentationPopover, displayName } = this.state
 
         const popoverProps = {
-            placement: 'left',
-            containerStyle: {
-                width: 384,
-                background: white,
-                flexDirection: 'column',
-                borderRadius: 3,
-                border: `1px solid ${titanium}`
-            }
+            placement: 'left'
         }
 
         const getClickable = () => {
@@ -186,16 +179,22 @@ class TapBehaviorBody extends React.Component<
             >
                 {[
                     getClickable(),
-                    <PopoverTextRadioButtonComponent
-                        key="presentationType2"
-                        names={['IN_APP', 'IN_BROWSER']}
-                        onClick={this.handleSelectPresentationType}
-                        selectedTapOption={
-                            editableCampaign.notificationTapPresentationType
-                        }
-                        displayName={displayName}
-                        device={device}
-                    />
+                    <div
+                        style={{
+                            width: 384
+                        }}
+                    >
+                        <PopoverTextRadioButtonComponent
+                            key="presentationType2"
+                            names={['IN_APP', 'IN_BROWSER']}
+                            onClick={this.handleSelectPresentationType}
+                            selectedTapOption={
+                                editableCampaign.notificationTapPresentationType
+                            }
+                            displayName={displayName}
+                            device={device}
+                        />
+                    </div>
                 ]}
             </PopoverContainer>
         )
@@ -264,7 +263,7 @@ class TapBehaviorBody extends React.Component<
                         </div>
                         {isTapBehaviorWebsitePresentationOpen !== 'close' &&
                             ReactDOM.createPortal(
-                                <NotificationMobilePopoverContainer
+                                <MobilePopover
                                     title="How should the website be presented?"
                                     child={child}
                                     onClose={() =>

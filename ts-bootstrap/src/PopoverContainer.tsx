@@ -20,6 +20,7 @@ class PopoverContainer extends React.Component<PopoverContainerProps, {}> {
     render() {
         const Fragment = React.Fragment
         const { id, children, popoverProps, targetParent, onClick } = this.props
+
         return (
             <Fragment>
                 <Manager>

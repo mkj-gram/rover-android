@@ -28,6 +28,7 @@ import RenameIcon from './RenameIcon'
 import AlertOptionsPushNotification from './AlertOptionsPushNotification'
 import AlertOptionsNotificationCenter from './AlertOptionsNotificationCenter'
 import AlertOptionsBadgeNumber from './AlertOptionsBadgeNumber'
+import PlusIcon from './PlusIcon'
 
 import Phone from './Phone'
 
@@ -62,5 +63,6 @@ export {
     SearchIcon,
     UserIcon,
     ZapIcon,
-    Phone
+    Phone,
+    PlusIcon
 }

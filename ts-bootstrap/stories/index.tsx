@@ -494,15 +494,7 @@ storiesOf('PopoverContainer', module).add('cases', () => {
         }
         render() {
             const popoverProps = {
-                placement: 'bottom',
-                containerStyle: {
-                    height: 288,
-                    width: 384,
-                    background: white,
-                    flexDirection: 'column',
-                    borderRadius: 3,
-                    border: `2px solid ${red}`
-                }
+                placement: 'bottom'
             }
             const targetParent = 'coverThis'
             return (
@@ -535,6 +527,19 @@ storiesOf('PopoverContainer', module).add('cases', () => {
                                 }}
                             >
                                 Test
+                            </div>,
+
+                            <div
+                                style={{
+                                    flexDirection: 'column'
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        width: 384,
+                                        height: 288
+                                    }}
+                                />
                             </div>
                         ]}
                     </PopoverContainer>
@@ -691,14 +696,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                 {this.state.popoverOpen2 && (
                                     <Popover
                                         placement="right"
-                                        containerStyle={{
-                                            height: 288,
-                                            width: 384,
-                                            background: white,
-                                            flexDirection: 'column',
-                                            borderRadius: 3,
-                                            border: `1px solid ${titanium}`
-                                        }}
                                         toggle={this.toggle2}
                                         targetParent="root"
                                         targetId="target5"
@@ -716,7 +713,14 @@ storiesOf('Popover', module).add('various cases', () => {
                                                 }
                                             }
                                         }}
-                                    />
+                                    >
+                                        <div
+                                            style={{
+                                                height: 288,
+                                                width: 384
+                                            }}
+                                        />
+                                    </Popover>
                                 )}
                             </Manager>
                         </div>
@@ -749,14 +753,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                 {this.state.popoverOpen3 && (
                                     <Popover
                                         placement="right"
-                                        containerStyle={{
-                                            height: 288,
-                                            width: 384,
-                                            background: white,
-                                            flexDirection: 'column',
-                                            borderRadius: 3,
-                                            border: `1px solid ${titanium}`
-                                        }}
                                         toggle={this.toggle3}
                                         navBarProperties={{
                                             buttonLeft: 'Button',
@@ -778,7 +774,14 @@ storiesOf('Popover', module).add('various cases', () => {
                                         toggleable={false}
                                         targetParent="root"
                                         targetId="target4"
-                                    />
+                                    >
+                                        <div
+                                            style={{
+                                                height: 288,
+                                                width: 384
+                                            }}
+                                        />
+                                    </Popover>
                                 )}
                             </Manager>
                         </div>
@@ -809,14 +812,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                 {this.state.popoverOpen1 && (
                                     <Popover
                                         placement="bottom"
-                                        containerStyle={{
-                                            height: 288,
-                                            width: 384,
-                                            background: white,
-                                            flexDirection: 'column',
-                                            borderRadius: 3,
-                                            border: `1px solid ${titanium}`
-                                        }}
                                         toggle={this.toggle1}
                                         navBarProperties={{
                                             title: 'Title',
@@ -843,7 +838,14 @@ storiesOf('Popover', module).add('various cases', () => {
                                         toggleable={true}
                                         targetId="target1"
                                         targetParent="root"
-                                    />
+                                    >
+                                        <div
+                                            style={{
+                                                height: 288,
+                                                width: 384
+                                            }}
+                                        />
+                                    </Popover>
                                 )}
                             </Manager>
                         </div>
@@ -874,14 +876,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                 {this.state.popoverOpen4 && (
                                     <Popover
                                         placement="top"
-                                        containerStyle={{
-                                            height: 288,
-                                            width: 384,
-                                            background: white,
-                                            flexDirection: 'column',
-                                            borderRadius: 3,
-                                            border: `1px solid ${red}`
-                                        }}
                                         toggle={this.toggle4}
                                         arrowColors={{
                                             primary: white,
@@ -891,7 +885,14 @@ storiesOf('Popover', module).add('various cases', () => {
                                         toggleable={true}
                                         targetId="target2"
                                         targetParent="root"
-                                    />
+                                    >
+                                        <div
+                                            style={{
+                                                height: 288,
+                                                width: 384
+                                            }}
+                                        />
+                                    </Popover>
                                 )}
                             </Manager>
                         </div>
@@ -914,14 +915,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                 {this.state.popoverOpen && (
                                     <Popover
                                         placement="auto"
-                                        containerStyle={{
-                                            height: 288,
-                                            width: 384,
-                                            background: white,
-                                            flexDirection: 'column',
-                                            borderRadius: 3,
-                                            border: `1px solid ${red}`
-                                        }}
                                         toggle={this.toggle}
                                         navBarProperties={{
                                             buttonLeft: 'Button',
@@ -943,7 +936,14 @@ storiesOf('Popover', module).add('various cases', () => {
                                         toggleable={true}
                                         targetId="target3"
                                         targetParent="root"
-                                    />
+                                    >
+                                        <div
+                                            style={{
+                                                height: 288,
+                                                width: 384
+                                            }}
+                                        />
+                                    </Popover>
                                 )}
                             </Manager>
                         </div>

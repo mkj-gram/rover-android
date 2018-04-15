@@ -121,7 +121,7 @@ class SendTestComponent extends React.Component<
             ret = (
                 <div
                     style={{
-                        height: 250,
+                        height: 256,
                         overflowY: 'scroll'
                     }}
                 >

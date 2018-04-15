@@ -173,3 +173,30 @@ export const closeTapBehaviorWebsitePresentation: ActionCreator<
         })
     }, 500)
 }
+
+// Popover Modal
+export const updateActivePopover: ActionCreator<
+    ThunkAction<void, State, void>
+> = (field: string) => (dispatch: Dispatch<State>): void => {
+    dispatch({
+        type: 'UPDATE_ACTIVE_POPOVER',
+        field
+    })
+}
+
+export const openPopoverModalForm: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'OPEN_POPOVER_MODAL_FORM' })
+}
+
+export const closePopoverModalForm: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'CLOSING_POPOVER_MODAL_FORM' })
+    setTimeout(() => {
+        dispatch({
+            type: 'CLOSE_POPOVER_MODAL_FORM'
+        })
+    }, 500)
+}

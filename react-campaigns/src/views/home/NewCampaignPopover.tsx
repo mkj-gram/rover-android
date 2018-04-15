@@ -523,15 +523,6 @@ class NewCampaignPopover extends React.PureComponent<
                                     ? 'bottom-start'
                                     : 'bottom-end'
                             }
-                            containerStyle={{
-                                height: 'auto',
-                                width: 384,
-                                background: white,
-                                flexDirection: 'column',
-                                borderRadius: 3,
-                                border: `1px solid ${titanium}`,
-                                zIndex: 1
-                            }}
                             toggle={this.handleOpenClose}
                             navBarProperties={{
                                 title: this.getTitle(),
@@ -564,7 +555,17 @@ class NewCampaignPopover extends React.PureComponent<
                             targetId="desktop-new-campaign-button"
                             targetParent="root"
                         >
-                            {this.renderContent()}
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    height: 'auto',
+                                    width: 384,
+
+                                    flexDirection: 'column'
+                                }}
+                            >
+                                {this.renderContent()}
+                            </div>
                         </Popover>
                     )}
             </Manager>

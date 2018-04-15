@@ -80,3 +80,12 @@ export const shouldCreateEditableCampaign = (state: State) =>
     editableCampaignSelector.shouldCreateEditableCampaign(
         state.editableCampaign
     )
+export const getEditableCampaign = (state: State) =>
+    editableCampaignSelector.getEditableCampaign(state.editableCampaign)
+
+// Active Popover
+export const getActivePopover = (state: State) =>
+    appSelector.getActivePopover(state.app)
+
+export const getIsPopoverModalFormOpen = (state: State) =>
+    appSelector.getIsPopoverModalFormOpen(state.app)

@@ -5,19 +5,22 @@ import { steel, titanium, turquoise } from '../styles/colors'
 import PlusIcon from './Icons/PlusIcon'
 import CircleCloseIcon from './Icons/CircleCloseIcon'
 
-export interface TextInputProps {
+export interface PopoverFormInputProps {
     deleteText: () => void
     id: string
     isEditingText: boolean
     label: string
     media: 'Mobile' | 'Tablet' | 'Desktop'
-    placeholder?: string
+
     startEditingText: () => void
-    text: string | undefined
+    text?: string
     updateText: (text: string) => void
     fieldStyle?: React.CSSProperties
     primaryTextSize?: 'h1' | 'h2' | 'large' | 'medium' | 'small'
-    isRequired?: boolean
+
+    addButton?: JSX.Element | React.ReactPortal
+    editButton?: JSX.Element | React.ReactPortal
+    textMode?: Boolean
 }
 
 const getFieldStyle: () => React.CSSProperties = () => ({
@@ -27,41 +30,12 @@ const getFieldStyle: () => React.CSSProperties = () => ({
     display: 'block'
 })
 
-const renderAddButton = (
-    media: 'Mobile' | 'Tablet' | 'Desktop',
-    startEditingText: () => void
-) => {
-    switch (media) {
-        case 'Desktop':
-            return (
-                <Button
-                    onClick={startEditingText}
-                    text="Add"
-                    type="regular"
-                    style={{
-                        innerStyle: {
-                            fontSize: 15,
-                            color: turquoise
-                        },
-                        outerStyle: {
-                            height: null,
-                            lineHeight: '24px'
-                        }
-                    }}
-                />
-            )
-        case 'Tablet':
-            return <PlusIcon fill={titanium} onClick={startEditingText} />
-        case 'Mobile':
-        default:
-            return
-    }
-}
 const renderTextControlButtons = (
     deleteText: () => void,
     media: 'Mobile' | 'Tablet' | 'Desktop',
     startEditingText: () => void,
-    text: string | undefined
+    text?: string,
+    editButton?: JSX.Element | React.ReactPortal
 ) => {
     switch (media) {
         case 'Desktop':
@@ -77,10 +51,6 @@ const renderTextControlButtons = (
                                     fontSize: 15,
                                     marginRight: 8,
                                     color: turquoise
-                                },
-                                outerStyle: {
-                                    height: null,
-                                    lineHeight: '24px'
                                 }
                             }}
                         />
@@ -93,71 +63,55 @@ const renderTextControlButtons = (
                             innerStyle: {
                                 fontSize: 15,
                                 color: turquoise
-                            },
-                            outerStyle: {
-                                height: null,
-                                lineHeight: '24px'
                             }
                         }}
                     />
                 </div>
             )
+
         case 'Tablet':
         case 'Mobile':
         default:
+            const Fragment = React.Fragment
             return (
-                <CircleCloseIcon
-                    fill={turquoise}
-                    onClick={e => {
-                        e.stopPropagation()
-                        deleteText()
-                    }}
-                />
+                <Fragment>
+                    <CircleCloseIcon
+                        fill={turquoise}
+                        onClick={e => {
+                            e.stopPropagation()
+                            deleteText()
+                        }}
+                        style={{
+                            marginRight: media === 'Tablet' ? 16 : 0
+                        }}
+                    />
+
+                    {editButton}
+                </Fragment>
             )
     }
 }
 
-const TextInput: React.SFC<TextInputProps> = ({
+const PopoverFormInput: React.SFC<PopoverFormInputProps> = ({
     deleteText,
     id,
     isEditingText,
     label,
     media,
-    placeholder,
+
     startEditingText,
     text,
     updateText,
     fieldStyle,
     primaryTextSize = 'large',
-    isRequired = false
+
+    addButton,
+    editButton,
+    textMode
 }) => {
     const containerFieldStyle: React.CSSProperties = {
         ...getFieldStyle(),
         ...fieldStyle
-    }
-
-    if (placeholder && isRequired) {
-        return (
-            <div style={containerFieldStyle} onClick={startEditingText}>
-                <Text
-                    text={label}
-                    label={true}
-                    size="small"
-                    textStyle={{ display: 'block', color: steel }}
-                />
-
-                <Text
-                    text={text}
-                    id={id}
-                    contentEditable={isEditingText}
-                    handleChange={(str: string) => updateText(str)}
-                    size={primaryTextSize}
-                    onBlurChange={true}
-                    placeholder={true}
-                    placeholderText={placeholder}
-                />
-            </div>
-        )
     }
 
     if (!text && !isEditingText) {
@@ -181,7 +135,7 @@ const TextInput: React.SFC<TextInputProps> = ({
                     size={primaryTextSize}
                     textStyle={{ color: steel }}
                 />
-                {renderAddButton(media, startEditingText)}
+                {addButton}
             </div>
         )
     }
@@ -204,7 +158,10 @@ const TextInput: React.SFC<TextInputProps> = ({
         >
             <div
                 style={{
-                    flex: '1 1 0'
+                    flex: '1 1 0',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                 }}
             >
                 <Text
@@ -229,13 +186,16 @@ const TextInput: React.SFC<TextInputProps> = ({
                 />
             </div>
             {!isEditingText &&
-                renderTextControlButtons(
-                    deleteText,
-                    media,
-                    startEditingText,
-                    text
-                )}
+                (textMode
+                    ? renderTextControlButtons(
+                          deleteText,
+                          media,
+                          startEditingText,
+                          text,
+                          editButton
+                      )
+                    : editButton)}
         </div>
     )
 }
-export default TextInput
+export default PopoverFormInput
