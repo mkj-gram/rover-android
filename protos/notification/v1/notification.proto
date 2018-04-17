@@ -9,20 +9,24 @@ import "protobuf/version.proto";
 import "google/protobuf/timestamp.proto";
 
 service Notification {
-  rpc SendCampaignNotification(SendCampaignNotificationRequest) returns (SendCampaignNotificationResponse);
 
-  // Crud
-  // rpc ListPlatforms(ListPlatformsRequest) returns (ListPlatformResponse);
+	rpc SendCampaignNotification(SendCampaignNotificationRequest) returns (SendCampaignNotificationResponse);
 
-  // rpc ListIosPlatforms(ListIosPlatformsRequest) returns (ListIosPlatformsResponse);
-  rpc GetIosPlatform(GetIosPlatformRequest) returns (GetIosPlatformResponse);
-  rpc CreateIosPlatform(CreateIosPlatformRequest) returns (CreateIosPlatformResponse);
-  rpc UpdateIosPlatformPushCertificate(UpdateIosPlatformPushCertificateRequest) returns (UpdateIosPlatformPushCertificateResponse);
+	// 
+	rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse);
 
-  // rpc ListAndroidPlatform(ListAndroidPlatformRequest) returns(ListAndroidPlatformResponse);
-  rpc CreateAndroidPlatform(CreateAndroidPlatformRequest) returns(CreateAndroidPlatformResponse);
-  rpc GetAndroidPlatform(GetAndroidPlatformRequest) returns(GetAndroidPlatformResponse);
-  rpc UpdateAndroidPlatformPushCredentials(UpdateAndroidPlatformPushCredentialsRequest) returns (UpdateAndroidPlatformPushCredentialsResponse);
+	// Crud
+	// rpc ListPlatforms(ListPlatformsRequest) returns (ListPlatformResponse);
+
+	// rpc ListIosPlatforms(ListIosPlatformsRequest) returns (ListIosPlatformsResponse);
+	rpc GetIosPlatform(GetIosPlatformRequest) returns (GetIosPlatformResponse);
+	rpc CreateIosPlatform(CreateIosPlatformRequest) returns (CreateIosPlatformResponse);
+	rpc UpdateIosPlatformPushCertificate(UpdateIosPlatformPushCertificateRequest) returns (UpdateIosPlatformPushCertificateResponse);
+
+	// rpc ListAndroidPlatform(ListAndroidPlatformRequest) returns(ListAndroidPlatformResponse);
+	rpc CreateAndroidPlatform(CreateAndroidPlatformRequest) returns(CreateAndroidPlatformResponse);
+	rpc GetAndroidPlatform(GetAndroidPlatformRequest) returns(GetAndroidPlatformResponse);
+	rpc UpdateAndroidPlatformPushCredentials(UpdateAndroidPlatformPushCredentialsRequest) returns (UpdateAndroidPlatformPushCredentialsResponse);
 
 }
 
@@ -33,217 +37,253 @@ service Notification {
 */
 
 message PushEnvironment {
-  enum Enum {
-    UNKNOWN = 0;
-    PRODUCTION = 1;
-    DEVELOPMENT = 2;
-  }
+	enum Enum {
+		UNKNOWN = 0;
+		PRODUCTION = 1;
+		DEVELOPMENT = 2;
+  	}
 }
 
 
 message NotificationTapBehaviorType {
-  enum Enum {
-    OPEN_EXPERIENCE = 0;
-    OPEN_APP        = 1;
-    OPEN_DEEP_LINK  = 2;
-    OPEN_WEBSITE    = 3;
-  }
+	enum Enum {
+		OPEN_EXPERIENCE = 0;
+		OPEN_APP        = 1;
+		OPEN_DEEP_LINK  = 2;
+		OPEN_WEBSITE    = 3;
+	}
 }
 
 message NotificationTapPresentationType {
-  enum Enum {
-    UNKNOWN       = 0;
-    IN_APP        = 1;
-    IN_BROWSER    = 2;
-  }
+	enum Enum {
+		UNKNOWN       = 0;
+		IN_APP        = 1;
+		IN_BROWSER    = 2;
+	}
 }
 
 message NotificationAttachmentType {
-  enum Enum {
-    UNKNOWN = 0;
+	enum Enum {
+		UNKNOWN = 0;
 
-    IMAGE = 1;
-    AUDIO = 2;
-    VIDEO = 3;
-  }
+		IMAGE = 1;
+		AUDIO = 2;
+		VIDEO = 3;
+	}
 }
 
 message SendCampaignNotificationRequest {
-  auth.v1.AuthContext auth_context                                                 = 1;
+	auth.v1.AuthContext auth_context                                                 = 1;
 
-  int32               campaign_id                                                  = 2;
-  string              experience_id                                                = 3;
+	int32               campaign_id                                                  = 2;
+	string              experience_id                                                = 3;
 
-  string                          notification_attachment_url                      = 10;
-  NotificationAttachmentType.Enum notification_attachment_type                     = 11;
+	string                          notification_attachment_url                      = 10;
+	NotificationAttachmentType.Enum notification_attachment_type                     = 11;
 
-  NotificationTapBehaviorType.Enum     notification_tap_behavior_type              = 12;
-  NotificationTapPresentationType.Enum notification_tap_behavior_presentation_type = 13;
+	NotificationTapBehaviorType.Enum     notification_tap_behavior_type              = 12;
+	NotificationTapPresentationType.Enum notification_tap_behavior_presentation_type = 13;
 
-  string              notification_tap_behavior_url                                = 14;
+	string              notification_tap_behavior_url                                = 14;
 
-  bool                notification_ios_content_available                           = 15;
-  bool                notification_ios_mutable_content                             = 16;
-  string              notification_ios_sound                                       = 17;
-  string              notification_ios_category_identifier                         = 18;
-  string              notification_ios_thread_identifier                           = 19;
+	bool                notification_ios_content_available                           = 15;
+	bool                notification_ios_mutable_content                             = 16;
+	string              notification_ios_sound                                       = 17;
+	string              notification_ios_category_identifier                         = 18;
+	string              notification_ios_thread_identifier                           = 19;
 
-  string              notification_android_channel_id                              = 20;
-  string              notification_android_sound                                   = 21;
-  string              notification_android_tag                                     = 22;
+	string              notification_android_channel_id                              = 20;
+	string              notification_android_sound                                   = 21;
+	string              notification_android_tag                                     = 22;
 
-  int32               notification_expiration                                      = 23;
+	int32               notification_expiration                                      = 23;
 
-  map<string,string>  notification_attributes                                      = 24;
+	map<string,string>  notification_attributes                                      = 24;
 
-  bool                notification_alert_option_push_notification                  = 25;
-  bool                notification_alert_option_notification_center                = 26;
-  bool                notification_alert_option_badge_number                       = 27;
+	bool                notification_alert_option_push_notification                  = 25;
+	bool                notification_alert_option_notification_center                = 26;
+	bool                notification_alert_option_badge_number                       = 27;
 
-  message Message {
-    
-    string              notification_body              = 1;
-    string              notification_title             = 2;
+	message Message {
 
-    string               device_id                     = 10;
-    string               device_push_token             = 11;
-    PushEnvironment.Enum device_push_token_environment = 12;
-    string               device_app_namespace          = 13;
-    int32                device_badge_count            = 14;
-    // Either "iOS" or "Android"
-    string               os_name                       = 15;
+	string              notification_body              = 1;
+	string              notification_title             = 2;
 
-    rover.protobuf.Version sdk_version                 = 16;
-  }
+	string               device_id                     = 10;
+	string               device_push_token             = 11;
+	PushEnvironment.Enum device_push_token_environment = 12;
+	string               device_app_namespace          = 13;
+	int32                device_badge_count            = 14;
+	// Either "iOS" or "Android"
+	string               os_name                       = 15;
 
-  repeated Message messages                                                        = 30;
+	rover.protobuf.Version sdk_version                 = 16;
+	}
+
+	repeated Message messages                                                        = 30;
 }
 
 
 message SendCampaignNotificationResponse {
 
-  message Result {
-    // indicates if there was an error
-    bool error = 1;
+	message Result {
+		// indicates if there was an error
+		bool error = 1;
 
-    string message = 2;
-  }
-  
-  repeated Result results = 1;
+		string message = 2;
+	}
+
+	repeated Result results = 1;
+}
+
+
+
+message ListNotificationsRequest {
+	auth.v1.AuthContext auth_context = 1;
+
+	string device_id = 2;
+}
+
+message ListNotificationsResponse {
+	message Notification {
+		string id = 1;
+
+		int32  campaign_id   = 2;
+		string experience_id = 3;
+
+		string title = 4;
+		string body  = 5;
+
+		string                          notification_attachment_url  = 6;
+		NotificationAttachmentType.Enum notification_attachment_type = 7;
+
+		string                                  notification_tap_behavior_url               = 8;
+		NotificationTapBehaviorType.Enum        notification_tap_behavior_type              = 9;
+		NotificationTapPresentationType.Enum    notification_tap_behavior_presentation_type = 10;
+
+		bool is_notification_center_enabled = 11;
+		bool is_read                        = 12;
+		bool is_deleted                     = 13;
+
+		google.protobuf.Timestamp created_at = 19;
+
+	}
+
+	repeated Notification notifications = 1;
 }
 
 
 /*
-    Platform
+	Platform
 */ 
 
 message Platform {
-    oneof paltform {
-        IosPlatform ios_platform            = 1;
-        AndroidPlatform android_platform    = 2;
-    }
+	oneof paltform {
+		IosPlatform ios_platform            = 1;
+		AndroidPlatform android_platform    = 2;
+	}
 }
 
 message IosPlatform {
-    int32 id            = 1;
-    int32 account_id    = 2;
-    string title        = 3;
+	int32 id            = 1;
+	int32 account_id    = 2;
+	string title        = 3;
 
-    string bundle_id                = 4;
-    bytes certificate_data          = 5;
-    string certificate_passphrase   = 6;
-    string certificate_filename     = 7;
-    google.protobuf.Timestamp certificate_expires_at = 8;
-    google.protobuf.Timestamp certificate_updated_at = 9;
+	string bundle_id                = 4;
+	bytes certificate_data          = 5;
+	string certificate_passphrase   = 6;
+	string certificate_filename     = 7;
+	google.protobuf.Timestamp certificate_expires_at = 8;
+	google.protobuf.Timestamp certificate_updated_at = 9;
 
-    google.protobuf.Timestamp updated_at = 18;
-    google.protobuf.Timestamp created_at = 19;
+	google.protobuf.Timestamp updated_at = 18;
+	google.protobuf.Timestamp created_at = 19;
 }
 
 message AndroidPlatform {
-    int32 id            = 1;
-    int32 account_id    = 2;
-    string title        = 3;
+	int32 id            = 1;
+	int32 account_id    = 2;
+	string title        = 3;
 
-    string push_credentials_server_key = 5;
-    string push_credentials_sender_id = 6;
-    google.protobuf.Timestamp push_credentials_updated_at = 7;
+	string push_credentials_server_key = 5;
+	string push_credentials_sender_id = 6;
+	google.protobuf.Timestamp push_credentials_updated_at = 7;
 
-    google.protobuf.Timestamp updated_at = 10;
-    google.protobuf.Timestamp created_at = 11;
+	google.protobuf.Timestamp updated_at = 10;
+	google.protobuf.Timestamp created_at = 11;
 }
 
 /*
-    RPC request & response
+	RPC request & response
  */
 message CreateIosPlatformRequest {
-    rover.auth.v1.AuthContext auth_context = 1;
+	rover.auth.v1.AuthContext auth_context = 1;
 
-    string title = 3;
+	string title = 3;
 
-    bytes certificate_data          = 5;
-    string certificate_passphrase   = 6;
-    string certificate_filename     = 7;
+	bytes certificate_data          = 5;
+	string certificate_passphrase   = 6;
+	string certificate_filename     = 7;
 }
 
 message CreateIosPlatformResponse {
-    IosPlatform ios_platform = 1;
+	IosPlatform ios_platform = 1;
 }
 
 message GetIosPlatformRequest {
-    rover.auth.v1.AuthContext auth_context = 1;
-    int32 ios_platform_id = 2;
+	rover.auth.v1.AuthContext auth_context = 1;
+	int32 ios_platform_id = 2;
 }
 
 message GetIosPlatformResponse {
-    IosPlatform ios_platform = 1;
+	IosPlatform ios_platform = 1;
 }
 
 message UpdateIosPlatformPushCertificateRequest {
-    rover.auth.v1.AuthContext auth_context = 1;
-    int32 ios_platform_id = 2;
+	rover.auth.v1.AuthContext auth_context = 1;
+	int32 ios_platform_id = 2;
 
-    bytes certificate_data = 3;
-    string certificate_passphrase = 4;
-    string certificate_filename = 5;
+	bytes certificate_data = 3;
+	string certificate_passphrase = 4;
+	string certificate_filename = 5;
 }
 
 message UpdateIosPlatformPushCertificateResponse {
-    IosPlatform ios_platform = 1;
+	IosPlatform ios_platform = 1;
 }
 
 
 message CreateAndroidPlatformRequest {
-    rover.auth.v1.AuthContext auth_context = 1;
+	rover.auth.v1.AuthContext auth_context = 1;
 
-    string title = 3;
+	string title = 3;
 
-    string push_credentials_server_key = 4;
-    string push_credentials_sender_id  = 5;
+	string push_credentials_server_key = 4;
+	string push_credentials_sender_id  = 5;
 }
 
 message CreateAndroidPlatformResponse {
-    AndroidPlatform android_platform = 1;
+	AndroidPlatform android_platform = 1;
 }
 
 message GetAndroidPlatformRequest {
-    rover.auth.v1.AuthContext auth_context = 1;
-    int32 android_platform_id = 2;
+	rover.auth.v1.AuthContext auth_context = 1;
+	int32 android_platform_id = 2;
 }
 
 message GetAndroidPlatformResponse {
-    AndroidPlatform android_platform = 1;
+	AndroidPlatform android_platform = 1;
 }
 
 message UpdateAndroidPlatformPushCredentialsRequest {
-    rover.auth.v1.AuthContext auth_context = 1;
+	rover.auth.v1.AuthContext auth_context = 1;
 
-    int32 android_platform_id = 2;
+	int32 android_platform_id = 2;
 
-    string push_credentials_server_key = 3;
-    string push_credentials_sender_id  = 4;
+	string push_credentials_server_key = 3;
+	string push_credentials_sender_id  = 4;
 }
 
 message UpdateAndroidPlatformPushCredentialsResponse {
-    AndroidPlatform android_platform = 1;
+	AndroidPlatform android_platform = 1;
 }
