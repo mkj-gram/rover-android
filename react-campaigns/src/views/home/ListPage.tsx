@@ -14,7 +14,8 @@ import {
     closeCampaignTypeSelector,
     createCampaign,
     fetchCampaigns,
-    handleOverviewModalDisplay
+    handleOverviewModalDisplay,
+    fetchCampaign
 } from '../../actions'
 import { getAllCampaigns, getIsError } from '../../reducers'
 
@@ -23,6 +24,7 @@ import CampaignsList from './CampaignsList'
 import OverviewContainer from '../wizards/overview/OverviewContainer'
 import ResponsiveContainer from '../utils/ResponsiveContainer'
 import ToolBar from './ToolBar'
+import { getCampaign } from '../../reducers/campaigns'
 
 export interface RouterProps {
     history: H.History
@@ -31,6 +33,7 @@ export interface RouterProps {
 
 export interface DispatchProps {
     fetchCampaigns: () => void
+    fetchCampaign: (campaignId: number) => void
     closeCampaignTypeSelector: () => void
     createCampaign: (name: string, campaignType: CampaignType) => void
     handleOverviewModalDisplay: (history: H.History, open: boolean) => void
@@ -72,11 +75,22 @@ class ListPage extends React.PureComponent<
             RouterProps
     ) {
         // tslint:disable-next-line:no-shadowed-variable
-        const { fetchCampaigns, location } = this.props
+        const {
+            fetchCampaigns,
+            location,
+            campaigns,
+            fetchCampaign
+        } = this.props
         const nextSearch = nextProps.location.search
 
         if (location.search !== nextSearch) {
             fetchCampaigns()
+        }
+
+        const { campaignId } = this.getQueryParams()
+
+        if (campaignId && getCampaign(campaigns, campaignId) === null) {
+            fetchCampaign(parseInt(campaignId))
         }
     }
 
@@ -204,6 +218,7 @@ class ListPage extends React.PureComponent<
                                 style={{
                                     flex: '1 1 auto'
                                 }}
+                                campaignType={campaignType}
                             />
                             <ToolBar
                                 currentPage={parseInt(pageNumber, 10)}
@@ -320,6 +335,9 @@ const mapDispatchToProps = (
                     keyword
                 )
             )
+        },
+        fetchCampaign: campaignId => {
+            dispatch(fetchCampaign(campaignId))
         },
         handleOverviewModalDisplay: (_, open) => {
             dispatch(handleOverviewModalDisplay(ownProps.history, open))

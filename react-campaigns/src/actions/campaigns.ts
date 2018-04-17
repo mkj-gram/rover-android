@@ -167,6 +167,115 @@ export const updateNotificationSettings: ActionCreator<
     )
 }
 
+export const fetchCampaign: ActionCreator<
+    ThunkAction<Promise<Action | void>, State, void>
+> = (campaignId: number) => (
+    dispatch: Dispatch<State>,
+    getState: () => State
+): Promise<Action | void> => {
+    const query: DocumentNode = gql`
+        query FetchCampaign($campaignId: Int!) {
+            campaign(campaignId: $campaignId) {
+                campaignId
+                name
+                campaignType
+                campaignStatus
+                UIState
+                ... on NotificationCampaign {
+                    notificationTitle
+                    notificationBody
+                    notificationAttachment {
+                        type
+                        url
+                    }
+                    notificationTapBehaviorType
+                    notificationTapPresentationType
+                    notificationTapBehaviorUrl
+                    notificationIosContentAvailable
+                    notificationIosMutableContent
+                    notificationIosSound
+                    notificationIosCategoryIdentifier
+                    notificationIosThreadIdentifier
+                    notificationAndroidChannelId
+                    notificationAndroidSound
+                    notificationAndroidTag
+                    notificationExpiration
+                    notificationAttributesMap
+                    notificationAlertOptionPushNotification
+                    notificationAlertOptionNotificationCenter
+                    notificationAlertOptionBadgeNumber
+                }
+                ... on ScheduledNotificationCampaign {
+                    scheduledType
+                    scheduledTimeZone
+                    scheduledTimestamp
+                    scheduledUseLocalDeviceTime
+                    scheduledDeliveryStatus
+                }
+                ... on SegmentableCampaign {
+                    segmentIds
+                    segmentCondition
+                }
+                ... on AutomatedNotificationCampaign {
+                    automatedMonday
+                    automatedTuesday
+                    automatedWednesday
+                    automatedThursday
+                    automatedFriday
+                    automatedSaturday
+                    automatedSunday
+                    automatedStartDate
+                    automatedEndDate
+                    automatedStartTime
+                    automatedEndTime
+                    automatedTimeZone
+                    automatedUseLocalDeviceTime
+                    automatedEventName
+                }
+            }
+        }
+    `
+    const request = {
+        query,
+        variables: {
+            campaignId
+        }
+    }
+    return Environment(request).then(
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: 'FETCH_CAMPAIGN_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                const campaigns = {
+                    ...getState().campaigns,
+                    [data.campaign.campaignId]: {
+                        ...data.campaign
+                    }
+                }
+                dispatch({
+                    type: 'FETCH_CAMPAIGN_SUCCESS',
+                    campaigns
+                })
+            }
+        },
+        ({ result }) => {
+            dispatch({
+                type: 'FETCH_CAMPAIGN_FAILURE',
+                message: result.errors[0].message
+            })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
+        }
+    )
+}
+
 export const duplicateCampaign: ActionCreator<
     ThunkAction<Promise<Action | void>, State, void>
 > = (name: string, campaignId: number) => (

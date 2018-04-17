@@ -45,6 +45,8 @@ export const fetchCampaigns = (
         pageNumber,
         keyword
     )
+export const fetchCampaign = (campaignId: number) =>
+    campaignsActions.fetchCampaign(campaignId)
 
 export const createCampaign = (name: string, campaignType: CampaignType) =>
     campaignsActions.createCampaign(name, campaignType)

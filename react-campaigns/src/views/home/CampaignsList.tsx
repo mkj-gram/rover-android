@@ -26,6 +26,7 @@ export interface Props {
     media: Media
     pushToOverview: (campaignId: string) => void
     style?: React.CSSProperties
+    campaignType: string
 }
 
 const isScheduledCampaign = (
@@ -460,7 +461,8 @@ const CampaignsList: React.SFC<Props> = ({
     campaigns,
     media,
     pushToOverview,
-    style
+    style,
+    campaignType
 }) => {
     const baseStyle: React.CSSProperties = {
         width: '100%',
@@ -473,11 +475,24 @@ const CampaignsList: React.SFC<Props> = ({
         alignItems: 'center',
         ...style
     }
+
+    const typeMap: StringMap<CampaignType> = {
+        scheduled: 'SCHEDULED_NOTIFICATION',
+        automated: 'AUTOMATED_NOTIFICATION',
+        interstitial: 'INTERSTITIAL',
+        web: 'WEB'
+    }
+
     return (
         <div style={baseStyle}>
             {Object.keys(campaigns)
                 .slice(0)
                 .reverse()
+                .filter(
+                    campaignId =>
+                        campaigns[campaignId].campaignType ===
+                            typeMap[campaignType] || campaignType === 'all'
+                )
                 .map((campaignId, index) => (
                     <div
                         key={index}
