@@ -163,7 +163,8 @@ class OverviewComponent extends React.Component<
                         flexDirection: 'column',
                         background: white,
                         position: 'relative',
-                        minHeight: '100%'
+                        minHeight: '100%',
+                        width: '100%'
                     }}
                     id="overviewComponentRoot"
                 >

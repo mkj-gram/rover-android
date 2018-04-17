@@ -79,6 +79,7 @@ class OverviewModalHeader extends React.Component<
         this.handleShowMoreSelection = this.handleShowMoreSelection.bind(this)
         this.handleRename = this.handleRename.bind(this)
         this.handleClose = this.handleClose.bind(this)
+        this.getTextStyle = this.getTextStyle.bind(this)
     }
 
     handleShowMore() {
@@ -144,6 +145,25 @@ class OverviewModalHeader extends React.Component<
 
     handleClose() {
         this.props.handleOverviewModalDisplay(this.props.history, false)
+    }
+
+    getTextStyle() {
+        const { rename } = this.state
+
+        let textStyle: React.CSSProperties = {
+            color: white
+        }
+
+        if (!rename) {
+            textStyle = {
+                ...textStyle,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                width: '100%'
+            }
+        }
+        return textStyle
     }
 
     render() {
@@ -215,13 +235,17 @@ class OverviewModalHeader extends React.Component<
                     </div>
                     <div
                         style={{
-                            marginTop: 16
+                            marginTop: 16,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            height: 40
                         }}
                     >
                         <Text
                             text={campaignName}
                             size="h1"
-                            textStyle={{ color: white }}
+                            textStyle={this.getTextStyle()}
                             contentEditable={this.state.rename}
                             handleChange={this.handleRename}
                             id="renameCampaign"

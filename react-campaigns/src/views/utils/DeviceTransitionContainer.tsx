@@ -50,7 +50,8 @@ class DeviceTransitionContainer extends React.Component<
                             display: 'flex',
                             animation: `${displayOverviewModal} 500ms ease`,
                             maxWidth: 769,
-                            position: 'relative'
+                            position: 'relative',
+                            minWidth: 0
                         }}
                         id="mainModalLeft"
                     >
@@ -79,7 +80,8 @@ class DeviceTransitionContainer extends React.Component<
                         display: 'flex',
                         animation: `${displayOverviewModal} 500ms ease`,
                         position: 'absolute',
-                        zIndex: 2
+                        zIndex: 2,
+                        minWidth: 0
                     }}
                     id="mainModalLeft"
                 >
