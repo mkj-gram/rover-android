@@ -9,7 +9,7 @@ import (
 type ReceiverFunc func(ctx context.Context, message Message) error
 
 type retryable interface {
-	RetryableError()
+	RetryableError() error
 }
 
 type Subscriber struct {
@@ -25,7 +25,7 @@ func (s *Subscriber) Subscribe(parentCtx context.Context, receiver ReceiverFunc)
 		}
 
 		if err := receiver(ctx, msg); err != nil {
-			if _, ok := err.(retryable); ok {
+			if _, ok := errors.Cause(err).(retryable); ok {
 				m.Nack()
 			}
 			// TODO: log error? nack or ack?

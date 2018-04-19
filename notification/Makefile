@@ -2,7 +2,7 @@ DCF ?= docker-compose -f ../docker/main.docker-compose.yaml
 # or =redo to rerun last migration goose docs for more
 MIGRATION_CMD ?=up
 ENV ?= MIGRATION_CMD=${MIGRATION_CMD}
-RUN ?= ${DCF} run -e "${ENV}" --rm notification-service
+RUN ?= ${DCF} run --service-ports -e "${ENV}" --rm notification-service
 
 ROVER ?= github.com/roverplatform/rover
 ROVER_GOPATH ?= /go/src/${ROVER}

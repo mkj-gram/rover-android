@@ -2,19 +2,29 @@ package main
 
 import (
 	"context"
-	"time"
-
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
+	"time"
 
+	_ "github.com/lib/pq"
+
+	gerrors "cloud.google.com/go/errors"
+	"cloud.google.com/go/pubsub"
+	"github.com/gocql/gocql"
+	"github.com/karlseguin/ccache"
 	"github.com/namsral/flag"
+	"github.com/pkg/errors"
+	prom "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/api/option"
 
-	"cloud.google.com/go/pubsub"
-
+	"github.com/roverplatform/rover/notification/postgres"
 	notification_pubsub "github.com/roverplatform/rover/notification/pubsub"
+	"github.com/roverplatform/rover/notification/push"
+	"github.com/roverplatform/rover/notification/scylla"
 )
 
 var (
@@ -26,7 +36,21 @@ var (
 
 	// GCP PubSub
 	pubsubSubcription            = flag.String("pubsub-subscription", "notification-push-worker", "GCP pubsub's subscription name")
-	pubSubMaxOutstandingMessages = flag.Int("pubsub-max-outstanding-messages", 1, "number of batches allowed to be processed in parallel")
+	pubSubMaxOutstandingMessages = flag.Int("pubsub-max-outstanding-messages", 1, "number of messages to process in parallel")
+
+	// PlatformCache
+	platformsCacheMaxSize = flag.Int("platforms-cache-max-size", 1000, "max items to cache")
+	platformsCacheMaxAge  = flag.Duration("platforms-cache-max-age", time.Duration(5*time.Minute), "max age to cache")
+
+	// worker concurrency
+	workerConcurrency = flag.Int("worker-concurrency", 10, "worker concurrency")
+
+	// Postgres
+	// TODO: should this be postgres-dsn?
+	pgDSN = flag.String("db-dsn", "", "postgres DSN")
+
+	// Scylla
+	scyllaDSN = flag.String("scylla-dsn", "", "scylla DSN")
 )
 
 var (
@@ -40,18 +64,39 @@ func main() {
 	var (
 		ctx, cancelFn = context.WithCancel(context.Background())
 
-		pubsubOpts []option.ClientOption
+		readinessProbes, livenessProbes []func() error
 	)
+
+	//
+	// Prometheus
+	//
+
+	prom.MustRegister(push.PrometheusMetrics...)
+
+	//
+	// GCP
+	//
+	var gcpClientOpts []option.ClientOption
+	if *gcpProjectID != "" {
+		gcpClientOpts = append(gcpClientOpts, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+	}
+
+	//
+	// GCP errors
+	//
+
+	errClient, err := gerrors.NewClient(ctx, *gcpProjectID, "notification/push-worker", "v1", true, gcpClientOpts...)
+	if err != nil {
+		stderr.Fatalf("errors.NewClient: %v", err)
+	} else {
+		stdout.Println("gcp.errors=on")
+	}
 
 	//
 	// Pubsub
 	//
 
-	if *gcpProjectID != "" {
-		pubsubOpts = append(pubsubOpts, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
-	}
-
-	pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, pubsubOpts...)
+	pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, gcpClientOpts...)
 	if err != nil {
 		stderr.Fatalf("pubsub.NewClient: %v", err)
 	} else {
@@ -66,63 +111,189 @@ func main() {
 		MaxExtension:           10 * time.Minute,
 		MaxOutstandingMessages: 1000,
 		MaxOutstandingBytes:    1e9, // 1G
-		NumGoroutines:          1,
+		NumGoroutines:          *workerConcurrency,
 	}
+
+	//
+	// postgres
+	//
+
+	db, err := postgres.Open(*pgDSN)
+	if err != nil {
+		stderr.Fatal("postgres.Open", err)
+	}
+
+	pgProbe := func() error {
+		if err := db.DB().Ping(); err != nil {
+			return errors.Wrap(err, "Postgres")
+		}
+
+		return nil
+	}
+	stdout.Println("postgres=on")
+
+	readinessProbes = append(readinessProbes, pgProbe)
+	// we don't want worker to be taken down if pgProbe fails?
+	// livenessProbes = append(livenessProbes, pgProbe)
+
+	//
+	// scylla
+	//
+
+	sDSN, err := scylla.ParseDSN(*scyllaDSN)
+	if err != nil {
+		stderr.Fatal("scylla.ParseDSN", err)
+	}
+
+	var opts = []scylla.ClusterOption{
+		scylla.WithDefaultKeyspace(sDSN.Keyspace),
+		scylla.WithConsistency(gocql.Quorum),
+	}
+
+	scyllaDB, err := scylla.New(sDSN.Hosts, opts)
+	if err != nil {
+		stderr.Fatal("scylla.New: ", err)
+	}
+	stdout.Println("scylla=on")
+
+	scyllaProbe := func() error {
+		return scyllaDB.
+			Session().
+			Query("SELECT count(*) FROM system.local WHERE key='local' limit 1").
+			Exec()
+	}
+
+	readinessProbes = append(readinessProbes, scyllaProbe)
+	// livenessProbes = append(livenessProbes, scyllaProbe)
+
+	//
+	// Platform Cache
+	//
+
+	var platformCache = ccache.New(ccache.Configure().
+		MaxSize(int64(*platformsCacheMaxSize)).
+		ItemsToPrune(10),
+	)
 
 	//
 	// Notification Pubsub
 	//
 
 	var (
+		handler = &push.Handler{
+			ClientFactory: &push.ClientFactory{
+				Cache:                 platformCache,
+				MaxAge:                *platformsCacheMaxAge,
+				AndroidPlatformsStore: db.AndroidPlatformStore(),
+				IosPlatformsStore:     db.IosPlatformStore(),
+			},
+			NotificationSettingsStore: scyllaDB.NotificationSettingsStore(),
+			NotificationsStore:        scyllaDB.NotificationsStore(),
+		}
+
 		subscriber = notification_pubsub.Subscriber{
 			Subscription: subscription,
 		}
 
-		onReceive = func(ctx context.Context, m notification_pubsub.Message) error {
-			switch nmsg := m.(type) {
-			case *notification_pubsub.PushMessage:
-				_ = nmsg
-			case *notification_pubsub.SilentPush:
-				_ = nmsg
-			default:
-				// TODO:
-			}
+		done = make(chan struct{})
 
-			return nil
+		instrument = func(h notification_pubsub.ReceiverFunc) notification_pubsub.ReceiverFunc {
+			return notification_pubsub.ReceiverFunc(func(ctx context.Context, m notification_pubsub.Message) error {
+				defer func() {
+					if val := recover(); val != nil {
+						var (
+							buf = make([]byte, 1024*10)
+							n   = runtime.Stack(buf, false)
+						)
+						stderr.Printf("status=panic panic=%q trace=%q\n", val, string(buf[:n]))
+						errClient.Reportf(ctx, nil, "status=error error=%q", err)
+					}
+				}()
+
+				if err := h(ctx, m); err != nil {
+					stderr.Printf("status=error error=%q\n", err.Error())
+					return err
+				}
+				return nil
+			})
 		}
 	)
+
 	go func() {
-		for {
-			if err := subscriber.Subscribe(ctx, onReceive); err != nil {
-				// errClient.Reportf(ctx, nil, "pubsub.receive: error=%q", err)
-				stderr.Fatalf("pubsub.receive: status=error error=%q\n", err)
-			} else {
-				stdout.Printf("pubsub.receive=exiting status=OK\n")
-			}
+		defer close(done)
+
+		handler := instrument(
+			notification_pubsub.ReceiverFunc(push.WithMetrics(
+				handler.Handle)))
+
+		if err := subscriber.Subscribe(ctx, handler); err != nil {
+			errClient.Reportf(ctx, nil, "pubsub.receive=exiting status=error error=%q", err)
+			stderr.Printf("pubsub.receive=exiting status=error error=%q\n", err.Error())
+			return
 		}
+		stdout.Printf("pubsub.receive=exiting status=OK\n")
+
 	}()
 
-	// go func() {
-	// 	lis, err := net.Listen("tcp", *rpcAddr)
-	// 	if err != nil {
-	// 		stderr.Fatalln("net.Listen", err)
-	// 	}
 	//
-	// 	if err := grpcServer.Serve(lis); err != nil {
-	// 		stderr.Println("Serve", err)
-	// 	}
-	// }()
+	// HTTP endpoint
+	//
 
-	sigc := make(chan os.Signal)
-	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		probeChain := func(probes []func() error) http.HandlerFunc {
+			return func(w http.ResponseWriter, r *http.Request) {
+				var result string
+				for _, probe := range probes {
+					if err := probe(); err != nil {
+						result += err.Error() + "\n"
+					}
+				}
+				if result != "" {
+					http.Error(w, result, http.StatusServiceUnavailable)
+					return
+				}
+				w.WriteHeader(200)
+				w.Write([]byte("ok"))
+			}
+
+		}
+
+		http.Handle("/metrics", prom.Handler())
+		http.Handle("/readiness", probeChain(readinessProbes))
+		http.Handle("/liveness", probeChain(livenessProbes))
+
+		httpServer := http.Server{
+			Addr:     *httpAddr,
+			ErrorLog: stderr,
+			Handler:  http.DefaultServeMux,
+		}
+
+		if err := httpServer.ListenAndServe(); err != nil {
+			stderr.Fatalf("http.ListenAndServe=exiting status=error error=%q\n", err)
+		}
+	}()
 
 	//
 	// Signals
 	//
+
+	sigc := make(chan os.Signal)
+	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
+
 	select {
-	case <-sigc:
-		log.Printf("Terminating")
+	case sig := <-sigc:
+		stdout.Printf("status=signal signal=%v\n", sig)
 	}
 
+	//
+	// Shutdown
+	//
 	cancelFn()
+
+	select {
+	case <-done:
+		stdout.Println("status=shutdown")
+	case <-time.After(time.Second * 30):
+		stdout.Println("status=shutdown error=timeout")
+	}
 }

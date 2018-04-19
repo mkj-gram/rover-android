@@ -40,37 +40,28 @@ type (
 	}
 )
 
+const iosPlatformFields = `
+ account_id
+,title
+,bundle_id
+
+,certificate_data
+,certificate_passphrase
+,certificate_filename
+,certificate_expires_at
+,certificate_updated_at
+
+,updated_at
+,created_at
+`
+
 type iosPlatformStore store
 
 func (s *iosPlatformStore) Create(ctx context.Context, p *IosPlatform) error {
 	query := `
-		INSERT INTO ios_platforms(
-			 account_id
-			,title
-			,bundle_id
-
-			,certificate_data
-			,certificate_passphrase
-			,certificate_filename
-			,certificate_expires_at
-			,certificate_updated_at
-
-			,updated_at
-			,created_at
-		) VALUES(
-			 $1
-			,$2
-			,$3
-
-			,$4
-			,$5
-			,$6
-			,$7
-			,$8
-
-			,$9
-			,$10
-		) RETURNING id
+		INSERT INTO ios_platforms(` + iosPlatformFields + `)
+		VALUES( $1 ,$2 ,$3 ,$4 ,$5 ,$6 ,$7 ,$8 ,$9 ,$10)
+		RETURNING id
 `
 
 	args := []interface{}{
@@ -97,24 +88,42 @@ func (s *iosPlatformStore) Create(ctx context.Context, p *IosPlatform) error {
 	return nil
 }
 
+func (s *iosPlatformStore) ListByAccountId(ctx context.Context, accountId int32) ([]*IosPlatform, error) {
+	var (
+		query = `
+		SELECT id,` + iosPlatformFields + `
+		FROM ios_platforms
+			WHERE account_id = $1
+			ORDER BY id desc
+`
+
+		ps []*IosPlatform
+	)
+
+	rows, err := s.db.QueryContext(ctx, query, accountId)
+	if err != nil {
+		return nil, errors.Wrap(err, "Query")
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var p IosPlatform
+
+		if err := s.scanPlatform(rows, &p); err != nil {
+			return nil, errors.Wrap(err, "scanPlatform")
+		}
+
+		ps = append(ps, &p)
+	}
+
+	return ps, errors.Wrap(rows.Err(), "rows.Err")
+}
+
 func (s *iosPlatformStore) OneById(ctx context.Context, id int32) (*IosPlatform, error) {
 	var (
 		query = `
-		SELECT
-			id
-			,account_id
-			,title
-			,bundle_id
-
-			,certificate_data
-			,certificate_passphrase
-			,certificate_filename
-			,certificate_expires_at
-			,certificate_updated_at
-
-			,updated_at
-			,created_at
-
+		SELECT id,` + iosPlatformFields + `
 		FROM ios_platforms
 			WHERE id = $1
 `
@@ -122,23 +131,9 @@ func (s *iosPlatformStore) OneById(ctx context.Context, id int32) (*IosPlatform,
 		p IosPlatform
 	)
 
-	if err := s.db.
-		QueryRowContext(ctx, query, id).
-		Scan(
-			&p.Id,
-			&p.AccountId,
-			&p.Title,
-			&p.BundleId,
+	row := s.db.QueryRowContext(ctx, query, id)
 
-			&p.CertificateData,
-			&p.CertificatePassphrase,
-			&p.CertificateFilename,
-			&p.CertificateExpiresAt,
-			&p.CertificateUpdatedAt,
-
-			&p.UpdatedAt,
-			&p.CreatedAt,
-		); err != nil {
+	if err := s.scanPlatform(row, &p); err != nil {
 		return nil, errors.Wrap(err, "Query")
 	}
 
@@ -163,27 +158,13 @@ func (s *iosPlatformStore) UpdatePushCredentials(ctx context.Context, update Ios
 		WHERE
 			id = $1 AND account_id = $2
 
-		RETURNING
-			 id
-			,account_id
-			,title
-			,bundle_id
-
-			,certificate_data
-			,certificate_passphrase
-			,certificate_filename
-			,certificate_expires_at
-			,certificate_updated_at
-
-			,updated_at
-			,created_at
-`
+		RETURNING id,` + iosPlatformFields
 
 		p IosPlatform
 	)
 
-	if err := s.db.
-		QueryRow(query,
+	row := s.db.
+		QueryRowContext(ctx, query,
 			update.Id,
 			update.AccountId,
 
@@ -196,24 +177,35 @@ func (s *iosPlatformStore) UpdatePushCredentials(ctx context.Context, update Ios
 			update.CertificateUpdatedAt,
 
 			update.UpdatedAt,
-		).
-		Scan(
-			&p.Id,
-			&p.AccountId,
-			&p.Title,
-			&p.BundleId,
+		)
 
-			&p.CertificateData,
-			&p.CertificatePassphrase,
-			&p.CertificateFilename,
-			&p.CertificateExpiresAt,
-			&p.CertificateUpdatedAt,
-
-			&p.UpdatedAt,
-			&p.CreatedAt,
-		); err != nil {
+	if err := s.scanPlatform(row, &p); err != nil {
 		return nil, errors.Wrap(err, "Update")
 	}
 
 	return &p, nil
+}
+
+type rowScanner interface {
+	Scan(dest ...interface{}) error
+}
+
+func (s *iosPlatformStore) scanPlatform(row rowScanner, p *IosPlatform) error {
+	err := row.Scan(
+		&p.Id,
+		&p.AccountId,
+		&p.Title,
+		&p.BundleId,
+
+		&p.CertificateData,
+		&p.CertificatePassphrase,
+		&p.CertificateFilename,
+		&p.CertificateExpiresAt,
+		&p.CertificateUpdatedAt,
+
+		&p.UpdatedAt,
+		&p.CreatedAt,
+	)
+
+	return err
 }

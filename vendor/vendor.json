@@ -81,6 +81,12 @@
 			"revisionTime": "2017-05-26T04:12:28Z"
 		},
 		{
+			"checksumSHA1": "E21EqUIMU5lQ0D0apz69xZeWyi8=",
+			"path": "github.com/appleboy/go-fcm",
+			"revision": "76aff676befe9006dac05197dbba470a3019a7e6",
+			"revisionTime": "2018-04-04T15:15:44Z"
+		},
+		{
 			"checksumSHA1": "spyv5/YFBjYyZLZa1U2LBfDR8PM=",
 			"path": "github.com/beorn7/perks/quantile",
 			"revision": "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9",
@@ -97,6 +103,12 @@
 			"path": "github.com/confluentinc/confluent-kafka-go/kafka",
 			"revision": "99a5addc08f7f0d0c20e51e0746f5af3434a5649",
 			"revisionTime": "2017-10-09T10:04:22Z"
+		},
+		{
+			"checksumSHA1": "4772zXrOaPVeDeSgdiV7Vp4KEjk=",
+			"path": "github.com/dgrijalva/jwt-go",
+			"revision": "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e",
+			"revisionTime": "2018-03-08T23:13:08Z"
 		},
 		{
 			"checksumSHA1": "PVJFTaYud+tJ/OHfHnmNXbeyxTo=",
@@ -457,6 +469,30 @@
 			"path": "github.com/scylladb/gocqlx/qb",
 			"revision": "9fa5432a65524efe309950bfe3771f3b37decd55",
 			"revisionTime": "2017-12-27T15:19:38Z"
+		},
+		{
+			"checksumSHA1": "DL5vX9aOefzIAxMDdaQBtgRdR0Y=",
+			"path": "github.com/sideshow/apns2",
+			"revision": "df275e5c35d2814db5013184c3fe18a33439eaa3",
+			"revisionTime": "2017-12-18T08:49:20Z"
+		},
+		{
+			"checksumSHA1": "EHOwwdWPJGt1vNVeJxyRDRHBhl8=",
+			"path": "github.com/sideshow/apns2/certificate",
+			"revision": "df275e5c35d2814db5013184c3fe18a33439eaa3",
+			"revisionTime": "2017-12-18T08:49:20Z"
+		},
+		{
+			"checksumSHA1": "9Lxz0w+q8pqp/Do/kNa8hLoQeY0=",
+			"path": "github.com/sideshow/apns2/payload",
+			"revision": "df275e5c35d2814db5013184c3fe18a33439eaa3",
+			"revisionTime": "2017-12-18T08:49:20Z"
+		},
+		{
+			"checksumSHA1": "nkQ/1JoIY4jh8XlI8LClfFVux9U=",
+			"path": "github.com/sideshow/apns2/token",
+			"revision": "df275e5c35d2814db5013184c3fe18a33439eaa3",
+			"revisionTime": "2017-12-18T08:49:20Z"
 		},
 		{
 			"checksumSHA1": "vE43s37+4CJ2CDU6TlOUOYE0K9c=",
@@ -979,6 +1015,10 @@
 			"path": "gopkg.in/olivere/elastic.v5/uritemplates",
 			"revision": "edbef41beaacc2ee95e61af8faff04e67c01e268",
 			"revisionTime": "2017-08-01T07:38:22Z"
+		},
+		{
+			"path": "https://github.com/appleboy/go-fcm",
+			"revision": ""
 		}
 	],
 	"rootPath": "github.com/roverplatform/rover"

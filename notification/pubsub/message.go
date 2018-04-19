@@ -31,7 +31,6 @@ func (m *SilentPush) notification() {}
 
 type PushMessage struct {
 	Device Device `json:"device"`
-
 	// Used to lookup notification settings
 	CampaignID        int    `json:"campaign_id"`
 	NotificationBody  string `json:"notification_body"`

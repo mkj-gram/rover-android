@@ -177,16 +177,19 @@ services:
       AUDIENCE_SERVICE_URL: "audience-service:5100"
 
   notification-service:
+    ports: [5080]
     image: golang:1.10-alpine
     working_dir: /go/src/github.com/roverplatform/rover
     depends_on:
       - postgres
       - scylla
+      - pubsub
     command: ./docker/notification-service/cmd migrate run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
+      PUBSUB_EMULATOR_HOST: "pubsub:8085"
       DB_DSN: "postgres://postgres:@postgres:5432/notification_dev?sslmode=disable"
       TEST_DB_DSN: "postgres://postgres:@postgres:5432/notification_test?sslmode=disable"
       SCYLLADB_DSN: "scylla://scylla:9042/notification_dev"

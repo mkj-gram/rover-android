@@ -58,6 +58,7 @@ func Test_Marshall(t *testing.T) {
 					OsName:               "iOS",
 					SdkVersion:           Version{1, 2, 3},
 				},
+
 				Payload: map[string]string{
 					"hello": "world",
 				},

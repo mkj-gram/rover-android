@@ -43,6 +43,10 @@ func NewFromSession(session *gocql.Session) *DB {
 	}
 }
 
+func (db *DB) Session() *gocql.Session {
+	return db.session
+}
+
 func (db *DB) Close() error {
 	if db.session.Closed() {
 		return errors.New("db has already been closed")
