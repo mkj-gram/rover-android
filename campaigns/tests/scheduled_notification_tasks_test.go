@@ -438,7 +438,7 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 			},
 
 			{
-				desc: "with segment_ids; signle task",
+				desc: "with segment_ids; single task",
 				gvn: &given{
 					Task: &sn.Task{
 						ID:               4,
@@ -870,6 +870,106 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 						AccountId:      1,
 						CampaignId:     1,
 						DeviceIds:      nil,
+						TimezoneOffset: 0,
+					},
+				},
+			},
+
+			{
+				desc: "retires notification.SendCampaignNotification",
+				gvn: &given{
+					Task: &sn.Task{
+						ID:               9,
+						Error:            "",
+						Forked:           false,
+						NumberOfAttempts: 0,
+						RunAt:            now,
+						State:            string(sn.TaskStateQueued),
+						ScrollId:         "scroll_id#03",
+
+						AccountId:      1,
+						CampaignId:     1,
+						TimezoneOffset: 0,
+					},
+
+					MockFunc: func(m args) {
+						var (
+							authCtx = &authpb.AuthContext{
+								AccountId:        1,
+								PermissionScopes: []string{"server"},
+							}
+
+							ctx = context.Background()
+						)
+
+						m.CampaignsStore.EXPECT().
+							OneById(ctx, int32(1), int32(1)).
+							Return(campaignWithSegments, nil)
+
+						m.AudienceClient.EXPECT().
+							Query(ctx,
+								&audiencepb.QueryRequest{
+									AuthContext: authCtx,
+
+									Iterator: &audiencepb.QueryRequest_ScrollIterator_{
+										ScrollIterator: &audiencepb.QueryRequest_ScrollIterator{
+											Operation: &audiencepb.QueryRequest_ScrollIterator_Next_{
+												Next: &audiencepb.QueryRequest_ScrollIterator_Next{
+													ScrollId: "scroll_id#03",
+												},
+											},
+										},
+									},
+								},
+							).
+							Return(
+								&audiencepb.QueryResponse{
+									ScrollId:  "",
+									TotalSize: 2,
+									Devices: []*audiencepb.Device{
+										&audiencepb.Device{DeviceId: "a"},
+										&audiencepb.Device{DeviceId: "b"},
+									},
+								},
+								nil,
+							)
+
+						// First call returns an error
+						m.NotificationClient.EXPECT().SendCampaignNotification(gomock.Any(), gomock.Any()).Return(nil, status.Error(codes.Internal, "internal"))
+						m.NotificationClient.EXPECT().
+							SendCampaignNotification(ctx, &notificationpb.SendCampaignNotificationRequest{
+								AuthContext:  authCtx,
+								CampaignId:   1,
+								ExperienceId: "",
+
+								NotificationAttachmentType:              notificationpb.NotificationAttachmentType_IMAGE,
+								NotificationTapBehaviorType:             notificationpb.NotificationTapBehaviorType_OPEN_APP,
+								NotificationTapBehaviorPresentationType: notificationpb.NotificationTapPresentationType_IN_APP,
+
+								Messages: []*notificationpb.SendCampaignNotificationRequest_Message{
+									{DeviceId: "a"},
+									{DeviceId: "b"},
+								},
+							}).
+							Return(&notificationpb.SendCampaignNotificationResponse{}, nil)
+
+					},
+				},
+
+				expErr: nil,
+
+				after: &expect{
+					Task: &sn.Task{
+						ID:               9,
+						Error:            "",
+						Forked:           false,
+						NumberOfAttempts: 0,
+						RunAt:            now,
+						State:            string(sn.TaskStateCompleted),
+						ScrollId:         "scroll_id#03",
+
+						AccountId:      1,
+						CampaignId:     1,
 						TimezoneOffset: 0,
 					},
 				},

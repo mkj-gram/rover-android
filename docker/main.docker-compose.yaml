@@ -154,6 +154,7 @@ services:
       - mongo
       - audience-service
       - scheduled_notification_tasks-worker
+      - notification-service
     command: ./docker/campaigns-service/cmd migrate run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
@@ -161,6 +162,7 @@ services:
       CGO_ENABLED: 0
       DB_DSN: "postgres://postgres:@postgres:5432/campaigns_dev?sslmode=disable"
       TEST_DB_DSN: "postgres://postgres:@postgres:5432/campaigns_test?sslmode=disable"
+      NOTIFICATION_SERVICE_URL: "notification-service:5100"
 
   scheduled_notification_tasks-worker:
     image: golang:1.10-alpine

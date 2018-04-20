@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -9,10 +10,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	audiencepb "github.com/roverplatform/rover/apis/go/audience/v1"
-	auth "github.com/roverplatform/rover/apis/go/auth/v1"
+	"github.com/roverplatform/rover/apis/go/auth/v1"
 	notificationpb "github.com/roverplatform/rover/apis/go/notification/v1"
+	"github.com/roverplatform/rover/apis/go/protobuf"
 	"github.com/roverplatform/rover/campaigns"
 	sn "github.com/roverplatform/rover/campaigns/que/scheduled_notifications"
+	"github.com/roverplatform/rover/go/retry"
 )
 
 var (
@@ -94,6 +97,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 
 	var (
 		processBatch = func(b Result) error {
+
 			if err := task.SetState(sn.TaskStateCompleted); err != nil {
 				return errors.Wrap(err, "SetState: completed")
 			}
@@ -105,15 +109,48 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 
 			req.AuthContext = authCtx
 
-			if /*resp*/ _, err := w.NotificationClient.SendCampaignNotification(ctx, req); err != nil {
-				// revert the state to inprogress so it can be rerun
-				if err2 := task.SetState(sn.TaskStateInProgress); err2 != nil {
-					// means task is marked as completed but hasn't actually completed
-					panic(err2.Error() + "\n\n SetState:" + err.Error())
+			var (
+				backoff = &retry.Backoff{
+					MaxAttempts: 10,
+					Jitter:      true,
+					Factor:      2,
+					Min:         time.Duration(1 * time.Second),
+					Max:         time.Duration(10 * time.Minute),
 				}
-				return errors.Wrap(err, "NotificationClient")
+				attempt = 0
+			)
+
+			for attempt < backoff.MaxAttempts {
+
+				if attempt > 0 {
+					select {
+					case <-time.After(backoff.ForAttempt(attempt)):
+						// Does nothing
+					case <-ctx.Done():
+						return errors.Wrap(ctx.Err(), "NotificationClient.SendCampaignNotification")
+					}
+				}
+
+				resp, err := w.NotificationClient.SendCampaignNotification(ctx, req)
+				if err != nil {
+					if st, ok := status.FromError(err); ok && st.Code() == codes.InvalidArgument {
+						return errors.Wrap(err, "NotificationClient")
+					}
+
+					attempt = attempt + 1
+				} else {
+					for _, r := range resp.GetResults() {
+						if r.Error == true {
+							// TODO log it out as an individual log
+						}
+					}
+
+					return nil
+				}
 			}
 
+			// Hit here because we exhausted out max retry
+			// TODO add error log here to indicate job has exhausted all retries
 			return nil
 		}
 
@@ -367,6 +404,9 @@ func buildNotificationRequest(b Result, c *campaigns.Campaign) (*notificationpb.
 			DeviceId:                   d.DeviceId,
 			DevicePushToken:            d.PushTokenKey,
 			DevicePushTokenEnvironment: toPushEnvironment(d.PushEnvironment.String()),
+
+			OsName:     d.OsName,
+			SdkVersion: getSdkVersion(d.GetFrameworks()),
 		}
 	}
 
@@ -375,9 +415,6 @@ func buildNotificationRequest(b Result, c *campaigns.Campaign) (*notificationpb.
 		ExperienceId: c.ExperienceId,
 
 		Messages: messages,
-
-		// TODO
-		// NotificationAlertOptionBadgeNumber
 
 		NotificationAttachmentUrl:               c.NotificationAttachmentUrl,
 		NotificationAttachmentType:              toNotificationAttachementType(c.NotificationAttachmentType),
@@ -401,6 +438,18 @@ func buildNotificationRequest(b Result, c *campaigns.Campaign) (*notificationpb.
 	}
 
 	return req, nil
+}
+
+func getSdkVersion(frameworks map[string]*audiencepb.Version) *rover_protobuf.Version {
+	if version, ok := frameworks["io.rover.Rover"]; ok {
+		return &rover_protobuf.Version{
+			Major:    version.Major,
+			Minor:    version.Minor,
+			Revision: version.Revision,
+		}
+	}
+
+	return nil
 }
 
 func toPushEnvironment(str string) notificationpb.PushEnvironment_Enum {

@@ -19,7 +19,7 @@ import (
 	prom "github.com/prometheus/client_golang/prometheus"
 
 	audiencepb "github.com/roverplatform/rover/apis/go/audience/v1"
-	notification "github.com/roverplatform/rover/apis/go/notification/v1"
+	"github.com/roverplatform/rover/apis/go/notification/v1"
 	"github.com/roverplatform/rover/campaigns/db"
 	campaignjobs "github.com/roverplatform/rover/campaigns/jobs"
 	"github.com/roverplatform/rover/campaigns/que"
@@ -45,9 +45,10 @@ var (
 	dbDSN = flag.String("db-dsn", "", "Postgres DSN url")
 
 	//
-	// Audience Service
+	// GRPC Services
 	//
-	audienceAddr = flag.String("audience-service-url", "", "audience service address")
+	audienceAddr     = flag.String("audience-service-url", "", "audience service address")
+	notificationAddr = flag.String("notification-service-url", "", "notification service address")
 
 	//
 	// Listeners
@@ -167,21 +168,23 @@ func main() {
 
 	audienceClient := audiencepb.NewAudienceClient(conn)
 
+	nconn, err := grpc.Dial(*notificationAddr, grpc.WithInsecure())
+	if err != nil {
+		stderr.Fatalln("grpc.Dial:", err)
+	}
+	defer nconn.Close()
+
+	notificationClient := notification.NewNotificationClient(nconn)
+
 	//
 	// worker pool
 	var (
 		taskc = make(chan *sn.Task)
 
 		snw = campaignjobs.ScheduledNotificationJob{
-			AudienceClient: audienceClient,
-			CampaignsStore: pgdb.CampaignsStore(),
-			NotificationClient: &printer{
-				fn: func(ctx context.Context, req *notification.SendCampaignNotificationRequest) (*notification.SendCampaignNotificationResponse, error) {
-					log.Printf("notification: %v", req)
-					var notification_err error // == do notification
-					return &notification.SendCampaignNotificationResponse{}, notification_err
-				},
-			},
+			AudienceClient:     audienceClient,
+			CampaignsStore:     pgdb.CampaignsStore(),
+			NotificationClient: notificationClient,
 		}
 
 		worker = func(n int) {
@@ -327,13 +330,4 @@ func main() {
 func statusOk(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(r.URL.Path + ":ok\n"))
-}
-
-type printer struct {
-	notification.NotificationClient
-	fn func(context.Context, *notification.SendCampaignNotificationRequest) (*notification.SendCampaignNotificationResponse, error)
-}
-
-func (p printer) SendCampaignNotification(ctx context.Context, req *notification.SendCampaignNotificationRequest, opts ...grpc.CallOption) (*notification.SendCampaignNotificationResponse, error) {
-	return p.fn(ctx, req)
 }
