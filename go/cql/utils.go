@@ -1,6 +1,8 @@
 package cql
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"net/url"
 	"strings"
 	"time"
@@ -30,6 +32,18 @@ func ParseDSN(dsn string) (*gocql.ClusterConfig, error) {
 			Password: pass,
 			Username: u.User.Username(),
 		}
+	}
+
+	if u.Scheme == "https" {
+		tlsCfg := &tls.Config{
+			// InsecureSkipVerify: true,
+			RootCAs: x509.NewCertPool(),
+		}
+		cfg.SslOpts = &gocql.SslOptions{
+			Config: tlsCfg,
+		}
+
+		tlsCfg.BuildNameToCertificate()
 	}
 
 	var q = u.Query()
