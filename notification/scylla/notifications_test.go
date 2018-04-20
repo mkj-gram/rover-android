@@ -119,13 +119,13 @@ func test_NotificationsStore_Create(t *testing.T) {
 
 			given: &scylla.Notification{},
 
-			expErr: errors.Errorf(`validations: account_id: is required. campaign_id: is required. device_id: is required. title: is required. body: is required.`),
+			expErr: errors.Errorf(`validations: id: uuid: invalid. account_id: is required. campaign_id: is required. device_id: is required. title: is required. body: is required.`),
 		},
 
 		{
 			desc: "creates a notification",
 			given: &scylla.Notification{
-				// Id:          "aaaaaaaa-3dcd-11e8-b467-0ed5f89f718b",
+				Id:         uuid(t, "f944c7b4-3dcd-11e8-b467-0ed5f89f718b"),
 				AccountId:  1,
 				CampaignId: 1,
 				DeviceId:   "d2",
@@ -152,22 +152,7 @@ func test_NotificationsStore_Create(t *testing.T) {
 		config, _ = DefaultClusterConfig(t)
 		session   = NewTestSession(t, config)
 		db        = scylla.NewFromSession(session)
-		timeUUID  = scylla.TimeUUID
 	)
-
-	scylla.TimeUUID = func() scylla.UUID {
-		t.Helper()
-		id, err := gocql.ParseUUID("f944c7b3-3dcd-11e8-b467-0ed5f89f718b")
-		if err != nil {
-			t.Fatal(err)
-		}
-		return id
-	}
-
-	// set/restore TimeUUID generator
-	defer func() {
-		scylla.TimeUUID = timeUUID
-	}()
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {

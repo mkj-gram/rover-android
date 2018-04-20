@@ -2,7 +2,10 @@ package scylla
 
 import "errors"
 
-var ErrNotFound = errors.New("scylla: no rows in result set")
+var (
+	ErrNotFound = errors.New("scylla: no rows in result set")
+	ErrInvalid  = errors.New("invalid")
+)
 
 type ValidationError struct {
 	message string

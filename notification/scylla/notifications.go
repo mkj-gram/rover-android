@@ -69,8 +69,24 @@ func (c *notificationsStore) OneById(ctx context.Context, acctId int32, deviceId
 	return &note, nil
 }
 
+func validateUUID(val interface{}) error {
+	uuid, ok := val.(UUID)
+	if !ok {
+		return errors.Wrap(ErrInvalid, "type")
+	}
+
+	for i := range uuid[:] {
+		if uuid[i] > 0 {
+			return nil
+		}
+	}
+
+	return errors.Wrap(ErrInvalid, "uuid")
+}
+
 func (c *notificationsStore) Create(ctx context.Context, note *Notification) error {
 	if err := va.All(
+		va.Value("id", note.Id, validateUUID),
 		va.Value("account_id", note.AccountId, va.Require),
 		va.Value("campaign_id", note.CampaignId, va.Require),
 		va.Value("device_id", note.DeviceId, va.Require),
@@ -79,8 +95,6 @@ func (c *notificationsStore) Create(ctx context.Context, note *Notification) err
 	); err != nil {
 		return errors.Wrap(err, "validations")
 	}
-
-	note.Id = TimeUUID()
 
 	fieldNames := []string{
 		"id",
