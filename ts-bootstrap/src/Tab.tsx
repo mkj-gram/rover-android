@@ -37,8 +37,23 @@ const Tab: React.SFC<TabProps> = ({ val, selected, onClick, tabStyle }) => {
         ...tabStyle.selection
     }
 
+    const onTabClick = () => {
+        const contentEditableText = document.getElementById(
+            'contentEditableText'
+        )
+
+        if (
+            contentEditableText &&
+            contentEditableText.children[1] === document.activeElement
+        ) {
+            (contentEditableText.children[1] as HTMLElement).blur()
+        }
+
+        onClick(val)
+    }
+
     return (
-        <div style={container} onClick={() => onClick(val)}>
+        <div style={container} onClick={() => onTabClick()}>
             {val}
             {selected === val ? <div style={selection} /> : <div />}
         </div>

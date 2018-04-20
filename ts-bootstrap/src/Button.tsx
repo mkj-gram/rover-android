@@ -52,16 +52,31 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
     }
 
     handleMouseEvent(e: any, val: string, eventType: string) {
+        const forceTouchEventBlur = () => {
+            const contentEditableText = document.getElementById(
+                'contentEditableText'
+            )
+
+            if (
+                contentEditableText &&
+                contentEditableText.children[1] === document.activeElement
+            ) {
+                (contentEditableText.children[1] as HTMLElement).blur()
+            }
+        }
+
         const { device } = this.props
+
         if (eventType === 'touch' && device !== 'Desktop') {
             this.setState({
                 mouseDown: !this.state.mouseDown
             })
 
             if (val === 'up') {
-                e.preventDefault()
+                forceTouchEventBlur()
 
                 this.props.onClick()
+                e.preventDefault()
             }
         } else if (eventType === 'mouse' && device === 'Desktop') {
             this.setState({

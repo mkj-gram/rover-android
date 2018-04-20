@@ -61,7 +61,6 @@ class ContentEditable extends React.Component<Props, {}> {
 
     componentDidMount() {
         document.addEventListener('keydown', this.handleKeyPress, false)
-        document.addEventListener('touchstart', this.handleTouchStart, false)
 
         this.placeCaretAtEnd(document.getElementById(this.props.id))
     }
@@ -72,7 +71,6 @@ class ContentEditable extends React.Component<Props, {}> {
 
     componentWillUnmount() {
         document.removeEventListener('keydown', this.handleKeyPress, false)
-        document.removeEventListener('touchstart', this.handleTouchStart, false)
     }
 
     handleKeyPress(e: KeyboardEvent) {
@@ -171,7 +169,7 @@ class ContentEditable extends React.Component<Props, {}> {
         var { html, id, ...props } = this.props
 
         return (
-            <div>
+            <div id="contentEditableText">
                 <style type="text/css">
                     {`
                     [contenteditable]:focus {outline: 1px solid transparent;}
