@@ -14,7 +14,6 @@ import (
 
 	gerrors "cloud.google.com/go/errors"
 	"cloud.google.com/go/pubsub"
-	"github.com/gocql/gocql"
 	"github.com/karlseguin/ccache"
 	"github.com/namsral/flag"
 	"github.com/pkg/errors"
@@ -140,19 +139,9 @@ func main() {
 	// scylla
 	//
 
-	sDSN, err := scylla.ParseDSN(*scyllaDSN)
+	scyllaDB, _ /* config */, err := scylla.Open(*scyllaDSN)
 	if err != nil {
-		stderr.Fatal("scylla.ParseDSN", err)
-	}
-
-	var opts = []scylla.ClusterOption{
-		scylla.WithDefaultKeyspace(sDSN.Keyspace),
-		scylla.WithConsistency(gocql.Quorum),
-	}
-
-	scyllaDB, err := scylla.New(sDSN.Hosts, opts)
-	if err != nil {
-		stderr.Fatal("scylla.New: ", err)
+		stderr.Fatal("scylla.Open: ", err)
 	}
 	stdout.Println("scylla=on")
 

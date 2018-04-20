@@ -35,6 +35,20 @@ func New(hosts []string, clusterOptions []ClusterOption) (*DB, error) {
 	return NewFromSession(session), nil
 }
 
+func Open(dsn string) (*DB, *gocql.ClusterConfig, error) {
+	config, err := ParseDSN(dsn)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	session, err := config.CreateSession()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return NewFromSession(session), config, nil
+}
+
 func NewFromSession(session *gocql.Session) *DB {
 	return &DB{
 		session:                   session,

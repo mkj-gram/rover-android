@@ -195,7 +195,7 @@ services:
       DB_DSN: "postgres://postgres:@postgres:5432/notification_dev?sslmode=disable"
       TEST_DB_DSN: "postgres://postgres:@postgres:5432/notification_test?sslmode=disable"
       SCYLLADB_DSN: "scylla://scylla:9042/notification_dev"
-      TEST_SCYLLADB_DSN: "scylla://scylla:9042/notification_test"
+      TEST_SCYLLADB_DSN: "scylla://scylla:9042/notification_test?timeout=5s"
 
   campaigns-frontend:
     image: node:7.5.0

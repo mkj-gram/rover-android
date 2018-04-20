@@ -3,23 +3,56 @@ package scylla
 import (
 	"net/url"
 	"strings"
+	"time"
+
+	"github.com/gocql/gocql"
+	"github.com/pkg/errors"
 )
 
-type DSN struct {
-	Hosts    []string
-	Keyspace string
-}
-
-func ParseDSN(path string) (DSN, error) {
-	u, err := url.Parse(path)
+func ParseDSN(dsn string) (*gocql.ClusterConfig, error) {
+	u, err := url.Parse(dsn)
 	if err != nil {
-		return DSN{}, err
+		return nil, err
 	}
 
-	var dsn = DSN{
-		Hosts:    strings.Split(u.Host, ","),
-		Keyspace: u.Path[1:],
+	var (
+		cfg = gocql.NewCluster()
+	)
+
+	cfg.Hosts = strings.Split(u.Host, ",")
+	if len(u.Path) > 1 {
+		cfg.Keyspace = u.Path[1:]
 	}
 
-	return dsn, nil
+	if u.User != nil {
+		pass, _ := u.User.Password()
+		cfg.Authenticator = gocql.PasswordAuthenticator{
+			Password: pass,
+			Username: u.User.Username(),
+		}
+	}
+
+	var q = u.Query()
+	// TODO: support more
+	switch q.Get("consistency") {
+	case "all":
+		cfg.Consistency = gocql.All
+	case "", "quorum":
+		cfg.Consistency = gocql.Quorum
+	default:
+		return cfg, errors.Wrap(ErrInvalid, "consistency")
+	}
+
+	switch str := q.Get("timeout"); str {
+	case "":
+		// use default
+	default:
+		timeout, err := time.ParseDuration(str)
+		if err != nil {
+			return cfg, errors.Wrap(err, "duration")
+		}
+		cfg.Timeout = timeout
+	}
+
+	return cfg, nil
 }

@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/namsral/flag"
@@ -53,6 +52,7 @@ func MigrateDB(t *testing.T, session *gocql.Session, dir string) {
 }
 
 func ResetDB(t *testing.T, config gocql.ClusterConfig, keyspace string, migrationPath string) {
+	t.Helper()
 
 	// Global session is a session which is not bound to a keyspace
 	config.Keyspace = ""
@@ -65,14 +65,15 @@ func ResetDB(t *testing.T, config gocql.ClusterConfig, keyspace string, migratio
 	// modify the cluster config to only look in 1 keyspace
 	config.Keyspace = keyspace
 	keyspaceSession := NewTestSession(t, &config)
-	MigrateDB(t, keyspaceSession, migrationPath)
+	defer keyspaceSession.Close()
 
-	keyspaceSession.Close()
-	globalSession.Close()
+	MigrateDB(t, keyspaceSession, migrationPath)
 }
 
 // ClearDB resets the default db by truncating tables used for tests
 func ClearDB(t *testing.T) *gocql.Session {
+	t.Helper()
+
 	config, _ := DefaultClusterConfig(t)
 	session := NewTestSession(t, config)
 	// TODO find all tables first then truncate
@@ -82,37 +83,27 @@ func ClearDB(t *testing.T) *gocql.Session {
 
 // ClearDBWithFixtures resets the db and then applies the given fixtures
 func ClearDBWithFixtures(t *testing.T, files string) {
+	t.Helper()
 	InsertFixtures(t, ClearDB(t), files)
 }
 
 func DefaultClusterConfig(t *testing.T) (*gocql.ClusterConfig, string) {
+	t.Helper()
 
-	info, err := scylla.ParseDSN(*testDSN)
+	config, err := scylla.ParseDSN(*testDSN)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if strings.Contains(info.Keyspace, "test") == false {
+	if strings.Contains(config.Keyspace, "test") == false {
 		t.Fatalf("Are you sure you want to connect to: %s it doesn't look like a test dsn", *testDSN)
 	}
 
-	return NewClusterConfig(info.Hosts, info.Keyspace), info.Keyspace
-
-}
-
-func NewClusterConfig(hosts []string, keyspace string) *gocql.ClusterConfig {
-	cluster := gocql.NewCluster(hosts...)
-	cluster.Consistency = gocql.Quorum
-	cluster.Timeout = time.Duration(5 * time.Second)
-
-	if keyspace != "" {
-		cluster.Keyspace = keyspace
-	}
-
-	return cluster
+	return config, config.Keyspace
 }
 
 func NewTestSession(t *testing.T, config *gocql.ClusterConfig) *gocql.Session {
+	t.Helper()
 
 	session, err := config.CreateSession()
 	if err != nil {

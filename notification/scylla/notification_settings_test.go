@@ -73,6 +73,8 @@ func testNotificationSettingsStore_OneById(t *testing.T) {
 		db        = scylla.NewFromSession(session)
 	)
 
+	defer session.Close()
+
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var (
@@ -241,6 +243,8 @@ func testNotificationSettingsStore_Create(t *testing.T) {
 		session   = NewTestSession(t, config)
 		db        = scylla.NewFromSession(session)
 	)
+
+	defer session.Close()
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
