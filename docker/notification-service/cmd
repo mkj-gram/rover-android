@@ -1,37 +1,43 @@
 #!/bin/sh
 
-# set -e
+# 
 # set -x
 
 
 SVC_HOME=./notification
 
 waiton() {
-	while :
-	do
-		nc -z $1 $2
-		result=$?
-		if [[ $result -eq 0 ]]; then
-			break
-		fi
-		sleep 1
-	done
+    while :
+    do
+        nc -z $1 $2
+        result=$?
+        if [[ $result -eq 0 ]]; then
+            break
+        fi
+        sleep 1
+    done
 }
 
 run() {
-	go run $SVC_HOME/cmd/notification-service/main.go
+    go run $SVC_HOME/cmd/notification-service/main.go
 }
 
 test() {
-	waiton postgres 5432
-	waiton scylla 9042
-	
-  	go test $SVC_HOME/...
+    waiton postgres 5432
+    waiton scylla 9042
+    
+    go test $SVC_HOME/...
 }
 
 migrate() {
+  set -e
   go run ./go/cmd/postgres-cli/main.go \
     --migration-path=$SVC_HOME/postgres/migrations
+
+  go run ./go/cmd/scylla-cli/main.go --dsn=$SCYLLADB_DSN \
+    --migration-path=$SVC_HOME/scylla/migrations \
+    --create-keyspace \
+    --keyspace-replicas=1
 }
 
 for cmd in $@; do

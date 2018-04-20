@@ -1,4 +1,4 @@
-package scylla
+package cql
 
 import (
 	"net/url"

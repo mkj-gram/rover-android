@@ -13,7 +13,7 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/namsral/flag"
-	"github.com/roverplatform/rover/notification/scylla"
+	"github.com/roverplatform/rover/go/cql"
 	"github.com/scylladb/gocqlx/migrate"
 )
 
@@ -90,7 +90,7 @@ func ClearDBWithFixtures(t *testing.T, files string) {
 func DefaultClusterConfig(t *testing.T) (*gocql.ClusterConfig, string) {
 	t.Helper()
 
-	config, err := scylla.ParseDSN(*testDSN)
+	config, err := cql.ParseDSN(*testDSN)
 	if err != nil {
 		t.Fatal(err)
 	}

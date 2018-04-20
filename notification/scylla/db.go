@@ -3,6 +3,7 @@ package scylla
 import (
 	"github.com/gocql/gocql"
 	"github.com/pkg/errors"
+	"github.com/roverplatform/rover/go/cql"
 )
 
 var TimeUUID = gocql.TimeUUID
@@ -35,18 +36,13 @@ func New(hosts []string, clusterOptions []ClusterOption) (*DB, error) {
 	return NewFromSession(session), nil
 }
 
-func Open(dsn string) (*DB, *gocql.ClusterConfig, error) {
-	config, err := ParseDSN(dsn)
+func Open(dsn string) (*DB, error) {
+	session, err := cql.Open(dsn)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	session, err := config.CreateSession()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return NewFromSession(session), config, nil
+	return NewFromSession(session), nil
 }
 
 func NewFromSession(session *gocql.Session) *DB {

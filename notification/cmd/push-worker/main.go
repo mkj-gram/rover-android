@@ -139,10 +139,11 @@ func main() {
 	// scylla
 	//
 
-	scyllaDB, _ /* config */, err := scylla.Open(*scyllaDSN)
+	scyllaDB, err := scylla.Open(*scyllaDSN)
 	if err != nil {
 		stderr.Fatal("scylla.Open: ", err)
 	}
+
 	stdout.Println("scylla=on")
 
 	scyllaProbe := func() error {

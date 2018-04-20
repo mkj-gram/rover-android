@@ -1,12 +1,12 @@
-package scylla_test
+package cql_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/gocql/gocql"
+	"github.com/roverplatform/rover/go/cql"
 	rtesting "github.com/roverplatform/rover/go/testing"
-	"github.com/roverplatform/rover/notification/scylla"
 )
 
 func TestParseDSN(t *testing.T) {
@@ -59,7 +59,7 @@ func TestParseDSN(t *testing.T) {
 
 			var (
 				exp, expErr = tt.expect, tt.expectError
-				cfg, gotErr = scylla.ParseDSN(tt.dsn)
+				cfg, gotErr = cql.ParseDSN(tt.dsn)
 				got         *config
 			)
 
