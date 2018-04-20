@@ -330,6 +330,7 @@ module.exports = function() {
         function updateDeviceAndWriteResponse(device, newDevice, response) {
             let tasks = []
 
+
             if (didDeviceUpdateLocation(device, newDevice)) {
                 deviceUpdated = true
                 

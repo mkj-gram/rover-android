@@ -122,11 +122,12 @@ class LocationBaseProcessor extends BaseProcessor {
 
     shouldProcessEvent(callback) {
 
-        if (this._device.location_longitude !== 0 && this._device.location_latitude !== 0 && this._device.location_longitude !== null && this._device.location_latitude !== null) {
+
+        if (this._device.location_longitude !== 0 && this._device.location_latitude !== 0 && !util.isNullOrUndefined(this._device.location_longitude) && !util.isNullOrUndefined(this._device.location_latitude)) {
             let distance = internals.getDistance({ latitude: this._device.location_latitude , longitude: this._device.location_longitude }, this._location);
             let shouldProcess = this._device.os_name == "iOS" || distance > 5000 || (distance >= 50 && this._location.accuracy <= 200)
             return callback(shouldProcess);
-        } else if ((this._device.location_longitude === 0 && this._device.location_latitude === 0) || (this._device.location_longitude === null && this._device.location_latitude === null)) {
+        } else if ((this._device.location_longitude === 0 && this._device.location_latitude === 0) || (util.isNullOrUndefined(this._device.location_longitude) && util.isNullOrUndefined(this._device.location_latitude)) ) {
             // Always process events from devices which don't currently have a location
             return callback(true);
         }
