@@ -153,7 +153,7 @@ services:
       - elastic
       - mongo
       - audience-service
-      - scheduled_notification_tasks-worker
+      - campaigns-scheduled_notification_tasks-worker
       - notification-service
     command: ./docker/campaigns-service/cmd migrate run
     volumes:
@@ -164,7 +164,7 @@ services:
       TEST_DB_DSN: "postgres://postgres:@postgres:5432/campaigns_test?sslmode=disable"
       NOTIFICATION_SERVICE_URL: "notification-service:5100"
 
-  scheduled_notification_tasks-worker:
+  campaigns-scheduled_notification_tasks-worker:
     image: golang:1.10-alpine
     working_dir: /go/src/github.com/roverplatform/rover
     depends_on:
@@ -186,7 +186,7 @@ services:
       - postgres
       - scylla
       - pubsub
-    command: ./docker/notification-service/cmd migrate run
+    command: ./docker/notification/cmd migrate run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     environment:

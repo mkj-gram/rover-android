@@ -15,7 +15,7 @@ test() {
 }
 
 migrate() {
-  go run $SVC_HOME/cmd/migration-cli/main.go \
+  go run ./go/postgres-cli/main.go \
     --migration-path=$SVC_HOME/db/migrations
 }
 

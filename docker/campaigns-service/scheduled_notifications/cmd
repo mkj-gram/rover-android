@@ -7,11 +7,11 @@ set -e
 SVC_HOME=./campaigns
 
 run() {
-	go run $SVC_HOME/cmd/scheduled_notification_tasks-worker/main.go
+	go run $SVC_HOME/cmd/campaigns-scheduled_notification_tasks-worker/main.go
 }
 
 migrate() {
-  go run $SVC_HOME/cmd/migration-cli/main.go \
+  go run ./go/cmd/postgres-cli/main.go \
     --migration-path=$SVC_HOME/db/migrations
 }
 

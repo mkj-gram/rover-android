@@ -282,16 +282,16 @@ steps:
       - 'install-complete'
 
 # Notification Service
-  - id: 'test-notification-service'
+  - id: 'test-notification'
     name: 'docker/compose:1.16.1'
     args:
       - -p
-      - test-notification-service
+      - test-notification
       - -f
       - ./docker/main.docker-compose.yaml
       - run
       - notification-service
-      - docker/notification-service/cmd
+      - docker/notification/cmd
       - test
     waitFor:
       - 'install-complete'
@@ -309,7 +309,7 @@ steps:
         - 'test-auth-service'
         - 'test-audience-service'
         - 'test-campaigns-service'
-        - 'test-notification-service'
+        - 'test-notification'
         - 'test-events-pipeline'
         - 'test-rover-apis'
         - 'test-sdk-api'
@@ -400,48 +400,42 @@ steps:
 
 
 # Notification Service
-  - id: 'build-notification-service-executable'
+  - id: 'build-notification-executables'
     name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
-      - build
-      - -o
-      - docker/notification-service/notification-service
-      - ./notification/cmd/notification-service
-    waitFor:
-      - 'test-complete'
-
-  - id: 'build-notification-postgres-cli'
-    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
-    env:
-      - PROJECT_ROOT=github.com/roverplatform/rover
-    args:
-      - build
-      - -o
-      - docker/notification-service/postgres-cli
+      - install
+      - ./notification/cmd/...
       - ./go/cmd/postgres-cli
+      - ./go/cmd/scylla-cli
     waitFor:
       - 'test-complete'
 
-  - id: 'build-notification-migrations'
+  - id: 'build-notification-resources'
     name: 'ubuntu'
     entrypoint: 'sh'
     args:
       - -c
-      - cp -r notification/postgres/migrations docker/notification-service/
-    waitFor:
-      - 'test-complete'
+      - |
+        export DEST=docker/notification
+        cp -r notification/postgres $$DEST
+        cp -r notification/scylla $$DEST
+        cp -r ./gopath/bin/notification-* $$DEST
+        cp -r ./gopath/bin/postgres-cli $$DEST
+        cp -r ./gopath/bin/scylla-cli $$DEST
 
-  - name: 'gcr.io/cloud-builders/docker'
+    waitFor:
+      - 'build-notification-executables'
+
+  - id: "build-notification-image"
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/notification-service:$REVISION_ID
-      - docker/notification-service/
+      - --tag=gcr.io/$PROJECT_ID/notification:$REVISION_ID
+      - docker/notification/
     waitFor:
-      - 'build-notification-service-executable'
-      - 'build-notification-postgres-cli'
-      - 'build-notification-migrations'
+      - 'build-notification-resources'
 
 # Events Pipeline
   - id: 'build-events-pipeline-executable'
@@ -618,7 +612,7 @@ images:
   - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/campaigns-service:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/notification-service:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/notification:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/events-pipeline:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
