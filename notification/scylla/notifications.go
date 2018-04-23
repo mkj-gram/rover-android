@@ -84,6 +84,36 @@ func validateUUID(val interface{}) error {
 	return errors.Wrap(ErrInvalid, "uuid")
 }
 
+func (c *notificationsStore) List(ctx context.Context, accountID int32, deviceID string) ([]*Notification, error) {
+
+	stmt, names := qb.
+		Select(notificationsTableName).
+		Where(
+			qb.Eq("account_id"),
+			qb.Eq("device_id"),
+		).
+		OrderBy("id", qb.DESC).
+		Limit(100). // TODO make this configurable
+		ToCql()
+
+	q := gocqlx.Query(c.session.Query(stmt).WithContext(ctx), names).BindMap(qb.M{
+		"account_id": accountID,
+		"device_id":  deviceID,
+	})
+	defer q.Release()
+
+	var notes []*Notification
+	if err := gocqlx.Select(&notes, q.Query); err != nil {
+		// err is no rows found do we bubble up or just return empty?
+		if err == gocql.ErrNotFound {
+			return nil, ErrNotFound
+		}
+		return nil, errors.Wrap(err, "db.Select")
+	}
+
+	return notes, nil
+}
+
 func (c *notificationsStore) Create(ctx context.Context, note *Notification) error {
 	if err := va.All(
 		va.Value("id", note.Id, validateUUID),

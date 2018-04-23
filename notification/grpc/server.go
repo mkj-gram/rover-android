@@ -28,6 +28,10 @@ type NotificationSettingsStore interface {
 	Create(ctx context.Context, settings scylla.NotificationSettings) error
 }
 
+type NotificationStore interface {
+	List(ctx context.Context, accountID int32, deviceID string) ([]*scylla.Notification, error)
+}
+
 type Publisher interface {
 	Publish(ctx context.Context, messages ...pubsub.Message) []error
 }
@@ -35,6 +39,7 @@ type Publisher interface {
 type NotificationServer struct {
 	DB interface {
 		NotificationSettingsStore() NotificationSettingsStore
+		NotificationStore() NotificationStore
 	}
 
 	Publisher Publisher

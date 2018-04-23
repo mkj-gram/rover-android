@@ -95,6 +95,28 @@ function deserialize_rover_notification_v1_GetIosPlatformResponse(buffer_arg) {
   return notification_v1_notification_pb.GetIosPlatformResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_notification_v1_ListNotificationsRequest(arg) {
+  if (!(arg instanceof notification_v1_notification_pb.ListNotificationsRequest)) {
+    throw new Error('Expected argument of type rover.notification.v1.ListNotificationsRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_notification_v1_ListNotificationsRequest(buffer_arg) {
+  return notification_v1_notification_pb.ListNotificationsRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_notification_v1_ListNotificationsResponse(arg) {
+  if (!(arg instanceof notification_v1_notification_pb.ListNotificationsResponse)) {
+    throw new Error('Expected argument of type rover.notification.v1.ListNotificationsResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_notification_v1_ListNotificationsResponse(buffer_arg) {
+  return notification_v1_notification_pb.ListNotificationsResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_notification_v1_SendCampaignNotificationRequest(arg) {
   if (!(arg instanceof notification_v1_notification_pb.SendCampaignNotificationRequest)) {
     throw new Error('Expected argument of type rover.notification.v1.SendCampaignNotificationRequest');
@@ -173,6 +195,18 @@ var NotificationService = exports.NotificationService = {
     requestDeserialize: deserialize_rover_notification_v1_SendCampaignNotificationRequest,
     responseSerialize: serialize_rover_notification_v1_SendCampaignNotificationResponse,
     responseDeserialize: deserialize_rover_notification_v1_SendCampaignNotificationResponse,
+  },
+  // 
+  listNotifications: {
+    path: '/rover.notification.v1.Notification/ListNotifications',
+    requestStream: false,
+    responseStream: false,
+    requestType: notification_v1_notification_pb.ListNotificationsRequest,
+    responseType: notification_v1_notification_pb.ListNotificationsResponse,
+    requestSerialize: serialize_rover_notification_v1_ListNotificationsRequest,
+    requestDeserialize: deserialize_rover_notification_v1_ListNotificationsRequest,
+    responseSerialize: serialize_rover_notification_v1_ListNotificationsResponse,
+    responseDeserialize: deserialize_rover_notification_v1_ListNotificationsResponse,
   },
   // Crud
   // rpc ListPlatforms(ListPlatformsRequest) returns (ListPlatformResponse);

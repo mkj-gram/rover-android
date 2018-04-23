@@ -32,9 +32,10 @@ test() {
 migrate() {
   set -e
   go run ./go/cmd/postgres-cli/main.go \
+    --db-dsn=$POSTGRES_DSN \
     --migration-path=$SVC_HOME/postgres/migrations
 
-  go run ./go/cmd/scylla-cli/main.go --dsn=$SCYLLADB_DSN \
+  go run ./go/cmd/scylla-cli/main.go --dsn=$SCYLLA_DSN \
     --migration-path=$SVC_HOME/scylla/migrations \
     --create-keyspace \
     --keyspace-replicas=1

@@ -17,7 +17,7 @@ import (
 	"github.com/scylladb/gocqlx/migrate"
 )
 
-var testDSN = flag.String("test-scylladb-dsn", "scylla://scylla:9042/notification_test", "")
+var testDSN = flag.String("test-scylla-dsn", "scylla://scylla:9042/notification_test", "")
 
 func init() {
 	flag.Parse()

@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
 	"github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/apis/go/notification/v1"
 	"github.com/roverplatform/rover/apis/go/protobuf"
+	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	"github.com/roverplatform/rover/notification/grpc"
 	"github.com/roverplatform/rover/notification/grpc/mocks"
 	"github.com/roverplatform/rover/notification/pubsub"
@@ -18,10 +20,15 @@ import (
 )
 
 type DB struct {
-	store *mocks.MockNotificationSettingsStore
+	settingsStore *mocks.MockNotificationSettingsStore
+	store         *mocks.MockNotificationStore
 }
 
 func (db *DB) NotificationSettingsStore() grpc.NotificationSettingsStore {
+	return db.settingsStore
+}
+
+func (db *DB) NotificationStore() grpc.NotificationStore {
 	return db.store
 }
 
@@ -368,7 +375,7 @@ func Test_SendCampaignNotification(t *testing.T) {
 				pub    = mocks.NewMockPublisher(ctrl)
 				server = grpc.NotificationServer{
 					DB: &DB{
-						store: store,
+						settingsStore: store,
 					},
 					Publisher: pub,
 				}
@@ -390,4 +397,163 @@ func Test_SendCampaignNotification(t *testing.T) {
 
 		})
 	}
+}
+
+func Test_ListNotifications(t *testing.T) {
+	tests := []struct {
+		name string
+
+		req *notification.ListNotificationsRequest
+
+		dbExpect func(settings *mocks.MockNotificationSettingsStore, store *mocks.MockNotificationStore)
+		exp      *notification.ListNotificationsResponse
+		expError error
+	}{
+		{
+			name: "empty list",
+			req: &notification.ListNotificationsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				DeviceId:    "abc123",
+			},
+
+			dbExpect: func(settings *mocks.MockNotificationSettingsStore, store *mocks.MockNotificationStore) {
+				store.EXPECT().List(gomock.Any(), int32(1), "abc123").Return(nil, scylla.ErrNotFound)
+			},
+
+			exp: &notification.ListNotificationsResponse{
+				Notifications: nil,
+			},
+		},
+
+		{
+			name: "multiple settings",
+			req: &notification.ListNotificationsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				DeviceId:    "abc123",
+			},
+
+			dbExpect: func(settings *mocks.MockNotificationSettingsStore, store *mocks.MockNotificationStore) {
+				store.EXPECT().List(gomock.Any(), int32(1), "abc123").Return([]*scylla.Notification{
+					{
+						Id:         uuid(t, "5890edfa-41ad-11e8-842f-0ed5f89f718b"),
+						CampaignId: 1,
+						DeviceId:   "abc123",
+						Title:      "title",
+						Body:       "body",
+						IsRead:     true,
+						IsDeleted:  false,
+					},
+					{
+						Id:         uuid(t, "7333ed56-41ad-11e8-842f-0ed5f89f718b"),
+						CampaignId: 2,
+						DeviceId:   "abc123",
+						Title:      "title2",
+						Body:       "body2",
+						IsRead:     true,
+						IsDeleted:  true,
+					},
+				}, nil)
+
+				settings.EXPECT().OneById(gomock.Any(), int32(1)).Return(&scylla.NotificationSettings{
+					CampaignId:   1,
+					ExperienceId: "experience-id",
+
+					AlertOptionNotificationCenter: true,
+
+					AttachmentType: scylla.AttachmentType_AUDIO,
+					AttachmentUrl:  "http://sounds.com/1.wav",
+
+					TapBehaviorType: scylla.TapBehaviorType_OPEN_EXPERIENCE,
+				}, nil)
+
+				settings.EXPECT().OneById(gomock.Any(), int32(2)).Return(&scylla.NotificationSettings{
+					CampaignId: 2,
+
+					AlertOptionNotificationCenter: false,
+
+					TapBehaviorType:             scylla.TapBehaviorType_OPEN_DEEP_LINK,
+					TapBehaviorPresentationType: scylla.TapBehaviorPresentationType_IN_APP,
+					TapBehaviorUrl:              "twitter://feed",
+				}, nil)
+			},
+
+			exp: &notification.ListNotificationsResponse{
+				Notifications: []*notification.ListNotificationsResponse_Notification{
+					{
+						Id:                          "5890edfa-41ad-11e8-842f-0ed5f89f718b",
+						CampaignId:                  1,
+						ExperienceId:                "experience-id",
+						Title:                       "title",
+						Body:                        "body",
+						IsRead:                      true,
+						IsDeleted:                   false,
+						IsNotificationCenterEnabled: true,
+
+						NotificationAttachmentType: notification.NotificationAttachmentType_AUDIO,
+						NotificationAttachmentUrl:  "http://sounds.com/1.wav",
+
+						CreatedAt: &timestamp.Timestamp{Seconds: 1523907340, Nanos: 584089000},
+					},
+					{
+						Id:         "7333ed56-41ad-11e8-842f-0ed5f89f718b",
+						CampaignId: 2,
+
+						Title:                       "title2",
+						Body:                        "body2",
+						IsRead:                      true,
+						IsDeleted:                   true,
+						IsNotificationCenterEnabled: false,
+
+						NotificationTapBehaviorType:             notification.NotificationTapBehaviorType_OPEN_DEEP_LINK,
+						NotificationTapBehaviorPresentationType: notification.NotificationTapPresentationType_IN_APP,
+						NotificationTapBehaviorUrl:              "twitter://feed",
+
+						CreatedAt: &timestamp.Timestamp{Seconds: 1523907385, Nanos: 273071000},
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var (
+				ctrl     = gomock.NewController(t)
+				settings = mocks.NewMockNotificationSettingsStore(ctrl)
+				store    = mocks.NewMockNotificationStore(ctrl)
+				server   = grpc.NotificationServer{
+					DB: &DB{
+						settingsStore: settings,
+						store:         store,
+					},
+				}
+			)
+			defer ctrl.Finish()
+
+			if test.dbExpect != nil {
+				test.dbExpect(settings, store)
+			}
+
+			var (
+				exp, expErr = test.exp, test.expError
+				got, gotErr = server.ListNotifications(context.Background(), test.req)
+			)
+
+			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+				t.Fatalf("\nDiff:\n%v", Difff(diff))
+			}
+
+		})
+	}
+}
+
+func uuid(t *testing.T, str string) scylla.UUID {
+	t.Helper()
+
+	id, err := gocql.ParseUUID(str)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return id
 }

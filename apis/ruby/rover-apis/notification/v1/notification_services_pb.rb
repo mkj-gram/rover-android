@@ -17,6 +17,8 @@ module Rover
           self.service_name = 'rover.notification.v1.Notification'
 
           rpc :SendCampaignNotification, SendCampaignNotificationRequest, SendCampaignNotificationResponse
+          # 
+          rpc :ListNotifications, ListNotificationsRequest, ListNotificationsResponse
           # Crud
           # rpc ListPlatforms(ListPlatformsRequest) returns (ListPlatformResponse);
           #

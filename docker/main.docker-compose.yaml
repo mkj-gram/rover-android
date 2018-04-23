@@ -192,10 +192,13 @@ services:
     environment:
       CGO_ENABLED: 0
       PUBSUB_EMULATOR_HOST: "pubsub:8085"
-      DB_DSN: "postgres://postgres:@postgres:5432/notification_dev?sslmode=disable"
-      TEST_DB_DSN: "postgres://postgres:@postgres:5432/notification_test?sslmode=disable"
-      SCYLLADB_DSN: "scylla://scylla:9042/notification_dev"
-      TEST_SCYLLADB_DSN: "scylla://scylla:9042/notification_test?timeout=5s"
+      
+      SCYLLA_DSN: "scylla://scylla:9042/notification_dev"
+      TEST_SCYLLA_DSN: "scylla://scylla:9042/notification_test?timeout=15s"
+
+      POSTGRES_DSN: "postgres://postgres:@postgres:5432/notification_dev?sslmode=disable"
+      POSTGRES_TEST_DSN: "postgres://postgres:@postgres:5432/notification_test?sslmode=disable"
+
 
   campaigns-frontend:
     image: node:7.5.0
@@ -215,6 +218,7 @@ services:
       - auth-service
       - audience-service
       - campaigns-service
+      - notification-service
       - kafka
     ports:
       - "4000:80"
@@ -226,6 +230,7 @@ services:
       AUTH_V1_SERVICE_HOST: auth-service
       AUDIENCE_V1_SERVICE_HOST: audience-service
       CAMPAIGNS_V1_SERVICE_HOST: campaigns-service
+      NOTIFICATION_V1_SERVICE_HOST: notification-service
       KAFKA_DSN: kafka:9092
       EVENTS_PIPELINE_INPUT_TOPIC: events.input
       NODE_ENV: development

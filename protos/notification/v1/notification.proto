@@ -41,7 +41,7 @@ message PushEnvironment {
 		UNKNOWN = 0;
 		PRODUCTION = 1;
 		DEVELOPMENT = 2;
-  	}
+	}
 }
 
 
