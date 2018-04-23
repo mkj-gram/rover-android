@@ -34,6 +34,7 @@ import {
 
 export interface TapBehaviorProps extends InjectedProps {
     campaign?: ScheduledCampaign | AutomatedNotificationCampaign
+    wizardSection: keyof editableUIState
 }
 
 export interface TapBehaviorState {
@@ -295,7 +296,7 @@ class TapBehaviorContainer extends React.Component<
         const { notificationTapBehaviorType } = editableCampaign
         const { Fragment } = React
         return (
-            <FormSection>
+            <FormSection device={device}>
                 <div
                     style={{
                         padding: device !== 'Mobile' ? '24px 32px' : 24,

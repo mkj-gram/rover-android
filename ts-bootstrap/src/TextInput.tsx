@@ -6,25 +6,27 @@ import PlusIcon from './Icons/PlusIcon'
 import CircleCloseIcon from './Icons/CircleCloseIcon'
 
 export interface TextInputProps {
+    children?: JSX.Element
     deleteText: () => void
+    fieldStyle?: React.CSSProperties
+    handleBlurChange?: (text?: string) => void
     id: string
     isEditingText: boolean
+    isRequired?: boolean
     label: string
     media: 'Mobile' | 'Tablet' | 'Desktop'
     placeholder?: string
+    primaryTextSize?: 'h1' | 'h2' | 'large' | 'medium' | 'small'
     startEditingText: () => void
     text: string | undefined
     updateText: (text: string) => void
-    fieldStyle?: React.CSSProperties
-    primaryTextSize?: 'h1' | 'h2' | 'large' | 'medium' | 'small'
-    isRequired?: boolean
 }
 
 const getFieldStyle: () => React.CSSProperties = () => ({
-    minHeight: 71,
     width: '100%',
-    marginTop: 24,
-    display: 'block'
+    display: 'block',
+    padding: '24px 0 23px',
+    borderBottom: `1px solid ${titanium}`
 })
 
 const renderAddButton = (
@@ -66,7 +68,7 @@ const renderTextControlButtons = (
     switch (media) {
         case 'Desktop':
             return (
-                <div>
+                <React.Fragment>
                     {text && (
                         <Button
                             onClick={deleteText}
@@ -100,7 +102,7 @@ const renderTextControlButtons = (
                             }
                         }}
                     />
-                </div>
+                </React.Fragment>
             )
         case 'Tablet':
         case 'Mobile':
@@ -118,7 +120,9 @@ const renderTextControlButtons = (
 }
 
 const TextInput: React.SFC<TextInputProps> = ({
+    children,
     deleteText,
+    handleBlurChange,
     id,
     isEditingText,
     label,
@@ -150,12 +154,14 @@ const TextInput: React.SFC<TextInputProps> = ({
                     text={text}
                     id={id}
                     contentEditable={isEditingText}
+                    handleBlurChange={handleBlurChange}
                     handleChange={(str: string) => updateText(str)}
                     size={primaryTextSize}
                     onBlurChange={true}
                     placeholder={true}
                     placeholderText={placeholder}
                 />
+                {children}
             </div>
         )
     }
@@ -218,6 +224,7 @@ const TextInput: React.SFC<TextInputProps> = ({
                     text={text}
                     id={id}
                     contentEditable={isEditingText}
+                    handleBlurChange={handleBlurChange}
                     handleChange={(str: string) => {
                         updateText(str)
                     }}
@@ -227,6 +234,7 @@ const TextInput: React.SFC<TextInputProps> = ({
                         width: '100%'
                     }}
                 />
+                {children}
             </div>
             {!isEditingText &&
                 renderTextControlButtons(

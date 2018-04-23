@@ -12,7 +12,7 @@ export default c => ({
     UIState: c.getUiState(),
     notificationBody: c.getNotificationBody(),
     notificationTitle: c.getNotificationTitle(),
-    notificationAttachment: () => {
+    notificationAttachment: (() => {
         let attachment = {}
         switch (c.getNotificationAttachmentType()) {
             case 0:
@@ -30,7 +30,7 @@ export default c => ({
 
         attachment.url = c.getNotificationAttachmentUrl()
         return attachment
-    },
+    })(),
     notificationTapBehaviorType: grpcEnumMap(
         RoverApis.campaigns.v1.Models.NotificationTapBehaviorType.Enum
     )[c.getNotificationTapBehaviorType()],
@@ -47,13 +47,13 @@ export default c => ({
     notificationAndroidSound: c.getNotificationAndroidSound(),
     notificationAndroidTag: c.getNotificationAndroidTag(),
     notificationExpiration: c.getNotificationExpiration(),
-    notificationAttributesMap: () => {
+    notificationAttributesMap: (() => {
         const attributes = c.getNotificationAttributesMap()
         return attributes.keys().arr_.reduce((acc, key) => {
             acc[key] = attributes.get(key)
             return acc
         }, {})
-    },
+    })(),
     notificationAlertOptionPushNotification: c.getNotificationAlertOptionPushNotification(),
     notificationAlertOptionNotificationCenter: c.getNotificationAlertOptionNotificationCenter(),
     notificationAlertOptionBadgeNumber: c.getNotificationAlertOptionBadgeNumber(),

@@ -7,11 +7,15 @@ import ResponsiveContainer from '../../utils/ResponsiveContainer'
 import OverviewModalRow from './OverviewModalRow'
 import NotificationContainer from '../notification/NotificationContainer'
 
-import { getIsNotificationDeliveryModalOpen } from '../../../reducers'
+import {
+    getIsNotificationDeliveryModalOpen,
+    getTypeProgress
+} from '../../../reducers'
 import { openNotificationDeliveryModal } from '../../../actions'
 
 export interface StateProps {
     isNotificationDeliveryModalOpen: string
+    notificationProgress: number
 }
 
 export interface DispatchProps {
@@ -19,9 +23,8 @@ export interface DispatchProps {
 }
 
 export type OverviewModalBodyContainerProps = {
-    showExperience: boolean
-    notificationComplete: number
     deliveryComplete: number
+    device: Media
 }
 
 export type OverviewModalBodyContainerState = {
@@ -40,7 +43,6 @@ class OverviewModalBodyContainer extends React.Component<
             redirectPage: ''
         }
         this.handlePageDirect = this.handlePageDirect.bind(this)
-        this.getPage = this.getPage.bind(this)
     }
 
     handlePageDirect(redirectPage: string) {
@@ -52,23 +54,11 @@ class OverviewModalBodyContainer extends React.Component<
         )
     }
 
-    getPage() {
-        const ResponsiveNotificationContainer = ResponsiveContainer()(
-            NotificationContainer
-        )
-        const page: StringMap<JSX.Element> = {
-            Notification: <ResponsiveNotificationContainer />,
-            Delivery: <div />
-        }
-
-        return page[this.state.redirectPage] || <div />
-    }
-
     render() {
         const {
-            showExperience,
-            notificationComplete,
+            notificationProgress,
             deliveryComplete,
+            device,
             isNotificationDeliveryModalOpen
         } = this.props
         const arr = [
@@ -77,7 +67,7 @@ class OverviewModalBodyContainer extends React.Component<
                 text:
                     // tslint:disable-next-line:max-line-length
                     'Compose the title and body of notification, add rich media and determine what happens when the user taps or swipes the notification.',
-                val: notificationComplete
+                val: notificationProgress
             },
             {
                 name: 'Delivery',
@@ -91,7 +81,7 @@ class OverviewModalBodyContainer extends React.Component<
                 text:
                     // tslint:disable-next-line:max-line-length
                     'Customize and personalize the content of the experience that will be delivered when the user swipes or taps the notification.',
-                val: showExperience
+                val: 10
             }
         ]
 
@@ -118,7 +108,7 @@ class OverviewModalBodyContainer extends React.Component<
                 })}
                 {isNotificationDeliveryModalOpen !== 'close' &&
                     ReactDOM.createPortal(
-                        this.getPage(),
+                        <NotificationContainer device={device} />,
                         document.getElementById('mainModalLeft')
                     )}
             </div>
@@ -127,9 +117,11 @@ class OverviewModalBodyContainer extends React.Component<
 }
 
 const mapStateToProps = (state: State): StateProps => ({
+    notificationProgress: getTypeProgress(state, 'notification'),
     isNotificationDeliveryModalOpen: getIsNotificationDeliveryModalOpen(state)
 })
 
+// tslint:disable-next-line:no-any
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
         openNotificationDeliveryModal: open => {

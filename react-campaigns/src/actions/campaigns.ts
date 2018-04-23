@@ -8,10 +8,7 @@ import { setTimeout } from 'timers'
 
 export const updateNotificationSettings: ActionCreator<
     ThunkAction<Promise<Action | void>, State, void>
-> = (
-    campaign: ScheduledCampaign | AutomatedNotificationCampaign,
-    campaignId: string
-) => (
+> = () => (
     dispatch: Dispatch<State>,
     getState: () => State
 ): Promise<Action | void> => {
@@ -123,11 +120,17 @@ export const updateNotificationSettings: ActionCreator<
             }
         }
     `
+    const state = getState()
+    const { editableCampaign, editableUIState } = state
+    const newCampaign = {
+        ...editableCampaign,
+        UIState: JSON.stringify(editableUIState)
+    }
 
     const request = {
         query,
         variables: {
-            ...campaign
+            ...newCampaign
         }
     }
 

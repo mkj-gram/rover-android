@@ -51,7 +51,8 @@ class DeviceTransitionContainer extends React.Component<
                             animation: `${displayOverviewModal} 500ms ease`,
                             maxWidth: 769,
                             position: 'relative',
-                            minWidth: 0
+                            minWidth: 0,
+                            overflowX: 'hidden'
                         }}
                         id="mainModalLeft"
                     >
@@ -60,7 +61,7 @@ class DeviceTransitionContainer extends React.Component<
                     <div
                         style={{
                             flex: '1 1 auto',
-                            height: '100vh',
+                            height: '100%',
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -75,7 +76,7 @@ class DeviceTransitionContainer extends React.Component<
             return (
                 <div
                     style={{
-                        height: '100vh',
+                        height: '100%',
                         width: '100%',
                         display: 'flex',
                         animation: `${displayOverviewModal} 500ms ease`,

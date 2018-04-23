@@ -1,6 +1,7 @@
 /// <reference path="../../typings/index.d.ts"/>
 
 import * as editableCampaignActions from './editableCampaign'
+import * as editableUIStateActions from './editableUIState'
 import * as campaignsActions from './campaigns'
 import * as testDevicesActions from './testDevices'
 import * as notificationActions from './notification'
@@ -60,10 +61,8 @@ export const duplicateCampaign = (name: string, campaignId: number) =>
 export const archiveCampaign = (campaignId: number) =>
     campaignsActions.archiveCampaign(campaignId)
 
-export const updateNotificationSettings = (
-    campaign: ScheduledCampaign | AutomatedNotificationCampaign,
-    campaignId: string
-) => campaignsActions.updateNotificationSettings(campaign, campaignId)
+export const updateNotificationSettings = () =>
+    campaignsActions.updateNotificationSettings()
 
 export const sendTest = (campaignId: number, deviceIds: string[]) =>
     sendTestActions.sendTest(campaignId, deviceIds)
@@ -103,9 +102,17 @@ export const closeCampaignTypeSelector: ActionCreator<
 export const updateEditableCampaign = (val: object) =>
     editableCampaignActions.updateEditableCampaign(val)
 
-export const createEditableCampaign = (
-    editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
-) => editableCampaignActions.createEditableCampaign(editableCampaign)
+export const createEditableCampaign = (campaignId: string) =>
+    editableCampaignActions.createEditableCampaign(campaignId)
+
+export const updateEditableUIState = (
+    newUIStateGroup: keyof editableUIState,
+    newUIStateValue: UIStateField | boolean
+) =>
+    editableUIStateActions.updateEditableUIState(
+        newUIStateGroup,
+        newUIStateValue
+    )
 
 // Notification Delivery Modal
 
@@ -120,6 +127,7 @@ export const openNotificationDeliveryModal: ActionCreator<
             dispatch({
                 type: 'CLOSE_NOTIFICATION_DELIVERY_MODAL'
             })
+            // tslint:disable-next-line:align
         }, 500)
     }
 }
@@ -156,6 +164,7 @@ export const closeTapBehaviorSelector: ActionCreator<
         dispatch({
             type: 'CLOSE_TAP_BEHAVIOR_SELECTOR'
         })
+        // tslint:disable-next-line:align
     }, 500)
 }
 
@@ -173,6 +182,7 @@ export const closeTapBehaviorWebsitePresentation: ActionCreator<
         dispatch({
             type: 'CLOSE_TAP_BEHAVIOR_WEBSITE_PRESENTATION'
         })
+        // tslint:disable-next-line:align
     }, 500)
 }
 

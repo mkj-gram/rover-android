@@ -1,5 +1,8 @@
 /// <reference path="../../typings/index.d.ts"/>
 import { AnyAction } from 'redux'
+import { getCampaign } from './'
+
+const isEqual = require('lodash/isEqual')
 
 export default (
     state: ScheduledCampaign | AutomatedNotificationCampaign = null,
@@ -17,6 +20,12 @@ export const shouldCreateEditableCampaign = (
     state: ScheduledCampaign | AutomatedNotificationCampaign
 ) => state === null
 
-export const getEditableCampaign = (
-    state: ScheduledCampaign | AutomatedNotificationCampaign
-): ScheduledCampaign | AutomatedNotificationCampaign | null => state
+export const getEditableCampaign = (state: State) => state.editableCampaign
+
+export const getShouldShowSaveAndClose = (state: State) => {
+    const { editableCampaign } = state
+    const { campaignId } = editableCampaign
+    const campaign = getCampaign(state, campaignId)
+    const { UIState, ...rest } = campaign
+    return !isEqual(editableCampaign, rest)
+}

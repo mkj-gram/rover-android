@@ -4,14 +4,16 @@ import { combineReducers, AnyAction } from 'redux'
 
 import app, * as appSelector from './app'
 import editableCampaign, * as editableCampaignSelector from './editableCampaign'
+import editableUIState, * as editableUIStateSelector from './editableUIState'
 import campaigns, * as campaignsSelector from './campaigns'
-import testDevices from './testDevices'
+import testDevices, * as testDeviceSelector from './testDevices'
 
 export default combineReducers({
     app,
     campaigns,
     testDevices,
-    editableCampaign
+    editableCampaign,
+    editableUIState
 })
 
 // Error
@@ -76,16 +78,29 @@ export const getFilteredCampaigns = (state: State, filter: CampaignStatus) =>
     campaignsSelector.getFilteredCampaigns(state.campaigns, filter)
 
 // Editable Campaign
-export const shouldCreateEditableCampaign = (state: State) =>
-    editableCampaignSelector.shouldCreateEditableCampaign(
-        state.editableCampaign
-    )
-export const getEditableCampaign = (state: State) =>
-    editableCampaignSelector.getEditableCampaign(state.editableCampaign)
-
 // Active Popover
 export const getActivePopover = (state: State) =>
     appSelector.getActivePopover(state.app)
 
 export const getIsPopoverModalFormOpen = (state: State) =>
     appSelector.getIsPopoverModalFormOpen(state.app)
+
+export const getEditableCampaign = (state: State) =>
+    editableCampaignSelector.getEditableCampaign(state)
+
+export const getShouldShowSaveAndClose = (state: State) =>
+    editableCampaignSelector.getShouldShowSaveAndClose(state)
+
+// Editable UIState
+export const getEditableUIState = (state: State) =>
+    editableUIStateSelector.getEditableUIState(state)
+
+export const getIsStageValid = (state: State, stage: keyof editableUIState) =>
+    editableUIStateSelector.getIsStageValid(state, stage)
+
+export const getTypeProgress = (state: State, type: UIStateType) =>
+    editableUIStateSelector.getTypeProgress(state, type)
+
+// Test Devices
+export const getTestDevices = (state: State) =>
+    testDeviceSelector.getTestDevices(state)

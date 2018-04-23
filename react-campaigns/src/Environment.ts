@@ -5,7 +5,7 @@ import { HttpLink } from 'apollo-link-http'
 const environments: StringMap<string> = {
     production: 'https://api.rover.io/graphql',
     staging: 'https://api.staging.rover.io/graphql',
-    development: 'http://localhost:4000/graphql'
+    development: 'http://192.168.0.144:4000/graphql'
 }
 
 const uri =
@@ -21,7 +21,8 @@ const getToken = (): string | null => {
 const link = new HttpLink({
     headers: {
         accept: 'application/json',
-        Authorization: `Bearer ${getToken()}`
+        // Authorization: `Bearer ${getToken()}`
+        'x-rover-account-token': '2511f80f3e77fefec46c519c590198a05021094a'
     },
     uri
 })

@@ -1,70 +1,69 @@
 /// <reference path="../../typings/index.d.ts"/>
-import gql from 'graphql-tag'
 import { Action, ActionCreator, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
-import Environment from '../Environment'
 
-import { GraphQLRequest } from 'apollo-link'
-import { DocumentNode } from 'graphql'
-import { setTimeout } from 'timers'
+import { getCampaign } from '../reducers'
 
 export const createEditableCampaign: ActionCreator<
     ThunkAction<void, State, void>
-> = (edCampaign: ScheduledCampaign | AutomatedNotificationCampaign) => (
-    dispatch: Dispatch<State>
+> = (campaignId: string) => (
+    dispatch: Dispatch<State>,
+    getState: () => State
 ): void => {
+    const state = getState()
+    const campaign = getCampaign(state, campaignId) as ScheduledCampaign
     // Initialize UIState
-    let editableCampaign:
-        | ScheduledCampaign
-        | AutomatedNotificationCampaign = edCampaign
-
-    if ((editableCampaign.UIState as string).length === 0) {
-        editableCampaign = {
-            ...edCampaign,
-            UIState: {
-                notification: {
-                    messageAndMedia: {
-                        seen: false,
-                        isValidContent: false
-                    },
-                    alertOptions: {
-                        seen: false,
-                        isValidContent: true
-                    },
-                    tapBehavior: {
-                        seen: false,
-                        isValidContent: true
-                    },
-                    advancedSettings: {
-                        seen: false,
-                        isValidContent: true
-                    }
-                },
-                showExperience: false
+    if ((campaign.UIState as string).length === 0) {
+        const { UIState, ...rest } = campaign as ScheduledCampaign
+        dispatch({
+            type: 'CREATE_EDITABLE_CAMPAIGN',
+            editableCampaign: {
+                ...rest
             }
-        }
+        })
+        dispatch({
+            type: 'CREATE_EDITABLE_UI_STATE',
+            editableUIState: {
+                messageAndMedia: {
+                    seen: false,
+                    type: 'notification'
+                },
+                alertOptions: {
+                    seen: false,
+                    type: 'notification'
+                },
+                tapBehavior: {
+                    seen: false,
+                    type: 'notification'
+                },
+                advancedSettings: {
+                    seen: false,
+                    type: 'notification'
+                }
+            }
+        })
     } else {
-        editableCampaign = {
-            ...edCampaign,
-            UIState: JSON.parse(editableCampaign.UIState as string)
-        }
+        const { UIState, ...rest } = campaign
+        dispatch({
+            type: 'CREATE_EDITABLE_CAMPAIGN',
+            editableCampaign: rest
+        })
+        dispatch({
+            type: 'CREATE_EDITABLE_UI_STATE',
+            editableUIState: JSON.parse(UIState as string)
+        })
     }
-
-    dispatch({
-        type: 'CREATE_EDITABLE_CAMPAIGN',
-        editableCampaign
-    })
 }
 
 export const updateEditableCampaign: ActionCreator<
     ThunkAction<void, State, void>
-> = (val: object) => (
+> = (campaignField: object) => (
     dispatch: Dispatch<State>,
     getState: () => State
 ): void => {
     const editableCampaign = {
         ...getState().editableCampaign,
-        ...val
+        ...campaignField
     }
 
     dispatch({

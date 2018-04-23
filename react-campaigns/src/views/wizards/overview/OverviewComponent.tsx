@@ -10,152 +10,59 @@ import { turquoise, white } from '@rover/ts-bootstrap/dist/src'
 import OverviewModalHeader from './OverviewModalHeader'
 import OverviewModalFooter from './OverviewModalFooter'
 import OverviewModalBodyContainer from './OverviewModalBodyContainer'
-import ResponsiveContainer from '../../utils/ResponsiveContainer'
-
-import { getCampaign } from '../../../reducers/campaigns'
-import { shouldCreateEditableCampaign } from '../../../reducers'
+import {
+    getCampaign,
+    getEditableCampaign,
+    getEditableUIState,
+    getTypeProgress
+} from '../../../reducers'
 
 import { createEditableCampaign } from '../../../actions'
+import editableUIState from '../../../reducers/editableUIState'
 
 export interface OwnProps {
     deliveryComplete?: number
+    device: Media
 }
 
 export interface StateProps {
-    campaigns: StringMap<Campaign>
-    shouldCreateEditableCampaign: boolean
+    campaign: Campaign
+    editableCampaign: Campaign
+    editableUIState: editableUIState
 }
 
 export interface DispatchProps {
-    createEditableCampaign: (campaign: Campaign) => void
+    createEditableCampaign: (campaignId: string) => void
 }
 
 export type OverviewComponentProps = OwnProps & StateProps & DispatchProps
 
 export interface OverviewComponentState {
-    campaign: Campaign
-    notificationComplete: number
-    deliveryComplete: number
-    showExperience: boolean
+    deliveryProgress: number
 }
 
 class OverviewComponent extends React.Component<
-    OverviewComponentProps & RouteComponentProps<any>,
+    OverviewComponentProps & RouteComponentProps<Location>,
     OverviewComponentState
 > {
-    constructor(props: OverviewComponentProps & RouteComponentProps<any>) {
+    constructor(props: OverviewComponentProps & RouteComponentProps<Location>) {
         super(props)
         this.state = {
-            campaign: null,
-            notificationComplete: 0,
-            deliveryComplete: 0,
-            showExperience: false
-        }
-        this.getNotificationComplete = this.getNotificationComplete.bind(this)
-        this.getShowExperience = this.getShowExperience.bind(this)
-        this.updateCampaignStatus = this.updateCampaignStatus.bind(this)
-    }
-
-    componentDidMount() {
-        const { campaigns, shouldCreateEditableCampaign } = this.props
-        this.updateCampaignStatus(campaigns, shouldCreateEditableCampaign)
-    }
-
-    componentWillReceiveProps(nextProps: OverviewComponentProps) {
-        const { campaigns, shouldCreateEditableCampaign } = nextProps
-        this.updateCampaignStatus(campaigns, shouldCreateEditableCampaign)
-    }
-
-    updateCampaignStatus(
-        campaigns: StringMap<Campaign>,
-        shouldCreateEditableCampaign: boolean
-    ) {
-        const { createEditableCampaign, location } = this.props
-        if (Object.keys(campaigns).length !== 0) {
-            const campaignId = parse(location.search.substring(1)).campaignId
-
-            const campaign = getCampaign(campaigns, campaignId)
-
-            createEditableCampaign(campaign)
-
-            const notificationComplete = this.getNotificationComplete(
-                campaign.UIState as any
-            )
-            const showExperience = this.getShowExperience(
-                campaign.UIState as any
-            )
-
-            this.setState({
-                campaign,
-                notificationComplete,
-                deliveryComplete: 25,
-                showExperience
-            })
+            deliveryProgress: 0
         }
     }
 
-    getNotificationComplete(uiState: string) {
-        if (
-            uiState.length === 0 ||
-            JSON.parse(uiState).notification === undefined
-        ) {
-            return 0
-        } else {
-            let parsedState = JSON.parse(uiState)
-            const denominator: number = Object.keys(parsedState.notification)
-                .length
-
-            const numerator: number = (() => {
-                let count = 0
-                let firstFalse = false
-                Object.keys(parsedState.notification).forEach(page => {
-                    if (!firstFalse) {
-                        if (
-                            parsedState.notification[page].seen &&
-                            parsedState.notification[page].isValidContent
-                        ) {
-                            count += 1
-                        } else {
-                            firstFalse = true
-                        }
-                    }
-                })
-                return count
-            })()
-
-            return Math.round(numerator / denominator * 100)
-        }
-    }
-
-    getShowExperience(uiState: string) {
-        if (
-            uiState.length === 0 ||
-            JSON.parse(uiState).showExperience === undefined
-        ) {
-            return false
-        } else {
-            return JSON.parse(uiState).showExperience
-        }
+    componentWillMount() {
+        const { campaign, createEditableCampaign } = this.props
+        createEditableCampaign(campaign.campaignId)
     }
 
     render() {
-        const {
-            notificationComplete,
-            deliveryComplete,
-            showExperience,
-            campaign
-        } = this.state
+        const { deliveryProgress } = this.state
+
+        const { campaign, device, editableUIState } = this.props
 
         if (campaign !== null) {
-            const OverviewModalFooterComponent = ResponsiveContainer({
-                sendTest: notificationComplete === 100,
-                publish: deliveryComplete === 100,
-                campaignId: parseInt(campaign.campaignId, 10)
-            })(OverviewModalFooter)
-
-            const OverviewModalHeaderComponent = ResponsiveContainer({
-                campaignId: campaign.campaignId
-            })(OverviewModalHeader)
             return (
                 <div
                     style={{
@@ -168,14 +75,16 @@ class OverviewComponent extends React.Component<
                     }}
                     id="overviewComponentRoot"
                 >
-                    <OverviewModalHeaderComponent />
+                    <OverviewModalHeader
+                        campaignId={campaign.campaignId}
+                        device={device}
+                    />
                     <OverviewModalBodyContainer
-                        showExperience={showExperience}
-                        notificationComplete={notificationComplete}
-                        deliveryComplete={deliveryComplete}
+                        deliveryComplete={0}
+                        device={device}
                     />
 
-                    <OverviewModalFooterComponent />
+                    <OverviewModalFooter device={device} />
                 </div>
             )
         } else {
@@ -184,20 +93,25 @@ class OverviewComponent extends React.Component<
     }
 }
 
-const mapStateToProps = (state: State): StateProps => ({
-    campaigns: state.campaigns,
-    shouldCreateEditableCampaign: shouldCreateEditableCampaign(state)
-})
+const mapStateToProps = (
+    state: State,
+    ownProps: RouteComponentProps<Location>
+): StateProps => {
+    const { location } = ownProps
+    const { campaignId } = parse(location.search.substring(1))
+
+    return {
+        campaign: getCampaign(state, campaignId),
+        editableCampaign: getEditableCampaign(state),
+        editableUIState: getEditableUIState(state)
+    }
+}
 
 // tslint:disable-next-line:no-any
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
-        createEditableCampaign: campaign => {
-            dispatch(
-                createEditableCampaign(campaign as
-                    | ScheduledCampaign
-                    | AutomatedNotificationCampaign)
-            )
+        createEditableCampaign: campaignId => {
+            dispatch(createEditableCampaign(campaignId))
         }
     }
 }

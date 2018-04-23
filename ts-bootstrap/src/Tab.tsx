@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { turquoise, black } from '../styles/colors'
+import { black, titanium, turquoise } from '../styles/colors'
 import { regular, text, semibold, medium } from '../styles/typography'
 
 export type TabProps = {
@@ -27,7 +27,7 @@ const Tab: React.SFC<TabProps> = ({ val, selected, onClick, tabStyle }) => {
         ...tabStyle.container
     }
 
-    const selection: React.CSSProperties = {
+    const selectedStyle: React.CSSProperties = {
         position: 'absolute',
         bottom: 0,
         left: 0,
@@ -46,16 +46,21 @@ const Tab: React.SFC<TabProps> = ({ val, selected, onClick, tabStyle }) => {
             contentEditableText &&
             contentEditableText.children[1] === document.activeElement
         ) {
-            (contentEditableText.children[1] as HTMLElement).blur()
+            ;(contentEditableText.children[1] as HTMLElement).blur()
         }
-
         onClick(val)
+    }
+
+    const unselectedStyle: React.CSSProperties = {
+        ...selectedStyle,
+        background: titanium,
+        height: 1
     }
 
     return (
         <div style={container} onClick={() => onTabClick()}>
             {val}
-            {selected === val ? <div style={selection} /> : <div />}
+            <div style={selected === val ? selectedStyle : unselectedStyle} />
         </div>
     )
 }

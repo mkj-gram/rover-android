@@ -12,3 +12,5 @@ export default (
     }
     return state
 }
+
+export const getTestDevices = (state: State) => state.testDevices

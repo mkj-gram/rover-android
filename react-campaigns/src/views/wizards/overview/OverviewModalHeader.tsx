@@ -35,7 +35,7 @@ export type OverviewModalHeaderState = {
     rename: boolean
 }
 
-export interface routerProps {
+export interface RouterProps {
     history: H.History
     location: H.Location
 }
@@ -56,7 +56,7 @@ class OverviewModalHeader extends React.Component<
     OverviewModalHeaderProps &
         DispatchProps &
         StateProps &
-        routerProps &
+        RouterProps &
         // tslint:disable-next-line:no-any
         RouteComponentProps<any>,
     OverviewModalHeaderState
@@ -65,7 +65,7 @@ class OverviewModalHeader extends React.Component<
         props: OverviewModalHeaderProps &
             DispatchProps &
             StateProps &
-            routerProps &
+            RouterProps &
             // tslint:disable-next-line:no-any
             RouteComponentProps<any>
     ) {
@@ -267,7 +267,7 @@ class OverviewModalHeader extends React.Component<
 const mapDispatchToProps = (
     // tslint:disable-next-line:no-any
     dispatch: Dispatch<any>,
-    props: routerProps & OverviewModalHeaderProps
+    props: RouterProps & OverviewModalHeaderProps
 ): DispatchProps => {
     const { location, history } = props
     return {
@@ -290,6 +290,7 @@ const mapDispatchToProps = (
 
                     history.push(`${location.pathname}${params}`)
                 })
+                // tslint:disable-next-line:align
             }, 500)
         },
         archiveCampaign: campaignId => {
@@ -305,6 +306,7 @@ const mapDispatchToProps = (
                         history.push(`/campaigns/`)
                     }
                 })
+                // tslint:disable-next-line:align
             }, 500)
         },
         handleOverviewModalDisplay: (_, open) => {

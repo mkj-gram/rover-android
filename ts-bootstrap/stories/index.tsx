@@ -415,64 +415,6 @@ storiesOf('Navbar', module).add('multi cases', () => {
     )
 })
 
-storiesOf('PhoneComponent', module)
-    .add('Badge Number', () => {
-        return (
-            <div style={{ display: 'flex' }}>
-                <PhoneComponent
-                    notificationType="notificationAlertOptionBadgeNumber"
-                    device="Mobile"
-                />
-                <PhoneComponent
-                    notificationType="notificationAlertOptionBadgeNumber"
-                    device="Desktop"
-                />
-                <PhoneComponent
-                    notificationType="notificationAlertOptionBadgeNumber"
-                    device="Tablet"
-                />
-            </div>
-        )
-    })
-    .add('Notification Center', () => {
-        return (
-            <div style={{ display: 'flex' }}>
-                <PhoneComponent
-                    notificationType="notificationAlertOptionNotificationCenter"
-                    device="Mobile"
-                />
-                <PhoneComponent
-                    notificationType="notificationAlertOptionNotificationCenter"
-                    device="Desktop"
-                />
-                <PhoneComponent
-                    notificationType="notificationAlertOptionNotificationCenter"
-                    device="Tablet"
-                />
-            </div>
-        )
-    })
-    .add('Push Notification', () => {
-        const currTime = moment().format('H mm')
-
-        return (
-            <div style={{ display: 'flex' }}>
-                <PhoneComponent
-                    notificationType="notificationAlertOptionPushNotification"
-                    device="Mobile"
-                />
-                <PhoneComponent
-                    notificationType="notificationAlertOptionPushNotification"
-                    device="Desktop"
-                />
-                <PhoneComponent
-                    notificationType="notificationAlertOptionPushNotification"
-                    device="Tablet"
-                />
-            </div>
-        )
-    })
-
 storiesOf('PopoverContainer', module).add('cases', () => {
     interface XState {
         switched: boolean

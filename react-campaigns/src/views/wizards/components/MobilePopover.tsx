@@ -21,7 +21,7 @@ const MobilePopover: React.SFC<MobilePopoverProps> = ({
         <div
             style={{
                 width: '100%',
-                height: '100vh',
+                height: '100%',
                 animation: `${
                     animation === 'closing' ? 'close' : 'open'
                 } 500ms ease`,

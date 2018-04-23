@@ -15,7 +15,8 @@ import {
     createCampaign,
     fetchCampaigns,
     handleOverviewModalDisplay,
-    fetchCampaign
+    fetchCampaign,
+    fetchTestDevices
 } from '../../actions'
 import { getAllCampaigns, getIsError } from '../../reducers'
 
@@ -34,6 +35,7 @@ export interface RouterProps {
 export interface DispatchProps {
     fetchCampaigns: () => void
     fetchCampaign: (campaignId: number) => void
+    fetchTestDevices: () => void
     closeCampaignTypeSelector: () => void
     createCampaign: (name: string, campaignType: CampaignType) => void
     handleOverviewModalDisplay: (history: H.History, open: boolean) => void
@@ -64,8 +66,10 @@ class ListPage extends React.PureComponent<
         this.pushToOverview = this.pushToOverview.bind(this)
     }
 
-    componentDidMount() {
-        this.props.fetchCampaigns()
+    componentWillMount() {
+        const { fetchCampaigns, fetchTestDevices } = this.props
+        fetchCampaigns()
+        fetchTestDevices()
     }
 
     componentDidUpdate(
@@ -339,6 +343,7 @@ const mapDispatchToProps = (
         fetchCampaign: campaignId => {
             dispatch(fetchCampaign(campaignId))
         },
+        fetchTestDevices: () => dispatch(fetchTestDevices()),
         handleOverviewModalDisplay: (_, open) => {
             dispatch(handleOverviewModalDisplay(ownProps.history, open))
         }

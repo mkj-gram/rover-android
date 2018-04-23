@@ -8,6 +8,7 @@ import FormSection from '../../utils/FormSection'
 
 export interface AlertsOptionsProps extends InjectedProps {
     campaign?: ScheduledCampaign | AutomatedNotificationCampaign
+    wizardSection: keyof editableUIState
 }
 
 class AlertOptionsContainer extends React.Component<AlertsOptionsProps, {}> {
@@ -19,7 +20,10 @@ class AlertOptionsContainer extends React.Component<AlertsOptionsProps, {}> {
         const { device, campaign } = this.props
 
         return (
-            <FormSection>
+            <FormSection
+                device={device}
+                style={{ paddingLeft: 0, paddingRight: 0 }}
+            >
                 <div
                     style={{
                         padding:

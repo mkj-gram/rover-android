@@ -6,6 +6,9 @@ import { handleAlertOptionsModalDisplay } from '../../../actions'
 import { getIsAlertOptionsOpen } from '../../../reducers'
 
 import {
+    AlertOptionsBadgeNumber,
+    AlertOptionsNotificationCenter,
+    AlertOptionsPushNotification,
     PhoneComponent,
     NavBar,
     Text,
@@ -17,7 +20,7 @@ export interface StateProps {
 }
 
 export interface AlertOptionsPhonePreviewProps {
-    device?: string
+    device?: Media
     val?: string
     descriptionVal?: string
 }
@@ -52,7 +55,29 @@ class AlertOptionsPhonePreview extends React.Component<
         let view
         let tempView
 
-        let topView = <PhoneComponent notificationType={val} device={device} />
+        const getAlertView = () => {
+            switch (val) {
+                case 'notificationAlertOptionPushNotification':
+                    return <AlertOptionsPushNotification />
+                case 'notificationAlertOptionNotificationCenter':
+                    return <AlertOptionsNotificationCenter />
+                case 'notificationAlertOptionBadgeNumber':
+                    return <AlertOptionsBadgeNumber />
+                default:
+                    return null
+            }
+        }
+
+        let topView = (
+            <PhoneComponent
+                viewLockScreen={
+                    val === 'notificationAlertOptionPushNotification'
+                }
+                device={device}
+            >
+                {getAlertView()}
+            </PhoneComponent>
+        )
 
         let bottomView = (
             <div
@@ -98,6 +123,7 @@ class AlertOptionsPhonePreview extends React.Component<
                         height: '100vh',
                         animation: `${animationVal} 500ms ease`,
                         position: 'absolute',
+                        zIndex: 1,
                         top: 0,
                         left: 0,
                         overflowY:

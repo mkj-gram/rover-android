@@ -1,60 +1,71 @@
 /// <reference path="../../../../typings/index.d.ts"/>
 import * as React from 'react'
 import { parse } from 'qs'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import { white, Button } from '@rover/ts-bootstrap/dist/src'
-import { getCampaign } from '../../../reducers/campaigns'
 
 import AlertOptionsContainer from './AlertOptionsContainer'
 import TapBehaviorContainer from './TapBehaviorContainer'
+import MessageAndMedia from './MessageAndMedia'
 import AdvancedSettingsContainer from './AdvancedSettingsContainer'
 
-import FormComponent from '../../utils/FormComponent'
+import Form from '../Form'
+import { updateNotificationSettings } from '../../../actions'
+import { getCampaign } from '../../../reducers/campaigns'
 import { getIsNotificationDeliveryModalOpen } from '../../../reducers'
 
-import TempMediaAndQuery from './TempMediaAndQuery'
-
-export interface NotificationContainerProps extends InjectedProps {
-    campaigns: StringMap<Campaign>
+export interface NotificationContainerStateProps {
+    campaign: Campaign
     isNotificationDeliveryModalOpen: string
 }
 
-class NotificationContainer extends React.Component<
-    NotificationContainerProps,
-    {}
-> {
-    constructor(props: NotificationContainerProps) {
-        super(props)
-    }
+export interface NotificationContainerProps {
+    device: Media
+}
 
-    render() {
-        const campaignId = parse(location.search.substring(1)).campaignId
-        const campaign = getCampaign(this.props.campaigns, campaignId)
+export interface NotificationContainerDispatchProps {
+    updateNotificationSettings: () => void
+}
 
-        const { isNotificationDeliveryModalOpen, device } = this.props
-        let animate =
-            isNotificationDeliveryModalOpen === 'closing' ? 'close' : 'open'
+const NotificationContainer: React.SFC<
+    NotificationContainerProps &
+        NotificationContainerStateProps &
+        NotificationContainerDispatchProps
+> = ({
+    campaign,
+    device,
+    isNotificationDeliveryModalOpen,
+    updateNotificationSettings
+}) => {
+    const campaignId = parse(location.search.substring(1)).campaignId
+    let animate =
+        isNotificationDeliveryModalOpen === 'closing' ? 'close' : 'open'
 
-        const pages: StringMap<JSX.Element> = {
-            messageAndMedia: (
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                >
-                    <TempMediaAndQuery
-                        campaign={
-                            campaign as
-                                | ScheduledCampaign
-                                | AutomatedNotificationCampaign
-                        }
-                        device={device}
-                    />
-                </div>
-            ),
-            alertOptions: (
+    const type: UIStateType = 'notification'
+
+    return (
+        <div
+            style={{
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                background: white,
+                animation: `${animate} 500ms ease`
+            }}
+            id="notificationContainer"
+        >
+            <Form
+                type={type}
+                campaignId={campaignId}
+                saveAndClose={updateNotificationSettings}
+                device={device}
+            >
+                <MessageAndMedia
+                    device={device}
+                    wizardSection="messageAndMedia"
+                />
                 <AlertOptionsContainer
                     campaign={
                         campaign as
@@ -62,9 +73,8 @@ class NotificationContainer extends React.Component<
                             | AutomatedNotificationCampaign
                     }
                     device={device}
+                    wizardSection="alertOptions"
                 />
-            ),
-            tapBehavior: (
                 <TapBehaviorContainer
                     campaign={
                         campaign as
@@ -72,43 +82,32 @@ class NotificationContainer extends React.Component<
                             | AutomatedNotificationCampaign
                     }
                     device={device}
+                    wizardSection="tapBehavior"
                 />
-            ),
-            advancedSettings: <AdvancedSettingsContainer device={device} />
-        }
-
-        const type: UIStateType = 'notification'
-
-        return (
-            <div
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    zIndex: 2,
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    background: white,
-                    animation: `${animate} 500ms ease`
-                }}
-                id="notificationContainer"
-            >
-                <FormComponent
-                    type={type}
-                    jsxPages={pages}
-                    isNotificationDeliveryModalOpen={
-                        isNotificationDeliveryModalOpen
-                    }
+                <AdvancedSettingsContainer
+                    wizardSection="advancedSettings"
                     device={device}
                 />
-            </div>
-        )
-    }
+            </Form>
+        </div>
+    )
 }
 
-const mapStateToProps = (state: State): NotificationContainerProps => ({
-    campaigns: state.campaigns,
+const mapStateToProps = (state: State): NotificationContainerStateProps => ({
+    campaign: getCampaign(
+        state.campaigns,
+        parse(location.search.substring(1)).campaignId
+    ),
     isNotificationDeliveryModalOpen: getIsNotificationDeliveryModalOpen(state)
 })
 
-export default connect(mapStateToProps, {})(NotificationContainer)
+const mapDispatchToProps = (
+    // tslint:disable-next-line:no-any
+    dispatch: Dispatch<any>
+): NotificationContainerDispatchProps => ({
+    updateNotificationSettings: () => dispatch(updateNotificationSettings())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+    NotificationContainer
+)

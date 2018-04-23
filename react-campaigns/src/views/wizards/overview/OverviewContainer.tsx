@@ -14,7 +14,7 @@ class OverviewContainer extends React.Component<OverviewContainerProps, {}> {
         const { device } = this.props
         return (
             <DeviceTransitionContainer device={device}>
-                <OverviewComponent />
+                <OverviewComponent device={device} />
             </DeviceTransitionContainer>
         )
     }

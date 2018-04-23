@@ -17,7 +17,7 @@ const Mobile = (props: any) => <Responsive {...props} maxDeviceWidth={767} />
 type funcType = () => void
 
 export interface InjectedProps {
-    device?: string
+    device?: Media
 }
 
 // tslint:disable-next-line:no-any
@@ -26,7 +26,7 @@ const responsiveContainer = (wrappedComponentProps: StringMap<any> = {}) => <
 >(
     Component: React.ComponentType<TOriginalProps & InjectedProps>
 ) => {
-    const res = class ResponsiveContainer extends React.Component<
+    return class ResponsiveContainer extends React.Component<
         TOriginalProps,
         {}
     > {
@@ -51,7 +51,6 @@ const responsiveContainer = (wrappedComponentProps: StringMap<any> = {}) => <
             )
         }
     }
-    return res
 }
 
 export default responsiveContainer

@@ -31,7 +31,7 @@ import {
 } from '../../../reducers'
 
 export interface AlertOptionsRowsProps {
-    device?: string
+    device?: Media
     campaign?: ScheduledCampaign | AutomatedNotificationCampaign
 }
 
@@ -259,9 +259,9 @@ const AlertOptionsRows: React.SFC<
                             device === 'Desktop' && (
                                 <div
                                     style={{
-                                        position: 'absolute',
+                                        position: 'fixed',
                                         top: 'calc(50%) -10px',
-                                        right: -11,
+                                        left: 759,
                                         height: 20,
                                         width: 20,
                                         transform: 'rotate(45deg)',

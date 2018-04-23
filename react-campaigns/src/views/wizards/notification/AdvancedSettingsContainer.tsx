@@ -6,7 +6,13 @@ import { Text } from '@rover/ts-bootstrap/dist/src'
 import AdvancedSettingsRowContainer from './AdvancedSettingsRowContainer'
 import FormSection from '../../utils/FormSection'
 
-const AdvancedSettingsContainer: React.SFC<InjectedProps> = ({ device }) => {
+interface AdvancedSettingsProps extends InjectedProps {
+    wizardSection: keyof editableUIState
+}
+
+const AdvancedSettingsContainer: React.SFC<AdvancedSettingsProps> = ({
+    device
+}) => {
     const iOSSettings: StringMap<StringMap<string>> = {
         notificationIosSound: {
             displayText: 'Sound',
@@ -23,7 +29,7 @@ const AdvancedSettingsContainer: React.SFC<InjectedProps> = ({ device }) => {
                 paddingBottom: 0
             }}
         >
-            <FormSection>
+            <FormSection device={device}>
                 <AdvancedSettingsRowContainer
                     device={device}
                     displayText={

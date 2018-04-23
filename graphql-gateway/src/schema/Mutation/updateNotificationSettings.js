@@ -121,7 +121,17 @@ const updateNotificationSettings = {
         request.setNotificationTitle(notificationTitle)
 
         if (notificationAttachment !== null) {
-            request.setNotificationAttachmentType(notificationAttachment.type)
+            switch (notificationAttachment.type) {
+                case 'image':
+                    request.setNotificationAttachmentType(1)
+                    break
+                case 'audio':
+                    request.setNotificationAttachmentType(2)
+                    break
+                case 'video':
+                    request.setNotificationAttachmentType(3)
+                    break
+            }
             request.setNotificationAttachmentUrl(notificationAttachment.url)
         }
 
@@ -165,7 +175,6 @@ const updateNotificationSettings = {
             const val = notificationAttributesMap[key].toString()
             map.set(key, val)
         })
-
         const response = await campaignsClient.updateNotificationSettings(
             request
         )

@@ -7,6 +7,8 @@ import {
     sendTest
 } from '../../../actions'
 
+import { getTypeProgress } from '../../../reducers'
+
 import { connect, Dispatch } from 'react-redux'
 import {
     Button,
@@ -21,10 +23,9 @@ import { InjectedProps } from '../../utils/ResponsiveContainer'
 import DeviceTransitionContainer from '../../utils/DeviceTransitionContainer'
 
 import SendTestComponent from './SendTestComponent'
+import notification from '../../../reducers/app/notification'
 
 export interface OverviewModalFooterProps extends InjectedProps {
-    sendTest?: boolean
-    publish?: boolean
     sendTestClick?: () => void
     publishClick?: () => void
     campaignId?: number
@@ -37,12 +38,13 @@ export interface OverviewModalFooterState {
 }
 
 export interface DispatchProps {
-    fetchTestDevices: () => void
     handleSendTestModalDisplay: (on?: boolean) => void
     sendTestNotification: (campaignId: number, deviceIds: string[]) => void
 }
 
 export interface TestDeviceStateProps {
+    deliveryProgress: number
+    notificationProgress: number
     testDevices: StringMap<string>
 }
 
@@ -64,12 +66,9 @@ class OverviewModalFooter extends React.Component<
         this.handleSendTestPrompt = this.handleSendTestPrompt.bind(this)
     }
 
-    componentDidMount() {
-        this.props.fetchTestDevices()
-    }
-
     handleSendTestToggle(device?: string, on?: boolean) {
-        if (this.props.sendTest) {
+        const { notificationProgress } = this.props
+        if (notificationProgress === 100) {
             if (device !== 'Mobile') {
                 this.setState({
                     toggleSendTest: !this.state.toggleSendTest
@@ -80,12 +79,6 @@ class OverviewModalFooter extends React.Component<
                     this.setState({
                         toggleSendTest: !this.state.toggleSendTest
                     })
-                } else {
-                    setTimeout(() => {
-                        this.setState({
-                            toggleSendTest: !this.state.toggleSendTest
-                        })
-                    }, 300)
                 }
             }
         }
@@ -112,7 +105,12 @@ class OverviewModalFooter extends React.Component<
     }
 
     render() {
-        const { sendTest, publish, device, publishClick } = this.props
+        const {
+            deliveryProgress,
+            device,
+            notificationProgress,
+            publishClick
+        } = this.props
 
         const {
             toggleSendTest,
@@ -163,30 +161,32 @@ class OverviewModalFooter extends React.Component<
                         onClick={this.handleSendTestToggle}
                         showPopover={this.state.toggleSendTest}
                     >
-                        {[
-                            <Button
-                                text="Send a Test"
-                                size="large"
-                                type={sendTest ? 'secondary' : 'disabled'}
-                                overrideWidth={114}
-                                style={{ outerStyle: { marginRight: 16 } }}
-                                onClick={this.handleSendTestToggle}
-                                key="sendTest1"
-                            />,
-                            <div
-                                style={{
-                                    width: 384
-                                }}
-                            >
-                                <SendTestComponent
-                                    key="sendTest2"
-                                    device={device}
-                                    selectedTestDevices={selectedTestDevices}
-                                    listOfTestDevices={this.props.testDevices}
-                                    handleCheck={this.handleCheck}
-                                />
-                            </div>
-                        ]}
+                        <Button
+                            text="Send a Test"
+                            size="large"
+                            type={
+                                notificationProgress === 100
+                                    ? 'secondary'
+                                    : 'disabled'
+                            }
+                            overrideWidth={114}
+                            style={{ outerStyle: { marginRight: 16 } }}
+                            onClick={this.handleSendTestToggle}
+                            key="sendTest1"
+                        />
+                        <div
+                            style={{
+                                width: 384
+                            }}
+                        >
+                            <SendTestComponent
+                                key="sendTest2"
+                                device={device}
+                                selectedTestDevices={selectedTestDevices}
+                                listOfTestDevices={this.props.testDevices}
+                                handleCheck={this.handleCheck}
+                            />
+                        </div>
                     </PopoverContainer>
                 )
             } else {
@@ -210,7 +210,11 @@ class OverviewModalFooter extends React.Component<
                         <Button
                             text="Send a Test"
                             size="large"
-                            type={sendTest ? 'secondary' : 'disabled'}
+                            type={
+                                notificationProgress === 100
+                                    ? 'secondary'
+                                    : 'disabled'
+                            }
                             overrideWidth={114}
                             style={{ outerStyle: { marginRight: 16 } }}
                             key="sendTest1"
@@ -275,7 +279,12 @@ class OverviewModalFooter extends React.Component<
                     <Button
                         text="Publish"
                         size="large"
-                        type={publish ? 'primary' : 'disabled'}
+                        type={
+                            notificationProgress === 100 &&
+                            deliveryProgress === 100
+                                ? 'primary'
+                                : 'disabled'
+                        }
                         overrideWidth={114}
                         onClick={publishClick}
                     />
@@ -288,9 +297,6 @@ class OverviewModalFooter extends React.Component<
 // tslint:disable-next-line:no-any
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
-        fetchTestDevices: () => {
-            dispatch(fetchTestDevices())
-        },
         handleSendTestModalDisplay: on => {
             dispatch(handleSendTestModalDisplay(on))
         },
@@ -301,6 +307,8 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
 }
 
 const mapStatetoProps = (state: State): TestDeviceStateProps => ({
+    deliveryProgress: 10,
+    notificationProgress: getTypeProgress(state, 'notification'),
     testDevices: state.testDevices
 })
 

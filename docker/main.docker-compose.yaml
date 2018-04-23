@@ -222,7 +222,7 @@ services:
       - kafka
     ports:
       - "4000:80"
-    command: bash -c "rm -rf node_modules/@rover && npm install && npm run build && npm start"
+    command: bash -c "rm -rf node_modules/@rover && npm install && npm run build && node dist"
     volumes:
       - ../:/rover:delegated
     working_dir: /rover/graphql-gateway

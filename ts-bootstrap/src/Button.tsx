@@ -200,11 +200,13 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
                             ? mouseStateColors.inactive
                             : mouseStateColors.active,
                     fontSize: 17,
-                    padding: '1px 0px 1px 0px'
+                    padding: 0
                 }
                 outerStyle = {
                     ...outerStyle,
-                    height: 24
+                    height: 24,
+                    display: 'flex',
+                    alignItems: 'center'
                 }
                 break
         }

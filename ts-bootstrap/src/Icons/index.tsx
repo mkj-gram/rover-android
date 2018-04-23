@@ -1,68 +1,79 @@
-import AlertInfoIcon from './AlertInfoIcon'
-import AlertWarnIcon from './AlertWarnIcon'
 import AlertErrorIcon from './AlertErrorIcon'
+import AlertInfoIcon from './AlertInfoIcon'
+import AlertOptionsBadgeNumber from './AlertOptionsBadgeNumber'
+import AlertOptionsNotificationCenter from './AlertOptionsNotificationCenter'
+import AlertOptionsPushNotification from './AlertOptionsPushNotification'
+import AlertWarnIcon from './AlertWarnIcon'
+import ArchiveIcon from './ArchiveIcon'
 import ArrowLeftIcon from './ArrowLeftIcon'
 import ArrowRightIcon from './ArrowRightIcon'
+import AudioIcon from './AudioIcon'
 import BarChartIcon from './BarChartIcon'
 import CalendarIcon from './CalendarIcon'
-import CheckmarkIcon from './CheckmarkIcon'
+import ChangeIcon from './ChangeIcon'
+import CheckCircleIcon from './CheckCircleIcon'
 import CheckIcon from './CheckIcon'
+import CheckmarkIcon from './CheckmarkIcon'
+import ChevronLeftIcon from './ChevronLeftIcon'
+import ChevronRightIcon from './ChevronRightIcon'
+import CircleCloseIcon from './CircleCloseIcon'
+import CloseIcon from './CloseIcon'
+import DuplicateIcon from './DuplicateIcon'
+import EyeIcon from './EyeIcon'
 import FilterArrowIcon from './FilterArrowIcon'
 import GearIcon from './GearIcon'
 import GridIcon from './GridIcon'
+import ImageIcon from './ImageIcon'
 import LinkIcon from './LinkIcon'
+import Phone from './Phone'
+import MoreIcon from './MoreIcon'
 import PhoneIcon from './PhoneIcon'
+import PlusIcon from './PlusIcon'
 import PlusSquareIcon from './PlusSquareIcon'
+import RefreshIcon from './RefreshIcon'
+import RenameIcon from './RenameIcon'
 import SearchIcon from './SearchIcon'
 import UserIcon from './UserIcon'
+import VideoIcon from './VideoIcon'
 import ZapIcon from './ZapIcon'
-import ArchiveIcon from './ArchiveIcon'
-import ChangeIcon from './ChangeIcon'
-import CheckCircleIcon from './CheckCircleIcon'
-import ChevronLeftIcon from './ChevronLeftIcon'
-import ChevronRightIcon from './ChevronRightIcon'
-import CloseIcon from './CloseIcon'
-import DuplicateIcon from './DuplicateIcon'
-import MoreIcon from './MoreIcon'
-import RenameIcon from './RenameIcon'
-import AlertOptionsPushNotification from './AlertOptionsPushNotification'
-import AlertOptionsNotificationCenter from './AlertOptionsNotificationCenter'
-import AlertOptionsBadgeNumber from './AlertOptionsBadgeNumber'
-import PlusIcon from './PlusIcon'
-
-import Phone from './Phone'
 
 export {
-    AlertOptionsPushNotification,
-    AlertOptionsNotificationCenter,
-    AlertOptionsBadgeNumber,
+    AlertErrorIcon,
     AlertInfoIcon,
+    AlertOptionsBadgeNumber,
+    AlertOptionsNotificationCenter,
+    AlertOptionsPushNotification,
     AlertWarnIcon,
+    ArchiveIcon,
     ArrowLeftIcon,
     ArrowRightIcon,
-    AlertErrorIcon,
+    AudioIcon,
     BarChartIcon,
     CalendarIcon,
     ChangeIcon,
-    CheckmarkIcon,
+    CheckCircleIcon,
     CheckIcon,
+    CheckmarkIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    CircleCloseIcon,
+    CloseIcon,
+    DuplicateIcon,
+    EyeIcon,
     FilterArrowIcon,
     GearIcon,
     GridIcon,
+    ImageIcon,
     LinkIcon,
-    PhoneIcon,
-    ArchiveIcon,
-    CheckCircleIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    DuplicateIcon,
-    CloseIcon,
     MoreIcon,
-    RenameIcon,
+    Phone,
+    PhoneIcon,
+    PlusIcon,
     PlusSquareIcon,
+    RefreshIcon,
+    RenameIcon,
     SearchIcon,
     UserIcon,
-    ZapIcon,
-    Phone,
-    PlusIcon
+    VideoIcon,
+    ZapIcon
 }

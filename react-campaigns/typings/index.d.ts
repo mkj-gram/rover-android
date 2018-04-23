@@ -39,10 +39,21 @@ interface StringMap<T> {
 
 interface UIStateInterface {
     notification: StringMap<StringMap<boolean>>
-    showExperience: boolean // Deprecate when updating overview page
 }
 
 type UIStateType = 'notification'
+
+type UIStateField = {
+    seen: boolean
+    type: UIStateType
+}
+
+type editableUIState = {
+    messageAndMedia: UIStateField
+    alertOptions: UIStateField
+    tapBehavior: UIStateField
+    advancedSettings: UIStateField
+}
 
 declare abstract class Campaign {
     name: string
@@ -123,11 +134,12 @@ declare class AutomatedNotificationCampaign extends Campaign {
 }
 
 type State = {
-    readonly campaigns: StringMap<Campaign>
-    readonly testDevices: StringMap<string>
-    readonly modal: StringMap<string | boolean>
-    readonly editableCampaign: AutomatedNotificationCampaign | ScheduledCampaign
     readonly app: AppState
+    readonly campaigns: StringMap<Campaign>
+    readonly editableCampaign: AutomatedNotificationCampaign | ScheduledCampaign
+    readonly editableUIState: editableUIState
+    readonly modal: StringMap<string | boolean>
+    readonly testDevices: StringMap<string>
 }
 
 type HomeState = {
@@ -203,5 +215,5 @@ type NotificationState = {
 }
 
 interface InjectedProps {
-    device?: string
+    device?: Media
 }

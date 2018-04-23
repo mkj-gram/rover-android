@@ -9,8 +9,7 @@
     ],
     "scripts": {
         "build-storybook": "build-storybook",
-        "build-storybook-firebase":
-            "build-storybook -c .storybook -o firebase && cp firebase/index.html firebase/storybook.html && cp firebase/index-temp.html firebase/index.html",
+        "build-storybook-firebase": "build-storybook -c .storybook -o firebase && cp firebase/index.html firebase/storybook.html && cp firebase/index-temp.html firebase/index.html",
         "compile": "tsc stories/index.tsx --outDir firebase --jsx react",
         "lint": "tslint -c tslint.json './**/*.tsx'",
         "storybook": "start-storybook -c .storybook -p 6006",
@@ -33,13 +32,13 @@
         "@storybook/addon-links": "3.3.3",
         "@storybook/react": "3.3.3",
         "@types/node": "8.5.2",
-        "@types/react": "16.0.40",
+        "@types/react": "16.3.2",
         "@types/react-dom": "16.0.4",
         "@types/storybook__react": "3.0.6",
         "awesome-typescript-loader": "3.4.1",
         "tslint": "5.9.1",
         "tslint-react": "3.2.0",
-        "typescript": "2.7.1",
+        "typescript": "2.8.1",
         "ts-loader": "3.2.0",
         "webpack": "3.10.0"
     },
