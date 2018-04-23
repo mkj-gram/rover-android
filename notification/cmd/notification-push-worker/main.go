@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"sync"
 	"syscall"
 	"time"
 
@@ -45,8 +46,7 @@ var (
 	workerConcurrency = flag.Int("worker-concurrency", 10, "worker concurrency")
 
 	// Postgres
-	// TODO: should this be postgres-dsn?
-	pgDSN = flag.String("db-dsn", "", "postgres DSN")
+	pgDSN = flag.String("postgres-dsn", "", "postgres DSN")
 
 	// Scylla
 	scyllaDSN = flag.String("scylla-dsn", "", "scylla DSN")
@@ -62,6 +62,7 @@ func main() {
 
 	var (
 		ctx, cancelFn = context.WithCancel(context.Background())
+		wg            sync.WaitGroup
 
 		readinessProbes, livenessProbes []func() error
 	)
@@ -185,8 +186,6 @@ func main() {
 			Subscription: subscription,
 		}
 
-		done = make(chan struct{})
-
 		instrument = func(h notification_pubsub.ReceiverFunc) notification_pubsub.ReceiverFunc {
 			return notification_pubsub.ReceiverFunc(func(ctx context.Context, m notification_pubsub.Message) error {
 				defer func() {
@@ -209,8 +208,9 @@ func main() {
 		}
 	)
 
+	wg.Add(1)
 	go func() {
-		defer close(done)
+		defer wg.Done()
 
 		handler := instrument(
 			notification_pubsub.ReceiverFunc(push.WithMetrics(
@@ -219,10 +219,11 @@ func main() {
 		if err := subscriber.Subscribe(ctx, handler); err != nil {
 			errClient.Reportf(ctx, nil, "pubsub.receive=exiting status=error error=%q", err)
 			stderr.Printf("pubsub.receive=exiting status=error error=%q\n", err.Error())
-			return
+		} else {
+			stdout.Printf("pubsub.receive=exiting status=OK\n")
 		}
-		stdout.Printf("pubsub.receive=exiting status=OK\n")
 
+		cancelFn()
 	}()
 
 	//
@@ -236,6 +237,7 @@ func main() {
 				for _, probe := range probes {
 					if err := probe(); err != nil {
 						result += err.Error() + "\n"
+						stderr.Printf("probe=error error=%q\n", err.Error())
 					}
 				}
 				if result != "" {
@@ -267,23 +269,22 @@ func main() {
 	// Signals
 	//
 
-	sigc := make(chan os.Signal)
-	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 
-	select {
-	case sig := <-sigc:
-		stdout.Printf("status=signal signal=%v\n", sig)
-	}
+		sigc := make(chan os.Signal)
+		signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 
-	//
-	// Shutdown
-	//
-	cancelFn()
+		select {
+		case <-ctx.Done():
+		case <-sigc:
+			stdout.Printf("status=signal signal=%q\n", <-sigc)
+			cancelFn()
+		}
+	}()
 
-	select {
-	case <-done:
-		stdout.Println("status=shutdown")
-	case <-time.After(time.Second * 30):
-		stdout.Println("status=shutdown error=timeout")
-	}
+	stdout.Printf("status=started\n")
+	wg.Wait()
+	stdout.Printf("status=done\n")
 }
