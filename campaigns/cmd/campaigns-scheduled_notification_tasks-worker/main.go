@@ -11,9 +11,11 @@ import (
 	"syscall"
 	"time"
 
+	gerrors "cloud.google.com/go/errors"
 	"github.com/jackc/pgx"
 	"github.com/namsral/flag"
 	"github.com/pkg/errors"
+	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 
 	prom "github.com/prometheus/client_golang/prometheus"
@@ -30,8 +32,8 @@ var (
 	//
 	// GCP
 	//
-	gcpProjectId      = flag.String("gcp-project-id", "", "GCP Project ID")
-	gcpServiceAcctKey = flag.String("gcp-service-account-key", "", "GCP service account key path")
+	gcpProjectID      = flag.String("gcp-project-id", "", "GCP Project ID")
+	gcpSvcAcctKeyPath = flag.String("gcp-service-account-key-path", "", "path to google service account key file")
 
 	//
 	// Queue
@@ -67,8 +69,7 @@ func main() {
 	var (
 		ctx, cancelFn = context.WithCancel(context.Background())
 
-		readiness http.Handler = http.HandlerFunc(statusOk)
-		liveness  http.Handler = http.HandlerFunc(statusOk)
+		livenessProbes, readinessProbes []func(context.Context) error
 	)
 
 	defer cancelFn()
@@ -94,9 +95,31 @@ func main() {
 		})
 	)
 
-	prom.MustRegister(jobsErrors)
-	prom.MustRegister(jobsPanics)
-	prom.MustRegister(jobsStats)
+	prom.MustRegister(jobsErrors, jobsPanics, jobsStats)
+
+	//
+	// GCP
+	//
+	var gcpClientOpts []option.ClientOption
+	if *gcpSvcAcctKeyPath != "" {
+		gcpClientOpts = append(gcpClientOpts, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
+	}
+
+	//
+	// GCP errors
+	//
+
+	var errClient *gerrors.Client
+
+	if *gcpProjectID != "" {
+		var err error
+		errClient, err = gerrors.NewClient(ctx, *gcpProjectID, "notification/push-worker", "v1", true, gcpClientOpts...)
+		if err != nil {
+			stderr.Fatalf("errors.NewClient: %v", err)
+		} else {
+			stdout.Println("gcp.errors=on")
+		}
+	}
 
 	//
 	// pgx Postgres
@@ -119,7 +142,7 @@ func main() {
 
 	defer pgpool.Close()
 
-	var pgping = func() error {
+	var pgping = func(ctx context.Context) error {
 		_, err := pgpool.ExecEx(ctx, `select 1`, nil)
 		if err != nil {
 			stderr.Printf("postgres: ping: error=%q\n", err)
@@ -127,21 +150,7 @@ func main() {
 		return err
 	}
 
-	readiness = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := pgping(); err != nil {
-			http.Error(w, err.Error(), http.StatusServiceUnavailable)
-			return
-		}
-		readiness.ServeHTTP(w, r)
-	})
-
-	liveness = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := pgping(); err != nil {
-			http.Error(w, err.Error(), http.StatusServiceUnavailable)
-			return
-		}
-		liveness.ServeHTTP(w, r)
-	})
+	readinessProbes = append(readinessProbes, pgping)
 
 	//
 	// Scheduled Notification Worker
@@ -205,6 +214,10 @@ func main() {
 						defer que.Recover(func(val interface{}, stacktrace string) {
 							jobsPanics.Inc()
 							stderr.Printf("%s job_id=%d status=panic stacktrace=%q", wn, task.ID, stacktrace)
+
+							if errClient != nil {
+								errClient.Reportf(ctx, nil, "%s job_id=%d status=panic stacktrace=%q", wn, task.ID, stacktrace)
+							}
 						})
 
 						stdout.Printf("%s job_id=%d status=starting\n", wn, task.ID)
@@ -267,10 +280,10 @@ func main() {
 	wg.Add(*queNWrokers)
 
 	for i := 0; i < *queNWrokers; i++ {
-		go func() {
+		go func(n int) {
 			defer wg.Done()
-			worker(i)
-		}()
+			worker(n)
+		}(i)
 	}
 
 	wg.Add(1)
@@ -288,10 +301,27 @@ func main() {
 	go func() {
 		// measure latency distributions of your RPCs
 		// grpc_prometheus.EnableHandlingTimeHistogram()
+		probe := func(probes []func(context.Context) error) http.HandlerFunc {
+			return func(w http.ResponseWriter, r *http.Request) {
+				var result string
+				for _, probe := range probes {
+					if err := probe(ctx); err != nil {
+						stderr.Printf("probe: %v\n", err)
+						result += err.Error() + "\n"
+					}
+				}
+				if result != "" {
+					http.Error(w, result, http.StatusServiceUnavailable)
+					return
+				}
+				w.WriteHeader(200)
+				w.Write([]byte("ok"))
+			}
+		}
 
 		http.Handle("/metrics", prom.Handler())
-		http.Handle("/readiness", readiness)
-		http.Handle("/liveness", liveness)
+		http.Handle("/readiness", probe(readinessProbes))
+		http.Handle("/liveness", probe(livenessProbes))
 		// http.Handle("/togglelogs", loghttp.ToggleLogs(ioutil.Discard, os.Stdout, verboseLog))
 
 		hsrv := http.Server{
@@ -315,15 +345,14 @@ func main() {
 
 	stdout.Println("status=waiting_for_signal")
 	select {
+	case <-ctx.Done():
 	case sig := <-sigc:
-		stdout.Println("signal=", sig)
+		stdout.Printf("signal=%v\n", sig)
+		cancelFn()
 	}
-
-	cancelFn()
 
 	stdout.Println("status=waiting_workers")
 	wg.Wait()
-
 	stdout.Println("status=stopped")
 }
 
