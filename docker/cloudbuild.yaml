@@ -222,16 +222,16 @@ steps:
       - 'install-complete'
 
 # Campaigns Service
-  - id: 'test-campaigns-service'
+  - id: 'test-campaigns'
     name: 'docker/compose:1.16.1'
     args:
       - -p
-      - test-campaigns-service
+      - test-campaigns
       - -f
       - ./docker/main.docker-compose.yaml
       - run
       - campaigns-service
-      - docker/campaigns-service/cmd
+      - docker/campaigns/cmd
       - test
     waitFor:
       - 'install-complete'
@@ -296,7 +296,7 @@ steps:
     waitFor:
       - 'install-complete'
       - 'test-audience-service'
-      - 'test-campaigns-service'
+      - 'test-campaigns'
 
 # Clean up the images running. This frees memory from the cloudbuilder server
   - id: 'test-cleanup-docker-compose'
@@ -308,7 +308,7 @@ steps:
     waitFor:
         - 'test-auth-service'
         - 'test-audience-service'
-        - 'test-campaigns-service'
+        - 'test-campaigns'
         - 'test-notification'
         - 'test-events-pipeline'
         - 'test-rover-apis'
@@ -377,27 +377,41 @@ steps:
       - 'build-audience-service-executable'
 
 # Campaigns Service
-  - id: 'build-campaigns-service-executable'
+  - id: 'build-campaigns-binaries'
     name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
-      - build
-      - -o
-      - docker/campaigns-service/campaigns-service
-      - github.com/roverplatform/rover/campaigns/cmd/campaigns-service
+      - install
+      - ./go/cmd/postgres-cli
+      - ./campaigns/cmd/campaigns-service
+      - ./campaigns/cmd/campaigns-scheduled_notification_tasks-worker
     waitFor:
       - 'test-complete'
 
 
-  - name: 'gcr.io/cloud-builders/docker'
+  - id: 'build-campaigns-resources'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - -c
+      - |
+        export DEST=docker/campaigns
+        cp -r campaigns/db $$DEST/postgres
+        cp -r ./gopath/bin/campaigns-* $$DEST
+        cp -r ./gopath/bin/postgres-cli $$DEST
+
+    waitFor:
+      - 'build-campaigns-binaries'
+
+  - id: "build-campaigns-image"
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/campaigns-service:$REVISION_ID
-      - docker/campaigns-service/
+      - --tag=gcr.io/$PROJECT_ID/campaigns:$REVISION_ID
+      - docker/campaigns/
     waitFor:
-      - 'build-campaigns-service-executable'
-
+      - 'build-campaigns-resources'
 
 # Notification Service
   - id: 'build-notification-executables'
@@ -611,7 +625,7 @@ images:
   - 'gcr.io/$PROJECT_ID/auth-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/campaigns-service:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/campaigns:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/notification:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/events-pipeline:$REVISION_ID'
   - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'

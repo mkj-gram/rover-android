@@ -10,12 +10,17 @@ run() {
 	go run $SVC_HOME/cmd/campaigns-service/main.go
 }
 
+run_worker() {
+  go run $SVC_HOME/cmd/campaigns-scheduled_notification_tasks-worker
+}
+
 test() {
   go test $SVC_HOME/...
 }
 
 migrate() {
   go run ./go/postgres-cli/main.go \
+    --db-dsn=${POSTGRES_DSN} \
     --migration-path=$SVC_HOME/db/migrations
 }
 

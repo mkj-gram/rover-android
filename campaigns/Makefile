@@ -13,12 +13,9 @@ test:
 run:
 	${RUN}
 
-run/que:
-	${RUN} go run ${ROVER_GOPATH}/cmd/que-workerpool/main.go
-
 db.migrate:
-	${RUN} go run ${ROVER_GOPATH}/campaigns/cmd/migration-cli/main.go \
-		--migration-path=/go/src/${ROVER}/campaigns/db/migrations/ \
+	${RUN} go run ./go/postgres-cli/main.go \
+		--migration-path=./campaigns/db/migrations/ \
 		--migration-cmd=${MIGRATION_CMD}
 
 shell:
