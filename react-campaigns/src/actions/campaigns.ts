@@ -171,11 +171,11 @@ export const updateNotificationSettings: ActionCreator<
 }
 
 export const fetchCampaign: ActionCreator<
-    ThunkAction<Promise<Action | void>, State, void>
+    ThunkAction<Promise<Action | void | {}>, State, void>
 > = (campaignId: number) => (
     dispatch: Dispatch<State>,
     getState: () => State
-): Promise<Action | void> => {
+): Promise<Action | void | {}> => {
     const query: DocumentNode = gql`
         query FetchCampaign($campaignId: Int!) {
             campaign(campaignId: $campaignId) {
@@ -246,35 +246,44 @@ export const fetchCampaign: ActionCreator<
     }
     return Environment(request).then(
         ({ data, errors }) => {
-            if (errors) {
-                dispatch({
-                    type: 'FETCH_CAMPAIGN_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
-            } else {
-                const campaigns = {
-                    ...getState().campaigns,
-                    [data.campaign.campaignId]: {
-                        ...data.campaign
+            return new Promise((resolve, reject) => {
+                if (errors) {
+                    dispatch({
+                        type: 'FETCH_CAMPAIGN_FAILURE',
+                        message: errors[0].message
+                    })
+
+                    reject()
+                    setTimeout(() => {
+                        dispatch({ type: 'DISMISS_FAILURE' })
+                    }, 4000)
+                } else {
+                    const campaigns = {
+                        ...getState().campaigns,
+                        [data.campaign.campaignId]: {
+                            ...data.campaign
+                        }
                     }
+                    dispatch({
+                        type: 'FETCH_CAMPAIGN_SUCCESS',
+                        campaigns
+                    })
+                    resolve()
                 }
-                dispatch({
-                    type: 'FETCH_CAMPAIGN_SUCCESS',
-                    campaigns
-                })
-            }
+            })
         },
         ({ result }) => {
-            dispatch({
-                type: 'FETCH_CAMPAIGN_FAILURE',
-                message: result.errors[0].message
+            return new Promise((resolve, reject) => {
+                dispatch({
+                    type: 'FETCH_CAMPAIGN_FAILURE',
+                    message: result.errors[0].message
+                })
+
+                reject()
+                setTimeout(() => {
+                    dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
             })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
         }
     )
 }

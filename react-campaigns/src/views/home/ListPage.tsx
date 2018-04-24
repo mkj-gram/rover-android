@@ -341,7 +341,12 @@ const mapDispatchToProps = (
             )
         },
         fetchCampaign: campaignId => {
-            dispatch(fetchCampaign(campaignId))
+            dispatch(fetchCampaign(campaignId)).then(
+                () => {},
+                () => {
+                    ownProps.history.replace('/campaigns/')
+                }
+            )
         },
         fetchTestDevices: () => dispatch(fetchTestDevices()),
         handleOverviewModalDisplay: (_, open) => {
