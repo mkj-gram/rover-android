@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	httpAddr = flag.String("rpc-addr", ":5080", "http address")
+	httpAddr = flag.String("http-addr", ":5080", "http address")
 	rpcAddr  = flag.String("rpc-addr", ":5100", "rpc address")
 
 	// Postgres
