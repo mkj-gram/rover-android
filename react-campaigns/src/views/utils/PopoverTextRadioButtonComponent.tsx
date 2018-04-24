@@ -85,7 +85,10 @@ class PopoverTextRadioButtonComponent extends React.Component<
                                 alignItems: 'center'
                             }}
                             onMouseOver={() => this.handleHover(name)}
-                            onClick={() => onClick(name)}
+                            onClick={e => {
+                                e.stopPropagation()
+                                onClick(name)
+                            }}
                         >
                             <Text text={displayName[name]} size="medium" />
 

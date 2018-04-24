@@ -3,11 +3,9 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { connect, Dispatch } from 'react-redux'
 import { parse } from 'qs'
-
 import { InjectedProps } from '../../utils/ResponsiveContainer'
 import { getCampaign } from '../../../reducers/campaigns'
 import { getIsTapBehaviorSelectorOpen } from '../../../reducers'
-
 import {
     Text,
     Button,
@@ -18,43 +16,34 @@ import {
     PopoverContainer,
     white
 } from '@rover/ts-bootstrap/dist/src'
-
 import PopoverTextRadioButtonComponent from '../../utils/PopoverTextRadioButtonComponent'
 import TapBehaviorBody from './TapBehaviorBody'
 import TapBehaviorRow from './TapBehaviorRow'
 import MobilePopover from '../components/MobilePopover'
-import UpdateEditableUIStateProperty from '../../utils/UpdateEditableUIStateProperty'
 import FormSection from '../../utils/FormSection'
-
 import {
     updateEditableCampaign,
     openTapBehaviorSelector,
     closeTapBehaviorSelector
 } from '../../../actions'
-
 export interface TapBehaviorProps extends InjectedProps {
     campaign?: ScheduledCampaign | AutomatedNotificationCampaign
     wizardSection: keyof editableUIState
 }
-
 export interface TapBehaviorState {
     showTapNotificationOptions?: boolean
-
     displayName?: StringMap<string>
 }
-
 export interface StateProps {
     editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
     campaigns: StringMap<Campaign>
     isTapBehaviorSelectorOpen: string
 }
-
 export interface DispatchProps {
     updateEditableCampaign: (val: object) => void
     openTapBehaviorSelector: () => void
     closeTapBehaviorSelector: () => void
 }
-
 class TapBehaviorContainer extends React.Component<
     TapBehaviorProps & StateProps & DispatchProps,
     TapBehaviorState
@@ -63,7 +52,6 @@ class TapBehaviorContainer extends React.Component<
         super(props)
         this.state = {
             showTapNotificationOptions: false,
-
             displayName: {
                 OPEN_EXPERIENCE: 'Present an experience',
                 OPEN_WEBSITE: 'Present a website',
@@ -77,29 +65,26 @@ class TapBehaviorContainer extends React.Component<
         )
         this.handleSelectTapOption = this.handleSelectTapOption.bind(this)
         this.tapNotificationRow = this.tapNotificationRow.bind(this)
+        this.getTapNotificationRowClickable = this.getTapNotificationRowClickable.bind(
+            this
+        )
     }
-
     handleShowNotificationOptions() {
         this.setState({
             showTapNotificationOptions: !this.state.showTapNotificationOptions
         })
     }
-
     handleSelectTapOption(
         notificationTapBehaviorType: NotificationTapBehaviorType
     ) {
-        const { editableCampaign, campaigns, device } = this.props
-        const campaignId = parse(location.search.substring(1)).campaignId
-        const campaign = getCampaign(campaigns, campaignId)
-
-        let notificationTapBehaviorUrl = (campaign as
-            | ScheduledCampaign
-            | AutomatedNotificationCampaign).notificationTapBehaviorUrl
-        let notificationTapPresentationType = (editableCampaign as
-            | ScheduledCampaign
-            | AutomatedNotificationCampaign).notificationTapPresentationType
-
-        let isValidContent = true
+        const {
+            closeTapBehaviorSelector,
+            device,
+            updateEditableCampaign,
+            campaign
+        } = this.props
+        let notificationTapBehaviorUrl
+        let notificationTapPresentationType
         if (
             notificationTapBehaviorType === 'OPEN_DEEP_LINK' ||
             notificationTapBehaviorType === 'OPEN_WEBSITE'
@@ -112,31 +97,21 @@ class TapBehaviorContainer extends React.Component<
                           | AutomatedNotificationCampaign)
                           .notificationTapBehaviorUrl
                     : ''
-            isValidContent = notificationTapBehaviorUrl.length !== 0
         } else {
             notificationTapBehaviorUrl = ''
         }
-
         if (notificationTapBehaviorType === 'OPEN_WEBSITE') {
             notificationTapPresentationType =
-                editableCampaign.notificationTapPresentationType === 'UNKNOWN'
+                campaign.notificationTapPresentationType === 'UNKNOWN'
                     ? 'IN_APP'
-                    : editableCampaign.notificationTapPresentationType
+                    : campaign.notificationTapPresentationType
         } else {
             notificationTapPresentationType = 'UNKNOWN'
         }
-
-        this.props.updateEditableCampaign({
+        updateEditableCampaign({
             notificationTapBehaviorType,
-            notificationTapBehaviorUrl,
             notificationTapPresentationType,
-            UIState: UpdateEditableUIStateProperty(
-                'notification',
-                editableCampaign.UIState as UIStateInterface,
-                'isValidContent',
-                'tapBehavior',
-                isValidContent
-            )
+            notificationTapBehaviorUrl
         })
         if (device === 'Mobile') {
             this.props.closeTapBehaviorSelector()
@@ -147,15 +122,12 @@ class TapBehaviorContainer extends React.Component<
             })
         }
     }
-
     getClickableView() {
         const { device, editableCampaign } = this.props
         const { showTapNotificationOptions, displayName } = this.state
-
         const popoverProps = {
             placement: 'left'
         }
-
         const getClickable = () => {
             switch (device) {
                 case 'Desktop':
@@ -177,7 +149,6 @@ class TapBehaviorContainer extends React.Component<
                     return null
             }
         }
-
         return (
             <PopoverContainer
                 id="tapBehaviorNotificationPopover"
@@ -215,7 +186,6 @@ class TapBehaviorContainer extends React.Component<
             </PopoverContainer>
         )
     }
-
     tapNotificationRow() {
         const {
             device,
@@ -225,7 +195,6 @@ class TapBehaviorContainer extends React.Component<
         const { displayName } = this.state
         const { notificationTapBehaviorType } = editableCampaign
         const Fragment = React.Fragment
-
         const row = (
             <Fragment>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -242,7 +211,6 @@ class TapBehaviorContainer extends React.Component<
                 {this.getClickableView()}
             </Fragment>
         )
-
         switch (device) {
             case 'Mobile':
                 const child = (
@@ -264,11 +232,7 @@ class TapBehaviorContainer extends React.Component<
                 )
                 return (
                     <Fragment>
-                        <div
-                            onClick={() => this.props.openTapBehaviorSelector()}
-                        >
-                            {row}
-                        </div>
+                        {row}
                         {isTapBehaviorSelectorOpen !== 'close' &&
                             ReactDOM.createPortal(
                                 <MobilePopover
@@ -290,52 +254,49 @@ class TapBehaviorContainer extends React.Component<
         }
     }
 
+    getTapNotificationRowClickable() {
+        const { device } = this.props
+        switch (device) {
+            case 'Mobile':
+                return this.props.openTapBehaviorSelector()
+            case 'Tablet':
+                return this.handleShowNotificationOptions()
+            case 'Desktop':
+            default:
+                return () => {}
+        }
+    }
+
     render() {
         const { device, campaign, editableCampaign } = this.props
-
         const { notificationTapBehaviorType } = editableCampaign
         const { Fragment } = React
         return (
             <FormSection device={device}>
-                <div
-                    style={{
-                        padding: device !== 'Mobile' ? '24px 32px' : 24,
-                        paddingBottom: 0
-                    }}
+                <Text
+                    text="Tap Behavior"
+                    size="h1"
+                    textStyle={{ margin: '24px 0' }}
+                />
+                <TapBehaviorRow
+                    handleClick={this.getTapNotificationRowClickable}
                 >
-                    <div
-                        style={{
-                            paddingBottom: 24
-                        }}
-                    >
-                        <Text text="Tap Behavior" size="h1" />
-                    </div>
-                    <TapBehaviorRow
-                        handleClick={
-                            device === 'Tablet'
-                                ? this.handleShowNotificationOptions
-                                : () => null
-                        }
-                    >
-                        {this.tapNotificationRow()}
-                    </TapBehaviorRow>
-                    <TapBehaviorBody
-                        device={device}
-                        selectedTapOption={notificationTapBehaviorType}
-                        campaign={campaign}
-                    />
-                </div>
+                    {this.tapNotificationRow()}
+                </TapBehaviorRow>
+                <TapBehaviorBody
+                    device={device}
+                    selectedTapOption={notificationTapBehaviorType}
+                    campaign={campaign}
+                />
             </FormSection>
         )
     }
 }
-
 const mapStateToProps = (state: State): StateProps => ({
     editableCampaign: state.editableCampaign,
     campaigns: state.campaigns,
     isTapBehaviorSelectorOpen: getIsTapBehaviorSelectorOpen(state)
 })
-
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
         updateEditableCampaign: val => {
@@ -349,7 +310,6 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
         }
     }
 }
-
 export default connect(mapStateToProps, mapDispatchToProps)(
     TapBehaviorContainer
 )

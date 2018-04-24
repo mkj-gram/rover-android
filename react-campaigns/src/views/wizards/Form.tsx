@@ -18,7 +18,6 @@ import {
     getShouldShowSaveAndClose,
     getTypeProgress
 } from '../../reducers/'
-import PhonePreview from './PhonePreview'
 import WizardModal from './WizardModal'
 
 import {
@@ -76,7 +75,9 @@ class Form extends React.Component<
                 const UIState: UIStateField = editableUIState[stage]
                 const { seen, type } = UIState
 
-                const isValid = getIsStageValid(stage)
+                const isPrevValid = getIsStageValid(prev.slice(
+                    -1
+                )[0] as keyof editableUIState)
                 const typeProgress = getTypeProgress(type)
                 const prevUIState: UIStateField =
                     editableUIState[
@@ -92,7 +93,7 @@ class Form extends React.Component<
                     return prev
                 }
 
-                if (isValid && prevSeen) {
+                if (isPrevValid && prevSeen) {
                     return [...prev, stage]
                 }
 

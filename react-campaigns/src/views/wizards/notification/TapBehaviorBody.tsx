@@ -24,7 +24,6 @@ import {
     closeTapBehaviorWebsitePresentation
 } from '../../../actions'
 import { getIsTapBehaviorWebsitePresentationOpen } from '../../../reducers'
-import UpdateEditableUIStateProperty from '../../utils/UpdateEditableUIStateProperty'
 
 export interface TapBehaviorBodyProps {
     device?: string
@@ -93,16 +92,7 @@ class TapBehaviorBody extends React.Component<
 
     handleURLChange(notificationTapBehaviorUrl: string) {
         const { editableCampaign } = this.props
-        this.props.updateEditableCampaign({
-            notificationTapBehaviorUrl,
-            UIState: UpdateEditableUIStateProperty(
-                'notification',
-                editableCampaign.UIState as UIStateInterface,
-                'isValidContent',
-                'tapBehavior',
-                notificationTapBehaviorUrl.length !== 0
-            )
-        })
+        this.props.updateEditableCampaign({ notificationTapBehaviorUrl })
         this.setState({
             urlContentEditable: false
         })
@@ -127,11 +117,13 @@ class TapBehaviorBody extends React.Component<
         updateEditableCampaign({
             notificationTapPresentationType
         })
-        this.setState({
-            showWebsitePresentationPopover: false
-        })
+
         if (device === 'Mobile') {
             closeTapBehaviorWebsitePresentation()
+        } else {
+            this.setState({
+                showWebsitePresentationPopover: false
+            })
         }
     }
 
@@ -177,25 +169,23 @@ class TapBehaviorBody extends React.Component<
                 onClick={this.handleShowPresentationPopover}
                 showPopover={showWebsitePresentationPopover}
             >
-                {[
-                    getClickable(),
-                    <div
-                        style={{
-                            width: 384
-                        }}
-                    >
-                        <PopoverTextRadioButtonComponent
-                            key="presentationType2"
-                            names={['IN_APP', 'IN_BROWSER']}
-                            onClick={this.handleSelectPresentationType}
-                            selectedTapOption={
-                                editableCampaign.notificationTapPresentationType
-                            }
-                            displayName={displayName}
-                            device={device}
-                        />
-                    </div>
-                ]}
+                {getClickable()}
+                <div
+                    style={{
+                        width: 384
+                    }}
+                >
+                    <PopoverTextRadioButtonComponent
+                        key="presentationType2"
+                        names={['IN_APP', 'IN_BROWSER']}
+                        onClick={this.handleSelectPresentationType}
+                        selectedTapOption={
+                            editableCampaign.notificationTapPresentationType
+                        }
+                        displayName={displayName}
+                        device={device}
+                    />
+                </div>
             </PopoverContainer>
         )
     }
@@ -219,7 +209,12 @@ class TapBehaviorBody extends React.Component<
 
         const row = (
             <Fragment>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}
+                >
                     <Text
                         text="How should it be presented?"
                         size="small"
@@ -254,13 +249,8 @@ class TapBehaviorBody extends React.Component<
                 )
                 return (
                     <Fragment>
-                        <div
-                            onClick={() =>
-                                this.props.openTapBehaviorWebsitePresentation()
-                            }
-                        >
-                            {row}
-                        </div>
+                        {row}
+
                         {isTapBehaviorWebsitePresentationOpen !== 'close' &&
                             ReactDOM.createPortal(
                                 <MobilePopover
@@ -334,9 +324,7 @@ class TapBehaviorBody extends React.Component<
                     {websiteURLRow}
                 </TapBehaviorRow>
                 <TapBehaviorRow
-                    handleClick={() =>
-                        this.getWebsitePresentRowClickable(device)
-                    }
+                    handleClick={this.getWebsitePresentRowClickable}
                 >
                     {this.websitePresentRow()}
                 </TapBehaviorRow>
@@ -349,12 +337,14 @@ class TapBehaviorBody extends React.Component<
         )
     }
 
-    getWebsitePresentRowClickable(device: string) {
+    getWebsitePresentRowClickable() {
+        const { device } = this.props
+
         switch (device) {
             case 'Mobile':
-                return this.props.openTapBehaviorWebsitePresentation
+                return this.props.openTapBehaviorWebsitePresentation()
             case 'Tablet':
-                return this.handleShowPresentationPopover
+                return this.handleShowPresentationPopover()
             case 'Desktop':
             default:
                 return () => {}

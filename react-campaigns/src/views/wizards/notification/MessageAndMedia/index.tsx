@@ -2,6 +2,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { connect, Dispatch } from 'react-redux'
+import MediaQuery from 'react-responsive'
 import { InjectedProps } from '../../../utils/ResponsiveContainer'
 import {
     Badge,
@@ -65,6 +66,8 @@ class MessageAndMedia extends React.Component<
             MessageAndMediaDispatchProps
     ) {
         super(props)
+
+        const { editableCampaign } = this.props
         this.state = {
             editingField: '',
             isShowingRichMediaPopover: false,
@@ -133,7 +136,7 @@ class MessageAndMedia extends React.Component<
         const Fragment = React.Fragment
         if (device === 'Desktop') {
             return (
-                <Fragment>
+                <MediaQuery minWidth={1140}>
                     {ReactDOM.createPortal(
                         <PhoneComponent device={device} viewLockScreen={true}>
                             <Fragment>
@@ -160,7 +163,7 @@ class MessageAndMedia extends React.Component<
                         />,
                         document.getElementById('mainModalRight')
                     )}
-                </Fragment>
+                </MediaQuery>
             )
         }
 
