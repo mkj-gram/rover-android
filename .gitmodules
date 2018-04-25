@@ -1,0 +1,4 @@
+[submodule "android/rover-android-sdk"]
+	path = android/rover-android-sdk
+	url = git@github.com:/RoverPlatform/rover-android
+	branch = 2.0-dev

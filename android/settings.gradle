@@ -1,0 +1,6 @@
+include ':test-app', ':test-app-java', ':test-app-gcm', ':experiences-app'
+
+// Now to include the public, open source, Rover SDK itself from the submodule.
+include 'rover-android-sdk:rover' // this is core.
+include 'rover-android-sdk:location'
+include 'rover-android-sdk:notifications'
