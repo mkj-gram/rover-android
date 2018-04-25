@@ -23,9 +23,19 @@ const isSendTestModalOpen = (state = 'open', action: AnyAction) => {
     }
 }
 
+const triggeredAnimation = (state = '', action: AnyAction) => {
+    switch (action.type) {
+        case 'TRIGGERED_ANIMATION':
+            return action.trigger
+        default:
+            return state
+    }
+}
+
 export default combineReducers({
     isOverviewModalOpen,
-    isSendTestModalOpen
+    isSendTestModalOpen,
+    triggeredAnimation
 })
 
 export const getIsOverviewModalOpen = (state: OverviewModalState) =>
@@ -33,3 +43,6 @@ export const getIsOverviewModalOpen = (state: OverviewModalState) =>
 
 export const getIsSendTestModalOpen = (state: OverviewModalState) =>
     state.isSendTestModalOpen
+
+export const getTriggeredAnimation = (state: OverviewModalState) =>
+    state.triggeredAnimation

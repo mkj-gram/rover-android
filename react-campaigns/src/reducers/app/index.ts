@@ -55,6 +55,10 @@ export const getIsOverviewModalOpen = (state: AppState) =>
 
 export const getIsSendTestModalOpen = (state: AppState) =>
     overviewSelector.getIsSendTestModalOpen(state.overview)
+
+export const getTriggeredAnimation = (state: AppState) =>
+    overviewSelector.getTriggeredAnimation(state.overview)
+
 export const getIsTapBehaviorSelectorOpen = (state: AppState) =>
     notificationSelector.getIsTapBehaviorSelectorOpen(state.notification)
 

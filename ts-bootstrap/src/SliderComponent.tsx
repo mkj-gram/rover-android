@@ -20,8 +20,8 @@ const getStyle = (
     property: string,
     value: string | boolean
 ) => {
-    if (style && style[property] !== undefined) {
-        return style[property]
+    if (style && style[property as keyof React.CSSProperties] !== undefined) {
+        return style[property as keyof React.CSSProperties]
     }
     return value
 }

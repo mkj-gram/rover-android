@@ -200,6 +200,7 @@ type ErrorState = StringMap<string | boolean>
 type OverviewModalState = {
     readonly isOverviewModalOpen: string
     readonly isSendTestModalOpen: string
+    readonly triggeredAnimation: string
 }
 
 type NotificationDeliveryState = {

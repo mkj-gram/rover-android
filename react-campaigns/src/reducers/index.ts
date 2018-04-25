@@ -45,6 +45,10 @@ export const getIsOverviewModalOpen = (state: State) =>
 export const getIsSendTestModalOpen = (state: State) =>
     appSelector.getIsSendTestModalOpen(state.app)
 
+// Overview: Animation Trigger
+export const getTriggeredAnimation = (state: State) =>
+    appSelector.getTriggeredAnimation(state.app)
+
 // Notification Delivery
 export const getIsNotificationDeliveryModalOpen = (state: State) =>
     appSelector.getIsNotificationDeliveryModalOpen(state.app)

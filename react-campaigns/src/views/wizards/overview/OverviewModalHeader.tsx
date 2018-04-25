@@ -275,39 +275,21 @@ const mapDispatchToProps = (
             dispatch(renameCampaign(name, campaignId))
         },
         duplicateCampaign: (name, campaignId) => {
-            dispatch({
-                type: 'CLOSE_OVERVIEW_MODAL'
-            })
-            setTimeout(() => {
-                dispatch(duplicateCampaign(name, campaignId)).then(id => {
-                    dispatch({
-                        type: 'OPEN_OVERVIEW_MODAL'
-                    })
-                    let params = location.search.replace(
-                        `campaignId=${campaignId}`,
-                        `campaignId=${id}`
-                    )
+            dispatch(duplicateCampaign(name, campaignId)).then(id => {
+                let params = location.search.replace(
+                    `campaignId=${campaignId}`,
+                    `campaignId=${id}`
+                )
 
-                    history.push(`${location.pathname}${params}`)
-                })
-                // tslint:disable-next-line:align
-            }, 500)
+                history.push(`${location.pathname}${params}`)
+            })
         },
         archiveCampaign: campaignId => {
-            dispatch({
-                type: 'CLOSE_OVERVIEW_MODAL'
+            dispatch(archiveCampaign(campaignId)).then(complete => {
+                if (complete) {
+                    history.push(`/campaigns/`)
+                }
             })
-            setTimeout(() => {
-                dispatch(archiveCampaign(campaignId)).then(complete => {
-                    dispatch({
-                        type: 'OPEN_OVERVIEW_MODAL'
-                    })
-                    if (complete) {
-                        history.push(`/campaigns/`)
-                    }
-                })
-                // tslint:disable-next-line:align
-            }, 500)
         },
         handleOverviewModalDisplay: (_, open) => {
             dispatch(handleOverviewModalDisplay(history, open))

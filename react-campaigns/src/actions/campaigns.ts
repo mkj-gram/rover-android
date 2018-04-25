@@ -289,11 +289,11 @@ export const fetchCampaign: ActionCreator<
 }
 
 export const duplicateCampaign: ActionCreator<
-    ThunkAction<Promise<Action | void>, State, void>
+    ThunkAction<Promise<number>, State, void>
 > = (name: string, campaignId: number) => (
     dispatch: Dispatch<State>,
     getState: () => State
-): Promise<Action | void> => {
+): Promise<number> => {
     const query: DocumentNode = gql`
         mutation DuplicateCampaign($name: String!, $campaignId: Int!) {
             duplicateCampaign(name: $name, campaignId: $campaignId) {
@@ -365,6 +365,13 @@ export const duplicateCampaign: ActionCreator<
         }
     }
 
+    dispatch({
+        type: 'TRIGGERED_ANIMATION',
+        trigger: 'duplicate'
+    })
+    dispatch({
+        type: 'CLOSE_OVERVIEW_MODAL'
+    })
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
@@ -372,10 +379,17 @@ export const duplicateCampaign: ActionCreator<
                     type: 'DUPLICATE_CAMPAIGN_FAILURE',
                     message: errors[0].message
                 })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
-                return Promise.resolve(campaignId)
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        dispatch({
+                            type: 'OPEN_OVERVIEW_MODAL'
+                        })
+                        return resolve()
+                    }, 250)
+                    setTimeout(() => {
+                        dispatch({ type: 'DISMISS_FAILURE' })
+                    }, 4000)
+                }).then(res => Promise.resolve(campaignId))
             } else {
                 const campaigns = {
                     ...getState().campaigns,
@@ -383,12 +397,21 @@ export const duplicateCampaign: ActionCreator<
                         ...data.duplicateCampaign
                     }
                 }
-                dispatch({
-                    type: 'DUPLICATE_CAMPAIGN_SUCCESS',
-                    campaigns
-                })
 
-                return Promise.resolve(data.duplicateCampaign.campaignId)
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        dispatch({
+                            type: 'OPEN_OVERVIEW_MODAL'
+                        })
+                        return resolve()
+                    }, 250)
+                }).then(result => {
+                    dispatch({
+                        type: 'DUPLICATE_CAMPAIGN_SUCCESS',
+                        campaigns
+                    })
+                    return Promise.resolve(data.duplicateCampaign.campaignId)
+                })
             }
         },
         ({ result }) => {
@@ -396,19 +419,27 @@ export const duplicateCampaign: ActionCreator<
                 type: 'DUPLICATE_CAMPAIGN_FAILURE',
                 message: result.errors[0].message
             })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    dispatch({
+                        type: 'OPEN_OVERVIEW_MODAL'
+                    })
+                    return resolve()
+                }, 250)
+                setTimeout(() => {
+                    dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            }).then(res => Promise.resolve(campaignId))
         }
     )
 }
 
 export const archiveCampaign: ActionCreator<
-    ThunkAction<Promise<Action | void>, State, void>
+    ThunkAction<Promise<boolean>, State, void>
 > = (campaignId: number) => (
     dispatch: Dispatch<State>,
     getState: () => State
-): Promise<Action | void> => {
+): Promise<boolean> => {
     const query: DocumentNode = gql`
         mutation ArchiveCampaign($campaignId: Int!) {
             archiveCampaign(campaignId: $campaignId)
@@ -422,16 +453,31 @@ export const archiveCampaign: ActionCreator<
         }
     }
 
+    dispatch({
+        type: 'TRIGGERED_ANIMATION',
+        trigger: ''
+    })
+    dispatch({
+        type: 'CLOSE_OVERVIEW_MODAL'
+    })
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
                 dispatch({
-                    type: ' ARCHIVE_CAMPAIGN_FAILURE',
+                    type: 'ARCHIVE_CAMPAIGN_FAILURE',
                     message: errors[0].message
                 })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        dispatch({
+                            type: 'OPEN_OVERVIEW_MODAL'
+                        })
+                    }, 250)
+                    setTimeout(() => {
+                        dispatch({ type: 'DISMISS_FAILURE' })
+                        return resolve()
+                    }, 4000)
+                }).then(res => Promise.resolve(false))
             } else {
                 const campaigns = {
                     ...getState().campaigns,
@@ -440,11 +486,15 @@ export const archiveCampaign: ActionCreator<
                         campaignStatus: 'ARCHIVED'
                     }
                 }
-                dispatch({
-                    type: 'ARCHIVE_CAMPAIGN_SUCCESS',
-                    campaigns
-                })
-                return Promise.resolve(data.archiveCampaign)
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        dispatch({
+                            type: 'ARCHIVE_CAMPAIGN_SUCCESS',
+                            campaigns
+                        })
+                        return resolve()
+                    }, 450)
+                }).then(res => Promise.resolve(true))
             }
         },
         ({ result }) => {
@@ -452,9 +502,17 @@ export const archiveCampaign: ActionCreator<
                 type: ' ARCHIVE_CAMPAIGN_FAILURE',
                 message: result.errors[0].message
             })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    dispatch({
+                        type: 'OPEN_OVERVIEW_MODAL'
+                    })
+                    return resolve()
+                }, 250)
+                setTimeout(() => {
+                    dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            }).then(res => Promise.resolve(false))
         }
     )
 }

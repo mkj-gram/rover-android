@@ -12,8 +12,8 @@ export interface NavBarProps {
     buttonRightCallback?: () => void
     style?: {
         containerStyle?: React.CSSProperties
-        buttonLeftStyle?: React.CSSProperties
-        buttonRightStyle?: React.CSSProperties
+        buttonLeftStyle?: StringMap<string | number | React.CSSProperties>
+        buttonRightStyle?: StringMap<string | number | React.CSSProperties>
         titleStyle?: React.CSSProperties
     }
     id?: string

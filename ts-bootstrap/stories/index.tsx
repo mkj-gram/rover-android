@@ -499,7 +499,7 @@ storiesOf('PopoverContainer', module).add('cases', () => {
 })
 
 storiesOf('SegmentControl', module).add('Buttons', () => {
-    const segmentControlButtonStyle = {
+    const segmentControlButtonStyle: React.CSSProperties = {
         ...text,
         color: turquoise,
         width: 98,

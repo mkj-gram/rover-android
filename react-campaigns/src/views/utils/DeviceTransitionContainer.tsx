@@ -3,7 +3,7 @@ import * as React from 'react'
 import { cloud } from '@rover/ts-bootstrap/dist/src'
 import { connect } from 'react-redux'
 
-import { getIsOverviewModalOpen } from '../../reducers'
+import { getIsOverviewModalOpen, getTriggeredAnimation } from '../../reducers'
 
 export interface DeviceTransitionContainerProps {
     children?: JSX.Element
@@ -12,89 +12,98 @@ export interface DeviceTransitionContainerProps {
 
 export interface OwnProps {
     displayOverviewModal?: string
+    triggeredAnimation: string
 }
 
-class DeviceTransitionContainer extends React.Component<
-    DeviceTransitionContainerProps & OwnProps,
-    {}
-> {
-    constructor(props: DeviceTransitionContainerProps & OwnProps) {
-        super(props)
+const DeviceTransitionContainer: React.SFC<
+    DeviceTransitionContainerProps & OwnProps
+> = ({ children, device, displayOverviewModal, triggeredAnimation }) => {
+    const Fragment = React.Fragment
+
+    let overviewContainerAnimation
+    if (triggeredAnimation === 'duplicate') {
+        overviewContainerAnimation = ''
+    } else {
+        overviewContainerAnimation =
+            displayOverviewModal === 'close' ? 'fadeOut' : 'fade'
     }
 
-    render() {
-        const { children, device, displayOverviewModal } = this.props
-        const Fragment = React.Fragment
+    const overviewAnimationTime = triggeredAnimation === 'duplicate' ? 300 : 500
 
-        const overviewContainerAnimation =
-            displayOverviewModal === 'close' ? 'fadeOut' : 'fade'
-
-        if (device === 'Desktop') {
-            return (
+    if (device === 'Desktop') {
+        return (
+            <div
+                style={{
+                    height: '100vh',
+                    width: '100%',
+                    backgroundColor: cloud,
+                    display: 'flex',
+                    overflowY: 'hidden',
+                    animation: `${overviewContainerAnimation} 600ms ease`,
+                    position: 'absolute',
+                    zIndex: 2
+                }}
+                id="mainModalView"
+            >
                 <div
                     style={{
-                        height: '100vh',
-                        width: '100%',
-                        backgroundColor: cloud,
+                        flex: '1 1 769px',
                         display: 'flex',
-                        overflowY: 'hidden',
-                        animation: `${overviewContainerAnimation} 600ms ease`,
-                        position: 'absolute',
-                        zIndex: 2
+                        animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease`,
+                        maxWidth: 769,
+                        position: 'relative',
+                        minWidth: 0,
+                        overflowX: 'hidden'
                     }}
-                    id="mainModalView"
+                    id="mainModalLeft"
                 >
-                    <div
-                        style={{
-                            flex: '1 1 769px',
-                            display: 'flex',
-                            animation: `${displayOverviewModal} 500ms ease`,
-                            maxWidth: 769,
-                            position: 'relative',
-                            minWidth: 0,
-                            overflowX: 'hidden'
-                        }}
-                        id="mainModalLeft"
-                    >
-                        {children}
-                    </div>
-                    <div
-                        style={{
-                            flex: '1 1 auto',
-                            height: '100%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            flexDirection: 'column',
-                            position: 'relative'
-                        }}
-                        id="mainModalRight"
-                    />
+                    {children}
                 </div>
-            )
-        } else {
-            return (
+                <div
+                    style={{
+                        flex: '1 1 auto',
+                        height: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'column',
+                        position: 'relative'
+                    }}
+                    id="mainModalRight"
+                />
+            </div>
+        )
+    } else {
+        return (
+            <div
+                style={{
+                    position: 'absolute',
+                    zIndex: 2,
+                    height: '100%',
+                    width: '100%',
+                    backgroundColor: cloud
+                }}
+            >
                 <div
                     style={{
                         height: '100%',
                         width: '100%',
                         display: 'flex',
                         animation: `${displayOverviewModal} 500ms ease`,
-                        position: 'absolute',
-                        zIndex: 2,
                         minWidth: 0
                     }}
                     id="mainModalLeft"
                 >
                     {children}
                 </div>
-            )
-        }
+            </div>
+        )
     }
 }
 
 const mapStateToProps = (state: State): OwnProps => ({
-    displayOverviewModal: getIsOverviewModalOpen(state)
+    displayOverviewModal: getIsOverviewModalOpen(state),
+    triggeredAnimation: getTriggeredAnimation(state)
 })
 
 export default connect(mapStateToProps, {})(DeviceTransitionContainer)

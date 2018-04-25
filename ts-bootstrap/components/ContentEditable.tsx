@@ -5,12 +5,16 @@ import { charcoal } from '../styles/colors'
 
 export interface Props
     extends StringMap<
-            string | StringMap<string | number> | Function | boolean
+            | string
+            | StringMap<string | number>
+            | Function
+            | boolean
+            | React.CSSProperties
         > {
     html: string
     onChange: (val: string) => void
     onBlur?: (evt: any) => void
-    style?: StringMap<string | number>
+    style?: React.CSSProperties
     id?: string
     onBlurChange?: boolean
     handlePlaceholderChange?: (val: string) => void

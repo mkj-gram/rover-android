@@ -11,6 +11,10 @@ export const handleOverviewModalDisplay: ActionCreator<
 > = (history: H.History, open: boolean) => (
     dispatch: Dispatch<State>
 ): void => {
+    dispatch({
+        type: 'TRIGGERED_ANIMATION',
+        trigger: ''
+    })
     if (open) {
         dispatch({
             type: 'OPEN_OVERVIEW_MODAL'
