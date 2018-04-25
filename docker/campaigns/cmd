@@ -19,7 +19,7 @@ test() {
 }
 
 migrate() {
-  go run ./go/postgres-cli/main.go \
+  go run ./go/cmd/postgres-cli/main.go \
     --db-dsn=${POSTGRES_DSN} \
     --migration-path=$SVC_HOME/db/migrations
 }
