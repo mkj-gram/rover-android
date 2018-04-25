@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const webpack = require('webpack')
 const path = require('path')
+const ip = require('ip')
 
 module.exports = {
     entry: './src/index.tsx',
@@ -47,7 +48,8 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             'process.env': {
-                NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production')
+                NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'production'),
+                HOST: JSON.stringify(ip.address())
             }
         }),
         new UglifyJSPlugin()
@@ -57,7 +59,8 @@ module.exports = {
             rewrites: [{ from: /\/campaigns\//, to: '/campaigns/index.html' }]
         },
         publicPath: '/campaigns/',
-        contentBase: '/'
+        contentBase: '/',
+        useLocalIp: true
     },
     devtool: 'source-map'
 }
