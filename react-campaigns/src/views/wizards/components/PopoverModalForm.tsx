@@ -163,6 +163,7 @@ const PopoverModalForm: React.SFC<
                 minHeight: 72,
                 borderBottom: `1px solid ${titanium}`
             }}
+            id={`popoverModal_${field}`}
         >
             <PopoverFormInput
                 {...inputTypeProps}

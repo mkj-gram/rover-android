@@ -33,6 +33,28 @@ class HoverTextInput extends React.Component<
         })
     }
 
+    componentDidUpdate() {
+        const { field } = this.props
+        const triangleChild = document.getElementById(
+            `hoverTextInputTriangle_${field}`
+        )
+        const descriptionChild = document.getElementById(
+            `hoverTextInputDescriptionChild_${field}`
+        )
+        const parent = document.getElementById(`hoverTextInputParent_${field}`)
+
+        if (descriptionChild && triangleChild && parent) {
+            triangleChild.style.top = `${parent.getBoundingClientRect().top -
+                (triangleChild.getBoundingClientRect().height -
+                    parent.getBoundingClientRect().height) /
+                    2}px`
+            descriptionChild.style.top = `${parent.getBoundingClientRect().top -
+                (descriptionChild.getBoundingClientRect().height -
+                    parent.getBoundingClientRect().height) /
+                    2}px`
+        }
+    }
+
     render() {
         const { children, description, field } = this.props
         const { isHovered } = this.state
@@ -47,21 +69,6 @@ class HoverTextInput extends React.Component<
               }
             : {}
 
-        const getTopAdjustment = () => {
-            const child = document.getElementById(
-                `hoverTextInputChild_${field}`
-            )
-            const parent = document.getElementById(
-                `hoverTextInputParent_${field}`
-            )
-
-            if (child && parent) {
-                child.style.top = `${parent.getBoundingClientRect().top -
-                    (child.getBoundingClientRect().height -
-                        parent.getBoundingClientRect().height) /
-                        2}px`
-            }
-        }
         const Fragment = React.Fragment
         return (
             <div
@@ -73,7 +80,6 @@ class HoverTextInput extends React.Component<
                     style={{
                         display: 'flex',
                         minHeight: 72,
-                        borderBottom: `1px solid ${titanium}`,
                         position: 'relative',
                         justifyContent: 'space-between',
                         alignItems: 'center'
@@ -81,50 +87,53 @@ class HoverTextInput extends React.Component<
                     id={`hoverTextInputParent_${field}`}
                 >
                     {children}
-                    {isHovered && (
-                        <Fragment>
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    top: 'calc(50% - 10px)',
-                                    left: 726,
-                                    height: 20,
-                                    width: 20,
-                                    transform: 'rotate(45deg)',
-                                    background: beige,
-                                    border: `1px solid ${titanium}`,
-                                    borderBottom: 'none',
-                                    borderLeft: 'none',
-                                    borderRadius: '0 5px 0 0'
-                                }}
-                            />
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    left: 800,
-                                    width: `calc(100vw - 832px)`
-                                }}
-                                id={`hoverTextInputChild_${field}`}
-                            >
+                    {isHovered &&
+                        ReactDOM.createPortal(
+                            <Fragment>
                                 <div
                                     style={{
-                                        padding: '16px 12px',
-                                        minWidth: 370,
-                                        maxWidth: 556,
-                                        borderLeft: `4px solid ${titanium}`
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: -10,
+                                        height: 20,
+                                        width: 20,
+                                        transform: 'rotate(45deg)',
+                                        background: beige,
+                                        border: `1px solid ${titanium}`,
+                                        borderBottom: 'none',
+                                        borderLeft: 'none',
+                                        borderRadius: '0 5px 0 0',
+                                        zIndex: 2
                                     }}
+                                    id={`hoverTextInputTriangle_${field}`}
+                                />
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 64,
+                                        width: `calc(100vw - 832px)`
+                                    }}
+                                    id={`hoverTextInputDescriptionChild_${field}`}
                                 >
-                                    <Text
-                                        text={description}
-                                        size="large"
-                                        label={true}
-                                    />
+                                    <div
+                                        style={{
+                                            padding: '16px 12px',
+                                            minWidth: 370,
+                                            maxWidth: 556,
+                                            borderLeft: `4px solid ${titanium}`
+                                        }}
+                                    >
+                                        <Text
+                                            text={description}
+                                            size="large"
+                                            label={true}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        </Fragment>
-                    )}
+                            </Fragment>,
+                            document.getElementById('mainModalRight')
+                        )}
                 </div>
             </div>
         )

@@ -206,7 +206,7 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
                 style={{
                     width: '100%',
                     height: '100%',
-                    zIndex: 2,
+                    zIndex: 10,
                     position: 'absolute',
                     top: 0,
                     backgroundColor: 'rgba(0,0,0,0.02)'

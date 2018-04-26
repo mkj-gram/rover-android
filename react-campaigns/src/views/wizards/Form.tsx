@@ -261,7 +261,8 @@ class Form extends React.Component<
             left: 0,
             height: '100%',
             width: '100%',
-            backgroundColor: 'white'
+            backgroundColor: white,
+            overflowY: 'scroll'
         }
         const wizardProps = {
             device,
@@ -304,6 +305,9 @@ class Form extends React.Component<
                                             index
                                         )} 300ms ease-in-out`
                                     }}
+                                    id={`${
+                                        child.props.wizardSection
+                                    }_formStackBody`}
                                 >
                                     {React.cloneElement(child, {
                                         isCurrentPage:

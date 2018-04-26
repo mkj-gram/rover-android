@@ -26,7 +26,7 @@ const WizardModal: React.SFC<WizardModalProps> = ({
     device
 }) => {
     const headerStyle: React.CSSProperties = {
-        height: 56,
+        minHeight: 56,
         width: '100%',
         backgroundColor: 'white',
         display: 'flex',
@@ -36,7 +36,7 @@ const WizardModal: React.SFC<WizardModalProps> = ({
         padding: device !== 'Mobile' ? '0 32px' : '0 24px'
     }
     const toolbarStyle: React.CSSProperties = {
-        height: 79,
+        minHeight: 79,
         width: '100%',
         backgroundColor: almostWhite,
         borderTop: `1px solid ${titanium}`,
@@ -73,7 +73,13 @@ const WizardModal: React.SFC<WizardModalProps> = ({
                 }}
             />
 
-            <div style={{ flex: '1 1 auto', position: 'relative' }}>
+            <div
+                id="wizardModalBody"
+                style={{
+                    flex: '1 1 auto',
+                    position: 'relative'
+                }}
+            >
                 {children}
             </div>
             <div style={toolbarStyle}>

@@ -15,9 +15,10 @@ import { updateEditableCampaign } from '../../../actions'
 
 import { getEditableCampaign } from '../../../reducers'
 
-import hasKey from '../../utils/hasKey'
 import PopoverModalForm from '../components/PopoverModalForm'
 import HoverTextInput from '../components/HoverTextInput'
+
+import keyboardScroll from '../../utils/keyboardScroll'
 
 export interface AdvancedSettingsRowContainerProps {
     children?: JSX.Element
@@ -25,7 +26,14 @@ export interface AdvancedSettingsRowContainerProps {
     displayText: string
     rowOnClick?: () => void
     description?: string
-    field: keyof ScheduledCampaign | keyof AutomatedNotificationCampaign
+    field:
+        | 'notificationIosSound'
+        | 'notificationIosCategoryIdentifier'
+        | 'notificationIosThreadIdentifier'
+        | 'notificationAndroidChannelId'
+        | 'notificationAndroidSound'
+        | 'notificationAndroidTag'
+
     placeholderText?: string
     type: string
 }
@@ -33,8 +41,6 @@ export interface AdvancedSettingsRowContainerProps {
 export interface AdvancedSettingsRowContainerState {
     urlContentEditable: boolean
     tempStrValue: string
-
-    isEditableText: boolean
 }
 
 export interface StateProps {
@@ -61,10 +67,7 @@ class AdvancedSettingsRowContainer extends React.Component<
         const { editableCampaign, field } = props
         this.state = {
             urlContentEditable: false,
-            tempStrValue: hasKey(editableCampaign, field)
-                ? (editableCampaign[field] as string)
-                : '',
-            isEditableText: false
+            tempStrValue: editableCampaign[field] as string
         }
 
         this.handleShowPopoverForm = this.handleShowPopoverForm.bind(this)
@@ -80,9 +83,7 @@ class AdvancedSettingsRowContainer extends React.Component<
 
         this.setState({
             urlContentEditable: true,
-            tempStrValue: hasKey(editableCampaign, field)
-                ? (editableCampaign[field] as string)
-                : ''
+            tempStrValue: editableCampaign[field] as string
         })
     }
 
@@ -112,6 +113,11 @@ class AdvancedSettingsRowContainer extends React.Component<
     }
 
     handleBlurChange(tempStrValue: string) {
+        keyboardScroll(
+            `popoverModal_${this.props.field}`,
+            false,
+            'advancedSettings_formStackBody'
+        )
         this.setState({
             urlContentEditable: false,
             tempStrValue
@@ -123,9 +129,7 @@ class AdvancedSettingsRowContainer extends React.Component<
 
         this.setState({
             urlContentEditable: device === 'Tablet' ? true : false,
-            tempStrValue: hasKey(editableCampaign, field)
-                ? (editableCampaign[field] as string)
-                : ''
+            tempStrValue: editableCampaign[field] as string
         })
     }
 
@@ -167,12 +171,10 @@ class AdvancedSettingsRowContainer extends React.Component<
             id: `${field}_advanced_settings`,
             label: displayText,
             media: device as Media,
-            text: hasKey(editableCampaign, field)
-                ? (editableCampaign[field] as string)
-                : '',
+            text: editableCampaign[field] as string,
             fieldStyle: {
                 marginTop: 0,
-                padding: '24px 0',
+                padding: device === 'Desktop' ? '24px 0 23px' : 0,
                 minHeight: 'none',
                 width: '100%'
             }
@@ -188,7 +190,6 @@ class AdvancedSettingsRowContainer extends React.Component<
 
         const popoverNavbarProps = (handleClosePopoverModal: () => void) => ({
             buttonRight:
-                hasKey(editableCampaign, field) &&
                 (editableCampaign[field] as string).length === 0
                     ? 'Add'
                     : 'Update',
@@ -252,7 +253,10 @@ class AdvancedSettingsRowContainer extends React.Component<
                     <div
                         style={{
                             width: '100%',
-                            padding: device === 'Tablet' ? '16px 0' : '24px 0',
+                            padding:
+                                device === 'Tablet'
+                                    ? '16px 0 15px'
+                                    : '24px 0 23px',
                             borderBottom: `1px solid ${titanium}`
                         }}
                         onClick={() =>

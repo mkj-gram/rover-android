@@ -168,7 +168,8 @@ class MessageAndMedia extends React.Component<
         }
 
         return (
-            isShowingPhonePreview && (
+            isShowingPhonePreview &&
+            ReactDOM.createPortal(
                 <PhonePreview
                     animation={`${phonePreviewAnimation} ease-out 400ms`}
                     device={device}
@@ -194,7 +195,8 @@ class MessageAndMedia extends React.Component<
                             notificationTitle={notificationTitle}
                         />
                     </Fragment>
-                </PhonePreview>
+                </PhonePreview>,
+                document.getElementById('mainModalLeft')
             )
         )
     }
