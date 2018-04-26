@@ -1,5 +1,5 @@
 /// <reference path="../typings/index.d.ts" />
-import { Manager, Target } from 'react-popper'
+import { Manager, Reference } from 'react-popper'
 import * as React from 'react'
 import Popover from './Popover'
 
@@ -24,11 +24,14 @@ class PopoverContainer extends React.Component<PopoverContainerProps, {}> {
         return (
             <Fragment>
                 <Manager>
-                    <Target>
-                        <div id={id} onClick={onClick}>
-                            {children[0]}
-                        </div>
-                    </Target>
+                    <Reference>
+                        {({ ref }) => (
+                            <div ref={ref} id={id} onClick={onClick}>
+                                {children[0]}
+                            </div>
+                        )}
+                    </Reference>
+
                     {this.props.showPopover && (
                         <Popover
                             {...popoverProps}

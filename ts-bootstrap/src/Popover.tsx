@@ -3,7 +3,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import NavBar from './NavBar'
 import { titanium, white } from '../styles/colors'
-import { Popper, Arrow } from 'react-popper'
+import { Popper } from 'react-popper'
 import PopperJS from 'popper.js'
 import ResponsiveContainer from '../components/ResponsiveContainer'
 
@@ -94,11 +94,12 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
         }
 
         let arrowPosition = (document.querySelector(
-            'span.popper__arrow'
+            'div.popper__arrow'
         ) as HTMLElement).style.top
         let styleElem = document.head.appendChild(
             document.createElement('style')
         )
+
         styleElem.setAttribute('id', 'popoverCustomStyle')
         const { primary, secondary, border } = this.props.arrowColors
         if (placement === 'left' || placement === 'right') {
@@ -198,20 +199,6 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
     render() {
         let { placement, targetParent } = this.props
         let { primary, border } = this.props.arrowColors
-
-        const modifiers = {
-            customStyle: {
-                enabled: true,
-                // tslint:disable-next-line:no-any
-                fn: (data: any) => {
-                    data.styles = {
-                        ...data.styles
-                    }
-                    data.arrowElement = <div className="popper__arrow" />
-                    return data
-                }
-            }
-        }
 
         const Fragment = React.Fragment
         let node = (
@@ -318,14 +305,25 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
                     }
                     
                 `}</style>
-                    <Popper
-                        modifiers={modifiers}
-                        placement={placement}
-                        className="popper"
-                    >
-                        <Arrow className="popper__arrow" />
-                        {this.evalChild()}
-                        {this.props.children}
+                    <Popper placement={placement}>
+                        {({ ref, style, arrowProps }) => (
+                            <div
+                                className="popper"
+                                ref={ref}
+                                data-placement={placement}
+                                style={{
+                                    ...style
+                                }}
+                            >
+                                {this.evalChild()}
+                                {this.props.children}
+                                <div
+                                    className="popper__arrow"
+                                    ref={arrowProps.ref}
+                                    style={arrowProps.style}
+                                />
+                            </div>
+                        )}
                     </Popper>
                 </div>
             </div>

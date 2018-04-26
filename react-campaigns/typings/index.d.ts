@@ -136,9 +136,15 @@ declare class AutomatedNotificationCampaign extends Campaign {
 type State = {
     readonly app: AppState
     readonly campaigns: StringMap<Campaign>
+    readonly testDevices: TestDeviceState
+    readonly modal: StringMap<string | boolean>
     readonly editableCampaign: AutomatedNotificationCampaign | ScheduledCampaign
     readonly editableUIState: editableUIState
-    readonly modal: StringMap<string | boolean>
+    
+}
+
+type TestDeviceState = {
+    readonly selectedTestDevices: string[]
     readonly testDevices: StringMap<string>
 }
 

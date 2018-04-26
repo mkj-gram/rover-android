@@ -1,7 +1,7 @@
 /// <reference path="../../typings/index.d.ts"/>
-import { AnyAction } from 'redux'
+import { AnyAction, combineReducers } from 'redux'
 
-export default (
+const testDevices = (
     state: StringMap<string> = {},
     action: AnyAction
 ): StringMap<string> | null => {
@@ -13,4 +13,22 @@ export default (
     return state
 }
 
-export const getTestDevices = (state: State) => state.testDevices
+const selectedTestDevices = (
+    state: string[] = [],
+    action: AnyAction
+): string[] => {
+    if (action.type === 'UPDATE_SELECTED_TEST_DEVICES') {
+        return action.deviceIds
+    }
+    return state
+}
+
+export default combineReducers({
+    testDevices,
+    selectedTestDevices
+})
+
+export const getSelectedTestDevices = (state: TestDeviceState) =>
+    state.selectedTestDevices
+
+export const getTestDevices = (state: TestDeviceState) => state.testDevices

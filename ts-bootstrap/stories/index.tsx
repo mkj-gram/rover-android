@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Manager, Target } from 'react-popper'
+import { Manager, Reference, Popper } from 'react-popper'
 import * as moment from 'moment'
 
 import {
@@ -435,6 +435,12 @@ storiesOf('PopoverContainer', module).add('cases', () => {
             })
         }
         render() {
+            const referenceStyle = {
+                width: 100,
+                height: 100,
+                backgroundColor: 'red'
+            }
+
             const popoverProps = {
                 placement: 'bottom'
             }
@@ -442,12 +448,11 @@ storiesOf('PopoverContainer', module).add('cases', () => {
             return (
                 <div
                     style={{
-                        height: 700,
-                        width: '100%',
                         display: 'flex',
-                        alignItems: 'center',
+                        height: '100vh',
+                        width: '100vw',
                         justifyContent: 'center',
-                        flexDirection: 'column'
+                        alignItems: 'center'
                     }}
                     id={targetParent}
                 >
@@ -485,11 +490,6 @@ storiesOf('PopoverContainer', module).add('cases', () => {
                             </div>
                         ]}
                     </PopoverContainer>
-                    <div
-                        style={{ width: 500, height: 100, background: 'pink' }}
-                    >
-                        ok leroy
-                    </div>
                 </div>
             )
         }
@@ -622,19 +622,23 @@ storiesOf('Popover', module).add('various cases', () => {
                     >
                         <div>
                             <Manager>
-                                <Target>
-                                    <div id="target5">
-                                        <Button
-                                            text="Next"
-                                            size="large"
-                                            type="primary"
-                                            style={{
-                                                outerStyle: { marginRight: 10 }
-                                            }}
-                                            onClick={() => this.toggle2()}
-                                        />
-                                    </div>
-                                </Target>
+                                <Reference>
+                                    {props => (
+                                        <div {...props} id="target5">
+                                            <Button
+                                                text="Next"
+                                                size="large"
+                                                type="primary"
+                                                style={{
+                                                    outerStyle: {
+                                                        marginRight: 10
+                                                    }
+                                                }}
+                                                onClick={() => this.toggle2()}
+                                            />
+                                        </div>
+                                    )}
+                                </Reference>
                                 {this.state.popoverOpen2 && (
                                     <Popover
                                         placement="right"
@@ -679,19 +683,22 @@ storiesOf('Popover', module).add('various cases', () => {
 
                         <div>
                             <Manager>
-                                <Target>
-                                    <div
-                                        id="target4"
-                                        onClick={() => this.toggle3()}
-                                        style={{
-                                            height: 60,
-                                            width: 100,
-                                            background: 'yellow'
-                                        }}
-                                    >
-                                        NavBar not toggable
-                                    </div>
-                                </Target>
+                                <Reference>
+                                    {props => (
+                                        <div
+                                            {...props}
+                                            id="target4"
+                                            onClick={() => this.toggle3()}
+                                            style={{
+                                                height: 60,
+                                                width: 100,
+                                                background: 'yellow'
+                                            }}
+                                        >
+                                            NavBar not toggable
+                                        </div>
+                                    )}
+                                </Reference>
                                 {this.state.popoverOpen3 && (
                                     <Popover
                                         placement="right"
@@ -738,19 +745,22 @@ storiesOf('Popover', module).add('various cases', () => {
                     >
                         <div>
                             <Manager>
-                                <Target>
-                                    <div
-                                        id="target1"
-                                        onClick={() => this.toggle1()}
-                                        style={{
-                                            height: 100,
-                                            width: 100,
-                                            background: 'yellow'
-                                        }}
-                                    >
-                                        NavBar
-                                    </div>
-                                </Target>
+                                <Reference>
+                                    {props => (
+                                        <div
+                                            {...props}
+                                            id="target1"
+                                            onClick={() => this.toggle1()}
+                                            style={{
+                                                height: 100,
+                                                width: 100,
+                                                background: 'yellow'
+                                            }}
+                                        >
+                                            NavBar
+                                        </div>
+                                    )}
+                                </Reference>
                                 {this.state.popoverOpen1 && (
                                     <Popover
                                         placement="bottom"
@@ -802,19 +812,22 @@ storiesOf('Popover', module).add('various cases', () => {
                     >
                         <div>
                             <Manager>
-                                <Target>
-                                    <div
-                                        id="target2"
-                                        onClick={() => this.toggle4()}
-                                        style={{
-                                            height: 100,
-                                            width: 100,
-                                            background: 'yellow'
-                                        }}
-                                    >
-                                        empty child
-                                    </div>
-                                </Target>
+                                <Reference>
+                                    {props => (
+                                        <div
+                                            {...props}
+                                            id="target2"
+                                            onClick={() => this.toggle4()}
+                                            style={{
+                                                height: 100,
+                                                width: 100,
+                                                background: 'yellow'
+                                            }}
+                                        >
+                                            empty child
+                                        </div>
+                                    )}
+                                </Reference>
                                 {this.state.popoverOpen4 && (
                                     <Popover
                                         placement="top"
@@ -841,19 +854,22 @@ storiesOf('Popover', module).add('various cases', () => {
 
                         <div>
                             <Manager>
-                                <Target>
-                                    <div
-                                        id="target3"
-                                        onClick={() => this.toggle()}
-                                        style={{
-                                            height: 100,
-                                            width: 100,
-                                            background: 'yellow'
-                                        }}
-                                    >
-                                        navbar
-                                    </div>
-                                </Target>
+                                <Reference>
+                                    {props => (
+                                        <div
+                                            {...props}
+                                            id="target3"
+                                            onClick={() => this.toggle()}
+                                            style={{
+                                                height: 100,
+                                                width: 100,
+                                                background: 'yellow'
+                                            }}
+                                        >
+                                            navbar
+                                        </div>
+                                    )}
+                                </Reference>
                                 {this.state.popoverOpen && (
                                     <Popover
                                         placement="auto"
@@ -1022,6 +1038,46 @@ storiesOf('RadioButton', module).add('selected and unselected', () => {
             <RadioButton selected={true} />
             <RadioButton selected={false} />
         </div>
+    )
+})
+
+storiesOf('SegmentControl', module).add('Buttons', () => {
+    const segmentControlButtonStyle = {
+        ...text,
+        color: turquoise,
+        width: 98,
+        height: 24,
+        textAlign: 'center'
+    }
+    return (
+        <SegmentControl>
+            <div
+                style={{
+                    ...segmentControlButtonStyle,
+                    color: 'white',
+                    backgroundColor: turquoise
+                }}
+                onClick={() => window.console.log('selected')}
+            >
+                Selected
+            </div>
+            <div
+                style={{
+                    ...segmentControlButtonStyle,
+                    borderLeft: `2px solid ${turquoise}`,
+                    borderRight: `2px solid ${turquoise}`
+                }}
+                onClick={() => window.console.log('normal')}
+            >
+                Normal
+            </div>
+            <div
+                style={segmentControlButtonStyle}
+                onClick={() => window.console.log('normal')}
+            >
+                Normal
+            </div>
+        </SegmentControl>
     )
 })
 

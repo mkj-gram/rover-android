@@ -6,7 +6,7 @@ import app, * as appSelector from './app'
 import editableCampaign, * as editableCampaignSelector from './editableCampaign'
 import editableUIState, * as editableUIStateSelector from './editableUIState'
 import campaigns, * as campaignsSelector from './campaigns'
-import testDevices, * as testDeviceSelector from './testDevices'
+import testDevices, * as testDevicesSelector from './testDevices'
 
 export default combineReducers({
     app,
@@ -41,6 +41,10 @@ export const getIsCampaignTypeSelectorClosing = (state: State) =>
 // Overview
 export const getIsOverviewModalOpen = (state: State) =>
     appSelector.getIsOverviewModalOpen(state.app)
+
+// Overview: Send Test
+export const getSelectedTestDevices = (state: State) =>
+    testDevicesSelector.getSelectedTestDevices(state.testDevices)
 
 export const getIsSendTestModalOpen = (state: State) =>
     appSelector.getIsSendTestModalOpen(state.app)
@@ -107,4 +111,4 @@ export const getTypeProgress = (state: State, type: UIStateType) =>
 
 // Test Devices
 export const getTestDevices = (state: State) =>
-    testDeviceSelector.getTestDevices(state)
+    testDevicesSelector.getTestDevices(state.testDevices)

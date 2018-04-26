@@ -83,3 +83,12 @@ export const fetchTestDevices: ActionCreator<
         }
     )
 }
+
+export const updateSelectedTestDevices: ActionCreator<
+    ThunkAction<void, State, void>
+> = (deviceIds: string[]) => (dispatch: Dispatch<State>): void => {
+    dispatch({
+        type: 'UPDATE_SELECTED_TEST_DEVICES',
+        deviceIds
+    })
+}

@@ -7,7 +7,7 @@ import {
     sendTest
 } from '../../../actions'
 
-import { getTypeProgress } from '../../../reducers'
+import { getTypeProgress, getTestDevices } from '../../../reducers'
 
 import { connect, Dispatch } from 'react-redux'
 import {
@@ -23,7 +23,7 @@ import { InjectedProps } from '../../utils/ResponsiveContainer'
 import DeviceTransitionContainer from '../../utils/DeviceTransitionContainer'
 
 import SendTestComponent from './SendTestComponent'
-import notification from '../../../reducers/app/notification'
+import SendTestConfirmationDialog from './SendTestConfirmationDialog'
 
 export interface OverviewModalFooterProps extends InjectedProps {
     sendTestClick?: () => void
@@ -34,7 +34,6 @@ export interface OverviewModalFooterProps extends InjectedProps {
 export interface OverviewModalFooterState {
     toggleSendTest: boolean
     sendTestPrompt: boolean
-    selectedTestDevices?: string[]
 }
 
 export interface DispatchProps {
@@ -47,7 +46,6 @@ export interface TestDeviceStateProps {
     notificationProgress: number
     testDevices: StringMap<string>
 }
-
 class OverviewModalFooter extends React.Component<
     TestDeviceStateProps & OverviewModalFooterProps & DispatchProps,
     OverviewModalFooterState
@@ -58,15 +56,15 @@ class OverviewModalFooter extends React.Component<
         super(props)
         this.state = {
             toggleSendTest: false,
-            sendTestPrompt: false,
-            selectedTestDevices: []
+            sendTestPrompt: false
         }
         this.handleSendTestToggle = this.handleSendTestToggle.bind(this)
-        this.handleCheck = this.handleCheck.bind(this)
+
         this.handleSendTestPrompt = this.handleSendTestPrompt.bind(this)
     }
 
-    handleSendTestToggle(device?: string, on?: boolean) {
+    handleSendTestToggle(on?: boolean) {
+        const { device } = this.props
         const { notificationProgress } = this.props
         if (notificationProgress === 100) {
             if (device !== 'Mobile') {
@@ -79,6 +77,12 @@ class OverviewModalFooter extends React.Component<
                     this.setState({
                         toggleSendTest: !this.state.toggleSendTest
                     })
+                } else {
+                    setTimeout(() => {
+                        this.setState({
+                            toggleSendTest: !this.state.toggleSendTest
+                        })
+                    }, 300)
                 }
             }
         }
@@ -91,67 +95,54 @@ class OverviewModalFooter extends React.Component<
         })
     }
 
-    handleCheck(val: string) {
-        let selectedDevices = this.state.selectedTestDevices.slice(0)
-        const index = this.state.selectedTestDevices.indexOf(val)
-        if (index !== -1) {
-            selectedDevices.splice(index, 1)
-        } else {
-            selectedDevices.push(val)
-        }
-        this.setState({
-            selectedTestDevices: selectedDevices
-        })
-    }
-
     render() {
         const {
             deliveryProgress,
-            device,
             notificationProgress,
-            publishClick
+            device,
+            publishClick,
+            testDevices
         } = this.props
 
-        const {
-            toggleSendTest,
-            selectedTestDevices,
+        const { toggleSendTest, sendTestPrompt } = this.state
 
-            sendTestPrompt
-        } = this.state
-
-        const popoverProps = {
-            placement: 'bottom',
-
-            navBarProperties: {
-                buttonLeft: 'Cancel',
-                buttonRight: selectedTestDevices.length !== 0 ? 'Send' : '',
-                id: 'navBarId',
-                style: {
-                    containerStyle: {
-                        borderRadius: '3px 3px 0px 0px'
-                    },
-                    buttonLeftStyle: {
-                        innerStyle: {
-                            color: graphite
-                        }
-                    },
-                    buttonRightStyle: {
-                        innerStyle: {
-                            color: graphite
-                        }
-                    }
-                },
-                buttonLeftCallback: this.handleSendTestToggle,
-                buttonRightCallback: this.handleSendTestPrompt
-            },
-            arrowColors: {
-                primary: cloud,
-                secondary: white,
-                border: titanium
+        const getPopoverTrigger = () => {
+            const popoverProps = {
+                placement: 'top'
             }
-        }
+            const node = (
+                <div
+                    style={{
+                        height: 312,
+                        width: 384
+                    }}
+                >
+                    <SendTestComponent
+                        key="sendTest2"
+                        device={device}
+                        buttonLeftCallback={() =>
+                            this.handleSendTestToggle(false)
+                        }
+                        listOfTestDevices={testDevices}
+                        buttonRightCallback={this.handleSendTestPrompt}
+                    />
+                </div>
+            )
 
-        const handleSendTest = () => {
+            const trigger = (
+                <Button
+                    text="Send a Test"
+                    size="large"
+                    type={
+                        notificationProgress === 100 ? 'secondary' : 'disabled'
+                    }
+                    overrideWidth={114}
+                    style={{ outerStyle: { marginRight: 16 } }}
+                    key="sendTest1"
+                    onClick={() => this.handleSendTestToggle(true)}
+                />
+            )
+
             if (device !== 'Mobile') {
                 return (
                     <PopoverContainer
@@ -161,67 +152,15 @@ class OverviewModalFooter extends React.Component<
                         onClick={this.handleSendTestToggle}
                         showPopover={this.state.toggleSendTest}
                     >
-                        <Button
-                            text="Send a Test"
-                            size="large"
-                            type={
-                                notificationProgress === 100
-                                    ? 'secondary'
-                                    : 'disabled'
-                            }
-                            overrideWidth={114}
-                            style={{ outerStyle: { marginRight: 16 } }}
-                            onClick={this.handleSendTestToggle}
-                            key="sendTest1"
-                        />
-                        <div
-                            style={{
-                                width: 384
-                            }}
-                        >
-                            <SendTestComponent
-                                key="sendTest2"
-                                device={device}
-                                selectedTestDevices={selectedTestDevices}
-                                listOfTestDevices={this.props.testDevices}
-                                handleCheck={this.handleCheck}
-                            />
-                        </div>
+                        {[trigger, node]}
                     </PopoverContainer>
                 )
             } else {
                 const Fragment = React.Fragment
-                let node = (
-                    <SendTestComponent
-                        key="sendTest2"
-                        device={device}
-                        buttonLeftCallback={() =>
-                            this.handleSendTestToggle('Mobile', false)
-                        }
-                        selectedTestDevices={selectedTestDevices}
-                        listOfTestDevices={this.props.testDevices}
-                        handleCheck={this.handleCheck}
-                        buttonRightCallback={this.handleSendTestPrompt}
-                    />
-                )
 
                 return (
                     <Fragment>
-                        <Button
-                            text="Send a Test"
-                            size="large"
-                            type={
-                                notificationProgress === 100
-                                    ? 'secondary'
-                                    : 'disabled'
-                            }
-                            overrideWidth={114}
-                            style={{ outerStyle: { marginRight: 16 } }}
-                            key="sendTest1"
-                            onClick={() =>
-                                this.handleSendTestToggle('Mobile', true)
-                            }
-                        />
+                        {trigger}
                         {toggleSendTest &&
                             ReactDOM.createPortal(
                                 node,
@@ -231,9 +170,6 @@ class OverviewModalFooter extends React.Component<
                 )
             }
         }
-        const promptStr = `You’re about to send a test version of this campaign to ${
-            selectedTestDevices.length
-        } ${selectedTestDevices.length > 1 ? 'devices' : 'device'}. Continue?`
 
         return (
             <div
@@ -255,25 +191,12 @@ class OverviewModalFooter extends React.Component<
                         display: 'flex'
                     }}
                 >
-                    {handleSendTest()}
+                    {getPopoverTrigger()}
+
                     {sendTestPrompt && (
-                        <Dialog
-                            buttonPrimaryText="Cancel"
-                            buttonSecondaryText="Send Test"
-                            primaryOnClick={this.handleSendTestPrompt}
-                            secondaryOnClick={() => {
-                                this.props.sendTestNotification(
-                                    this.props.campaignId,
-                                    selectedTestDevices
-                                )
-                                this.handleSendTestPrompt()
-                            }}
-                            isOpen={sendTestPrompt}
-                            targetParent="overviewComponentRoot"
-                            dialogText={promptStr}
-                            childStyle={{
-                                marginBottom: 32
-                            }}
+                        <SendTestConfirmationDialog
+                            handleSendTestPrompt={this.handleSendTestPrompt}
+                            campaignId={this.props.campaignId}
                         />
                     )}
                     <Button
@@ -309,7 +232,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
 const mapStatetoProps = (state: State): TestDeviceStateProps => ({
     deliveryProgress: 10,
     notificationProgress: getTypeProgress(state, 'notification'),
-    testDevices: state.testDevices
+    testDevices: getTestDevices(state)
 })
 
 export default connect(mapStatetoProps, mapDispatchToProps)(OverviewModalFooter)

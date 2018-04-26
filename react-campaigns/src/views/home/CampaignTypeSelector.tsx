@@ -3,8 +3,6 @@
 import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
-import { Manager, Target } from 'react-popper'
-
 import {
     closeCampaignTypeSelector,
     openCampaignTypeSelector
@@ -22,7 +20,7 @@ import {
     LinkIcon,
     NavBar,
     PhoneIcon,
-    Popover,
+    PopoverContainer,
     RadioButton,
     steel,
     Text,
@@ -171,136 +169,129 @@ const CampaignTypeSelector: React.SFC<
             </div>
         )
     }
+
+    const popoverProps = {
+        placement: 'bottom',
+
+        arrowColors: {
+            primary: white,
+            secondary: titanium,
+            border: titanium
+        },
+        toggleable: true
+    }
     return (
         <React.Fragment>
-            <Manager>
-                <Target>
+            <PopoverContainer
+                id="campaign-type-selector"
+                popoverProps={popoverProps}
+                onClick={handleOpenClose}
+                targetParent="root"
+                showPopover={media !== 'Mobile' && isCampaignTypeSelectorOpen}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}
+                >
+                    {listType !== 'all' && getCampaignTypeIcon(listType)}
+                    <Text
+                        text={getFormattedListType(listType)}
+                        size="medium"
+                        textStyle={{ marginLeft: 8 }}
+                    />
+                    <div style={{ height: 16, marginLeft: 4 }}>
+                        <FilterArrowIcon />
+                    </div>
+                </div>
+                <div
+                    style={{
+                        height: 280,
+                        width: 384,
+                        flexDirection: 'column',
+                        paddingLeft: 16,
+                        paddingRight: 16
+                    }}
+                >
+                    {renderCampaignTypeRow('all')}
+                    {renderCampaignTypeRow('scheduled')}
+                    {renderCampaignTypeRow('automated')}
+                    {renderCampaignTypeRow('interstitial')}
+                    {renderCampaignTypeRow('web')}
+                </div>
+            </PopoverContainer>
+            {isCampaignTypeSelectorOpen &&
+                media === 'Mobile' && (
                     <div
-                        id="campaign-type-selector"
-                        onClick={handleOpenClose}
+                        id="sendTestId"
                         style={{
                             display: 'flex',
-                            alignItems: 'center'
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: '100%',
+                            height: '100%',
+                            zIndex: 2,
+                            position: 'absolute',
+                            background: white,
+                            top: 0,
+                            left: 0,
+                            animation: `${
+                                isCampaignTypeSelectorClosing ? 'close' : 'open'
+                            } 300ms ease`,
+                            overflowY: 'scroll'
                         }}
                     >
-                        {listType !== 'all' && getCampaignTypeIcon(listType)}
-                        <Text
-                            text={getFormattedListType(listType)}
-                            size="medium"
-                            textStyle={{ marginLeft: 8 }}
-                        />
-                        <div style={{ height: 16, marginLeft: 4 }}>
-                            <FilterArrowIcon />
-                        </div>
-                    </div>
-                </Target>
-                {isCampaignTypeSelectorOpen &&
-                    media === 'Mobile' && (
                         <div
-                            id="sendTestId"
                             style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                width: '100%',
                                 height: '100%',
-                                zIndex: 2,
-                                position: 'absolute',
-                                background: white,
-                                top: 0,
-                                left: 0,
-                                animation: `${
-                                    isCampaignTypeSelectorClosing
-                                        ? 'close'
-                                        : 'open'
-                                } 300ms ease`,
-                                overflowY: 'scroll'
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column'
                             }}
                         >
-                            <div
+                            <NavBar
+                                buttonRight="Done"
+                                buttonLeft="Cancel"
+                                buttonLeftCallback={
+                                    closeMobileCampaignTypeSelector
+                                }
+                                buttonRightCallback={closeCampaignTypeSelector}
                                 style={{
-                                    height: '100%',
-                                    width: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column'
-                                }}
-                            >
-                                <NavBar
-                                    buttonRight="Done"
-                                    buttonLeft="Cancel"
-                                    buttonLeftCallback={
-                                        closeMobileCampaignTypeSelector
-                                    }
-                                    buttonRightCallback={
-                                        closeCampaignTypeSelector
-                                    }
-                                    style={{
-                                        buttonLeftStyle: {
-                                            innerStyle: {
-                                                color: graphite,
-                                                marginTop: 3
-                                            }
-                                        },
-                                        buttonRightStyle: {
-                                            innerStyle: {
-                                                color: graphite,
-                                                marginTop: 3
-                                            }
+                                    buttonLeftStyle: {
+                                        innerStyle: {
+                                            color: graphite,
+                                            marginTop: 3
                                         }
+                                    },
+                                    buttonRightStyle: {
+                                        innerStyle: {
+                                            color: graphite,
+                                            marginTop: 3
+                                        }
+                                    }
+                                }}
+                                title=""
+                            />
+                            <div style={{ padding: 24 }}>
+                                <Text size="h1" text="Filter Campaigns" />
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        marginBottom: 24
                                     }}
-                                    title=""
-                                />
-                                <div style={{ padding: 24 }}>
-                                    <Text size="h1" text="Filter Campaigns" />
-                                    <div
-                                        style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            marginBottom: 24
-                                        }}
-                                    >
-                                        {renderCampaignTypeRow('all')}
-                                        {renderCampaignTypeRow('scheduled')}
-                                        {renderCampaignTypeRow('automated')}
-                                        {renderCampaignTypeRow('interstitial')}
-                                        {renderCampaignTypeRow('web')}
-                                    </div>
+                                >
+                                    {renderCampaignTypeRow('all')}
+                                    {renderCampaignTypeRow('scheduled')}
+                                    {renderCampaignTypeRow('automated')}
+                                    {renderCampaignTypeRow('interstitial')}
+                                    {renderCampaignTypeRow('web')}
                                 </div>
                             </div>
                         </div>
-                    )}
-                {media !== 'Mobile' &&
-                    isCampaignTypeSelectorOpen && (
-                        <Popover
-                            placement="top"
-                            toggle={handleOpenClose}
-                            arrowColors={{
-                                primary: 'white',
-                                secondary: titanium,
-                                border: titanium
-                            }}
-                            toggleable={true}
-                            targetId="campaign-type-selector"
-                            targetParent="root"
-                        >
-                            <div
-                                style={{
-                                    height: 280,
-                                    width: 384,
-                                    flexDirection: 'column',
-                                    paddingLeft: 16,
-                                    paddingRight: 16
-                                }}
-                            >
-                                {renderCampaignTypeRow('all')}
-                                {renderCampaignTypeRow('scheduled')}
-                                {renderCampaignTypeRow('automated')}
-                                {renderCampaignTypeRow('interstitial')}
-                                {renderCampaignTypeRow('web')}
-                            </div>
-                        </Popover>
-                    )}
-            </Manager>
+                    </div>
+                )}
         </React.Fragment>
     )
 }

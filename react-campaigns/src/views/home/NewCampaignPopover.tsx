@@ -26,12 +26,10 @@ import {
     turquoise,
     PhoneIcon,
     PlusSquareIcon,
-    Popover,
     white,
-    ZapIcon
+    ZapIcon,
+    PopoverContainer
 } from '@rover/ts-bootstrap/dist/src'
-
-import { Manager, Target } from 'react-popper'
 
 export interface NewCampaignPopoverProps {
     media: Media
@@ -432,25 +430,77 @@ class NewCampaignPopover extends React.PureComponent<
             isNewCampaignPopoverClosing
         } = this.props
         const { contentState, newCampaignName, newCampaignType } = this.state
+
+        const popoverProps = {
+            placement: media === 'Desktop' ? 'bottom-start' : 'bottom-end',
+
+            toggle: this.handleOpenClose,
+            navBarProperties: {
+                title: this.getTitle(),
+                buttonRight: this.getRightButton(),
+                buttonLeft: this.getLeftButton(),
+                buttonLeftCallback: this.getLeftButtonCallback(),
+                buttonRightCallback: this.getRightButtonCallback(),
+                id: 'navBarId',
+                style: {
+                    containerStyle: {
+                        borderRadius: '3px 3px 0px 0px',
+                        padding: 16
+                    },
+                    buttonLeftStyle: {
+                        outerStyle: {
+                            height: 17
+                        },
+                        innerStyle: {
+                            color: graphite
+                        }
+                    }
+                }
+            },
+            arrowColors: {
+                primary: cloud,
+                secondary: white,
+                border: titanium
+            }
+        }
+
+        const targetId = 'desktop-new-campaign-button'
+        const Fragment = React.Fragment
+
         return (
-            <Manager>
-                <Target>
-                    <div id="desktop-new-campaign-button">
-                        {media === 'Desktop' ? (
-                            <Button
-                                onClick={this.handleOpenClose}
-                                text="New Campaign"
-                                type="primary"
-                                size="small"
-                            />
-                        ) : (
-                            <PlusSquareIcon
-                                fill={turquoise}
-                                onClick={this.handleOpenClose}
-                            />
-                        )}
+            <Fragment>
+                <PopoverContainer
+                    id="desktop-new-campaign-button"
+                    popoverProps={popoverProps}
+                    onClick={this.handleOpenClose}
+                    targetParent="root"
+                    showPopover={isNewCampaignPopoverOpen && media !== 'Mobile'}
+                >
+                    {media === 'Desktop' ? (
+                        <Button
+                            onClick={this.handleOpenClose}
+                            text="New Campaign"
+                            type="primary"
+                            size="small"
+                        />
+                    ) : (
+                        <PlusSquareIcon
+                            fill={turquoise}
+                            onClick={this.handleOpenClose}
+                        />
+                    )}
+                    <div
+                        style={{
+                            display: 'flex',
+                            height: 'auto',
+                            width: 384,
+                            flexDirection: 'column'
+                        }}
+                    >
+                        {this.renderContent()}
                     </div>
-                </Target>
+                </PopoverContainer>
+
                 {isNewCampaignPopoverOpen &&
                     media === 'Mobile' && (
                         <div
@@ -515,60 +565,7 @@ class NewCampaignPopover extends React.PureComponent<
                             </div>
                         </div>
                     )}
-                {isNewCampaignPopoverOpen &&
-                    media !== 'Mobile' && (
-                        <Popover
-                            placement={
-                                media === 'Desktop'
-                                    ? 'bottom-start'
-                                    : 'bottom-end'
-                            }
-                            toggle={this.handleOpenClose}
-                            navBarProperties={{
-                                title: this.getTitle(),
-                                buttonRight: this.getRightButton(),
-                                buttonLeft: this.getLeftButton(),
-                                buttonLeftCallback: this.getLeftButtonCallback(),
-                                buttonRightCallback: this.getRightButtonCallback(),
-                                id: 'navBarId',
-                                style: {
-                                    containerStyle: {
-                                        borderRadius: '3px 3px 0px 0px',
-                                        padding: 16
-                                    },
-                                    buttonLeftStyle: {
-                                        outerStyle: {
-                                            height: 17
-                                        },
-                                        innerStyle: {
-                                            color: graphite
-                                        }
-                                    }
-                                }
-                            }}
-                            arrowColors={{
-                                primary: cloud,
-                                secondary: white,
-                                border: titanium
-                            }}
-                            toggleable={true}
-                            targetId="desktop-new-campaign-button"
-                            targetParent="root"
-                        >
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    height: 'auto',
-                                    width: 384,
-
-                                    flexDirection: 'column'
-                                }}
-                            >
-                                {this.renderContent()}
-                            </div>
-                        </Popover>
-                    )}
-            </Manager>
+            </Fragment>
         )
     }
 }

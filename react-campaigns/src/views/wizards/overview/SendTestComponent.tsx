@@ -1,6 +1,6 @@
 /// <reference path="../../../../typings/index.d.ts"/>
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import {
     NavBar,
     titanium,
@@ -10,30 +10,40 @@ import {
     graphite
 } from '@rover/ts-bootstrap/dist/src'
 
-import { getIsSendTestModalOpen } from '../../../reducers'
+import { updateSelectedTestDevices } from '../../../actions'
+
+import {
+    getIsSendTestModalOpen,
+    getSelectedTestDevices
+} from '../../../reducers'
 
 export interface SendTestPopoverProps {
     device?: string
     buttonLeftCallback?: () => void
     buttonRightCallback?: () => void
-    selectedTestDevices?: string[]
     listOfTestDevices?: StringMap<string>
-    handleCheck?: (val: string) => void
 }
 
 export interface OwnProps {
     sendTestModalDisplay?: string
+    selectedTestDevices?: string[]
+}
+
+export interface DispatchProps {
+    updateSelectedTestDevices?: (deviceIds: string[]) => void
 }
 
 export type textSize = 'h1' | 'h2' | 'large' | 'medium' | 'small'
 
 class SendTestComponent extends React.Component<
-    SendTestPopoverProps & OwnProps,
+    SendTestPopoverProps & OwnProps & DispatchProps,
     {}
 > {
-    constructor(props: SendTestPopoverProps & OwnProps) {
+    constructor(props: SendTestPopoverProps & OwnProps & DispatchProps) {
         super(props)
+
         this.getDeviceText = this.getDeviceText.bind(this)
+        this.handleCheck = this.handleCheck.bind(this)
     }
 
     getDeviceText(listOfTestDevices: StringMap<string>, deviceId: string) {
@@ -41,19 +51,26 @@ class SendTestComponent extends React.Component<
             ? deviceId
             : listOfTestDevices[deviceId]
     }
+    handleCheck(deviceId: string) {
+        const { updateSelectedTestDevices, selectedTestDevices } = this.props
+        let selectedDevices = selectedTestDevices.slice(0)
+        const index = selectedTestDevices.indexOf(deviceId)
+        if (index !== -1) {
+            selectedDevices.splice(index, 1)
+        } else {
+            selectedDevices.push(deviceId)
+        }
+        updateSelectedTestDevices(selectedDevices)
+    }
 
     renderDeviceList(device: string) {
-        const {
-            listOfTestDevices,
-            selectedTestDevices,
-            handleCheck
-        } = this.props
+        const { listOfTestDevices, selectedTestDevices } = this.props
 
         const getRowStyle = () => {
             switch (device) {
                 case 'Mobile':
                     return {
-                        height: 72,
+                        minHeight: 72,
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
@@ -81,7 +98,9 @@ class SendTestComponent extends React.Component<
                 style={getRowStyle() as React.CSSProperties}
                 key={index}
                 onClick={
-                    device !== 'Desktop' ? () => handleCheck(dev) : () => null
+                    device !== 'Desktop'
+                        ? () => this.handleCheck(dev)
+                        : () => null
                 }
             >
                 <div
@@ -99,7 +118,7 @@ class SendTestComponent extends React.Component<
                 <div style={{ marginLeft: 10 }}>
                     <CheckBox
                         checked={selectedTestDevices.includes(dev)}
-                        onClick={handleCheck}
+                        onClick={this.handleCheck}
                         value={dev}
                     />
                 </div>
@@ -121,14 +140,36 @@ class SendTestComponent extends React.Component<
             ret = (
                 <div
                     style={{
-                        height: 256,
-                        overflowY: 'scroll'
+                        display: 'flex',
+                        flexDirection: 'column'
                     }}
                 >
+                    <NavBar
+                        buttonLeft="Cancel"
+                        buttonRight={
+                            selectedTestDevices.length !== 0 ? 'Send' : ''
+                        }
+                        buttonLeftCallback={buttonLeftCallback}
+                        buttonRightCallback={buttonRightCallback}
+                        style={{
+                            buttonLeftStyle: {
+                                outerStyle: {
+                                    marginLeft: 16,
+                                    color: graphite
+                                }
+                            },
+                            buttonRightStyle: {
+                                outerStyle: {
+                                    marginRight: 16,
+                                    color: graphite
+                                }
+                            }
+                        }}
+                    />
                     <div
                         style={{
-                            display: 'flex',
-                            flexDirection: 'column'
+                            height: 250,
+                            overflowY: 'scroll'
                         }}
                     >
                         {this.renderDeviceList(device)}
@@ -185,6 +226,9 @@ class SendTestComponent extends React.Component<
                                     innerStyle: {
                                         color: graphite
                                     }
+                                },
+                                containerStyle: {
+                                    minHeight: 56
                                 }
                             }}
                         />
@@ -196,7 +240,9 @@ class SendTestComponent extends React.Component<
                             }}
                         >
                             <Text text="Send a Test" size="h1" />
-                            {this.renderDeviceList(device)}
+                            <div style={{ overflowY: 'scroll' }}>
+                                {this.renderDeviceList(device)}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -207,7 +253,16 @@ class SendTestComponent extends React.Component<
 }
 
 const mapStateToProps = (state: State): OwnProps => ({
-    sendTestModalDisplay: getIsSendTestModalOpen(state)
+    sendTestModalDisplay: getIsSendTestModalOpen(state),
+    selectedTestDevices: getSelectedTestDevices(state)
 })
 
-export default connect(mapStateToProps, {})(SendTestComponent)
+const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
+    return {
+        updateSelectedTestDevices: (deviceIds: string[]) => {
+            dispatch(updateSelectedTestDevices(deviceIds))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SendTestComponent)

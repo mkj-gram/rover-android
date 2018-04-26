@@ -67,6 +67,9 @@ export const updateNotificationSettings = () =>
 export const sendTest = (campaignId: number, deviceIds: string[]) =>
     sendTestActions.sendTest(campaignId, deviceIds)
 
+export const updateSelectedTestDevices = (deviceIds: string[]) =>
+    testDevicesActions.updateSelectedTestDevices(deviceIds)
+
 // Home
 export const openNewCampaignPopover: ActionCreator<
     ThunkAction<void, State, void>
