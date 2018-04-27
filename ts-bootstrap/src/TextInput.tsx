@@ -160,6 +160,7 @@ const TextInput: React.SFC<TextInputProps> = ({
                     onBlurChange={true}
                     placeholder={true}
                     placeholderText={placeholder}
+                    textStyle={{ width: '100%' }}
                 />
                 {children}
             </div>
