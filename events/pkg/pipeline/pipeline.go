@@ -86,8 +86,8 @@ func NewPipeline(consumer Consumer, inputTopic string, producer Producer, output
 			Jitter:      false,
 		},
 
-		runningChan:  make(chan bool),
-		shutdownChan: make(chan bool),
+		runningChan:  make(chan bool, 1),
+		shutdownChan: make(chan bool, 1),
 	}
 
 	for _, op := range options {
@@ -99,7 +99,10 @@ func NewPipeline(consumer Consumer, inputTopic string, producer Producer, output
 
 // Run the pipeline.
 func (p *Pipeline) Run(ctx context.Context) error {
-	p.source.consumer.Subscribe(p.source.topic, nil)
+	if err := p.source.consumer.Subscribe(p.source.topic, nil); err != nil {
+		return err
+	}
+
 	return p.loop(ctx)
 }
 
@@ -168,7 +171,7 @@ func (p *Pipeline) next() error {
 	case kafka.Error:
 		// Should probably disconnect?
 		return e
-	case kafka.PartitionEOF:
+	case kafka.PartitionEOF, kafka.OffsetsCommitted:
 		return nil
 	default:
 		return errors.Errorf("Unknown kafka event: %v", e)

@@ -52,6 +52,7 @@ func main() {
 		"session.timeout.ms":    6000,
 		"request.required.acks": -1,
 		"auto.offset.reset":     "earliest",
+		"enable.auto.commit":    false,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -92,7 +93,10 @@ func main() {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 
-	go p.Run(ctx)
+	var done = make(chan error)
+	go func() {
+		done <- p.Run(ctx)
+	}()
 
 	log.Println("[*] Pipeline running! To exit press CTRL+C")
 	sigc := make(chan os.Signal)
@@ -101,6 +105,10 @@ func main() {
 	select {
 	case sig := <-sigc:
 		log.Println("signal:", sig)
+	case err := <-done:
+		if err != nil {
+			log.Println("Done:", err)
+		}
 	}
 
 	p.Shutdown(10 * time.Second)
