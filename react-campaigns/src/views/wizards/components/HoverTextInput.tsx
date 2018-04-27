@@ -2,6 +2,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { connect, Dispatch } from 'react-redux'
+import MediaQuery from 'react-responsive'
 
 import { beige, titanium, Text } from '@rover/ts-bootstrap/dist/src'
 
@@ -28,9 +29,11 @@ class HoverTextInput extends React.Component<
     }
 
     handleHover() {
-        this.setState({
-            isHovered: !this.state.isHovered
-        })
+        if (window.innerWidth >= 1140) {
+            this.setState({
+                isHovered: !this.state.isHovered
+            })
+        }
     }
 
     componentDidUpdate() {
@@ -87,53 +90,56 @@ class HoverTextInput extends React.Component<
                     id={`hoverTextInputParent_${field}`}
                 >
                     {children}
-                    {isHovered &&
-                        ReactDOM.createPortal(
-                            <Fragment>
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: -10,
-                                        height: 20,
-                                        width: 20,
-                                        transform: 'rotate(45deg)',
-                                        background: beige,
-                                        border: `1px solid ${titanium}`,
-                                        borderBottom: 'none',
-                                        borderLeft: 'none',
-                                        borderRadius: '0 5px 0 0',
-                                        zIndex: 2
-                                    }}
-                                    id={`hoverTextInputTriangle_${field}`}
-                                />
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 64,
-                                        width: `calc(100vw - 832px)`
-                                    }}
-                                    id={`hoverTextInputDescriptionChild_${field}`}
-                                >
+                    {isHovered && (
+                        <MediaQuery minWidth={1140}>
+                            {ReactDOM.createPortal(
+                                <Fragment>
                                     <div
                                         style={{
-                                            padding: '16px 12px',
-                                            minWidth: 370,
-                                            maxWidth: 556,
-                                            borderLeft: `4px solid ${titanium}`
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: -10,
+                                            height: 20,
+                                            width: 20,
+                                            transform: 'rotate(45deg)',
+                                            background: beige,
+                                            border: `1px solid ${titanium}`,
+                                            borderBottom: 'none',
+                                            borderLeft: 'none',
+                                            borderRadius: '0 5px 0 0',
+                                            zIndex: 2
                                         }}
+                                        id={`hoverTextInputTriangle_${field}`}
+                                    />
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 64,
+                                            width: `calc(100vw - 832px)`
+                                        }}
+                                        id={`hoverTextInputDescriptionChild_${field}`}
                                     >
-                                        <Text
-                                            text={description}
-                                            size="large"
-                                            label={true}
-                                        />
+                                        <div
+                                            style={{
+                                                padding: '16px 12px',
+                                                minWidth: 370,
+                                                maxWidth: 556,
+                                                borderLeft: `4px solid ${titanium}`
+                                            }}
+                                        >
+                                            <Text
+                                                text={description}
+                                                size="large"
+                                                label={true}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            </Fragment>,
-                            document.getElementById('mainModalRight')
-                        )}
+                                </Fragment>,
+                                document.getElementById('mainModalRight')
+                            )}
+                        </MediaQuery>
+                    )}
                 </div>
             </div>
         )

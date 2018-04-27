@@ -116,9 +116,9 @@ class OverviewModalFooter extends React.Component<
                         height: 312,
                         width: 384
                     }}
+                    key="sendTest2"
                 >
                     <SendTestComponent
-                        key="sendTest2"
                         device={device}
                         buttonLeftCallback={() =>
                             this.handleSendTestToggle(false)

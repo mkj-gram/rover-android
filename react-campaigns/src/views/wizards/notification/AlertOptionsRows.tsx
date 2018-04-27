@@ -8,6 +8,7 @@ import {
     updateEditableCampaign,
     setHoverOption
 } from '../../../actions'
+import MediaQuery from 'react-responsive'
 
 import AlertOptionsPhonePreview from './AlertOptionsPhonePreview'
 
@@ -100,7 +101,7 @@ const AlertOptionsRows: React.SFC<
     }
 
     const handleMouseOver = (val: string) => {
-        if (device === 'Desktop') {
+        if (device === 'Desktop' && window.innerWidth >= 1140) {
             const onHoverOption = val === hoverValue ? '' : val
             setHoverOption(onHoverOption)
         }
@@ -257,21 +258,23 @@ const AlertOptionsRows: React.SFC<
                         {hoverValue.length !== 0 &&
                             hoverValue === elem &&
                             device === 'Desktop' && (
-                                <div
-                                    style={{
-                                        position: 'fixed',
-                                        top: 'calc(50%) -10px',
-                                        left: 759,
-                                        height: 20,
-                                        width: 20,
-                                        transform: 'rotate(45deg)',
-                                        background: beige,
-                                        border: `1px solid ${titanium}`,
-                                        borderBottom: 'none',
-                                        borderLeft: 'none',
-                                        borderRadius: '0 5px 0 0'
-                                    }}
-                                />
+                                <MediaQuery minWidth={1140}>
+                                    <div
+                                        style={{
+                                            position: 'fixed',
+                                            top: 'calc(50%) -10px',
+                                            left: 759,
+                                            height: 20,
+                                            width: 20,
+                                            transform: 'rotate(45deg)',
+                                            background: beige,
+                                            border: `1px solid ${titanium}`,
+                                            borderBottom: 'none',
+                                            borderLeft: 'none',
+                                            borderRadius: '0 5px 0 0'
+                                        }}
+                                    />
+                                </MediaQuery>
                             )}
                     </div>
                     <div
@@ -280,10 +283,17 @@ const AlertOptionsRows: React.SFC<
                             background: titanium
                         }}
                     />
+
                     {hoverValue.length !== 0 &&
                         hoverValue === elem &&
-                        device === 'Desktop' &&
-                        getCaretAndPreviewPortals(hoverValue, matchName)}
+                        device === 'Desktop' && (
+                            <MediaQuery minWidth={1140}>
+                                {getCaretAndPreviewPortals(
+                                    hoverValue,
+                                    matchName
+                                )}
+                            </MediaQuery>
+                        )}
                     {(deviceInfoSelected as string).length !== 0 &&
                         (deviceInfoSelected === elem ||
                             deviceInfoSelected === 'close') &&
