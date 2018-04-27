@@ -94,7 +94,7 @@ class ListPage extends React.PureComponent<
         const { campaignId } = this.getQueryParams()
 
         if (campaignId && getCampaign(campaigns, campaignId) === null) {
-            fetchCampaign(parseInt(campaignId))
+            fetchCampaign(parseInt(campaignId, 10))
         }
     }
 
@@ -342,7 +342,7 @@ const mapDispatchToProps = (
         },
         fetchCampaign: campaignId => {
             dispatch(fetchCampaign(campaignId)).then(
-                () => {},
+                () => undefined,
                 () => {
                     ownProps.history.replace('/campaigns/')
                 }

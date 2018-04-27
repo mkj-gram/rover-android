@@ -109,6 +109,8 @@ class AdvancedSettingsRowContainer extends React.Component<
                     tempStrValue: str
                 })
                 break
+            default:
+                return
         }
     }
 

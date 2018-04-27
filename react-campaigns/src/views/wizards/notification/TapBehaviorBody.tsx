@@ -347,7 +347,7 @@ class TapBehaviorBody extends React.Component<
                 return this.handleShowPresentationPopover()
             case 'Desktop':
             default:
-                return () => {}
+                return null
         }
     }
 
@@ -426,6 +426,7 @@ const mapStateToProps = (state: State): StateProps => ({
     )
 })
 
+// tslint:disable-next-line:no-any
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
         updateEditableCampaign: val => {

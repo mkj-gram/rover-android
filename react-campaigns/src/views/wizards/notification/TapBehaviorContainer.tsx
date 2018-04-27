@@ -263,7 +263,7 @@ class TapBehaviorContainer extends React.Component<
                 return this.handleShowNotificationOptions()
             case 'Desktop':
             default:
-                return () => {}
+                return null
         }
     }
 
@@ -297,6 +297,7 @@ const mapStateToProps = (state: State): StateProps => ({
     campaigns: state.campaigns,
     isTapBehaviorSelectorOpen: getIsTapBehaviorSelectorOpen(state)
 })
+// tslint:disable-next-line:no-any
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
         updateEditableCampaign: val => {

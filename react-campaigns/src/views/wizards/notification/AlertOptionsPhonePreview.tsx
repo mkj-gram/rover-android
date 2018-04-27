@@ -45,8 +45,7 @@ class AlertOptionsPhonePreview extends React.Component<
                 'Alert users with a system notification',
             notificationAlertOptionNotificationCenter:
                 'Add to your app’s Notification Center',
-            notificationAlertOptionBadgeNumber:
-                "Increment the number on your app's badge icon"
+            notificationAlertOptionBadgeNumber: `Increment the number on your app's badge icon`
         }
 
         const Fragment = React.Fragment

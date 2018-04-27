@@ -23,6 +23,7 @@ import MobilePopover from './MobilePopover'
 export interface PopoverModalFormProps {
     presentationType: 'popover' | 'modal' | 'regular'
     field: string
+    // tslint:disable-next-line:no-any
     popoverFormInputProps: any
     popoverModalProps?: (handleClosePopoverModal: () => void) => object
     popoverNavbarProps?: (handleClosePopoverModal: () => void) => object
@@ -55,7 +56,7 @@ const PopoverModalForm: React.SFC<
     popoverModalProps,
     popoverNavbarProps,
     popoverFormInputProps,
-    handleSaveChange = () => {},
+    handleSaveChange,
     handleShowPopoverForm,
     children,
     presentationType,
@@ -87,6 +88,7 @@ const PopoverModalForm: React.SFC<
     const getClickableView = (mode: string) => {
         const clonedPopoverModalChild = React.cloneElement(children, {
             handleSaveChange: (fieldVal: string) =>
+                handleSaveChange &&
                 handleSaveChange(handleClosePopoverModal, fieldVal),
             key: `${field}_PopoverModalChild`
         })

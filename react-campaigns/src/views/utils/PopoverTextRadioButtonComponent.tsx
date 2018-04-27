@@ -28,10 +28,10 @@ class PopoverTextRadioButtonComponent extends React.Component<
 > {
     constructor(props: PopoverTextRadioButtonComponentProps) {
         super(props)
-        ;(this.state = {
+        this.state = {
             onHoverName: ''
-        }),
-            (this.handleHover = this.handleHover.bind(this))
+        }
+        this.handleHover = this.handleHover.bind(this)
     }
 
     handleHover(onHoverName: string) {

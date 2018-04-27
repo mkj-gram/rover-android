@@ -60,8 +60,8 @@ export const fetchTestDevices: ActionCreator<
                             // tslint:disable-next-line:no-any
                             (v: any) => v.attribute === 'device_id'
                         )[0].value
-                        // tslint:disable-next-line:no-any
                     ] = elem.filter(
+                        // tslint:disable-next-line:no-any
                         (v: any) => v.attribute === 'label'
                     )[0].value
                 })

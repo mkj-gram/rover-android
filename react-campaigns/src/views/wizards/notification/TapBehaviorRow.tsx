@@ -4,7 +4,7 @@ import { titanium } from '@rover/ts-bootstrap/dist/src'
 
 export interface TapBehaviorRowProps {
     children?: JSX.Element
-    handleClick?: () => void
+    handleClick: () => void
 }
 
 const TapBehaviorRow: React.SFC<TapBehaviorRowProps> = ({

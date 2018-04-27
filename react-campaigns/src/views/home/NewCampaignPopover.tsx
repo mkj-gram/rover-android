@@ -571,6 +571,7 @@ class NewCampaignPopover extends React.PureComponent<
 }
 
 const mapDispatchToProps = (
+    // tslint:disable-next-line:no-any
     dispatch: Dispatch<any>,
     ownProps: NewCampaignPopoverProps
 ): DispatchProps => {
