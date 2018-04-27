@@ -84,7 +84,10 @@ class OverviewComponent extends React.Component<
                         device={device}
                     />
 
-                    <OverviewModalFooter device={device} />
+                    <OverviewModalFooter
+                        device={device}
+                        campaignId={parseInt(campaign.campaignId, 10)}
+                    />
                 </div>
             )
         } else {

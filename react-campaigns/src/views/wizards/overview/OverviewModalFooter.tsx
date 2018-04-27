@@ -28,7 +28,7 @@ import SendTestConfirmationDialog from './SendTestConfirmationDialog'
 export interface OverviewModalFooterProps extends InjectedProps {
     sendTestClick?: () => void
     publishClick?: () => void
-    campaignId?: number
+    campaignId: number
 }
 
 export interface OverviewModalFooterState {
