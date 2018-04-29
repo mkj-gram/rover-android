@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Button from './Button'
-import ChevronLeftIcon from './Icons/ChevronLeftIcon'
+
 import { charcoal, cloud } from '../styles/colors'
 import { text, medium } from '../styles/typography'
 
@@ -18,7 +18,7 @@ export interface NavBarProps {
     }
     id?: string
     getElement?: (val: string, val1: string) => void
-    chevronLeft?: boolean
+    customLeftElem?: JSX.Element
 }
 
 class NavBar extends React.Component<NavBarProps, {}> {
@@ -54,7 +54,7 @@ class NavBar extends React.Component<NavBarProps, {}> {
             id,
             buttonLeftCallback,
             buttonRightCallback,
-            chevronLeft
+            customLeftElem
         } = this.props
 
         const container: React.CSSProperties = {
@@ -87,44 +87,9 @@ class NavBar extends React.Component<NavBarProps, {}> {
             alignItems: 'center'
         }
 
-        if (chevronLeft) {
-            buttonLeftStyle = {
-                ...buttonLeftStyle,
-                outerStyle: {
-                    marginLeft: 0
-                }
-            }
-        }
-
         const renderLeftNavbar = () => {
-            if (chevronLeft) {
-                buttonLeftStyle = {
-                    ...buttonLeftStyle,
-                    outerStyle: {
-                        marginLeft: 0
-                    }
-                }
-                return (
-                    <div
-                        onClick={buttonLeftCallback}
-                        style={{
-                            ...innerStyle,
-                            flex: 'none'
-                        }}
-                    >
-                        {chevronLeft && (
-                            <ChevronLeftIcon
-                                fill="#000"
-                                style={{ marginLeft: 8 }}
-                            />
-                        )}
-                        <Button
-                            text={buttonLeft}
-                            type="regular"
-                            style={buttonLeftStyle}
-                        />
-                    </div>
-                )
+            if (customLeftElem) {
+                return customLeftElem
             } else {
                 return (
                     <Button

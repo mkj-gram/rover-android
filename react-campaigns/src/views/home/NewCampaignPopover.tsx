@@ -28,7 +28,8 @@ import {
     PlusSquareIcon,
     white,
     ZapIcon,
-    PopoverContainer
+    PopoverContainer,
+    ChevronLeftIcon
 } from '@rover/ts-bootstrap/dist/src'
 
 export interface NewCampaignPopoverProps {
@@ -68,6 +69,7 @@ class NewCampaignPopover extends React.PureComponent<
         this.handleOpenClose = this.handleOpenClose.bind(this)
         this.getRightButtonCallback = this.getRightButtonCallback.bind(this)
     }
+
     componentWillReceiveProps(
         nextProps: NewCampaignPopoverProps & DispatchProps & StateProps
     ) {
@@ -330,6 +332,36 @@ class NewCampaignPopover extends React.PureComponent<
         )
     }
 
+    getNavbarLeftElem() {
+        const { media } = this.props
+        const { contentState } = this.state
+
+        if (contentState === 'name-campaign') {
+            return (
+                <div
+                    style={{
+                        display: 'flex',
+                        marginLeft: media === 'Mobile' ? 16 : -8
+                    }}
+                    onClick={this.getLeftButtonCallback()}
+                >
+                    <ChevronLeftIcon fill="#000" />
+                    <Button
+                        text="Back"
+                        type="regular"
+                        style={{
+                            innerStyle: {
+                                color: graphite
+                            }
+                        }}
+                        onClick={this.getLeftButtonCallback()}
+                    />
+                </div>
+            )
+        }
+        return null
+    }
+
     renderContent() {
         const { onCreate, media } = this.props
         const {
@@ -355,7 +387,7 @@ class NewCampaignPopover extends React.PureComponent<
                 {contentState === 'name-campaign' && (
                     <div
                         style={{
-                            padding: '0 16px'
+                            padding: media === 'Mobile' ? '0 24px' : '0 16px'
                         }}
                     >
                         <div
@@ -441,6 +473,7 @@ class NewCampaignPopover extends React.PureComponent<
                 buttonLeft: this.getLeftButton(),
                 buttonLeftCallback: this.getLeftButtonCallback(),
                 buttonRightCallback: this.getRightButtonCallback(),
+                customLeftElem: this.getNavbarLeftElem(),
                 id: 'navBarId',
                 style: {
                     containerStyle: {
@@ -450,6 +483,14 @@ class NewCampaignPopover extends React.PureComponent<
                     buttonLeftStyle: {
                         outerStyle: {
                             height: 17
+                        },
+                        innerStyle: {
+                            color: graphite
+                        }
+                    },
+                    buttonRightStyle: {
+                        outerStyle: {
+                            marginRight: 0
                         },
                         innerStyle: {
                             color: graphite
@@ -540,18 +581,23 @@ class NewCampaignPopover extends React.PureComponent<
                                     style={{
                                         buttonLeftStyle: {
                                             innerStyle: {
-                                                color: graphite,
-                                                marginTop: 3
+                                                color: graphite
+                                            },
+                                            outerStyle: {
+                                                marginLeft: 24
                                             }
                                         },
                                         buttonRightStyle: {
                                             innerStyle: {
-                                                color: graphite,
-                                                marginTop: 3
+                                                color: graphite
+                                            },
+                                            outerStyle: {
+                                                marginRight: 24
                                             }
                                         }
                                     }}
                                     title={this.getTitle()}
+                                    customLeftElem={this.getNavbarLeftElem()}
                                 />
                                 <div
                                     style={{

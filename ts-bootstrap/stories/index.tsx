@@ -61,7 +61,7 @@ import {
 } from '../styles/typography'
 
 import { storiesOf } from '@storybook/react'
-import { CheckmarkIcon } from '../src/Icons/index'
+import { CheckmarkIcon, ChevronLeftIcon } from '../src/Icons/index'
 
 storiesOf('Alert', module)
     .add('Info', () => (
@@ -397,6 +397,26 @@ storiesOf('Dialog', module)
     })
 
 storiesOf('Navbar', module).add('multi cases', () => {
+    const customLeftElem = (
+        <div
+            style={{
+                display: 'flex',
+                marginLeft: 16
+            }}
+        >
+            <ChevronLeftIcon fill="#000" />
+            <Button
+                text="Back"
+                type="regular"
+                style={{
+                    innerStyle: {
+                        color: graphite
+                    }
+                }}
+            />
+        </div>
+    )
+
     return (
         <div style={{ height: '100%', width: '100%' }}>
             <NavBar buttonLeft="ok" />
@@ -409,7 +429,7 @@ storiesOf('Navbar', module).add('multi cases', () => {
                 buttonLeft="left"
                 title="this title"
                 buttonRight="Right"
-                chevronLeft={true}
+                customLeftElem={customLeftElem}
             />
         </div>
     )
@@ -496,46 +516,6 @@ storiesOf('PopoverContainer', module).add('cases', () => {
     }
 
     return <X />
-})
-
-storiesOf('SegmentControl', module).add('Buttons', () => {
-    const segmentControlButtonStyle: React.CSSProperties = {
-        ...text,
-        color: turquoise,
-        width: 98,
-        height: 24,
-        textAlign: 'center'
-    }
-    return (
-        <SegmentControl>
-            <div
-                style={{
-                    ...segmentControlButtonStyle,
-                    color: 'white',
-                    backgroundColor: turquoise
-                }}
-                onClick={() => window.console.log('selected')}
-            >
-                Selected
-            </div>
-            <div
-                style={{
-                    ...segmentControlButtonStyle,
-                    borderLeft: `2px solid ${turquoise}`,
-                    borderRight: `2px solid ${turquoise}`
-                }}
-                onClick={() => window.console.log('normal')}
-            >
-                Normal
-            </div>
-            <div
-                style={segmentControlButtonStyle}
-                onClick={() => window.console.log('normal')}
-            >
-                Normal
-            </div>
-        </SegmentControl>
-    )
 })
 
 storiesOf('Popover', module).add('various cases', () => {
