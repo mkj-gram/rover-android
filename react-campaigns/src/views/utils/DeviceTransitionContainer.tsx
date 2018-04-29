@@ -25,10 +25,10 @@ const DeviceTransitionContainer: React.SFC<
         overviewContainerAnimation = ''
     } else {
         overviewContainerAnimation =
-            displayOverviewModal === 'close' ? 'fadeOut' : 'fade'
+            displayOverviewModal === 'open' ? 'fade' : 'fadeOut'
     }
 
-    const overviewAnimationTime = triggeredAnimation === 'duplicate' ? 300 : 500
+    const overviewAnimationTime = triggeredAnimation === 'duplicate' ? 250 : 500
 
     if (device === 'Desktop') {
         return (
@@ -48,7 +48,8 @@ const DeviceTransitionContainer: React.SFC<
                 <div
                     style={{
                         flex: '1 1 769px',
-                        display: 'flex',
+                        display:
+                            displayOverviewModal !== 'closed' ? 'flex' : 'none',
                         animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease`,
                         maxWidth: 769,
                         position: 'relative',
@@ -88,8 +89,9 @@ const DeviceTransitionContainer: React.SFC<
                     style={{
                         height: '100%',
                         width: '100%',
-                        display: 'flex',
-                        animation: `${displayOverviewModal} 500ms ease`,
+                        display:
+                            displayOverviewModal !== 'closed' ? 'flex' : 'none',
+                        animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease`,
                         minWidth: 0
                     }}
                     id="mainModalLeft"

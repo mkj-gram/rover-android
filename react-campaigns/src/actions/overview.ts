@@ -21,7 +21,7 @@ export const handleOverviewModalDisplay: ActionCreator<
         })
     } else {
         dispatch({
-            type: 'CLOSE_OVERVIEW_MODAL'
+            type: 'CLOSING_OVERVIEW_MODAL'
         })
         setTimeout(() => {
             history.push('/campaigns/')

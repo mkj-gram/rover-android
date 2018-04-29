@@ -133,7 +133,7 @@ export const updateNotificationSettings: ActionCreator<
             ...newCampaign
         }
     }
-
+   
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
@@ -370,8 +370,16 @@ export const duplicateCampaign: ActionCreator<
         trigger: 'duplicate'
     })
     dispatch({
-        type: 'CLOSE_OVERVIEW_MODAL'
+        type: 'CLOSING_OVERVIEW_MODAL'
     })
+    let closed = false
+    setTimeout(() => {
+        dispatch({
+            type: 'CLOSED_OVERVIEW_MODAL'
+        })
+        closed = true
+    }, 250)
+
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
@@ -385,7 +393,7 @@ export const duplicateCampaign: ActionCreator<
                             type: 'OPEN_OVERVIEW_MODAL'
                         })
                         return resolve()
-                    }, 250)
+                    }, !closed ? 250 : 0)
                     setTimeout(() => {
                         dispatch({ type: 'DISMISS_FAILURE' })
                     }, 4000)
@@ -404,7 +412,7 @@ export const duplicateCampaign: ActionCreator<
                             type: 'OPEN_OVERVIEW_MODAL'
                         })
                         return resolve()
-                    }, 250)
+                    }, !closed ? 250 : 0)
                 }).then(result => {
                     dispatch({
                         type: 'DUPLICATE_CAMPAIGN_SUCCESS',
@@ -425,7 +433,7 @@ export const duplicateCampaign: ActionCreator<
                         type: 'OPEN_OVERVIEW_MODAL'
                     })
                     return resolve()
-                }, 250)
+                }, !closed ? 250 : 0)
                 setTimeout(() => {
                     dispatch({ type: 'DISMISS_FAILURE' })
                 }, 4000)
@@ -458,8 +466,16 @@ export const archiveCampaign: ActionCreator<
         trigger: ''
     })
     dispatch({
-        type: 'CLOSE_OVERVIEW_MODAL'
+        type: 'CLOSING_OVERVIEW_MODAL'
     })
+    let closed = false
+    setTimeout(() => {
+        dispatch({
+            type: 'CLOSED_OVERVIEW_MODAL'
+        })
+        closed = true
+    }, 500)
+
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
@@ -472,7 +488,7 @@ export const archiveCampaign: ActionCreator<
                         dispatch({
                             type: 'OPEN_OVERVIEW_MODAL'
                         })
-                    }, 250)
+                    }, !closed ? 400 : 0)
                     setTimeout(() => {
                         dispatch({ type: 'DISMISS_FAILURE' })
                         return resolve()
@@ -493,7 +509,7 @@ export const archiveCampaign: ActionCreator<
                             campaigns
                         })
                         return resolve()
-                    }, 450)
+                    }, !closed ? 400 : 0)
                 }).then(res => Promise.resolve(true))
             }
         },
@@ -508,7 +524,7 @@ export const archiveCampaign: ActionCreator<
                         type: 'OPEN_OVERVIEW_MODAL'
                     })
                     return resolve()
-                }, 250)
+                }, !closed ? 400 : 0)
                 setTimeout(() => {
                     dispatch({ type: 'DISMISS_FAILURE' })
                 }, 4000)

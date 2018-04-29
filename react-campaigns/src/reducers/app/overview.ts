@@ -5,8 +5,10 @@ const isOverviewModalOpen = (state = 'open', action: AnyAction) => {
     switch (action.type) {
         case 'OPEN_OVERVIEW_MODAL':
             return 'open'
-        case 'CLOSE_OVERVIEW_MODAL':
+        case 'CLOSING_OVERVIEW_MODAL':
             return 'close'
+        case 'CLOSED_OVERVIEW_MODAL':
+            return 'closed'
         default:
             return state
     }
