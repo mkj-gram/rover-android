@@ -212,9 +212,9 @@ class Form extends React.Component<
                 type={isValid ? 'primary' : 'disabled'}
                 overrideWidth={96}
                 onClick={() => {
-                    saveAndClose()
                     openNotificationDeliveryModal(false)
                     this.setFormAsSeen(lastForm)
+                    saveAndClose()
                 }}
             />
         )
