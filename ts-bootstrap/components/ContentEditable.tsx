@@ -87,7 +87,6 @@ class ContentEditable extends React.Component<Props, {}> {
     }
 
     placeCaretAtEnd(el: any) {
-        el.focus()
         if (
             typeof window.getSelection != 'undefined' &&
             typeof document.createRange != 'undefined'
