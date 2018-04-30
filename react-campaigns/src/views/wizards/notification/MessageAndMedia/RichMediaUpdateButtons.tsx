@@ -75,7 +75,12 @@ const RichMediaUpdateButtons: React.SFC<
         return (
             <div style={{ display: 'flex' }}>
                 <Button
-                    text="Change"
+                    onClick={() =>
+                        updateEditableCampaign({
+                            notificationAttachment: null
+                        })
+                    }
+                    text="Remove"
                     type="regular"
                     style={{
                         innerStyle: {
@@ -86,12 +91,7 @@ const RichMediaUpdateButtons: React.SFC<
                     }}
                 />
                 <Button
-                    onClick={() =>
-                        updateEditableCampaign({
-                            notificationAttachment: null
-                        })
-                    }
-                    text="Remove"
+                    text="Edit"
                     type="regular"
                     style={{
                         innerStyle: {
