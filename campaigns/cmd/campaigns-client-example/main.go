@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/namsral/flag"
@@ -24,8 +25,11 @@ var (
 	campaignsServiceUrl = flag.String("campaigns-service-url", "campaigns-service:5100", "campaigns service url address")
 
 	// Action
-	cmd = flag.String("cmd", "", "create|publish|unpublish")
-	arg = flag.Int("arg", 0, "create|publish|unpublish")
+	cmd        = flag.String("cmd", "", "create|publish|unpublish")
+	accountId  = flag.Int("account-id", 1, "campaign id")
+	campaignId = flag.Int("campaign-id", 0, "campaign id")
+	pageSize   = flag.Int("page-size", 100, "campaign id")
+	deviceIds  = flag.String("device-ids", "", "device ids, comma separated list")
 )
 
 var (
@@ -50,7 +54,7 @@ func main() {
 		m jsonpb.Marshaler
 
 		authCtx = &AuthContext{
-			AccountId:        1,
+			AccountId:        int32(*accountId),
 			PermissionScopes: nil,
 			UserId:           0,
 		}
@@ -70,15 +74,21 @@ func main() {
 	switch *cmd {
 	default:
 		stderr.Println("Unknown CMD:", *cmd)
+
+	case "list":
+		resp, err := campaignsClient.List(ctx, &ListRequest{
+			AuthContext: authCtx,
+			PageSize:    int32(*pageSize),
+		})
+
+		pp(resp, err)
+
 	case "create":
 		resp, err := campaignsClient.Create(ctx, &CreateRequest{
 			AuthContext:  authCtx,
 			CampaignType: CampaignType_SCHEDULED_NOTIFICATION,
 			Name:         "a campaign",
 		})
-		if err != nil {
-			stderr.Fatalln("client.Create:", err)
-		}
 
 		pp(resp, err)
 
@@ -93,7 +103,7 @@ func main() {
 
 		resp, err := campaignsClient.UpdateScheduledDeliverySettings(ctx, &UpdateScheduledDeliverySettingsRequest{
 			AuthContext: authCtx,
-			CampaignId:  int32(*arg),
+			CampaignId:  int32(*campaignId),
 			// ScheduledTimeZone: ""
 			ScheduledType:      ScheduledType_SCHEDULED,
 			ScheduledTimestamp: ts,
@@ -104,7 +114,7 @@ func main() {
 	case "publish":
 		resp, err := campaignsClient.Publish(ctx, &PublishRequest{
 			AuthContext: authCtx,
-			CampaignId:  int32(*arg),
+			CampaignId:  int32(*campaignId),
 		})
 		if err != nil {
 			stderr.Fatalln("client.Publish:", err)
@@ -112,15 +122,16 @@ func main() {
 
 		pp(resp, err)
 
-		// case "cancel":
-		// 	resp, err := campaignsClient.Unpublish(ctx, &UnpublishRequest{
-		// 		AuthContext: authCtx,
-		// 		CampaignId:  int32(*arg),
-		// 	})
-		// 	if err != nil {
-		// 		stderr.Fatalln("client.Unpublish:", err)
-		// 	}
-		//
-		// 	pp(resp, err)
+	case "send_test":
+		resp, err := campaignsClient.SendTest(ctx, &SendTestRequest{
+			AuthContext: authCtx,
+			CampaignId:  int32(*campaignId),
+			DeviceIds:   strings.Split(*deviceIds, ","),
+		})
+		if err != nil {
+			stderr.Fatalln("client.Unpublish:", err)
+		}
+
+		pp(resp, err)
 	}
 }
