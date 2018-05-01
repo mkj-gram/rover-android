@@ -3,30 +3,28 @@ package main
 import (
 	"context"
 	"io/ioutil"
-	"net/http"
-	"runtime"
-	"strings"
-	"time"
-
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
+	"strings"
 	"syscall"
+
+	_ "github.com/lib/pq"
 
 	gerrors "cloud.google.com/go/errors"
 	"cloud.google.com/go/pubsub"
-	_ "github.com/lib/pq"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/namsral/flag"
 	"github.com/pkg/errors"
+	prom "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	prom "github.com/prometheus/client_golang/prometheus"
-	grpc_middleware "github.com/roverplatform/rover/go/grpc/middleware"
-
 	"github.com/roverplatform/rover/apis/go/notification/v1"
+	grpc_middleware "github.com/roverplatform/rover/go/grpc/middleware"
 	notification_grpc "github.com/roverplatform/rover/notification/grpc"
 	"github.com/roverplatform/rover/notification/postgres"
 	notification_pubsub "github.com/roverplatform/rover/notification/pubsub"
@@ -34,11 +32,11 @@ import (
 )
 
 var (
-	httpAddr = flag.String("http-addr", ":5080", "http address")
 	rpcAddr  = flag.String("rpc-addr", ":5100", "rpc address")
+	httpAddr = flag.String("http-addr", ":5080", "http address")
 
 	// Postgres
-	postgresDsn = flag.String("postgres-dsn", "postgres://postgres:@localhost/test?sslmode=disable", "postgres")
+	postgresDsn = flag.String("postgres-dsn", "postgres://postgres:@postgres:5432/notification_dev?sslmode=disable", "postgres")
 
 	// Scylla
 	scyllaDsn = flag.String("scylla-dsn", "", "scylla")
@@ -47,8 +45,8 @@ var (
 	gcpProjectID      = flag.String("gcp-project-id", "", "GCP PROJECT_ID")
 	gcpSvcAcctKeyPath = flag.String("gcp-service-account-key-path", "", "path to google service account key file")
 
-	// GCP pubsub
-	pubsubTopic = flag.String("pubsub-topic", "notifications", "GCP pubsub's subscription name")
+	// GCP PubSub
+	pubsubTopic = flag.String("pubsub-topic", "notifications", "GCP pubsub's topic name")
 )
 
 var (
@@ -75,8 +73,9 @@ func main() {
 	flag.Parse()
 
 	var (
-		ctx, cancelFn = context.WithCancel(context.Background())
+		isProduction = strings.Contains(*gcpProjectID, "-prod")
 
+		ctx, cancelFn                   = context.WithCancel(context.Background())
 		readinessProbes, livenessProbes []func() error
 
 		unaryMiddleware = []grpc.UnaryServerInterceptor{
@@ -89,7 +88,7 @@ func main() {
 	//
 	// Logs
 	//
-	if !strings.Contains(*gcpProjectID, "-prod") {
+	if !isProduction {
 		// development
 		verboseLog.SetOutput(os.Stdout)
 	}
@@ -103,31 +102,9 @@ func main() {
 	}
 
 	//
-	// GCP Pubsub
-	//
-
-	pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, gcpClientOpts...)
-	if err != nil {
-		stderr.Fatalf("pubsub.NewClient: %v", err)
-	} else {
-		stdout.Println("gcp.pubsub=on")
-	}
-
-	publisherTopic := pubsubClient.Topic(*pubsubTopic)
-	defer publisherTopic.Stop()
-
-	publisherTopic.PublishSettings = pubsub.PublishSettings{
-		DelayThreshold: 1 * time.Millisecond,
-		CountThreshold: 100,
-		ByteThreshold:  1e6,
-		Timeout:        60 * time.Second,
-	}
-
-	//
 	// GCP errors
 	//
-
-	if *gcpProjectID != "" {
+	if isProduction {
 		errClient, err := gerrors.NewClient(ctx, *gcpProjectID, "notification/service", "v1", true, gcpClientOpts...)
 		if err != nil {
 			stderr.Fatalf("errors.NewClient: %v", err)
@@ -151,12 +128,27 @@ func main() {
 	}
 
 	//
+	// GCP Pubsub
+	//
+
+	pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, gcpClientOpts...)
+	if err != nil {
+		stderr.Fatalf("pubsub.NewClient: %v", err)
+	} else {
+		stdout.Println("pubsub connected")
+	}
+	topic := pubsubClient.Topic(*pubsubTopic)
+	stdout.Printf("pubsub:topic %s\n", topic.String())
+	publisher := &notification_pubsub.Publisher{Topic: topic}
+
+	//
 	// Postgres
 	//
 	pg, err := postgres.Open(*postgresDsn)
 	if err != nil {
 		stderr.Fatalln("postgres.Open", err)
 	}
+	stdout.Println("postgres connected")
 
 	pgProbe := func() error {
 		if err := pg.DB().Ping(); err != nil {
@@ -168,7 +160,7 @@ func main() {
 	stdout.Println("postgres=on")
 
 	readinessProbes = append(readinessProbes, pgProbe)
-	// livenessProbes = append(livenessProbes, pgProbe)
+	livenessProbes = append(livenessProbes, pgProbe)
 
 	//
 	// Scylla
@@ -188,21 +180,18 @@ func main() {
 	}
 
 	readinessProbes = append(readinessProbes, scyllaProbe)
-	// livenessProbes = append(livenessProbes, scyllaProbe)
+	livenessProbes = append(livenessProbes, scyllaProbe)
 
 	//
 	// Notification Server
 	//
-
 	server := &notification_grpc.Server{
 		PlatformServer: notification_grpc.PlatformServer{
 			DB: pg,
 		},
 		NotificationServer: notification_grpc.NotificationServer{
-			DB: &ScyllaStore{db: scyllaDB},
-			Publisher: &notification_pubsub.Publisher{
-				Topic: publisherTopic,
-			},
+			DB:        &ScyllaStore{db: scyllaDB},
+			Publisher: publisher,
 		},
 	}
 
@@ -228,6 +217,7 @@ func main() {
 			stderr.Fatalf("net.Listen=exiting status=error error=%q\n", err)
 		}
 
+		stdout.Printf("grpc listening on %s\n", *rpcAddr)
 		if err := grpcServer.Serve(lis); err != nil {
 			stderr.Printf("grpc.server=exiting status=error error=%q\n", err)
 		} else {
@@ -255,6 +245,9 @@ func main() {
 				w.WriteHeader(200)
 				w.Write([]byte("ok"))
 			}
+		}
+		if err := http.ListenAndServe(*httpAddr, nil); err != nil {
+			stderr.Fatalln("http.ListenAndServe", err)
 		}
 
 		http.Handle("/metrics", prom.Handler())

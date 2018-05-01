@@ -44,7 +44,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&tCfg.DSN, "postgres-test-dsn", ``, "test DSN")
+	flag.StringVar(&tCfg.DSN, "test-postgres-dsn", ``, "test DSN")
 
 	flag.StringVar(&tCfg.fixtures.Path, "fixtures-path", `../postgres/testdata/fixtures.sql`, "path to migrations")
 

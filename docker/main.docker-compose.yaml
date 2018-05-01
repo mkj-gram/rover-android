@@ -190,13 +190,14 @@ services:
       - ../:/go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
-      PUBSUB_EMULATOR_HOST: "pubsub:8085"
-      
-      SCYLLA_DSN: "scylla://scylla:9042/notification_dev"
-      TEST_SCYLLA_DSN: "scylla://scylla:9042/notification_test?timeout=15s"
 
       POSTGRES_DSN: "postgres://postgres:@postgres:5432/notification_dev?sslmode=disable"
-      POSTGRES_TEST_DSN: "postgres://postgres:@postgres:5432/notification_test?sslmode=disable"
+      TEST_POSTGRES_DSN: "postgres://postgres:@postgres:5432/notification_test?sslmode=disable"
+      SCYLLA_DSN: "scylla://scylla:9042/notification_dev"
+      TEST_SCYLLA_DSN: "scylla://scylla:9042/notification_test?timeout=5s"
+      GCP_PROJECT_ID: "rover-development"
+      PUBSUB_EMULATOR_HOST: "pubsub:8085"
+      PUBSUB_TOPIC: "notification-service-dev-topic"
 
 
   campaigns-frontend:
