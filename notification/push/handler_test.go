@@ -118,7 +118,7 @@ func ts(t *testing.T, s string) time.Time {
 func TestHandler(t *testing.T) {
 
 	var (
-		sdkVersion = notification_pubsub.Version{Major: 1, Minor: 2, Revision: 3}
+		sdkVersion = notification_pubsub.Version{Major: 2, Minor: 2, Revision: 3}
 		ctx        = context.TODO()
 
 		timeNow = time.Now()
@@ -169,7 +169,129 @@ func TestHandler(t *testing.T) {
 		expErr error
 	}{
 		{
-			desc: "FCM request",
+			desc: "FCM sdk 1.0 request",
+
+			message: &notification_pubsub.PushMessage{
+				CampaignID:        1,
+				NotificationBody:  "a body",
+				NotificationTitle: "a title",
+				Device: notification_pubsub.Device{
+					AccountID:            1,
+					AppNamespace:         "hello",
+					BadgeCount:           2,
+					ID:                   "device_id",
+					OsName:               "Android",
+					PushToken:            "pushtoken",
+					PushTokenEnvironment: "production",
+					SdkVersion:           notification_pubsub.Version{Major: 1},
+				},
+			},
+
+			expReq: &HTTPRequest{
+				Headers: http.Header{
+					"User-Agent":      []string{"Go-http-client/1.1"},
+					"Content-Length":  []string{"486"},
+					"Authorization":   []string{"key=server_key"},
+					"Content-Type":    []string{"application/json"},
+					"Accept-Encoding": []string{"gzip"},
+				},
+				Body: M{
+					"to":           "pushtoken",
+					"collapse_key": "channel-id",
+
+					"data": M{
+						"_rover": true,
+						"message": M{
+							"id":   "09702289-4329-11e8-a214-784f43835469",
+							"type": "messages",
+							"attributes": M{
+								"notification-text": "a body",
+								"ios-title":         "a title",
+								"android-title":     "a title",
+								"tags":              []interface{}{},
+								"read":              false,
+								"saved-to-inbox":    false,
+								"content-type":      "experience",
+								"deep-link-url":     "",
+								"website-url":       "",
+								"properties": M{
+									"value1": "something",
+									"value2": "another",
+								},
+								"experience-id": "5b10eda90000000000000000",
+								"timestamp":     "2018-04-18T16:53:36.5864073Z",
+							},
+						},
+					},
+				},
+			},
+
+			serverResponse: func(rw http.ResponseWriter, req *http.Request) {
+				rw.WriteHeader(http.StatusOK)
+				rw.Header().Set("Content-Type", "application/json")
+				fmt.Fprint(rw, `{
+													"success": 1,
+													"failure":0,
+													"results": [{
+														"message_id":"q1w2e3r4",
+														"registration_id": "t5y6u7i8o9",
+														"error": ""
+													}]
+												}`)
+			},
+
+			setupMocks: func(m mocked) {
+
+				m.MocknotificationSettingsStore.
+					EXPECT().OneById(ctx, int32(1)).
+					Return(
+						makeNotificationSettings(func(t *scylla.NotificationSettings) {
+							t.TapBehaviorType = scylla.TapBehaviorType_OPEN_EXPERIENCE
+							t.ExperienceId = "5b10eda90000000000000000"
+						}),
+						nil,
+					)
+
+				notification := scylla.Notification{
+					AccountId:  1,
+					CampaignId: 1,
+					DeviceId:   "device_id",
+					Id:         uuid(t, "09702289-4329-11e8-a214-784f43835469"),
+					IsDeleted:  false,
+					IsRead:     false,
+					Body:       "a body",
+					Title:      "a title",
+				}
+
+				m.MocknotificationsStore.
+					EXPECT().Create(ctx, &notification).
+					Return(
+						nil,
+					)
+
+				m.MockAndroidPlatformStore.
+					EXPECT().
+					ListByAccountId(ctx, int32(1)).
+					Return(
+						[]*postgres.AndroidPlatform{
+							&postgres.AndroidPlatform{
+								Id:        1,
+								AccountId: 1,
+								CreatedAt: timeNow,
+								UpdatedAt: timeNow,
+								Title:     "a key",
+								PushCredentialsSenderId:  "server_sender_id",
+								PushCredentialsServerKey: "server_key",
+								PushCredentialsUpdatedAt: timeNow,
+							},
+						},
+						nil,
+					)
+			},
+		},
+
+		{
+			desc: "FCM sdk 2.0 request",
 
 			message: &notification_pubsub.PushMessage{
 				CampaignID:        1,
@@ -284,7 +406,135 @@ func TestHandler(t *testing.T) {
 		},
 
 		{
-			desc: "APNS request",
+			desc: "APNS sdk 1.0 request",
+
+			message: &notification_pubsub.PushMessage{
+				CampaignID:        1,
+				NotificationBody:  "a body",
+				NotificationTitle: "a title",
+				Device: notification_pubsub.Device{
+					AccountID:            1,
+					AppNamespace:         "io.rover.Bagel",
+					BadgeCount:           2,
+					ID:                   "device_id",
+					OsName:               "iOS",
+					PushToken:            "pushtoken",
+					PushTokenEnvironment: "test",
+					SdkVersion:           notification_pubsub.Version{Major: 1},
+				},
+			},
+
+			expReq: &HTTPRequest{
+
+				Headers: http.Header{
+					"User-Agent":       []string{"Go-http-client/1.1"},
+					"Content-Length":   []string{"608"},
+					"Apns-Collapse-Id": []string{"thread"},
+					"Apns-Id":          []string{"09702289-4329-11e8-a214-784f43835469"},
+					"Apns-Topic":       []string{"io.rover.Bagel"},
+					"Content-Type":     []string{"application/json; charset=utf-8"},
+					"Accept-Encoding":  []string{"gzip"},
+				},
+				Body: M{
+					"aps": M{
+						"alert": M{
+							"body":  "a body",
+							"title": "a title",
+						},
+						"badge":             float64(2),
+						"category":          "category",
+						"content-available": float64(1),
+						"mutable-content":   float64(1),
+						"sound":             "sound-file.wav",
+						"thread-id":         "thread",
+					},
+					"_rover": true,
+					"data": M{
+						"id":   "09702289-4329-11e8-a214-784f43835469",
+						"type": "messages",
+						"attributes": M{
+							"notification-text": "a body",
+							"ios-title":         "a title",
+							"android-title":     "a title",
+							"tags":              []interface{}{},
+							"read":              false,
+							"saved-to-inbox":    false,
+							"content-type":      "website",
+							"deep-link-url":     "https://google.ca",
+							"website-url":       "https://google.ca",
+							"properties": M{
+								"value1": "something",
+								"value2": "another",
+							},
+							"experience-id": "",
+							"timestamp":     "2018-04-18T16:53:36.5864073Z",
+						},
+					},
+				},
+			},
+
+			serverResponse: func(rw http.ResponseWriter, req *http.Request) {
+				rw.WriteHeader(http.StatusOK)
+			},
+
+			setupMocks: func(m mocked) {
+
+				m.MocknotificationSettingsStore.
+					EXPECT().OneById(ctx, int32(1)).
+					Return(
+						makeNotificationSettings(func(t *scylla.NotificationSettings) {
+							t.TapBehaviorType = scylla.TapBehaviorType_OPEN_WEBSITE
+							t.TapBehaviorUrl = "https://google.ca"
+							t.ExperienceId = ""
+						}),
+						nil,
+					)
+
+				notification := scylla.Notification{
+					AccountId:  1,
+					CampaignId: 1,
+					DeviceId:   "device_id",
+					Id:         uuid(t, "09702289-4329-11e8-a214-784f43835469"),
+					IsDeleted:  false,
+					IsRead:     false,
+					Body:       "a body",
+					Title:      "a title",
+				}
+
+				m.MocknotificationsStore.
+					EXPECT().Create(ctx, &notification).
+					Return(
+						nil,
+					)
+
+				m.MockIosPlatformStore.
+					EXPECT().
+					ListByAccountId(ctx, int32(1)).
+					Return(
+						[]*postgres.IosPlatform{
+							&postgres.IosPlatform{
+								Id:        1,
+								AccountId: 1,
+
+								CreatedAt: timeNow,
+								UpdatedAt: timeNow,
+
+								BundleId: "io.rover.Bagel",
+
+								CertificateData:       toBase64(t, certP12(t, "../grpc/testdata/io.rover.Bagel.p12")),
+								CertificateFilename:   "cert2",
+								CertificatePassphrase: "",
+								CertificateExpiresAt:  ts(t, "2018-10-28T13:15:13-04:00"),
+								CertificateUpdatedAt:  timeNow,
+							},
+						},
+						nil,
+					)
+			},
+		},
+
+		{
+			desc: "APNS sdk 2.0 request",
 
 			message: &notification_pubsub.PushMessage{
 				CampaignID:        1,

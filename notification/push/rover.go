@@ -26,7 +26,7 @@ type RoverNotification struct {
 	Attachment *Attachment `json:"attachment,omitempty"`
 	ActionInfo *ActionInfo `json:"actionInfo,omitempty"`
 
-	DelivetedAt time.Time  `json:"deliveredAt"`
+	DeliveredAt time.Time  `json:"deliveredAt"`
 	ExpiresAt   *time.Time `json:"expiresAt"`
 
 	IsRead                      bool `json:"isRead"`
@@ -51,7 +51,7 @@ func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Not
 		// TODO:
 		ActionInfo: &ActionInfo{},
 
-		DelivetedAt: note.CreatedAt(),
+		DeliveredAt: note.CreatedAt(),
 
 		// TODO?
 		ExpiresAt: nil,
@@ -60,5 +60,61 @@ func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Not
 
 		IsDeleted: note.IsDeleted,
 		IsRead:    note.IsRead,
+	}
+}
+
+type LegacyRoverNotification struct {
+	ID         string                       `json:"id"`
+	Type       string                       `json:"type"`
+	Attributes LegacyNotificationAttributes `json:"attributes"`
+}
+
+type LegacyNotificationAttributes struct {
+	NotificationText string            `json:"notification-text"`
+	IosTitle         string            `json:"ios-title"`
+	AndroidTitle     string            `json:"android-title"`
+	Tags             []string          `json:"tags"`
+	Read             bool              `json:"read"`
+	SavedToInbox     bool              `json:"saved-to-inbox"`
+	ContentType      string            `json:"content-type"`
+	WebsiteURL       string            `json:"website-url"`
+	DeepLinkURL      string            `json:"deep-link-url"`
+	Timestamp        time.Time         `json:"timestamp"`
+	Properties       map[string]string `json:"properties"`
+	ExperienceID     string            `json:"experience-id"`
+}
+
+func ToLegacyRoverNotification(settings *scylla.NotificationSettings, note *scylla.Notification) *LegacyRoverNotification {
+	var contentType string
+	switch settings.TapBehaviorType {
+	case scylla.TapBehaviorType_OPEN_APP:
+		contentType = "custom"
+	case scylla.TapBehaviorType_OPEN_DEEP_LINK:
+		contentType = "deep-link"
+	case scylla.TapBehaviorType_OPEN_WEBSITE:
+		contentType = "website"
+	case scylla.TapBehaviorType_OPEN_EXPERIENCE:
+		contentType = "experience"
+	default:
+		contentType = "custom"
+	}
+
+	return &LegacyRoverNotification{
+		ID:   note.Id.String(),
+		Type: "messages",
+		Attributes: LegacyNotificationAttributes{
+			NotificationText: note.Body,
+			IosTitle:         note.Title,
+			AndroidTitle:     note.Title,
+			Tags:             []string{},
+			Read:             false,
+			SavedToInbox:     settings.AlertOptionNotificationCenter,
+			ContentType:      contentType,
+			WebsiteURL:       settings.TapBehaviorUrl,
+			DeepLinkURL:      settings.TapBehaviorUrl,
+			Timestamp:        note.CreatedAt(),
+			Properties:       settings.Attributes,
+			ExperienceID:     settings.ExperienceId,
+		},
 	}
 }

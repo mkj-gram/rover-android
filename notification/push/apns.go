@@ -96,12 +96,24 @@ func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationS
 	case *notification_pubsub.PushMessage:
 		req.DeviceToken = msg.Device.PushToken
 		req.Topic = msg.Device.AppNamespace
-		req.Payload = M{
-			"aps": alert(msg),
-			"rover": M{
-				"notification": ToRoverNotification(settings, note),
-			},
+
+		var payload M
+		if msg.Device.SdkVersion.Major == 1 {
+			payload = M{
+				"aps":    alert(msg),
+				"_rover": true,
+				"data":   ToLegacyRoverNotification(settings, note),
+			}
+		} else {
+			payload = M{
+				"aps": alert(msg),
+				"rover": M{
+					"notification": ToRoverNotification(settings, note),
+				},
+			}
 		}
+
+		req.Payload = payload
 	case *notification_pubsub.SilentPush:
 		req.DeviceToken = msg.Device.PushToken
 		req.Topic = msg.Device.AppNamespace

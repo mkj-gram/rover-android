@@ -53,7 +53,7 @@ func Test_RoverPayload_MarshalJSON(t *testing.T) {
 					Attributes: map[string]string{"a": "1"},
 					Type:       "openURL",
 				},
-				DelivetedAt: *ts(t, "2018-03-01T01:02:03Z"),
+				DeliveredAt: *ts(t, "2018-03-01T01:02:03Z"),
 				ExpiresAt:   ts(t, "2017-03-01T01:02:03Z"),
 
 				IsRead:                      true,

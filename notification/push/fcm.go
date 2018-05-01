@@ -32,11 +32,21 @@ func ToFCMRequest(m notification_pubsub.Message, settings *scylla.NotificationSe
 		// }
 
 		req.To = msg.Device.PushToken
-		req.Data = M{
-			"rover": M{
-				"notification": ToRoverNotification(settings, note),
-			},
+
+		var payload M
+		if msg.Device.SdkVersion.Major == 1 {
+			payload = M{
+				"_rover":  true,
+				"message": ToLegacyRoverNotification(settings, note),
+			}
+		} else {
+			payload = M{
+				"rover": M{
+					"notification": ToRoverNotification(settings, note),
+				},
+			}
 		}
+		req.Data = payload
 	case *notification_pubsub.SilentPush:
 		req.To = msg.Device.PushToken
 		req.Data = M{
