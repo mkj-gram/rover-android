@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sideshow/apns2"
+
 	notification_pubsub "github.com/roverplatform/rover/notification/pubsub"
 	"github.com/roverplatform/rover/notification/scylla"
-	"github.com/sideshow/apns2"
 )
 
 type (
@@ -69,7 +70,7 @@ func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationS
 					// URLArgs
 					// only for silent push
 					ContentAvailable: boolToInt(settings.IosContentAvailable),
-					MutableContent:   boolToInt(settings.IosMutableContent),
+					MutableContent:   1,
 					Sound:            settings.IosSound,
 					ThreadID:         settings.IosThreadIdentifier,
 					Category:         settings.IosCategoryIdentifier,
@@ -128,16 +129,24 @@ func sendAPNSRequest(ctx context.Context, client *apns2.Client, req *apns2.Notif
 		return errors.Wrap(err, "apns.Push")
 	}
 
-	if resp.Sent() {
-		return nil
-	}
+	metrics.pushResponseStatus.WithLabelValues("apns", fmt.Sprintf("%d", resp.StatusCode)).Inc()
 
-	metrics.pushErrors.WithLabelValues("apns", fmt.Sprintf("%d", resp.StatusCode)).Inc()
-
-	// TODO: clarify which is retryable
-	err = errors.Errorf("status=%d reason=%q", resp.StatusCode, resp.Reason)
-	if resp.StatusCode >= 500 && resp.StatusCode < 600 {
+	err = errors.Errorf("status=%d reason=%q apns_id=%q", resp.StatusCode, resp.Reason, resp.ApnsID)
+	switch {
+	case resp.StatusCode >= 500 && resp.StatusCode < 600:
+		// service errors
 		return retryable{error: err}
+	case resp.StatusCode >= 400 && resp.StatusCode < 500:
+		// client errors
+		return err
+	case resp.StatusCode >= 300 && resp.StatusCode < 400:
+		// redirection
+		return err
+	case resp.StatusCode >= 200 && resp.StatusCode < 300:
+		// success
+		return nil
+	default:
+		return err
 	}
 
 	return nil

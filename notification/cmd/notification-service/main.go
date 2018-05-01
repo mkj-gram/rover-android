@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"runtime"
+	"strings"
+	"time"
 
 	"log"
 	"net"
@@ -13,6 +15,7 @@ import (
 	"syscall"
 
 	gerrors "cloud.google.com/go/errors"
+	"cloud.google.com/go/pubsub"
 	_ "github.com/lib/pq"
 	"github.com/namsral/flag"
 	"github.com/pkg/errors"
@@ -26,6 +29,7 @@ import (
 	"github.com/roverplatform/rover/apis/go/notification/v1"
 	notification_grpc "github.com/roverplatform/rover/notification/grpc"
 	"github.com/roverplatform/rover/notification/postgres"
+	notification_pubsub "github.com/roverplatform/rover/notification/pubsub"
 	"github.com/roverplatform/rover/notification/scylla"
 )
 
@@ -42,6 +46,9 @@ var (
 	// GCP
 	gcpProjectID      = flag.String("gcp-project-id", "", "GCP PROJECT_ID")
 	gcpSvcAcctKeyPath = flag.String("gcp-service-account-key-path", "", "path to google service account key file")
+
+	// GCP pubsub
+	pubsubTopic = flag.String("pubsub-topic", "notifications", "GCP pubsub's subscription name")
 )
 
 var (
@@ -82,7 +89,7 @@ func main() {
 	//
 	// Logs
 	//
-	if *gcpProjectID == "" {
+	if !strings.Contains(*gcpProjectID, "-prod") {
 		// development
 		verboseLog.SetOutput(os.Stdout)
 	}
@@ -96,11 +103,32 @@ func main() {
 	}
 
 	//
+	// GCP Pubsub
+	//
+
+	pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, gcpClientOpts...)
+	if err != nil {
+		stderr.Fatalf("pubsub.NewClient: %v", err)
+	} else {
+		stdout.Println("gcp.pubsub=on")
+	}
+
+	publisherTopic := pubsubClient.Topic(*pubsubTopic)
+	defer publisherTopic.Stop()
+
+	publisherTopic.PublishSettings = pubsub.PublishSettings{
+		DelayThreshold: 1 * time.Millisecond,
+		CountThreshold: 100,
+		ByteThreshold:  1e6,
+		Timeout:        60 * time.Second,
+	}
+
+	//
 	// GCP errors
 	//
 
 	if *gcpProjectID != "" {
-		errClient, err := gerrors.NewClient(ctx, *gcpProjectID, "notification/push-worker", "v1", true, gcpClientOpts...)
+		errClient, err := gerrors.NewClient(ctx, *gcpProjectID, "notification/service", "v1", true, gcpClientOpts...)
 		if err != nil {
 			stderr.Fatalf("errors.NewClient: %v", err)
 		} else {
@@ -110,12 +138,11 @@ func main() {
 		unaryMiddleware = append(unaryMiddleware, func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 			defer func() {
 				if val := recover(); val != nil {
-					var (
-						buf = make([]byte, 1024*10)
-						n   = runtime.Stack(buf, false)
-					)
-					stderr.Printf("status=panic panic=%q trace=%q\n", val, string(buf[:n]))
-					errClient.Reportf(ctx, nil, "status=panic error=%q", err)
+					trace := make([]byte, 1024*10)
+					trace = trace[:runtime.Stack(trace, false)]
+
+					stderr.Printf("status=panic panic=%q trace=%q\n", val, string(trace))
+					errClient.Reportf(ctx, nil, "status=panic error=%q", val)
 					panic(val)
 				}
 			}()
@@ -173,6 +200,9 @@ func main() {
 		},
 		NotificationServer: notification_grpc.NotificationServer{
 			DB: &ScyllaStore{db: scyllaDB},
+			Publisher: &notification_pubsub.Publisher{
+				Topic: publisherTopic,
+			},
 		},
 	}
 
@@ -249,16 +279,16 @@ func main() {
 	// Signals
 	//
 
-	log.Println("status=started")
+	stdout.Println("status=started")
 	select {
 	case <-ctx.Done():
-		log.Printf("status=cancel error=%q\n", ctx.Err())
+		stderr.Printf("status=cancel error=%q\n", ctx.Err())
 	case sig := <-sigc:
-		log.Printf("status=signal signal=%v\n", sig)
+		stdout.Printf("status=signal signal=%v\n", sig)
 		cancelFn()
 	}
 
 	grpcServer.GracefulStop()
 
-	log.Println("status=done")
+	stdout.Println("status=done")
 }

@@ -3,18 +3,6 @@
 	"ignore": "test",
 	"package": [
 		{
-			"path": "appengine",
-			"revision": ""
-		},
-		{
-			"path": "appengine_internal",
-			"revision": ""
-		},
-		{
-			"path": "appengine_internal/base",
-			"revision": ""
-		},
-		{
 			"checksumSHA1": "AH7jcN7pvaPDU6UjHdpT081DDGk=",
 			"path": "cloud.google.com/go/compute/metadata",
 			"revision": "7eaaec940b71769743a0d2848381a596475db704",
@@ -1015,10 +1003,6 @@
 			"path": "gopkg.in/olivere/elastic.v5/uritemplates",
 			"revision": "edbef41beaacc2ee95e61af8faff04e67c01e268",
 			"revisionTime": "2017-08-01T07:38:22Z"
-		},
-		{
-			"path": "https://github.com/appleboy/go-fcm",
-			"revision": ""
 		}
 	],
 	"rootPath": "github.com/roverplatform/rover"

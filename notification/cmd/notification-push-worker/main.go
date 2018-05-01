@@ -2,16 +2,19 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
 
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/pkcs12"
 
 	gerrors "cloud.google.com/go/errors"
 	"cloud.google.com/go/pubsub"
@@ -41,6 +44,10 @@ var (
 	// PlatformCache
 	platformsCacheMaxSize = flag.Int("platforms-cache-max-size", 1000, "max items to cache")
 	platformsCacheMaxAge  = flag.Duration("platforms-cache-max-age", time.Duration(5*time.Minute), "max age to cache")
+
+	// Rover Inbox
+	roverInboxCertificateData = flag.String("rover-inbox-cert-data", "", "rover inbox certificate data")
+	roverInboxCertificatePass = flag.String("rover-inbox-cert-pass", "", "rover inbox certificate pass")
 
 	// worker concurrency
 	workerConcurrency = flag.Int("worker-concurrency", 10, "worker concurrency")
@@ -136,6 +143,10 @@ func main() {
 	// we don't want worker to be taken down if pgProbe fails?
 	// livenessProbes = append(livenessProbes, pgProbe)
 
+	if *roverInboxCertificateData != "" {
+		postgres.RoverInboxIosPlatform = mustParsePlatform(*roverInboxCertificateData, *roverInboxCertificatePass)
+	}
+
 	//
 	// scylla
 	//
@@ -188,21 +199,37 @@ func main() {
 
 		instrument = func(h notification_pubsub.ReceiverFunc) notification_pubsub.ReceiverFunc {
 			return notification_pubsub.ReceiverFunc(func(ctx context.Context, m notification_pubsub.Message) error {
+				var (
+					err   error
+					start = time.Now()
+				)
+
 				defer func() {
+					var (
+						dur = time.Since(start)
+					)
+
 					if val := recover(); val != nil {
-						var (
-							buf = make([]byte, 1024*10)
-							n   = runtime.Stack(buf, false)
-						)
-						stderr.Printf("status=panic panic=%q trace=%q\n", val, string(buf[:n]))
-						errClient.Reportf(ctx, nil, "status=error error=%q", err)
+						trace := make([]byte, 1024*10)
+						trace = trace[:runtime.Stack(trace, false)]
+
+						stderr.Printf("handler=handle dur=%v status=panic panic=%q trace=%q\n", dur, val, string(trace))
+						errClient.Reportf(ctx, nil, "handler=handle dur=%v status=error error=%q", dur, val)
+						return
+					}
+
+					if err != nil {
+						stderr.Printf("handler=handle dur=%v status=error error=%q\n", dur, err)
+					} else {
+						// TODO: use proper logs
+						if !strings.Contains(*gcpProjectID, "-prod") {
+							stdout.Printf("handler=handle dur=%v status=ok\n", dur)
+						}
 					}
 				}()
 
-				if err := h(ctx, m); err != nil {
-					stderr.Printf("status=error error=%q\n", err.Error())
-					return err
-				}
+				err = h(ctx, m)
+
 				return nil
 			})
 		}
@@ -278,8 +305,8 @@ func main() {
 
 		select {
 		case <-ctx.Done():
-		case <-sigc:
-			stdout.Printf("status=signal signal=%q\n", <-sigc)
+		case sig := <-sigc:
+			stdout.Printf("status=signal signal=%q\n", sig)
 			cancelFn()
 		}
 	}()
@@ -287,4 +314,33 @@ func main() {
 	stdout.Printf("status=started\n")
 	wg.Wait()
 	stdout.Printf("status=done\n")
+}
+
+func mustParsePlatform(data, pass string) *postgres.IosPlatform {
+	certData, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		panic(errors.Wrap(err, "base64.DecodeString"))
+	}
+
+	_ /*pkey*/, cert, err := pkcs12.Decode(certData, pass)
+	if err != nil {
+		panic(errors.Wrap(err, "pkcs12.Decode"))
+	}
+
+	now := time.Now()
+
+	return &postgres.IosPlatform{
+		Id:        0,
+		AccountId: 0,
+		Title:     "rover Inbox",
+
+		BundleId:              "io.rover.Inbox",
+		CertificateData:       data,
+		CertificateExpiresAt:  cert.NotAfter,
+		CertificatePassphrase: pass,
+		CertificateUpdatedAt:  now,
+
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
 }

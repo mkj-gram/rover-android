@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -169,7 +172,14 @@ func main() {
 	// audienceClient
 	//
 
-	conn, err := grpc.Dial(*audienceAddr, grpc.WithInsecure())
+	var (
+		clientOpts = []grpc.DialOption{
+			grpc.WithUnaryInterceptor(grpc.UnaryClientInterceptor(Logger(stdout))),
+			grpc.WithInsecure(),
+		}
+	)
+
+	conn, err := grpc.Dial(*audienceAddr, clientOpts...)
 	if err != nil {
 		stderr.Fatalln("grpc.Dial:", err)
 	}
@@ -177,7 +187,7 @@ func main() {
 
 	audienceClient := audiencepb.NewAudienceClient(conn)
 
-	nconn, err := grpc.Dial(*notificationAddr, grpc.WithInsecure())
+	nconn, err := grpc.Dial(*notificationAddr, clientOpts...)
 	if err != nil {
 		stderr.Fatalln("grpc.Dial:", err)
 	}
@@ -208,6 +218,7 @@ func main() {
 					// function call is required for defers to fire after
 					func() {
 						// release task PG's lock eventually
+
 						defer task.Done()
 
 						// Recover any panics and log/update task.Error
@@ -222,10 +233,10 @@ func main() {
 
 						stdout.Printf("%s job_id=%d status=starting\n", wn, task.ID)
 
-						start := time.Now()
 						// work
-						err := snw.Do(ctx, task)
-						dur := time.Now().Sub(start)
+						start := time.Now()
+						result, err := snw.Do(ctx, task)
+						dur := time.Since(start)
 
 						if err != nil {
 							jobsErrors.Inc()
@@ -234,7 +245,17 @@ func main() {
 							stdout.Printf("%s job_id=%d dur=%v status=OK \n", wn, task.ID, dur)
 						}
 
-						jobsStats.Observe(float64(dur / time.Second))
+						// TODO: use logger
+						if result != nil && !strings.Contains(*gcpProjectID, "production") {
+							data, err := json.Marshal(result)
+							if err != nil {
+								stderr.Printf("result=marshal status=error error=%q\n", err)
+							} else {
+								stdout.Printf("%s\n", string(data))
+							}
+						}
+
+						jobsStats.Observe(dur.Seconds())
 					}()
 				}
 			}
@@ -359,4 +380,39 @@ func main() {
 func statusOk(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(r.URL.Path + ":ok\n"))
+}
+
+type printer interface {
+	Printf(string, ...interface{})
+}
+
+func Logger(l printer) grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		var (
+			start = time.Now()
+			err   error
+		)
+
+		defer func() {
+			dur := time.Since(start)
+
+			if val := recover(); val != nil {
+				trace := make([]byte, 1024)
+				trace = trace[:runtime.Stack(trace, false)]
+
+				l.Printf("method=%s dur=%v req=%q status=panic panic=%q trace=%q", method, req, dur, val, string(trace))
+				panic(val)
+			}
+
+			if err != nil {
+				l.Printf("method=%s dur=%v req=%q status=error error=%q", method, req, dur, err)
+			} else {
+				l.Printf("method=%s dur=%v req=%q status=ok", method, req, dur)
+			}
+		}()
+
+		err = invoker(ctx, method, req, reply, cc, opts...)
+
+		return err
+	}
 }

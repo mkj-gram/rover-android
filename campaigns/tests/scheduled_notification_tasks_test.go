@@ -1025,7 +1025,7 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 
 			var (
 				exp, expErr = tc.after, tc.expErr
-				gotErr      = job.Do(context.TODO(), task)
+				_, gotErr   = job.Do(context.TODO(), task)
 				got         = &expect{
 					Task: fetchTask(t, pgpool, int64(exp.Task.ID)),
 				}

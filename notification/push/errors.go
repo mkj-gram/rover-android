@@ -17,6 +17,6 @@ type retryable struct {
 	error
 }
 
-func (r *retryable) RetryableError() error {
+func (r retryable) RetryableError() error {
 	return r.error
 }

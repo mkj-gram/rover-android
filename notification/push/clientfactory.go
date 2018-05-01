@@ -3,6 +3,7 @@ package push
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -55,27 +56,32 @@ func (c *ClientFactory) GetAPNSClient(ctx context.Context, acctId int32, bundleI
 		}
 	}
 
-	ps, err := c.IosPlatformsStore.ListByAccountId(ctx, acctId)
-	if err != nil {
-		return nil, errors.Wrap(err, "ListByAccountId")
-	}
+	var p *postgres.IosPlatform
 
-	platformByBundleId := func() *postgres.IosPlatform {
-		for i := range ps {
-			if ps[i].BundleId == bundleId {
-				return ps[i]
-			}
+	if bundleId == "io.rover.Inbox" {
+		p = postgres.RoverInboxIosPlatform
+	} else {
+		ps, err := c.IosPlatformsStore.ListByAccountId(ctx, acctId)
+		if err != nil {
+			return nil, errors.Wrap(err, "ListByAccountId")
 		}
-		return nil
+
+		for i := range ps {
+			if ps[i].BundleId != bundleId {
+				continue
+			}
+			p = ps[i]
+			break
+		}
 	}
 
-	var p = platformByBundleId()
 	if p == nil {
 		return nil, errors.Wrapf(ErrNotFound, "bundle=%q", bundleId)
 	}
 
 	var (
 		client *apns2.Client
+		err    error
 	)
 
 	if c.NewAPNSClient == nil {
@@ -156,14 +162,20 @@ func NewAPNSClient(p *postgres.IosPlatform) (*apns2.Client, error) {
 		)
 	}
 
-	pkey, cert, err := pkcs12.Decode([]byte(p.CertificateData), p.CertificatePassphrase)
+	certData, err := base64.StdEncoding.DecodeString(p.CertificateData)
+	if err != nil {
+		return nil, errors.Wrap(err, "base64.DecodeString")
+	}
+
+	pkey, cert, err := pkcs12.Decode(certData, p.CertificatePassphrase)
 	if err != nil {
 		return nil, errors.Wrap(err, "pkcs12.Decode")
 	}
 
 	tlsCert := tls.Certificate{
-		PrivateKey: pkey,
-		Leaf:       cert,
+		Certificate: [][]byte{cert.Raw},
+		PrivateKey:  pkey,
+		Leaf:        cert,
 	}
 
 	return apns2.NewClient(tlsCert), nil

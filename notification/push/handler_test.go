@@ -2,6 +2,7 @@ package push_test
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -33,6 +34,12 @@ func uuid(t *testing.T, str string) scylla.UUID {
 	}
 
 	return id
+}
+
+func toBase64(t *testing.T, data []byte) string {
+	t.Helper()
+
+	return base64.StdEncoding.EncodeToString(data)
 }
 
 func makeNotificationSettings(fn func(t *scylla.NotificationSettings)) *scylla.NotificationSettings {
@@ -388,7 +395,7 @@ func TestHandler(t *testing.T) {
 
 								BundleId: "io.rover.Bagel",
 
-								CertificateData:       string(certP12(t, "../grpc/testdata/io.rover.Bagel.p12")),
+								CertificateData:       toBase64(t, certP12(t, "../grpc/testdata/io.rover.Bagel.p12")),
 								CertificateFilename:   "cert2",
 								CertificatePassphrase: "",
 								CertificateExpiresAt:  ts(t, "2018-10-28T13:15:13-04:00"),

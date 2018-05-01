@@ -30,6 +30,11 @@ type (
 		Profiles   []*audiencepb.Profile
 
 		ChildTaskId int64
+
+		Notification struct {
+			Request       *notificationpb.SendCampaignNotificationRequest
+			ErrorMessages []string
+		}
 	}
 
 	Handler interface {
@@ -54,7 +59,7 @@ func (fn HandlerFunc) Handle(t *sn.Task, b Result) error {
 	return fn(t, b)
 }
 
-func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error {
+func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Result, error) {
 	// 1. Query for a new task on table scheduled_notification_task where status is not failed, completed or cancelled and run_at <= now()
 	//  2. Update task state to be IN_PROGRESS
 	//  3. Fetch the campaign from task.campaign_id
@@ -74,7 +79,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 
 	if sn.TaskState(task.State) == sn.TaskStateQueued {
 		if err := task.SetState(sn.TaskStateInProgress); err != nil {
-			return errors.Wrap(err, "SetState: inprogress")
+			return nil, errors.Wrap(err, "SetState: inprogress")
 		}
 	}
 
@@ -87,7 +92,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 			PermissionScopes: []string{"server"},
 		}
 
-		batch = Result{
+		batch = &Result{
 			AccountId:  acctId,
 			CampaignId: campaignId,
 		}
@@ -96,18 +101,34 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 	)
 
 	var (
-		processBatch = func(b Result) error {
+		isRetryable = func(err error) bool {
+			statuscode, ok := status.FromError(err)
+			if !ok {
+				return false
+			}
+
+			switch statuscode.Code() {
+			case codes.Canceled, codes.DeadlineExceeded, codes.ResourceExhausted, codes.Internal, codes.Unavailable:
+				return true
+			default:
+				return false
+			}
+		}
+
+		processBatch = func() error {
 
 			if err := task.SetState(sn.TaskStateCompleted); err != nil {
 				return errors.Wrap(err, "SetState: completed")
 			}
 
-			req, err := buildNotificationRequest(b, campaign)
+			req, err := buildNotificationRequest(batch, campaign)
 			if err != nil {
 				return errors.Wrap(err, "buildNotificationRequest")
 			}
 
 			req.AuthContext = authCtx
+
+			batch.Notification.Request = req
 
 			var (
 				backoff = &retry.Backoff{
@@ -133,15 +154,16 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 
 				resp, err := w.NotificationClient.SendCampaignNotification(ctx, req)
 				if err != nil {
-					if st, ok := status.FromError(err); ok && st.Code() == codes.InvalidArgument {
-						return errors.Wrap(err, "NotificationClient")
+					if isRetryable(err) {
+						attempt = attempt + 1
+						continue
 					}
+					return errors.Wrap(err, "NotificationClient")
 
-					attempt = attempt + 1
 				} else {
 					for _, r := range resp.GetResults() {
 						if r.Error == true {
-							// TODO log it out as an individual log
+							batch.Notification.ErrorMessages = append(batch.Notification.ErrorMessages, r.Message)
 						}
 					}
 
@@ -192,25 +214,11 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 			batch.Devices = devices
 			batch.Profiles = resp.Profiles
 
-			if err := processBatch(batch); err != nil {
+			if err := processBatch(); err != nil {
 				return errors.Wrap(err, "processBatch")
 			}
 
 			return nil
-		}
-
-		isRetryable = func(err error) bool {
-			statuscode, ok := status.FromError(err)
-			if !ok {
-				return false
-			}
-
-			switch statuscode.Code() {
-			case codes.Canceled, codes.DeadlineExceeded, codes.ResourceExhausted, codes.Internal, codes.Unavailable:
-				return true
-			default:
-				return false
-			}
 		}
 
 		handleNextBatch = func() error {
@@ -253,7 +261,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 			batch.Profiles = resp.Profiles
 			batch.ChildTaskId = childId
 
-			if err := processBatch(batch); err != nil {
+			if err := processBatch(); err != nil {
 				return errors.Wrap(err, "processBatch")
 			}
 
@@ -308,7 +316,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 			batch.Profiles = resp.Profiles
 			batch.ChildTaskId = childId
 
-			if err := processBatch(batch); err != nil {
+			if err := processBatch(); err != nil {
 				return errors.Wrap(err, "processBatch")
 			}
 
@@ -334,10 +342,10 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) error 
 			panic(err2.Error() + "\n\n SetError:" + err.Error())
 		}
 
-		return err
+		return batch, err
 	}
 
-	return nil
+	return batch, nil
 }
 
 // TODO: add RPC to bulk fetch by the ids
@@ -388,7 +396,7 @@ func buildQueryRequest(input interface{}) *audiencepb.QueryRequest {
 	panic(errors.Errorf("buildQueryRequest: unexpected input:%T, %v", input, input))
 }
 
-func buildNotificationRequest(b Result, c *campaigns.Campaign) (*notificationpb.SendCampaignNotificationRequest, error) {
+func buildNotificationRequest(b *Result, c *campaigns.Campaign) (*notificationpb.SendCampaignNotificationRequest, error) {
 
 	var messages = make([]*notificationpb.SendCampaignNotificationRequest_Message, len(b.Devices))
 	for i, d := range b.Devices {
