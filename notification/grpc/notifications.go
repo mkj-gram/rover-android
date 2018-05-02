@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"github.com/pkg/errors"
-	"github.com/roverplatform/rover/apis/go/notification/v1"
+	notificationpb "github.com/roverplatform/rover/apis/go/notification/v1"
 	"github.com/roverplatform/rover/notification/pubsub"
 	"github.com/roverplatform/rover/notification/scylla"
 	"golang.org/x/net/context"
@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *NotificationServer) ListNotifications(ctx context.Context, req *notification.ListNotificationsRequest) (*notification.ListNotificationsResponse, error) {
+func (s *NotificationServer) ListNotifications(ctx context.Context, req *notificationpb.ListNotificationsRequest) (*notificationpb.ListNotificationsResponse, error) {
 	var (
 		accountID = req.GetAuthContext().GetAccountId()
 		deviceID  = req.GetDeviceId()
@@ -19,7 +19,7 @@ func (s *NotificationServer) ListNotifications(ctx context.Context, req *notific
 	notifications, err := s.DB.NotificationStore().List(ctx, accountID, deviceID)
 	if err != nil {
 		if err == scylla.ErrNotFound {
-			return &notification.ListNotificationsResponse{}, nil
+			return &notificationpb.ListNotificationsResponse{}, nil
 		}
 
 		return nil, status.Error(codes.Internal, err.Error())
@@ -45,7 +45,7 @@ func (s *NotificationServer) ListNotifications(ctx context.Context, req *notific
 		if err == scylla.ErrNotFound {
 			// TODO  log here NotFound means db is not in a correct state
 		}
-		return nil, status.Error(codes.Internal, errors.Wrap(err, "getNotificationSettingsByIds").Error())
+		return nil, status.Errorf(ErrToStatus(err), "getNotificationSettingsByIds: %v", err)
 	}
 
 	// index the settings by campaignID
@@ -55,17 +55,78 @@ func (s *NotificationServer) ListNotifications(ctx context.Context, req *notific
 	}
 
 	// now loop through notifications building them out into models
-	var notes = make([]*notification.ListNotificationsResponse_Notification, len(notifications))
+	var notes = make([]*notificationpb.NotificationItem, len(notifications))
 	for i := range notifications {
 		notes[i] = notificationToProto(notifications[i], settingsByCampaignID[notifications[i].CampaignId])
 	}
 
-	return &notification.ListNotificationsResponse{
+	return &notificationpb.ListNotificationsResponse{
 		Notifications: notes,
 	}, nil
 }
 
-func (s *NotificationServer) SendCampaignNotification(ctx context.Context, req *notification.SendCampaignNotificationRequest) (*notification.SendCampaignNotificationResponse, error) {
+func (s *NotificationServer) GetNotification(ctx context.Context, req *notificationpb.GetNotificationRequest) (*notificationpb.GetNotificationResponse, error) {
+	var (
+		accountID      = req.GetAuthContext().GetAccountId()
+		deviceID       = req.GetDeviceId()
+		notificationID = req.GetNotificationId()
+	)
+
+	note, err := s.DB.NotificationStore().OneById(ctx, accountID, deviceID, notificationID)
+	if err != nil {
+		return nil, status.Errorf(ErrToStatus(err), "OneById: %v", err)
+	}
+
+	settings, err := s.DB.NotificationSettingsStore().OneById(ctx, note.CampaignId)
+	if err != nil {
+		return nil, status.Errorf(ErrToStatus(err), "OneById: %v", err)
+	}
+
+	item := notificationToProto(note, settings)
+
+	return &notificationpb.GetNotificationResponse{
+		Notification: item,
+	}, nil
+}
+
+func (s *NotificationServer) UpdateNotificationReadStatus(ctx context.Context, req *notificationpb.UpdateNotificationReadStatusRequest) (*notificationpb.UpdateNotificationReadStatusResponse, error) {
+	var (
+		accountID      = req.GetAuthContext().GetAccountId()
+		deviceID       = req.GetDeviceId()
+		notificationID = req.GetNotificationId()
+		isRead         = req.GetRead()
+	)
+
+	_, err := s.DB.NotificationStore().OneById(ctx, accountID, deviceID, notificationID)
+	if err != nil {
+		return nil, status.Errorf(ErrToStatus(err), "OneById: %v", err)
+	}
+
+	err = s.DB.NotificationStore().SetReadStatus(ctx, accountID, deviceID, notificationID, isRead)
+	if err != nil {
+		return nil, status.Errorf(ErrToStatus(err), "SetReadStatus: %v", err)
+	}
+
+	return &notificationpb.UpdateNotificationReadStatusResponse{}, nil
+}
+
+func (s *NotificationServer) DeleteNotification(ctx context.Context, req *notificationpb.DeleteNotificationRequest) (*notificationpb.DeleteNotificationResponse, error) {
+	var (
+		accountID      = req.GetAuthContext().GetAccountId()
+		deviceID       = req.GetDeviceId()
+		notificationID = req.GetNotificationId()
+	)
+
+	err := s.DB.NotificationStore().Delete(ctx, accountID, deviceID, notificationID)
+	if err != nil {
+		return nil, status.Errorf(ErrToStatus(err), "Delete: %v", err)
+	}
+
+	return &notificationpb.DeleteNotificationResponse{}, nil
+
+}
+
+func (s *NotificationServer) SendCampaignNotification(ctx context.Context, req *notificationpb.SendCampaignNotificationRequest) (*notificationpb.SendCampaignNotificationResponse, error) {
 
 	var (
 		campaignID = req.GetCampaignId()
@@ -74,20 +135,17 @@ func (s *NotificationServer) SendCampaignNotification(ctx context.Context, req *
 	)
 
 	settings, err := s.DB.NotificationSettingsStore().OneById(ctx, campaignID)
-	if err != nil && err != scylla.ErrNotFound {
-		return nil, errors.Wrap(err, "OneById")
+	if err != nil && errors.Cause(err) != scylla.ErrNotFound {
+		return nil, status.Errorf(ErrToStatus(err), "OneById: %v", err)
 	}
 
 	if settings == nil {
 		if err = s.DB.NotificationSettingsStore().Create(ctx, notificationSettingsFromProto(req)); err != nil {
-			if _, ok := err.(*scylla.ValidationError); ok {
-				return nil, status.Error(codes.InvalidArgument, err.Error())
-			}
-			return nil, errors.Wrap(err, "Create")
+			return nil, status.Errorf(ErrToStatus(err), "Create: %v", err)
 		}
 	}
 
-	type result = notification.SendCampaignNotificationResponse_Result
+	type result = notificationpb.SendCampaignNotificationResponse_Result
 
 	var (
 		pubsubMessages = make([]pubsub.Message, len(messages))
@@ -107,12 +165,12 @@ func (s *NotificationServer) SendCampaignNotification(ctx context.Context, req *
 		}
 	}
 
-	return &notification.SendCampaignNotificationResponse{
+	return &notificationpb.SendCampaignNotificationResponse{
 		Results: results,
 	}, nil
 }
 
-func pubsubMessageFromProto(accountID int32, campaignID int32, m *notification.SendCampaignNotificationRequest_Message) *pubsub.PushMessage {
+func pubsubMessageFromProto(accountID int32, campaignID int32, m *notificationpb.SendCampaignNotificationRequest_Message) *pubsub.PushMessage {
 	return &pubsub.PushMessage{
 		CampaignID:        int(campaignID),
 		NotificationBody:  m.GetNotificationBody(),
@@ -151,8 +209,8 @@ func (s *NotificationServer) getNotificationSettingsByIds(ctx context.Context, c
 	return settings, nil
 }
 
-func notificationToProto(note *scylla.Notification, settings *scylla.NotificationSettings) *notification.ListNotificationsResponse_Notification {
-	return &notification.ListNotificationsResponse_Notification{
+func notificationToProto(note *scylla.Notification, settings *scylla.NotificationSettings) *notificationpb.NotificationItem {
+	return &notificationpb.NotificationItem{
 		Id:         note.Id.String(),
 		CampaignId: note.CampaignId,
 		Title:      note.Title,
@@ -162,49 +220,49 @@ func notificationToProto(note *scylla.Notification, settings *scylla.Notificatio
 		CreatedAt:  timeToProto(note.CreatedAt()),
 
 		// Static props
-		ExperienceId:               settings.ExperienceId,
-		NotificationAttachmentUrl:  settings.AttachmentUrl,
-		NotificationAttachmentType: attachmentTypeToProto(settings.AttachmentType),
+		ExperienceId:   settings.ExperienceId,
+		AttachmentUrl:  settings.AttachmentUrl,
+		AttachmentType: attachmentTypeToProto(settings.AttachmentType),
 
-		NotificationTapBehaviorUrl:              settings.TapBehaviorUrl,
-		NotificationTapBehaviorType:             notification.NotificationTapBehaviorType_Enum(notification.NotificationTapBehaviorType_Enum_value[string(settings.TapBehaviorType)]),
-		NotificationTapBehaviorPresentationType: notification.NotificationTapPresentationType_Enum(notification.NotificationTapPresentationType_Enum_value[string(settings.TapBehaviorPresentationType)]),
+		TapBehaviorUrl:              settings.TapBehaviorUrl,
+		TapBehaviorType:             notificationpb.NotificationTapBehaviorType_Enum(notificationpb.NotificationTapBehaviorType_Enum_value[string(settings.TapBehaviorType)]),
+		TapBehaviorPresentationType: notificationpb.NotificationTapPresentationType_Enum(notificationpb.NotificationTapPresentationType_Enum_value[string(settings.TapBehaviorPresentationType)]),
 
 		IsNotificationCenterEnabled: settings.AlertOptionNotificationCenter,
 	}
 }
 
-func attachmentTypeToProto(in scylla.AttachmentType) notification.NotificationAttachmentType_Enum {
+func attachmentTypeToProto(in scylla.AttachmentType) notificationpb.NotificationAttachmentType_Enum {
 	switch in {
 	case scylla.AttachmentType_NONE:
-		return notification.NotificationAttachmentType_UNKNOWN
+		return notificationpb.NotificationAttachmentType_UNKNOWN
 	case scylla.AttachmentType_AUDIO:
-		return notification.NotificationAttachmentType_AUDIO
+		return notificationpb.NotificationAttachmentType_AUDIO
 	case scylla.AttachmentType_IMAGE:
-		return notification.NotificationAttachmentType_IMAGE
+		return notificationpb.NotificationAttachmentType_IMAGE
 	case scylla.AttachmentType_VIDEO:
-		return notification.NotificationAttachmentType_VIDEO
+		return notificationpb.NotificationAttachmentType_VIDEO
 	default:
 		panic(errors.Errorf("unknown attachment type: %s", string(in)))
 	}
 }
 
-func attachmentTypeFromProto(in notification.NotificationAttachmentType_Enum) scylla.AttachmentType {
+func attachmentTypeFromProto(in notificationpb.NotificationAttachmentType_Enum) scylla.AttachmentType {
 	switch in {
-	case notification.NotificationAttachmentType_UNKNOWN:
+	case notificationpb.NotificationAttachmentType_UNKNOWN:
 		return scylla.AttachmentType_NONE
-	case notification.NotificationAttachmentType_AUDIO:
+	case notificationpb.NotificationAttachmentType_AUDIO:
 		return scylla.AttachmentType_AUDIO
-	case notification.NotificationAttachmentType_IMAGE:
+	case notificationpb.NotificationAttachmentType_IMAGE:
 		return scylla.AttachmentType_IMAGE
-	case notification.NotificationAttachmentType_VIDEO:
+	case notificationpb.NotificationAttachmentType_VIDEO:
 		return scylla.AttachmentType_VIDEO
 	default:
 		panic(errors.Errorf("unknown attachment type: %s", in.String()))
 	}
 }
 
-func notificationSettingsFromProto(in *notification.SendCampaignNotificationRequest) scylla.NotificationSettings {
+func notificationSettingsFromProto(in *notificationpb.SendCampaignNotificationRequest) scylla.NotificationSettings {
 
 	return scylla.NotificationSettings{
 		CampaignId: in.CampaignId,

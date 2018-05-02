@@ -71,6 +71,24 @@ func (mr *MockNotificationClientMockRecorder) CreateIosPlatform(arg0, arg1 inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIosPlatform", reflect.TypeOf((*MockNotificationClient)(nil).CreateIosPlatform), varargs...)
 }
 
+// DeleteNotification mocks base method
+func (m *MockNotificationClient) DeleteNotification(arg0 context.Context, arg1 *v1.DeleteNotificationRequest, arg2 ...grpc.CallOption) (*v1.DeleteNotificationResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteNotification", varargs...)
+	ret0, _ := ret[0].(*v1.DeleteNotificationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteNotification indicates an expected call of DeleteNotification
+func (mr *MockNotificationClientMockRecorder) DeleteNotification(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteNotification", reflect.TypeOf((*MockNotificationClient)(nil).DeleteNotification), varargs...)
+}
+
 // GetAndroidPlatform mocks base method
 func (m *MockNotificationClient) GetAndroidPlatform(arg0 context.Context, arg1 *v1.GetAndroidPlatformRequest, arg2 ...grpc.CallOption) (*v1.GetAndroidPlatformResponse, error) {
 	varargs := []interface{}{arg0, arg1}
@@ -105,6 +123,24 @@ func (m *MockNotificationClient) GetIosPlatform(arg0 context.Context, arg1 *v1.G
 func (mr *MockNotificationClientMockRecorder) GetIosPlatform(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIosPlatform", reflect.TypeOf((*MockNotificationClient)(nil).GetIosPlatform), varargs...)
+}
+
+// GetNotification mocks base method
+func (m *MockNotificationClient) GetNotification(arg0 context.Context, arg1 *v1.GetNotificationRequest, arg2 ...grpc.CallOption) (*v1.GetNotificationResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetNotification", varargs...)
+	ret0, _ := ret[0].(*v1.GetNotificationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNotification indicates an expected call of GetNotification
+func (mr *MockNotificationClientMockRecorder) GetNotification(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotification", reflect.TypeOf((*MockNotificationClient)(nil).GetNotification), varargs...)
 }
 
 // ListNotifications mocks base method
@@ -177,4 +213,22 @@ func (m *MockNotificationClient) UpdateIosPlatformPushCertificate(arg0 context.C
 func (mr *MockNotificationClientMockRecorder) UpdateIosPlatformPushCertificate(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateIosPlatformPushCertificate", reflect.TypeOf((*MockNotificationClient)(nil).UpdateIosPlatformPushCertificate), varargs...)
+}
+
+// UpdateNotificationReadStatus mocks base method
+func (m *MockNotificationClient) UpdateNotificationReadStatus(arg0 context.Context, arg1 *v1.UpdateNotificationReadStatusRequest, arg2 ...grpc.CallOption) (*v1.UpdateNotificationReadStatusResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateNotificationReadStatus", varargs...)
+	ret0, _ := ret[0].(*v1.UpdateNotificationReadStatusResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateNotificationReadStatus indicates an expected call of UpdateNotificationReadStatus
+func (mr *MockNotificationClientMockRecorder) UpdateNotificationReadStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNotificationReadStatus", reflect.TypeOf((*MockNotificationClient)(nil).UpdateNotificationReadStatus), varargs...)
 }

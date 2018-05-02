@@ -69,21 +69,6 @@ func (c *notificationsStore) OneById(ctx context.Context, acctId int32, deviceId
 	return &note, nil
 }
 
-func validateUUID(val interface{}) error {
-	uuid, ok := val.(UUID)
-	if !ok {
-		return errors.Wrap(ErrInvalid, "type")
-	}
-
-	for i := range uuid[:] {
-		if uuid[i] > 0 {
-			return nil
-		}
-	}
-
-	return errors.Wrap(ErrInvalid, "uuid")
-}
-
 func (c *notificationsStore) List(ctx context.Context, accountID int32, deviceID string) ([]*Notification, error) {
 
 	stmt, names := qb.
@@ -150,4 +135,85 @@ func (c *notificationsStore) Create(ctx context.Context, note *Notification) err
 	}
 
 	return nil
+}
+
+func (c *notificationsStore) SetReadStatus(ctx context.Context, accountID int32, deviceID string, notificationID string, isRead bool) error {
+	// TODO until we have LWT we need to manually check if it exists first
+	if _, err := c.OneById(ctx, accountID, deviceID, notificationID); err != nil {
+		return errors.Wrap(err, "OneById")
+	}
+
+	stmt, names := qb.
+		Update(notificationsTableName).
+		Where(
+			qb.Eq("id"),
+			qb.Eq("account_id"),
+			qb.Eq("device_id"),
+		).
+		Set("is_read").
+		// Existing(). TODO wait for LWT
+		ToCql()
+
+	q := gocqlx.
+		Query(c.session.Query(stmt).WithContext(ctx), names).
+		BindMap(qb.M{
+			"id":         notificationID,
+			"account_id": accountID,
+			"device_id":  deviceID,
+
+			"is_read": isRead,
+		})
+
+	if err := q.ExecRelease(); err != nil {
+		return errors.Wrap(err, "db.Set")
+	}
+
+	return nil
+}
+
+func (c *notificationsStore) Delete(ctx context.Context, accountID int32, deviceID string, notificationID string) error {
+
+	// Check that the notification exists
+	if _, err := c.OneById(ctx, accountID, deviceID, notificationID); err != nil {
+		return errors.Wrap(err, "OneById")
+	}
+
+	stmt, names := qb.
+		Delete(notificationsTableName).
+		Where(
+			qb.Eq("id"),
+			qb.Eq("account_id"),
+			qb.Eq("device_id"),
+		).
+		// Existing(). TODO wait for LWT
+		ToCql()
+
+	q := gocqlx.
+		Query(c.session.Query(stmt).WithContext(ctx), names).
+		BindMap(qb.M{
+			"id":         notificationID,
+			"account_id": accountID,
+			"device_id":  deviceID,
+		})
+
+	if err := q.ExecRelease(); err != nil {
+		return errors.Wrap(err, "db.Delete")
+	}
+
+	return nil
+}
+
+func validateUUID(val interface{}) error {
+	uuid, ok := val.(UUID)
+	if !ok {
+		return errors.Wrap(ErrInvalid, "type")
+	}
+
+	for i := range uuid[:] {
+		if uuid[i] > 0 {
+			return nil
+		}
+	}
+
+	return errors.Wrap(ErrInvalid, "uuid")
 }

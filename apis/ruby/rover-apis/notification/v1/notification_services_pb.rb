@@ -19,6 +19,9 @@ module Rover
           rpc :SendCampaignNotification, SendCampaignNotificationRequest, SendCampaignNotificationResponse
           # 
           rpc :ListNotifications, ListNotificationsRequest, ListNotificationsResponse
+          rpc :GetNotification, GetNotificationRequest, GetNotificationResponse
+          rpc :UpdateNotificationReadStatus, UpdateNotificationReadStatusRequest, UpdateNotificationReadStatusResponse
+          rpc :DeleteNotification, DeleteNotificationRequest, DeleteNotificationResponse
           # Crud
           # rpc ListPlatforms(ListPlatformsRequest) returns (ListPlatformResponse);
           #

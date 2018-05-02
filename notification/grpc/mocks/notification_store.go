@@ -6,9 +6,10 @@ package mocks
 
 import (
 	context "context"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	scylla "github.com/roverplatform/rover/notification/scylla"
-	reflect "reflect"
 )
 
 // MockNotificationStore is a mock of NotificationStore interface
@@ -34,6 +35,18 @@ func (m *MockNotificationStore) EXPECT() *MockNotificationStoreMockRecorder {
 	return m.recorder
 }
 
+// Delete mocks base method
+func (m *MockNotificationStore) Delete(arg0 context.Context, arg1 int32, arg2, arg3 string) error {
+	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete
+func (mr *MockNotificationStoreMockRecorder) Delete(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockNotificationStore)(nil).Delete), arg0, arg1, arg2, arg3)
+}
+
 // List mocks base method
 func (m *MockNotificationStore) List(arg0 context.Context, arg1 int32, arg2 string) ([]*scylla.Notification, error) {
 	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2)
@@ -45,4 +58,29 @@ func (m *MockNotificationStore) List(arg0 context.Context, arg1 int32, arg2 stri
 // List indicates an expected call of List
 func (mr *MockNotificationStoreMockRecorder) List(arg0, arg1, arg2 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockNotificationStore)(nil).List), arg0, arg1, arg2)
+}
+
+// OneById mocks base method
+func (m *MockNotificationStore) OneById(arg0 context.Context, arg1 int32, arg2, arg3 string) (*scylla.Notification, error) {
+	ret := m.ctrl.Call(m, "OneById", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(*scylla.Notification)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// OneById indicates an expected call of OneById
+func (mr *MockNotificationStoreMockRecorder) OneById(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OneById", reflect.TypeOf((*MockNotificationStore)(nil).OneById), arg0, arg1, arg2, arg3)
+}
+
+// SetReadStatus mocks base method
+func (m *MockNotificationStore) SetReadStatus(arg0 context.Context, arg1 int32, arg2, arg3 string, arg4 bool) error {
+	ret := m.ctrl.Call(m, "SetReadStatus", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetReadStatus indicates an expected call of SetReadStatus
+func (mr *MockNotificationStoreMockRecorder) SetReadStatus(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetReadStatus", reflect.TypeOf((*MockNotificationStore)(nil).SetReadStatus), arg0, arg1, arg2, arg3, arg4)
 }

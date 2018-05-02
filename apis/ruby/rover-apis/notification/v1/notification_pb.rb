@@ -79,28 +79,51 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :error, :bool, 1
     optional :message, :string, 2
   end
-  add_message "rover.notification.v1.ListNotificationsRequest" do
-    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
-    optional :device_id, :string, 2
-  end
-  add_message "rover.notification.v1.ListNotificationsResponse" do
-    repeated :notifications, :message, 1, "rover.notification.v1.ListNotificationsResponse.Notification"
-  end
-  add_message "rover.notification.v1.ListNotificationsResponse.Notification" do
+  add_message "rover.notification.v1.NotificationItem" do
     optional :id, :string, 1
     optional :campaign_id, :int32, 2
     optional :experience_id, :string, 3
     optional :title, :string, 4
     optional :body, :string, 5
-    optional :notification_attachment_url, :string, 6
-    optional :notification_attachment_type, :enum, 7, "rover.notification.v1.NotificationAttachmentType.Enum"
-    optional :notification_tap_behavior_url, :string, 8
-    optional :notification_tap_behavior_type, :enum, 9, "rover.notification.v1.NotificationTapBehaviorType.Enum"
-    optional :notification_tap_behavior_presentation_type, :enum, 10, "rover.notification.v1.NotificationTapPresentationType.Enum"
+    optional :attachment_url, :string, 6
+    optional :attachment_type, :enum, 7, "rover.notification.v1.NotificationAttachmentType.Enum"
+    optional :tap_behavior_url, :string, 8
+    optional :tap_behavior_type, :enum, 9, "rover.notification.v1.NotificationTapBehaviorType.Enum"
+    optional :tap_behavior_presentation_type, :enum, 10, "rover.notification.v1.NotificationTapPresentationType.Enum"
     optional :is_notification_center_enabled, :bool, 11
     optional :is_read, :bool, 12
     optional :is_deleted, :bool, 13
     optional :created_at, :message, 19, "google.protobuf.Timestamp"
+  end
+  add_message "rover.notification.v1.ListNotificationsRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :device_id, :string, 2
+  end
+  add_message "rover.notification.v1.ListNotificationsResponse" do
+    repeated :notifications, :message, 1, "rover.notification.v1.NotificationItem"
+  end
+  add_message "rover.notification.v1.GetNotificationRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :device_id, :string, 2
+    optional :notification_id, :string, 3
+  end
+  add_message "rover.notification.v1.GetNotificationResponse" do
+    optional :notification, :message, 1, "rover.notification.v1.NotificationItem"
+  end
+  add_message "rover.notification.v1.UpdateNotificationReadStatusRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :device_id, :string, 2
+    optional :notification_id, :string, 3
+    optional :read, :bool, 4
+  end
+  add_message "rover.notification.v1.UpdateNotificationReadStatusResponse" do
+  end
+  add_message "rover.notification.v1.DeleteNotificationRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :device_id, :string, 2
+    optional :notification_id, :string, 3
+  end
+  add_message "rover.notification.v1.DeleteNotificationResponse" do
   end
   add_message "rover.notification.v1.Platform" do
     oneof :paltform do
@@ -200,9 +223,15 @@ module Rover
       SendCampaignNotificationRequest::Message = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationRequest.Message").msgclass
       SendCampaignNotificationResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationResponse").msgclass
       SendCampaignNotificationResponse::Result = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.SendCampaignNotificationResponse.Result").msgclass
+      NotificationItem = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.NotificationItem").msgclass
       ListNotificationsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.ListNotificationsRequest").msgclass
       ListNotificationsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.ListNotificationsResponse").msgclass
-      ListNotificationsResponse::Notification = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.ListNotificationsResponse.Notification").msgclass
+      GetNotificationRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.GetNotificationRequest").msgclass
+      GetNotificationResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.GetNotificationResponse").msgclass
+      UpdateNotificationReadStatusRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.UpdateNotificationReadStatusRequest").msgclass
+      UpdateNotificationReadStatusResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.UpdateNotificationReadStatusResponse").msgclass
+      DeleteNotificationRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.DeleteNotificationRequest").msgclass
+      DeleteNotificationResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.DeleteNotificationResponse").msgclass
       Platform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.Platform").msgclass
       IosPlatform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.IosPlatform").msgclass
       AndroidPlatform = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.notification.v1.AndroidPlatform").msgclass

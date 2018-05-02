@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/roverplatform/rover/apis/go/notification/v1"
 	"github.com/roverplatform/rover/notification/postgres"
 	"github.com/roverplatform/rover/notification/pubsub"
@@ -30,6 +31,9 @@ type NotificationSettingsStore interface {
 
 type NotificationStore interface {
 	List(ctx context.Context, accountID int32, deviceID string) ([]*scylla.Notification, error)
+	OneById(ctx context.Context, accountID int32, deviceID string, ID string) (*scylla.Notification, error)
+	SetReadStatus(ctx context.Context, accountID int32, deviceID string, ID string, read bool) error
+	Delete(ctx context.Context, accountID int32, deviceID string, ID string) error
 }
 
 type Publisher interface {

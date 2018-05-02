@@ -51,6 +51,28 @@ function deserialize_rover_notification_v1_CreateIosPlatformResponse(buffer_arg)
   return notification_v1_notification_pb.CreateIosPlatformResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_notification_v1_DeleteNotificationRequest(arg) {
+  if (!(arg instanceof notification_v1_notification_pb.DeleteNotificationRequest)) {
+    throw new Error('Expected argument of type rover.notification.v1.DeleteNotificationRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_notification_v1_DeleteNotificationRequest(buffer_arg) {
+  return notification_v1_notification_pb.DeleteNotificationRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_notification_v1_DeleteNotificationResponse(arg) {
+  if (!(arg instanceof notification_v1_notification_pb.DeleteNotificationResponse)) {
+    throw new Error('Expected argument of type rover.notification.v1.DeleteNotificationResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_notification_v1_DeleteNotificationResponse(buffer_arg) {
+  return notification_v1_notification_pb.DeleteNotificationResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_notification_v1_GetAndroidPlatformRequest(arg) {
   if (!(arg instanceof notification_v1_notification_pb.GetAndroidPlatformRequest)) {
     throw new Error('Expected argument of type rover.notification.v1.GetAndroidPlatformRequest');
@@ -93,6 +115,28 @@ function serialize_rover_notification_v1_GetIosPlatformResponse(arg) {
 
 function deserialize_rover_notification_v1_GetIosPlatformResponse(buffer_arg) {
   return notification_v1_notification_pb.GetIosPlatformResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_notification_v1_GetNotificationRequest(arg) {
+  if (!(arg instanceof notification_v1_notification_pb.GetNotificationRequest)) {
+    throw new Error('Expected argument of type rover.notification.v1.GetNotificationRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_notification_v1_GetNotificationRequest(buffer_arg) {
+  return notification_v1_notification_pb.GetNotificationRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_notification_v1_GetNotificationResponse(arg) {
+  if (!(arg instanceof notification_v1_notification_pb.GetNotificationResponse)) {
+    throw new Error('Expected argument of type rover.notification.v1.GetNotificationResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_notification_v1_GetNotificationResponse(buffer_arg) {
+  return notification_v1_notification_pb.GetNotificationResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_rover_notification_v1_ListNotificationsRequest(arg) {
@@ -183,6 +227,28 @@ function deserialize_rover_notification_v1_UpdateIosPlatformPushCertificateRespo
   return notification_v1_notification_pb.UpdateIosPlatformPushCertificateResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_notification_v1_UpdateNotificationReadStatusRequest(arg) {
+  if (!(arg instanceof notification_v1_notification_pb.UpdateNotificationReadStatusRequest)) {
+    throw new Error('Expected argument of type rover.notification.v1.UpdateNotificationReadStatusRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_notification_v1_UpdateNotificationReadStatusRequest(buffer_arg) {
+  return notification_v1_notification_pb.UpdateNotificationReadStatusRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_notification_v1_UpdateNotificationReadStatusResponse(arg) {
+  if (!(arg instanceof notification_v1_notification_pb.UpdateNotificationReadStatusResponse)) {
+    throw new Error('Expected argument of type rover.notification.v1.UpdateNotificationReadStatusResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_notification_v1_UpdateNotificationReadStatusResponse(buffer_arg) {
+  return notification_v1_notification_pb.UpdateNotificationReadStatusResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 
 var NotificationService = exports.NotificationService = {
   sendCampaignNotification: {
@@ -207,6 +273,39 @@ var NotificationService = exports.NotificationService = {
     requestDeserialize: deserialize_rover_notification_v1_ListNotificationsRequest,
     responseSerialize: serialize_rover_notification_v1_ListNotificationsResponse,
     responseDeserialize: deserialize_rover_notification_v1_ListNotificationsResponse,
+  },
+  getNotification: {
+    path: '/rover.notification.v1.Notification/GetNotification',
+    requestStream: false,
+    responseStream: false,
+    requestType: notification_v1_notification_pb.GetNotificationRequest,
+    responseType: notification_v1_notification_pb.GetNotificationResponse,
+    requestSerialize: serialize_rover_notification_v1_GetNotificationRequest,
+    requestDeserialize: deserialize_rover_notification_v1_GetNotificationRequest,
+    responseSerialize: serialize_rover_notification_v1_GetNotificationResponse,
+    responseDeserialize: deserialize_rover_notification_v1_GetNotificationResponse,
+  },
+  updateNotificationReadStatus: {
+    path: '/rover.notification.v1.Notification/UpdateNotificationReadStatus',
+    requestStream: false,
+    responseStream: false,
+    requestType: notification_v1_notification_pb.UpdateNotificationReadStatusRequest,
+    responseType: notification_v1_notification_pb.UpdateNotificationReadStatusResponse,
+    requestSerialize: serialize_rover_notification_v1_UpdateNotificationReadStatusRequest,
+    requestDeserialize: deserialize_rover_notification_v1_UpdateNotificationReadStatusRequest,
+    responseSerialize: serialize_rover_notification_v1_UpdateNotificationReadStatusResponse,
+    responseDeserialize: deserialize_rover_notification_v1_UpdateNotificationReadStatusResponse,
+  },
+  deleteNotification: {
+    path: '/rover.notification.v1.Notification/DeleteNotification',
+    requestStream: false,
+    responseStream: false,
+    requestType: notification_v1_notification_pb.DeleteNotificationRequest,
+    responseType: notification_v1_notification_pb.DeleteNotificationResponse,
+    requestSerialize: serialize_rover_notification_v1_DeleteNotificationRequest,
+    requestDeserialize: deserialize_rover_notification_v1_DeleteNotificationRequest,
+    responseSerialize: serialize_rover_notification_v1_DeleteNotificationResponse,
+    responseDeserialize: deserialize_rover_notification_v1_DeleteNotificationResponse,
   },
   // Crud
   // rpc ListPlatforms(ListPlatformsRequest) returns (ListPlatformResponse);
