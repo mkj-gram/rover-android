@@ -25,7 +25,14 @@ export const getEditableCampaign = (state: State) => state.editableCampaign
 export const getShouldShowSaveAndClose = (state: State) => {
     const { editableCampaign } = state
     const { campaignId } = editableCampaign
+
     const campaign = getCampaign(state, campaignId)
-    const { UIState, ...rest } = campaign
-    return !isEqual(editableCampaign, rest)
+
+    const { name: campaignName, UIState, ...campaignFields } = campaign
+    const {
+        name: editableCampaignName,
+        ...editableCampaignFields
+    } = editableCampaign
+
+    return !isEqual(editableCampaignFields, campaignFields)
 }
