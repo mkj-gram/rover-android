@@ -78,26 +78,18 @@ const DeviceTransitionContainer: React.SFC<
         return (
             <div
                 style={{
-                    position: 'absolute',
                     zIndex: 2,
+                    position: 'absolute',
                     height: '100%',
                     width: '100%',
-                    backgroundColor: cloud
+                    display:
+                        displayOverviewModal !== 'closed' ? 'flex' : 'none',
+                    animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease`,
+                    minWidth: 0
                 }}
+                id="mainModalLeft"
             >
-                <div
-                    style={{
-                        height: '100%',
-                        width: '100%',
-                        display:
-                            displayOverviewModal !== 'closed' ? 'flex' : 'none',
-                        animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease`,
-                        minWidth: 0
-                    }}
-                    id="mainModalLeft"
-                >
-                    {children}
-                </div>
+                {children}
             </div>
         )
     }
