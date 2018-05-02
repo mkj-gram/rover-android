@@ -103,18 +103,16 @@ class SendTestComponent extends React.Component<
                         : () => null
                 }
             >
-                <div
-                    style={{
+                <Text
+                    text={this.getDeviceText(listOfTestDevices, dev)}
+                    size={device !== 'Mobile' ? 'medium' : 'large'}
+                    textStyle={{
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
                     }}
-                >
-                    <Text
-                        text={this.getDeviceText(listOfTestDevices, dev)}
-                        size={device !== 'Mobile' ? 'medium' : 'large'}
-                    />
-                </div>
+                />
+
                 <div style={{ marginLeft: 10 }}>
                     <CheckBox
                         checked={selectedTestDevices.includes(dev)}
