@@ -2,14 +2,13 @@ package logger
 
 import (
 	"fmt"
-	"os"
 	"time"
 )
 
 var _ Logger = (*Entry)(nil)
 
 type Entry struct {
-	Logger *RLog
+	Logger *Log
 
 	Data Fields
 
@@ -21,7 +20,7 @@ type Entry struct {
 	Message string
 }
 
-func newEntry(l *RLog) *Entry {
+func newEntry(l *Log) *Entry {
 	return &Entry{
 		Logger: l,
 
@@ -91,27 +90,10 @@ func (entry *Entry) Fatal(args ...interface{}) {
 }
 
 func (entry *Entry) log(level Level, msg string) {
-
 	entry.Time = time.Now()
 	entry.Level = level
 	entry.Message = msg
 
-	entry.write()
+	entry.Logger.Out.WriteEntry(entry)
 	entry.Reset()
-}
-
-func (entry *Entry) write() error {
-	serialized, err := entry.Logger.Formatter.Format(entry)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to obtain reader, %v\n", err)
-		return err
-	}
-
-	_, err = entry.Logger.Out.Write(serialized)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to write to log, %v\n", err)
-		return err
-	}
-
-	return nil
 }
