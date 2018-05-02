@@ -24,7 +24,6 @@ func (b Bool) Value() bool {
 	return *b.value
 }
 
-
 // Get returns the bool value or false if value is not present
 func (b Bool) Get() (bool, bool) {
 	if !b.Present() {

@@ -162,7 +162,7 @@ func Test_Value(t *testing.T) {
 			exp: nil,
 		},
 		{
-			expErr: fmt.Errorf(`timestamp: unable value &timestamp.Timestamp{Timestamp:timestamp.Timestamp{Seconds:0, Nanos:-1}}: timestamp: nanos:-1 : nanos not in range [0, 1e9)`),
+			expErr: fmt.Errorf(`timestamp: unable value &timestamp.Timestamp{Seconds:0, Nanos:-1}: timestamp: nanos:-1 : nanos not in range [0, 1e9)`),
 			in:     ts(0, -1),
 		},
 	}

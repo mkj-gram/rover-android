@@ -46,17 +46,19 @@ steps:
       - '-c'
       - |
         set -x
-        files=$(go fmt ./auth/service ./audience/service)
-            if [[ $? != 0 ]]; then
-                echo "Command failed."
-                exit 1
-            elif [[ $files ]]; then
-                echo $files
-                echo "Files found."
-                exit 1
-            else
-                echo "No files found."
-            fi
+        export GO_PKGS="./auth/... ./audience/... ./campaigns/... ./notification/... ./go/..."
+
+        files=$(go fmt $$GO_PKGS)
+        if [[ $? != 0 ]]; then
+            echo "Command failed."
+            exit 1
+        elif [[ $files ]]; then
+            echo $files
+            echo "Files found."
+            exit 1
+        else
+            echo "No files found."
+        fi
     waitFor:
       - 'container-cache-complete'
   # golint
@@ -190,6 +192,17 @@ steps:
 # Note use a uniq --project-name property so ensure each run does not interfere with others
 
 
+
+# Go Code
+  - id: 'test-go-code'
+    name: 'gcr.io/cloud-builders/go:alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - test
+      - ./go/...
+    waitFor:
+      - lint-complete
 
 # Auth Service
   - id: 'test-auth-service'
