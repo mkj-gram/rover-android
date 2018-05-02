@@ -1,5 +1,11 @@
 package logger
 
+import (
+	"fmt"
+	"io"
+	"os"
+)
+
 var DefaultWriter = &StdWriter{
 	Stdout: os.Stdout,
 	Stderr: os.Stderr,
