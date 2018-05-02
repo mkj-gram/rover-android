@@ -197,6 +197,7 @@ class OverviewModalFooter extends React.Component<
                         <SendTestConfirmationDialog
                             handleSendTestPrompt={this.handleSendTestPrompt}
                             campaignId={this.props.campaignId}
+                            device={device}
                         />
                     )}
                     <Button

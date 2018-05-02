@@ -7,7 +7,7 @@ import { Dialog } from '@rover/ts-bootstrap/dist/src'
 import { sendTest } from '../../../actions'
 import { getSelectedTestDevices } from '../../../reducers'
 
-export interface DialogModalProps {
+export interface DialogModalProps extends InjectedProps {
     handleSendTestPrompt: () => void
     campaignId: number
 }
@@ -26,7 +26,8 @@ const DialogModal: React.SFC<
     handleSendTestPrompt,
     selectedTestDevices,
     sendTestNotification,
-    campaignId
+    campaignId,
+    device
 }) => {
     const promptStr = `You’re about to send a test version of this campaign to ${
         selectedTestDevices.length
@@ -41,7 +42,9 @@ const DialogModal: React.SFC<
                 handleSendTestPrompt()
             }}
             isOpen={true}
-            targetParent="overviewComponentRoot"
+            targetParent={
+                device === 'Desktop' ? 'mainModalView' : 'mainModalLeft'
+            }
             dialogText={promptStr}
             childStyle={{
                 marginBottom: 32
