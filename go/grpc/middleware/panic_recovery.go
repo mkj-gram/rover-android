@@ -14,6 +14,7 @@ const traceSize = 1024 * 1024 //bytes
 // PanicHandler defines type that handles recovered errors
 type PanicHandler func(panicVal interface{}, info *grpc.UnaryServerInfo) error
 
+// DefaultPanicHandler recovers from panic by printing an error
 var DefaultPanicHandler = func(pval interface{}, info *grpc.UnaryServerInfo) error {
 	trace := make([]byte, traceSize)
 	trace = trace[:runtime.Stack(trace, false)]

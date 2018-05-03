@@ -56,6 +56,11 @@ func NewFromSession(session *gocql.Session) *DB {
 func (db *DB) Session() *gocql.Session {
 	return db.session
 }
+func (db *DB) Ping() error {
+	return db.session.
+		Query("SELECT count(*) FROM system.local WHERE key='local' limit 1").
+		Exec()
+}
 
 func (db *DB) Close() error {
 	if db.session.Closed() {

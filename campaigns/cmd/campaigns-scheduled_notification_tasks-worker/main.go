@@ -2,14 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"runtime"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -29,14 +25,21 @@ import (
 	campaignjobs "github.com/roverplatform/rover/campaigns/jobs"
 	"github.com/roverplatform/rover/campaigns/que"
 	sn "github.com/roverplatform/rover/campaigns/que/scheduled_notifications"
+	rhttp "github.com/roverplatform/rover/go/http"
+	rlog "github.com/roverplatform/rover/go/logger"
 )
 
 var (
 	//
 	// GCP
 	//
-	gcpProjectID      = flag.String("gcp-project-id", "", "GCP Project ID")
+	gcpProjectId      = flag.String("gcp-project-id", "", "GCP Project ID")
 	gcpSvcAcctKeyPath = flag.String("gcp-service-account-key-path", "", "path to google service account key file")
+
+	//
+	// Logs
+	//
+	logLevel = flag.String("log-level", "info", "log level")
 
 	//
 	// Queue
@@ -62,8 +65,7 @@ var (
 )
 
 var (
-	stderr = log.New(os.Stderr, "", 0)
-	stdout = log.New(os.Stdout, "", 0)
+	log = rlog.New()
 )
 
 func main() {
@@ -72,10 +74,15 @@ func main() {
 	var (
 		ctx, cancelFn = context.WithCancel(context.Background())
 
-		livenessProbes, readinessProbes []func(context.Context) error
+		livenessProbes, readinessProbes []rhttp.ProbeFunc
 	)
 
 	defer cancelFn()
+
+	//
+	// Logs
+	//
+	log.SetLevel(rlog.LevelFromString(*logLevel))
 
 	//
 	// Prometheus metrics
@@ -111,17 +118,15 @@ func main() {
 	//
 	// GCP errors
 	//
-
 	var errClient *gerrors.Client
-
-	if *gcpProjectID != "" {
+	if *gcpSvcAcctKeyPath != "" {
 		var err error
-		errClient, err = gerrors.NewClient(ctx, *gcpProjectID, "notification/push-worker", "v1", true, gcpClientOpts...)
+		errClient, err = gerrors.NewClient(ctx, *gcpProjectId, "campaigns/service", "v1", true, gcpClientOpts...)
 		if err != nil {
-			stderr.Fatalf("errors.NewClient: %v", err)
-		} else {
-			stdout.Println("gcp.errors=on")
+			log.Fatalf("errors.NewClient: %v", err)
 		}
+	} else {
+		log.Infof("google.errors=off")
 	}
 
 	//
@@ -131,29 +136,25 @@ func main() {
 
 	pgxcfg, err := pgx.ParseURI(*dbDSN)
 	if err != nil {
-		stderr.Fatalln("pgx.ParseURI:", err)
+		log.Fatalf("pgx.ParseURI: %v", err)
 	}
 
 	pgpool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
 		ConnConfig: pgxcfg,
 		// AfterConnect: PrepareStatements,
 	})
-
 	if err != nil {
-		stderr.Fatalln("pgx.NewConnPool:", err)
+		log.Fatalf("pgx.NewConnPool: %v", err)
 	}
-
 	defer pgpool.Close()
 
 	var pgping = func(ctx context.Context) error {
 		_, err := pgpool.ExecEx(ctx, `select 1`, nil)
-		if err != nil {
-			stderr.Printf("postgres: ping: error=%q\n", err)
-		}
-		return err
+		return errors.Wrap(err, "postgres")
 	}
 
 	readinessProbes = append(readinessProbes, pgping)
+	livenessProbes = append(livenessProbes, pgping)
 
 	//
 	// Scheduled Notification Worker
@@ -163,10 +164,11 @@ func main() {
 	// DB API
 	//
 
-	pgdb, err := db.Open(*dbDSN)
+	pg, err := db.Open(*dbDSN)
 	if err != nil {
-		stderr.Fatalln("db.Open:", err)
+		log.Fatalf("db.Open: %v", err)
 	}
+	defer pg.Close()
 
 	//
 	// audienceClient
@@ -174,14 +176,14 @@ func main() {
 
 	var (
 		clientOpts = []grpc.DialOption{
-			grpc.WithUnaryInterceptor(grpc.UnaryClientInterceptor(Logger(stdout))),
+			grpc.WithUnaryInterceptor(grpc.UnaryClientInterceptor(Logger(log))),
 			grpc.WithInsecure(),
 		}
 	)
 
 	conn, err := grpc.Dial(*audienceAddr, clientOpts...)
 	if err != nil {
-		stderr.Fatalln("grpc.Dial:", err)
+		log.Fatalf("grpc.Dial: %v", err)
 	}
 	defer conn.Close()
 
@@ -189,7 +191,7 @@ func main() {
 
 	nconn, err := grpc.Dial(*notificationAddr, clientOpts...)
 	if err != nil {
-		stderr.Fatalln("grpc.Dial:", err)
+		log.Fatalf("grpc.Dial:", err)
 	}
 	defer nconn.Close()
 
@@ -202,60 +204,67 @@ func main() {
 
 		snw = campaignjobs.ScheduledNotificationJob{
 			AudienceClient:     audienceClient,
-			CampaignsStore:     pgdb.CampaignsStore(),
+			CampaignsStore:     pg.CampaignsStore(),
 			NotificationClient: notificationClient,
 		}
 
 		worker = func(n int) {
-			var wn = fmt.Sprintf("worker: worker_id=%d", n)
+			log := log.WithFields(rlog.Fields{"worker.id": n})
+
 			for {
 				select {
 				case <-ctx.Done():
-					stdout.Println(wn, "stopping")
+					log.Infof("stopping")
 					return
 				case task := <-taskc:
+					var (
+						start  = time.Now()
+						result *campaignjobs.Result
+						err    error
+					)
+
+					log = log.WithFields(rlog.Fields{
+						"task.id":    task.ID,
+						"task.state": task.State,
+					})
+
+					log.Infof("starting")
 
 					// function call is required for defers to fire after
 					func() {
 						// release task PG's lock eventually
-
 						defer task.Done()
 
 						// Recover any panics and log/update task.Error
-						defer que.Recover(func(val interface{}, stacktrace string) {
+						defer que.Recover(func(val interface{}, trace string) {
 							jobsPanics.Inc()
-							stderr.Printf("%s job_id=%d status=panic stacktrace=%q", wn, task.ID, stacktrace)
-
+							log.WithFields(rlog.Fields{"panic": trace}).Error(val)
 							if errClient != nil {
-								errClient.Reportf(ctx, nil, "%s job_id=%d status=panic stacktrace=%q", wn, task.ID, stacktrace)
+								errClient.Reportf(ctx, nil, "job_id=%d error=%q panic=%q", task.ID, trace, val)
 							}
 						})
 
-						stdout.Printf("%s job_id=%d status=starting\n", wn, task.ID)
+						defer func() {
+							log = log.WithFields(rlog.Fields{
+								"dur": time.Since(start),
+							})
+							jobsStats.Observe(time.Since(start).Seconds())
+
+							if err != nil {
+								jobsErrors.Inc()
+								log.Errorf(err.Error())
+							} else {
+								log.Infof("ok")
+							}
+
+							log.WithFields(rlog.Fields{
+								"task":   task,
+								"result": result,
+							}).Debug("")
+						}()
 
 						// work
-						start := time.Now()
-						result, err := snw.Do(ctx, task)
-						dur := time.Since(start)
-
-						if err != nil {
-							jobsErrors.Inc()
-							stderr.Printf("%s job_id=%d dur=%v status=error error=%q\n", wn, task.ID, dur, err)
-						} else {
-							stdout.Printf("%s job_id=%d dur=%v status=OK \n", wn, task.ID, dur)
-						}
-
-						// TODO: use logger
-						if result != nil && !strings.Contains(*gcpProjectID, "production") {
-							data, err := json.Marshal(result)
-							if err != nil {
-								stderr.Printf("result=marshal status=error error=%q\n", err)
-							} else {
-								stdout.Printf("%s\n", string(data))
-							}
-						}
-
-						jobsStats.Observe(dur.Seconds())
+						result, err = snw.Do(ctx, task)
 					}()
 				}
 			}
@@ -266,19 +275,19 @@ func main() {
 			for {
 				select {
 				case <-ctx.Done():
-					stdout.Println("poller: stopping")
+					log.Infof("poller: stopping")
 					return
 				default:
 				}
 
 				task, err := sn.LockOne(pgpool)
 				if err != nil {
-					stderr.Printf("poller: status=error error=%q\n", errors.Wrap(err, "LockOne"))
+					log.Error(errors.Wrap(err, "poller: LockOne"))
 					time.Sleep(*queSleepDuration)
 					continue
 				}
 				if task == nil {
-					stdout.Printf("poller: status=idling for=%v dispatched=%d\n", queSleepDuration, count)
+					log.Infof("poller: status=idling for=%v dispatched=%d\n", queSleepDuration, count)
 					if count > 0 {
 						count = 0
 					}
@@ -295,7 +304,7 @@ func main() {
 	)
 
 	if err := sn.PrepareStatements(pgpool); err != nil {
-		stderr.Fatalln("PrepareStatements:", err)
+		log.Fatalf("PrepareStatements: %v", err)
 	}
 
 	wg.Add(*queNWrokers)
@@ -313,8 +322,8 @@ func main() {
 		poller()
 	}()
 
-	stdout.Println("workerpool=started")
-	stdout.Println("poller=started")
+	log.Infof("workerpool=started")
+	log.Infof("poller=started")
 
 	//
 	// HTTP endpoints
@@ -322,39 +331,22 @@ func main() {
 	go func() {
 		// measure latency distributions of your RPCs
 		// grpc_prometheus.EnableHandlingTimeHistogram()
-		probe := func(probes []func(context.Context) error) http.HandlerFunc {
-			return func(w http.ResponseWriter, r *http.Request) {
-				var result string
-				for _, probe := range probes {
-					if err := probe(ctx); err != nil {
-						stderr.Printf("probe: %v\n", err)
-						result += err.Error() + "\n"
-					}
-				}
-				if result != "" {
-					http.Error(w, result, http.StatusServiceUnavailable)
-					return
-				}
-				w.WriteHeader(200)
-				w.Write([]byte("ok"))
-			}
-		}
+
+		log := log.WithFields(rlog.Fields{"probe": ""})
 
 		http.Handle("/metrics", prom.Handler())
-		http.Handle("/readiness", probe(readinessProbes))
-		http.Handle("/liveness", probe(livenessProbes))
+		http.Handle("/readiness", rhttp.ProbeChain(ctx, log, readinessProbes...))
+		http.Handle("/liveness", rhttp.ProbeChain(ctx, log, livenessProbes...))
 		// http.Handle("/togglelogs", loghttp.ToggleLogs(ioutil.Discard, os.Stdout, verboseLog))
 
-		hsrv := http.Server{
-			Addr:     *httpAddr,
-			ErrorLog: stderr,
-			Handler:  http.DefaultServeMux,
-		}
+		log.Infof("http=server status=listening address=%q", *httpAddr)
 
-		stdout.Printf("proto=http address=%q", *httpAddr)
-
-		if err := hsrv.ListenAndServe(); err != nil {
-			stderr.Fatalln("http.ListenAndServe:", err)
+		if err := (&http.Server{
+			Addr: *httpAddr,
+			// ErrorLog: stderr,
+			Handler: http.DefaultServeMux,
+		}).ListenAndServe(); err != nil {
+			log.Fatalf("http=server status=error error=%q", err)
 		}
 	}()
 
@@ -364,29 +356,20 @@ func main() {
 	sigc := make(chan os.Signal)
 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 
-	stdout.Println("status=waiting_for_signal")
+	log.Infof("status=waiting_for_signal")
 	select {
 	case <-ctx.Done():
 	case sig := <-sigc:
-		stdout.Printf("signal=%v\n", sig)
+		log.Errorf("status=signal signal=%v\n", sig)
 		cancelFn()
 	}
 
-	stdout.Println("status=waiting_workers")
+	log.Infof("status=waiting_workers")
 	wg.Wait()
-	stdout.Println("status=stopped")
+	log.Infof("status=stopped")
 }
 
-func statusOk(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(r.URL.Path + ":ok\n"))
-}
-
-type printer interface {
-	Printf(string, ...interface{})
-}
-
-func Logger(l printer) grpc.UnaryClientInterceptor {
+func Logger(log rlog.Logger) grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		var (
 			start = time.Now()
@@ -394,20 +377,25 @@ func Logger(l printer) grpc.UnaryClientInterceptor {
 		)
 
 		defer func() {
-			dur := time.Since(start)
+			log := log.WithFields(rlog.Fields{
+				"rpc": method,
+				"dur": time.Since(start),
+				"req": req,
+			})
 
 			if val := recover(); val != nil {
 				trace := make([]byte, 1024)
 				trace = trace[:runtime.Stack(trace, false)]
 
-				l.Printf("method=%s dur=%v req=%q status=panic panic=%q trace=%q", method, req, dur, val, string(trace))
+				log.WithFields(rlog.Fields{"panic": string(trace)}).Error(val)
+
 				panic(val)
 			}
 
 			if err != nil {
-				l.Printf("method=%s dur=%v req=%q status=error error=%q", method, req, dur, err)
+				log.Errorf(err.Error())
 			} else {
-				l.Printf("method=%s dur=%v req=%q status=ok", method, req, dur)
+				log.Infof("ok")
 			}
 		}()
 

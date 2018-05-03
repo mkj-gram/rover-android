@@ -2,14 +2,10 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"runtime"
-	"strings"
 	"syscall"
 
 	_ "github.com/lib/pq"
@@ -24,7 +20,10 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/roverplatform/rover/apis/go/notification/v1"
+	grpc_logs "github.com/roverplatform/rover/go/grpc/logs"
 	grpc_middleware "github.com/roverplatform/rover/go/grpc/middleware"
+	rhttp "github.com/roverplatform/rover/go/http"
+	rlog "github.com/roverplatform/rover/go/logger"
 	notification_grpc "github.com/roverplatform/rover/notification/grpc"
 	"github.com/roverplatform/rover/notification/postgres"
 	notification_pubsub "github.com/roverplatform/rover/notification/pubsub"
@@ -32,6 +31,17 @@ import (
 )
 
 var (
+	// GCP
+	gcpProjectID      = flag.String("gcp-project-id", "", "GCP PROJECT_ID")
+	gcpSvcAcctKeyPath = flag.String("gcp-service-account-key-path", "", "path to google service account key file")
+
+	// GCP PubSub
+	pubsubTopic = flag.String("pubsub-topic", "notifications", "GCP pubsub's topic name")
+
+	// Logs
+	logLevel = flag.String("log-level", "info", "log level")
+
+	// Listeners
 	rpcAddr  = flag.String("rpc-addr", ":5100", "rpc address")
 	httpAddr = flag.String("http-addr", ":5080", "http address")
 
@@ -40,58 +50,36 @@ var (
 
 	// Scylla
 	scyllaDsn = flag.String("scylla-dsn", "", "scylla")
-
-	// GCP
-	gcpProjectID      = flag.String("gcp-project-id", "", "GCP PROJECT_ID")
-	gcpSvcAcctKeyPath = flag.String("gcp-service-account-key-path", "", "path to google service account key file")
-
-	// GCP PubSub
-	pubsubTopic = flag.String("pubsub-topic", "notifications", "GCP pubsub's topic name")
 )
 
 var (
-	stderr = log.New(os.Stderr, "", 0)
-	stdout = log.New(os.Stdout, "", 0)
-
-	verboseLog = log.New(ioutil.Discard, "", 0)
+	log = rlog.New()
 )
-
-// Wrapper around scylla.DB to support grpc use-cases
-type ScyllaStore struct {
-	db *scylla.DB
-}
-
-func (n *ScyllaStore) NotificationSettingsStore() notification_grpc.NotificationSettingsStore {
-	return n.db.NotificationSettingsStore()
-}
-
-func (n *ScyllaStore) NotificationStore() notification_grpc.NotificationStore {
-	return n.db.NotificationsStore()
-}
 
 func main() {
 	flag.Parse()
 
 	var (
-		isProduction = strings.Contains(*gcpProjectID, "-prod")
+		ctx, cancelFn = context.WithCancel(context.Background())
 
-		ctx, cancelFn                   = context.WithCancel(context.Background())
-		readinessProbes, livenessProbes []func() error
+		readinessProbes, livenessProbes []rhttp.ProbeFunc
 
 		unaryMiddleware = []grpc.UnaryServerInterceptor{
 			grpc_prometheus.UnaryServerInterceptor,
-			grpc_middleware.UnaryPanicRecovery(grpc_middleware.DefaultPanicHandler),
-			grpc_middleware.UnaryLog(verboseLog),
+			grpc_middleware.UnaryPanicRecovery(grpc_logs.Recoverer(log)),
+			grpc_logs.UnaryInterceptor(log),
 		}
 	)
 
 	//
+	// Prometheus
+	//
+	prom.MustRegister(notification_pubsub.PrometheusMetrics...)
+
+	//
 	// Logs
 	//
-	if !isProduction {
-		// development
-		verboseLog.SetOutput(os.Stdout)
-	}
+	log.SetLevel(rlog.LevelFromString(*logLevel))
 
 	//
 	// GCP
@@ -104,25 +92,16 @@ func main() {
 	//
 	// GCP errors
 	//
-	if isProduction {
+	if *gcpSvcAcctKeyPath != "" {
 		errClient, err := gerrors.NewClient(ctx, *gcpProjectID, "notification/service", "v1", true, gcpClientOpts...)
 		if err != nil {
-			stderr.Fatalf("errors.NewClient: %v", err)
+			log.Fatalf("errors.NewClient: %v", err)
 		} else {
-			stdout.Println("gcp.errors=on")
+			log.Infof("gcp.errors=on")
 		}
 
 		unaryMiddleware = append(unaryMiddleware, func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-			defer func() {
-				if val := recover(); val != nil {
-					trace := make([]byte, 1024*10)
-					trace = trace[:runtime.Stack(trace, false)]
-
-					stderr.Printf("status=panic panic=%q trace=%q\n", val, string(trace))
-					errClient.Reportf(ctx, nil, "status=panic error=%q", val)
-					panic(val)
-				}
-			}()
+			defer errClient.Catch(ctx, gerrors.Repanic(true))
 			return handler(ctx, req)
 		})
 	}
@@ -133,12 +112,12 @@ func main() {
 
 	pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, gcpClientOpts...)
 	if err != nil {
-		stderr.Fatalf("pubsub.NewClient: %v", err)
+		log.Errorf("pubsub.NewClient: %v", err)
 	} else {
-		stdout.Println("pubsub connected")
+		log.Infof("gcp.pubsub=connected")
 	}
 	topic := pubsubClient.Topic(*pubsubTopic)
-	stdout.Printf("pubsub:topic %s\n", topic.String())
+	log.Infof("pubsub.topic=%s\n", topic.String())
 	publisher := &notification_pubsub.Publisher{Topic: topic}
 
 	//
@@ -146,18 +125,19 @@ func main() {
 	//
 	pg, err := postgres.Open(*postgresDsn)
 	if err != nil {
-		stderr.Fatalln("postgres.Open", err)
+		log.Fatalf("postgres.Open: %v", err)
 	}
-	stdout.Println("postgres connected")
+	defer pg.Close()
 
-	pgProbe := func() error {
-		if err := pg.DB().Ping(); err != nil {
+	log.Infof("postgres=on")
+
+	pgProbe := func(ctx context.Context) error {
+		if err := pg.DB().PingContext(ctx); err != nil {
 			return errors.Wrap(err, "Postgres")
 		}
 
 		return nil
 	}
-	stdout.Println("postgres=on")
 
 	readinessProbes = append(readinessProbes, pgProbe)
 	livenessProbes = append(livenessProbes, pgProbe)
@@ -167,16 +147,14 @@ func main() {
 	//
 	scyllaDB, err := scylla.Open(*scyllaDsn)
 	if err != nil {
-		stderr.Fatalln("scylla.Open", err)
+		log.Fatalf("scylla.Open:", err)
 	}
+	defer scyllaDB.Close()
 
-	stdout.Println("scylla=on")
+	log.Infof("scylla=on")
 
-	scyllaProbe := func() error {
-		return scyllaDB.
-			Session().
-			Query("SELECT count(*) FROM system.local WHERE key='local' limit 1").
-			Exec()
+	scyllaProbe := func(_ context.Context) error {
+		return errors.Wrap(scyllaDB.Ping(), "scylla")
 	}
 
 	readinessProbes = append(readinessProbes, scyllaProbe)
@@ -214,14 +192,14 @@ func main() {
 
 		lis, err := net.Listen("tcp", *rpcAddr)
 		if err != nil {
-			stderr.Fatalf("net.Listen=exiting status=error error=%q\n", err)
+			log.Fatal("net.Listen:", err.Error())
 		}
 
-		stdout.Printf("grpc listening on %s\n", *rpcAddr)
+		log.Infof("grpc=listening addr=%q\n", *rpcAddr)
 		if err := grpcServer.Serve(lis); err != nil {
-			stderr.Printf("grpc.server=exiting status=error error=%q\n", err)
+			log.Errorf("grpc.server=exiting error=%q\n", err)
 		} else {
-			stderr.Println("grpc.server=exiting status=OK", err)
+			log.Infof("grpc.server=exiting")
 		}
 	}()
 
@@ -230,38 +208,21 @@ func main() {
 	//
 
 	go func() {
-		probeChain := func(probes []func() error) http.HandlerFunc {
-			return func(w http.ResponseWriter, r *http.Request) {
-				var result string
-				for _, probe := range probes {
-					if err := probe(); err != nil {
-						result += err.Error() + "\n"
-					}
-				}
-				if result != "" {
-					http.Error(w, result, http.StatusServiceUnavailable)
-					return
-				}
-				w.WriteHeader(200)
-				w.Write([]byte("ok"))
-			}
-		}
-		if err := http.ListenAndServe(*httpAddr, nil); err != nil {
-			stderr.Fatalln("http.ListenAndServe", err)
-		}
+		log := log.WithFields(rlog.Fields{"probe": ""})
 
 		http.Handle("/metrics", prom.Handler())
-		http.Handle("/readiness", probeChain(readinessProbes))
-		http.Handle("/liveness", probeChain(livenessProbes))
+		http.Handle("/readiness", rhttp.ProbeChain(ctx, log, readinessProbes...))
+		http.Handle("/liveness", rhttp.ProbeChain(ctx, log, livenessProbes...))
 
 		httpServer := http.Server{
-			Addr:     *httpAddr,
-			ErrorLog: stderr,
-			Handler:  http.DefaultServeMux,
+			Addr: *httpAddr,
+			// TODO:
+			// ErrorLog: stderr,
+			Handler: http.DefaultServeMux,
 		}
 
 		if err := httpServer.ListenAndServe(); err != nil {
-			stderr.Fatalf("http.ListenAndServe=exiting status=error error=%q\n", err)
+			log.Errorf("http.server=exiting error=%q\n", err)
 		}
 	}()
 
@@ -272,16 +233,29 @@ func main() {
 	// Signals
 	//
 
-	stdout.Println("status=started")
+	log.Infof("status=started\n")
 	select {
 	case <-ctx.Done():
-		stderr.Printf("status=cancel error=%q\n", ctx.Err())
+		log.Errorf("status=cancel error=%q\n", ctx.Err())
 	case sig := <-sigc:
-		stdout.Printf("status=signal signal=%v\n", sig)
+		log.Infof("status=signal signal=%v\n", sig)
 		cancelFn()
 	}
 
 	grpcServer.GracefulStop()
 
-	stdout.Println("status=done")
+	log.Infof("status=done\n")
+}
+
+// Wrapper around scylla.DB to support grpc use-cases
+type ScyllaStore struct {
+	db *scylla.DB
+}
+
+func (n *ScyllaStore) NotificationSettingsStore() notification_grpc.NotificationSettingsStore {
+	return n.db.NotificationSettingsStore()
+}
+
+func (n *ScyllaStore) NotificationStore() notification_grpc.NotificationStore {
+	return n.db.NotificationsStore()
 }

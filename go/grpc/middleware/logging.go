@@ -31,12 +31,9 @@ func UnaryLogger(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	return resp, err
 }
 
-type logger interface {
-	Printf(string, ...interface{})
-}
-
 // UnaryLog simple logger middleware
-func UnaryLog(l logger) grpc.UnaryServerInterceptor {
+// deprecated, use UnaryLog2
+func UnaryLog(l interface{ Printf(string, ...interface{}) }) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		from := time.Now()
 

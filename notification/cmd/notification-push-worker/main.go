@@ -2,19 +2,14 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"runtime"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
 
 	_ "github.com/lib/pq"
-	"golang.org/x/crypto/pkcs12"
 
 	gerrors "cloud.google.com/go/errors"
 	"cloud.google.com/go/pubsub"
@@ -24,6 +19,8 @@ import (
 	prom "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/api/option"
 
+	rhttp "github.com/roverplatform/rover/go/http"
+	rlog "github.com/roverplatform/rover/go/logger"
 	"github.com/roverplatform/rover/notification/postgres"
 	notification_pubsub "github.com/roverplatform/rover/notification/pubsub"
 	"github.com/roverplatform/rover/notification/push"
@@ -31,6 +28,7 @@ import (
 )
 
 var (
+	// Listeners
 	httpAddr = flag.String("http-addr", ":5080", "http address")
 
 	// GCP
@@ -40,6 +38,9 @@ var (
 	// GCP PubSub
 	pubsubSubcription            = flag.String("pubsub-subscription", "notification-push-worker", "GCP pubsub's subscription name")
 	pubSubMaxOutstandingMessages = flag.Int("pubsub-max-outstanding-messages", 1, "number of messages to process in parallel")
+
+	// Logs
+	logLevel = flag.String("log-level", "info", "log level")
 
 	// PlatformCache
 	platformsCacheMaxSize = flag.Int("platforms-cache-max-size", 1000, "max items to cache")
@@ -60,8 +61,7 @@ var (
 )
 
 var (
-	stderr = log.New(os.Stderr, "", 0)
-	stdout = log.New(os.Stdout, "", 0)
+	log = rlog.New()
 )
 
 func main() {
@@ -71,20 +71,26 @@ func main() {
 		ctx, cancelFn = context.WithCancel(context.Background())
 		wg            sync.WaitGroup
 
-		readinessProbes, livenessProbes []func() error
+		readinessProbes, livenessProbes []rhttp.ProbeFunc
 	)
+
+	//
+	// Logs
+	//
+	log.SetLevel(rlog.LevelFromString(*logLevel))
 
 	//
 	// Prometheus
 	//
 
 	prom.MustRegister(push.PrometheusMetrics...)
+	prom.MustRegister(notification_pubsub.PrometheusMetrics...)
 
 	//
 	// GCP
 	//
 	var gcpClientOpts []option.ClientOption
-	if *gcpProjectID != "" {
+	if *gcpSvcAcctKeyPath != "" {
 		gcpClientOpts = append(gcpClientOpts, option.WithServiceAccountFile(*gcpSvcAcctKeyPath))
 	}
 
@@ -94,10 +100,9 @@ func main() {
 
 	errClient, err := gerrors.NewClient(ctx, *gcpProjectID, "notification/push-worker", "v1", true, gcpClientOpts...)
 	if err != nil {
-		stderr.Fatalf("errors.NewClient: %v", err)
-	} else {
-		stdout.Println("gcp.errors=on")
+		log.Fatalf("errors.NewClient: %v", err)
 	}
+	log.Infof("gcp.errors=on")
 
 	//
 	// Pubsub
@@ -105,10 +110,9 @@ func main() {
 
 	pubsubClient, err := pubsub.NewClient(ctx, *gcpProjectID, gcpClientOpts...)
 	if err != nil {
-		stderr.Fatalf("pubsub.NewClient: %v", err)
-	} else {
-		stdout.Println("gcp.pubsub=on")
+		log.Fatalf("pubsub.NewClient: %v", err)
 	}
+	log.Infof("gcp.pubsub=on")
 
 	var (
 		subscription = pubsubClient.Subscription(*pubsubSubcription)
@@ -125,26 +129,31 @@ func main() {
 	// postgres
 	//
 
-	db, err := postgres.Open(*pgDSN)
+	pg, err := postgres.Open(*pgDSN)
 	if err != nil {
-		stderr.Fatal("postgres.Open", err)
+		log.Fatalf("postgres.Open:%v", err)
 	}
+	log.Infof("postgres=on")
+	defer pg.Close()
 
-	pgProbe := func() error {
-		if err := db.DB().Ping(); err != nil {
-			return errors.Wrap(err, "Postgres")
+	pgProbe := func(ctx context.Context) error {
+		if err := pg.DB().PingContext(ctx); err != nil {
+			return errors.Wrap(err, "postgres")
 		}
 
 		return nil
 	}
-	stdout.Println("postgres=on")
 
 	readinessProbes = append(readinessProbes, pgProbe)
-	// we don't want worker to be taken down if pgProbe fails?
-	// livenessProbes = append(livenessProbes, pgProbe)
+	// TODO: take down worker if pgProbe fails?
+	livenessProbes = append(livenessProbes, pgProbe)
 
 	if *roverInboxCertificateData != "" {
-		postgres.RoverInboxIosPlatform = mustParsePlatform(*roverInboxCertificateData, *roverInboxCertificatePass)
+		p, err := postgres.ParseIosPlatform(*roverInboxCertificateData, *roverInboxCertificatePass)
+		if err != nil {
+			log.Fatalf("ParseIosPlatform: %v", err)
+		}
+		postgres.RoverInboxIosPlatform = p
 	}
 
 	//
@@ -153,20 +162,18 @@ func main() {
 
 	scyllaDB, err := scylla.Open(*scyllaDSN)
 	if err != nil {
-		stderr.Fatal("scylla.Open: ", err)
+		log.Fatalf("scylla.Open: %v", err)
 	}
+	defer scyllaDB.Close()
 
-	stdout.Println("scylla=on")
+	log.Infof("scylla=on")
 
-	scyllaProbe := func() error {
-		return scyllaDB.
-			Session().
-			Query("SELECT count(*) FROM system.local WHERE key='local' limit 1").
-			Exec()
+	scyllaProbe := func(_ context.Context) error {
+		return errors.Wrap(scyllaDB.Ping(), "scylla")
 	}
 
 	readinessProbes = append(readinessProbes, scyllaProbe)
-	// livenessProbes = append(livenessProbes, scyllaProbe)
+	livenessProbes = append(livenessProbes, scyllaProbe)
 
 	//
 	// Platform Cache
@@ -180,14 +187,13 @@ func main() {
 	//
 	// Notification Pubsub
 	//
-
 	var (
 		handler = &push.Handler{
 			ClientFactory: &push.ClientFactory{
 				Cache:                 platformCache,
 				MaxAge:                *platformsCacheMaxAge,
-				AndroidPlatformsStore: db.AndroidPlatformStore(),
-				IosPlatformsStore:     db.IosPlatformStore(),
+				AndroidPlatformsStore: pg.AndroidPlatformStore(),
+				IosPlatformsStore:     pg.IosPlatformStore(),
 			},
 			NotificationSettingsStore: scyllaDB.NotificationSettingsStore(),
 			NotificationsStore:        scyllaDB.NotificationsStore(),
@@ -204,27 +210,17 @@ func main() {
 					start = time.Now()
 				)
 
+				defer errClient.Catch(ctx, gerrors.Repanic(false))
+
 				defer func() {
-					var (
-						dur = time.Since(start)
-					)
-
-					if val := recover(); val != nil {
-						trace := make([]byte, 1024*10)
-						trace = trace[:runtime.Stack(trace, false)]
-
-						stderr.Printf("handler=handle dur=%v status=panic panic=%q trace=%q\n", dur, val, string(trace))
-						errClient.Reportf(ctx, nil, "handler=handle dur=%v status=error error=%q", dur, val)
-						return
-					}
+					log := log.WithFields(rlog.Fields{
+						"src": "handler.handle", "dur": time.Since(start),
+					})
 
 					if err != nil {
-						stderr.Printf("handler=handle dur=%v status=error error=%q\n", dur, err)
+						log.Error(err.Error())
 					} else {
-						// TODO: use proper logs
-						if !strings.Contains(*gcpProjectID, "-prod") {
-							stdout.Printf("handler=handle dur=%v status=ok\n", dur)
-						}
+						log.Infof("status=ok")
 					}
 				}()
 
@@ -243,11 +239,12 @@ func main() {
 			notification_pubsub.ReceiverFunc(push.WithMetrics(
 				handler.Handle)))
 
+		log := log.WithFields(rlog.Fields{"src": "pubsub.receive"})
+
 		if err := subscriber.Subscribe(ctx, handler); err != nil {
-			errClient.Reportf(ctx, nil, "pubsub.receive=exiting status=error error=%q", err)
-			stderr.Printf("pubsub.receive=exiting status=error error=%q\n", err.Error())
+			log.Error(err.Error())
 		} else {
-			stdout.Printf("pubsub.receive=exiting status=OK\n")
+			log.Infof("exiting")
 		}
 
 		cancelFn()
@@ -258,37 +255,21 @@ func main() {
 	//
 
 	go func() {
-		probeChain := func(probes []func() error) http.HandlerFunc {
-			return func(w http.ResponseWriter, r *http.Request) {
-				var result string
-				for _, probe := range probes {
-					if err := probe(); err != nil {
-						result += err.Error() + "\n"
-						stderr.Printf("probe=error error=%q\n", err.Error())
-					}
-				}
-				if result != "" {
-					http.Error(w, result, http.StatusServiceUnavailable)
-					return
-				}
-				w.WriteHeader(200)
-				w.Write([]byte("ok"))
-			}
 
-		}
+		log := log.WithFields(rlog.Fields{"probe": ""})
 
 		http.Handle("/metrics", prom.Handler())
-		http.Handle("/readiness", probeChain(readinessProbes))
-		http.Handle("/liveness", probeChain(livenessProbes))
+		http.Handle("/readiness", rhttp.ProbeChain(ctx, log, readinessProbes...))
+		http.Handle("/liveness", rhttp.ProbeChain(ctx, log, livenessProbes...))
 
 		httpServer := http.Server{
-			Addr:     *httpAddr,
-			ErrorLog: stderr,
-			Handler:  http.DefaultServeMux,
+			Addr: *httpAddr,
+			// ErrorLog: stderr,
+			Handler: http.DefaultServeMux,
 		}
 
 		if err := httpServer.ListenAndServe(); err != nil {
-			stderr.Fatalf("http.ListenAndServe=exiting status=error error=%q\n", err)
+			log.Fatalf("http.ListenAndServe=exiting error=%q", err)
 		}
 	}()
 
@@ -306,41 +287,12 @@ func main() {
 		select {
 		case <-ctx.Done():
 		case sig := <-sigc:
-			stdout.Printf("status=signal signal=%q\n", sig)
+			log.Infof("signal=%q\n", sig)
 			cancelFn()
 		}
 	}()
 
-	stdout.Printf("status=started\n")
+	log.Infof("status=started\n")
 	wg.Wait()
-	stdout.Printf("status=done\n")
-}
-
-func mustParsePlatform(data, pass string) *postgres.IosPlatform {
-	certData, err := base64.StdEncoding.DecodeString(data)
-	if err != nil {
-		panic(errors.Wrap(err, "base64.DecodeString"))
-	}
-
-	_ /*pkey*/, cert, err := pkcs12.Decode(certData, pass)
-	if err != nil {
-		panic(errors.Wrap(err, "pkcs12.Decode"))
-	}
-
-	now := time.Now()
-
-	return &postgres.IosPlatform{
-		Id:        0,
-		AccountId: 0,
-		Title:     "rover Inbox",
-
-		BundleId:              "io.rover.Inbox",
-		CertificateData:       data,
-		CertificateExpiresAt:  cert.NotAfter,
-		CertificatePassphrase: pass,
-		CertificateUpdatedAt:  now,
-
-		CreatedAt: now,
-		UpdatedAt: now,
-	}
+	log.Infof("status=done\n")
 }

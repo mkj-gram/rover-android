@@ -36,13 +36,11 @@ var metrics = struct {
 	}, []string{"type"}),
 }
 
-func Metrics() []prometheus.Collector {
-	return []prometheus.Collector{
-		metrics.publisherTotal,
-		metrics.publisherTotalFailed,
-		metrics.publisherDuration,
-		metrics.subscriberTotal,
-	}
+var PrometheusMetrics = []prometheus.Collector{
+	metrics.publisherTotal,
+	metrics.publisherTotalFailed,
+	metrics.publisherDuration,
+	metrics.subscriberTotal,
 }
 
 func getMessageLabel(message Message) string {
