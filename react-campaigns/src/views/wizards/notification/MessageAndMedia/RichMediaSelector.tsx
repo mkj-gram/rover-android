@@ -156,7 +156,7 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                         background: titanium
                     }}
                 />
-                {richMediaAttachmentTab === 'IMAGE' && (
+                {/* {richMediaAttachmentTab === 'IMAGE' && (
                     <div
                         style={{
                             alignItems: 'center',
@@ -174,7 +174,7 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                                 richMediaAttachmentTab.slice(1).toLowerCase()}`}
                         />
                     </div>
-                )}
+                )} */}
                 <div style={{ width: 352 }}>
                     <TextInput
                         id="notification-rich-media-attachment"
@@ -192,13 +192,11 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                             textOverflow: 'ellipsis'
                         }}
                         isEditingText={isEditingRichMediaURL}
-                        label={
-                            richMediaAttachmentTab === 'IMAGE' &&
-                            'Or use a self-hosted image'
-                        }
+                        label=""
                         media={device}
-                        placeholder={`Enter ${richMediaAttachmentTab.toLowerCase()} ${richMediaAttachmentTab !==
-                            'IMAGE' && 'clip'} URL`}
+                        placeholder={`Enter ${richMediaAttachmentTab.toLowerCase()} ${
+                            richMediaAttachmentTab !== 'IMAGE' ? 'clip' : ''
+                        } URL`}
                         startEditingText={() => updateEditingField('url')}
                         text={url && type === richMediaAttachmentTab ? url : ''}
                         // tslint:disable-next-line:no-empty
