@@ -13,23 +13,23 @@ const updateSchema = Joi.object().required().keys({
 })
 
 
-function serializeMessage(message, template) {
+function serializeMessage(message) {
     return {
-        id: message._id.toString(),
+        id: message.id,
         type: 'messages',
         attributes: {
-            'notification-text': template.notification_text,
-            'ios-title': message.ios_title || template.ios_title || "",
-            'android-title': message.ios_title || template.android_title || "",
-            'tags': template.tags || [],
+            'notification-text': message.notification_text,
+            'ios-title': message.ios_title || "",
+            'android-title': message.ios_title || "",
+            'tags': message.tags || [],
             'read': message.read,
             'saved-to-inbox': message.saved_to_inbox,
-            'content-type': template.content_type,
-            'website-url': template.website_url,
-            'deep-link-url': template.deeplink_url,
-            'landing-page': dasherize(template.landing_page_template),
-            'experience-id': template.experience_id,
-            'properties': template.properties || {},
+            'content-type': message.content_type,
+            'website-url': message.website_url,
+            'deep-link-url': message.deeplink_url,
+            'landing-page': dasherize(message.landing_page_template),
+            'experience-id': message.experience_id,
+            'properties': message.properties || {},
             'timestamp': moment.utc(message.timestamp).toISOString()
         }
     }
@@ -67,51 +67,61 @@ module.exports = function() {
                 return callback({ status: 422, message: "Failed to get current device" })
             }
 
-            methods.message.find(messageId, { fields: ['_id', 'message_template_id', 'read']}, function(err, message) {
-                if (err) {
-                    return callback({ status: 500, message: "Failed to get current message" })
-                }
-
-                if (message === null || message === undefined) {
-                    return callback({ status: 404, message: "Message not found" })
-                }
-
-                const templateId = message.message_template_id
-
-                if (templateId === null || templateId === undefined) {
-                    return callback({ status: 404, message: "Message template not found" })
-                }
-
-                methods.messageTemplate.find(templateId, { useCache: true }, function(err, template) {
+            if (methods.message.isV1Id(messageId)) {
+                methods.message.find(messageId, { fields: ['_id', 'message_template_id', 'read']}, function(err, message) {
                     if (err) {
-                        return callback({ status: 500, message: "Failed to find message template" })
+                        return callback({ status: 500, message: "Failed to get current message" })
                     }
 
-                    if (template === null || template === undefined) {
+                    if (message === null || message === undefined) {
+                        return callback({ status: 404, message: "Message not found" })
+                    }
+
+                    const templateId = message.message_template_id
+
+                    if (templateId === null || templateId === undefined) {
                         return callback({ status: 404, message: "Message template not found" })
                     }
 
-                    return callback(null, device, message, template)
+                    methods.messageTemplate.find(templateId, { useCache: true }, function(err, template) {
+                        if (err) {
+                            return callback({ status: 500, message: "Failed to find message template" })
+                        }
+
+                        if (template === null || template === undefined) {
+                            return callback({ status: 404, message: "Message template not found" })
+                        }
+
+                        const m = methods.message.serialize(message, template)
+                        return callback(null, device, m)
+                    })
                 })
-            })
+            } else {
+                methods.notification.get(device, messageId, function(err, notification) {
+                    if (err) {
+                        return callback({ status: 500, message: "Failed to get current message" })
+                    }
+
+                    return callback(null, device, notification)
+                })
+            }
         })
     }
 
    
-
     handlers.get = function(request, reply) {
         const methods = request.server.methods;
         const logger = request.server.plugins.logger.logger;
         const messageId = request.params.id;
 
-        before(request, function(err, device, message, template) {
+        before(request, function(err, device, message) {
             if (err) {
                 logger.error(err)
                 return writeReplyError(reply, err.status, { status: err.status, error: err.message })
             }
 
             let response = {
-                data: serializeMessage(message, template)
+                data: serializeMessage(message)
             }
 
             reply.writeHead(200, {
@@ -130,7 +140,7 @@ module.exports = function() {
         const logger = request.server.plugins.logger.logger;
         const messageId = request.params.id;
 
-        before(request, function(err, device, message, template) {
+        before(request, function(err, device, message) {
             if (err) {
                 logger.error(err)
                 return writeReplyError(reply, err.status, { status: err.status, error: err.message })
@@ -147,46 +157,24 @@ module.exports = function() {
                     return writeReplyError(reply, 400, { status: 400, error: "Missing attributes" })
                 }
 
-                let updates = {}
+                const isRead = attributes.read
 
-                Object.keys(attributes).forEach(function(key) {
-                    if (message[key] != attributes[key]) {
-                        updates[key] = attributes[key]
-                        message[key] = attributes[key]
-                    }
-                })
-
-                if (Object.keys(attributes).length === 0) {
-                    let response = {
-                        data: serializeMessage(message, template)
+                if (methods.message.isV1Id(message.id)) {
+                    let currentTime = new Date()
+                    const updates = {
+                        read: isRead,
+                        updated_at: currentTime
                     }
 
-                    reply.writeHead(200, {
-                        'Content-Type': 'application/json',
-                        'Connection': 'keep-alive'
-                    })
-
-                    reply.write(JSON.stringify(response))
-
-                    return reply.end()
-                }
-
-                let currentTime = new Date()
-                updates.updated_at = currentTime
-
-                methods.message.update(message._id, {"$set": updates }, function(err, response) {
-                    if (err) {
-                        return writeReplyError(reply, 500, { status: 500, error: "Failed to update message" })
-                    }
-
-                    methods.inbox.updateLastModifiedAt(device, currentTime, function(err) {
+                    methods.message.update(message._id, {"$set": updates }, function(err) {
                         if (err) {
-                            logger.error(err)
-                            return writeReplyError(reply, 500, { status: 500, error: "Failed to update inbox" })
+                            return writeReplyError(reply, 500, { status: 500, error: "Failed to update message" })
                         }
 
-                        let response = {
-                            data: serializeMessage(message, template)
+                        message.read = isRead
+
+                        const response = {
+                            data: serializeMessage(message)
                         }
 
                         reply.writeHead(200, {
@@ -198,7 +186,27 @@ module.exports = function() {
 
                         return reply.end()
                     })
-                })
+                } else {
+                    methods.notification.setReadStatus(device, message.id, isRead, function(err) {
+                        if (err) {
+                            return writeReplyError(reply, 500, {status: 500, error: "Failed to update message" })
+                        }
+
+                        message.read = isRead
+                        const response = {
+                            data: serializeMessage(message)
+                        }
+
+                        reply.writeHead(200, {
+                            'Content-Type': 'application/json',
+                            'Connection': 'leep-alive'
+                        })
+
+                        reply.write(JSON.stringify(response))
+
+                        return reply.end()
+                    })
+                }
             })
         })
     }
@@ -208,26 +216,37 @@ module.exports = function() {
         const logger = request.server.plugins.logger.logger;
         const messageId = request.params.id;
 
-        before(request, function(err, device, message, template) {
+        before(request, function(err, device, message) {
             if (err) {
                 return writeReplyError(reply, err.status, { status: err.status, error: err.message })
             }
 
-            methods.message.deleteOne(message._id, function(err) {
-                if (err) {
-                    return writeReplyError(reply, 500, { status: 500, error: "Failed to delete message "});
-                }
-                
-                methods.inbox.deleteMessage(device, message._id.toString(), function(err) {
+            if (methods.message.isV1Id(message.id)) {
+                methods.message.deleteOne(message.id, function(err) {
                     if (err) {
                         return writeReplyError(reply, 500, { status: 500, error: "Failed to delete message "});
                     }
 
+                    methods.inbox.deleteMessage(device, message.id, function(err) {
+                        if (err) {
+                            return writeReplyError(reply, 500, { status: 500, error: "Failed to delete message "});
+                        }
+
+                        reply.writeHead(204, {})
+                        return reply.end()
+                    })
+                })
+            } else {
+                methods.notification.delete(device, message.id, function(err) {
+                    if (err) {
+                        return writeReplyError(reply, 500, { status: 500, error: "Failed to delete message"});
+                    }
+
                     reply.writeHead(204, {})
                     return reply.end()
-
                 })
-            })
+            }
+            
         })
     }
 

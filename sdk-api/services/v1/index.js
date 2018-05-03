@@ -18,6 +18,7 @@ const ExperienceStatsService = require('./lib/experience-stats');
 const XenioZoneService = require('./lib/xenio-zone');
 const XenioPlaceService = require('./lib/xenio-place');
 const StaticSegmentService = require('./lib/static-segments');
+const NotificationService = require('./lib/notification');
 
 const ProfileService = require('./lib/profile')
 const DeviceService = require('./lib/device')
@@ -43,6 +44,7 @@ module.exports.register = function(server, options, next) {
     server.methods.xenioZone = {};
     server.methods.xenioPlace = {};
     server.methods.staticSegment = {};
+    server.methods.notification = {};
 
     server.methods.inbox.fetch = InboxService.fetch.bind(server);
     server.methods.inbox.find = InboxService.find.bind(server);
@@ -51,7 +53,9 @@ module.exports.register = function(server, options, next) {
     server.methods.inbox.getLastModifiedAt = InboxService.getLastModifiedAt.bind(server)
     server.methods.inbox.updateLastModifiedAt = InboxService.updateLastModifiedAt.bind(server)
 
+
     server.methods.message.isV1Id = MessageService.isV1Id.bind(server);
+    server.methods.message.serialize = MessageService.serialize.bind(server);
     server.methods.message.find = MessageService.find.bind(server);
     server.methods.message.findAll = MessageService.findAll.bind(server);
     server.methods.message.update = MessageService.update.bind(server);
@@ -103,6 +107,11 @@ module.exports.register = function(server, options, next) {
     server.methods.xenioPlace.findById = XenioPlaceService.findById.bind(server);
 
     server.methods.staticSegment.withinSegment = StaticSegmentService.withinSegment.bind(server);
+
+    server.methods.notification.serialize = NotificationService.serialize.bind(server);
+    server.methods.notification.get = NotificationService.get.bind(server);
+    server.methods.notification.setReadStatus = NotificationService.setReadStatus.bind(server);
+    server.methods.notification.delete = NotificationService.delete.bind(server);
 
     server.methods.profile = ProfileService(server.connections.audience.client, server.plugins.logger.logger, server.connections.elasticsearch.queue)
     server.methods.device = DeviceService(server.connections.audience.client, server.plugins.logger.logger)

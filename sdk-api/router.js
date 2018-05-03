@@ -16,8 +16,7 @@ const RoverApiAuth = require('./auth/rover-api-auth');
 
 const EventsMatcher = new RegExp("^\/v1\/events$");
 const InboxLandingPageMatcher = new RegExp("^\/v1\/inbox\/+([a-f0-9]{24})\/+landing-page$", 'i');
-const InboxMessageMatcher = new RegExp("^\/v1\/inbox\/+messages\/+([a-f0-9]{24})$");
-const InboxMessageMatcher2 = new RegExp("^\/v1\/inbox\/+([a-f0-9]{24})$");
+const InboxMessageMatcher = new RegExp("^\/v1\/inbox(\/messages){0,1}\/+([a-f0-9]{24}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$");
 const InboxMatcher = new RegExp("^\/v1\/inbox$", 'i');
 
 const InboxController = require('./controllers/v1/inbox')()
@@ -84,14 +83,7 @@ const route = function(req, res) {
             } else if(match = url.match(InboxMessageMatcher)) {
                 // GET /v1/inbox/messages/57e4181bc69a2845d977f7c0
                 req.params = {
-                    id: match[1]
-                };
-                newrelic.setTransactionName("v1/inbox/messages");
-                return InboxMessagesController.get(req, res);
-            } else if (match = url.match(InboxMessageMatcher2)) {
-                // GET /v1/inbox/57e4181bc69a2845d977f7c0
-                req.params = {
-                    id: match[1]
+                    id: match[2]
                 };
                 newrelic.setTransactionName("v1/inbox/messages");
                 return InboxMessagesController.get(req, res);
@@ -155,14 +147,7 @@ const route = function(req, res) {
                 if(match = url.match(InboxMessageMatcher)) {
                     // GET /v1/inbox/messages/57e4181bc69a2845d977f7c0
                     req.params = {
-                        id: match[1]
-                    };
-                    newrelic.setTransactionName("v1/inbox/messages");
-                    return InboxMessagesController.update(req, res);
-                } else if (match = url.match(InboxMessageMatcher2)) {
-                    // GET /v1/inbox/57e4181bc69a2845d977f7c0
-                    req.params = {
-                        id: match[1]
+                        id: match[2]
                     };
                     newrelic.setTransactionName("v1/inbox/messages");
                     return InboxMessagesController.update(req, res);
@@ -185,14 +170,7 @@ const route = function(req, res) {
             if(match = url.match(InboxMessageMatcher)) {
                 // DELETE /v1/inbox/messages/57e4181bc69a2845d977f7c0
                 req.params = {
-                    id: match[1]
-                };
-                newrelic.setTransactionName("v1/inbox/messages");
-                return InboxMessagesController.destroy(req, res);
-            } else if (match = url.match(InboxMessageMatcher2)) {
-                // DELETE /v1/inbox/57e4181bc69a2845d977f7c0
-                req.params = {
-                    id: match[1]
+                    id: match[2]
                 };
                 newrelic.setTransactionName("v1/inbox/messages");
                 return InboxMessagesController.destroy(req, res);

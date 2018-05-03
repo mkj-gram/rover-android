@@ -1,11 +1,35 @@
 'use strict';
 
 const util = require('util');
+const dasherize = require('dasherize');
 
 const collection = 'messages';
 
 const internals = {};
 
+
+internals.serialize = function(message, template) {
+    if (template === undefined) {
+        return undefined
+    }
+    
+    return {
+        id: message._id.toString(),
+        notification_text: template.notification_text,
+        ios_title: message.ios_title || template.ios_title || "",
+        android_title: message.android_title || template.android_title || "",
+        tags: template.tags || [],
+        read: message.read,
+        saved_to_inbox: message.saved_to_inbox,
+        content_type: template.content_type,
+        website_url: template.website_url,
+        deep_link_url: template.deeplink_url,
+        landing_page: dasherize(template.landing_page_template),
+        experience_id: template.experience_id,
+        properties: template.properties || {},
+        timestamp: message.timestamp
+    }
+}
 
 internals.isV1Id = function(id) {
     const server = this;
@@ -53,9 +77,6 @@ internals.findAll = function(ids, args, callback) {
     const logger = server.plugins.logger.logger;
 
     logger.debug(`Service: [message.findAll: ${ids}] ` + util.inspect(args, true, null, false));
-    // TODO
-    // check to see if they are already objectids or not
-
     let objectIds = ids.map( id => ObjectId(id) );
 
     let formattedArgs = {}
@@ -139,6 +160,7 @@ internals.bulkInsert = function(messages, callback) {
 
 module.exports = {
     isV1Id: internals.isV1Id,
+    serialize: internals.serialize,
     find: internals.find,
     findAll: internals.findAll,
     update: internals.update,
