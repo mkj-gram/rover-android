@@ -2,13 +2,17 @@
 
 set -e
 
+source ./docker/functions.bash
+
+
 run() {
-	go run /go/src/github.com/roverplatform/rover/auth/service/cmd/authsvcd/main.go -db-dsn=${DB_DSN}
+	go run ./auth/service/cmd/authsvcd/main.go -db-dsn=${DB_DSN}
 }
 
 test() {
-  go test -tags integration \
-    github.com/roverplatform/rover/auth/service/... \
+  waiton postgres 5432
+
+  go test -tags integration ./auth/service/... \
     -pg-dsn=${DB_DSN} \
     -service.migrations.dir=./db/migrations/postgres \
     -service.migrations.run true
@@ -21,15 +25,15 @@ bench() {
 }
 
 migrate() {
-  go run /go/src/github.com/roverplatform/rover/auth/service/cmd/migration-cli/main.go \
+  waiton postgres 5432
+
+  go run ./auth/service/cmd/migration-cli/main.go \
       -pg-dsn=${DB_DSN} \
       -migrations-dir=${MIGRATION_DIR}
 }
 
-create_account() { 
-  go run /go/src/github.com/roverplatform/rover/auth/service/cmd/auth-cli/main.go -pg-dsn ${DB_DSN} -name ${NAME} -password ${PASSWORD} -email ${EMAIL}
+create_account() {
+  go run ./auth/service/cmd/auth-cli/main.go -pg-dsn ${DB_DSN} -name ${NAME} -password ${PASSWORD} -email ${EMAIL}
 }
 
-for cmd in $*; do
-  $cmd
-done
+main $@

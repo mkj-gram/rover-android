@@ -1,8 +1,7 @@
 #!/bin/sh
 
 set -e
-# set -x
-
+source ./docker/functions.bash
 
 SVC_HOME=./campaigns
 
@@ -15,15 +14,17 @@ run_worker() {
 }
 
 test() {
+  waiton postgres 5432
+
   go test $SVC_HOME/...
 }
 
 migrate() {
+  waiton postgres 5432
+
   go run ./go/cmd/postgres-cli/main.go \
     --db-dsn=${POSTGRES_DSN} \
     --migration-path=$SVC_HOME/db/migrations
 }
 
-for cmd in $@; do
-  $cmd
-done
+main $@

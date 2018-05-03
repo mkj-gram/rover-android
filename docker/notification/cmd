@@ -1,22 +1,10 @@
 #!/bin/sh
 
-# 
 # set -x
 
+source ./docker/functions.bash
 
 SVC_HOME=./notification
-
-waiton() {
-    while :
-    do
-        nc -z $1 $2
-        result=$?
-        if [[ $result -eq 0 ]]; then
-            break
-        fi
-        sleep 1
-    done
-}
 
 run() {
     go run $SVC_HOME/cmd/notification-service/main.go
@@ -25,7 +13,7 @@ run() {
 test() {
     waiton postgres 5432
     waiton scylla 9042
-    
+
     go test $SVC_HOME/...
 }
 
@@ -41,6 +29,4 @@ migrate() {
     --keyspace-replicas=1
 }
 
-for cmd in $@; do
-  $cmd
-done
+main $@

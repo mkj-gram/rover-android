@@ -4,7 +4,7 @@ RUN ?= ${DCF} run --rm auth-service
 ROVER ?= github.com/roverplatform/rover
 
 test:
-	${RUN} go test -tags integration -v ${ROVER}/auth/service/...
+	${RUN} ./docker/auth-service/cmd migrate test
 
 run:
 	${RUN}
