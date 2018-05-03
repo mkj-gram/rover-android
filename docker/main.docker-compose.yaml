@@ -298,6 +298,7 @@ services:
       - audience-service
       - auth-service
       - geocoder-service
+      - notification-service
     working_dir: /rover/sdk-api
     ports: [3100]
     volumes:
@@ -315,8 +316,9 @@ services:
       AUDIENCE_V1_SERVICE_HOST: audience-service
       AUTH_V1_SERVICE_HOST: auth-service
       GEOCODER_V1_SERVICE_HOST: geocoder-service
+      NOTIFICATION_V1_SERVICE_HOST: notification-service
 
-      MONGODB_URI: mongodb://mongo:27017/sdk-api-dev
+      MONGODB_URI: mongodb://mongo:27017/rover-local
 
       ELASTICSEARCH_URLS: http://elastic:9200/
 

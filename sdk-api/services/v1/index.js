@@ -44,6 +44,7 @@ module.exports.register = function(server, options, next) {
     server.methods.xenioPlace = {};
     server.methods.staticSegment = {};
 
+    server.methods.inbox.fetch = InboxService.fetch.bind(server);
     server.methods.inbox.find = InboxService.find.bind(server);
     server.methods.inbox.addMessage = InboxService.addMessage.bind(server);
     server.methods.inbox.deleteMessage = InboxService.deleteMessage.bind(server);

@@ -14,12 +14,70 @@ docker exec -it  docker_postgres_1 psql -U postgres -d rover-local
 
 ## Testing
 
+### `/v1/inbox`
+
+Insert Data into legacy inbox
+```
+// Create a Message Template
+docker exec -it  docker_postgres_1 psql -U postgres -d rover-local
+
+insert into message_templates (id,account_id,type,title,notification_text,save_to_inbox,content_type,experience_id,updated_at,created_at)
+values(1,1,'ScheduledMessageTemplate','Untitled','hello',true,'experience','ex-id',now(),now());
+
+
+// Create a MongoDB message
+docker exec -it docker_mongo_1 mongo
+
+use rover-local
+
+db.messages.insert({
+  message_template_id: 1,
+  read: false,
+  viewed: false,
+  saved_to_inbox: true,
+  timestamp: new Date()  
+})
+
+// Record the ObjectID from the above insert
+// Add to redis inbox
+
+docker exec -it docker_redis_1 redis-cli
+
+// inbox key "{account_id}:{device_id}"
+SELECT 1
+LPUSH 1:2273F676-DEED-495B-9101-BF9037DEB28B 5ae904b21c4dde5ea0ef4ea3
+```
+
+Grab the inbox
+```
+curl -X "GET" "http://localhost:32791/v1/inbox" \
+    -H 'x-rover-api-key: 4cb63ba9fe421b53849439ef914f44f03aaaeb16' \
+    -H 'x-rover-device-id: 2273F676-DEED-495B-9101-BF9037DEB28B'
+```
+
+Insert data into new inbox
+```
+docker exec -it docker_scylla_1 cqlsh
+
+
+USE notification_dev;
+INSERT INTO notification_settings
+  (campaign_id, account_id, attachment_type, tap_behavior_type, tap_behavior_presentation_type)
+  VALUES (1,1, 'AUDIO', 'OPEN_EXPERIENCE', 'IN_BROWSER');
+
+INSERT INTO notifications
+(id, account_id, campaign_id, device_id, title, body, is_read, is_deleted)
+VALUES
+(903a2440-4e1b-11e8-9c2d-fa7ae01bbebc, 1, 1, '2273F676-DEED-495B-9101-BF9037DEB28B', 'title1', 'body1', false, true);
+
+```
+
 ### `/v1/events`
 
 ```
-curl -X "POST" "http://localhost:3100/v1/events" \
+curl -X "POST" "http://localhost:32783/v1/events" \
      -H 'Content-Type: application/json; charset=utf-8' \
-     -H 'x-rover-api-key: token1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' \
+     -H 'x-rover-api-key: 4cb63ba9fe421b53849439ef914f44f03aaaeb16' \
      -H 'x-rover-device-id: 2273F676-DEED-495B-9101-BF9037DEB28B' \
      -d $'{
   "data": {

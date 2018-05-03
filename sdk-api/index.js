@@ -66,6 +66,18 @@ tasks.push(function(callback)  {
 })
 
 tasks.push(function(callback)  {
+    let notification = require('./connections/notification')
+    notification.register(server, {}, (err) => {
+        if (err) {
+            return callback(err)
+        }
+
+        Logger.info("Notification Client initialized")
+        return callback()
+    })
+})
+
+tasks.push(function(callback)  {
     let geocoder = require('./connections/geocoder')
     geocoder.register(server, {}, (err) => {
         if (err) {
