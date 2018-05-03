@@ -363,7 +363,7 @@ steps:
     name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/auth-service:$REVISION_ID
+      - --tag=gcr.io/$PROJECT_ID/auth-service:$SHORT_SHA
       - ./docker/auth-service/
     waitFor:
       - 'build-auth-service-executable'
@@ -384,7 +384,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/audience-service:$REVISION_ID
+      - --tag=gcr.io/$PROJECT_ID/audience-service:$SHORT_SHA
       - docker/audience-service/
     waitFor:
       - 'build-audience-service-executable'
@@ -421,7 +421,7 @@ steps:
     name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/campaigns:$REVISION_ID
+      - --tag=gcr.io/$PROJECT_ID/campaigns:$SHORT_SHA
       - docker/campaigns/
     waitFor:
       - 'build-campaigns-resources'
@@ -459,7 +459,7 @@ steps:
     name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/notification:$REVISION_ID
+      - --tag=gcr.io/$PROJECT_ID/notification:$SHORT_SHA
       - docker/notification/
     waitFor:
       - 'build-notification-resources'
@@ -482,7 +482,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/events-pipeline:$REVISION_ID
+      - --tag=gcr.io/$PROJECT_ID/events-pipeline:$SHORT_SHA
       - docker/events/pipeline
     waitFor:
       - 'build-events-pipeline-executable'
@@ -503,7 +503,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID
+      - --tag=gcr.io/$PROJECT_ID/audience-segments-worker:$SHORT_SHA
       - docker/audience-segments-worker/
     waitFor:
       - 'build-audience-segments-worker-executable'
@@ -525,7 +525,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - '--tag=gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
+      - '--tag=gcr.io/$PROJECT_ID/bulk-gateway:$SHORT_SHA'
       - 'bulk-gateway'
     waitFor:
       - 'build-bulk-gateway-prune'
@@ -558,7 +558,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
-      - '--tag=gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
+      - '--tag=gcr.io/$PROJECT_ID/graphql-gateway:$SHORT_SHA'
       - 'graphql-gateway'
     waitFor:
       - 'build-graphql-gateway-prune'
@@ -578,7 +578,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - '--tag=gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID'
+      - '--tag=gcr.io/$PROJECT_ID/rest-gateway:$SHORT_SHA'
       - 'rest-gateway'
     waitFor:
       - 'build-rest-gateway-prune'
@@ -600,7 +600,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - '--tag=gcr.io/$PROJECT_ID/scheduled-messages-worker:$REVISION_ID'
+      - '--tag=gcr.io/$PROJECT_ID/scheduled-messages-worker:$SHORT_SHA'
       - 'scheduled-messages-worker'
     waitFor:
       - 'build-scheduled-messages-worker-prune'
@@ -620,7 +620,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - '--tag=gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID'
+      - '--tag=gcr.io/$PROJECT_ID/sdk-api:$SHORT_SHA'
       - 'sdk-api'
     waitFor:
       - 'build-sdk-api-prune'
@@ -635,14 +635,14 @@ options:
 # ----------------------------------------------------- #
 
 images:
-  - 'gcr.io/$PROJECT_ID/auth-service:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/audience-service:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/audience-segments-worker:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/campaigns:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/notification:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/events-pipeline:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/bulk-gateway:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/graphql-gateway:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/rest-gateway:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/scheduled-messages-worker:$REVISION_ID'
-  - 'gcr.io/$PROJECT_ID/sdk-api:$REVISION_ID'
+  - 'gcr.io/$PROJECT_ID/auth-service:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/audience-service:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/audience-segments-worker:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/campaigns:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/notification:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/events-pipeline:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/bulk-gateway:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/graphql-gateway:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/rest-gateway:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/scheduled-messages-worker:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/sdk-api:$SHORT_SHA'
