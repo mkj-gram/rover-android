@@ -7,6 +7,12 @@ const collection = 'messages';
 const internals = {};
 
 
+internals.isV1Id = function(id) {
+    const server = this;
+    const ObjectId = server.connections.mongodb.ObjectId;
+
+    return ObjectId.isValid(id)
+}
 
 internals.find = function(id, args, callback) {
     const server = this;
@@ -132,6 +138,7 @@ internals.bulkInsert = function(messages, callback) {
 };
 
 module.exports = {
+    isV1Id: internals.isV1Id,
     find: internals.find,
     findAll: internals.findAll,
     update: internals.update,

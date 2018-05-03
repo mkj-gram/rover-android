@@ -25,6 +25,17 @@ class MessageBaseProcessor extends BaseProcessor {
         }
     }
 
+    shouldProcessEvent(callback) {
+        const server = this._server
+        const methods = server.methods
+
+        if (methods.message.isV1Id(this._messageId || this._message.id)) {
+            return callback(true)
+        }
+        
+        return callback(false);
+    }
+
     valid() {
         if (super.valid() == false) {
             return false;

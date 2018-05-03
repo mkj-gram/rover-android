@@ -51,6 +51,7 @@ module.exports.register = function(server, options, next) {
     server.methods.inbox.getLastModifiedAt = InboxService.getLastModifiedAt.bind(server)
     server.methods.inbox.updateLastModifiedAt = InboxService.updateLastModifiedAt.bind(server)
 
+    server.methods.message.isV1Id = MessageService.isV1Id.bind(server);
     server.methods.message.find = MessageService.find.bind(server);
     server.methods.message.findAll = MessageService.findAll.bind(server);
     server.methods.message.update = MessageService.update.bind(server);
