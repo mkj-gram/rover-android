@@ -25,18 +25,22 @@ export interface PhonePreviewProps extends ResponsiveContainerProps {
     previewTitle?: string
 }
 
-const renderPreviewDescription = (description: string, media: Media) => (
-    <Text
-        text={description}
-        size="large"
-        textStyle={{
-            width: 200,
-            height: 48,
-            display: 'block',
-            margin: `${media === 'Mobile' ? '24px' : '40px'} auto`
-        }}
-    />
-)
+const renderPreviewDescription = (description: string, media: Media) => {
+    if (description) {
+        return (
+            <Text
+                text={description}
+                size="large"
+                textStyle={{
+                    width: 200,
+                    height: 48,
+                    display: 'block',
+                    margin: `${media === 'Mobile' ? '24px' : '40px'} auto`
+                }}
+            />
+        )
+    }
+}
 
 const renderFullScreenPreview = (args: PhonePreviewProps) => {
     const {
@@ -57,6 +61,7 @@ const renderFullScreenPreview = (args: PhonePreviewProps) => {
 
     const mobileStyle: React.CSSProperties = {
         margin: '0 auto',
+        marginTop: 56,
         width: 326,
         animation: 'open ease-out 400ms'
     }
@@ -77,7 +82,7 @@ const renderFullScreenPreview = (args: PhonePreviewProps) => {
         width: '100%',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        marginTop: 64,
         animation: 'open ease-out 600ms',
         flexDirection: 'column'
     }

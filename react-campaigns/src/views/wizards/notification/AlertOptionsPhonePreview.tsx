@@ -81,20 +81,20 @@ class AlertOptionsPhonePreview extends React.Component<
         let bottomView = (
             <div
                 style={{
-                    paddingTop: device !== 'Mobile' ? 40 : 24,
+                    paddingTop: device !== 'Desktop' ? 24 : 40,
                     width:
                         val === 'notificationAlertOptionBadgeNumber'
                             ? 200
                             : 151,
                     textAlign: 'center',
-                    paddingBottom: device !== 'Mobile' ? 'none' : 24
+                    paddingBottom: device === 'Tablet' ? 24 : 0
                 }}
             >
                 <Text text={matchName[val]} size="large" />
             </div>
         )
 
-        if (device === 'Mobile') {
+        if (device !== 'Desktop') {
             tempView = bottomView
             bottomView = topView
             topView = tempView
@@ -148,8 +148,7 @@ class AlertOptionsPhonePreview extends React.Component<
                     <div
                         style={{
                             display: 'flex',
-                            justifyContent:
-                                device === 'Tablet' ? 'center' : 'flex-start',
+                            justifyContent: 'flex-start',
                             alignItems: 'center',
                             flexDirection: 'column',
                             width: '100%',

@@ -173,7 +173,7 @@ class MessageAndMedia extends React.Component<
                 <PhonePreview
                     animation={`${phonePreviewAnimation} ease-out 400ms`}
                     device={device}
-                    buttonLeft="Cancel"
+                    buttonLeft="Close"
                     buttonLeftCallback={() =>
                         this.setState({ phonePreviewAnimation: 'close' }, () =>
                             setTimeout(
