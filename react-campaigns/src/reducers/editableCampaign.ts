@@ -23,7 +23,7 @@ export const shouldCreateEditableCampaign = (
 export const getEditableCampaign = (state: State) => state.editableCampaign
 
 export const getShouldShowSaveAndClose = (state: State) => {
-    const { editableCampaign } = state
+    const { editableCampaign, editableUIState } = state
     const { campaignId } = editableCampaign
 
     const campaign = getCampaign(state, campaignId)
@@ -34,5 +34,16 @@ export const getShouldShowSaveAndClose = (state: State) => {
         ...editableCampaignFields
     } = editableCampaign
 
-    return !isEqual(editableCampaignFields, campaignFields)
+    const nextTriggeredShowSaveAndClose = () =>
+        Object.keys(editableUIState).some(
+            (page: keyof editableUIState) =>
+                editableUIState[page].seen &&
+                ((UIState as string).length === 0 ||
+                    !JSON.parse(UIState as string)[page].seen)
+        )
+
+    return (
+        !isEqual(editableCampaignFields, campaignFields) ||
+        nextTriggeredShowSaveAndClose()
+    )
 }
