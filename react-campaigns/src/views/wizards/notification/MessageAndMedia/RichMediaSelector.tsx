@@ -82,27 +82,28 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                 break
         }
     }
-    return (
+
+    const dividerLine = () => (
         <div
             style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                marginTop: device === 'Mobile' && 56,
-                overflow: 'auto',
-                backgroundColor: 'white'
+                height: 1,
+                width: device !== 'Mobile' ? 352 : '100%',
+                background: titanium
             }}
-        >
+        />
+    )
+    const Fragment = React.Fragment
+    return (
+        <Fragment>
             {device === 'Mobile' && (
-                <Text
-                    size="h1"
-                    text="Add Attachment"
-                    textStyle={{
-                        alignSelf: 'flex-start',
+                <div
+                    style={{
                         margin: 24,
                         marginBottom: 8
                     }}
-                />
+                >
+                    <Text size="h1" text="Add Attachment" />
+                </div>
             )}
             <TabBar>
                 <Tab
@@ -130,6 +131,7 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                     onClick={() => updateRichMediaAttachmentTab('VIDEO', '')}
                 />
             </TabBar>
+
             <div
                 style={{
                     padding:
@@ -139,90 +141,64 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                 }}
             >
                 <Text
-                    size="small"
+                    size={device === 'Mobile' ? 'medium' : 'small'}
                     text={getMediaDescription()}
                     textStyle={{
                         margin:
                             device === 'Mobile'
                                 ? '24px 0 23px 0'
                                 : '0 0 15px 0',
-                        width: 352
+                        width: device !== 'Mobile' ? 352 : '100%'
                     }}
                 />
-                <div
-                    style={{
-                        height: 1,
-                        width: 352,
-                        background: titanium
+                {dividerLine()}
+
+                <TextInput
+                    id="notification-rich-media-attachment"
+                    isRequired={true}
+                    deleteText={() =>
+                        updateEditableCampaign({
+                            notificationAttachment: null
+                        })
+                    }
+                    fieldStyle={{
+                        padding:
+                            device === 'Mobile' ? '24px 0 23px' : '16px 0 15px',
+                        border: 'none',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
                     }}
-                />
-                {/* {richMediaAttachmentTab === 'IMAGE' && (
-                    <div
-                        style={{
-                            alignItems: 'center',
-                            display: 'flex',
-                            borderBottom: `1px solid ${titanium}`,
-                            height: device === 'Mobile' ? 96 : 64,
-                            width: 352
-                        }}
-                    >
-                        <Button
-                            onClick={() => window.console.log('upload button')}
-                            type="primary"
-                            size={device === 'Mobile' ? 'large' : 'small'}
-                            text={`Choose ${richMediaAttachmentTab[0] +
-                                richMediaAttachmentTab.slice(1).toLowerCase()}`}
-                        />
-                    </div>
-                )} */}
-                <div style={{ width: 352 }}>
-                    <TextInput
-                        id="notification-rich-media-attachment"
-                        isRequired={true}
-                        deleteText={() =>
+                    isEditingText={isEditingRichMediaURL}
+                    label=""
+                    media={device}
+                    placeholder={`Enter ${richMediaAttachmentTab.toLowerCase()} ${
+                        richMediaAttachmentTab !== 'IMAGE' ? 'clip' : ''
+                    } URL`}
+                    startEditingText={() => updateEditingField('url')}
+                    text={url && type === richMediaAttachmentTab ? url : ''}
+                    // tslint:disable-next-line:no-empty
+                    handleBlurChange={() => {}}
+                    updateText={(text: string) =>
+                        updateEditingField('', () => {
+                            close()
                             updateEditableCampaign({
-                                notificationAttachment: null
+                                notificationAttachment: {
+                                    type: richMediaAttachmentTab,
+                                    url: text
+                                }
                             })
-                        }
-                        fieldStyle={{
-                            padding: device === 'Mobile' ? '24px 0' : '16px 0',
-                            border: 'none',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                        }}
-                        isEditingText={isEditingRichMediaURL}
-                        label=""
-                        media={device}
-                        placeholder={`Enter ${richMediaAttachmentTab.toLowerCase()} ${
-                            richMediaAttachmentTab !== 'IMAGE' ? 'clip' : ''
-                        } URL`}
-                        startEditingText={() => updateEditingField('url')}
-                        text={url && type === richMediaAttachmentTab ? url : ''}
-                        // tslint:disable-next-line:no-empty
-                        handleBlurChange={() => {}}
-                        updateText={(text: string) =>
-                            updateEditingField('', () => {
-                                close()
-                                updateEditableCampaign({
-                                    notificationAttachment: {
-                                        type: richMediaAttachmentTab,
-                                        url: text
-                                    }
-                                })
-                            })
-                        }
-                    />
-                </div>
+                        })
+                    }
+                    primaryTextSize={device === 'Mobile' ? 'large' : 'medium'}
+                />
+
+                {device === 'Mobile' && richMediaAttachmentTab === 'IMAGE'
+                    ? dividerLine()
+                    : null}
                 {richMediaAttachmentTab !== 'IMAGE' && (
                     <React.Fragment>
-                        <div
-                            style={{
-                                height: 1,
-                                width: 352,
-                                background: titanium
-                            }}
-                        />
+                        {dividerLine()}
                         <Alert
                             message={`${richMediaAttachmentTab[0] +
                                 richMediaAttachmentTab
@@ -230,15 +206,14 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                                     .toLowerCase()} not supported on Android`}
                             style={{
                                 margin:
-                                    device === 'Mobile' ? '24px 0' : '16px 0',
-                                width: 352
+                                    device === 'Mobile' ? '24px 0' : '16px 0'
                             }}
                             type="warn"
                         />
                     </React.Fragment>
                 )}
             </div>
-        </div>
+        </Fragment>
     )
 }
 

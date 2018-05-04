@@ -150,15 +150,7 @@ const NotificationAttachmentPicker: React.SFC<
                         child={children[1]}
                         animation={isPopoverOpen}
                         navbarProps={{
-                            buttonLeftCallback: () => close(),
-                            style: {
-                                containerStyle: {
-                                    position: 'fixed',
-                                    top: 0,
-                                    left: 0,
-                                    zIndex: 2
-                                }
-                            }
+                            buttonLeftCallback: () => close()
                         }}
                     />,
                     document.getElementById('mainModalLeft')
