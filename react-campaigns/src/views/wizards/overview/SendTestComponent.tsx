@@ -97,11 +97,7 @@ class SendTestComponent extends React.Component<
             <div
                 style={getRowStyle() as React.CSSProperties}
                 key={index}
-                onClick={
-                    device !== 'Desktop'
-                        ? () => this.handleCheck(dev)
-                        : () => null
-                }
+                onClick={() => this.handleCheck(dev)}
             >
                 <Text
                     text={this.getDeviceText(listOfTestDevices, dev)}

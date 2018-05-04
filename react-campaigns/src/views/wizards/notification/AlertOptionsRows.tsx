@@ -94,11 +94,7 @@ const AlertOptionsRows: React.SFC<
         }
     }
 
-    const handleRowClick = (val: string) => {
-        if (device !== 'Desktop') {
-            handleSwitchChange(val)
-        }
-    }
+    const handleRowClick = (val: string) => handleSwitchChange(val)
 
     const handleMouseOver = (val: string) => {
         if (device === 'Desktop' && window.innerWidth >= 1140) {

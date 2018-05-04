@@ -107,9 +107,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
             <div
                 style={{ background: white, width: '100%' }}
                 onClick={
-                    device !== 'Desktop' && !experienceOff
-                        ? () => handlePageDirect(name)
-                        : () => null
+                    !experienceOff ? () => handlePageDirect(name) : () => null
                 }
                 key={name}
             >

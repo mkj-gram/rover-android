@@ -504,11 +504,7 @@ const CampaignsList: React.SFC<Props> = ({
                             flex: '0 0 auto',
                             borderBottom: `1px solid ${titanium}`
                         }}
-                        onClick={() =>
-                            media === 'Desktop'
-                                ? null
-                                : pushToOverview(campaignId)
-                        }
+                        onClick={() => pushToOverview(campaignId)}
                     >
                         {renderCampaign(
                             campaigns[campaignId],

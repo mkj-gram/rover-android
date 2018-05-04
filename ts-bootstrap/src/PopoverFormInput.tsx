@@ -123,11 +123,7 @@ const PopoverFormInput: React.SFC<PopoverFormInputProps> = ({
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}
-                onClick={() => {
-                    if (media === 'Mobile' || media === 'Tablet') {
-                        startEditingText()
-                    }
-                }}
+                onClick={() => startEditingText()}
             >
                 <Text
                     text={label}
@@ -148,10 +144,7 @@ const PopoverFormInput: React.SFC<PopoverFormInputProps> = ({
                 alignItems: 'center'
             }}
             onClick={(e: any) => {
-                if (
-                    (media === 'Mobile' || media === 'Tablet') &&
-                    !isEditingText
-                ) {
+                if (!isEditingText) {
                     startEditingText()
                 }
             }}

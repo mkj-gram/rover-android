@@ -176,11 +176,7 @@ const TextInput: React.SFC<TextInputProps> = ({
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}
-                onClick={() => {
-                    if (media === 'Mobile' || media === 'Tablet') {
-                        startEditingText()
-                    }
-                }}
+                onClick={() => startEditingText()}
             >
                 <Text
                     text={label}
@@ -201,10 +197,7 @@ const TextInput: React.SFC<TextInputProps> = ({
                 alignItems: 'center'
             }}
             onClick={(e: any) => {
-                if (
-                    (media === 'Mobile' || media === 'Tablet') &&
-                    !isEditingText
-                ) {
+                if (!isEditingText) {
                     startEditingText()
                 }
             }}

@@ -261,10 +261,9 @@ class TapBehaviorContainer extends React.Component<
             case 'Mobile':
                 return this.props.openTapBehaviorSelector()
             case 'Tablet':
-                return this.handleShowNotificationOptions()
             case 'Desktop':
             default:
-                return null
+                return this.handleShowNotificationOptions()
         }
     }
 

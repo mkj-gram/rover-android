@@ -51,7 +51,7 @@ const FormSwitch: React.SFC<
                 justifyContent: 'space-between',
                 alignItems: 'center'
             }}
-            onClick={!hoverable ? handleUpdateSwitch : () => null}
+            onClick={handleUpdateSwitch}
         >
             <Text text={displayText} size="large" />
             <Switch

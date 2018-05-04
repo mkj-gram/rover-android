@@ -91,9 +91,7 @@ const NotificationAttachmentPicker: React.SFC<
                 borderBottom: `1px solid ${titanium}`
             }}
             onClick={() =>
-                device !== 'Desktop' &&
-                activePopover !== 'notification-attachment-picker' &&
-                open()
+                activePopover !== 'notification-attachment-picker' && open()
             }
         >
             {notificationAttachment ? (

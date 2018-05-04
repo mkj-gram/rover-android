@@ -285,27 +285,25 @@ class TapBehaviorBody extends React.Component<
                     flexDirection: 'column',
                     width: '100%'
                 }}
+                onClick={() =>
+                    this.setState({
+                        urlContentEditable: !this.state.urlContentEditable
+                    })
+                }
             >
                 <Text text="Which website?" size="small" label={true} />
-                <div
-                    onClick={() =>
-                        this.setState({
-                            urlContentEditable: !this.state.urlContentEditable
-                        })
-                    }
-                >
-                    <Text
-                        text={editableCampaign.notificationTapBehaviorUrl}
-                        size="large"
-                        contentEditable={this.state.urlContentEditable}
-                        handleChange={this.handleURLChange}
-                        placeholder={true}
-                        id="websiteURL"
-                        onBlurChange={true}
-                        placeholderText="Enter website URL"
-                        textStyle={{ width: '100%' }}
-                    />
-                </div>
+
+                <Text
+                    text={editableCampaign.notificationTapBehaviorUrl}
+                    size="large"
+                    contentEditable={this.state.urlContentEditable}
+                    handleChange={this.handleURLChange}
+                    placeholder={true}
+                    id="websiteURL"
+                    onBlurChange={true}
+                    placeholderText="Enter website URL"
+                    textStyle={{ width: '100%' }}
+                />
             </div>
         )
 
@@ -345,10 +343,9 @@ class TapBehaviorBody extends React.Component<
             case 'Mobile':
                 return this.props.openTapBehaviorWebsitePresentation()
             case 'Tablet':
-                return this.handleShowPresentationPopover()
             case 'Desktop':
             default:
-                return null
+                return this.handleShowPresentationPopover()
         }
     }
 
@@ -361,27 +358,25 @@ class TapBehaviorBody extends React.Component<
                     flexDirection: 'column',
                     width: '100%'
                 }}
+                onClick={() =>
+                    this.setState({
+                        urlContentEditable: !this.state.urlContentEditable
+                    })
+                }
             >
                 <Text text="Which deep link?" size="small" label={true} />
-                <div
-                    onClick={() =>
-                        this.setState({
-                            urlContentEditable: !this.state.urlContentEditable
-                        })
-                    }
-                >
-                    <Text
-                        text={editableCampaign.notificationTapBehaviorUrl}
-                        size="large"
-                        contentEditable={this.state.urlContentEditable}
-                        handleChange={this.handleURLChange}
-                        placeholder={true}
-                        id="deeplinkView"
-                        onBlurChange={true}
-                        placeholderText="Enter deep link URL"
-                        textStyle={{ width: '100%' }}
-                    />
-                </div>
+
+                <Text
+                    text={editableCampaign.notificationTapBehaviorUrl}
+                    size="large"
+                    contentEditable={this.state.urlContentEditable}
+                    handleChange={this.handleURLChange}
+                    placeholder={true}
+                    id="deeplinkView"
+                    onBlurChange={true}
+                    placeholderText="Enter deep link URL"
+                    textStyle={{ width: '100%' }}
+                />
             </div>
         )
 
