@@ -252,7 +252,7 @@ class Form extends React.Component<
 
     render() {
         const Fragment = React.Fragment
-        const { children, device } = this.props
+        const { children, device, getTypeProgress, type } = this.props
         const { formStack, useBackFormAnimation } = this.state
 
         const formChildStyle: React.CSSProperties = {
@@ -266,7 +266,7 @@ class Form extends React.Component<
         }
         const wizardProps = {
             device,
-            progress: (formStack.length - 1) / children.length * 100,
+            progress: getTypeProgress(type),
             rightToolbarElement:
                 children.length === formStack.length
                     ? this.getFinishButton()
