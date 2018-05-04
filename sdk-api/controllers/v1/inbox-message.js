@@ -166,7 +166,7 @@ module.exports = function() {
                         updated_at: currentTime
                     }
 
-                    methods.message.update(message._id, {"$set": updates }, function(err) {
+                    methods.message.update(message.id, {"$set": updates }, function(err) {
                         if (err) {
                             return writeReplyError(reply, 500, { status: 500, error: "Failed to update message" })
                         }
