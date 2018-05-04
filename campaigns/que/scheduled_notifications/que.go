@@ -48,6 +48,7 @@ func LockOne(pool *pgx.ConnPool) (*Task, error) {
 			&j.DeviceIds,
 			&j.TimezoneOffset,
 			&j.AccountId,
+			&j.IsTest,
 		)
 		if err != nil {
 			pool.Release(conn)

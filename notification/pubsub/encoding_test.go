@@ -36,13 +36,14 @@ func Test_Marshall(t *testing.T) {
 				NotificationTitle: "a title",
 
 				CampaignID: 4,
+				IsTest:     true,
 			},
 
 			exp: testMsg{
 				Attrs: map[string]string{
 					"notification_kind": "message",
 				},
-				Data: `{"device":{"account_id":2,"id":"id","push_token":"token","push_token_environment":"production","app_namespace":"app_ns","badge_count":1,"os_name":"iOS","sdk_version":{"major":1,"minor":2,"revision":3}},"campaign_id":4,"notification_body":"hello world","notification_title":"a title"}`,
+				Data: `{"device":{"account_id":2,"id":"id","push_token":"token","push_token_environment":"production","app_namespace":"app_ns","badge_count":1,"os_name":"iOS","sdk_version":{"major":1,"minor":2,"revision":3}},"campaign_id":4,"notification_body":"hello world","notification_title":"a title","is_test":true}`,
 			},
 		},
 
@@ -110,7 +111,7 @@ func Test_Unmarshal(t *testing.T) {
 				Attributes: map[string]string{
 					"notification_kind": "message",
 				},
-				Data: []byte(`{"device":{"account_id":2,"id":"id","push_token":"token","push_token_environment":"production","app_namespace":"app_ns","badge_count":1,"os_name":"iOS","sdk_version":{"major":1,"minor":2,"revision":3}},"campaign_id":4,"notification_body":"hello world","notification_title":"a title"}`),
+				Data: []byte(`{"device":{"account_id":2,"id":"id","push_token":"token","push_token_environment":"production","app_namespace":"app_ns","badge_count":1,"os_name":"iOS","sdk_version":{"major":1,"minor":2,"revision":3}},"campaign_id":4,"notification_body":"hello world","notification_title":"a title","is_test": true}`),
 			},
 
 			exp: &PushMessage{
@@ -129,6 +130,7 @@ func Test_Unmarshal(t *testing.T) {
 				NotificationTitle: "a title",
 
 				CampaignID: 4,
+				IsTest:     true,
 			},
 		},
 

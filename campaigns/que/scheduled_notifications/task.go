@@ -61,6 +61,8 @@ type Task struct {
 	// timezone offset
 	TimezoneOffset int
 
+	IsTest bool
+
 	mu      sync.Mutex
 	deleted bool
 	pool    *pgx.ConnPool
@@ -145,6 +147,7 @@ func (j *Task) Fork(ScrollId string) (int64, error) {
 		// NumberOfAttempts: 0,
 		// Error:            "",
 
+		RunAt:          j.RunAt,
 		Forked:         false,
 		ScrollId:       ScrollId,
 		CampaignId:     j.CampaignId,
@@ -152,15 +155,17 @@ func (j *Task) Fork(ScrollId string) (int64, error) {
 		DeviceIds:      nil,
 		TimezoneOffset: j.TimezoneOffset,
 
+		IsTest: j.IsTest,
+
 		conn: j.conn,
 		pool: j.pool,
 	}
 
 	// TODO: does it need special types?
 	rows, err := tx.Query("insertSNT",
-		"queued", j.RunAt, t.NumberOfAttempts, t.Error,
+		"queued", t.RunAt, t.NumberOfAttempts, t.Error,
 		t.Forked, t.ScrollId, t.CampaignId, t.DeviceIds, t.TimezoneOffset,
-		t.AccountId,
+		t.AccountId, t.IsTest,
 	)
 	if err != nil {
 		return 0, errors.Wrap(err, "tx.Query")

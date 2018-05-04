@@ -136,6 +136,8 @@ func PushMessageToNotification(msg *notification_pubsub.PushMessage, settings *s
 	note.AccountId = settings.AccountID
 	note.CampaignId = settings.CampaignId
 
+	note.IsTest = msg.IsTest
+
 	note.DeviceId = msg.Device.ID
 
 	note.Body = msg.NotificationBody

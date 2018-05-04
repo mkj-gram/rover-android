@@ -18,13 +18,13 @@ INSERT INTO scheduled_notification_tasks
   (
     state, run_at, number_of_attempts, error,
     forked, scroll_id, campaign_id, device_ids, timezone_offset,
-    account_id
+    account_id, is_test
   )
 VALUES
   (
     $1::text, $2::timestamptz, $3::integer, $4::text,
     $5::boolean, $6::text, $7::integer, $8::text[], $9::integer,
-    $10::integer
+    $10::integer, $11::boolean
   ) RETURNING job_id
 `
 
@@ -103,7 +103,7 @@ SELECT
 	job_id,
 	state, run_at, number_of_attempts, error,
 	forked, scroll_id, campaign_id, device_ids, timezone_offset,
-	account_id
+	account_id, is_test
 FROM jobs
 WHERE locked
 LIMIT 1

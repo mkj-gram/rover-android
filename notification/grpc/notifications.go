@@ -176,6 +176,8 @@ func pubsubMessageFromProto(accountID int32, campaignID int32, m *notificationpb
 		NotificationBody:  m.GetNotificationBody(),
 		NotificationTitle: m.GetNotificationTitle(),
 
+		IsTest: m.IsTest,
+
 		Device: pubsub.Device{
 			AccountID:            int(accountID),
 			ID:                   m.GetDeviceId(),

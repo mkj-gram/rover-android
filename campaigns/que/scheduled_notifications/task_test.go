@@ -134,6 +134,7 @@ func test_ScheduledNotificationTask(t *testing.T) {
 			AccountId:      2,
 			DeviceIds:      []string{"1", "2", "3"},
 			TimezoneOffset: 10,
+			IsTest:         true,
 		}
 
 		_, err := pgpool.Exec("insertSNT",
@@ -148,6 +149,7 @@ func test_ScheduledNotificationTask(t *testing.T) {
 			tt.DeviceIds,
 			tt.TimezoneOffset,
 			tt.AccountId,
+			tt.IsTest,
 		)
 
 		if err != nil {
@@ -194,6 +196,7 @@ func test_ScheduledNotificationTask(t *testing.T) {
 				AccountId:      2,
 				DeviceIds:      []string{"1", "2", "3"},
 				TimezoneOffset: 10,
+				IsTest:         true,
 			}
 		)
 
@@ -223,6 +226,7 @@ func test_ScheduledNotificationTask(t *testing.T) {
 					AccountId:      2,
 					DeviceIds:      nil,
 					TimezoneOffset: 10,
+					IsTest:         true,
 				}
 			)
 
@@ -261,6 +265,7 @@ func test_ScheduledNotificationTask(t *testing.T) {
 					AccountId:      2,
 					DeviceIds:      []string{"1", "2", "3"},
 					TimezoneOffset: 10,
+					IsTest:         true,
 				}
 			)
 
@@ -292,6 +297,7 @@ func test_ScheduledNotificationTask(t *testing.T) {
 					AccountId:      2,
 					DeviceIds:      []string{"1", "2", "3"},
 					TimezoneOffset: 10,
+					IsTest:         true,
 				}
 			)
 
@@ -310,14 +316,14 @@ func fetchTask(t *testing.T, pool *pgx.ConnPool, id int64) *sn.Task {
 	row := pool.QueryRow(`
 		SELECT
 			job_id, state, run_at, number_of_attempts, error,
-			forked, scroll_id, campaign_id, account_id, device_ids, timezone_offset
+			forked, scroll_id, campaign_id, account_id, device_ids, timezone_offset, is_test
 		FROM scheduled_notification_tasks
 		WHERE job_id = $1
 	`, id)
 
 	if err := row.Scan(
 		&task.ID, &task.State, &task.RunAt, &task.NumberOfAttempts, &task.Error,
-		&task.Forked, &task.ScrollId, &task.CampaignId, &task.AccountId, &task.DeviceIds, &task.TimezoneOffset,
+		&task.Forked, &task.ScrollId, &task.CampaignId, &task.AccountId, &task.DeviceIds, &task.TimezoneOffset, &task.IsTest,
 	); err != nil {
 		t.Fatal("row.Scan:", err)
 	}

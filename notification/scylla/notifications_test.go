@@ -136,6 +136,7 @@ func test_NotificationsStore_Create(t *testing.T) {
 				Body:       "body2",
 				IsRead:     true,
 				IsDeleted:  true,
+				IsTest:     true,
 			},
 
 			after: &scylla.Notification{
@@ -147,6 +148,7 @@ func test_NotificationsStore_Create(t *testing.T) {
 				Body:       "body2",
 				IsRead:     true,
 				IsDeleted:  true,
+				IsTest:     true,
 			},
 		},
 	}
@@ -170,7 +172,7 @@ func test_NotificationsStore_Create(t *testing.T) {
 
 			if test.after != nil {
 				var (
-					exp, expErr = test.given, (error)(nil)
+					exp, expErr = test.after, (error)(nil)
 					got, gotErr = db.NotificationsStore().OneById(context.Background(), test.given.AccountId, test.given.DeviceId, test.given.Id.String())
 				)
 

@@ -185,6 +185,7 @@ func TestHandler(t *testing.T) {
 					PushTokenEnvironment: "production",
 					SdkVersion:           notification_pubsub.Version{Major: 1},
 				},
+				IsTest: true,
 			},
 
 			expReq: &HTTPRequest{
@@ -261,6 +262,7 @@ func TestHandler(t *testing.T) {
 					IsRead:     false,
 					Body:       "a body",
 					Title:      "a title",
+					IsTest:     true,
 				}
 
 				m.MocknotificationsStore.

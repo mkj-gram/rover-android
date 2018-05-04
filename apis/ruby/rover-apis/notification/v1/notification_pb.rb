@@ -64,6 +64,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.notification.v1.SendCampaignNotificationRequest.Message" do
     optional :notification_body, :string, 1
     optional :notification_title, :string, 2
+    optional :is_test, :bool, 9
     optional :device_id, :string, 10
     optional :device_push_token, :string, 11
     optional :device_push_token_environment, :enum, 12, "rover.notification.v1.PushEnvironment.Enum"

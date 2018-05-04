@@ -26,8 +26,11 @@ type (
 	Result struct {
 		AccountId  int
 		CampaignId int
-		Devices    []*audiencepb.Device
-		Profiles   []*audiencepb.Profile
+
+		IsTest bool
+
+		Devices  []*audiencepb.Device
+		Profiles []*audiencepb.Profile
 
 		ChildTaskId int64
 
@@ -93,6 +96,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Resu
 		}
 
 		batch = &Result{
+			IsTest:     task.IsTest,
 			AccountId:  acctId,
 			CampaignId: campaignId,
 		}
@@ -412,6 +416,8 @@ func buildNotificationRequest(b *Result, c *campaigns.Campaign) (*notificationpb
 			DeviceId:                   d.DeviceId,
 			DevicePushToken:            d.PushTokenKey,
 			DevicePushTokenEnvironment: toPushEnvironment(d.PushEnvironment.String()),
+
+			IsTest: b.IsTest,
 
 			OsName:     d.OsName,
 			SdkVersion: getSdkVersion(d.GetFrameworks()),

@@ -978,6 +978,7 @@ proto.rover.notification.v1.SendCampaignNotificationRequest.Message.toObject = f
   var f, obj = {
     notificationBody: jspb.Message.getFieldWithDefault(msg, 1, ""),
     notificationTitle: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    isTest: jspb.Message.getFieldWithDefault(msg, 9, false),
     deviceId: jspb.Message.getFieldWithDefault(msg, 10, ""),
     devicePushToken: jspb.Message.getFieldWithDefault(msg, 11, ""),
     devicePushTokenEnvironment: jspb.Message.getFieldWithDefault(msg, 12, 0),
@@ -1028,6 +1029,10 @@ proto.rover.notification.v1.SendCampaignNotificationRequest.Message.deserializeB
     case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setNotificationTitle(value);
+      break;
+    case 9:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsTest(value);
       break;
     case 10:
       var value = /** @type {string} */ (reader.readString());
@@ -1097,6 +1102,13 @@ proto.rover.notification.v1.SendCampaignNotificationRequest.Message.serializeBin
   if (f.length > 0) {
     writer.writeString(
       2,
+      f
+    );
+  }
+  f = message.getIsTest();
+  if (f) {
+    writer.writeBool(
+      9,
       f
     );
   }
@@ -1180,6 +1192,23 @@ proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.ge
 /** @param {string} value */
 proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.setNotificationTitle = function(value) {
   jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional bool is_test = 9;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.getIsTest = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 9, false));
+};
+
+
+/** @param {boolean} value */
+proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.setIsTest = function(value) {
+  jspb.Message.setField(this, 9, value);
 };
 
 

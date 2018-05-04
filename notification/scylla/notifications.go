@@ -29,6 +29,7 @@ type Notification struct {
 
 	IsRead    bool `db:"is_read"`
 	IsDeleted bool `db:"is_deleted"`
+	IsTest    bool `db:"is_test"`
 }
 
 func (n *Notification) CreatedAt() time.Time {
@@ -120,6 +121,7 @@ func (c *notificationsStore) Create(ctx context.Context, note *Notification) err
 		"body",
 		"is_read",
 		"is_deleted",
+		"is_test",
 	}
 
 	stmt, names := qb.

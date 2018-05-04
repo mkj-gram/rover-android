@@ -35,6 +35,8 @@ type PushMessage struct {
 	CampaignID        int    `json:"campaign_id"`
 	NotificationBody  string `json:"notification_body"`
 	NotificationTitle string `json:"notification_title"`
+
+	IsTest bool `json:"is_test"`
 }
 
 func (m *PushMessage) notification() {}

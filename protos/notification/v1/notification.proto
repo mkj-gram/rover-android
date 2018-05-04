@@ -109,21 +109,22 @@ message SendCampaignNotificationRequest {
 	bool                notification_alert_option_notification_center                = 26;
 	bool                notification_alert_option_badge_number                       = 27;
 
-	message Message {
+  message Message {
+    string              notification_body              = 1;
+    string              notification_title             = 2;
 
-	string              notification_body              = 1;
-	string              notification_title             = 2;
+    bool                is_test                        = 9;
 
-	string               device_id                     = 10;
-	string               device_push_token             = 11;
-	PushEnvironment.Enum device_push_token_environment = 12;
-	string               device_app_namespace          = 13;
-	int32                device_badge_count            = 14;
-	// Either "iOS" or "Android"
-	string               os_name                       = 15;
+    string               device_id                     = 10;
+    string               device_push_token             = 11;
+    PushEnvironment.Enum device_push_token_environment = 12;
+    string               device_app_namespace          = 13;
+    int32                device_badge_count            = 14;
+    // Either "iOS" or "Android"
+    string               os_name                       = 15;
 
-	rover.protobuf.Version sdk_version                 = 16;
-	}
+    rover.protobuf.Version sdk_version                 = 16;
+  }
 
 	repeated Message messages                                                        = 30;
 }
