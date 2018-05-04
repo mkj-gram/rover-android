@@ -9,7 +9,6 @@ import { getActivePopover } from '../../../reducers'
 import AdvancedSettingsRowContainer from './AdvancedSettingsRowContainer'
 import FormSection from '../../utils/FormSection'
 import FormSwitch from '../components/FormSwitch'
-import keyboardScroll from '../../utils/keyboardScroll'
 
 export interface StateProps {
     activePopover: string
@@ -23,12 +22,6 @@ const AdvancedSettingsContainer: React.SFC<
     InjectedProps & StateProps & advancedSettingsContainerProps
 > = ({ activePopover, device }) => {
     const Fragment = React.Fragment
-
-    keyboardScroll(
-        `popoverModal_${activePopover}`,
-        activePopover.length !== 0 && device === 'Tablet',
-        'advancedSettings_formStackBody'
-    )
 
     return (
         <Fragment>

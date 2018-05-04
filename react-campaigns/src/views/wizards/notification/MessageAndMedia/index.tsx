@@ -286,7 +286,14 @@ class MessageAndMedia extends React.Component<
                     }
                 />
                 {/* Rich Media Attachments */}
-                <NotificationAttachmentPicker device={device}>
+                <NotificationAttachmentPicker
+                    device={device}
+                    updateEditingField={() =>
+                        this.setState({
+                            editingField: ''
+                        })
+                    }
+                >
                     <RichMediaUpdateButtons device={device} />
                     <RichMediaSelector
                         device={device}

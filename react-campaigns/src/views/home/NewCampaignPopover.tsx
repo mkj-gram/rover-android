@@ -465,7 +465,7 @@ class NewCampaignPopover extends React.PureComponent<
 
         const popoverProps = {
             placement: media === 'Desktop' ? 'bottom-start' : 'bottom-end',
-
+            device: media,
             toggle: this.handleOpenClose,
             navBarProperties: {
                 title: this.getTitle(),

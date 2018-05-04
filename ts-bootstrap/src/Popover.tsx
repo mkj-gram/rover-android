@@ -45,6 +45,7 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
 
     componentDidMount() {
         const { device } = this.props
+
         switch (device) {
             case 'Desktop':
                 document.addEventListener('mouseup', this.handleClickOutside)
@@ -59,6 +60,7 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
     }
     componentWillUnmount() {
         const { device } = this.props
+
         switch (device) {
             case 'Desktop':
                 document.removeEventListener('mouseup', this.handleClickOutside)
@@ -336,12 +338,4 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
     }
 }
 
-const Popover: React.SFC<PopoverProps> = props => {
-    const ResponsivePopoverContainer = ResponsiveContainer(props)(
-        PopoverComponent
-    )
-
-    return <ResponsivePopoverContainer />
-}
-
-export default Popover
+export default PopoverComponent

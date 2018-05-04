@@ -108,7 +108,8 @@ class OverviewModalFooter extends React.Component<
 
         const getPopoverTrigger = () => {
             const popoverProps = {
-                placement: 'top'
+                placement: 'top',
+                device
             }
             const node = (
                 <div

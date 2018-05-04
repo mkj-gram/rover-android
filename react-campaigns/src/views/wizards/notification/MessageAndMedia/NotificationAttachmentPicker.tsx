@@ -32,6 +32,7 @@ interface NotificationAttachmentPickerStateProps {
 interface NotificationAttachmentPickerProps {
     children: JSX.Element[]
     device: Media
+    updateEditingField: () => void
 }
 
 interface NotificationAttachmentPickerDispatchProps {
@@ -52,11 +53,13 @@ const NotificationAttachmentPicker: React.SFC<
     editableCampaign,
     isPopoverOpen,
     openPopoverModalForm,
-    updateActivePopover
+    updateActivePopover,
+    updateEditingField
 }) => {
     const { notificationAttachment } = editableCampaign
     const popoverProps = {
-        placement: 'left'
+        placement: 'left',
+        device: device
     }
     const open = () => {
         updateActivePopover('notification-attachment-picker')
@@ -73,6 +76,7 @@ const NotificationAttachmentPicker: React.SFC<
             case 'Desktop':
             case 'Tablet':
             default:
+                updateEditingField()
                 updateActivePopover('')
                 break
         }

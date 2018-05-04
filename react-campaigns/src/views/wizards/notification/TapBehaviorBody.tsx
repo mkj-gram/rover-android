@@ -132,7 +132,8 @@ class TapBehaviorBody extends React.Component<
         const { showWebsitePresentationPopover, displayName } = this.state
 
         const popoverProps = {
-            placement: 'left'
+            placement: 'left',
+            device: device
         }
 
         const getClickable = () => {

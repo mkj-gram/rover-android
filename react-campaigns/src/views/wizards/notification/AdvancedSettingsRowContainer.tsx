@@ -18,8 +18,6 @@ import { getEditableCampaign } from '../../../reducers'
 import PopoverModalForm from '../components/PopoverModalForm'
 import HoverTextInput from '../components/HoverTextInput'
 
-import keyboardScroll from '../../utils/keyboardScroll'
-
 export interface AdvancedSettingsRowContainerProps {
     children?: JSX.Element
     device: string
@@ -82,7 +80,7 @@ class AdvancedSettingsRowContainer extends React.Component<
         const { editableCampaign, field } = this.props
 
         this.setState({
-            urlContentEditable: true,
+            urlContentEditable: false,
             tempStrValue: editableCampaign[field] as string
         })
     }
@@ -94,13 +92,9 @@ class AdvancedSettingsRowContainer extends React.Component<
         })
         switch (device) {
             case 'Desktop':
-                this.setState({
-                    urlContentEditable: false
-                })
-                break
             case 'Tablet':
                 this.setState({
-                    urlContentEditable: true
+                    urlContentEditable: false
                 })
                 break
             case 'Mobile':
@@ -115,11 +109,6 @@ class AdvancedSettingsRowContainer extends React.Component<
     }
 
     handleBlurChange(tempStrValue: string) {
-        keyboardScroll(
-            `popoverModal_${this.props.field}`,
-            false,
-            'advancedSettings_formStackBody'
-        )
         this.setState({
             urlContentEditable: false,
             tempStrValue
@@ -130,7 +119,7 @@ class AdvancedSettingsRowContainer extends React.Component<
         const { field, editableCampaign, device } = this.props
 
         this.setState({
-            urlContentEditable: device === 'Tablet' ? true : false,
+            urlContentEditable: false,
             tempStrValue: editableCampaign[field] as string
         })
     }
@@ -208,7 +197,7 @@ class AdvancedSettingsRowContainer extends React.Component<
         const popoverModalProps = (handleClosePopoverModal: () => void) => {
             return {
                 placement: 'left',
-
+                device: device,
                 navBarProperties: {
                     buttonLeft: 'Cancel',
 
@@ -261,11 +250,12 @@ class AdvancedSettingsRowContainer extends React.Component<
                                     : '24px 0 23px',
                             borderBottom: `1px solid ${titanium}`
                         }}
-                        onClick={() =>
+                        onClick={e => {
+                            e.stopPropagation()
                             this.setState({
                                 urlContentEditable: !urlContentEditable
                             })
-                        }
+                        }}
                     >
                         <Text
                             text={tempStrValue}
