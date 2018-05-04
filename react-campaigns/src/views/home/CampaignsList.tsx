@@ -469,7 +469,6 @@ const CampaignsList: React.SFC<Props> = ({
         paddingLeft: media === 'Mobile' ? 24 : 32,
         paddingRight: media === 'Mobile' ? 24 : 32,
         overflowY: 'scroll',
-        WebkitOverflowScrolling: 'touch',
         backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
