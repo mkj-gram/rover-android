@@ -13,11 +13,17 @@ export interface MessageAndMediaNotificationProps {
     notificationAttachment?: NotificationAttachment
     notificationBody?: string
     notificationTitle?: string
+    children?: JSX.Element
 }
 
 const MessageAndMediaNotification: React.SFC<
     MessageAndMediaNotificationProps
-> = ({ notificationAttachment, notificationBody, notificationTitle }) => {
+> = ({
+    children,
+    notificationAttachment,
+    notificationBody,
+    notificationTitle
+}) => {
     const renderAttachmentIcon = () => {
         switch (notificationAttachment.type) {
             case 'IMAGE':
@@ -80,84 +86,90 @@ const MessageAndMediaNotification: React.SFC<
     return (
         <div
             style={{
-                width: 288,
-                minHeight: 128,
-                backgroundColor: 'white',
-                border: `3px solid ${turquoise}`,
-                borderRadius: 8,
                 position: 'absolute',
-                paddingBottom: 20,
                 top: 205,
-                left: 16,
-                display: 'flex',
-                flexDirection: 'column',
-                alignContent: 'initial',
-                overflow: 'hidden'
+                left: 16
             }}
         >
             <div
                 style={{
-                    backgroundColor: '#acecf4',
-                    height: 45,
-                    width: '100%',
-                    flex: '0 0 auto',
+                    width: 288,
+                    minHeight: 128,
+                    backgroundColor: 'white',
+                    border: `3px solid ${turquoise}`,
+                    borderRadius: 8,
+                    paddingBottom: 20,
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0px 13px'
+                    flexDirection: 'column',
+                    alignContent: 'initial',
+                    overflow: 'hidden'
                 }}
             >
                 <div
                     style={{
-                        height: 20,
-                        width: 20,
-                        border: `3px solid ${turquoise}`,
-                        borderRadius: 5
+                        backgroundColor: '#acecf4',
+                        height: 45,
+                        width: '100%',
+                        flex: '0 0 auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0px 13px'
                     }}
-                />
-                <div
-                    style={{
-                        height: 4,
-                        width: 20,
-                        borderRadius: 4,
-                        backgroundColor: turquoise
-                    }}
-                />
-            </div>
-            <Text
-                size="small"
-                textStyle={{
-                    marginTop: 20,
-                    marginLeft: 12,
-                    fontWeight: 'bold',
-                    width: '100%',
-                    flex: 'none'
-                }}
-                text={notificationTitle}
-            />
-            <div
-                style={{
-                    width: '100%',
-                    flex: '1 1 auto',
-                    padding: '0px 12px',
-                    maxHeight: 72,
-                    overflow: 'hidden',
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                }}
-            >
+                >
+                    <div
+                        style={{
+                            height: 20,
+                            width: 20,
+                            border: `3px solid ${turquoise}`,
+                            borderRadius: 5
+                        }}
+                    />
+                    <div
+                        style={{
+                            height: 4,
+                            width: 20,
+                            borderRadius: 4,
+                            backgroundColor: turquoise
+                        }}
+                    />
+                </div>
                 <Text
                     size="small"
-                    text={notificationBody}
                     textStyle={{
-                        maxWidth: 216,
-                        wordWrap: 'break-word',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis'
+                        marginTop: 20,
+                        marginLeft: 12,
+                        fontWeight: 'bold',
+                        width: '100%',
+                        flex: 'none'
                     }}
+                    text={notificationTitle}
                 />
-                {notificationAttachment && renderAttachmentIcon()}
+                <div
+                    style={{
+                        width: '100%',
+                        flex: '1 1 auto',
+                        padding: '0px 12px',
+                        maxHeight: 72,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <Text
+                        size="small"
+                        text={notificationBody}
+                        textStyle={{
+                            maxWidth: 216,
+                            wordWrap: 'break-word',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                        }}
+                    />
+                    {notificationAttachment && renderAttachmentIcon()}
+                </div>
             </div>
+            {children}
         </div>
     )
 }

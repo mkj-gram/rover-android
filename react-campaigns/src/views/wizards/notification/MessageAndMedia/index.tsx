@@ -80,45 +80,32 @@ class MessageAndMedia extends React.Component<
     }
 
     renderBodyLengthBadge(length: number): JSX.Element | null {
+        const style = {
+            textAlign: 'right',
+            marginRight: 16,
+            marginTop: 8
+        }
         if (length === 0) {
             return
         }
         if (length < 90) {
             return (
-                <div>
-                    <Badge color={green} text={`${length} CHAR`} />
-                    <Text
-                        label={true}
-                        size="small"
-                        text="should fully display on most devices"
-                        textStyle={{ color: steel, marginLeft: 8 }}
-                    />
+                <div style={style}>
+                    <Badge color={green} text={`${length} CHARACTERS`} />
                 </div>
             )
         }
         if (length >= 90 && length < 148) {
             return (
-                <div>
-                    <Badge color={yellow} text={`${length} CHAR`} />
-                    <Text
-                        label={true}
-                        size="small"
-                        text="may not display on some devices"
-                        textStyle={{ color: steel, marginLeft: 8 }}
-                    />
+                <div style={style}>
+                    <Badge color={yellow} text={`${length} CHARACTERS`} />
                 </div>
             )
         }
         if (length >= 148) {
             return (
-                <div>
-                    <Badge color={red} text={`${length} CHAR`} />
-                    <Text
-                        label={true}
-                        size="small"
-                        text="will not fully display on most devices"
-                        textStyle={{ color: steel, marginLeft: 8 }}
-                    />
+                <div style={style}>
+                    <Badge color={red} text={`${length} CHARACTERS`} />
                 </div>
             )
         }
@@ -147,7 +134,11 @@ class MessageAndMedia extends React.Component<
                                     }
                                     notificationBody={notificationBody}
                                     notificationTitle={notificationTitle}
-                                />
+                                >
+                                    {this.renderBodyLengthBadge(
+                                        notificationBody.length
+                                    )}
+                                </MessageAndMediaNotification>
                             </Fragment>
                         </PhoneComponent>,
                         document.getElementById('mainModalRight')
@@ -193,7 +184,11 @@ class MessageAndMedia extends React.Component<
                             notificationAttachment={notificationAttachment}
                             notificationBody={notificationBody}
                             notificationTitle={notificationTitle}
-                        />
+                        >
+                            {this.renderBodyLengthBadge(
+                                notificationBody.length
+                            )}
+                        </MessageAndMediaNotification>
                     </Fragment>
                 </PhonePreview>,
                 document.getElementById('mainModalLeft')
@@ -256,9 +251,7 @@ class MessageAndMedia extends React.Component<
                                 })
                         )
                     }
-                >
-                    {this.renderBodyLengthBadge(notificationBody.length)}
-                </TextInput>
+                />
 
                 {/* Title */}
                 <TextInput
