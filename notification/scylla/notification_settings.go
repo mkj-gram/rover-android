@@ -3,6 +3,7 @@ package scylla
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/gocql/gocql"
 	"github.com/pkg/errors"
@@ -126,6 +127,10 @@ func (n *NotificationSettings) Valid() error {
 	}
 
 	return nil
+}
+
+func (n *NotificationSettings) Equals(other *NotificationSettings) bool {
+	return reflect.DeepEqual(n, other)
 }
 
 type notificationSettingsStore store

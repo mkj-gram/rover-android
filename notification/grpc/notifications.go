@@ -139,8 +139,11 @@ func (s *NotificationServer) SendCampaignNotification(ctx context.Context, req *
 		return nil, status.Errorf(ErrToStatus(err), "OneById: %v", err)
 	}
 
-	if settings == nil {
-		if err = s.DB.NotificationSettingsStore().Create(ctx, notificationSettingsFromProto(req)); err != nil {
+	var newSettings = notificationSettingsFromProto(req)
+
+	if settings == nil || !settings.Equals(&newSettings) {
+		// Creates or overwrites the existing settings with the new settings
+		if err = s.DB.NotificationSettingsStore().Create(ctx, newSettings); err != nil {
 			return nil, status.Errorf(ErrToStatus(err), "Create: %v", err)
 		}
 	}
