@@ -81,7 +81,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
         }
         let button = (
             <Button
-                text="Next"
+                text="Edit"
                 size="small"
                 type="primary"
                 onClick={() => handlePageDirect(name)}

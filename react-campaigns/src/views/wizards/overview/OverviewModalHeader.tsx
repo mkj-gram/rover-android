@@ -33,6 +33,7 @@ export interface OverviewModalHeaderProps extends InjectedProps {
 export type OverviewModalHeaderState = {
     showPopover: boolean
     rename: boolean
+    name: string
 }
 
 export interface RouterProps {
@@ -70,9 +71,11 @@ class OverviewModalHeader extends React.Component<
             RouteComponentProps<any>
     ) {
         super(props)
+        const { campaignName } = this.props
         this.state = {
             showPopover: false,
-            rename: false
+            rename: false,
+            name: campaignName
         }
         this.handleShowMore = this.handleShowMore.bind(this)
         this.getCampaignType = this.getCampaignType.bind(this)
@@ -120,11 +123,16 @@ class OverviewModalHeader extends React.Component<
                 {
                     showPopover: false
                 },
-                () =>
+                () => {
                     duplicateCampaign(
                         `${campaignName}- Copy`,
                         parseInt(campaignId, 10)
                     )
+                    setTimeout(
+                        () => this.setState({ name: `${campaignName}- Copy` }),
+                        250
+                    )
+                }
             )
         } else if (val === 'Archive') {
             this.setState(
@@ -137,10 +145,10 @@ class OverviewModalHeader extends React.Component<
     }
 
     handleRename(name: string) {
-        this.props.renameCampaign(name, parseInt(this.props.campaignId, 10))
-        this.setState({
-            rename: false
-        })
+        const { campaignId, renameCampaign } = this.props
+
+        renameCampaign(name, parseInt(campaignId, 10))
+        this.setState({ rename: false, name })
     }
 
     handleClose() {
@@ -151,7 +159,8 @@ class OverviewModalHeader extends React.Component<
         const { rename } = this.state
 
         let textStyle: React.CSSProperties = {
-            color: white
+            color: white,
+            display: 'block'
         }
 
         if (!rename) {
@@ -174,6 +183,8 @@ class OverviewModalHeader extends React.Component<
             onMore,
             device
         } = this.props
+
+        const { name, rename, showPopover } = this.state
 
         const popoverProps = {
             placement: 'bottom-end',
@@ -212,7 +223,7 @@ class OverviewModalHeader extends React.Component<
                             popoverProps={popoverProps}
                             targetParent="root"
                             onClick={this.handleShowMore}
-                            showPopover={this.state.showPopover}
+                            showPopover={showPopover}
                         >
                             {[
                                 <MoreIcon fill={white} key="moreIcon1" />,
@@ -239,16 +250,18 @@ class OverviewModalHeader extends React.Component<
                             marginTop: 16,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            height: 40
+                            whiteSpace: 'nowrap'
                         }}
+                        onClick={() => this.setState({ rename: true })}
                     >
                         <Text
-                            text={campaignName}
+                            text={name}
                             size="h1"
                             textStyle={this.getTextStyle()}
-                            contentEditable={this.state.rename}
+                            contentEditable={rename}
                             handleChange={this.handleRename}
+                            handleBlurChange={this.handleRename}
+                            onBlurChange={true}
                             id="renameCampaign"
                         />
                     </div>
