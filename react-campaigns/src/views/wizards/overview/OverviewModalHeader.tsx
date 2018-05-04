@@ -113,23 +113,38 @@ class OverviewModalHeader extends React.Component<
             duplicateCampaign
         } = this.props
 
+        const getDuplicateCampaignName = () => {
+            const duplicatedCampaignRegEx = /copy\s?\d*$/
+
+            if (!duplicatedCampaignRegEx.exec(campaignName)) {
+                return `${campaignName} copy`
+            } else {
+                const copyNumber = /\d*$/.exec(campaignName)[0]
+                if (!copyNumber) {
+                    return `${campaignName} 2`
+                } else {
+                    const newCopyNumber = (parseInt(copyNumber) + 1).toString()
+                    return campaignName.replace(/\d*$/, newCopyNumber)
+                }
+            }
+        }
+
         if (val === 'Rename') {
             this.setState({
                 rename: true,
                 showPopover: false
             })
         } else if (val === 'Duplicate') {
+            const newCampaignName = getDuplicateCampaignName()
+
             this.setState(
                 {
                     showPopover: false
                 },
                 () => {
-                    duplicateCampaign(
-                        `${campaignName}- Copy`,
-                        parseInt(campaignId, 10)
-                    )
+                    duplicateCampaign(newCampaignName, parseInt(campaignId, 10))
                     setTimeout(
-                        () => this.setState({ name: `${campaignName}- Copy` }),
+                        () => this.setState({ name: newCampaignName }),
                         250
                     )
                 }
