@@ -234,6 +234,22 @@ services:
       KAFKA_DSN: kafka:9092
       EVENTS_PIPELINE_INPUT_TOPIC: events.input
       NODE_ENV: development
+  
+  graphql-admin:
+    image: node:8.9.0
+    depends_on:
+      - auth-service
+    ports:
+      - "4001:80"
+    command: bash -c "rm -rf node_modules/@rover && npm install && npm run build && node dist"
+    volumes:
+      - ../:/rover:delegated
+    working_dir: /rover/graphql-admin
+    environment:
+      AUTH_V1_SERVICE_HOST: auth-service
+      AUTH_CLIENT_ID: "1025209954364-pgmntrdfq5526cq2slgsa4ao82a3qtls.apps.googleusercontent.com"
+      AUTH_CLIENT_SECRET: "DPD50JrQqU5Xbsgdk2PkxSJh"
+      NODE_ENV: development
 
   geocoder-service:
     image: golang:1.10-alpine

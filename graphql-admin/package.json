@@ -1,0 +1,35 @@
+{
+  "name": "@rover/graphql-admin",
+  "version": "1.0.0",
+  "description": "Rover administration api gateway",
+  "main": "src/index",
+  "private": true,
+  "author": "Rover.io",
+  "scripts": {
+    "start": "nodemon -L src --exec ts-node",
+    "build": "rm -rf ./dist && tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "google-auth-library": "^1.4.0",
+    "graphql-yoga": "^1.13.1"
+  },
+  "devDependencies": {
+    "jest": "^22.4.3",
+    "nodemon": "1.17.3",
+    "ts-node": "^6.0.2",
+    "typescript": "^2.8.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testRegex": ".*.test\\.ts$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "./dist"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "html"
+    ]
+  }
+}
