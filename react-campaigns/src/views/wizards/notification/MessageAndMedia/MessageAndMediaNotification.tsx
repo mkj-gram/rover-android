@@ -86,6 +86,8 @@ const MessageAndMediaNotification: React.SFC<
     return (
         <div
             style={{
+                width: 288,
+                minHeight: 128,
                 position: 'absolute',
                 top: 205,
                 left: 16
@@ -100,6 +102,9 @@ const MessageAndMediaNotification: React.SFC<
                     borderRadius: 8,
                     paddingBottom: 20,
                     display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    opacity: 0.8,
                     flexDirection: 'column',
                     alignContent: 'initial',
                     overflow: 'hidden'
@@ -138,7 +143,7 @@ const MessageAndMediaNotification: React.SFC<
                     size="small"
                     textStyle={{
                         marginTop: 20,
-                        marginLeft: 12,
+                        padding: '0 12px',
                         fontWeight: 'bold',
                         width: '100%',
                         flex: 'none'

@@ -53,6 +53,13 @@ export const getIsSendTestModalOpen = (state: State) =>
 export const getTriggeredAnimation = (state: State) =>
     appSelector.getTriggeredAnimation(state.app)
 
+// Form
+export const getCurrentFormPage = (state: State) =>
+    appSelector.getCurrentFormPage(state.app)
+
+export const getShouldShowPhonePreview = (state: State) =>
+    appSelector.getShouldShowPhonePreview(state.app)
+
 // Notification Delivery
 export const getIsNotificationDeliveryModalOpen = (state: State) =>
     appSelector.getIsNotificationDeliveryModalOpen(state.app)

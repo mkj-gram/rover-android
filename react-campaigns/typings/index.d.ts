@@ -140,7 +140,6 @@ type State = {
     readonly modal: StringMap<string | boolean>
     readonly editableCampaign: AutomatedNotificationCampaign | ScheduledCampaign
     readonly editableUIState: editableUIState
-    
 }
 
 type TestDeviceState = {
@@ -194,6 +193,7 @@ type AppState = {
     overview: OverviewModalState
     error: ErrorState
     activePopover: PopoverState
+    form: FormState
 }
 
 type PopoverState = {
@@ -202,6 +202,17 @@ type PopoverState = {
 }
 
 type ErrorState = StringMap<string | boolean>
+
+type formPage =
+    | ''
+    | 'messageAndMedia'
+    | 'alertOptions'
+    | 'tapBehavior'
+    | 'advancedSettings'
+
+type FormState = {
+    readonly currentPage: formPage
+}
 
 type OverviewModalState = {
     readonly isOverviewModalOpen: string

@@ -117,6 +117,12 @@ export const updateEditableUIState = (
         newUIStateValue
     )
 
+// Form
+export const setCurrentFormPage: ActionCreator<
+    ThunkAction<void, State, void>
+> = (currentPage: formPage) => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'UPDATE_CURRENT_PAGE', currentPage: currentPage })
+}
 // Notification Delivery Modal
 
 export const openNotificationDeliveryModal: ActionCreator<

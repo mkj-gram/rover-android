@@ -46,11 +46,12 @@ class OverviewModalBodyContainer extends React.Component<
     }
 
     handlePageDirect(redirectPage: string) {
+        const { openNotificationDeliveryModal } = this.props
         this.setState(
             {
                 redirectPage
             },
-            () => this.props.openNotificationDeliveryModal(true)
+            () => openNotificationDeliveryModal(true)
         )
     }
 

@@ -2,7 +2,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { connect, Dispatch } from 'react-redux'
-import MediaQuery from 'react-responsive'
 import { InjectedProps } from '../../../utils/ResponsiveContainer'
 import {
     Badge,
@@ -28,6 +27,7 @@ import PhonePreview from '../../PhonePreview'
 import { updateEditableCampaign } from '../../../../actions'
 import { getEditableCampaign, getEditableUIState } from '../../../../reducers'
 
+import MediaQuery from 'react-responsive'
 import NotificationAttachmentPicker from './NotificationAttachmentPicker'
 import RichMediaSelector from './RichMediaSelector'
 import RichMediaUpdateButtons from './RichMediaUpdateButtons'
@@ -122,39 +122,29 @@ class MessageAndMedia extends React.Component<
 
         const Fragment = React.Fragment
         if (device === 'Desktop') {
-            return (
+            return ReactDOM.createPortal(
                 <MediaQuery minWidth={1140}>
-                    {ReactDOM.createPortal(
-                        <PhoneComponent device={device} viewLockScreen={true}>
-                            <Fragment>
-                                <MessageAndMediaIcon />
-                                <MessageAndMediaNotification
-                                    notificationAttachment={
-                                        notificationAttachment
-                                    }
-                                    notificationBody={notificationBody}
-                                    notificationTitle={notificationTitle}
-                                >
-                                    {this.renderBodyLengthBadge(
-                                        notificationBody.length
-                                    )}
-                                </MessageAndMediaNotification>
-                            </Fragment>
-                        </PhoneComponent>,
-                        document.getElementById('mainModalRight')
-                    )}
-                    {ReactDOM.createPortal(
-                        <RefreshIcon
-                            fill={steel}
-                            style={{
-                                position: 'absolute',
-                                top: 16,
-                                right: 32
-                            }}
-                        />,
-                        document.getElementById('mainModalRight')
-                    )}
-                </MediaQuery>
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 96,
+                            left: 24,
+                            zIndex: 1
+                        }}
+                    >
+                        <MessageAndMediaIcon />
+                        <MessageAndMediaNotification
+                            notificationAttachment={notificationAttachment}
+                            notificationBody={notificationBody}
+                            notificationTitle={notificationTitle}
+                        >
+                          {this.renderBodyLengthBadge(
+                              notificationBody.length
+                              )}
+                        </MessageAndMediaNotification>
+                    </div>
+                </MediaQuery>,
+                document.getElementById('phone-bezel')
             )
         }
 

@@ -114,24 +114,16 @@ const renderFullScreenPreview = (args: PhonePreviewProps) => {
 
 const PhonePreview: React.SFC<PhonePreviewProps> = props => {
     const { children, description, device } = props
-    const desktopStyle: React.CSSProperties = {
-        animation: 'fade ease-out 400ms'
-    }
     if (device === 'Mobile' || device === 'Tablet') {
         return renderFullScreenPreview(props)
     }
     if (device === 'Desktop') {
         return (
             <Fragment>
-                {ReactDOM.createPortal(
-                    <div style={desktopStyle}>
-                        <PhoneComponent device={device} viewLockScreen={false}>
-                            {children}
-                        </PhoneComponent>
-                        {renderPreviewDescription(description, device)}
-                    </div>,
-                    document.getElementById('mainModalRight')
-                )}
+                <PhoneComponent device={device} viewLockScreen={true}>
+                    {children}
+                </PhoneComponent>
+                {renderPreviewDescription(description, device)}
             </Fragment>
         )
     }

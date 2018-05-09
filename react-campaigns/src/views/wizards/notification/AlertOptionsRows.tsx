@@ -13,16 +13,19 @@ import MediaQuery from 'react-responsive'
 import AlertOptionsPhonePreview from './AlertOptionsPhonePreview'
 
 import {
-    Text,
-    Switch,
-    titanium,
-    beige,
-    white,
-    silver,
-    mercury,
+    AlertInfoIcon,
+    AlertOptionsBadgeNumber,
+    AlertOptionsNotificationCenter,
+    AlertOptionsPushNotification,
     almostWhite,
+    beige,
     cloud,
-    AlertInfoIcon
+    mercury,
+    silver,
+    Switch,
+    Text,
+    titanium,
+    white
 } from '@rover/ts-bootstrap/dist/src'
 import { turquoise } from '@rover/ts-bootstrap/dist/styles/colors'
 
@@ -56,14 +59,14 @@ type alertType =
 const AlertOptionsRows: React.SFC<
     AlertOptionsRowsProps & StateProps & DispatchProps
 > = ({
+    campaign,
+    device,
     deviceInfoSelected,
     editableCampaign,
-    hoverValue,
-    device,
-    campaign,
     handleAlertOptionsModalDisplay,
-    updateEditableCampaign,
-    setHoverOption
+    hoverValue,
+    setHoverOption,
+    updateEditableCampaign
 }) => {
     const {
         notificationAlertOptionBadgeNumber,
@@ -114,12 +117,8 @@ const AlertOptionsRows: React.SFC<
             ret = (
                 <Fragment>
                     {ReactDOM.createPortal(
-                        <AlertOptionsPhonePreview
-                            device={device}
-                            val={matchName[val]}
-                        />,
-
-                        document.getElementById('mainModalRight')
+                        getAlertIcon(matchName[val] as alertType),
+                        document.getElementById('phone-bezel')
                     )}
                 </Fragment>
             )
@@ -132,13 +131,86 @@ const AlertOptionsRows: React.SFC<
                             val={matchName[val]}
                             descriptionVal={val}
                         />,
-
                         document.getElementById('notificationContainer')
                     )}
                 </Fragment>
             )
         }
         return ret
+    }
+
+    const getAlertIcon = (type: alertType) => {
+        const style: React.CSSProperties = {
+            position: 'absolute',
+            top: 96,
+            left: 24,
+            textAlign: 'center',
+            width: 320
+        }
+        switch (type) {
+            case 'notificationAlertOptionBadgeNumber':
+                return (
+                    <div style={{ ...style, zIndex: 10 }}>
+                        <AlertOptionsBadgeNumber />
+                        <Text
+                            text="Increment the number on your app's badge icon"
+                            size="large"
+                            textStyle={{
+                                margin: '131px auto',
+                                width: 200
+                            }}
+                        />
+                    </div>
+                )
+            case 'notificationAlertOptionNotificationCenter':
+                return (
+                    <div
+                        style={{
+                            ...style,
+                            backgroundColor: 'white',
+                            height: 568,
+                            zIndex: 10
+                        }}
+                    >
+                        <AlertOptionsNotificationCenter />
+                        <Text
+                            text="Add to your app’s Notification Center"
+                            size="large"
+                            textStyle={{
+                                margin: '131px auto',
+                                width: 200
+                            }}
+                        />
+                    </div>
+                )
+            case 'notificationAlertOptionPushNotification':
+                return (
+                    <div style={style}>
+                        <AlertOptionsPushNotification />
+                        <Text
+                            text="Alert users with a system notification"
+                            size="large"
+                            textStyle={{
+                                margin: '131px auto',
+                                width: 151
+                            }}
+                        />
+                    </div>
+                )
+            default:
+                return (
+                    <div
+                        style={{
+                            ...style,
+                            height: 568,
+                            width: 320,
+                            background:
+                                'white linear-gradient(rgba(233,233,233,1.0), rgba(238,238,238,0.5))',
+                            zIndex: 10
+                        }}
+                    />
+                )
+        }
     }
 
     const getSwitchValue = (val: string) => {
@@ -280,16 +352,6 @@ const AlertOptionsRows: React.SFC<
                         }}
                     />
 
-                    {hoverValue.length !== 0 &&
-                        hoverValue === elem &&
-                        device === 'Desktop' && (
-                            <MediaQuery minWidth={1140}>
-                                {getCaretAndPreviewPortals(
-                                    hoverValue,
-                                    matchName
-                                )}
-                            </MediaQuery>
-                        )}
                     {(deviceInfoSelected as string).length !== 0 &&
                         (deviceInfoSelected === elem ||
                             deviceInfoSelected === 'close') &&
@@ -300,6 +362,11 @@ const AlertOptionsRows: React.SFC<
                         )}
                 </div>
             ))}
+            {device === 'Desktop' && (
+                <MediaQuery minWidth={1140}>
+                    {getCaretAndPreviewPortals(hoverValue, matchName)}
+                </MediaQuery>
+            )}
         </Fragment>
     )
 }

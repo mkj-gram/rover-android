@@ -7,6 +7,7 @@ import notificationDelivery, * as notificationDeliverySelector from './notificat
 import notification, * as notificationSelector from './notification'
 import overview, * as overviewSelector from './overview'
 import error, * as errorSelector from './error'
+import form, * as formSelector from './form'
 import activePopover, * as activePopoverSelector from './activePopover'
 
 export default combineReducers({
@@ -15,6 +16,7 @@ export default combineReducers({
     notificationDelivery,
     overview,
     error,
+    form,
     activePopover
 })
 
@@ -75,3 +77,10 @@ export const getIsPopoverModalFormOpen = (state: AppState) =>
 
 export const getActivePopover = (state: AppState) =>
     activePopoverSelector.getActivePopover(state.activePopover)
+
+// Form
+export const getCurrentFormPage = (state: AppState) =>
+    formSelector.getCurrentPage(state.form)
+
+export const getShouldShowPhonePreview = (state: AppState) =>
+    formSelector.getShouldShowPhonePreview(state.form)

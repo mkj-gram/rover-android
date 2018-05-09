@@ -62,7 +62,8 @@ const renderLockScreen = (device: 'Mobile' | 'Tablet' | 'Desktop') => {
                         color: silver,
                         display: 'flex',
                         justifyContent: 'center',
-                        width: '100%'
+                        width: '100%',
+                        zIndex: 10
                     }}
                 >
                     {moment().format('dddd, MMMM D')}
@@ -97,7 +98,8 @@ const renderLockScreen = (device: 'Mobile' | 'Tablet' | 'Desktop') => {
                     color: silver,
                     display: 'flex',
                     justifyContent: 'center',
-                    width: '100%'
+                    width: '100%',
+                    zIndex: 10
                 }}
             >
                 {moment().format('dddd, MMMM D')}

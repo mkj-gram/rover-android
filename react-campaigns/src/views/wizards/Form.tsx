@@ -18,10 +18,13 @@ import {
     getShouldShowSaveAndClose,
     getTypeProgress
 } from '../../reducers/'
+
+import PhonePreview from './PhonePreview'
 import WizardModal from './WizardModal'
 
 import {
     createEditableCampaign,
+    setCurrentFormPage,
     updateEditableUIState,
     openNotificationDeliveryModal
 } from '../../actions'
@@ -36,6 +39,7 @@ export interface FormProps extends ResponsiveContainerProps {
 
 export interface FormDispatchProps {
     createEditableCampaign: () => void
+    setCurrentFormPage: (formPage: formPage) => void
     openNotificationDeliveryModal: (open: boolean) => void
     updateEditableUIState: (
         newUIStateGroup: keyof editableUIState,
@@ -117,7 +121,14 @@ class Form extends React.Component<
         }
     }
 
+    componentDidMount() {
+        const { setCurrentFormPage } = this.props
+        const { formStack } = this.state
+        setCurrentFormPage(formStack[formStack.length - 1])
+    }
+
     getBackButton() {
+        const { setCurrentFormPage } = this.props
         const { formStack } = this.state
 
         if (formStack.length <= 1) {
@@ -130,18 +141,17 @@ class Form extends React.Component<
                 size="large"
                 type="secondary"
                 overrideWidth={96}
-                onClick={() =>
-                    this.setState({ useBackFormAnimation: true }, () =>
-                        setTimeout(
-                            () =>
-                                this.setState({
-                                    formStack: formStack.slice(0, -1),
-                                    useBackFormAnimation: false
-                                }),
-                            300
-                        )
-                    )
-                }
+                onClick={() => {
+                    setCurrentFormPage(formStack[formStack.length - 2])
+                    this.setState({ useBackFormAnimation: true }, () => {
+                        setTimeout(() => {
+                            this.setState({
+                                formStack: formStack.slice(0, -1),
+                                useBackFormAnimation: false
+                            })
+                        }, 300)
+                    })
+                }}
             />
         )
     }
@@ -149,11 +159,13 @@ class Form extends React.Component<
     getCancelButton() {
         const {
             openNotificationDeliveryModal,
-            createEditableCampaign
+            createEditableCampaign,
+            setCurrentFormPage
         } = this.props
         return (
             <Button
                 onClick={() => {
+                    setCurrentFormPage('')
                     openNotificationDeliveryModal(false)
                     createEditableCampaign()
                 }}
@@ -170,6 +182,7 @@ class Form extends React.Component<
             editableCampaign,
             editableUIState,
             getIsStageValid,
+            setCurrentFormPage,
             openNotificationDeliveryModal,
             updateEditableUIState
         } = this.props
@@ -186,8 +199,12 @@ class Form extends React.Component<
                 type={isValid ? 'primary' : 'disabled'}
                 overrideWidth={96}
                 onClick={() =>
-                    this.setState({ formStack: [...formStack, nextForm] }, () =>
-                        this.setFormAsSeen(lastForm)
+                    this.setState(
+                        { formStack: [...formStack, nextForm] },
+                        () => {
+                            setCurrentFormPage(nextForm)
+                            this.setFormAsSeen(lastForm)
+                        }
                     )
                 }
             />
@@ -198,7 +215,8 @@ class Form extends React.Component<
         const {
             getIsStageValid,
             openNotificationDeliveryModal,
-            saveAndClose
+            saveAndClose,
+            setCurrentFormPage
         } = this.props
         const { formStack } = this.state
         const lastForm: keyof editableUIState = formStack.slice(-1)[0]
@@ -212,6 +230,7 @@ class Form extends React.Component<
                 type={isValid ? 'primary' : 'disabled'}
                 overrideWidth={96}
                 onClick={() => {
+                    setCurrentFormPage('')
                     openNotificationDeliveryModal(false)
                     this.setFormAsSeen(lastForm)
                     saveAndClose()
@@ -224,6 +243,7 @@ class Form extends React.Component<
         const {
             openNotificationDeliveryModal,
             saveAndClose,
+            setCurrentFormPage,
             showSaveAndClose
         } = this.props
         if (!showSaveAndClose) {
@@ -233,6 +253,7 @@ class Form extends React.Component<
             <Button
                 onClick={() => {
                     saveAndClose()
+                    setCurrentFormPage('')
                     openNotificationDeliveryModal(false)
                 }}
                 size="large"
@@ -334,6 +355,8 @@ const mapDispatchToProps = (
             dispatch(createEditableCampaign(campaignId)),
         openNotificationDeliveryModal: (open: boolean) =>
             dispatch(openNotificationDeliveryModal(open)),
+        setCurrentFormPage: (formPage: formPage) =>
+            dispatch(setCurrentFormPage(formPage)),
         updateEditableUIState: (
             newUIStateGroup: keyof editableUIState,
             newUIStateValue: UIStateField | boolean

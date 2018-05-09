@@ -137,7 +137,8 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                     padding:
                         device === 'Mobile'
                             ? '0px 24px 24px 24px'
-                            : `16px 16px 0 16px`
+                            : `16px 16px 0 16px`,
+                    width: device !== 'Mobile' ? 384 : '100%'
                 }}
             >
                 <Text
