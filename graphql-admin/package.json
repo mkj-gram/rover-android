@@ -2,7 +2,7 @@
   "name": "@rover/graphql-admin",
   "version": "1.0.0",
   "description": "Rover administration api gateway",
-  "main": "src/index",
+  "main": "src/index.ts",
   "private": true,
   "author": "Rover.io",
   "scripts": {
@@ -15,14 +15,23 @@
     "graphql-yoga": "^1.13.1"
   },
   "devDependencies": {
-    "jest": "^22.4.3",
-    "nodemon": "1.17.3",
+    "nodemon": "^1.17.3",
     "ts-node": "^6.0.2",
-    "typescript": "^2.8.1"
+    "typescript": "2.8.1",
+    "@types/jest": "^22.2.3",
+    "jest": "^22.4.3",
+    "ts-jest": "^22.4.5"
   },
   "jest": {
     "testEnvironment": "node",
-    "testRegex": ".*.test\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "testPathIgnorePatterns": [
       "/node_modules/",
       "./dist"
