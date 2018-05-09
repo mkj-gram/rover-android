@@ -135,7 +135,7 @@ func test_Ios_CreateIosPlatform(t *testing.T) {
 		{
 			desc:   "error: validations",
 			req:    &notificationpb.CreateIosPlatformRequest{},
-			expErr: status.Errorf(codes.InvalidArgument, "validations: auth_ctx.account_id: is required. certificate_data: is required. certificate_filename: is required. title: is required."),
+			expErr: status.Errorf(codes.InvalidArgument, "validations: auth_ctx.account_id: is required. title: is required."),
 		},
 
 		{
@@ -255,7 +255,7 @@ func test_Ios_UpdatePushCredentials(t *testing.T) {
 		{
 			desc:   "error: validations",
 			req:    &notificationpb.UpdateIosPlatformPushCertificateRequest{},
-			expErr: status.Errorf(codes.InvalidArgument, "validations: auth_ctx.account_id: is required. certificate_data: is required. certificate_filename: is required."),
+			expErr: status.Errorf(codes.InvalidArgument, "validations: auth_ctx.account_id: is required."),
 		},
 
 		{
@@ -336,6 +336,53 @@ func test_Ios_UpdatePushCredentials(t *testing.T) {
 					CertificateFilename:   "cert2",
 					CertificatePassphrase: "",
 					CertificateExpiresAt:  ts(t, ts2(t, "2018-10-28T13:15:13-04:00")),
+					CertificateUpdatedAt:  updatedAt,
+
+					UpdatedAt: updatedAt,
+					CreatedAt: updatedAt,
+				},
+			},
+		},
+
+		{
+			desc: "clear the ios_platform",
+			req: &notificationpb.UpdateIosPlatformPushCertificateRequest{
+				AuthContext: &authpb.AuthContext{AccountId: 1},
+
+				IosPlatformId: 1000,
+
+				CertificateData:       nil,
+				CertificatePassphrase: "",
+				CertificateFilename:   "",
+			},
+
+			exp: &notificationpb.UpdateIosPlatformPushCertificateResponse{
+				IosPlatform: &notificationpb.IosPlatform{
+					Id:                    1000,
+					AccountId:             1,
+					Title:                 "title",
+					BundleId:              "",
+					CertificateData:       nil,
+					CertificateFilename:   "",
+					CertificatePassphrase: "",
+					CertificateExpiresAt:  nil,
+					CertificateUpdatedAt:  updatedAt,
+
+					UpdatedAt: updatedAt,
+					CreatedAt: updatedAt,
+				},
+			},
+
+			after: &expect{
+				IosPlatform: &notificationpb.IosPlatform{
+					Id:                    1000,
+					AccountId:             1,
+					Title:                 "title",
+					BundleId:              "",
+					CertificateData:       nil,
+					CertificateFilename:   "",
+					CertificatePassphrase: "",
+					CertificateExpiresAt:  nil,
 					CertificateUpdatedAt:  updatedAt,
 
 					UpdatedAt: updatedAt,

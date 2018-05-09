@@ -5,7 +5,7 @@ class V1::AndroidPlatformsController < V1::ApplicationController
     before_action :set_android_platform, only: [:show, :update, :destroy]
 
     allow :admin, :server
-    
+
     def show
         json = {
             data: serialize_android_platform(@android_platform)
@@ -16,8 +16,8 @@ class V1::AndroidPlatformsController < V1::ApplicationController
 
     def create
         json = flatten_request({single_record: true})
-        android_platform = current_account.build_android_platform(android_platform_params(json[:data]))
-        if android_platform.save
+        android_platform, ok = AndroidPlatformService.create(account_id: current_account.id, attrs: android_platform_params(json[:data]))
+        if ok
             json = {
                 data: serialize_android_platform(android_platform)
             }
@@ -29,7 +29,7 @@ class V1::AndroidPlatformsController < V1::ApplicationController
 
     def update
         json = flatten_request({single_record: true})
-        if @android_platform.update_attributes(android_platform_params(json[:data]))
+        if AndroidPlatformService.update(platform: @android_platform, attrs: android_platform_params(json[:data]))
             json = {
                 data: serialize_android_platform(@android_platform)
             }
@@ -39,9 +39,8 @@ class V1::AndroidPlatformsController < V1::ApplicationController
         end
     end
 
-
     def destroy
-        if @android_platform.destroy
+        if AndroidPlatformService.clear_credentials(platform: @android_platform)
             head :no_content
         else
             render json: {errors: V1::AndroidPlatformErrorSerializer.serialize(android_platform.errors)}, status: :unprocessable_entity

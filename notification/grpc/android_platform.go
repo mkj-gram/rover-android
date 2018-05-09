@@ -15,8 +15,8 @@ func (p *PlatformServer) CreateAndroidPlatform(ctx context.Context, req *notific
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
 		va.Value("title", req.Title, va.Require),
-		va.Value("push_credentials_server_key", req.PushCredentialsServerKey, va.Require),
-		va.Value("push_credentials_server_id", req.PushCredentialsSenderId, va.Require),
+		// va.Value("push_credentials_server_key", req.PushCredentialsServerKey, va.Require),
+		// va.Value("push_credentials_server_id", req.PushCredentialsSenderId, va.Require),
 	); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "validations: %v", err)
 	}
@@ -84,8 +84,8 @@ func (s *PlatformServer) UpdateAndroidPlatformPushCredentials(ctx context.Contex
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
-		va.Value("push_credentials_server_key", req.PushCredentialsServerKey, va.Require),
-		va.Value("push_credentials_server_id", req.PushCredentialsSenderId, va.Require),
+		// va.Value("push_credentials_server_key", req.PushCredentialsServerKey, va.Require),
+		// va.Value("push_credentials_server_id", req.PushCredentialsSenderId, va.Require),
 	); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "validations: %v", err)
 	}
@@ -93,7 +93,7 @@ func (s *PlatformServer) UpdateAndroidPlatformPushCredentials(ctx context.Contex
 	var (
 		now = postgres.TimeNow()
 
-		upd = postgres.AndroidPlatformUpdatePushCredentials{
+		update = postgres.AndroidPlatformUpdatePushCredentials{
 			Id:        req.GetAndroidPlatformId(),
 			AccountId: req.GetAuthContext().GetAccountId(),
 
@@ -104,7 +104,8 @@ func (s *PlatformServer) UpdateAndroidPlatformPushCredentials(ctx context.Contex
 			UpdatedAt: now,
 		}
 	)
-	platform, err := s.DB.AndroidPlatformStore().UpdatePushCredentials(ctx, &upd)
+
+	platform, err := s.DB.AndroidPlatformStore().UpdatePushCredentials(ctx, &update)
 	if err != nil {
 		return nil, status.Errorf(ErrToStatus(err), "db.Update: %v", err)
 	}

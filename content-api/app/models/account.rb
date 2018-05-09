@@ -172,9 +172,7 @@ class Account < ActiveRecord::Base
     end
 
     def create_platforms
-        IosPlatform.create(account_id: self.id, title: self.title)
-        AndroidPlatform.create(account_id: self.id, title: self.title)
+        IosPlatformService.create(account_id: self.id, attrs: {title: self.title})
+        AndroidPlatformService.create(account_id: self.id, attrs: {title: self.title})
     end
-
-
 end

@@ -10,6 +10,7 @@ class IosPlatform < ActiveRecord::Base
     belongs_to :account
 
     def certificate
+        return nil unless self.apns_certificate.present?
         return Base64.decode64(self.apns_certificate)
     end
 

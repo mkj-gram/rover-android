@@ -49,25 +49,30 @@ func (s *PlatformServer) CreateIosPlatform(ctx context.Context, req *notificatio
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
-		va.Value("certificate_data", req.CertificateData, va.Require),
-		va.Value("certificate_filename", req.CertificateFilename, va.Require),
+		// NOTE: disabled for compatibility with content-api
+		// va.Value("certificate_data", req.CertificateData, va.Require),
+		// va.Value("certificate_filename", req.CertificateFilename, va.Require),
 		va.Value("title", req.Title, va.Require),
 	); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "validations: %v", err)
 	}
 
-	cert, err := decode(req.GetCertificateData(), req.GetCertificatePassphrase())
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Decode: %v", err)
-	}
+	var cert *Certificate
+	if len(req.CertificateData) > 0 {
+		var err error
+		cert, err = decode(req.GetCertificateData(), req.GetCertificatePassphrase())
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "Decode: %v", err)
+		}
 
-	if err := va.All(
-		va.Value("cert", cert,
-			validateCertIsUniversal,
-			validateCertHasBundleId,
-			validateCertIsNotExpired,
-		)); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "validations: %v", err)
+		if err := va.All(
+			va.Value("cert", cert,
+				validateCertIsUniversal,
+				validateCertHasBundleId,
+				validateCertIsNotExpired,
+			)); err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "validations: %v", err)
+		}
 	}
 
 	var (
@@ -76,18 +81,21 @@ func (s *PlatformServer) CreateIosPlatform(ctx context.Context, req *notificatio
 		platform = postgres.IosPlatform{
 			AccountId: req.AuthContext.AccountId,
 			Title:     req.Title,
-			BundleId:  cert.BundleId,
 
-			CertificateData:       cert.EncodedData(),
 			CertificatePassphrase: req.CertificatePassphrase,
 			CertificateFilename:   req.CertificateFilename,
-			CertificateExpiresAt:  cert.ExpiresAt,
 			CertificateUpdatedAt:  now,
 
 			UpdatedAt: now,
 			CreatedAt: now,
 		}
 	)
+
+	if cert != nil {
+		platform.BundleId = cert.BundleId
+		platform.CertificateExpiresAt = cert.ExpiresAt
+		platform.CertificateData = cert.EncodedData()
+	}
 
 	if err := s.DB.IosPlatformStore().Create(ctx, &platform); err != nil {
 		return nil, status.Errorf(ErrToStatus(err), "db.Create: %v", err)
@@ -135,24 +143,29 @@ func (s *PlatformServer) UpdateIosPlatformPushCertificate(ctx context.Context, r
 	var acctId = req.GetAuthContext().GetAccountId()
 	if err := va.All(
 		va.Value("auth_ctx.account_id", acctId, va.Require),
-		va.Value("certificate_data", req.CertificateData, va.Require),
-		va.Value("certificate_filename", req.CertificateFilename, va.Require),
+		// va.Value("certificate_data", req.CertificateData, va.Require),
+		// va.Value("certificate_filename", req.CertificateFilename, va.Require),
 	); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "validations: %v", err)
 	}
 
-	cert, err := decode(req.GetCertificateData(), req.GetCertificatePassphrase())
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Decode: %v", err)
-	}
+	var cert *Certificate
+	if len(req.CertificateData) > 0 {
+		var err error
+		cert, err = decode(req.GetCertificateData(), req.GetCertificatePassphrase())
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "Decode: %v", err)
+		}
 
-	if err := va.All(
-		va.Value("cert", cert,
-			validateCertIsUniversal,
-			validateCertHasBundleId,
-			validateCertIsNotExpired,
-		)); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "validations: %v", err)
+		if err := va.All(
+			va.Value("cert", cert,
+				validateCertIsUniversal,
+				validateCertHasBundleId,
+				validateCertIsNotExpired,
+			)); err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "validations: %v", err)
+		}
+
 	}
 
 	var (
@@ -161,17 +174,23 @@ func (s *PlatformServer) UpdateIosPlatformPushCertificate(ctx context.Context, r
 		update = postgres.IosPlatformUpdatePushCredentials{
 			Id:        req.IosPlatformId,
 			AccountId: req.GetAuthContext().GetAccountId(),
-			BundleId:  cert.BundleId,
+			BundleId:  "",
 
-			CertificateData:       cert.EncodedData(),
+			CertificateData:       "",
 			CertificatePassphrase: req.CertificatePassphrase,
 			CertificateFilename:   req.CertificateFilename,
-			CertificateExpiresAt:  cert.ExpiresAt,
-			CertificateUpdatedAt:  now,
+			// CertificateExpiresAt:  time.Time{},
+			CertificateUpdatedAt: now,
 
 			UpdatedAt: now,
 		}
 	)
+
+	if cert != nil {
+		update.BundleId = cert.BundleId
+		update.CertificateData = cert.EncodedData()
+		update.CertificateExpiresAt = cert.ExpiresAt
+	}
 
 	platform, err := s.DB.IosPlatformStore().UpdatePushCredentials(ctx, update)
 	if err != nil {

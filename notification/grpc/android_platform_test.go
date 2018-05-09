@@ -134,7 +134,7 @@ func test_Android_CreatePlatform(t *testing.T) {
 		{
 			desc:   "error: validations",
 			req:    &notificationpb.CreateAndroidPlatformRequest{},
-			expErr: status.Errorf(codes.InvalidArgument, "validations: auth_ctx.account_id: is required. title: is required. push_credentials_server_key: is required. push_credentials_server_id: is required."),
+			expErr: status.Errorf(codes.InvalidArgument, "validations: auth_ctx.account_id: is required. title: is required."),
 		},
 
 		{
@@ -238,7 +238,7 @@ func test_Android_UpdatePushCredentials(t *testing.T) {
 			desc: "error: validations",
 			req:  &notificationpb.UpdateAndroidPlatformPushCredentialsRequest{},
 
-			expErr: status.Errorf(codes.InvalidArgument, "validations: auth_ctx.account_id: is required. push_credentials_server_key: is required. push_credentials_server_id: is required."),
+			expErr: status.Errorf(codes.InvalidArgument, "validations: auth_ctx.account_id: is required."),
 		},
 
 		{
@@ -288,6 +288,49 @@ func test_Android_UpdatePushCredentials(t *testing.T) {
 
 					PushCredentialsSenderId:  "senderid",
 					PushCredentialsServerKey: "serverkey",
+					PushCredentialsUpdatedAt: updatedAt,
+
+					UpdatedAt: updatedAt,
+					CreatedAt: updatedAt,
+				},
+			},
+		},
+
+		{
+			desc: "clears the android_platform",
+			req: &notificationpb.UpdateAndroidPlatformPushCredentialsRequest{
+				AuthContext: &authpb.AuthContext{AccountId: 1},
+
+				AndroidPlatformId: 1000,
+
+				PushCredentialsSenderId:  "",
+				PushCredentialsServerKey: "",
+			},
+
+			exp: &notificationpb.UpdateAndroidPlatformPushCredentialsResponse{
+				AndroidPlatform: &notificationpb.AndroidPlatform{
+					Id:        1000,
+					AccountId: 1,
+					Title:     "title",
+
+					PushCredentialsSenderId:  "",
+					PushCredentialsServerKey: "",
+					PushCredentialsUpdatedAt: updatedAt,
+
+					UpdatedAt: updatedAt,
+					CreatedAt: updatedAt,
+				},
+			},
+
+			after: &expect{
+				AndroidPlatform: &notificationpb.AndroidPlatform{
+					Id:        1000,
+					AccountId: 1,
+
+					Title: "title",
+
+					PushCredentialsSenderId:  "",
+					PushCredentialsServerKey: "",
 					PushCredentialsUpdatedAt: updatedAt,
 
 					UpdatedAt: updatedAt,

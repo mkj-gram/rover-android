@@ -17,5 +17,4 @@ class AndroidPlatform < ActiveRecord::Base
             account.update_attributes(android_platform_name: self.title)
         end
     end
-
 end

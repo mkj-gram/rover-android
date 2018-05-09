@@ -11,6 +11,10 @@ import (
 )
 
 func timeToProto(t time.Time) *timestamp.Timestamp {
+	if t.IsZero() {
+		return nil
+	}
+
 	ts, err := timestamp.TimestampProto(t)
 	if err != nil {
 		panic(errors.Wrap(err, "timestamp.ToProto"))
@@ -31,7 +35,6 @@ func IosPlatformToProto(p *db.IosPlatform) (*notification.IosPlatform, error) {
 		Title:     p.Title,
 		BundleId:  p.BundleId,
 
-		CertificateData:       certData,
 		CertificatePassphrase: p.CertificatePassphrase,
 		CertificateFilename:   p.CertificateFilename,
 		CertificateUpdatedAt:  timeToProto(p.CertificateUpdatedAt),
@@ -39,6 +42,10 @@ func IosPlatformToProto(p *db.IosPlatform) (*notification.IosPlatform, error) {
 
 		UpdatedAt: timeToProto(p.UpdatedAt),
 		CreatedAt: timeToProto(p.CreatedAt),
+	}
+
+	if len(p.CertificateData) > 0 {
+		proto.CertificateData = certData
 	}
 
 	return proto, nil
