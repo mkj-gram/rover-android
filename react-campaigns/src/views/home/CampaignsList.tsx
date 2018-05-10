@@ -27,6 +27,7 @@ export interface Props {
     pushToOverview: (campaignId: string) => void
     style?: React.CSSProperties
     campaignType: string
+    campaignStatus: QueryParams['campaignStatus']
 }
 
 const isScheduledCampaign = (
@@ -462,7 +463,8 @@ const CampaignsList: React.SFC<Props> = ({
     media,
     pushToOverview,
     style,
-    campaignType
+    campaignType,
+    campaignStatus
 }) => {
     const baseStyle: React.CSSProperties = {
         width: '100%',
@@ -483,11 +485,22 @@ const CampaignsList: React.SFC<Props> = ({
         web: 'WEB'
     }
 
+    const statusMap: StringMap<CampaignStatus> = {
+        drafts: 'DRAFT',
+        published: 'PUBLISHED',
+        archived: 'ARCHIVED'
+    }
+
     return (
         <div style={baseStyle}>
             {Object.keys(campaigns)
-                .slice(0)
                 .reverse()
+                .filter(
+                    campaignId =>
+                        campaigns[campaignId].campaignStatus ===
+                            statusMap[campaignStatus] ||
+                        campaignStatus === 'all'
+                )
                 .filter(
                     campaignId =>
                         campaigns[campaignId].campaignType ===

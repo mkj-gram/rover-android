@@ -6,27 +6,31 @@ import { ThunkAction } from 'redux-thunk'
 import * as H from 'history'
 import { setTimeout } from 'timers'
 
-export const handleOverviewModalDisplay: ActionCreator<
+export const handleOpenOverviewModalDisplay: ActionCreator<
     ThunkAction<void, State, void>
-> = (history: H.History, open: boolean) => (
-    dispatch: Dispatch<State>
-): void => {
+> = () => (dispatch: Dispatch<State>): void => {
     dispatch({
         type: 'TRIGGERED_ANIMATION',
         trigger: ''
     })
-    if (open) {
-        dispatch({
-            type: 'OPEN_OVERVIEW_MODAL'
-        })
-    } else {
-        dispatch({
-            type: 'CLOSING_OVERVIEW_MODAL'
-        })
-        setTimeout(() => {
-            history.push('/campaigns/')
-        }, 500)
-    }
+    dispatch({
+        type: 'OPEN_OVERVIEW_MODAL'
+    })
+}
+
+export const handleCloseOverviewModalDisplay: ActionCreator<
+    ThunkAction<void, State, void>
+> = (history: H.History, path: string) => (dispatch: Dispatch<State>): void => {
+    dispatch({
+        type: 'TRIGGERED_ANIMATION',
+        trigger: ''
+    })
+    dispatch({
+        type: 'CLOSING_OVERVIEW_MODAL'
+    })
+    setTimeout(() => {
+        history.push(path)
+    }, 500)
 }
 
 export const handleSendTestModalDisplay: ActionCreator<

@@ -14,7 +14,7 @@ import {
     closeCampaignTypeSelector,
     createCampaign,
     fetchCampaigns,
-    handleOverviewModalDisplay,
+    handleOpenOverviewModalDisplay,
     fetchCampaign,
     fetchTestDevices
 } from '../../actions'
@@ -38,7 +38,7 @@ export interface DispatchProps {
     fetchTestDevices: () => void
     closeCampaignTypeSelector: () => void
     createCampaign: (name: string, campaignType: CampaignType) => void
-    handleOverviewModalDisplay: (history: H.History, open: boolean) => void
+    handleOpenOverviewModalDisplay: () => void
 }
 
 export interface StateProps {
@@ -164,7 +164,7 @@ class ListPage extends React.PureComponent<
         })
 
         history.replace(`/campaigns/wizard/?${newQuery}`)
-        this.props.handleOverviewModalDisplay(history, true)
+        this.props.handleOpenOverviewModalDisplay()
     }
     render() {
         const { Fragment } = React
@@ -224,6 +224,7 @@ class ListPage extends React.PureComponent<
                                     flex: '1 1 auto'
                                 }}
                                 campaignType={campaignType}
+                                campaignStatus={campaignStatus}
                             />
                             <ToolBar
                                 currentPage={parseInt(pageNumber, 10)}
@@ -328,7 +329,7 @@ const mapDispatchToProps = (
                 }
 
                 ownProps.history.push(path)
-                dispatch(handleOverviewModalDisplay(ownProps.history, true))
+                dispatch(handleOpenOverviewModalDisplay())
             })
         },
         fetchCampaigns: () => {
@@ -350,9 +351,8 @@ const mapDispatchToProps = (
             )
         },
         fetchTestDevices: () => dispatch(fetchTestDevices()),
-        handleOverviewModalDisplay: (_, open) => {
-            dispatch(handleOverviewModalDisplay(ownProps.history, open))
-        }
+        handleOpenOverviewModalDisplay: () =>
+            dispatch(handleOpenOverviewModalDisplay())
     }
 }
 const mapStateToProps = (state: State): StateProps => ({

@@ -133,7 +133,7 @@ export const updateNotificationSettings: ActionCreator<
             ...newCampaign
         }
     }
-   
+
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {

@@ -8,7 +8,7 @@ import {
     archiveCampaign
 } from '../../../actions/campaigns'
 import { getCampaign } from '../../../reducers'
-import { handleOverviewModalDisplay } from '../../../actions'
+import { handleCloseOverviewModalDisplay } from '../../../actions'
 import { Link } from 'react-router-dom'
 import * as H from 'history'
 
@@ -45,7 +45,7 @@ export interface DispatchProps {
     renameCampaign: (name: string, campaignId: number) => void
     duplicateCampaign: (name: string, campaignId: number) => void
     archiveCampaign: (campaignId: number) => void
-    handleOverviewModalDisplay: (history: H.History, open: boolean) => void
+    handleCloseOverviewModalDisplay: (history: H.History, path: string) => void
 }
 
 export type StateProps = {
@@ -167,7 +167,14 @@ class OverviewModalHeader extends React.Component<
     }
 
     handleClose() {
-        this.props.handleOverviewModalDisplay(this.props.history, false)
+        const { location, history, campaignId } = this.props
+        const campaignIdRegEx = new RegExp(`[\\&-]?campaignId=${campaignId}`)
+        const search = location.search.replace(campaignIdRegEx, '')
+        const pathname = location.pathname.replace('wizard/', '')
+        this.props.handleCloseOverviewModalDisplay(
+            history,
+            `${pathname}${search}`
+        )
     }
 
     getTextStyle() {
@@ -299,6 +306,7 @@ const mapDispatchToProps = (
     props: RouterProps & OverviewModalHeaderProps
 ): DispatchProps => {
     const { location, history } = props
+
     return {
         renameCampaign: (name, campaignId) => {
             dispatch(renameCampaign(name, campaignId))
@@ -316,12 +324,19 @@ const mapDispatchToProps = (
         archiveCampaign: campaignId => {
             dispatch(archiveCampaign(campaignId)).then(complete => {
                 if (complete) {
-                    history.push(`/campaigns/`)
+                    const campaignIdRegEx = new RegExp(
+                        `[\\&-]?campaignId=${campaignId}`
+                    )
+
+                    const search = location.search.replace(campaignIdRegEx, '')
+                    const pathname = location.pathname.replace('wizard/', '')
+
+                    history.push(`${pathname}${search}`)
                 }
             })
         },
-        handleOverviewModalDisplay: (_, open) => {
-            dispatch(handleOverviewModalDisplay(history, open))
+        handleCloseOverviewModalDisplay: (_, path) => {
+            dispatch(handleCloseOverviewModalDisplay(history, path))
         }
     }
 }

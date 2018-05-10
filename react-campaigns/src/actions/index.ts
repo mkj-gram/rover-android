@@ -17,8 +17,13 @@ import { ThunkAction } from 'redux-thunk'
 export const handleSendTestModalDisplay = (on?: boolean) =>
     overviewActions.handleSendTestModalDisplay(on)
 
-export const handleOverviewModalDisplay = (history: H.History, open: boolean) =>
-    overviewActions.handleOverviewModalDisplay(history, open)
+export const handleCloseOverviewModalDisplay = (
+    history: H.History,
+    path: string
+) => overviewActions.handleCloseOverviewModalDisplay(history, path)
+
+export const handleOpenOverviewModalDisplay = () =>
+    overviewActions.handleOpenOverviewModalDisplay()
 
 export const fetchTestDevices = (
     predicates?: string,
