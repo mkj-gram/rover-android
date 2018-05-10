@@ -20,6 +20,7 @@ export interface Props
     handlePlaceholderChange?: (val: string) => void
     placeholder?: boolean
     handleBlurChange?: (val: string) => void
+    onInputChange?: (input: string) => void
 }
 
 class ContentEditable extends React.Component<Props, {}> {
@@ -44,6 +45,10 @@ class ContentEditable extends React.Component<Props, {}> {
             return true
         }
 
+        if (document.activeElement === htmlEl) {
+            return false
+        }
+
         if (
             nextProps.html !== htmlEl.innerHTML &&
             nextProps.html !== props.html
@@ -58,8 +63,9 @@ class ContentEditable extends React.Component<Props, {}> {
     }
 
     componentDidUpdate() {
-        if (this.htmlEl && this.props.html !== this.htmlEl.innerHTML) {
-            this.htmlEl.innerHTML = this.props.html
+        const { html, id } = this.props
+        if (this.htmlEl && html !== this.htmlEl.innerHTML) {
+            this.htmlEl.innerHTML = html
         }
     }
 
@@ -79,10 +85,7 @@ class ContentEditable extends React.Component<Props, {}> {
 
     handleKeyPress(e: KeyboardEvent) {
         if (e.keyCode === 13) {
-            this.props.onChange(this.htmlEl.innerHTML
-                .replace(/&nbsp;/g, ' ')
-                .replace(/<br>/g, '')
-                .replace(/\s*$/, '') as string)
+            this.props.onChange(this.sanitizeHTML(this.htmlEl.innerHTML))
         }
     }
 
@@ -106,51 +109,52 @@ class ContentEditable extends React.Component<Props, {}> {
     }
 
     emitChange(evt: any, byPassTargetSet: boolean = false) {
-        if (!this.htmlEl || !this.props.onBlurChange) {
+        const { handleBlurChange, html, onChange, onBlurChange } = this.props
+
+        if (!this.htmlEl || !onBlurChange) {
             if (!byPassTargetSet) {
-                evt.target = { value: this.props.html }
+                evt.target = { value: html }
             }
-            if (this.props.handleBlurChange) {
-                this.props.handleBlurChange(this.props.html as string)
+            if (handleBlurChange) {
+                handleBlurChange(html as string)
             } else {
-                this.props.onChange(this.props.html as string)
+                onChange(html as string)
             }
 
             return
         }
 
-        var html = this.htmlEl.innerHTML
-            .replace(/&nbsp;/g, ' ')
-            .replace(/<br>/g, '')
-            .replace(/\s*$/, '')
+        const sanitizedHtml: string = this.sanitizeHTML(this.htmlEl.innerHTML)
 
-        if (
-            (this.props.onChange || this.props.handleBlurChange) &&
-            html !== this.lastHtml
-        ) {
+        if ((onChange || handleBlurChange) && sanitizedHtml !== this.lastHtml) {
             if (!byPassTargetSet) {
-                evt.target = { value: html }
+                evt.target = { value: sanitizedHtml }
             }
 
-            if (this.props.handleBlurChange) {
-                this.props.handleBlurChange(html as string)
+            if (handleBlurChange) {
+                handleBlurChange(sanitizedHtml)
             } else {
-                this.props.onChange(html as string)
+                onChange(sanitizedHtml)
             }
         }
-        this.lastHtml = html
+        this.lastHtml = sanitizedHtml
     }
 
     onInput(evt: any) {
+        const { handlePlaceholderChange, onInputChange } = this.props
         if (!this.htmlEl) {
             return
         }
 
-        if (this.props.handlePlaceholderChange !== undefined) {
-            this.props.handlePlaceholderChange(this.htmlEl.innerHTML
-                .replace(/&nbsp;/g, ' ')
-                .replace(/<br>/g, '')
-                .replace(/\s*$/, '') as string)
+        const sanitizedHtml: string = this.htmlEl.innerHTML
+            .replace(/&nbsp;/g, ' ')
+            .replace(/<br>/g, '')
+        if (handlePlaceholderChange) {
+            handlePlaceholderChange(sanitizedHtml)
+        }
+
+        if (onInputChange) {
+            onInputChange(sanitizedHtml)
         }
     }
 
@@ -166,6 +170,13 @@ class ContentEditable extends React.Component<Props, {}> {
         }
 
         this.htmlEl.style.color = (this.props.style.color as string) || 'black'
+    }
+
+    sanitizeHTML(html: string): string {
+        return html
+            .replace(/&nbsp;/g, ' ')
+            .replace(/<br>/g, '')
+            .replace(/\s*$/, '')
     }
 
     render() {

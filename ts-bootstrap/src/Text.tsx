@@ -10,32 +10,34 @@ import PlaceholderComponent from '../components/PlaceholderComponent'
 
 export interface TextProps {
     text: string | JSX.Element
-    size: 'h1' | 'h2' | 'large' | 'medium' | 'small'
-    position?: 'left' | 'center'
     contentEditable?: boolean
-    placeholder?: boolean
-    label?: boolean
-    handleChange?: (val: string) => void
-    textStyle?: React.CSSProperties
-    id?: string
-    onBlurChange?: boolean
-    placeholderText?: string
     handleBlurChange?: (evt: string) => void
+    handleChange?: (val: string) => void
+    id?: string
+    label?: boolean
+    onBlurChange?: boolean
+    onInputChange?: (input: string) => void
+    placeholder?: boolean
+    placeholderText?: string
+    position?: 'left' | 'center'
+    size: 'h1' | 'h2' | 'large' | 'medium' | 'small'
+    textStyle?: React.CSSProperties
 }
 
 const Text: React.SFC<TextProps> = ({
-    text,
-    size,
-    position,
-    placeholder,
-    label,
     contentEditable,
+    handleBlurChange,
     handleChange,
-    textStyle,
     id,
+    label,
     onBlurChange,
+    onInputChange,
+    placeholder,
     placeholderText,
-    handleBlurChange
+    position,
+    size,
+    text,
+    textStyle
 }) => {
     let style: StringMap<string | number> = {
         ...typographyText,
@@ -111,25 +113,27 @@ const Text: React.SFC<TextProps> = ({
     } else if (!placeholder || (placeholder && (text as string).length !== 0)) {
         return (
             <ContentEditable
+                handleBlurChange={handleBlurChange}
                 html={html}
-                onChange={handleChange}
-                style={style}
                 id={id}
                 onBlurChange={onBlurChange}
-                handleBlurChange={handleBlurChange}
+                onChange={handleChange}
+                onInputChange={onInputChange}
+                style={style}
             />
         )
     } else {
         return (
             <PlaceholderComponent
+                contentEditable={contentEditable}
+                handleBlurChange={handleBlurChange}
                 html={html}
+                id={id}
+                onBlurChange={onBlurChange}
+                onChange={handleChange}
+                onInputChange={onInputChange}
                 placeholderText={placeholderText}
                 style={style}
-                onChange={handleChange}
-                id={id}
-                contentEditable={contentEditable}
-                onBlurChange={onBlurChange}
-                handleBlurChange={handleBlurChange}
             />
         )
     }

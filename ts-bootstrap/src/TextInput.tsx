@@ -15,6 +15,7 @@ export interface TextInputProps {
     isRequired?: boolean
     label: string
     media: 'Mobile' | 'Tablet' | 'Desktop'
+    onInputChange?: (input: string) => void
     placeholder?: string
     primaryTextSize?: 'h1' | 'h2' | 'large' | 'medium' | 'small'
     startEditingText: () => void
@@ -127,6 +128,7 @@ const TextInput: React.SFC<TextInputProps> = ({
     isEditingText,
     label,
     media,
+    onInputChange,
     placeholder,
     startEditingText,
     text,
@@ -158,6 +160,7 @@ const TextInput: React.SFC<TextInputProps> = ({
                     handleChange={(str: string) => updateText(str)}
                     size={primaryTextSize}
                     onBlurChange={true}
+                    onInputChange={onInputChange}
                     placeholder={true}
                     placeholderText={placeholder}
                     textStyle={{ width: '100%' }}
@@ -224,6 +227,7 @@ const TextInput: React.SFC<TextInputProps> = ({
                     }}
                     size={primaryTextSize}
                     onBlurChange={isEditingText}
+                    onInputChange={onInputChange}
                     textStyle={{
                         width: '100%'
                     }}

@@ -38,11 +38,13 @@ export interface MessageAndMediaProps extends InjectedProps {
 }
 
 export interface MessageAndMediaState {
+    bodyPreview: string
     editingField: 'body' | 'title' | 'url' | ''
     isShowingRichMediaPopover: boolean
     isShowingPhonePreview: boolean
     phonePreviewAnimation: string
     richMediaAttachmentTab: 'IMAGE' | 'AUDIO' | 'VIDEO'
+    titlePreview: string
 }
 
 export interface MessageAndMediaDispatchProps {
@@ -68,12 +70,15 @@ class MessageAndMedia extends React.Component<
         super(props)
 
         const { editableCampaign } = this.props
+        const { notificationBody, notificationTitle } = editableCampaign
         this.state = {
+            bodyPreview: notificationBody,
             editingField: '',
             isShowingRichMediaPopover: false,
             isShowingPhonePreview: false,
             phonePreviewAnimation: 'open',
-            richMediaAttachmentTab: 'IMAGE'
+            richMediaAttachmentTab: 'IMAGE',
+            titlePreview: notificationTitle
         }
 
         this.setState = this.setState.bind(this)
@@ -113,38 +118,34 @@ class MessageAndMedia extends React.Component<
 
     renderPreview() {
         const { device, editableCampaign } = this.props
-        const { isShowingPhonePreview, phonePreviewAnimation } = this.state
         const {
-            notificationAttachment,
-            notificationBody,
-            notificationTitle
-        } = editableCampaign
+            bodyPreview,
+            isShowingPhonePreview,
+            phonePreviewAnimation,
+            titlePreview
+        } = this.state
+        const { notificationAttachment, notificationBody } = editableCampaign
 
         const Fragment = React.Fragment
         if (device === 'Desktop') {
-            return ReactDOM.createPortal(
+            return (
                 <MediaQuery minWidth={1140}>
-                    <div
-                        style={{
-                            position: 'absolute',
-                            top: 96,
-                            left: 24,
-                            zIndex: 1
-                        }}
-                    >
-                        <MessageAndMediaIcon />
-                        <MessageAndMediaNotification
-                            notificationAttachment={notificationAttachment}
-                            notificationBody={notificationBody}
-                            notificationTitle={notificationTitle}
+                    {ReactDOM.createPortal(
+                        <div
+                            style={{ position: 'absolute', top: 96, left: 24 }}
                         >
-                          {this.renderBodyLengthBadge(
-                              notificationBody.length
-                              )}
-                        </MessageAndMediaNotification>
-                    </div>
-                </MediaQuery>,
-                document.getElementById('phone-bezel')
+                            <MessageAndMediaIcon />
+                            <MessageAndMediaNotification
+                                notificationAttachment={notificationAttachment}
+                                notificationBody={bodyPreview}
+                                notificationTitle={titlePreview}
+                            >
+                                {this.renderBodyLengthBadge(bodyPreview.length)}
+                            </MessageAndMediaNotification>
+                        </div>,
+                        document.getElementById('phone-bezel')
+                    )}
+                </MediaQuery>
             )
         }
 
@@ -172,12 +173,10 @@ class MessageAndMedia extends React.Component<
                         <MessageAndMediaIcon />
                         <MessageAndMediaNotification
                             notificationAttachment={notificationAttachment}
-                            notificationBody={notificationBody}
-                            notificationTitle={notificationTitle}
+                            notificationBody={bodyPreview}
+                            notificationTitle={titlePreview}
                         >
-                            {this.renderBodyLengthBadge(
-                                notificationBody.length
-                            )}
+                            {this.renderBodyLengthBadge(bodyPreview.length)}
                         </MessageAndMediaNotification>
                     </Fragment>
                 </PhonePreview>,
@@ -193,7 +192,12 @@ class MessageAndMedia extends React.Component<
             isCurrentPage,
             updateEditableCampaign
         } = this.props
-        const { editingField, richMediaAttachmentTab } = this.state
+        const {
+            bodyPreview,
+            editingField,
+            richMediaAttachmentTab,
+            titlePreview
+        } = this.state
         const { notificationBody, notificationTitle } = editableCampaign
         return (
             <FormSection device={device} style={{ marginTop: 24 }}>
@@ -223,13 +227,16 @@ class MessageAndMedia extends React.Component<
                     isEditingText={editingField === 'body'}
                     label="Body"
                     media={device}
+                    onInputChange={(bodyPreview: string) =>
+                        this.setState({ bodyPreview })
+                    }
                     placeholder="Enter the main notification copy"
                     startEditingText={() =>
                         this.setState({
                             editingField: 'body'
                         })
                     }
-                    text={notificationBody}
+                    text={bodyPreview}
                     updateText={(text: string) =>
                         this.setState(
                             {
@@ -246,16 +253,20 @@ class MessageAndMedia extends React.Component<
                 {/* Title */}
                 <TextInput
                     id="notification-title-text"
-                    deleteText={() =>
+                    deleteText={() => {
+                        this.setState({ titlePreview: '' })
                         updateEditableCampaign({ notificationTitle: '' })
-                    }
+                    }}
                     isEditingText={editingField === 'title'}
                     label="Title"
                     media={device}
+                    onInputChange={(titlePreview: string) =>
+                        this.setState({ titlePreview })
+                    }
                     startEditingText={() =>
                         this.setState({ editingField: 'title' })
                     }
-                    text={notificationTitle}
+                    text={titlePreview}
                     updateText={(text: string) =>
                         this.setState(
                             {

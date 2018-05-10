@@ -11,6 +11,7 @@ export interface Props {
     id?: string
     contentEditable?: boolean
     onBlurChange?: boolean
+    onInputChange?: (input: string) => void
     handleBlurChange?: (val: string) => void
 }
 
@@ -42,6 +43,7 @@ class PlaceholderComponent extends React.Component<Props, State> {
             placeholderText,
             style,
             onChange,
+            onInputChange,
             id,
             contentEditable,
             onBlurChange,
@@ -73,6 +75,7 @@ class PlaceholderComponent extends React.Component<Props, State> {
                     <ContentEditable
                         html={html}
                         onChange={onChange}
+                        onInputChange={onInputChange}
                         id={id}
                         onBlurChange={onBlurChange}
                         style={this.props.style}
