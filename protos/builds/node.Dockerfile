@@ -1,11 +1,18 @@
-FROM protoc:3.2.0
+FROM node:6.14.2
 
-ENV NODE_VERSION=6.7.0-r1
+ENV PROTOC_ZIP=protoc-3.2.0-linux-x86_64.zip
 
-RUN apk update && apk add nodejs=$NODE_VERSION
+RUN apt-get update && \
+	apt-get install unzip
 
-RUN apk add --no-cache make
+WORKDIR /
+
+RUN mkdir /protoc && \
+	curl -OL https://github.com/google/protobuf/releases/download/v3.2.0/$PROTOC_ZIP && \
+	unzip -o $PROTOC_ZIP -d /protoc && \
+	cp /protoc/bin/protoc /usr/local/bin && \
+	cp -r /protoc/include/* /usr/local/include && \
+	rm -f $PROTOC_ZIP && \
+	rm -rf /protoc
 
 RUN npm install -g grpc-tools
-
-ENTRYPOINT ["./protos/builds/scripts/node.sh"]

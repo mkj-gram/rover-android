@@ -14,5 +14,5 @@ FILES="`find $PROTO_PATH -name *.proto`"
 echo "Proto Files: "
 echo $FILES
 
-protoc -I ${PROTO_PATH} --ruby_out=./$TARGET_DIR --grpc_out=./$TARGET_DIR --plugin=protoc-gen-grpc=/opt/namely/grpc_ruby_plugin $FILES
+protoc -I ${PROTO_PATH} --ruby_out=./$TARGET_DIR --grpc_out=./$TARGET_DIR --plugin=protoc-gen-grpc=`which grpc_tools_ruby_protoc_plugin` $FILES
 echo "DONE"

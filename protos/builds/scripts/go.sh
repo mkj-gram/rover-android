@@ -8,9 +8,7 @@ if [ ! -d "$TARGET_DIR" ]; then
   mkdir $TARGET_DIR
 fi
 
-cp -r ./protos/* $GOPATH/src/
-
-PROTO_PATH=$GOPATH/src/
+PROTO_PATH=./protos
 
 GO_MAPS="Mgoogle/protobuf/timestamp.proto=github.com/roverplatform/rover/go/protobuf/ptypes/timestamp\
 ,Mauth/v1/auth.proto=github.com/roverplatform/rover/apis/go/auth/v1\

@@ -1,28 +1,18 @@
-FROM protoc:3.2.0
+FROM ruby:2.2
 
-RUN set -ex \
-    && apk --no-cache --update add --virtual .ruby-builder \
-  git \
-  gcc \
-  g++ \
-  openssl \
-  make \
-    cmake \
-  autoconf \
-  automake \
-  libtool
+ENV PROTOC_ZIP=protoc-3.2.0-linux-x86_64.zip
 
-RUN mkdir -p /usr/local/grpc \
-  && git clone https://github.com/grpc/grpc.git /usr/local/grpc
+RUN apt-get update && \
+  apt-get install unzip
 
-RUN cd /usr/local/grpc \
-  && git checkout v1.1.2 \
-  && git submodule update --init
+WORKDIR /
 
-RUN cd /usr/local/grpc \
-  && make grpc_ruby_plugin
+RUN mkdir /protoc && \
+  curl -OL https://github.com/google/protobuf/releases/download/v3.2.0/$PROTOC_ZIP && \
+  unzip -o $PROTOC_ZIP -d /protoc && \
+  cp /protoc/bin/protoc /usr/local/bin && \
+  cp -r /protoc/include/* /usr/local/include && \
+  rm -f $PROTOC_ZIP && \
+  rm -rf /protoc
 
-RUN mkdir -p /opt/namely \
-  && cp /usr/local/grpc/bins/opt/grpc_ruby_plugin /opt/namely
-
-ENTRYPOINT ["./protos/builds/scripts/ruby.sh"]
+RUN gem install grpc-tools
