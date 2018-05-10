@@ -22,7 +22,7 @@ export interface OverviewModalRowProps extends InjectedProps {
     name?: string
     text?: string
     val?: boolean | number
-    handlePageDirect?: (val?: string) => void
+    openWizard?: (stateType: UIStateType) => void
 }
 
 class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
@@ -72,7 +72,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
         return ret
     }
     render() {
-        let { device, name, text, val, handlePageDirect } = this.props
+        let { device, name, text, val, openWizard } = this.props
         // Desktop as default
         let outerStyle: React.CSSProperties = {
             padding: '24px 32px 0 32px',
@@ -84,7 +84,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
                 text="Edit"
                 size="small"
                 type="primary"
-                onClick={() => handlePageDirect(name)}
+                onClick={() => openWizard(name.toLowerCase() as UIStateType)}
                 style={{ outerStyle: { marginLeft: 32 } }}
             />
         )
@@ -107,7 +107,9 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
             <div
                 style={{ background: white, width: '100%' }}
                 onClick={
-                    !experienceOff ? () => handlePageDirect(name) : () => null
+                    !experienceOff
+                        ? () => openWizard(name.toLowerCase() as UIStateType)
+                        : () => null
                 }
                 key={name}
             >

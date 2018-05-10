@@ -128,23 +128,6 @@ export const setCurrentFormPage: ActionCreator<
 > = (currentPage: formPage) => (dispatch: Dispatch<State>): void => {
     dispatch({ type: 'UPDATE_CURRENT_PAGE', currentPage: currentPage })
 }
-// Notification Delivery Modal
-
-export const openNotificationDeliveryModal: ActionCreator<
-    ThunkAction<void, State, void>
-> = (open: boolean) => (dispatch: Dispatch<State>): void => {
-    if (open) {
-        dispatch({ type: 'OPEN_NOTIFICATION_DELIVERY_MODAL' })
-    } else {
-        dispatch({ type: 'CLOSING_NOTIFICATION_DELIVERY_MODAL' })
-        setTimeout(() => {
-            dispatch({
-                type: 'CLOSE_NOTIFICATION_DELIVERY_MODAL'
-            })
-            // tslint:disable-next-line:align
-        }, 500)
-    }
-}
 
 export const updateLastVewPage: ActionCreator<
     ThunkAction<void, State, void>
@@ -223,6 +206,29 @@ export const closePopoverModalForm: ActionCreator<
     setTimeout(() => {
         dispatch({
             type: 'CLOSE_POPOVER_MODAL_FORM'
+        })
+    }, 500)
+}
+
+// Wizard Modal
+export const openWizardModal: ActionCreator<ThunkAction<void, State, void>> = (
+    stateType: UIStateType
+) => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'START_OPENING_WIZARD_MODAL', stateType })
+    setTimeout(() => {
+        dispatch({
+            type: 'FINISH_OPENING_WIZARD_MODAL'
+        })
+    }, 500)
+}
+
+export const closeWizardModal: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'START_CLOSING_WIZARD_MODAL' })
+    setTimeout(() => {
+        dispatch({
+            type: 'FINISH_CLOSING_WIZARD_MODAL'
         })
     }, 500)
 }

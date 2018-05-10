@@ -41,7 +41,7 @@ interface UIStateInterface {
     notification: StringMap<StringMap<boolean>>
 }
 
-type UIStateType = 'notification'
+type UIStateType = 'notification' | 'experience' | 'delivery'
 
 type UIStateField = {
     seen: boolean
@@ -194,6 +194,7 @@ type AppState = {
     error: ErrorState
     activePopover: PopoverState
     form: FormState
+    wizardModal: WizardModal
 }
 
 type PopoverState = {
@@ -230,6 +231,12 @@ type NotificationState = {
     readonly isTapBehaviorWebsitePresentationOpen: string
     readonly alertOptionsHoverValue: string
     readonly isAlertOptionsOpen: string
+}
+
+type WizardModal = {
+    readonly currentWizard: UIStateType
+    readonly isWizardModalOpen: boolean
+    readonly isWizardModalClosing: boolean
 }
 
 interface InjectedProps {

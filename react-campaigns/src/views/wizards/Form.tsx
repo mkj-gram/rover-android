@@ -12,7 +12,6 @@ import {
     getCampaign,
     getEditableCampaign,
     getEditableUIState,
-    getIsNotificationDeliveryModalOpen,
     getIsStageValid,
     getLastViewPage,
     getShouldShowSaveAndClose,
@@ -23,10 +22,10 @@ import PhonePreview from './PhonePreview'
 import WizardModal from './WizardModal'
 
 import {
+    closeWizardModal,
     createEditableCampaign,
     setCurrentFormPage,
-    updateEditableUIState,
-    openNotificationDeliveryModal
+    updateEditableUIState
 } from '../../actions'
 
 export interface FormProps extends ResponsiveContainerProps {
@@ -40,7 +39,7 @@ export interface FormProps extends ResponsiveContainerProps {
 export interface FormDispatchProps {
     createEditableCampaign: () => void
     setCurrentFormPage: (formPage: formPage) => void
-    openNotificationDeliveryModal: (open: boolean) => void
+    closeWizardModal: () => void
     updateEditableUIState: (
         newUIStateGroup: keyof editableUIState,
         newUIStateValue: UIStateField | boolean
@@ -56,9 +55,8 @@ export interface FormStateProps {
 }
 
 export interface FormState {
-    animateForms: boolean
+    formAnimation: 'ltr' | 'rtl' | ''
     formStack: (keyof editableUIState)[]
-    useBackFormAnimation: boolean
 }
 
 class Form extends React.Component<
@@ -108,8 +106,7 @@ class Form extends React.Component<
 
         this.state = {
             formStack: initialFormStack,
-            animateForms: false,
-            useBackFormAnimation: false
+            formAnimation: ''
         }
         this.setState = this.setState.bind(this)
     }
@@ -143,14 +140,20 @@ class Form extends React.Component<
                 overrideWidth={96}
                 onClick={() => {
                     setCurrentFormPage(formStack[formStack.length - 2])
-                    this.setState({ useBackFormAnimation: true }, () => {
-                        setTimeout(() => {
-                            this.setState({
-                                formStack: formStack.slice(0, -1),
-                                useBackFormAnimation: false
-                            })
-                        }, 300)
-                    })
+                    this.setState(
+                        {
+                            formAnimation: 'rtl'
+                        },
+                        () =>
+                            setTimeout(
+                                () =>
+                                    this.setState({
+                                        formStack: formStack.slice(0, -1),
+                                        formAnimation: ''
+                                    }),
+                                300
+                            )
+                    )
                 }}
             />
         )
@@ -158,15 +161,15 @@ class Form extends React.Component<
 
     getCancelButton() {
         const {
-            openNotificationDeliveryModal,
+            closeWizardModal,
             createEditableCampaign,
             setCurrentFormPage
         } = this.props
         return (
             <Button
                 onClick={() => {
+                    closeWizardModal()
                     setCurrentFormPage('')
-                    openNotificationDeliveryModal(false)
                     createEditableCampaign()
                 }}
                 size="large"
@@ -183,7 +186,7 @@ class Form extends React.Component<
             editableUIState,
             getIsStageValid,
             setCurrentFormPage,
-            openNotificationDeliveryModal,
+            closeWizardModal,
             updateEditableUIState
         } = this.props
         const { formStack } = this.state
@@ -200,7 +203,10 @@ class Form extends React.Component<
                 overrideWidth={96}
                 onClick={() =>
                     this.setState(
-                        { formStack: [...formStack, nextForm] },
+                        {
+                            formAnimation: 'ltr',
+                            formStack: [...formStack, nextForm]
+                        },
                         () => {
                             setCurrentFormPage(nextForm)
                             this.setFormAsSeen(lastForm)
@@ -214,7 +220,7 @@ class Form extends React.Component<
     getFinishButton() {
         const {
             getIsStageValid,
-            openNotificationDeliveryModal,
+            closeWizardModal,
             saveAndClose,
             setCurrentFormPage
         } = this.props
@@ -231,7 +237,7 @@ class Form extends React.Component<
                 overrideWidth={96}
                 onClick={() => {
                     setCurrentFormPage('')
-                    openNotificationDeliveryModal(false)
+                    closeWizardModal()
                     this.setFormAsSeen(lastForm)
                     saveAndClose()
                 }}
@@ -241,7 +247,7 @@ class Form extends React.Component<
 
     getSaveAndCloseButton() {
         const {
-            openNotificationDeliveryModal,
+            closeWizardModal,
             saveAndClose,
             setCurrentFormPage,
             showSaveAndClose
@@ -254,7 +260,7 @@ class Form extends React.Component<
                 onClick={() => {
                     saveAndClose()
                     setCurrentFormPage('')
-                    openNotificationDeliveryModal(false)
+                    closeWizardModal()
                 }}
                 size="large"
                 text="Save & Close"
@@ -274,7 +280,7 @@ class Form extends React.Component<
     render() {
         const Fragment = React.Fragment
         const { children, device, getTypeProgress, type } = this.props
-        const { formStack, useBackFormAnimation } = this.state
+        const { formAnimation, formStack } = this.state
 
         const formChildStyle: React.CSSProperties = {
             position: 'absolute',
@@ -299,18 +305,6 @@ class Form extends React.Component<
             leftHeaderElement: this.getCancelButton()
         }
 
-        const getAnimation = (index: number): string => {
-            if (index === 0) {
-                return ''
-            }
-
-            if (useBackFormAnimation && index === formStack.length - 1) {
-                return 'rtl'
-            }
-
-            return 'ltr'
-        }
-
         return (
             <Fragment>
                 <WizardModal {...wizardProps}>
@@ -322,9 +316,9 @@ class Form extends React.Component<
                                     style={{
                                         zIndex: index,
                                         ...formChildStyle,
-                                        animation: `${getAnimation(
-                                            index
-                                        )} 300ms ease-in-out`
+                                        animation:
+                                            index === formStack.length - 1 &&
+                                            `${formAnimation} 300ms ease-in-out`
                                     }}
                                     id={`${
                                         child.props.wizardSection
@@ -353,10 +347,9 @@ const mapDispatchToProps = (
     return {
         createEditableCampaign: () =>
             dispatch(createEditableCampaign(campaignId)),
-        openNotificationDeliveryModal: (open: boolean) =>
-            dispatch(openNotificationDeliveryModal(open)),
         setCurrentFormPage: (formPage: formPage) =>
             dispatch(setCurrentFormPage(formPage)),
+        closeWizardModal: () => dispatch(closeWizardModal()),
         updateEditableUIState: (
             newUIStateGroup: keyof editableUIState,
             newUIStateValue: UIStateField | boolean

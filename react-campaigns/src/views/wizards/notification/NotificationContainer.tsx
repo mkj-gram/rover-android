@@ -12,11 +12,11 @@ import AdvancedSettingsContainer from './AdvancedSettingsContainer'
 import Form from '../Form'
 import { updateNotificationSettings } from '../../../actions'
 import { getCampaign } from '../../../reducers/campaigns'
-import { getIsNotificationDeliveryModalOpen } from '../../../reducers'
+import { getIsWizardModalClosing } from '../../../reducers'
 
 export interface NotificationContainerStateProps {
     campaign: Campaign
-    isNotificationDeliveryModalOpen: string
+    isWizardModalClosing: boolean
 }
 
 export interface NotificationContainerProps {
@@ -34,12 +34,11 @@ const NotificationContainer: React.SFC<
 > = ({
     campaign,
     device,
-    isNotificationDeliveryModalOpen,
+    isWizardModalClosing,
     updateNotificationSettings
 }) => {
     const campaignId = parse(location.search.substring(1)).campaignId
-    let animate =
-        isNotificationDeliveryModalOpen === 'closing' ? 'close' : 'open'
+    let animate = isWizardModalClosing ? 'close' : 'open'
 
     const type: UIStateType = 'notification'
 
@@ -98,7 +97,7 @@ const mapStateToProps = (state: State): NotificationContainerStateProps => ({
         state.campaigns,
         parse(location.search.substring(1)).campaignId
     ),
-    isNotificationDeliveryModalOpen: getIsNotificationDeliveryModalOpen(state)
+    isWizardModalClosing: getIsWizardModalClosing(state)
 })
 
 const mapDispatchToProps = (

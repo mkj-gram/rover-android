@@ -82,6 +82,16 @@ export const getIsTapBehaviorSelectorOpen = (state: State) =>
 export const getIsTapBehaviorWebsitePresentationOpen = (state: State) =>
     appSelector.getIsTapBehaviorWebsitePresentationOpen(state.app)
 
+// WizardModal
+export const getCurrentWizard = (state: State) =>
+    appSelector.getCurrentWizard(state.app)
+
+export const getIsWizardModalOpen = (state: State) =>
+    appSelector.getIsWizardModalOpen(state.app)
+
+export const getIsWizardModalClosing = (state: State) =>
+    appSelector.getIsWizardModalClosing(state.app)
+
 // Campaigns
 export const getCampaign = (state: State, id: string) =>
     campaignsSelector.getCampaign(state.campaigns, id)

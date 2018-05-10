@@ -9,6 +9,7 @@ import overview, * as overviewSelector from './overview'
 import error, * as errorSelector from './error'
 import form, * as formSelector from './form'
 import activePopover, * as activePopoverSelector from './activePopover'
+import wizardModal, * as wizardModalSelector from './wizardModal'
 
 export default combineReducers({
     notification,
@@ -17,7 +18,8 @@ export default combineReducers({
     overview,
     error,
     form,
-    activePopover
+    activePopover,
+    wizardModal
 })
 
 export const getIsCreatingCampaign = (state: AppState) =>
@@ -84,3 +86,13 @@ export const getCurrentFormPage = (state: AppState) =>
 
 export const getShouldShowPhonePreview = (state: AppState) =>
     formSelector.getShouldShowPhonePreview(state.form)
+
+// Wizard
+export const getCurrentWizard = (state: AppState) =>
+    wizardModalSelector.getCurrentWizard(state.wizardModal)
+
+export const getIsWizardModalOpen = (state: AppState) =>
+    wizardModalSelector.getIsWizardModalOpen(state.wizardModal)
+
+export const getIsWizardModalClosing = (state: AppState) =>
+    wizardModalSelector.getIsWizardModalClosing(state.wizardModal)
