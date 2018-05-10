@@ -9,7 +9,7 @@ import ContentEditable from '../components/ContentEditable'
 import PlaceholderComponent from '../components/PlaceholderComponent'
 
 export interface TextProps {
-    text: string
+    text: string | JSX.Element
     size: 'h1' | 'h2' | 'large' | 'medium' | 'small'
     position?: 'left' | 'center'
     contentEditable?: boolean
@@ -105,10 +105,10 @@ const Text: React.SFC<TextProps> = ({
 
     if (
         !contentEditable &&
-        (!placeholder || (placeholder && text.length !== 0))
+        (!placeholder || (placeholder && (text as string).length !== 0))
     ) {
         return <div style={style}>{text}</div>
-    } else if (!placeholder || (placeholder && text.length !== 0)) {
+    } else if (!placeholder || (placeholder && (text as string).length !== 0)) {
         return (
             <ContentEditable
                 html={html}

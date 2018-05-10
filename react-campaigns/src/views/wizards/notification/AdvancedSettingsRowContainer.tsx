@@ -23,7 +23,7 @@ export interface AdvancedSettingsRowContainerProps {
     device: string
     displayText: string
     rowOnClick?: () => void
-    description?: string
+    description?: JSX.Element
     field:
         | 'notificationIosSound'
         | 'notificationIosCategoryIdentifier'
@@ -270,18 +270,17 @@ class AdvancedSettingsRowContainer extends React.Component<
                             textStyle={{ width: 350 }}
                         />
                     </div>
-                    {description.length !== 0 && (
-                        <div
-                            style={{
-                                paddingTop: device === 'Tablet' ? 16 : 24
-                            }}
-                        >
-                            <Text
-                                size={device === 'Tablet' ? 'small' : 'medium'}
-                                text={description}
-                            />
-                        </div>
-                    )}
+
+                    <div
+                        style={{
+                            paddingTop: device === 'Tablet' ? 16 : 24
+                        }}
+                    >
+                        <Text
+                            size={device === 'Tablet' ? 'small' : 'medium'}
+                            text={description}
+                        />
+                    </div>
                 </div>
             )
             switch (device) {

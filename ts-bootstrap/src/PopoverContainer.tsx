@@ -8,7 +8,7 @@ export interface PopoverContainerProps {
     children?: JSX.Element[]
     popoverProps?: object
     targetParent?: string
-    onClick?: () => void
+    onClick?: (e?: any) => void
     showPopover?: boolean
 }
 
@@ -26,7 +26,14 @@ class PopoverContainer extends React.Component<PopoverContainerProps, {}> {
                 <Manager>
                     <Reference>
                         {({ ref }) => (
-                            <div ref={ref} id={id} onClick={onClick}>
+                            <div
+                                ref={ref}
+                                id={id}
+                                onClick={e => {
+                                    e.stopPropagation()
+                                    onClick()
+                                }}
+                            >
                                 {children[0]}
                             </div>
                         )}

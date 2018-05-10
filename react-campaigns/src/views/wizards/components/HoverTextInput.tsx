@@ -4,11 +4,11 @@ import * as ReactDOM from 'react-dom'
 import { connect, Dispatch } from 'react-redux'
 import MediaQuery from 'react-responsive'
 
-import { beige, titanium, Text } from '@rover/ts-bootstrap/dist/src'
+import { beige, titanium, Text, charcoal } from '@rover/ts-bootstrap/dist/src'
 
 export interface HoverTextInputProps {
     children: JSX.Element | JSX.Element[]
-    description: string
+    description: JSX.Element
     field: string
 }
 
@@ -28,10 +28,10 @@ class HoverTextInput extends React.Component<
         this.handleHover = this.handleHover.bind(this)
     }
 
-    handleHover() {
+    handleHover(isHovered: boolean) {
         if (window.innerWidth >= 1140) {
             this.setState({
-                isHovered: !this.state.isHovered
+                isHovered
             })
         }
     }
@@ -46,7 +46,9 @@ class HoverTextInput extends React.Component<
         )
         const parent = document.getElementById(`hoverTextInputParent_${field}`)
 
-        if (descriptionChild && triangleChild && parent) {
+        const bridgeHover = document.getElementById(`hoverTextBridge_${field}`)
+
+        if (descriptionChild && triangleChild && parent && bridgeHover) {
             triangleChild.style.top = `${parent.getBoundingClientRect().top -
                 (triangleChild.getBoundingClientRect().height -
                     parent.getBoundingClientRect().height) /
@@ -55,6 +57,11 @@ class HoverTextInput extends React.Component<
                 (descriptionChild.getBoundingClientRect().height -
                     parent.getBoundingClientRect().height) /
                     2}px`
+
+            bridgeHover.style.top = `${parent.getBoundingClientRect().top}px`
+            bridgeHover.style.height = `${
+                parent.getBoundingClientRect().height
+            }px`
         }
     }
 
@@ -76,8 +83,8 @@ class HoverTextInput extends React.Component<
         return (
             <div
                 style={{ ...style }}
-                onMouseEnter={() => this.handleHover()}
-                onMouseLeave={() => this.handleHover()}
+                onMouseEnter={() => this.handleHover(true)}
+                onMouseLeave={() => this.handleHover(false)}
             >
                 <div
                     style={{
@@ -94,6 +101,19 @@ class HoverTextInput extends React.Component<
                         <MediaQuery minWidth={1140}>
                             {ReactDOM.createPortal(
                                 <Fragment>
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            height: 0,
+                                            width: 64
+                                        }}
+                                        onMouseEnter={() =>
+                                            this.handleHover(true)
+                                        }
+                                        id={`hoverTextBridge_${field}`}
+                                    />
                                     <div
                                         style={{
                                             position: 'absolute',
@@ -128,11 +148,20 @@ class HoverTextInput extends React.Component<
                                                 borderLeft: `4px solid ${titanium}`
                                             }}
                                         >
-                                            <Text
-                                                text={description}
-                                                size="large"
-                                                label={true}
-                                            />
+                                            <div
+                                                style={{
+                                                    cursor: 'default',
+                                                    fontFamily:
+                                                        '"Source Sans Pro", sans-serif',
+                                                    fontSize: 19,
+                                                    fontWeight: 400,
+                                                    color: charcoal,
+                                                    display: 'inline-block',
+                                                    lineHeight: '24px'
+                                                }}
+                                            >
+                                                {description}
+                                            </div>
                                         </div>
                                     </div>
                                 </Fragment>,
