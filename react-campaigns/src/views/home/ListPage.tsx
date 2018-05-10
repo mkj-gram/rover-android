@@ -188,6 +188,7 @@ class ListPage extends React.PureComponent<
                         {shouldShowWizard && (
                             <OverviewContainer device={device} />
                         )}
+
                         <div
                             style={{
                                 width: '100vw',

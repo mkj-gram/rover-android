@@ -54,6 +54,7 @@ import {
 } from '../styles/typography'
 
 import {
+    AudienceIcon,
     AlertErrorIcon,
     AlertInfoIcon,
     AlertOptionsBadgeNumber,
@@ -74,6 +75,7 @@ import {
     CircleCloseIcon,
     CloseIcon,
     DuplicateIcon,
+    ExternalLinkIcon,
     EyeIcon,
     FilterArrowIcon,
     GearIcon,
@@ -137,6 +139,7 @@ export {
     TabBar,
     Text,
     TextInput,
+    AudienceIcon,
     AlertErrorIcon,
     AlertInfoIcon,
     AlertOptionsBadgeNumber,
@@ -158,6 +161,7 @@ export {
     CircleCloseIcon,
     CloseIcon,
     DuplicateIcon,
+    ExternalLinkIcon,
     EyeIcon,
     FilterArrowIcon,
     GearIcon,

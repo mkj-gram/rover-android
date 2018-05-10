@@ -1,3 +1,4 @@
+import AudienceIcon from './AudienceIcon'
 import AlertErrorIcon from './AlertErrorIcon'
 import AlertInfoIcon from './AlertInfoIcon'
 import AlertOptionsBadgeNumber from './AlertOptionsBadgeNumber'
@@ -19,6 +20,7 @@ import ChevronRightIcon from './ChevronRightIcon'
 import CircleCloseIcon from './CircleCloseIcon'
 import CloseIcon from './CloseIcon'
 import DuplicateIcon from './DuplicateIcon'
+import ExternalLinkIcon from './ExternalLinkIcon'
 import EyeIcon from './EyeIcon'
 import FilterArrowIcon from './FilterArrowIcon'
 import GearIcon from './GearIcon'
@@ -38,6 +40,7 @@ import VideoIcon from './VideoIcon'
 import ZapIcon from './ZapIcon'
 
 export {
+    AudienceIcon,
     AlertErrorIcon,
     AlertInfoIcon,
     AlertOptionsBadgeNumber,
@@ -59,6 +62,7 @@ export {
     CircleCloseIcon,
     CloseIcon,
     DuplicateIcon,
+    ExternalLinkIcon,
     EyeIcon,
     FilterArrowIcon,
     GearIcon,
