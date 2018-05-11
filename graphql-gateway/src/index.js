@@ -81,6 +81,7 @@ async function main() {
             schema,
             graphiql: true,
             context: {
+                headers: req.headers,
                 authContext: req.auth && req.auth.context,
                 accountToken: req.headers['x-rover-account-token'],
                 deviceIdentifier: req.headers['x-rover-device-identifier'],

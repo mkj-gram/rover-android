@@ -11,6 +11,7 @@
     "@rover/auth-client": "../auth/clients/node",
     "@rover-common/grpc-promisify": "../node/grpc-promisify",
     "@rover/events-pipeline-client": "../events/clients/node",
+    "@rover-common/ip-parse": "../node/ip-parse",
     "babel-cli": "^6.22.2",
     "babel-preset-latest": "^6.22.0",
     "babel-polyfill": "^6.26.0",
