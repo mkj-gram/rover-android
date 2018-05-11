@@ -1,6 +1,6 @@
 import { GraphQLScalarType } from 'graphql'
 
-const VersionRegex = /^(\d+\.\d+\.\d+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
+const VersionRegex = /^((\d+\.\d+)|(\d+\.\d+\.\d+)+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
 
 /**
  * Validate the string value against the VersionRegex. If no match is found a TypeError is thrown
@@ -25,8 +25,8 @@ const parseStringValue = (string) => {
 	const match = validateStringValue(string)
 
 	const version = match[1].split('.').map(i => parseInt(i))
-	const preRelease = match[2] || ''
-	const meta = match[3] || ''
+	const preRelease = match[4] || ''
+	const meta = match[5] || ''
 	
 	return {
 		'major': 		version[0],
