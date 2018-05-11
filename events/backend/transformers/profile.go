@@ -9,7 +9,7 @@ import (
 
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/event/v1"
-	"github.com/roverplatform/rover/events/pkg/pipeline"
+	"github.com/roverplatform/rover/events/backend/pipeline"
 )
 
 func FindProfile(client audience.AudienceClient) pipeline.Handler {

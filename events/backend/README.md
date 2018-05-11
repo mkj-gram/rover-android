@@ -41,7 +41,7 @@ When an event is received it goes through a list of transformers that build the 
             |           |                |     +---v-------+-----+
 +---Event--->  graphql  +----------------+     |                 |
             |           |                      |                 |
-            |           |                      |   Transformer   |
+            |           |                      |     Pipeline    |
             +-----------+                      |                 |
                                                +-----------------+
 ```

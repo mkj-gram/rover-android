@@ -1,5 +1,3 @@
-// +build integration
-
 package pipeline_test
 
 import (
@@ -14,7 +12,7 @@ import (
 
 	"github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/apis/go/event/v1"
-	"github.com/roverplatform/rover/events/pkg/pipeline"
+	"github.com/roverplatform/rover/events/backend/pipeline"
 
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
@@ -113,7 +111,7 @@ func createConsumer(id string, t *testing.T) *kafka.Consumer {
 		"group.id":           id,
 		"bootstrap.servers":  *tKafkaDsn,
 		"session.timeout.ms": 6000,
-		"auto.offset.reset":  "latest",
+		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": false,
 	})
 
@@ -161,11 +159,18 @@ func produceEvent(producer *kafka.Producer, topic string, e *event.EventInput) e
 
 	producer.Produce(msg, done)
 	ret := <-done
-	if m := ret.(*kafka.Message); m.TopicPartition.Error != nil {
-		return m.TopicPartition.Error
-	}
 
-	return nil
+	switch m := ret.(type) {
+	case *kafka.Message:
+		if m.TopicPartition.Error != nil {
+			return m.TopicPartition.Error
+		}
+		return nil
+	case kafka.Error:
+		return m
+	default:
+		return errors.Errorf("Unknown kafka event: %v", m)
+	}
 }
 
 // Helper to consume the next kafka message before a timeout occurs

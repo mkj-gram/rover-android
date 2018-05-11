@@ -256,7 +256,7 @@ steps:
       - -p
       - test-events-pipeline
       - -f
-      - ./events/test.docker-compose.yaml
+      - ./events/backend/test.docker-compose.yaml
       - run
       - events-pipeline
       - docker/events/pipeline/cmd
@@ -505,7 +505,7 @@ steps:
       - static_all
       - -o
       - docker/events/pipeline/pipeline
-      - github.com/roverplatform/rover/events/cmd/pipeline
+      - github.com/roverplatform/rover/events/backend/cmd/pipeline
     waitFor:
       - 'test-complete'
 

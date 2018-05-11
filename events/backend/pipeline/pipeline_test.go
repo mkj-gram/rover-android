@@ -11,7 +11,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/roverplatform/rover/apis/go/event/v1"
 
-	"github.com/roverplatform/rover/events/pkg/pipeline/mocks"
+	"github.com/roverplatform/rover/events/backend/pipeline/mocks"
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
 

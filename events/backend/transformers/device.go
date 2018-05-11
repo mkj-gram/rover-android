@@ -14,7 +14,7 @@ import (
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/apis/go/protobuf"
 	"github.com/roverplatform/rover/apis/go/protobuf/struct"
-	"github.com/roverplatform/rover/events/pkg/pipeline"
+	"github.com/roverplatform/rover/events/backend/pipeline"
 )
 
 const roverEventNamespace = "rover"

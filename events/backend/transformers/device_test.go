@@ -18,9 +18,9 @@ import (
 	"github.com/roverplatform/rover/apis/go/protobuf"
 	"github.com/roverplatform/rover/apis/go/protobuf/struct"
 	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
-	"github.com/roverplatform/rover/events/pkg/pipeline"
+	"github.com/roverplatform/rover/events/backend/pipeline"
+	"github.com/roverplatform/rover/events/backend/transformers"
 
-	"github.com/roverplatform/rover/events/pkg/transformers"
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
 

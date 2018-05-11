@@ -14,8 +14,8 @@ import (
 	"github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/apis/go/event/v1"
 
-	"github.com/roverplatform/rover/events/pkg/pipeline"
-	"github.com/roverplatform/rover/events/pkg/transformers"
+	"github.com/roverplatform/rover/events/backend/pipeline"
+	"github.com/roverplatform/rover/events/backend/transformers"
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
 

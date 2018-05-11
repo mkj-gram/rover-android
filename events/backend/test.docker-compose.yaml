@@ -13,7 +13,7 @@ services:
     image: roverio/golang-rdkafka:1.10-alpine
     command: ./docker/events/pipeline/cmd test
     volumes:
-      - ../:/go/src/github.com/roverplatform/rover
+      - ../../:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover
     depends_on:
       - kafka

@@ -16,8 +16,8 @@ import (
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	gmock "github.com/roverplatform/rover/apis/go/geocoder/v1/mock"
 	"github.com/roverplatform/rover/apis/go/protobuf/struct"
+	"github.com/roverplatform/rover/events/backend/transformers"
 
-	"github.com/roverplatform/rover/events/pkg/transformers"
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
 

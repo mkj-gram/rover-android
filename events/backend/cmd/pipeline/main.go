@@ -14,10 +14,10 @@ import (
 
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
-	"github.com/roverplatform/rover/events/pkg/middleware"
+	"github.com/roverplatform/rover/events/backend/middleware"
 
-	"github.com/roverplatform/rover/events/pkg/pipeline"
-	"github.com/roverplatform/rover/events/pkg/transformers"
+	"github.com/roverplatform/rover/events/backend/pipeline"
+	"github.com/roverplatform/rover/events/backend/transformers"
 )
 
 var (
