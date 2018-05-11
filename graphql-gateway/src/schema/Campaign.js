@@ -523,7 +523,7 @@ export const ScheduledNotificationCampaign = new GraphQLObjectType({
     })
 })
 
-const ScheduledType = new GraphQLEnumType({
+export const ScheduledType = new GraphQLEnumType({
     name: 'ScheduledType',
     values: {
         NOW: {},
@@ -531,7 +531,7 @@ const ScheduledType = new GraphQLEnumType({
     }
 })
 
-const SegmentCondition = new GraphQLEnumType({
+export const SegmentCondition = new GraphQLEnumType({
     name: 'SegmentCondition',
     values: {
         ANY: {},

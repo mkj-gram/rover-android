@@ -11,6 +11,7 @@ import trackEvents from './trackEvents'
 import updateDeviceTestLabelProperty from './updateDeviceTestLabelProperty'
 import updateDynamicSegmentPredicates from './updateDynamicSegmentPredicates'
 import updateNotificationSettings from './updateNotificationSettings'
+import updateScheduledDeliverySettings from './updateScheduledDeliverySettings'
 import updateSegmentName from './updateSegmentName'
 
 const Mutation = new GraphQLObjectType({
@@ -27,6 +28,7 @@ const Mutation = new GraphQLObjectType({
         updateDeviceTestLabelProperty,
         updateDynamicSegmentPredicates,
         updateNotificationSettings,
+        updateScheduledDeliverySettings,
         updateSegmentName
     }
 })
