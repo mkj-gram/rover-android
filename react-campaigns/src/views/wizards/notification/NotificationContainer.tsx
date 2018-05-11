@@ -66,11 +66,6 @@ const NotificationContainer: React.SFC<
                     wizardSection="messageAndMedia"
                 />
                 <AlertOptionsContainer
-                    campaign={
-                        campaign as
-                            | ScheduledCampaign
-                            | AutomatedNotificationCampaign
-                    }
                     device={device}
                     wizardSection="alertOptions"
                 />

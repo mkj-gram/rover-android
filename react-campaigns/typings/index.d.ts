@@ -242,3 +242,8 @@ type WizardModal = {
 interface InjectedProps {
     device?: Media
 }
+
+type alertType =
+    | 'notificationAlertOptionBadgeNumber'
+    | 'notificationAlertOptionPushNotification'
+    | 'notificationAlertOptionNotificationCenter'

@@ -20,9 +20,8 @@ export interface StateProps {
 }
 
 export interface AlertOptionsPhonePreviewProps {
-    device?: Media
-    val?: string
-    descriptionVal?: string
+    device: Media
+    val: string
 }
 
 export interface DispatchProps {
@@ -40,16 +39,25 @@ class AlertOptionsPhonePreview extends React.Component<
     }
 
     render() {
-        const matchName: StringMap<string> = {
-            notificationAlertOptionPushNotification:
-                'Alert users with a system notification',
-            notificationAlertOptionNotificationCenter:
-                'Add to your app’s Notification Center',
-            notificationAlertOptionBadgeNumber: `Increment the number on your app's badge icon`
+        const matchName: StringMap<StringMap<string>> = {
+            notificationAlertOptionPushNotification: {
+                description: 'Alert users with a system notification',
+                displayText: 'Push Notification'
+            },
+
+            notificationAlertOptionNotificationCenter: {
+                description: 'Add to your app’s Notification Center',
+                displayText: 'Notification Center'
+            },
+
+            notificationAlertOptionBadgeNumber: {
+                description: "Increment the number on your app's badge icon",
+                displayText: 'Badge Number'
+            }
         }
 
         const Fragment = React.Fragment
-        const { device, val, descriptionVal } = this.props
+        const { device, val } = this.props
 
         let view
         let tempView
@@ -90,7 +98,10 @@ class AlertOptionsPhonePreview extends React.Component<
                     paddingBottom: device === 'Tablet' ? 24 : 0
                 }}
             >
-                <Text text={matchName[val]} size="large" />
+                <Text
+                    text={matchName[val] && matchName[val].description}
+                    size="large"
+                />
             </div>
         )
 
@@ -133,7 +144,7 @@ class AlertOptionsPhonePreview extends React.Component<
                 >
                     <NavBar
                         buttonLeft="Close"
-                        title={descriptionVal}
+                        title={matchName[val] && matchName[val].displayText}
                         buttonLeftCallback={() =>
                             this.props.handleAlertOptionsModalDisplay('')
                         }

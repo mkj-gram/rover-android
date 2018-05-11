@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 export interface FormSectionProps {
-    children?: JSX.Element[] | JSX.Element
+    children?: JSX.Element | (JSX.Element | React.ReactPortal)[]
     device: Media
     style?: React.CSSProperties
 }
