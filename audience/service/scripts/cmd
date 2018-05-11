@@ -5,24 +5,24 @@ set -e
 DCS='docker-compose -f ../../docker/main.docker-compose.yaml'
 
 seed_run() {
-  ${DCS} -f ../../docker/audience-service/seed.docker-compose.yaml run --rm -e BACKUP_DIR=${BACKUP_DIR} -e ACCOUNT_ID=${ACCOUNT_ID} -e DEVICES=${DEVICES} -e SRC_MONGO=${SRC_MONGO} -e RCVR_MONGO=${RCVR_MONGO} seed
+  ${DCS} -f ../../docker/audience/seed.docker-compose.yaml run --rm -e BACKUP_DIR=${BACKUP_DIR} -e ACCOUNT_ID=${ACCOUNT_ID} -e DEVICES=${DEVICES} -e SRC_MONGO=${SRC_MONGO} -e RCVR_MONGO=${RCVR_MONGO} seed
 
   if [ $? -eq 0 ];
   then
-      ${DCS} run --rm -e ACCOUNT_ID=${ACCOUNT_ID} audience-service ./docker/audience-service/cmd index
+      ${DCS} run --rm -e ACCOUNT_ID=${ACCOUNT_ID} audience-service ./docker/audience/cmd index
   fi
 }
 
 reset_run() {
-    ${DCS} run --rm -e ACCOUNT_ID=${ACCOUNT_ID} -e MONGO_DSN=${MONGO_DSN} audience-service ./docker/audience-service/cmd reset
+    ${DCS} run --rm -e ACCOUNT_ID=${ACCOUNT_ID} -e MONGO_DSN=${MONGO_DSN} audience-service ./docker/audience/cmd reset
 
     if [ $? -eq 0 ];
     then
         # Delete Index
-        ${DCS} run --rm -e ACCOUNT_ID=${ACCOUNT_ID} audience-service ./docker/audience-service/cmd elastic_clear_one_index
+        ${DCS} run --rm -e ACCOUNT_ID=${ACCOUNT_ID} audience-service ./docker/audience/cmd elastic_clear_one_index
 
         # Index to allow audience app to function
-        ${DCS} run --rm -e ACCOUNT_ID=${ACCOUNT_ID} audience-service ./docker/audience-service/cmd index
+        ${DCS} run --rm -e ACCOUNT_ID=${ACCOUNT_ID} audience-service ./docker/audience/cmd index
     fi
 }
 

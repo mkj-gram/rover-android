@@ -214,7 +214,7 @@ steps:
      - ./docker/main.docker-compose.yaml 
      - run 
      - auth-service
-     - docker/auth-service/cmd 
+     - docker/auth/cmd 
      - test
     waitFor:
       - 'install-complete'
@@ -229,7 +229,7 @@ steps:
       - ./docker/main.docker-compose.yaml
       - run
       - audience-service
-      - docker/audience-service/cmd
+      - docker/audience/cmd
       - test
     waitFor:
       - 'install-complete'
@@ -346,52 +346,82 @@ steps:
 #   Build all apps into their production docker images  #
 # ----------------------------------------------------- #
 
-# Auth Service
-  - id: 'build-auth-service-executable'
-    name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
+# Auth Project
+  - id: 'build-auth-binaries'
+    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
-      - build
-      - -o
-      - docker/auth-service/auth
-      - github.com/roverplatform/rover/auth/service/cmd/authsvcd
+      - install
+      - ./go/cmd/postgres-cli
+      - ./auth/service/cmd/auth-service
     waitFor:
       - 'test-complete'
 
-  - id: 'build-auth-service-container'
+
+  - id: 'build-auth-resources'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - -c
+      - |
+        export DEST=docker/auth/build
+        mkdir -p $$DEST $$DEST/bin/ $$DEST/postgres/migrations
+        cp -r ./gopath/bin/auth-* $$DEST/bin/
+        cp -r ./gopath/bin/postgres-cli $$DEST/bin/
+        cp -r ./auth/service/db/migrations/postgres $$DEST/postgres/migrations
+    waitFor:
+      - 'build-auth-binaries'
+
+  - id: "build-auth-image"
     name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/auth-service:$SHORT_SHA
-      - ./docker/auth-service/
+      - --tag=gcr.io/$PROJECT_ID/auth:$SHORT_SHA
+      - docker/auth/
     waitFor:
-      - 'build-auth-service-executable'
+      - 'build-auth-resources'
 
-# Audience Service
-  - id: 'build-audience-service-executable'
-    name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
+# Audience Project
+  - id: 'build-audience-binaries'
+    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
-      - build
-      - -o
-      - docker/audience-service/audience-service
-      - github.com/roverplatform/rover/audience/service/cmd/audience-service
+      - install
+      - ./audience/service/cmd/elastic-cli
+      - ./audience/service/cmd/audience-service
+      - ./audience/service/cmd/audience-segments-worker
+      # - ./audience/service/cmd/migrations/...
     waitFor:
       - 'test-complete'
 
-  - name: 'gcr.io/cloud-builders/docker'
+
+  - id: 'build-audience-resources'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - -c
+      - |
+        export DEST=docker/audience/build
+        mkdir -p $$DEST/bin
+        cp -r ./gopath/bin/audience-* $$DEST/bin/
+        cp -r ./gopath/bin/elastic-cli $$DEST/bin/
+    waitFor:
+      - 'build-audience-binaries'
+
+  - id: "build-audience-image"
+    name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/audience-service:$SHORT_SHA
-      - docker/audience-service/
+      - --tag=gcr.io/$PROJECT_ID/audience:$SHORT_SHA
+      - docker/audience/
     waitFor:
-      - 'build-audience-service-executable'
+      - 'build-audience-resources'
 
-# Campaigns Service
+# Campaigns Project
   - id: 'build-campaigns-binaries'
-    name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
+    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
@@ -409,11 +439,11 @@ steps:
     args:
       - -c
       - |
-        export DEST=docker/campaigns
-        cp -r campaigns/db $$DEST/postgres
-        cp -r ./gopath/bin/campaigns-* $$DEST
-        cp -r ./gopath/bin/postgres-cli $$DEST
-
+        export DEST=docker/campaigns/build
+        mkdir -p $$DEST/bin $$DEST/postgres
+        cp -r campaigns/db/migrations $$DEST/postgres/
+        cp -r ./gopath/bin/campaigns-* $$DEST/bin/
+        cp -r ./gopath/bin/postgres-cli $$DEST/bin/
     waitFor:
       - 'build-campaigns-binaries'
 
@@ -426,7 +456,7 @@ steps:
     waitFor:
       - 'build-campaigns-resources'
 
-# Notification Service
+# Notification Project
   - id: 'build-notification-executables'
     name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
     env:
@@ -445,13 +475,13 @@ steps:
     args:
       - -c
       - |
-        export DEST=docker/notification
-        cp -r notification/postgres $$DEST
-        cp -r notification/scylla $$DEST
-        cp -r ./gopath/bin/notification-* $$DEST
-        cp -r ./gopath/bin/postgres-cli $$DEST
-        cp -r ./gopath/bin/scylla-cli $$DEST
-
+        export DEST=docker/notification/build
+        mkdir -p $$DEST/bin $$DEST/postgres/ $$DEST/scylla/
+        cp -r ./notification/postgres/migrations $$DEST/postgres/migrations
+        cp -r ./notification/scylla/migrations $$DEST/scylla/migrations
+        cp -r ./gopath/bin/notification-* $$DEST/bin/
+        cp -r ./gopath/bin/postgres-cli $$DEST/bin/
+        cp -r ./gopath/bin/scylla-cli $$DEST/bin/
     waitFor:
       - 'build-notification-executables'
 
@@ -486,28 +516,6 @@ steps:
       - docker/events/pipeline
     waitFor:
       - 'build-events-pipeline-executable'
-
-# Audience Segments Worker
-  - id: 'build-audience-segments-worker-executable'
-    name: 'gcr.io/$PROJECT_ID/golang:1.9-alpine'
-    env:
-      - PROJECT_ROOT=github.com/roverplatform/rover
-    args:
-      - build
-      - -o
-      - docker/audience-segments-worker/audience-segments-worker
-      - github.com/roverplatform/rover/audience/service/cmd/segments-worker
-    waitFor:
-      - 'test-complete'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - --tag=gcr.io/$PROJECT_ID/audience-segments-worker:$SHORT_SHA
-      - docker/audience-segments-worker/
-    waitFor:
-      - 'build-audience-segments-worker-executable'
-
 
 # Bulk Gateway
   
@@ -635,9 +643,8 @@ options:
 # ----------------------------------------------------- #
 
 images:
-  - 'gcr.io/$PROJECT_ID/auth-service:$SHORT_SHA'
-  - 'gcr.io/$PROJECT_ID/audience-service:$SHORT_SHA'
-  - 'gcr.io/$PROJECT_ID/audience-segments-worker:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/auth:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/audience:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/campaigns:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/notification:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/events-pipeline:$SHORT_SHA'

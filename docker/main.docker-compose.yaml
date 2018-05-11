@@ -95,8 +95,8 @@ services:
       - mongo
       - elastic
       - pubsub
-      - segments-worker
-    command: ./docker/audience-service/cmd configure_pubsub run
+      - audience-segments-worker
+    command: ./docker/audience/cmd configure_pubsub run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover
@@ -112,13 +112,13 @@ services:
       PUBSUB_TOPIC_NAME: "audience-service-dev-topic"           # Used in pubsub-cli to configure the topic
       PUBSUB_SUBSCRIPTION: "audience-service-dev-subscription"  # Used in pubsub-cli to configure the topic
 
-  segments-worker:
+  audience-segments-worker:
     image: golang:1.10-alpine
     depends_on:
       - pubsub
       - elastic
       - mongo
-    command: ./docker/audience-segments-worker/cmd configure_pubsub run
+    command: ./docker/audience/cmd configure_pubsub run_worker
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover
@@ -137,11 +137,12 @@ services:
     working_dir: /go/src/github.com/roverplatform/rover
     depends_on:
       - postgres
-    command: ./docker/auth-service/cmd migrate run
+    command: ./docker/auth/cmd migrate run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     environment:
       CGO_ENABLED: 0
+      TEST_DB_DSN: "postgres://postgres:@postgres:5432/authsvc_test?sslmode=disable"
       DB_DSN: "postgres://postgres:@postgres:5432/authsvc_dev?sslmode=disable"
       MIGRATION_DIR: ./auth/service/db/migrations/postgres
 

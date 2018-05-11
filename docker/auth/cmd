@@ -1,19 +1,18 @@
 #!/bin/sh
 
 set -e
-
 source ./docker/functions.bash
 
 
 run() {
-	go run ./auth/service/cmd/authsvcd/main.go -db-dsn=${DB_DSN}
+	go run ./auth/service/cmd/auth-service/main.go -db-dsn=${DB_DSN}
 }
 
 test() {
   waiton postgres 5432
 
   go test -tags integration ./auth/service/... \
-    -pg-dsn=${DB_DSN} \
+    -pg-dsn=${TEST_DB_DSN} \
     -service.migrations.dir=./db/migrations/postgres \
     -service.migrations.run true
 }
@@ -21,15 +20,15 @@ test() {
 bench() {
   go test -tags integration -bench . -run NONE -benchtime 10s \
     ./auth/service/... \
-    -service.DSN=${DB_DSN}
+    -service.DSN=${TEST_DB_DSN}
 }
 
 migrate() {
   waiton postgres 5432
 
-  go run ./auth/service/cmd/migration-cli/main.go \
-      -pg-dsn=${DB_DSN} \
-      -migrations-dir=${MIGRATION_DIR}
+  go run ./go/cmd/postgres-cli/main.go \
+      -db-dsn=${DB_DSN} \
+      -migration-path=${MIGRATION_DIR}
 }
 
 create_account() {

@@ -29,7 +29,7 @@ db.seed:
 	BACKUP_DIR=$(BACKUP_DIR) ACCOUNT_ID=$(ACCOUNT_ID) DEVICES=$(DEVICES) SRC_MONGO=${MONGO_SRC_DSN} RCVR_MONGO=${MONGO_DSN} ./scripts/cmd seed_run
 
 db.reset:
-	${RUN} ./docker/audience-service/cmd mongo_clear elastic_clear_index
+	${RUN} ./docker/audience/cmd mongo_clear elastic_clear_index
 
 db.reset-one:
 	ACCOUNT_ID=$(ACCOUNT_ID) MONGO_DSN=${MONGO_DSN} ./scripts/cmd reset_run
@@ -53,7 +53,7 @@ mongo.sh:
 	${MONGO_RUN} mongo ${MONGO_DSN}
 
 index:
-	${DCF} run --rm -e ACCOUNT_ID=$(ACCOUNT_ID) audience-service ./docker/audience-service/cmd index
+	${DCF} run --rm -e ACCOUNT_ID=$(ACCOUNT_ID) audience-service ./docker/audience/cmd index
 
 
 .PHONY: run test shell db.shell
