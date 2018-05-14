@@ -3,7 +3,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { Redirect } from 'react-router'
 import {
-    black,
+    charcoal,
     titanium,
     ChevronRightIcon,
     Button,
@@ -89,7 +89,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
             />
         )
         const experienceOff = name === 'Experience' && val === false
-        let textStyle = experienceOff ? { color: silver } : { color: black }
+        let textStyle = experienceOff ? { color: silver } : { color: charcoal }
         if (device === 'Mobile') {
             outerStyle = {
                 ...outerStyle,

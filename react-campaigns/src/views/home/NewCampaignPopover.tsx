@@ -349,11 +349,6 @@ class NewCampaignPopover extends React.PureComponent<
                     <Button
                         text="Back"
                         type="regular"
-                        style={{
-                            innerStyle: {
-                                color: graphite
-                            }
-                        }}
                         onClick={this.getLeftButtonCallback()}
                     />
                 </div>
@@ -483,17 +478,11 @@ class NewCampaignPopover extends React.PureComponent<
                     buttonLeftStyle: {
                         outerStyle: {
                             height: 17
-                        },
-                        innerStyle: {
-                            color: graphite
                         }
                     },
                     buttonRightStyle: {
                         outerStyle: {
                             marginRight: 0
-                        },
-                        innerStyle: {
-                            color: graphite
                         }
                     }
                 }

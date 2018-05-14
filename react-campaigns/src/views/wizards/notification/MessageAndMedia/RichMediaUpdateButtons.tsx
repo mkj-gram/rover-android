@@ -8,7 +8,8 @@ import {
     PlusIcon,
     Text,
     titanium,
-    turquoise
+    turquoise,
+    aquamarine
 } from '@rover/ts-bootstrap/dist/src'
 import { updateEditableCampaign } from '../../../../actions/'
 import {
@@ -64,9 +65,12 @@ const RichMediaUpdateButtons: React.SFC<
                 type="regular"
                 style={{
                     innerStyle: {
-                        color: turquoise,
                         fontSize: 15
                     }
+                }}
+                mouseDownColors={{
+                    active: turquoise,
+                    inactive: aquamarine
                 }}
             />
         )
@@ -84,10 +88,13 @@ const RichMediaUpdateButtons: React.SFC<
                     type="regular"
                     style={{
                         innerStyle: {
-                            color: turquoise,
                             fontSize: 15,
                             marginRight: 8
                         }
+                    }}
+                    mouseDownColors={{
+                        active: turquoise,
+                        inactive: aquamarine
                     }}
                 />
                 <Button
@@ -95,9 +102,12 @@ const RichMediaUpdateButtons: React.SFC<
                     type="regular"
                     style={{
                         innerStyle: {
-                            color: turquoise,
                             fontSize: 15
                         }
+                    }}
+                    mouseDownColors={{
+                        active: turquoise,
+                        inactive: aquamarine
                     }}
                 />
             </div>

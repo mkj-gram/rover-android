@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Button from './Button'
 import Text from './Text'
-import { steel, titanium, turquoise } from '../styles/colors'
+import { steel, titanium, turquoise, aquamarine } from '../styles/colors'
 import PlusIcon from './Icons/PlusIcon'
 import CircleCloseIcon from './Icons/CircleCloseIcon'
 
@@ -43,13 +43,16 @@ const renderAddButton = (
                     type="regular"
                     style={{
                         innerStyle: {
-                            fontSize: 15,
-                            color: turquoise
+                            fontSize: 15
                         },
                         outerStyle: {
                             height: null,
                             lineHeight: '24px'
                         }
+                    }}
+                    mouseDownColors={{
+                        active: turquoise,
+                        inactive: aquamarine
                     }}
                 />
             )
@@ -78,13 +81,16 @@ const renderTextControlButtons = (
                             style={{
                                 innerStyle: {
                                     fontSize: 15,
-                                    marginRight: 8,
-                                    color: turquoise
+                                    marginRight: 8
                                 },
                                 outerStyle: {
                                     height: null,
                                     lineHeight: '24px'
                                 }
+                            }}
+                            mouseDownColors={{
+                                active: turquoise,
+                                inactive: aquamarine
                             }}
                         />
                     )}
@@ -94,13 +100,16 @@ const renderTextControlButtons = (
                         type="regular"
                         style={{
                             innerStyle: {
-                                fontSize: 15,
-                                color: turquoise
+                                fontSize: 15
                             },
                             outerStyle: {
                                 height: null,
                                 lineHeight: '24px'
                             }
+                        }}
+                        mouseDownColors={{
+                            active: turquoise,
+                            inactive: aquamarine
                         }}
                     />
                 </React.Fragment>
