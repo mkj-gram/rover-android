@@ -1,13 +1,17 @@
 package zoneinfo_test
 
 import (
-	"github.com/go-test/deep"
-	"github.com/roverplatform/rover/go/zoneinfo"
 	"strings"
 	"testing"
+
+	"sort"
+
+	"github.com/go-test/deep"
+	"github.com/roverplatform/rover/go/zoneinfo"
 )
 
 func TestGetZones(t *testing.T) {
+	// TODO stub out time.now()
 	tcases := []struct {
 		name   string
 		offset int
@@ -22,8 +26,10 @@ func TestGetZones(t *testing.T) {
 				"Africa/Bamako",
 				"Africa/Banjul",
 				"Africa/Bissau",
+				"Africa/Casablanca",
 				"Africa/Conakry",
 				"Africa/Dakar",
+				"Africa/El_Aaiun",
 				"Africa/Freetown",
 				"Africa/Lome",
 				"Africa/Monrovia",
@@ -42,8 +48,8 @@ func TestGetZones(t *testing.T) {
 				"Etc/GMT0",
 				"Etc/Greenwich",
 				"Etc/UCT",
-				"Etc/Universal",
 				"Etc/UTC",
+				"Etc/Universal",
 				"Etc/Zulu",
 				"GMT",
 				"GMT+0",
@@ -52,8 +58,8 @@ func TestGetZones(t *testing.T) {
 				"Greenwich",
 				"Iceland",
 				"UCT",
-				"Universal",
 				"UTC",
+				"Universal",
 				"Zulu",
 			},
 		},
@@ -67,7 +73,10 @@ func TestGetZones(t *testing.T) {
 	for _, tc := range tcases {
 
 		got := zoneinfo.GetZones(tc.offset)
+		sort.Strings(got)
+		sort.Strings(tc.exp)
 
+		t.Log(got)
 		if diff := deep.Equal(tc.exp, got); diff != nil {
 			t.Fatal("\nDiff:", strings.Join(diff, "\n"))
 		}
