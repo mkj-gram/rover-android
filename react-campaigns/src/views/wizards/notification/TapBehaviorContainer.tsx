@@ -126,8 +126,7 @@ class TapBehaviorContainer extends React.Component<
         const { device, editableCampaign } = this.props
         const { showTapNotificationOptions, displayName } = this.state
         const popoverProps = {
-            placement: 'left',
-            device
+            placement: 'left'
         }
         const getClickable = () => {
             switch (device) {

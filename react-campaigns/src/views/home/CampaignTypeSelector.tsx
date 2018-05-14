@@ -178,8 +178,7 @@ const CampaignTypeSelector: React.SFC<
             secondary: titanium,
             border: titanium
         },
-        toggleable: true,
-        device: media
+        toggleable: true
     }
     return (
         <React.Fragment>

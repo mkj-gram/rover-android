@@ -197,7 +197,6 @@ class AdvancedSettingsRowContainer extends React.Component<
         const popoverModalProps = (handleClosePopoverModal: () => void) => {
             return {
                 placement: 'left',
-                device: device,
                 navBarProperties: {
                     buttonLeft: 'Cancel',
 

@@ -66,6 +66,7 @@ class OverviewModalFooter extends React.Component<
     handleSendTestToggle(on?: boolean) {
         const { device } = this.props
         const { notificationProgress } = this.props
+
         if (notificationProgress === 100) {
             if (device !== 'Mobile') {
                 this.setState({
@@ -108,8 +109,7 @@ class OverviewModalFooter extends React.Component<
 
         const getPopoverTrigger = () => {
             const popoverProps = {
-                placement: 'top',
-                device
+                placement: 'top'
             }
             const node = (
                 <div
@@ -140,7 +140,11 @@ class OverviewModalFooter extends React.Component<
                     overrideWidth={114}
                     style={{ outerStyle: { marginRight: 16 } }}
                     key="sendTest1"
-                    onClick={() => this.handleSendTestToggle(true)}
+                    onClick={() => {
+                        if (device !== 'Desktop') {
+                            this.handleSendTestToggle(true)
+                        }
+                    }}
                 />
             )
 

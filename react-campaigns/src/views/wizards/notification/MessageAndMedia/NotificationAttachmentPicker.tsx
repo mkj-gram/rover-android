@@ -58,8 +58,7 @@ const NotificationAttachmentPicker: React.SFC<
 }) => {
     const { notificationAttachment } = editableCampaign
     const popoverProps = {
-        placement: 'left',
-        device: device
+        placement: 'left'
     }
     const open = () => {
         updateActivePopover('notification-attachment-picker')

@@ -102,13 +102,17 @@ class NewCampaignPopover extends React.PureComponent<
     }
 
     getRightButtonCallback() {
-        const { newCampaignName, newCampaignType } = this.state
+        const { newCampaignType } = this.state
         return () =>
             this.setState(
                 {
                     contentState: 'loading'
                 },
-                () => this.props.onCreate(newCampaignName, newCampaignType)
+                () =>
+                    this.props.onCreate(
+                        this.state.newCampaignName,
+                        newCampaignType
+                    )
             )
     }
 
@@ -348,8 +352,20 @@ class NewCampaignPopover extends React.PureComponent<
                     <ChevronLeftIcon fill="#000" />
                     <Button
                         text="Back"
-                        type="regular"
-                        onClick={this.getLeftButtonCallback()}
+                        type="disabled"
+                        style={{
+                            innerStyle: {
+                                fontSize: 17,
+                                padding: 0,
+                                color: steel
+                            },
+                            outerStyle: {
+                                height: 24,
+                                display: 'flex',
+                                alignItems: 'center',
+                                background: 'none'
+                            }
+                        }}
                     />
                 </div>
             )
@@ -460,7 +476,6 @@ class NewCampaignPopover extends React.PureComponent<
 
         const popoverProps = {
             placement: media === 'Desktop' ? 'bottom-start' : 'bottom-end',
-            device: media,
             toggle: this.handleOpenClose,
             navBarProperties: {
                 title: this.getTitle(),
@@ -508,16 +523,12 @@ class NewCampaignPopover extends React.PureComponent<
                 >
                     {media === 'Desktop' ? (
                         <Button
-                            onClick={this.handleOpenClose}
                             text="New Campaign"
                             type="primary"
                             size="small"
                         />
                     ) : (
-                        <PlusSquareIcon
-                            fill={turquoise}
-                            onClick={this.handleOpenClose}
-                        />
+                        <PlusSquareIcon fill={turquoise} />
                     )}
                     <div
                         style={{
@@ -565,21 +576,15 @@ class NewCampaignPopover extends React.PureComponent<
                                 <NavBar
                                     buttonRight={this.getRightButton()}
                                     buttonLeft={this.getLeftButton()}
-                                    buttonLeftCallback={this.getLeftButtonCallback()}
                                     buttonRightCallback={this.getRightButtonCallback()}
+                                    buttonLeftCallback={this.getLeftButtonCallback()}
                                     style={{
                                         buttonLeftStyle: {
-                                            innerStyle: {
-                                                color: graphite
-                                            },
                                             outerStyle: {
                                                 marginLeft: 24
                                             }
                                         },
                                         buttonRightStyle: {
-                                            innerStyle: {
-                                                color: graphite
-                                            },
                                             outerStyle: {
                                                 marginRight: 24
                                             }

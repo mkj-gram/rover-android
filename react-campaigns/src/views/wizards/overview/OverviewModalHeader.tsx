@@ -209,8 +209,7 @@ class OverviewModalHeader extends React.Component<
         const { name, rename, showPopover } = this.state
 
         const popoverProps = {
-            placement: 'bottom-end',
-            device
+            placement: 'bottom-end'
         }
 
         return (

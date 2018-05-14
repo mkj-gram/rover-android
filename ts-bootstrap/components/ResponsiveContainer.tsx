@@ -26,32 +26,21 @@ const responsiveContainer = (wrappedComponentProps: StringMap<any> = {}) => <
 >(
     Component: React.ComponentType<TOriginalProps & InjectedProps>
 ) => {
-    const res = class ResponsiveContainer extends React.Component<
-        TOriginalProps,
-        {}
-    > {
-        render(): JSX.Element {
-            const Fragment = React.Fragment
+    const Fragment = React.Fragment
 
-            return (
-                <Fragment>
-                    <Desktop>
-                        <Component
-                            {...wrappedComponentProps}
-                            device="Desktop"
-                        />
-                    </Desktop>
-                    <Tablet>
-                        <Component {...wrappedComponentProps} device="Tablet" />
-                    </Tablet>
-                    <Mobile>
-                        <Component {...wrappedComponentProps} device="Mobile" />
-                    </Mobile>
-                </Fragment>
-            )
-        }
-    }
-    return res
+    return (
+        <Fragment>
+            <Desktop>
+                <Component {...wrappedComponentProps} device="Desktop" />
+            </Desktop>
+            <Tablet>
+                <Component {...wrappedComponentProps} device="Tablet" />
+            </Tablet>
+            <Mobile>
+                <Component {...wrappedComponentProps} device="Mobile" />
+            </Mobile>
+        </Fragment>
+    )
 }
 
 export default responsiveContainer

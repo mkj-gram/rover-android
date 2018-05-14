@@ -338,4 +338,11 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
     }
 }
 
-export default PopoverComponent
+const Popover = (props: PopoverProps) => {
+    const ResponsivePopoverContainer = ResponsiveContainer(props)(
+        PopoverComponent
+    )
+    return ResponsivePopoverContainer
+}
+
+export default Popover

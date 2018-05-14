@@ -247,17 +247,11 @@ class ButtonComponent extends React.Component<ButtonProps, ButtonState> {
     }
 }
 
-class Button extends React.Component<ButtonProps, ButtonState> {
-    constructor(props: ButtonProps) {
-        super(props)
-    }
-
-    render() {
-        const ResponsiveButtonContainer = ResponsiveContainer(this.props)(
-            ButtonComponent
-        )
-        return <ResponsiveButtonContainer />
-    }
+const Button = (props: ButtonProps) => {
+    const ResponsiveButtonContainer = ResponsiveContainer(props)(
+        ButtonComponent
+    )
+    return ResponsiveButtonContainer
 }
 
 export default Button
