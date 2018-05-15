@@ -68,6 +68,7 @@ const NotificationAttachmentPicker: React.SFC<
         switch (device) {
             case 'Mobile':
                 closePopoverModalForm()
+                updateEditingField()
                 setTimeout(() => {
                     updateActivePopover('')
                 }, 500)
