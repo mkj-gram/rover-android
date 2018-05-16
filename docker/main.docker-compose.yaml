@@ -237,7 +237,7 @@ services:
       NODE_ENV: development
   
   graphql-admin:
-    image: node:8.9.0
+    image: node:7.10.1
     depends_on:
       - auth-service
     ports:

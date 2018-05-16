@@ -18,6 +18,7 @@ type Backend interface {
 	GetAccount(context.Context, *auth.GetAccountRequest) (*auth.Account, error)
 	CreateAccount(context.Context, *auth.Account) (*auth.Account, error)
 	UpdateAccount(context.Context, *auth.Account) (*auth.Account, error)
+	ListAccounts(context.Context) ([]*auth.Account, error)
 
 	// Basic CRUD operations for Users
 	CreateUser(context.Context, *User) (*User, error)

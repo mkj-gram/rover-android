@@ -126,6 +126,28 @@ function deserialize_rover_auth_v1_GetUserRequest(buffer_arg) {
   return auth_v1_auth_pb.GetUserRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_auth_v1_ListAccountsRequest(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.ListAccountsRequest)) {
+    throw new Error('Expected argument of type rover.auth.v1.ListAccountsRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_ListAccountsRequest(buffer_arg) {
+  return auth_v1_auth_pb.ListAccountsRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_auth_v1_ListAccountsResponse(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.ListAccountsResponse)) {
+    throw new Error('Expected argument of type rover.auth.v1.ListAccountsResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_ListAccountsResponse(buffer_arg) {
+  return auth_v1_auth_pb.ListAccountsResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_auth_v1_ListTokensRequest(arg) {
   if (!(arg instanceof auth_v1_auth_pb.ListTokensRequest)) {
     throw new Error('Expected argument of type rover.auth.v1.ListTokensRequest');
@@ -332,6 +354,17 @@ var AuthService = exports.AuthService = {
     requestDeserialize: deserialize_rover_auth_v1_ListTokensRequest,
     responseSerialize: serialize_rover_auth_v1_ListTokensResponse,
     responseDeserialize: deserialize_rover_auth_v1_ListTokensResponse,
+  },
+  listAccounts: {
+    path: '/rover.auth.v1.Auth/ListAccounts',
+    requestStream: false,
+    responseStream: false,
+    requestType: auth_v1_auth_pb.ListAccountsRequest,
+    responseType: auth_v1_auth_pb.ListAccountsResponse,
+    requestSerialize: serialize_rover_auth_v1_ListAccountsRequest,
+    requestDeserialize: deserialize_rover_auth_v1_ListAccountsRequest,
+    responseSerialize: serialize_rover_auth_v1_ListAccountsResponse,
+    responseDeserialize: deserialize_rover_auth_v1_ListAccountsResponse,
   },
   //
   // Basic CRUD operations for Users

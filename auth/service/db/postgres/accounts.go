@@ -56,3 +56,34 @@ func (d *DB) UpdateAccount(ctx context.Context, acct *auth.Account) (*auth.Accou
 
 	return acct, nil
 }
+
+func (d *DB) ListAccounts(ctx context.Context) ([]*auth.Account, error) {
+
+	rows, err := d.db.QueryContext(ctx, `
+		SELECT
+			id, name, created_at, updated_at
+			FROM accounts
+			ORDER BY id DESC`)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Scan")
+	}
+	defer rows.Close()
+
+	var accts []*auth.Account
+
+	for rows.Next() {
+		acct := &auth.Account{}
+		err := rows.Scan(
+			&acct.Id,
+			&acct.Name,
+			&acct.CreatedAt,
+			&acct.UpdatedAt)
+		if err != nil {
+			return nil, errors.Wrap(err, "Scan")
+		}
+		accts = append(accts, acct)
+	}
+
+	return accts, nil
+}

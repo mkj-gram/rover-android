@@ -170,6 +170,25 @@ func (svr *Server) ListTokens(ctx context.Context, r *auth.ListTokensRequest) (*
 	}, nil
 }
 
+// ListAccounts implements auth.ListAccounts
+func (svr *Server) ListAccounts(ctx context.Context, r *auth.ListAccountsRequest) (*auth.ListAccountsResponse, error) {
+
+	accts, err := svr.DB.ListAccounts(ctx)
+
+	if err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return &auth.ListAccountsResponse{
+				Accounts: []*auth.Account{},
+			}, nil
+		}
+		return nil, grpc.Errorf(codes.Unknown, "db.ListAccounts")
+	}
+
+	return &auth.ListAccountsResponse{
+		Accounts: accts,
+	}, nil
+}
+
 // GetUser implements auth.AuthServer
 func (svr *Server) GetUser(ctx context.Context, r *auth.GetUserRequest) (*auth.User, error) {
 	usr, err := svr.DB.GetUserById(ctx, int(r.GetUserId()))

@@ -1,0 +1,16 @@
+import * as RoverApis from '@rover/apis'
+import getAccountFromProto from '../../grpc/getAccountFromProto'
+import * as promisify from '@rover-common/grpc-promisify'
+import { authClient } from '../grpcClients'
+promisify(authClient)
+
+const listAccounts = async () => {
+    const Models = RoverApis.auth.v1.Models
+    const request = new RoverApis.auth.v1.Models.ListAccountsRequest()
+    const response = await authClient.listAccounts(request)
+    return response.getAccountsList().map((account: any) => {
+        return getAccountFromProto(account)
+    })
+}
+
+export default listAccounts

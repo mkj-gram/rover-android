@@ -104,6 +104,7 @@ module Rover
           rpc :CreateAccount, CreateAccountRequest, Account
           rpc :UpdateAccount, UpdateAccountRequest, Account
           rpc :ListTokens, ListTokensRequest, ListTokensResponse
+          rpc :ListAccounts, ListAccountsRequest, ListAccountsResponse
           #
           # Basic CRUD operations for Users
           rpc :GetUser, GetUserRequest, User
