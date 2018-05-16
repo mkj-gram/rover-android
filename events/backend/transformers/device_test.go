@@ -952,7 +952,7 @@ func TestUpdateDeviceWithContextTransformer(t *testing.T) {
 					DeviceManufacturer: "Apple",
 					OsName:             "iOS",
 					OsVersion:          &audience.Version{Major: 1, Minor: 2, Revision: 5},
-					DeviceModel:        "iPhone 7,2",
+					DeviceModel:        "iPhone 6",
 					DeviceModelRaw:     "iPhone 7,2",
 					Frameworks: map[string]*audience.Version{
 						"io.rover.Rover": {
@@ -1114,7 +1114,10 @@ func TestUpdateDeviceWithContextTransformer(t *testing.T) {
 			var (
 				ctrl   = gomock.NewController(t)
 				client = mock.NewMockAudienceClient(ctrl)
-				tr     = transformers.UpdateDeviceWithContext(client)
+				m      = map[string]string{
+					"iPhone 7,2": "iPhone 6",
+				}
+				tr = transformers.UpdateDeviceWithContext(client, func(s string) string { return m[s] })
 			)
 
 			tc.clientExp(client)

@@ -33,7 +33,7 @@ func TestRoot(t *testing.T) {
 		req  event.Event
 
 		exp       event.Event
-		clientExp func(c *mock.MockAudienceClient, c2 *gmock.MockGeocoderClient)
+		clientExp func(c *mock.MockAudienceClient, c2 *gmock.MockGeocoderClient, nameMapper func(string) string)
 		expErr    error
 	}{
 		{
@@ -83,7 +83,7 @@ func TestRoot(t *testing.T) {
 				},
 			},
 
-			clientExp: func(c *mock.MockAudienceClient, c2 *gmock.MockGeocoderClient) {
+			clientExp: func(c *mock.MockAudienceClient, c2 *gmock.MockGeocoderClient, nameMapper func(n string) string) {
 				var (
 					authCtx = &auth.AuthContext{AccountId: 1}
 				)
@@ -238,11 +238,11 @@ func TestRoot(t *testing.T) {
 				ctrl    = gomock.NewController(t)
 				aclient = mock.NewMockAudienceClient(ctrl)
 				gclient = gmock.NewMockGeocoderClient(ctrl)
-				tr      = transformers.Root(aclient, gclient)
+				tr      = transformers.Root(aclient, gclient, func(s string) string { return s })
 			)
 
 			if tc.clientExp != nil {
-				tc.clientExp(aclient, gclient)
+				tc.clientExp(aclient, gclient, nil)
 			}
 
 			var gotErr = tr.Handle(ctx, &tc.req)

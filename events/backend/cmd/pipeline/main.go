@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"syscall"
@@ -45,6 +46,10 @@ var (
 
 var (
 	logLevel = flag.String("log-level", "info", "log level")
+	//
+	// Device
+	//
+	deviceModelNameJSONMapPath = flag.String("device-model-name-map-path", "", "device model name to marketing name json map file path")
 )
 
 func main() {
@@ -112,7 +117,17 @@ func main() {
 
 	audienceClient := audience.NewAudienceClient(conn)
 
-	handler := transformers.Root(audienceClient, geocoderClient)
+	data, err := ioutil.ReadFile(*deviceModelNameJSONMapPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	deviceModelNameMapper, err := transformers.ParseDeviceMap(string(data))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	handler := transformers.Root(audienceClient, geocoderClient, deviceModelNameMapper)
 
 	p := pipeline.NewPipeline(consumer, *inputTopic, producer, *outputTopic, handler, pipelineOpts...)
 

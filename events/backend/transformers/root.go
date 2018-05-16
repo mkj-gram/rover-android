@@ -11,13 +11,13 @@ import (
 	"github.com/roverplatform/rover/events/backend/pipeline"
 )
 
-func Root(audienceClient audience.AudienceClient, geocoderClient geocoder.GeocoderClient) pipeline.Handler {
+func Root(audienceClient audience.AudienceClient, geocoderClient geocoder.GeocoderClient, deviceModelNameMapper func(string) string) pipeline.Handler {
 
 	var (
 		deviceInputChain = pipeline.NewChain("DeviceInputChain").
 					Then(FindDevice(audienceClient)).
 					Then(CreateDevice(audienceClient)).
-					Then(UpdateDeviceWithContext(audienceClient)).
+					Then(UpdateDeviceWithContext(audienceClient, deviceModelNameMapper)).
 					Then(UpdateDeviceCustomAttributes(audienceClient)).
 					Then(UpdateDeviceLocation(audienceClient, geocoderClient)).
 					Then(UpdateDeviceName(audienceClient)).

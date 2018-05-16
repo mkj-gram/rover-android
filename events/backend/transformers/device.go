@@ -2,6 +2,7 @@ package transformers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 
@@ -19,6 +20,21 @@ import (
 
 const roverEventNamespace = "rover"
 const locationUpdateEventName = "Location Update"
+
+func ParseDeviceMap(data string) (func(string) string, error) {
+	var m = make(map[string]string)
+	if err := json.Unmarshal([]byte(data), &m); err != nil {
+		return nil, err
+	}
+
+	return func(name string) string {
+		if marketingName, ok := m[name]; ok {
+			return marketingName
+		}
+		return name
+
+	}, nil
+}
 
 func isDeviceInput(input *event.EventInput) bool {
 	_, ok := input.GetType().(*event.EventInput_DeviceEventInput)
@@ -216,8 +232,9 @@ func toAudienceFrameworks(m map[string]*rover_protobuf.Version) map[string]*audi
 	return mapped
 }
 
-// Update the device based on context
-func UpdateDeviceWithContext(client audience.AudienceClient) pipeline.Handler {
+// UpdateDeviceWithContext returns the pipeline.Handler to update a device with a corresponding context
+// deviceModelNameMapper - maps model name to marketing name
+func UpdateDeviceWithContext(client audience.AudienceClient, deviceModelNameMapper func(string) string) pipeline.Handler {
 	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
 
 		if !isDeviceInput(e.GetInput()) {
@@ -255,8 +272,7 @@ func UpdateDeviceWithContext(client audience.AudienceClient) pipeline.Handler {
 			OsName:             dctx.GetOperatingSystemName(),
 			OsVersion:          versionForAudience(dctx.GetOperatingSystemVersion()),
 
-			// TODO map this device model to human readable
-			DeviceModel:                 dctx.GetDeviceModel(),
+			DeviceModel:                 deviceModelNameMapper(dctx.GetDeviceModel()),
 			DeviceModelRaw:              dctx.GetDeviceModel(),
 			Frameworks:                  toAudienceFrameworks(dctx.GetFrameworks()),
 			LocaleLanguage:              dctx.GetLocaleLanguage(),
