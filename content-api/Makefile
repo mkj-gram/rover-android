@@ -1,4 +1,4 @@
-DC ?= docker-compose -f ../docker/rover.docker-compose.yaml -f ../docker/main.docker-compose.yaml -f ../docker/content-api/docker-compose.yaml
+DC ?= docker-compose -f ../docker/main.docker-compose.yaml -f ../docker/content-api/docker-compose.yaml
 RUN ?= ${DC} run --rm --service-ports content-api
 ARGS ?= spec
 test:

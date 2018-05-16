@@ -1,5 +1,10 @@
 version: "3"
 
+volumes:
+  cachefs:
+  pgdata:
+  esdata:
+
 services:
 
 
@@ -29,4 +34,3 @@ services:
       RACK_ENV: development
       WEB_CONCURRENCY: 1
       MAX_THREADS: 1
-
