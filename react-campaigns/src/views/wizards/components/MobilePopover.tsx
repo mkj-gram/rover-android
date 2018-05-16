@@ -39,17 +39,11 @@ const MobilePopover: React.SFC<MobilePopoverProps> = ({
                     buttonLeftStyle: {
                         outerStyle: {
                             marginLeft: 24
-                        },
-                        innerStyle: {
-                            color: graphite
                         }
                     },
                     buttonRightStyle: {
                         outerStyle: {
                             marginRight: 24
-                        },
-                        innerStyle: {
-                            color: graphite
                         }
                     }
                 }}

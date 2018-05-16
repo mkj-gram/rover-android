@@ -8,7 +8,7 @@ type CampaignType =
     | 'UNKNOWN'
 
 type NotificationAttachment = {
-    type: 'IMAGE' | 'AUDIO' | 'VIDEO' | 'UNKNOWN'
+    type: 'IMAGE' | 'AUDIO' | 'VIDEO'
     url: string
 }
 

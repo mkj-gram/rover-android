@@ -26,6 +26,10 @@ interface RichMediaSelectorProps extends InjectedProps {
         editingField: '' | 'url'
     ) => void
     updateEditingField: (editingField: string, callback?: () => void) => void
+    updateTempNotificationAttachmentFields: (
+        updateTempNotificationAttachmentFields: NotificationAttachment
+    ) => void
+    tempNotificationAttachment: NotificationAttachment
 }
 
 interface RichMediaSelectorStateProps {
@@ -51,11 +55,15 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
     updateActivePopover,
     updateEditableCampaign,
     updateEditingField,
-    updateRichMediaAttachmentTab
+    updateRichMediaAttachmentTab,
+
+    updateTempNotificationAttachmentFields,
+    tempNotificationAttachment
 }) => {
-    const { notificationAttachment } = editableCampaign
-    const type = notificationAttachment ? notificationAttachment.type : 'IMAGE'
-    const url = notificationAttachment ? notificationAttachment.url : ''
+    const type = tempNotificationAttachment
+        ? tempNotificationAttachment.type
+        : 'IMAGE'
+    const url = tempNotificationAttachment ? tempNotificationAttachment.url : ''
     const getMediaDescription = (): string => {
         switch (richMediaAttachmentTab) {
             case 'IMAGE':
@@ -157,11 +165,15 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                 <TextInput
                     id="notification-rich-media-attachment"
                     isRequired={true}
-                    deleteText={() =>
+                    deleteText={() => {
                         updateEditableCampaign({
                             notificationAttachment: null
                         })
-                    }
+                        updateTempNotificationAttachmentFields({
+                            type: 'IMAGE',
+                            url: ''
+                        })
+                    }}
                     fieldStyle={{
                         padding:
                             device === 'Mobile' ? '24px 0 23px' : '16px 0 15px',
@@ -179,7 +191,16 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                     startEditingText={() => updateEditingField('url')}
                     text={url && type === richMediaAttachmentTab ? url : ''}
                     // tslint:disable-next-line:no-empty
-                    handleBlurChange={() => {}}
+                    handleBlurChange={(text: string) => {
+                        if (device === 'Mobile') {
+                            updateEditingField('', () => {
+                                updateTempNotificationAttachmentFields({
+                                    type: richMediaAttachmentTab,
+                                    url: text
+                                })
+                            })
+                        }
+                    }}
                     updateText={(text: string) =>
                         updateEditingField('', () => {
                             close()
@@ -188,6 +209,10 @@ const RichMediaSelector: React.SFC<RichMediaSelectorProp> = ({
                                     type: richMediaAttachmentTab,
                                     url: text
                                 }
+                            })
+                            updateTempNotificationAttachmentFields({
+                                type: richMediaAttachmentTab,
+                                url: text
                             })
                         })
                     }

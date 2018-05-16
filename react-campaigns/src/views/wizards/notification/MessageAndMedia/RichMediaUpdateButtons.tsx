@@ -21,6 +21,9 @@ import editableUIState from '../../../../reducers/editableUIState'
 
 interface RichMediaUpdateButtonsProps {
     device: Media
+    updateTempNotificationAttachmentFields: (
+        updateTempNotificationAttachmentFields: NotificationAttachment
+    ) => void
 }
 
 interface RichMediaUpdateButtonsStateProps {
@@ -37,7 +40,13 @@ const RichMediaUpdateButtons: React.SFC<
     RichMediaUpdateButtonsProps &
         RichMediaUpdateButtonsStateProps &
         RichMediaUpdateButtonsDispatchProps
-> = ({ activePopover, editableCampaign, device, updateEditableCampaign }) => {
+> = ({
+    activePopover,
+    editableCampaign,
+    device,
+    updateEditableCampaign,
+    updateTempNotificationAttachmentFields
+}) => {
     const { notificationAttachment } = editableCampaign
 
     if (device === 'Tablet' && !notificationAttachment) {
@@ -54,6 +63,10 @@ const RichMediaUpdateButtons: React.SFC<
                 onClick={e => {
                     e.stopPropagation()
                     updateEditableCampaign({ notificationAttachment: null })
+                    updateTempNotificationAttachmentFields({
+                        type: 'IMAGE',
+                        url: ''
+                    })
                 }}
             />
         )
@@ -79,11 +92,15 @@ const RichMediaUpdateButtons: React.SFC<
         return (
             <div style={{ display: 'flex' }}>
                 <Button
-                    onClick={() =>
+                    onClick={() => {
                         updateEditableCampaign({
                             notificationAttachment: null
                         })
-                    }
+                        updateTempNotificationAttachmentFields({
+                            type: 'IMAGE',
+                            url: ''
+                        })
+                    }}
                     text="Remove"
                     type="regular"
                     style={{

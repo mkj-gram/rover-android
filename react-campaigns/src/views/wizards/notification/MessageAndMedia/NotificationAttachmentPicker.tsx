@@ -20,7 +20,8 @@ import MobilePopover from '../../components/MobilePopover'
 import {
     closePopoverModalForm,
     openPopoverModalForm,
-    updateActivePopover
+    updateActivePopover,
+    updateEditableCampaign
 } from '../../../../actions/'
 
 interface NotificationAttachmentPickerStateProps {
@@ -33,12 +34,17 @@ interface NotificationAttachmentPickerProps {
     children: JSX.Element[]
     device: Media
     updateEditingField: () => void
+    tempNotificationAttachment: NotificationAttachment
+    updateTempNotificationAttachmentFields: (
+        updateTempNotificationAttachmentFields: NotificationAttachment
+    ) => void
 }
 
 interface NotificationAttachmentPickerDispatchProps {
     closePopoverModalForm: () => void
     openPopoverModalForm: () => void
     updateActivePopover: (field: string) => void
+    updateEditableCampaign: (editedField: object) => void
 }
 
 const NotificationAttachmentPicker: React.SFC<
@@ -54,7 +60,11 @@ const NotificationAttachmentPicker: React.SFC<
     isPopoverOpen,
     openPopoverModalForm,
     updateActivePopover,
-    updateEditingField
+    updateEditingField,
+
+    updateEditableCampaign,
+    tempNotificationAttachment,
+    updateTempNotificationAttachmentFields
 }) => {
     const { notificationAttachment } = editableCampaign
     const popoverProps = {
@@ -67,6 +77,9 @@ const NotificationAttachmentPicker: React.SFC<
     const close = () => {
         switch (device) {
             case 'Mobile':
+                updateTempNotificationAttachmentFields({
+                    ...notificationAttachment
+                })
                 closePopoverModalForm()
                 updateEditingField()
                 setTimeout(() => {
@@ -150,7 +163,18 @@ const NotificationAttachmentPicker: React.SFC<
                         child={children[1]}
                         animation={isPopoverOpen}
                         navbarProps={{
-                            buttonLeftCallback: () => close()
+                            buttonLeftCallback: () => close(),
+                            buttonRight: 'Add',
+                            buttonRightCallback: () => {
+                                closePopoverModalForm()
+                                updateEditingField()
+                                updateEditableCampaign({
+                                    notificationAttachment: tempNotificationAttachment
+                                })
+                                setTimeout(() => {
+                                    updateActivePopover('')
+                                }, 500)
+                            }
                         }}
                     />,
                     document.getElementById('mainModalLeft')
@@ -181,7 +205,9 @@ const mapDispatchToProps = (
         },
         updateActivePopover: field => {
             dispatch(updateActivePopover(field))
-        }
+        },
+        updateEditableCampaign: (x: object) =>
+            dispatch(updateEditableCampaign(x))
     }
 }
 

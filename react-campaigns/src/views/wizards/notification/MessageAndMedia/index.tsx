@@ -45,6 +45,7 @@ export interface MessageAndMediaState {
     phonePreviewAnimation: string
     richMediaAttachmentTab: 'IMAGE' | 'AUDIO' | 'VIDEO'
     titlePreview: string
+    tempNotificationAttachment: NotificationAttachment
 }
 
 export interface MessageAndMediaDispatchProps {
@@ -70,15 +71,28 @@ class MessageAndMedia extends React.Component<
         super(props)
 
         const { editableCampaign } = this.props
-        const { notificationBody, notificationTitle } = editableCampaign
+        const {
+            notificationBody,
+            notificationTitle,
+            notificationAttachment
+        } = editableCampaign
+
         this.state = {
             bodyPreview: notificationBody,
             editingField: '',
             isShowingRichMediaPopover: false,
             isShowingPhonePreview: false,
             phonePreviewAnimation: 'open',
-            richMediaAttachmentTab: 'IMAGE',
-            titlePreview: notificationTitle
+            richMediaAttachmentTab: notificationAttachment
+                ? notificationAttachment.type
+                : 'IMAGE',
+            titlePreview: notificationTitle,
+            tempNotificationAttachment: {
+                type: notificationAttachment
+                    ? notificationAttachment.type
+                    : 'IMAGE',
+                url: notificationAttachment ? notificationAttachment.url : ''
+            }
         }
 
         this.setState = this.setState.bind(this)
@@ -192,13 +206,27 @@ class MessageAndMedia extends React.Component<
             isCurrentPage,
             updateEditableCampaign
         } = this.props
+
         const {
             bodyPreview,
             editingField,
             richMediaAttachmentTab,
-            titlePreview
+            titlePreview,
+            tempNotificationAttachment
         } = this.state
-        const { notificationBody, notificationTitle } = editableCampaign
+        const {
+            notificationBody,
+            notificationTitle,
+            notificationAttachment
+        } = editableCampaign
+
+        const updateTempNotificationAttachmentFields = (
+            tempNotificationAttachment: NotificationAttachment
+        ) =>
+            this.setState({
+                tempNotificationAttachment
+            })
+
         return (
             <FormSection device={device} style={{ marginTop: 24 }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -287,8 +315,17 @@ class MessageAndMedia extends React.Component<
                             editingField: ''
                         })
                     }
+                    tempNotificationAttachment={tempNotificationAttachment}
+                    updateTempNotificationAttachmentFields={
+                        updateTempNotificationAttachmentFields
+                    }
                 >
-                    <RichMediaUpdateButtons device={device} />
+                    <RichMediaUpdateButtons
+                        device={device}
+                        updateTempNotificationAttachmentFields={
+                            updateTempNotificationAttachmentFields
+                        }
+                    />
                     <RichMediaSelector
                         device={device}
                         isEditingRichMediaURL={editingField === 'url'}
@@ -306,6 +343,10 @@ class MessageAndMedia extends React.Component<
                             editingField: 'body' | 'title' | 'url' | '',
                             callback
                         ) => this.setState({ editingField }, callback)}
+                        updateTempNotificationAttachmentFields={
+                            updateTempNotificationAttachmentFields
+                        }
+                        tempNotificationAttachment={tempNotificationAttachment}
                     />
                 </NotificationAttachmentPicker>
                 {isCurrentPage && this.renderPreview()}
