@@ -165,6 +165,18 @@ steps:
     waitFor:
       - 'lint-complete'
 
+# GraphQL Admin
+  - id: 'install-graphql-admin'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'graphql-admin'
+    env:
+      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+    waitFor:
+      - 'lint-complete'
 
 # End Install Stage
   - id: 'install-complete'
@@ -180,6 +192,7 @@ steps:
       - 'install-rest-gateway'
       - 'install-scheduled-messages-worker'
       - 'install-sdk-api'
+      - 'install-graphql-admin'
 
 
 # ----------------------------------------------------- #
@@ -189,7 +202,7 @@ steps:
 # ----------------------------------------------------- #
   
 # TODO figure out a clean way to use docker-compose for integration tests
-# Note use a uniq --project-name property so ensure each run does not interfere with others
+# Note use a unique --project-name property so ensure each run does not interfere with others
 
 
 
@@ -633,6 +646,38 @@ steps:
     waitFor:
       - 'build-sdk-api-prune'
 
+# GraphQL Admin
+
+  # Transpile
+  - id: 'build-graphql-admin-transpile'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args:
+      - run
+      - build
+    dir: 'graphql-admin'
+
+  # Remove all devDependencies
+  - id: 'build-graphql-admin-prune'
+    name: 'node:7.10.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'graphql-admin'
+    waitFor:
+      - 'build-graphql-admin-transpile'
+
+  # Build final production image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--tag=gcr.io/$PROJECT_ID/graphql-admin:$SHORT_SHA'
+      - 'graphql-admin'
+    waitFor:
+      - 'build-graphql-admin-prune'
+
 options:
   machineType: 'N1_HIGHCPU_32'
 
@@ -653,3 +698,4 @@ images:
   - 'gcr.io/$PROJECT_ID/rest-gateway:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/scheduled-messages-worker:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/sdk-api:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/graphql-admin:$SHORT_SHA'
