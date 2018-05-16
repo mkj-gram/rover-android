@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,9 +14,9 @@ import (
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/events/backend/middleware"
-
 	"github.com/roverplatform/rover/events/backend/pipeline"
 	"github.com/roverplatform/rover/events/backend/transformers"
+	"github.com/roverplatform/rover/go/logger"
 )
 
 var (
@@ -28,10 +27,14 @@ var (
 
 	audienceServiceDsn = flag.String("audience-service-dsn", "localhost:5100", "Audience Service DSN")
 	geocoderServiceDsn = flag.String("geocoder-service-dsn", "localhost:5100", "Geocoder Service DSN")
+
+	logLevel = flag.String("log-level", "info", "log level")
 )
 
 func main() {
 	flag.Parse()
+	var log = logger.New()
+	log.SetLevel(logger.LevelFromString(*logLevel))
 
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  *kafkaDSN,
@@ -58,7 +61,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Println("Connected to kafka")
+	log.Info("Connected to kafka")
+
+	var pipelineOpts = []pipeline.Option{
+		pipeline.WithLogger(log),
+	}
 
 	// TODO register prom and http endpoint
 
@@ -88,7 +95,7 @@ func main() {
 
 	handler := transformers.Root(audienceClient, geocoderClient)
 
-	p := pipeline.NewPipeline(consumer, *inputTopic, producer, *outputTopic, handler)
+	p := pipeline.NewPipeline(consumer, *inputTopic, producer, *outputTopic, handler, pipelineOpts...)
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
@@ -98,18 +105,18 @@ func main() {
 		done <- p.Run(ctx)
 	}()
 
-	log.Println("[*] Pipeline running! To exit press CTRL+C")
+	log.Info("[*] Pipeline running! To exit press CTRL+C")
 	sigc := make(chan os.Signal)
 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case sig := <-sigc:
-		log.Println("signal:", sig)
+		log.Debug("signal:", sig)
 	case err := <-done:
 		if err != nil {
-			log.Println("Done:", err)
+			log.Info("Done:", err)
 		}
 	}
 
-	p.Shutdown(10 * time.Second)
+	p.Shutdown(30 * time.Second)
 }

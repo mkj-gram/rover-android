@@ -281,6 +281,7 @@ services:
       OUTPUT_TOPIC: events.output
       AUDIENCE_SERVICE_DSN: audience-service:5100
       GEOCODER_SERVICE_DSN: geocoder-service:5100
+      LOG_LEVEL: debug
 
   smw:
     image: node:6.9.1

@@ -95,5 +95,4 @@ func (entry *Entry) log(level Level, msg string) {
 	entry.Message = msg
 
 	entry.Logger.Out.WriteEntry(entry)
-	entry.Reset()
 }

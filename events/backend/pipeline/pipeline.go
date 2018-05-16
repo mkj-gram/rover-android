@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/roverplatform/rover/apis/go/event/v1"
+	"github.com/roverplatform/rover/go/logger"
 )
 
 type Producer interface {
@@ -27,6 +28,8 @@ type Consumer interface {
 
 type Pipeline struct {
 	Handler Handler
+
+	logger logger.Logger
 
 	// Input & Output
 	source source
@@ -66,6 +69,9 @@ var (
 )
 
 func NewPipeline(consumer Consumer, inputTopic string, producer Producer, outputTopic string, handler Handler, options ...Option) *Pipeline {
+	var defaultLogger = logger.New()
+	defaultLogger.SetLevel(logger.ErrorLevel)
+
 	pipe := &Pipeline{
 		source: source{
 			consumer: consumer,
@@ -76,6 +82,8 @@ func NewPipeline(consumer Consumer, inputTopic string, producer Producer, output
 			topic:    outputTopic,
 		},
 		Handler: handler,
+
+		logger: defaultLogger,
 
 		timeNow: time.Now,
 		backoff: &Backoff{
@@ -99,16 +107,16 @@ func NewPipeline(consumer Consumer, inputTopic string, producer Producer, output
 
 // Run the pipeline.
 func (p *Pipeline) Run(ctx context.Context) error {
+	p.logger.Debugf("subscribing to kafka topic: %s", p.source.topic)
 	if err := p.source.consumer.Subscribe(p.source.topic, nil); err != nil {
 		return err
 	}
-
+	p.logger.Debug("successfully subscribed to topic")
 	return p.loop(ctx)
 }
 
 // Shutdown the pipeline waiting for outstanding messages to be processed or the timeout occurs
 func (p *Pipeline) Shutdown(timeout time.Duration) {
-	log.Println("Shutting down")
 
 	select {
 	case <-p.runningChan:
@@ -119,9 +127,9 @@ func (p *Pipeline) Shutdown(timeout time.Duration) {
 
 	select {
 	case <-time.After(timeout):
-		log.Println("Abrupt shutdown")
+		p.logger.Error("Abrupt shutdown")
 	case <-p.shutdownChan:
-		log.Println("Finished clean")
+		p.logger.Info("Finished clean")
 	}
 
 	err := p.source.consumer.Close()
@@ -186,12 +194,21 @@ func (p *Pipeline) handle(in *kafka.Message) error {
 		err error
 
 		currentAttempt = 0
+
+		scopedLog = p.logger.WithFields(logger.Fields{
+			"topic":     in.TopicPartition.Topic,
+			"partition": in.TopicPartition.Partition,
+			"offset":    in.TopicPartition.Offset,
+		})
 	)
+
+	scopedLog.Debug("new message from source")
 
 	// Keep retrying until we hit max attempts of 5?
 	for currentAttempt < p.backoff.MaxAttempts {
 		out, err = p.process(in)
 		if err != nil && IsRetryableError(errors.Cause(err)) {
+			scopedLog.Debugf("attempt: %d failed, error: %v", currentAttempt, err)
 			time.Sleep(p.backoff.ForAttempt(currentAttempt))
 			currentAttempt++
 		} else {
@@ -199,8 +216,12 @@ func (p *Pipeline) handle(in *kafka.Message) error {
 		}
 	}
 
-	if err != nil && IsRetryableError(errors.Cause(err)) {
-		panic(fmt.Errorf("attempted too many times to process message: %v", in))
+	if err != nil {
+		if IsRetryableError(errors.Cause(err)) {
+			panic(fmt.Errorf("attempted too many times to process message: %v", in))
+		}
+
+		scopedLog.Error(err)
 	}
 
 	done := &processedMessage{
@@ -208,8 +229,11 @@ func (p *Pipeline) handle(in *kafka.Message) error {
 		OutputMessage: out,
 	}
 
+	scopedLog.Debug("message processed")
+
 	err = p.complete(done)
 	if err != nil {
+		scopedLog.Error(errors.Wrap(err, "complete"))
 		return err
 	}
 
@@ -236,7 +260,7 @@ func (p *Pipeline) process(in *kafka.Message) (out *kafka.Message, err error) {
 		if r := recover(); r != nil {
 			// transformer has most likely panicked
 			out = nil
-			err = errors.Errorf("failed to process event: %v", r)
+			err = errors.WithStack(errors.Errorf("failed to process event: %v", r))
 		}
 	}()
 

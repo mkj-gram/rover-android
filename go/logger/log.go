@@ -46,7 +46,6 @@ func (l *Log) SetLevel(level Level) {
 // WithFields generates a new logger with stored fields later to be used by the formatter in output
 func (l *Log) WithFields(fields Fields) Logger {
 	entry := l.newEntry()
-	defer l.releaseEntry(entry)
 	return entry.WithFields(fields)
 }
 
@@ -110,6 +109,7 @@ func (l *Log) newEntry() *Entry {
 
 // releaseEntry place the entry back into the pool for it to be re-used later
 func (l *Log) releaseEntry(entry *Entry) {
+	entry.Reset()
 	l.entryPool.Put(entry)
 }
 

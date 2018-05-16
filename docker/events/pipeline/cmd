@@ -4,7 +4,7 @@ set -e
 source ./docker/functions.bash
 
 run() {
-	go run ./events/cmd/pipeline/main.go
+	go run ./events/backend/cmd/pipeline/main.go
 }
 
 test() {
