@@ -17,7 +17,7 @@ type (
 		CertificateData       string
 		CertificatePassphrase string
 		CertificateFilename   string
-		CertificateExpiresAt  time.Time
+		CertificateExpiresAt  *time.Time
 		CertificateUpdatedAt  time.Time
 
 		UpdatedAt time.Time
@@ -33,7 +33,7 @@ type (
 		CertificateData       string
 		CertificatePassphrase string
 		CertificateFilename   string
-		CertificateExpiresAt  time.Time
+		CertificateExpiresAt  *time.Time
 		CertificateUpdatedAt  time.Time
 
 		UpdatedAt time.Time

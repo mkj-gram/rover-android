@@ -155,7 +155,7 @@ func (c *ClientFactory) GetFCMClient(ctx context.Context, acctId int32) (*fcm.Cl
 }
 
 func NewAPNSClient(p *postgres.IosPlatform) (*apns2.Client, error) {
-	if !p.CertificateExpiresAt.IsZero() && time.Now().After(p.CertificateExpiresAt) {
+	if p.CertificateExpiresAt != nil && time.Now().After(*p.CertificateExpiresAt) {
 		return nil, errors.Wrap(
 			&retryable{error: errors.Errorf("certificate expired: platform_id=%d", p.Id)},
 			"NewAPNSClient",

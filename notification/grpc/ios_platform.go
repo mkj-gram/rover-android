@@ -93,8 +93,8 @@ func (s *PlatformServer) CreateIosPlatform(ctx context.Context, req *notificatio
 
 	if cert != nil {
 		platform.BundleId = cert.BundleId
-		platform.CertificateExpiresAt = cert.ExpiresAt
 		platform.CertificateData = cert.EncodedData()
+		platform.CertificateExpiresAt = &cert.ExpiresAt
 	}
 
 	if err := s.DB.IosPlatformStore().Create(ctx, &platform); err != nil {
@@ -189,7 +189,7 @@ func (s *PlatformServer) UpdateIosPlatformPushCertificate(ctx context.Context, r
 	if cert != nil {
 		update.BundleId = cert.BundleId
 		update.CertificateData = cert.EncodedData()
-		update.CertificateExpiresAt = cert.ExpiresAt
+		update.CertificateExpiresAt = &cert.ExpiresAt
 	}
 
 	platform, err := s.DB.IosPlatformStore().UpdatePushCredentials(ctx, update)

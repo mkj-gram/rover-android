@@ -38,10 +38,12 @@ func IosPlatformToProto(p *db.IosPlatform) (*notification.IosPlatform, error) {
 		CertificatePassphrase: p.CertificatePassphrase,
 		CertificateFilename:   p.CertificateFilename,
 		CertificateUpdatedAt:  timeToProto(p.CertificateUpdatedAt),
-		CertificateExpiresAt:  timeToProto(p.CertificateExpiresAt),
 
 		UpdatedAt: timeToProto(p.UpdatedAt),
 		CreatedAt: timeToProto(p.CreatedAt),
+	}
+	if p.CertificateExpiresAt != nil {
+		proto.CertificateExpiresAt = timeToProto(*p.CertificateExpiresAt)
 	}
 
 	if len(p.CertificateData) > 0 {

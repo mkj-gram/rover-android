@@ -32,8 +32,8 @@ func ParseIosPlatform(data, pass string) (*IosPlatform, error) {
 
 		BundleId:              "io.rover.Inbox",
 		CertificateData:       data,
-		CertificateExpiresAt:  cert.NotAfter,
 		CertificatePassphrase: pass,
+		CertificateExpiresAt:  &cert.NotAfter,
 		CertificateUpdatedAt:  now,
 
 		CreatedAt: now,

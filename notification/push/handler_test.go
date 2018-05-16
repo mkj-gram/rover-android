@@ -509,6 +509,8 @@ func TestHandler(t *testing.T) {
 						nil,
 					)
 
+				var expiresAt = ts(t, "2018-10-28T13:15:13-04:00")
+
 				m.MockIosPlatformStore.
 					EXPECT().
 					ListByAccountId(ctx, int32(1)).
@@ -526,7 +528,7 @@ func TestHandler(t *testing.T) {
 								CertificateData:       toBase64(t, certP12(t, "../grpc/testdata/io.rover.Bagel.p12")),
 								CertificateFilename:   "cert2",
 								CertificatePassphrase: "",
-								CertificateExpiresAt:  ts(t, "2018-10-28T13:15:13-04:00"),
+								CertificateExpiresAt:  &expiresAt,
 								CertificateUpdatedAt:  timeNow,
 							},
 						},
@@ -633,6 +635,8 @@ func TestHandler(t *testing.T) {
 						nil,
 					)
 
+				var expiresAt = ts(t, "2018-10-28T13:15:13-04:00")
+
 				m.MockIosPlatformStore.
 					EXPECT().
 					ListByAccountId(ctx, int32(1)).
@@ -650,7 +654,7 @@ func TestHandler(t *testing.T) {
 								CertificateData:       toBase64(t, certP12(t, "../grpc/testdata/io.rover.Bagel.p12")),
 								CertificateFilename:   "cert2",
 								CertificatePassphrase: "",
-								CertificateExpiresAt:  ts(t, "2018-10-28T13:15:13-04:00"),
+								CertificateExpiresAt:  &expiresAt,
 								CertificateUpdatedAt:  timeNow,
 							},
 						},
