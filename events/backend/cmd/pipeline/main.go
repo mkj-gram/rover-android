@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,6 +11,8 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/namsral/flag"
 	"google.golang.org/grpc"
+
+	prom "github.com/prometheus/client_golang/prometheus"
 
 	"github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
@@ -20,14 +23,27 @@ import (
 )
 
 var (
+	httpAddr = flag.String("http-addr", ":5080", "http listen address")
+
+	//
+	// DSN
+	//
 	kafkaDSN = flag.String("kafka-dsn", "kafka:9092", "Kafka bootstrap servers dsn")
+
+	//
+	//
 	// TODO figure out a naming convention so its easy convert protobuf models
 	inputTopic  = flag.String("input-topic", "events.input", "Kafka input topic to read events from")
 	outputTopic = flag.String("output-topic", "events.output", "kafka output topic to write transformed events")
 
-	audienceServiceDsn = flag.String("audience-service-dsn", "localhost:5100", "Audience Service DSN")
-	geocoderServiceDsn = flag.String("geocoder-service-dsn", "localhost:5100", "Geocoder Service DSN")
+	//
+	// Service URLs
+	//
+	audienceServiceDsn = flag.String("audience-service-dsn", "audience:5100", "Audience Service DSN")
+	geocoderServiceDsn = flag.String("geocoder-service-dsn", "geocoder:5100", "Geocoder Service DSN")
+)
 
+var (
 	logLevel = flag.String("log-level", "info", "log level")
 )
 
@@ -60,14 +76,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	log.Info("Connected to kafka")
+
+	//
+	// Prometheus
+	//
+
+	prom.MustRegister(pipeline.PrometheusMetrics...)
 
 	var pipelineOpts = []pipeline.Option{
 		pipeline.WithLogger(log),
 	}
-
-	// TODO register prom and http endpoint
 
 	/*
 		Reverse Geocoding
@@ -105,7 +124,14 @@ func main() {
 		done <- p.Run(ctx)
 	}()
 
-	log.Info("[*] Pipeline running! To exit press CTRL+C")
+	go func() {
+		http.Handle("/metrics", prom.Handler())
+		if err := http.ListenAndServe(*httpAddr, nil); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	log.Infof("[*] Pipeline running! To exit press CTRL+C")
 	sigc := make(chan os.Signal)
 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 

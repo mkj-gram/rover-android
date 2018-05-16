@@ -254,13 +254,33 @@ func (p *Pipeline) process(in *kafka.Message) (out *kafka.Message, err error) {
 
 		input  event.EventInput
 		output event.Event
+		start  = time.Now()
 	)
 
 	defer func() {
+		var errKind = "error"
 		if r := recover(); r != nil {
 			// transformer has most likely panicked
 			out = nil
 			err = errors.WithStack(errors.Errorf("failed to process event: %v", r))
+			errKind = "panic"
+		}
+
+		labels := []string{
+			fmt.Sprint(input.AuthContext.GetAccountId()),
+			input.Namespace,
+			input.Name,
+		}
+
+		metrics.pipelineEventsProcessedTotal.
+			WithLabelValues(labels...).Inc()
+
+		metrics.pipelineEventsProcessedDurationSeconds.
+			WithLabelValues(labels...).Observe(time.Since(start).Seconds())
+
+		if err != nil {
+			metrics.pipelineEventsProcessedErrorsTotal.
+				WithLabelValues(append(labels, errKind)...).Inc()
 		}
 	}()
 
