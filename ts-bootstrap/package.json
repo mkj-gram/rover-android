@@ -16,9 +16,11 @@
         "transpile": "tsc"
     },
     "dependencies": {
+        "@types/pikaday": "^1.6.3",
         "@types/react-responsive": "3.0.0",
         "babel-core": "^6.26.0",
         "moment": "^2.20.1",
+        "pikaday": "^1.7.0",
         "react": "16.2.0",
         "react-dev-utils": "4.0.1",
         "react-dom": "16.2.0",

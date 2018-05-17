@@ -3,6 +3,7 @@ import Badge from './Badge'
 import Button from './Button'
 import CheckBox from './CheckBox'
 import Dialog from './Dialog'
+import DatePicker from './DatePicker'
 import NavBar from './NavBar'
 import PhoneComponent from './PhoneComponent'
 import Popover from './Popover'
@@ -160,6 +161,7 @@ export {
     ChevronRightIcon,
     CircleCloseIcon,
     CloseIcon,
+    DatePicker,
     DuplicateIcon,
     ExternalLinkIcon,
     EyeIcon,

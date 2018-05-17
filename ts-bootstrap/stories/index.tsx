@@ -11,6 +11,7 @@ import {
     Badge,
     Button,
     CheckBox,
+    DatePicker,
     Dialog,
     NavBar,
     PhoneComponent,
@@ -231,6 +232,84 @@ storiesOf('Checkbox', module).add('on and off', () => (
         <CheckBox checked={true} />
     </div>
 ))
+
+storiesOf('DatePicker', module).add('select Date', () => {
+    interface datePickerState {
+        selected: string
+        showDatePicker: boolean
+        time: Date
+        displayTime: string
+    }
+
+    class DatePickerComponent extends React.Component<{}, datePickerState> {
+        constructor(props: any) {
+            super(props)
+            const time = moment(new Date())
+                .add(3, 'days')
+                .toDate()
+            const displayTime = moment(new Date())
+                .add(3, 'days')
+                .format('LL')
+            this.state = {
+                selected: '',
+                showDatePicker: false,
+                time,
+                displayTime
+            }
+            this.onSelect = this.onSelect.bind(this)
+            this.handleShowDatepicker = this.handleShowDatepicker.bind(this)
+        }
+
+        onSelect(time: Date) {
+            this.setState({
+                time,
+                displayTime: moment(time).format('LL'),
+                showDatePicker: !this.state.showDatePicker
+            })
+        }
+        handleShowDatepicker() {
+            this.setState({
+                showDatePicker: !this.state.showDatePicker
+            })
+        }
+
+        render() {
+            const Fragment = React.Fragment
+            const targetParent = 'coverThis'
+
+            return (
+                <div
+                    style={{
+                        display: 'flex',
+                        height: '100vh',
+                        width: '100vw',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                    id={targetParent}
+                >
+                    <PopoverContainer
+                        id="12345"
+                        popoverProps={{
+                            placement: 'left'
+                        }}
+                        targetParent={targetParent}
+                        onClick={this.handleShowDatepicker}
+                        showPopover={this.state.showDatePicker}
+                    >
+                        <Button text={this.state.displayTime} size="large" />
+                        <DatePicker
+                            onSelect={this.onSelect}
+                            defaultDate={this.state.time}
+                        />
+                    </PopoverContainer>
+                </div>
+            )
+        }
+    }
+
+    return <DatePickerComponent />
+})
 
 storiesOf('Dialog', module)
     .add('two buttons', () => {
