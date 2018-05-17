@@ -1,6 +1,7 @@
 package retry
 
 import (
+	"context"
 	"math"
 	"math/rand"
 	"time"
@@ -64,4 +65,40 @@ func (b *Backoff) ForAttempt(attempt int) time.Duration {
 		return max
 	}
 	return dur
+}
+
+// Do calls work function specified number of times as configured
+// work must return true in order to be retried
+// Do returns true if work needs not be retried unless MaxAttempts exausted
+func (b *Backoff) Do(ctx context.Context, work func() (retry bool)) (ok bool) {
+	var (
+		attempt = 0
+	)
+
+	for attempt < b.MaxAttempts {
+		if attempt == 0 {
+			select {
+			case <-ctx.Done():
+				return false
+			default:
+			}
+		}
+
+		if attempt > 0 {
+			select {
+			case <-ctx.Done():
+				return false
+			case <-time.After(b.ForAttempt(attempt)):
+				// delay
+			}
+		}
+
+		if retry := work(); retry {
+			attempt += 1
+			continue
+		}
+		break
+	}
+
+	return attempt < b.MaxAttempts
 }
