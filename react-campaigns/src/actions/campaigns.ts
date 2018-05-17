@@ -101,7 +101,7 @@ export const updateScheduledDeliverySettings: ActionCreator<
             segmentIds
         }
     }
-    dispatch({ 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_REQUEST' })
+    dispatch({ type: 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_REQUEST' })
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {

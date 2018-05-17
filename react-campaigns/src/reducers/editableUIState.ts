@@ -20,6 +20,7 @@ export const getIsStageValid = (
 ): boolean => {
     const { editableCampaign } = state
     switch (stage) {
+        // Notification Settings
         case 'messageAndMedia':
             const { notificationBody } = editableCampaign
             return notificationBody !== ''
@@ -51,6 +52,21 @@ export const getIsStageValid = (
             }
         case 'advancedSettings':
             return getIsStageValid(state, 'tapBehavior')
+
+        // Scheduled Delivery Settings
+        case 'dateAndTime':
+            const {
+                scheduledType,
+                scheduledTimestamp
+            } = editableCampaign as ScheduledCampaign
+            switch (scheduledType) {
+                case 'NOW':
+                    return true
+                case 'SCHEDULED':
+                    return scheduledTimestamp !== ''
+                default:
+                    return false
+            }
         default:
             return false
     }

@@ -6,6 +6,7 @@ import { connect, Dispatch } from 'react-redux'
 import ResponsiveContainer from '../../utils/ResponsiveContainer'
 import OverviewModalRow from './OverviewModalRow'
 import NotificationContainer from '../notification/NotificationContainer'
+import ScheduledDelivery from '../ScheduledDelivery'
 
 import { getCurrentWizard, getTypeProgress } from '../../../reducers'
 import { openWizardModal } from '../../../actions'
@@ -42,7 +43,7 @@ const OverviewModalBodyContainer: React.SFC<
             val: notificationProgress
         },
         {
-            name: 'Delivery',
+            name: 'Scheduled Delivery',
             text:
                 // tslint:disable-next-line:max-line-length
                 'Determine how and when the notification is delivered as well as which devices/users will receive it.',
@@ -58,7 +59,6 @@ const OverviewModalBodyContainer: React.SFC<
     ]
 
     const openSelectedWizard = (wizard: UIStateType) => openWizardModal(wizard)
-
     return (
         <div
             style={{
@@ -83,6 +83,11 @@ const OverviewModalBodyContainer: React.SFC<
             {currentWizard === 'notification' &&
                 ReactDOM.createPortal(
                     <NotificationContainer device={device} />,
+                    document.getElementById('mainModalLeft')
+                )}
+            {currentWizard === 'scheduleddelivery' &&
+                ReactDOM.createPortal(
+                    <ScheduledDelivery device={device} />,
                     document.getElementById('mainModalLeft')
                 )}
         </div>

@@ -71,6 +71,7 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
         }
         return ret
     }
+
     render() {
         let { device, name, text, val, openWizard } = this.props
         // Desktop as default
@@ -84,7 +85,12 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
                 text="Edit"
                 size="small"
                 type="primary"
-                onClick={() => openWizard(name.toLowerCase() as UIStateType)}
+                onClick={() =>
+                    openWizard(name
+                        .toLowerCase()
+                        .split(' ')
+                        .join('') as UIStateType)
+                }
                 style={{ outerStyle: { marginLeft: 32 } }}
             />
         )
@@ -108,7 +114,11 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
                 style={{ background: white, width: '100%' }}
                 onClick={
                     !experienceOff
-                        ? () => openWizard(name.toLowerCase() as UIStateType)
+                        ? () =>
+                              openWizard(name
+                                  .toLowerCase()
+                                  .split(' ')
+                                  .join('') as UIStateType)
                         : () => null
                 }
                 key={name}

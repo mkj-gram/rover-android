@@ -41,7 +41,11 @@ interface UIStateInterface {
     notification: StringMap<StringMap<boolean>>
 }
 
-type UIStateType = 'notification' | 'experience' | 'delivery'
+type UIStateType =
+    | 'notification'
+    | 'experience'
+    | 'scheduleddelivery'
+    | 'automateddelivery'
 
 type UIStateField = {
     seen: boolean
@@ -49,10 +53,14 @@ type UIStateField = {
 }
 
 type editableUIState = {
+    // Notification Settings
     messageAndMedia: UIStateField
     alertOptions: UIStateField
     tapBehavior: UIStateField
     advancedSettings: UIStateField
+
+    // Scheduled Delivery Settings
+    dateAndTime: UIStateField
 }
 
 declare abstract class Campaign {
@@ -210,6 +218,7 @@ type formPage =
     | 'alertOptions'
     | 'tapBehavior'
     | 'advancedSettings'
+    | 'dateAndTime'
 
 type FormState = {
     readonly currentPage: formPage

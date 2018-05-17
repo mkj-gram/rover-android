@@ -39,6 +39,10 @@ export const createEditableCampaign: ActionCreator<
                 advancedSettings: {
                     seen: false,
                     type: 'notification'
+                },
+                dateAndTime: {
+                    seen: false,
+                    type: 'scheduleddelivery'
                 }
             }
         })
