@@ -6,6 +6,138 @@ import { DocumentNode } from 'graphql'
 import Environment from '../Environment'
 import { setTimeout } from 'timers'
 
+export const updateScheduledDeliverySettings: ActionCreator<
+    ThunkAction<Promise<Action | void>, State, void>
+> = () => (
+    dispatch: Dispatch<State>,
+    getState: () => State
+): Promise<Action | void> => {
+    const query: DocumentNode = gql`
+        mutation UpdateScheduledDeliverySettings(
+            $campaignId: Int!
+            $scheduledTimestamp: DateTime!
+            $scheduledTimeZone: String!
+            $scheduledUseLocalDeviceTime: Boolean!
+            $segmentCondition: SegmentCondition!
+            $segmentIds: [String]!
+            $UIState: String!
+            $scheduledType: ScheduledType!
+        ) {
+            updateScheduledDeliverySettings(
+                campaignId: $campaignId
+                scheduledTimestamp: $scheduledTimestamp
+                scheduledTimeZone: $scheduledTimeZone
+                scheduledType: $scheduledType
+                scheduledUseLocalDeviceTime: $scheduledUseLocalDeviceTime
+                segmentCondition: $segmentCondition
+                segmentIds: $segmentIds
+                UIState: $UIState
+            ) {
+                campaignId
+                name
+                campaignType
+                campaignStatus
+                UIState
+                ... on NotificationCampaign {
+                    notificationTitle
+                    notificationBody
+                    notificationAttachment {
+                        type
+                        url
+                    }
+                    notificationTapBehaviorType
+                    notificationTapPresentationType
+                    notificationTapBehaviorUrl
+                    notificationIosContentAvailable
+                    notificationIosMutableContent
+                    notificationIosSound
+                    notificationIosCategoryIdentifier
+                    notificationIosThreadIdentifier
+                    notificationAndroidChannelId
+                    notificationAndroidSound
+                    notificationAndroidTag
+                    notificationExpiration
+                    notificationAttributesMap
+                    notificationAlertOptionPushNotification
+                    notificationAlertOptionNotificationCenter
+                    notificationAlertOptionBadgeNumber
+                }
+                ... on ScheduledNotificationCampaign {
+                    scheduledType
+                    scheduledTimeZone
+                    scheduledTimestamp
+                    scheduledUseLocalDeviceTime
+                    scheduledDeliveryStatus
+                }
+                ... on SegmentableCampaign {
+                    segmentIds
+                    segmentCondition
+                }
+            }
+        }
+    `
+
+    const state = getState()
+    const { editableCampaign, editableUIState } = state
+    const {
+        campaignId,
+        scheduledTimestamp,
+        scheduledTimeZone,
+        scheduledType,
+        scheduledUseLocalDeviceTime,
+        segmentCondition,
+        segmentIds
+    } = editableCampaign as ScheduledCampaign
+
+    const request = {
+        query,
+        variables: {
+            campaignId,
+            scheduledTimestamp,
+            scheduledTimeZone,
+            scheduledType,
+            scheduledUseLocalDeviceTime,
+            segmentCondition,
+            segmentIds
+        }
+    }
+    dispatch({ 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_REQUEST' })
+    return Environment(request).then(
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                const campaign = data.updateScheduledDeliverySettings
+                const campaigns = {
+                    ...getState().campaigns,
+                    [campaign.campaignId]: {
+                        ...campaign
+                    }
+                }
+                return dispatch({
+                    type: 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_SUCCESS',
+                    campaigns
+                })
+            }
+        },
+        ({ result }) => {
+            dispatch({
+                type: 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_FAILURE',
+                message: result.errors[0].message
+            })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
+        }
+    )
+}
+
 export const updateNotificationSettings: ActionCreator<
     ThunkAction<Promise<Action | void>, State, void>
 > = () => (
