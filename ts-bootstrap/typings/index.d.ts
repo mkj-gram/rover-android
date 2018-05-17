@@ -2,6 +2,10 @@ interface StringMap<T> {
     [x: string]: T
 }
 
+interface NumberMap<T> {
+    [x: number]: T
+}
+
 type RoverSVGProps = {
     fill?: string
     height?: string

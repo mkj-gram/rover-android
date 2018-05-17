@@ -66,8 +66,10 @@ const SliderComponent: React.SFC<SliderProps> = ({
                             turquoise
                         )};
                         border-radius: none;
+                        -webkit-box-shadow: none;
+                       
                     }
-
+                
                     .roverSlider .rangeslider__handle {
                         cursor: default;
                         height: ${getStyle(handleStyle, 'height', '12px')};
@@ -95,7 +97,10 @@ const SliderComponent: React.SFC<SliderProps> = ({
                     .roverSlider :focus {
                         outline: 1px solid transparent;
                     }
-                
+                    .roverSlider .rangeslider  {
+                        -webkit-box-shadow: none;
+                        box-shadow: none;
+                    }                
                 `}
                 </style>
 

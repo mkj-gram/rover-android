@@ -1,7 +1,12 @@
 /// <reference path="../typings/index.d.ts" />
 import * as React from 'react'
 
-import { text as typographyText, semibold, regular } from '../styles/typography'
+import {
+    text as typographyText,
+    semibold,
+    regular,
+    light
+} from '../styles/typography'
 
 import { silver, graphite, charcoal } from '../styles/colors'
 
@@ -20,7 +25,7 @@ export interface TextProps {
     placeholder?: boolean
     placeholderText?: string
     position?: 'left' | 'center'
-    size: 'h1' | 'h2' | 'large' | 'medium' | 'small'
+    size: 'h1' | 'h2' | 'large' | 'medium' | 'small' | 'x-large'
     textStyle?: React.CSSProperties
 }
 
@@ -62,6 +67,15 @@ const Text: React.SFC<TextProps> = ({
                 ...semibold,
                 lineHeight: '32px',
                 fontSize: 25
+            }
+            break
+        case 'x-large':
+            style = {
+                ...style,
+                ...light,
+                color: graphite,
+                lineHeight: '80px',
+                fontSize: 64
             }
             break
         case 'large':

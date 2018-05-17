@@ -19,6 +19,7 @@ import Tab from './Tab'
 import TabBar from './TabBar'
 import Text from './Text'
 import TextInput from './TextInput'
+import TimePicker from './TimePicker'
 
 import {
     aquamarine,
@@ -140,6 +141,7 @@ export {
     TabBar,
     Text,
     TextInput,
+    TimePicker,
     AudienceIcon,
     AlertErrorIcon,
     AlertInfoIcon,
