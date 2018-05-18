@@ -2,16 +2,16 @@ import {
     GraphQLBoolean,
     GraphQLEnumType,
     GraphQLID,
+    GraphQLInputObjectType,
+    GraphQLList,
     GraphQLNonNull,
     GraphQLString,
     GraphQLObjectType,
-    GraphQLUnionType,
-    GraphQLInputObjectType
+    GraphQLUnionType
 } from 'graphql'
 
 import { GraphQLDateTime } from 'graphql-iso-date'
-
-import ActionInfo from './ActionInfo'
+import { OpenURLAction, PresentExperienceAction, PresentWebsiteAction } from './Action'
 
 const Notification = new GraphQLObjectType({
     name: 'Notification',
@@ -31,8 +31,8 @@ const Notification = new GraphQLObjectType({
         attachment: {
             type: NotificationAttachment
         },
-        actionInfo: {
-            type: new GraphQLNonNull(ActionInfo)
+        action: {
+            type: NotificationAction
         },
         deliveredAt: {
             type: new GraphQLNonNull(GraphQLDateTime)
@@ -50,6 +50,21 @@ const Notification = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLBoolean)
         }
     })
+})
+
+const NotificationAction = new GraphQLUnionType({
+    name: 'NotificationAction',
+    types: () => [OpenURLAction, PresentExperienceAction, PresentWebsiteAction],
+    resolveType: data => {
+        switch (data['__typename']) {
+            case 'OpenURLAction':
+                return OpenURLAction
+            case 'PresentExperienceAction':
+                return PresentExperienceAction
+            case 'PresentWebsiteAction':
+                return PresentWebsiteAction
+        }
+    }
 })
 
 export const NotificationAttachment = new GraphQLObjectType({

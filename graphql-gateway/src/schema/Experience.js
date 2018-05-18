@@ -13,7 +13,7 @@ import {
 
 import GraphQLJSON from 'graphql-type-json'
 
-import ActionInfo from './ActionInfo'
+import Action from './Action'
 
 const BackgroundContentMode = new GraphQLEnumType({
     name: 'BackgroundContentMode',
@@ -54,8 +54,8 @@ const BackgroundScale = new GraphQLEnumType({
 export const BarcodeBlock = new GraphQLObjectType({
     name: 'BarcodeBlock',
     fields: () => ({
-        actionInfo: {
-            type: ActionInfo
+        action: {
+            type: Action
         },
         autoHeight: {
             type: new GraphQLNonNull(GraphQLBoolean)
@@ -175,8 +175,8 @@ const Block = new GraphQLUnionType({
 export const ButtonBlock = new GraphQLObjectType({
     name: 'ButtonBlock',
     fields: () => ({
-        actionInfo: {
-            type: ActionInfo
+        action: {
+            type: Action
         },
         autoHeight: {
             type: new GraphQLNonNull(GraphQLBoolean)
@@ -400,8 +400,8 @@ const Image = new GraphQLObjectType({
 export const ImageBlock = new GraphQLObjectType({
     name: 'ImageBlock',
     fields: () => ({
-        actionInfo: {
-            type: ActionInfo
+        action: {
+            type: Action
         },
         autoHeight: {
             type: new GraphQLNonNull(GraphQLBoolean)
@@ -550,8 +550,8 @@ const Position = new GraphQLEnumType({
 export const RectangleBlock = new GraphQLObjectType({
     name: 'RectangleBlock',
     fields: () => ({
-        actionInfo: {
-            type: ActionInfo
+        action: {
+            type: Action
         },
         autoHeight: {
             type: new GraphQLNonNull(GraphQLBoolean)
@@ -736,8 +736,8 @@ const TextAlignment = new GraphQLEnumType({
 export const TextBlock = new GraphQLObjectType({
     name: 'TextBlock',
     fields: () => ({
-        actionInfo: {
-            type: ActionInfo
+        action: {
+            type: Action
         },
         autoHeight: {
             type: new GraphQLNonNull(GraphQLBoolean)
@@ -859,8 +859,8 @@ const VerticalAlignment = new GraphQLEnumType({
 export const WebViewBlock = new GraphQLObjectType({
     name: 'WebViewBlock',
     fields: () => ({
-        actionInfo: {
-            type: ActionInfo
+        action: {
+            type: Action
         },
         autoHeight: {
             type: new GraphQLNonNull(GraphQLBoolean)

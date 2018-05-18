@@ -4,6 +4,14 @@ import Mutation from './Mutation'
 import Query from './Query'
 
 import {
+    AddNotificationAction,
+    GoToScreenAction,
+    OpenURLAction,
+    PresentExperienceAction,
+    PresentWebsiteAction
+} from './Action'
+
+import {
     AutomatedNotificationCampaign,
     ScheduledNotificationCampaign
 } from './Campaign'
@@ -32,6 +40,7 @@ const schema = new GraphQLSchema({
     query: Query,
     mutation: Mutation,
     types: [
+        AddNotificationAction,
         AutomatedNotificationCampaign,
         BarcodeBlock,
         BooleanPredicate,
@@ -39,8 +48,12 @@ const schema = new GraphQLSchema({
         DatePredicate,
         FloatPredicate,
         GeofencePredicate,
+        GoToScreenAction,
         ImageBlock,
         NumberPredicate,
+        OpenURLAction,
+        PresentExperienceAction,
+        PresentWebsiteAction,
         RectangleBlock,
         ScheduledNotificationCampaign,
         StringArrayPredicate,

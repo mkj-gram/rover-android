@@ -1,44 +1,34 @@
 import RoverApis from '@rover/apis'
 
-const getActionInfo = (n) => {
-	switch (n.getNotificationTapBehaviorType()) {
+const getAction = (n) => {
+	switch (n.getTapBehaviorType()) {
 		case 0:
 			return {
-				name: 'presentExperience',
-				attributes: {
-					campaignID: n.getCampaignId()
-				}
+				__typename: 'PresentExperienceAction',
+				campaignID: n.getCampaignId()
 			}
 		case 1:
-			return {
-				name: 'openApp'
-			}
+			return null
 		case 2:
 			return {
-				name: 'openURL',
-				attributes: {
-					url: n.getNotificationTapBehaviorUrl()
-				}
+				__typename: 'OpenURLAction',
+				url: n.getTapBehaviorUrl()
 			}
 		case 3:
 			// IN_BROWSER
-			if (n.getNotificationTapBehaviorPresentationType() == 2) {
+			if (n.getTapBehaviorPresentationType() == 2) {
 				return {
-					name: 'openURL',
-					attributes: {
-						url: n.getNotificationAttachmentUrl()
-					}
+					__typename: 'OpenURLAction',
+					url: n.getTapBehaviorUrl()
 				}
 			} else {
 				return {
-					name: 'presentWebsite',
-					attributes: {
-						url: n.getNotificationAttachmentUrl()
-					}
+					__typename: 'PresentWebsiteAction',
+					url: n.getTapBehaviorUrl()
 				}
 			}
 		default:
-			return undefined	
+			return null	
 	}
 }
 
@@ -49,7 +39,7 @@ export default n => ({
 	body: n.getBody(),
 	attachment: (() => {
 		const attachment = {}
-		switch (n.getNotificationAttachmentType()) {
+		switch (n.getAttachmentType()) {
 			case 0:
 				return null
 			case 1:
@@ -63,10 +53,10 @@ export default n => ({
 				break
 		}
 
-		attachment.url = n.getNotificationAttachmentUrl()
+		attachment.url = n.getAttachmentUrl()
 		return attachment
 	})(),
-	actionInfo: getActionInfo(n),
+	action: getAction(n),
 	deliveredAt: RoverApis.Helpers.timestampFromProto(n.getCreatedAt()),
 	expiresAt: null,
 	isRead: n.getIsRead(),

@@ -19,6 +19,9 @@ test() {
 
 migrate() {
   set -e
+  waiton postgres 5432
+  waiton scylla 9042
+  
   go run ./go/cmd/postgres-cli/main.go \
     --db-dsn=$POSTGRES_DSN \
     --migration-path=$SVC_HOME/postgres/migrations

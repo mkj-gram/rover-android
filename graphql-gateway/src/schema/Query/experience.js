@@ -218,7 +218,7 @@ const normalizeBoolean = (data, fallback) => {
     return fallback
 }
 
-const normalizeActionInfo = data => {
+const normalizeAction = data => {
     if (data === null || data === undefined) {
         return null
     }
@@ -226,10 +226,8 @@ const normalizeActionInfo = data => {
     const url = data['url']
     if (typeof url === 'string') {
         return {
-            name: 'openURL',
-            attributes: {
-                url
-            }
+            __typename: 'OpenURLAction',
+            url
         }
     }
 
@@ -237,11 +235,8 @@ const normalizeActionInfo = data => {
     const screenID = data['screen-id']
     if (typeof experienceID === 'string' && typeof screenID === 'string') {
         return {
-            name: 'goToScreen',
-            attributes: {
-                experienceID,
-                screenID
-            }
+            __typename: 'GoToScreenAction',
+            screenID
         }
     }
 
@@ -427,7 +422,7 @@ const normalizeBlock = data => {
     }
 
     return {
-        actionInfo: normalizeActionInfo(data['action']),
+        action: normalizeAction(data['action']),
         autoHeight: normalizeBoolean(data['auto-height'], false),
         height: normalizeLength(data['height']),
         horizontalAlignment: normalizeHorizontalAlignment(data['alignment']),
