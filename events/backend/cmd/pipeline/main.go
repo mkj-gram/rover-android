@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,6 +11,7 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/namsral/flag"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 
 	prom "github.com/prometheus/client_golang/prometheus"
@@ -20,16 +21,26 @@ import (
 	"github.com/roverplatform/rover/events/backend/middleware"
 	"github.com/roverplatform/rover/events/backend/pipeline"
 	"github.com/roverplatform/rover/events/backend/transformers"
-	"github.com/roverplatform/rover/go/logger"
+	rhttp "github.com/roverplatform/rover/go/http"
+	rlog "github.com/roverplatform/rover/go/logger"
 )
 
 var (
+	//
+	// Endpoints
+	//
 	httpAddr = flag.String("http-addr", ":5080", "http listen address")
+
+	//
+	// Log
+	//
+	logLevel = flag.String("log-level", "info", "log level")
 
 	//
 	// DSN
 	//
-	kafkaDSN = flag.String("kafka-dsn", "kafka:9092", "Kafka bootstrap servers dsn")
+	kafkaDSN     = flag.String("kafka-dsn", "kafka:9092", "Kafka bootstrap servers dsn")
+	kafkaTimeout = flag.Duration("kafka-timeout", time.Duration(1*time.Second), "Kafka ping timeout")
 
 	//
 	//
@@ -42,10 +53,7 @@ var (
 	//
 	audienceServiceDsn = flag.String("audience-service-dsn", "audience:5100", "Audience Service DSN")
 	geocoderServiceDsn = flag.String("geocoder-service-dsn", "geocoder:5100", "Geocoder Service DSN")
-)
 
-var (
-	logLevel = flag.String("log-level", "info", "log level")
 	//
 	// Device
 	//
@@ -54,9 +62,29 @@ var (
 
 func main() {
 	flag.Parse()
-	var log = logger.New()
-	log.SetLevel(logger.LevelFromString(*logLevel))
 
+	var (
+		readinessProbes, livenessProbes []rhttp.ProbeFunc
+
+		pipelineOpts []pipeline.Option
+	)
+
+	//
+	// Logger
+	//
+	log := rlog.New()
+	log.SetLevel(rlog.LevelFromString(*logLevel))
+	pipelineOpts = append(pipelineOpts, pipeline.WithLogger(log))
+
+	//
+	// Context
+	//
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+
+	//
+	// Kafka
+	//
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  *kafkaDSN,
 		"compression.codec":  "snappy",
@@ -83,29 +111,32 @@ func main() {
 	}
 	log.Info("Connected to kafka")
 
+	kafkaConsumerProbe := func(ctx context.Context) error {
+		_, err := consumer.GetMetadata(inputTopic, true, int((*kafkaTimeout).Nanoseconds()/1e6))
+		return errors.Wrap(err, "kafka: consumer")
+	}
+
+	livenessProbes = append(livenessProbes, kafkaConsumerProbe)
+	readinessProbes = append(readinessProbes, kafkaConsumerProbe)
+
 	//
 	// Prometheus
 	//
 
 	prom.MustRegister(pipeline.PrometheusMetrics...)
 
-	var pipelineOpts = []pipeline.Option{
-		pipeline.WithLogger(log),
-	}
-
-	/*
-		Reverse Geocoding
-	*/
+	//
+	// Reverse Geocoding
+	//
 	geocoderConn, err := grpc.Dial(*geocoderServiceDsn, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	geocoderClient := geocoder.NewGeocoderClient(geocoderConn)
 
-	/*
-		Device & Profiles
-	*/
+	//
+	// Audience
+	//
 	conn, err := grpc.Dial(
 		*audienceServiceDsn,
 		grpc.WithInsecure(),
@@ -114,8 +145,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	audienceClient := audience.NewAudienceClient(conn)
+
+	//
+	// Pipeline
+	//
 
 	data, err := ioutil.ReadFile(*deviceModelNameJSONMapPath)
 	if err != nil {
@@ -131,22 +165,34 @@ func main() {
 
 	p := pipeline.NewPipeline(consumer, *inputTopic, producer, *outputTopic, handler, pipelineOpts...)
 
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
-
+	//
+	// main
+	//
 	var done = make(chan error)
 	go func() {
 		done <- p.Run(ctx)
 	}()
 
+	//
+	// Http
+	//
 	go func() {
+		log := log.WithFields(rlog.Fields{"probe": ""})
+
 		http.Handle("/metrics", prom.Handler())
+		http.Handle("/readiness", rhttp.ProbeChain(ctx, log, readinessProbes...))
+		http.Handle("/liveness", rhttp.ProbeChain(ctx, log, livenessProbes...))
+
 		if err := http.ListenAndServe(*httpAddr, nil); err != nil {
 			log.Fatal(err)
 		}
 	}()
 
 	log.Infof("[*] Pipeline running! To exit press CTRL+C")
+
+	//
+	// Signals
+	//
 	sigc := make(chan os.Signal)
 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 
