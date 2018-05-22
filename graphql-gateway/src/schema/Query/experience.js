@@ -78,7 +78,7 @@ const fetchExperience = (identifier, accountToken) => {
                     id: data['id'],
                     ...attributes
                 })
-
+                
                 resolve(experience)
             } catch (err) {
                 reject(err)
@@ -115,18 +115,22 @@ const normalizeScreen = data => {
     }
 
     return {
-        ...normalizeBackground(data),
+        background: normalizeBackground(data),
         id: data['id'],
         isStretchyHeaderEnabled: normalizeBoolean(data['is-stretchy-header-enabled'], true),
         rows: normalizeRows(data['rows']),
-        statusBarStyle: normalizeStatusBarStyle(data['status-bar-style']),
-        statusBarColor: normalizeColor(data['status-bar-color']),
-        titleBarBackgroundColor: normalizeColor(data['title-bar-background-color']),
-        titleBarButtons: normalizeTitleBarButtons(data['title-bar-buttons']),
-        titleBarButtonColor: normalizeColor(data['title-bar-button-color']),
-        titleBarText: data['title'],
-        titleBarTextColor: normalizeColor(data['title-bar-text-color']),
-        useDefaultTitleBarStyle: normalizeBoolean(data['use-default-title-bar-style'], false),
+        statusBar: {
+            style: normalizeStatusBarStyle(data['status-bar-style']),
+            color: normalizeColor(data['status-bar-color'])
+        },
+        titleBar: {
+            backgroundColor: normalizeColor(data['title-bar-background-color']),
+            buttons: normalizeTitleBarButtons(data['title-bar-buttons']),
+            buttonColor: normalizeColor(data['title-bar-button-color']),
+            text: data['title'],
+            textColor: normalizeColor(data['title-bar-text-color']),
+            useDefaultStyle: normalizeBoolean(data['use-default-title-bar-style'], false)
+        },
         keys: normalizeKeys(data['custom-keys']),
         tags: []
     }
@@ -134,10 +138,10 @@ const normalizeScreen = data => {
 
 const normalizeBackground = data => {
     return {
-        backgroundColor: normalizeColor(data['background-color']),
-        backgroundContentMode: normalizeBackgroundContentMode(data['background-content-mode']),
-        backgroundImage: normalizeImage(data['background-image']),
-        backgroundScale: normalizeInteger(data['background-scale'], 1)
+        color: normalizeColor(data['background-color']),
+        contentMode: normalizeBackgroundContentMode(data['background-content-mode']),
+        image: normalizeImage(data['background-image']),
+        scale: normalizeInteger(data['background-scale'], 1)
     }
 }
 
@@ -218,31 +222,6 @@ const normalizeBoolean = (data, fallback) => {
     return fallback
 }
 
-const normalizeAction = data => {
-    if (data === null || data === undefined) {
-        return null
-    }
-
-    const url = data['url']
-    if (typeof url === 'string') {
-        return {
-            __typename: 'OpenURLAction',
-            url
-        }
-    }
-
-    const experienceID = data['experience-id']
-    const screenID = data['screen-id']
-    if (typeof experienceID === 'string' && typeof screenID === 'string') {
-        return {
-            __typename: 'GoToScreenAction',
-            screenID
-        }
-    }
-
-    return null
-}
-
 const normalizeStatusBarStyle = data => {
     switch (data) {
         case 'light':
@@ -267,13 +246,34 @@ const normalizeRow = data => {
     }
 
     return {
-        autoHeight: normalizeBoolean(data['auto-height'], false),
-        ...normalizeBackground(data),
+        background: normalizeBackground(data),
         blocks: normalizeBlocks(data['blocks']),
-        height: normalizeLength(data['height']),
+        height: normalizeHeight(data),
         id: data['id'],
         keys: normalizeKeys(data['custom-keys']),
         tags: []
+    }
+}
+
+const normalizeHeight = data => {
+    if (data === null || data === undefined) {
+        return {
+            __typename: 'HeightStatic',
+            value: 0
+        }
+    }
+
+    let autoHeight = normalizeBoolean(data['auto-height'], false)
+    if (autoHeight) {
+        return {
+            __typename: 'HeightIntrinsic'
+        }
+    }
+
+    let length = normalizeLength(data['height'])
+    return {
+        __typename: 'HeightStatic',
+        value: length.value
     }
 }
 
@@ -338,81 +338,9 @@ const normalizeBorder = data => {
     }
 
     return {
-        borderColor: normalizeColor(data['border-color']),
-        borderRadius: normalizeInteger(data['border-radius'], 0),
-        borderWidth: normalizeInteger(data['border-width'], 0)
-    }
-}
-
-const normalizeHorizontalAlignment = data => {
-    if (data === null || data === undefined) {
-        return 'left'
-    }
-
-    let horizontal = data['horizontal']
-    switch (horizontal) {
-        case 'left':
-        case 'right':
-        case 'center':
-        case 'fill':
-            return horizontal
-        default:
-            return 'left'
-    }
-}
-
-const normalizeVerticalAlignment = data => {
-    if (data === null || data === undefined) {
-        return 'top'
-    }
-
-    let vertical = data['vertical']
-    switch (vertical) {
-        case 'top':
-        case 'bottom':
-        case 'middle':
-        case 'fill':
-            return vertical
-        default:
-            return 'top'
-    }
-}
-
-const normalizeInsets = data => {
-    if (data === null || data === undefined) {
-        return null
-    }
-
-    return {
-        bottom: normalizeInteger(data['bottom'], 0),
-        left: normalizeInteger(data['left'], 0),
-        right: normalizeInteger(data['right'], 0),
-        top: normalizeInteger(data['top'], 0)
-    }
-}
-
-const normalizeOffsets = data => {
-    if (data === null || data === undefined) {
-        return null
-    }
-
-    return {
-        bottom: normalizeLength(data['bottom']),
-        center: normalizeLength(data['center']),
-        left: normalizeLength(data['left']),
-        middle: normalizeLength(data['middle']),
-        right: normalizeLength(data['right']),
-        top: normalizeLength(data['top'])
-    }
-}
-
-const normalizePosition = data => {
-    switch (data) {
-        case 'stacked':
-        case 'floating':
-            return data
-        default:
-            return 'floating'
+        color: normalizeColor(data['border-color']),
+        radius: normalizeInteger(data['border-radius'], 0),
+        width: normalizeInteger(data['border-width'], 0)
     }
 }
 
@@ -421,18 +349,177 @@ const normalizeBlock = data => {
         return null
     }
 
+    const action = (data => {
+        if (data === null || data === undefined) {
+            return null
+        }
+
+        const url = data['url']
+        if (typeof url === 'string') {
+            return {
+                __typename: 'OpenURLAction',
+                url
+            }
+        }
+    
+        const screenID = data['screen-id']
+        if (typeof screenID === 'string') {
+            return {
+                __typename: 'GoToScreenAction',
+                screenID
+            }
+        }
+    
+        return null
+    })(data['action'])
+
+    const insets = (data => {
+        if (data === null || data === undefined) {
+            return {
+                bottom: 0,
+                left: 0,
+                right: 0,
+                top: 0
+            }
+        }
+    
+        return {
+            bottom: normalizeInteger(data['bottom'], 0),
+            left: normalizeInteger(data['left'], 0),
+            right: normalizeInteger(data['right'], 0),
+            top: normalizeInteger(data['top'], 0)
+        }
+    })(data['inset'])
+
+    const { bottom, center, left, middle, right, top } = (data => {
+        if (data === null || data === undefined) {
+            return {
+                bottom: 0,
+                center: 0,
+                left: 0,
+                middle: 0,
+                right: 0,
+                top: 0
+            }
+        }
+
+        return {
+            bottom: normalizeLength(data['bottom']).value,
+            center: normalizeLength(data['center']).value,
+            left: normalizeLength(data['left']).value,
+            middle: normalizeLength(data['middle']).value,
+            right: normalizeLength(data['right']).value,
+            top: normalizeLength(data['top']).value
+        }
+    })(data['offset'])
+
+    const { horizontal, vertical } = (data => {
+        if (data === null || data === undefined) {
+            return {
+                horizontal: 'left',
+                vertical: 'top'
+            }
+        }
+
+        return {
+            horizontal: data['horizontal'] || 'top',
+            vertical: data['vertical'] || 'left'
+        }
+    })(data['alignment'])
+
+    const horizontalAlignment = (() => {
+        const width = normalizeLength(data['width']).value
+        switch (horizontal) {    
+            case 'right':
+                return {
+                    __typename: 'HorizontalAlignmentRight',
+                    offset: right,
+                    width
+                }
+            case 'center': 
+                return {
+                    __typename: 'HorizontalAlignmentCenter',
+                    offset: center,
+                    width
+                }
+            case 'fill':
+                return {
+                    __typename: 'HorizontalAlignmentFill',
+                    leftOffset: left,
+                    rightOffset: right
+                }
+            default:
+                return {
+                    __typename: 'HorizontalAlignmentLeft',
+                    offset: left,
+                    width
+                }
+        }
+    })()
+    
+    const verticalAlignment = (() => {
+        const height = (() => {
+            const autoHeight = normalizeBoolean(data['auto-height'], false)
+            if (autoHeight) {
+                return {
+                    __typename: 'HeightIntrinsic'
+                }
+            }
+    
+            return {
+                __typename: 'HeightStatic',
+                value: normalizeLength(data['height']).value
+            }
+        })() 
+
+        const isStacked = data['position'] === 'stacked'
+
+        if (isStacked) {
+            return {
+                __typename: 'VerticalAlignmentStacked',
+                topOffset: top,
+                bottomOffset: bottom,
+                height
+            }
+        }
+
+        switch (vertical) {
+            case 'bottom':
+                return {
+                    __typename: 'VerticalAlignmentBottom',
+                    offset: bottom,
+                    height
+                }
+            case 'middle':
+                return {
+                    __typename: 'VerticalAlignmentMiddle',
+                    offset: middle,
+                    height
+                }
+            case 'fill':
+                return {
+                    __typename: 'VerticalAlignmentFill',
+                    topOffset: top,
+                    bottomOffset: bottom
+                }
+            default:
+                return {
+                    __typename: 'VerticalAlignmentTop',
+                    offset: top,
+                    height
+                }
+        }
+    })
+
     return {
-        action: normalizeAction(data['action']),
-        autoHeight: normalizeBoolean(data['auto-height'], false),
-        height: normalizeLength(data['height']),
-        horizontalAlignment: normalizeHorizontalAlignment(data['alignment']),
+        action,
         id: data['id'],
-        insets: normalizeInsets(data['inset']),
-        offsets: normalizeOffsets(data['offset']),
+        insets,   
         opacity: normalizeNumber(data['opacity'], 1.0),
-        position: normalizePosition(data['position']),
-        verticalAlignment: normalizeVerticalAlignment(data['alignment']),
-        width: normalizeLength(data['width']),
+        position: {
+            horizontalAlignment,
+            verticalAlignment,
+        },
         keys: normalizeKeys(data['custom-keys']),
         tags: []
     }
@@ -444,12 +531,15 @@ const normalizeBarcodeBlock = data => {
     }
 
     return {
+        __typename: 'BarcodeBlock',
         ...normalizeBlock(data),
-        ...normalizeBackground(data),
-        ...normalizeBorder(data),
-        barcodeScale: normalizeInteger(data['barcode-scale'], 1),
-        barcodeText: data['barcode-text'],
-        barcodeFormat: normalizeBarcodeFormat(data['barcode-type'])
+        background: normalizeBackground(data),
+        border: normalizeBorder(data),
+        barcode: {
+            scale: normalizeInteger(data['barcode-scale'], 1),
+            text: data['barcode-text'],
+            format: normalizeBarcodeFormat(data['barcode-type'])
+        }
     }
 }
 
@@ -471,30 +561,11 @@ const normalizeButtonBlock = data => {
     }
 
     return {
+        __typename: 'ButtonBlock',
         ...normalizeBlock(data),
-        disabled: normalizeButtonState(data, 'disabled'),
-        highlighted: normalizeButtonState(data, 'highlighted'),
-        normal: normalizeButtonState(data, 'normal'),
-        selected: normalizeButtonState(data, 'selected'),
-    }
-}
-
-const normalizeButtonState = (data, name) => {
-    if (data === null || data === undefined) {
-        return null
-    }
-
-    data = {
-        'background-content-mode': data['background-content-mode'],
-        'background-image': data['background-image'],
-        'background-scale': data['background-scale'],
-        ...(data['states'] || {})[name]
-    }
-
-    return {
-        ...normalizeBackground(data),
-        ...normalizeBorder(data),
-        ...normalizeText(data)
+        background: normalizeBackground(data['states']['normal']),
+        border: normalizeBorder(data['states']['normal']),
+        text: normalizeText(data['states']['normal'])
     }
 }
 
@@ -504,9 +575,10 @@ const normalizeImageBlock = data => {
     }
 
     return {
+        __typename: 'ImageBlock',
         ...normalizeBlock(data),
-        ...normalizeBackground(data),
-        ...normalizeBorder(data),
+        background: normalizeBackground(data),
+        border: normalizeBorder(data),
         image: normalizeImage(data['image'])
     }
 }
@@ -517,10 +589,11 @@ const normalizeTextBlock = data => {
     }
 
     return {
+        __typename: 'TextBlock',
         ...normalizeBlock(data),
-        ...normalizeBackground(data),
-        ...normalizeBorder(data),
-        ...normalizeText(data)
+        background: normalizeBackground(data),
+        border: normalizeBorder(data),
+        text: normalizeText(data)
     }
 }
 
@@ -530,10 +603,10 @@ const normalizeText = data => {
     }
 
     return {
-        text: data['text'],
-        textAlignment: normalizeTextAlignment(data['text-alignment']),
-        textColor: normalizeColor(data['text-color']),
-        textFont: normalizeFont(data['text-font'])
+        rawValue: data['text'],
+        alignment: normalizeTextAlignment(data['text-alignment']),
+        color: normalizeColor(data['text-color']),
+        font: normalizeFont(data['text-font'])
     }
 }
 
@@ -582,11 +655,14 @@ const normalizeWebViewBlock = data => {
     }
 
     return {
+        __typename: 'WebViewBlock',
         ...normalizeBlock(data),
-        ...normalizeBackground(data),
-        ...normalizeBorder(data),
-        isScrollingEnabled: normalizeBoolean(data['scrollable'], true),
-        url: data['url']
+        background: normalizeBackground(data),
+        border: normalizeBorder(data),
+        webView: {
+            isScrollingEnabled: normalizeBoolean(data['scrollable'], true),
+            url: data['url']
+        }
     }
 }
 
@@ -596,9 +672,10 @@ const normalizeRectangleBlock = data => {
     }
 
     return {
+        __typename: 'RectangleBlock',
         ...normalizeBlock(data),
-        ...normalizeBackground(data),
-        ...normalizeBorder(data)
+        background: normalizeBackground(data),
+        border: normalizeBorder(data)
     }
 }
 

@@ -1,0 +1,5 @@
+query FetchExperienceByCampaignURL($campaignURL: String!) {
+    experience(campaignURL: $campaignURL) {
+        ...experienceFields
+    }
+}

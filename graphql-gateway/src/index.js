@@ -10,6 +10,8 @@ import Auth from '@rover/auth-client'
 import Transformer from '@rover/events-pipeline-client'
 import { authClient } from './grpcClients'
 
+import persistedQueries from './persistedQueries'
+
 import 'babel-polyfill'
 
 dotenv.config()
@@ -76,8 +78,8 @@ async function main() {
     }
 
     clients.transformer = transformer
-    
-    app.use('/graphql', cors(), authMiddleware, graphqlHTTP(req => ({
+
+    app.use('/graphql', cors(), authMiddleware, persistedQueries, graphqlHTTP(req => ({
             schema,
             graphiql: true,
             context: {

@@ -1,0 +1,5 @@
+query FetchExperienceByID($id: ID!) {
+    experience(id: $id) {
+        ...experienceFields
+    }
+}

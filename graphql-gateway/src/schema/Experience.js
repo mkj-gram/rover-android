@@ -4,16 +4,42 @@ import {
     GraphQLFloat,
     GraphQLID,
     GraphQLInt,
+    GraphQLInterfaceType,
     GraphQLList,
     GraphQLNonNull,
     GraphQLObjectType,
     GraphQLString,
-    GraphQLUnionType
+    GraphQLUnionType,
+    graphql
 } from 'graphql'
 
 import GraphQLJSON from 'graphql-type-json'
 
-import Action from './Action'
+import { 
+    GoToScreenAction, 
+    OpenURLAction, 
+    PresentExperienceAction, 
+    PresentNotificationCenterAction, 
+    PresentWebsiteAction 
+} from './Action'
+
+const Background = new GraphQLObjectType({
+    name: 'Background',
+    fields: () => ({
+        color: {
+            type: new GraphQLNonNull(Color)
+        },
+        contentMode: {
+            type: new GraphQLNonNull(BackgroundContentMode)
+        },
+        image: {
+            type: Image
+        },
+        scale: {
+            type: new GraphQLNonNull(BackgroundScale)
+        }
+    })
+})
 
 const BackgroundContentMode = new GraphQLEnumType({
     name: 'BackgroundContentMode',
@@ -51,77 +77,17 @@ const BackgroundScale = new GraphQLEnumType({
     }
 })
 
-export const BarcodeBlock = new GraphQLObjectType({
-    name: 'BarcodeBlock',
+const Barcode = new GraphQLObjectType({
+    name: 'Barcode',
     fields: () => ({
-        action: {
-            type: Action
-        },
-        autoHeight: {
-            type: new GraphQLNonNull(GraphQLBoolean)
-        },
-        backgroundColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        backgroundContentMode: {
-            type: new GraphQLNonNull(BackgroundContentMode)
-        },
-        backgroundImage: {
-            type: Image
-        },
-        backgroundScale: {
-            type: new GraphQLNonNull(BackgroundScale)
-        },
-        barcodeScale: {
+        scale: {
             type: new GraphQLNonNull(GraphQLInt)
         },
-        barcodeText: {
+        text: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        barcodeFormat: {
+        format: {
             type: new GraphQLNonNull(BarcodeFormat)
-        },
-        borderColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        borderRadius: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        borderWidth: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        height: {
-            type: new GraphQLNonNull(Length)
-        },
-        horizontalAlignment: {
-            type: new GraphQLNonNull(HorizontalAlignment)
-        },
-        id: {
-            type: new GraphQLNonNull(GraphQLID)
-        },
-        insets: {
-            type: new GraphQLNonNull(Insets)
-        },
-        offsets: {
-            type: new GraphQLNonNull(Offsets)
-        },
-        opacity: {
-            type: new GraphQLNonNull(GraphQLFloat)
-        },
-        position: {
-            type: new GraphQLNonNull(Position)
-        },
-        verticalAlignment: {
-            type: new GraphQLNonNull(VerticalAlignment)
-        },
-        width: {
-            type: Length
-        },
-        keys: {
-            type: new GraphQLNonNull(GraphQLJSON)
-        },
-        tags: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
         }
     })
 })
@@ -144,54 +110,21 @@ const BarcodeFormat = new GraphQLEnumType({
     }
 })
 
-const Block = new GraphQLUnionType({
-    name: 'Block',
-    types: () => [BarcodeBlock, ButtonBlock, ImageBlock, RectangleBlock, TextBlock, WebViewBlock],
-    resolveType: data => {
-        if (data.barcodeText) {
-            return BarcodeBlock
-        }
-
-        if (data.highlighted) {
-            return ButtonBlock
-        }
-
-        if (data.image) {
-            return ImageBlock
-        }
-
-        if (data.text) {
-            return TextBlock
-        }
-
-        if (data.url) {
-            return WebViewBlock
-        }
-
-        return RectangleBlock
-    }
-})
-
-export const ButtonBlock = new GraphQLObjectType({
-    name: 'ButtonBlock',
+export const BarcodeBlock = new GraphQLObjectType({
+    name: 'BarcodeBlock',
+    interfaces: () => [Block],
     fields: () => ({
         action: {
-            type: Action
+            type: BlockAction
         },
-        autoHeight: {
-            type: new GraphQLNonNull(GraphQLBoolean)
+        background: {
+            type: new GraphQLNonNull(Background)
         },
-        disabled: {
-            type: new GraphQLNonNull(ButtonState)
+        barcode: {
+            type: new GraphQLNonNull(Barcode)
         },
-        height: {
-            type: new GraphQLNonNull(Length)
-        },
-        highlighted: {
-            type: new GraphQLNonNull(ButtonState)
-        },
-        horizontalAlignment: {
-            type: new GraphQLNonNull(HorizontalAlignment)
+        border: {
+            type: new GraphQLNonNull(Border)
         },
         id: {
             type: new GraphQLNonNull(GraphQLID)
@@ -199,26 +132,11 @@ export const ButtonBlock = new GraphQLObjectType({
         insets: {
             type: new GraphQLNonNull(Insets)
         },
-        normal: {
-            type: new GraphQLNonNull(ButtonState)
-        },
-        offsets: {
-            type: new GraphQLNonNull(Offsets)
-        },
         opacity: {
             type: new GraphQLNonNull(GraphQLFloat)
         },
         position: {
             type: new GraphQLNonNull(Position)
-        },
-        selected: {
-            type: new GraphQLNonNull(ButtonState)
-        },
-        verticalAlignment: {
-            type: new GraphQLNonNull(VerticalAlignment)
-        },
-        width: {
-            type: Length
         },
         keys: {
             type: new GraphQLNonNull(GraphQLJSON)
@@ -229,41 +147,122 @@ export const ButtonBlock = new GraphQLObjectType({
     })
 })
 
-const ButtonState = new GraphQLObjectType({
-    name: 'ButtonState',
+const Block = new GraphQLInterfaceType({
+    name: 'Block',
     fields: () => ({
-        backgroundColor: {
+        action: {
+            type: BlockAction
+        },
+        background: {
+            type: new GraphQLNonNull(Background)
+        },
+        border: {
+            type: new GraphQLNonNull(Border)
+        },
+        id: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        insets: {
+            type: new GraphQLNonNull(Insets)
+        },
+        opacity: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        position: {
+            type: new GraphQLNonNull(Position)
+        },
+        keys: {
+            type: new GraphQLNonNull(GraphQLJSON)
+        },
+        tags: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
+        }
+    }),
+    resolveType: data => {
+        switch (data['__typename']) {
+            case 'BarcodeBlock':
+                return BarcodeBlock
+            case 'ButtonBlock':
+                return ButtonBlock    
+            case 'ImageBlock':
+                return ImageBlock
+            case 'RectangleBlock':
+                return RectangleBlock
+            case 'TextBlock':
+                return TextBlock
+            case 'WebViewBlock':
+                return WebViewBlock
+        }
+    }
+})
+
+const BlockAction = new GraphQLUnionType({
+    name: 'BlockAction',
+    types: () => [GoToScreenAction, OpenURLAction, PresentExperienceAction, PresentNotificationCenterAction, PresentWebsiteAction],
+    resolveType: data => {
+        switch (data['__typename']) {
+            case 'GoToScreenAction':
+                return GoToScreenAction
+            case 'OpenURLAction':
+                return OpenURLAction
+            case 'PresentExperienceAction':
+                return PresentExperienceAction
+            case 'PresentNotificationCenterAction':
+                return PresentNotificationCenterAction
+            case 'PresentWebsiteAction':
+                return PresentWebsiteAction
+        }
+    }
+})
+
+export const Border = new GraphQLObjectType({
+    name: 'Border',
+    fields: () => ({
+        color: {
             type: new GraphQLNonNull(Color)
         },
-        backgroundContentMode: {
-            type: new GraphQLNonNull(BackgroundContentMode)
-        },
-        backgroundImage: {
-            type: Image
-        },
-        backgroundScale: {
-            type: new GraphQLNonNull(BackgroundScale)
-        },
-        borderColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        borderRadius: {
+        radius: {
             type: new GraphQLNonNull(GraphQLInt)
         },
-        borderWidth: {
+        width: {
             type: new GraphQLNonNull(GraphQLInt)
+        }
+    })
+})
+
+export const ButtonBlock = new GraphQLObjectType({
+    name: 'ButtonBlock',
+    interfaces: () => [Block],
+    fields: () => ({
+        action: {
+            type: BlockAction
+        },
+        background: {
+            type: new GraphQLNonNull(Background)
+        },
+        border: {
+            type: new GraphQLNonNull(Border)
+        },
+        id: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        insets: {
+            type: new GraphQLNonNull(Insets)
+        },
+        opacity: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        position: {
+            type: new GraphQLNonNull(Position)
         },
         text: {
-            type: new GraphQLNonNull(GraphQLString)
+            type: new GraphQLNonNull(Text)
         },
-        textAlignment: {
-            type: new GraphQLNonNull(TextAlignment)
+        keys: {
+            type: new GraphQLNonNull(GraphQLJSON)
         },
-        textColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        textFont: {
-            type: new GraphQLNonNull(Font)
+        tags: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
         }
     })
 })
@@ -308,6 +307,460 @@ const Experience = new GraphQLObjectType({
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
         }
     })
+})
+
+const Height = new GraphQLUnionType({
+    name: 'Height',
+    types: () => [HeightIntrinsic, HeightStatic],
+    resolveType: data => {
+        if (data['value'] !== null && data['value'] !== undefined) {
+            return HeightStatic
+        }
+
+        return HeightIntrinsic
+    }
+})
+
+const HeightIntrinsic = new GraphQLObjectType({
+    name: 'HeightIntrinsic',
+    fields: () => ({ 
+        placeholder: {
+            type: new GraphQLNonNull(GraphQLString),
+            description: 'This property should not be used. It is simply a placeholder because GraphQL does not permit types without any fields.',
+            resolve: () => 'placeholder'
+        }
+    })
+})
+
+const HeightStatic = new GraphQLObjectType({
+    name: 'HeightStatic',
+    fields: () => ({ 
+        value: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        }
+    })
+})
+
+const Image = new GraphQLObjectType({
+    name: 'Image',
+    fields: () => ({
+        height: {
+            type: new GraphQLNonNull(GraphQLInt)
+        },
+        isURLOptimizationEnabled: {
+            type: new GraphQLNonNull(GraphQLBoolean)
+        },
+        name: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        size: {
+            type: new GraphQLNonNull(GraphQLInt)
+        },
+        width: {
+            type: new GraphQLNonNull(GraphQLInt)
+        },
+        url: {
+            type: new GraphQLNonNull(GraphQLString)
+        }
+    })
+})
+
+export const ImageBlock = new GraphQLObjectType({
+    name: 'ImageBlock',
+    interfaces: () => [Block],
+    fields: () => ({
+        action: {
+            type: BlockAction
+        },
+        background: {
+            type: new GraphQLNonNull(Background)
+        },
+        border: {
+            type: new GraphQLNonNull(Border)
+        },
+        id: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        image: {
+            type: new GraphQLNonNull(Image)
+        },
+        insets: {
+            type: new GraphQLNonNull(Insets)
+        },
+        opacity: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        position: {
+            type: new GraphQLNonNull(Position)
+        },
+        keys: {
+            type: new GraphQLNonNull(GraphQLJSON)
+        },
+        tags: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
+        }
+    })
+})
+
+const Insets = new GraphQLObjectType({
+    name: 'Insets',
+    fields: () => ({
+        bottom: {
+            type: new GraphQLNonNull(GraphQLInt)
+        },
+        left: {
+            type: new GraphQLNonNull(GraphQLInt)
+        },
+        right: {
+            type: new GraphQLNonNull(GraphQLInt)
+        },
+        top: {
+            type: new GraphQLNonNull(GraphQLInt)
+        }
+    })
+})
+
+const Position = new GraphQLObjectType({
+    name: 'Position',
+    fields: () => ({
+        horizontalAlignment: {
+            type: new GraphQLNonNull(HorizontalAlignment)
+        },
+        verticalAlignment: {
+            type: new GraphQLNonNull(VerticalAlignment)
+        }
+    })
+})
+
+const HorizontalAlignment = new GraphQLUnionType({
+    name: 'HorizontalAlignment',
+    types: () => [HorizontalAlignmentCenter, HorizontalAlignmentLeft, HorizontalAlignmentRight, HorizontalAlignmentFill],
+    resolveType: data => {
+        switch (data['__typename']) {
+            case 'HorizontalAlignmentCenter':
+                return HorizontalAlignmentCenter
+            case 'HorizontalAlignmentLeft':
+                return HorizontalAlignmentLeft
+            case 'HorizontalAlignmentRight':
+                return HorizontalAlignmentRight
+            case 'HorizontalAlignmentFill':
+                return HorizontalAlignmentFill
+        }
+    }
+})
+
+const HorizontalAlignmentCenter = new GraphQLObjectType({
+    name: 'HorizontalAlignmentCenter',
+    fields: () => ({
+        offset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        width: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        }
+    })
+})
+
+const HorizontalAlignmentLeft = new GraphQLObjectType({
+    name: 'HorizontalAlignmentLeft',
+    fields: () => ({
+        offset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        width: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        }
+    })
+})
+
+const HorizontalAlignmentRight = new GraphQLObjectType({
+    name: 'HorizontalAlignmentRight',
+    fields: () => ({
+        offset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        width: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        }
+    })
+})
+
+const HorizontalAlignmentFill = new GraphQLObjectType({
+    name: 'HorizontalAlignmentFill',
+    fields: () => ({
+        leftOffset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        rightOffset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        }
+    })
+})
+
+const VerticalAlignment = new GraphQLUnionType({
+    name: 'VerticalAlignment',
+    types: () => [VerticalAlignmentBottom, VerticalAlignmentMiddle, VerticalAlignmentFill, VerticalAlignmentStacked, VerticalAlignmentTop],
+    resolveType: data => {
+        switch (data['__typename']) {
+            case 'VerticalAlignmentBottom':
+                return VerticalAlignmentBottom
+            case 'VerticalAlignmentMiddle':
+                return VerticalAlignmentMiddle
+            case 'VerticalAlignmentFill':
+                return VerticalAlignmentFill
+            case 'VerticalAlignmentStacked':
+                return VerticalAlignmentStacked
+            case 'VerticalAlignmentTop':
+                return VerticalAlignmentTop
+        }
+    }
+})
+
+const VerticalAlignmentBottom = new GraphQLObjectType({
+    name: 'VerticalAlignmentBottom',
+    fields: () => ({
+        offset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        height: {
+            type: new GraphQLNonNull(Height)
+        }
+    })
+})
+
+const VerticalAlignmentMiddle = new GraphQLObjectType({
+    name: 'VerticalAlignmentMiddle',
+    fields: () => ({
+        offset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        height: {
+            type: new GraphQLNonNull(Height)
+        }
+    })
+})
+
+const VerticalAlignmentFill = new GraphQLObjectType({
+    name: 'VerticalAlignmentFill',
+    fields: () => ({
+        topOffset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        bottomOffset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        }
+    })
+})
+
+const VerticalAlignmentStacked = new GraphQLObjectType({
+    name: 'VerticalAlignmentStacked',
+    fields: () => ({
+        topOffset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        bottomOffset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        height: {
+            type: new GraphQLNonNull(Height)
+        }
+    })
+})
+
+const VerticalAlignmentTop = new GraphQLObjectType({
+    name: 'VerticalAlignmentTop',
+    fields: () => ({
+        offset: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        height: {
+            type: new GraphQLNonNull(Height)
+        }
+    })
+})
+
+export const RectangleBlock = new GraphQLObjectType({
+    name: 'RectangleBlock',
+    interfaces: () => [Block],
+    fields: () => ({
+        action: {
+            type: BlockAction
+        },
+        background: {
+            type: new GraphQLNonNull(Background)
+        },
+        border: {
+            type: new GraphQLNonNull(Border)
+        },
+        id: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        insets: {
+            type: new GraphQLNonNull(Insets)
+        },
+        opacity: {
+            type: new GraphQLNonNull(GraphQLFloat)
+        },
+        position: {
+            type: new GraphQLNonNull(Position)
+        },
+        keys: {
+            type: new GraphQLNonNull(GraphQLJSON)
+        },
+        tags: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
+        }
+    })
+})
+
+const Row = new GraphQLObjectType({
+    name: 'Row',
+    fields: () => ({
+        background: {
+            type: new GraphQLNonNull(Background)
+        },
+        blocks: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Block)))
+        },
+        height: {
+            type: new GraphQLNonNull(Height)
+        },
+        id: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        keys: {
+            type: new GraphQLNonNull(GraphQLJSON)
+        },
+        tags: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
+        }
+    })
+})
+
+const Screen = new GraphQLObjectType({
+    name: 'Screen',
+    fields: () => ({
+        background: {
+            type: new GraphQLNonNull(Background)
+        },
+        id: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        isStretchyHeaderEnabled: {
+            type: new GraphQLNonNull(GraphQLBoolean)
+        },
+        rows: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Row)))
+        },
+        statusBar: {
+            type: new GraphQLNonNull(StatusBar)
+        },
+        titleBar: {
+            type: new GraphQLNonNull(TitleBar)
+        },
+        keys: {
+            type: new GraphQLNonNull(GraphQLJSON)
+        },
+        tags: {
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
+        }
+    })
+})
+
+const StatusBar = new GraphQLObjectType({
+    name: 'StatusBar',
+    fields: () => ({
+        style: {
+            type: new GraphQLNonNull(StatusBarStyle)
+        },
+        color: {
+            type: new GraphQLNonNull(Color)
+        }
+    })
+})
+
+const StatusBarStyle = new GraphQLEnumType({
+    name: 'StatusBarStyle',
+    values: {
+        DARK: {
+            value: 'dark'
+        },
+        LIGHT: {
+            value: 'light'
+        }
+    }
+})
+
+const TitleBar = new GraphQLObjectType({
+    name: 'TitleBar',
+    fields: () => ({
+        backgroundColor: {
+            type: new GraphQLNonNull(Color)
+        },
+        buttons: {
+            type: new GraphQLNonNull(TitleBarButtons)
+        },
+        buttonColor: {
+            type: new GraphQLNonNull(Color)
+        },
+        text: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        textColor: {
+            type: new GraphQLNonNull(Color)
+        },
+        useDefaultStyle: {
+            type: new GraphQLNonNull(GraphQLBoolean)
+        }
+    })
+})
+
+const TitleBarButtons = new GraphQLEnumType({
+    name: 'TitleBarButtons',
+    values: {
+        CLOSE: {
+            value: 'close'
+        },
+        BACK: {
+            value: 'back'
+        },
+        BOTH: {
+            value: 'both'
+        }
+    }
+})
+
+const Text = new GraphQLObjectType({
+    name: 'Text',
+    fields: () => ({
+        rawValue: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        alignment: {
+            type: new GraphQLNonNull(TextAlignment)
+        },
+        color: {
+            type: new GraphQLNonNull(Color)
+        },
+        font: {
+            type: new GraphQLNonNull(Font)
+        }
+    })
+})
+
+const TextAlignment = new GraphQLEnumType({
+    name: 'TextAlignment',
+    values: {
+        LEFT: {
+            value: 'left'
+        },
+        RIGHT: {
+            value: 'right'
+        },
+        CENTER: {
+            value: 'center'
+        }
+    }
 })
 
 const Font = new GraphQLObjectType({
@@ -355,428 +808,24 @@ const FontWeight = new GraphQLEnumType({
     }
 })
 
-const HorizontalAlignment = new GraphQLEnumType({
-    name: 'HorizontalAlignment',
-    values: {
-        LEFT: {
-            value: 'left'
-        },
-        RIGHT: {
-            value: 'right'
-        },
-        CENTER: {
-            value: 'center'
-        },
-        FILL: {
-            value: 'fill'
-        },
-    }
-})
-
-const Image = new GraphQLObjectType({
-    name: 'Image',
-    fields: () => ({
-        height: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        isURLOptimizationEnabled: {
-            type: new GraphQLNonNull(GraphQLBoolean)
-        },
-        name: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        size: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        width: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        url: {
-            type: new GraphQLNonNull(GraphQLString)
-        }
-    })
-})
-
-export const ImageBlock = new GraphQLObjectType({
-    name: 'ImageBlock',
-    fields: () => ({
-        action: {
-            type: Action
-        },
-        autoHeight: {
-            type: new GraphQLNonNull(GraphQLBoolean)
-        },
-        backgroundColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        backgroundContentMode: {
-            type: new GraphQLNonNull(BackgroundContentMode)
-        },
-        backgroundImage: {
-            type: Image
-        },
-        backgroundScale: {
-            type: new GraphQLNonNull(BackgroundScale)
-        },
-        borderColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        borderRadius: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        borderWidth: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        height: {
-            type: new GraphQLNonNull(Length)
-        },
-        horizontalAlignment: {
-            type: new GraphQLNonNull(HorizontalAlignment)
-        },
-        id: {
-            type: new GraphQLNonNull(GraphQLID)
-        },
-        image: {
-            type: Image
-        },
-        insets: {
-            type: new GraphQLNonNull(Insets)
-        },
-        offsets: {
-            type: new GraphQLNonNull(Offsets)
-        },
-        opacity: {
-            type: new GraphQLNonNull(GraphQLFloat)
-        },
-        position: {
-            type: new GraphQLNonNull(Position)
-        },
-        verticalAlignment: {
-            type: new GraphQLNonNull(VerticalAlignment)
-        },
-        width: {
-            type: Length
-        },
-        keys: {
-            type: new GraphQLNonNull(GraphQLJSON)
-        },
-        tags: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
-        }
-    })
-})
-
-const Insets = new GraphQLObjectType({
-    name: 'Insets',
-    fields: () => ({
-        bottom: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        left: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        right: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        top: {
-            type: new GraphQLNonNull(GraphQLInt)
-        }
-    })
-})
-
-const Length = new GraphQLObjectType({
-    name: 'Length',
-    fields: () => ({
-        unit: {
-            type: new GraphQLNonNull(Unit)
-        },
-        value: {
-            type: new GraphQLNonNull(GraphQLFloat)
-        }
-    })
-})
-
-const LockStatus = new GraphQLEnumType({
-    name: 'LockStatus',
-    values: {
-        UNLOCKED: {
-            value: 'unlocked'
-        },
-        PARTIAL: {
-            value: 'partial'
-        },
-        LOCKED: {
-            value: 'locked'
-        }
-    }
-})
-
-const Offsets = new GraphQLObjectType({
-    name: 'Offsets',
-    fields: () => ({
-        bottom: {
-            type: new GraphQLNonNull(Length)
-        },
-        center: {
-            type: new GraphQLNonNull(Length)
-        },
-        left: {
-            type: new GraphQLNonNull(Length)
-        },
-        middle: {
-            type: new GraphQLNonNull(Length)
-        },
-        right: {
-            type: new GraphQLNonNull(Length)
-        },
-        top: {
-            type: new GraphQLNonNull(Length)
-        }
-    })
-})
-
-const Position = new GraphQLEnumType({
-    name: 'Position',
-    values: {
-        STACKED: {
-            value: 'stacked'
-        },
-        FLOATING: {
-            value: 'floating'
-        }
-    }
-})
-
-export const RectangleBlock = new GraphQLObjectType({
-    name: 'RectangleBlock',
-    fields: () => ({
-        action: {
-            type: Action
-        },
-        autoHeight: {
-            type: new GraphQLNonNull(GraphQLBoolean)
-        },
-        backgroundColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        backgroundContentMode: {
-            type: new GraphQLNonNull(BackgroundContentMode)
-        },
-        backgroundImage: {
-            type: Image
-        },
-        backgroundScale: {
-            type: new GraphQLNonNull(BackgroundScale)
-        },
-        borderColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        borderRadius: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        borderWidth: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        height: {
-            type: new GraphQLNonNull(Length)
-        },
-        horizontalAlignment: {
-            type: new GraphQLNonNull(HorizontalAlignment)
-        },
-        id: {
-            type: new GraphQLNonNull(GraphQLID)
-        },
-        insets: {
-            type: new GraphQLNonNull(Insets)
-        },
-        offsets: {
-            type: new GraphQLNonNull(Offsets)
-        },
-        opacity: {
-            type: new GraphQLNonNull(GraphQLFloat)
-        },
-        position: {
-            type: new GraphQLNonNull(Position)
-        },
-        verticalAlignment: {
-            type: new GraphQLNonNull(VerticalAlignment)
-        },
-        width: {
-            type: Length
-        },
-        keys: {
-            type: new GraphQLNonNull(GraphQLJSON)
-        },
-        tags: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
-        }
-    })
-})
-
-const Row = new GraphQLObjectType({
-    name: 'Row',
-    fields: () => ({
-        autoHeight: {
-            type: new GraphQLNonNull(GraphQLBoolean)
-        },
-        backgroundColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        backgroundContentMode: {
-            type: new GraphQLNonNull(BackgroundContentMode)
-        },
-        backgroundImage: {
-            type: Image
-        },
-        backgroundScale: {
-            type: new GraphQLNonNull(BackgroundScale)
-        },
-        blocks: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Block)))
-        },
-        height: {
-            type: new GraphQLNonNull(Length)
-        },
-        id: {
-            type: new GraphQLNonNull(GraphQLID)
-        },
-        keys: {
-            type: new GraphQLNonNull(GraphQLJSON)
-        },
-        tags: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
-        }
-    })
-})
-
-const Screen = new GraphQLObjectType({
-    name: 'Screen',
-    fields: () => ({
-        backgroundColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        backgroundContentMode: {
-            type: new GraphQLNonNull(BackgroundContentMode)
-        },
-        backgroundImage: {
-            type: Image
-        },
-        backgroundScale: {
-            type: new GraphQLNonNull(BackgroundScale)
-        },
-        id: {
-            type: new GraphQLNonNull(GraphQLID)
-        },
-        isStretchyHeaderEnabled: {
-            type: new GraphQLNonNull(GraphQLBoolean)
-        },
-        rows: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Row)))
-        },
-        statusBarStyle: {
-            type: new GraphQLNonNull(StatusBarStyle)
-        },
-        statusBarColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        titleBarBackgroundColor: {
-            type: Color
-        },
-        titleBarButtons: {
-            type: TitleBarButtons
-        },
-        titleBarButtonColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        titleBarText: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        titleBarTextColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        useDefaultTitleBarStyle: {
-            type: new GraphQLNonNull(GraphQLBoolean)
-        },
-        keys: {
-            type: new GraphQLNonNull(GraphQLJSON)
-        },
-        tags: {
-            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))
-        }
-    })
-})
-
-const StatusBarStyle = new GraphQLEnumType({
-    name: 'StatusBarStyle',
-    values: {
-        DARK: {
-            value: 'dark'
-        },
-        LIGHT: {
-            value: 'light'
-        }
-    }
-})
-
-const TextAlignment = new GraphQLEnumType({
-    name: 'TextAlignment',
-    values: {
-        LEFT: {
-            value: 'left'
-        },
-        RIGHT: {
-            value: 'right'
-        },
-        CENTER: {
-            value: 'center'
-        }
-    }
-})
-
 export const TextBlock = new GraphQLObjectType({
     name: 'TextBlock',
+    interfaces: () => [Block],
     fields: () => ({
         action: {
-            type: Action
+            type: BlockAction
         },
-        autoHeight: {
-            type: new GraphQLNonNull(GraphQLBoolean)
+        background: {
+            type: new GraphQLNonNull(Background)
         },
-        backgroundColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        backgroundContentMode: {
-            type: new GraphQLNonNull(BackgroundContentMode)
-        },
-        backgroundImage: {
-            type: Image
-        },
-        backgroundScale: {
-            type: new GraphQLNonNull(BackgroundScale)
-        },
-        borderColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        borderRadius: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        borderWidth: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        height: {
-            type: new GraphQLNonNull(Length)
-        },
-        horizontalAlignment: {
-            type: new GraphQLNonNull(HorizontalAlignment)
+        border: {
+            type: new GraphQLNonNull(Border)
         },
         id: {
             type: new GraphQLNonNull(GraphQLID)
         },
         insets: {
             type: new GraphQLNonNull(Insets)
-        },
-        offsets: {
-            type: new GraphQLNonNull(Offsets)
         },
         opacity: {
             type: new GraphQLNonNull(GraphQLFloat)
@@ -785,22 +834,7 @@ export const TextBlock = new GraphQLObjectType({
             type: new GraphQLNonNull(Position)
         },
         text: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        textAlignment: {
-            type: new GraphQLNonNull(TextAlignment)
-        },
-        textColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        textFont: {
-            type: new GraphQLNonNull(Font)
-        },
-        verticalAlignment: {
-            type: new GraphQLNonNull(VerticalAlignment)
-        },
-        width: {
-            type: Length
+            type: new GraphQLNonNull(Text)
         },
         keys: {
             type: new GraphQLNonNull(GraphQLJSON)
@@ -811,86 +845,30 @@ export const TextBlock = new GraphQLObjectType({
     })
 })
 
-const TitleBarButtons = new GraphQLEnumType({
-    name: 'TitleBarButtons',
-    values: {
-        CLOSE: {
-            value: 'close'
+export const WebView = new GraphQLObjectType({
+    name: 'WebView',
+    fields: () => ({
+        isScrollingEnabled: {
+            type: new GraphQLNonNull(GraphQLBoolean)
         },
-        BACK: {
-            value: 'back'
-        },
-        BOTH: {
-            value: 'both'
+        url: {
+            type: new GraphQLNonNull(GraphQLString)
         }
-    }
-})
-
-const Unit = new GraphQLEnumType({
-    name: 'Unit',
-    values: {
-        POINTS: {
-            value: 'points'
-        },
-        PERCENTAGE: {
-            value: 'percentage'
-        }
-    }
-})
-
-const VerticalAlignment = new GraphQLEnumType({
-    name: 'VerticalAlignment',
-    values: {
-        TOP: {
-            value: 'top'
-        },
-        BOTTOM: {
-            value: 'bottom'
-        },
-        MIDDLE: {
-            value: 'middle'
-        },
-        FILL: {
-            value: 'fill'
-        },
-    }
+    })
 })
 
 export const WebViewBlock = new GraphQLObjectType({
     name: 'WebViewBlock',
+    interfaces: () => [Block],
     fields: () => ({
         action: {
-            type: Action
+            type: BlockAction
         },
-        autoHeight: {
-            type: new GraphQLNonNull(GraphQLBoolean)
+        background: {
+            type: new GraphQLNonNull(Background)
         },
-        backgroundColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        backgroundContentMode: {
-            type: new GraphQLNonNull(BackgroundContentMode)
-        },
-        backgroundImage: {
-            type: Image
-        },
-        backgroundScale: {
-            type: new GraphQLNonNull(BackgroundScale)
-        },
-        borderColor: {
-            type: new GraphQLNonNull(Color)
-        },
-        borderRadius: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        borderWidth: {
-            type: new GraphQLNonNull(GraphQLInt)
-        },
-        height: {
-            type: new GraphQLNonNull(Length)
-        },
-        horizontalAlignment: {
-            type: new GraphQLNonNull(HorizontalAlignment)
+        border: {
+            type: new GraphQLNonNull(Border)
         },
         id: {
             type: new GraphQLNonNull(GraphQLID)
@@ -898,26 +876,14 @@ export const WebViewBlock = new GraphQLObjectType({
         insets: {
             type: new GraphQLNonNull(Insets)
         },
-        isScrollingEnabled: {
-            type: new GraphQLNonNull(GraphQLBoolean)
-        },
-        offsets: {
-            type: new GraphQLNonNull(Offsets)
-        },
         opacity: {
             type: new GraphQLNonNull(GraphQLFloat)
         },
         position: {
             type: new GraphQLNonNull(Position)
         },
-        url: {
-            type: GraphQLString
-        },
-        verticalAlignment: {
-            type: new GraphQLNonNull(VerticalAlignment)
-        },
-        width: {
-            type: Length
+        webView: {
+            type: new GraphQLNonNull(WebView)
         },
         keys: {
             type: new GraphQLNonNull(GraphQLJSON)
@@ -927,4 +893,5 @@ export const WebViewBlock = new GraphQLObjectType({
         }
     })
 })
+
 export default Experience

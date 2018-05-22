@@ -1,0 +1,166 @@
+fragment experienceFields on Experience {
+    campaignID
+    homeScreenID
+    id
+    screens {
+        background {
+            ...backgroundFields
+        }
+        id
+        isStretchyHeaderEnabled
+        rows {
+            background {
+                ...backgroundFields
+            }
+            blocks {
+                __typename
+                action {
+                    __typename
+                    ... on GoToScreenAction {
+                        screenID
+                    }
+                    ... on OpenURLAction {
+                        url
+                    }
+                    ... on PresentExperienceAction {
+                        campaignID
+                    }
+                    ... on PresentWebsiteAction {
+                        url
+                    }
+                }
+                background {
+                    ...backgroundFields
+                }
+                border {
+                    color {
+                        ...colorFields
+                    }
+                    radius
+                    width
+                }
+                id
+                insets {
+                    bottom
+                    left
+                    right
+                    top
+                }
+                opacity
+                position {
+                    horizontalAlignment {
+                        __typename
+                        ... on HorizontalAlignmentCenter {
+                            offset
+                            width
+                        }
+                        ... on HorizontalAlignmentLeft {
+                            offset
+                            width
+                        }
+                        ... on HorizontalAlignmentRight {
+                            offset
+                            width
+                        }
+                        ... on HorizontalAlignmentFill {
+                            leftOffset
+                            rightOffset
+                        }
+                    }
+                    verticalAlignment {
+                        __typename
+                       ... on VerticalAlignmentBottom {
+                            offset
+                            height {
+                                ...heightFields
+                            }
+                        }
+                        ... on VerticalAlignmentMiddle {
+                            offset
+                            height {
+                                ...heightFields
+                            }
+                        }
+                        ... on VerticalAlignmentFill {
+                            topOffset
+                            bottomOffset
+                        }
+                        ... on VerticalAlignmentStacked {
+                            topOffset
+                            bottomOffset
+                            height {
+                                ...heightFields
+                            }
+                        }
+                        ... on VerticalAlignmentTop {
+                            offset
+                            height {
+                                ...heightFields
+                            }
+                        }
+                    }
+                }
+                keys
+                tags
+                ... on BarcodeBlock {
+                    barcode {
+                        scale
+                        text
+                        format
+                    }
+                }
+                ... on ButtonBlock {
+                    text {
+                        ...textFields
+                    }
+                }
+                ... on ImageBlock {
+                    image {
+                        ...imageFields
+                    }
+                }
+                ... on TextBlock {
+                    text {
+                        ...textFields
+                    }
+                }
+                ... on WebViewBlock {
+                    webView {
+                        isScrollingEnabled
+                        url
+                    }
+                }
+            }
+            height {
+                ...heightFields
+            }
+            id
+            keys
+            tags
+        }
+        statusBar {
+            style
+            color {
+                ...colorFields
+            }
+        }
+        titleBar {
+            backgroundColor {
+                ...colorFields
+            }
+            buttons
+            buttonColor {
+                ...colorFields
+            }
+            text
+            textColor {
+                ...colorFields
+            }
+            useDefaultStyle
+        }
+        keys
+        tags
+    }
+    keys
+    tags
+}

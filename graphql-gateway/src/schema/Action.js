@@ -62,6 +62,17 @@ export const PresentExperienceAction = new GraphQLObjectType({
     })
 })
 
+export const PresentNotificationCenterAction = new GraphQLObjectType({
+    name: 'PresentNotificationCenterAction',
+    fields: () => ({ 
+        placeholder: {
+            type: new GraphQLNonNull(GraphQLString),
+            description: 'This property should not be used. It is simply a placeholder because GraphQL does not permit types without any fields.',
+            resolve: () => 'placeholder'
+        }
+    })
+})
+
 export const PresentWebsiteAction = new GraphQLObjectType({
     name: 'PresentWebsiteAction',
     fields: () => ({

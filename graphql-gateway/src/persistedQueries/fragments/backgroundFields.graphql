@@ -1,0 +1,10 @@
+fragment backgroundFields on Background {
+    color {
+        ...colorFields
+    }
+    contentMode
+    image {
+        ...imageFields
+    }
+    scale
+}

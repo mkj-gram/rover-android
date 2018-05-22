@@ -1,0 +1,6 @@
+fragment colorFields on Color {
+    red
+    green
+    blue
+    alpha
+}

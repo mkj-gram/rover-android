@@ -1,0 +1,11 @@
+fragment textFields on Text {
+    rawValue
+    alignment
+    color {
+        ...colorFields
+    }
+    font {
+        size
+        weight
+    }
+}
