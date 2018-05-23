@@ -48,7 +48,7 @@ const fetchExperience = (identifier, accountToken) => {
         }
 
         const options = {
-            url: `${baseUrl}/v1/experiences/${identifier}`,
+            url: `${baseUrl}/v1/experiences/${identifier}/current`,
             headers: {
                 accept: 'application/json',
                 'x-rover-api-key': accountToken
