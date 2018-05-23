@@ -32,16 +32,9 @@ const DeviceTransitionContainer: React.SFC<
     triggeredAnimation
 }) => {
     const Fragment = React.Fragment
-
-    let overviewContainerAnimation
-    if (triggeredAnimation === 'duplicate') {
-        overviewContainerAnimation = ''
-    } else {
-        overviewContainerAnimation =
-            displayOverviewModal === 'open' ? 'fade' : 'fadeOut'
-    }
-
-    const overviewAnimationTime = triggeredAnimation === 'duplicate' ? 250 : 500
+    const overviewContainerAnimation =
+        triggeredAnimation === 'duplicate' ? '' : displayOverviewModal
+    const overviewAnimationTime = 350
 
     if (device === 'Desktop') {
         return (
@@ -52,7 +45,7 @@ const DeviceTransitionContainer: React.SFC<
                     backgroundColor: cloud,
                     display: 'flex',
                     overflow: 'hidden',
-                    animation: `${overviewContainerAnimation} 600ms ease`,
+                    animation: `${overviewContainerAnimation} 350ms ease-out`,
                     position: 'absolute',
                     zIndex: 2
                 }}
@@ -63,7 +56,7 @@ const DeviceTransitionContainer: React.SFC<
                 >
                     <div
                         style={{
-                            animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease`,
+                            animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease-out`,
                             display:
                                 displayOverviewModal !== 'closed'
                                     ? 'flex'
@@ -121,7 +114,7 @@ const DeviceTransitionContainer: React.SFC<
                     width: '100%',
                     display:
                         displayOverviewModal !== 'closed' ? 'flex' : 'none',
-                    animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease`,
+                    animation: `${displayOverviewModal} ${overviewAnimationTime}ms ease-out`,
                     minWidth: 0
                 }}
                 id="mainModalLeft"

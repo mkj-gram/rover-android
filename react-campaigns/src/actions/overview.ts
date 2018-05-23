@@ -30,7 +30,7 @@ export const handleCloseOverviewModalDisplay: ActionCreator<
     })
     setTimeout(() => {
         history.push(path)
-    }, 500)
+    }, 325)
 }
 
 export const handleSendTestModalDisplay: ActionCreator<

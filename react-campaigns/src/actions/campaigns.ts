@@ -510,7 +510,7 @@ export const duplicateCampaign: ActionCreator<
             type: 'CLOSED_OVERVIEW_MODAL'
         })
         closed = true
-    }, 250)
+    }, 350)
 
     return Environment(request).then(
         ({ data, errors }) => {
@@ -525,7 +525,7 @@ export const duplicateCampaign: ActionCreator<
                             type: 'OPEN_OVERVIEW_MODAL'
                         })
                         return resolve()
-                    }, !closed ? 250 : 0)
+                    }, !closed ? 350 : 0)
                     setTimeout(() => {
                         dispatch({ type: 'DISMISS_FAILURE' })
                     }, 4000)
@@ -544,7 +544,7 @@ export const duplicateCampaign: ActionCreator<
                             type: 'OPEN_OVERVIEW_MODAL'
                         })
                         return resolve()
-                    }, !closed ? 250 : 0)
+                    }, !closed ? 350 : 0)
                 }).then(result => {
                     dispatch({
                         type: 'DUPLICATE_CAMPAIGN_SUCCESS',
@@ -565,7 +565,7 @@ export const duplicateCampaign: ActionCreator<
                         type: 'OPEN_OVERVIEW_MODAL'
                     })
                     return resolve()
-                }, !closed ? 250 : 0)
+                }, !closed ? 350 : 0)
                 setTimeout(() => {
                     dispatch({ type: 'DISMISS_FAILURE' })
                 }, 4000)
@@ -606,7 +606,7 @@ export const archiveCampaign: ActionCreator<
             type: 'CLOSED_OVERVIEW_MODAL'
         })
         closed = true
-    }, 500)
+    }, 350)
 
     return Environment(request).then(
         ({ data, errors }) => {
@@ -620,7 +620,7 @@ export const archiveCampaign: ActionCreator<
                         dispatch({
                             type: 'OPEN_OVERVIEW_MODAL'
                         })
-                    }, !closed ? 400 : 0)
+                    }, !closed ? 300 : 0)
                     setTimeout(() => {
                         dispatch({ type: 'DISMISS_FAILURE' })
                         return resolve()
@@ -641,7 +641,7 @@ export const archiveCampaign: ActionCreator<
                             campaigns
                         })
                         return resolve()
-                    }, !closed ? 400 : 0)
+                    }, !closed ? 300 : 0)
                 }).then(res => Promise.resolve(true))
             }
         },
@@ -656,7 +656,7 @@ export const archiveCampaign: ActionCreator<
                         type: 'OPEN_OVERVIEW_MODAL'
                     })
                     return resolve()
-                }, !closed ? 400 : 0)
+                }, !closed ? 300 : 0)
                 setTimeout(() => {
                     dispatch({ type: 'DISMISS_FAILURE' })
                 }, 4000)
