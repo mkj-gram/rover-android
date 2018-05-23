@@ -704,7 +704,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                         placement="right"
                                         toggle={this.toggle2}
                                         targetParent="root"
-                                        targetId="target5"
                                         navBarProperties={{
                                             buttonLeft: 'Button',
                                             title: 'Title',
@@ -782,7 +781,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                         }}
                                         toggleable={false}
                                         targetParent="root"
-                                        targetId="target4"
                                     >
                                         <div
                                             style={{
@@ -848,7 +846,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                             border: titanium
                                         }}
                                         toggleable={true}
-                                        targetId="target1"
                                         targetParent="root"
                                     >
                                         <div
@@ -898,7 +895,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                             border: red
                                         }}
                                         toggleable={true}
-                                        targetId="target2"
                                         targetParent="root"
                                     >
                                         <div
@@ -952,7 +948,6 @@ storiesOf('Popover', module).add('various cases', () => {
                                             border: red
                                         }}
                                         toggleable={true}
-                                        targetId="target3"
                                         targetParent="root"
                                     >
                                         <div

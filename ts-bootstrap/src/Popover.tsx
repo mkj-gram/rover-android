@@ -18,7 +18,6 @@ export interface PopoverProps extends InjectedProps {
     navBarProperties?: StringMap<string | number | object | func>
 
     toggleable?: boolean
-    targetId?: string
     targetParent?: string
 }
 
@@ -32,12 +31,10 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
         },
         toggleable: true
     }
-    private wrapperRef: HTMLDivElement = undefined
 
     constructor(props: PopoverProps) {
         super(props)
         this.handleClickOutside = this.handleClickOutside.bind(this)
-        this.setWrapperRef = this.setWrapperRef.bind(this)
         this.evalChild = this.evalChild.bind(this)
         this.getElement = this.getElement.bind(this)
         this.handleKeyPress = this.handleKeyPress.bind(this)
@@ -180,19 +177,8 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
         return val
     }
 
-    setWrapperRef(node: HTMLDivElement) {
-        this.wrapperRef = node
-    }
-
     handleClickOutside(e: MouseEvent) {
-        if (
-            this.wrapperRef &&
-            !this.wrapperRef.contains(e.target as HTMLElement) &&
-            !document
-                .getElementById(this.props.targetId)
-                .contains(e.target as HTMLElement) &&
-            this.props.toggleable
-        ) {
+        if ((e.target as HTMLElement).id === 'popover-overlay') {
             e.preventDefault()
             this.props.toggle()
         }
@@ -213,9 +199,9 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
                     top: 0,
                     backgroundColor: 'rgba(0,0,0,0.02)'
                 }}
+                id="popover-overlay"
             >
-                <div ref={this.setWrapperRef}>
-                    <style type="text/css">{`
+                <style type="text/css">{`
                     .popper {                                            
                         background: ${white};
                         border: 1px solid ${titanium};
@@ -307,42 +293,38 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
                     }
                     
                 `}</style>
-                    <Popper placement={placement}>
-                        {({ ref, style, arrowProps }) => (
+                <Popper placement={placement}>
+                    {({ ref, style, arrowProps }) => (
+                        <div
+                            className="popper"
+                            ref={ref}
+                            data-placement={placement}
+                            style={{
+                                ...style
+                            }}
+                        >
+                            {this.evalChild()}
+                            {this.props.children}
                             <div
-                                className="popper"
-                                ref={ref}
-                                data-placement={placement}
-                                style={{
-                                    ...style
-                                }}
-                            >
-                                {this.evalChild()}
-                                {this.props.children}
-                                <div
-                                    className="popper__arrow"
-                                    ref={arrowProps.ref}
-                                    style={arrowProps.style}
-                                />
-                            </div>
-                        )}
-                    </Popper>
-                </div>
+                                className="popper__arrow"
+                                ref={arrowProps.ref}
+                                style={arrowProps.style}
+                            />
+                        </div>
+                    )}
+                </Popper>
             </div>
         )
-
         return ReactDOM.createPortal(
             node,
             document.getElementById(targetParent)
         )
     }
 }
-
 const Popover = (props: PopoverProps) => {
     const ResponsivePopoverContainer = ResponsiveContainer(props)(
         PopoverComponent
     )
     return ResponsivePopoverContainer
 }
-
 export default Popover

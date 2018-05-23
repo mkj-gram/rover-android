@@ -43,7 +43,6 @@ class PopoverContainer extends React.Component<PopoverContainerProps, {}> {
                         <Popover
                             {...popoverProps}
                             toggle={onClick}
-                            targetId={id}
                             targetParent={targetParent}
                         >
                             {children[1]}
