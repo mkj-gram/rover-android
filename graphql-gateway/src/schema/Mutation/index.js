@@ -5,6 +5,7 @@ import archiveCampaign from './archiveCampaign'
 import createCampaign from './createCampaign'
 import createSegment from './createSegment'
 import duplicateCampaign from './duplicateCampaign'
+import publishCampaign from './publishCampaign'
 import renameCampaign from './renameCampaign'
 import sendTestCampaign from './sendTestCampaign'
 import trackEvents from './trackEvents'
@@ -22,6 +23,7 @@ const Mutation = new GraphQLObjectType({
         createCampaign,
         createSegment,
         duplicateCampaign,
+        publishCampaign,
         renameCampaign,
         sendTestCampaign,
         trackEvents,
