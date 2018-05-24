@@ -20,10 +20,7 @@ const Context = new GraphQLInputObjectType({
         appBuild: {
             type: GraphQLString
         },
-        appName: {
-            type: GraphQLString
-        },
-        appNamespace: {
+        appIdentifier: {
             type: GraphQLString
         },
         appVersion: {

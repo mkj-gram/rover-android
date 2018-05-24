@@ -22,8 +22,12 @@ const trackEvents = {
         for (let i = 0; i < events.length; i++) {
             const event = events[i]
 
-            if (event.context && headers['x-real-ip']) {
-                event.context.ip = ParseIp(headers['x-real-ip'])
+            if (event.context) {
+                if (headers['x-real-ip']) {
+                    event.context.ip = ParseIp(headers['x-real-ip'])
+                }
+
+                event.context.appNamespace = event.context.appIdentifier  
             }
 
             try {
