@@ -14,6 +14,7 @@ import { openWizardModal } from '../../../actions'
 export interface StateProps {
     currentWizard: UIStateType
     notificationProgress: number
+    scheduledDeliveryProgress: number
 }
 
 export interface DispatchProps {
@@ -21,7 +22,6 @@ export interface DispatchProps {
 }
 
 export type OverviewModalBodyContainerProps = {
-    deliveryComplete: number
     device: Media
 }
 
@@ -30,7 +30,7 @@ const OverviewModalBodyContainer: React.SFC<
 > = ({
     notificationProgress,
     currentWizard,
-    deliveryComplete,
+    scheduledDeliveryProgress,
     device,
     openWizardModal
 }) => {
@@ -47,7 +47,7 @@ const OverviewModalBodyContainer: React.SFC<
             text:
                 // tslint:disable-next-line:max-line-length
                 'Determine how and when the notification is delivered as well as which devices/users will receive it.',
-            val: deliveryComplete
+            val: scheduledDeliveryProgress
         },
         {
             name: 'Experience',
@@ -96,7 +96,8 @@ const OverviewModalBodyContainer: React.SFC<
 
 const mapStateToProps = (state: State): StateProps => ({
     currentWizard: getCurrentWizard(state),
-    notificationProgress: getTypeProgress(state, 'notification')
+    notificationProgress: getTypeProgress(state, 'notification'),
+    scheduledDeliveryProgress: getTypeProgress(state, 'scheduleddelivery')
 })
 
 // tslint:disable-next-line:no-any

@@ -80,6 +80,7 @@ class Form extends React.Component<
                 const isPrevValid = getIsStageValid(prev.slice(
                     -1
                 )[0] as keyof editableUIState)
+
                 const typeProgress = getTypeProgress(type)
                 const prevUIState: UIStateField =
                     editableUIState[

@@ -13,8 +13,7 @@ import OverviewModalBodyContainer from './OverviewModalBodyContainer'
 import {
     getCampaign,
     getEditableCampaign,
-    getEditableUIState,
-    getTypeProgress
+    getEditableUIState
 } from '../../../reducers'
 
 import { createEditableCampaign } from '../../../actions'
@@ -37,19 +36,12 @@ export interface DispatchProps {
 
 export type OverviewComponentProps = OwnProps & StateProps & DispatchProps
 
-export interface OverviewComponentState {
-    deliveryProgress: number
-}
-
 class OverviewComponent extends React.Component<
     OverviewComponentProps & RouteComponentProps<Location>,
-    OverviewComponentState
+    {}
 > {
     constructor(props: OverviewComponentProps & RouteComponentProps<Location>) {
         super(props)
-        this.state = {
-            deliveryProgress: 0
-        }
     }
 
     componentWillMount() {
@@ -58,8 +50,6 @@ class OverviewComponent extends React.Component<
     }
 
     render() {
-        const { deliveryProgress } = this.state
-
         const { campaign, device, editableUIState } = this.props
 
         if (campaign !== null) {
@@ -79,10 +69,7 @@ class OverviewComponent extends React.Component<
                         campaignId={campaign.campaignId}
                         device={device}
                     />
-                    <OverviewModalBodyContainer
-                        deliveryComplete={0}
-                        device={device}
-                    />
+                    <OverviewModalBodyContainer device={device} />
 
                     <OverviewModalFooter
                         device={device}

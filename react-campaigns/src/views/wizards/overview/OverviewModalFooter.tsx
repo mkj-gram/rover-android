@@ -42,7 +42,7 @@ export interface DispatchProps {
 }
 
 export interface TestDeviceStateProps {
-    deliveryProgress: number
+    scheduledDeliveryProgress: number
     notificationProgress: number
     testDevices: StringMap<string>
 }
@@ -98,7 +98,7 @@ class OverviewModalFooter extends React.Component<
 
     render() {
         const {
-            deliveryProgress,
+            scheduledDeliveryProgress,
             notificationProgress,
             device,
             publishClick,
@@ -210,7 +210,7 @@ class OverviewModalFooter extends React.Component<
                         size="large"
                         type={
                             notificationProgress === 100 &&
-                            deliveryProgress === 100
+                            scheduledDeliveryProgress === 100
                                 ? 'primary'
                                 : 'disabled'
                         }
@@ -236,7 +236,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
 }
 
 const mapStatetoProps = (state: State): TestDeviceStateProps => ({
-    deliveryProgress: 10,
+    scheduledDeliveryProgress: getTypeProgress(state, 'scheduleddelivery'),
     notificationProgress: getTypeProgress(state, 'notification'),
     testDevices: getTestDevices(state)
 })

@@ -74,13 +74,13 @@ export const getIsStageValid = (
 
 export const getTypeProgress = (state: State, type: UIStateType): number => {
     const { editableUIState } = state
-    const fields = Object.keys(editableUIState)
+    const fields = Object.keys(editableUIState).filter(
+        (field: keyof editableUIState) =>
+            (editableUIState[field] as UIStateField).type === type
+    )
+
     return (
         fields
-            .filter(
-                (field: keyof editableUIState) =>
-                    (editableUIState[field] as UIStateField).type === type
-            )
             .filter(
                 (field: keyof editableUIState) =>
                     (editableUIState[field] as UIStateField).seen
