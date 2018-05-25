@@ -160,7 +160,7 @@ const NotificationAttachmentPicker: React.SFC<
                 activePopover === 'notification-attachment-picker' &&
                 ReactDOM.createPortal(
                     <MobilePopover
-                        child={children[1]}
+                        children={children[1]}
                         animation={isPopoverOpen}
                         navbarProps={{
                             buttonLeftCallback: () => close(),

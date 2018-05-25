@@ -163,7 +163,7 @@ const FormSwitch: React.SFC<
                         {activePopover === activePopoverId &&
                             ReactDOM.createPortal(
                                 <MobilePopover
-                                    child={
+                                    children={
                                         <div
                                             style={{
                                                 margin: 24,

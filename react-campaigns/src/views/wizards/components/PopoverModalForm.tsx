@@ -101,7 +101,7 @@ const PopoverModalForm: React.SFC<
                     field === activePopover
                     ? ReactDOM.createPortal(
                           <MobilePopover
-                              child={clonedPopoverModalChild}
+                              children={clonedPopoverModalChild}
                               animation={isPopoverModalFormOpen}
                               navbarProps={popoverNavbarProps(
                                   handleClosePopoverModal

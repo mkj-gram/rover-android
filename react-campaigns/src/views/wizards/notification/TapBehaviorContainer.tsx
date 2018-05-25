@@ -237,7 +237,7 @@ class TapBehaviorContainer extends React.Component<
                             ReactDOM.createPortal(
                                 <MobilePopover
                                     title="What happens when the notification is tapped?"
-                                    child={child}
+                                    children={child}
                                     onClose={() =>
                                         this.props.closeTapBehaviorSelector()
                                     }

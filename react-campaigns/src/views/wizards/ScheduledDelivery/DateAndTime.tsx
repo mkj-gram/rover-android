@@ -1,35 +1,16 @@
 /// <reference path="../../../../typings/index.d.ts"/>
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
 import { parse } from 'qs'
 import { connect, Dispatch } from 'react-redux'
 
-import {
-    openPopoverModalForm,
-    updateActivePopover,
-    updateEditableCampaign
-} from '../../../actions'
-import {
-    getActivePopover,
-    getIsPopoverModalFormOpen,
-    getEditableCampaign,
-    getEditableUIState,
-    getCampaign
-} from '../../../reducers'
+import { updateEditableCampaign } from '../../../actions'
+import { getEditableCampaign, getCampaign } from '../../../reducers'
 
-import {
-    aquamarine,
-    Button,
-    PopoverContainer,
-    turquoise,
-    Text,
-    RadioButton
-} from '@rover/ts-bootstrap/dist/src'
+import { RadioButton, Switch, Text } from '@rover/ts-bootstrap/dist/src'
 
-import PopoverTextRadioButtonComponent from '../../utils/PopoverTextRadioButtonComponent'
-import MobilePopover from '../components/MobilePopover'
 import FormSection from '../../utils/FormSection'
 import Row from '../components/Row'
+import TimezonePicker from './TimezonePicker'
 
 export interface DateAndTimeProps {
     device: Media
@@ -37,30 +18,17 @@ export interface DateAndTimeProps {
 }
 
 export interface DateAndTimeStateProps {
-    activePopover: string
     editableCampaign: ScheduledCampaign
-    editableUIState: editableUIState
-    isPopoverModalFormOpen: string
     campaign: ScheduledCampaign
 }
 
 export interface DateAndTimeDispatchProps {
-    updateActivePopover: (field: string) => void
     updateEditableCampaign: (x: object) => void
 }
 
 const DateAndTime: React.SFC<
     DateAndTimeProps & DateAndTimeStateProps & DateAndTimeDispatchProps
-> = ({
-    activePopover,
-    device,
-    editableCampaign,
-    editableUIState,
-    isPopoverModalFormOpen,
-    updateActivePopover,
-    updateEditableCampaign,
-    campaign
-}) => {
+> = ({ device, editableCampaign, updateEditableCampaign, campaign }) => {
     const { Fragment } = React
     const {
         scheduledDate,
@@ -68,7 +36,10 @@ const DateAndTime: React.SFC<
         scheduledTimeZone,
         scheduledUseLocalDeviceTime
     } = campaign
-
+    const {
+        scheduledType,
+        scheduledUseLocalDeviceTime: useLocalDeviceTime
+    } = editableCampaign
     return (
         <Fragment>
             {/*Title */}
@@ -95,7 +66,7 @@ const DateAndTime: React.SFC<
                 >
                     <Text text="As soon as it's published" size="large" />
                     <RadioButton
-                        selected={editableCampaign['scheduledType'] === 'NOW'}
+                        selected={scheduledType === 'NOW'}
                         style={{
                             outerStyle: { height: 18, width: 18 }
                         }}
@@ -110,24 +81,42 @@ const DateAndTime: React.SFC<
                 >
                     <Text text="A scheduled date and time" size="large" />
                     <RadioButton
-                        selected={
-                            editableCampaign['scheduledType'] === 'SCHEDULED'
-                        }
+                        selected={scheduledType === 'SCHEDULED'}
                         style={{
                             outerStyle: { height: 18, width: 18 }
                         }}
                     />
                 </Row>
             </FormSection>
+            {scheduledType === 'SCHEDULED' && (
+                <FormSection device={device}>
+                    <Text text="Scheduled the delivery" size="h2" />
+                    <Row
+                        onClick={() =>
+                            updateEditableCampaign({
+                                scheduledUseLocalDeviceTime: !useLocalDeviceTime
+                            })
+                        }
+                    >
+                        <Text text="A scheduled date and time" size="large" />
+                        <Switch
+                            on={useLocalDeviceTime}
+                            onClick={() =>
+                                updateEditableCampaign({
+                                    scheduledUseLocalDeviceTime: !useLocalDeviceTime
+                                })
+                            }
+                        />
+                    </Row>
+                    {useLocalDeviceTime && <TimezonePicker device={device} />}
+                </FormSection>
+            )}
         </Fragment>
     )
 }
 
 const mapStateToProps = (state: State): DateAndTimeStateProps => ({
-    activePopover: getActivePopover(state),
     editableCampaign: getEditableCampaign(state) as ScheduledCampaign,
-    editableUIState: getEditableUIState(state),
-    isPopoverModalFormOpen: getIsPopoverModalFormOpen(state),
     campaign: getCampaign(
         state,
         parse(location.search.substring(1)).campaignId
@@ -139,8 +128,6 @@ const mapDispatchToProps = (
     dispatch: Dispatch<any>
 ): DateAndTimeDispatchProps => {
     return {
-        updateActivePopover: (activePopover: string) =>
-            dispatch(updateActivePopover(activePopover)),
         updateEditableCampaign: (x: object) =>
             dispatch(updateEditableCampaign(x))
     }

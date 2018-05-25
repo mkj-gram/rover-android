@@ -255,7 +255,7 @@ class TapBehaviorBody extends React.Component<
                             ReactDOM.createPortal(
                                 <MobilePopover
                                     title="How should the website be presented?"
-                                    child={child}
+                                    children={child}
                                     onClose={() =>
                                         this.props.closeTapBehaviorWebsitePresentation()
                                     }

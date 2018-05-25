@@ -9,6 +9,7 @@ import PhoneComponent from './PhoneComponent'
 import Popover from './Popover'
 import PopoverContainer from './PopoverContainer'
 import PopoverFormInput from './PopoverFormInput'
+import PopoverSearch from './PopoverSearch'
 import ProgressBar from './ProgressBar'
 import ProgressBarThin from './ProgressBarThin'
 import RadioButton from './RadioButton'
@@ -131,6 +132,7 @@ export {
     Dialog,
     NavBar,
     Popover,
+    PopoverSearch,
     ProgressBar,
     ProgressBarThin,
     RadioButton,

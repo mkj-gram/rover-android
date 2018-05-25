@@ -3,7 +3,7 @@ import * as React from 'react'
 import { NavBar, white, Text, graphite } from '@rover/ts-bootstrap/dist/src'
 
 export interface MobilePopoverProps {
-    child: JSX.Element | JSX.Element[]
+    children: JSX.Element | JSX.Element[]
     onClose?: () => void
     animation: string
     title?: string
@@ -12,7 +12,7 @@ export interface MobilePopoverProps {
 
 const MobilePopover: React.SFC<MobilePopoverProps> = ({
     animation,
-    child,
+    children,
     title,
     onClose,
     navbarProps
@@ -58,7 +58,7 @@ const MobilePopover: React.SFC<MobilePopoverProps> = ({
                     <Text text={title} size="h2" />
                 </div>
             )}
-            {child}
+            {children}
         </div>
     )
 }
