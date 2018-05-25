@@ -20,7 +20,7 @@ export const updateScheduledDeliverySettings: ActionCreator<
             $scheduledTimeZone: String!
             $scheduledUseLocalDeviceTime: Boolean!
             $segmentCondition: SegmentCondition!
-            $segmentIds: [String]!
+            $segmentIds: [String!]!
             $UIState: String!
             $scheduledType: ScheduledType!
         ) {
@@ -103,7 +103,8 @@ export const updateScheduledDeliverySettings: ActionCreator<
             scheduledType,
             scheduledUseLocalDeviceTime,
             segmentCondition,
-            segmentIds
+            segmentIds,
+            UIState: JSON.stringify(editableUIState)
         }
     }
     dispatch({ type: 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_REQUEST' })
