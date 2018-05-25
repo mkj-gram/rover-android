@@ -24,7 +24,9 @@ type (
 	campaign struct {
 		campaigns.Campaign
 
-		SegmentIds pq.StringArray `db:"segment_ids"`
+		SegmentIds    pq.StringArray `db:"segment_ids"`
+		ScheduledDate *time.Time     `db:"scheduled_date"`
+		ScheduledTime *time.Time     `db:"scheduled_time"`
 	}
 
 	ListParams struct {
@@ -44,6 +46,21 @@ func (c *campaign) fromDB() error {
 	if len(c.SegmentIds) > 0 {
 		c.Campaign.SegmentIds = []string(c.SegmentIds)
 	}
+
+	if c.ScheduledDate != nil {
+		var year, month, day = c.ScheduledDate.Date()
+		c.Campaign.ScheduledDate = &campaigns.Date{
+			Year:  int32(year),
+			Month: int32(month),
+			Day:   int32(day),
+		}
+	}
+
+	if c.ScheduledTime != nil {
+		var seconds = int32(c.ScheduledTime.Second() + c.ScheduledTime.Minute()*60 + c.ScheduledTime.Hour()*3600)
+		c.Campaign.ScheduledTime = &seconds
+	}
+
 	return nil
 }
 
@@ -511,14 +528,50 @@ func UpdateScheduledDeliverySettings(dbCtx namedQuerier, ctx context.Context, re
 		now = TimeNow()
 
 		update = struct {
-			*campaigns.UpdateScheduledDeliverySettingsRequest
-			SegmentIds pq.StringArray `db:"segment_ids"`
-			UpdatedAt  time.Time      `db:"updated_at"`
-		}{
-			UpdateScheduledDeliverySettingsRequest: req,
+			AccountId  int32 `db:"account_id"`
+			CampaignId int32 `db:"campaign_id"`
 
-			SegmentIds: pq.StringArray(req.SegmentIds),
-			UpdatedAt:  now,
+			SegmentCondition string         `db:"segment_condition"`
+			SegmentIds       pq.StringArray `db:"segment_ids"`
+
+			UiState string `db:"ui_state"`
+
+			ScheduledType string     `db:"scheduled_type"`
+			ScheduledDate *time.Time `db:"scheduled_date"`
+			ScheduledTime *time.Time `db:"scheduled_time"`
+
+			ScheduledTimeZone           string    `db:"scheduled_time_zone"`
+			ScheduledUseLocalDeviceTime bool      `db:"scheduled_use_local_device_time"`
+			UpdatedAt                   time.Time `db:"updated_at"`
+		}{
+			AccountId:        req.AccountId,
+			CampaignId:       req.CampaignId,
+			SegmentCondition: req.SegmentCondition,
+			SegmentIds:       pq.StringArray(req.SegmentIds),
+			UiState:          req.UiState,
+			ScheduledType:    req.ScheduledType,
+			ScheduledDate: func() *time.Time {
+				if req.ScheduledDate == nil {
+					return nil
+				}
+				var (
+					day   = req.ScheduledDate.Day
+					month = req.ScheduledDate.Month
+					year  = req.ScheduledDate.Year
+				)
+				var date = time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.UTC)
+				return &date
+			}(),
+			ScheduledTime: func() *time.Time {
+				if req.ScheduledTime == nil {
+					return nil
+				}
+				var t = time.Date(0, 0, 0, 0, 0, int(*req.ScheduledTime), 0, time.UTC)
+				return &t
+			}(),
+			ScheduledTimeZone:           req.ScheduledTimeZone,
+			ScheduledUseLocalDeviceTime: req.ScheduledUseLocalDeviceTime,
+			UpdatedAt:                   now,
 		}
 
 		q = `
@@ -532,7 +585,8 @@ func UpdateScheduledDeliverySettings(dbCtx namedQuerier, ctx context.Context, re
 				,segment_condition = :segment_condition
 
 				,scheduled_type                  = :scheduled_type
-				,scheduled_timestamp             = :scheduled_timestamp
+				,scheduled_date					 = :scheduled_date
+				,scheduled_time 				 = :scheduled_time
 				,scheduled_time_zone             = :scheduled_time_zone
 				,scheduled_use_local_device_time = :scheduled_use_local_device_time
 

@@ -65,7 +65,8 @@ INSERT INTO campaigns
 ,notification_alert_option_badge_number
 
 ,scheduled_type
-,scheduled_timestamp
+,scheduled_date
+,scheduled_time
 ,scheduled_time_zone
 ,scheduled_use_local_device_time
 ,scheduled_delivery_status
@@ -141,8 +142,10 @@ INSERT INTO campaigns
 --
 -- ,scheduled_type
 , 'SCHEDULED'
--- ,scheduled_timestamp
-, '2017-05-04T16:26:25.445494'
+-- ,scheduled_date
+, '2017-05-04'::date
+-- ,scheduled_time
+, '18:33:39.493033'::time
 -- ,scheduled_time_zone
 , 'America/Toronto'
 -- ,scheduled_use_local_device_time

@@ -6,6 +6,7 @@ option go_package = "campaigns/v1;campaignspb";
 
 import "auth/v1/auth.proto";
 import "protobuf/predicates.proto";
+import "protobuf/wrappers.proto";
 
 import "google/protobuf/timestamp.proto";
 
@@ -111,6 +112,12 @@ message RateLimit {
     HOUR = 0;
     DAY = 1;
   }
+}
+
+message Date {
+  int32 day   = 1;
+  int32 month = 2;
+  int32 year  = 3;
 }
 
 
@@ -260,12 +267,13 @@ message UpdateScheduledDeliverySettingsRequest{
   string ui_state                                                     = 10;
 
   SegmentCondition.Enum    segment_condition                         = 11;
-  repeated string           segment_ids                               = 12;
+  repeated string          segment_ids                               = 12;
 
-  ScheduledType.Enum       scheduled_type                            = 13;
-  google.protobuf.Timestamp scheduled_timestamp                       = 14;
-  string                    scheduled_time_zone                       = 15;
-  bool                      scheduled_use_local_device_time           = 16;
+  ScheduledType.Enum        scheduled_type                            = 13;
+  Date                      scheduled_date                            = 14;
+  rover.protobuf.Int32Value scheduled_time                            = 15; 
+  string                    scheduled_time_zone                       = 16;
+  bool                      scheduled_use_local_device_time           = 17;
 }
 message UpdateScheduledDeliverySettingsResponse{
   Campaign campaign = 1;
@@ -356,11 +364,12 @@ message ScheduledNotificationCampaign {
   bool                notification_alert_option_notification_center   = 38;
   bool                notification_alert_option_badge_number          = 39;
 
-  ScheduledType.Enum           scheduled_type                        = 40;
-  google.protobuf.Timestamp scheduled_timestamp                       = 41;
-  string                  scheduled_time_zone                         = 42;
-  bool                    scheduled_use_local_device_time             = 43;
-  ScheduledDeliveryStatus.Enum scheduled_delivery_status                   = 44;
+  ScheduledType.Enum        scheduled_type                            = 40;
+  Date                      scheduled_date                            = 41;
+  rover.protobuf.Int32Value scheduled_time                            = 42;
+  string                    scheduled_time_zone                       = 43;
+  bool                      scheduled_use_local_device_time           = 44;
+  ScheduledDeliveryStatus.Enum scheduled_delivery_status              = 45;
 }
 
 message AutomatedNotificationCampaign {

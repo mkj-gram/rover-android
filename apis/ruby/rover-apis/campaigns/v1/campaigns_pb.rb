@@ -5,6 +5,7 @@ require 'google/protobuf'
 
 require 'auth/v1/auth_pb'
 require 'protobuf/predicates_pb'
+require 'protobuf/wrappers_pb'
 require 'google/protobuf/timestamp_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.campaigns.v1.CampaignType" do
@@ -73,6 +74,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_enum "rover.campaigns.v1.RateLimit.Unit" do
     value :HOUR, 0
     value :DAY, 1
+  end
+  add_message "rover.campaigns.v1.Date" do
+    optional :day, :int32, 1
+    optional :month, :int32, 2
+    optional :year, :int32, 3
   end
   add_message "rover.campaigns.v1.Campaign" do
     oneof :campaign do
@@ -176,9 +182,10 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :segment_condition, :enum, 11, "rover.campaigns.v1.SegmentCondition.Enum"
     repeated :segment_ids, :string, 12
     optional :scheduled_type, :enum, 13, "rover.campaigns.v1.ScheduledType.Enum"
-    optional :scheduled_timestamp, :message, 14, "google.protobuf.Timestamp"
-    optional :scheduled_time_zone, :string, 15
-    optional :scheduled_use_local_device_time, :bool, 16
+    optional :scheduled_date, :message, 14, "rover.campaigns.v1.Date"
+    optional :scheduled_time, :message, 15, "rover.protobuf.Int32Value"
+    optional :scheduled_time_zone, :string, 16
+    optional :scheduled_use_local_device_time, :bool, 17
   end
   add_message "rover.campaigns.v1.UpdateScheduledDeliverySettingsResponse" do
     optional :campaign, :message, 1, "rover.campaigns.v1.Campaign"
@@ -241,10 +248,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :notification_alert_option_notification_center, :bool, 38
     optional :notification_alert_option_badge_number, :bool, 39
     optional :scheduled_type, :enum, 40, "rover.campaigns.v1.ScheduledType.Enum"
-    optional :scheduled_timestamp, :message, 41, "google.protobuf.Timestamp"
-    optional :scheduled_time_zone, :string, 42
-    optional :scheduled_use_local_device_time, :bool, 43
-    optional :scheduled_delivery_status, :enum, 44, "rover.campaigns.v1.ScheduledDeliveryStatus.Enum"
+    optional :scheduled_date, :message, 41, "rover.campaigns.v1.Date"
+    optional :scheduled_time, :message, 42, "rover.protobuf.Int32Value"
+    optional :scheduled_time_zone, :string, 43
+    optional :scheduled_use_local_device_time, :bool, 44
+    optional :scheduled_delivery_status, :enum, 45, "rover.campaigns.v1.ScheduledDeliveryStatus.Enum"
   end
   add_message "rover.campaigns.v1.AutomatedNotificationCampaign" do
     optional :campaign_id, :int32, 1
@@ -317,6 +325,7 @@ module Rover
       NotificationAttachmentType::Enum = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.NotificationAttachmentType.Enum").enummodule
       RateLimit = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.RateLimit").msgclass
       RateLimit::Unit = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.RateLimit.Unit").enummodule
+      Date = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.Date").msgclass
       Campaign = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.Campaign").msgclass
       CreateRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CreateRequest").msgclass
       CreateResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CreateResponse").msgclass

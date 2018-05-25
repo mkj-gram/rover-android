@@ -8,6 +8,7 @@ import (
 
 	campaignspb "github.com/roverplatform/rover/apis/go/campaigns/v1"
 	"github.com/roverplatform/rover/apis/go/protobuf/predicates"
+	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
 	"github.com/roverplatform/rover/campaigns"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 )
@@ -84,10 +85,14 @@ func protoToUpdateScheduledDeliverySettingsRequest(req *campaignspb.UpdateSchedu
 	update.UiState = req.UiState
 
 	update.ScheduledType = req.ScheduledType.String()
-	if req.ScheduledTimestamp != nil {
-		t, _ := timestamp.Time(req.ScheduledTimestamp)
-		update.ScheduledTimestamp = &t
+	if req.ScheduledDate != nil {
+		update.ScheduledDate = &campaigns.Date{Day: req.ScheduledDate.Day, Month: req.ScheduledDate.Month, Year: req.ScheduledDate.Year}
 	}
+	if req.ScheduledTime != nil {
+		var t = req.ScheduledTime.GetValue()
+		update.ScheduledTime = &t
+	}
+
 	update.ScheduledTimeZone = req.ScheduledTimeZone
 	update.ScheduledUseLocalDeviceTime = req.ScheduledUseLocalDeviceTime
 
@@ -297,9 +302,15 @@ func campaignToProtoScheduledNotification(c *campaigns.Campaign, proto *campaign
 	proto.NotificationAlertOptionBadgeNumber = c.NotificationAlertOptionBadgeNumber
 
 	proto.ScheduledType = campaignspb.ScheduledType_Enum_FromString(c.ScheduledType)
-	if c.ScheduledTimestamp != nil {
-		// TODO: handle error
-		proto.ScheduledTimestamp, _ = timestamp.TimestampProto(*c.ScheduledTimestamp)
+	if c.ScheduledDate != nil {
+		proto.ScheduledDate = &campaignspb.Date{
+			Year:  c.ScheduledDate.Year,
+			Month: c.ScheduledDate.Month,
+			Day:   c.ScheduledDate.Day,
+		}
+	}
+	if c.ScheduledTime != nil {
+		proto.ScheduledTime = &wrappers.Int32Value{Value: *c.ScheduledTime}
 	}
 	proto.ScheduledTimeZone = c.ScheduledTimeZone
 	proto.ScheduledUseLocalDeviceTime = c.ScheduledUseLocalDeviceTime

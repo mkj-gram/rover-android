@@ -346,10 +346,10 @@ func (s *Server) scheduleTasks(ctx context.Context, tx *db.Tx, c *campaigns.Camp
 	case campaignspb.ScheduledType_NOW:
 		runAt = db.TimeNow()
 	case campaignspb.ScheduledType_SCHEDULED:
-		if c.ScheduledTimestamp == nil {
+		if c.ScheduledTimestamp() == nil {
 			return nil, status.Errorf(codes.InvalidArgument, "validation: ScheduledTimestamp: is required.")
 		}
-		runAt = *c.ScheduledTimestamp
+		runAt = *c.ScheduledTimestamp()
 	default:
 		return nil, status.Errorf(codes.InvalidArgument, "Scheduled Type: unknown: %q(%v)", scheduledType.String(), scheduledType)
 	}
@@ -440,7 +440,6 @@ func (s *Server) UpdateScheduledDeliverySettings(ctx context.Context, req *campa
 		va.Value("account_id", acctId, va.Require),
 		va.Value("campaign_id", req.CampaignId, va.Require),
 		va.Value("scheduled_type", req.ScheduledType, requireScheduledType),
-		va.Value("scheduled_timestamp", req.ScheduledTimestamp, requireTimestampOnScheduled(req)),
 	); err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
 	}
@@ -481,14 +480,14 @@ func (s *Server) UpdateScheduledDeliverySettings(ctx context.Context, req *campa
 				return db.TimeNow(), true
 			case campaignspb.ScheduledType_SCHEDULED:
 				if prev.ScheduledType != update.ScheduledType {
-					return *update.ScheduledTimestamp, true
+					return *update.ScheduledTimestamp(), true
 				}
 
-				if prev.ScheduledTimestamp.Equal(*update.ScheduledTimestamp) {
+				if prev.ScheduledTimestamp().Equal(*update.ScheduledTimestamp()) {
 					return time.Time{}, false
 				}
 
-				return *update.ScheduledTimestamp, true
+				return *update.ScheduledTimestamp(), true
 			default:
 				panic(errors.Errorf("ScheduledType: unknown: %v", update.ScheduledType))
 			}
@@ -504,6 +503,7 @@ func (s *Server) UpdateScheduledDeliverySettings(ctx context.Context, req *campa
 	)
 
 	if isPublished() {
+		// TODO validate a published campaign
 		if useLocalDeviceTimeChanged() {
 			if _ /*n*/, err := tx.ScheduledTasksStore().DeleteByCampaignId(ctx, acctId, int64(req.CampaignId)); err != nil {
 				return nil, status.Errorf(ErrorToStatus(err), "tasks.DeleteByCampaignId: %v", err)
@@ -565,21 +565,6 @@ func requireScheduledType(val interface{}) error {
 		}
 	}
 	return status.Errorf(codes.InvalidArgument, "unexpected value(%T) = %v", val, val)
-}
-
-type validator func(val interface{}) error
-
-func requireTimestampOnScheduled(req *campaignspb.UpdateScheduledDeliverySettingsRequest) validator {
-	return func(val interface{}) error {
-		if req.ScheduledType != campaignspb.ScheduledType_SCHEDULED {
-			return nil
-		}
-		if req.ScheduledTimestamp != nil && req.ScheduledTimestamp.Seconds > 0 {
-			return nil
-		}
-
-		return va.ErrRequired
-	}
 }
 
 func (s *Server) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaignspb.UpdateAutomatedDeliverySettingsRequest) (*campaignspb.UpdateAutomatedDeliverySettingsResponse, error) {

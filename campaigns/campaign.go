@@ -101,11 +101,48 @@ type NotificationDetails struct {
 	NotificationAlertOptionBadgeNumber        bool `db:"notification_alert_option_badge_number"`
 }
 
+type Date struct {
+	Day   int32
+	Month int32
+	Year  int32
+}
+
 type ScheduleDetails struct {
-	ScheduledType               string     `db:"scheduled_type"`
-	ScheduledTimestamp          *time.Time `db:"scheduled_timestamp"`
-	ScheduledTimeZone           string     `db:"scheduled_time_zone"`
-	ScheduledUseLocalDeviceTime bool       `db:"scheduled_use_local_device_time"`
+	ScheduledType               string `db:"scheduled_type"`
+	ScheduledDate               *Date  `db:"-"`
+	ScheduledTime               *int32 `db:"-"`
+	ScheduledTimeZone           string `db:"scheduled_time_zone"`
+	ScheduledUseLocalDeviceTime bool   `db:"scheduled_use_local_device_time"`
+}
+
+func (s ScheduleDetails) ScheduledTimestamp() *time.Time {
+	if s.ScheduledDate == nil {
+		return nil
+	}
+
+	if s.ScheduledTime == nil {
+		return nil
+	}
+
+	var (
+		day   = s.ScheduledDate.Day
+		month = s.ScheduledDate.Month
+		year  = s.ScheduledDate.Year
+	)
+
+	var zone *time.Location
+	if s.ScheduledTimeZone != "" {
+		z, err := time.LoadLocation(s.ScheduledTimeZone)
+		if err != nil {
+			panic(err)
+		}
+		zone = z
+	} else {
+		zone = time.UTC
+	}
+
+	var t = time.Date(int(year), time.Month(month), int(day), 0, 0, int(*s.ScheduledTime), 0, zone)
+	return &t
 }
 
 type AutomationDetails struct {

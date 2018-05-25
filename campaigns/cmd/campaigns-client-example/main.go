@@ -15,7 +15,7 @@ import (
 
 	. "github.com/roverplatform/rover/apis/go/auth/v1"
 	. "github.com/roverplatform/rover/apis/go/campaigns/v1"
-	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
+	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
 )
 
 var (
@@ -94,7 +94,7 @@ func main() {
 
 	case "reschedule":
 		var (
-			ts, err = timestamp.TimestampProto(time.Now().Add(time.Minute * 5))
+			ts = time.Now().Add(time.Minute * 5)
 		)
 
 		if err != nil {
@@ -105,8 +105,9 @@ func main() {
 			AuthContext: authCtx,
 			CampaignId:  int32(*campaignId),
 			// ScheduledTimeZone: ""
-			ScheduledType:      ScheduledType_SCHEDULED,
-			ScheduledTimestamp: ts,
+			ScheduledType: ScheduledType_SCHEDULED,
+			ScheduledDate: &Date{Day: int32(ts.Day()), Month: int32(ts.Month()), Year: int32(ts.Year())},
+			ScheduledTime: &wrappers.Int32Value{Value: int32(ts.Second() + ts.Minute()*60 + ts.Hour()*60*60)},
 		})
 
 		pp(resp, err)
