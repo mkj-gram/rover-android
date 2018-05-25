@@ -496,13 +496,17 @@ export const ScheduledNotificationCampaign = new GraphQLObjectType({
         scheduledType: {
             type: ScheduledType
         },
-        scheduledTimestamp: {
+        scheduledDate: {
             type: GraphQLDateTime,
-            description: 'Timestamp to send scheduled message'
+            description: 'ISO string of Year, Month, Day'
+        },
+        scheduledTime: {
+            type: GraphQLInt,
+            description: 'Seconds from midnight'
         },
         scheduledTimeZone: {
             type: GraphQLString,
-            description: 'Timezone used to parse scheduledTimestamp'
+            description: 'Timezone used to create Date object'
         },
         scheduledUseLocalDeviceTime: {
             type: GraphQLBoolean,

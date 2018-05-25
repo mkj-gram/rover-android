@@ -57,13 +57,14 @@ export const getIsStageValid = (
         case 'dateAndTime':
             const {
                 scheduledType,
-                scheduledTimestamp
+                scheduledDate,
+                scheduledTime
             } = editableCampaign as ScheduledCampaign
             switch (scheduledType) {
                 case 'NOW':
                     return true
                 case 'SCHEDULED':
-                    return scheduledTimestamp !== ''
+                    return scheduledDate !== null && scheduledTime !== null
                 default:
                     return false
             }

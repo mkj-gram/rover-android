@@ -15,7 +15,8 @@ export const updateScheduledDeliverySettings: ActionCreator<
     const query: DocumentNode = gql`
         mutation UpdateScheduledDeliverySettings(
             $campaignId: Int!
-            $scheduledTimestamp: DateTime!
+            $scheduledDate: DateTime
+            $scheduledTime: Int
             $scheduledTimeZone: String!
             $scheduledUseLocalDeviceTime: Boolean!
             $segmentCondition: SegmentCondition!
@@ -25,7 +26,8 @@ export const updateScheduledDeliverySettings: ActionCreator<
         ) {
             updateScheduledDeliverySettings(
                 campaignId: $campaignId
-                scheduledTimestamp: $scheduledTimestamp
+                scheduledDate: $scheduledDate
+                scheduledTime: $scheduledTime
                 scheduledTimeZone: $scheduledTimeZone
                 scheduledType: $scheduledType
                 scheduledUseLocalDeviceTime: $scheduledUseLocalDeviceTime
@@ -65,7 +67,8 @@ export const updateScheduledDeliverySettings: ActionCreator<
                 ... on ScheduledNotificationCampaign {
                     scheduledType
                     scheduledTimeZone
-                    scheduledTimestamp
+                    scheduledDate
+                    scheduledTime
                     scheduledUseLocalDeviceTime
                     scheduledDeliveryStatus
                 }
@@ -81,7 +84,8 @@ export const updateScheduledDeliverySettings: ActionCreator<
     const { editableCampaign, editableUIState } = state
     const {
         campaignId,
-        scheduledTimestamp,
+        scheduledDate,
+        scheduledTime,
         scheduledTimeZone,
         scheduledType,
         scheduledUseLocalDeviceTime,
@@ -93,7 +97,8 @@ export const updateScheduledDeliverySettings: ActionCreator<
         query,
         variables: {
             campaignId,
-            scheduledTimestamp,
+            scheduledDate,
+            scheduledTime,
             scheduledTimeZone,
             scheduledType,
             scheduledUseLocalDeviceTime,
@@ -225,7 +230,8 @@ export const updateNotificationSettings: ActionCreator<
                 ... on ScheduledNotificationCampaign {
                     scheduledType
                     scheduledTimeZone
-                    scheduledTimestamp
+                    scheduledDate
+                    scheduledTime
                     scheduledUseLocalDeviceTime
                     scheduledDeliveryStatus
                 }
@@ -343,7 +349,8 @@ export const fetchCampaign: ActionCreator<
                 ... on ScheduledNotificationCampaign {
                     scheduledType
                     scheduledTimeZone
-                    scheduledTimestamp
+                    scheduledDate
+                    scheduledTime
                     scheduledUseLocalDeviceTime
                     scheduledDeliveryStatus
                 }
@@ -461,7 +468,8 @@ export const duplicateCampaign: ActionCreator<
                 ... on ScheduledNotificationCampaign {
                     scheduledType
                     scheduledTimeZone
-                    scheduledTimestamp
+                    scheduledDate
+                    scheduledTime
                     scheduledUseLocalDeviceTime
                     scheduledDeliveryStatus
                 }
@@ -775,7 +783,8 @@ export const fetchCampaigns: ActionCreator<
                 ... on ScheduledNotificationCampaign {
                     scheduledType
                     scheduledTimeZone
-                    scheduledTimestamp
+                    scheduledDate
+                    scheduledTime
                     scheduledUseLocalDeviceTime
                     scheduledDeliveryStatus
                 }
@@ -896,7 +905,8 @@ export const createCampaign: ActionCreator<
                 ... on ScheduledNotificationCampaign {
                     scheduledType
                     scheduledTimeZone
-                    scheduledTimestamp
+                    scheduledDate
+                    scheduledTime
                     scheduledUseLocalDeviceTime
                     scheduledDeliveryStatus
                 }

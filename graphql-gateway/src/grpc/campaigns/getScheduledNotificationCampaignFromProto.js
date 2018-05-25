@@ -60,9 +60,19 @@ export default c => ({
     scheduledType: grpcEnumMap(
         RoverApis.campaigns.v1.Models.ScheduledType.Enum
     )[c.getScheduledType()],
-    scheduledTimestamp: RoverApis.Helpers.timestampFromProto(
-        c.getScheduledTimestamp()
-    ),
+
+    scheduledDate: (() => {
+        const attributes = c.getScheduledDate()
+
+        return attributes
+            ? new Date(
+                  attributes.getYear(),
+                  attributes.getMonth() - 1,
+                  attributes.getDay()
+              ).toISOString()
+            : null
+    })(),
+    scheduledTime: c.getScheduledTime(),
     scheduledTimeZone: c.getScheduledTimeZone(),
     scheduledUseLocalDeviceTime: c.getScheduledUseLocalDeviceTime(),
     scheduledDeliveryStatus: grpcEnumMap(

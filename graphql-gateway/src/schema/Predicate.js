@@ -215,7 +215,8 @@ const Predicate = new GraphQLInterfaceType({
 
 export const PredicateAggregate = new GraphQLObjectType({
     name: 'PredicateAggregate',
-    description: 'Object containing list of device predicates and list of profile predicates',
+    description:
+        'Object containing list of device predicates and list of profile predicates',
     fields: () => ({
         predicateList: {
             type: new GraphQLNonNull(new GraphQLList(Predicate))

@@ -93,7 +93,8 @@ declare class ScheduledCampaign extends Campaign {
     notificationAlertOptionNotificationCenter: boolean
     notificationAlertOptionBadgeNumber: boolean
     scheduledType: ScheduledType
-    scheduledTimestamp: string
+    scheduledDate: string
+    scheduledTime: number
     scheduledTimeZone: string
     scheduledUseLocalDeviceTime: boolean
     segmentIds: Array<string>
