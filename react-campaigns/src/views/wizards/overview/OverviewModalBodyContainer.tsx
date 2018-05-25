@@ -68,18 +68,14 @@ const OverviewModalBodyContainer: React.SFC<
                 overflowY: 'scroll'
             }}
         >
-            {arr.map(row => {
-                let injectedProps = {
-                    name: row.name,
-                    text: row.text,
-                    val: row.val,
-                    openWizard: openSelectedWizard
-                }
-                const RowContainer = ResponsiveContainer(injectedProps)(
-                    OverviewModalRow
-                )
-                return <RowContainer key={row.name} />
-            })}
+            {arr.map(row => (
+                <OverviewModalRow
+                    {...row}
+                    device={device}
+                    openWizard={openSelectedWizard}
+                    key={row.name}
+                />
+            ))}
             {currentWizard === 'notification' &&
                 ReactDOM.createPortal(
                     <NotificationContainer device={device} />,

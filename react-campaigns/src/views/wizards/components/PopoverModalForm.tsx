@@ -8,6 +8,7 @@ import {
     updateActivePopover
 } from '../../../actions'
 import { getIsPopoverModalFormOpen, getActivePopover } from '../../../reducers'
+import ResponsiveContainer from '../../utils/ResponsiveContainer'
 
 import {
     TextInput,
@@ -20,7 +21,7 @@ import {
 
 import MobilePopover from './MobilePopover'
 
-export interface PopoverModalFormProps {
+export interface PopoverModalFormProps extends InjectedProps {
     presentationType: 'popover' | 'modal' | 'regular'
     field: string
     // tslint:disable-next-line:no-any
@@ -68,7 +69,8 @@ const PopoverModalForm: React.SFC<
     isPopoverModalFormOpen,
     closePopoverModalForm,
     openPopoverModalForm,
-    updateActivePopover
+    updateActivePopover,
+    device
 }) => {
     const handleClosePopoverModal = () => {
         switch (presentationType) {
@@ -116,7 +118,11 @@ const PopoverModalForm: React.SFC<
                         popoverProps={popoverModalProps(
                             handleClosePopoverModal
                         )}
-                        targetParent="mainModalLeft"
+                        targetParent={
+                            device === 'Desktop'
+                                ? 'mainModalView'
+                                : 'mainModalLeft'
+                        }
                         onClick={showForm}
                         showPopover={activePopover === field}
                     >
@@ -204,4 +210,7 @@ const mapDispatchToProps = (
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PopoverModalForm)
+export default connect(mapStateToProps, mapDispatchToProps)(
+    (props: PopoverModalFormProps & StateProps & DispatchProps) =>
+        ResponsiveContainer(props)(PopoverModalForm)
+)

@@ -7,9 +7,7 @@ import DeviceTransitionContainer from '../../utils/DeviceTransitionContainer'
 
 import { InjectedProps } from '../../utils/ResponsiveContainer'
 
-export interface OverviewContainerProps extends InjectedProps {}
-
-class OverviewContainer extends React.Component<OverviewContainerProps, {}> {
+class OverviewContainer extends React.Component<InjectedProps, {}> {
     render() {
         const { device } = this.props
         return (

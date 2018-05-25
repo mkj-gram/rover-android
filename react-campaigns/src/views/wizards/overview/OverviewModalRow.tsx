@@ -121,7 +121,6 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
                                   .join('') as UIStateType)
                         : () => null
                 }
-                key={name}
             >
                 <div style={outerStyle}>
                     <Text text={name} size="h2" textStyle={textStyle} />

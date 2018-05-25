@@ -48,19 +48,13 @@ export interface StateProps {
 
 export interface ListPageState {}
 
-class ListPage extends React.PureComponent<
-    StateProps &
-        DispatchProps &
-        ResponsiveContainerProps &
-        RouteComponentProps<RouterProps>,
-    {}
-> {
-    constructor(
-        props: StateProps &
-            DispatchProps &
-            ResponsiveContainerProps &
-            RouteComponentProps<RouterProps>
-    ) {
+export type ListPageProps = StateProps &
+    DispatchProps &
+    ResponsiveContainerProps &
+    RouteComponentProps<RouterProps>
+
+class ListPage extends React.PureComponent<ListPageProps, {}> {
+    constructor(props: ListPageProps) {
         super(props)
         this.createNewCampaign = this.createNewCampaign.bind(this)
         this.pushToOverview = this.pushToOverview.bind(this)
@@ -360,6 +354,8 @@ const mapStateToProps = (state: State): StateProps => ({
     isError: getIsError(state)
 })
 
-export default ResponsiveContainer()(
-    withRouter(connect(mapStateToProps, mapDispatchToProps)(ListPage))
+export default withRouter(
+    connect(mapStateToProps, mapDispatchToProps)((props: ListPageProps) =>
+        ResponsiveContainer(props)(ListPage)
+    )
 )
