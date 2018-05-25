@@ -107,7 +107,8 @@ func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationS
 		} else {
 			payload = M{
 				"aps": alert(msg),
-				"rover": M{
+				"action": M{
+					"__typename":   "AddNotificationAction",
 					"notification": ToRoverNotification(settings, note),
 				},
 			}
@@ -118,8 +119,8 @@ func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationS
 		req.DeviceToken = msg.Device.PushToken
 		req.Topic = msg.Device.AppNamespace
 		req.Payload = M{
-			"aps":   M{"content-available": 1},
-			"rover": msg.Payload,
+			"aps":    M{"content-available": 1},
+			"action": msg.Payload,
 		}
 	default:
 		panic(errors.Wrapf(ErrUnknown, "type=%T", msg))

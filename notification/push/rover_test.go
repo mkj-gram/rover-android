@@ -49,9 +49,11 @@ func Test_RoverPayload_MarshalJSON(t *testing.T) {
 					Type: "IMAGE",
 					Url:  "http://example.com/img.png",
 				},
-				ActionInfo: &ActionInfo{
-					Attributes: map[string]string{"a": "1"},
-					Type:       "openURL",
+				Action: &actionInfo{
+					campaignId:                  123,
+					tapBehaviorType:             "OPEN_EXPERIENCE",
+					tapBehaviorPresentationType: "IN_BROWSER",
+					tapBehaviorUrl:              "https://hello.world",
 				},
 				DeliveredAt: *ts(t, "2018-03-01T01:02:03Z"),
 				ExpiresAt:   ts(t, "2017-03-01T01:02:03Z"),
@@ -60,7 +62,7 @@ func Test_RoverPayload_MarshalJSON(t *testing.T) {
 				IsDeleted:                   true,
 				IsNotificationCenterEnabled: true,
 			},
-			exp: `{"id":"f944c7b4-3dcd-11e8-b467-0ed5f89f718b","campaignID":1,"title":"a title","body":"a body","attachment":{"type":"IMAGE","url":"http://example.com/img.png"},"actionInfo":{"type":"openURL","attributes":{"a":"1"}},"deliveredAt":"2018-03-01T01:02:03Z","expiresAt":"2017-03-01T01:02:03Z","isRead":true,"isDeleted":true,"isNotificationCenterEnabled":true}`,
+			exp: `{"id":"f944c7b4-3dcd-11e8-b467-0ed5f89f718b","campaignID":1,"title":"a title","body":"a body","attachment":{"type":"IMAGE","url":"http://example.com/img.png"},"action":{"__typename":"PresentExperienceAction","campaignID":123},"deliveredAt":"2018-03-01T01:02:03Z","expiresAt":"2017-03-01T01:02:03Z","isRead":true,"isDeleted":true,"isNotificationCenterEnabled":true}`,
 		},
 	}
 

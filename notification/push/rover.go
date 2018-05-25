@@ -1,6 +1,7 @@
 package push
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/roverplatform/rover/notification/scylla"
@@ -11,9 +12,59 @@ type Attachment struct {
 	Url  string `json:"url"`
 }
 
-type ActionInfo struct {
-	Type       string            `json:"type"`
-	Attributes map[string]string `json:"attributes"`
+type actionInfo struct {
+	tapBehaviorType             string
+	campaignId                  int
+	tapBehaviorPresentationType string
+	tapBehaviorUrl              string
+
+	settings *scylla.NotificationSettings
+}
+
+// see rover/protos/campaigns/v1/campaigns.proto:58
+// and graphql-gateway/src/grpc/notification/getNotificationFromProto.js
+// for mappings
+func (action *actionInfo) MarshalJSON() ([]byte, error) {
+	type M = map[string]interface{}
+	var payload M
+
+	switch action.tapBehaviorType {
+	// 0
+	case string(scylla.TapBehaviorType_OPEN_EXPERIENCE):
+		payload = M{
+			"__typename": "PresentExperienceAction",
+			"campaignID": action.campaignId,
+		}
+		// 1
+	case string(scylla.TapBehaviorType_OPEN_APP):
+		payload = nil
+		// 2
+	case string(scylla.TapBehaviorType_OPEN_DEEP_LINK):
+		payload = M{
+			"__typename": "OpenURLAction",
+			"url":        action.tapBehaviorUrl,
+		}
+		// 3
+	case string(scylla.TapBehaviorType_OPEN_WEBSITE):
+		switch action.tapBehaviorPresentationType {
+		case string(scylla.TapBehaviorPresentationType_IN_BROWSER):
+			payload = M{
+				"__typename": "OpenURLAction",
+				"url":        action.tapBehaviorUrl,
+			}
+
+		default:
+			payload = M{
+				"__typename": "PresentWebsiteAction",
+				"url":        action.tapBehaviorUrl,
+			}
+		}
+
+	default:
+		payload = nil
+	}
+
+	return json.Marshal(payload)
 }
 
 type RoverNotification struct {
@@ -24,7 +75,7 @@ type RoverNotification struct {
 	Body  string `json:"body"`
 
 	Attachment *Attachment `json:"attachment,omitempty"`
-	ActionInfo *ActionInfo `json:"actionInfo,omitempty"`
+	Action     *actionInfo `json:"action,omitempty"`
 
 	DeliveredAt time.Time  `json:"deliveredAt"`
 	ExpiresAt   *time.Time `json:"expiresAt"`
@@ -48,8 +99,12 @@ func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Not
 			Url:  settings.AttachmentUrl,
 		},
 
-		// TODO:
-		ActionInfo: &ActionInfo{},
+		Action: &actionInfo{
+			tapBehaviorPresentationType: string(settings.TapBehaviorPresentationType),
+			tapBehaviorUrl:              settings.TapBehaviorUrl,
+			campaignId:                  int(settings.CampaignId),
+			tapBehaviorType:             string(settings.TapBehaviorType),
+		},
 
 		DeliveredAt: note.CreatedAt(),
 

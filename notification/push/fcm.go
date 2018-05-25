@@ -41,7 +41,8 @@ func ToFCMRequest(m notification_pubsub.Message, settings *scylla.NotificationSe
 			}
 		} else {
 			payload = M{
-				"rover": M{
+				"action": M{
+					"__typename":   "AddNotificationAction",
 					"notification": ToRoverNotification(settings, note),
 				},
 			}
@@ -50,7 +51,7 @@ func ToFCMRequest(m notification_pubsub.Message, settings *scylla.NotificationSe
 	case *notification_pubsub.SilentPush:
 		req.To = msg.Device.PushToken
 		req.Data = M{
-			"rover": msg.Payload,
+			"action": msg.Payload,
 		}
 
 	default:
