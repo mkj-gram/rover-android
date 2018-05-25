@@ -63,7 +63,8 @@ const DateAndTime: React.SFC<
 }) => {
     const { Fragment } = React
     const {
-        scheduledTimestamp,
+        scheduledDate,
+        scheduledTime,
         scheduledTimeZone,
         scheduledUseLocalDeviceTime
     } = campaign
@@ -85,7 +86,8 @@ const DateAndTime: React.SFC<
                     onClick={() =>
                         updateEditableCampaign({
                             scheduledType: 'NOW',
-                            scheduledTimestamp,
+                            scheduledDate,
+                            scheduledTime,
                             scheduledTimeZone,
                             scheduledUseLocalDeviceTime
                         })

@@ -52,19 +52,28 @@ const updateScheduledDeliverySettings = {
         { authContext }
     ) => {
         const request = new RoverApis.campaigns.v1.Models.UpdateScheduledDeliverySettingsRequest()
-        const dateValue = new RoverApis.campaigns.v1.Models.Date()
-        const timeValue = new RoverApis.protobuf.Models.Int32Value()
 
         request.setAuthContext(authContext)
         request.setCampaignId(campaignId)
-        const dateScheduledTime = new Date(scheduledDate)
-        dateValue.setDay(dateScheduledTime.getDate())
-        dateValue.setMonth(dateScheduledTime.getMonth() + 1)
-        dateValue.setYear(dateScheduledTime.getFullYear())
-        request.setScheduledDate(dateValue)
 
-        timeValue.setValue(scheduledTime)
-        request.setScheduledTime(timeValue)
+        if (scheduledDate) {
+            const dateValue = new RoverApis.campaigns.v1.Models.Date()
+            const dateScheduledTime = new Date(scheduledDate)
+            dateValue.setDay(dateScheduledTime.getDate())
+            dateValue.setMonth(dateScheduledTime.getMonth() + 1)
+            dateValue.setYear(dateScheduledTime.getFullYear())
+            request.setScheduledDate(dateValue)
+        } else {
+            request.setScheduledDate(null)
+        }
+
+        if (scheduledTime) {
+            const timeValue = new RoverApis.protobuf.Models.Int32Value()
+            timeValue.setValue(scheduledTime)
+            request.setScheduledTime(timeValue)
+        } else {
+            request.setScheduledTime(null)
+        }
 
         request.setScheduledTimeZone(scheduledTimeZone)
         request.setScheduledUseLocalDeviceTime(scheduledUseLocalDeviceTime)
