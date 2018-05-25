@@ -30,13 +30,13 @@ export interface Props {
     campaignStatus: QueryParams['campaignStatus']
 }
 
-const isScheduledCampaign = (
+export const isScheduledCampaign = (
     campaign: Campaign
 ): campaign is ScheduledCampaign => {
     return (campaign as ScheduledCampaign).scheduledDeliveryStatus !== undefined
 }
 
-const isAutomatedNotificationCampaign = (
+export const isAutomatedNotificationCampaign = (
     campaign: Campaign
 ): campaign is AutomatedNotificationCampaign => {
     return (

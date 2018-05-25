@@ -1,11 +1,7 @@
 /// <reference path="../../../../typings/index.d.ts"/>
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import {
-    fetchTestDevices,
-    handleSendTestModalDisplay,
-    sendTest
-} from '../../../actions'
+import { fetchTestDevices, handleSendTestModalDisplay } from '../../../actions'
 
 import { getTypeProgress, getTestDevices } from '../../../reducers'
 
@@ -24,6 +20,7 @@ import DeviceTransitionContainer from '../../utils/DeviceTransitionContainer'
 
 import SendTestComponent from './SendTestComponent'
 import SendTestConfirmationDialog from './SendTestConfirmationDialog'
+import PublishCampaignConfirmationDialog from './PublishCampaignConfirmationDialog'
 
 export interface OverviewModalFooterProps extends InjectedProps {
     sendTestClick?: () => void
@@ -34,11 +31,11 @@ export interface OverviewModalFooterProps extends InjectedProps {
 export interface OverviewModalFooterState {
     toggleSendTest: boolean
     sendTestPrompt: boolean
+    showPublishCampaignDialog: boolean
 }
 
 export interface DispatchProps {
     handleSendTestModalDisplay: (on?: boolean) => void
-    sendTestNotification: (campaignId: number, deviceIds: string[]) => void
 }
 
 export interface TestDeviceStateProps {
@@ -56,11 +53,14 @@ class OverviewModalFooter extends React.Component<
         super(props)
         this.state = {
             toggleSendTest: false,
-            sendTestPrompt: false
+            sendTestPrompt: false,
+            showPublishCampaignDialog: false
         }
         this.handleSendTestToggle = this.handleSendTestToggle.bind(this)
-
         this.handleSendTestPrompt = this.handleSendTestPrompt.bind(this)
+        this.handlePublishCampaignPrompt = this.handlePublishCampaignPrompt.bind(
+            this
+        )
     }
 
     handleSendTestToggle(on?: boolean) {
@@ -96,16 +96,27 @@ class OverviewModalFooter extends React.Component<
         })
     }
 
+    handlePublishCampaignPrompt() {
+        this.setState({
+            showPublishCampaignDialog: !this.state.showPublishCampaignDialog
+        })
+    }
+
     render() {
         const {
             scheduledDeliveryProgress,
             notificationProgress,
             device,
             publishClick,
-            testDevices
+            testDevices,
+            campaignId
         } = this.props
 
-        const { toggleSendTest, sendTestPrompt } = this.state
+        const {
+            toggleSendTest,
+            sendTestPrompt,
+            showPublishCampaignDialog
+        } = this.state
 
         const getPopoverTrigger = () => {
             const popoverProps = {
@@ -201,10 +212,11 @@ class OverviewModalFooter extends React.Component<
                     {sendTestPrompt && (
                         <SendTestConfirmationDialog
                             handleSendTestPrompt={this.handleSendTestPrompt}
-                            campaignId={this.props.campaignId}
+                            campaignId={campaignId}
                             device={device}
                         />
                     )}
+
                     <Button
                         text="Publish"
                         size="large"
@@ -215,8 +227,17 @@ class OverviewModalFooter extends React.Component<
                                 : 'disabled'
                         }
                         overrideWidth={114}
-                        onClick={publishClick}
+                        onClick={this.handlePublishCampaignPrompt}
                     />
+                    {showPublishCampaignDialog && (
+                        <PublishCampaignConfirmationDialog
+                            campaignId={campaignId}
+                            device={device}
+                            handlePublishCampaignPrompt={
+                                this.handlePublishCampaignPrompt
+                            }
+                        />
+                    )}
                 </div>
             </div>
         )
@@ -228,9 +249,6 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
         handleSendTestModalDisplay: on => {
             dispatch(handleSendTestModalDisplay(on))
-        },
-        sendTestNotification: (campaignId, deviceIds) => {
-            dispatch(sendTest(campaignId, deviceIds))
         }
     }
 }

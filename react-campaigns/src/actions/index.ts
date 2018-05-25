@@ -72,6 +72,9 @@ export const updateNotificationSettings = () =>
 export const updateScheduledDeliverySettings = () =>
     campaignsActions.updateScheduledDeliverySettings()
 
+export const publishCampaign = (campaignId: number) =>
+    campaignsActions.publishCampaign(campaignId)
+
 export const sendTest = (campaignId: number, deviceIds: string[]) =>
     sendTestActions.sendTest(campaignId, deviceIds)
 

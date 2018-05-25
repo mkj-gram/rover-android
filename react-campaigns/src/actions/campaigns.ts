@@ -6,6 +6,51 @@ import { DocumentNode } from 'graphql'
 import Environment from '../Environment'
 import { setTimeout } from 'timers'
 
+export const publishCampaign: ActionCreator<
+    ThunkAction<Promise<Action | void>, State, void>
+> = (campaignId: number) => (
+    dispatch: Dispatch<State>
+): Promise<Action | void> => {
+    const query: DocumentNode = gql`
+        mutation PublishCampaign($campaignId: Int!) {
+            publishCampaign(campaignId: $campaignId)
+        }
+    `
+
+    const request = {
+        query,
+        variables: {
+            campaignId
+        }
+    }
+    return Environment(request).then(
+        ({ data, errors }) => {
+            if (errors) {
+                dispatch({
+                    type: 'PUBLISH_CAMPAIGN_FAILURE',
+                    message: errors[0].message
+                })
+                setTimeout(() => {
+                    return dispatch({ type: 'DISMISS_FAILURE' })
+                }, 4000)
+            } else {
+                return dispatch({
+                    type: 'PUBLISH_CAMPAIGN_SUCCESS'
+                })
+            }
+        },
+        ({ result }) => {
+            dispatch({
+                type: 'PUBLISH_CAMPAIGN_FAILURE',
+                message: result.errors[0].message
+            })
+            setTimeout(() => {
+                return dispatch({ type: 'DISMISS_FAILURE' })
+            }, 4000)
+        }
+    )
+}
+
 export const updateScheduledDeliverySettings: ActionCreator<
     ThunkAction<Promise<Action | void>, State, void>
 > = () => (
