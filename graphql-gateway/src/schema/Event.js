@@ -11,7 +11,7 @@ import GraphQLJSON from 'graphql-type-json'
 
 import GraphQLFrameworkMap from './FrameworkMap'
 
-const Context = new GraphQLInputObjectType({
+const DeviceContext = new GraphQLInputObjectType({
     name: 'Context',
     fields: () => ({
         appBadgeNumber: {
@@ -30,6 +30,9 @@ const Context = new GraphQLInputObjectType({
             type: GraphQLJSON
         },
         carrierName: {
+            type: GraphQLString
+        },
+        deviceIdentifier: {
             type: GraphQLString
         },
         deviceManufacturer: {
@@ -117,8 +120,8 @@ const Event = new GraphQLInputObjectType({
         timestamp: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        context: {
-            type: new GraphQLNonNull(Context)
+        device: {
+            type: DeviceContext
         },
         attributes: {
             type: GraphQLJSON

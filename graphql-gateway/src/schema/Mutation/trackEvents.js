@@ -16,19 +16,25 @@ const trackEvents = {
             type: new GraphQLNonNull(new GraphQLList(Event))
         }
     },
-    resolve: requireAuthentication(async (_, { events }, { headers, clients, authContext, deviceIdentifier }) => {
+    resolve: requireAuthentication(async (_, { events }, { headers, clients, authContext }) => {
         const transformer = clients.transformer
 
         for (let i = 0; i < events.length; i++) {
             const event = events[i]
+            const { device } = event
 
-            if (event.context) {
-                if (headers['x-real-ip']) {
-                    event.context.ip = ParseIp(headers['x-real-ip'])
-                }
+            // TODO: Add support for non-device events. For now, no-op if the event doesn't have an associated DeviceContext.
+            if (!device) { continue }
 
-                event.context.appNamespace = event.context.appIdentifier  
+            if (headers['x-real-ip']) {
+                device.ip = ParseIp(headers['x-real-ip'])
             }
+
+            // TODO: Rename appNamespace to appIdentifier throughout the rest of the stack.
+            device.appNamespace = device.appIdentifier  
+            
+            // TODO: Adapt the transformer client to support other sharding/partitioning strategies instead of requiring deviceIdentifier.
+            const { deviceIdentifier } = device
 
             try {
                 await transformer.submit(authContext, deviceIdentifier, Constants.DEVICE_EVENT, event)

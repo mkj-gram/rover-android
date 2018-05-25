@@ -9,7 +9,7 @@ import { notificationClient } from '../../grpcClients'
 const notifications = {
     type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Notification))),
     resolve: async(
-        { deviceIdentifier }, 
+        { identifier: deviceId }, 
         _, 
         { authContext }
     ) => {
@@ -17,7 +17,7 @@ const notifications = {
         const request = new RoverApis.notification.v1.Models.ListNotificationsRequest()
 
         request.setAuthContext(authContext)
-        request.setDeviceId(deviceIdentifier)
+        request.setDeviceId(deviceId)
 
         const response = await notificationClient.listNotifications(request)
 

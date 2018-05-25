@@ -175,8 +175,8 @@ const beaconRegions = [
 
 const regions = {
     type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Region))),
-    resolve: ({ deviceIdentifier }) => {
-        // TODO: Fetch regions, passing in deviceIdentifier
+    resolve: (device) => {
+        // TODO: Fetch regions, passing in device.identifier
         let a = geofenceRegions.sort(() => .5 - Math.random()).slice(0, 15)
         let b = beaconRegions.sort(() => .5 - Math.random()).slice(0, 5)
         return a.concat(b)
