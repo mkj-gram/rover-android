@@ -105,7 +105,7 @@ Client.prototype.submit = function(auth, identifier, type, event) {
 		let payload
 
 		if (type === Constants.DEVICE_EVENT) {
-			payload = Serializer.serializeDeviceEvent(auth, event, identifier, event.context)
+			payload = Serializer.serializeDeviceEvent(auth, event, identifier, event.device)
 		} else {
 			return reject(new Error("profile event: unimplemented"))
 		}
