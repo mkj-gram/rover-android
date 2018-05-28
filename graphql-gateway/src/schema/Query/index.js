@@ -7,6 +7,7 @@ import dynamicSegment from './dynamicSegment'
 import experience from './experience'
 import segmentFromPredicates from './segmentFromPredicates'
 import segmentSchema from './segmentSchema'
+import segmentSize from './segmentSize'
 import stringSuggestion from './stringSuggestion'
 
 const Query = new GraphQLObjectType({
@@ -19,6 +20,7 @@ const Query = new GraphQLObjectType({
         experience,
         segmentFromPredicates,
         segmentSchema,
+        segmentSize,
         stringSuggestion
     }
 })
