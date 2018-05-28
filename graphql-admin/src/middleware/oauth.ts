@@ -1,19 +1,19 @@
 import { OAuth2Client } from 'google-auth-library'
 import { Response, Request, NextFunction } from 'express'
 import { TokenPayload } from 'google-auth-library/build/src/auth/loginticket'
+import * as httpContext from './http-context'
 
-interface AdminRequest extends Request {
-    oAuth: TokenPayload
-}
-
-const OAuthMiddleware = function(clientID: string, clientSecret: string) {
-    return function(req: AdminRequest, res: Response, next: NextFunction) {
+export const OAuthMiddleware = function(
+    clientID: string,
+    clientSecret: string
+) {
+    return function(req: Request, res: Response, next: NextFunction) {
         const headers = req.headers
 
         if (!headers.hasOwnProperty('authorization')) {
             return res.status(401).send('Unauthorized request')
         }
-        const idToken = headers['authorization'].split(' ')[1]
+        const idToken = headers.authorization.split(' ')[1]
         const client = new OAuth2Client(clientID, clientSecret)
 
         async function verifyIdentity() {
@@ -26,9 +26,10 @@ const OAuthMiddleware = function(clientID: string, clientSecret: string) {
             if (payload === undefined) {
                 throw new Error('Auth error')
             }
-            const domain = payload['hd']
-            const verified = payload['email_verified']
+            const domain = payload.hd
+            const verified = payload.email_verified
             if (domain !== 'rover.io' || !verified) {
+                httpContext.set('user', payload)
                 throw new Error('User must be using a verified rover.io email')
             }
             return payload
@@ -36,11 +37,9 @@ const OAuthMiddleware = function(clientID: string, clientSecret: string) {
 
         verifyIdentity()
             .then(payload => {
-                req.oAuth = payload
+                httpContext.set('user', payload)
                 next()
             })
             .catch(err => res.status(401).send(err.message))
     }
 }
-
-export { OAuthMiddleware }

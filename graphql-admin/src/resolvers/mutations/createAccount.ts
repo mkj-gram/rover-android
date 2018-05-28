@@ -4,6 +4,7 @@ import * as promisify from '@rover-common/grpc-promisify'
 import { authClient } from '../grpcClients'
 promisify(authClient)
 
+// tslint:disable-next-line:no-any
 const createAccount = async (_: any, { name }: any) => {
     const Models = RoverApis.auth.v1.Models
     const request = new RoverApis.auth.v1.Models.CreateAccountRequest()
