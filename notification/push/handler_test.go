@@ -696,8 +696,8 @@ func TestHandler(t *testing.T) {
 					AndroidPlatformsStore: m.MockAndroidPlatformStore,
 					IosPlatformsStore:     m.MockIosPlatformStore,
 
-					NewAPNSClient: func(p *postgres.IosPlatform) (*apns2.Client, error) {
-						c, err := push.NewAPNSClient(p)
+					NewAPNSClient: func(certData, certKey string) (*apns2.Client, error) {
+						c, err := push.NewAPNSClient(certData, certKey)
 						if err != nil {
 							return nil, err
 						}
@@ -707,8 +707,8 @@ func TestHandler(t *testing.T) {
 						return c, err
 					},
 
-					NewFCMClient: func(p *postgres.AndroidPlatform) (*fcm.Client, error) {
-						return fcm.NewClient(p.PushCredentialsServerKey, fcm.WithEndpoint(server.URL))
+					NewFCMClient: func(serverKey string) (*fcm.Client, error) {
+						return fcm.NewClient(serverKey, fcm.WithEndpoint(server.URL))
 					},
 				}
 

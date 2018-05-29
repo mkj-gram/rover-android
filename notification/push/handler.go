@@ -20,7 +20,7 @@ const (
 type (
 	clientFactory interface {
 		GetAPNSClient(ctx context.Context, acctId int32, bundleId string, env string) (*apns2.Client, error)
-		GetFCMClient(ctx context.Context, acctId int32) (*fcm.Client, error)
+		GetFCMClient(ctx context.Context, acctId int32, packageName string) (*fcm.Client, error)
 	}
 
 	notificationSettingsStore interface {
@@ -91,10 +91,11 @@ func (w *Handler) Handle(ctx context.Context, m notification_pubsub.Message) err
 	switch device.OsName {
 	case OsAndroid:
 		var (
-			req = mkFCMRequest()
+			req         = mkFCMRequest()
+			packageName = device.AppNamespace
 		)
 
-		client, err := w.ClientFactory.GetFCMClient(ctx, int32(device.AccountID))
+		client, err := w.ClientFactory.GetFCMClient(ctx, int32(device.AccountID), packageName)
 		if err != nil {
 			return errors.Wrap(err, "fcmfactory.GetClient")
 		}

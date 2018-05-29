@@ -39,12 +39,13 @@ type ClientFactory struct {
 	IosPlatformsStore     IosPlatformStore
 	AndroidPlatformsStore AndroidPlatformStore
 
-	NewAPNSClient func(p *postgres.IosPlatform) (*apns2.Client, error)
-	NewFCMClient  func(p *postgres.AndroidPlatform) (*fcm.Client, error)
+	NewAPNSClient func(certData, certKey string) (*apns2.Client, error)
+	NewFCMClient  func(serverKey string) (*fcm.Client, error)
 }
 
 func (c *ClientFactory) GetAPNSClient(ctx context.Context, acctId int32, bundleId string, env string) (*apns2.Client, error) {
 	env = strings.ToLower(env)
+
 	var (
 		cacheKey = fmt.Sprintf("ios:%d:%s:%s", acctId, bundleId, env)
 		item     = c.Cache.Get(cacheKey)
@@ -56,16 +57,19 @@ func (c *ClientFactory) GetAPNSClient(ctx context.Context, acctId int32, bundleI
 		}
 	}
 
-	var p *postgres.IosPlatform
+	var (
+		certData, certKey string
+	)
 
-	if bundleId == "io.rover.Inbox" {
-		p = postgres.RoverInboxIosPlatform
+	if isRoverInboxIOSApp(bundleId) {
+		certData, certKey = RoverInbox.APNS.CertData, RoverInbox.APNS.CertKey
 	} else {
 		ps, err := c.IosPlatformsStore.ListByAccountId(ctx, acctId)
 		if err != nil {
 			return nil, errors.Wrap(err, "ListByAccountId")
 		}
 
+		var p *postgres.IosPlatform
 		for i := range ps {
 			if ps[i].BundleId != bundleId {
 				continue
@@ -73,22 +77,26 @@ func (c *ClientFactory) GetAPNSClient(ctx context.Context, acctId int32, bundleI
 			p = ps[i]
 			break
 		}
+
+		if p == nil {
+			return nil, errors.Wrapf(ErrNotFound, "apns: bundle=%q", bundleId)
+		}
+
+		if p.CertificateExpiresAt != nil && time.Now().After(*p.CertificateExpiresAt) {
+			return nil, &retryable{
+				error: errors.Errorf("certificate expired: platform_id=%d", p.Id),
+			}
+		}
+
+		certData, certKey = p.CertificateData, p.CertificatePassphrase
 	}
 
-	if p == nil {
-		return nil, errors.Wrapf(ErrNotFound, "bundle=%q", bundleId)
+	var newClient = c.NewAPNSClient
+	if newClient == nil {
+		newClient = NewAPNSClient
 	}
 
-	var (
-		client *apns2.Client
-		err    error
-	)
-
-	if c.NewAPNSClient == nil {
-		client, err = NewAPNSClient(p)
-	} else {
-		client, err = c.NewAPNSClient(p)
-	}
+	client, err := newClient(certData, certKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "NewAPNSClient")
 	}
@@ -109,7 +117,7 @@ func (c *ClientFactory) GetAPNSClient(ctx context.Context, acctId int32, bundleI
 	return client, nil
 }
 
-func (c *ClientFactory) GetFCMClient(ctx context.Context, acctId int32) (*fcm.Client, error) {
+func (c *ClientFactory) GetFCMClient(ctx context.Context, acctId int32, packageName string) (*fcm.Client, error) {
 	var (
 		cacheKey = fmt.Sprintf("android:%d", acctId)
 		item     = c.Cache.Get(cacheKey)
@@ -121,32 +129,43 @@ func (c *ClientFactory) GetFCMClient(ctx context.Context, acctId int32) (*fcm.Cl
 		}
 	}
 
-	ps, err := c.AndroidPlatformsStore.ListByAccountId(ctx, acctId)
-	if err != nil {
-		return nil, errors.Wrap(err, "ListByAccountId")
-	}
+	var (
+		serverKey string
+	)
 
-	getPlatform := func() *postgres.AndroidPlatform {
-		if len(ps) > 0 {
-			return ps[0]
+	if isRoverInboxAndroidApp(packageName) {
+		serverKey = RoverInbox.FCM.ServerKey
+	} else {
+		ps, err := c.AndroidPlatformsStore.ListByAccountId(ctx, acctId)
+		if err != nil {
+			return nil, errors.Wrap(err, "ListByAccountId")
 		}
 
-		return nil
+		var getPlatform = func() *postgres.AndroidPlatform {
+			// TODO: search by sender id
+			if len(ps) > 0 {
+				return ps[0]
+			}
+
+			return nil
+		}
+
+		var p = getPlatform()
+		if p == nil {
+			return nil, errors.Wrap(ErrNotFound, "platform")
+		}
+
+		serverKey = p.PushCredentialsServerKey
 	}
 
-	var p = getPlatform()
-	if p == nil {
-		return nil, errors.Wrap(ErrNotFound, "platform")
+	var newClient = c.NewFCMClient
+	if newClient == nil {
+		newClient = NewFCMClient
 	}
 
-	var client *fcm.Client
-	if c.NewFCMClient == nil {
-		client, err = NewFCMClient(p)
-	} else {
-		client, err = c.NewFCMClient(p)
-	}
+	client, err := newClient(serverKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewFCMClient")
+		return nil, errors.Wrap(err, "fcm: newClient")
 	}
 
 	c.Cache.Set(cacheKey, client, c.MaxAge)
@@ -154,20 +173,13 @@ func (c *ClientFactory) GetFCMClient(ctx context.Context, acctId int32) (*fcm.Cl
 	return client, nil
 }
 
-func NewAPNSClient(p *postgres.IosPlatform) (*apns2.Client, error) {
-	if p.CertificateExpiresAt != nil && time.Now().After(*p.CertificateExpiresAt) {
-		return nil, errors.Wrap(
-			&retryable{error: errors.Errorf("certificate expired: platform_id=%d", p.Id)},
-			"NewAPNSClient",
-		)
-	}
-
-	certData, err := base64.StdEncoding.DecodeString(p.CertificateData)
+func NewAPNSClient(certDataBase64Encoded string, certKey string) (*apns2.Client, error) {
+	certData, err := base64.StdEncoding.DecodeString(certDataBase64Encoded)
 	if err != nil {
 		return nil, errors.Wrap(err, "base64.DecodeString")
 	}
 
-	pkey, cert, err := pkcs12.Decode(certData, p.CertificatePassphrase)
+	pkey, cert, err := pkcs12.Decode(certData, certKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "pkcs12.Decode")
 	}
@@ -181,8 +193,8 @@ func NewAPNSClient(p *postgres.IosPlatform) (*apns2.Client, error) {
 	return apns2.NewClient(tlsCert), nil
 }
 
-func NewFCMClient(p *postgres.AndroidPlatform) (*fcm.Client, error) {
-	c, err := fcm.NewClient(p.PushCredentialsServerKey)
+func NewFCMClient(serverKey string) (*fcm.Client, error) {
+	c, err := fcm.NewClient(serverKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "fcm.NewClient")
 	}

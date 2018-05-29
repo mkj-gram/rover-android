@@ -47,8 +47,12 @@ var (
 	platformsCacheMaxAge  = flag.Duration("platforms-cache-max-age", time.Duration(5*time.Minute), "max age to cache")
 
 	// Rover Inbox
-	roverInboxCertificateData = flag.String("rover-inbox-cert-data", "", "rover inbox certificate data")
-	roverInboxCertificatePass = flag.String("rover-inbox-cert-pass", "", "rover inbox certificate pass")
+	// apns
+	roverInboxAPNSCertificateData = flag.String("rover-inbox-apns-cert-data", "", "rover inbox APNS certificate data, base64 encoded")
+	roverInboxAPNSCertificatePass = flag.String("rover-inbox-apns-cert-pass", "", "rover inbox APNS certificate pass")
+	// fcm
+	roverInboxFCMSenderId  = flag.String("rover-inbox-fcm-sender-id", "", "rover inbox fcm sender id")
+	roverInboxFCMServerKey = flag.String("rover-inbox-fcm-server-key", "", "rover inbox fcm server key")
 
 	// worker concurrency
 	workerConcurrency = flag.Int("worker-concurrency", 10, "worker concurrency")
@@ -148,12 +152,14 @@ func main() {
 	// TODO: take down worker if pgProbe fails?
 	livenessProbes = append(livenessProbes, pgProbe)
 
-	if *roverInboxCertificateData != "" {
-		p, err := postgres.ParseIosPlatform(*roverInboxCertificateData, *roverInboxCertificatePass)
-		if err != nil {
-			log.Fatalf("ParseIosPlatform: %v", err)
-		}
-		postgres.RoverInboxIosPlatform = p
+	if *roverInboxAPNSCertificateData != "" {
+		push.RoverInbox.APNS.CertData = *roverInboxAPNSCertificateData
+		push.RoverInbox.APNS.CertKey = *roverInboxAPNSCertificatePass
+	}
+
+	if *roverInboxFCMServerKey != "" {
+		push.RoverInbox.FCM.SenderId = *roverInboxFCMSenderId
+		push.RoverInbox.FCM.ServerKey = *roverInboxFCMServerKey
 	}
 
 	//
