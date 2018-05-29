@@ -1,5 +1,7 @@
 package push
 
+import "strings"
+
 // RoverInbox predefined credentials
 // NOTE: must be set from an entry point
 var RoverInbox struct {
@@ -19,5 +21,6 @@ func isRoverInboxIOSApp(bundleId string) bool {
 }
 
 func isRoverInboxAndroidApp(packageName string) bool {
-	return packageName == "io.rover.app.inbox" || packageName == "io.rover.app.debug"
+	const PackageName = "io.rover.app.inbox"
+	return packageName == PackageName || strings.HasPrefix(packageName, PackageName+".")
 }
