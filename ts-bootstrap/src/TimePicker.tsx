@@ -5,26 +5,23 @@ import SliderComponent from './SliderComponent'
 import { steel, graphite } from '../styles/colors'
 
 export type TimePickerProps = {
-    hour: number
-    minute: number
-    period: string
-    handleHourChange: (hour: number) => void
-    handleMinuteChange: (minute: number) => void
-    handlePeriodChange: (period: string) => void
+    seconds?: number
+    handleSecondsChange: (seconds: number) => void
     containerStyle?: React.CSSProperties
 }
 
 const TimePicker: React.SFC<TimePickerProps> = ({
-    hour,
-    minute,
-    period,
-    handleHourChange,
-    handleMinuteChange,
-    containerStyle,
-    handlePeriodChange
+    seconds,
+    handleSecondsChange,
+    containerStyle
 }) => {
-    const formatMinute = () =>
-        minute.toString().length === 1 ? `0${minute}` : minute
+    const minutes = Math.floor(seconds / 60) % 60
+    let hours = Math.floor(seconds / 3600) % 3600
+
+    const period = seconds - 12 * 3600 < 0 ? 'AM' : 'PM'
+    if (period === 'PM') {
+        hours = hours % 12
+    }
 
     return (
         <div
@@ -36,7 +33,9 @@ const TimePicker: React.SFC<TimePickerProps> = ({
         >
             <Text
                 size="x-large"
-                text={`${hour}:${formatMinute()} ${period}`}
+                text={`${hours === 0 || hours === 12 ? 12 : hours % 12}:${
+                    minutes.toString().length === 1 ? `0${minutes}` : minutes
+                } ${period}`}
                 textStyle={{ paddingBottom: 24 }}
             />
             <div
@@ -50,10 +49,13 @@ const TimePicker: React.SFC<TimePickerProps> = ({
                 <SliderComponent
                     min={1}
                     max={12}
-                    value={hour % 12 + 1}
-                    onChange={hour => 
-                        handleHourChange(((hour + 10) % 12) + 1)
-                    }
+                    value={hours % 12 + 1}
+                    onChange={newHour => {
+                        const convertedHour = newHour - 1
+                        const diffHours = convertedHour - hours
+
+                        handleSecondsChange(seconds + diffHours * 3600)
+                    }}
                     containerStyle={{
                         width: '100%'
                     }}
@@ -70,8 +72,12 @@ const TimePicker: React.SFC<TimePickerProps> = ({
                 <SliderComponent
                     min={0}
                     max={59}
-                    value={minute}
-                    onChange={handleMinuteChange}
+                    value={minutes}
+                    onChange={newMinute => {
+                        const diffMinutes = newMinute - minutes
+
+                        handleSecondsChange(seconds + diffMinutes * 60)
+                    }}
                     containerStyle={{
                         width: '100%'
                     }}
@@ -83,14 +89,32 @@ const TimePicker: React.SFC<TimePickerProps> = ({
                 style={{
                     outerStyle: {
                         backgroundColor: period === 'AM' ? steel : graphite,
-                        height: 23
+                        height: 22
+                    },
+                    textStyle: {
+                        lineHeight: '17px'
                     }
                 }}
                 text={period}
-                onClick={() => handlePeriodChange(period)}
+                onClick={() => {
+                    if (period === 'PM') {
+                        const seconds = minutes * 60 + (hours % 12) * 3600
+                        handleSecondsChange(seconds)
+                    } else {
+                        const seconds = minutes * 60 + (hours + 12) * 3600
+                        handleSecondsChange(seconds)
+                    }
+                }}
             />
         </div>
     )
+}
+
+TimePicker.defaultProps = {
+    seconds: (() => {
+        const dt = new Date()
+        return dt.getSeconds() + 60 * dt.getMinutes() + 60 * 60 * dt.getHours()
+    })()
 }
 
 export default TimePicker

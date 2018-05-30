@@ -1792,59 +1792,31 @@ storiesOf('TimePicker', module).add('pick time', () => {
     const Fragment = React.Fragment
 
     interface YState {
-        hour: number
-        minute: number
-        period: string
+        seconds: number
     }
 
     class Y extends React.Component<{}, YState> {
         // tslint:disable-next-line:no-any
         constructor(props: any) {
             super(props)
-            const currTime = moment()
-            let hour = currTime.hour()
-            let period = 'AM'
-            if (hour > 12) {
-                period = 'PM'
-                hour = hour - 12
-            }
-            const minute = currTime.minute()
+
             this.state = {
-                hour,
-                minute,
-                period
+                seconds: undefined
             }
-            this.handleHourChange = this.handleHourChange.bind(this)
-            this.handleMinuteChange = this.handleMinuteChange.bind(this)
-            this.handlePeriodChange = this.handlePeriodChange.bind(this)
+            this.handleSecondsChange = this.handleSecondsChange.bind(this)
         }
 
-        handleHourChange(hour: number) {
+        handleSecondsChange(seconds: number) {
             this.setState({
-                hour
-            })
-        }
-
-        handleMinuteChange(minute: number) {
-            this.setState({
-                minute
-            })
-        }
-
-        handlePeriodChange(period: string) {
-            this.setState({
-                period: period === 'AM' ? 'PM' : 'AM'
+                seconds
             })
         }
 
         render() {
-            const { hour, minute, period } = this.state
             return (
                 <TimePicker
                     {...this.state}
-                    handleHourChange={this.handleHourChange}
-                    handleMinuteChange={this.handleMinuteChange}
-                    handlePeriodChange={this.handlePeriodChange}
+                    handleSecondsChange={this.handleSecondsChange}
                 />
             )
         }
