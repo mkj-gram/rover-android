@@ -63,7 +63,7 @@ type editableUIState = {
     dateAndTime: UIStateField
 }
 
-declare abstract class Campaign {
+interface Campaign {
     name: string
     campaignId: string
     campaignType: CampaignType
@@ -71,7 +71,7 @@ declare abstract class Campaign {
     UIState: UIStateInterface | string
 }
 
-declare class ScheduledCampaign extends Campaign {
+interface ScheduledCampaign extends Campaign {
     notificationBody: string
     notificationTitle: string
     notificationAttachment: NotificationAttachment
@@ -102,7 +102,7 @@ declare class ScheduledCampaign extends Campaign {
     scheduledDeliveryStatus: ScheduledDeliveryStatus
 }
 
-declare class AutomatedNotificationCampaign extends Campaign {
+interface AutomatedNotificationCampaign extends Campaign {
     notificationBody: string
     notificationTitle: string
     notificationAttachment: NotificationAttachment
