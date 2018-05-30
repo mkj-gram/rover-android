@@ -1,25 +1,23 @@
 //
 //  Session.swift
-//  Experiences
+//  Auth
 //
 //  Created by Sean Rucker on 2018-05-19.
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
 
-import Foundation
-
-class Session {
-    static let shared = Session()
+public class Session {
+    public static let shared = Session()
     
-    struct Info: Codable {
-        var accountName: String
-        var token: String
-        var sdkToken: String
+    public struct Info: Codable {
+        public var accountName: String?
+        public var token: String
+        public var sdkToken: String
     }
     
-    private(set) var info: Info?
+    public private(set) var info: Info?
     
-    var isAuthenticated: Bool {
+    public var isAuthenticated: Bool {
         return info != nil
     }
     
@@ -29,18 +27,19 @@ class Session {
         }
     }
     
-    enum AuthenticationResult {
+    public enum AuthenticationResult {
         case failed(error: Error?)
         case success
     }
     
-    enum AuthenticationError: Error {
+    public enum AuthenticationError: Error {
         case invalidServerResponse
     }
     
-    func authenticate(email: String, password: String, completionHandler: ((AuthenticationResult) -> Void)?) {
+    public func authenticate(email: String, password: String, completionHandler: ((AuthenticationResult) -> Void)?) {
         invalidate()
-        let url = URL(string: "sessions", relativeTo: APIEndpoint.default.rawValue)!
+        let apiEndpoint = URL(string: "https://api.rover.io/v1/")!
+        let url = URL(string: "sessions", relativeTo: apiEndpoint)!
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -72,7 +71,7 @@ class Session {
                 return
             }
             
-            let url = URL(string: "accounts/\(intermediaryResponse.accountID)", relativeTo: APIEndpoint.default.rawValue)!
+            let url = URL(string: "accounts/\(intermediaryResponse.accountID)", relativeTo: apiEndpoint)!
             
             var request = URLRequest(url: url)
             request.addValue("Bearer \(intermediaryResponse.token)", forHTTPHeaderField: "Authorization")
@@ -117,7 +116,7 @@ class Session {
         task.resume()
     }
     
-    func invalidate() {
+    public func invalidate() {
         if !isAuthenticated {
             return
         }
@@ -127,7 +126,7 @@ class Session {
         NotificationCenter.default.post(name: .didInvalidate, object: self)
     }
     
-    func authorize(request: inout URLRequest) {
+    public func authorize(request: inout URLRequest) {
         guard let info = info else {
             return
         }
@@ -139,8 +138,8 @@ class Session {
 // MARK: Notification.Name
 
 extension Notification.Name {
-    static let didAuthenticate = Notification.Name("didAuthenticate")
-    static let didInvalidate = Notification.Name("didInvalidate")
+    public static let didAuthenticate = Notification.Name("didAuthenticate")
+    public static let didInvalidate = Notification.Name("didInvalidate")
 }
 
 // MARK: Credentials
@@ -219,7 +218,7 @@ fileprivate struct IntermediaryResponse: Decodable {
 // MARK: FinalResponse
 
 fileprivate struct FinalResponse: Decodable {
-    var title: String
+    var title: String?
     var token: String
     
     private enum CodingKeys: String, CodingKey {
@@ -239,7 +238,7 @@ fileprivate struct FinalResponse: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let dataContainer = try container.nestedContainer(keyedBy: DataKeys.self, forKey: .data)
         let attributesContainer = try dataContainer.nestedContainer(keyedBy: AttributesKeys.self, forKey: .attributes)
-        title = try attributesContainer.decode(String.self, forKey: .title)
+        title = try attributesContainer.decode(String?.self, forKey: .title)
         token = try attributesContainer.decode(String.self, forKey: .token)
     }
 }

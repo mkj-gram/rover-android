@@ -1,0 +1,613 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DB5675B320BEC2840010141A /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5675B220BEC2840010141A /* NotificationService.swift */; };
+		DB5675B720BEC2840010141A /* NotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = DB5675B020BEC2830010141A /* NotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DB5DB15A20BECAF200785CD1 /* RoverAppExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB5DB15920BECAF200785CD1 /* RoverAppExtensions.framework */; };
+		DB5DB15B20BECAF200785CD1 /* RoverAppExtensions.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DB5DB15920BECAF200785CD1 /* RoverAppExtensions.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB5DB15E20BECB0200785CD1 /* RoverAppExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB5DB15D20BECB0200785CD1 /* RoverAppExtensions.framework */; };
+		DB6ADDAD20B5DB24002F226C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADDAC20B5DB24002F226C /* AppDelegate.swift */; };
+		DB6ADDB420B5DB28002F226C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DB6ADDB320B5DB28002F226C /* Assets.xcassets */; };
+		DB6ADDB720B5DB28002F226C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB6ADDB520B5DB28002F226C /* LaunchScreen.storyboard */; };
+		DBBEC94120B5F53700691F08 /* Auth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94020B5F53700691F08 /* Auth.framework */; };
+		DBBEC94220B5F53700691F08 /* Auth.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94020B5F53700691F08 /* Auth.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC94420B5F53700691F08 /* Components.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94320B5F53700691F08 /* Components.framework */; };
+		DBBEC94520B5F53700691F08 /* Components.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94320B5F53700691F08 /* Components.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC94720B5F53700691F08 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94620B5F53700691F08 /* RoverFoundation.framework */; };
+		DBBEC94820B5F53700691F08 /* RoverFoundation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94620B5F53700691F08 /* RoverFoundation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC94A20B5F53700691F08 /* RoverNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94920B5F53700691F08 /* RoverNotifications.framework */; };
+		DBBEC94B20B5F53700691F08 /* RoverNotifications.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94920B5F53700691F08 /* RoverNotifications.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC94D20B5F53700691F08 /* RoverLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94C20B5F53700691F08 /* RoverLocation.framework */; };
+		DBBEC94E20B5F53800691F08 /* RoverLocation.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94C20B5F53700691F08 /* RoverLocation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC95020B5F53800691F08 /* RoverBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94F20B5F53800691F08 /* RoverBluetooth.framework */; };
+		DBBEC95120B5F53800691F08 /* RoverBluetooth.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC94F20B5F53800691F08 /* RoverBluetooth.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC95320B5F53800691F08 /* RoverExperiences.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95220B5F53800691F08 /* RoverExperiences.framework */; };
+		DBBEC95420B5F53800691F08 /* RoverExperiences.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95220B5F53800691F08 /* RoverExperiences.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC95620B5F53800691F08 /* RoverEvents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95520B5F53800691F08 /* RoverEvents.framework */; };
+		DBBEC95720B5F53800691F08 /* RoverEvents.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95520B5F53800691F08 /* RoverEvents.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC95920B5F53800691F08 /* RoverApplication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95820B5F53800691F08 /* RoverApplication.framework */; };
+		DBBEC95A20B5F53800691F08 /* RoverApplication.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95820B5F53800691F08 /* RoverApplication.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC95C20B5F53800691F08 /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95B20B5F53800691F08 /* RoverUI.framework */; };
+		DBBEC95D20B5F53800691F08 /* RoverUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95B20B5F53800691F08 /* RoverUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC95F20B5F53800691F08 /* RoverIdentity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95E20B5F53800691F08 /* RoverIdentity.framework */; };
+		DBBEC96020B5F53800691F08 /* RoverIdentity.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC95E20B5F53800691F08 /* RoverIdentity.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC96520B637AA00691F08 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBEC96420B637AA00691F08 /* NavigationController.swift */; };
+		DBBEC96820BAEE5900691F08 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DBBEC96720BAEE5900691F08 /* Main.storyboard */; };
+		DBBEC96A20BAF2D900691F08 /* AuthorizeNotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBEC96920BAF2D900691F08 /* AuthorizeNotificationsViewController.swift */; };
+		DBBEC96C20BAF2FA00691F08 /* AuthorizeLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBEC96B20BAF2FA00691F08 /* AuthorizeLocationViewController.swift */; };
+		DBBEC96E20BAF36F00691F08 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBEC96D20BAF36F00691F08 /* OnboardingViewController.swift */; };
+		DBBEC97020BAF56000691F08 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBEC96F20BAF56000691F08 /* RootViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DB5675B520BEC2840010141A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DB6ADDA120B5DB24002F226C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DB5675AF20BEC2830010141A;
+			remoteInfo = NotificationServiceExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DB5675BB20BEC2840010141A /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DB5675B720BEC2840010141A /* NotificationServiceExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBBEC96120B5F53800691F08 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DBBEC94E20B5F53800691F08 /* RoverLocation.framework in Embed Frameworks */,
+				DBBEC95420B5F53800691F08 /* RoverExperiences.framework in Embed Frameworks */,
+				DBBEC94B20B5F53700691F08 /* RoverNotifications.framework in Embed Frameworks */,
+				DBBEC96020B5F53800691F08 /* RoverIdentity.framework in Embed Frameworks */,
+				DBBEC95D20B5F53800691F08 /* RoverUI.framework in Embed Frameworks */,
+				DBBEC95120B5F53800691F08 /* RoverBluetooth.framework in Embed Frameworks */,
+				DBBEC95720B5F53800691F08 /* RoverEvents.framework in Embed Frameworks */,
+				DBBEC95A20B5F53800691F08 /* RoverApplication.framework in Embed Frameworks */,
+				DBBEC94520B5F53700691F08 /* Components.framework in Embed Frameworks */,
+				DBBEC94820B5F53700691F08 /* RoverFoundation.framework in Embed Frameworks */,
+				DBBEC94220B5F53700691F08 /* Auth.framework in Embed Frameworks */,
+				DB5DB15B20BECAF200785CD1 /* RoverAppExtensions.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DB3DDA5520BB0D3D005D832A /* Inbox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Inbox.entitlements; sourceTree = "<group>"; };
+		DB5675B020BEC2830010141A /* NotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB5675B220BEC2840010141A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		DB5675B420BEC2840010141A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DB5DB15920BECAF200785CD1 /* RoverAppExtensions.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverAppExtensions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB5DB15D20BECB0200785CD1 /* RoverAppExtensions.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverAppExtensions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB5DB15F20BECBDB00785CD1 /* NotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationServiceExtension.entitlements; sourceTree = "<group>"; };
+		DB6ADDA920B5DB24002F226C /* Inbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Inbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB6ADDAC20B5DB24002F226C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DB6ADDB320B5DB28002F226C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DB6ADDB620B5DB28002F226C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DB6ADDB820B5DB28002F226C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DBBEC94020B5F53700691F08 /* Auth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Auth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC94320B5F53700691F08 /* Components.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Components.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC94620B5F53700691F08 /* RoverFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC94920B5F53700691F08 /* RoverNotifications.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverNotifications.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC94C20B5F53700691F08 /* RoverLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC94F20B5F53800691F08 /* RoverBluetooth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverBluetooth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC95220B5F53800691F08 /* RoverExperiences.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverExperiences.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC95520B5F53800691F08 /* RoverEvents.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverEvents.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC95820B5F53800691F08 /* RoverApplication.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverApplication.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC95B20B5F53800691F08 /* RoverUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC95E20B5F53800691F08 /* RoverIdentity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverIdentity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC96420B637AA00691F08 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
+		DBBEC96720BAEE5900691F08 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		DBBEC96920BAF2D900691F08 /* AuthorizeNotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizeNotificationsViewController.swift; sourceTree = "<group>"; };
+		DBBEC96B20BAF2FA00691F08 /* AuthorizeLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizeLocationViewController.swift; sourceTree = "<group>"; };
+		DBBEC96D20BAF36F00691F08 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
+		DBBEC96F20BAF56000691F08 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DB5675AD20BEC2830010141A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB5DB15E20BECB0200785CD1 /* RoverAppExtensions.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6ADDA620B5DB24002F226C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBBEC94D20B5F53700691F08 /* RoverLocation.framework in Frameworks */,
+				DBBEC95320B5F53800691F08 /* RoverExperiences.framework in Frameworks */,
+				DBBEC94A20B5F53700691F08 /* RoverNotifications.framework in Frameworks */,
+				DBBEC95F20B5F53800691F08 /* RoverIdentity.framework in Frameworks */,
+				DBBEC95C20B5F53800691F08 /* RoverUI.framework in Frameworks */,
+				DBBEC95020B5F53800691F08 /* RoverBluetooth.framework in Frameworks */,
+				DBBEC95620B5F53800691F08 /* RoverEvents.framework in Frameworks */,
+				DBBEC95920B5F53800691F08 /* RoverApplication.framework in Frameworks */,
+				DBBEC94420B5F53700691F08 /* Components.framework in Frameworks */,
+				DBBEC94720B5F53700691F08 /* RoverFoundation.framework in Frameworks */,
+				DBBEC94120B5F53700691F08 /* Auth.framework in Frameworks */,
+				DB5DB15A20BECAF200785CD1 /* RoverAppExtensions.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DB5675B120BEC2830010141A /* NotificationServiceExtension */ = {
+			isa = PBXGroup;
+			children = (
+				DB5DB15F20BECBDB00785CD1 /* NotificationServiceExtension.entitlements */,
+				DB5675B220BEC2840010141A /* NotificationService.swift */,
+				DB5675B420BEC2840010141A /* Info.plist */,
+			);
+			path = NotificationServiceExtension;
+			sourceTree = "<group>";
+		};
+		DB5DB15C20BECB0200785CD1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DB5DB15D20BECB0200785CD1 /* RoverAppExtensions.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DB6ADDA020B5DB24002F226C = {
+			isa = PBXGroup;
+			children = (
+				DB5DB15920BECAF200785CD1 /* RoverAppExtensions.framework */,
+				DBBEC95E20B5F53800691F08 /* RoverIdentity.framework */,
+				DBBEC95B20B5F53800691F08 /* RoverUI.framework */,
+				DBBEC95820B5F53800691F08 /* RoverApplication.framework */,
+				DBBEC95520B5F53800691F08 /* RoverEvents.framework */,
+				DBBEC95220B5F53800691F08 /* RoverExperiences.framework */,
+				DBBEC94F20B5F53800691F08 /* RoverBluetooth.framework */,
+				DBBEC94C20B5F53700691F08 /* RoverLocation.framework */,
+				DBBEC94920B5F53700691F08 /* RoverNotifications.framework */,
+				DBBEC94620B5F53700691F08 /* RoverFoundation.framework */,
+				DBBEC94320B5F53700691F08 /* Components.framework */,
+				DBBEC94020B5F53700691F08 /* Auth.framework */,
+				DB6ADDAB20B5DB24002F226C /* Inbox */,
+				DB5675B120BEC2830010141A /* NotificationServiceExtension */,
+				DB6ADDAA20B5DB24002F226C /* Products */,
+				DB5DB15C20BECB0200785CD1 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		DB6ADDAA20B5DB24002F226C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DB6ADDA920B5DB24002F226C /* Inbox.app */,
+				DB5675B020BEC2830010141A /* NotificationServiceExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DB6ADDAB20B5DB24002F226C /* Inbox */ = {
+			isa = PBXGroup;
+			children = (
+				DBBEC96620B9A7FA00691F08 /* Supporting Files */,
+				DB6ADDAC20B5DB24002F226C /* AppDelegate.swift */,
+				DBBEC96B20BAF2FA00691F08 /* AuthorizeLocationViewController.swift */,
+				DBBEC96920BAF2D900691F08 /* AuthorizeNotificationsViewController.swift */,
+				DBBEC96420B637AA00691F08 /* NavigationController.swift */,
+				DBBEC96D20BAF36F00691F08 /* OnboardingViewController.swift */,
+				DBBEC96F20BAF56000691F08 /* RootViewController.swift */,
+			);
+			path = Inbox;
+			sourceTree = "<group>";
+		};
+		DBBEC96620B9A7FA00691F08 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				DB6ADDB320B5DB28002F226C /* Assets.xcassets */,
+				DB6ADDB520B5DB28002F226C /* LaunchScreen.storyboard */,
+				DB6ADDB820B5DB28002F226C /* Info.plist */,
+				DBBEC96720BAEE5900691F08 /* Main.storyboard */,
+				DB3DDA5520BB0D3D005D832A /* Inbox.entitlements */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DB5675AF20BEC2830010141A /* NotificationServiceExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB5675BA20BEC2840010141A /* Build configuration list for PBXNativeTarget "NotificationServiceExtension" */;
+			buildPhases = (
+				DB5675AC20BEC2830010141A /* Sources */,
+				DB5675AD20BEC2830010141A /* Frameworks */,
+				DB5675AE20BEC2830010141A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NotificationServiceExtension;
+			productName = NotificationServiceExtension;
+			productReference = DB5675B020BEC2830010141A /* NotificationServiceExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		DB6ADDA820B5DB24002F226C /* Inbox */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB6ADDBB20B5DB28002F226C /* Build configuration list for PBXNativeTarget "Inbox" */;
+			buildPhases = (
+				DB6ADDA520B5DB24002F226C /* Sources */,
+				DB6ADDA620B5DB24002F226C /* Frameworks */,
+				DB6ADDA720B5DB24002F226C /* Resources */,
+				DBBEC96120B5F53800691F08 /* Embed Frameworks */,
+				DB5675BB20BEC2840010141A /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DB5675B620BEC2840010141A /* PBXTargetDependency */,
+			);
+			name = Inbox;
+			productName = Inbox;
+			productReference = DB6ADDA920B5DB24002F226C /* Inbox.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DB6ADDA120B5DB24002F226C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0930;
+				LastUpgradeCheck = 0930;
+				ORGANIZATIONNAME = "Sean Rucker";
+				TargetAttributes = {
+					DB5675AF20BEC2830010141A = {
+						CreatedOnToolsVersion = 9.3.1;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					DB6ADDA820B5DB24002F226C = {
+						CreatedOnToolsVersion = 9.3.1;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = DB6ADDA420B5DB24002F226C /* Build configuration list for PBXProject "Inbox" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DB6ADDA020B5DB24002F226C;
+			productRefGroup = DB6ADDAA20B5DB24002F226C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DB6ADDA820B5DB24002F226C /* Inbox */,
+				DB5675AF20BEC2830010141A /* NotificationServiceExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DB5675AE20BEC2830010141A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6ADDA720B5DB24002F226C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBBEC96820BAEE5900691F08 /* Main.storyboard in Resources */,
+				DB6ADDB720B5DB28002F226C /* LaunchScreen.storyboard in Resources */,
+				DB6ADDB420B5DB28002F226C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DB5675AC20BEC2830010141A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB5675B320BEC2840010141A /* NotificationService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB6ADDA520B5DB24002F226C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBBEC96520B637AA00691F08 /* NavigationController.swift in Sources */,
+				DBBEC96A20BAF2D900691F08 /* AuthorizeNotificationsViewController.swift in Sources */,
+				DBBEC97020BAF56000691F08 /* RootViewController.swift in Sources */,
+				DBBEC96E20BAF36F00691F08 /* OnboardingViewController.swift in Sources */,
+				DB6ADDAD20B5DB24002F226C /* AppDelegate.swift in Sources */,
+				DBBEC96C20BAF2FA00691F08 /* AuthorizeLocationViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DB5675B620BEC2840010141A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DB5675AF20BEC2830010141A /* NotificationServiceExtension */;
+			targetProxy = DB5675B520BEC2840010141A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		DB6ADDB520B5DB28002F226C /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DB6ADDB620B5DB28002F226C /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		DB5675B820BEC2840010141A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/NotificationServiceExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WDEZX8QD47;
+				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.rover.Inbox.NotificationServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DB5675B920BEC2840010141A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NotificationServiceExtension/NotificationServiceExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WDEZX8QD47;
+				INFOPLIST_FILE = NotificationServiceExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.rover.Inbox.NotificationServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DB6ADDB920B5DB28002F226C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DB6ADDBA20B5DB28002F226C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DB6ADDBC20B5DB28002F226C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Inbox/Inbox.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WDEZX8QD47;
+				INFOPLIST_FILE = Inbox/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.rover.Inbox;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		DB6ADDBD20B5DB28002F226C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Inbox/Inbox.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WDEZX8QD47;
+				INFOPLIST_FILE = Inbox/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.rover.Inbox;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DB5675BA20BEC2840010141A /* Build configuration list for PBXNativeTarget "NotificationServiceExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB5675B820BEC2840010141A /* Debug */,
+				DB5675B920BEC2840010141A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DB6ADDA420B5DB24002F226C /* Build configuration list for PBXProject "Inbox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB6ADDB920B5DB28002F226C /* Debug */,
+				DB6ADDBA20B5DB28002F226C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DB6ADDBB20B5DB28002F226C /* Build configuration list for PBXNativeTarget "Inbox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB6ADDBC20B5DB28002F226C /* Debug */,
+				DB6ADDBD20B5DB28002F226C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DB6ADDA120B5DB24002F226C /* Project object */;
+}

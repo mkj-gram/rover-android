@@ -1,15 +1,13 @@
 //
 //  SignInViewController.swift
-//  Experiences
+//  Auth
 //
 //  Created by Sean Rucker on 2018-05-19.
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
 
-import UIKit
-
-public class SignInViewController: UIViewController {
-    override public var preferredStatusBarStyle: UIStatusBarStyle {
+open class SignInViewController: UIViewController {
+    override open var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
     
@@ -72,7 +70,7 @@ public class SignInViewController: UIViewController {
     private var logoTopConstraint: NSLayoutConstraint!
     private var emailFieldTopConstraint: NSLayoutConstraint!
     
-    override public func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor(red: 52/255, green: 58/255, blue: 76/255, alpha: 1.0)
@@ -212,7 +210,6 @@ public class SignInViewController: UIViewController {
 }
 
 extension SignInViewController: UITextFieldDelegate {
-    
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         switch textField {
         case emailField:

@@ -6,6 +6,7 @@
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
 
+import Auth
 import RoverExperiences
 
 class TableViewController: UITableViewController {
@@ -59,7 +60,8 @@ class TableViewController: UITableViewController {
     }
     
     @objc func reloadExperiences() {
-        let url = URL(string: "experience-list-items", relativeTo: APIEndpoint.default.rawValue)!
+        let apiEndpoint = URL(string: "https://api.rover.io/v1/")!
+        let url = URL(string: "experience-list-items", relativeTo: apiEndpoint)!
         var request = URLRequest(url: url)
         Session.shared.authorize(request: &request)
         

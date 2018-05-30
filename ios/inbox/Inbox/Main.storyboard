@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Jg2-bd-Tzl">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Authorize Location View Controller-->
+        <scene sceneID="6MW-AI-PJY">
+            <objects>
+                <viewController storyboardIdentifier="authorizeLocation" id="4lY-Z8-i1g" customClass="AuthorizeLocationViewController" customModule="Inbox" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="1zv-ah-vvL"/>
+                        <viewControllerLayoutGuide type="bottom" id="ZEf-Dk-Wr2"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Fux-iV-1Xn">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2oO-gh-2Pr" userLabel="Panel">
+                                <rect key="frame" x="77.5" y="183.5" width="220" height="300"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Location Icon" translatesAutoresizingMaskIntoConstraints="NO" id="LAl-fc-cYy">
+                                        <rect key="frame" x="84" y="0.0" width="52" height="52"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="52" id="C2Q-bT-KOJ"/>
+                                            <constraint firstAttribute="height" constant="52" id="em4-qK-mvb"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Location Permissions" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qjR-kc-WLY">
+                                        <rect key="frame" x="28" y="82" width="163" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.1673478484" green="0.80810064079999999" blue="0.87246710059999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r5d-bj-mIO">
+                                        <rect key="frame" x="0.0" y="123" width="220" height="50.5"/>
+                                        <attributedString key="attributedText">
+                                            <fragment content="Rover Inbox needs location permissions turned on for it to detect beacons and geofences">
+                                                <attributes>
+                                                    <font key="NSFont" metaFont="system" size="14"/>
+                                                    <real key="NSKern" value="0.0"/>
+                                                    <font key="NSOriginalFont" metaFont="system" size="14"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                        <tabStops/>
+                                                    </paragraphStyle>
+                                                    <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </attributes>
+                                            </fragment>
+                                        </attributedString>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ngo-3z-h9l" customClass="RoundedButton" customModule="Components">
+                                        <rect key="frame" x="50" y="192.5" width="120" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="120" id="8ak-iJ-zWl"/>
+                                        </constraints>
+                                        <color key="tintColor" red="0.1673478484" green="0.80810064079999999" blue="0.87246710059999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" title="Turn On">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="requestAuthorization" destination="4lY-Z8-i1g" eventType="touchUpInside" id="i8z-yY-JCK"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="r5d-bj-mIO" firstAttribute="leading" secondItem="2oO-gh-2Pr" secondAttribute="leading" id="6Yq-FG-bh5"/>
+                                    <constraint firstAttribute="trailing" secondItem="r5d-bj-mIO" secondAttribute="trailing" id="86D-A7-qt7"/>
+                                    <constraint firstAttribute="width" constant="220" id="Apa-Gw-f1U"/>
+                                    <constraint firstItem="qjR-kc-WLY" firstAttribute="top" secondItem="LAl-fc-cYy" secondAttribute="bottom" constant="30" id="ODz-bg-Abc"/>
+                                    <constraint firstItem="ngo-3z-h9l" firstAttribute="top" secondItem="r5d-bj-mIO" secondAttribute="bottom" constant="19" id="Uqd-pb-GwQ"/>
+                                    <constraint firstItem="r5d-bj-mIO" firstAttribute="top" secondItem="qjR-kc-WLY" secondAttribute="bottom" constant="20" id="WLR-54-jQn"/>
+                                    <constraint firstItem="ngo-3z-h9l" firstAttribute="centerX" secondItem="2oO-gh-2Pr" secondAttribute="centerX" id="bIf-oP-imi"/>
+                                    <constraint firstAttribute="height" constant="300" id="lQm-BR-o7K"/>
+                                    <constraint firstItem="qjR-kc-WLY" firstAttribute="centerX" secondItem="2oO-gh-2Pr" secondAttribute="centerX" id="mRy-XV-ouj"/>
+                                    <constraint firstItem="LAl-fc-cYy" firstAttribute="centerX" secondItem="2oO-gh-2Pr" secondAttribute="centerX" id="pvc-CY-Mup"/>
+                                    <constraint firstItem="LAl-fc-cYy" firstAttribute="top" secondItem="2oO-gh-2Pr" secondAttribute="top" id="r8i-rD-TDc"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="2oO-gh-2Pr" firstAttribute="centerX" secondItem="Fux-iV-1Xn" secondAttribute="centerX" id="LbM-Cb-wFM"/>
+                            <constraint firstItem="2oO-gh-2Pr" firstAttribute="centerY" secondItem="Fux-iV-1Xn" secondAttribute="centerY" id="LqB-Qd-0CK"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="tgM-O8-JBw"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="MLt-cg-ylY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-529" y="-406"/>
+        </scene>
+        <!--Root View Controller-->
+        <scene sceneID="UJZ-d0-kq8">
+            <objects>
+                <viewController id="Jg2-bd-Tzl" customClass="RootViewController" customModule="Inbox" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="u73-Z5-qye">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="w6b-AV-uMY"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dXb-h0-vEX" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2078" y="-406"/>
+        </scene>
+        <!--Onboarding View Controller-->
+        <scene sceneID="udE-Pk-ar9">
+            <objects>
+                <pageViewController storyboardIdentifier="onboarding" autoresizesArchivedViewToFullSize="NO" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="3A3-S3-plL" customClass="OnboardingViewController" customModule="Inbox" customModuleProvider="target" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="3sF-0N-BfH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1300" y="-406"/>
+        </scene>
+        <!--Authorize Notifications View Controller-->
+        <scene sceneID="5Nb-uS-bP1">
+            <objects>
+                <viewController storyboardIdentifier="authorizeNotifications" id="EQq-oA-NXM" customClass="AuthorizeNotificationsViewController" customModule="Inbox" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="X8X-Oy-5q6"/>
+                        <viewControllerLayoutGuide type="bottom" id="gWr-xQ-JqS"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="k5k-qf-doS">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UHU-fT-srx" userLabel="Panel">
+                                <rect key="frame" x="77" y="183" width="220" height="300"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Notification Icon" translatesAutoresizingMaskIntoConstraints="NO" id="WRw-lM-74M">
+                                        <rect key="frame" x="84" y="0.0" width="52" height="52"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="52" id="hiH-t6-TXA"/>
+                                            <constraint firstAttribute="width" constant="52" id="jO3-oY-GNZ"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Notification Permissions" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WKb-T9-1Rq">
+                                        <rect key="frame" x="17.5" y="82" width="185" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.1673478484" green="0.80810064079999999" blue="0.87246710059999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MiG-rK-8qb">
+                                        <rect key="frame" x="0.0" y="123" width="220" height="50.5"/>
+                                        <attributedString key="attributedText">
+                                            <fragment content="Rover Inbox needs ">
+                                                <attributes>
+                                                    <color key="NSColor" red="0.36466276650000001" green="0.36473065609999999" blue="0.3646585047" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <font key="NSFont" metaFont="system" size="14"/>
+                                                    <real key="NSKern" value="0.0"/>
+                                                    <font key="NSOriginalFont" metaFont="system" size="14"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                        <tabStops/>
+                                                    </paragraphStyle>
+                                                    <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content="notification">
+                                                <attributes>
+                                                    <color key="NSColor" red="0.36466276650000001" green="0.36473065609999999" blue="0.3646585047" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <font key="NSFont" metaFont="system" size="14"/>
+                                                    <real key="NSKern" value="0.0"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                        <tabStops/>
+                                                    </paragraphStyle>
+                                                    <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content=" permissions turned on for it to ">
+                                                <attributes>
+                                                    <color key="NSColor" red="0.36466276650000001" green="0.36473065609999999" blue="0.3646585047" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <font key="NSFont" metaFont="system" size="14"/>
+                                                    <real key="NSKern" value="0.0"/>
+                                                    <font key="NSOriginalFont" metaFont="system" size="14"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                        <tabStops/>
+                                                    </paragraphStyle>
+                                                    <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </attributes>
+                                            </fragment>
+                                            <fragment content="receive push notifications">
+                                                <attributes>
+                                                    <color key="NSColor" red="0.36466276650000001" green="0.36473065609999999" blue="0.3646585047" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <font key="NSFont" metaFont="system" size="14"/>
+                                                    <real key="NSKern" value="0.0"/>
+                                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                        <tabStops/>
+                                                    </paragraphStyle>
+                                                    <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </attributes>
+                                            </fragment>
+                                        </attributedString>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6OX-t2-xme" customClass="RoundedButton" customModule="Components">
+                                        <rect key="frame" x="50" y="192.5" width="120" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="120" id="BWG-Br-BWv"/>
+                                        </constraints>
+                                        <color key="tintColor" red="0.1673478484" green="0.80810064079999999" blue="0.87246710059999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" title="Turn On">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="requestAuthorization" destination="EQq-oA-NXM" eventType="touchUpInside" id="2If-sm-iJj"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="6OX-t2-xme" firstAttribute="top" secondItem="MiG-rK-8qb" secondAttribute="bottom" constant="19" id="1XN-2R-fz1"/>
+                                    <constraint firstItem="WKb-T9-1Rq" firstAttribute="centerX" secondItem="UHU-fT-srx" secondAttribute="centerX" id="5pp-uK-7Cq"/>
+                                    <constraint firstAttribute="trailing" secondItem="MiG-rK-8qb" secondAttribute="trailing" id="7Vh-YR-jvZ"/>
+                                    <constraint firstItem="WRw-lM-74M" firstAttribute="centerX" secondItem="UHU-fT-srx" secondAttribute="centerX" id="DXM-ST-e4v"/>
+                                    <constraint firstItem="WKb-T9-1Rq" firstAttribute="top" secondItem="WRw-lM-74M" secondAttribute="bottom" constant="30" id="WPT-fn-fde"/>
+                                    <constraint firstAttribute="width" constant="220" id="X3j-li-g5C"/>
+                                    <constraint firstItem="MiG-rK-8qb" firstAttribute="top" secondItem="WKb-T9-1Rq" secondAttribute="bottom" constant="20" id="XG5-gi-aOD"/>
+                                    <constraint firstAttribute="height" constant="300" id="Ypr-Zj-iIr"/>
+                                    <constraint firstItem="MiG-rK-8qb" firstAttribute="leading" secondItem="UHU-fT-srx" secondAttribute="leading" id="dTn-sv-0o6"/>
+                                    <constraint firstItem="WRw-lM-74M" firstAttribute="top" secondItem="UHU-fT-srx" secondAttribute="top" id="oxA-xU-Qp2"/>
+                                    <constraint firstItem="6OX-t2-xme" firstAttribute="centerX" secondItem="UHU-fT-srx" secondAttribute="centerX" id="rch-CO-wyn"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="UHU-fT-srx" firstAttribute="centerY" secondItem="k5k-qf-doS" secondAttribute="centerY" id="8Qt-LI-cyZ"/>
+                            <constraint firstItem="UHU-fT-srx" firstAttribute="centerX" secondItem="k5k-qf-doS" secondAttribute="centerX" id="gJD-PE-5Nn"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="3bz-pc-VQ2"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="OZQ-Ak-dYS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="234" y="-406"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Location Icon" width="52" height="52"/>
+        <image name="Notification Icon" width="52" height="52"/>
+    </resources>
+</document>

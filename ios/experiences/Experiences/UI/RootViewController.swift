@@ -6,7 +6,7 @@
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
 
-import UIKit
+import Auth
 
 class RootViewController: SignInViewController {
     override func viewDidLoad() {

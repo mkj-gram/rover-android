@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		DB6ADD3A20B1EE92002F226C /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD3920B1EE92002F226C /* NavigationController.swift */; };
 		DB6ADD3C20B1EECC002F226C /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD3B20B1EECC002F226C /* TableViewController.swift */; };
-		DB6ADD4020B211F5002F226C /* APIEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD3F20B211F5002F226C /* APIEndpoint.swift */; };
 		DB6ADD4220B21F9C002F226C /* TableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD4120B21F9C002F226C /* TableHeader.swift */; };
 		DB6ADD4420B22BA0002F226C /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD4320B22BA0002F226C /* RootViewController.swift */; };
 		DB6ADD9320B3634F002F226C /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD4C20B30F9B002F226C /* RoverFoundation.framework */; };
@@ -20,16 +19,14 @@
 		DB6ADD9920B3634F002F226C /* RoverUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD9720B3634F002F226C /* RoverUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DB6ADD9E20B37763002F226C /* RoverEvents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD9C20B3774C002F226C /* RoverEvents.framework */; };
 		DB6ADD9F20B37763002F226C /* RoverEvents.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD9C20B3774C002F226C /* RoverEvents.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC93A20B5F2C600691F08 /* Auth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC93920B5F2C600691F08 /* Auth.framework */; };
+		DBBEC93B20B5F2C600691F08 /* Auth.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC93920B5F2C600691F08 /* Auth.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBBEC93D20B5F2C600691F08 /* Components.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC93C20B5F2C600691F08 /* Components.framework */; };
+		DBBEC93E20B5F2C600691F08 /* Components.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC93C20B5F2C600691F08 /* Components.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBE03B4920B0864C00F3CE95 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B4820B0864C00F3CE95 /* AppDelegate.swift */; };
 		DBE03B4E20B0864C00F3CE95 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DBE03B4C20B0864C00F3CE95 /* Main.storyboard */; };
 		DBE03B5020B0864E00F3CE95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DBE03B4F20B0864E00F3CE95 /* Assets.xcassets */; };
 		DBE03B5320B0864E00F3CE95 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DBE03B5120B0864E00F3CE95 /* LaunchScreen.storyboard */; };
-		DBE03B5C20B08AB200F3CE95 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B5B20B08AB200F3CE95 /* SignInViewController.swift */; };
-		DBE03B6020B08AF600F3CE95 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B5F20B08AF600F3CE95 /* UIColor.swift */; };
-		DBE03B6320B08CA900F3CE95 /* UnderlineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B6220B08CA900F3CE95 /* UnderlineTextField.swift */; };
-		DBE03B6520B08CE100F3CE95 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B6420B08CE100F3CE95 /* UIImage.swift */; };
-		DBE03B6720B08D1200F3CE95 /* RoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B6620B08D1200F3CE95 /* RoundedButton.swift */; };
-		DBE03B7020B08D9400F3CE95 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B6A20B08D9400F3CE95 /* Session.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -40,8 +37,10 @@
 			dstSubfolderSpec = 10;
 			files = (
 				DB6ADD9F20B37763002F226C /* RoverEvents.framework in Embed Frameworks */,
+				DBBEC93B20B5F2C600691F08 /* Auth.framework in Embed Frameworks */,
 				DB6ADD9420B3634F002F226C /* RoverFoundation.framework in Embed Frameworks */,
 				DB6ADD9920B3634F002F226C /* RoverUI.framework in Embed Frameworks */,
+				DBBEC93E20B5F2C600691F08 /* Components.framework in Embed Frameworks */,
 				DB6ADD9620B3634F002F226C /* RoverExperiences.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -52,25 +51,20 @@
 /* Begin PBXFileReference section */
 		DB6ADD3920B1EE92002F226C /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		DB6ADD3B20B1EECC002F226C /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
-		DB6ADD3F20B211F5002F226C /* APIEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoint.swift; sourceTree = "<group>"; };
 		DB6ADD4120B21F9C002F226C /* TableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableHeader.swift; sourceTree = "<group>"; };
 		DB6ADD4320B22BA0002F226C /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		DB6ADD4820B30E7F002F226C /* RoverExperiences.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverExperiences.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB6ADD4C20B30F9B002F226C /* RoverFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB6ADD9720B3634F002F226C /* RoverUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB6ADD9C20B3774C002F226C /* RoverEvents.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverEvents.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC93920B5F2C600691F08 /* Auth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Auth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBBEC93C20B5F2C600691F08 /* Components.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Components.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBE03B4520B0864C00F3CE95 /* Experiences.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Experiences.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBE03B4820B0864C00F3CE95 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DBE03B4D20B0864C00F3CE95 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		DBE03B4F20B0864E00F3CE95 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DBE03B5220B0864E00F3CE95 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DBE03B5420B0864E00F3CE95 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DBE03B5B20B08AB200F3CE95 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
-		DBE03B5F20B08AF600F3CE95 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
-		DBE03B6220B08CA900F3CE95 /* UnderlineTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnderlineTextField.swift; sourceTree = "<group>"; };
-		DBE03B6420B08CE100F3CE95 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
-		DBE03B6620B08D1200F3CE95 /* RoundedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedButton.swift; sourceTree = "<group>"; };
-		DBE03B6A20B08D9400F3CE95 /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,8 +73,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB6ADD9E20B37763002F226C /* RoverEvents.framework in Frameworks */,
+				DBBEC93A20B5F2C600691F08 /* Auth.framework in Frameworks */,
 				DB6ADD9320B3634F002F226C /* RoverFoundation.framework in Frameworks */,
 				DB6ADD9820B3634F002F226C /* RoverUI.framework in Frameworks */,
+				DBBEC93D20B5F2C600691F08 /* Components.framework in Frameworks */,
 				DB6ADD9520B3634F002F226C /* RoverExperiences.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -107,9 +103,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		DBBEC93F20B5F2F500691F08 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				DBE03B4C20B0864C00F3CE95 /* Main.storyboard */,
+				DBE03B4F20B0864E00F3CE95 /* Assets.xcassets */,
+				DBE03B5120B0864E00F3CE95 /* LaunchScreen.storyboard */,
+				DBE03B5420B0864E00F3CE95 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		DBE03B3C20B0864C00F3CE95 = {
 			isa = PBXGroup;
 			children = (
+				DBBEC93C20B5F2C600691F08 /* Components.framework */,
+				DBBEC93920B5F2C600691F08 /* Auth.framework */,
 				DB6ADD9720B3634F002F226C /* RoverUI.framework */,
 				DB6ADD4C20B30F9B002F226C /* RoverFoundation.framework */,
 				DB6ADD4820B30E7F002F226C /* RoverExperiences.framework */,
@@ -131,52 +140,10 @@
 			isa = PBXGroup;
 			children = (
 				DB6ADD4720B23941002F226C /* UI */,
-				DBE03B5D20B08AD800F3CE95 /* Components */,
+				DBBEC93F20B5F2F500691F08 /* Supporting Files */,
 				DBE03B4820B0864C00F3CE95 /* AppDelegate.swift */,
-				DBE03B4C20B0864C00F3CE95 /* Main.storyboard */,
-				DBE03B4F20B0864E00F3CE95 /* Assets.xcassets */,
-				DBE03B5120B0864E00F3CE95 /* LaunchScreen.storyboard */,
-				DBE03B5420B0864E00F3CE95 /* Info.plist */,
 			);
 			path = Experiences;
-			sourceTree = "<group>";
-		};
-		DBE03B5A20B08AA700F3CE95 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				DBE03B6A20B08D9400F3CE95 /* Session.swift */,
-				DBE03B5B20B08AB200F3CE95 /* SignInViewController.swift */,
-			);
-			path = Auth;
-			sourceTree = "<group>";
-		};
-		DBE03B5D20B08AD800F3CE95 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				DBE03B5A20B08AA700F3CE95 /* Auth */,
-				DBE03B5E20B08AEB00F3CE95 /* Extensions */,
-				DBE03B6120B08C8200F3CE95 /* Forms */,
-				DB6ADD3F20B211F5002F226C /* APIEndpoint.swift */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		DBE03B5E20B08AEB00F3CE95 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				DBE03B5F20B08AF600F3CE95 /* UIColor.swift */,
-				DBE03B6420B08CE100F3CE95 /* UIImage.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		DBE03B6120B08C8200F3CE95 /* Forms */ = {
-			isa = PBXGroup;
-			children = (
-				DBE03B6220B08CA900F3CE95 /* UnderlineTextField.swift */,
-				DBE03B6620B08D1200F3CE95 /* RoundedButton.swift */,
-			);
-			path = Forms;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -251,18 +218,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBE03B7020B08D9400F3CE95 /* Session.swift in Sources */,
-				DBE03B6320B08CA900F3CE95 /* UnderlineTextField.swift in Sources */,
 				DB6ADD3A20B1EE92002F226C /* NavigationController.swift in Sources */,
 				DB6ADD4420B22BA0002F226C /* RootViewController.swift in Sources */,
-				DBE03B6020B08AF600F3CE95 /* UIColor.swift in Sources */,
 				DB6ADD4220B21F9C002F226C /* TableHeader.swift in Sources */,
-				DBE03B6520B08CE100F3CE95 /* UIImage.swift in Sources */,
-				DBE03B6720B08D1200F3CE95 /* RoundedButton.swift in Sources */,
 				DBE03B4920B0864C00F3CE95 /* AppDelegate.swift in Sources */,
 				DB6ADD3C20B1EECC002F226C /* TableViewController.swift in Sources */,
-				DB6ADD4020B211F5002F226C /* APIEndpoint.swift in Sources */,
-				DBE03B5C20B08AB200F3CE95 /* SignInViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,6 +8,6 @@
       location = "group:../../../rover-ios/Rover.xcodeproj">
    </FileRef>
    <FileRef
-      location = "container:Experiences.xcodeproj">
+      location = "container:Inbox.xcodeproj">
    </FileRef>
 </Workspace>

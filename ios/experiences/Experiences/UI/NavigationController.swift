@@ -6,6 +6,7 @@
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
 
+import Auth
 import RoverExperiences
 
 class NavigationController: UINavigationController {

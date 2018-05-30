@@ -1,12 +1,10 @@
 //
 //  UIImage.swift
-//  Experiences
+//  Components
 //
 //  Created by Sean Rucker on 2018-05-19.
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
-
-import UIKit
 
 extension UIImage {
     public static func tintImage(image: UIImage, color: UIColor) -> UIImage? {
