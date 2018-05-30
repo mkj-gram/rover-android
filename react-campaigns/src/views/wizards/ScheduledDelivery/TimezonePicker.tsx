@@ -22,12 +22,13 @@ import {
     charcoal,
     PopoverContainer,
     PopoverSearch,
+    RadioButton,
     Text,
     titanium,
     turquoise
 } from '@rover/ts-bootstrap/dist/src'
 
-import PopoverTextRadioButtonComponent from '../../utils/PopoverTextRadioButtonComponent'
+import SelectableList from '../../utils/SelectableList'
 import MobilePopover from '../components/MobilePopover'
 
 export interface TimezonePickerProps {
@@ -86,18 +87,13 @@ class TimezonePicker extends React.Component<
 
     getDisplayNames() {
         const { timezoneSearch } = this.state
-        return moment.tz.names().reduce((prev: Array<string>, next: string) => {
-            if (
-                next.toLowerCase().includes(timezoneSearch.toLowerCase()) ||
-                timezoneSearch === ''
-            ) {
-                return {
-                    ...prev,
-                    [next]: next
-                }
-            }
-            return prev
-        }, {})
+        return moment.tz
+            .names()
+            .filter(
+                name =>
+                    name.toLowerCase().includes(timezoneSearch.toLowerCase()) ||
+                    timezoneSearch === ''
+            )
     }
     updatePopoverVisibility() {
         const {
@@ -146,18 +142,37 @@ class TimezonePicker extends React.Component<
     renderTimezones() {
         const { device, editableCampaign } = this.props
         const { selectedTimezone } = this.state
-        const { scheduledTimeZone } = editableCampaign
         const displayNames = this.getDisplayNames()
         return (
-            <PopoverTextRadioButtonComponent
-                device={device}
-                names={Object.keys(displayNames)}
-                onClick={(scheduledTimeZone: string) =>
-                    this.setState({ selectedTimezone: scheduledTimeZone })
-                }
-                selectedTapOption={selectedTimezone}
-                displayName={displayNames}
-            />
+            <SelectableList device={device}>
+                {displayNames.map(name => (
+                    <div
+                        key={name}
+                        onClick={e => {
+                            e.stopPropagation()
+                            this.setState({
+                                selectedTimezone: name
+                            })
+                        }}
+                        style={{
+                            display: 'flex',
+                            height: device !== 'Mobile' ? 55 : 71,
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Text text={name} size="large" />
+
+                        <RadioButton
+                            selected={selectedTimezone === name}
+                            style={{
+                                outerStyle: { height: 18, width: 18 }
+                            }}
+                        />
+                    </div>
+                ))}
+            </SelectableList>
         )
     }
 
