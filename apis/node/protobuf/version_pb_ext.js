@@ -2,7 +2,7 @@
  * 	Extensions added to proto.rover.protobuf.Version
  */
 
-const VersionRegex = /^(\d+\.\d+\.\d+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
+const VersionRegex = /^((\d+)|(\d+\.\d+)|(\d+\.\d+\.\d+)+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
 
 /**
  * Converts this JavaScript value to a new Version proto.
@@ -19,19 +19,20 @@ proto.rover.protobuf.Version.fromJavaScript = function(value) {
 
 	if (typeof value === 'string') {
 		const match = value.match(VersionRegex)
+		
 
 		if (match) {
-			const parts = value.split('.').map(i => parseInt(i))
-			const major 	= parts[0]
-			const minor 	= parts[1]
-			const revision 	= parts[2]
+			const version   = match[1].split('.').map(i => parseInt(i))
+			const major 	= version[0]
+			const minor 	= version[1]
+			const revision 	= version[2]
 
 			ret.setMajor(major)
 			ret.setMinor(minor)
 			ret.setRevision(revision)
 
 		} else {
-			throw new Error('unrecognized input, must be in the form of (^\d+\.\d+\.\d+$|^\d+\.\d+$) got: \"' + value.toString() + "\"")
+			throw new Error(`unrecognized input, must be in the form of ${VersionRegex} got: ${value.toString()}`)
 		}
 		
 	} else if(typeof value === 'object') {

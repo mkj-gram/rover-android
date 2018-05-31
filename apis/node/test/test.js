@@ -63,7 +63,7 @@ describe('Version', function() {
 	it('throws an error when input is a string but does not match version regex', function() {
 		expect(function() {
 			Version.fromJavaScript("hello.hello")
-		}).to.throw('unrecognized input, must be in the form of (^\d+\.\d+\.\d+$|^\d+\.\d+$) got: "hello.hello"')
+		}).to.throw('unrecognized input, must be in the form of /^((\\d+)|(\\d+\\.\\d+)|(\\d+\\.\\d+\\.\\d+)+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$/ got: hello.hello')
 	})
 
 	it('parses string values', function() {
@@ -76,17 +76,43 @@ describe('Version', function() {
 		expect(got2.getMajor()).to.equal(3)
 		expect(got2.getMinor()).to.equal(4)
 		expect(got2.getRevision()).to.equal(2)
+
+		const got3 = Version.fromJavaScript("3.4")
+		expect(got3.getMajor()).to.equal(3)
+		expect(got3.getMinor()).to.equal(4)
+		expect(got3.getRevision()).to.equal(0)
+
+		const got4 = Version.fromJavaScript("3")
+		expect(got4.getMajor()).to.equal(3)
+		expect(got4.getMinor()).to.equal(0)
+		expect(got4.getRevision()).to.equal(0)
 	})
 
 	it('parses version objects', function() {
-		const got = Version.fromJavaScript({ major: 4, minor: 3 })
-		expect(got.getMajor()).to.equal(4)
+		const got = Version.fromJavaScript("1.3.1")
+		expect(got.getMajor()).to.equal(1)
 		expect(got.getMinor()).to.equal(3)
+		expect(got.getRevision()).to.equal(1)
 
-		const got2 = Version.fromJavaScript({ major: 3, minor: 10, revision: 6 })
+		const got2 = Version.fromJavaScript("3.4.2")
 		expect(got2.getMajor()).to.equal(3)
-		expect(got2.getMinor()).to.equal(10)
-		expect(got2.getRevision()).to.equal(6)
+		expect(got2.getMinor()).to.equal(4)
+		expect(got2.getRevision()).to.equal(2)
+
+		const got3 = Version.fromJavaScript("11.4")
+		expect(got3.getMajor()).to.equal(11)
+		expect(got3.getMinor()).to.equal(4)
+		expect(got3.getRevision()).to.equal(0)
+
+		const got4 = Version.fromJavaScript("3")
+		expect(got4.getMajor()).to.equal(3)
+		expect(got4.getMinor()).to.equal(0)
+		expect(got4.getRevision()).to.equal(0)
+
+		const got5 = Version.fromJavaScript("11.83-alpha.2")
+		expect(got5.getMajor()).to.equal(11)
+		expect(got5.getMinor()).to.equal(83)
+		expect(got5.getRevision()).to.equal(0)
 	})
 
 	it('accepts patch as well', function() {
