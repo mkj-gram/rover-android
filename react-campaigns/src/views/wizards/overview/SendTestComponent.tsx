@@ -128,6 +128,7 @@ const SendTestComponent: React.SFC<
 
                 switch (device) {
                     case 'Desktop':
+                    default:
                         return (
                             <AudienceLink
                                 primaryText="No test devices found."
@@ -299,6 +300,7 @@ const mapStateToProps = (state: State): OwnProps => ({
     selectedTestDevices: getSelectedTestDevices(state)
 })
 
+// tslint:disable-next-line:no-any
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
         updateSelectedTestDevices: (deviceIds: string[]) => {

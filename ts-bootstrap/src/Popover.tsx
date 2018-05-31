@@ -302,6 +302,7 @@ class PopoverComponent extends React.Component<PopoverProps, {}> {
                             style={{
                                 ...style
                             }}
+                            onClick={e => e.stopPropagation()}
                         >
                             {this.evalChild()}
                             {this.props.children}

@@ -61,6 +61,7 @@ const PublishCampaignConfirmationDialog: React.SFC<
                 const day = dateScheduledTime.getDate()
                 const month = dateScheduledTime.getMonth() + 1
 
+                // tslint:disable-next-line:max-line-length
                 dialogText = `Publishing this campaign will schedule it for delivery on ${month} ${day} at ${hour} ${minute} ${period} ${scheduledTimeZone}. Continue?`
             }
         }

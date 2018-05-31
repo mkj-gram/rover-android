@@ -107,7 +107,7 @@ class DatePickerComponent extends React.Component<DatePickerProps, {}> {
             device
         } = this.props
 
-        const padding = device === 'Mobile' ? '24' : '16'
+        const margin = device === 'Mobile' ? '24' : '16'
         return (
             <div>
                 <style type="text/css">
@@ -116,7 +116,9 @@ class DatePickerComponent extends React.Component<DatePickerProps, {}> {
                             display: none;
                         }
                         .DatePicker button {                         
-                          border: none;                         
+                          border: none;
+                          background: #FFF;
+                          padding: 0;                         
                         }
                         .DatePicker .pika-title {
                           align-items: flex-start;
@@ -154,20 +156,20 @@ class DatePickerComponent extends React.Component<DatePickerProps, {}> {
                           pointer-events: none;
                         }                  
                         .DatePicker .pika-title button.pika-prev {
-                          left: ${padding}px;
+                          left: ${margin}px;
                           top: 16px;
                         }
                         .DatePicker .pika-title button.pika-next {
-                          right: ${padding}px;
+                          right: ${margin}px;
                           top: 16px;
                         }
                         .DatePicker .pika-lendar {                     
                           background-color: ${backgroundColor};
                         }
                         .DatePicker .pika-table {                      
-                          padding-left: ${padding}px;
-                          padding-right: ${padding}px;
-                          padding-bottom: 8px;
+                          margin-left: auto;
+                          margin-right: auto;
+                          margin-bottom: 8px;
                           font-family: Source Sans Pro;                                                
                         }
                         .DatePicker .pika-row {
@@ -180,10 +182,11 @@ class DatePickerComponent extends React.Component<DatePickerProps, {}> {
                           line-height: 40px;
                           text-align: center;
                           text-decoration: none;
-                          width: 40px;
+                          
                           font-size: 17px;
                           font-weight: 600;
                           color: ${weekdaysColor};
+                          width: 40px;
                         }
                         .DatePicker td button {                          
                           color: ${numberColor};
@@ -216,7 +219,11 @@ class DatePickerComponent extends React.Component<DatePickerProps, {}> {
                           color: ${outsideCurrentMonthColor}
                         }
                         .DatePicker td button:hover:before {
-                            background-color: ${hoveredDayBackgroundColor}
+                            background-color: ${
+                                device === 'Desktop'
+                                    ? hoveredDayBackgroundColor
+                                    : 'none'
+                            }
                         }
                         .DatePicker td.is-selected button {
                           color: white;
@@ -331,13 +338,14 @@ class DatePickerComponent extends React.Component<DatePickerProps, {}> {
                           content: "";
                           height: 40px;
                           width: 40px;
+                        }
+                        .DatePicker th:nth-child(6) {
+                          padding-right: 8px;
                         }                      
-                        .DatePicker th:nth-child(6) abbr {
-                            margin-right: 12px;
+                        .DatePicker th:nth-child(6) abbr {                        
                             width: 32px;
                         }
-                        .DatePicker td:nth-child(6) button {
-                          margin-right: 12px;
+                        .DatePicker td:nth-child(6) button {                     
                           width: 32px;
                         }
                         .DatePicker td:nth-child(7) button:before,
@@ -348,8 +356,7 @@ class DatePickerComponent extends React.Component<DatePickerProps, {}> {
                           width: 40px;
                         }
                         .DatePicker th:nth-child(7) abbr {
-                          margin-right: 0!important;
-                          margin-left: 0!important;
+                          margin-right: 0!important;                          
                           width: 32px;
                         }
                         .DatePicker th:nth-child(7) button {
@@ -358,8 +365,7 @@ class DatePickerComponent extends React.Component<DatePickerProps, {}> {
                           width: 32px;
                         }
                         .DatePicker td:nth-child(7) button {
-                          margin-right: 4px;
-                          margin-left: 0!important;
+                          margin-right: 4px;                      
                           width: 32px;                        
                         }
                         .DatePicker .pika-prev.is-disabled svg path {

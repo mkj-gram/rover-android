@@ -11,6 +11,7 @@ import { RadioButton, Switch, Text } from '@rover/ts-bootstrap/dist/src'
 import FormSection from '../../utils/FormSection'
 import Row from '../components/Row'
 import TimezonePicker from './TimezonePicker'
+import DatePickerContainer from './DatePickerContainer'
 
 export interface DateAndTimeProps {
     device: Media
@@ -40,6 +41,7 @@ const DateAndTime: React.SFC<
         scheduledType,
         scheduledUseLocalDeviceTime: useLocalDeviceTime
     } = editableCampaign
+
     return (
         <Fragment>
             {/*Title */}
@@ -75,7 +77,12 @@ const DateAndTime: React.SFC<
                 <Row
                     onClick={() =>
                         updateEditableCampaign({
-                            scheduledType: 'SCHEDULED'
+                            scheduledType: 'SCHEDULED',
+                            scheduledTimeZone:
+                                editableCampaign.scheduledTimeZone.length === 0
+                                    ? Intl.DateTimeFormat().resolvedOptions()
+                                          .timeZone
+                                    : editableCampaign.scheduledTimeZone
                         })
                     }
                 >
@@ -91,6 +98,10 @@ const DateAndTime: React.SFC<
             {scheduledType === 'SCHEDULED' && (
                 <FormSection device={device}>
                     <Text text="Scheduled the delivery" size="h2" />
+                    <DatePickerContainer
+                        device={device}
+                        field="scheduledDate"
+                    />
                     <Row
                         onClick={() =>
                             updateEditableCampaign({
@@ -98,17 +109,10 @@ const DateAndTime: React.SFC<
                             })
                         }
                     >
-                        <Text text="A scheduled date and time" size="large" />
-                        <Switch
-                            on={useLocalDeviceTime}
-                            onClick={() =>
-                                updateEditableCampaign({
-                                    scheduledUseLocalDeviceTime: !useLocalDeviceTime
-                                })
-                            }
-                        />
+                        <Text text="Use local device time zone?" size="large" />
+                        <Switch on={useLocalDeviceTime} onClick={() => null} />
                     </Row>
-                    {useLocalDeviceTime && <TimezonePicker device={device} />}
+                    {!useLocalDeviceTime && <TimezonePicker device={device} />}
                 </FormSection>
             )}
         </Fragment>

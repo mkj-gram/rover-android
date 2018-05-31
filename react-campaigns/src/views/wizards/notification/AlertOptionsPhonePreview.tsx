@@ -51,7 +51,7 @@ class AlertOptionsPhonePreview extends React.Component<
             },
 
             notificationAlertOptionBadgeNumber: {
-                description: "Increment the number on your app's badge icon",
+                description: 'Increment the number on your app\'s badge icon',
                 displayText: 'Badge Number'
             }
         }

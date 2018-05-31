@@ -123,7 +123,9 @@ class OverviewModalHeader extends React.Component<
                 if (!copyNumber) {
                     return `${campaignName} 2`
                 } else {
-                    const newCopyNumber = (parseInt(copyNumber) + 1).toString()
+                    const newCopyNumber = (
+                        parseInt(copyNumber, 10) + 1
+                    ).toString()
                     return campaignName.replace(/\d*$/, newCopyNumber)
                 }
             }

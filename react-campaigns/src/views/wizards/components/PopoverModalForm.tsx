@@ -33,7 +33,8 @@ export interface PopoverModalFormProps extends InjectedProps {
 
     handleSaveChange?: (
         handleClosePopoverModal: () => void,
-        fieldValue: string
+        // tslint:disable-next-line:no-any
+        fieldValue: any
     ) => void
 
     children?: JSX.Element
@@ -89,8 +90,8 @@ const PopoverModalForm: React.SFC<
 
     const getClickableView = (mode: string) => {
         const clonedPopoverModalChild = React.cloneElement(children, {
-            handleSaveChange: (fieldVal: string) =>
-                handleSaveChange &&
+            // tslint:disable-next-line:no-any
+            handleSaveChange: (fieldVal: any) =>
                 handleSaveChange(handleClosePopoverModal, fieldVal),
             key: `${field}_PopoverModalChild`
         })
@@ -138,12 +139,17 @@ const PopoverModalForm: React.SFC<
     const handleOpenModal = () => {
         updateActivePopover(field)
         openPopoverModalForm()
+        if (handleShowPopoverForm) {
+            handleShowPopoverForm()
+        }
     }
 
     const showForm = () => {
         const activeField = activePopover === field ? '' : field
         updateActivePopover(activeField)
-        handleShowPopoverForm()
+        if (handleShowPopoverForm) {
+            handleShowPopoverForm()
+        }
     }
 
     const getRowOnClickAction = () => {

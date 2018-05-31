@@ -9,7 +9,8 @@
     ],
     "scripts": {
         "build-storybook": "build-storybook",
-        "build-storybook-firebase": "build-storybook -c .storybook -o firebase && cp firebase/index.html firebase/storybook.html && cp firebase/index-temp.html firebase/index.html",
+        "build-storybook-firebase":
+            "build-storybook -c .storybook -o firebase && cp firebase/index.html firebase/storybook.html && cp firebase/index-temp.html firebase/index.html",
         "compile": "tsc stories/index.tsx --outDir firebase --jsx react",
         "lint": "tslint -c tslint.json './**/*.tsx'",
         "storybook": "start-storybook -c .storybook -p 6006",

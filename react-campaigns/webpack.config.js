@@ -13,7 +13,10 @@ module.exports = {
         publicPath: '/campaigns/'
     },
     resolve: {
-        extensions: ['.tsx', '.js', '.ts']
+        extensions: ['.tsx', '.js', '.ts'],
+        alias: {
+            react: path.resolve('node_modules/react')
+        }
     },
     module: {
         rules: [

@@ -14,12 +14,12 @@ export interface StateProps {
     activePopover: string
 }
 
-export interface advancedSettingsContainerProps {
+export interface AdvancedSettingsContainerProps {
     wizardSection: keyof editableUIState
 }
 
 const AdvancedSettingsContainer: React.SFC<
-    InjectedProps & StateProps & advancedSettingsContainerProps
+    InjectedProps & StateProps & AdvancedSettingsContainerProps
 > = ({ activePopover, device }) => {
     const Fragment = React.Fragment
 
@@ -61,6 +61,7 @@ const AdvancedSettingsContainer: React.SFC<
                             information read
                             {hyperlinkWrapper(
                                 'Configuring a Background Update Notification',
+                                // tslint:disable-next-line:max-line-length
                                 'https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html#//apple_ref/doc/uid/TP40008194-CH10-SW8'
                             )}
                             from Apple's documentation.
@@ -93,6 +94,7 @@ const AdvancedSettingsContainer: React.SFC<
                             a remote notification. For more information read
                             {hyperlinkWrapper(
                                 'Assigning Custom Actions to a Remote Notification',
+                                // tslint:disable-next-line:max-line-length
                                 'https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html#//apple_ref/doc/uid/TP40008194-CH10-SW4'
                             )}
                             from Apple's documentation.
@@ -113,6 +115,7 @@ const AdvancedSettingsContainer: React.SFC<
                             notifications. For more information read
                             {hyperlinkWrapper(
                                 'Payload Key Reference',
+                                // tslint:disable-next-line:max-line-length
                                 'https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html'
                             )}
                             from Apple's documentation.

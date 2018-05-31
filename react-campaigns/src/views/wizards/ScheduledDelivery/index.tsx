@@ -6,7 +6,7 @@ import { connect, Dispatch } from 'react-redux'
 import DateAndTime from './DateAndTime'
 import Form from '../Form'
 import { getCampaign, getIsWizardModalClosing } from '../../../reducers'
-import { updateScheduledDeliverySettings } from '../../../actions/'
+import { updateScheduledDeliverySettings } from '../../../actions'
 
 export interface ScheduledDeliveryStateProps {
     campaign: Campaign
