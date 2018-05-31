@@ -86,7 +86,7 @@ type RoverNotification struct {
 }
 
 func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Notification) *RoverNotification {
-	return &RoverNotification{
+	rn := &RoverNotification{
 		Id: note.Id.String(),
 
 		CampaignID: note.CampaignId,
@@ -94,10 +94,7 @@ func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Not
 		Title: note.Title,
 		Body:  note.Body,
 
-		Attachment: &Attachment{
-			Type: string(settings.AttachmentType),
-			Url:  settings.AttachmentUrl,
-		},
+		Attachment: nil,
 
 		Action: &actionInfo{
 			tapBehaviorPresentationType: string(settings.TapBehaviorPresentationType),
@@ -116,6 +113,15 @@ func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Not
 		IsDeleted: note.IsDeleted,
 		IsRead:    note.IsRead,
 	}
+
+	if !(settings.AttachmentUrl == "" || settings.AttachmentType == scylla.AttachmentType_NONE) {
+		rn.Attachment = &Attachment{
+			Type: string(settings.AttachmentType),
+			Url:  settings.AttachmentUrl,
+		}
+	}
+
+	return rn
 }
 
 type LegacyRoverNotification struct {

@@ -37,6 +37,22 @@ func Test_RoverPayload_MarshalJSON(t *testing.T) {
 		in  interface{}
 		exp string
 	}{
+
+		{
+			in: &RoverNotification{
+				Id:         "f944c7b4-3dcd-11e8-b467-0ed5f89f718b",
+				CampaignID: 1,
+
+				Title: "a title",
+				Body:  "a body",
+
+				IsRead:                      true,
+				IsDeleted:                   true,
+				IsNotificationCenterEnabled: true,
+			},
+			exp: `{"id":"f944c7b4-3dcd-11e8-b467-0ed5f89f718b","campaignID":1,"title":"a title","body":"a body","deliveredAt":"0001-01-01T00:00:00Z","expiresAt":null,"isRead":true,"isDeleted":true,"isNotificationCenterEnabled":true}`,
+		},
+
 		{
 			in: &RoverNotification{
 				Id:         "f944c7b4-3dcd-11e8-b467-0ed5f89f718b",
