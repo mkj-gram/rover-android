@@ -12,7 +12,7 @@ import GraphQLJSON from 'graphql-type-json'
 import GraphQLFrameworkMap from './FrameworkMap'
 
 const DeviceContext = new GraphQLInputObjectType({
-    name: 'Context',
+    name: 'DeviceContext',
     fields: () => ({
         appBadgeNumber: {
             type: GraphQLInt
@@ -33,7 +33,7 @@ const DeviceContext = new GraphQLInputObjectType({
             type: GraphQLString
         },
         deviceIdentifier: {
-            type: GraphQLString
+            type: new GraphQLNonNull(GraphQLID)
         },
         deviceManufacturer: {
             type: GraphQLString

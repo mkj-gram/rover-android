@@ -3,7 +3,6 @@ package pipeline
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -134,7 +133,7 @@ func (p *Pipeline) Shutdown(timeout time.Duration) {
 
 	err := p.source.consumer.Close()
 	if err != nil {
-		log.Println(err)
+		p.logger.Error(err)
 	}
 
 	p.sink.producer.Close()
@@ -248,13 +247,11 @@ func (p *Pipeline) handle(in *kafka.Message) error {
 //		We can transform this original event by reverse geocoding the latitude and longitude and adding Country, Province, Street
 func (p *Pipeline) process(in *kafka.Message) (out *kafka.Message, err error) {
 	var (
-		ctx  = context.Background()
-		data = in.Value
-		key  = in.Key
-
-		input  event.EventInput
-		output event.Event
-		start  = time.Now()
+		ctx   = NewContext(context.Background())
+		data  = in.Value
+		key   = in.Key
+		input = event.Event{}
+		start = time.Now()
 	)
 
 	defer func() {
@@ -294,16 +291,13 @@ func (p *Pipeline) process(in *kafka.Message) (out *kafka.Message, err error) {
 		return nil, errors.Wrap(err, "validation error")
 	}
 
-	// Populate the output event with the input
-	output.Input = &input
-
-	err = p.Handler.Handle(ctx, &output)
+	err = p.Handler.Handle(ctx, &input)
 	if err != nil {
 		return nil, errors.Wrap(err, "Handler.Handle")
 	}
 
 	// Generate the output kafka message which re-uses the same key for partitioning but the transformed protobuf message as the new value
-	value, err := proto.Marshal(&output)
+	value, err := proto.Marshal(&input)
 	if err != nil {
 		return nil, errors.Wrap(err, "proto.Marshal")
 	}
@@ -328,7 +322,6 @@ func (p *Pipeline) complete(processed *processedMessage) error {
 	if out != nil {
 		deliveryChan := make(chan kafka.Event, 1)
 		defer close(deliveryChan)
-
 		err := p.sink.producer.Produce(out, deliveryChan)
 		if err != nil {
 			return errors.Wrap(err, "kafka.Produce")
@@ -361,7 +354,7 @@ func (p *Pipeline) complete(processed *processedMessage) error {
 }
 
 // Checks if an event is valid for processing
-func valid(event *event.EventInput) error {
+func valid(event *event.Event) error {
 	if event.Id == "" {
 		return invalidEventMissingIdError
 	}

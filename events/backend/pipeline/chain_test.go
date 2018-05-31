@@ -15,7 +15,7 @@ func TestChain_ThenCallsAllHandlersInChain(t *testing.T) {
 	chain := chain{}
 
 	addToChain := func(i int) {
-		chain.Then(HandlerFunc(func(ctx context.Context, e *event.Event) error {
+		chain.Then(HandlerFunc(func(ctx Context, e *event.Event) error {
 			called[i] = true
 			return nil
 		}))
@@ -26,7 +26,7 @@ func TestChain_ThenCallsAllHandlersInChain(t *testing.T) {
 	}
 
 	// Call the Handle function to initialize the chain execution
-	chain.Handle(nil, &event.Event{})
+	chain.Handle(NewContext(context.Background()), &event.Event{})
 
 	for i, result := range called {
 		if result == false {

@@ -12,6 +12,7 @@ require 'auth/v1/auth_pb'
 require 'audience/v1/audience_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.event.v1.DeviceContext" do
+    optional :device_identifier, :string, 1
     optional :profile_identifier, :string, 2
     optional :attributes, :message, 3, "rover.protobuf.Struct"
     optional :app_build, :string, 4
@@ -44,7 +45,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :advertising_id, :string, 31
     optional :is_bluetooth_enabled, :message, 32, "rover.protobuf.BoolValue"
   end
-  add_message "rover.event.v1.EventInput" do
+  add_message "rover.event.v1.Event" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :namespace, :string, 2
     optional :id, :string, 3
@@ -52,33 +53,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :timestamp, :message, 5, "rover.protobuf.Timestamp"
     optional :received_at, :message, 6, "google.protobuf.Timestamp"
     optional :attributes, :message, 7, "rover.protobuf.Struct"
-    oneof :type do
-      optional :device_event_input, :message, 8, "rover.event.v1.DeviceEventInput"
-      optional :profile_event_input, :message, 9, "rover.event.v1.ProfileEventInput"
-    end
-  end
-  add_message "rover.event.v1.DeviceEventInput" do
-    optional :device_id, :string, 1
-    optional :context, :message, 2, "rover.event.v1.DeviceContext"
-  end
-  add_message "rover.event.v1.ProfileEventInput" do
-    optional :profile_identifier, :string, 1
-  end
-  add_message "rover.event.v1.Event" do
-    optional :input, :message, 1, "rover.event.v1.EventInput"
-    optional :processed_at, :message, 2, "google.protobuf.Timestamp"
-    oneof :source do
-      optional :device_source, :message, 3, "rover.event.v1.DeviceSource"
-      optional :profile_source, :message, 4, "rover.event.v1.ProfileSource"
-    end
-  end
-  add_message "rover.event.v1.DeviceSource" do
-    optional :device, :message, 1, "rover.audience.v1.Device"
-    optional :associated_profile, :message, 2, "rover.audience.v1.Profile"
-  end
-  add_message "rover.event.v1.ProfileSource" do
-    optional :profile, :message, 1, "rover.audience.v1.Profile"
-    repeated :associated_devices, :message, 2, "rover.audience.v1.Device"
+    optional :device, :message, 8, "rover.event.v1.DeviceContext"
+    optional :processed_at, :message, 10, "google.protobuf.Timestamp"
   end
 end
 
@@ -86,12 +62,7 @@ module Rover
   module Event
     module V1
       DeviceContext = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.DeviceContext").msgclass
-      EventInput = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.EventInput").msgclass
-      DeviceEventInput = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.DeviceEventInput").msgclass
-      ProfileEventInput = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.ProfileEventInput").msgclass
       Event = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.Event").msgclass
-      DeviceSource = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.DeviceSource").msgclass
-      ProfileSource = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.ProfileSource").msgclass
     end
   end
 end

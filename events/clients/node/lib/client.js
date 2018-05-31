@@ -1,6 +1,5 @@
 const Kafka         = require('node-rdkafka')
 const Serializer    = require('./serializer')
-const Constants     = require('./constants')
 const AuthContext   = require('@rover/apis').auth.v1.Models.AuthContext
 
 
@@ -73,18 +72,16 @@ Client.prototype.disconnect = function() {
 }
 
 /**
- * Submit an event to transformer's kafka input topic
+ * Submit an event to the pipeline's kafka input topic
  * @param  {AuthContext} auth        
- * @param  {String} identifier
- * @param  {ENUM} <Profile,Device>
+ * @param  {String} key 	the key to use while selecting a kafka partition
  * @param  {Object} event            
  * @return {Promise}                 
  */
-Client.prototype.submit = function(auth, identifier, type, event) {
+Client.prototype.submit = function(auth, key, event) {
 	return new Promise((resolve, reject) => {
 		const producer = this._producer
-		const key = identifier
-
+		
 		if (!producer.isConnected()) {
 			return reject(new Error("client is not connected: please call connect() before calling submit()"))
 		}
@@ -94,22 +91,10 @@ Client.prototype.submit = function(auth, identifier, type, event) {
 		}
 
 		if (key === null || key === undefined || key === "") {
-			return reject(new TypeError("device identifier cannot be empty"))
-		}
-
-		if (type !== Constants.PROFILE_EVENT && type !== Constants.DEVICE_EVENT) {
-			return reject(new Error("unsupported event type got: " + type))
-		}
-
-		
-		let payload
-
-		if (type === Constants.DEVICE_EVENT) {
-			payload = Serializer.serializeDeviceEvent(auth, event, identifier, event.device)
-		} else {
-			return reject(new Error("profile event: unimplemented"))
+			return reject(new TypeError("partition key cannot be empty"))
 		}
 		
+		const payload = Serializer.serializeEvent(event)
 		payload.setAuthContext(auth)
 		
 		try {

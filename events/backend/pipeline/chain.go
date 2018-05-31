@@ -1,8 +1,6 @@
 package pipeline
 
 import (
-	"context"
-
 	"github.com/roverplatform/rover/apis/go/event/v1"
 )
 
@@ -22,7 +20,7 @@ func NewChain(name string) *chain {
 
 // Handle implements pipeline.Handler by sequential calling all of the handlers that have been added to the chain
 // if an error occurs the chain breaks and returns the error without calling the rest of the handlers
-func (c chain) Handle(ctx context.Context, e *event.Event) error {
+func (c chain) Handle(ctx Context, e *event.Event) error {
 	var err error
 
 	for _, handler := range c.handlers {

@@ -7,7 +7,7 @@ import schema from './schema'
 
 import RoverApis from '@rover/apis'
 import Auth from '@rover/auth-client'
-import Transformer from '@rover/events-pipeline-client'
+import EventPipeline from '@rover/events-pipeline-client'
 import { authClient } from './grpcClients'
 
 import persistedQueries from './persistedQueries'
@@ -57,9 +57,9 @@ process.on('SIGTERM', function() {
     // Wait for kubernetes to remove us from the load-balancer
     // Then do a full shutdown
     setTimeout(function() {
-        if (clients.transformer) {
-            clients.transformer.flush()
-                .then(_ => clients.transformer.disconnect())
+        if (clients.pipeline) {
+            clients.pipeline.flush()
+                .then(_ => clients.pipeline.disconnect())
                 .then(_ => console.info("Transformer cleanly shutdown"))
         }
     }, 10000)
@@ -69,15 +69,15 @@ process.on('SIGTERM', function() {
 
 async function main() {
 
-    const transformer = new Transformer.Client({ topic: process.env.EVENTS_PIPELINE_INPUT_TOPIC , kafka: { 'metadata.broker.list': process.env.KAFKA_DSN } })
+    const pipeline = new EventPipeline.Client({ topic: process.env.EVENTS_PIPELINE_INPUT_TOPIC , kafka: { 'metadata.broker.list': process.env.KAFKA_DSN } })
     try {
-        await transformer.connect()
+        await pipeline.connect()
     } catch (err) {
         // error but continue
         console.error(err)
     }
 
-    clients.transformer = transformer
+    clients.pipeline = pipeline
 
     app.use('/graphql', cors(), authMiddleware, persistedQueries, graphqlHTTP(req => ({
             schema,

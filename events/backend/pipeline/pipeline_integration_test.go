@@ -32,15 +32,11 @@ func TestPipeline(t *testing.T) {
 		writer = createProducer("producer", t)
 		reader = createConsumer("consumer", t)
 
-		req = &event.EventInput{
+		req = &event.Event{
 			AuthContext: &auth.AuthContext{AccountId: 1, PermissionScopes: []string{"server"}},
 			Namespace:   "rover",
 			Id:          "123ABC",
 			Name:        "My Event",
-		}
-
-		exp = &event.Event{
-			Input: req,
 		}
 
 		// Track the event that the pipeline was trying to transform
@@ -48,7 +44,7 @@ func TestPipeline(t *testing.T) {
 	)
 
 	// Dumb handler which just forwards the event
-	handler := pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
+	handler := pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 		handledEvent = e
 		return nil
 	})
@@ -81,7 +77,7 @@ func TestPipeline(t *testing.T) {
 		t.Error("Handler was not called")
 	}
 
-	if diff := rtesting.Diff(exp, output, nil, nil); diff != nil {
+	if diff := rtesting.Diff(req, output, nil, nil); diff != nil {
 		t.Errorf("Diff:\n%v", rtesting.Difff(diff))
 	}
 }
@@ -140,7 +136,7 @@ func createProducer(id string, t *testing.T) *kafka.Producer {
 }
 
 // Helper method to synchronously produce an event to a kafka topic
-func produceEvent(producer *kafka.Producer, topic string, e *event.EventInput) error {
+func produceEvent(producer *kafka.Producer, topic string, e *event.Event) error {
 	data, err := proto.Marshal(e)
 	if err != nil {
 		return nil

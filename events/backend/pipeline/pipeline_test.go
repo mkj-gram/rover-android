@@ -1,7 +1,6 @@
 package pipeline
 
 import (
-	"context"
 	"errors"
 	"testing"
 	"time"
@@ -24,7 +23,7 @@ var now = func() time.Time {
 }
 
 // Default handler which just accepts an event and passes it along
-var defaultHandler = HandlerFunc(func(ctx context.Context, e *event.Event) error {
+var defaultHandler = HandlerFunc(func(ctx Context, e *event.Event) error {
 	return nil
 })
 
@@ -36,23 +35,18 @@ func TestPipeline_handle_produces_and_commits_on_success(t *testing.T) {
 		producer = mocks.Producer{}
 		consumer = mocks.Consumer{}
 
-		req = &kafka.Message{Value: serialize(t, &event.EventInput{Id: "id", Name: "name"}), Key: []byte("key")}
+		req = &kafka.Message{Value: serialize(t, &event.Event{Id: "id", Name: "name"}), Key: []byte("key")}
 		exp = &kafka.Message{
 			Key:            []byte("key"),
 			TopicPartition: kafka.TopicPartition{Topic: &topic},
 			Timestamp:      now(),
 			Value: serialize(t, &event.Event{
-				Input: &event.EventInput{
-					Id:   "id",
-					Name: "name",
-				},
-			})}
+				Id:   "id",
+				Name: "name",
+			}),
+		}
 
-		countHandler = HandlerFunc(func(ctx context.Context, e *event.Event) error {
-			return nil
-		})
-
-		pipe = NewPipeline(&consumer, topic, &producer, topic, countHandler, WithTimeFunc(now))
+		pipe = NewPipeline(&consumer, topic, &producer, topic, defaultHandler, WithTimeFunc(now))
 	)
 
 	pipe.handle(req)
@@ -87,9 +81,9 @@ func TestPipeline_handle_only_commits_on_error(t *testing.T) {
 		producer = mocks.Producer{}
 		consumer = mocks.Consumer{}
 
-		req = &kafka.Message{Value: serialize(t, &event.EventInput{Id: "id", Name: "name"}), Key: []byte("key")}
+		req = &kafka.Message{Value: serialize(t, &event.Event{Id: "id", Name: "name"}), Key: []byte("key")}
 
-		errorHandler = HandlerFunc(func(ctx context.Context, e *event.Event) error {
+		errorHandler = HandlerFunc(func(ctx Context, e *event.Event) error {
 			return errors.New("we can not continue")
 		})
 
@@ -120,10 +114,10 @@ func TestPipeline_handle_retries_on_error(t *testing.T) {
 		producer = mocks.Producer{}
 		consumer = mocks.Consumer{}
 
-		req = &kafka.Message{Value: serialize(t, &event.EventInput{Id: "id", Name: "name"}), Key: []byte("key")}
+		req = &kafka.Message{Value: serialize(t, &event.Event{Id: "id", Name: "name"}), Key: []byte("key")}
 
 		handlerCalled = 0
-		countHandler  = HandlerFunc(func(ctx context.Context, e *event.Event) error {
+		countHandler  = HandlerFunc(func(ctx Context, e *event.Event) error {
 			handlerCalled++
 			if handlerCalled < 3 {
 				return NewRetryableError(nil)
@@ -160,9 +154,9 @@ func TestPipeline_handle_panics_after_too_many_attempts(t *testing.T) {
 		producer = mocks.Producer{}
 		consumer = mocks.Consumer{}
 
-		req = &kafka.Message{Value: serialize(t, &event.EventInput{Id: "id", Name: "name"}), Key: []byte("key")}
+		req = &kafka.Message{Value: serialize(t, &event.Event{Id: "id", Name: "name"}), Key: []byte("key")}
 
-		countHandler = HandlerFunc(func(ctx context.Context, e *event.Event) error {
+		countHandler = HandlerFunc(func(ctx Context, e *event.Event) error {
 			return NewRetryableError(nil)
 		})
 
@@ -202,7 +196,7 @@ func TestPipeline_process(t *testing.T) {
 		},
 		{
 			desc: "returns error when input is an invalid event",
-			in:   &kafka.Message{Value: serialize(t, &event.EventInput{}), Key: []byte("a")},
+			in:   &kafka.Message{Value: serialize(t, &event.Event{}), Key: []byte("a")},
 
 			expErr: errors.New("validation error: id is missing"),
 		},
@@ -210,7 +204,7 @@ func TestPipeline_process(t *testing.T) {
 			desc: "embeds EventInput in Event",
 			in: &kafka.Message{
 				Key: []byte("a"),
-				Value: serialize(t, &event.EventInput{
+				Value: serialize(t, &event.Event{
 					Id:   "ABC",
 					Name: "MyEvent",
 				})},
@@ -220,17 +214,17 @@ func TestPipeline_process(t *testing.T) {
 				Key:            []byte("a"),
 				Timestamp:      now(),
 				Value: serialize(t, &event.Event{
-					Input: &event.EventInput{
-						Id:   "ABC",
-						Name: "MyEvent",
-					},
-				})},
+
+					Id:   "ABC",
+					Name: "MyEvent",
+				}),
+			},
 		},
 		{
 			desc: "recovers from panics",
-			in:   &kafka.Message{Value: serialize(t, &event.EventInput{Id: "A", Name: "test"}), Key: []byte("a")},
+			in:   &kafka.Message{Value: serialize(t, &event.Event{Id: "A", Name: "test"}), Key: []byte("a")},
 
-			handler: HandlerFunc(func(ctx context.Context, e *event.Event) error {
+			handler: HandlerFunc(func(ctx Context, e *event.Event) error {
 				panic("Boom")
 				return nil
 			}),

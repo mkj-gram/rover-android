@@ -17,7 +17,7 @@ const trackEvents = {
         }
     },
     resolve: requireAuthentication(async (_, { events }, { headers, clients, authContext }) => {
-        const transformer = clients.transformer
+        const pipeline = clients.pipeline
 
         for (let i = 0; i < events.length; i++) {
             const event = events[i]
@@ -33,11 +33,12 @@ const trackEvents = {
             // TODO: Rename appNamespace to appIdentifier throughout the rest of the stack.
             device.appNamespace = device.appIdentifier  
             
-            // TODO: Adapt the transformer client to support other sharding/partitioning strategies instead of requiring deviceIdentifier.
+            // TODO: Once support we support non-device events use a paritition key that makes sense for the event
+            // ie. If its a server to server call with a profile identifier we should key the event by profile identifier
             const { deviceIdentifier } = device
 
             try {
-                await transformer.submit(authContext, deviceIdentifier, Constants.DEVICE_EVENT, event)
+                await pipeline.submit(authContext, deviceIdentifier, event)
             } catch(err) {
                 throw new Error(`Failed to submit events[${i}]: ${err}`)
             }

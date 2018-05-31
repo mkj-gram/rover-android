@@ -1,9 +1,7 @@
 package transformers
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"reflect"
 
 	"github.com/pkg/errors"
@@ -18,8 +16,14 @@ import (
 	"github.com/roverplatform/rover/events/backend/pipeline"
 )
 
-const roverEventNamespace = "rover"
-const locationUpdateEventName = "Location Update"
+const (
+	roverEventNamespace     = "rover"
+	locationUpdateEventName = "Location Update"
+)
+
+const (
+	deviceContextKey = "device"
+)
 
 func ParseDeviceMap(data string) (func(string) string, error) {
 	var m = make(map[string]string)
@@ -36,26 +40,21 @@ func ParseDeviceMap(data string) (func(string) string, error) {
 	}, nil
 }
 
-func isDeviceInput(input *event.EventInput) bool {
-	_, ok := input.GetType().(*event.EventInput_DeviceEventInput)
-	return ok
-}
-
 func FindDevice(client audience.AudienceClient) pipeline.Handler {
-	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
-		if !isDeviceInput(e.GetInput()) {
+		if e.GetDevice() == nil {
 			return nil
 		}
 
-		var deviceId = e.GetInput().GetDeviceEventInput().GetDeviceId()
+		var deviceId = e.GetDevice().GetDeviceIdentifier()
 
 		if deviceId == "" {
 			return errors.New("DeviceID cannot be blank")
 		}
 
 		resp, err := client.GetDevice(ctx, &audience.GetDeviceRequest{
-			AuthContext: e.GetInput().GetAuthContext(),
+			AuthContext: e.GetAuthContext(),
 			DeviceId:    deviceId,
 		})
 
@@ -74,53 +73,7 @@ func FindDevice(client audience.AudienceClient) pipeline.Handler {
 			}
 		}
 
-		source := e.Source.(*event.Event_DeviceSource).DeviceSource
-
-		source.Device = resp.GetDevice()
-
-		return nil
-	})
-}
-
-func FindProfileDevices(client audience.AudienceClient) pipeline.Handler {
-	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
-
-		input, ok := e.GetInput().GetType().(*event.EventInput_ProfileEventInput)
-		if !ok {
-			return nil
-		}
-
-		var identifier = input.ProfileEventInput.GetProfileIdentifier()
-		if identifier == "" {
-			return nil
-		}
-
-		resp, err := client.ListDevicesByProfileIdentifier(ctx, &audience.ListDevicesByProfileIdentifierRequest{
-			AuthContext:       e.GetInput().GetAuthContext(),
-			ProfileIdentifier: identifier,
-		})
-
-		if err != nil {
-			if st, ok := status.FromError(err); ok {
-				switch st.Code() {
-				case codes.NotFound:
-					return nil
-				case codes.Canceled, codes.Unknown, codes.DeadlineExceeded, codes.ResourceExhausted, codes.Aborted, codes.Internal, codes.Unavailable, codes.DataLoss:
-					return pipeline.NewRetryableError(errors.Wrap(err, "FindProfileDevices"))
-				default:
-					return errors.Wrap(err, "FindProfileDevices")
-				}
-			} else {
-				return err
-			}
-		}
-
-		source, ok := e.GetSource().(*event.Event_ProfileSource)
-		if !ok {
-			return nil
-		}
-
-		source.ProfileSource.AssociatedDevices = resp.GetDevices()
+		ctx.Set(deviceContextKey, resp.GetDevice())
 
 		return nil
 	})
@@ -128,25 +81,24 @@ func FindProfileDevices(client audience.AudienceClient) pipeline.Handler {
 
 // Create a device if no device in audience exists. This only runs when the input type is of device
 func CreateDevice(client audience.AudienceClient) pipeline.Handler {
-	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
 		// This event is not a device input so we can just skip over
-		if !isDeviceInput(e.GetInput()) {
+		if e.GetDevice() == nil {
 			return nil
 		}
 
 		// If the source already specifies a device then we can continue
-		if e.GetDeviceSource().GetDevice() != nil {
+		if _, ok := ctx.Value(deviceContextKey).(*audience.Device); ok {
 			return nil
 		}
 
 		// Assume we don't have a device in our system when we get here
 		// we will try to create one and if it already exists we can re-run the FindTransformer
-		// Note resp is meaningless
 		resp, err := client.CreateDevice(ctx, &audience.CreateDeviceRequest{
-			AuthContext:       e.Input.GetAuthContext(),
-			DeviceId:          e.Input.GetDeviceEventInput().GetDeviceId(),
-			ProfileIdentifier: e.Input.GetDeviceEventInput().GetContext().GetProfileIdentifier(),
+			AuthContext:       e.GetAuthContext(),
+			DeviceId:          e.GetDevice().GetDeviceIdentifier(),
+			ProfileIdentifier: e.GetDevice().GetProfileIdentifier(),
 		})
 
 		if err != nil {
@@ -161,32 +113,27 @@ func CreateDevice(client audience.AudienceClient) pipeline.Handler {
 			return nil
 		}
 
-		e.Source = &event.Event_DeviceSource{
-			DeviceSource: &event.DeviceSource{
-				Device: resp.GetDevice(),
-			},
-		}
-
+		ctx.Set(deviceContextKey, resp.GetDevice())
 		return nil
 	})
 }
 
 func SetDeviceProfile(client audience.AudienceClient) pipeline.Handler {
-	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
-		if !isDeviceInput(e.GetInput()) {
-			return nil
-		}
-
-		source, ok := e.Source.(*event.Event_DeviceSource)
-		if !ok {
+		if e.GetDevice() == nil {
 			return nil
 		}
 
 		var (
-			device = source.DeviceSource.GetDevice()
-			dctx   = e.GetInput().GetDeviceEventInput().GetContext()
+			device *audience.Device
+			dctx   = e.GetDevice()
+			ok     bool
 		)
+
+		if device, ok = ctx.Value(deviceContextKey).(*audience.Device); !ok {
+			return nil
+		}
 
 		// if the device is missing or the context is nil just move on
 		if device == nil || dctx == nil {
@@ -198,7 +145,7 @@ func SetDeviceProfile(client audience.AudienceClient) pipeline.Handler {
 		}
 
 		_, err := client.SetDeviceProfileIdentifier(ctx, &audience.SetDeviceProfileIdentifierRequest{
-			AuthContext:       e.GetInput().GetAuthContext(),
+			AuthContext:       e.GetAuthContext(),
 			DeviceId:          device.GetDeviceId(),
 			ProfileIdentifier: dctx.GetProfileIdentifier(),
 		})
@@ -215,8 +162,8 @@ func SetDeviceProfile(client audience.AudienceClient) pipeline.Handler {
 			return nil
 		}
 
-		e.GetDeviceSource().GetDevice().ProfileIdentifier = dctx.GetProfileIdentifier()
-
+		device.ProfileIdentifier = dctx.GetProfileIdentifier()
+		ctx.Set(deviceContextKey, device)
 		return nil
 	})
 }
@@ -235,21 +182,21 @@ func toAudienceFrameworks(m map[string]*rover_protobuf.Version) map[string]*audi
 // UpdateDeviceWithContext returns the pipeline.Handler to update a device with a corresponding context
 // deviceModelNameMapper - maps model name to marketing name
 func UpdateDeviceWithContext(client audience.AudienceClient, deviceModelNameMapper func(string) string) pipeline.Handler {
-	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
-		if !isDeviceInput(e.GetInput()) {
-			return nil
-		}
-
-		source, ok := e.Source.(*event.Event_DeviceSource)
-		if !ok {
+		if e.GetDevice() == nil {
 			return nil
 		}
 
 		var (
-			device = source.DeviceSource.GetDevice()
-			dctx   = e.GetInput().GetDeviceEventInput().GetContext()
+			device *audience.Device
+			dctx   = e.GetDevice()
+			ok     bool
 		)
+
+		if device, ok = ctx.Value(deviceContextKey).(*audience.Device); !ok {
+			return nil
+		}
 
 		// check if any attributes are not equivalent
 		if device == nil || dctx == nil {
@@ -259,8 +206,8 @@ func UpdateDeviceWithContext(client audience.AudienceClient, deviceModelNameMapp
 		// TODO check if we need to actually update the device or not
 
 		resp, err := client.UpdateDevice(ctx, &audience.UpdateDeviceRequest{
-			AuthContext: e.GetInput().GetAuthContext(),
-			DeviceId:    e.GetInput().GetDeviceEventInput().GetDeviceId(),
+			AuthContext: e.GetAuthContext(),
+			DeviceId:    device.GetDeviceId(),
 
 			PushEnvironment:    dctx.GetPushEnvironment(),
 			PushTokenKey:       dctx.GetPushToken(),
@@ -306,28 +253,29 @@ func UpdateDeviceWithContext(client audience.AudienceClient, deviceModelNameMapp
 			return nil
 		}
 
-		e.GetDeviceSource().Device = resp.GetDevice()
+		ctx.Set(deviceContextKey, resp.GetDevice())
 
 		return nil
 	})
 }
 
 func UpdateDeviceCustomAttributes(client audience.AudienceClient) pipeline.Handler {
-	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
-		if !isDeviceInput(e.GetInput()) {
-			return nil
-		}
-
-		source, ok := e.Source.(*event.Event_DeviceSource)
-		if !ok {
+		// TODO dry this function check up
+		if e.GetDevice() == nil {
 			return nil
 		}
 
 		var (
-			device = source.DeviceSource.GetDevice()
-			dctx   = e.GetInput().GetDeviceEventInput().GetContext()
+			device *audience.Device
+			dctx   = e.GetDevice()
+			ok     bool
 		)
+
+		if device, ok = ctx.Value(deviceContextKey).(*audience.Device); !ok {
+			return nil
+		}
 
 		if device == nil || dctx == nil {
 			return nil
@@ -363,7 +311,7 @@ func UpdateDeviceCustomAttributes(client audience.AudienceClient) pipeline.Handl
 					return nil, errors.New("ListValue has no string values")
 				}
 			default:
-				return nil, fmt.Errorf("no mapping exists for (%T)", v)
+				return nil, errors.Errorf("no mapping exists for (%T)", v)
 			}
 		}
 
@@ -377,8 +325,8 @@ func UpdateDeviceCustomAttributes(client audience.AudienceClient) pipeline.Handl
 			return nil
 		}
 		_, err := client.UpdateDeviceCustomAttributes(ctx, &audience.UpdateDeviceCustomAttributesRequest{
-			AuthContext: e.GetInput().GetAuthContext(),
-			DeviceId:    e.GetInput().GetDeviceEventInput().GetDeviceId(),
+			AuthContext: e.GetAuthContext(),
+			DeviceId:    device.GetDeviceId(),
 			Attributes:  update,
 		})
 
@@ -394,40 +342,41 @@ func UpdateDeviceCustomAttributes(client audience.AudienceClient) pipeline.Handl
 			return nil
 		}
 
-		source.DeviceSource.Device.Attributes = update
+		device.Attributes = update
+		ctx.Set(deviceContextKey, device)
 
 		return nil
 	})
 }
 
 func UpdateDeviceLocation(audienceClient audience.AudienceClient, geocoderClient geocoder.GeocoderClient) pipeline.Handler {
-	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
-		if !isDeviceInput(e.GetInput()) {
+		if e.GetDevice() == nil {
 			return nil
 		}
 
 		// Only process event if its a rover location update event
-		if e.GetInput().GetNamespace() != roverEventNamespace || e.GetInput().GetName() != locationUpdateEventName {
-			return nil
-		}
-
-		source, ok := e.Source.(*event.Event_DeviceSource)
-		if !ok {
+		if e.GetNamespace() != roverEventNamespace || e.GetName() != locationUpdateEventName {
 			return nil
 		}
 
 		var (
-			device = source.DeviceSource.GetDevice()
-			dctx   = e.GetInput().GetDeviceEventInput().GetContext()
+			device *audience.Device
+			dctx   = e.GetDevice()
+			ok     bool
 		)
+
+		if device, ok = ctx.Value(deviceContextKey).(*audience.Device); !ok {
+			return nil
+		}
 
 		if device == nil || dctx == nil {
 			return nil
 		}
 
 		var (
-			attributes = e.GetInput().GetAttributes().GetFields()
+			attributes = e.GetAttributes().GetFields()
 			lat        = 0.0
 			lng        = 0.0
 			accuracy   = 0.0
@@ -446,7 +395,7 @@ func UpdateDeviceLocation(audienceClient audience.AudienceClient, geocoderClient
 		}
 
 		var updateRequest = &audience.UpdateDeviceLocationRequest{
-			AuthContext:       e.GetInput().GetAuthContext(),
+			AuthContext:       e.GetAuthContext(),
 			DeviceId:          device.GetDeviceId(),
 			LocationLongitude: lng,
 			LocationLatitude:  lat,
@@ -481,28 +430,29 @@ func UpdateDeviceLocation(audienceClient audience.AudienceClient, geocoderClient
 		device.LocationState = updateRequest.LocationState
 		device.LocationCity = updateRequest.LocationCity
 
+		ctx.Set(deviceContextKey, device)
+
 		return nil
 	})
 }
 
 func UpdateDeviceName(client audience.AudienceClient) pipeline.Handler {
-	return pipeline.HandlerFunc(func(ctx context.Context, e *event.Event) error {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
-		if !isDeviceInput(e.GetInput()) {
-			return nil
-		}
-
-		source, ok := e.Source.(*event.Event_DeviceSource)
-		if !ok {
+		if e.GetDevice() == nil {
 			return nil
 		}
 
 		var (
-			device = source.DeviceSource.GetDevice()
-			dctx   = e.GetInput().GetDeviceEventInput().GetContext()
+			device *audience.Device
+			dctx   = e.GetDevice()
+			ok     bool
 		)
 
-		// check if any attributes are not equivalent
+		if device, ok = ctx.Value(deviceContextKey).(*audience.Device); !ok {
+			return nil
+		}
+
 		if device == nil || dctx == nil {
 			return nil
 		}
@@ -512,7 +462,7 @@ func UpdateDeviceName(client audience.AudienceClient) pipeline.Handler {
 		}
 
 		_, err := client.UpdateDeviceLabelProperty(ctx, &audience.UpdateDeviceLabelPropertyRequest{
-			AuthContext: e.GetInput().GetAuthContext(),
+			AuthContext: e.GetAuthContext(),
 			DeviceId:    device.GetDeviceId(),
 			Label:       dctx.GetDeviceName(),
 		})

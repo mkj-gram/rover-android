@@ -1,5 +1,4 @@
 const Client        = require('../lib/client')
-const Constants     = require('../lib/constants')
 const Serializer    = require('../lib/serializer')
 const RoverApis     = require('@rover/apis')
 const chai          = require('chai')
@@ -42,13 +41,13 @@ describe('Client', function() {
 				})
 		})
 
-		it('is rejected when device identifier is not defined', function(done) {
+		it('is rejected a partition key is empty', function(done) {
 			const client = new Client()
 			const context = new RoverApis.auth.v1.Models.AuthContext()
 
 			client.connect()
 				.then(_ => {
-					return expect(client.submit(context)).to.be.rejectedWith("device identifier cannot be empty").notify(done)
+					return expect(client.submit(context)).to.be.rejectedWith("partition key cannot be empty").notify(done)
 				})
 				.catch(err => done(err))
 				.then(_ => {
@@ -56,19 +55,20 @@ describe('Client', function() {
 				})
 		})
 
-		it('is rejected when event type is not specified', function(done) {
+		it('rejected when device is set but device identifier is empty', function(done) {
 			const client = new Client()
 			const context = new RoverApis.auth.v1.Models.AuthContext()
 
 			client.connect()
 				.then(_ => {
-					return expect(client.submit(context, "hello", "abc")).to.be.rejectedWith("unsupported event type got: abc").notify(done)
+					return expect(client.submit(context, "1", {device: { deviceIdentifier: "" }})).to.be.rejectedWith("device.deviceIdentifier cannot be empty").notify(done)
 				})
 				.catch(err => done(err))
 				.then(_ => {
 					client.disconnect()
 				})
 		})
+
 
 		// TODO
 		// Need to make sure before this test runs the topic "test" exists within kafka
@@ -95,7 +95,8 @@ describe('Client', function() {
 					longitude: -71.3621,
 					accuracy: 200
 				},
-				context: {
+				device: {
+					deviceIdentifier: deviceIdentifier,
 					appBadgeNumber: 2,
 					appBuild: "Prod 3.1 - OSX 13",
 					appName: "AwesomeDoughnuts",
@@ -139,7 +140,7 @@ describe('Client', function() {
 				})
 				.then(_ => consumer.seekLast(0))
 				.then(_ => client.connect())
-				.then(_ => client.submit(context, deviceIdentifier, Constants.DEVICE_EVENT, input))
+				.then(_ => client.submit(context, deviceIdentifier, input))
 				.then(_ => client.flush())
 				.then(_ => consumer.next())
 				.then(msg => {
@@ -147,12 +148,11 @@ describe('Client', function() {
 					expect(msg).to.not.be.undefined
 					expect(msg.length).to.equal(1)
 					expect(msg[0].key.toString()).to.equal(deviceIdentifier)
-					// // Deserialize the kafka message back to protobuf
-					const proto = RoverApis.event.v1.Models.EventInput.deserializeBinary(msg[0].value)
-					const input = proto.getDeviceEventInput()
-					const dctx = input.getContext()
+					// Deserialize the kafka message back to protobuf
+					const event = RoverApis.event.v1.Models.Event.deserializeBinary(msg[0].value)
+					const dctx = event.getDevice()
 					
-					expect(input.getDeviceId()).to.equal(deviceIdentifier)
+					expect(dctx.getDeviceIdentifier()).to.equal(deviceIdentifier)
 
 					const exp = {
 						id: eventId,
@@ -160,7 +160,7 @@ describe('Client', function() {
 						name: 'location update',
 						attributes: { accuracy: 200, latitude: 43.111, longitude: -71.3621 },
 						timestamp: new Date("2018-02-19T16:00:59.000Z"),
-						context: {
+						device: {
 							profileIdentifier: 'hello@doughnuts.io',
 							appBadgeNumber: 2,
 							appBuild: 'Prod 3.1 - OSX 13',
@@ -202,12 +202,12 @@ describe('Client', function() {
 					})
 
 					const got = {
-						id: proto.getId(),
-						namespace: proto.getNamespace(),
-						name: proto.getName(),
-						attributes: proto.getAttributes().toJavaScript(),
-						timestamp: proto.getTimestamp().toDate(),
-						context: {
+						id: event.getId(),
+						namespace: event.getNamespace(),
+						name: event.getName(),
+						attributes: event.getAttributes().toJavaScript(),
+						timestamp: event.getTimestamp().toDate(),
+						device: {
 							profileIdentifier: dctx.getProfileIdentifier(),
 							appBadgeNumber: dctx.getAppBadgeNumber().getValue(),
 							appBuild: dctx.getAppBuild(),

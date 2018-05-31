@@ -3,7 +3,7 @@ const Protobuf		= require('@rover/apis').protobuf.Models
 const Audience 		= require('@rover/apis').audience.v1.Models
 
 const { Struct, Version, Timestamp } = Protobuf
-const { EventInput, DeviceEventInput, DeviceContext } = require('@rover/apis').event.v1.Models
+const { Event, DeviceContext } = require('@rover/apis').event.v1.Models
 
 
 function locationAuthorizationToProto(authorization) {
@@ -55,7 +55,11 @@ function pushEnvironmentToProto(environment) {
 function deviceContextToProto(context) {
 	let dc = new DeviceContext()
 
-	// dc.setDeviceId(context.id)
+	if (context.deviceIdentifier == "") {
+		throw new Error("device.deviceIdentifier cannot be empty")
+	}
+
+	dc.setDeviceIdentifier(context.deviceIdentifier)
 	dc.setProfileIdentifier(context.profileIdentifier)
 
 	dc.setAttributes(Struct.fromJavaScript(context.attributes || {}))
@@ -115,10 +119,8 @@ function deviceContextToProto(context) {
  * @param  {Object} event
  * @return {Protobuf<event.Event>}
  */
-function serializeEventInput(auth, event) {
-	let e = new EventInput()
-
-	e.setAuthContext(auth)
+function serializeEvent(event) {
+	let e = new Event()
 
 	e.setNamespace(event.namespace)
 	e.setId(event.id)
@@ -130,25 +132,13 @@ function serializeEventInput(auth, event) {
 
 	e.setAttributes(Struct.fromJavaScript(event.attributes || {}))
 
-	return e
-}
-
-/**
- * Serializes a json representation of a device event to the protobuf equivalent
- * @param  {Object} event
- * @return {Protobuf<event.Event>}
- */
-function serializeDeviceEvent(auth, event, deviceId, deviceContext) {
-	const e = serializeEventInput(auth, event)
-
-	const input = new DeviceEventInput()
-	input.setDeviceId(deviceId)
-	input.setContext(deviceContextToProto(deviceContext || {}))
-	e.setDeviceEventInput(input)
+	if(event.device) {
+		e.setDevice(deviceContextToProto(event.device))
+	}
 
 	return e
 }
 
 module.exports = {
-	serializeDeviceEvent: serializeDeviceEvent
+	serializeEvent: serializeEvent
 }
