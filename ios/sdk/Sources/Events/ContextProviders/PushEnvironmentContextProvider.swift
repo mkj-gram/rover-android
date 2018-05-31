@@ -13,12 +13,12 @@ class PushEnvironmentContextProvider: ContextProvider {
     lazy var pushEnvironment: String? = {
         guard let path = bundle.path(forResource: "embedded", ofType: "mobileprovision") else {
             logger.warn("Could not detect push environment: Provisioning profile not found (this is expected behaviour if you are running a simulator)")
-            return nil
+            return "production"
         }
         
         guard let embeddedProfile = try? String(contentsOfFile: path, encoding: String.Encoding.ascii) else {
             logger.warn("Could not detect push environment: Failed to read provisioning profile at \(path)")
-            return nil
+            return "production"
         }
         
         let scanner = Scanner(string: embeddedProfile)
@@ -26,27 +26,27 @@ class PushEnvironmentContextProvider: ContextProvider {
         
         guard scanner.scanUpTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", into: nil), scanner.scanUpTo("</plist>", into: &string) else {
             logger.warn("Could not detect push environment: Unrecognized provisioning profile structure")
-            return nil
+            return "production"
         }
         
         guard let data = string?.appending("</plist>").data(using: String.Encoding.utf8) else {
             logger.warn("Could not detect push environment: Failed to decode provisioning profile")
-            return nil
+            return "production"
         }
         
         guard let plist = (try? PropertyListSerialization.propertyList(from: data, options: [], format: nil)) as? [String: Any] else {
             logger.warn("Could not detect push environment: Failed to serialize provisioning profile")
-            return nil
+            return "production"
         }
         
         guard let entitlements = plist["Entitlements"] as? [String: Any] else {
             logger.warn("Could not detect push environment: No entitlements found in provisioning profile")
-            return nil
+            return "production"
         }
         
         guard let pushEnvironment = entitlements["aps-environment"] as? String else {
             logger.warn("Could not detect push environment: aps environment missing from entitlements")
-            return nil
+            return "production"
         }
         
         return pushEnvironment
