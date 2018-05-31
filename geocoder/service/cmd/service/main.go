@@ -6,16 +6,15 @@ import (
 	"os"
 	"os/signal"
 	"time"
-
+	"github.com/newrelic/go-agent"
 	"github.com/go-redis/redis"
 	"github.com/namsral/flag"
-	"github.com/newrelic/go-agent"
 	"google.golang.org/grpc"
-	"googlemaps.github.io/maps"
-
+	
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service"
 	"github.com/roverplatform/rover/geocoder/service/cache"
+	"github.com/roverplatform/rover/geocoder/service/locationiq"
 	"github.com/roverplatform/rover/go/grpc/middleware"
 	"github.com/roverplatform/rover/go/grpc/middleware/newrelic"
 )
@@ -27,24 +26,25 @@ const (
 var (
 	rpcAddr = flag.String("rpc-addr", ":5100", "rpc address")
 
-	gcpApiKey = flag.String("gcp-api-key", "", "google api key")
-
 	redisDsn = flag.String("redis-dsn", "", "redis dsn")
 
 	newRelicKey = flag.String("newrelic-key", "", "Newrelic license key")
+
+	locationIqAPIKey    = flag.String("locationiq-api-key", "", "locationIQ api key")
+	locationIqZoomLevel = flag.Int("locationiq-zoom-level", 10, "locationIQ zoom level")
 )
 
 func main() {
-	flag.EnvironmentPrefix = "GEOCODER_SERVICE"
 	flag.CommandLine.Init("", flag.ExitOnError)
 	flag.Parse()
 
 	/*
 		Service handler setup
 	*/
-	client, err := maps.NewClient(maps.WithAPIKey(*gcpApiKey))
+	
+	client, err := locationiq.NewClient(*locationIqAPIKey, *locationIqZoomLevel)
 	if err != nil {
-		log.Fatalf("maps.NewClient: %v\n", err)
+		log.Fatalf("locationIQ.NewClient: %v\n", err)
 	}
 
 	redisOpts, err := redis.ParseURL(*redisDsn)

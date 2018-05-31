@@ -8,19 +8,19 @@ import (
 
 	"github.com/go-redis/redis"
 	"golang.org/x/net/context"
-	"googlemaps.github.io/maps"
 
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service/cache"
+	"github.com/roverplatform/rover/geocoder/service/locationiq"
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
 
-type MapsClientMock struct {
-	Result []maps.GeocodingResult
+type LocationIQClientMock struct {
+	Result *locationiq.ReverseGeocodeResponse
 	Error  error
 }
 
-func (m *MapsClientMock) ReverseGeocode(ctx context.Context, request *maps.GeocodingRequest) ([]maps.GeocodingResult, error) {
+func (m *LocationIQClientMock) ReverseGeocode(ctx context.Context, latitude float64, longitude float64) (*locationiq.ReverseGeocodeResponse, error) {
 	return m.Result, m.Error
 }
 
@@ -39,60 +39,60 @@ func TestServer_ReverseGeocode(t *testing.T) {
 	tests := []struct {
 		name     string
 		onBefore func()
-		client   MapsClient
+		client   LocationIQClient
 		req      *geocoder.ReverseGeocodeRequest
 		want     *geocoder.ReverseGeocodeResponse
 	}{
 		{
 			name:   "Loads and parses /testdata/response.01.json",
-			client: &MapsClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.01.json"), Error: nil},
+			client: &LocationIQClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.01.json"), Error: nil},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  43.6507328,
 				Longitude: -79.3761292,
 			},
 			want: &geocoder.ReverseGeocodeResponse{
-				Country: "Canada",
+				Country: "CA",
 				State:   "Ontario",
 				City:    "Toronto",
 			},
 		},
 		{
 			name:   "Loads and parses /testdata/response.02.json",
-			client: &MapsClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.02.json"), Error: nil},
+			client: &LocationIQClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.02.json"), Error: nil},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  50.10228739999999,
 				Longitude: 8.7591725,
 			},
 			want: &geocoder.ReverseGeocodeResponse{
-				Country: "Germany",
-				State:   "Hessen",
+				Country: "DE",
+				State:   "Hesse",
 				City:    "Offenbach am Main",
 			},
 		},
 		{
 			name:   "Loads and parses /testdata/response.03.json",
-			client: &MapsClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.03.json"), Error: nil},
+			client: &LocationIQClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.03.json"), Error: nil},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  41.47641300000001,
 				Longitude: 95.33326799999999,
 			},
 			want: &geocoder.ReverseGeocodeResponse{
-				Country: "China",
-				State:   "Gansu Sheng",
-				City:    "Jiuquan Shi",
+				Country: "CN",
+				State:   "Gansu",
+				City:    "Xiaoquan East",
 			},
 		},
 		{
 			name:   "Loads and parses /testdata/response.04.json",
-			client: &MapsClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.04.json"), Error: nil},
+			client: &LocationIQClientMock{Result: loadReverseGeocodeResponse(t, "./testdata/response.04.json"), Error: nil},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  39.037842,
 				Longitude: -115.537396,
 			},
 			want: &geocoder.ReverseGeocodeResponse{
-				Country: "United States",
+				Country: "US",
 				State:   "Nevada",
-				City:    "",
+				City:    "White Pine County",
 			},
 		},
 		{
@@ -107,7 +107,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 					City:    "Random String",
 				}, 0)
 			},
-			client: &MapsClientMock{Result: nil, Error: errors.New("Value Not From Cache")},
+			client: &LocationIQClientMock{Result: nil, Error: errors.New("Value Not From Cache")},
 			req: &geocoder.ReverseGeocodeRequest{
 				Latitude:  100,
 				Longitude: -23.22,
@@ -139,13 +139,13 @@ func TestServer_ReverseGeocode(t *testing.T) {
 	}
 }
 
-func loadReverseGeocodeResponse(t *testing.T, file string) []maps.GeocodingResult {
+func loadReverseGeocodeResponse(t *testing.T, file string) *locationiq.ReverseGeocodeResponse {
 	raw, err := ioutil.ReadFile(file)
 	if err != nil {
 		t.Error(err)
 	}
-
-	var result []maps.GeocodingResult
+	
+	var result *locationiq.ReverseGeocodeResponse
 
 	json.Unmarshal(raw, &result)
 

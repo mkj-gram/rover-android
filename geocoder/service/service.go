@@ -1,38 +1,32 @@
 package service
 
 import (
-	"sort"
-
+	"strings"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"googlemaps.github.io/maps"
 
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service/cache"
+	"github.com/roverplatform/rover/geocoder/service/locationiq"
 )
 
 var (
 	_ geocoder.GeocoderServer = (*Server)(nil)
 )
 
-// Precision levels of GeocodingResults
-const (
-	APPROXIMATE = iota
-	GEOMETRIC_CENTER
-	RANGE_INTERPOLATED
-	ROOFTOP
-)
-
-type MapsClient interface {
-	ReverseGeocode(ctx context.Context, request *maps.GeocodingRequest) ([]maps.GeocodingResult, error)
+// LocationIQClient interfaces with LocationIQ to reverse geocode
+type LocationIQClient interface {
+	ReverseGeocode(ctx context.Context, latitude float64, longitude float64) (*locationiq.ReverseGeocodeResponse, error)
 }
 
+// Server ...
 type Server struct {
-	Client MapsClient
+	Client LocationIQClient
 	Cache  *cache.Store
 }
 
+// ReverseGeocode given latitude & longitude returns reverse geocode
 func (s *Server) ReverseGeocode(ctx context.Context, req *geocoder.ReverseGeocodeRequest) (*geocoder.ReverseGeocodeResponse, error) {
 
 	response, err := s.Cache.GetReverseGeocodeResponse(req)
@@ -40,25 +34,15 @@ func (s *Server) ReverseGeocode(ctx context.Context, req *geocoder.ReverseGeocod
 		return response, nil
 	}
 
-	results, err := s.Client.ReverseGeocode(ctx, &maps.GeocodingRequest{
-		LatLng: &maps.LatLng{
-			Lat: req.GetLatitude(),
-			Lng: req.GetLongitude(),
-		},
-	})
+	results, err := s.Client.ReverseGeocode(ctx, req.GetLatitude(), req.GetLongitude())
 
 	if err != nil {
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	if len(results) == 0 {
-		return nil, status.Error(codes.FailedPrecondition, "No results")
+	if results == nil {
+		return nil, status.Error(codes.FailedPrecondition, "No ReverseGeocode result")
 	}
-
-	// Ensure that the result set is sorted from most precise to least
-	sort.Slice(results, func(i, j int) bool {
-		return getPrecisionLevel(results[i]) > getPrecisionLevel(results[j])
-	})
 
 	response = &geocoder.ReverseGeocodeResponse{
 		Country: getCountry(results),
@@ -74,71 +58,51 @@ func (s *Server) ReverseGeocode(ctx context.Context, req *geocoder.ReverseGeocod
 	return response, nil
 }
 
-func getPrecisionLevel(result maps.GeocodingResult) int {
-	switch result.Geometry.LocationType {
-	case "APPROXIMATE":
-		return APPROXIMATE
-	case "GEOMETRIC_CENTER":
-		return GEOMETRIC_CENTER
-	case "RANGE_INTERPOLATED":
-		return RANGE_INTERPOLATED
-	case "ROOFTOP":
-		return ROOFTOP
-	default:
-		return APPROXIMATE
+func getCountry(results *locationiq.ReverseGeocodeResponse) string {
+	countyCode := results.CountryCode
+	if countyCode != "" {
+		return strings.ToUpper(countyCode)
 	}
-}
-
-func getComponentByType(result maps.GeocodingResult, ctype string) *maps.AddressComponent {
-	for _, component := range result.AddressComponents {
-		for _, t := range component.Types {
-			if t == ctype {
-				return &component
-			}
-		}
-	}
-	return nil
-}
-
-func getCountry(results []maps.GeocodingResult) string {
-
-	for _, result := range results {
-		component := getComponentByType(result, "country")
-		if component != nil {
-			return component.LongName
-		}
-	}
-
 	return ""
 }
 
-func getState(results []maps.GeocodingResult) string {
-
-	for _, result := range results {
-		component := getComponentByType(result, "administrative_area_level_1")
-		if component != nil {
-			return component.LongName
-		}
+func getState(results *locationiq.ReverseGeocodeResponse) string {
+	state := results.State
+	if state != "" {
+		return state
 	}
-
-	for _, result := range results {
-		component := getComponentByType(result, "administrative_area_level_2")
-		if component != nil {
-			return component.LongName
-		}
-	}
-
 	return ""
 }
 
-func getCity(results []maps.GeocodingResult) string {
+func getCity(results *locationiq.ReverseGeocodeResponse) string {
+	city := results.City
+	if city != "" {
+		return city
+	}	
 
-	for _, result := range results {
-		component := getComponentByType(result, "locality")
-		if component != nil {
-			return component.LongName
-		}
+	hamlet := results.Hamlet
+	if hamlet != "" {
+		return hamlet
 	}
 
+	village := results.Village
+	if village != "" {
+		return village
+	}
+
+	town := results.Town
+	if town != "" {
+		return town
+	}
+
+	county := results.County
+	if county != "" {
+		return county
+	}
+
+	district := results.StateDistrict
+	if district != "" {
+		return district
+	}
 	return ""
 }

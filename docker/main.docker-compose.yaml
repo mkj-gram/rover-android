@@ -261,8 +261,9 @@ services:
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     environment:
-      GEOCODER_SERVICE_GCP_API_KEY: "AIzaSyBNFTti0wKJ3J_FMw1tCpTB4bPyQ8j53bc"
-      GEOCODER_SERVICE_REDIS_DSN: "redis://redis:6379/3"
+      REDIS_DSN: "redis://redis:6379/3"
+      LOCATIONIQ_API_KEY: "926b09abbef41a"
+      LOCATIONIQ_ZOOM_LEVEL: 10
 
   events-pipeline:
     image: roverio/golang-rdkafka:1.10-alpine
