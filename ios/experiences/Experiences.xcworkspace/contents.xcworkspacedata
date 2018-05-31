@@ -2,10 +2,10 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:../library/Library.xcodeproj">
+      location = "group:../sdk/Rover.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:../../../rover-ios/Rover.xcodeproj">
+      location = "group:../library/Library.xcodeproj">
    </FileRef>
    <FileRef
       location = "container:Experiences.xcodeproj">
