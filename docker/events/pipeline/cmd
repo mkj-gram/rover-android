@@ -3,7 +3,24 @@
 set -e
 source ./docker/functions.bash
 
+migrate() {
+	if [[ -z "$1" ]]; then
+		echo "migrate no arguments supplied"
+		exit 1
+	fi
+
+	waiton postgres 5432
+
+	postgres_cli create -db-dsn $1
+	postgres_cli migrate \
+		-db-dsn $1 \
+		-migration-path ./events/backend/schema/migrations 
+}
+
 run() {
+	migrate ${POSTGRES_DSN}
+
+	waiton kafka 9092
 	go run ./events/backend/cmd/pipeline/main.go
 }
 
@@ -12,6 +29,8 @@ test() {
 	waiton kafka 9092
 	# wait for zookeeper client
 	waiton kafka 2181
+
+	migrate ${TEST_POSTGRES_DSN}
 	go test github.com/roverplatform/rover/events/backend/...
 }
 

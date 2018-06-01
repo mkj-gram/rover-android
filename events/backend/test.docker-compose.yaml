@@ -9,6 +9,9 @@ services:
       - ADVERTISED_HOST=kafka
       - NUM_PARTITIONS=3
 
+  postgres:
+    image: postgres:9.6-alpine
+
   events-pipeline:
     image: roverio/golang-rdkafka:1.10-alpine
     command: ./docker/events/pipeline/cmd test
@@ -17,5 +20,7 @@ services:
     working_dir: /go/src/github.com/roverplatform/rover
     depends_on:
       - kafka
+      - postgres
     environment:
       CGO_ENABLED: 1
+      TEST_POSTGRES_DSN: "postgres://postgres:@postgres:5432/events_pipeline_test?sslmode=disable"

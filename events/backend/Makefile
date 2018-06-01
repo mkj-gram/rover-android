@@ -12,4 +12,7 @@ shell:
 test:
 	${RUNTEST} ./docker/events/pipeline/cmd test
 
+test.shell:
+	${RUNTEST} sh
+
 .PHONY: run.pipeline shell test

@@ -17,6 +17,10 @@ waiton() {
   eval "$OPTS"
 }
 
+postgres_cli() {
+  go run ./go/cmd/postgres-cli/*.go $@
+}
+
 main() {
   for cmd in $@; do
     $cmd

@@ -20,6 +20,8 @@ import (
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/events/backend/middleware"
 	"github.com/roverplatform/rover/events/backend/pipeline"
+	"github.com/roverplatform/rover/events/backend/schema"
+	"github.com/roverplatform/rover/events/backend/tracker"
 	"github.com/roverplatform/rover/events/backend/transformers"
 	rhttp "github.com/roverplatform/rover/go/http"
 	rlog "github.com/roverplatform/rover/go/logger"
@@ -41,6 +43,7 @@ var (
 	//
 	kafkaDSN     = flag.String("kafka-dsn", "kafka:9092", "Kafka bootstrap servers dsn")
 	kafkaTimeout = flag.Duration("kafka-timeout", time.Duration(1*time.Second), "Kafka ping timeout")
+	postgresDSN  = flag.String("postgres-dsn", "postgres://postgres@postgres:5432/events_pipeline_dev", "PostgreSQL dsn")
 
 	//
 	//
@@ -126,6 +129,16 @@ func main() {
 	prom.MustRegister(pipeline.PrometheusMetrics...)
 
 	//
+	//	Schema and Tracker
+	//
+	schemaDB, err := schema.Open(*postgresDSN)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	handler := pipeline.NewChain("SchemaTracker").Then(tracker.NewTracker(schemaDB))
+
+	//
 	// Reverse Geocoding
 	//
 	geocoderConn, err := grpc.Dial(*geocoderServiceDsn, grpc.WithInsecure())
@@ -161,8 +174,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	handler := transformers.Root(audienceClient, geocoderClient, deviceModelNameMapper)
-
+	handler = handler.Then(pipeline.NewChain("Audience").Then(transformers.Root(audienceClient, geocoderClient, deviceModelNameMapper)))
 	p := pipeline.NewPipeline(consumer, *inputTopic, producer, *outputTopic, handler, pipelineOpts...)
 
 	//

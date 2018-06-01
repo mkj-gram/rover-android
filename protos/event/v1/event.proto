@@ -92,6 +92,13 @@ message Event {
 	// Optional Device
 	DeviceContext device = 8;
 
+	message SchemaIdentifier {
+		int64 id = 1;
+		int64 version = 2;
+	}
+
+	SchemaIdentifier schema_identifier = 9;
+	
 	// represents when the pipeline received the event as input
 	google.protobuf.Timestamp processed_at  = 10;
 }

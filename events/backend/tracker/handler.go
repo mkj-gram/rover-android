@@ -1,0 +1,185 @@
+package tracker
+
+import (
+	"context"
+
+	"github.com/pkg/errors"
+	"github.com/roverplatform/rover/apis/go/event/v1"
+	"github.com/roverplatform/rover/apis/go/protobuf/struct"
+	"github.com/roverplatform/rover/events/backend/pipeline"
+	"github.com/roverplatform/rover/events/backend/schema"
+)
+
+type SchemaRepository interface {
+	FindLastByEvent(ctx context.Context, accountId int32, namespace, name string) (*schema.EventSchema, error)
+	Create(ctx context.Context, eventSchema schema.EventSchema) (*schema.EventSchema, error)
+	UpdateAttributeSchema(ctx context.Context, eventSchema schema.EventSchema, newSchema map[string]schema.Type) (*schema.EventSchema, error)
+}
+
+func NewTracker(db SchemaRepository) pipeline.Handler {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
+
+		var (
+			accountId = e.GetAuthContext().GetAccountId()
+			namespace = e.GetNamespace()
+			name      = e.GetName()
+		)
+
+		eventSchema, err := db.FindLastByEvent(ctx, accountId, namespace, name)
+		// TODO check if err is retryable
+		if err != nil && errors.Cause(err) != schema.ErrNotFound {
+			return err
+		}
+
+		// We are assuming any other pipeline.Handler's cannot edit the attributes hash
+		if eventSchema == nil {
+			// generate one and save then compare
+			newSchema, err := SchemaFromEventInput(e.GetAttributes())
+			if err != nil {
+				return err
+			}
+
+			createSchema := schema.EventSchema{
+				AccountId:       accountId,
+				Namespace:       namespace,
+				Name:            name,
+				AttributeSchema: newSchema,
+				Version:         1,
+			}
+
+			eventSchema, err = db.Create(ctx, createSchema)
+			if err != nil {
+				if errors.Cause(err) == schema.ErrAlreadyExists {
+					return pipeline.NewRetryableError(err)
+				}
+				return err
+			}
+		}
+
+		//eventSchema current schema
+		haveSchema, err := SchemaFromEventInput(e.GetAttributes())
+		if err != nil {
+			return errors.Wrap(err, "SchemaFromEventInput")
+		}
+
+		// check if the current schema supports
+		ok, needsUpdate := Supports(eventSchema.AttributeSchema, haveSchema)
+		// does not support means type miss-match
+		if !ok {
+			return errors.New("current schema does not support input")
+		}
+
+		if needsUpdate {
+			var newSchema = eventSchema.AttributeSchema.Merge(haveSchema)
+			if savedSchema, err := db.UpdateAttributeSchema(ctx, *eventSchema, newSchema); err != nil {
+				if errors.Cause(err) == schema.ErrAlreadyExists {
+					return pipeline.NewRetryableError(errors.Wrap(err, "db.UpdateAttributeSchema"))
+				}
+				return errors.Wrap(err, "db.UpdateAttributeSchema")
+			} else {
+				eventSchema = savedSchema
+			}
+		}
+
+		e.SchemaIdentifier = &event.Event_SchemaIdentifier{
+			Id:      eventSchema.Id,
+			Version: eventSchema.Version,
+		}
+
+		return nil
+	})
+}
+
+func TypeOfValue(value *structpb.Value) (schema.Type, bool) {
+	if value == nil {
+		return schema.INVALID, true
+	}
+
+	switch v := value.GetKind().(type) {
+	case *structpb.Value_NullValue:
+		return schema.INVALID, false
+	case *structpb.Value_NumberValue:
+		return schema.NUMBER, true
+	case *structpb.Value_StringValue:
+		return schema.STRING, true
+	case *structpb.Value_BoolValue:
+		return schema.BOOLEAN, true
+	case *structpb.Value_StructValue:
+		var complex = schema.ComplexType{}
+		for name, svalue := range v.StructValue.GetFields() {
+			if sv, ok := TypeOfValue(svalue); ok {
+				complex[name] = sv
+			} else {
+				return schema.INVALID, false // this isn't valid
+			}
+		}
+		return complex, true
+	case *structpb.Value_ListValue:
+		if len(v.ListValue.GetValues()) == 0 {
+			// empty array just return unknown
+			return schema.INVALID, true
+		}
+		// compute all the types if they are the same we good if not kaboom
+		var eleType, ok = TypeOfValue(v.ListValue.GetValues()[0])
+		if !ok || !schema.IsScalarType(eleType) {
+			return schema.INVALID, false
+		}
+		for _, element := range v.ListValue.GetValues() {
+			if nextType, ok := TypeOfValue(element); !ok || nextType != eleType {
+				return schema.INVALID, false
+			}
+		}
+		if !schema.IsScalarType(eleType) {
+			return schema.INVALID, false
+		}
+		return schema.ArrayType{Type: schema.ScalarFromType(eleType)}, true
+	default:
+		// default to invalid
+		return schema.INVALID, false
+	}
+}
+
+func SchemaFromEventInput(attributes *structpb.Struct) (schema.AttributeSchema, error) {
+	var s = schema.AttributeSchema{}
+
+	for name, value := range attributes.GetFields() {
+		if t, ok := TypeOfValue(value); ok {
+			s[name] = t
+		} else {
+			return nil, errors.Errorf("invalid type for %q[%v]", name, value)
+		}
+	}
+
+	return s, nil
+}
+
+func NeedsUpdating(diff schema.M) bool {
+	for _, o := range diff {
+		switch d := o.(type) {
+		case schema.Diff:
+			if d.Was == schema.INVALID && d.Now != schema.INVALID {
+				return true
+			}
+		case schema.M:
+			if NeedsUpdating(d) {
+				return true
+			}
+		default:
+			return false
+		}
+	}
+
+	return false
+}
+
+// Determines if schema1 can support schema2 and if it does support it does it need updating
+func Supports(schema1 schema.AttributeSchema, schema2 schema.AttributeSchema) (bool, bool) {
+
+	for name, type1 := range schema1 {
+		if type2, ok := schema2[name]; ok && !type1.Supports(type2) {
+			return false, false
+		}
+	}
+
+	return true, NeedsUpdating(schema1.Diff(schema2))
+}

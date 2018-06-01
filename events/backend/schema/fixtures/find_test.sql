@@ -1,0 +1,1 @@
+INSERT INTO event_schemas VALUES (1,1,1,'rover', 'Location Update', '{"longitude":"number","latitude":"number","accuracy":"number"}', '2018-05-18T14:54:32.046Z'::timestamp);

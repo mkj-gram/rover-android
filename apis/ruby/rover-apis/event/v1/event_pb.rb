@@ -54,7 +54,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :received_at, :message, 6, "google.protobuf.Timestamp"
     optional :attributes, :message, 7, "rover.protobuf.Struct"
     optional :device, :message, 8, "rover.event.v1.DeviceContext"
+    optional :schema_identifier, :message, 9, "rover.event.v1.Event.SchemaIdentifier"
     optional :processed_at, :message, 10, "google.protobuf.Timestamp"
+  end
+  add_message "rover.event.v1.Event.SchemaIdentifier" do
+    optional :id, :int64, 1
+    optional :version, :int64, 2
   end
 end
 
@@ -63,6 +68,7 @@ module Rover
     module V1
       DeviceContext = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.DeviceContext").msgclass
       Event = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.Event").msgclass
+      Event::SchemaIdentifier = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.event.v1.Event.SchemaIdentifier").msgclass
     end
   end
 end

@@ -275,6 +275,7 @@ services:
       - kafka
       - audience-service
       - geocoder-service
+      - postgres
     environment:
       CGO_ENABLED: 1
       KAFKA_DSN: kafka:9092
@@ -283,6 +284,8 @@ services:
       AUDIENCE_SERVICE_DSN: audience-service:5100
       GEOCODER_SERVICE_DSN: geocoder-service:5100
       LOG_LEVEL: debug
+      POSTGRES_DSN: "postgres://postgres:@postgres:5432/events_pipeline_dev?sslmode=disable"
+      DEVICE_MODEL_NAME_MAP_PATH: ./events/backend/sample-device-mapping.json
 
   smw:
     image: node:6.9.1
