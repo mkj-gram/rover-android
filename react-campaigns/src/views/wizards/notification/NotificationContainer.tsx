@@ -51,7 +51,7 @@ const NotificationContainer: React.SFC<
                 top: 0,
                 left: 0,
                 background: white,
-                animation: `${animate} 500ms ease`
+                animation: `${animate} 350ms ease`
             }}
             id="notificationContainer"
         >

@@ -94,7 +94,7 @@ const DeviceTransitionContainer: React.SFC<
                                     ? '0%'
                                     : `${(window.innerWidth - 784) / 2 + 368}px`
                             })`,
-                            transition: '300ms ease-out'
+                            transition: '350ms ease-out'
                         }}
                     >
                         <MediaQuery minWidth={1140}>

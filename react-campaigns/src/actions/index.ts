@@ -236,5 +236,5 @@ export const closeWizardModal: ActionCreator<
         dispatch({
             type: 'FINISH_CLOSING_WIZARD_MODAL'
         })
-    }, 500)
+    }, 350)
 }
