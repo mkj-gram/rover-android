@@ -80,6 +80,15 @@ const WizardModal: React.SFC<WizardModalProps> = ({
                     position: 'relative'
                 }}
             >
+                <style type="text/css">
+                    {`
+                        #wizardModalBody {                        
+                            -webkit-transform: translateZ(0px);
+                            -webkit-transform: translate3d(0,0,0);
+                            -webkit-perspective: 1000;
+                        }                                          
+                    `}
+                </style>
                 {children}
             </div>
             <div style={toolbarStyle}>
