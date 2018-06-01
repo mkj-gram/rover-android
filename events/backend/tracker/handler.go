@@ -2,6 +2,7 @@ package tracker
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/event/v1"
@@ -56,6 +57,8 @@ func NewTracker(db SchemaRepository) pipeline.Handler {
 			}
 		}
 
+		// coerce the attributes with the current schema
+		Coerce(e.GetAttributes(), eventSchema.AttributeSchema)
 		//eventSchema current schema
 		haveSchema, err := SchemaFromEventInput(e.GetAttributes())
 		if err != nil {
@@ -182,4 +185,119 @@ func Supports(schema1 schema.AttributeSchema, schema2 schema.AttributeSchema) (b
 	}
 
 	return true, NeedsUpdating(schema1.Diff(schema2))
+}
+
+// Coerce the attributes into the schema type if possible
+func Coerce(attributes *structpb.Struct, s schema.AttributeSchema) {
+	for name, value := range attributes.GetFields() {
+		if value == nil {
+			continue
+		}
+
+		if stype, ok := s[name]; ok {
+			switch v := value.Kind.(type) {
+			case *structpb.Value_NullValue:
+				continue
+			case *structpb.Value_NumberValue:
+				if schema.IsScalarType(stype) {
+					if converted := coerceNumber(v, schema.ScalarFromType(stype)); converted != nil {
+						attributes.GetFields()[name] = converted
+					}
+				} else if schema.IsArrayType(stype) {
+					if converted := coerceNumber(v, schema.ArrayFromType(stype).Type); converted != nil {
+						attributes.GetFields()[name] = structpb.ListVal(converted)
+					}
+				}
+
+			case *structpb.Value_StringValue:
+				if schema.IsScalarType(stype) {
+					if converted := coerceString(v, schema.ScalarFromType(stype)); converted != nil {
+						attributes.GetFields()[name] = converted
+					}
+				} else if schema.IsArrayType(stype) {
+					if converted := coerceString(v, schema.ArrayFromType(stype).Type); converted != nil {
+						attributes.GetFields()[name] = structpb.ListVal(converted)
+					}
+				}
+
+			case *structpb.Value_BoolValue:
+				if schema.IsScalarType(stype) {
+					if converted := coerceBool(v, schema.ScalarFromType(stype)); converted != nil {
+						attributes.GetFields()[name] = converted
+					}
+				} else if schema.IsArrayType(stype) {
+					if converted := coerceBool(v, schema.ArrayFromType(stype).Type); converted != nil {
+						attributes.GetFields()[name] = structpb.ListVal(converted)
+					}
+				}
+			case *structpb.Value_StructValue:
+				// other type must be complex
+				if schema.IsComplexType(stype) {
+					// recurse on the attributes
+					Coerce(v.StructValue, schema.ComplexFromType(stype))
+				}
+			}
+		}
+	}
+}
+
+func coerceString(s *structpb.Value_StringValue, t schema.ScalarType) *structpb.Value {
+	var val = s.StringValue
+	switch t {
+	case schema.BOOLEAN:
+		switch val {
+		case "1", "yes", "true":
+			return structpb.Bool(true)
+		case "0", "no", "false":
+			return structpb.Bool(false)
+		}
+	case schema.NUMBER:
+		if v, err := strconv.ParseFloat(val, 64); err == nil {
+			return structpb.Number(v)
+		}
+	case schema.STRING:
+		return structpb.String(val)
+	}
+
+	return nil
+}
+
+func coerceNumber(n *structpb.Value_NumberValue, t schema.ScalarType) *structpb.Value {
+	var val = n.NumberValue
+	switch t {
+	case schema.STRING:
+		return structpb.String(strconv.FormatFloat(val, 'f', -1, 64))
+	case schema.BOOLEAN:
+		if val == 1.0 {
+			return structpb.Bool(true)
+		} else if val == 0.0 {
+			return structpb.Bool(false)
+		}
+	case schema.NUMBER:
+		return structpb.Number(val)
+	}
+	return nil
+}
+
+func coerceBool(n *structpb.Value_BoolValue, t schema.ScalarType) *structpb.Value {
+	var val = n.BoolValue
+	switch t {
+	case schema.STRING:
+		switch val {
+		case true:
+			return structpb.String("true")
+		case false:
+			return structpb.String("false")
+		}
+	case schema.BOOLEAN:
+		return structpb.Bool(val)
+	case schema.NUMBER:
+		switch val {
+		case true:
+			return structpb.Number(1)
+		case false:
+			return structpb.Number(0)
+		}
+	}
+	return nil
 }

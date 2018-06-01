@@ -87,6 +87,10 @@ func IsArrayType(t Type) bool {
 	return ok
 }
 
+func ArrayFromType(t Type) ArrayType {
+	return t.(ArrayType)
+}
+
 var arrayElementMatch, _ = regexp.Compile(`^\"array\[(\w+)\]\"$`)
 
 func (t ArrayType) MarshalJSON() ([]byte, error) {
@@ -153,6 +157,10 @@ func (t ComplexType) IsValid() bool {
 func IsComplexType(t Type) bool {
 	var _, ok = t.(ComplexType)
 	return ok
+}
+
+func ComplexFromType(t Type) ComplexType {
+	return t.(ComplexType)
 }
 
 /*
