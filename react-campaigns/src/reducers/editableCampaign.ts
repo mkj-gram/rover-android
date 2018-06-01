@@ -60,3 +60,16 @@ export const getDisplayTime = (state: State) => {
         minutes.toString().length === 1 ? `0${minutes}` : minutes
     } ${period}`
 }
+
+export const getFormatDate = (state: State) => {
+    const { editableCampaign } = state
+    const { scheduledDate } = editableCampaign as ScheduledCampaign
+    if (scheduledDate == null) {
+        return null
+    }
+    const year = scheduledDate.substr(0, 4)
+    const month = scheduledDate.substr(5, 2)
+    const day = scheduledDate.substr(8, 2)
+
+    return new Date(`${month}/${day}/${year}`)
+}

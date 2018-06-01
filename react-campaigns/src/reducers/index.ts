@@ -119,6 +119,9 @@ export const getShouldShowSaveAndClose = (state: State) =>
 export const getDisplayTime = (state: State) =>
     editableCampaignSelector.getDisplayTime(state)
 
+export const getFormatDate = (state: State) =>
+    editableCampaignSelector.getFormatDate(state)
+
 // Editable UIState
 export const getEditableUIState = (state: State) =>
     editableUIStateSelector.getEditableUIState(state)

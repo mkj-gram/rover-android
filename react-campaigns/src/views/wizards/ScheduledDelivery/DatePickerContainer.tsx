@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
 import { updateEditableCampaign } from '../../../actions'
-import { getEditableCampaign } from '../../../reducers'
+import { getEditableCampaign, getFormatDate } from '../../../reducers'
 
 import PopoverModalForm from '../components/PopoverModalForm'
 import { DatePicker } from '@rover/ts-bootstrap/dist/src'
@@ -19,6 +19,7 @@ import {
 
 export interface StateProps {
     editableCampaign: ScheduledCampaign
+    formattedDate: Date
 }
 
 export interface DispatchProps {
@@ -36,16 +37,13 @@ export interface DatePickerModalPopoverProps {
 
 const DatePickerContainer: React.SFC<
     DispatchProps & StateProps & DatePickerProps
-> = ({ field, device, editableCampaign, updateEditableCampaign }) => {
-    const getFormatDate = () => {
-        const isoStringDate = editableCampaign[field] as string
-        const year = isoStringDate.substr(0, 4)
-        const month = isoStringDate.substr(5, 2)
-        const day = isoStringDate.substr(8, 2)
-
-        return new Date(`${month}/${day}/${year}`)
-    }
-
+> = ({
+    field,
+    device,
+    editableCampaign,
+    updateEditableCampaign,
+    formattedDate
+}) => {
     const onSelect = (handleClosePopoverModal: () => void, time: Date) => {
         updateEditableCampaign({
             [field]: `${new Date(time)
@@ -57,9 +55,9 @@ const DatePickerContainer: React.SFC<
 
     const getPopoverFormInputProps = () => {
         const formatDate = () =>
-            getFormatDate().toLocaleString('en-us', {
+            formattedDate.toLocaleString('en-us', {
                 month: 'long',
-                day: '2-digit',
+                day: 'numeric',
                 year: 'numeric'
             })
 
@@ -126,7 +124,7 @@ const DatePickerContainer: React.SFC<
                     defaultDate={
                         editableCampaign[field] == null
                             ? undefined
-                            : getFormatDate()
+                            : formattedDate
                     }
                 />
             </div>
@@ -162,7 +160,8 @@ const DatePickerContainer: React.SFC<
 }
 
 const mapStateToProps = (state: State): StateProps => ({
-    editableCampaign: getEditableCampaign(state) as ScheduledCampaign
+    editableCampaign: getEditableCampaign(state) as ScheduledCampaign,
+    formattedDate: getFormatDate(state)
 })
 const mapDispatchToProps = (
     // tslint:disable-next-line:no-any
