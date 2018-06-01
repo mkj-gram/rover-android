@@ -127,6 +127,7 @@ func main() {
 	//
 
 	prom.MustRegister(pipeline.PrometheusMetrics...)
+	prom.MustRegister(tracker.PrometheusMetrics...)
 
 	//
 	//	Schema and Tracker

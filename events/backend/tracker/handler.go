@@ -2,6 +2,7 @@ package tracker
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -21,9 +22,10 @@ func NewTracker(db SchemaRepository) pipeline.Handler {
 	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
 		var (
-			accountId = e.GetAuthContext().GetAccountId()
-			namespace = e.GetNamespace()
-			name      = e.GetName()
+			accountId  = e.GetAuthContext().GetAccountId()
+			namespace  = e.GetNamespace()
+			name       = e.GetName()
+			promLabels = []string{fmt.Sprintf("%d", accountId), namespace, name}
 		)
 
 		eventSchema, err := db.FindLastByEvent(ctx, accountId, namespace, name)
@@ -48,8 +50,11 @@ func NewTracker(db SchemaRepository) pipeline.Handler {
 				Version:         1,
 			}
 
+			metrics.schemaUpdatesTotal.WithLabelValues(promLabels...).Inc()
+
 			eventSchema, err = db.Create(ctx, createSchema)
 			if err != nil {
+				metrics.schemaUpdatesErrorsTotal.WithLabelValues(promLabels...).Inc()
 				if errors.Cause(err) == schema.ErrAlreadyExists {
 					return pipeline.NewRetryableError(err)
 				}
@@ -69,12 +74,16 @@ func NewTracker(db SchemaRepository) pipeline.Handler {
 		ok, needsUpdate := Supports(eventSchema.AttributeSchema, haveSchema)
 		// does not support means type miss-match
 		if !ok {
+			metrics.schemaMismatchTotal.WithLabelValues(promLabels...).Inc()
 			return errors.New("current schema does not support input")
 		}
 
 		if needsUpdate {
+			metrics.schemaUpdatesTotal.WithLabelValues(promLabels...).Inc()
+
 			var newSchema = eventSchema.AttributeSchema.Merge(haveSchema)
 			if savedSchema, err := db.UpdateAttributeSchema(ctx, *eventSchema, newSchema); err != nil {
+				metrics.schemaUpdatesErrorsTotal.WithLabelValues(promLabels...).Inc()
 				if errors.Cause(err) == schema.ErrAlreadyExists {
 					return pipeline.NewRetryableError(errors.Wrap(err, "db.UpdateAttributeSchema"))
 				}
