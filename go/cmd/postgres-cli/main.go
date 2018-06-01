@@ -100,6 +100,8 @@ func main() {
 		createCmd.Parse(os.Args[2:])
 	case "migrate":
 		migrateCmd.Parse(os.Args[2:])
+	default:
+		migrateCmd.Parse(os.Args[2:])
 	}
 
 	if createCmd.Parsed() {
