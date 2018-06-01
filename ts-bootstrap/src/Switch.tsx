@@ -115,8 +115,15 @@ const Switch: React.SFC<SwitchProps> = ({
         ...style.textStyle
     }
 
+    const handleClick = (
+        e: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>
+    ) => {
+        e.stopPropagation()
+        forceOn ? null : onClick()
+    }
+
     return (
-        <div style={outerStyle} onClick={forceOn ? () => null : onClick}>
+        <div style={outerStyle} onClick={handleClick}>
             <style type="text/css">
                 {`
                     .slide {

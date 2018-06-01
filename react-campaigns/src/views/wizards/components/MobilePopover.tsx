@@ -25,7 +25,7 @@ const MobilePopover: React.SFC<MobilePopoverProps> = ({
                 animation: `${
                     animation === 'closing' ? 'close' : 'open'
                 } 500ms ease`,
-                position: 'absolute',
+                position: 'fixed',
                 top: 0,
                 left: 0,
                 zIndex: 3,

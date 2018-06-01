@@ -89,12 +89,14 @@ const PopoverModalForm: React.SFC<
     }
 
     const getClickableView = (mode: string) => {
-        const clonedPopoverModalChild = React.cloneElement(children, {
-            // tslint:disable-next-line:no-any
-            handleSaveChange: (fieldVal: any) =>
-                handleSaveChange(handleClosePopoverModal, fieldVal),
-            key: `${field}_PopoverModalChild`
-        })
+        const clonedPopoverModalChild = handleSaveChange
+            ? React.cloneElement(children, {
+                  // tslint:disable-next-line:no-any
+                  handleSaveChange: (fieldVal: any) =>
+                      handleSaveChange(handleClosePopoverModal, fieldVal),
+                  key: `${field}_PopoverModalChild`
+              })
+            : children
 
         switch (presentationType) {
             case 'modal':

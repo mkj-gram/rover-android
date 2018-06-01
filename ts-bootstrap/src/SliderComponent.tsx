@@ -72,8 +72,8 @@ const SliderComponent: React.SFC<SliderProps> = ({
                 
                     .roverSlider .rangeslider__handle {
                         cursor: default;
-                        height: ${getStyle(handleStyle, 'height', '12px')};
-                        width: ${getStyle(handleStyle, 'width', '12px')};
+                        height: ${getStyle(handleStyle, 'height', '16px')};
+                        width: ${getStyle(handleStyle, 'width', '16px')};
                         border-radius: ${getStyle(
                             handleStyle,
                             'borderRadius',

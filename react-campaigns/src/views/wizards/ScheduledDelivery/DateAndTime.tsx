@@ -12,6 +12,7 @@ import FormSection from '../../utils/FormSection'
 import Row from '../components/Row'
 import TimezonePicker from './TimezonePicker'
 import DatePickerContainer from './DatePickerContainer'
+import TimePickerContainer from './TimePickerContainer'
 
 export interface DateAndTimeProps {
     device: Media
@@ -98,9 +99,14 @@ const DateAndTime: React.SFC<
             {scheduledType === 'SCHEDULED' && (
                 <FormSection device={device}>
                     <Text text="Scheduled the delivery" size="h2" />
+
                     <DatePickerContainer
                         device={device}
                         field="scheduledDate"
+                    />
+                    <TimePickerContainer
+                        device={device}
+                        field="scheduledTime"
                     />
                     <Row
                         onClick={() =>
@@ -110,7 +116,14 @@ const DateAndTime: React.SFC<
                         }
                     >
                         <Text text="Use local device time zone?" size="large" />
-                        <Switch on={useLocalDeviceTime} onClick={() => null} />
+                        <Switch
+                            on={useLocalDeviceTime}
+                            onClick={() =>
+                                updateEditableCampaign({
+                                    scheduledUseLocalDeviceTime: !useLocalDeviceTime
+                                })
+                            }
+                        />
                     </Row>
                     {!useLocalDeviceTime && <TimezonePicker device={device} />}
                 </FormSection>

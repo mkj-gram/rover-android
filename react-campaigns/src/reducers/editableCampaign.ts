@@ -47,3 +47,16 @@ export const getShouldShowSaveAndClose = (state: State) => {
         nextTriggeredShowSaveAndClose()
     )
 }
+
+export const getDisplayTime = (state: State) => {
+    const { editableCampaign } = state
+    const { scheduledTime } = editableCampaign as ScheduledCampaign
+
+    let minutes = Math.floor(scheduledTime / 60) % 60
+    let hours = Math.floor(scheduledTime / 3600) % 3600
+    let period = scheduledTime - 12 * 3600 < 0 ? 'AM' : 'PM'
+
+    return `${hours === 0 || hours === 12 ? 12 : hours % 12}:${
+        minutes.toString().length === 1 ? `0${minutes}` : minutes
+    } ${period}`
+}

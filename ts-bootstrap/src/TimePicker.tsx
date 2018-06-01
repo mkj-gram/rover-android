@@ -26,7 +26,6 @@ const TimePicker: React.SFC<TimePickerProps> = ({
     return (
         <div
             style={{
-                width: 352,
                 height: 272,
                 ...containerStyle
             }}

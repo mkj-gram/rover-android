@@ -64,7 +64,7 @@ const DatePickerContainer: React.SFC<
             })
 
         return {
-            id: `${field}_advanced_settings`,
+            id: `${field}_date_picker`,
             label: 'Date',
             media: device as Media,
             text: editableCampaign[field] == null ? '' : formatDate(),
@@ -116,7 +116,7 @@ const DatePickerContainer: React.SFC<
     }) => {
         return (
             <div
-                key="date-picker-component"
+                key={key}
                 style={{
                     width: device === 'Mobile' ? '100%' : 360
                 }}
@@ -137,21 +137,21 @@ const DatePickerContainer: React.SFC<
         <PopoverModalForm
             popoverFormInputProps={getPopoverFormInputProps()}
             presentationType={device !== 'Mobile' ? 'popover' : 'modal'}
-            field={`${field}_advanced_settings`}
+            field={field}
             popoverModalProps={getPopoverModalProps}
             popoverNavbarProps={getPopoverNavbarProps}
             addButton={
                 device === 'Desktop' ? (
                     getAddChangeButton('Add')
                 ) : (
-                    <PlusIcon fill={titanium} />
+                    <PlusIcon key="date-picker-add-change" fill={titanium} />
                 )
             }
             editButton={
                 device === 'Desktop' ? (
                     getAddChangeButton('Change')
                 ) : (
-                    <ChangeIcon fill={titanium} />
+                    <ChangeIcon key="date-picker-add-change" fill={titanium} />
                 )
             }
             handleSaveChange={onSelect}
