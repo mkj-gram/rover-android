@@ -27,7 +27,7 @@ class NotificationStoreService: NotificationStore {
         self.logger = logger
         self.maxSize = maxSize
         
-        stateFetcher.addQueryFragment(NotificationStoreService.queryFragment)
+        stateFetcher.addQueryFragment(NotificationStoreService.queryFragment, fragments: NotificationStoreService.fragments)
         
         stateObservation = stateFetcher.addObserver { data in
             let decoder = JSONDecoder()
@@ -101,33 +101,11 @@ class NotificationStoreService: NotificationStore {
     
     static let queryFragment = """
         notifications {
-            id
-            campaignID
-            title
-            body
-            attachment {
-                type
-                url
-            }
-            action {
-                __typename
-                ...on OpenURLAction {
-                    url
-                }
-                ...on PresentExperienceAction {
-                    campaignID
-                }
-                ...on PresentWebsiteAction {
-                    url
-                }
-            }
-            deliveredAt
-            expiresAt
-            isRead
-            isNotificationCenterEnabled
-            isDeleted
+            ...notificationFields
         }
         """
+    
+    static let fragments = ["notificationFields"]
     
     struct FetchQuery: GraphQLOperation {
         static var identifier: String {
@@ -151,15 +129,18 @@ class NotificationStoreService: NotificationStore {
             return ""
         }
         
-        var query: GraphQLQuery {
-            return .inline(query: """
+        var query: String {
+            return """
                 query {
                     device(identifier:\"\(FetchQuery.identifier)\") {
                         \(NotificationStoreService.queryFragment)
                     }
                 }
                 """
-            )
+        }
+        
+        var fragments: [String]? {
+            return NotificationStoreService.fragments
         }
     }
     

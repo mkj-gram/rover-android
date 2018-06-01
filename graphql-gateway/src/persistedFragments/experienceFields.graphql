@@ -164,3 +164,49 @@ fragment experienceFields on Experience {
     keys
     tags
 }
+
+fragment backgroundFields on Background {
+    color {
+        ...colorFields
+    }
+    contentMode
+    image {
+        ...imageFields
+    }
+    scale
+}
+
+fragment colorFields on Color {
+    red
+    green
+    blue
+    alpha
+}
+
+fragment heightFields on Height {
+    __typename
+    ... on HeightStatic {
+        value
+    }
+}
+
+fragment imageFields on Image {
+    height
+    isURLOptimizationEnabled
+    name
+    size
+    width
+    url
+}
+
+fragment textFields on Text {
+    rawValue
+    alignment
+    color {
+        ...colorFields
+    }
+    font {
+        size
+        weight
+    }
+}

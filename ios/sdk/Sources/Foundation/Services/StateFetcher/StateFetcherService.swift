@@ -16,11 +16,14 @@ class StateFetcherService: StateFetcher {
     }
     
     // MARK: Fetching State
-    
-    func addQueryFragment(_ fragment: String) {
-        fetchQuery.fragments.append(fragment)
+    func addQueryFragment(_ query: String, fragments: [String]?) {
+        fetchQuery.queries.append(query)
+        
+        if let fragments = fragments {
+            fetchQuery._fragments.append(contentsOf: fragments)
+        }
     }
-    
+        
     struct FetchQuery: GraphQLOperation {
         static var identifier: String {
             if let UIDeviceClass = NSClassFromString("UIDevice") {
@@ -43,17 +46,22 @@ class StateFetcherService: StateFetcher {
             return ""
         }
         
-        var fragments = [String]()
+        var queries = [String]()
         
-        var query: GraphQLQuery {
-            return .inline(query: """
+        var query: String {
+            return """
                 query {
                     device(identifier:\"\(FetchQuery.identifier)\") {
-                        \(fragments.joined(separator: "\n"))
+                        \(queries.joined(separator: "\n"))
                     }
                 }
                 """
-            )
+        }
+        
+        var _fragments = [String]()
+        
+        var fragments: [String]? {
+            return _fragments
         }
     }
     

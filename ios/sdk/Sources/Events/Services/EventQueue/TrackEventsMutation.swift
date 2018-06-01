@@ -15,13 +15,12 @@ struct TrackEventsMutation: GraphQLOperation {
         return .mutation
     }
     
-    var query: GraphQLQuery {
-        return .inline(query: """
+    var query: String {
+        return """
             mutation TrackEvents($events: [Event]!) {
                 trackEvents(events:$events)
             }
             """
-        )
     }
     
     struct Variables: Encodable {

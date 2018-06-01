@@ -1,5 +1,0 @@
-query FetchExperienceByCampaignID($campaignID: ID!) {
-    experience(campaignID: $campaignID) {
-        ...experienceFields
-    }
-}

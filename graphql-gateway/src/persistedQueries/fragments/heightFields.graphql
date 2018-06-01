@@ -1,6 +1,0 @@
-fragment heightFields on Height {
-    __typename
-    ... on HeightStatic {
-        value
-    }
-}

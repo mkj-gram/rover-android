@@ -78,18 +78,40 @@ class ExperienceStoreService: ExperienceStore {
             }
         }
         
-        var query: GraphQLQuery {
+        var query: String {
             switch variables!.identifier {
             case .campaignID:
-                return .persisted(id: 1)
+                return """
+                    query FetchExperienceByCampaignID($campaignID: ID!) {
+                        experience(campaignID: $campaignID) {
+                            ...experienceFields
+                        }
+                    }
+                    """
             case .campaignURL:
-                return .persisted(id: 2)
+                return """
+                    query FetchExperienceByCampaignURL($campaignURL: String!) {
+                        experience(campaignURL: $campaignURL) {
+                            ...experienceFields
+                        }
+                    }
+                    """
             case .experienceID:
-                return .persisted(id: 3)
+                return """
+                    query FetchExperienceByID($id: ID!) {
+                        experience(id: $id) {
+                        ...experienceFields
+                        }
+                    }
+                    """
             }
         }
         
         var variables: Variables?
+        
+        var fragments: [String]? {
+            return ["experienceFields"]
+        }
         
         init(identifier: ExperienceIdentifier) {
             variables = Variables(identifier: identifier)

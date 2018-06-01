@@ -23,7 +23,7 @@ class RegionStoreService: RegionStore {
         self.client = client
         self.logger = logger
         
-        stateFetcher.addQueryFragment(RegionStoreService.queryFragment)
+        stateFetcher.addQueryFragment(RegionStoreService.queryFragment, fragments: RegionStoreService.fragments)
         
         stateObservation = stateFetcher.addObserver { data in
             let decoder = JSONDecoder()
@@ -48,19 +48,11 @@ class RegionStoreService: RegionStore {
     
     static let queryFragment = """
         regions {
-            __typename
-            ... on BeaconRegion {
-                uuid
-                major
-                minor
-            }
-            ... on GeofenceRegion {
-                latitude
-                longitude
-                radius
-            }
+            ...regionFields
         }
         """
+    
+    static let fragments = ["regionFields"]
     
     struct FetchQuery: GraphQLOperation {
         static var identifier: String {
@@ -84,15 +76,18 @@ class RegionStoreService: RegionStore {
             return ""
         }
         
-        var query: GraphQLQuery {
-            return .inline(query: """
+        var query: String {
+            return """
                 query {
                     device(identifier:\"\(FetchQuery.identifier)\") {
                         \(RegionStoreService.queryFragment)
                     }
                 }
                 """
-            )
+        }
+        
+        var fragments: [String]? {
+            return RegionStoreService.fragments
         }
     }
     

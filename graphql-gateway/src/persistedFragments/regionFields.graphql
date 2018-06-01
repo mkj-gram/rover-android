@@ -1,0 +1,13 @@
+fragment regionFields on Region {
+    __typename
+    ... on BeaconRegion {
+        uuid
+        major
+        minor
+    }
+    ... on GeofenceRegion {
+        latitude
+        longitude
+        radius
+    }
+}

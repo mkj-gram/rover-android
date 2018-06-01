@@ -10,7 +10,7 @@ import Auth from '@rover/auth-client'
 import EventPipeline from '@rover/events-pipeline-client'
 import { authClient } from './grpcClients'
 
-import persistedQueries from './persistedQueries'
+import persistedFragments from './persistedFragments'
 
 import 'babel-polyfill'
 
@@ -79,7 +79,7 @@ async function main() {
 
     clients.pipeline = pipeline
 
-    app.use('/graphql', cors(), authMiddleware, persistedQueries, graphqlHTTP(req => ({
+    app.use('/graphql', cors(), authMiddleware, persistedFragments, graphqlHTTP(req => ({
             schema,
             graphiql: true,
             context: {

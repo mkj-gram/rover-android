@@ -1,8 +1,0 @@
-fragment imageFields on Image {
-    height
-    isURLOptimizationEnabled
-    name
-    size
-    width
-    url
-}

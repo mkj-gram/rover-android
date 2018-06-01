@@ -64,13 +64,20 @@ class APIClientService: APIClient {
             return endpoint
         }
         
+        let condensed = operation.query.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.joined(separator: " ")
         var queryItems: [URLQueryItem] = [
-            operation.query.queryItem
+            URLQueryItem(name: "query", value: condensed)
         ]
         
         if let variables = operation.variables, let encoded = encode(variables) {
             let value = String(data: encoded, encoding: .utf8)
             let queryItem = URLQueryItem(name: "variables", value: value)
+            queryItems.append(queryItem)
+        }
+        
+        if let fragments = operation.fragments, let encoded = encode(fragments) {
+            let value = String(data: encoded, encoding: .utf8)
+            let queryItem = URLQueryItem(name: "fragments", value: value)
             queryItems.append(queryItem)
         }
         

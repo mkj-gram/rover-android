@@ -12,7 +12,7 @@ public enum FetchStateResult {
 }
 
 public protocol StateFetcher {
-    func addQueryFragment(_ fragment: String)
+    func addQueryFragment(_ query: String, fragments: [String]?)
     func addObserver(block: @escaping (Data) -> Void) -> NSObjectProtocol
     func removeObserver(_ token: NSObjectProtocol)
     func fetchState(completionHandler: ((FetchStateResult) -> Void)?)
