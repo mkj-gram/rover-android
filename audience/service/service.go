@@ -632,7 +632,11 @@ func (s *Server) Query(ctx context.Context, r *audience.QueryRequest) (*audience
 		if req.QuerySegments == nil {
 			return nil, status.Errorf(codes.InvalidArgument, "QuerySegments: nil")
 		}
-		dx, err := s.db.ListDynamicSegmentsByIds(ctx, r.GetAuthContext().GetAccountId(), req.QuerySegments.Ids)
+
+		db := s.db.Copy()
+		defer db.Close()
+
+		dx, err := db.ListDynamicSegmentsByIds(ctx, r.GetAuthContext().GetAccountId(), req.QuerySegments.Ids)
 		if err != nil {
 			return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.ListDynamicSegmentsByIds: %v", err)
 		}
