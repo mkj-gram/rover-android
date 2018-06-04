@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Rover Inbox</string>
+
+    <string name="action_sign_out">Sign out</string>
+
+    <string name="title_activity_login">Sign In to Rover Inbox</string>
+</resources>

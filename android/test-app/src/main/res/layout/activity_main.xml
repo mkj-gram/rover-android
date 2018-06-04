@@ -41,7 +41,7 @@
         app:layout_constraintStart_toEndOf="@+id/message"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <io.rover.rover.experiences.ui.ExperienceView
+    <io.rover.experiences.ui.ExperienceView
         android:id="@+id/demoExperienceView"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -55,7 +55,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/testButton" />
 
-    <io.rover.rover.notifications.ui.NotificationCenterListView
+    <io.rover.notifications.ui.NotificationCenterListView
         android:id="@+id/demoNotificationCentre"
         android:layout_width="0dp"
         android:layout_height="0dp"

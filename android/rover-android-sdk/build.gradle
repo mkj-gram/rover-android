@@ -1,0 +1,39 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    // all of the modules of the SDK will use this version number.
+    ext.rover_sdk_version = '2.0.0-dev'
+
+    ext.kotlin_version = '1.2.31'
+
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.0.31"
+        classpath 'com.google.gms:google-services:3.2.0'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "http://dl.bintray.com/jetbrains/spek" }
+        google()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+// Note to Rover's own internal developers:  this top-level build file is typically only used by
+// external developers who wish to build our SDK from source.  In the context of our monorepo,
+// android/build.gradle is used instead.

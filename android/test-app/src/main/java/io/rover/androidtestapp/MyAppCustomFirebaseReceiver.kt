@@ -2,6 +2,7 @@ package io.rover.androidtestapp
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import io.rover.notifications.PushReceiverInterface
 import io.rover.rover.Rover
 
 /**
@@ -9,7 +10,7 @@ import io.rover.rover.Rover
  */
 class MyAppCustomFirebaseReceiver: FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        val pushPlugin = Rover.sharedInstance.notificationHandler
+        val pushPlugin = Rover.sharedInstance.resolveSingletonOrFail(PushReceiverInterface::class.java)
         remoteMessage.notification
         remoteMessage.data
         pushPlugin.onMessageReceivedData(remoteMessage.data)

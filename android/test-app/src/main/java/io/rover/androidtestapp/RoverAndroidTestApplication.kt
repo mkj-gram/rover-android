@@ -11,10 +11,10 @@ import io.rover.rover.core.container.Assembler
 import io.rover.rover.core.container.Container
 import io.rover.rover.core.container.Scope
 import io.rover.rover.core.events.domain.Event
-import io.rover.rover.experiences.DefaultTopLevelNavigation
-import io.rover.rover.experiences.ExperiencesAssembler
-import io.rover.rover.experiences.TopLevelNavigation
-import io.rover.rover.notifications.NotificationsAssembler
+import io.rover.experiences.ExperiencesAssembler
+import io.rover.experiences.routing.ExperienceEnabledTopLevelNavigation
+import io.rover.rover.core.routing.TopLevelNavigation
+import io.rover.notifications.NotificationsAssembler
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
@@ -34,15 +34,15 @@ class RoverAndroidTestApplication : Application() {
             CoreAssembler(
                 "6c546189dc45df1293bddc18c0b54786",
                 this,
-                "http://192.168.0.143:4000/graphql"
+                "inbox",
+                endpoint = "https://api.staging.rover.io/graphql"
             ),
             ExperiencesAssembler(),
-            LocationAssembler(),
+            // LocationAssembler(),
             NotificationsAssembler(
                 this.applicationContext,
                 R.mipmap.ic_launcher,
                 0,
-                "inbox",
                 "rover"
             ) {
                 FirebaseInstanceId.getInstance().deleteInstanceId()
@@ -55,7 +55,7 @@ class RoverAndroidTestApplication : Application() {
                         Scope.Singleton,
                         TopLevelNavigation::class.java
                     ) { _ ->
-                        object : DefaultTopLevelNavigation(applicationContext) {
+                        object : ExperienceEnabledTopLevelNavigation(applicationContext) {
                             override fun displayNotificationCenterIntent(): Intent {
                                 return MainActivity.makeIntent(applicationContext, true)
                             }
@@ -63,11 +63,6 @@ class RoverAndroidTestApplication : Application() {
                     }
                 }
             }
-        )
-
-        // TODO: hax
-        Rover.sharedInstance.eventQueue.trackEvent(
-            Event("App Opened", hashMapOf())
         )
     }
 }

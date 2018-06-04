@@ -3,7 +3,6 @@ package io.rover.app.experiences
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
 import android.support.v4.view.PagerAdapter
 import android.support.v7.app.AppCompatActivity
@@ -14,15 +13,16 @@ import android.view.ViewGroup
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
-import io.rover.app.experiences.services.AuthService
+import io.rover.account.AuthService
+import io.rover.account.ui.LoginActivity
 import io.rover.app.experiences.services.ExperienceRepository
 import io.rover.app.experiences.viewmodels.ExperienceListFilter
 import io.rover.app.experiences.viewmodels.ExperiencesListViewModel
 import io.rover.app.experiences.views.ExperiencesListView
-import io.rover.rover.experiences.ui.containers.StandaloneExperienceHostActivity
+import io.rover.experiences.ui.containers.StandaloneExperienceHostActivity
 import kotlinx.android.synthetic.main.activity_experiences_list.*
-import timber.log.Timber
 
 class ExperiencesListActivity : AppCompatActivity() {
 
@@ -54,14 +54,21 @@ class ExperiencesListActivity : AppCompatActivity() {
         pagerAdapter
             .events
             .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
-            .subscribe({ selectedExperience ->
-                startActivity(
-                    StandaloneExperienceHostActivity.makeIntent(
-                        this.applicationContext,
-                        selectedExperience.id,
-                        null
-                    )
-                )
+            .subscribe({ event ->
+                when(event) {
+                    is SectionsPagerAdapter.Event.ForceLogout -> {
+                        signOut()
+                    }
+                    is SectionsPagerAdapter.Event.ExperienceSelected -> {
+                        startActivity(
+                            StandaloneExperienceHostActivity.makeIntent(
+                                this.applicationContext,
+                                event.id,
+                                null
+                            )
+                        )
+                    }
+                }
             }, { error ->
                 throw(error)
             })
@@ -84,7 +91,7 @@ class ExperiencesListActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_experiences_list, menu)
+        menuInflater.inflate(R.menu.menu_inbox, menu)
         return true
     }
 
@@ -95,14 +102,18 @@ class ExperiencesListActivity : AppCompatActivity() {
         val id = item.itemId
 
         if (id == R.id.action_sign_out) {
-            authService.logOut()
-            startActivity(
-                Intent(this, LoginActivity::class.java)
-            )
-            finish()
+            signOut()
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun signOut() {
+        authService.logOut()
+        startActivity(
+            Intent(this, LoginActivity::class.java)
+        )
+        finish()
     }
 
     /**
@@ -131,13 +142,23 @@ class ExperiencesListActivity : AppCompatActivity() {
                 experienceRepository
             )
 
+            // subscribe to navigate to experience event
             viewModel.events
-                .filter { event -> event is ExperiencesListViewModel.Event.NavigateToExperience }
-                .map { event ->
-                    event as ExperiencesListViewModel.Event.NavigateToExperience
-                    ExperienceSelected(event.id, event.name)
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap { event ->
+                    when(event) {
+                        is ExperiencesListViewModel.Event.NavigateToExperience ->
+                            Observable.just(Event.ExperienceSelected(event.id, event.name))
+                        is ExperiencesListViewModel.Event.ForceLogOut -> {
+                            Observable.just(Event.ForceLogout())
+                        }
+                        else -> Observable.empty()
+                    }
                 }
                 .subscribe(subject)
+
+            viewModel.events
+
 
             // TODO: inject viewmodel from surrounding context properly!
             view.viewModel = viewModel
@@ -155,10 +176,14 @@ class ExperiencesListActivity : AppCompatActivity() {
 
         override fun getCount(): Int = ExperienceListFilter.values().count()
 
-        private val subject = PublishSubject.create<ExperienceSelected>()
+        private val subject = PublishSubject.create<Event>()
 
-        val events: Observable<ExperienceSelected> = subject
+        val events: Observable<Event> = subject
 
-        data class ExperienceSelected(val id: String, val name: String)
+        sealed class Event {
+            class ForceLogout(): Event()
+            data class ExperienceSelected(val id: String, val name: String): Event()
+        }
+
     }
 }

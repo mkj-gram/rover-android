@@ -16,11 +16,9 @@ import android.widget.Button
 import com.facebook.stetho.urlconnection.ByteArrayRequestEntity
 import com.facebook.stetho.urlconnection.StethoURLConnectionManager
 import io.rover.rover.Rover
-import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionInterception
-import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionInterceptor
 import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionNetworkClient
-import io.rover.rover.experiences.ui.containers.StandaloneExperienceHostActivity
-import io.rover.rover.notifications.ui.NotificationCenterListView
+import io.rover.experiences.ui.containers.StandaloneExperienceHostActivity
+import io.rover.notifications.ui.NotificationCenterListView
 import kotlinx.android.synthetic.main.activity_main.demoExperienceView
 import kotlinx.android.synthetic.main.activity_main.demoNotificationCentre
 import kotlinx.android.synthetic.main.activity_main.message
@@ -29,7 +27,6 @@ import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
-
 
 class MainActivity : AppCompatActivity() {
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -68,12 +65,8 @@ class MainActivity : AppCompatActivity() {
                 get() = this@MainActivity
         }
 
-        demoNotificationCentre.viewModel = Rover
-            .sharedInstance
-            .notificationCenterViewModel
-
-         if(this.intent?.extras?.getBoolean("SHOW_NOTIFICATION_CENTER", false) ?: true) {
-            navigation.selectedItemId = R.id.navigation_notifications
+        if(this.intent?.extras?.getBoolean("SHOW_NOTIFICATION_CENTER", false) ?: true) {
+             navigation.selectedItemId = R.id.navigation_notifications
 
              switchBetweenExperienceAndNotifications(true)
         } else {
@@ -105,8 +98,6 @@ class MainActivity : AppCompatActivity() {
         // poke be done?  Perhaps some sort of Permission Manager thingy that would live in Core.
 
         // in the case where you hav
-
-
 
 
         makePermissionsAttempt()
@@ -187,33 +178,6 @@ class MainActivity : AppCompatActivity() {
             return Intent(context, MainActivity::class.java).apply {
                 putExtra("SHOW_NOTIFICATION_CENTER", showNotificationCenter)
             }
-        }
-    }
-}
-
-/**
- * If you want to be able to see the requests made by the Rover SDK to our API in
- * [Stetho's](http://facebook.github.io/stetho/) network inspector, copy this class into your
- * application and set an instance of it on the [AsyncTaskAndHttpUrlConnectionNetworkClient] with
- * [AsyncTaskAndHttpUrlConnectionNetworkClient.registerInterceptor] (DI instructions for
- * users to follow).
- */
-class StethoRoverInterceptor : AsyncTaskAndHttpUrlConnectionInterceptor {
-    override fun onOpened(httpUrlConnection: HttpURLConnection, requestPath: String, body: ByteArray): AsyncTaskAndHttpUrlConnectionInterception {
-        val connManager = StethoURLConnectionManager(requestPath)
-        connManager.preConnect(httpUrlConnection, ByteArrayRequestEntity(body))
-
-        return object : AsyncTaskAndHttpUrlConnectionInterception {
-            override fun onConnected() {
-                connManager.postConnect()
-            }
-
-            override fun onError(exception: IOException) {
-                connManager.httpExchangeFailed(exception)
-            }
-
-            override fun sniffStream(source: InputStream): InputStream =
-                connManager.interpretResponseStream(source)
         }
     }
 }

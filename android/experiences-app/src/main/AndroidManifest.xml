@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:name=".ExperiencesApplication"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".ExperiencesListActivity"
             android:label="@string/app_name"
@@ -21,10 +21,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login">
-        </activity>
-    </application>
 
+        <activity
+            android:name="io.rover.experiences.ui.containers.StandaloneExperienceHostActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+        />
+    </application>
 </manifest>

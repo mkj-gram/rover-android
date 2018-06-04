@@ -13,9 +13,9 @@ here.
 
 The Rover Android SDK itself: `rover-android-sdk`, the submodule.
 
-The Engineering Test App(s): `test-app`, `test-app-gcm`, and `test-app-java`.
-Meant for engineering-only use to validate certain developer user cases or
-provide a test bench for Rover developers to work in.
+The Engineering Test App(s): `test-app` and `test-app-java`. Meant for
+engineering-only use to validate certain developer user cases or provide
+a test bench for Rover developers to work in.
 
 The Experiences App: `experiences-app`. 
 

@@ -10,9 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import io.rover.rover.experiences.ui.containers.StandaloneExperienceHostActivity;
-import io.rover.rover.experiences.ui.navigation.ExperienceExternalNavigationEvent;
-
+import io.rover.experiences.ui.containers.StandaloneExperienceHostActivity;
+import io.rover.experiences.ui.navigation.ExperienceExternalNavigationEvent;
 
 public class MainActivity extends AppCompatActivity {
 

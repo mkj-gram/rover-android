@@ -1,8 +1,8 @@
 package io.rover.app.experiences.services
 
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.annotations.SerializedName
 import io.reactivex.Single
+import io.rover.account.AuthService
 import io.rover.rover.core.data.http.NetworkTask
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -40,7 +40,6 @@ class V1ApiNetworkClient(
                             .build()
                     )
                 }
-                .addNetworkInterceptor(StethoInterceptor())
                 .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC })
             .build()
         )

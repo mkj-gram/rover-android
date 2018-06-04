@@ -26,13 +26,13 @@
              in order to set your style and an optional parent activity for use when Experiences
              are launched directly from push notifications. -->
         <activity
-            android:name="io.rover.rover.experiences.ui.containers.StandaloneExperienceHostActivity"
+            android:name="io.rover.experiences.ui.containers.StandaloneExperienceHostActivity"
             tools:replace="android:theme"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".MainActivity"
         />
 
-        <activity android:name="io.rover.rover.experiences.ui.TransientLinkLaunchActivity">
+        <activity android:name="io.rover.experiences.ui.TransientLinkLaunchActivity">
             <!-- for deep links -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

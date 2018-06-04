@@ -23,7 +23,12 @@ public class RoverAndroidTestApplication extends Application {
         }
 
         Rover.initialize(
-                new CoreAssembler("6c546189dc45df1293bddc18c0b54786", this, "https://api.rover.io", Color.RED)
+            new CoreAssembler(
+                "6c546189dc45df1293bddc18c0b54786",
+                this,
+                "test-app",
+                Color.RED
+            )
         );
     }
 }

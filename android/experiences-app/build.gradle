@@ -16,15 +16,19 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            applicationIdSuffix ".debug"
         }
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
@@ -33,6 +37,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     implementation project(":rover-android-sdk:rover")
+    implementation project(":rover-android-sdk:experiences")
+    implementation project(":account")
 
     implementation "io.reactivex.rxjava2:rxjava:2.1.6"
 
@@ -42,7 +48,6 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:2.3.0"
     implementation "com.squareup.retrofit2:converter-gson:2.3.0"
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-
 
     implementation 'com.uber.autodispose:autodispose:0.4.0'
     implementation 'com.uber.autodispose:autodispose-android:0.4.0'
@@ -54,9 +59,9 @@ dependencies {
     // logging!
     implementation 'com.jakewharton.timber:timber:4.6.0'
 
-    implementation 'com.facebook.stetho:stetho:1.5.0'
-    // so we can inject Stetho HTTP monitoring into the Rover SDK
-    implementation 'com.facebook.stetho:stetho-urlconnection:1.5.0'
-    // so we can inject Stetho HTTP monitoring into the Retrofit requests made by the Experiences app.
-    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
+    // Service SDKs.
+    // MS AppCenter for delivering builds (but not for crash reporting/analytics)
+    def appCenterSdkVersion = '1.5.1'
+    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
 }

@@ -1,14 +1,21 @@
 package io.rover.app.experiences
 
 import android.app.Application
-import com.facebook.stetho.Stetho
+import android.content.Intent
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.distribute.Distribute
 import io.reactivex.schedulers.Schedulers
-import io.rover.app.experiences.services.AuthService
+import io.rover.account.AccountAssembler
+import io.rover.account.AuthService
 import io.rover.app.experiences.services.ExperienceRepository
-import io.rover.app.experiences.services.SharedPreferencesLocalStorageService
 import io.rover.app.experiences.services.V1ApiNetworkClient
+import io.rover.experiences.ExperiencesAssembler
 import io.rover.rover.Rover
+import io.rover.rover.core.CoreAssembler
+import io.rover.rover.core.data.AuthenticationContext
 import timber.log.Timber
+import io.rover.rover.platform.SharedPreferencesLocalStorage
 
 /**
  * Android entry point for the Rover Android Experiences app.
@@ -17,13 +24,10 @@ class ExperiencesApplication: Application() {
 
     // TODO: These will be replaced with proper DI
 
-    private val storageService by lazy {
-        SharedPreferencesLocalStorageService(this)
-    }
-
     val authService by lazy {
-        Timber.v("Setting up AuthService!")
-        AuthService(storageService, Schedulers.io(), this)
+        Rover.sharedInstance.resolveSingletonOrFail(
+            AuthenticationContext::class.java
+        ) as AuthService
     }
 
     val experienceRepository by lazy {
@@ -38,7 +42,15 @@ class ExperiencesApplication: Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Stetho.initializeWithDefaults(this)
+        if (!BuildConfig.DEBUG) {
+            AppCenter.start(
+                this,
+                getString(R.string.microsoft_app_center_secret),
+                // TODO might replace App Center Crashes with Crashlytics.
+                Crashes::class.java,
+                Distribute::class.java
+            )
+        }
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
@@ -46,42 +58,29 @@ class ExperiencesApplication: Application() {
             // TODO: Timber tree that reports to Crashlytics or whatnot
         }
 
+        Rover.initialize(
+            CoreAssembler(
+                "",
+                this,
+                "inbox"
+            ),
+            AccountAssembler(
+                this,
+                Intent(
+                    this,
+                    ExperiencesListActivity::class.java
+                )
+            ),
+            ExperiencesAssembler()
+        )
+
         Rover.installSaneGlobalHttpCache(this)
 
         // So, a typical app using Rover would do the usual static-context Rover.initialize()
         // routine here.  However, we will not do so since we are using a late-bound custom
         // authentication context.  See AuthService. Now we have to at least warm up authservice, so
-        // it can do that side-effect of initializing the Rover SDK in the event that authentcation
+        // it can do that side-effect of initializing the Rover SDK in the event that authentication
         // is already persisted.
         authService
     }
-//
-//    /**
-//     * If you want to be able to see the requests made by the Rover SDK to our API in
-//     * [Stetho's](http://facebook.github.io/stetho/) network inspector, copy this class into your
-//     * application and set an instance of it on the [AsyncTaskAndHttpUrlConnectionNetworkClient] with
-//     * [AsyncTaskAndHttpUrlConnectionNetworkClient.registerInterceptor] (DI instructions for
-//     * users to follow).
-//     */
-//    class StethoRoverInterceptor : AsyncTaskAndHttpUrlConnectionInterceptor {
-//        override fun onOpened(httpUrlConnection: HttpURLConnection, requestPath: String, body: ByteArray): AsyncTaskAndHttpUrlConnectionInterception {
-//            val connManager = StethoURLConnectionManager(requestPath)
-//            connManager.preConnect(httpUrlConnection, ByteArrayRequestEntity(body))
-//
-//            return object : AsyncTaskAndHttpUrlConnectionInterception {
-//                override fun onConnected() {
-//                    connManager.postConnect()
-//                }
-//
-//                override fun onError(exception: IOException) {
-//                    connManager.httpExchangeFailed(exception)
-//                }
-//
-//                override fun sniffStream(source: InputStream): InputStream =
-//                    connManager.interpretResponseStream(source)
-//            }
-//        }
-//    }
-
 }
-

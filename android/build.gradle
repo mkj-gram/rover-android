@@ -1,7 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    // all of the modules of the SDK will use this version number.
+    // NOTE: MAKE SURE rover-android-sdk/build.gradle is updated with the same number!
+    ext.rover_sdk_version = '2.0.0-dev'
+
     ext.kotlin_version = '1.2.31'
+
     repositories {
         google()
         jcenter()
@@ -32,3 +37,4 @@ task clean(type: Delete) {
 
 // Note: sync any version changes (gradle wrapper version, kotlin version, and android gradle build
 // plugin) into rover-android-sdk/build.gradle.  These two files should be largely the same.
+
