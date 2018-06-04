@@ -13,6 +13,7 @@ import {
     CheckBox,
     DatePicker,
     Dialog,
+    List,
     NavBar,
     PhoneComponent,
     Popover,
@@ -63,7 +64,12 @@ import {
 } from '../styles/typography'
 
 import { storiesOf } from '@storybook/react'
-import { CheckmarkIcon, ChevronLeftIcon } from '../src/Icons/index'
+import {
+    CheckmarkIcon,
+    ChevronLeftIcon,
+    CircleCloseIcon,
+    PlusIcon
+} from '../src/Icons/index'
 
 storiesOf('Alert', module)
     .add('Info', () => (
@@ -475,6 +481,104 @@ storiesOf('Dialog', module)
 
         return <WholeScreen />
     })
+
+storiesOf('List', module).add('add remove list elements', () => {
+    interface XState {
+        elemList: any
+    }
+
+    class ListComp extends React.Component<{}, XState> {
+        constructor(props: any) {
+            super(props)
+            this.state = {
+                elemList: [1]
+            }
+        }
+
+        render() {
+            const separationElement = (
+                <Badge color={steel} text="AND" style={{ display: 'block' }} />
+            )
+            const addElement = (
+                <div
+                    style={{
+                        width: 140,
+                        height: 24,
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}
+                    onClick={() => {
+                        let x = this.state.elemList
+                        x.push(2)
+                        this.setState({
+                            elemList: x
+                        })
+                    }}
+                >
+                    <div
+                        style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: 4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: turquoise,
+                            marginRight: 8
+                        }}
+                    >
+                        <PlusIcon fill={white} />
+                    </div>
+                    <Button
+                        text="Add Segment"
+                        mouseDownColors={{
+                            active: turquoise,
+                            inactive: aquamarine
+                        }}
+                        type="regular"
+                    />
+                </div>
+            )
+
+            return this.state.elemList.map((elem: any, index: any) => (
+                <List
+                    addElement={
+                        index === this.state.elemList.length - 1
+                            ? addElement
+                            : null
+                    }
+                    separationElement={index !== 0 ? separationElement : null}
+                >
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Text text="Score Update" size="medium" />
+                        <Text
+                            text={`${index} devices`}
+                            label={true}
+                            size="small"
+                        />
+                    </div>
+                    <CircleCloseIcon
+                        fill={silver}
+                        onClick={() => {
+                            let newElementList = this.state.elemList
+                            newElementList.splice(index, 1)
+                            this.setState({
+                                elemList: newElementList
+                            })
+                        }}
+                    />
+                </List>
+            ))
+        }
+    }
+
+    return <ListComp />
+})
 
 storiesOf('Navbar', module).add('multi cases', () => {
     const customLeftElem = (

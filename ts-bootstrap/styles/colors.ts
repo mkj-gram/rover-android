@@ -26,6 +26,8 @@ export const palered: string = '#FEF1EB'
 
 export const paleyellow: string = '#FDF7ED'
 
+export const quartz: string = '#F5F5F5'
+
 export const red: string = '#E37A48'
 
 export const silver: string = '#BCBCBC'

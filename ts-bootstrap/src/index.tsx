@@ -4,6 +4,7 @@ import Button from './Button'
 import CheckBox from './CheckBox'
 import Dialog from './Dialog'
 import DatePicker from './DatePicker'
+import List from './List'
 import NavBar from './NavBar'
 import PhoneComponent from './PhoneComponent'
 import Popover from './Popover'
@@ -130,6 +131,7 @@ export {
     Badge,
     Button,
     Dialog,
+    List,
     NavBar,
     Popover,
     PopoverSearch,
