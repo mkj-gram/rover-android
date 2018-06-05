@@ -52,7 +52,9 @@ func (w *Handler) Handle(ctx context.Context, m notification_pubsub.Message) err
 
 		settings, err := w.NotificationSettingsStore.OneById(ctx, int32(msg.CampaignID))
 		if err != nil {
-			// TODO: check if retriable
+			if scylla.IsRetryableError(err) {
+				err = &retryable{error: err}
+			}
 			return errors.Wrap(err, "settings.OneById")
 		}
 
@@ -62,7 +64,9 @@ func (w *Handler) Handle(ctx context.Context, m notification_pubsub.Message) err
 		}
 
 		if err := w.NotificationsStore.Create(ctx, &note); err != nil {
-			// TODO: check if retriable
+			if scylla.IsRetryableError(err) {
+				err = &retryable{error: err}
+			}
 			return errors.Wrap(err, "notifications.Create")
 		}
 
