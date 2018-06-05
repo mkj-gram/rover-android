@@ -231,7 +231,6 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                     </div>
                 )
             case 'SCHEDULED':
-            case 'INPROGRESS':
                 return (
                     <div
                         style={{
@@ -242,6 +241,26 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                         <Badge
                             color={yellow}
                             text="SCHEDULED"
+                            style={{ marginRight: 8 }}
+                        />
+                        <Text
+                            label={true}
+                            size="small"
+                            text="Jan 8, 2018 at 11:00 AM"
+                        />
+                    </div>
+                )
+            case 'INPROGRESS':
+                return (
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'baseline'
+                        }}
+                    >
+                        <Badge
+                            color={yellow}
+                            text="IN PROGRESS"
                             style={{ marginRight: 8 }}
                         />
                         <Text
