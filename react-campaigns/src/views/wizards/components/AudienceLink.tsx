@@ -58,7 +58,8 @@ class AudienceLink extends React.Component<
                         fontWeight: 600,
                         marginTop: 16,
                         marginBottom: 8,
-                        color: graphite
+                        color: graphite,
+                        textAlign: 'center'
                     }}
                 />
                 <div

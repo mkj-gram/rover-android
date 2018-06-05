@@ -4,6 +4,7 @@ import { Action, ActionCreator, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
 import { DocumentNode } from 'graphql'
 import Environment from '../Environment'
+import handleError from '../Environment/handleError'
 import { setTimeout } from 'timers'
 
 export const publishCampaign: ActionCreator<
@@ -26,28 +27,23 @@ export const publishCampaign: ActionCreator<
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
-                dispatch({
-                    type: 'PUBLISH_CAMPAIGN_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return handleError(
+                    'PUBLISH_CAMPAIGN_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
             } else {
                 return dispatch({
                     type: 'PUBLISH_CAMPAIGN_SUCCESS'
                 })
             }
         },
-        ({ result }) => {
-            dispatch({
-                type: 'PUBLISH_CAMPAIGN_FAILURE',
-                message: result.errors[0].message
-            })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
-        }
+        ({ result }) =>
+            handleError(
+                'PUBLISH_CAMPAIGN_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }
 
@@ -156,13 +152,11 @@ export const updateScheduledDeliverySettings: ActionCreator<
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
-                dispatch({
-                    type: 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return handleError(
+                    'UPDATE_SCHEDULED_DELIVERY_SETTINGS_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
             } else {
                 const campaign = data.updateScheduledDeliverySettings
                 const campaigns = {
@@ -177,15 +171,12 @@ export const updateScheduledDeliverySettings: ActionCreator<
                 })
             }
         },
-        ({ result }) => {
-            dispatch({
-                type: 'UPDATE_SCHEDULED_DELIVERY_SETTINGS_FAILURE',
-                message: result.errors[0].message
-            })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
-        }
+        ({ result }) =>
+            handleError(
+                'UPDATE_SCHEDULED_DELIVERY_SETTINGS_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }
 
@@ -321,13 +312,11 @@ export const updateNotificationSettings: ActionCreator<
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
-                dispatch({
-                    type: 'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return handleError(
+                    'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
             } else {
                 const campaign = data.updateNotificationSettings
                 const campaigns = {
@@ -342,15 +331,12 @@ export const updateNotificationSettings: ActionCreator<
                 })
             }
         },
-        ({ result }) => {
-            dispatch({
-                type: 'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_FAILURE',
-                message: result.errors[0].message
-            })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
-        }
+        ({ result }) =>
+            handleError(
+                'UPDATE_CAMPAIGN_NOTIFICATION_SETTINGS_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }
 
@@ -433,15 +419,11 @@ export const fetchCampaign: ActionCreator<
         ({ data, errors }) => {
             return new Promise((resolve, reject) => {
                 if (errors) {
-                    dispatch({
-                        type: 'FETCH_CAMPAIGN_FAILURE',
-                        message: errors[0].message
-                    })
-
-                    reject()
-                    setTimeout(() => {
-                        dispatch({ type: 'DISMISS_FAILURE' })
-                    }, 4000)
+                    handleError(
+                        'FETCH_CAMPAIGN_FAILURE',
+                        dispatch,
+                        errors[0].message
+                    )
                 } else {
                     const campaigns = {
                         ...getState().campaigns,
@@ -457,19 +439,12 @@ export const fetchCampaign: ActionCreator<
                 }
             })
         },
-        ({ result }) => {
-            return new Promise((resolve, reject) => {
-                dispatch({
-                    type: 'FETCH_CAMPAIGN_FAILURE',
-                    message: result.errors[0].message
-                })
-
-                reject()
-                setTimeout(() => {
-                    dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
-            })
-        }
+        ({ result }) =>
+            handleError(
+                'FETCH_CAMPAIGN_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }
 
@@ -742,13 +717,11 @@ export const renameCampaign: ActionCreator<
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
-                dispatch({
-                    type: ' RENAME_CAMPAIGN_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return handleError(
+                    'RENAME_CAMPAIGN_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
             } else {
                 const campaigns = {
                     ...getState().campaigns,
@@ -763,15 +736,12 @@ export const renameCampaign: ActionCreator<
                 })
             }
         },
-        ({ result }) => {
-            dispatch({
-                type: ' RENAME_CAMPAIGN_FAILURE',
-                message: result.errors[0].message
-            })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
-        }
+        ({ result }) =>
+            handleError(
+                'RENAME_CAMPAIGN_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }
 
@@ -871,13 +841,11 @@ export const fetchCampaigns: ActionCreator<
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
-                dispatch({
-                    type: 'FETCH_CAMPAIGNS_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return handleError(
+                    'FETCH_CAMPAIGNS_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
             } else {
                 let campaigns = null
                 if (data.campaigns) {
@@ -896,15 +864,12 @@ export const fetchCampaigns: ActionCreator<
                 })
             }
         },
-        ({ result }) => {
-            dispatch({
-                type: 'FETCH_CAMPAIGNS_FAILURE',
-                message: result.errors[0].message
-            })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
-        }
+        ({ result }) =>
+            handleError(
+                'FETCH_CAMPAIGNS_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }
 
@@ -992,13 +957,11 @@ export const createCampaign: ActionCreator<
         ({ data, errors }) => {
             if (errors) {
                 dispatch({ type: `CLOSE_NEW_CAMPAIGN_POPOVER` })
-                dispatch({
-                    type: 'CREATE_CAMPAIGN_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return handleError(
+                    'CREATE_CAMPAIGN_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
             } else {
                 const campaigns = {
                     ...getState().campaigns,
@@ -1016,13 +979,11 @@ export const createCampaign: ActionCreator<
         },
         ({ result }) => {
             dispatch({ type: `CLOSE_NEW_CAMPAIGN_POPOVER` })
-            dispatch({
-                type: 'CREATE_CAMPAIGN_FAILURE',
-                message: result.errors[0].message
-            })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
+            return handleError(
+                'CREATE_CAMPAIGN_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
         }
     )
 }

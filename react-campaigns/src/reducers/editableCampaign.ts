@@ -20,6 +20,28 @@ export const shouldCreateEditableCampaign = (
     state: ScheduledCampaign | AutomatedNotificationCampaign
 ) => state === null
 
+const getIsSegmentConditionUpdated = (state: State): boolean => {
+    const { editableCampaign, editableUIState } = state
+    const { campaignId } = editableCampaign
+    const { audience } = editableUIState
+    const { conditionSelected } = audience
+
+    const campaign = getCampaign(state, campaignId)
+    const { UIState } = campaign
+
+    if (UIState.length < 1) {
+        return false
+    }
+
+    const currentAudience = JSON.parse(UIState).audience
+
+    if (conditionSelected && !isEqual(audience, currentAudience)) {
+        return true
+    }
+
+    return false
+}
+
 export const getEditableCampaign = (state: State) => state.editableCampaign
 
 export const getShouldShowSaveAndClose = (state: State) => {
@@ -44,7 +66,8 @@ export const getShouldShowSaveAndClose = (state: State) => {
 
     return (
         !isEqual(editableCampaignFields, campaignFields) ||
-        nextTriggeredShowSaveAndClose()
+        nextTriggeredShowSaveAndClose() ||
+        getIsSegmentConditionUpdated(state)
     )
 }
 

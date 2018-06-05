@@ -3,6 +3,7 @@ import gql from 'graphql-tag'
 import { Action, ActionCreator, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
 import Environment from '../Environment'
+import handleError from '../Environment/handleError'
 
 import { GraphQLRequest } from 'apollo-link'
 import { DocumentNode } from 'graphql'
@@ -29,13 +30,11 @@ export const sendTest: ActionCreator<
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
-                dispatch({
-                    type: 'SEND_TEST_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return handleError(
+                    'SEND_TEST_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
             } else {
                 return dispatch({
                     type: 'SEND_TEST_SUCCESS'
@@ -43,13 +42,11 @@ export const sendTest: ActionCreator<
             }
         },
         ({ result }) => {
-            dispatch({
-                type: 'SEND_TEST_FAILURE',
-                message: result.errors[0].message
-            })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
+            return handleError(
+                'SEND_TEST_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
         }
     )
 }

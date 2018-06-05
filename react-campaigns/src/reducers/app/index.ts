@@ -2,26 +2,35 @@
 
 import { combineReducers } from 'redux'
 
-import home, * as homeSelector from './home'
-import notificationDelivery, * as notificationDeliverySelector from './notificationDelivery'
-import notification, * as notificationSelector from './notification'
-import overview, * as overviewSelector from './overview'
+import activePopover, * as activePopoverSelector from './activePopover'
+import audience, * as audienceSelector from './audience'
 import error, * as errorSelector from './error'
 import form, * as formSelector from './form'
-import activePopover, * as activePopoverSelector from './activePopover'
+import home, * as homeSelector from './home'
+import notification, * as notificationSelector from './notification'
+import notificationDelivery, * as notificationDeliverySelector from './notificationDelivery'
+import overview, * as overviewSelector from './overview'
 import wizardModal, * as wizardModalSelector from './wizardModal'
 
 export default combineReducers({
-    notification,
-    home,
-    notificationDelivery,
-    overview,
+    activePopover,
+    audience,
     error,
     form,
-    activePopover,
+    home,
+    notification,
+    notificationDelivery,
+    overview,
     wizardModal
 })
+// Audience
+export const getAggregateAudienceSize = (state: AppState, segmentId: string) =>
+    audienceSelector.getAggregateAudienceSize(state.audience, segmentId)
 
+export const getTotalAudienceSize = (state: AppState) =>
+    audienceSelector.getTotalAudienceSize(state.audience)
+
+// Home
 export const getIsCreatingCampaign = (state: AppState) =>
     homeSelector.getIsCreatingCampaign(state.home)
 

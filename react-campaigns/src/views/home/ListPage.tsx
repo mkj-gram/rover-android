@@ -13,10 +13,11 @@ import { Alert } from '@rover/ts-bootstrap/dist/src'
 import {
     closeCampaignTypeSelector,
     createCampaign,
-    fetchCampaigns,
-    handleOpenOverviewModalDisplay,
     fetchCampaign,
-    fetchTestDevices
+    fetchCampaigns,
+    fetchSegments,
+    fetchTestDevices,
+    handleOpenOverviewModalDisplay
 } from '../../actions'
 import { getAllCampaigns, getIsError } from '../../reducers'
 
@@ -33,11 +34,12 @@ export interface RouterProps {
 }
 
 export interface DispatchProps {
-    fetchCampaigns: () => void
-    fetchCampaign: (campaignId: number) => void
-    fetchTestDevices: () => void
     closeCampaignTypeSelector: () => void
     createCampaign: (name: string, campaignType: CampaignType) => void
+    fetchCampaign: (campaignId: number) => void
+    fetchCampaigns: () => void
+    fetchSegments: () => void
+    fetchTestDevices: () => void
     handleOpenOverviewModalDisplay: () => void
 }
 
@@ -61,8 +63,9 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
     }
 
     componentWillMount() {
-        const { fetchCampaigns, fetchTestDevices } = this.props
+        const { fetchCampaigns, fetchSegments, fetchTestDevices } = this.props
         fetchCampaigns()
+        fetchSegments()
         fetchTestDevices()
     }
 
@@ -344,6 +347,7 @@ const mapDispatchToProps = (
                 }
             )
         },
+        fetchSegments: () => dispatch(fetchSegments()),
         fetchTestDevices: () => dispatch(fetchTestDevices()),
         handleOpenOverviewModalDisplay: () =>
             dispatch(handleOpenOverviewModalDisplay())

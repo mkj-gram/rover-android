@@ -3,6 +3,7 @@ import * as React from 'react'
 import { parse } from 'qs'
 import { connect, Dispatch } from 'react-redux'
 
+import Audience from './Audience'
 import DateAndTime from './DateAndTime'
 import Form from '../Form'
 import { getCampaign, getIsWizardModalClosing } from '../../../reducers'
@@ -55,13 +56,8 @@ const ScheduledDelivery: React.SFC<
                 saveAndClose={updateScheduledDeliverySettings}
                 device={device}
             >
-                {[
-                    <DateAndTime
-                        key="dateAndTime"
-                        device={device}
-                        wizardSection="dateAndTime"
-                    />
-                ]}
+                <DateAndTime device={device} wizardSection="dateAndTime" />
+                <Audience device={device} wizardSection="audience" />
             </Form>
         </div>
     )

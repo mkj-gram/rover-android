@@ -5,17 +5,16 @@ import { ThunkAction } from 'redux-thunk'
 
 export const updateEditableUIState: ActionCreator<
     ThunkAction<void, State, void>
-> = (newUIStateGroup: keyof editableUIState, newUIStateValue: UIStateField) => (
-    dispatch: Dispatch<State>,
-    getState: () => State
-): void => {
+> = (
+    newUIStateGroup: keyof editableUIState,
+    newUIStateValue: UIStateField | AudienceUIState
+) => (dispatch: Dispatch<State>, getState: () => State): void => {
     const state = getState()
     const editableUIState = getEditableUIState(state)
 
     const newEditableUIState = {
         ...editableUIState,
         [newUIStateGroup]: {
-            ...editableUIState[newUIStateGroup],
             ...newUIStateValue
         }
     }

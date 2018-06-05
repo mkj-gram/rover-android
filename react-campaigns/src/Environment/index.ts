@@ -1,4 +1,4 @@
-/// <reference path="../typings/index.d.ts"/>
+/// <reference path="../../typings/index.d.ts"/>
 import { execute, makePromise, GraphQLRequest } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
 

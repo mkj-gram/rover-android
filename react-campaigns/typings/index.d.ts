@@ -37,10 +37,6 @@ interface StringMap<T> {
     [x: string]: T
 }
 
-interface UIStateInterface {
-    notification: StringMap<StringMap<boolean>>
-}
-
 type UIStateType =
     | 'notification'
     | 'experience'
@@ -52,6 +48,10 @@ type UIStateField = {
     type: UIStateType
 }
 
+interface AudienceUIState extends UIStateField {
+    conditionSelected: SegmentCondition | 'ALL-DEVICES'
+}
+
 type editableUIState = {
     // Notification Settings
     messageAndMedia: UIStateField
@@ -61,6 +61,7 @@ type editableUIState = {
 
     // Scheduled Delivery Settings
     dateAndTime: UIStateField
+    audience: AudienceUIState
 }
 
 interface Campaign {
@@ -68,7 +69,7 @@ interface Campaign {
     campaignId: string
     campaignType: CampaignType
     campaignStatus: CampaignStatus
-    UIState: UIStateInterface | string
+    UIState: string
 }
 
 interface ScheduledCampaign extends Campaign {
@@ -149,6 +150,7 @@ type State = {
     readonly modal: StringMap<string | boolean>
     readonly editableCampaign: AutomatedNotificationCampaign | ScheduledCampaign
     readonly editableUIState: editableUIState
+    readonly segments: SegmentsState
 }
 
 type TestDeviceState = {
@@ -178,11 +180,6 @@ interface OverviewModalRowContainerProps {
     val: number | boolean
 }
 
-// type RoverSVGProps = {
-//     fill?: string
-//     style?: StringMap<string | number>
-// }
-
 interface ResponsiveContainerProps {
     device?: Media
 }
@@ -196,15 +193,18 @@ type QueryParams = {
 }
 
 type AppState = {
-    home: HomeState
-    notificationDelivery: NotificationDeliveryState
-    notification: NotificationState
-    overview: OverviewModalState
-    error: ErrorState
     activePopover: PopoverState
+    audience: AudienceState
+    error: ErrorState
     form: FormState
+    home: HomeState
+    notification: NotificationState
+    notificationDelivery: NotificationDeliveryState
+    overview: OverviewModalState
     wizardModal: WizardModal
 }
+
+type AudienceState = StringMap<number>
 
 type PopoverState = {
     readonly activePopover: string
@@ -220,6 +220,7 @@ type formPage =
     | 'tapBehavior'
     | 'advancedSettings'
     | 'dateAndTime'
+    | 'audience'
 
 type FormState = {
     readonly currentPage: formPage
@@ -242,6 +243,13 @@ type NotificationState = {
     readonly alertOptionsHoverValue: string
     readonly isAlertOptionsOpen: string
 }
+
+type Segment = {
+    readonly segmentId: string
+    readonly name: string
+}
+
+type SegmentsState = StringMap<Segment>
 
 type WizardModal = {
     readonly currentWizard: UIStateType

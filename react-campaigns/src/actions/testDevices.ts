@@ -3,6 +3,7 @@ import gql from 'graphql-tag'
 import { Action, ActionCreator, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
 import Environment from '../Environment'
+import handleError from '../Environment/handleError'
 
 import { GraphQLRequest } from 'apollo-link'
 import { DocumentNode } from 'graphql'
@@ -44,13 +45,11 @@ export const fetchTestDevices: ActionCreator<
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
-                dispatch({
-                    type: 'FETCH_TEST_DEVICES_FAILURE',
-                    message: errors[0].message
-                })
-                setTimeout(() => {
-                    return dispatch({ type: 'DISMISS_FAILURE' })
-                }, 4000)
+                return handleError(
+                    'FETCH_TEST_DEVICES_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
             } else {
                 let testDevices: StringMap<string> = {}
                 // tslint:disable-next-line:no-any
@@ -72,15 +71,12 @@ export const fetchTestDevices: ActionCreator<
                 })
             }
         },
-        ({ result }) => {
-            dispatch({
-                type: 'FETCH_TEST_DEVICES_FAILURE',
-                message: result.errors[0].message
-            })
-            setTimeout(() => {
-                return dispatch({ type: 'DISMISS_FAILURE' })
-            }, 4000)
-        }
+        ({ result }) =>
+            handleError(
+                'FETCH_TEST_DEVICES_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }
 

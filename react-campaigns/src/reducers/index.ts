@@ -3,17 +3,19 @@
 import { combineReducers, AnyAction } from 'redux'
 
 import app, * as appSelector from './app'
+import campaigns, * as campaignsSelector from './campaigns'
 import editableCampaign, * as editableCampaignSelector from './editableCampaign'
 import editableUIState, * as editableUIStateSelector from './editableUIState'
-import campaigns, * as campaignsSelector from './campaigns'
+import segments, * as segmentsSelector from './segments'
 import testDevices, * as testDevicesSelector from './testDevices'
 
 export default combineReducers({
     app,
     campaigns,
-    testDevices,
     editableCampaign,
-    editableUIState
+    editableUIState,
+    segments,
+    testDevices
 })
 
 // Error
@@ -37,6 +39,13 @@ export const getIsCampaignTypeSelectorOpen = (state: State) =>
 
 export const getIsCampaignTypeSelectorClosing = (state: State) =>
     appSelector.getIsCampaignTypeSelectorClosing(state.app)
+
+// Audience
+export const getAggregateAudienceSize = (state: State, segmentId: string) =>
+    appSelector.getAggregateAudienceSize(state.app, segmentId)
+
+export const getTotalAudienceSize = (state: State) =>
+    appSelector.getTotalAudienceSize(state.app)
 
 // Overview
 export const getIsOverviewModalOpen = (state: State) =>
@@ -131,6 +140,13 @@ export const getIsStageValid = (state: State, stage: keyof editableUIState) =>
 
 export const getTypeProgress = (state: State, type: UIStateType) =>
     editableUIStateSelector.getTypeProgress(state, type)
+
+// Segments
+export const getAllSegments = (state: State) =>
+    segmentsSelector.getAllSegments(state.segments)
+
+export const getSegment = (state: State, segmentId: string) =>
+    segmentsSelector.getSegment(state.segments, segmentId)
 
 // Test Devices
 export const getTestDevices = (state: State) =>

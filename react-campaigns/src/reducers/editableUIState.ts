@@ -68,6 +68,13 @@ export const getIsStageValid = (
                 default:
                     return false
             }
+        case 'audience':
+            const { audience } = getEditableUIState(state)
+            const { conditionSelected } = audience
+            if (conditionSelected) {
+                return getIsStageValid(state, 'dateAndTime')
+            }
+            return false
         default:
             return false
     }

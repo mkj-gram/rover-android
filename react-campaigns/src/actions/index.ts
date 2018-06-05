@@ -5,6 +5,7 @@ import * as editableUIStateActions from './editableUIState'
 import * as campaignsActions from './campaigns'
 import * as testDevicesActions from './testDevices'
 import * as notificationActions from './notification'
+import * as segmentsActions from './segments'
 import * as sendTestActions from './sendTest'
 
 import * as overviewActions from './overview'
@@ -121,7 +122,7 @@ export const createEditableCampaign = (campaignId: string) =>
 
 export const updateEditableUIState = (
     newUIStateGroup: keyof editableUIState,
-    newUIStateValue: UIStateField | boolean
+    newUIStateValue: UIStateField | AudienceUIState | boolean
 ) =>
     editableUIStateActions.updateEditableUIState(
         newUIStateGroup,
@@ -215,6 +216,16 @@ export const closePopoverModalForm: ActionCreator<
         })
     }, 500)
 }
+
+// Segments
+export const fetchSegments = () => segmentsActions.fetchSegments()
+
+export const fetchNextAudienceSize = (
+    segmentId: string,
+    condition: 'ANY' | 'ALL'
+) => segmentsActions.fetchNextAudienceSize(segmentId, condition)
+
+export const fetchAudienceSize = () => segmentsActions.fetchAudienceSize()
 
 // Wizard Modal
 export const openWizardModal: ActionCreator<ThunkAction<void, State, void>> = (
