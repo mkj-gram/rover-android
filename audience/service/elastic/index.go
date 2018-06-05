@@ -97,10 +97,17 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 
 	// multiple predicate aggregates
 	case *audience.QueryRequest_QueryPredicateAggregates:
-		var root []M
+		var (
+			must []M
+			root []M
+		)
+
+		if r.TimeZoneOffset != nil {
+			must = append(must, TimeZoneOffsetToFilter(r.GetTimeZoneOffset().GetSeconds()))
+		}
 
 		for _, pa := range val.QueryPredicateAggregates.PredicateAggregates {
-			rq, err := DeviceAndProfilePredicateAggregateToQuery(pa, r.GetTimeZoneOffset())
+			rq, err := DeviceAndProfilePredicateAggregateToQuery(pa, nil)
 			if err != nil {
 				return nil, errors.Wrap(err, "PredicatesToQuery")
 			}
@@ -120,11 +127,17 @@ func (q *Index) Query(ctx context.Context, r *audience.QueryRequest) (*audience.
 			return nil, errors.Wrapf(InvalidArgument, "unknown condition: %v", cond)
 		}
 
+		must = append(must, M{
+			"bool": M{
+				condition: root,
+			},
+		})
+
 		query = M{
 			"bool": M{
 				"filter": M{
 					"bool": M{
-						condition: root,
+						"must": must,
 					},
 				},
 			},

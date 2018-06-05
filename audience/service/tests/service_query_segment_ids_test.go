@@ -118,17 +118,47 @@ func testAudience_Query_SegmentIds(t *testing.T) {
 
 			exp: expect{
 				exp: &audience.QueryResponse{
-					TotalSize: 4,
+					TotalSize: 5,
 					ScrollId:  "", // unpredictable
 					Devices: []*audience.Device{
 						{DeviceId: "d4", ProfileIdentifier: ""},
 						{DeviceId: "d3", ProfileIdentifier: "p1"},
 						{DeviceId: "d1", ProfileIdentifier: "p1"},
 						{DeviceId: "d2", ProfileIdentifier: "frank"},
+						{DeviceId: "d5", TimeZone: "America/Toronto"},
 					},
 					Profiles: []*audience.Profile{
 						{Identifier: "p1", AccountId: 1},
 					},
+				},
+			},
+		},
+
+		{
+			desc: "no segments specified+time_zone: query all in time zone",
+			req: &audience.QueryRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Iterator:    scroll,
+
+				Query: &audience.QueryRequest_QuerySegments_{
+					QuerySegments: &audience.QueryRequest_QuerySegments{
+						Condition: audience.PredicateAggregate_ANY,
+						Ids:       nil,
+					},
+				},
+				TimeZoneOffset: &audience.QueryRequest_TimeZoneOffset{
+					Seconds: -4 * 3600,
+				},
+			},
+
+			exp: expect{
+				exp: &audience.QueryResponse{
+					TotalSize: 1,
+					ScrollId:  "", // unpredictable
+					Devices: []*audience.Device{
+						{DeviceId: "d5", ProfileIdentifier: "", TimeZone: "America/Toronto"},
+					},
+					Profiles: nil,
 				},
 			},
 		},
@@ -158,6 +188,34 @@ func testAudience_Query_SegmentIds(t *testing.T) {
 					},
 					Profiles: []*audience.Profile{
 						{Identifier: "p1", AccountId: 1},
+					},
+				},
+			},
+		},
+
+		{
+			desc: "segments specified+time zone: filters by time_zone",
+			req: &audience.QueryRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Iterator:    scroll,
+
+				Query: &audience.QueryRequest_QuerySegments_{
+					QuerySegments: &audience.QueryRequest_QuerySegments{
+						Condition: audience.PredicateAggregate_ANY,
+						Ids:       []string{"113000000000000000000000", "112000000000000000000000", "111000000000000000000000"},
+					},
+				},
+
+				TimeZoneOffset: &audience.QueryRequest_TimeZoneOffset{
+					Seconds: -4 * 3600,
+				},
+			},
+
+			exp: expect{
+				exp: &audience.QueryResponse{
+					TotalSize: 1,
+					Devices: []*audience.Device{
+						{DeviceId: "d5", TimeZone: "America/Toronto"},
 					},
 				},
 			},
