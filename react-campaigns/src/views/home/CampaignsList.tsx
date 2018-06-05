@@ -18,7 +18,8 @@ import {
     Text,
     yellow,
     ZapIcon,
-    ChevronRightIcon
+    ChevronRightIcon,
+    silver
 } from '@rover/ts-bootstrap/dist/src'
 
 export interface Props {
@@ -156,10 +157,10 @@ const renderCampaign = (
             </div>
             {media !== 'Mobile' &&
                 campaignStatus !== 'DRAFT' &&
-                renderStat(19302, 'Delivered')}
+                renderStat(0, 'Delivered')}
             {campaignStatus !== 'DRAFT' &&
                 media === 'Desktop' &&
-                renderStat(1277, 'Opened')}
+                renderStat(0, 'Opened')}
             {media === 'Desktop' ? (
                 renderListButtons(campaign, pushToOverview)
             ) : (
@@ -472,8 +473,17 @@ const renderStat = (value: number, description: string) => (
             flexDirection: 'column'
         }}
     >
-        <Text size="large" text={value.toString()} />
-        <Text size="small" label={true} text={description} />
+        <Text
+            size="large"
+            text={value.toString()}
+            textStyle={{ color: silver }}
+        />
+        <Text
+            size="small"
+            label={true}
+            text={description}
+            textStyle={{ color: silver }}
+        />
     </div>
 )
 
