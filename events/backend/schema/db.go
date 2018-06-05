@@ -28,6 +28,10 @@ type DB struct {
 	now func() time.Time
 }
 
+func (db *DB) Ping() error {
+	return db.sql.Ping()
+}
+
 func schemaFromRow(row *sql.Row) (*EventSchema, error) {
 	var schema EventSchema
 

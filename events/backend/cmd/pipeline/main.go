@@ -137,6 +137,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	schemaProbe := func(ctx context.Context) error {
+		if err := schemaDB.Ping(); err != nil {
+			return errors.Wrap(err, "schemaDB.Ping")
+		}
+		return nil
+	}
+
+	livenessProbes = append(livenessProbes, schemaProbe)
+	readinessProbes = append(readinessProbes, schemaProbe)
+
 	handler := pipeline.NewChain("SchemaTracker").Then(tracker.NewTracker(schemaDB))
 
 	//
