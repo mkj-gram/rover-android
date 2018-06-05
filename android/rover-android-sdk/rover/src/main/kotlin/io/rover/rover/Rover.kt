@@ -10,6 +10,7 @@ import io.rover.rover.core.events.EventQueueServiceInterface
 import io.rover.rover.core.logging.AndroidLogger
 import io.rover.rover.core.logging.EventQueueLogger
 import io.rover.rover.core.logging.GlobalStaticLogHolder
+import io.rover.rover.core.logging.LogBuffer
 import io.rover.rover.core.permissions.PermissionsNotifierInterface
 import io.rover.rover.core.routing.LinkOpenInterface
 import java.net.HttpURLConnection
@@ -28,15 +29,17 @@ import java.net.HttpURLConnection
 class Rover(
     assemblers: List<Assembler>
 ): ContainerResolver by InjectionContainer(assemblers) {
-
     init {
         // global, which we "inject" using static scope
-        GlobalStaticLogHolder.globalLogEmitter = EventQueueLogger(
-            // uses the resolver to discover when the EventQueueService is ready and can be used
-            // to submit the logs.
-            this,
-            AndroidLogger()
-        )
+        GlobalStaticLogHolder.globalLogEmitter =
+             LogBuffer(
+                EventQueueLogger(
+                    // uses the resolver to discover when the EventQueueService is ready and can be used
+                    // to submit the logs.
+                    this,
+                    AndroidLogger()
+                )
+             )
 
         initializeContainer()
     }

@@ -39,8 +39,14 @@ interface ExperienceViewModelInterface : BindableViewModel {
     val experienceNavigation: Publisher<ExperienceNavigationViewModelInterface>
 
     sealed class Event {
+        /**
+         * Display an user friendly error message.
+         */
         data class DisplayError(
-            val message: String
+            /**
+             * Do not display this message.
+             */
+            val engineeringReason: String
         ): Event()
 
         /**

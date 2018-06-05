@@ -1,12 +1,16 @@
 package io.rover.experiences.ui
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
+import android.animation.TimeInterpolator
+import android.animation.TypeEvaluator
 import android.content.Context
 import android.os.Build
+import android.provider.Settings
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.CircularProgressDrawable
-import android.support.v4.widget.ImageViewCompat
 import android.support.v7.app.ActionBar
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.Toolbar
@@ -14,9 +18,10 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.Menu
 import android.view.View
-import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
+import android.view.animation.LinearInterpolator
+import io.rover.experiences.R
 import io.rover.rover.core.logging.log
 import io.rover.rover.platform.whenNotNull
 import io.rover.rover.core.streams.androidLifecycleDispose
@@ -65,8 +70,8 @@ class ExperienceView : CoordinatorLayout, BindableView<ExperienceViewModelInterf
             viewModel.events.androidLifecycleDispose(this).subscribe({ event ->
                 when (event) {
                     is ExperienceViewModelInterface.Event.DisplayError -> {
-                        Snackbar.make(this, "Problem: ${event.message}", Snackbar.LENGTH_LONG).show()
-                        log.w("Unable to retrieve experience: ${event.message}")
+                        Snackbar.make(this, R.string.rover_experiences_fetch_failure, Snackbar.LENGTH_LONG).show()
+                        log.w("Unable to retrieve experience: ${event.engineeringReason}")
                     }
                 }
             }, { error ->
@@ -81,14 +86,45 @@ class ExperienceView : CoordinatorLayout, BindableView<ExperienceViewModelInterf
                 connectToolbar(newToolbar)
             }, { throw(it) }, { subscriptionCallback(it) })
 
+            val startingBrightness = Settings.System.getInt(
+                context.contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS
+            )
+            log.v("Starting brightness is: $startingBrightness")
+            val startingBrightnessFraction = startingBrightness / 255f
+            val window = toolbarHost.provideWindow()
+            // set a starting value that matches what the current device brightness is so the
+            // animator below has a sane starting position.
+            window.attributes = (window.attributes ?: WindowManager.LayoutParams()).apply {
+                screenBrightness = startingBrightnessFraction
+            }
+            var runningAnimator : Animator? = null
             viewModel.extraBrightBacklight.androidLifecycleDispose(this).subscribe({ extraBright ->
-                toolbarHost.provideWindow().attributes = (toolbarHost.provideWindow().attributes
-                    ?: WindowManager.LayoutParams()).apply {
-                    screenBrightness = when (extraBright) {
-                        true -> WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-                        false -> WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                runningAnimator?.cancel()
+                val animator = ObjectAnimator.ofObject(
+                    window,
+                    "attributes",
+                    TypeEvaluator<WindowManager.LayoutParams> { fraction, startValue, endValue ->
+                        // and and take the starting value and copy it, setting the new interpolated screen brightness.
+                        val newParams = WindowManager.LayoutParams().apply { copyFrom(startValue) }
+                        val newBrightness = startValue.screenBrightness + (fraction * (endValue.screenBrightness - startValue.screenBrightness))
+                        newParams.screenBrightness = newBrightness
+                        newParams
+                    },
+                    WindowManager.LayoutParams().apply {
+                        screenBrightness = when (extraBright) {
+                            true -> WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                            false -> startingBrightnessFraction
+                        }
                     }
-                }
+                )
+                // it's unclear why, the animator has a habit of running up against the endvalue and
+                // running there a large portion of the animation duration.  For now, the workaround
+                // is to set the runtime to something pretty long.
+                animator.duration = 3000
+                animator.interpolator = LinearInterpolator()
+                animator.start()
+                runningAnimator = animator
             }, { throw(it) }, { subscriptionCallback(it) })
 
             viewModel.experienceNavigation.androidLifecycleDispose(this).subscribe( { experienceNavigationViewModel ->

@@ -3,7 +3,11 @@ package io.rover.app.experiences
 import android.app.Application
 import android.content.Intent
 import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.crashes.AbstractCrashesListener
 import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.crashes.CrashesListener
+import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
+import com.microsoft.appcenter.crashes.model.ErrorReport
 import com.microsoft.appcenter.distribute.Distribute
 import io.reactivex.schedulers.Schedulers
 import io.rover.account.AccountAssembler
@@ -14,6 +18,8 @@ import io.rover.experiences.ExperiencesAssembler
 import io.rover.rover.Rover
 import io.rover.rover.core.CoreAssembler
 import io.rover.rover.core.data.AuthenticationContext
+import io.rover.rover.core.logging.GlobalStaticLogHolder
+import io.rover.rover.core.logging.LogBuffer
 import timber.log.Timber
 import io.rover.rover.platform.SharedPreferencesLocalStorage
 
@@ -49,6 +55,15 @@ class ExperiencesApplication: Application() {
                 // TODO might replace App Center Crashes with Crashlytics.
                 Crashes::class.java,
                 Distribute::class.java
+            )
+
+            Crashes.setListener(
+                object : AbstractCrashesListener() {
+                    override fun getErrorAttachments(report: ErrorReport?): MutableIterable<ErrorAttachmentLog> {
+                        val logger = GlobalStaticLogHolder.globalLogEmitter as LogBuffer?
+                        return mutableListOf(ErrorAttachmentLog.attachmentWithText(logger?.getLogsAsText() ?: "No log buffer available", "log.txt"))
+                    }
+                }
             )
         }
 
