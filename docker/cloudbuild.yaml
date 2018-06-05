@@ -508,6 +508,7 @@ steps:
       - 'build-notification-resources'
 
 # Events Pipeline
+
   - id: 'build-events-pipeline-executable'
     name: 'gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine'
     env:
@@ -517,18 +518,44 @@ steps:
       - -tags
       - static_all
       - -o
-      - docker/events/pipeline/pipeline
+      - docker/events/build/bin/pipeline
       - github.com/roverplatform/rover/events/backend/cmd/pipeline
     waitFor:
       - 'test-complete'
 
+  - id: 'build-events-clis'
+    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/events/build/bin/postgres-cli
+      - github.com/roverplatform/rover/go/cmd/postgres-cli
+    waitFor: 
+      - 'test-complete'
+
+  - id: 'build-events-resources'
+    name: 'ubuntu'
+    entrypoint: 'sh'
+    args:
+      - -c
+      - |
+        export DEST=docker/events
+        mkdir -p $$DEST/build/postgres/
+        cp -r ./events/backend/schema/migrations $$DEST/build/postgres/
+    waitFor:
+      - 'build-events-clis'
+      - 'build-events-pipeline-executable'
+
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - build
-      - --tag=gcr.io/$PROJECT_ID/events-pipeline:$SHORT_SHA
-      - docker/events/pipeline
+      - -t
+      - gcr.io/$PROJECT_ID/events:$SHORT_SHA
+      - docker/events
     waitFor:
-      - 'build-events-pipeline-executable'
+      - 'build-events-resources'
 
 # Bulk Gateway
   
@@ -692,7 +719,7 @@ images:
   - 'gcr.io/$PROJECT_ID/audience:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/campaigns:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/notification:$SHORT_SHA'
-  - 'gcr.io/$PROJECT_ID/events-pipeline:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/events:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/bulk-gateway:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/rest-gateway:$SHORT_SHA'
