@@ -5,8 +5,9 @@ import { withRouter, RouteComponentProps, Redirect } from 'react-router'
 import {
     renameCampaign,
     duplicateCampaign,
-    archiveCampaign
-} from '../../../actions/campaigns'
+    archiveCampaign,
+    createEditableCampaign
+} from '../../../actions'
 import { getCampaign } from '../../../reducers'
 import { handleCloseOverviewModalDisplay } from '../../../actions'
 import { Link } from 'react-router-dom'
@@ -319,6 +320,7 @@ const mapDispatchToProps = (
                     `campaignId=${id}`
                 )
 
+                dispatch(createEditableCampaign(`${id}`))
                 history.push(`${location.pathname}${params}`)
             })
         },
@@ -355,5 +357,8 @@ const mapStateToProps = (
 }
 
 export default withRouter(
-    connect(mapStateToProps, mapDispatchToProps)(OverviewModalHeader)
+    connect(
+        mapStateToProps,
+        mapDispatchToProps
+    )(OverviewModalHeader)
 )
