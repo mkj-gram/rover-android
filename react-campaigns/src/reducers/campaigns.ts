@@ -1,6 +1,13 @@
 /// <reference path="../../typings/index.d.ts"/>
 import { AnyAction } from 'redux'
 
+import {
+    isScheduledCampaign,
+    isAutomatedNotificationCampaign
+} from '../views/utils/getCampaignType'
+
+import { formatDisplayTime, formatDate } from '../views/utils/formatDateTime'
+
 export default (
     state: StringMap<Campaign> = {},
     action: AnyAction
@@ -40,4 +47,28 @@ export const getFilteredCampaigns = (
         default:
             throw new Error(`Unknown filter: ${filter}`)
     }
+}
+
+export const getDisplayTime = (campaign: Campaign, timeField: string) => {
+    let time
+    if (isScheduledCampaign(campaign)) {
+        time = campaign[timeField as 'scheduledTime']
+    }
+
+    if (isAutomatedNotificationCampaign(campaign)) {
+        // ToDO
+    }
+    return formatDisplayTime(time)
+}
+
+export const getFormatDate = (campaign: Campaign, dateField: string) => {
+    let date
+    if (isScheduledCampaign(campaign)) {
+        date = campaign[dateField as 'scheduledDate']
+    }
+
+    if (isAutomatedNotificationCampaign(campaign)) {
+        // ToDO
+    }
+    return formatDate(date)
 }

@@ -3,7 +3,10 @@ import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
 import { updateEditableCampaign } from '../../../actions'
-import { getEditableCampaign, getDisplayTime } from '../../../reducers'
+import {
+    getEditableCampaign,
+    getEditableCampaignDisplayTime
+} from '../../../reducers'
 
 import PopoverModalForm from '../components/PopoverModalForm'
 import { TimePicker } from '@rover/ts-bootstrap/dist/src'
@@ -19,7 +22,7 @@ import {
 
 export interface StateProps {
     editableCampaign: ScheduledCampaign
-    displayTime: string
+    getDisplayTime: (timeField: string) => string
 }
 
 export interface DispatchProps {
@@ -58,12 +61,16 @@ class TimePickerContainer extends React.Component<
     }
 
     getPopoverFormInputProps() {
-        const { field, editableCampaign, device, displayTime } = this.props
+        const { field, editableCampaign, device, getDisplayTime } = this.props
+
         return {
             id: `${field}_time_picker`,
             label: 'Time',
             media: device as Media,
-            text: editableCampaign[field] == null ? '' : displayTime,
+            text:
+                editableCampaign[field] == null
+                    ? ''
+                    : getDisplayTime('scheduledTime'),
             fieldStyle: {
                 marginTop: 0,
                 padding: device === 'Desktop' ? '24px 0 23px' : 0,
@@ -208,7 +215,8 @@ class TimePickerContainer extends React.Component<
 
 const mapStateToProps = (state: State): StateProps => ({
     editableCampaign: getEditableCampaign(state) as ScheduledCampaign,
-    displayTime: getDisplayTime(state)
+    getDisplayTime: (timeField: string) =>
+        getEditableCampaignDisplayTime(state, timeField)
 })
 const mapDispatchToProps = (
     // tslint:disable-next-line:no-any
@@ -220,4 +228,7 @@ const mapDispatchToProps = (
         }
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(TimePickerContainer)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TimePickerContainer)

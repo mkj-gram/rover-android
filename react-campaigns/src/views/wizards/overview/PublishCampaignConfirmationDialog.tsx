@@ -4,8 +4,8 @@ import { connect, Dispatch } from 'react-redux'
 
 import {
     getEditableCampaign,
-    getDisplayTime,
-    getFormatDate
+    getEditableCampaignDisplayTime,
+    getEditableCampaignFormatDate
 } from '../../../reducers'
 import { publishCampaign } from '../../../actions'
 
@@ -13,7 +13,7 @@ import { Dialog } from '@rover/ts-bootstrap/dist/src'
 import {
     isScheduledCampaign,
     isAutomatedNotificationCampaign
-} from '../../home/CampaignsList'
+} from '../../utils/getCampaignType'
 
 export interface PublishDialogProps extends InjectedProps {
     campaignId: number
@@ -22,8 +22,8 @@ export interface PublishDialogProps extends InjectedProps {
 
 export interface PublishDialogStateProps {
     editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
-    displayTime: string
-    formattedDate: Date
+    getDisplayTime: (timeField: string) => string
+    getFormatDate: (dateField: string) => Date
 }
 export interface DispatchProps {
     publishCampaign: (campaignId: number) => void
@@ -37,8 +37,8 @@ const PublishCampaignConfirmationDialog: React.SFC<
     handlePublishCampaignPrompt,
     editableCampaign,
     publishCampaign,
-    displayTime,
-    formattedDate
+    getFormatDate,
+    getDisplayTime
 }) => {
     const getDialogText = () => {
         let dialogText
@@ -52,10 +52,14 @@ const PublishCampaignConfirmationDialog: React.SFC<
                     scheduledUseLocalDeviceTime
                 } = editableCampaign
 
-                const monthAndDay = formattedDate.toLocaleString('en-us', {
+                const monthAndDay = getFormatDate(
+                    'scheduledDate'
+                ).toLocaleString('en-us', {
                     month: 'long',
                     day: 'numeric'
                 })
+
+                const displayTime = getDisplayTime('scheduledTime')
 
                 const displayScheduledTimezone = scheduledUseLocalDeviceTime
                     ? "using the devices' local time zone"
@@ -93,8 +97,10 @@ const PublishCampaignConfirmationDialog: React.SFC<
 
 const mapStateToProps = (state: State): PublishDialogStateProps => ({
     editableCampaign: getEditableCampaign(state) as ScheduledCampaign,
-    displayTime: getDisplayTime(state),
-    formattedDate: getFormatDate(state)
+    getDisplayTime: (timeField: string) =>
+        getEditableCampaignDisplayTime(state, timeField),
+    getFormatDate: (dateField: string) =>
+        getEditableCampaignFormatDate(state, dateField)
 })
 
 // tslint:disable-next-line:no-any
@@ -106,6 +112,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-    PublishCampaignConfirmationDialog
-)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(PublishCampaignConfirmationDialog)

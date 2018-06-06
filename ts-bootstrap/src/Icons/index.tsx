@@ -24,6 +24,7 @@ import ExternalLinkIcon from './ExternalLinkIcon'
 import EyeIcon from './EyeIcon'
 import FilterArrowIcon from './FilterArrowIcon'
 import GearIcon from './GearIcon'
+import GlobeIcon from './GlobeIcon'
 import GridIcon from './GridIcon'
 import ImageIcon from './ImageIcon'
 import LinkIcon from './LinkIcon'
@@ -66,6 +67,7 @@ export {
     EyeIcon,
     FilterArrowIcon,
     GearIcon,
+    GlobeIcon,
     GridIcon,
     ImageIcon,
     LinkIcon,

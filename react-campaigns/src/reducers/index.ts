@@ -111,6 +111,12 @@ export const getAllCampaigns = (state: State) =>
 export const getFilteredCampaigns = (state: State, filter: CampaignStatus) =>
     campaignsSelector.getFilteredCampaigns(state.campaigns, filter)
 
+export const getCampaignDisplayTime = (state: Campaign, timeField: string) =>
+    campaignsSelector.getDisplayTime(state, timeField)
+
+export const getCampaignFormatDate = (state: Campaign, dateField: string) =>
+    campaignsSelector.getFormatDate(state, dateField)
+
 // Editable Campaign
 // Active Popover
 export const getActivePopover = (state: State) =>
@@ -125,11 +131,15 @@ export const getEditableCampaign = (state: State) =>
 export const getShouldShowSaveAndClose = (state: State) =>
     editableCampaignSelector.getShouldShowSaveAndClose(state)
 
-export const getDisplayTime = (state: State) =>
-    editableCampaignSelector.getDisplayTime(state)
+export const getEditableCampaignDisplayTime = (
+    state: State,
+    timeField: string
+) => editableCampaignSelector.getDisplayTime(state, timeField)
 
-export const getFormatDate = (state: State) =>
-    editableCampaignSelector.getFormatDate(state)
+export const getEditableCampaignFormatDate = (
+    state: State,
+    dateField: string
+) => editableCampaignSelector.getFormatDate(state, dateField)
 
 // Editable UIState
 export const getEditableUIState = (state: State) =>

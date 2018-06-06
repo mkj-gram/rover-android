@@ -1,6 +1,12 @@
 /// <reference path="../../typings/index.d.ts"/>
 import { AnyAction } from 'redux'
 import { getCampaign } from './'
+import {
+    isScheduledCampaign,
+    isAutomatedNotificationCampaign
+} from '../views/utils/getCampaignType'
+
+import { formatDisplayTime, formatDate } from '../views/utils/formatDateTime'
 
 const isEqual = require('lodash/isEqual')
 
@@ -71,28 +77,30 @@ export const getShouldShowSaveAndClose = (state: State) => {
     )
 }
 
-export const getDisplayTime = (state: State) => {
+export const getDisplayTime = (state: State, timeField: string) => {
     const { editableCampaign } = state
-    const { scheduledTime } = editableCampaign as ScheduledCampaign
+    let time
+    if (isScheduledCampaign(editableCampaign)) {
+        time = editableCampaign[timeField as 'scheduledTime']
+    }
 
-    let minutes = Math.floor(scheduledTime / 60) % 60
-    let hours = Math.floor(scheduledTime / 3600) % 3600
-    let period = scheduledTime - 12 * 3600 < 0 ? 'AM' : 'PM'
+    if (isAutomatedNotificationCampaign(editableCampaign)) {
+        // ToDO
+    }
 
-    return `${hours === 0 || hours === 12 ? 12 : hours % 12}:${
-        minutes.toString().length === 1 ? `0${minutes}` : minutes
-    } ${period}`
+    return formatDisplayTime(time)
 }
 
-export const getFormatDate = (state: State) => {
+export const getFormatDate = (state: State, dateField: string) => {
     const { editableCampaign } = state
-    const { scheduledDate } = editableCampaign as ScheduledCampaign
-    if (scheduledDate == null) {
-        return null
+    let date
+    if (isScheduledCampaign(editableCampaign)) {
+        date = editableCampaign[dateField as 'scheduledDate']
     }
-    const year = scheduledDate.substr(0, 4)
-    const month = scheduledDate.substr(5, 2)
-    const day = scheduledDate.substr(8, 2)
 
-    return new Date(`${month}/${day}/${year}`)
+    if (isAutomatedNotificationCampaign(editableCampaign)) {
+        // ToDO
+    }
+
+    return formatDate(date)
 }

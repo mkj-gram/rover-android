@@ -1,5 +1,6 @@
 /// <reference path="../../../typings/index.d.ts"/>
 import * as React from 'react'
+import { connect } from 'react-redux'
 import {
     Badge,
     BarChartIcon,
@@ -19,8 +20,15 @@ import {
     yellow,
     ZapIcon,
     ChevronRightIcon,
-    silver
+    silver,
+    GlobeIcon
 } from '@rover/ts-bootstrap/dist/src'
+import { getCampaignDisplayTime, getCampaignFormatDate } from '../../reducers'
+
+import {
+    isScheduledCampaign,
+    isAutomatedNotificationCampaign
+} from '../utils/getCampaignType'
 
 export interface Props {
     campaigns: StringMap<Campaign>
@@ -31,19 +39,9 @@ export interface Props {
     campaignStatus: QueryParams['campaignStatus']
 }
 
-export const isScheduledCampaign = (
-    campaign: Campaign
-): campaign is ScheduledCampaign => {
-    return (campaign as ScheduledCampaign).scheduledDeliveryStatus !== undefined
-}
-
-export const isAutomatedNotificationCampaign = (
-    campaign: Campaign
-): campaign is AutomatedNotificationCampaign => {
-    return (
-        (campaign as AutomatedNotificationCampaign).automatedMonday !==
-        undefined
-    )
+export interface CampaignsListProps {
+    getDisplayTime: (campaign: Campaign, timeField: string) => string
+    getFormatDate: (campaign: Campaign, dateField: string) => Date
 }
 
 const getCampaignIcon = (
@@ -135,7 +133,9 @@ const getCampaignIcon = (
 const renderCampaign = (
     campaign: Campaign,
     media: Media,
-    pushToOverview: (campaignId: string) => void
+    pushToOverview: (campaignId: string) => void,
+    getFormatDate: (campaign: Campaign, dateField: string) => Date,
+    getDisplayTime: (campaign: Campaign, timeField: string) => string
 ) => {
     const { campaignId, name, campaignStatus, campaignType } = campaign
     return (
@@ -153,7 +153,12 @@ const renderCampaign = (
             {renderCampaignIcon(campaign, media)}
             <div style={{ flex: '1 1 auto' }}>
                 <Text text={name} size="large" />
-                {renderCampaignProgressState(campaign, media)}
+                {renderCampaignProgressState(
+                    campaign,
+                    media,
+                    getFormatDate,
+                    getDisplayTime
+                )}
             </div>
             {media !== 'Mobile' &&
                 campaignStatus !== 'DRAFT' &&
@@ -198,8 +203,20 @@ const renderCampaignIcon = (campaign: Campaign, media: Media) => {
     )
 }
 
-const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
+const renderCampaignProgressState = (
+    campaign: Campaign,
+    media: Media,
+    getFormatDate: (campaign: Campaign, dateField: string) => Date,
+    getDisplayTime: (campaign: Campaign, timeField: string) => string
+) => {
     if (isScheduledCampaign(campaign)) {
+        const {
+            scheduledDate,
+            scheduledTime,
+            scheduledUseLocalDeviceTime,
+            scheduledTimeZone
+        } = campaign
+
         // tslint:disable-next-line:switch-default
         switch (campaign.scheduledDeliveryStatus) {
             case 'UNKNOWN':
@@ -232,6 +249,33 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                     </div>
                 )
             case 'SCHEDULED':
+                const formatDate = getFormatDate(campaign, 'scheduledDate')
+                const date = formatDate
+                    ? formatDate.toLocaleString('en-us', {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric'
+                      })
+                    : null
+
+                const displayTime = getDisplayTime(campaign, 'scheduledTime')
+
+                const displayTimeZone = scheduledUseLocalDeviceTime ? (
+                    <GlobeIcon
+                        fill={charcoal}
+                        height="12"
+                        width="12"
+                        viewBox="0 0 24 24"
+                        style={{ marginLeft: 8 }}
+                    />
+                ) : (
+                    <Badge
+                        color={charcoal}
+                        text={scheduledTimeZone}
+                        style={{ marginLeft: 8 }}
+                    />
+                )
+
                 return (
                     <div
                         style={{
@@ -244,10 +288,33 @@ const renderCampaignProgressState = (campaign: Campaign, media: Media) => {
                             text="SCHEDULED"
                             style={{ marginRight: 8 }}
                         />
-                        <Text
-                            label={true}
-                            size="small"
-                            text="Jan 8, 2018 at 11:00 AM"
+                        {date ? (
+                            <React.Fragment>
+                                <Text
+                                    label={true}
+                                    size="small"
+                                    text={`${date} at ${displayTime}`}
+                                    textStyle={{
+                                        color: steel
+                                    }}
+                                />
+                                {media !== 'Mobile' ? displayTimeZone : null}
+                            </React.Fragment>
+                        ) : null}
+                    </div>
+                )
+            case 'INPROGRESS':
+                return (
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'baseline'
+                        }}
+                    >
+                        <Badge
+                            color={yellow}
+                            text="IN PROGRESS"
+                            style={{ marginRight: 8 }}
                         />
                     </div>
                 )
@@ -487,13 +554,15 @@ const renderStat = (value: number, description: string) => (
     </div>
 )
 
-const CampaignsList: React.SFC<Props> = ({
+const CampaignsList: React.SFC<Props & CampaignsListProps> = ({
     campaigns,
     media,
     pushToOverview,
     style,
     campaignType,
-    campaignStatus
+    campaignStatus,
+    getFormatDate,
+    getDisplayTime
 }) => {
     const baseStyle: React.CSSProperties = {
         width: '100%',
@@ -550,7 +619,9 @@ const CampaignsList: React.SFC<Props> = ({
                         {renderCampaign(
                             campaigns[campaignId],
                             media,
-                            pushToOverview
+                            pushToOverview,
+                            getFormatDate,
+                            getDisplayTime
                         )}
                     </div>
                 ))}
@@ -558,4 +629,14 @@ const CampaignsList: React.SFC<Props> = ({
     )
 }
 
-export default CampaignsList
+const mapStateToProps = (state: State): CampaignsListProps => ({
+    getDisplayTime: (campaign: Campaign, timeField: string) =>
+        getCampaignDisplayTime(campaign, timeField),
+    getFormatDate: (campaign: Campaign, dateField: string) =>
+        getCampaignFormatDate(campaign, dateField)
+})
+
+export default connect(
+    mapStateToProps,
+    {}
+)(CampaignsList)

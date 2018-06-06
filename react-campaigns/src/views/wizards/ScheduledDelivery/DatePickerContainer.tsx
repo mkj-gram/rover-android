@@ -3,7 +3,10 @@ import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
 import { updateEditableCampaign } from '../../../actions'
-import { getEditableCampaign, getFormatDate } from '../../../reducers'
+import {
+    getEditableCampaign,
+    getEditableCampaignFormatDate
+} from '../../../reducers'
 
 import PopoverModalForm from '../components/PopoverModalForm'
 import { DatePicker } from '@rover/ts-bootstrap/dist/src'
@@ -19,7 +22,7 @@ import {
 
 export interface StateProps {
     editableCampaign: ScheduledCampaign
-    formattedDate: Date
+    getFormatDate: (dateField: string) => Date
 }
 
 export interface DispatchProps {
@@ -42,7 +45,7 @@ const DatePickerContainer: React.SFC<
     device,
     editableCampaign,
     updateEditableCampaign,
-    formattedDate
+    getFormatDate
 }) => {
     const onSelect = (handleClosePopoverModal: () => void, time: Date) => {
         updateEditableCampaign({
@@ -55,7 +58,7 @@ const DatePickerContainer: React.SFC<
 
     const getPopoverFormInputProps = () => {
         const formatDate = () =>
-            formattedDate.toLocaleString('en-us', {
+            getFormatDate('scheduledDate').toLocaleString('en-us', {
                 month: 'long',
                 day: 'numeric',
                 year: 'numeric'
@@ -124,7 +127,7 @@ const DatePickerContainer: React.SFC<
                     defaultDate={
                         editableCampaign[field] == null
                             ? undefined
-                            : formattedDate
+                            : getFormatDate('scheduledDate')
                     }
                 />
             </div>
@@ -161,7 +164,8 @@ const DatePickerContainer: React.SFC<
 
 const mapStateToProps = (state: State): StateProps => ({
     editableCampaign: getEditableCampaign(state) as ScheduledCampaign,
-    formattedDate: getFormatDate(state)
+    getFormatDate: (dateField: string) =>
+        getEditableCampaignFormatDate(state, dateField)
 })
 const mapDispatchToProps = (
     // tslint:disable-next-line:no-any
@@ -173,4 +177,7 @@ const mapDispatchToProps = (
         }
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(DatePickerContainer)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(DatePickerContainer)

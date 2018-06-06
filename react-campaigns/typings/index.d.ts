@@ -133,7 +133,7 @@ interface AutomatedNotificationCampaign extends Campaign {
     automatedSunday: boolean
     automatedStartDate: string
     automatedEndDate: string
-    auotmatedStartTime: number
+    automatedStartTime: number
     automatedEndTime: number
     automatedTimeZone: string
     automatedUseLocalDeviceTime: boolean
