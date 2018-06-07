@@ -5,7 +5,7 @@ import { Text, titanium } from '@rover/ts-bootstrap/dist/src'
 export interface FormSectionRowProps {
     onClick?: () => void
 
-    children?: JSX.Element[]
+    children?: JSX.Element[] | JSX.Element
 }
 
 const Row: React.SFC<FormSectionRowProps> = ({ onClick, children }) => {

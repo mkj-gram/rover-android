@@ -155,6 +155,9 @@ export const getTypeProgress = (state: State, type: UIStateType) =>
 export const getAllSegments = (state: State) =>
     segmentsSelector.getAllSegments(state.segments)
 
+export const getUnselectedSegments = (state: State) =>
+    segmentsSelector.getUnselectedSegments(state)
+
 export const getSegment = (state: State, segmentId: string) =>
     segmentsSelector.getSegment(state.segments, segmentId)
 

@@ -71,10 +71,19 @@ export const getIsStageValid = (
         case 'audience':
             const { audience } = getEditableUIState(state)
             const { conditionSelected } = audience
-            if (conditionSelected) {
-                return getIsStageValid(state, 'dateAndTime')
+            const { segmentIds } = editableCampaign
+            switch (conditionSelected) {
+                case 'ALL-DEVICES':
+                    return getIsStageValid(state, 'dateAndTime')
+                case 'ALL':
+                case 'ANY':
+                    return (
+                        segmentIds.length > 0 &&
+                        getIsStageValid(state, 'dateAndTime')
+                    )
+                default:
+                    return false
             }
-            return false
         default:
             return false
     }

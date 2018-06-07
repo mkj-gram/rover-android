@@ -23,6 +23,7 @@ import AudienceLink from '../components/AudienceLink'
 import FormSection from '../../utils/FormSection'
 import Row from '../components/Row'
 import SegmentConditionSelector from './SegmentConditionSelector'
+import SegmentSelector from './SegmentSelector'
 
 export interface AudienceProps {
     device: Media
@@ -33,20 +34,22 @@ export interface AudienceStateProps {
     editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
 }
 
-export interface AudienceDispatchProps {
-    fetchNextAudienceSize: (segmentId: string, condition: 'ANY' | 'ALL') => void
-}
-
-const Audience: React.SFC<
-    AudienceProps & AudienceStateProps & AudienceDispatchProps
-> = ({ device, editableCampaign, fetchNextAudienceSize }) => {
+const Audience: React.SFC<AudienceProps & AudienceStateProps> = ({
+    device,
+    editableCampaign
+}) => {
     const { Fragment } = React
 
     return (
         <Fragment>
             <FormSection device={device} style={{ marginTop: 24 }}>
-                <Text text="Audience" size="h1" />
+                <Text
+                    text="Audience"
+                    size="h1"
+                    textStyle={{ marginBottom: 8 }}
+                />
                 <SegmentConditionSelector device={device} />
+                <SegmentSelector device={device} />
             </FormSection>
             {device === 'Desktop' &&
                 ReactDOM.createPortal(
@@ -65,14 +68,4 @@ const mapStateToProps = (state: State): AudienceStateProps => ({
     editableCampaign: getEditableCampaign(state)
 })
 
-const mapDispatchToProps = (
-    // tslint:disable-next-line:no-any
-    dispatch: Dispatch<any>
-): AudienceDispatchProps => {
-    return {
-        fetchNextAudienceSize: (segmentId: string, condition: 'ANY' | 'ALL') =>
-            dispatch(fetchNextAudienceSize(segmentId, condition))
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Audience)
+export default connect(mapStateToProps)(Audience)
