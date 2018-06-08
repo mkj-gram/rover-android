@@ -12,6 +12,7 @@ import (
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service/cache"
 	"github.com/roverplatform/rover/geocoder/service/locationiq"
+	"github.com/roverplatform/rover/geocoder/service/mappings"
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
 
@@ -36,6 +37,11 @@ func TestServer_ReverseGeocode(t *testing.T) {
 	}
 	cache := &cache.Store{Client: redis}
 
+	mappingHelper, err := mappings.NewCountry("./mappings/ISO3166Countries.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	tests := []struct {
 		name     string
 		onBefore func()
@@ -51,7 +57,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 				Longitude: -79.3761292,
 			},
 			want: &geocoder.ReverseGeocodeResponse{
-				Country: "CA",
+				Country: "Canada",
 				State:   "Ontario",
 				City:    "Toronto",
 			},
@@ -64,7 +70,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 				Longitude: 8.7591725,
 			},
 			want: &geocoder.ReverseGeocodeResponse{
-				Country: "DE",
+				Country: "Germany",
 				State:   "Hesse",
 				City:    "Offenbach am Main",
 			},
@@ -77,7 +83,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 				Longitude: 95.33326799999999,
 			},
 			want: &geocoder.ReverseGeocodeResponse{
-				Country: "CN",
+				Country: "China",
 				State:   "Gansu",
 				City:    "Xiaoquan East",
 			},
@@ -90,7 +96,7 @@ func TestServer_ReverseGeocode(t *testing.T) {
 				Longitude: -115.537396,
 			},
 			want: &geocoder.ReverseGeocodeResponse{
-				Country: "US",
+				Country: "United States of America",
 				State:   "Nevada",
 				City:    "White Pine County",
 			},
@@ -124,8 +130,9 @@ func TestServer_ReverseGeocode(t *testing.T) {
 		ctx := context.Background()
 		t.Run(tt.name, func(t *testing.T) {
 			s := &Server{
-				Client: tt.client,
-				Cache:  cache,
+				Client:         tt.client,
+				Cache:          cache,
+				CountryMapping: mappingHelper,
 			}
 			if tt.onBefore != nil {
 				tt.onBefore()
@@ -144,7 +151,7 @@ func loadReverseGeocodeResponse(t *testing.T, file string) *locationiq.ReverseGe
 	if err != nil {
 		t.Error(err)
 	}
-	
+
 	var result *locationiq.ReverseGeocodeResponse
 
 	json.Unmarshal(raw, &result)

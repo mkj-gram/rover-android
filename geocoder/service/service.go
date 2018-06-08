@@ -1,7 +1,6 @@
 package service
 
 import (
-	"strings"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -9,6 +8,7 @@ import (
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service/cache"
 	"github.com/roverplatform/rover/geocoder/service/locationiq"
+	"github.com/roverplatform/rover/geocoder/service/mappings"
 )
 
 var (
@@ -22,8 +22,9 @@ type LocationIQClient interface {
 
 // Server ...
 type Server struct {
-	Client LocationIQClient
-	Cache  *cache.Store
+	Client         LocationIQClient
+	Cache          *cache.Store
+	CountryMapping *mappings.Country
 }
 
 // ReverseGeocode given latitude & longitude returns reverse geocode
@@ -45,7 +46,7 @@ func (s *Server) ReverseGeocode(ctx context.Context, req *geocoder.ReverseGeocod
 	}
 
 	response = &geocoder.ReverseGeocodeResponse{
-		Country: getCountry(results),
+		Country: getCountry(results, s.CountryMapping),
 		State:   getState(results),
 		City:    getCity(results),
 	}
@@ -58,10 +59,11 @@ func (s *Server) ReverseGeocode(ctx context.Context, req *geocoder.ReverseGeocod
 	return response, nil
 }
 
-func getCountry(results *locationiq.ReverseGeocodeResponse) string {
+func getCountry(results *locationiq.ReverseGeocodeResponse, mappingHelper *mappings.Country) string {
+
 	countyCode := results.CountryCode
 	if countyCode != "" {
-		return strings.ToUpper(countyCode)
+		return mappingHelper.GetNameFromCountryCode(countyCode)
 	}
 	return ""
 }
@@ -78,7 +80,7 @@ func getCity(results *locationiq.ReverseGeocodeResponse) string {
 	city := results.City
 	if city != "" {
 		return city
-	}	
+	}
 
 	hamlet := results.Hamlet
 	if hamlet != "" {

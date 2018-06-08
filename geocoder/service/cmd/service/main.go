@@ -6,15 +6,17 @@ import (
 	"os"
 	"os/signal"
 	"time"
-	"github.com/newrelic/go-agent"
+
 	"github.com/go-redis/redis"
 	"github.com/namsral/flag"
+	"github.com/newrelic/go-agent"
 	"google.golang.org/grpc"
-	
+
 	"github.com/roverplatform/rover/apis/go/geocoder/v1"
 	"github.com/roverplatform/rover/geocoder/service"
 	"github.com/roverplatform/rover/geocoder/service/cache"
 	"github.com/roverplatform/rover/geocoder/service/locationiq"
+	"github.com/roverplatform/rover/geocoder/service/mappings"
 	"github.com/roverplatform/rover/go/grpc/middleware"
 	"github.com/roverplatform/rover/go/grpc/middleware/newrelic"
 )
@@ -32,6 +34,8 @@ var (
 
 	locationIqAPIKey    = flag.String("locationiq-api-key", "", "locationIQ api key")
 	locationIqZoomLevel = flag.Int("locationiq-zoom-level", 10, "locationIQ zoom level")
+
+	countryMappingFile = flag.String("country-mapping", "./mappings/ISO3166Countries.json", "country mapping file")
 )
 
 func main() {
@@ -41,10 +45,15 @@ func main() {
 	/*
 		Service handler setup
 	*/
-	
+
 	client, err := locationiq.NewClient(*locationIqAPIKey, *locationIqZoomLevel)
 	if err != nil {
 		log.Fatalf("locationIQ.NewClient: %v\n", err)
+	}
+
+	mappingHelper, err := mappings.NewCountry(*countryMappingFile)
+	if err != nil {
+		log.Fatalf("mappings.NewCountry: %v\n", err)
 	}
 
 	redisOpts, err := redis.ParseURL(*redisDsn)
@@ -54,7 +63,7 @@ func main() {
 	redisClient := redis.NewClient(redisOpts)
 	cacheStore := &cache.Store{Client: redisClient}
 
-	server := service.Server{Client: client, Cache: cacheStore}
+	server := service.Server{Client: client, Cache: cacheStore, CountryMapping: mappingHelper}
 
 	/*
 		GRPC setup

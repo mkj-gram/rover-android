@@ -264,6 +264,7 @@ services:
       REDIS_DSN: "redis://redis:6379/3"
       LOCATIONIQ_API_KEY: "926b09abbef41a"
       LOCATIONIQ_ZOOM_LEVEL: 10
+      COUNTRY_MAPPING: "./geocoder/service/mappings/ISO3166Countries.json"
 
   events-pipeline:
     image: roverio/golang-rdkafka:1.10-alpine
