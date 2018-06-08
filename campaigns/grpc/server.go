@@ -323,7 +323,12 @@ func (s *Server) scheduleTasks(ctx context.Context, tx *db.Tx, c *campaigns.Camp
 						AccountId:  int(c.AccountId),
 						CampaignId: int(c.CampaignId),
 
-						RunAt:          runAt.Add(time.Duration(tzOffsetSeconds) * time.Second),
+						// NOTE: subtracts the timeone offset: tz ahead reach scheduled time earlier
+						// ie: given the TimeZone=UTC and ScheduledTime=4pm (local device time)
+						// then
+						// - in America/Toronto(GMT-5) the scheduled time becomes 4pm-(-5h)=9pm UTC time
+						// - in GMT+2 the scheduled time becomes 4pm-(+2h)=2pm UTC time
+						RunAt:          runAt.Add(-time.Duration(tzOffsetSeconds) * time.Second),
 						TimezoneOffset: int(tzOffsetSeconds),
 
 						ScrollId: "",
@@ -350,13 +355,14 @@ func (s *Server) scheduleTasks(ctx context.Context, tx *db.Tx, c *campaigns.Camp
 			return nil, status.Errorf(codes.InvalidArgument, "validation: ScheduledTimestamp: is required.")
 		}
 		runAt = *c.ScheduledTimestamp()
+
+		if c.ScheduledUseLocalDeviceTime {
+			return taskIds, scheduleAtDeviceTime(runAt)
+		}
 	default:
 		return nil, status.Errorf(codes.InvalidArgument, "Scheduled Type: unknown: %q(%v)", scheduledType.String(), scheduledType)
 	}
 
-	if c.ScheduledUseLocalDeviceTime {
-		return taskIds, scheduleAtDeviceTime(runAt)
-	}
 	return taskIds, scheduleAtAbsoluteTime(runAt)
 }
 
@@ -480,6 +486,9 @@ func (s *Server) UpdateScheduledDeliverySettings(ctx context.Context, req *campa
 				return db.TimeNow(), true
 			case campaignspb.ScheduledType_SCHEDULED:
 				if prev.ScheduledType != update.ScheduledType {
+					if ts := update.ScheduledTimestamp(); ts == nil {
+						return time.Time{}, false
+					}
 					return *update.ScheduledTimestamp(), true
 				}
 

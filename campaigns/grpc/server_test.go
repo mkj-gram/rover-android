@@ -162,7 +162,7 @@ func TestCampaigns(t *testing.T) {
 	t.Run("UpdateAutomatedDeliverySettings", test_UpdateAutomatedDeliverySettings)
 
 	t.Run("UpdateScheduledDeliverySettings", test_UpdateScheduledDeliverySettings)
-	//t.Run("UpdateScheduledDeliverySettings/Published", test_UpdateScheduledDeliverySettings_Published)
+	t.Run("UpdateScheduledDeliverySettings/Published", test_UpdateScheduledDeliverySettings_Published)
 
 	t.Run("Load", test_LoadCampaign)
 }
@@ -2117,7 +2117,6 @@ func test_UpdateScheduledDeliverySettings(t *testing.T) {
 	}
 }
 
-/*
 func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 	var (
 		ctx         = context.Background()
@@ -2150,8 +2149,10 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 2},
 				CampaignId:  8,
 
-				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
-				ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494+00:00"),
+				ScheduledType: campaignspb.ScheduledType_SCHEDULED,
+				// ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494+00:00"),
+				ScheduledTime:               &wrappers.Int32Value{Value: 16*3600 + 26*60 + 25},
+				ScheduledDate:               &campaignspb.Date{Day: 04, Month: 05, Year: 2017},
 				ScheduledTimeZone:           "America/Toronto",
 				ScheduledUseLocalDeviceTime: false,
 			},
@@ -2170,9 +2171,11 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
 
-							ScheduledType:      campaignspb.ScheduledType_SCHEDULED,
-							ScheduledTimeZone:  "America/Toronto",
-							ScheduledTimestamp: ts(t, "2017-05-04T16:26:25.445494Z"),
+							ScheduledType:     campaignspb.ScheduledType_SCHEDULED,
+							ScheduledTimeZone: "America/Toronto",
+							// ScheduledTimestamp: ts(t, "2017-05-04T16:26:25.445494Z"),
+							ScheduledTime: &wrappers.Int32Value{Value: 16*3600 + 26*60 + 25},
+							ScheduledDate: &campaignspb.Date{Day: 04, Month: 05, Year: 2017},
 						},
 					},
 				},
@@ -2182,7 +2185,7 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 						AccountId:  2,
 						CampaignId: 8,
 						DeviceIds:  nil,
-						RunAt:      ts2(t, "2017-05-04T16:26:25.445494Z"),
+						RunAt:      ts2(t, "2017-05-04T16:26:25.000000-04:00"),
 						State:      "queued",
 					},
 				},
@@ -2214,9 +2217,9 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
 
-							ScheduledType:               campaignspb.ScheduledType_NOW,
-							ScheduledTimeZone:           "America/Toronto",
-							ScheduledTimestamp:          nil,
+							ScheduledType:     campaignspb.ScheduledType_NOW,
+							ScheduledTimeZone: "America/Toronto",
+							// ScheduledTimestamp:          nil,
 							ScheduledUseLocalDeviceTime: false,
 						},
 					},
@@ -2235,14 +2238,13 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 		},
 
 		{
-			name: "use_local_device_time=true: scheduled_type=now: creates tasks scheduled for NOW",
+			name: "use_local_device_time=true: scheduled_type=now: creates task scheduled for NOW",
 			req: &campaignspb.UpdateScheduledDeliverySettingsRequest{
 				AuthContext: &auth.AuthContext{AccountId: 2},
 				CampaignId:  8,
 
-				ScheduledType:               campaignspb.ScheduledType_NOW,
-				ScheduledTimeZone:           "America/Toronto",
-				ScheduledUseLocalDeviceTime: true,
+				ScheduledType:     campaignspb.ScheduledType_NOW,
+				ScheduledTimeZone: "America/Toronto",
 			},
 
 			after: &expect{
@@ -2259,15 +2261,22 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
 
-							ScheduledType:               campaignspb.ScheduledType_NOW,
-							ScheduledTimeZone:           "America/Toronto",
-							ScheduledTimestamp:          nil,
-							ScheduledUseLocalDeviceTime: true,
+							ScheduledType:     campaignspb.ScheduledType_NOW,
+							ScheduledTimeZone: "America/Toronto",
+							// ScheduledTimestamp:          nil,
 						},
 					},
 				},
 
-				Tasks: tasksInTimezones(timeUpdatedAt, zoneinfo.UniqueOffsets, 2, 8),
+				Tasks: []*Task{
+					{
+						AccountId:  2,
+						CampaignId: 8,
+						DeviceIds:  nil,
+						RunAt:      timeUpdatedAt,
+						State:      "queued",
+					},
+				},
 			},
 		},
 
@@ -2278,9 +2287,11 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 				CampaignId:  8,
 
 				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
-				ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
 				ScheduledTimeZone:           "America/Toronto",
 				ScheduledUseLocalDeviceTime: true,
+				// ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
+				ScheduledTime: &wrappers.Int32Value{Value: 16*3600 + 26*60 + 25},
+				ScheduledDate: &campaignspb.Date{Day: 04, Month: 05, Year: 2017},
 			},
 
 			after: &expect{
@@ -2299,13 +2310,17 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 
 							ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
 							ScheduledTimeZone:           "America/Toronto",
-							ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
 							ScheduledUseLocalDeviceTime: true,
+							// ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
+							ScheduledTime: &wrappers.Int32Value{Value: 16*3600 + 26*60 + 25},
+							ScheduledDate: &campaignspb.Date{Day: 04, Month: 05, Year: 2017},
 						},
 					},
 				},
 
-				Tasks: tasksInTimezones(ts2(t, "2017-05-04T16:26:25.445494Z"), zoneinfo.UniqueOffsets, 2, 8),
+				// TODO: will this break once DST is over?
+				// note hardcoded -04:00 tz
+				Tasks: tasksInTimezones(ts2(t, "2017-05-04T16:26:25.000000-04:00").UTC(), zoneinfo.UniqueOffsets, 2, 8),
 			},
 		},
 
@@ -2316,9 +2331,11 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 				CampaignId:  8,
 
 				ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
-				ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
 				ScheduledTimeZone:           "America/Toronto",
 				ScheduledUseLocalDeviceTime: false,
+				// ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
+				ScheduledTime: &wrappers.Int32Value{Value: 16*3600 + 26*60 + 25},
+				ScheduledDate: &campaignspb.Date{Day: 04, Month: 05, Year: 2017},
 			},
 
 			after: &expect{
@@ -2337,8 +2354,10 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 
 							ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
 							ScheduledTimeZone:           "America/Toronto",
-							ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
 							ScheduledUseLocalDeviceTime: false,
+							// ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
+							ScheduledTime: &wrappers.Int32Value{Value: 16*3600 + 26*60 + 25},
+							ScheduledDate: &campaignspb.Date{Day: 04, Month: 05, Year: 2017},
 						},
 					},
 				},
@@ -2347,7 +2366,7 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 					{
 						AccountId:      2,
 						CampaignId:     8,
-						RunAt:          ts2(t, "2017-05-04T16:26:25.445494Z"),
+						RunAt:          ts2(t, "2017-05-04T16:26:25.000000-04:00"),
 						State:          "queued",
 						TimezoneOffset: 0,
 					},
@@ -2418,7 +2437,7 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 		})
 	}
 }
-*/
+
 func test_LoadCampaign(t *testing.T) {
 	var (
 		ctx         = context.Background()
@@ -2657,7 +2676,7 @@ func campaignTasks(ctx context.Context, db *db.DB, accountId, campaignId int32) 
 
 func tasksInTimezones(runAt time.Time, offsets []int, acctId, campaignId int32) []*Task {
 	var tasks []*Task
-	for _, offset := range zoneinfo.UniqueOffsets {
+	for _, offset := range offsets {
 
 		tasks = append(tasks, &Task{
 			AccountId:  int(acctId),
@@ -2667,7 +2686,7 @@ func tasksInTimezones(runAt time.Time, offsets []int, acctId, campaignId int32) 
 			State: "queued",
 
 			TimezoneOffset: int(offset),
-			RunAt:          runAt.Add(time.Duration(offset) * time.Second),
+			RunAt:          runAt.Add(-time.Duration(offset) * time.Second),
 		})
 	}
 
