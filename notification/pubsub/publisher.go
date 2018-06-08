@@ -80,7 +80,6 @@ func validateMessage(message Message) error {
 	case *PushMessage:
 		return va.All(
 			va.Value("notification_body", m.NotificationBody, va.Require),
-			va.Value("notification_title", m.NotificationTitle, va.Require),
 			va.Value("device.id", m.Device.ID, va.Require),
 		)
 
