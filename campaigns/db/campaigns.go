@@ -245,6 +245,7 @@ func CampaignUpdateStatus(dbCtx namedExecer, ctx context.Context, accountId, cam
 				WHERE
 					account_id = :account_id
 					AND			id = :campaign_id
+					AND	campaign_status != :campaign_status
 			`
 	)
 

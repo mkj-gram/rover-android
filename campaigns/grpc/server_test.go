@@ -1391,6 +1391,62 @@ func test_Publish(t *testing.T) {
 
 			exp: &campaignspb.PublishResponse{},
 		},
+
+		{
+			name: "error: scheduled: second publish fails",
+			req: &campaignspb.PublishRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				CampaignId:  3,
+			},
+
+			before: &expect{
+				exp: &campaign{
+					AccountId: 1,
+					Campaign: &campaignspb.Campaign{
+						&campaignspb.Campaign_ScheduledNotificationCampaign{
+							&campaignspb.ScheduledNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494Z"),
+								UpdatedAt: updatedAt,
+
+								CampaignId:     3,
+								CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+								Name:           "c3",
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+							},
+						},
+					},
+				},
+			},
+
+			after: &expect{
+				exp: &campaign{
+					AccountId: 1,
+					Campaign: &campaignspb.Campaign{
+						&campaignspb.Campaign_ScheduledNotificationCampaign{
+							&campaignspb.ScheduledNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: updatedAt,
+
+								CampaignId:     3,
+								CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+								Name:           "c3",
+
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+							},
+						},
+					},
+				},
+			},
+
+			expErr: status.Errorf(codes.NotFound, "campaigns.UpdateStatus: db.Update: sql: no rows in result set"),
+		},
 	}
 
 	for _, tt := range tests {
