@@ -141,7 +141,6 @@ describe('Client', function() {
 				.then(_ => consumer.seekLast(0))
 				.then(_ => client.connect())
 				.then(_ => client.submit(context, deviceIdentifier, input))
-				.then(_ => client.flush())
 				.then(_ => consumer.next())
 				.then(msg => {
 					

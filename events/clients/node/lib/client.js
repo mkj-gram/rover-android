@@ -1,6 +1,8 @@
+const Wait          = require('./wait')
 const Kafka         = require('node-rdkafka')
 const Serializer    = require('./serializer')
 const AuthContext   = require('@rover/apis').auth.v1.Models.AuthContext
+const uuid          = require('uuid/v1');
 
 
 var Client = function(config) {
@@ -9,27 +11,37 @@ var Client = function(config) {
 	let kafkaDefaultConfig = {
 		'metadata.broker.list': 'kafka:9092',
 		'compression.codec': 'snappy',
-		'retry.backoff.ms': 10,
+		'retry.backoff.ms': 100,
 		'message.send.max.retries': 3,
-		'request.required.acks': 1,
 		'socket.keepalive.enable': true,
-		'queue.buffering.max.messages': 50000,
-		'queue.buffering.max.ms': 1000,
-		'batch.num.messages': 1000,
+		'queue.buffering.max.messages': 50000, // Maximum messages we can buffer in memory before rejecting
+		'queue.buffering.max.ms': 250,         // How often we should flush the internal buffer
+		'batch.num.messages': 10000,           // How many messages we send to kafka on each flush
 	}
 
 	this._topic = c.topic || "events"
 	// Allow for overiding of any of the defaults
-	this._producer = new Kafka.Producer(Object.assign(kafkaDefaultConfig, c.kafka));
+	const kafkaConfig = Object.assign(kafkaDefaultConfig, c.kafka, { 'dr_cb': true })
+	this._producer = new Kafka.Producer(kafkaConfig, { 'request.required.acks': -1 });
+	
+	this._waiter = new Wait()
 }
 
 Client.prototype.connect = function() {
 	return new Promise((resolve, reject) => {
 		let producer = this._producer
+		let waiter   = this._waiter
 		producer.connect(null, function(err, data) {
 			if (err) {
 				return reject(err)
 			}
+
+			producer.setPollInterval(50)
+			producer.on('delivery-report', function(err, report) {
+				let key = report.opaque
+				waiter.notify(key, err)
+			})
+
 			return resolve()
 		})
 	})
@@ -79,36 +91,74 @@ Client.prototype.disconnect = function() {
  * @return {Promise}                 
  */
 Client.prototype.submit = function(auth, key, event) {
+	return this.submitBatch([{ auth: auth, key: key, event: event }])
+}
+
+
+/**
+ * Submit a batch of events to the pipeline's kafka input topic. Only returning when all succesfully publish 
+ * or an individial message fails
+ * @param  {AuthContext} auth        
+ * @param  {String} key 	the key to use while selecting a kafka partition
+ * @param  {Object} event            
+ * @return {Promise}                 
+ */
+Client.prototype.submitBatch = function(batch) {
 	return new Promise((resolve, reject) => {
+		if (!Array.isArray(batch)) {
+			return reject(new Error("batch must be an array"))
+		}
+
 		const producer = this._producer
-		
+		const waiter   = this._waiter
+
 		if (!producer.isConnected()) {
 			return reject(new Error("client is not connected: please call connect() before calling submit()"))
 		}
 
-		if (auth === null || auth === undefined ||  !(auth instanceof AuthContext)) {
-			return reject(new TypeError("auth is not defined or of type AuthContext"))
-		}
+		let group = []
 
-		if (key === null || key === undefined || key === "") {
-			return reject(new TypeError("partition key cannot be empty"))
+		for (let i = 0; i < batch.length; i++) {
+			let { auth, key, event } = batch[i]
+
+			if (auth === null || auth === undefined ||  !(auth instanceof AuthContext)) {
+				return reject(new TypeError("auth is not defined or of type AuthContext"))
+			}
+
+			if (key === null || key === undefined || key === "") {
+				return reject(new TypeError("partition key cannot be empty"))
+			}
+
+			const payload = Serializer.serializeEvent(event)
+			payload.setAuthContext(auth)
+			
+			try {
+				let waitKey = uuid()
+				producer.produce(
+					this._topic,
+					null, // defaults to consistent random for keyed messages
+					new Buffer(payload.serializeBinary()),
+					key,
+					Date.now(),
+					waitKey
+				)
+				group.push(waitKey)
+			} catch(err) {
+				return reject(err)
+			}
 		}
 		
-		const payload = Serializer.serializeEvent(event)
-		payload.setAuthContext(auth)
-		
-		try {
-			producer.produce(
-				this._topic,
-				null, // defaults to consistent random for keyed messages
-				new Buffer(payload.serializeBinary()),
-				key,
-				Date.now()
-			)
-			return resolve()
-		} catch(err) {
-			return reject(err)
-		}
+		Promise.all(group.map(function(key) {
+			return new Promise((resolve, reject) => {
+				waiter.on(key, function(err) {
+					if (err) {
+						return reject(err)
+					}
+					return resolve()
+				})
+			})
+		})).catch(err => reject(err))
+		.then(_ => resolve())
 	})
 }
 

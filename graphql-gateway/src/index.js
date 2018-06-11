@@ -88,12 +88,13 @@ async function main() {
                 accountToken: req.headers['x-rover-account-token'],
                 clients: clients
             },
-            formatError: (error) => {
+            formatError: (err) => {
+                console.error(err.originalError && err.originalError.stack || err.stack)
+
                 return {
-                    message: error.message,
-                    locations: error.locations,
-                    stack: error.stack,
-                    path: error.path
+                    message: err.message,
+                    locations: err.locations,
+                    path: err.path,
                 }
             }
         })))
