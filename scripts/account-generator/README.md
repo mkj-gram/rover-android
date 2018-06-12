@@ -2,5 +2,5 @@
 
 Example
 ```bash
-./generate --acount-id 1 --num-records 5000
+./generate --account-id 1 --num-records 5000
 ```

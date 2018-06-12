@@ -14,7 +14,7 @@ const style = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'fixed',
+    position: 'absolute',
     right: 0,
     zIndex: 1
 }
@@ -119,7 +119,7 @@ class RowActionButton extends Component {
                         >
                             <VerticalEllipseIcon fill={ellipseColor} width="4px" height="16px" />
                         </div>
-                        : <div style={{ ...style, zIndex: 0, borderLeft: 'none' }} />
+                        : <div style={{ ...style, zIndex: 0, borderLeft: 'none' }} /> // required for popover anchor 
                     }
                     <div
                         style={{
