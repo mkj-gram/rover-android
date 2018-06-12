@@ -234,9 +234,28 @@ func (s *Server) Publish(ctx context.Context, req *campaignspb.PublishRequest) (
 		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
 	}
 
+	c, err := s.DB.CampaignsStore().OneById(ctx, acctId, req.CampaignId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "campaigns.OneById: %v", err)
+	}
+
+	var proto campaignspb.Campaign
+	if err := CampaignToProto(c, &proto); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "CampaignToProto: %v", err)
+	}
+
+	if err := validateCampaign(&proto); err != nil {
+		return nil, status.Errorf(codes.FailedPrecondition, "validate: %v", err)
+	}
+
 	var (
-		cStatus = campaignspb.CampaignStatus_PUBLISHED.String()
+		publishedStatus  = campaignspb.CampaignStatus_PUBLISHED
+		alreadyPublished = proto.GetScheduledNotificationCampaign().CampaignStatus == publishedStatus
 	)
+
+	if alreadyPublished {
+		return nil, status.Errorf(codes.FailedPrecondition, "already published")
+	}
 
 	tx, err := s.DB.Begin()
 	if err != nil {
@@ -245,13 +264,8 @@ func (s *Server) Publish(ctx context.Context, req *campaignspb.PublishRequest) (
 
 	defer tx.Rollback()
 
-	if err := tx.CampaignsStore().UpdateStatus(ctx, acctId, req.CampaignId, cStatus); err != nil {
+	if err := tx.CampaignsStore().UpdateStatus(ctx, acctId, req.CampaignId, publishedStatus.String()); err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "campaigns.UpdateStatus: %v", err)
-	}
-
-	c, err := s.DB.CampaignsStore().OneById(ctx, acctId, req.CampaignId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(err), "campaigns.OneById: %v", err)
 	}
 
 	var (
@@ -614,6 +628,20 @@ func (s *Server) SendTest(ctx context.Context, req *campaignspb.SendTestRequest)
 		va.Value("campaign_id", req.CampaignId, va.Require),
 	); err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
+	}
+
+	c, err := s.DB.CampaignsStore().OneById(ctx, acctId, req.CampaignId)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "campaigns.OneById: %v", err)
+	}
+
+	var proto campaignspb.Campaign
+	if err := CampaignToProto(c, &proto); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "CampaignToProto: %v", err)
+	}
+
+	if err := validateCampaign(&proto); err != nil {
+		return nil, status.Errorf(codes.FailedPrecondition, "validate: %v", err)
 	}
 
 	if len(req.DeviceIds) == 0 {

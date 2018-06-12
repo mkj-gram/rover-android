@@ -271,7 +271,7 @@ message UpdateScheduledDeliverySettingsRequest{
 
   ScheduledType.Enum        scheduled_type                            = 13;
   Date                      scheduled_date                            = 14;
-  rover.protobuf.Int32Value scheduled_time                            = 15; 
+  rover.protobuf.Int32Value scheduled_time                            = 15;
   string                    scheduled_time_zone                       = 16;
   bool                      scheduled_use_local_device_time           = 17;
 }

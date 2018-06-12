@@ -331,6 +331,11 @@ func test_List(t *testing.T) {
 								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 
+								NotificationTitle: "a title",
+								NotificationBody:  "a body",
+
+								NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
+
 								CampaignId:     3,
 								Name:           "c3",
 								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
@@ -1329,7 +1334,7 @@ func test_Publish(t *testing.T) {
 				CampaignId:  404,
 			},
 
-			expErr: status.Errorf(codes.NotFound, "campaigns.UpdateStatus: db.Update: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "campaigns.OneById: db.Get: sql: no rows in result set"),
 		},
 
 		{
@@ -1351,6 +1356,11 @@ func test_Publish(t *testing.T) {
 							&campaignspb.ScheduledNotificationCampaign{
 								CreatedAt: ts(t, "2017-05-04T16:26:25.445494Z"),
 								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494Z"),
+
+								NotificationBody:  "a body",
+								NotificationTitle: "a title",
+
+								NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
 
 								CampaignId:     3,
 								CampaignStatus: campaignspb.CampaignStatus_DRAFT,
@@ -1375,9 +1385,14 @@ func test_Publish(t *testing.T) {
 								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt: updatedAt,
 
+								NotificationBody:  "a body",
+								NotificationTitle: "a title",
+
 								CampaignId:     3,
 								CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
 								Name:           "c3",
+
+								NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
 
 								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
@@ -1414,6 +1429,10 @@ func test_Publish(t *testing.T) {
 
 								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
+								NotificationTitle:           "a title",
+								NotificationBody:            "a body",
+								NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
+
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
 							},
@@ -1437,6 +1456,10 @@ func test_Publish(t *testing.T) {
 
 								SegmentCondition: campaignspb.SegmentCondition_ALL,
 
+								NotificationTitle:           "a title",
+								NotificationBody:            "a body",
+								NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
+
 								NotificationExpiration:                  -1,
 								NotificationAlertOptionPushNotification: true,
 							},
@@ -1445,7 +1468,7 @@ func test_Publish(t *testing.T) {
 				},
 			},
 
-			expErr: status.Errorf(codes.NotFound, "campaigns.UpdateStatus: db.Update: sql: no rows in result set"),
+			expErr: status.Errorf(codes.FailedPrecondition, "already published"),
 		},
 	}
 
@@ -2224,6 +2247,9 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
 							Name:           "c8",
 
+							NotificationBody:            "a body",
+							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
+
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
 
@@ -2270,6 +2296,9 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
 							Name:           "c8",
 
+							NotificationBody:            "a body",
+							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
+
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
 
@@ -2313,6 +2342,9 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							CampaignId:     8,
 							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
 							Name:           "c8",
+
+							NotificationBody:            "a body",
+							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
 
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
@@ -2361,6 +2393,9 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							CampaignId:     8,
 							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
 
+							NotificationBody:            "a body",
+							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
+
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
 
@@ -2404,6 +2439,9 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							Name:           "c8",
 							CampaignId:     8,
 							CampaignStatus: campaignspb.CampaignStatus_PUBLISHED,
+
+							NotificationBody:            "a body",
+							NotificationTapBehaviorType: campaignspb.NotificationTapBehaviorType_OPEN_APP,
 
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
