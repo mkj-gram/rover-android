@@ -128,7 +128,7 @@ func TestCampaigns(t *testing.T) {
 	}
 
 	var m = tCfg.migration
-	t.Logf("Migrations: cmd=%q path=%q", m.Cmd, m.Path)
+	t.Logf("Config: %v", tCfg)
 	tDb.MigrationStatus()
 	if m.Path != "" && m.Cmd != "" {
 		if err := tDb.Migrate(m.Cmd, m.Args); err != nil {
