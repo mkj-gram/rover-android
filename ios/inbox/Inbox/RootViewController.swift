@@ -118,10 +118,9 @@ class RootViewController: UIViewController {
         }
         
         Rover.initialize(assemblers: [
-            FoundationAssembler(accountToken: accountToken, loggerThreshold: .debug),
-            EventsAssembler(),
-            UIAssembler(),
-            ApplicationAssembler(associatedDomains: ["inbox.rover.io"], urlSchemes: ["rv-inbox"]),
+            FoundationAssembler(loggerThreshold: .debug),
+            DataAssembler(accountToken: accountToken),
+            UIAssembler(associatedDomains: ["inbox.rover.io"], urlSchemes: ["rv-inbox"]),
             ExperiencesAssembler(),
             NotificationsAssembler(appGroup: "group.io.rover.inbox"),
             LocationAssembler(),

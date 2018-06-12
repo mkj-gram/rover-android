@@ -25,10 +25,10 @@ public struct NotificationsAssembler: Assembler {
     
     public func assemble(container: Container) {
         
-        // MARK: ContextProvider (notification)
+        // MARK: ContextProvider (notificationAuthorization)
         
-        container.register(ContextProvider.self, name: "notification") { resolver in
-            return NotificationContextProvider(userNotificationCenter: UNUserNotificationCenter.current())
+        container.register(ContextProvider.self, name: "notificationAuthorization") { resolver in
+            return NotificationAuthorizationContextProvider(userNotificationCenter: UNUserNotificationCenter.current())
         }
         
         // MARK: InfluenceTracker
@@ -43,7 +43,7 @@ public struct NotificationsAssembler: Assembler {
         // MARK: NotificationStore
         
         container.register(NotificationStore.self) { [maxNotifications] resolver in
-            let client = resolver.resolve(APIClient.self)!
+            let client = resolver.resolve(GraphQLClient.self)!
             let eventQueue = resolver.resolve(EventQueue.self)
             let logger = resolver.resolve(Logger.self)!
             let stateFetcher = resolver.resolve(StateFetcher.self)!
@@ -81,11 +81,6 @@ public struct NotificationsAssembler: Assembler {
     }
     
     public func containerDidAssemble(resolver: Resolver) {
-        if let eventQueue = resolver.resolve(EventQueue.self) {
-            let contextProvider = resolver.resolve(ContextProvider.self, name: "notification")!
-            eventQueue.addContextProviders(contextProvider)
-        }
-        
         if let frameworksRegistry = resolver.resolve(FrameworksRegistry.self) {
             frameworksRegistry.register("io.rover.RoverNotifications")
         }

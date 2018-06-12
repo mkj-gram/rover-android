@@ -7,13 +7,9 @@
 //
 
 public struct FoundationAssembler: Assembler {
-    public var accountToken: String
-    public var endpoint: URL
     public var loggerThreshold: LogLevel
     
-    public init(accountToken: String, endpoint: URL = URL(string: "https://api.rover.io/graphql")!, loggerThreshold: LogLevel = .warn) {
-        self.accountToken = accountToken
-        self.endpoint = endpoint
+    public init(loggerThreshold: LogLevel = .warn) {
         self.loggerThreshold = loggerThreshold
     }
 
@@ -34,25 +30,10 @@ public struct FoundationAssembler: Assembler {
             return FrameworksRegistryService(logger: logger)
         }
         
-        // MARK: APIClient
-        
-        container.register(APIClient.self) { [accountToken, endpoint] resolver in
-            let session = URLSession(configuration: URLSessionConfiguration.default)
-            return APIClientService(accountToken: accountToken, endpoint: endpoint, session: session)
-        }
-        
         // MARK: Logger
         
         container.register(Logger.self) { _ in
             return LoggerService(threshold: self.loggerThreshold)
-        }
-        
-        // MARK: StateFetcher
-        
-        container.register(StateFetcher.self) { resolver in
-            let client = resolver.resolve(APIClient.self)!
-            let logger = resolver.resolve(Logger.self)!
-            return StateFetcherService(client: client, logger: logger)
         }
     }
     

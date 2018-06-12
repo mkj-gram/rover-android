@@ -30,7 +30,7 @@ public struct LocationAssembler: Assembler {
         }
         
         container.register(RegionStore.self) { resolver in
-            let client = resolver.resolve(APIClient.self)!
+            let client = resolver.resolve(GraphQLClient.self)!
             let logger = resolver.resolve(Logger.self)!
             let stateFetcher = resolver.resolve(StateFetcher.self)!
             return RegionStoreService(client: client, logger: logger, stateFetcher: stateFetcher)
@@ -38,10 +38,6 @@ public struct LocationAssembler: Assembler {
     }
     
     public func containerDidAssemble(resolver: Resolver) {
-        let contextProvider = resolver.resolve(ContextProvider.self, name: "location")!
-        let eventQueue = resolver.resolve(EventQueue.self)!
-        eventQueue.addContextProviders(contextProvider)
-        
         if let frameworksRegistry = resolver.resolve(FrameworksRegistry.self) {
             frameworksRegistry.register("io.rover.RoverLocation")
         }

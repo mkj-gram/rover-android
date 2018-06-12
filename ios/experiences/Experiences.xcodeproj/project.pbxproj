@@ -17,12 +17,12 @@
 		DB6ADD9620B3634F002F226C /* RoverExperiences.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD4820B30E7F002F226C /* RoverExperiences.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DB6ADD9820B3634F002F226C /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD9720B3634F002F226C /* RoverUI.framework */; };
 		DB6ADD9920B3634F002F226C /* RoverUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD9720B3634F002F226C /* RoverUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DB6ADD9E20B37763002F226C /* RoverEvents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD9C20B3774C002F226C /* RoverEvents.framework */; };
-		DB6ADD9F20B37763002F226C /* RoverEvents.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD9C20B3774C002F226C /* RoverEvents.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBBEC93A20B5F2C600691F08 /* Auth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC93920B5F2C600691F08 /* Auth.framework */; };
 		DBBEC93B20B5F2C600691F08 /* Auth.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC93920B5F2C600691F08 /* Auth.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBBEC93D20B5F2C600691F08 /* Components.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC93C20B5F2C600691F08 /* Components.framework */; };
 		DBBEC93E20B5F2C600691F08 /* Components.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBBEC93C20B5F2C600691F08 /* Components.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBD88AF320C1BFD900085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AF220C1BFD900085AE0 /* RoverData.framework */; };
+		DBD88AF420C1BFD900085AE0 /* RoverData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AF220C1BFD900085AE0 /* RoverData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBE03B4920B0864C00F3CE95 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B4820B0864C00F3CE95 /* AppDelegate.swift */; };
 		DBE03B4E20B0864C00F3CE95 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DBE03B4C20B0864C00F3CE95 /* Main.storyboard */; };
 		DBE03B5020B0864E00F3CE95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DBE03B4F20B0864E00F3CE95 /* Assets.xcassets */; };
@@ -36,8 +36,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				DB6ADD9F20B37763002F226C /* RoverEvents.framework in Embed Frameworks */,
 				DBBEC93B20B5F2C600691F08 /* Auth.framework in Embed Frameworks */,
+				DBD88AF420C1BFD900085AE0 /* RoverData.framework in Embed Frameworks */,
 				DB6ADD9420B3634F002F226C /* RoverFoundation.framework in Embed Frameworks */,
 				DB6ADD9920B3634F002F226C /* RoverUI.framework in Embed Frameworks */,
 				DBBEC93E20B5F2C600691F08 /* Components.framework in Embed Frameworks */,
@@ -59,6 +59,7 @@
 		DB6ADD9C20B3774C002F226C /* RoverEvents.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverEvents.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBBEC93920B5F2C600691F08 /* Auth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Auth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBBEC93C20B5F2C600691F08 /* Components.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Components.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBD88AF220C1BFD900085AE0 /* RoverData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBE03B4520B0864C00F3CE95 /* Experiences.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Experiences.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBE03B4820B0864C00F3CE95 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DBE03B4D20B0864C00F3CE95 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -72,8 +73,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB6ADD9E20B37763002F226C /* RoverEvents.framework in Frameworks */,
 				DBBEC93A20B5F2C600691F08 /* Auth.framework in Frameworks */,
+				DBD88AF320C1BFD900085AE0 /* RoverData.framework in Frameworks */,
 				DB6ADD9320B3634F002F226C /* RoverFoundation.framework in Frameworks */,
 				DB6ADD9820B3634F002F226C /* RoverUI.framework in Frameworks */,
 				DBBEC93D20B5F2C600691F08 /* Components.framework in Frameworks */,
@@ -117,6 +118,7 @@
 		DBE03B3C20B0864C00F3CE95 = {
 			isa = PBXGroup;
 			children = (
+				DBD88AF220C1BFD900085AE0 /* RoverData.framework */,
 				DBBEC93C20B5F2C600691F08 /* Components.framework */,
 				DBBEC93920B5F2C600691F08 /* Auth.framework */,
 				DB6ADD9720B3634F002F226C /* RoverUI.framework */,

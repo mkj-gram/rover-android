@@ -7,7 +7,7 @@
 //
 
 #import <CoreBluetooth/CoreBluetooth.h>
-#import <RoverEvents/RoverEvents.h>
+#import <RoverData/RoverData.h>
 
 //! Project version number for RoverBluetooth.
 FOUNDATION_EXPORT double RoverBluetoothVersionNumber;

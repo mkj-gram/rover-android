@@ -26,8 +26,9 @@ class NavigationController: UINavigationController {
         
         let accountToken = Session.shared.info!.sdkToken
         Rover.initialize(assemblers: [
-            FoundationAssembler(accountToken: accountToken),
-            UIAssembler(),
+            FoundationAssembler(),
+            DataAssembler(accountToken: accountToken),
+            UIAssembler(isApplicationSessionTrackingEnabled: false, isApplicationVersionTrackingEnabled: false),
             ExperiencesAssembler()
         ])
     }

@@ -7,7 +7,7 @@
 //
 
 #import <CoreLocation/CoreLocation.h>
-#import <RoverEvents/RoverEvents.h>
+#import <RoverData/RoverData.h>
 
 //! Project version number for RoverLocation.
 FOUNDATION_EXPORT double RoverLocationVersionNumber;

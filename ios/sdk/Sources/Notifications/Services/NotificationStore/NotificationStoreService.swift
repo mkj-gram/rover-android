@@ -7,7 +7,7 @@
 //
 
 class NotificationStoreService: NotificationStore {
-    let client: APIClient
+    let client: GraphQLClient
     let eventQueue: EventQueue?
     let logger: Logger
     let maxSize: Int
@@ -21,7 +21,7 @@ class NotificationStoreService: NotificationStore {
     var observers = ObserverSet<[Notification]>()
     var stateObservation: NSObjectProtocol?
     
-    init(maxSize: Int, client: APIClient, eventQueue: EventQueue?, logger: Logger, stateFetcher: StateFetcher) {
+    init(maxSize: Int, client: GraphQLClient, eventQueue: EventQueue?, logger: Logger, stateFetcher: StateFetcher) {
         self.client = client
         self.eventQueue = eventQueue
         self.logger = logger
@@ -108,31 +108,10 @@ class NotificationStoreService: NotificationStore {
     static let fragments = ["notificationFields"]
     
     struct FetchQuery: GraphQLOperation {
-        static var identifier: String {
-            if let UIDeviceClass = NSClassFromString("UIDevice") {
-                let currentDeviceSelector = NSSelectorFromString("currentDevice")
-                if let currentIMP = UIDeviceClass.method(for: currentDeviceSelector) {
-                    typealias currentFunc = @convention(c) (AnyObject, Selector) -> AnyObject?
-                    let curriedImplementation = unsafeBitCast(currentIMP, to: currentFunc.self)
-                    if let device = curriedImplementation(UIDeviceClass.self, currentDeviceSelector) {
-                        let identifierForVendorSelector = NSSelectorFromString("identifierForVendor")
-                        if let identifierForVendorIMP = device.method(for: identifierForVendorSelector) {
-                            typealias identifierForVendorFunc = @convention(c) (AnyObject, Selector) -> NSUUID?
-                            let curriedImplementation2 = unsafeBitCast(identifierForVendorIMP, to: identifierForVendorFunc.self)
-                            if let identifierForVendor = curriedImplementation2(device, identifierForVendorSelector) {
-                                return identifierForVendor.uuidString
-                            }
-                        }
-                    }
-                }
-            }
-            return ""
-        }
-        
         var query: String {
             return """
                 query {
-                    device(identifier:\"\(FetchQuery.identifier)\") {
+                    device(identifier:\"\(UIDevice.current.identifierForVendor?.uuidString ?? "")\") {
                         \(NotificationStoreService.queryFragment)
                     }
                 }

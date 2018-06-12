@@ -9,10 +9,20 @@
 import SafariServices
 
 public struct UIAssembler {
-    public let sessionKeepAliveTime: Int
+    public var associatedDomains: [String]
+    public var urlSchemes: [String]
     
-    public init(sessionKeepAliveTime: Int = 30) {
+    public var sessionKeepAliveTime: Int
+    
+    public var isApplicationSessionTrackingEnabled: Bool
+    public var isApplicationVersionTrackingEnabled: Bool
+    
+    public init(associatedDomains: [String] = [], urlSchemes: [String] = [], sessionKeepAliveTime: Int = 30, isApplicationSessionTrackingEnabled: Bool = true, isApplicationVersionTrackingEnabled: Bool = true) {
+        self.associatedDomains = associatedDomains
+        self.urlSchemes = urlSchemes
         self.sessionKeepAliveTime = sessionKeepAliveTime
+        self.isApplicationSessionTrackingEnabled = isApplicationSessionTrackingEnabled
+        self.isApplicationVersionTrackingEnabled = isApplicationVersionTrackingEnabled
     }
 }
 
@@ -20,6 +30,15 @@ public struct UIAssembler {
 
 extension UIAssembler: Assembler {
     public func assemble(container: Container) {
+        
+        // MARK: ApplicationMonitor
+        
+        container.register(ApplicationMonitor.self) { resolver in
+            let eventQueue = resolver.resolve(EventQueue.self)!
+            let logger = resolver.resolve(Logger.self)!
+            let sessionController = resolver.resolve(SessionController.self)!
+            return ApplicationMonitorService(bundle: Bundle.main, eventQueue: eventQueue, logger: logger, sessionController: sessionController, userDefaults: UserDefaults.standard)
+        }
         
         // MARK: ImageStore
         
@@ -43,6 +62,13 @@ extension UIAssembler: Assembler {
             return PresentViewOperation(viewControllerToPresent: viewControllerToPresent, animated: true, logger: logger)
         }
         
+        // MARK: Router
+        
+        container.register(Router.self) { resolver in
+            let dispatcher = resolver.resolve(Dispatcher.self)!
+            return RouterService(associatedDomains: self.associatedDomains, urlSchemes: self.urlSchemes, dispatcher: dispatcher)
+        }
+        
         // MARK: SessionController
         
         container.register(SessionController.self, scope: .transient) { [sessionKeepAliveTime] _ in
@@ -60,5 +86,9 @@ extension UIAssembler: Assembler {
         if let frameworksRegistry = resolver.resolve(FrameworksRegistry.self) {
             frameworksRegistry.register("io.rover.RoverUI")
         }
+        
+        var applicationMonitor = resolver.resolve(ApplicationMonitor.self)!
+        applicationMonitor.isSessionTrackingEnabled = isApplicationSessionTrackingEnabled
+        applicationMonitor.isVersionTrackingEnabled = isApplicationVersionTrackingEnabled
     }
 }

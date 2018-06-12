@@ -7,10 +7,10 @@
 //
 
 class ExperienceStoreService: ExperienceStore {
-    let client: APIClient
+    let client: GraphQLClient
     let logger: Logger
     
-    init(client: APIClient, logger: Logger) {
+    init(client: GraphQLClient, logger: Logger) {
         self.client = client
         self.logger = logger
     }

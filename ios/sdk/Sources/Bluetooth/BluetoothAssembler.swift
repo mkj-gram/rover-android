@@ -24,12 +24,10 @@ public struct BluetoothAssembler: Assembler {
     }
     
     public func containerDidAssemble(resolver: Resolver) {
+        let frameworksRegistry = resolver.resolve(FrameworksRegistry.self)!
+        frameworksRegistry.register("io.rover.RoverBluetooth")
+        
         let bluetoothManager = resolver.resolve(BluetoothManager.self)!
         bluetoothManager.restore()
-        
-        if let eventQueue = resolver.resolve(EventQueue.self) {
-            let contextProvider = resolver.resolve(ContextProvider.self, name: "bluetooth")!
-            eventQueue.addContextProviders(contextProvider)
-        }
     }
 }

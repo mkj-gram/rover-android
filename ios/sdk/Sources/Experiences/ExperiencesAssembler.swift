@@ -16,7 +16,7 @@ public struct ExperiencesAssembler: Assembler {
         // MARK: ExperienceStore
         
         container.register(ExperienceStore.self) { resolver in
-            let client = resolver.resolve(APIClient.self)!
+            let client = resolver.resolve(GraphQLClient.self)!
             let logger = resolver.resolve(Logger.self)!
             return ExperienceStoreService(client: client, logger: logger)
         }
@@ -86,5 +86,10 @@ public struct ExperiencesAssembler: Assembler {
             let sessionController = resolver.resolve(SessionController.self)!
             return ScreenViewController(collectionViewLayout: collectionViewLayout, experience: experience, screen: screen, dispatcher: dispatcher, eventQueue: eventQueue, imageStore: imageStore, sessionController: sessionController)
         }
+    }
+    
+    public func containerDidAssemble(resolver: Resolver) {
+        let frameworksRegistry = resolver.resolve(FrameworksRegistry.self)!
+        frameworksRegistry.register("io.rover.RoverExperiences")
     }
 }

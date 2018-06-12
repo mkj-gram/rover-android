@@ -7,7 +7,7 @@
 //
 
 class RegionStoreService: RegionStore {
-    let client: APIClient
+    let client: GraphQLClient
     let logger: Logger
     
     var regions = Set<Region>() {
@@ -19,7 +19,7 @@ class RegionStoreService: RegionStore {
     var observers = ObserverSet<Set<Region>>()
     var stateObservation: NSObjectProtocol?
     
-    init(client: APIClient, logger: Logger, stateFetcher: StateFetcher) {
+    init(client: GraphQLClient, logger: Logger, stateFetcher: StateFetcher) {
         self.client = client
         self.logger = logger
         
@@ -55,31 +55,10 @@ class RegionStoreService: RegionStore {
     static let fragments = ["regionFields"]
     
     struct FetchQuery: GraphQLOperation {
-        static var identifier: String {
-            if let UIDeviceClass = NSClassFromString("UIDevice") {
-                let currentDeviceSelector = NSSelectorFromString("currentDevice")
-                if let currentIMP = UIDeviceClass.method(for: currentDeviceSelector) {
-                    typealias currentFunc = @convention(c) (AnyObject, Selector) -> AnyObject?
-                    let curriedImplementation = unsafeBitCast(currentIMP, to: currentFunc.self)
-                    if let device = curriedImplementation(UIDeviceClass.self, currentDeviceSelector) {
-                        let identifierForVendorSelector = NSSelectorFromString("identifierForVendor")
-                        if let identifierForVendorIMP = device.method(for: identifierForVendorSelector) {
-                            typealias identifierForVendorFunc = @convention(c) (AnyObject, Selector) -> NSUUID?
-                            let curriedImplementation2 = unsafeBitCast(identifierForVendorIMP, to: identifierForVendorFunc.self)
-                            if let identifierForVendor = curriedImplementation2(device, identifierForVendorSelector) {
-                                return identifierForVendor.uuidString
-                            }
-                        }
-                    }
-                }
-            }
-            return ""
-        }
-        
         var query: String {
             return """
                 query {
-                    device(identifier:\"\(FetchQuery.identifier)\") {
+                    device(identifier:\"\(UIDevice.current.identifierForVendor?.uuidString ?? "")\") {
                         \(RegionStoreService.queryFragment)
                     }
                 }

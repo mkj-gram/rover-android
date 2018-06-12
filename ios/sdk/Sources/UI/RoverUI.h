@@ -6,7 +6,7 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
-#import <RoverFoundation/RoverFoundation.h>
+#import <RoverData/RoverData.h>
 #import <UIKit/UIKit.h>
 
 //! Project version number for RoverUI.

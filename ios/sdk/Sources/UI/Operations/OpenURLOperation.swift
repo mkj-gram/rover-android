@@ -6,8 +6,6 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
-import RoverFoundation
-
 open class OpenURLOperation: RoverFoundation.Operation {
     public let url: URL
     
