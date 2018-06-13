@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package rover.event.v1;
+
+option go_package = "schema/v1;schema";
+
+import "google/protobuf/timestamp.proto";
+
+service Schema {
+	rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse) {};
+}
+
+/*
+	Request & Response
+*/
+message GetSchemaRequest {
+	int32 schema_id      = 1;
+	int32 schema_version = 2;
+}
+
+message GetSchemaResponse {
+	EventSchema schema = 1;
+}
+
+
+/*
+	Models
+*/
+message Scalar {
+	enum Type {
+		STRING    = 0;
+		NUMBER    = 1;
+		BOOLEAN   = 2;
+		TIMESTAMP = 3;
+	}
+	Scalar.Type type = 1;
+}
+
+message Array {
+	Scalar subtype = 1;
+}
+
+message Complex {
+	map<string, Type> attributes = 1;
+}
+
+message Type {
+	oneof type {
+		Scalar  scalar  = 1;
+		Array   array   = 2;
+		Complex complex = 3;
+	}
+}
+
+message EventSchema {
+	int32 id         = 1;
+	int32 version    = 2;
+	int32 account_id = 3;
+
+	string namespace = 4;
+	string name      = 5;
+
+	Complex attribute_schema = 6;
+
+	google.protobuf.Timestamp created_at = 9;
+}

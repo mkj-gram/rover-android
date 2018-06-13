@@ -523,16 +523,15 @@ steps:
     waitFor:
       - 'test-complete'
 
-  - id: 'build-events-clis'
+  - id: 'build-events-executables'
     name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
     env:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
-      - build
-      - -o
-      - docker/events/build/bin/postgres-cli
-      - github.com/roverplatform/rover/go/cmd/postgres-cli
-    waitFor: 
+      - install
+      - ./go/cmd/postgres-cli
+      - ./events/backend/cmd/schema-service
+    waitFor:
       - 'test-complete'
 
   - id: 'build-events-resources'
@@ -544,8 +543,10 @@ steps:
         export DEST=docker/events
         mkdir -p $$DEST/build/postgres/
         cp -r ./events/backend/schema/migrations $$DEST/build/postgres/
+        cp ./gopath/bin/postgres-cli $$DEST/build/bin
+        cp ./gopath/bin/schema-service $$DEST/build/bin
     waitFor:
-      - 'build-events-clis'
+      - 'build-events-executables'
       - 'build-events-pipeline-executable'
 
   - name: 'gcr.io/cloud-builders/docker'
