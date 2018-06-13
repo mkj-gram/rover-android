@@ -21,15 +21,10 @@ import io.rover.experiences.ui.layout.screen.ScreenViewModelInterface
  * This layout manager is perhaps a bit unusual compared to the stock ones: it's driven by data.
  */
 class BlockAndRowLayoutManager(
-    private val screenViewModel: ScreenViewModelInterface,
+    private val layout: Layout,
     private val displayMetrics: DisplayMetrics
 ) : RecyclerView.LayoutManager() {
     // State:
-
-    /**
-     * The cached results of the last layout pass.
-     */
-    private var layout: Layout? = null
 
     /**
      * The current scroll position of the recycler view (specifically, the top of the RecyclerView's
@@ -48,8 +43,6 @@ class BlockAndRowLayoutManager(
 
     override fun canScrollVertically(): Boolean = true
 
-    private val prefetchPx = 300.dpAsPx(displayMetrics)
-
     init {
         isItemPrefetchEnabled = true
     }
@@ -60,32 +53,16 @@ class BlockAndRowLayoutManager(
     )
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
-        log.d("Expensive onLayoutChildren() called.")
-
-        // call the expensive operation of having the screen view model (and nested view models) lay
-        // out all of their view models into an abstract representation of their positions on the
-        // display.  This also flattens out all the rows and blocks into a single dimensional
-        // sequence. We then persist this as in-memory state for fast iteration by fill().
+        // in typical RecyclerView LayoutMangers, this method would do the heavy lifting of building
+        // the layout.  However, in our arrangement, that is done externally because we need the
+        // full layout early.  So, we'll just invoke fill.
 
         val widthDp = this.width.pxAsDp(displayMetrics)
 
-        val existingLayout = layout
-
-        if (existingLayout == null || existingLayout.width != widthDp) {
-            // a layout (re-)pass is needed.
-            layout = screenViewModel.render(
-                widthDp
-            )
-
-            fill(recycler, layout!!)
+        if(layout.width != widthDp) {
+            log.w("onLayoutChildren() noticed that current rendered layout is meant for view of width of ${layout.width} dp, but current view width is $widthDp dp.")
         }
-
-        // print a warning if this is a patently unnecessary layout pass.  This is probably caused
-        // by a content-bearing view based on a stock Android view triggering an Android layout
-        // pass (which under our custom layout regime is unnecessary).
-        if (existingLayout != null && existingLayout.width == widthDp) {
-            log.w("Unnecessary layout pass.  Make sure all views are inhibiting requestLayout() and forceLayout().")
-        }
+        fill(recycler, layout)
     }
 
     override fun scrollVerticallyBy(dy: Int, recycler: RecyclerView.Recycler, state: RecyclerView.State): Int {
@@ -161,7 +138,7 @@ class BlockAndRowLayoutManager(
         // too.
         layout.coordinatesAndViewModels.forEachIndexed { index, (viewPosition, _, _) ->
             val displayPosition = viewPosition.dpAsPx(displayMetrics)
-            val warmOver = displayPosition.bottom > (verticalTopBound - prefetchPx) && displayPosition.top < (verticalBottomBound + prefetchPx)
+            val warmOver = displayPosition.bottom > (verticalTopBound) && displayPosition.top < (verticalBottomBound)
             if (warmOver) {
                 layoutPrefetchRegistry.addPosition(index, Math.abs(displayPosition.top - scrollPosition))
             }

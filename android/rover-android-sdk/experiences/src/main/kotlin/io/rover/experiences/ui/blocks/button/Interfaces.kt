@@ -11,36 +11,12 @@ import io.rover.rover.core.ui.concerns.BindableViewModel
 import org.reactivestreams.Publisher
 
 /**
- * View Model for block content that contains a clickable button.
+ * View Model for block content that contains a button (but only the presentation aspects thereof).
  *
- * Note that if you're looking for the Click event, that is handled more generally in
+ * Note that if you're looking for the Click event/handling itself, that is handled in
  * [BlockViewModel].
  */
-interface ButtonViewModelInterface {
-    val buttonEvents: Publisher<Event>
-
-    sealed class Event {
-        /**
-         * Animate the button for the given state.
-         */
-        data class DisplayState(
-            val animate: Boolean,
-
-            /**
-             * The owning view will maintain a set of background views itself for allowing for
-             * partially occlusive transitions between button states.  This means it has need to
-             * know which of the backgrounds it should display on a given [Event.DisplayState]
-             * event.
-             */
-            val stateOfButton: StateOfButton,
-
-            /**
-             * The given animation should undo itself afterwards.
-             */
-            val selfRevert: Boolean
-        ) : Event()
-    }
-}
+interface ButtonViewModelInterface: BindableViewModel
 
 interface ButtonBlockViewModelInterface :
     CompositeBlockViewModelInterface,
@@ -48,18 +24,4 @@ interface ButtonBlockViewModelInterface :
     BlockViewModelInterface,
     BackgroundViewModelInterface,
     BorderViewModelInterface,
-    ButtonViewModelInterface,
     TextViewModelInterface
-
-interface ButtonStateViewModelInterface :
-    BindableViewModel,
-    TextViewModelInterface,
-    BackgroundViewModelInterface,
-    BorderViewModelInterface
-
-enum class StateOfButton {
-    Normal,
-    Disabled,
-    Highlighted,
-    Selected
-}

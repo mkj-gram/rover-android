@@ -32,16 +32,32 @@ sealed class PipelineStageResult<TOutput> {
 
 interface AssetService {
     /**
-     * Retrieve the needed photo, from caches if possible.
+     * Subscribe to any updates for the image at URL, fully decoded and ready for display.
      *
-     * The Publisher will will yield on the app's main UI thread.
+     * It will complete after successfully yielding once.  However, it will not attempt
      *
-     * TODO: retry logic will not exist on the consumer-side of this method, so rather than
-     * NetworkResult, another result<->error optional type should be used instead.
+     * The Publisher will yield on the app's main UI thread.
+     */
+    fun imageByUrl(
+        url: URL
+    ): Publisher<Bitmap>
+
+    /**
+     * Use this to request and wait for a single update to the given image asset by URI.  Use this
+     * is lieu of [imageByUrl] if you need to subscribe to a single update.
      */
     fun getImageByUrl(
         url: URL
     ): Publisher<NetworkResult<Bitmap>>
+
+    // TODO: the aggregation behaviour will go in the Asset Service.
+
+    /**
+     * Request a fetch.  Be sure you are subscribed to [imageByUrl] to receive the updates.
+     */
+    fun tryFetch(
+        url: URL
+    )
 }
 
 interface ImageOptimizationServiceInterface {
@@ -58,21 +74,22 @@ interface ImageOptimizationServiceInterface {
     fun optimizeImageBackground(
         background: Background,
         targetViewPixelSize: PixelSize,
-        displayMetrics: DisplayMetrics
+        density: Float
     ): OptimizedImage?
 
     /**
      * Take a given image block and return the URI with optimization parameters needed to display
      * it.
      *
-     * @return optimized URI.  May be null if the image block in question has no image set.
+     * @return optimized URI.
      */
     fun optimizeImageBlock(
         image: Image,
         containingBlock: Block,
+        // TODO: perhaps change this to MeasuredSize
         targetViewPixelSize: PixelSize,
-        displayMetrics: DisplayMetrics
-    ): URI?
+        density: Float
+    ): URI
 }
 
 /**

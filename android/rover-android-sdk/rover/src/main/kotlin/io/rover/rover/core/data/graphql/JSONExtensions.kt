@@ -115,7 +115,6 @@ fun JSONObject.safeOptDate(name: String, dateFormatting: DateFormattingInterface
     }
 }
 
-@Deprecated("This method uses reflection to obtain the property name, which is not appropriate in case of customer use of Proguard.", ReplaceWith("putProp(obj, prop, name, transform)"))
 fun <T, R> JSONObject.putProp(obj: T, prop: KProperty1<T, R>, transform: ((R) -> Any?)? = null) {
     put(
         prop.name,

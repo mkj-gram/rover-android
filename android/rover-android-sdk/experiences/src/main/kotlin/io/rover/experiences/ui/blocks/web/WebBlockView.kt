@@ -14,6 +14,8 @@ import io.rover.experiences.ui.blocks.concerns.layout.LayoutableView
 import io.rover.experiences.ui.blocks.concerns.background.ViewBackground
 import io.rover.experiences.ui.blocks.concerns.layout.ViewBlock
 import io.rover.experiences.ui.blocks.concerns.ViewComposition
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.ViewModelBinding
 
 class WebBlockView : WebView, LayoutableView<WebViewBlockViewModelInterface> {
     constructor(context: Context?) : super(context)
@@ -25,20 +27,17 @@ class WebBlockView : WebView, LayoutableView<WebViewBlockViewModelInterface> {
     // mixins (TODO: injections)
     private val viewComposition = ViewComposition()
 
-    private val viewBackground = ViewBackground(this, viewComposition)
+    private val viewBackground = ViewBackground(this)
     private val viewBorder = ViewBorder(this, viewComposition)
     private val viewBlock = ViewBlock(this)
     private val viewWeb = ViewWeb(this)
 
-    override var viewModel: WebViewBlockViewModelInterface? = null
-        set(value) {
-            field = value
-
-            viewBorder.borderViewModel = viewModel
-            viewBlock.blockViewModel = viewModel
-            viewBackground.backgroundViewModel = viewModel
-            viewWeb.webViewModel = viewModel
-        }
+    override var viewModel: BindableView.Binding<WebViewBlockViewModelInterface>? by ViewModelBinding { binding, _ ->
+        viewBorder.viewModel = binding
+        viewBlock.viewModel = binding
+        viewBackground.viewModel = binding
+        viewWeb.viewModel = binding
+    }
 
     override fun onDraw(canvas: Canvas) {
         viewComposition.beforeOnDraw(canvas)
@@ -73,7 +72,7 @@ class WebBlockView : WebView, LayoutableView<WebViewBlockViewModelInterface> {
         // override, so we'll ask the view model from here.  While I could teach ViewComposition
         // about TouchEvent, because handlers can consume events it is unclear
 
-        requestDisallowInterceptTouchEvent((viewModel?.scrollingEnabled) ?: true)
+        requestDisallowInterceptTouchEvent((viewModel?.viewModel?.scrollingEnabled) ?: true)
         return super.onTouchEvent(event)
     }
 }

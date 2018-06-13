@@ -3,16 +3,16 @@ package io.rover.experiences.ui.blocks.concerns.text
 import android.text.Spanned
 import io.rover.experiences.ui.blocks.concerns.layout.Measurable
 import io.rover.experiences.ui.blocks.text.TextBlockViewModel
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.BindableViewModel
 
-interface ViewTextInterface {
-    var textViewModel: TextViewModelInterface?
-}
+interface ViewTextInterface: BindableView<TextViewModelInterface>
 
 /**
  * View Model for block content that contains rich text content (decorated with strong, italic, and
  * underline HTML tags).
  */
-interface TextViewModelInterface : Measurable {
+interface TextViewModelInterface : Measurable, BindableViewModel {
     val text: String
 
     val singleLine: Boolean

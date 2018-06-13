@@ -31,7 +31,7 @@ class NotificationsRepository(
     private val dateFormatting: DateFormattingInterface,
     private val ioExecutor: Executor,
     private val mainThreadScheduler: Scheduler,
-    private val eventsPlugin: EventQueueServiceInterface,
+    private val eventQueue: EventQueueServiceInterface,
     private val stateManagerService: StateManagerServiceInterface,
     localStorage: LocalStorage
 ): NotificationsRepositoryInterface {
@@ -113,12 +113,13 @@ class NotificationsRepository(
 
     private fun replaceLocalStorage(notifications: List<Notification>): Publisher<out List<Notification>> {
         return PublisherOperators.defer {
-            log.v("Updating local storage with ${notifications.size} notifications containing: ${notifications}")
+            log.v("Updating local storage with ${notifications.size} notifications.")
             keyValueStorage[STORE_KEY] = JSONArray(notifications.map { it.encodeJson(dateFormatting) }).toString()
             PublisherOperators.just(notifications)
         }.subscribeOn(ioExecutor)
     }
 
+    // TODO: change to use server-provided fragment
     private val queryFragment: String = """
         notifications {
             id
@@ -239,7 +240,7 @@ class NotificationsRepository(
             }
 
             if(!alreadyDeleted) {
-                eventsPlugin.trackEvent(
+                eventQueue.trackEvent(
                     Event(
                         "Notification Marked Deleted",
                         hashMapOf()
@@ -274,7 +275,7 @@ class NotificationsRepository(
             }
 
             if(!alreadyRead) {
-                eventsPlugin.trackEvent(
+                eventQueue.trackEvent(
                     Event(
                         "Notification Marked Read",
                         hashMapOf()

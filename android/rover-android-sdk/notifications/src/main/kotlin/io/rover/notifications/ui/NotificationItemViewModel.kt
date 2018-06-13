@@ -3,7 +3,6 @@ package io.rover.notifications.ui
 import android.graphics.Bitmap
 import io.rover.rover.core.logging.log
 import org.reactivestreams.Publisher
-import io.rover.rover.core.streams.doOnSubscribe
 import io.rover.rover.core.streams.flatMap
 import io.rover.rover.core.data.NetworkResult
 import io.rover.notifications.domain.Notification
@@ -37,7 +36,7 @@ class NotificationItemViewModel(
                         PublisherOperators.just(attachmentResult.response)
                     }
                 }
-            }.doOnSubscribe { log.v("Requesting image for ${notificationItem.id}") }
+            }
         }
     }
 }

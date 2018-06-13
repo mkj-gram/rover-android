@@ -10,6 +10,7 @@ import io.rover.experiences.ui.blocks.concerns.background.ViewBackground
 import io.rover.experiences.ui.blocks.concerns.layout.ViewBlock
 import io.rover.experiences.ui.blocks.concerns.border.ViewBorder
 import io.rover.experiences.ui.blocks.concerns.ViewComposition
+import io.rover.rover.core.ui.concerns.BindableView
 
 class BarcodeBlockView : AppCompatImageView, LayoutableView<BarcodeBlockViewModelInterface> {
     constructor(context: Context?) : super(context)
@@ -17,16 +18,16 @@ class BarcodeBlockView : AppCompatImageView, LayoutableView<BarcodeBlockViewMode
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     private val viewComposition = ViewComposition()
-    private val viewBackground = ViewBackground(this, viewComposition)
+    private val viewBackground = ViewBackground(this)
     private val viewBorder = ViewBorder(this, viewComposition)
     private val viewBarcode = ViewBarcode(this)
     private val viewBlock = ViewBlock(this, setOf(viewBorder, viewBarcode))
 
-    override var viewModel: BarcodeBlockViewModelInterface? by ViewModelBinding { viewModel, _ ->
-        viewBorder.borderViewModel = viewModel
-        viewBarcode.barcodeViewModel = viewModel
-        viewBlock.blockViewModel = viewModel
-        viewBackground.backgroundViewModel = viewModel
+    override var viewModel: BindableView.Binding<BarcodeBlockViewModelInterface>? by ViewModelBinding { binding, _ ->
+        viewBorder.viewModel = binding
+        viewBarcode.viewModel = binding
+        viewBlock.viewModel = binding
+        viewBackground.viewModel = binding
     }
 
     override fun onDraw(canvas: Canvas) {

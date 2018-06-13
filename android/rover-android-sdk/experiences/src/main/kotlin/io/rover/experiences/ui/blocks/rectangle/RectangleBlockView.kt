@@ -12,6 +12,8 @@ import io.rover.experiences.ui.blocks.concerns.layout.LayoutableView
 import io.rover.experiences.ui.blocks.concerns.background.ViewBackground
 import io.rover.experiences.ui.blocks.concerns.border.ViewBorder
 import io.rover.experiences.ui.blocks.concerns.ViewComposition
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.ViewModelBinding
 
 class RectangleBlockView : View, LayoutableView<RectangleBlockViewModelInterface> {
     constructor(context: Context?) : super(context)
@@ -22,14 +24,13 @@ class RectangleBlockView : View, LayoutableView<RectangleBlockViewModelInterface
 
     // mixins
     private val viewComposition = ViewComposition()
-    private val viewBackground = ViewBackground(this, viewComposition)
+    private val viewBackground = ViewBackground(this)
     private val viewBorder = ViewBorder(this, viewComposition)
 
-    override var viewModel: RectangleBlockViewModelInterface? = null
-        set(viewModel) {
-            viewBackground.backgroundViewModel = viewModel
-            viewBorder.borderViewModel = viewModel
-        }
+    override var viewModel: BindableView.Binding<RectangleBlockViewModelInterface>? by ViewModelBinding { binding, _ ->
+        viewBackground.viewModel = viewModel
+        viewBorder.viewModel = viewModel
+    }
 
     override val view: View
         get() = this

@@ -3,6 +3,8 @@ package io.rover.experiences.ui.blocks.web
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.ViewModelBinding
 
 @SuppressLint("SetJavaScriptEnabled")
 class ViewWeb(
@@ -25,12 +27,9 @@ class ViewWeb(
         // when you scroll by
     }
 
-    override var webViewModel: WebViewModelInterface? = null
-        set(viewModel) {
-            field = viewModel
-
-            webView.loadUrl(
-                viewModel?.url?.toString() ?: "about://blank"
-            )
-        }
+    override var viewModel: BindableView.Binding<WebViewModelInterface>? by ViewModelBinding { binding, _ ->
+        webView.loadUrl(
+            binding?.viewModel?.url?.toString() ?: "about://blank"
+        )
+    }
 }

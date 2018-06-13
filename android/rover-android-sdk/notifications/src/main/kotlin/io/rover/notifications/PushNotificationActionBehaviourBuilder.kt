@@ -74,10 +74,12 @@ class PushNotificationActionBehaviourBuilder(
      * gave does not exist, then we will lazily create it at notification reception time to
      * avoid the
      *
-     * We include a default implementation here.
+     * We include a default implementation here, however, you should consider registering your own
+     * channel ID in your application initialization and passing it to the NotificationAssembler()
+     * constructor.
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    open fun registerDefaultChannelId() {
+    fun registerDefaultChannelId() {
         log.w("Rover is registering a default channel ID for you.  This isn't optimal; if you are targeting Android SDK >= 26 then you should create your Notification Channels.\n" +
             "See https://developer.android.com/training/notify-user/channels.html")
         // Create the NotificationChannel
@@ -94,12 +96,14 @@ class PushNotificationActionBehaviourBuilder(
         notificationManager.createNotificationChannel(mChannel)
     }
 
+
     private fun processNotification(notification: io.rover.notifications.domain.Notification): Publisher<Unit> {
         verifyChannelSetUp()
 
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationCompat.Builder(applicationContext, notification.channelId ?: defaultChannelId ?: NotificationChannel.DEFAULT_CHANNEL_ID)
         } else {
+            @Suppress("DEPRECATION") // Only in use to support legacy Android API.
             NotificationCompat.Builder(applicationContext)
         }
 

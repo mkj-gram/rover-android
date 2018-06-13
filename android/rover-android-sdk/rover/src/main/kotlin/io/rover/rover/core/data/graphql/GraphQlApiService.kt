@@ -3,25 +3,24 @@ package io.rover.rover.core.data.graphql
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import io.rover.rover.core.logging.log
 import io.rover.rover.core.data.APIException
 import io.rover.rover.core.data.AuthenticationContext
-import io.rover.rover.core.data.NetworkError
 import io.rover.rover.core.data.GraphQlRequest
+import io.rover.rover.core.data.NetworkError
 import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.data.domain.EventSnapshot
 import io.rover.rover.core.data.domain.Experience
+import io.rover.rover.core.data.graphql.operations.FetchExperienceRequest
+import io.rover.rover.core.data.graphql.operations.SendEventsRequest
 import io.rover.rover.core.data.http.HttpClientResponse
 import io.rover.rover.core.data.http.HttpRequest
 import io.rover.rover.core.data.http.HttpVerb
 import io.rover.rover.core.data.http.NetworkClient
 import io.rover.rover.core.data.http.NetworkTask
-import io.rover.rover.core.data.http.WireEncoderInterface
-import io.rover.rover.core.data.graphql.operations.FetchExperienceRequest
-import io.rover.rover.core.data.graphql.operations.SendEventsRequest
+import io.rover.rover.core.logging.log
+import io.rover.rover.platform.DateFormattingInterface
 import org.json.JSONException
 import java.io.IOException
-import java.net.URI
 import java.net.URL
 
 /**
@@ -33,8 +32,8 @@ import java.net.URL
 class GraphQlApiService(
     private val endpoint: URL,
     private val authenticationContext: AuthenticationContext,
-    private val wireEncoder: WireEncoderInterface,
-    private val networkClient: NetworkClient
+    private val networkClient: NetworkClient,
+    private val dateFormatting: DateFormattingInterface
 ): GraphQlApiServiceInterface {
     private val mainThreadHandler = Handler(Looper.getMainLooper())
 
@@ -101,7 +100,7 @@ class GraphQlApiService(
                             try {
                                 NetworkResult.Success(
                                     // TODO This could emit, say, a JSON decode exception!  Need a story.
-                                    httpRequest.decode(body, wireEncoder)
+                                    httpRequest.decode(body)
                                 )
                             } catch (e: APIException) {
                                 log.w("API error: $e")
@@ -196,8 +195,8 @@ class GraphQlApiService(
         }
 
         val request = SendEventsRequest(
-            events,
-            wireEncoder
+            dateFormatting,
+            events
         )
 
         return operation(request) { uploadResult ->

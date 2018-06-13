@@ -1,14 +1,8 @@
 package io.rover.rover.core.data
 
-import io.rover.rover.platform.DateFormattingInterface
-import io.rover.rover.platform.DeviceIdentificationInterface
-import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
-import io.rover.rover.core.data.http.NetworkClient
-import io.rover.rover.core.data.http.WireEncoderInterface
+import io.rover.rover.core.data.graphql.getObjectIterable
 import org.json.JSONArray
 import org.json.JSONObject
-import java.net.URLEncoder
-import java.util.concurrent.Executor
 
 /**
  * A network response.  Optionally either a success (with requested payload), or a failure (with the
@@ -86,13 +80,16 @@ interface GraphQlRequest<out TInput> {
      *
      * A default implementation is provided here, which should suffice for most use cases.
      */
-    fun decode(json: String, wireEncoder: WireEncoderInterface): TInput {
+    fun decode(json: String): TInput {
         val parsed = JSONObject(json)
         val possibleErrors = parsed.optJSONArray("errors")
         if (possibleErrors != null) {
-            throw APIException(wireEncoder.decodeErrors(possibleErrors))
+            throw APIException(possibleErrors.getObjectIterable().map {
+                // TODO: change to a better type than just Exception.  perhaps one with best-effort decoding of the GraphQL errors object.
+                Exception(it.toString())
+            })
         } else {
-            return decodePayload(parsed, wireEncoder)
+            return decodePayload(parsed)
         }
     }
 
@@ -105,12 +102,13 @@ interface GraphQlRequest<out TInput> {
      * string, or what have you, and a peculiarity of the org.json package is that you more-or-less
      * need to know ahead of time what you are expecting.
      */
-    fun decodePayload(responseObject: JSONObject, wireEncoder: WireEncoderInterface): TInput
+    fun decodePayload(responseObject: JSONObject): TInput
 
     /**
      * Implements the standard outgoing query request envelope format in request body form, if a mutation.
      *
-     * Will return an empty body if it is a
+     * Will return an empty body if it a non-mutation operation, which will use HTTP GET instead of
+     * POST and thus does not use a request body.
      */
     fun encodeBody(): String? {
         return if(mutation) {

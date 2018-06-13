@@ -14,23 +14,51 @@ import java.net.URI
 
 interface ExperienceNavigationViewModelInterface : BindableViewModel {
     /**
-     * The containing view model can subscribe to be informed of user input that it needs to act on.
-     *
-     * May only have one subscriber.
+     * Emits when the user should be navigated away to some other piece of content external to the
+     * Experience.
      */
-    val events: Publisher<Emission.Event>
+    val externalNavigationEvents: Publisher<ExperienceExternalNavigationEvent>
+
 
     /**
-     * The View should subscribe to this stream and thus be kept up to date.
+     * Bind the toolbar display in the view to this publisher.
      *
-     * In this case events include instructions to navigate to and display an Experience screen and
-     * set the backlight and toolbar.
-     *
-     * When newly subscribed, the view will immediately receive such events as are necessary
-     * to fully populate it.
+     * New subscribers are immediately brought up to date.
      */
-    val updates: Publisher<Emission.Update>
+    val toolbar: Publisher<ExperienceToolbarViewModelInterface>
 
+    data class ScreenUpdate(
+        val screenViewModel: ScreenViewModelInterface,
+        val backwards: Boolean,
+        val animate: Boolean
+    )
+
+    /**
+     * Observe this publisher to determine what screen view should be displayed, and if its
+     * appearance should be animated.
+     *
+     * New subscribers are immediately brought up to date.
+     */
+    val screen: Publisher<ScreenUpdate>
+
+    /**
+     * Bind the backlight to this publisher.  Signifies that the brightness parameter LayoutParams
+     * of the containing window should either be set to either 1 or
+     * [WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE].
+     *
+     * New subscribers are immediately brought up to date.
+     */
+    val backlight: Publisher<Boolean>
+
+    /**
+     * Call when the user has displayed the Experience and should begin navigation.  If this is not
+     * called, the user will only see a blank screen!
+     */
+    fun start()
+
+    /**
+     * Call when the user has pressed the back button.
+     */
     fun pressBack()
 
     /**
@@ -51,50 +79,6 @@ interface ExperienceNavigationViewModelInterface : BindableViewModel {
      * models (that contain this one) to have stronger type guarantees in their own state bundles.
      */
     val state: Parcelable
-
-    /**
-     * All items that can be asynchronously emitted to subscribers of this view model.  It is split
-     * into two categories: Event, and Update.
-     *
-     * They both have somewhat different semantics.  Events are only valid in the same "moment" at
-     * which they are emitted, but equally require guranteed, single delivery to their subscriber.
-     *
-     * Updates, on the other hand, are idempotent and may be re-emitted to bring new subscribers up
-     * to date.
-     */
-    sealed class Emission {
-        /**
-         * The subscribing view model will receive these.  See [updates].
-         */
-        sealed class Event: Emission() {
-            data class NavigateAway(
-                val event: ExperienceExternalNavigationEvent
-            ) : Event()
-        }
-
-        /**
-         * The View should subscribe to these and thus be kept up to date.  See [events].
-         */
-        sealed class Update: Emission() {
-            data class GoToScreen(
-                val screenViewModel: ScreenViewModelInterface,
-                val backwards: Boolean,
-                val animate: Boolean
-            ) : Update()
-
-            // TODO: rename to Toolbar.
-            data class SetActionBar(
-                val experienceToolbarViewModel: ExperienceToolbarViewModelInterface
-            ) : Update()
-
-            /**
-             * This event signifies that the brightness parameter LayoutParams of the containing window
-             * should either be set to either 1 or
-             * [WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE].
-             */
-            data class SetBacklightBoost(val extraBright: Boolean) : Update()
-        }
-    }
 }
 
 /**

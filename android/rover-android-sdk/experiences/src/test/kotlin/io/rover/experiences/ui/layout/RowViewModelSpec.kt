@@ -19,6 +19,7 @@ import io.rover.rover.core.data.domain.HorizontalAlignment
 import io.rover.rover.core.data.domain.Position
 import io.rover.rover.core.data.domain.VerticalAlignment
 import io.rover.rover.core.operations.ActionBehaviourMappingInterface
+import io.rover.rover.core.streams.Scheduler
 import io.rover.rover.core.ui.RectF
 import org.amshove.kluent.mock
 import org.amshove.kluent.shouldBeInstanceOf
@@ -48,6 +49,12 @@ class RowViewModelSpec : Spek({
                         container.register(Scope.Singleton, ModulesTrackerInterface::class.java) { resolver ->
                             mock()
                         }
+
+                        container.register(
+                            Scope.Singleton,
+                            Scheduler::class.java,
+                            "main"
+                        ) { resolver -> mock() }
 
                         container.register(
                             Scope.Singleton,

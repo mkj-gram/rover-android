@@ -17,14 +17,6 @@ import java.net.URLDecoder
 
 class ImageOptimizationServiceSpec : Spek({
 
-    fun createDisplayMetrics(dpi: Int): DisplayMetrics {
-        val mdpi = 160
-        return DisplayMetrics().apply {
-            densityDpi = dpi
-            density = dpi / mdpi.toFloat()
-        }
-    }
-
     fun decodeUriParams(uri: URI): Map<String, String> {
         return uri.query.split("&").map { it.split("=").map { URLDecoder.decode(it, "UTF-8") } }.associate { Pair(it[0], it[1]) }
     }
@@ -48,12 +40,12 @@ class ImageOptimizationServiceSpec : Spek({
         )
 
         on("optimized to display in exactly the same pixel-size block") {
-            val displayMetrics = createDisplayMetrics(480)
+
 
             val (uri, _) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(120, 100),
-                displayMetrics
+                3.0f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -65,12 +57,11 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in a block with smaller pixel-size but the same aspect ratio") {
-            val displayMetrics = createDisplayMetrics(480)
 
             val (uri, _) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(60, 50),
-                displayMetrics
+                3.0f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -82,12 +73,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in smaller but same aspect ratio block") {
-            val displayMetrics = createDisplayMetrics(480)
-
             val (uri, _) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(34, 29),
-                displayMetrics
+                3.0f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -101,12 +90,10 @@ class ImageOptimizationServiceSpec : Spek({
         on("optimized to display in a block with a wider dimension and a narrower dimension") {
             // TODO: should have same assertions as the same-pixel size case!
 
-            val displayMetrics = createDisplayMetrics(480)
-
             val (uri, _) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(140, 90),
-                displayMetrics
+                3.0f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -138,12 +125,10 @@ class ImageOptimizationServiceSpec : Spek({
         )
 
         on("optimized to display in exactly the same size block on same density display") {
-            val displayMetrics = createDisplayMetrics(480)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(120, 100),
-                displayMetrics
+                3.0f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -166,12 +151,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in exactly the same size block on a 560 dpi display") {
-            val displayMetrics = createDisplayMetrics(560)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(140, 117), // * 1.16666~ (480 dp -> 560 dp factor)
-                displayMetrics
+                3.5f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -195,12 +178,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in a slightly wider block on same density display") {
-            val displayMetrics = createDisplayMetrics(480)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(140, 100), // wider by 20 image pixels (which is the same as display pixels here)
-                displayMetrics
+                3.0f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -223,12 +204,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in a slightly wider block on a 560 dpi display") {
-            val displayMetrics = createDisplayMetrics(560)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(163, 117), // wider by 20 image pixels and then * 1.16666~ (480 dp -> 560 dp factor)
-                displayMetrics
+                3.5f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -252,12 +231,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in a narrower block on same density display") {
-            val displayMetrics = createDisplayMetrics(480)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(100, 100), // 20 image pixels narrower.
-                displayMetrics
+                3.0f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -280,12 +257,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in a narrower block on a 560 dpi display") {
-            val displayMetrics = createDisplayMetrics(560)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(117, 117), // 20 image pixels narrower and then * 1.16666~ (480 dp -> 560 dp factor)
-                displayMetrics
+                3.5f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -309,12 +284,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in exactly the same size block on a 160 dpi display") {
-            val displayMetrics = createDisplayMetrics(160)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(40, 33), // * 0.3 (480 dp -> 160 dp factor)
-                displayMetrics
+                1f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -337,12 +310,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in a narrower block on a 160 dpi display") {
-            val displayMetrics = createDisplayMetrics(160)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(33, 33), // 20 image pixels narrower and then * 0.3 (480 dp -> 160 dp factor)
-                displayMetrics
+                1f
             )!!
 
             val decodedParams = decodeUriParams(uri)
@@ -365,12 +336,10 @@ class ImageOptimizationServiceSpec : Spek({
         }
 
         on("optimized to display in a slightly wider block on a 160 dpi display") {
-            val displayMetrics = createDisplayMetrics(160)
-
             val (uri, optimizedConfiguration) = imageOptimizationService.optimizeImageBackground(
                 background,
                 PixelSize(47, 33), // wider by 20 image pixels and then * 0.3 (480 dp -> 160 dp factor)
-                displayMetrics
+                1f
             )!!
 
             val decodedParams = decodeUriParams(uri)

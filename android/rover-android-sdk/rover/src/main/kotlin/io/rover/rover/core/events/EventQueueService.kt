@@ -177,10 +177,6 @@ class EventQueueService(
         }
     }
 
-    override fun setPushToken(token: String?) {
-        (contextProviders.first { it is PushTokenTransmissionChannel } as PushTokenTransmissionChannel).setPushToken(token)
-    }
-
     init {
         log.v("Starting up.")
         if(singletonStartedGuard) {

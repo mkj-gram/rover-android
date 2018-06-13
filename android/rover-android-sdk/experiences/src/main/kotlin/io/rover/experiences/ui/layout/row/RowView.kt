@@ -9,6 +9,8 @@ import android.view.View
 import io.rover.experiences.ui.blocks.concerns.ViewComposition
 import io.rover.experiences.ui.blocks.concerns.background.ViewBackground
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableView
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.ViewModelBinding
 
 class RowView : View, LayoutableView<RowViewModelInterface> {
     constructor(context: Context?) : super(context)
@@ -18,12 +20,11 @@ class RowView : View, LayoutableView<RowViewModelInterface> {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     private val viewComposition = ViewComposition()
-    private val viewBackground = ViewBackground(this, viewComposition)
+    private val viewBackground = ViewBackground(this)
 
-    override var viewModel: RowViewModelInterface? = null
-        set(viewModel) {
-            viewBackground.backgroundViewModel = viewModel
-        }
+    override var viewModel: BindableView.Binding<RowViewModelInterface>? by ViewModelBinding { binding, _ ->
+        viewBackground.viewModel = binding
+    }
 
     override fun onDraw(canvas: Canvas) {
         viewComposition.beforeOnDraw(canvas)

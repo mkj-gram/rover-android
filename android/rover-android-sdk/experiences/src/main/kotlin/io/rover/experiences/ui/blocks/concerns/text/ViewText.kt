@@ -6,6 +6,8 @@ import android.os.Build
 import android.text.Layout
 import android.view.Gravity
 import android.widget.TextView
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.ViewModelBinding
 
 /**
  * Mixin that binds a text block view model to the relevant parts of a [TextView].
@@ -30,35 +32,34 @@ class ViewText(
         }
     }
 
-    override var textViewModel: TextViewModelInterface? = null
-        set(viewModel) {
-            if (viewModel != null) {
-                // TODO: this may be a fair bit of compute at bind-time.  But not sure where to put
-                // memoized android-specific stuff (the Spanned below) because the ViewModel is
-                // off-limits for Android stuff
+    override var viewModel: BindableView.Binding<TextViewModelInterface>? by ViewModelBinding { binding, subscriptionCallback ->
+        if (binding != null) {
+            // TODO: this may be a fair bit of compute at bind-time.  But not sure where to put
+            // memoized android-specific stuff (the Spanned below) because the ViewModel is
+            // off-limits for Android stuff
 
-                val spanned = textToSpannedTransformer.transform(
-                    viewModel.text,
-                    viewModel.boldRelativeToBlockWeight()
-                )
+            val spanned = textToSpannedTransformer.transform(
+                binding.viewModel.text,
+                binding.viewModel.boldRelativeToBlockWeight()
+            )
 
-                textView.text = spanned
+            textView.text = spanned
 
-                textView.gravity = when (viewModel.fontAppearance.align) {
-                    Paint.Align.RIGHT -> Gravity.END
-                    Paint.Align.LEFT -> Gravity.START
-                    Paint.Align.CENTER -> Gravity.CENTER_HORIZONTAL
-                } or if (viewModel.centerVertically) Gravity.CENTER_VERTICAL else 0
+            textView.gravity = when (binding.viewModel.fontAppearance.align) {
+                Paint.Align.RIGHT -> Gravity.END
+                Paint.Align.LEFT -> Gravity.START
+                Paint.Align.CENTER -> Gravity.CENTER_HORIZONTAL
+            } or if (binding.viewModel.centerVertically) Gravity.CENTER_VERTICAL else 0
 
-                textView.textSize = viewModel.fontAppearance.fontSize.toFloat()
+            textView.textSize = binding.viewModel.fontAppearance.fontSize.toFloat()
 
-                textView.setTextColor(viewModel.fontAppearance.color)
+            textView.setTextColor(binding.viewModel.fontAppearance.color)
 
-                textView.typeface = Typeface.create(
-                    viewModel.fontAppearance.font.fontFamily, viewModel.fontAppearance.font.fontStyle
-                )
+            textView.typeface = Typeface.create(
+                binding.viewModel.fontAppearance.font.fontFamily, binding.viewModel.fontAppearance.font.fontStyle
+            )
 
-                textView.setSingleLine(viewModel.singleLine)
-            }
+            textView.setSingleLine(binding.viewModel.singleLine)
         }
+    }
 }

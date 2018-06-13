@@ -6,6 +6,7 @@ import io.rover.rover.core.data.domain.TitleBarButtons
 import io.rover.rover.core.data.domain.Row
 import io.rover.experiences.ui.blocks.concerns.background.BackgroundViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
+import io.rover.experiences.ui.blocks.image.ImageBlockViewModelInterface
 import io.rover.experiences.ui.toolbar.ToolbarConfiguration
 import io.rover.experiences.ui.layout.DisplayItem
 import io.rover.experiences.ui.layout.Layout
@@ -22,8 +23,7 @@ class ScreenViewModel(
     private val screen: Screen,
     private val backgroundViewModel: BackgroundViewModelInterface,
     private val resolveNavigationViewModel: (row: Row) -> RowViewModelInterface
-) : ScreenViewModelInterface,
-    BackgroundViewModelInterface by backgroundViewModel {
+) : ScreenViewModelInterface, BackgroundViewModelInterface by backgroundViewModel {
 
     // TODO: remember (State) scroll position
 
@@ -120,9 +120,18 @@ class ScreenViewModel(
         // in the list must occlude prior ones.
         val blocks = rowViewModel.mapBlocksToRectDisplayList(rowFrame).asReversed()
 
-        return mapRowsToRectDisplayList(tail, width, Layout(results.coordinatesAndViewModels + rowHead + blocks, results.height + rowViewModel.frame(rowBounds).height(), results.width))
+        return mapRowsToRectDisplayList(
+            tail,
+            width,
+            Layout(
+                results.coordinatesAndViewModels + rowHead + blocks,
+                results.height + rowViewModel.frame(rowBounds).height(),
+                results.width
+            )
+        )
     }
 
     override val screenId: String
         get() = screen.id.rawValue
 }
+

@@ -20,7 +20,7 @@ data class Layout(
     val height: Float,
 
     /**
-     * The requested width for the layout pass.
+     * The requested width (in dp) for the layout pass.
      */
     val width: Float
 )

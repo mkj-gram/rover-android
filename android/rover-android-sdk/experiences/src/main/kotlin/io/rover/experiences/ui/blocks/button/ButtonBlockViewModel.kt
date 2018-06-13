@@ -8,7 +8,6 @@ import io.rover.experiences.ui.blocks.concerns.text.TextViewModelInterface
 
 class ButtonBlockViewModel(
     blockViewModel: BlockViewModelInterface,
-    buttonViewModel: ButtonViewModelInterface,
     private val borderViewModel: BorderViewModelInterface,
     private val backgroundViewModel: BackgroundViewModelInterface,
     private val textViewModel: TextViewModelInterface
@@ -16,7 +15,6 @@ class ButtonBlockViewModel(
     BlockViewModelInterface by blockViewModel,
     BorderViewModelInterface by borderViewModel,
     BackgroundViewModelInterface by backgroundViewModel,
-    TextViewModelInterface by textViewModel,
-    ButtonViewModelInterface by buttonViewModel {
+    TextViewModelInterface by textViewModel {
     override val viewType: ViewType = ViewType.Button
 }

@@ -190,6 +190,101 @@ object PublisherOperators {
         return Publisher { subscriber -> builder().subscribe(subscriber) }
     }
 
+    fun <T, R> combineLatest(sources: List<Publisher<T>>, combiner: (List<T>) -> R): Publisher<R> {
+        return Publisher { subscriber ->
+            var cancelled = false
+            var requested = false
+
+            val latest = HashMap<Int, T>()
+
+            val subscriptions: MutableSet<Subscription> = mutableSetOf()
+
+            subscriber.onSubscribe(
+                object : Subscription {
+                    override fun cancel() {
+                        cancelled = true
+                        subscriptions.forEach { it.cancel() }
+                    }
+
+                    override fun request(n: Long) {
+                        if(n != Long.MAX_VALUE) throw RuntimeException("Backpressure signalling not supported.  Request Long.MAX_VALUE.")
+
+                        if(requested) return
+                        requested = true
+                        val remainingSources = sources.toMutableSet()
+
+                        sources.forEachIndexed { index, source ->
+                            source.subscribe(object : Subscriber<T> {
+                                override fun onComplete() {
+                                    remainingSources.remove(source)
+                                    if (remainingSources.isEmpty() && !cancelled) {
+                                        subscriber.onComplete()
+                                    }
+                                }
+
+                                override fun onError(error: Throwable) {
+                                    if (!cancelled) subscriber.onError(error)
+                                }
+
+                                override fun onNext(item: T) {
+                                    if (!cancelled) {
+                                        latest[index] = item
+                                        // if we have a value for all the soures, combiner and then
+                                        // emit!
+                                        if(latest.count() == sources.count()) {
+                                            subscriber.onNext(
+                                                combiner(
+                                                    latest.values.toList()
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                                override fun onSubscribe(subscription: Subscription) {
+                                    if (!cancelled) {
+                                        subscriptions.add(subscription)
+                                        subscription.request(Long.MAX_VALUE)
+                                    } else {
+                                        // just in case a subscription comes up after we are cancelled
+                                        // ourselves, cancel.
+                                        subscription.cancel()
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    fun <T1, T2, R> combineLatest(
+        source1: Publisher<T1>,
+        source2: Publisher<T2>,
+        combiner: (T1, T2) -> R
+    ): Publisher<R> {
+        @Suppress("UNCHECKED_CAST") // Suppression due to erasure/variance issues.
+        return combineLatest(listOf(source1, source2) as List<Publisher<Any>>) { list: List<Any> ->
+            // Suppression due to erasure.
+            @Suppress("UNCHECKED_CAST")
+            combiner(list[0] as T1, list[1] as T2)
+        }
+    }
+
+//    fun <T1: Any, T2: Any, T3: Any, R: Any> combineLatest(
+//        source1: Publisher<T1>,
+//        source2: Publisher<T2>,
+//        source3: Publisher<T3>,
+//        combiner: (T1, T2, T3) -> R
+//    ): Publisher<out R> {
+//        return combineLatest(listOf(source1, source2, source3)) { (item1, item2,item3) ->
+//            // Suppression due to erasure.
+//            @Suppress("UNCHECKED_CAST")
+//            combiner(item1 as T1, item2 as T2, item3 as T3)
+//        }
+//    }
+
 }
 
 fun <T> Publisher<out T>.subscribe(
@@ -313,6 +408,7 @@ fun <T> Publisher<T>.filter(predicate: (T) -> Boolean): Publisher<T> {
  * stream with a badly inferred type and thus all of their events could be an unexpected type
  * that will be ignored.
  */
+@Suppress("UNCHECKED_CAST") // Suppression because of variance issues.
 inline fun <reified TSub: T, reified T: Any> Publisher<T>.filterForSubtype(): Publisher<TSub> {
     return this.filter { TSub::class.java.isAssignableFrom(it::class.java) } as Publisher<TSub>
 }
@@ -394,6 +490,8 @@ fun <T, R> Publisher<T>.flatMap(transform: (T) -> Publisher<out R>): Publisher<R
         prior.subscribe(sourceSubscriber)
     }
 }
+
+
 
 /**
  * Subscribe to the [Publisher] once, and multicast yielded signals to multiple subscribers.
@@ -613,6 +711,7 @@ fun <T> Publisher<T>.shareAndReplay(count: Int): Publisher<T> {
     }
 }
 
+@Suppress("UNCHECKED_CAST") // Suppression because of variance issues.
 fun <T: Any> Publisher<T>.first(): Publisher<T> {
     return Publisher { subscriber ->
         var sourceSubscription: Subscription? = null
@@ -653,6 +752,62 @@ fun <T: Any> Publisher<T>.first(): Publisher<T> {
             }
         )
     }
+}
+
+/**
+ * Will filter out sequences of identitical (by comparison) items.  An item will not be
+ * emitted if it is the same as the prior.
+ */
+fun <T: Any> Publisher<T>.distinctUntilChanged(): Publisher<T> {
+    return Publisher { subscriber ->
+
+        var lastSeen : LastSeen<T> = LastSeen.NoneYet()
+        var sourceSubscriber: Subscriber<T>?
+
+        subscriber.onSubscribe(
+            object : Subscription {
+                override fun cancel() {
+                    // TODO gotta pass subscription througu
+                }
+
+                override fun request(n: Long) {
+                    // subscribe to prior
+                    @Suppress("UNCHECKED_CAST") // suppressed due to erasure/variance issues.
+                    sourceSubscriber = object : Subscriber<T> by subscriber as Subscriber<T> {
+                        override fun onNext(item: T) {
+                            // atomically copy lastSeen so smart cast below can work.
+                            val lastSeenCaptured = lastSeen
+                            when(lastSeenCaptured) {
+                                is LastSeen.NoneYet -> {
+                                    subscriber.onNext(item)
+                                }
+                                is LastSeen.Seen<T> -> {
+                                    if(lastSeenCaptured.value != item) {
+                                        subscriber.onNext(item)
+                                    }
+                                }
+                            }
+                            lastSeen = LastSeen.Seen(item)
+                        }
+                    }
+
+                    this@distinctUntilChanged.subscribe(
+                        sourceSubscriber!!
+                    )
+                }
+            }
+        )
+    }
+
+
+}
+
+/**
+ * A maybe type just because our maybe value itself could be null.
+ */
+sealed class LastSeen<T: Any> {
+    class NoneYet<T: Any>: LastSeen<T>()
+    class Seen<T: Any>(val value: T): LastSeen<T>()
 }
 
 /**
@@ -718,6 +873,7 @@ fun <T : Any> Publisher<out T>.shareAndReplayTypesOnResubscribe(vararg types: Cl
     }
 }
 
+@Suppress("UNCHECKED_CAST") // Suppression because of variance issues.
 fun <T> Publisher<T>.doOnSubscribe(behaviour: () -> Unit): Publisher<T> {
     return Publisher { subscriber ->
         val wrappedSubscriber = object : Subscriber<T> by subscriber as Subscriber<T> {
@@ -730,6 +886,7 @@ fun <T> Publisher<T>.doOnSubscribe(behaviour: () -> Unit): Publisher<T> {
     }
 }
 
+@Suppress("UNCHECKED_CAST") // Suppression because of variance issues.
 fun <T> Publisher<T>.doOnRequest(behaviour: () -> Unit): Publisher<T> {
     return Publisher { subscriber ->
         val wrappedSubscriber = object : Subscriber<T> by subscriber as Subscriber<T> {
@@ -755,10 +912,9 @@ fun <T> Publisher<T>.doOnRequest(behaviour: () -> Unit): Publisher<T> {
 /**
  * Execute the given block when the subscription is cancelled.
  */
+@Suppress("UNCHECKED_CAST") // Warning suppression needed because of variance issues.
 fun <T> Publisher<T>.doOnUnsubscribe(behaviour: () -> Unit): Publisher<T> {
     return Publisher { subscriber ->
-        // I guess do it on complete & cancel?
-
         val wrappedSubscriber = object : Subscriber<T> by subscriber as Subscriber<T> {
             override fun onSubscribe(subscription: Subscription) {
                 val wrappedSubscription = object : Subscription {
@@ -838,60 +994,70 @@ class PublishSubject<T> : Subject<T> {
  * Not thread safe, and uses Android static API (the main looper) and thus assumes subscription
  * and emission on the Android main thread.  Thus will break tests.
  */
+@Suppress("UNCHECKED_CAST") // Suppression because of variance issues.
 fun <T> Publisher<T>.timeout(interval: Long, unit: TimeUnit): Publisher<T> {
-    return Publisher { subscriber ->
+
+    class TimeoutPublisher: Publisher<T> {
+        @Volatile
         var stillWaiting = true
+        @Volatile
         var requested = false
-        this@timeout.subscribe(
-            object : Subscriber<T> by subscriber as Subscriber<T> {
-                override fun onComplete() {
-                    stillWaiting = false
-                    subscriber.onComplete()
-                }
 
-                override fun onNext(item: T) {
-                    stillWaiting = false
-                    subscriber.onNext(item)
-                }
-
-                override fun onError(error: Throwable) {
-                    stillWaiting = false
-                    subscriber.onError(error)
-                }
-
-                override fun onSubscribe(subscription: Subscription) {
-                    val clientSubscription = object : Subscription {
-                        override fun cancel() {
-
-                            // cancel the source:
-                            subscription.cancel()
-
-                            // cancel the timer:
-                            stillWaiting = false
-                        }
-
-                        override fun request(n: Long) {
-                            subscription.request(n)
-
-                            if(requested) return
-                            requested = true
-                            val handler = Handler(Looper.getMainLooper())
-
-                            handler.postDelayed({
-                                if(stillWaiting) {
-                                    // timeout has run out!
-                                    onError(Throwable("$interval ${unit.name.toLowerCase()} timeout has expired."))
-                                    subscription.cancel()
-                                }
-                            }, unit.toMillis(interval))
-                        }
+        override fun subscribe(subscriber: Subscriber<in T>) {
+            this@timeout.subscribe(
+                object : Subscriber<T> by subscriber as Subscriber<T> {
+                    override fun onComplete() {
+                        stillWaiting = false
+                        subscriber.onComplete()
                     }
 
-                    subscriber.onSubscribe(clientSubscription)
+                    override fun onNext(item: T) {
+                        stillWaiting = false
+                        log.v("Set stillWaiting to $stillWaiting")
+                        subscriber.onNext(item)
+                    }
+
+                    override fun onError(error: Throwable) {
+                        stillWaiting = false
+                        subscriber.onError(error)
+                    }
+
+                    override fun onSubscribe(subscription: Subscription) {
+                        val clientSubscription = object : Subscription {
+                            override fun cancel() {
+
+                                // cancel the source:
+                                subscription.cancel()
+
+                                // cancel the timer:
+                                stillWaiting = false
+                            }
+
+                            override fun request(n: Long) {
+                                subscription.request(n)
+
+                                if(requested) return
+                                requested = true
+                                val handler = Handler(Looper.getMainLooper())
+
+                                handler.postDelayed({
+                                    if(stillWaiting) {
+                                        // timeout has run out!
+                                        onError(Throwable("$interval ${unit.name.toLowerCase()} timeout has expired."))
+                                        subscription.cancel()
+                                    }
+                                }, unit.toMillis(interval))
+                            }
+                        }
+
+                        subscriber.onSubscribe(clientSubscription)
+                    }
                 }
-            }
-        )
+            )
+        }
     }
+
+    return TimeoutPublisher()
 }
 
 fun <T> Collection<T>.asPublisher(): Publisher<T> {
@@ -915,6 +1081,7 @@ fun <T> Collection<T>.asPublisher(): Publisher<T> {
 /**
  * Execute a side-effect whenever an item is emitted by the Publisher.
  */
+@Suppress("UNCHECKED_CAST") // Suppression because of variance issues.
 fun <T> Publisher<T>.doOnNext(callback: (item: T) -> Unit): Publisher<T> {
     val prior = this
     return Publisher { subscriber ->
@@ -937,6 +1104,7 @@ fun <T> Publisher<T>.doOnNext(callback: (item: T) -> Unit): Publisher<T> {
 /**
  * Execute a side-effect whenever an error is emitted by the Publisher.
  */
+@Suppress("UNCHECKED_CAST") // Suppression because of variance issues.
 fun <T> Publisher<T>.doOnError(callback: (error: Throwable) -> Unit): Publisher<T> {
     val prior = this
     return Publisher { subscriber ->
@@ -959,6 +1127,7 @@ fun <T> Publisher<T>.doOnError(callback: (error: Throwable) -> Unit): Publisher<
 /**
  * Execute a side-effect whenever when the Publisher completes.
  */
+@Suppress("UNCHECKED_CAST") // Suppression needed because of variance issues.
 fun <T> Publisher<T>.doOnComplete(callback: () -> Unit): Publisher<T> {
     val prior = this
     return Publisher { subscriber ->
@@ -981,7 +1150,8 @@ fun <T> Publisher<T>.doOnComplete(callback: () -> Unit): Publisher<T> {
 /**
  * Transform any emitted errors into in-band values.
  */
-fun <T> Publisher<T>.onErrorReturn(callback: (throwable: Throwable) -> T): Publisher<T> {
+@Suppress("UNCHECKED_CAST") // Suppression because of variance issues.
+fun <T> Publisher<T>.onErrorReturn(callback: (throwable: Throwable) -> T): Publisher<out T> {
     val prior = this
     return Publisher { subscriber ->
         prior.subscribe(object : Subscriber<T> by subscriber as Subscriber<T> {

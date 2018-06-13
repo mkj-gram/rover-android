@@ -17,6 +17,7 @@ import io.rover.rover.core.logging.GlobalStaticLogHolder
 import io.rover.rover.core.logging.JvmLogger
 import io.rover.rover.core.logging.log
 import io.rover.rover.core.operations.ActionBehaviourMappingInterface
+import io.rover.rover.core.streams.Scheduler
 import org.amshove.kluent.mock
 import org.amshove.kluent.shouldBeLessThan
 import org.jetbrains.spek.api.Spek
@@ -49,6 +50,12 @@ class RenderingIntegrationTest : Spek({
                         container.register(Scope.Singleton, ActionBehaviourMappingInterface::class.java) { resolver ->
                             mock()
                         }
+
+                        container.register(
+                            Scope.Singleton,
+                            Scheduler::class.java,
+                            "main"
+                        ) { resolver -> mock() }
 
                         container.register(
                             Scope.Singleton,

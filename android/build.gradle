@@ -5,14 +5,14 @@ buildscript {
     // NOTE: MAKE SURE rover-android-sdk/build.gradle is updated with the same number!
     ext.rover_sdk_version = '2.0.0-dev'
 
-    ext.kotlin_version = '1.2.31'
+    ext.kotlin_version = '1.2.41'
 
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.1.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.0.31"
         classpath 'com.google.gms:google-services:3.2.0'

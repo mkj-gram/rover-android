@@ -25,10 +25,8 @@ import io.rover.rover.core.data.ServerKey
 import io.rover.rover.core.data.domain.Attributes
 import io.rover.rover.core.data.graphql.GraphQlApiService
 import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
-import io.rover.rover.core.data.graphql.WireEncoder
 import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionNetworkClient
 import io.rover.rover.core.data.http.NetworkClient
-import io.rover.rover.core.data.http.WireEncoderInterface
 import io.rover.rover.core.data.state.StateManagerService
 import io.rover.rover.core.data.state.StateManagerServiceInterface
 import io.rover.rover.core.events.ContextProvider
@@ -50,9 +48,6 @@ import io.rover.rover.core.events.contextproviders.ScreenContextProvider
 import io.rover.rover.core.events.contextproviders.TelephonyContextProvider
 import io.rover.rover.core.events.contextproviders.TimeZoneContextProvider
 import io.rover.rover.core.events.domain.Event
-import io.rover.rover.core.logging.AndroidLogger
-import io.rover.rover.core.logging.EventQueueLogger
-import io.rover.rover.core.logging.GlobalStaticLogHolder
 import io.rover.rover.core.operations.ActionBehaviour
 import io.rover.rover.core.operations.ActionBehaviourMapping
 import io.rover.rover.core.operations.ActionBehaviourMappingInterface
@@ -135,10 +130,6 @@ class CoreAssembler @JvmOverloads constructor(
             DateFormatting()
         }
 
-        container.register(Scope.Singleton, WireEncoderInterface::class.java) { resolver ->
-            WireEncoder(resolver.resolveSingletonOrFail(DateFormattingInterface::class.java))
-        }
-
         container.register(Scope.Singleton, Executor::class.java, "io") { _ ->
             IoMultiplexingExecutor.build("io")
         }
@@ -163,12 +154,12 @@ class CoreAssembler @JvmOverloads constructor(
             GraphQlApiService(
                 URL(endpoint),
                 resolver.resolveSingletonOrFail(AuthenticationContext::class.java),
-                resolver.resolveSingletonOrFail(WireEncoderInterface::class.java),
-                resolver.resolveSingletonOrFail(NetworkClient::class.java)
+                resolver.resolveSingletonOrFail(NetworkClient::class.java),
+                resolver.resolveSingletonOrFail(DateFormattingInterface::class.java)
             )
         }
 
-        container.register(Scope.Singleton, PermissionsNotifierInterface::class.java) { resolver ->
+        container.register(Scope.Singleton, PermissionsNotifierInterface::class.java) { _ ->
             PermissionsNotifier(
                 application
             )
@@ -185,7 +176,7 @@ class CoreAssembler @JvmOverloads constructor(
             )
         }
 
-        container.register(Scope.Singleton, ImageOptimizationServiceInterface::class.java) { resolver ->
+        container.register(Scope.Singleton, ImageOptimizationServiceInterface::class.java) { _ ->
             ImageOptimizationService()
         }
 
@@ -250,11 +241,11 @@ class CoreAssembler @JvmOverloads constructor(
             )
         }
 
-        container.register(Scope.Singleton, ContextProvider::class.java, "application") { resolver ->
+        container.register(Scope.Singleton, ContextProvider::class.java, "application") { _ ->
             ApplicationContextProvider(application)
         }
 
-        container.register(Scope.Singleton, ContextProvider::class.java, "deviceName") { resolver ->
+        container.register(Scope.Singleton, ContextProvider::class.java, "deviceName") { _ ->
             DeviceNameContextProvider(application)
         }
 
@@ -265,7 +256,7 @@ class CoreAssembler @JvmOverloads constructor(
         }
 
         BluetoothAdapter.getDefaultAdapter().whenNotNull { bluetoothAdapter ->
-            container.register(Scope.Singleton, ContextProvider::class.java, "bluetooth") { resolver ->
+            container.register(Scope.Singleton, ContextProvider::class.java, "bluetooth") { _ ->
                 BluetoothContextProvider(bluetoothAdapter)
             }
         }
@@ -283,7 +274,7 @@ class CoreAssembler @JvmOverloads constructor(
             )
         }
 
-        container.register(Scope.Singleton, EmbeddedWebBrowserDisplayInterface::class.java) { resolver ->
+        container.register(Scope.Singleton, EmbeddedWebBrowserDisplayInterface::class.java) { _ ->
             EmbeddedWebBrowserDisplay(
                 chromeTabBackgroundColor
             )
@@ -299,7 +290,7 @@ class CoreAssembler @JvmOverloads constructor(
         container.register(
             Scope.Singleton,
             TopLevelNavigation::class.java
-        ) { resolver ->
+        ) { _ ->
             DefaultTopLevelNavigation(application)
         }
 
@@ -374,7 +365,7 @@ class CoreAssembler @JvmOverloads constructor(
             Scope.Transient,
             ActionBehaviour::class.java,
             "openURL"
-        ) { resolver, url: URI ->
+        ) { _, url: URI ->
             // what if I map them
             ActionBehaviour.IntentAction(
                 Intent(

@@ -6,6 +6,7 @@ import android.os.Looper
 import io.rover.notifications.domain.PushAction
 import io.rover.notifications.graphql.decodeJson
 import io.rover.rover.core.events.EventQueueServiceInterface
+import io.rover.rover.core.events.PushTokenTransmissionChannel
 import io.rover.rover.core.logging.log
 import io.rover.rover.core.operations.ActionBehaviour
 import io.rover.rover.core.operations.ActionBehaviourMappingInterface
@@ -17,20 +18,13 @@ import java.net.MalformedURLException
 
 
 open class PushReceiver(
-    // TODO change to private val pushTokenTransmissionChannel: PushTokenTransmissionChannel,
-    private val eventsPlugin: EventQueueServiceInterface,
+    private val pushTokenTransmissionChannel: PushTokenTransmissionChannel,
     private val dateFormatting: DateFormattingInterface,
     private val actionBehaviourMapping: ActionBehaviourMappingInterface
 ): PushReceiverInterface {
 
     override fun onTokenRefresh(token: String?) {
-        // so, we need the token to be consumable from a FirebasePushTokenContextProvider
-
-        // TODO to make things safer for GCM consumers, which may be calling this off the main
-        // thread, manually delegate this to the main thread just in case.
-        Handler(Looper.getMainLooper()).post {
-            eventsPlugin.setPushToken(token)
-        }
+        pushTokenTransmissionChannel.setPushToken(token)
     }
 
     /**

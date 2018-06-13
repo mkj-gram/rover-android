@@ -8,7 +8,6 @@ import io.rover.rover.core.container.Container
 import io.rover.rover.core.container.Resolver
 import io.rover.rover.core.container.Scope
 import io.rover.rover.core.data.domain.Attributes
-import io.rover.rover.core.data.http.WireEncoderInterface
 import io.rover.rover.core.data.state.StateManagerServiceInterface
 import io.rover.rover.core.events.ContextProvider
 import io.rover.rover.core.events.EventQueueServiceInterface
@@ -25,6 +24,7 @@ import io.rover.notifications.domain.Notification
 import io.rover.notifications.ui.NotificationCenterListViewModel
 import io.rover.notifications.ui.concerns.NotificationCenterListViewModelInterface
 import io.rover.notifications.ui.concerns.NotificationsRepositoryInterface
+import io.rover.rover.core.events.PushTokenTransmissionChannel
 import io.rover.rover.core.routing.ActionIntentBackstackSynthesizerInterface
 import io.rover.rover.platform.DateFormattingInterface
 import io.rover.rover.platform.LocalStorage
@@ -91,6 +91,12 @@ class NotificationsAssembler @JvmOverloads constructor(
             )
         }
 
+        // and now re-register a factory to return that same object instance, but as the
+        // PushTokenTransmissionChannel.
+        container.register(Scope.Singleton, PushTokenTransmissionChannel::class.java) { resolver ->
+            resolver.resolve(ContextProvider::class.java, "pushToken") as PushTokenTransmissionChannel
+        }
+
         container.register(
             Scope.Transient, // can be a singleton because it is stateless and has no parameters.
             NotificationCenterListViewModelInterface::class.java
@@ -130,7 +136,7 @@ class NotificationsAssembler @JvmOverloads constructor(
             PushReceiverInterface::class.java
         ) { resolver ->
             PushReceiver(
-                resolver.resolveSingletonOrFail(EventQueueServiceInterface::class.java),
+                resolver.resolveSingletonOrFail(PushTokenTransmissionChannel::class.java),
                 resolver.resolveSingletonOrFail(DateFormattingInterface::class.java),
                 resolver.resolveSingletonOrFail(ActionBehaviourMappingInterface::class.java)
             )

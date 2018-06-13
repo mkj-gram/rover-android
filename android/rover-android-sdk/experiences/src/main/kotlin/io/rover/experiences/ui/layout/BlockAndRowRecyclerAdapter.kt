@@ -1,29 +1,44 @@
 package io.rover.experiences.ui.layout
 
 import android.support.v7.widget.RecyclerView
+import android.util.DisplayMetrics
 import android.view.ViewGroup
-import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
 import io.rover.experiences.ui.blocks.barcode.BarcodeBlockView
 import io.rover.experiences.ui.blocks.button.ButtonBlockView
-import io.rover.experiences.ui.blocks.image.ImageBlockView
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableView
+import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
+import io.rover.experiences.ui.blocks.image.ImageBlockView
 import io.rover.experiences.ui.blocks.rectangle.RectangleBlockView
-import io.rover.experiences.ui.layout.row.RowView
 import io.rover.experiences.ui.blocks.text.TextBlockView
 import io.rover.experiences.ui.blocks.web.WebBlockView
+import io.rover.experiences.ui.layout.row.RowView
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.MeasuredSize
+import io.rover.rover.core.ui.concerns.ViewModelBinding
 
 /**
  * The RecyclerView adapter for Experience layouts.
  */
-class BlockAndRowRecyclerAdapter(
-    private val viewModelSequence: List<LayoutableViewModel>
+open class BlockAndRowRecyclerAdapter(
+    private val layout: Layout,
+    private val displayMetrics: DisplayMetrics
 ) : RecyclerView.Adapter<BlockAndRowRecyclerAdapter.LayoutableBlockHolder>() {
+
+    private val viewModels = layout.coordinatesAndViewModels.map { it.viewModel }
+
     override fun getItemCount(): Int {
-        return viewModelSequence.size
+        return viewModels.size
     }
 
     override fun onBindViewHolder(holder: LayoutableBlockHolder, position: Int) {
-        holder.viewModel = viewModelSequence[position]
+        holder.viewModel = BindableView.Binding(
+            viewModels[position],
+            MeasuredSize(
+                layout.coordinatesAndViewModels[position].position.width(),
+                layout.coordinatesAndViewModels[position].position.height(),
+                displayMetrics.density
+            )
+        )
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LayoutableBlockHolder {
@@ -34,7 +49,7 @@ class BlockAndRowRecyclerAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        val viewModel = viewModelSequence[position]
+        val viewModel = viewModels[position]
         return viewModel.viewType.ordinal
     }
 
@@ -53,7 +68,7 @@ class BlockAndRowRecyclerAdapter(
             ViewType.Barcode -> BarcodeBlockView(parent.context)
         } as LayoutableView<LayoutableViewModel>
 
-        // TODO: should we delegate this to the upcoming improved DI system?
+        // TODO: should we delegate this to the Experiences DI container?
     }
 
     /**
@@ -64,12 +79,8 @@ class BlockAndRowRecyclerAdapter(
     ) : RecyclerView.ViewHolder(
         layoutableItemView.view
     ) {
-        var viewModel: LayoutableViewModel? = null
-            set(value) {
-                if (value != null) {
-                    layoutableItemView.viewModel = value
-                }
-                field = value
-            }
+        var viewModel: BindableView.Binding<LayoutableViewModel>? by ViewModelBinding { binding, _ ->
+            layoutableItemView.viewModel = binding
+        }
     }
 }

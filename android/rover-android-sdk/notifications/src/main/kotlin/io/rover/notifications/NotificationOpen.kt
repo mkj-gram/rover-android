@@ -3,10 +3,9 @@ package io.rover.notifications
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import io.rover.rover.core.data.domain.AttributeValue
 import io.rover.notifications.domain.Notification
 import io.rover.notifications.graphql.decodeJson
-import io.rover.rover.core.data.http.WireEncoderInterface
+import io.rover.rover.core.data.domain.AttributeValue
 import io.rover.rover.core.events.EventQueueService
 import io.rover.rover.core.events.EventQueueServiceInterface
 import io.rover.rover.core.events.domain.Event
@@ -15,7 +14,6 @@ import io.rover.rover.core.operations.ActionBehaviour
 import io.rover.rover.core.operations.ActionBehaviourMappingInterface
 import io.rover.rover.core.routing.ActionIntentBackstackSynthesizerInterface
 import io.rover.rover.core.ui.OpenAppAction
-import io.rover.rover.platform.DateFormatting
 import io.rover.rover.platform.DateFormattingInterface
 import org.json.JSONObject
 

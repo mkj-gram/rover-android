@@ -8,6 +8,7 @@ import android.widget.ImageView
 import io.rover.rover.platform.toAndroidBitmap
 import io.rover.rover.core.ui.concerns.ViewModelBinding
 import io.rover.experiences.ui.blocks.concerns.layout.PaddingContributor
+import io.rover.rover.core.ui.concerns.BindableView
 import io.rover.shaded.zxing.com.google.zxing.BarcodeFormat
 import io.rover.shaded.zxing.com.google.zxing.EncodeHintType
 import io.rover.shaded.zxing.com.google.zxing.MultiFormatWriter
@@ -28,9 +29,10 @@ class ViewBarcode(
         barcodeView.scaleType = ImageView.ScaleType.FIT_XY
     }
 
-    override var barcodeViewModel: BarcodeViewModelInterface? by ViewModelBinding { viewModel, _ ->
+    override var viewModel: BindableView.Binding<BarcodeViewModelInterface>? by ViewModelBinding { binding, _ ->
         // TODO: render off-thread (although generation seems fast so it may not matter too
         // much).
+        val viewModel = binding?.viewModel
         if (viewModel != null) {
             // TODO: factor this out into a "BarcodeService"
             val bitmap = MultiFormatWriter().encode(
@@ -72,5 +74,5 @@ class ViewBarcode(
     }
 
     override val contributedPadding: Rect
-        get() = barcodeViewModel?.paddingDeflection?.asAndroidRect() ?: throw RuntimeException("ViewBarcode must be bound to the view model before ViewBlock.") // not a great way to enforce this invariant, alas.
+        get() = viewModel?.viewModel?.paddingDeflection?.asAndroidRect() ?: throw RuntimeException("ViewBarcode must be bound to the view model before ViewBlock.") // not a great way to enforce this invariant, alas.
 }

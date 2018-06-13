@@ -30,7 +30,7 @@ class AccountAssembler(
         container.register(
             Scope.Singleton,
             LoginActivity.LoginActivityTargetIntent::class.java
-        ) { resolver ->
+        ) { _ ->
             LoginActivity.LoginActivityTargetIntent(
                 targetIntent
             )

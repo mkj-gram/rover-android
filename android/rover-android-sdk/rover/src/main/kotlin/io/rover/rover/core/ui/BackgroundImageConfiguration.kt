@@ -1,5 +1,6 @@
 package io.rover.rover.core.ui
 
+import android.graphics.Bitmap
 import android.graphics.Shader
 import io.rover.rover.core.ui.Rect
 

@@ -1,11 +1,24 @@
 package io.rover.rover.core.ui.concerns
 
 import android.view.View
+import io.rover.rover.core.ui.RectF
 
 /**
  * A ViewModel that an appropriate Rover view can be bound to.
  */
 interface BindableViewModel
+
+
+/**
+ * View models that wish to be informed early (when they are present on the screen but out of view)
+ * of what their measured size is, so they can perhaps do some sort of asynchronous background
+ * update behaviour.
+ */
+interface PrefetchAfterMeasure {
+    fun measuredSizeReadyForPrefetch(
+        measuredSize: MeasuredSize
+    )
+}
 
 /**
  * Wraps a Rover Android [View] that can be bound to a [BindableViewModel].
@@ -15,8 +28,48 @@ interface BindableViewModel
  * various different [View] subclasses.
  */
 interface BindableView<VM : BindableViewModel> {
-    var viewModel: VM?
+    // TODO rename to viewModelBinding
+    var viewModel: Binding<VM>?
 
     val view: View
         get() = this as View
+
+    data class Binding<out VM: BindableViewModel>(
+        /**
+         * The view model which should be bound to the view, and its contents/behaviour thus
+         * displayed.
+         */
+        val viewModel: VM,
+
+        /**
+         * If relevant for this type of view model, the measured size for the content performed
+         * during the layout pass.
+         */
+        val measuredSize: MeasuredSize? = null
+    )
+}
+
+data class MeasuredSize(
+    /**
+     * Width, in dps.
+     */
+    val width: Float,
+
+    /**
+     * Height, in dps.
+     */
+    val height: Float,
+
+    /**
+     * The conversion factor between the dps and device-dependent pixels.
+     */
+    val density: Float
+)
+
+fun RectF.toMeasuredSize(density: Float): MeasuredSize {
+    return MeasuredSize(
+        width(),
+        height(),
+        density
+    )
 }

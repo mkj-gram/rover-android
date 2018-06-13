@@ -14,26 +14,32 @@ import io.rover.rover.platform.whenNotNull
 import io.rover.rover.core.ui.dpAsPx
 import io.rover.experiences.ui.blocks.concerns.layout.PaddingContributor
 import io.rover.experiences.ui.blocks.concerns.ViewCompositionInterface
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.ViewModelBinding
 
 class ViewBorder(
-    private val view: View,
+    override val view: View,
     viewComposition: ViewCompositionInterface
 ) : ViewBorderInterface, PaddingContributor {
     // State:
     private var configuration: MaskConfiguration? = null
     private var size: Pair<Int, Int>? = null
 
+    override var viewModel: BindableView.Binding<BorderViewModelInterface>? by ViewModelBinding { binding, subscriptionCallback ->
+        renderRoundedCornersMaskIfPossible(binding?.viewModel)
+    }
+
     init {
         val displayMetrics = view.resources.displayMetrics
 
         viewComposition.registerOnSizeChangedCallback { width, height, _, _ ->
             size = Pair(width, height)
-            renderRoundedCornersMaskIfPossible()
+            renderRoundedCornersMaskIfPossible(viewModel?.viewModel)
         }
 
         // register callbacks with the View to get into the canvas rendering chain.
         viewComposition.registerAfterDraw { canvas ->
-            val viewModel = borderViewModel
+            val viewModel = this.viewModel?.viewModel
             val configuration = this.configuration
 
             // canvas is potentially deflected because of a content scroll, particularly with web
@@ -94,8 +100,7 @@ class ViewBorder(
      * Canvas.drawRoundRect would only touch those pixels the mask would directly apply to, thus
      * leaving the PorterDuff filter useless.
      */
-    private fun renderRoundedCornersMaskIfPossible() {
-        val viewModel = borderViewModel
+    private fun renderRoundedCornersMaskIfPossible(viewModel: BorderViewModelInterface?) {
         val size = this.size
 
         configuration = if (viewModel != null && size != null) {
@@ -170,19 +175,11 @@ class ViewBorder(
         view.invalidate()
     }
 
-    override var borderViewModel: BorderViewModelInterface? = null
-        set(viewModel) {
-            field = viewModel
-            if (viewModel != null) {
-                field = viewModel
 
-                renderRoundedCornersMaskIfPossible()
-            }
-        }
 
     override val contributedPadding: Rect
         get() {
-            return borderViewModel.whenNotNull {
+            return viewModel?.viewModel.whenNotNull {
                 Rect(
                     it.borderWidth,
                     it.borderWidth,

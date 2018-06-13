@@ -50,7 +50,7 @@ interface ExperienceViewModelInterface : BindableViewModel {
         ): Event()
 
         /**
-         * The user should be navigated somewhere external to
+         * The user should be navigated somewhere external to the experience.
          */
         data class NavigateTo(
             val externalNavigationEvent: ExperienceExternalNavigationEvent

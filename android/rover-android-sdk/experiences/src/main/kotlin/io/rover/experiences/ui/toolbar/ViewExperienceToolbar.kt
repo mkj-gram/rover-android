@@ -2,6 +2,7 @@ package io.rover.experiences.ui.toolbar
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.support.v7.app.ActionBar
@@ -34,9 +35,6 @@ class ViewExperienceToolbar(
     private val defaultStatusBarColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         hostWindowForStatusBar.statusBarColor
     } else 0
-
-    // we need to create and hold a MenuItem
-    private var activeCloseMenuItem: MenuItem? = null
 
     /**
      * We'll cancel the subscription to the observable chain created in setViewModelAndReturnToolbar()
@@ -102,8 +100,13 @@ class ViewExperienceToolbar(
                 if (!configuration.useExistingStyle) {
                     // TODO may do with the style above instead
                     toolbar.background = ColorDrawable(configuration.color)
+                    closeButton.setTextColor(configuration.buttonColor)
 
-                    closeButton.setTextColor(configuration.textColor)
+                    // best effort: if on API 21 or better, set the back nav icon color. Otherwise,
+                    // it just fails back to the default.
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        toolbar.navigationIcon?.setTint(configuration.buttonColor)
+                    }
                 }
 
                 // status bar color only supported on Lollipop and greater.
@@ -113,7 +116,6 @@ class ViewExperienceToolbar(
                     }
                 }
 
-                // activeCloseMenuItem!!.isVisible = toolbarViewModel.configuration.closeButton
                 textButton.visibility = if (toolbarViewModel.configuration.closeButton) View.VISIBLE else View.GONE
             }, { error -> throw(error) }, { subscription ->
                 activeMenuSubscription = subscription

@@ -11,27 +11,36 @@ import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
 import io.rover.rover.core.ui.PixelSize
 import io.rover.experiences.ui.blocks.concerns.layout.CompositeBlockViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.Measurable
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.rover.core.ui.concerns.MeasuredSize
+import io.rover.rover.core.ui.concerns.PrefetchAfterMeasure
 
-interface ViewImageInterface {
-    var imageBlockViewModel: ImageBlockViewModelInterface?
-}
+// ViewImage mixin is binding against ImageBlockViewModelInterface instead of
+// ImageViewModelInterface in order to discover the block's opacity for use in an animation.  This
+// is a hack and should be solved properly.
+interface ViewImageInterface: BindableView<ImageBlockViewModelInterface>
 
-interface ImageViewModelInterface : Measurable {
-    // TODO: I may elect to demote the Bitmap concern from the ViewModel into just the View (or a
-    // helper of some kind) in order to avoid a thick Android object (Bitmap) being touched here
+interface ImageViewModelInterface : Measurable, BindableViewModel, PrefetchAfterMeasure {
+    /**
+     * Subscribe to be informed of the image becoming ready.
+     */
+    val imageUpdates: Publisher<ImageUpdate>
+
+    data class ImageUpdate(
+        val bitmap: Bitmap,
+        val fadeIn: Boolean
+    )
 
     /**
-     * Get the needed image for display, hitting caches if possible and the network if necessary.
-     * You'll need to give a [PixelSize] of the target view the image will be landing in.  This will
-     * allow for optimizations to select, download, and cache the appropriate size of content.
+     * Inform the view model of the display geometry of the image view, so that it may
+     * make an attempt to retrieve the image for display.
      *
-     * Remember to call [NetworkTask.resume] to start the retrieval, or your callback will never
-     * be hit.
+     * Be sure to subscribe to [imageUpdates] first.
      */
-    fun requestImage(
-        targetViewPixelSize: PixelSize,
-        displayMetrics: DisplayMetrics
-    ): Publisher<Bitmap>
+    fun informDimensions(
+        measuredSize: MeasuredSize
+    )
 }
 
 interface ImageBlockViewModelInterface :
@@ -42,4 +51,5 @@ interface ImageBlockViewModelInterface :
     BorderViewModelInterface,
     ImageViewModelInterface
 
+@Deprecated("Use MeasuredSize passed in through the view model Binding.")
 typealias DimensionCallback = (width: Int, height: Int) -> Unit

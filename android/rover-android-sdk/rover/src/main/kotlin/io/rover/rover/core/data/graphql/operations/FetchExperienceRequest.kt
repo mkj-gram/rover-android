@@ -2,7 +2,7 @@ package io.rover.rover.core.data.graphql.operations
 
 import io.rover.rover.core.data.domain.Experience
 import io.rover.rover.core.data.GraphQlRequest
-import io.rover.rover.core.data.http.WireEncoderInterface
+import io.rover.rover.core.data.graphql.operations.data.decodeJson
 import org.json.JSONObject
 
 class FetchExperienceRequest(
@@ -43,8 +43,8 @@ class FetchExperienceRequest(
         }
     }
 
-    override fun decodePayload(responseObject: JSONObject, wireEncoder: WireEncoderInterface): Experience {
-        return wireEncoder.decodeExperience(
+    override fun decodePayload(responseObject: JSONObject): Experience {
+        return Experience.decodeJson(
             responseObject.getJSONObject("data").getJSONObject("experience")
         )
     }

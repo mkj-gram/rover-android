@@ -103,7 +103,7 @@ open class DrawableWrapper(drawable: Drawable) : Drawable(), Drawable.Callback {
     }
 
     override fun jumpToCurrentState() {
-        DrawableCompat.jumpToCurrentState(wrappedDrawable!!)
+        wrappedDrawable!!.jumpToCurrentState()
     }
 
     override fun getCurrent(): Drawable {

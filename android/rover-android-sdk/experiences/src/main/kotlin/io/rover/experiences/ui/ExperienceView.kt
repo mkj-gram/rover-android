@@ -57,7 +57,8 @@ class ExperienceView : CoordinatorLayout, BindableView<ExperienceViewModelInterf
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    override var viewModel: ExperienceViewModelInterface? by ViewModelBinding(false) { viewModel, subscriptionCallback ->
+    override var viewModel: BindableView.Binding<ExperienceViewModelInterface>? by ViewModelBinding(false) { binding, subscriptionCallback ->
+        val viewModel = binding?.viewModel
         // sadly have to set rebindingAllowed to be false because of complexity dealing with the
         // toolbar. May fix it later as required. TODO: put a note here about note why this is?
 
@@ -128,8 +129,10 @@ class ExperienceView : CoordinatorLayout, BindableView<ExperienceViewModelInterf
             }, { throw(it) }, { subscriptionCallback(it) })
 
             viewModel.experienceNavigation.androidLifecycleDispose(this).subscribe( { experienceNavigationViewModel ->
-                experienceNavigationView.viewModel = experienceNavigationViewModel
-                turnOffProgressIndicator()
+                experienceNavigationView.viewModel = BindableView.Binding(
+                    experienceNavigationViewModel
+                )
+                turnOffProgressIndicator ()
             }, { throw(it) }, { subscriptionCallback(it) })
 
             viewModel.loadingState.androidLifecycleDispose(this).subscribe( { loadingState ->
@@ -186,8 +189,6 @@ class ExperienceView : CoordinatorLayout, BindableView<ExperienceViewModelInterf
     private var toolbar: Toolbar? = null
 
     private val experienceNavigationView: ExperienceNavigationView = ExperienceNavigationView(context)
-
-
 
     private val appBarLayout = AppBarLayout(context)
 

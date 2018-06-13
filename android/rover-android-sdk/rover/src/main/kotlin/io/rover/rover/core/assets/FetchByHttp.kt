@@ -26,7 +26,7 @@ class ImageDownloader (
      * will contain a stream that can be read from until the connection completes.
      */
     fun downloadStreamFromUrl(url: URL): Publisher<HttpClientResponse> {
-        // TODO: do the same global http cache check as the version in data plugin is doing.
+        // TODO: do the same global http cache check as the version in graphql API service is doing.
         // TODO: also need some sort of interception support.
 
         return Publisher { subscriber ->
@@ -85,7 +85,7 @@ class ImageDownloader (
                         log.v("$url -> HTTP $responseCode")
 
                         val result = when (responseCode) {
-                            in 200..299 -> {
+                            in 200..299, 304 -> {
                                 try {
                                     HttpClientResponse.Success(
                                         CloseableBufferedInputStream(

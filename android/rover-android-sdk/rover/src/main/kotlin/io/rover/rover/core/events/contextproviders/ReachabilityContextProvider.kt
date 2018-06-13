@@ -16,6 +16,7 @@ class ReachabilityContextProvider(
 ): ContextProvider {
     private val connectionManager = applicationContext.applicationContext.getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+    @Suppress("DEPRECATION") // Using deprecated API only on legacy Android.
     private fun getNetworkInfoForType(networkType: Int): List<NetworkInfo> {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             connectionManager.allNetworks.map { network ->

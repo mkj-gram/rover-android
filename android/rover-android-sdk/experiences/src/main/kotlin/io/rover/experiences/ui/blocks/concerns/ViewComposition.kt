@@ -65,6 +65,7 @@ interface ViewCompositionInterface {
      */
     fun registerAfterDraw(stage: (Canvas) -> Unit)
 
+    @Deprecated("Use MeasuredSize passed in with View Model binding instead.")
     fun registerOnSizeChangedCallback(callback: (width: Int, height: Int, oldWidth: Int, oldHeight: Int) -> Unit)
 
     // The following methods must be wired up!

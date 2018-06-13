@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
 
                 AlertDialog.Builder(this)
                     .setMessage("Rover Android Test App would like to use your location for Geofences and Beacons.")
-                    .setNeutralButton("Got it") { dialogInterface, which ->
+                    .setNeutralButton("Got it") { _, _ ->
                         makePermissionsAttempt()
                     }
             } else {

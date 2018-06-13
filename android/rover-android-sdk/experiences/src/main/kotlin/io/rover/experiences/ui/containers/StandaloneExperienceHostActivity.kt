@@ -20,6 +20,9 @@ import io.rover.experiences.ui.ExperienceViewModel
 import io.rover.experiences.ui.ExperienceViewModelInterface
 import io.rover.experiences.ui.navigation.ExperienceExternalNavigationEvent
 import io.rover.rover.core.operations.ActionBehaviour
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.rover.platform.whenNotNull
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
@@ -49,8 +52,7 @@ open class StandaloneExperienceHostActivity : AppCompatActivity() {
      * to do some other sort of external behaviour in your app, such as open a native login screen.
      */
     protected open fun dispatchExternalNavigationEvent(externalNavigationEvent: ExperienceExternalNavigationEvent) {
-        // TODO: all getting replaced with ActionBehaviour delegation! ... somehow
-
+        // TODO: refactor the following into a separate class that takes the host activity as an argument.
         when (externalNavigationEvent) {
             is ExperienceExternalNavigationEvent.Exit -> {
                 finish()
@@ -83,15 +85,13 @@ open class StandaloneExperienceHostActivity : AppCompatActivity() {
         }
     }
 
-    // We're actually just showing a single screen for now
-    // private val experiencesView by lazy { ScreenView(this) }
     protected open val experiencesView by lazy { ExperienceView(this) }
 
     private var experienceViewModel: ExperienceViewModelInterface? = null
         set(viewModel) {
             field = viewModel
 
-            experiencesView.viewModel = viewModel
+            experiencesView.viewModel = viewModel.whenNotNull { BindableView.Binding(it) }
 
             viewModel
                 ?.events

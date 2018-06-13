@@ -6,25 +6,43 @@ import org.reactivestreams.Publisher
 import io.rover.rover.core.data.domain.Background
 import io.rover.rover.core.ui.BackgroundImageConfiguration
 import io.rover.rover.core.ui.PixelSize
+import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.rover.core.ui.concerns.MeasuredSize
+import io.rover.rover.core.ui.concerns.PrefetchAfterMeasure
 
 /**
  * Binds [BackgroundViewModelInterface] properties to that of a view.
  *
  * Backgrounds can specify a background colour or image.
  */
-interface ViewBackgroundInterface {
-    var backgroundViewModel: BackgroundViewModelInterface?
-}
+interface ViewBackgroundInterface: BindableView<BackgroundViewModelInterface>
 
 /**
  * This interface is exposed by View Models that have support for a background.  Equivalent to
  * the [Background] domain model interface.
  */
-interface BackgroundViewModelInterface {
+interface BackgroundViewModelInterface: BindableViewModel, PrefetchAfterMeasure {
     val backgroundColor: Int
 
-    fun requestBackgroundImage(
-        targetViewPixelSize: PixelSize,
-        displayMetrics: DisplayMetrics
-    ): Publisher<Pair<Bitmap, BackgroundImageConfiguration>>
+    /**
+     * Subscribe to be informed of the image becoming ready.
+     */
+    val backgroundUpdates: Publisher<BackgroundUpdate>
+
+    data class BackgroundUpdate(
+        val bitmap: Bitmap,
+        val fadeIn: Boolean,
+        val backgroundImageConfiguration: BackgroundImageConfiguration
+    )
+
+    /**
+     * Inform the view model of the display geometry of the image view, so that it may
+     * make an attempt to retrieve the image for display.
+     *
+     * Be sure to subscribe to [imageUpdates] first.
+     */
+    fun informDimensions(
+        measuredSize: MeasuredSize
+    )
 }

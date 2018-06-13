@@ -162,28 +162,16 @@ class ExperienceViewModel(
 
                 // track events with a side-effect, but I need the experience itself in scope.
                 trackEnterExperience(experience)
-                this.events.subscribe { update ->
-                    when(update) {
-                        is ExperienceNavigationViewModelInterface.Emission.Event.NavigateAway -> {
-                            trackLeaveExperience(experience)
-                        }
-                    }
+
+                this.externalNavigationEvents.subscribe { _ ->
+                    trackLeaveExperience(experience)
                 }
             }
         }.shareAndReplay(1)
 
         // filter out all the navigation view model events external navigation events.
         val navigateAwayEvents = experienceNavigation.flatMap { navigationViewModel ->
-            navigationViewModel.events.map { navigationEvent ->
-                when (navigationEvent) {
-                    // pass the ViewEvents further up to the surrounding activity.
-                    // Any external navigation events (exit, load web URI, change backlight)
-                    // from the navigation view model need to be passed up.
-                    is ExperienceNavigationViewModelInterface.Emission.Event.NavigateAway -> {
-                        navigationEvent.event
-                    }
-                }
-            }
+            navigationViewModel.externalNavigationEvents
         }
 
         // emit those navigation events to our view.
@@ -193,26 +181,16 @@ class ExperienceViewModel(
             )
         }
 
-        // all the "update" emissions coming from the navigation view model.
-        val updateEvents = experienceNavigation.flatMap { navigationViewModel ->
-            navigationViewModel.updates
+        // pass through the backlight and toolbar updates.
+        val backlightEvents = experienceNavigation.flatMap { navigationViewModel ->
+            navigationViewModel.backlight
         }
-
+        val toolbarEvents = experienceNavigation.flatMap { navigationViewModel ->
+            navigationViewModel.toolbar
+        }
         val backlightSubject = PublishSubject<Boolean>()
-
-        // and proxy through the backlight and toolbar updates to our view.
-        updateEvents.subscribe { update ->
-            when(update) {
-                is ExperienceNavigationViewModelInterface.Emission.Update.SetActionBar -> {
-                    toolBarSubject.onNext(
-                        update.experienceToolbarViewModel
-                    )
-                }
-                is ExperienceNavigationViewModelInterface.Emission.Update.SetBacklightBoost -> {
-                    backlightSubject.onNext(update.extraBright)
-                }
-            }
-        }
+        backlightEvents.subscribe { backlightSubject.onNext(it) }
+        toolbarEvents.subscribe { toolBarSubject.onNext(it) }
 
         actionBar = toolBarSubject.shareAndReplay(1)
         extraBrightBacklight = backlightSubject.shareAndReplay(1)

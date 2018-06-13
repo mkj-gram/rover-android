@@ -3,14 +3,24 @@ package io.rover.rover.core.assets
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.streams.CallbackReceiver
-import io.rover.rover.core.streams.asPublisher
 import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.data.http.NetworkTask
+import io.rover.rover.core.logging.log
+import io.rover.rover.core.streams.CallbackReceiver
+import io.rover.rover.core.streams.PublishSubject
+import io.rover.rover.core.streams.asPublisher
+import io.rover.rover.core.streams.doOnNext
+import io.rover.rover.core.streams.doOnSubscribe
+import io.rover.rover.core.streams.filter
+import io.rover.rover.core.streams.flatMap
+import io.rover.rover.core.streams.map
+import io.rover.rover.core.streams.onErrorReturn
+import io.rover.rover.core.streams.subscribe
+import io.rover.rover.core.streams.timeout
 import org.reactivestreams.Publisher
 import java.net.URL
 import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 
 internal class AndroidAssetService(
     imageDownloader: ImageDownloader,
@@ -84,11 +94,60 @@ internal class AndroidAssetService(
         )
     }
 
-    override fun getImageByUrl(
+    override fun imageByUrl(
         url: URL
-    ): Publisher<NetworkResult<Bitmap>> {
+    ): Publisher<Bitmap> {
+        return receivedImages
+            .filter { it.url == url }
+            .map { it.bitmap }
+            .doOnSubscribe {
+                // kick off an initial fetch if one is not already running.
+                tryFetch(url)
+            }
+    }
+
+    override fun tryFetch(url: URL) {
+        requests.onNext(url)
+    }
+
+    override fun getImageByUrl(url: URL): Publisher<NetworkResult<Bitmap>> {
+        // TODO: change to also use internal subject.
         // adapt the SynchronousOperationNetworkTask to Publisher:
         return { callback: CallbackReceiver<NetworkResult<Bitmap>> -> synchronousNetworkTaskForImageDownload(url, callback) }.asPublisher()
+    }
+
+    private data class ImageReadyEvent(
+        val url: URL,
+        val bitmap: Bitmap
+    )
+
+    private val requests = PublishSubject<URL>()
+
+    private val receivedImages = PublishSubject<ImageReadyEvent>()
+
+    init {
+        val outstanding: MutableSet<URL> = mutableSetOf()
+        requests
+            .filter { url ->
+                synchronized(outstanding) { url !in outstanding }
+            }
+            .doOnNext { synchronized(outstanding) { outstanding.add(it) } }
+            .flatMap { url ->
+                getImageByUrl(url)
+                    .timeout(10, TimeUnit.SECONDS)
+                    .onErrorReturn {
+                        NetworkResult.Error(it, false)
+                    }
+                    .map { Pair(url, it) }
+            }
+            .subscribe({ (url, result) ->
+                synchronized(outstanding) { outstanding.remove(url) }
+                when(result) {
+                    is NetworkResult.Success -> receivedImages.onNext(
+                        ImageReadyEvent(url, result.response)
+                    )
+                }
+            })
     }
 
     /**

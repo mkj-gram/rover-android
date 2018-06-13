@@ -12,8 +12,12 @@ import io.rover.rover.core.data.domain.Color
  * https://developer.android.com/guide/practices/screens_support.html
  */
 fun Float.dpAsPx(displayMetrics: DisplayMetrics): Int {
-    val scale = displayMetrics.density
-    return (this * scale + 0.5f).toInt()
+    return this.dpAsPx(displayMetrics.density)
+}
+
+fun Float.dpAsPx(displayDensity: Float): Int {
+    // TODO change to: TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, metrics)
+    return (this * displayDensity + 0.5f).toInt()
 }
 
 /**

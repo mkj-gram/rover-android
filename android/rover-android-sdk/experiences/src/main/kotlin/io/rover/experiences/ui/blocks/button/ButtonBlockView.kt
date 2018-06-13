@@ -15,6 +15,7 @@ import io.rover.experiences.ui.blocks.concerns.layout.ViewBlock
 import io.rover.experiences.ui.blocks.concerns.text.AndroidRichTextToSpannedTransformer
 import io.rover.experiences.ui.blocks.concerns.text.ViewText
 import io.rover.rover.core.logging.log
+import io.rover.rover.core.ui.concerns.BindableView
 import io.rover.rover.core.ui.concerns.ViewModelBinding
 
 // API compatibility is managed at runtime in a way that Android lint's static analysis is not able
@@ -26,17 +27,16 @@ class ButtonBlockView : AppCompatTextView, LayoutableView<ButtonBlockViewModelIn
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    override var viewModel: ButtonBlockViewModelInterface? by ViewModelBinding { viewModel, _ ->
-        viewBackground.backgroundViewModel = viewModel
-        viewBorder.borderViewModel = viewModel
-        viewBorder.borderViewModel = viewModel
-        viewBlock.blockViewModel = viewModel
-        viewBackground.backgroundViewModel = viewModel
-        viewText.textViewModel = viewModel
+    override var viewModel: BindableView.Binding<ButtonBlockViewModelInterface>? by ViewModelBinding { binding, _ ->
+        viewBackground.viewModel = binding
+        viewBorder.viewModel = binding
+        viewBlock.viewModel = binding
+        viewBackground.viewModel = binding
+        viewText.viewModel = binding
     }
 
     private val viewComposition = ViewComposition()
-    private val viewBackground = ViewBackground(this, viewComposition)
+    private val viewBackground = ViewBackground(this)
     private val viewBorder = ViewBorder(this, viewComposition)
     private val viewBlock = ViewBlock(this, setOf(viewBorder))
     private val viewText = ViewText(this, AndroidRichTextToSpannedTransformer())

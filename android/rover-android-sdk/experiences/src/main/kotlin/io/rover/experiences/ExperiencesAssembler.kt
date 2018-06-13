@@ -2,6 +2,7 @@ package io.rover.experiences
 
 import android.content.Context
 import android.os.Parcelable
+import android.util.DisplayMetrics
 import io.rover.experiences.routing.ExperienceEnabledTopLevelNavigation
 import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.assets.ImageOptimizationServiceInterface
@@ -35,6 +36,9 @@ import io.rover.experiences.ui.blocks.text.TextBlockViewModel
 import io.rover.experiences.ui.blocks.web.WebViewBlockViewModel
 import io.rover.experiences.ui.blocks.web.WebViewModel
 import io.rover.experiences.ui.blocks.web.WebViewModelInterface
+import io.rover.experiences.ui.layout.BlockAndRowLayoutManager
+import io.rover.experiences.ui.layout.BlockAndRowRecyclerAdapter
+import io.rover.experiences.ui.layout.Layout
 import io.rover.experiences.ui.layout.row.RowViewModel
 import io.rover.experiences.ui.layout.row.RowViewModelInterface
 import io.rover.experiences.ui.layout.screen.ScreenViewModel
@@ -127,7 +131,8 @@ class ExperiencesAssembler: Assembler {
             BackgroundViewModel(
                 background,
                 resolver.resolveSingletonOrFail(AssetService::class.java),
-                resolver.resolveSingletonOrFail(ImageOptimizationServiceInterface::class.java)
+                resolver.resolveSingletonOrFail(ImageOptimizationServiceInterface::class.java),
+                resolver.resolveSingletonOrFail(Scheduler::class.java, "main")
             )
         }
 
@@ -228,16 +233,8 @@ class ExperiencesAssembler: Assembler {
                 image,
                 containingBlock,
                 resolver.resolveSingletonOrFail(AssetService::class.java),
-                resolver.resolveSingletonOrFail(ImageOptimizationServiceInterface::class.java)
-            )
-        }
-
-        container.register(
-            Scope.Transient,
-            ButtonViewModelInterface::class.java
-        ) { resolver, block: ButtonBlock, blockViewModel: BlockViewModelInterface ->
-            ButtonViewModel(
-                blockViewModel
+                resolver.resolveSingletonOrFail(ImageOptimizationServiceInterface::class.java),
+                resolver.resolveSingletonOrFail(Scheduler::class.java, "main")
             )
         }
 
@@ -257,7 +254,8 @@ class ExperiencesAssembler: Assembler {
             BackgroundViewModel(
                 background,
                 resolver.resolveSingletonOrFail(AssetService::class.java),
-                resolver.resolveSingletonOrFail(ImageOptimizationServiceInterface::class.java)
+                resolver.resolveSingletonOrFail(ImageOptimizationServiceInterface::class.java),
+                resolver.resolveSingletonOrFail(Scheduler::class.java, "main")
             )
         }
 
@@ -285,14 +283,8 @@ class ExperiencesAssembler: Assembler {
             Scope.Transient,
             CompositeBlockViewModelInterface::class.java
         ) { resolver: Resolver, block: Block ->
-
             // TODO: perhaps I should register each block as its own factory in the container, to
             // make overriding individual ones easier.
-
-            // crap I have a problem.  Because I my root interface is BlockViewModelInterface,
-            // which naturally contains the layout concerns to all blocks, and I also use
-            // a "BlockViewModel" mixin that implements that interface, I have an ambiguity while
-            // trying to look up that block
             when(block) {
                 is RectangleBlock -> {
                     RectangleBlockViewModel(
@@ -331,9 +323,6 @@ class ExperiencesAssembler: Assembler {
 
                     ButtonBlockViewModel(
                         blockViewModel,
-                        resolver.resolve(
-                            ButtonViewModelInterface::class.java, null, block, blockViewModel
-                        )!!,
                         borderViewModel,
                         resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
                         resolver.resolve(TextViewModelInterface::class.java, "button", block.text)!!
@@ -359,11 +348,26 @@ class ExperiencesAssembler: Assembler {
                     )
                 }
                 else -> throw Exception(
-                    "This Rover UI block type is not yet supported by the 2.0 SDK: ${block.javaClass.simpleName}."
+                    "This Rover UI block type is not supported by this version of the SDK: ${block.javaClass.simpleName}."
                 )
             }
         }
 
+        container.register(
+            Scope.Transient,
+            BlockAndRowRecyclerAdapter::class.java
+        ) { _, layout: Layout, displayMetrics: DisplayMetrics ->
+            BlockAndRowRecyclerAdapter(layout, displayMetrics)
+        }
+
+        container.register(
+            Scope.Transient,
+            BlockAndRowLayoutManager::class.java
+        ) { _, layout: Layout, displayMetrics: DisplayMetrics ->
+            BlockAndRowLayoutManager(
+                layout, displayMetrics
+            )
+        }
         // action types (TODO perhaps delegate to a "sub-assembler"):
         container.register(
             Scope.Transient,
@@ -381,7 +385,9 @@ class ExperiencesAssembler: Assembler {
             Scope.Transient,
             ActionBehaviour::class.java,
             "goToScreen"
-        ) { resolver, screenId: String ->
+        ) { _, _: String ->
+            // goToScreen must be handled in place by the experience navigation view model.  it
+            // cannot be reslolved to an ActionBehaviour.
             ActionBehaviour.Intrinsic()
         }
     }

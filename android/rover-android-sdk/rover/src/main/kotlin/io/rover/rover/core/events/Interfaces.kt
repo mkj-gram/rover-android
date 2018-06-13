@@ -26,7 +26,8 @@ interface ContextProvider {
 }
 
 /**
- * This listens for a push token and ensures that it is transmitted up to the Rover API.
+ * This should be informed of changes to the push token and ensures that it is transmitted up to the
+ * Rover API.
  */
 interface PushTokenTransmissionChannel {
     /**
@@ -67,14 +68,6 @@ interface EventQueueServiceInterface {
      * Asynchronous, will immediately return.
      */
     fun flushNow()
-
-    /**
-     * A temporary method to allow the Push Plugin to set the outgoing firebase push token.
-     *
-     * Will be removed.
-     */
-    @Deprecated("Remove this method once PushTokenTransmissionChannel can be directly injected to the PushReceiver.")
-    fun setPushToken(token: String?)
 }
 
 interface DeviceAttributesInterface {

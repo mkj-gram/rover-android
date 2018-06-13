@@ -5,7 +5,6 @@ import android.os.Looper
 import io.rover.rover.core.data.GraphQlRequest
 import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
-import io.rover.rover.core.data.http.WireEncoderInterface
 import io.rover.rover.core.logging.log
 import io.rover.rover.core.streams.CallbackReceiver
 import io.rover.rover.core.streams.PublishSubject
@@ -78,7 +77,7 @@ private class DeviceStateNetworkRequest(
         put("identifier", deviceIdentifier)
     }
 
-    override fun decodePayload(responseObject: JSONObject, wireEncoder: WireEncoderInterface): JSONObject {
+    override fun decodePayload(responseObject: JSONObject): JSONObject {
         return responseObject.getJSONObject("data").getJSONObject("device")
     }
 

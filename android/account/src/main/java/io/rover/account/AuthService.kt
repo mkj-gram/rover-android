@@ -227,7 +227,7 @@ class CustomAuthContextAssembler(
     private val authContext: AuthenticationContext
 ): Assembler {
     override fun assemble(container: Container) {
-        container.register(Scope.Singleton, AuthenticationContext::class.java) { resolver ->
+        container.register(Scope.Singleton, AuthenticationContext::class.java) { _ ->
             authContext
         }
     }

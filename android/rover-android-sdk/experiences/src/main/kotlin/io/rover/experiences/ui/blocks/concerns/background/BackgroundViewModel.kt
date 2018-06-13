@@ -1,62 +1,80 @@
 package io.rover.experiences.ui.blocks.concerns.background
 
-import android.graphics.Bitmap
-import android.util.DisplayMetrics
-import io.rover.rover.core.data.domain.Background
-import io.rover.rover.core.logging.log
-import org.reactivestreams.Publisher
-import io.rover.rover.core.streams.flatMap
 import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.assets.ImageOptimizationServiceInterface
-import io.rover.rover.core.data.NetworkResult
-import io.rover.rover.core.streams.PublisherOperators
-import io.rover.rover.core.ui.BackgroundImageConfiguration
+import io.rover.rover.core.data.domain.Background
+import io.rover.rover.core.logging.log
+import io.rover.rover.core.streams.*
 import io.rover.rover.core.ui.PixelSize
 import io.rover.rover.core.ui.asAndroidColor
+import io.rover.rover.core.ui.concerns.MeasuredSize
+import io.rover.rover.core.ui.dpAsPx
+import org.reactivestreams.Publisher
+import java.util.concurrent.TimeUnit
 
 class BackgroundViewModel(
     private val background: Background,
     private val assetService: AssetService,
-    private val imageOptimizationService: ImageOptimizationServiceInterface
+    private val imageOptimizationService: ImageOptimizationServiceInterface,
+    mainScheduler: Scheduler
 ) : BackgroundViewModelInterface {
     override val backgroundColor: Int
         get() = background.color.asAndroidColor()
 
-    override fun requestBackgroundImage(
-        targetViewPixelSize: PixelSize,
-        displayMetrics: DisplayMetrics
-    ): Publisher<Pair<Bitmap, BackgroundImageConfiguration>> {
-        val uri = background.image?.url
-        return if (uri != null) {
-            val (urlToFetch, imageConfiguration) =
-                imageOptimizationService.optimizeImageBackground(
-                    background,
-                    targetViewPixelSize,
-                    displayMetrics
-                ) ?: return PublisherOperators.empty()
+    override fun informDimensions(measuredSize: MeasuredSize) {
+        measurementsSubject.onNext(measuredSize)
+    }
 
-            assetService.getImageByUrl(urlToFetch.toURL()).flatMap { result ->
-                when (result) {
-                    is NetworkResult.Success -> {
-                        PublisherOperators.just(
-                            Pair(
-                                result.response,
-                                imageConfiguration
-                            )
-                        )
+    override fun measuredSizeReadyForPrefetch(measuredSize: MeasuredSize) {
+        prefetchMeasurementsSubject.onNext(measuredSize)
+    }
+
+    private val prefetchMeasurementsSubject = PublishSubject<MeasuredSize>()
+    private val measurementsSubject = PublishSubject<MeasuredSize>()
+    private var fadeInNeeded = false
+
+    override val backgroundUpdates: Publisher<BackgroundViewModelInterface.BackgroundUpdate> = PublisherOperators.merge(
+        prefetchMeasurementsSubject.imageFetchTransform(),
+        measurementsSubject
+            .flatMap {
+                PublisherOperators.just(it)
+                    .imageFetchTransform()
+                    .share().apply {
+                        // as a side-effect, register a subscriber right away that will monitor for timeouts
+                        // (but only on asset requests being emitted for view dimensions not for prefetch
+                        // dimensions)
+                        if(background.image != null) {
+                            timeout(100, TimeUnit.MILLISECONDS)
+                                .subscribe(
+                                    {},
+                                    { error ->
+                                        log.v("Fade in needed, because $error")
+                                        fadeInNeeded = true
+                                    }
+                                )
+                        }
                     }
-                    is NetworkResult.Error -> {
-                        // TODO perhaps attempt a retry? or should a lower layer attempt retry?
-                        // concern should remain here if the experience UI should react or indicate
-                        // an error somehow.
-                        log.e("Problem retrieving image: ${result.throwable}")
-                        PublisherOperators.empty()
-                    }
-                }
             }
-        } else {
-            // log.v("Null URI.  No image set.")
-            PublisherOperators.empty()
+    ).shareHotAndReplay(0).observeOn(mainScheduler) // shareHot because this chain is responsible for side-effect of pre-warming cache, even before subscribed.
+
+    private fun Publisher<MeasuredSize>.imageFetchTransform(): Publisher<BackgroundViewModelInterface.BackgroundUpdate> {
+        return flatMap { measuredSize ->
+            val optimizedImage = imageOptimizationService.optimizeImageBackground(
+                background,
+                PixelSize(
+                    measuredSize.width.dpAsPx(measuredSize.density),
+                    measuredSize.height.dpAsPx(measuredSize.density)
+                ),
+                measuredSize.density
+            ) ?: return@flatMap PublisherOperators.empty<BackgroundViewModelInterface.BackgroundUpdate>()
+
+            assetService.imageByUrl(optimizedImage.uri.toURL()).map { bitmap ->
+                BackgroundViewModelInterface.BackgroundUpdate(
+                    bitmap,
+                    fadeInNeeded,
+                    optimizedImage.imageConfiguration
+                )
+            }
         }
     }
 }

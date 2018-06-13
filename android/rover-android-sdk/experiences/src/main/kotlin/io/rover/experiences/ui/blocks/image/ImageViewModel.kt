@@ -2,54 +2,87 @@ package io.rover.experiences.ui.blocks.image
 
 import android.graphics.Bitmap
 import android.util.DisplayMetrics
-import io.rover.rover.core.data.domain.ImageBlock
 import io.rover.rover.core.logging.log
 import org.reactivestreams.Publisher
-import io.rover.rover.core.streams.flatMap
 import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.assets.ImageOptimizationServiceInterface
 import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.data.domain.Block
 import io.rover.rover.core.data.domain.Image
-import io.rover.rover.core.streams.PublisherOperators
+import io.rover.rover.core.streams.*
 import io.rover.rover.core.ui.PixelSize
 import io.rover.rover.core.ui.RectF
+import io.rover.rover.core.ui.concerns.MeasuredSize
+import io.rover.rover.core.ui.dpAsPx
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 class ImageViewModel(
     private val image: Image?,
     private val block: Block,
     private val assetService: AssetService,
-    private val imageOptimizationService: ImageOptimizationServiceInterface
+    private val imageOptimizationService: ImageOptimizationServiceInterface,
+    mainScheduler: Scheduler
 ) : ImageViewModelInterface {
 
-    override fun requestImage(
-        targetViewPixelSize: PixelSize,
-        displayMetrics: DisplayMetrics
-    ): Publisher<Bitmap> {
-        return if(image == null) {
-            PublisherOperators.empty()
-        } else {
-            val uriWithParameters = imageOptimizationService.optimizeImageBlock(
-                image,
-                block,
-                targetViewPixelSize,
-                displayMetrics
-            )
+    override fun informDimensions(measuredSize: MeasuredSize) {
+        measurementsSubject.onNext(measuredSize)
+    }
 
-            val url = URL(uriWithParameters.toString())
+    override fun measuredSizeReadyForPrefetch(measuredSize: MeasuredSize) {
+        prefetchMeasurementsSubject.onNext(measuredSize)
+    }
 
-            assetService.getImageByUrl(url).flatMap { result ->
-                when (result) {
-                    is NetworkResult.Success -> PublisherOperators.just(result.response)
-                    is NetworkResult.Error -> {
-                        // TODO perhaps attempt a retry? or should a lower layer attempt retry?
-                        // concern should remain here if the experience UI should react or indicate
-                        // an error somehow.
-                        log.e("Problem retrieving image: ${result.throwable}")
-                        PublisherOperators.empty()
+    private val prefetchMeasurementsSubject = PublishSubject<MeasuredSize>()
+    private val measurementsSubject = PublishSubject<MeasuredSize>()
+
+    private var fadeInNeeded = false
+
+    override val imageUpdates: Publisher<ImageViewModelInterface.ImageUpdate> = PublisherOperators.merge(
+        prefetchMeasurementsSubject.imageFetchTransform(),
+        measurementsSubject
+            .flatMap {
+                PublisherOperators.just(it)
+                    .imageFetchTransform()
+                    .share()
+                    .apply {
+                        if (image != null) {
+                            timeout(100, TimeUnit.MILLISECONDS)
+                                .subscribe(
+                                    { },
+                                    { error ->
+                                        log.v("Fade in needed, because $error")
+                                        fadeInNeeded = true
+                                    }
+                                )
+                        }
                     }
-                }
+            }
+    ).shareHotAndReplay(0).observeOn(mainScheduler) // shareHot because this chain is responsible for side-effect of pre-warming cache, even before subscribed.
+
+    private fun Publisher<MeasuredSize>.imageFetchTransform(): Publisher<ImageViewModelInterface.ImageUpdate> {
+        return flatMap { measuredSize ->
+            if(image == null) {
+                PublisherOperators.empty()
+            } else {
+                val uriWithParameters = imageOptimizationService.optimizeImageBlock(
+                    image,
+                    block,
+                    PixelSize(
+                        measuredSize.width.dpAsPx(measuredSize.density),
+                        measuredSize.height.dpAsPx(measuredSize.density)
+                    ),
+                    measuredSize.density
+                )
+
+                // so if item does not appear within a threshold of time then turn on a fade-in bit?
+                assetService.imageByUrl(uriWithParameters.toURL())
+                    .map { bitmap ->
+                        ImageViewModelInterface.ImageUpdate(
+                            bitmap,
+                            fadeInNeeded
+                        )
+                    }
             }
         }
     }

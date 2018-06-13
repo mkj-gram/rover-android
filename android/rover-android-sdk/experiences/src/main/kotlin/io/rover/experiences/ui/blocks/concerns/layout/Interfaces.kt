@@ -4,6 +4,7 @@ import android.graphics.Rect
 import io.rover.experiences.ui.blocks.concerns.border.BorderViewModel
 import io.rover.rover.core.ui.RectF
 import io.rover.experiences.ui.navigation.NavigateTo
+import io.rover.rover.core.ui.concerns.BindableView
 import org.reactivestreams.Publisher
 
 /**
@@ -11,9 +12,7 @@ import org.reactivestreams.Publisher
  *
  * This is responsible for setting padding and anything else relating to block layout.
  */
-interface ViewBlockInterface {
-    var blockViewModel: BlockViewModelInterface?
-}
+interface ViewBlockInterface: BindableView<BlockViewModelInterface>
 
 /**
  * The View-side equivalent to [LayoutPaddingDeflection].  This View-side parallel structure needs
@@ -147,12 +146,13 @@ interface BlockViewModelInterface : LayoutableViewModel {
     val events: Publisher<Event>
 }
 
-enum class Alignment {
-    Bottom,
-    Fill,
-    Center,
-    Top
-}
+// TODO: remove!
+//enum class Alignment {
+//    Bottom,
+//    Fill,
+//    Center,
+//    Top
+//}
 
 data class Insets(
     val top: Int,

@@ -5,6 +5,7 @@ import android.os.Build
 import io.rover.rover.core.logging.log
 import java.util.concurrent.Executor
 import java.util.concurrent.ForkJoinPool
+import java.util.concurrent.ForkJoinWorkerThread
 import java.util.concurrent.SynchronousQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -24,14 +25,12 @@ class IoMultiplexingExecutor {
          */
         @SuppressLint("NewApi")
         @JvmStatic
-        fun build(name: String): Executor {
+        fun build(executorName: String): Executor {
             val alwaysUseLegacyThreadPool = false
 
             val cpuCount = Runtime.getRuntime().availableProcessors()
 
             val useModernThreadPool = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !alwaysUseLegacyThreadPool
-
-            // log.v("Setting up ioExecutor Thread Pool for $name.  Number of CPU cores: $cpuCount. Using ${if(useModernThreadPool) "forkjoin" else "legacy"} executor.")
 
             return if (useModernThreadPool) {
                 // The below is equivalent to:
@@ -40,11 +39,16 @@ class IoMultiplexingExecutor {
                 // It's specifically meant for use in a ForkJoinTask work-stealing workload, but as a
                 // side-effect it also configures an Executor that does a fair job of enforcing a
                 // maximum thread pool size, which is difficult to do with the stock Executors due to an
-                // odd design decision by the Java design team a few decades ago:
+                // odd design decision by the Java team a few decades ago:
                 // https://github.com/kimchy/kimchy.github.com/blob/master/_posts/2008-11-23-juc-executorservice-gotcha.textile
                 ForkJoinPool(
                     cpuCount * 100,
-                    ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+                    ForkJoinPool.ForkJoinWorkerThreadFactory { pool ->
+                        ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool).apply {
+                            // include our executor name in the worker thread names.
+                            this.name = "Rover/IoMultiplexingExecutor($executorName)-${this.name}"
+                        }
+                    },
                     null, true)
             } else {
                 // we'll use an unbounded thread pool on Android versions older than 21.
