@@ -63,34 +63,6 @@ interface PushReceiverInterface {
     fun onTokenRefresh(token: String?)
 }
 
-//interface ActionRoutingBehaviourInterface {
-//    /**
-//     * Map a given action URI to the appropriate Rover behaviour.
-//     *
-//     * Should return an Intent for the given push notification action.
-//     */
-//    fun actionUriToIntent(action: URI): IntentAndBackstackRequest
-//
-//    /**
-//     * The mapped intent and whether the action explicitly requested that a backstack not be
-//     * synthesized.  Note that a backstack may be synthesized anyway depending on the context.
-//     *
-//     * The intent may be null, particularly if the synthesized backstack is all that the action
-//     * needs.
-//     */
-//    data class IntentAndBackstackRequest(
-//        val intent: Intent?,
-//        val noBackstack: Boolean
-//    )
-//
-//    /**
-//     * Determine if the given action is appropriate for opening directly in a currently open app.
-//     *
-//     * For example, "open app" deep links would be pointless if opened within the app.
-//     */
-//    fun isDirectOpenAppropriate(action: URI): Boolean
-//}
-
 interface NotificationOpenInterface {
     /**
      * A pending intent that will be used for the Android notification itself.
@@ -122,3 +94,17 @@ interface NotificationOpenInterface {
     fun intentForOpeningNotificationDirectly(notification: Notification): Intent?
 }
 
+interface InfluenceTrackerServiceInterface {
+    /**
+     * Start monitoring the application lifecycle for app opens, allowing the Influene Tracker
+     * to emit an Event when the app is opened soon after a push notification arrives.
+     */
+    fun startListening()
+
+    /**
+     * Let the influence tracker know that a notification has been received.
+     */
+    fun notifyNotificationReceived(
+        notification: Notification
+    )
+}

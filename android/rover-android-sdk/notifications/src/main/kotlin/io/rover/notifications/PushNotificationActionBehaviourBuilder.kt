@@ -39,6 +39,8 @@ class PushNotificationActionBehaviourBuilder(
 
     private val assetService: AssetService,
 
+    private val influenceTrackerService: InfluenceTrackerServiceInterface,
+
     /**
      * A small icon is necessary for Android push notifications.  Pass a resid.
      *
@@ -98,6 +100,9 @@ class PushNotificationActionBehaviourBuilder(
 
 
     private fun processNotification(notification: io.rover.notifications.domain.Notification): Publisher<Unit> {
+        // notify the influenced opens tracker that a notification is being executed.
+        influenceTrackerService.notifyNotificationReceived(notification)
+
         verifyChannelSetUp()
 
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -118,6 +118,10 @@ class CoreAssembler @JvmOverloads constructor(
             application
         }
 
+        container.register(Scope.Singleton, Application::class.java) { _ ->
+            application
+        }
+
         container.register(Scope.Singleton, ModulesTrackerInterface::class.java) { _ ->
             ModulesTracker()
         }

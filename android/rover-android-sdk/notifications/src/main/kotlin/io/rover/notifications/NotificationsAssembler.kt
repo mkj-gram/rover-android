@@ -1,5 +1,6 @@
 package io.rover.notifications
 
+import android.app.Application
 import android.content.Context
 import android.support.annotation.DrawableRes
 import io.rover.rover.core.assets.AssetService
@@ -133,6 +134,17 @@ class NotificationsAssembler @JvmOverloads constructor(
 
         container.register(
             Scope.Singleton,
+            InfluenceTrackerServiceInterface::class.java
+        ) { resolver ->
+            InfluenceTrackerService(
+                resolver.resolveSingletonOrFail(Application::class.java),
+                resolver.resolveSingletonOrFail(LocalStorage::class.java),
+                resolver.resolveSingletonOrFail(EventQueueServiceInterface::class.java)
+            )
+        }
+
+        container.register(
+            Scope.Singleton,
             PushReceiverInterface::class.java
         ) { resolver ->
             PushReceiver(
@@ -156,6 +168,7 @@ class NotificationsAssembler @JvmOverloads constructor(
                 resolver.resolveSingletonOrFail(NotificationsRepositoryInterface::class.java),
                 resolver.resolveSingletonOrFail(NotificationOpenInterface::class.java),
                 resolver.resolveSingletonOrFail(AssetService::class.java),
+                resolver.resolveSingletonOrFail(InfluenceTrackerServiceInterface::class.java),
                 smallIconResId,
                 smallIconDrawableLevel,
                 defaultChannelId
@@ -197,5 +210,7 @@ class NotificationsAssembler @JvmOverloads constructor(
         )
 
         resolver.resolveSingletonOrFail(NotificationsRepositoryInterface::class.java)
+
+        resolver.resolveSingletonOrFail(InfluenceTrackerServiceInterface::class.java).startListening()
     }
 }
