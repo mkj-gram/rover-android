@@ -44,7 +44,7 @@ class BackgroundViewModel(
                         // (but only on asset requests being emitted for view dimensions not for prefetch
                         // dimensions)
                         if(background.image != null) {
-                            timeout(100, TimeUnit.MILLISECONDS)
+                            timeout(50, TimeUnit.MILLISECONDS)
                                 .subscribe(
                                     {},
                                     { error ->

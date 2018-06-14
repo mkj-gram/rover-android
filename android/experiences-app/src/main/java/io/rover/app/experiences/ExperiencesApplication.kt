@@ -70,7 +70,7 @@ class ExperiencesApplication: Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         } else {
-            // TODO: Timber tree that reports to Crashlytics or whatnot
+            // TODO: Timber tree that reports to logs into Rover's own logger so the logs can be gathered by App Center crashes as seen above.
         }
 
         Rover.initialize(

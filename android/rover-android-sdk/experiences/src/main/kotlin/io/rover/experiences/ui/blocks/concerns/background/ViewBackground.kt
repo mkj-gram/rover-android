@@ -34,7 +34,11 @@ class ViewBackground(
             view.background = null
             view.setBackgroundColor(viewModel.backgroundColor)
 
-            binding.viewModel.backgroundUpdates.subscribe({ (bitmap, fadeIn, backgroundImageConfiguration) ->
+            binding
+                .viewModel
+                .backgroundUpdates
+                .androidLifecycleDispose(view)
+                .subscribe({ (bitmap, fadeIn, backgroundImageConfiguration) ->
                 // now construct/compose drawables for the given configuration and bitmap.
 
                 // note that this will only have an effect in tiled mode (which is exactly

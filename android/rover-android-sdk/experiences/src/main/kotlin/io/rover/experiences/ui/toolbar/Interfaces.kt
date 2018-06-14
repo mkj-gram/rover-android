@@ -3,10 +3,6 @@ package io.rover.experiences.ui.toolbar
 import android.support.v7.widget.Toolbar
 import org.reactivestreams.Publisher
 
-interface ViewExperienceAppBarInterface {
-    var experienceAppBarViewModel: ExperienceAppBarViewModelInterface?
-}
-
 interface ViewExperienceToolbarInterface {
     /**
      * Set the toolbar view model.  However, uncharacteristically of the other bindable view mixins,
@@ -18,14 +14,6 @@ interface ViewExperienceToolbarInterface {
     fun setViewModelAndReturnToolbar(
         toolbarViewModel: ExperienceToolbarViewModelInterface
     ): Toolbar
-}
-
-interface ExperienceAppBarViewModelInterface {
-    val events: Publisher<Event>
-
-    class Event(
-        val appBarConfiguration: ToolbarConfiguration
-    )
 }
 
 interface ExperienceToolbarViewModelInterface {

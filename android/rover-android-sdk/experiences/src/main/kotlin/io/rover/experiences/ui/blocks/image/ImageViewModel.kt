@@ -47,7 +47,7 @@ class ImageViewModel(
                     .share()
                     .apply {
                         if (image != null) {
-                            timeout(100, TimeUnit.MILLISECONDS)
+                            timeout(50, TimeUnit.MILLISECONDS)
                                 .subscribe(
                                     { },
                                     { error ->

@@ -1023,6 +1023,15 @@ fun <T> Publisher<T>.timeout(interval: Long, unit: TimeUnit): Publisher<T> {
                     }
 
                     override fun onSubscribe(subscription: Subscription) {
+                        val handler = Handler(Looper.getMainLooper())
+                        val timeoutHandler = {
+                            if(stillWaiting) {
+                                // timeout has run out!
+                                onError(Throwable("$interval ${unit.name.toLowerCase()} timeout has expired."))
+                                subscription.cancel()
+                            }
+                        }
+
                         val clientSubscription = object : Subscription {
                             override fun cancel() {
 
@@ -1031,6 +1040,8 @@ fun <T> Publisher<T>.timeout(interval: Long, unit: TimeUnit): Publisher<T> {
 
                                 // cancel the timer:
                                 stillWaiting = false
+
+                                handler.removeCallbacks(timeoutHandler)
                             }
 
                             override fun request(n: Long) {
@@ -1038,15 +1049,9 @@ fun <T> Publisher<T>.timeout(interval: Long, unit: TimeUnit): Publisher<T> {
 
                                 if(requested) return
                                 requested = true
-                                val handler = Handler(Looper.getMainLooper())
 
-                                handler.postDelayed({
-                                    if(stillWaiting) {
-                                        // timeout has run out!
-                                        onError(Throwable("$interval ${unit.name.toLowerCase()} timeout has expired."))
-                                        subscription.cancel()
-                                    }
-                                }, unit.toMillis(interval))
+
+                                handler.postDelayed(timeoutHandler, unit.toMillis(interval))
                             }
                         }
 

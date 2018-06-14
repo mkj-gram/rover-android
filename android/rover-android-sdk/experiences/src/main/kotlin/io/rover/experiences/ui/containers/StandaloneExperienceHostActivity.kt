@@ -144,7 +144,8 @@ open class StandaloneExperienceHostActivity : AppCompatActivity() {
             experiencesView
         )
 
-        // wire up the toolbar host to the ExperienceView.
+        // wire up the toolbar host to the ExperienceView.  Note that the activity will be leaked
+        // unless you remember to set it back to null in onDestroy().
         experiencesView.toolbarHost = toolbarHost
 
         // obtain any possibly saved state for the experience view model.  See
@@ -171,6 +172,13 @@ open class StandaloneExperienceHostActivity : AppCompatActivity() {
                 "Please pass either one of CAMPAIGN_ID/EXPERIENCE_ID or EXPERIENCE_URL. Consider using StandaloneExperienceHostActivity.makeIntent()"
             )
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // TODO: this is liable to be forgotten by implementers making their own activity. If
+        // forgotten, the activity will be leaked.
+        experiencesView.toolbarHost = null
     }
 
     private fun experienceViewModel(experienceRequest: ExperienceViewModel.ExperienceRequest, icicle: Parcelable?): ExperienceViewModelInterface {
