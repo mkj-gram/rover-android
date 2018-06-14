@@ -6,6 +6,7 @@ import {
 } from 'graphql'
 
 import Notification from './Notification'
+import URL from './URL'
 
 const Action = new GraphQLUnionType({
     name: 'Action',
@@ -48,7 +49,7 @@ export const OpenURLAction = new GraphQLObjectType({
     name: 'OpenURLAction',
     fields: () => ({
         url: {
-            type: new GraphQLNonNull(GraphQLString)
+            type: new GraphQLNonNull(URL)
         }
     })
 })
@@ -77,7 +78,7 @@ export const PresentWebsiteAction = new GraphQLObjectType({
     name: 'PresentWebsiteAction',
     fields: () => ({
         url: {
-            type: new GraphQLNonNull(GraphQLString)
+            type: new GraphQLNonNull(URL)
         }
     })
 })

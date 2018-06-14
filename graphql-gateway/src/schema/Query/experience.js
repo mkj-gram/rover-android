@@ -356,6 +356,13 @@ const normalizeBlock = data => {
 
         const url = data['url']
         if (typeof url === 'string') {
+            try {
+                // Throws an error if `url` is not a valid URL
+                new URL(url)
+            } catch(err) {
+                return null
+            }
+
             return {
                 __typename: 'OpenURLAction',
                 url
