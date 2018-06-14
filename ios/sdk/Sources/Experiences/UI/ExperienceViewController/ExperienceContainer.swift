@@ -29,7 +29,7 @@ open class ExperienceContainer: UIViewController {
         let cancelButton = UIButton(type: .custom)
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.setTitle("Cancel", for: .normal)
-        cancelButton.setTitleColor(UIColor.blue, for: .normal)
+        cancelButton.setTitleColor(UIColor.darkText, for: .normal)
         cancelButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
         return cancelButton
     }()
@@ -109,11 +109,35 @@ open class ExperienceContainer: UIViewController {
         }
     }
     
+    var cancelButtonTimer: Timer?
+    
+    open func showCancelButton() {
+        if let timer = cancelButtonTimer {
+            timer.invalidate()
+        }
+        
+        cancelButton.isHidden = true
+        cancelButtonTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(3), repeats: false) { [weak self] _ in
+            self?.cancelButtonTimer = nil
+            self?.cancelButton.isHidden = false
+        }
+    }
+    
+    open func hideCancelButton() {
+        if let timer = cancelButtonTimer {
+            timer.invalidate()
+        }
+        
+        cancelButton.isHidden = true
+    }
+    
     open func startLoading() {
+        showCancelButton()
         activityIndicator.startAnimating()
     }
     
     open func stopLoading() {
+        hideCancelButton()
         activityIndicator.stopAnimating()
     }
     
