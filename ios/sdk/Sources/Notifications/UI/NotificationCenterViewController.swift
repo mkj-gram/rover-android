@@ -101,6 +101,9 @@ open class NotificationCenterViewController: UIViewController {
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         sessionController.startTracking()
+        
+        // Clear badge number any time the notification center is viewed, regardless of the number of unread messages
+        UIApplication.shared.applicationIconBadgeNumber = 0
     }
     
     override open func viewWillDisappear(_ animated: Bool) {

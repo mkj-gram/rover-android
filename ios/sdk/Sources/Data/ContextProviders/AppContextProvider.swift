@@ -59,7 +59,7 @@ class AppContextProvider: ContextProvider {
         return bundleIdentifier
     }()
     
-    var badgeNumber: Int? = {
+    var badgeNumber: Int? {
         if Thread.isMainThread {
             return UIApplication.shared.applicationIconBadgeNumber
         } else {
@@ -67,7 +67,7 @@ class AppContextProvider: ContextProvider {
                 return UIApplication.shared.applicationIconBadgeNumber
             }
         }
-    }()
+    }
     
     init(bundle: Bundle, logger: Logger) {
         self.bundle = bundle
