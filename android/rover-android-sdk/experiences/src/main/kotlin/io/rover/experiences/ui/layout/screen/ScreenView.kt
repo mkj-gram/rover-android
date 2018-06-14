@@ -77,7 +77,8 @@ class ScreenView : RecyclerView, BindableView<ScreenViewModelInterface> {
             // and then setup the adapter itself.
             adapter = blockAndRowAdapter
 
-            // and then iterate through all of the viewmodels that respond to
+            // and then iterate through all of the viewmodels that respond to PrefetchAfterMeasure
+            // and induce them to greedily start fetching their needed assets.
             layout
                 .coordinatesAndViewModels
                 .filter { it.viewModel is PrefetchAfterMeasure }

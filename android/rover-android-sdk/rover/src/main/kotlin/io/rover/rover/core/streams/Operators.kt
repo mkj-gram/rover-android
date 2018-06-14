@@ -229,12 +229,12 @@ object PublisherOperators {
                                 override fun onNext(item: T) {
                                     if (!cancelled) {
                                         latest[index] = item
-                                        // if we have a value for all the soures, combiner and then
-                                        // emit!
+                                        // if we have a value for all the sources, run combiner and
+                                        // then emit!
                                         if(latest.count() == sources.count()) {
                                             subscriber.onNext(
                                                 combiner(
-                                                    latest.values.toList()
+                                                    latest.keys.sorted().map { latest[it]!! }
                                                 )
                                             )
                                         }
